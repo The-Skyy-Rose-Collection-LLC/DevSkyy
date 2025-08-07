@@ -7,3 +7,4 @@ An AI-powered, auto-fixing, self-healing dev agent for The Skyy Rose Collection.
 - Optimizes Divi layout blocks
 - Auto-commits fixes to GitHub
 
+![DevSkyy AI Status](https://img.shields.io/badge/DevAgent-running-brightgreen?style=flat-square&logo=github)
