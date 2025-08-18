@@ -4,3 +4,10 @@ fastapi
 uvicorn
 fastapi
 uvicorn
+pydantic
+fastapi
+pydantic
+uvicorn
+fastapi
+pydantic
+uvicorn
