@@ -1,2 +1,6 @@
 requests
 PyGithub
+fastapi
+uvicorn
+fastapi
+uvicorn
