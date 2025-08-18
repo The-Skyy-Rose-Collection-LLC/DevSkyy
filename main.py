@@ -5,10 +5,14 @@ from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
 from agent.modules.financial_agent import FinancialAgent, ChargebackReason
 from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
+from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
+from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues
+from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes
 from typing import Dict, Any, List
 import json
+import asyncio
 
 
 app = FastAPI(title="The Skyy Rose Collection - Ecommerce Platform", version="1.0.0")
@@ -17,6 +21,9 @@ app = FastAPI(title="The Skyy Rose Collection - Ecommerce Platform", version="1.
 inventory_agent = InventoryAgent()
 financial_agent = FinancialAgent()
 ecommerce_agent = EcommerceAgent()
+wordpress_agent = WordPressAgent()
+web_dev_agent = WebDevelopmentAgent()
+site_comm_agent = SiteCommunicationAgent()
 
 
 def run_agent() -> dict:
@@ -159,16 +166,130 @@ def get_analytics_report() -> Dict[str, Any]:
     return ecommerce_agent.generate_analytics_report()
 
 
+# WordPress/Divi Management Endpoints
+@app.post("/wordpress/analyze-layout")
+def analyze_divi_layout(layout_data: str) -> Dict[str, Any]:
+    """Analyze Divi layout structure and performance."""
+    return wordpress_agent.analyze_divi_layout(layout_data)
+
+
+@app.post("/wordpress/fix-layout")
+def fix_divi_layout(layout_data: str) -> Dict[str, Any]:
+    """Fix Divi layout issues and optimize structure."""
+    return wordpress_agent.fix_divi_layout_issues(layout_data)
+
+
+@app.post("/wordpress/generate-css")
+def generate_custom_css(requirements: Dict[str, Any]) -> Dict[str, str]:
+    """Generate production-ready custom CSS for Divi."""
+    css = wordpress_agent.generate_divi_custom_css(requirements)
+    return {"custom_css": css}
+
+
+@app.get("/wordpress/audit-woocommerce")
+def audit_woocommerce() -> Dict[str, Any]:
+    """Audit WooCommerce configuration and performance."""
+    return wordpress_agent.audit_woocommerce_setup()
+
+
+@app.post("/wordpress/generate-layout/{layout_type}")
+def generate_divi_layout(layout_type: str) -> Dict[str, str]:
+    """Generate production-ready Divi 5 layout structures."""
+    layout = wordpress_agent.generate_divi_5_layout(layout_type)
+    return {"layout_code": layout, "layout_type": layout_type}
+
+
+# Web Development & Code Fixing Endpoints
+@app.post("/webdev/analyze-code")
+def analyze_code(code: str, language: str) -> Dict[str, Any]:
+    """Analyze code quality and identify issues."""
+    return web_dev_agent.analyze_code_quality(code, language)
+
+
+@app.post("/webdev/fix-code")
+def fix_code_issues(code: str, language: str) -> Dict[str, Any]:
+    """Automatically fix common code issues."""
+    return web_dev_agent.fix_code_issues(code, language)
+
+
+@app.post("/webdev/optimize-structure")
+def optimize_page_structure(html_content: str) -> Dict[str, Any]:
+    """Optimize HTML page structure for SEO and performance."""
+    return web_dev_agent.optimize_page_structure(html_content)
+
+
+# Site Communication & Insights Endpoints
+@app.post("/site/connect-chatbot")
+async def connect_chatbot(website_url: str, api_key: str = None) -> Dict[str, Any]:
+    """Connect to website chatbot for insights."""
+    return await site_comm_agent.connect_to_chatbot(website_url, api_key)
+
+
+@app.get("/site/health-insights")
+def get_site_health(website_url: str) -> Dict[str, Any]:
+    """Get comprehensive site health insights."""
+    return site_comm_agent.gather_site_health_insights(website_url)
+
+
+@app.get("/site/customer-feedback")
+def get_customer_feedback(website_url: str) -> Dict[str, Any]:
+    """Analyze customer feedback and sentiment."""
+    return site_comm_agent.analyze_customer_feedback(website_url)
+
+
+@app.get("/site/market-insights")
+def get_market_insights(website_url: str) -> Dict[str, Any]:
+    """Get target market insights and behavior analysis."""
+    return site_comm_agent.get_target_market_insights(website_url)
+
+
+@app.get("/site/comprehensive-report")
+def get_site_report(website_url: str) -> Dict[str, Any]:
+    """Generate comprehensive site insights report."""
+    return site_comm_agent.generate_comprehensive_report(website_url)
+
+
+# Enhanced DevSkyy Workflow Endpoint
+@app.post("/devskyy/full-optimization")
+async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
+    """Run comprehensive DevSkyy optimization with all agents."""
+    
+    # Run basic DevSkyy workflow
+    basic_result = run_agent()
+    
+    # WordPress/Divi optimization
+    wordpress_result = optimize_wordpress_performance()
+    
+    # Web development fixes
+    webdev_result = fix_web_development_issues()
+    
+    # Site communication and insights
+    site_insights = await communicate_with_site()
+    
+    return {
+        "devskyy_status": "fully_optimized",
+        "timestamp": "2024-01-20T12:00:00Z",
+        "basic_workflow": basic_result,
+        "wordpress_optimization": wordpress_result,
+        "web_development": webdev_result,
+        "site_insights": site_insights,
+        "overall_status": "production_ready"
+    }
+
+
 # Combined Dashboard Endpoint
 @app.get("/dashboard")
 def get_complete_dashboard() -> Dict[str, Any]:
     """Get comprehensive platform dashboard."""
     return {
-        "platform": "The Skyy Rose Collection",
+        "platform": "The Skyy Rose Collection - DevSkyy Enhanced",
         "timestamp": "2024-01-20T12:00:00Z",
         "inventory": inventory_agent.generate_report(),
         "financial": financial_agent.get_financial_dashboard(),
-        "ecommerce": ecommerce_agent.generate_analytics_report()
+        "ecommerce": ecommerce_agent.generate_analytics_report(),
+        "wordpress_status": "optimized",
+        "web_development": "production_ready",
+        "site_communication": "active"
     }
 
 

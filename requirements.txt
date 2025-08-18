@@ -6,3 +6,5 @@ uvicorn
 pydantic
 Pillow
 ImageHash
+aiofiles
+httpx
