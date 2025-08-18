@@ -1,11 +1,13 @@
-import runpy
+import importlib
 import sys
 import types
+from pathlib import Path
 from unittest.mock import patch
 
+from fastapi.testclient import TestClient
 
-def test_main_calls_functions_in_sequence():
-    # Create dummy modules to satisfy imports in main.py
+
+def test_run_endpoint_calls_functions_in_sequence():
     modules = {
         "agent": types.ModuleType("agent"),
         "agent.modules": types.ModuleType("agent.modules"),
@@ -16,6 +18,7 @@ def test_main_calls_functions_in_sequence():
         "agent.git_commit": types.ModuleType("agent.git_commit"),
     }
     sys.modules.update(modules)
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
     call_order = []
 
@@ -37,10 +40,15 @@ def test_main_calls_functions_in_sequence():
          patch("agent.modules.fixer.fix_code", side_effect=fix_side_effect, create=True) as mock_fix, \
          patch("agent.git_commit.commit_fixes", side_effect=commit_side_effect, create=True) as mock_commit, \
          patch("agent.scheduler.cron.schedule_hourly_job", side_effect=schedule_side_effect, create=True) as mock_schedule:
-        runpy.run_module("main", run_name="__main__")
+        main = importlib.import_module("main")
+        importlib.reload(main)
+        client = TestClient(main.app)
+        response = client.post("/run")
 
+    assert response.json() == {"status": "completed"}
     assert call_order == ["scan", "fix", "commit", "schedule"]
     mock_scan.assert_called_once_with()
     mock_fix.assert_called_once_with("raw")
     mock_commit.assert_called_once_with("fixed")
     mock_schedule.assert_called_once_with()
+
