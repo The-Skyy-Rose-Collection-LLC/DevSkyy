@@ -8,3 +8,5 @@ Pillow
 ImageHash
 aiofiles
 httpx
+schedule
+schedule
