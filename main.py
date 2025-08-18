@@ -966,7 +966,7 @@ async def push_to_github():
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")")
 
 # Start enhanced learning system on import
 try:
