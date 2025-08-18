@@ -2,9 +2,15 @@
 import asyncio
 from datetime import datetime, timedelta
 from typing import Dict, Any
-import schedule
 import time
 import threading
+
+try:
+    import schedule
+    SCHEDULE_AVAILABLE = True
+except ImportError:
+    SCHEDULE_AVAILABLE = False
+    print("⚠️  Schedule module not available, using basic threading scheduler")
 
 
 class EnhancedLearningScheduler:
@@ -24,35 +30,41 @@ class EnhancedLearningScheduler:
     def start_continuous_learning(self):
         """Start all continuous learning processes."""
         
-        # Schedule brand intelligence updates
-        schedule.every(self.learning_intervals["brand_analysis"]).hours.do(
-            self._run_brand_analysis
-        )
-        
-        # Schedule product monitoring
-        schedule.every(self.learning_intervals["product_monitoring"]).hours.do(
-            self._monitor_products
-        )
-        
-        # Schedule market trend analysis
-        schedule.every(self.learning_intervals["market_trends"]).hours.do(
-            self._analyze_market_trends
-        )
-        
-        # Schedule customer feedback analysis
-        schedule.every(self.learning_intervals["customer_feedback"]).minutes.do(
-            self._analyze_customer_feedback
-        )
-        
-        # Schedule website change monitoring
-        schedule.every(self.learning_intervals["website_changes"]).minutes.do(
-            self._monitor_website_changes
-        )
-        
-        # Start scheduler in background thread
-        scheduler_thread = threading.Thread(target=self._run_scheduler)
-        scheduler_thread.daemon = True
-        scheduler_thread.start()
+        if SCHEDULE_AVAILABLE:
+            # Schedule brand intelligence updates
+            schedule.every(self.learning_intervals["brand_analysis"]).hours.do(
+                self._run_brand_analysis
+            )
+            
+            # Schedule product monitoring
+            schedule.every(self.learning_intervals["product_monitoring"]).hours.do(
+                self._monitor_products
+            )
+            
+            # Schedule market trend analysis
+            schedule.every(self.learning_intervals["market_trends"]).hours.do(
+                self._analyze_market_trends
+            )
+            
+            # Schedule customer feedback analysis
+            schedule.every(self.learning_intervals["customer_feedback"]).minutes.do(
+                self._analyze_customer_feedback
+            )
+            
+            # Schedule website change monitoring
+            schedule.every(self.learning_intervals["website_changes"]).minutes.do(
+                self._monitor_website_changes
+            )
+            
+            # Start scheduler in background thread
+            scheduler_thread = threading.Thread(target=self._run_scheduler)
+            scheduler_thread.daemon = True
+            scheduler_thread.start()
+        else:
+            # Use basic threading scheduler as fallback
+            scheduler_thread = threading.Thread(target=self._run_basic_scheduler)
+            scheduler_thread.daemon = True
+            scheduler_thread.start()
         
         print("🌟 DevSkyy Enhanced Learning System Started")
         print("📚 Brand Intelligence: ACTIVE")
@@ -62,8 +74,30 @@ class EnhancedLearningScheduler:
     def _run_scheduler(self):
         """Run the scheduler in background."""
         while self.learning_active:
-            schedule.run_pending()
+            if SCHEDULE_AVAILABLE:
+                schedule.run_pending()
             time.sleep(30)  # Check every 30 seconds
+    
+    def _run_basic_scheduler(self):
+        """Basic fallback scheduler using threading timers."""
+        print("🔄 Using basic threading scheduler")
+        
+        # Start initial tasks
+        self._run_brand_analysis()
+        
+        # Schedule recurring tasks with threading timers
+        def schedule_recurring(func, interval_minutes):
+            func()
+            if self.learning_active:
+                timer = threading.Timer(interval_minutes * 60, lambda: schedule_recurring(func, interval_minutes))
+                timer.daemon = True
+                timer.start()
+        
+        # Schedule all tasks
+        schedule_recurring(self._monitor_products, 60)  # 1 hour
+        schedule_recurring(self._analyze_market_trends, 240)  # 4 hours
+        schedule_recurring(self._analyze_customer_feedback, 30)  # 30 minutes
+        schedule_recurring(self._monitor_website_changes, 15)  # 15 minutes
     
     def _run_brand_analysis(self):
         """Execute comprehensive brand analysis."""
@@ -133,7 +167,8 @@ class EnhancedLearningScheduler:
     def stop_learning(self):
         """Stop continuous learning processes."""
         self.learning_active = False
-        schedule.clear()
+        if SCHEDULE_AVAILABLE:
+            schedule.clear()
         print("🛑 Enhanced Learning System Stopped")
 
 
