@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
@@ -11,11 +10,11 @@ from agent.modules.site_communication_agent import SiteCommunicationAgent, commu
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
 from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
 from agent.scheduler.cron import schedule_hourly_job
-from agent.git_commit import commit_fixes
+from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
 import json
 import asyncio
-
+from datetime import datetime # Imported datetime
 
 app = FastAPI(title="The Skyy Rose Collection - DevSkyy Enhanced Platform", version="2.0.0")
 
@@ -33,7 +32,7 @@ site_comm_agent = SiteCommunicationAgent()
 # Inject brand intelligence into all agents
 for agent_name, agent in [
     ("inventory", inventory_agent),
-    ("financial", financial_agent), 
+    ("financial", financial_agent),
     ("ecommerce", ecommerce_agent),
     ("wordpress", wordpress_agent),
     ("web_development", web_dev_agent),
@@ -72,7 +71,7 @@ def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
     assets = inventory_agent.scan_assets()
     duplicates = inventory_agent.find_duplicates()
-    
+
     return {
         "total_assets": len(assets),
         "duplicate_groups": len(duplicates),
@@ -91,7 +90,7 @@ def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
     """Remove duplicate assets."""
     if keep_strategy not in ["latest", "largest", "first"]:
         raise HTTPException(status_code=400, detail="Invalid keep_strategy")
-    
+
     result = inventory_agent.remove_duplicates(keep_strategy)
     return result
 
@@ -105,7 +104,7 @@ def visualize_similarities() -> Dict[str, str]:
 
 # Financial Management Endpoints
 @app.post("/payments/process")
-def process_payment(amount: float, currency: str, customer_id: str, 
+def process_payment(amount: float, currency: str, customer_id: str,
                    product_id: str, payment_method: str, gateway: str = "stripe") -> Dict[str, Any]:
     """Process a payment transaction."""
     return financial_agent.process_payment(
@@ -120,7 +119,7 @@ def create_chargeback(transaction_id: str, reason: str, amount: float = None) ->
         chargeback_reason = ChargebackReason(reason.lower())
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid chargeback reason")
-    
+
     return financial_agent.create_chargeback(transaction_id, chargeback_reason, amount)
 
 
@@ -138,7 +137,7 @@ def get_financial_dashboard() -> Dict[str, Any]:
 
 # Ecommerce Management Endpoints
 @app.post("/products/add")
-def add_product(name: str, category: str, price: float, cost: float, 
+def add_product(name: str, category: str, price: float, cost: float,
                stock_quantity: int, sku: str, sizes: List[str], colors: List[str],
                description: str, images: List[str] = None, tags: List[str] = None) -> Dict[str, Any]:
     """Add a new product to the catalog."""
@@ -146,9 +145,9 @@ def add_product(name: str, category: str, price: float, cost: float,
         product_category = ProductCategory(category.lower())
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid product category")
-    
+
     return ecommerce_agent.add_product(
-        name, product_category, price, cost, stock_quantity, sku, 
+        name, product_category, price, cost, stock_quantity, sku,
         sizes, colors, description, images, tags
     )
 
@@ -160,14 +159,14 @@ def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
 
 
 @app.post("/customers/create")
-def create_customer(email: str, first_name: str, last_name: str, 
+def create_customer(email: str, first_name: str, last_name: str,
                    phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
     return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
 
 
 @app.post("/orders/create")
-def create_order(customer_id: str, items: List[Dict[str, Any]], 
+def create_order(customer_id: str, items: List[Dict[str, Any]],
                 shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
     """Create a new order."""
     return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
@@ -272,33 +271,33 @@ def get_site_report(website_url: str) -> Dict[str, Any]:
 @app.post("/devskyy/full-optimization")
 async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
     """Run comprehensive DevSkyy optimization with brand-aware agents."""
-    
+
     # Execute brand learning cycle first
     brand_learning = await brand_intelligence.continuous_learning_cycle()
-    
+
     # Update all agents with latest brand context
     for agent_name, agent in [
         ("inventory", inventory_agent),
-        ("financial", financial_agent), 
+        ("financial", financial_agent),
         ("ecommerce", ecommerce_agent),
         ("wordpress", wordpress_agent),
         ("web_development", web_dev_agent),
         ("site_communication", site_comm_agent)
     ]:
         agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
-    
+
     # Run basic DevSkyy workflow
     basic_result = run_agent()
-    
+
     # WordPress/Divi optimization with brand awareness
     wordpress_result = optimize_wordpress_performance()
-    
+
     # Web development fixes with brand context
     webdev_result = fix_web_development_issues()
-    
+
     # Site communication and insights
     site_insights = await communicate_with_site()
-    
+
     return {
         "devskyy_status": "fully_optimized_with_brand_intelligence",
         "timestamp": datetime.now().isoformat(),
@@ -344,21 +343,36 @@ def get_brand_evolution() -> Dict[str, Any]:
 
 # Enhanced Combined Dashboard Endpoint
 @app.get("/dashboard")
-def get_complete_dashboard() -> Dict[str, Any]:
-    """Get comprehensive platform dashboard with brand intelligence."""
-    return {
-        "platform": "The Skyy Rose Collection - DevSkyy Enhanced",
-        "timestamp": datetime.now().isoformat(),
-        "brand_intelligence": brand_intelligence.analyze_brand_assets(),
-        "inventory": inventory_agent.generate_report() if hasattr(inventory_agent, 'generate_report') else {"status": "active"},
-        "financial": financial_agent.get_financial_dashboard(),
-        "ecommerce": ecommerce_agent.generate_analytics_report() if hasattr(ecommerce_agent, 'generate_analytics_report') else {"status": "active"},
-        "wordpress_status": "optimized_with_brand_context",
-        "web_development": "production_ready_with_brand_awareness",
-        "site_communication": "active_with_brand_intelligence",
-        "continuous_learning": "active"
-    }
+async def get_dashboard():
+    """Get comprehensive business dashboard."""
+    try:
+        # Get metrics from all agents
+        inventory_metrics = inventory_agent.get_metrics()
+        financial_metrics = financial_agent.get_financial_overview()
+        ecommerce_metrics = ecommerce_agent.get_analytics_dashboard()
 
+        return {
+            "platform_status": "OPERATIONAL",
+            "inventory": inventory_metrics,
+            "financial": financial_metrics,
+            "ecommerce": ecommerce_metrics,
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/github/push")
+async def push_to_github():
+    """Push all current changes to GitHub repository."""
+    try:
+        commit_all_changes()
+        return {
+            "status": "success",
+            "message": "All changes pushed to GitHub",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
 
 # Start enhanced learning system on import
 enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)
@@ -378,6 +392,6 @@ if __name__ == "__main__":
     import uvicorn
     print("🚀 Starting DevSkyy Enhanced - The Future of AI Agents")
     print("🌟 Brand Intelligence: MAXIMUM")
-    print("📚 Continuous Learning: ACTIVE") 
+    print("📚 Continuous Learning: ACTIVE")
     print("⚡ Setting the Bar for AI Agents")
     uvicorn.run(app, host="0.0.0.0", port=8000)
