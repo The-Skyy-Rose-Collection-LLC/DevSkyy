@@ -23,7 +23,51 @@ mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = '''python -c "from main import monitor_wordpress_continuously, monitor_web_development_continuously, manage_avatar_chatbot_continuously; import time; import json; exec('while True:\n    wp_status = monitor_wordpress_continuously()\n    dev_status = monitor_web_development_continuously()\n    chatbot_status = manage_avatar_chatbot_continuously()\n    print(f\"WordPress: {wp_status[\\\"overall_status\\\"]} | Development: {dev_status[\\\"development_status\\\"]} | Chatbot: {chatbot_status[\\\"chatbot_status\\\"]}\")\n    time.sleep(300)')"'''
+args = "python -c \""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "from main import monitor_wordpress_continuously, monitor_web_development_continuously, manage_avatar_chatbot_continuously"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "import time"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "import json"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = ""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "while True: "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    wp_status = monitor_wordpress_continuously()"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    dev_status = monitor_web_development_continuously() "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    chatbot_status = manage_avatar_chatbot_continuously()"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''    print(f'WordPress: {wp_status[\"overall_status\"]} | Development: {dev_status[\"development_status\"]} | Chatbot: {chatbot_status[\"chatbot_status\"]}')'''
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    time.sleep(300)"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "\""
 
 [[ports]]
 localPort = 8000
