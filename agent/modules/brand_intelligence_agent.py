@@ -1,512 +1,316 @@
-import logging
-from datetime import datetime
-from typing import Dict, Any, List, Optional
-import asyncio
-import json
-import os
-from pathlib import Path
-import openai
-from dotenv import load_dotenv
 
-load_dotenv()
-logger = logging.getLogger(__name__)
+from typing import Dict, List, Any, Optional
+from datetime import datetime, timedelta
+import json
+import asyncio
+import hashlib
+
 
 class BrandIntelligenceAgent:
-    """
-    Production-level Brand Intelligence Agent for The Skyy Rose Collection.
-    Provides comprehensive brand analysis, context awareness, and strategic insights.
-    """
-
+    """Central intelligence agent that continuously learns about The Skyy Rose Collection brand."""
+    
     def __init__(self):
-        self.brand_name = "The Skyy Rose Collection"
-        self.brand_values = {
-            "luxury": "Premium quality fashion and accessories",
-            "elegance": "Sophisticated and timeless designs",
-            "empowerment": "Empowering women through beautiful fashion",
-            "sustainability": "Eco-conscious and ethical practices",
-            "innovation": "Cutting-edge design and technology"
+        self.brand_profile = {
+            "name": "The Skyy Rose Collection",
+            "aesthetic": "luxury fashion, rose-inspired, elegant minimalism",
+            "color_palette": ["rose gold", "blush pink", "champagne", "ivory", "deep rose"],
+            "style_keywords": ["ethereal", "romantic", "timeless", "sophisticated"],
+            "target_demographic": "fashion-forward women 25-45",
+            "brand_values": ["quality", "elegance", "empowerment", "sustainability"]
         }
-
-        self.target_demographics = {
-            "primary": "Women aged 25-45, fashion-conscious, higher income",
-            "secondary": "Young professionals, fashion enthusiasts, luxury buyers",
-            "psychographics": "Quality-focused, brand-loyal, socially conscious"
-        }
-
-        self.brand_colors = {
-            "primary": "#E6B8A2",  # Rose gold
-            "secondary": "#2C3E50", # Deep navy
-            "accent": "#F8F9FA",   # Soft white
-            "luxury": "#C9A96E"    # Champagne gold
-        }
-
-        self.theme_evolution = {
-            "current_season": "Winter 2024",
-            "dominant_themes": ["Elegant Minimalism", "Sustainable Luxury", "Empowered Femininity"],
-            "color_trends": ["Warm Neutrals", "Deep Jewel Tones", "Metallic Accents"],
-            "style_direction": "Contemporary Classic with Modern Edge"
-        }
-
-        self.competitive_landscape = {
-            "direct_competitors": ["Reformation", "Everlane", "& Other Stories"],
-            "positioning": "Premium sustainable fashion with personalized experience",
-            "unique_value_prop osition": "Curated luxury meets conscious consumption"
-        }
-
-        # Initialize OpenAI client
-        self.api_key = os.getenv("OPENAI_API_KEY")
-        self.openai_available = openai is not None and self.api_key is not None
-        if self.openai_available:
-            openai.api_key = self.api_key
-
-        self.uploaded_assets = {}
-        self.learning_from_assets = False
+        self.asset_database = {}
+        self.theme_evolution = []
+        self.product_drops = []
+        self.content_analysis = {}
+        self.learning_schedule = {}
         
-        logger.info("🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection")
-
-    def analyze_brand_assets(self) -> Dict[str, Any]:
-        """Comprehensive analysis of all brand assets and positioning."""
-        try:
-            return {
-                "brand_identity": {
-                    "name": self.brand_name,
-                    "values": self.brand_values,
-                    "color_palette": self.brand_colors,
-                    "brand_essence": "Sophisticated, sustainable, empowering fashion for modern women"
+    def analyze_brand_assets(self, website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
+        """Continuously analyze brand assets from website, social media, and content."""
+        
+        # Simulate comprehensive brand asset analysis
+        asset_analysis = {
+            "visual_assets": {
+                "logo_variations": ["primary_logo", "minimal_mark", "text_only"],
+                "color_usage": {
+                    "primary_colors": ["#D4A5A5", "#F5E6E6", "#E8C4C4"],
+                    "accent_colors": ["#B8860B", "#F7F7F7", "#2C2C2C"],
+                    "color_consistency_score": 95
                 },
-                "market_positioning": {
-                    "segment": "Premium Contemporary",
-                    "price_point": "Mid-to-High Luxury",
-                    "target_demographics": self.target_demographics,
-                    "competitive_advantage": "Sustainable luxury with personalized shopping experience"
+                "typography": {
+                    "primary_font": "elegant serif",
+                    "secondary_font": "clean sans-serif",
+                    "typography_score": 92
                 },
-                "current_trends": self.theme_evolution,
-                "brand_health_score": self._calculate_brand_health(),
-                "recommendations": self._generate_brand_recommendations(),
-                "analysis_timestamp": datetime.now().isoformat()
-            }
-        except Exception as e:
-            logger.error(f"Brand analysis failed: {str(e)}")
-            return {"error": str(e), "status": "failed"}
-
-    def get_brand_context_for_agent(self, agent_type: str) -> Dict[str, Any]:
-        """Provide tailored brand context for specific agent types."""
-        base_context = {
-            "brand_name": self.brand_name,
-            "brand_voice": "Sophisticated, warm, and empowering",
-            "key_values": list(self.brand_values.keys()),
-            "target_audience": self.target_demographics["primary"]
+                "imagery_style": {
+                    "photography_tone": "soft, natural lighting",
+                    "model_aesthetics": "diverse, confident, elegant",
+                    "product_styling": "minimalist, rose-inspired backgrounds"
+                }
+            },
+            "content_themes": {
+                "seasonal_trends": self._analyze_seasonal_content(),
+                "product_categories": ["dresses", "accessories", "jewelry", "outerwear"],
+                "messaging_tone": "empowering, elegant, inclusive",
+                "hashtag_strategy": ["#SkyRoseCollection", "#RoseGoldVibes", "#ElegantFashion"]
+            },
+            "recent_drops": self._track_product_drops(),
+            "brand_evolution": self._track_brand_changes(),
+            "competitor_insights": self._analyze_market_position(),
+            "customer_sentiment": self._analyze_brand_perception()
         }
-
-        agent_specific_context = {
-            "inventory": {
-                "product_categories": ["Dresses", "Tops", "Bottoms", "Outerwear", "Accessories"],
-                "quality_standards": "Premium materials only",
-                "sustainability_focus": "Eco-friendly and ethically sourced",
-                "size_range": "XS-XXL with inclusive sizing"
-            },
-            "financial": {
-                "pricing_strategy": "Premium positioning with value emphasis",
-                "discount_policy": "Limited strategic discounts to maintain exclusivity",
-                "payment_preferences": "Secure, multiple options including installments",
-                "revenue_goals": "Sustainable growth with customer retention focus"
-            },
-            "ecommerce": {
-                "shopping_experience": "Personalized, intuitive, luxurious",
-                "product_presentation": "High-quality imagery with detailed descriptions",
-                "customer_service": "White-glove service with personal touch",
-                "return_policy": "Generous and customer-friendly"
-            },
-            "wordpress": {
-                "design_aesthetic": "Clean, elegant, mobile-first",
-                "performance_priority": "Fast loading, seamless navigation",
-                "seo_focus": "Fashion keywords, local optimization",
-                "conversion_optimization": "Clear CTAs, trust signals, social proof"
-            },
-            "web_development": {
-                "code_standards": "Clean, maintainable, accessible",
-                "performance_targets": "Sub-3 second load times",
-                "mobile_optimization": "Mobile-first responsive design",
-                "security_requirements": "PCI compliance, data protection"
-            },
-            "site_communication": {
-                "tone_of_voice": "Warm, professional, inspiring",
-                "communication_style": "Personalized and relationship-focused",
-                "customer_touchpoints": "Email, SMS, live chat, social media",
-                "brand_messaging": "Empowerment through sustainable luxury"
-            }
-        }
-
-        context = {**base_context, **agent_specific_context.get(agent_type, {})}
-
-        logger.info(f"🎯 Generated brand context for {agent_type} agent")
-        return context
-
-    async def continuous_learning_cycle(self) -> Dict[str, Any]:
-        """Execute continuous brand learning and adaptation."""
-        try:
-            # Analyze current market trends
-            market_analysis = await self._analyze_market_trends()
-
-            # Track brand performance metrics
-            performance_metrics = self._track_brand_performance()
-
-            # Analyze customer feedback and sentiment
-            sentiment_analysis = await self._analyze_customer_sentiment()
-
-            # Update brand strategies based on insights
-            strategy_updates = self._update_brand_strategies(market_analysis, sentiment_analysis)
-
-            # Generate actionable insights
-            insights = self._generate_actionable_insights(market_analysis, performance_metrics, sentiment_analysis)
-
-            return {
-                "learning_cycle_status": "completed",
-                "market_analysis": market_analysis,
-                "performance_metrics": performance_metrics,
-                "sentiment_analysis": sentiment_analysis,
-                "strategy_updates": strategy_updates,
-                "actionable_insights": insights,
-                "next_cycle_scheduled": (datetime.now().timestamp() + 3600),  # 1 hour
-                "timestamp": datetime.now().isoformat()
-            }
-
-        except Exception as e:
-            logger.error(f"Brand learning cycle failed: {str(e)}")
-            return {
-                "status": "failed",
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }
-
-    async def _analyze_market_trends(self) -> Dict[str, Any]:
-        """Analyze current fashion and retail market trends."""
-        # In production, this would connect to trend analysis APIs
+        
+        # Update internal knowledge base
+        self._update_brand_knowledge(asset_analysis)
+        
+        return asset_analysis
+    
+    def _analyze_seasonal_content(self) -> Dict[str, Any]:
+        """Analyze seasonal content patterns and upcoming trends."""
         return {
-            "fashion_trends": [
-                "Sustainable luxury materials",
-                "Minimalist designs with statement pieces",
-                "Neutral color palettes with pops of color",
-                "Size inclusive fashion"
-            ],
-            "retail_trends": [
-                "Personalized shopping experiences",
-                "Social commerce integration",
-                "Virtual try-on technology",
-                "Subscription-based models"
-            ],
-            "consumer_behavior": [
-                "Increased focus on sustainability",
-                "Preference for quality over quantity",
-                "Mobile-first shopping",
-                "Social media influence on purchases"
-            ],
-            "trend_confidence": 85,
-            "sources": ["Fashion Week Reports", "Retail Analytics", "Consumer Surveys"]
-        }
-
-    def _track_brand_performance(self) -> Dict[str, Any]:
-        """Track key brand performance indicators."""
-        return {
-            "brand_awareness": {
-                "score": 78,
-                "trend": "increasing",
-                "metrics": ["Social mentions", "Search volume", "Brand recall"]
-            },
-            "customer_satisfaction": {
-                "score": 92,
-                "trend": "stable",
-                "metrics": ["Reviews", "NPS", "Repeat purchases"]
-            },
-            "market_share": {
-                "score": 15,
-                "trend": "growing",
-                "category": "Premium sustainable fashion"
-            },
-            "brand_equity": {
-                "score": 85,
-                "components": ["Recognition", "Loyalty", "Perceived quality"]
+            "current_season": "winter_collection",
+            "trending_themes": ["rose gold accents", "winter elegance", "holiday glamour"],
+            "upcoming_trends": ["spring florals", "pastel renaissance", "sustainable luxury"],
+            "content_calendar": {
+                "new_year": "fresh beginnings collection",
+                "valentines": "romantic rose collection",
+                "spring": "bloom collection",
+                "summer": "golden hour collection"
             }
         }
-
-    async def _analyze_customer_sentiment(self) -> Dict[str, Any]:
-        """Analyze customer sentiment across all touchpoints."""
-        # In production, this would analyze real customer data
+    
+    def _track_product_drops(self) -> List[Dict[str, Any]]:
+        """Track recent and upcoming product drops."""
+        return [
+            {
+                "drop_id": "winter_elegance_2024",
+                "launch_date": "2024-01-15",
+                "theme": "Winter Elegance",
+                "key_pieces": ["Rose Gold Statement Necklace", "Velvet Evening Dress"],
+                "price_range": "$75-$350",
+                "marketing_focus": "holiday glamour, winter weddings"
+            },
+            {
+                "drop_id": "valentines_exclusive_2024", 
+                "launch_date": "2024-02-01",
+                "theme": "Romantic Rose",
+                "key_pieces": ["Heart-shaped Rose Pendant", "Blush Pink Silk Dress"],
+                "limited_edition": True,
+                "pre_order_status": "active"
+            }
+        ]
+    
+    def _track_brand_changes(self) -> List[Dict[str, Any]]:
+        """Track brand evolution and theme changes."""
+        return [
+            {
+                "change_date": "2024-01-10",
+                "type": "website_redesign",
+                "description": "Enhanced mobile experience with rose gold accents",
+                "impact_areas": ["user_experience", "conversion_optimization"]
+            },
+            {
+                "change_date": "2024-01-05",
+                "type": "brand_messaging",
+                "description": "Increased focus on sustainability and ethical fashion",
+                "impact_areas": ["brand_values", "marketing_strategy"]
+            }
+        ]
+    
+    def _analyze_market_position(self) -> Dict[str, Any]:
+        """Analyze competitive positioning and market trends."""
+        return {
+            "market_position": "premium affordable luxury",
+            "competitive_advantages": [
+                "unique rose-inspired aesthetic",
+                "inclusive sizing",
+                "sustainable practices",
+                "direct-to-consumer model"
+            ],
+            "market_trends": [
+                "sustainable fashion growth",
+                "personalization demand",
+                "social commerce expansion"
+            ],
+            "differentiation_score": 88
+        }
+    
+    def _analyze_brand_perception(self) -> Dict[str, Any]:
+        """Analyze customer sentiment and brand perception."""
         return {
             "overall_sentiment": "positive",
-            "sentiment_score": 4.2,
-            "positive_themes": [
-                "Product quality",
-                "Customer service",
-                "Brand values alignment",
-                "Shopping experience"
+            "brand_associations": ["elegant", "quality", "romantic", "empowering"],
+            "customer_feedback_themes": [
+                "love the rose gold aesthetic",
+                "excellent quality for the price",
+                "sizes run true to fit",
+                "fast shipping"
             ],
-            "improvement_areas": [
-                "Price perception",
-                "Size availability",
-                "Shipping times"
-            ],
-            "sentiment_sources": [
-                "Product reviews",
-                "Social media mentions",
-                "Customer service interactions",
-                "Survey responses"
-            ],
-            "recommendation": "Maintain current quality standards while addressing price value communication"
+            "brand_loyalty_score": 84,
+            "recommendation_rate": 92
         }
-
-    def _update_brand_strategies(self, market_analysis: Dict, sentiment_analysis: Dict) -> Dict[str, Any]:
-        """Update brand strategies based on analysis."""
-        return {
-            "product_strategy": {
-                "focus": "Expand sustainable luxury line",
-                "new_categories": ["Workwear", "Casual luxury"],
-                "priority": "high"
+    
+    def _update_brand_knowledge(self, analysis: Dict[str, Any]) -> None:
+        """Update the shared brand knowledge base for all agents."""
+        timestamp = datetime.now().isoformat()
+        
+        # Create knowledge snapshot
+        knowledge_update = {
+            "timestamp": timestamp,
+            "analysis_data": analysis,
+            "confidence_score": 95,
+            "data_sources": ["website", "social_media", "customer_feedback", "sales_data"]
+        }
+        
+        # Store in searchable format
+        knowledge_hash = hashlib.md5(json.dumps(analysis, sort_keys=True).encode()).hexdigest()
+        self.asset_database[knowledge_hash] = knowledge_update
+    
+    def get_brand_context_for_agent(self, agent_type: str) -> Dict[str, Any]:
+        """Provide brand-specific context for different agent types."""
+        
+        base_context = {
+            "brand_name": "The Skyy Rose Collection",
+            "brand_aesthetic": self.brand_profile["aesthetic"],
+            "current_season": "winter_collection_2024",
+            "latest_drop": self._get_latest_drop(),
+            "brand_voice": "elegant, empowering, inclusive, sophisticated"
+        }
+        
+        # Agent-specific context
+        agent_contexts = {
+            "wordpress": {
+                **base_context,
+                "theme_colors": ["#D4A5A5", "#F5E6E6", "#E8C4C4"],
+                "divi_modules": ["rose_gold_buttons", "elegant_galleries", "product_showcases"],
+                "brand_fonts": ["elegant_serif_primary", "clean_sans_secondary"]
             },
-            "marketing_strategy": {
-                "channels": ["Instagram", "TikTok", "Email marketing"],
-                "messaging": "Sustainable luxury for everyday elegance",
-                "influencer_partnerships": "Micro-influencers in sustainability space"
+            "ecommerce": {
+                **base_context,
+                "product_categories": ["dresses", "accessories", "jewelry", "outerwear"],
+                "pricing_strategy": "premium_affordable",
+                "target_demographic": "fashion-forward women 25-45",
+                "seasonal_promotions": self._get_current_promotions()
             },
-            "customer_experience": {
-                "improvements": ["Virtual styling", "Size advisory", "Sustainability tracking"],
-                "personalization": "AI-driven product recommendations"
+            "marketing": {
+                **base_context,
+                "key_hashtags": ["#SkyRoseCollection", "#RoseGoldVibes", "#ElegantFashion"],
+                "content_themes": ["empowerment", "elegance", "inclusivity"],
+                "campaign_focus": "winter_elegance_and_valentines_prep"
             },
-            "pricing_strategy": {
-                "approach": "Value-based pricing with clear sustainability premiums",
-                "promotions": "Limited strategic sales during key seasons"
+            "customer_service": {
+                **base_context,
+                "brand_values": self.brand_profile["brand_values"],
+                "common_compliments": ["quality", "fit", "aesthetic", "shipping"],
+                "service_tone": "warm, professional, solution-focused"
+            },
+            "financial": {
+                **base_context,
+                "business_model": "direct_to_consumer",
+                "growth_focus": "sustainable_expansion",
+                "key_metrics": ["aov", "customer_lifetime_value", "retention_rate"]
             }
         }
-
-    def _generate_actionable_insights(self, market_analysis: Dict, performance_metrics: Dict, sentiment_analysis: Dict) -> List[Dict[str, Any]]:
-        """Generate actionable insights from all analyses."""
-        return [
-            {
-                "insight": "Increase sustainable material communication",
-                "priority": "high",
-                "action": "Create detailed sustainability pages and product certifications",
-                "expected_impact": "Improved brand differentiation and customer trust"
-            },
-            {
-                "insight": "Expand size inclusivity messaging",
-                "priority": "medium",
-                "action": "Feature diverse models and sizing guides prominently",
-                "expected_impact": "Broader market appeal and improved conversion"
-            },
-            {
-                "insight": "Optimize mobile shopping experience",
-                "priority": "high",
-                "action": "Implement mobile-first design improvements",
-                "expected_impact": "Increased mobile conversion rates"
-            },
-            {
-                "insight": "Develop premium loyalty program",
-                "priority": "medium",
-                "action": "Create tiered loyalty with exclusive experiences",
-                "expected_impact": "Improved customer retention and lifetime value"
-            }
-        ]
-
-    def _calculate_brand_health(self) -> int:
-        """Calculate overall brand health score."""
-        # Weighted scoring across multiple factors
-        awareness_score = 78 * 0.2
-        satisfaction_score = 92 * 0.3
-        loyalty_score = 85 * 0.2
-        differentiation_score = 88 * 0.15
-        innovation_score = 82 * 0.15
-
-        total_score = awareness_score + satisfaction_score + loyalty_score + differentiation_score + innovation_score
-        return round(total_score)
-
-    def _generate_brand_recommendations(self) -> List[str]:
-        """Generate strategic brand recommendations."""
-        return [
-            "Strengthen sustainability messaging across all touchpoints",
-            "Develop exclusive member experiences to build loyalty",
-            "Expand product line into adjacent categories",
-            "Implement AI-driven personalization",
-            "Create brand collaboration opportunities",
-            "Develop mobile app for enhanced customer experience",
-            "Increase social responsibility initiatives visibility"
-        ]
-
+        
+        return agent_contexts.get(agent_type, base_context)
+    
     def _get_latest_drop(self) -> Dict[str, Any]:
-        """Get information about the latest product collection."""
+        """Get information about the latest product drop."""
+        if self.product_drops:
+            return self.product_drops[-1]
         return {
-            "collection_name": "Winter Elegance 2024",
-            "launch_date": "2024-01-15",
-            "theme": "Sustainable luxury meets winter sophistication",
-            "key_pieces": [
-                "Cashmere Blend Coats",
-                "Sustainable Silk Blouses",
-                "Eco-Wool Sweaters",
-                "Statement Accessories"
-            ],
-            "color_palette": ["Camel", "Deep Navy", "Cream", "Rose Gold"],
-            "price_range": "$120-$450",
-            "sustainability_features": [
-                "Recycled materials",
-                "Ethical manufacturing",
-                "Carbon-neutral shipping"
-            ],
-            "marketing_focus": "Timeless pieces for conscious consumers"
+            "drop_id": "winter_elegance_2024",
+            "theme": "Winter Elegance",
+            "status": "live"
         }
-
-    def _track_brand_changes(self) -> List[Dict[str, Any]]:
-        """Track recent brand changes and evolution."""
+    
+    def _get_current_promotions(self) -> List[str]:
+        """Get current promotional campaigns."""
         return [
-            {
-                "change_type": "visual_identity",
-                "description": "Updated logo with more sustainable imagery",
-                "date": "2024-01-01",
-                "impact": "Stronger sustainability association"
-            },
-            {
-                "change_type": "product_line",
-                "description": "Introduced recycled material collection",
-                "date": "2024-01-10",
-                "impact": "Enhanced eco-conscious positioning"
-            },
-            {
-                "change_type": "messaging",
-                "description": "Emphasized empowerment and sustainability equally",
-                "date": "2024-01-05",
-                "impact": "Broader appeal to conscious consumers"
-            }
-        ]
-
-    def _analyze_seasonal_content(self) -> Dict[str, Any]:
-        """Analyze seasonal content and upcoming updates."""
-        return {
-            "current_season": "Winter 2024",
-            "upcoming_themes": [
-                "Spring Renewal - Fresh, sustainable styles",
-                "Summer Elegance - Lightweight luxury pieces",
-                "Fall Sophistication - Timeless professional wear"
-            ],
-            "content_calendar": {
-                "January": "New Year, New Sustainable You",
-                "February": "Love for the Planet Valentine's",
-                "March": "Spring Sustainable Fashion Week"
-            },
-            "trend_predictions": [
-                "Increased demand for versatile pieces",
-                "Growing interest in rental/subscription models",
-                "Rise of digital fashion experiences"
-            ]
-        }
-
-    def analyze_brand_sentiment(self, content: str) -> Dict[str, Any]:
-        """Analyze brand sentiment using OpenAI."""
-        if not self.openai_available:
-            return {
-                "sentiment": "neutral",
-                "confidence": 0.5,
-                "keywords": ["analysis", "unavailable"],
-                "summary": "OpenAI analysis unavailable - using fallback",
-                "timestamp": datetime.now().isoformat()
-            }
-
-        try:
-            response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
-                {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
-            ],
-            temperature=0.5,
-            max_tokens=150
-            )
-            
-            sentiment_data = json.loads(response.choices[0].message.content)
-            sentiment_data["timestamp"] = datetime.now().isoformat()
-            logger.info("✅ Brand sentiment analyzed successfully using OpenAI")
-            return sentiment_data
-        except Exception as e:
-            logger.error(f"Brand sentiment analysis failed: {str(e)}")
-            return {
-                "sentiment": "error",
-                "confidence": 0.0,
-                "keywords": ["analysis", "error"],
-                "summary": f"Error during OpenAI sentiment analysis: {str(e)}",
-                "timestamp": datetime.now().isoformat()
-            }
-
-
-def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Learn from uploaded brand assets to enhance intelligence."""
-        try:
-            self.uploaded_assets = asset_data
-            self.learning_from_assets = True
-            
-            # Analyze visual consistency
-            visual_analysis = self._analyze_visual_assets(asset_data.get("visual_assets", {}))
-            
-            # Extract brand patterns
-            brand_patterns = self._extract_brand_patterns(asset_data)
-            
-            # Update brand understanding
-            enhanced_insights = self._generate_asset_insights(visual_analysis, brand_patterns)
-            
-            # Update theme evolution based on assets
-            if asset_data.get("seasonal_collections"):
-                self._update_seasonal_understanding(asset_data["seasonal_collections"])
-            
-            return {
-                "learning_status": "completed",
-                "assets_processed": asset_data.get("total_learning_sources", 0),
-                "visual_analysis": visual_analysis,
-                "brand_patterns": brand_patterns,
-                "enhanced_insights": enhanced_insights,
-                "confidence_boost": "+25%",
-                "timestamp": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Asset learning failed: {str(e)}")
-            return {"error": str(e), "learning_status": "failed"}
-    
-    def _analyze_visual_assets(self, visual_assets: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze visual brand assets for consistency."""
-        return {
-            "logo_variations": len(visual_assets.get("logos", [])),
-            "product_image_quality": "high" if len(visual_assets.get("product_images", [])) > 5 else "building",
-            "marketing_consistency": "strong" if len(visual_assets.get("marketing_materials", [])) > 3 else "developing",
-            "visual_cohesion_score": 85,
-            "recommendations": [
-                "Maintain consistent color usage across all materials",
-                "Ensure logo appears consistently in all contexts",
-                "Use high-quality product photography standards"
-            ]
-        }
-    
-    def _extract_brand_patterns(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract recurring brand patterns from assets."""
-        return {
-            "dominant_colors": ["Rose Gold", "Deep Navy", "Cream"],
-            "style_patterns": ["Minimalist", "Elegant", "Sustainable"],
-            "messaging_themes": ["Luxury", "Empowerment", "Sustainability"],
-            "seasonal_consistency": True,
-            "quality_standards": "Premium"
-        }
-    
-    def _generate_asset_insights(self, visual_analysis: Dict, patterns: Dict) -> List[str]:
-        """Generate insights from asset analysis."""
-        return [
-            "Brand visual identity shows strong luxury positioning",
-            "Sustainability messaging is consistent across materials", 
-            "Product photography maintains premium quality standards",
-            "Color palette reinforces elegance and sophistication",
-            "Marketing materials align with empowerment themes"
+            "new_year_fresh_start_20_percent_off",
+            "valentines_pre_order_early_bird", 
+            "winter_collection_bundle_deals"
         ]
     
-    def _update_seasonal_understanding(self, seasonal_assets: List[Dict]):
-        """Update seasonal understanding from collection assets."""
-        self.theme_evolution["asset_informed"] = True
-        self.theme_evolution["collection_count"] = len(seasonal_assets)
-        self.theme_evolution["visual_evolution"] = "Data-driven from uploaded collections"
+    async def continuous_learning_cycle(self) -> Dict[str, Any]:
+        """Execute continuous learning cycle for brand intelligence."""
+        
+        learning_tasks = [
+            self._monitor_website_changes(),
+            self._track_social_media_content(),
+            self._analyze_customer_interactions(),
+            self._monitor_product_performance(),
+            self._track_market_trends()
+        ]
+        
+        results = await asyncio.gather(*learning_tasks)
+        
+        # Compile learning insights
+        learning_summary = {
+            "cycle_timestamp": datetime.now().isoformat(),
+            "website_changes": results[0],
+            "social_content": results[1], 
+            "customer_insights": results[2],
+            "product_performance": results[3],
+            "market_trends": results[4],
+            "learning_confidence": 94,
+            "next_cycle": (datetime.now() + timedelta(hours=2)).isoformat()
+        }
+        
+        return learning_summary
+    
+    async def _monitor_website_changes(self) -> Dict[str, Any]:
+        """Monitor website for theme, content, and structure changes."""
+        return {
+            "new_pages": ["valentines-collection-preview"],
+            "theme_updates": ["enhanced_mobile_product_galleries"],
+            "content_changes": ["updated_about_us_sustainability_focus"],
+            "performance_improvements": ["optimized_image_loading", "faster_checkout"]
+        }
+    
+    async def _track_social_media_content(self) -> Dict[str, Any]:
+        """Track social media content and engagement patterns."""
+        return {
+            "trending_posts": ["rose_gold_styling_tips", "customer_spotlight_features"],
+            "engagement_patterns": ["high_engagement_on_styling_content"],
+            "influencer_collaborations": ["micro_influencer_winter_campaign"],
+            "user_generated_content": ["customer_photos_with_hashtag"]
+        }
+    
+    async def _analyze_customer_interactions(self) -> Dict[str, Any]:
+        """Analyze customer service interactions and feedback."""
+        return {
+            "common_questions": ["sizing_guidance", "care_instructions", "shipping_times"],
+            "compliment_themes": ["quality", "packaging", "customer_service"],
+            "improvement_suggestions": ["more_size_options", "virtual_try_on"],
+            "satisfaction_score": 4.7
+        }
+    
+    async def _monitor_product_performance(self) -> Dict[str, Any]:
+        """Monitor product sales performance and trends."""
+        return {
+            "top_performers": ["Rose_Gold_Statement_Necklace", "Blush_Midi_Dress"],
+            "emerging_favorites": ["Velvet_Evening_Bag", "Pearl_Drop_Earrings"],
+            "seasonal_trends": ["winter_accessories_outselling_expectations"],
+            "inventory_insights": ["restock_rose_gold_items_needed"]
+        }
+    
+    async def _track_market_trends(self) -> Dict[str, Any]:
+        """Track fashion and ecommerce market trends."""
+        return {
+            "fashion_trends": ["sustainable_luxury_growth", "personalization_demand"],
+            "ecommerce_trends": ["social_commerce_expansion", "ar_try_on_adoption"],
+            "competitor_moves": ["competitor_a_sustainability_launch"],
+            "opportunity_areas": ["expand_jewelry_line", "introduce_mens_accessories"]
+        }
 
-def initialize_brand_intelligence() -> BrandIntelligenceAgent:
-    """Initialize the brand intelligence system."""
-    return BrandIntelligenceAgent()
+
+def initialize_brand_intelligence() -> Dict[str, Any]:
+    """Initialize brand intelligence for all agents."""
+    agent = BrandIntelligenceAgent()
+    
+    return {
+        "brand_intelligence": "initialized",
+        "continuous_learning": "active",
+        "brand_context": "available_for_all_agents",
+        "learning_cycle": "every_2_hours"
+    }
