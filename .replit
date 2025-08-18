@@ -2,7 +2,7 @@ modules = ["python-3.12", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["libxcrypt", "python313Packages.pytest"]
+packages = ["glibcLocales", "libxcrypt", "python313Packages.pytest"]
 
 [workflows]
 runButton = "Run"

@@ -10,3 +10,7 @@ aiofiles
 httpx
 schedule
 schedule
+numpy
+scikit-learn
+numpy
+scikit-learn
