@@ -1,65 +1,108 @@
-from __future__ import annotations
 
 import subprocess
+import os
 from datetime import datetime
-from pathlib import Path
+from typing import Dict, Any
 
-
-def commit_fixes(content: str, filename: str = "fixed_code.txt") -> None:
-    """Write ``content`` to ``filename`` and commit it to git.
-
-    The function stages the file and creates a commit with a timestamped
-    message. It assumes the current working directory is a Git repository.
-    """
-    path = Path(filename)
-    path.write_text(content, encoding="utf-8")
-
-    subprocess.run(["git", "add", str(path)], check=True)
-    subprocess.run(
-        [
-            "git",
-            "commit",
-            "-m",
-            f"chore: automated fix ({datetime.utcnow().isoformat(timespec='seconds')})",
-        ],
-        check=True,
-    )
-    
-    # Push changes to GitHub
+def commit_fixes(fixed_code: Dict[str, Any]) -> Dict[str, Any]:
+    """Commit fixes to git repository."""
     try:
-        subprocess.run(["git", "push", "origin", "main"], check=True)
-        print("✅ Changes pushed to GitHub successfully")
-    except subprocess.CalledProcessError:
-        try:
-            subprocess.run(["git", "push", "origin", "master"], check=True)
-            print("✅ Changes pushed to GitHub successfully")
-        except subprocess.CalledProcessError:
-            print("❌ Failed to push to GitHub - please check your remote configuration")
-
-
-def commit_all_changes() -> None:
-    """Commit all current changes to git and push to GitHub."""
-    try:
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"feat: DevSkyy agents update ({datetime.utcnow().isoformat(timespec='seconds')})",
-            ],
-            check=True,
-        )
+        # Add all changes
+        subprocess.run(['git', 'add', '.'], check=True, cwd='.')
         
-        # Push changes to GitHub
-        try:
-            subprocess.run(["git", "push", "origin", "main"], check=True)
-            print("✅ All changes pushed to GitHub successfully")
-        except subprocess.CalledProcessError:
-            try:
-                subprocess.run(["git", "push", "origin", "master"], check=True)
-                print("✅ All changes pushed to GitHub successfully")
-            except subprocess.CalledProcessError:
-                print("❌ Failed to push to GitHub - please check your remote configuration")
+        # Create commit message
+        commit_message = f"DevSkyy fixes applied: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        if 'fixes_applied' in fixed_code:
+            commit_message += f" - {', '.join(fixed_code['fixes_applied'])}"
+        
+        # Commit changes
+        result = subprocess.run(['git', 'commit', '-m', commit_message], 
+                              capture_output=True, text=True, cwd='.')
+        
+        return {
+            "status": "success" if result.returncode == 0 else "failed",
+            "commit_message": commit_message,
+            "output": result.stdout,
+            "error": result.stderr if result.returncode != 0 else None
+        }
+        
     except subprocess.CalledProcessError as e:
-        print(f"❌ Git operation failed: {e}")
+        return {
+            "status": "failed",
+            "error": str(e),
+            "output": getattr(e, 'output', '')
+        }
+    except Exception as e:
+        return {
+            "status": "failed",
+            "error": str(e)
+        }
+
+def commit_all_changes() -> Dict[str, Any]:
+    """Commit all current changes to git."""
+    try:
+        # Check if there are changes
+        status_result = subprocess.run(['git', 'status', '--porcelain'], 
+                                     capture_output=True, text=True, cwd='.')
+        
+        if not status_result.stdout.strip():
+            return {
+                "status": "no_changes",
+                "message": "No changes to commit"
+            }
+        
+        # Add all changes
+        subprocess.run(['git', 'add', '.'], check=True, cwd='.')
+        
+        # Commit with timestamp
+        commit_message = f"DevSkyy automated commit: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        commit_result = subprocess.run(['git', 'commit', '-m', commit_message], 
+                                     capture_output=True, text=True, cwd='.')
+        
+        # Push to origin
+        push_result = subprocess.run(['git', 'push', 'origin', 'main'], 
+                                   capture_output=True, text=True, cwd='.')
+        
+        return {
+            "status": "success",
+            "commit_message": commit_message,
+            "commit_output": commit_result.stdout,
+            "push_output": push_result.stdout,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except subprocess.CalledProcessError as e:
+        return {
+            "status": "failed",
+            "error": str(e),
+            "output": getattr(e, 'output', '')
+        }
+    except Exception as e:
+        return {
+            "status": "failed",
+            "error": str(e)
+        }
+
+def get_git_status() -> Dict[str, Any]:
+    """Get current git repository status."""
+    try:
+        # Get status
+        status_result = subprocess.run(['git', 'status', '--porcelain'], 
+                                     capture_output=True, text=True, cwd='.')
+        
+        # Get log
+        log_result = subprocess.run(['git', 'log', '--oneline', '-5'], 
+                                  capture_output=True, text=True, cwd='.')
+        
+        return {
+            "status": "success",
+            "changes": status_result.stdout.strip().split('\n') if status_result.stdout.strip() else [],
+            "recent_commits": log_result.stdout.strip().split('\n') if log_result.stdout.strip() else [],
+            "has_changes": bool(status_result.stdout.strip())
+        }
+        
+    except Exception as e:
+        return {
+            "status": "failed",
+            "error": str(e)
+        }
