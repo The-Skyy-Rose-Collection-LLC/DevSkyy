@@ -25,4 +25,4 @@ def schedule_hourly_job(job: Callable[[], None] | None = None) -> None:
     # Start the first run one hour from now
     timer = threading.Timer(3600, _runner)
     timer.daemon = True
-    timer.start()
+    timer.start()()

@@ -3,3 +3,15 @@ modules = ["python-3.12"]
 [nix]
 channel = "stable-25_05"
 packages = ["python313Packages.pytest"]
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 44005262
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
