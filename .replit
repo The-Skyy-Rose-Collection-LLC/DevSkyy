@@ -16,6 +16,39 @@ mode = "sequential"
 task = "shell.exec"
 args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 
+[[workflows.workflow]]
+name = "Continuous Monitoring"
+author = 44005262
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -c \"from main import monitor_wordpress_continuously, monitor_web_development_continuously, manage_avatar_chatbot_continuously; import time; import json; "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "while True: "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    wp_status = monitor_wordpress_continuously()"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    dev_status = monitor_web_development_continuously() "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    chatbot_status = manage_avatar_chatbot_continuously()"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''    print(f'WordPress: {wp_status[\"overall_status\"]} | Development: {dev_status[\"development_status\"]} | Chatbot: {chatbot_status[\"chatbot_status\"]}')'''
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "    time.sleep(300)\""
+
 [[ports]]
 localPort = 8000
 externalPort = 80
