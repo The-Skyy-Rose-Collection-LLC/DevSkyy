@@ -1,150 +1,176 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
-from agent.modules.financial import monitor_financial_health
-from agent.modules.inventory import manage_inventory
-from agent.modules.customer_service import handle_customer_service
-from agent.modules.marketing import optimize_marketing
+from agent.modules.inventory_agent import InventoryAgent
+from agent.modules.financial_agent import FinancialAgent, ChargebackReason
+from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes
-from datetime import datetime
+from typing import Dict, Any, List
 import json
 
-app = FastAPI(title="DevSkyy E-commerce Agent Suite", version="2.0.0")
+
+app = FastAPI(title="The Skyy Rose Collection - Ecommerce Platform", version="1.0.0")
+
+# Initialize agents
+inventory_agent = InventoryAgent()
+financial_agent = FinancialAgent()
+ecommerce_agent = EcommerceAgent()
+
 
 def run_agent() -> dict:
     """Execute the full DevSkyy agent workflow."""
-    try:
-        # Original workflow
-        raw_code = scan_site()
-        fixed_code = fix_code(raw_code)
-        commit_fixes(fixed_code)
-        
-        # New agent workflows
-        financial_status = monitor_financial_health()
-        inventory_status = manage_inventory()
-        customer_service_status = handle_customer_service()
-        marketing_status = optimize_marketing()
-        
-        # Schedule next run
-        schedule_hourly_job()
-        
-        # Compile comprehensive status report
-        status_report = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "code_scanning": "completed",
-            "financial": financial_status,
-            "inventory": inventory_status,
-            "customer_service": customer_service_status,
-            "marketing": marketing_status,
-            "overall_health": _calculate_overall_health([
-                financial_status,
-                inventory_status,
-                customer_service_status,
-                marketing_status
-            ])
-        }
-        
-        # Save detailed report
-        commit_fixes(json.dumps(status_report, indent=2), "agent_status_report.json")
-        
-        return {"status": "completed", "summary": status_report}
-        
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    raw_code = scan_site()
+    fixed_code = fix_code(raw_code)
+    commit_fixes(fixed_code)
+    schedule_hourly_job()
+    return {"status": "completed"}
 
-def _calculate_overall_health(agent_statuses) -> str:
-    """Calculate overall system health based on agent reports."""
-    critical_issues = 0
-    
-    # Check financial health
-    if agent_statuses[0].get("overall_status") == "NEEDS_ATTENTION":
-        critical_issues += 1
-    
-    # Check inventory issues
-    if agent_statuses[1].get("action_required"):
-        critical_issues += 1
-    
-    # Check customer service performance
-    if agent_statuses[2].get("overall_status") == "NEEDS_ATTENTION":
-        critical_issues += 1
-    
-    # Check marketing performance
-    if agent_statuses[3].get("action_required"):
-        critical_issues += 1
-    
-    if critical_issues == 0:
-        return "EXCELLENT"
-    elif critical_issues <= 1:
-        return "GOOD"
-    elif critical_issues <= 2:
-        return "FAIR"
-    else:
-        return "CRITICAL"
 
 @app.post("/run")
 def run() -> dict:
-    """Endpoint to trigger the complete DevSkyy agent workflow."""
+    """Endpoint to trigger the DevSkyy agent workflow."""
     return run_agent()
+
 
 @app.get("/")
 def root() -> dict:
     """Health check endpoint."""
+    return {"message": "The Skyy Rose Collection Platform Online ✨"}
+
+
+# Inventory Management Endpoints
+@app.post("/inventory/scan")
+def scan_inventory() -> Dict[str, Any]:
+    """Scan and analyze all digital assets."""
+    assets = inventory_agent.scan_assets()
+    duplicates = inventory_agent.find_duplicates()
+    
     return {
-        "message": "DevSkyy E-commerce Agent Suite online",
-        "agents": [
-            "Code Scanner & Fixer",
-            "Financial Monitor",
-            "Inventory Manager", 
-            "Customer Service Automation",
-            "Marketing Optimizer"
-        ],
-        "version": "2.0.0"
+        "total_assets": len(assets),
+        "duplicate_groups": len(duplicates),
+        "scan_completed": True
     }
 
-@app.get("/financial/status")
-def financial_status() -> dict:
-    """Get current financial status."""
-    return monitor_financial_health()
 
-@app.get("/inventory/status")
-def inventory_status() -> dict:
-    """Get current inventory status."""
-    return manage_inventory()
+@app.get("/inventory/report")
+def get_inventory_report() -> Dict[str, Any]:
+    """Get comprehensive inventory report."""
+    return inventory_agent.generate_report()
 
-@app.get("/customer-service/status")
-def customer_service_status() -> dict:
-    """Get customer service metrics."""
-    return handle_customer_service()
 
-@app.get("/marketing/status")
-def marketing_status() -> dict:
-    """Get marketing performance data."""
-    return optimize_marketing()
-
-@app.post("/customer-service/auto-respond")
-def auto_respond(ticket_content: str, customer_name: str = "Valued Customer") -> dict:
-    """Generate automated customer service response."""
-    from agent.modules.customer_service import CustomerServiceAgent
+@app.post("/inventory/cleanup")
+def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
+    """Remove duplicate assets."""
+    if keep_strategy not in ["latest", "largest", "first"]:
+        raise HTTPException(status_code=400, detail="Invalid keep_strategy")
     
-    agent = CustomerServiceAgent()
-    categorization = agent.auto_categorize_tickets(ticket_content)
+    result = inventory_agent.remove_duplicates(keep_strategy)
+    return result
+
+
+@app.get("/inventory/visualize")
+def visualize_similarities() -> Dict[str, str]:
+    """Get visual representation of asset similarities."""
+    visualization = inventory_agent.visualize_similarities()
+    return {"visualization": visualization}
+
+
+# Financial Management Endpoints
+@app.post("/payments/process")
+def process_payment(amount: float, currency: str, customer_id: str, 
+                   product_id: str, payment_method: str, gateway: str = "stripe") -> Dict[str, Any]:
+    """Process a payment transaction."""
+    return financial_agent.process_payment(
+        amount, currency, customer_id, product_id, payment_method, gateway
+    )
+
+
+@app.post("/chargebacks/create")
+def create_chargeback(transaction_id: str, reason: str, amount: float = None) -> Dict[str, Any]:
+    """Create a chargeback case."""
+    try:
+        chargeback_reason = ChargebackReason(reason.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid chargeback reason")
     
-    if categorization["auto_response_available"]:
-        response = agent.generate_auto_response(categorization["category"], customer_name)
-        return {
-            "category": categorization["category"],
-            "confidence": categorization["confidence"],
-            "auto_response": response,
-            "priority": categorization["suggested_priority"]
-        }
-    else:
-        return {
-            "category": categorization["category"],
-            "message": "Ticket requires human attention",
-            "priority": categorization["suggested_priority"]
-        }
+    return financial_agent.create_chargeback(transaction_id, chargeback_reason, amount)
+
+
+@app.post("/chargebacks/{chargeback_id}/evidence")
+def submit_chargeback_evidence(chargeback_id: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
+    """Submit evidence for a chargeback dispute."""
+    return financial_agent.submit_chargeback_evidence(chargeback_id, evidence)
+
+
+@app.get("/financial/dashboard")
+def get_financial_dashboard() -> Dict[str, Any]:
+    """Get comprehensive financial dashboard."""
+    return financial_agent.get_financial_dashboard()
+
+
+# Ecommerce Management Endpoints
+@app.post("/products/add")
+def add_product(name: str, category: str, price: float, cost: float, 
+               stock_quantity: int, sku: str, sizes: List[str], colors: List[str],
+               description: str, images: List[str] = None, tags: List[str] = None) -> Dict[str, Any]:
+    """Add a new product to the catalog."""
+    try:
+        product_category = ProductCategory(category.lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid product category")
+    
+    return ecommerce_agent.add_product(
+        name, product_category, price, cost, stock_quantity, sku, 
+        sizes, colors, description, images, tags
+    )
+
+
+@app.post("/inventory/{product_id}/update")
+def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
+    """Update product inventory levels."""
+    return ecommerce_agent.update_inventory(product_id, quantity_change)
+
+
+@app.post("/customers/create")
+def create_customer(email: str, first_name: str, last_name: str, 
+                   phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
+    """Create a new customer profile."""
+    return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
+
+
+@app.post("/orders/create")
+def create_order(customer_id: str, items: List[Dict[str, Any]], 
+                shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
+    """Create a new order."""
+    return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
+
+
+@app.get("/customers/{customer_id}/recommendations")
+def get_recommendations(customer_id: str, limit: int = 5) -> List[Dict[str, Any]]:
+    """Get product recommendations for a customer."""
+    return ecommerce_agent.get_product_recommendations(customer_id, limit)
+
+
+@app.get("/analytics/report")
+def get_analytics_report() -> Dict[str, Any]:
+    """Get comprehensive analytics report."""
+    return ecommerce_agent.generate_analytics_report()
+
+
+# Combined Dashboard Endpoint
+@app.get("/dashboard")
+def get_complete_dashboard() -> Dict[str, Any]:
+    """Get comprehensive platform dashboard."""
+    return {
+        "platform": "The Skyy Rose Collection",
+        "timestamp": "2024-01-20T12:00:00Z",
+        "inventory": inventory_agent.generate_report(),
+        "financial": financial_agent.get_financial_dashboard(),
+        "ecommerce": ecommerce_agent.generate_analytics_report()
+    }
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -4,3 +4,5 @@ PyGithub
 fastapi
 uvicorn
 pydantic
+Pillow
+ImageHash
