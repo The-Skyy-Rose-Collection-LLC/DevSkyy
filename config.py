@@ -1,40 +1,60 @@
 
+"""
+Production Configuration for The Skyy Rose Collection Platform
+"""
 import os
-from typing import Optional
+from dotenv import load_dotenv
 
-class Settings:
-    """Production configuration settings."""
-    
-    # API Settings
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "The Skyy Rose Collection Platform"
-    VERSION: str = "2.0.0"
-    
-    # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
+load_dotenv()
+
+class Config:
+    """Base configuration."""
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    DEBUG = False
+    TESTING = False
     
     # Database
-    DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
+    DATABASE_URL = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
     
-    # External Services
-    STRIPE_SECRET_KEY: Optional[str] = os.getenv("STRIPE_SECRET_KEY")
-    PAYPAL_CLIENT_ID: Optional[str] = os.getenv("PAYPAL_CLIENT_ID")
-    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+    # API Keys
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
     
-    # Rate Limiting
-    RATE_LIMIT_PER_MINUTE: int = 60
+    # Brand Settings
+    BRAND_NAME = "The Skyy Rose Collection"
+    BRAND_DOMAIN = "theskyy-rose-collection.com"
     
-    # CORS
-    BACKEND_CORS_ORIGINS: list = ["*"]  # Configure for production
+    # Performance
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     
-    # Logging
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    
-    # Feature Flags
-    ENABLE_DOCS: bool = os.getenv("ENABLE_DOCS", "true").lower() == "true"
-    
-    class Config:
-        case_sensitive = True
+    # Security
+    CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
+    TRUSTED_HOSTS = ["theskyy-rose-collection.com", "*.replit.app"]
 
-settings = Settings()
+class DevelopmentConfig(Config):
+    """Development configuration."""
+    DEBUG = True
+    CORS_ORIGINS = ["*"]
+    TRUSTED_HOSTS = ["*"]
+
+class ProductionConfig(Config):
+    """Production configuration."""
+    DEBUG = False
+    
+    # Enhanced security for production
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+
+class TestingConfig(Config):
+    """Testing configuration."""
+    TESTING = True
+    DATABASE_URL = 'sqlite:///:memory:'
+
+# Configuration mapping
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopmentConfig
+}
