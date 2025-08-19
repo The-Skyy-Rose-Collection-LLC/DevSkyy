@@ -32,3 +32,6 @@ externalPort = 80
 [objectStorage]
 defaultBucketID = "replit-objstore-34b89646-5899-4d64-b398-985c8022cbf2"
 
+[deployment]
+run = ["sh", "-c", "python main.py"]
+
