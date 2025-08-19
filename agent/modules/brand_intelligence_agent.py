@@ -1,4 +1,3 @@
-
 import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
@@ -17,7 +16,7 @@ class BrandIntelligenceAgent:
     Production-level Brand Intelligence Agent for The Skyy Rose Collection.
     Provides comprehensive brand analysis, context awareness, and strategic insights.
     """
-    
+
     def __init__(self):
         self.brand_name = "The Skyy Rose Collection"
         self.brand_values = {
@@ -27,36 +26,39 @@ class BrandIntelligenceAgent:
             "sustainability": "Eco-conscious and ethical practices",
             "innovation": "Cutting-edge design and technology"
         }
-        
+
         self.target_demographics = {
             "primary": "Women aged 25-45, fashion-conscious, higher income",
             "secondary": "Young professionals, fashion enthusiasts, luxury buyers",
             "psychographics": "Quality-focused, brand-loyal, socially conscious"
         }
-        
+
         self.brand_colors = {
             "primary": "#E6B8A2",  # Rose gold
             "secondary": "#2C3E50", # Deep navy
             "accent": "#F8F9FA",   # Soft white
             "luxury": "#C9A96E"    # Champagne gold
         }
-        
+
         self.theme_evolution = {
             "current_season": "Winter 2024",
             "dominant_themes": ["Elegant Minimalism", "Sustainable Luxury", "Empowered Femininity"],
             "color_trends": ["Warm Neutrals", "Deep Jewel Tones", "Metallic Accents"],
             "style_direction": "Contemporary Classic with Modern Edge"
         }
-        
+
         self.competitive_landscape = {
             "direct_competitors": ["Reformation", "Everlane", "& Other Stories"],
             "positioning": "Premium sustainable fashion with personalized experience",
-            "unique_value_proposition": "Curated luxury meets conscious consumption"
+            "unique_value_prop osition": "Curated luxury meets conscious consumption"
         }
-        
+
         # Initialize OpenAI client
-        self.openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY')) if os.getenv('OPENAI_API_KEY') else None
-        
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        self.openai_available = openai is not None and self.api_key is not None
+        if self.openai_available:
+            openai.api_key = self.api_key
+
         logger.info("🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection")
 
     def analyze_brand_assets(self) -> Dict[str, Any]:
@@ -92,7 +94,7 @@ class BrandIntelligenceAgent:
             "key_values": list(self.brand_values.keys()),
             "target_audience": self.target_demographics["primary"]
         }
-        
+
         agent_specific_context = {
             "inventory": {
                 "product_categories": ["Dresses", "Tops", "Bottoms", "Outerwear", "Accessories"],
@@ -131,9 +133,9 @@ class BrandIntelligenceAgent:
                 "brand_messaging": "Empowerment through sustainable luxury"
             }
         }
-        
+
         context = {**base_context, **agent_specific_context.get(agent_type, {})}
-        
+
         logger.info(f"🎯 Generated brand context for {agent_type} agent")
         return context
 
@@ -142,19 +144,19 @@ class BrandIntelligenceAgent:
         try:
             # Analyze current market trends
             market_analysis = await self._analyze_market_trends()
-            
+
             # Track brand performance metrics
             performance_metrics = self._track_brand_performance()
-            
+
             # Analyze customer feedback and sentiment
             sentiment_analysis = await self._analyze_customer_sentiment()
-            
+
             # Update brand strategies based on insights
             strategy_updates = self._update_brand_strategies(market_analysis, sentiment_analysis)
-            
+
             # Generate actionable insights
             insights = self._generate_actionable_insights(market_analysis, performance_metrics, sentiment_analysis)
-            
+
             return {
                 "learning_cycle_status": "completed",
                 "market_analysis": market_analysis,
@@ -165,7 +167,7 @@ class BrandIntelligenceAgent:
                 "next_cycle_scheduled": (datetime.now().timestamp() + 3600),  # 1 hour
                 "timestamp": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"Brand learning cycle failed: {str(e)}")
             return {
@@ -310,7 +312,7 @@ class BrandIntelligenceAgent:
         loyalty_score = 85 * 0.2
         differentiation_score = 88 * 0.15
         innovation_score = 82 * 0.15
-        
+
         total_score = awareness_score + satisfaction_score + loyalty_score + differentiation_score + innovation_score
         return round(total_score)
 
@@ -391,6 +393,43 @@ class BrandIntelligenceAgent:
                 "Rise of digital fashion experiences"
             ]
         }
+
+    def analyze_brand_sentiment(self, content: str) -> Dict[str, Any]:
+        """Analyze brand sentiment using OpenAI."""
+        if not self.openai_available:
+            return {
+                "sentiment": "neutral",
+                "confidence": 0.5,
+                "keywords": ["analysis", "unavailable"],
+                "summary": "OpenAI analysis unavailable - using fallback",
+                "timestamp": datetime.now().isoformat()
+            }
+
+        try:
+            response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
+                {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
+            ],
+            temperature=0.5,
+            max_tokens=150
+            )
+            
+            sentiment_data = json.loads(response.choices[0].message.content)
+            sentiment_data["timestamp"] = datetime.now().isoformat()
+            logger.info("✅ Brand sentiment analyzed successfully using OpenAI")
+            return sentiment_data
+        except Exception as e:
+            logger.error(f"Brand sentiment analysis failed: {str(e)}")
+            return {
+                "sentiment": "error",
+                "confidence": 0.0,
+                "keywords": ["analysis", "error"],
+                "summary": f"Error during OpenAI sentiment analysis: {str(e)}",
+                "timestamp": datetime.now().isoformat()
+            }
+
 
 def initialize_brand_intelligence() -> BrandIntelligenceAgent:
     """Initialize the brand intelligence system."""
