@@ -1,4 +1,5 @@
-modules = ["python-3.12", "postgresql-16"]
+modules = ["python-3.12", "web"]
+run = "uvicorn main:app --host 0.0.0.0 --port 8000"
 
 [nix]
 channel = "stable-25_05"
