@@ -82,19 +82,24 @@ class EnhancedLearningScheduler:
     def _schedule_learning_cycles(self):
         """Schedule all learning cycles."""
         # Real-time learning (every 5 minutes)
-        schedule.every(5).minutes.do(self._real_time_learning)
+        schedule.every(5).minutes.do(lambda: asyncio.create_task(self._real_time_learning()))
         
         # Hourly deep analysis
-        schedule.every().hour.do(self._hourly_analysis)
+        schedule.every().hour.do(lambda: asyncio.create_task(self._hourly_analysis()))
         
         # Daily pattern recognition
-        schedule.every().day.at("02:00").do(self._daily_pattern_analysis)
+        schedule.every().day.at("02:00").do(lambda: asyncio.create_task(self._daily_pattern_analysis()))
         
         # Weekly strategy optimization
-        schedule.every().monday.at("00:00").do(self._weekly_strategy_optimization)
+        schedule.every().monday.at("00:00").do(lambda: asyncio.create_task(self._weekly_strategy_optimization()))
         
-        # Monthly comprehensive review
-        schedule.every().month.do(self._monthly_comprehensive_review)
+        # Monthly comprehensive review (first day of each month)
+        schedule.every().day.at("00:00").do(self._check_monthly_review)
+
+    def _check_monthly_review(self):
+        """Check if monthly review should run (first day of month)."""
+        if datetime.now().day == 1:
+            asyncio.create_task(self._monthly_comprehensive_review())
 
     def _run_scheduler(self):
         """Run the continuous learning scheduler."""
