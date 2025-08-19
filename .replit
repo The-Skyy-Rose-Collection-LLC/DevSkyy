@@ -2,7 +2,7 @@ modules = ["python-3.12", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["glibcLocales", "libGL", "libGLU", "libxcrypt", "python313Packages.pytest"]
+packages = ["cairo", "ffmpeg-full", "freetype", "geckodriver", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "lcms2", "libGL", "libGLU", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "pkg-config", "python313Packages.pytest", "qhull", "tcl", "tk", "xcodebuild", "zlib"]
 
 [workflows]
 runButton = "Run"

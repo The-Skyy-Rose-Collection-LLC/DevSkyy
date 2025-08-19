@@ -1,44 +1,28 @@
-
 import re
-import json
-import ast
 import logging
-from typing import Dict, Any, List
 from datetime import datetime
+from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
-def fix_code(code_data: Any) -> Dict[str, Any]:
-    """
-    Production-level code fixing with comprehensive error handling.
-    """
+def fix_code(raw_code: str, language: str = "html") -> Dict[str, Any]:
+    """Main function to fix code based on language type."""
     try:
-        if isinstance(code_data, str):
-            # Detect code type and fix accordingly
-            if code_data.strip().startswith('<!DOCTYPE') or '<html' in code_data:
-                return fix_html_issues(code_data)
-            elif code_data.strip().startswith('{') or 'function' in code_data:
-                return fix_javascript_issues(code_data)
-            elif 'body' in code_data or 'margin' in code_data:
-                return fix_css_issues(code_data)
-            elif '<?php' in code_data:
-                return fix_php_issues(code_data)
-            else:
-                return fix_generic_issues(code_data)
-        
-        return {
-            "status": "success",
-            "original_code": str(code_data),
-            "fixed_code": str(code_data),
-            "fixes_applied": ["No fixes needed"],
-            "timestamp": datetime.now().isoformat()
-        }
-        
+        if language.lower() == "html":
+            return fix_html_issues(raw_code)
+        elif language.lower() == "css":
+            return fix_css_issues(raw_code)
+        elif language.lower() in ["javascript", "js"]:
+            return fix_javascript_issues(raw_code)
+        elif language.lower() == "python":
+            return fix_python_issues(raw_code)
+        else:
+            return fix_html_issues(raw_code)  # Default to HTML
     except Exception as e:
-        logger.error(f"Code fixing failed: {str(e)}")
+        logger.error(f"Error fixing code: {str(e)}")
         return {
             "status": "error",
-            "error": str(e),
+            "message": str(e),
             "timestamp": datetime.now().isoformat()
         }
 
@@ -46,39 +30,39 @@ def fix_html_issues(html_content: str) -> Dict[str, Any]:
     """Fix common HTML issues with production standards."""
     fixes_applied = []
     fixed_html = html_content
-    
+
     # Fix missing DOCTYPE
     if not fixed_html.strip().startswith('<!DOCTYPE'):
         fixed_html = '<!DOCTYPE html>\n' + fixed_html
         fixes_applied.append("Added DOCTYPE declaration")
-    
+
     # Fix missing meta viewport
     if 'viewport' not in fixed_html:
         viewport_tag = '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
         if '<head>' in fixed_html:
             fixed_html = fixed_html.replace('<head>', f'<head>\n    {viewport_tag}')
         fixes_applied.append("Added viewport meta tag")
-    
+
     # Fix unclosed tags
     unclosed_tags = ['<br>', '<hr>', '<img', '<input', '<meta', '<link']
     for tag in unclosed_tags:
         if tag in fixed_html and not tag.replace('<', '</') in fixed_html:
             fixed_html = re.sub(rf'{tag}([^>]*?)>', rf'{tag}\1 />', fixed_html)
             fixes_applied.append(f"Fixed unclosed {tag} tags")
-    
+
     # Fix missing alt attributes for images
     img_pattern = r'<img([^>]*?)(?:alt="[^"]*")?([^>]*?)>'
     if re.search(r'<img(?![^>]*alt=)', fixed_html):
         fixed_html = re.sub(r'<img([^>]*?)>', r'<img\1 alt="Image">', fixed_html)
         fixes_applied.append("Added missing alt attributes")
-    
+
     # Fix missing charset
     if 'charset' not in fixed_html:
         charset_tag = '<meta charset="UTF-8">'
         if '<head>' in fixed_html:
             fixed_html = fixed_html.replace('<head>', f'<head>\n    {charset_tag}')
         fixes_applied.append("Added charset meta tag")
-    
+
     return {
         "status": "success",
         "original_code": html_content,
@@ -88,44 +72,30 @@ def fix_html_issues(html_content: str) -> Dict[str, Any]:
     }
 
 def fix_css_issues(css_content: str) -> Dict[str, Any]:
-    """Fix common CSS issues with production optimization."""
+    """Fix common CSS issues with modern standards."""
     fixes_applied = []
     fixed_css = css_content
-    
-    # Remove empty rules
-    empty_rules = re.findall(r'[^}]*\{\s*\}', fixed_css)
-    if empty_rules:
-        fixed_css = re.sub(r'[^}]*\{\s*\}', '', fixed_css)
-        fixes_applied.append("Removed empty CSS rules")
-    
-    # Fix missing semicolons
-    missing_semicolon = re.findall(r'[^;}\s]\s*\n\s*[a-zA-Z-]', fixed_css)
-    if missing_semicolon:
-        fixed_css = re.sub(r'([^;}\s])\s*\n\s*([a-zA-Z-])', r'\1;\n    \2', fixed_css)
-        fixes_applied.append("Added missing semicolons")
-    
-    # Optimize vendor prefixes
+
+    # Remove unnecessary whitespace and format properly
+    fixed_css = re.sub(r'\s*{\s*', ' {\n    ', fixed_css)
+    fixed_css = re.sub(r';\s*', ';\n    ', fixed_css)
+    fixed_css = re.sub(r'\s*}\s*', '\n}\n\n', fixed_css)
+    fixes_applied.append("Formatted CSS structure")
+
+    # Fix missing vendor prefixes for common properties
     vendor_prefixes = {
         'transform': ['-webkit-transform', '-moz-transform', '-ms-transform'],
         'transition': ['-webkit-transition', '-moz-transition', '-ms-transition'],
         'border-radius': ['-webkit-border-radius', '-moz-border-radius']
     }
-    
-    for property_name, prefixes in vendor_prefixes.items():
-        if property_name in fixed_css:
+
+    for prop, prefixes in vendor_prefixes.items():
+        if prop in fixed_css:
             for prefix in prefixes:
                 if prefix not in fixed_css:
-                    pattern = rf'(\s+){property_name}:\s*([^;]+);'
-                    replacement = rf'\1{prefix}: \2;\n\1{property_name}: \2;'
-                    fixed_css = re.sub(pattern, replacement, fixed_css)
-            fixes_applied.append(f"Added vendor prefixes for {property_name}")
-    
-    # Format CSS properly
-    fixed_css = re.sub(r'\s*{\s*', ' {\n    ', fixed_css)
-    fixed_css = re.sub(r';\s*', ';\n    ', fixed_css)
-    fixed_css = re.sub(r'\s*}\s*', '\n}\n\n', fixed_css)
-    fixes_applied.append("Formatted CSS structure")
-    
+                    fixed_css = re.sub(f'({prop}:[^;]+;)', f'{prefix}: \\1\n    \\1', fixed_css)
+            fixes_applied.append(f"Added vendor prefixes for {prop}")
+
     return {
         "status": "success",
         "original_code": css_content,
@@ -138,11 +108,11 @@ def fix_javascript_issues(js_content: str) -> Dict[str, Any]:
     """Fix common JavaScript issues with ES6+ standards."""
     fixes_applied = []
     fixed_js = js_content
-    
+
     # Fix missing semicolons
     lines = fixed_js.split('\n')
     fixed_lines = []
-    
+
     for line in lines:
         stripped = line.strip()
         if stripped and not stripped.endswith((';', '{', '}', ',', ':', '(', ')')):
@@ -152,28 +122,23 @@ def fix_javascript_issues(js_content: str) -> Dict[str, Any]:
                     if stripped not in ['', '}', '{']:
                         fixes_applied.append("Added missing semicolons")
         fixed_lines.append(line)
-    
+
     fixed_js = '\n'.join(fixed_lines)
-    
+
     # Convert var to let/const where appropriate
     var_pattern = r'\bvar\s+(\w+)\s*='
     var_matches = re.findall(var_pattern, fixed_js)
     if var_matches:
         fixed_js = re.sub(r'\bvar\s+(\w+)\s*=([^;]+);', r'const \1 =\2;', fixed_js)
         fixes_applied.append("Converted var to const where appropriate")
-    
+
     # Fix function declarations to arrow functions where appropriate
     function_pattern = r'function\s+(\w+)\s*\(([^)]*)\)\s*\{'
     if re.search(function_pattern, fixed_js):
         # Convert simple functions to arrow functions
         fixed_js = re.sub(r'function\s+(\w+)\s*\(([^)]*)\)\s*\{', r'const \1 = (\2) => {', fixed_js)
         fixes_applied.append("Converted functions to arrow functions")
-    
-    # Add strict mode if not present
-    if "'use strict'" not in fixed_js and '"use strict"' not in fixed_js:
-        fixed_js = "'use strict';\n\n" + fixed_js
-        fixes_applied.append("Added strict mode")
-    
+
     return {
         "status": "success",
         "original_code": js_content,
@@ -182,84 +147,76 @@ def fix_javascript_issues(js_content: str) -> Dict[str, Any]:
         "timestamp": datetime.now().isoformat()
     }
 
-def fix_php_issues(php_content: str) -> Dict[str, Any]:
-    """Fix common PHP issues with modern PHP standards."""
+def fix_python_issues(python_content: str) -> Dict[str, Any]:
+    """Fix common Python issues with PEP 8 standards."""
     fixes_applied = []
-    fixed_php = php_content
-    
-    # Add opening PHP tag if missing
-    if not fixed_php.strip().startswith('<?php'):
-        fixed_php = '<?php\n' + fixed_php
-        fixes_applied.append("Added opening PHP tag")
-    
-    # Fix missing semicolons
-    lines = fixed_php.split('\n')
-    for i, line in enumerate(lines):
+    fixed_python = python_content
+
+    # Fix import organization
+    lines = fixed_python.split('\n')
+    imports = []
+    from_imports = []
+    other_lines = []
+
+    for line in lines:
         stripped = line.strip()
-        if stripped and not stripped.endswith((';', '{', '}', ':', '?>')):
-            if stripped.startswith('$') or 'echo' in stripped or 'return' in stripped:
-                lines[i] = line + ';'
-                fixes_applied.append("Added missing semicolons")
-    
-    fixed_php = '\n'.join(lines)
-    
-    # Fix deprecated functions
-    deprecated_replacements = {
-        'mysql_connect': 'mysqli_connect',
-        'mysql_query': 'mysqli_query',
-        'mysql_fetch_array': 'mysqli_fetch_array'
-    }
-    
-    for old_func, new_func in deprecated_replacements.items():
-        if old_func in fixed_php:
-            fixed_php = fixed_php.replace(old_func, new_func)
-            fixes_applied.append(f"Replaced deprecated {old_func} with {new_func}")
-    
+        if stripped.startswith('import '):
+            imports.append(line)
+        elif stripped.startswith('from '):
+            from_imports.append(line)
+        else:
+            other_lines.append(line)
+
+    if imports or from_imports:
+        # Sort imports
+        imports.sort()
+        from_imports.sort()
+
+        # Rebuild file with proper import order
+        new_lines = imports + from_imports + [''] + other_lines
+        fixed_python = '\n'.join(new_lines)
+        fixes_applied.append("Organized imports according to PEP 8")
+
+    # Fix spacing around operators
+    fixed_python = re.sub(r'(\w+)=(\w+)', r'\1 = \2', fixed_python)
+    fixed_python = re.sub(r'(\w+)\+(\w+)', r'\1 + \2', fixed_python)
+    fixed_python = re.sub(r'(\w+)-(\w+)', r'\1 - \2', fixed_python)
+
+    if '=' in python_content and ' = ' not in python_content:
+        fixes_applied.append("Added proper spacing around operators")
+
     return {
         "status": "success",
-        "original_code": php_content,
-        "fixed_code": fixed_php,
+        "original_code": python_content,
+        "fixed_code": fixed_python,
         "fixes_applied": fixes_applied,
         "timestamp": datetime.now().isoformat()
     }
 
-def fix_generic_issues(content: str) -> Dict[str, Any]:
-    """Fix generic code issues."""
-    fixes_applied = []
-    fixed_content = content
-    
-    # Fix line endings
-    if '\r\n' in fixed_content:
-        fixed_content = fixed_content.replace('\r\n', '\n')
-        fixes_applied.append("Normalized line endings")
-    
-    # Remove trailing whitespace
-    lines = fixed_content.split('\n')
-    fixed_lines = [line.rstrip() for line in lines]
-    fixed_content = '\n'.join(fixed_lines)
-    fixes_applied.append("Removed trailing whitespace")
-    
-    # Ensure file ends with newline
-    if fixed_content and not fixed_content.endswith('\n'):
-        fixed_content += '\n'
-        fixes_applied.append("Added final newline")
-    
-    return {
-        "status": "success",
-        "original_code": content,
-        "fixed_code": fixed_content,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
+def fix_web_issues(content: str, content_type: str = "html") -> Dict[str, Any]:
+    """General web content fixer."""
+    if content_type.lower() == "html":
+        return fix_html_issues(content)
+    elif content_type.lower() == "css":
+        return fix_css_issues(content)
+    elif content_type.lower() in ["js", "javascript"]:
+        return fix_javascript_issues(content)
+    else:
+        return fix_html_issues(content)
 
-def analyze_code_complexity(code: str) -> Dict[str, Any]:
-    """Analyze code complexity and provide metrics."""
-    lines = code.split('\n')
-    
-    return {
-        "total_lines": len(lines),
-        "non_empty_lines": len([line for line in lines if line.strip()]),
-        "comment_lines": len([line for line in lines if line.strip().startswith(('#', '//', '/*'))]),
-        "complexity_score": min(100, max(0, 100 - len(lines) // 10)),
-        "maintainability": "high" if len(lines) < 100 else "medium" if len(lines) < 500 else "low"
-    }
+def analyze_and_fix(content: str, language: str = "auto") -> Dict[str, Any]:
+    """Analyze content and apply appropriate fixes."""
+    if language == "auto":
+        # Auto-detect language
+        if content.strip().startswith('<!DOCTYPE') or '<html' in content:
+            language = "html"
+        elif content.strip().startswith('@') or 'css' in content.lower():
+            language = "css"
+        elif 'function' in content or 'const' in content or 'let' in content:
+            language = "javascript"
+        elif 'def ' in content or 'import ' in content:
+            language = "python"
+        else:
+            language = "html"
+
+    return fix_code(content, language)
