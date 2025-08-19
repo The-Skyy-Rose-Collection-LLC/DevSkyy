@@ -56,34 +56,6 @@ def fix_html_issues(html_content: str) -> Dict[str, Any]:
         fixed_html = re.sub(r'<img([^>]*?)>', r'<img\1 alt="Image">', fixed_html)
         fixes_applied.append("Added missing alt attributes")
 
-    return {
-        "status": "success",
-        "original_code": html_content,
-        "fixed_code": fixed_html,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
-
-def fix_code(raw_code: str) -> Dict[str, Any]:
-    """Main function to fix code issues."""
-    if not raw_code or not isinstance(raw_code, str):
-        return {
-            "status": "no_code_provided",
-            "message": "No code content to fix"
-        }
-    
-    # Detect code type and apply appropriate fixes
-    if raw_code.strip().startswith('<!DOCTYPE') or '<html' in raw_code:
-        return fix_html_issues(raw_code)
-    elif 'def ' in raw_code or 'import ' in raw_code:
-        return fix_python_issues(raw_code)
-    else:
-        return {
-            "status": "unknown_format",
-            "message": "Code format not recognized",
-            "original_code": raw_code
-        }
-
     # Fix missing charset
     if 'charset' not in fixed_html:
         charset_tag = '<meta charset="UTF-8">'
@@ -98,6 +70,8 @@ def fix_code(raw_code: str) -> Dict[str, Any]:
         "fixes_applied": fixes_applied,
         "timestamp": datetime.now().isoformat()
     }
+
+
 
 def fix_css_issues(css_content: str) -> Dict[str, Any]:
     """Fix common CSS issues with modern standards."""
