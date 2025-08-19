@@ -1,4 +1,21 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
+from datetime import datetime
+from typing import Dict, Any
+import uvicorn
+import logging
+import asyncio
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Import enhanced modules
+from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent
+from agent.modules.inventory_agent import InventoryAgent
+from agent.modules.financial_agent import FinancialAgent
+from agent.modules.ecommerce_agent import EcommerceAgent
+from agent.modules.wordpress_agent import WordPressAgent
+from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
@@ -417,7 +434,6 @@ def manage_avatar_chatbot_continuously() -> Dict[str, Any]:
     }
 
 if __name__ == "__main__":
-    import uvicorn
     print("🚀 Starting DevSkyy Enhanced - The Future of AI Agents")
     print("🌟 Brand Intelligence: MAXIMUM")
     print("📚 Continuous Learning: ACTIVE")
