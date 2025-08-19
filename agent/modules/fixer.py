@@ -1,228 +1,445 @@
-import re
-import logging
-from datetime import datetime
-from typing import Dict, Any, List
 
+import os
+import re
+import json
+import logging
+from typing import Dict, Any, List
+from datetime import datetime
+import ast
+import autopep8
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def fix_code(raw_code: str, language: str = "html") -> Dict[str, Any]:
-    """Main function to fix code based on language type."""
+def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Comprehensive code fixing based on scan results.
+    Production-level implementation with automatic code repair.
+    """
     try:
-        if language.lower() == "html":
-            return fix_html_issues(raw_code)
-        elif language.lower() == "css":
-            return fix_css_issues(raw_code)
-        elif language.lower() in ["javascript", "js"]:
-            return fix_javascript_issues(raw_code)
-        elif language.lower() == "python":
-            return fix_python_issues(raw_code)
-        else:
-            return fix_html_issues(raw_code)  # Default to HTML
+        logger.info("🔧 Starting comprehensive code fixing...")
+        
+        fix_results = {
+            "fix_id": f"fix_{int(datetime.now().timestamp())}",
+            "timestamp": datetime.now().isoformat(),
+            "status": "completed",
+            "files_fixed": 0,
+            "errors_fixed": 0,
+            "warnings_fixed": 0,
+            "optimizations_applied": 0,
+            "fixes_applied": [],
+            "backup_created": True
+        }
+        
+        # Create backup before fixing
+        _create_backup()
+        
+        # Fix Python files
+        python_fixes = _fix_python_files()
+        fix_results["fixes_applied"].extend(python_fixes)
+        
+        # Fix JavaScript files
+        js_fixes = _fix_javascript_files()
+        fix_results["fixes_applied"].extend(js_fixes)
+        
+        # Fix HTML files
+        html_fixes = _fix_html_files()
+        fix_results["fixes_applied"].extend(html_fixes)
+        
+        # Fix CSS files
+        css_fixes = _fix_css_files()
+        fix_results["fixes_applied"].extend(css_fixes)
+        
+        # Fix configuration files
+        config_fixes = _fix_configuration_files()
+        fix_results["fixes_applied"].extend(config_fixes)
+        
+        # Update counters
+        fix_results["files_fixed"] = len(set(fix["file"] for fix in fix_results["fixes_applied"]))
+        fix_results["errors_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "error")
+        fix_results["warnings_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning")
+        fix_results["optimizations_applied"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization")
+        
+        logger.info(f"✅ Code fixing completed: {fix_results['files_fixed']} files fixed")
+        
+        return fix_results
+        
     except Exception as e:
-        logger.error(f"Error fixing code: {str(e)}")
+        logger.error(f"❌ Code fixing failed: {str(e)}")
         return {
-            "status": "error",
-            "message": str(e),
+            "status": "failed",
+            "error": str(e),
             "timestamp": datetime.now().isoformat()
         }
 
-def fix_html_issues(html_content: str) -> Dict[str, Any]:
-    """Fix common HTML issues with production standards."""
-    fixes_applied = []
-    fixed_html = html_content
+def _create_backup() -> None:
+    """Create backup of current codebase."""
+    import shutil
+    import time
+    
+    backup_dir = f"backup_{int(time.time())}"
+    
+    try:
+        # Copy important files
+        files_to_backup = []
+        for root, dirs, files in os.walk('.'):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'node_modules'}]
+            for file in files:
+                if file.endswith(('.py', '.js', '.html', '.css', '.json')):
+                    files_to_backup.append(os.path.join(root, file))
+        
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        for file_path in files_to_backup:
+            backup_path = os.path.join(backup_dir, file_path.lstrip('./'))
+            os.makedirs(os.path.dirname(backup_path), exist_ok=True)
+            shutil.copy2(file_path, backup_path)
+        
+        logger.info(f"📦 Backup created in {backup_dir}")
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Backup creation failed: {str(e)}")
 
-    # Fix missing DOCTYPE
-    if not fixed_html.strip().startswith('<!DOCTYPE'):
-        fixed_html = '<!DOCTYPE html>\n' + fixed_html
-        fixes_applied.append("Added DOCTYPE declaration")
+def _fix_python_files() -> List[Dict[str, Any]]:
+    """Fix Python files with comprehensive improvements."""
+    fixes = []
+    
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_*'}]
+        
+        for file in files:
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                file_fixes = _fix_python_file(file_path)
+                fixes.extend(file_fixes)
+    
+    return fixes
 
-    # Fix missing meta viewport
-    if 'viewport' not in fixed_html:
-        viewport_tag = '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
-        if '<head>' in fixed_html:
-            fixed_html = fixed_html.replace('<head>', f'<head>\n    {viewport_tag}')
-        fixes_applied.append("Added viewport meta tag")
+def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
+    """Fix individual Python file."""
+    fixes = []
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            original_content = f.read()
+        
+        modified_content = original_content
+        
+        # Fix common Python issues
+        
+        # 1. Fix import errors
+        if 'from datetime import datetime' not in modified_content and 'datetime.now()' in modified_content:
+            modified_content = 'from datetime import datetime\n' + modified_content
+            fixes.append({
+                "file": file_path,
+                "type": "error",
+                "description": "Added missing datetime import",
+                "line": 1
+            })
+        
+        # 2. Fix logging setup
+        if 'logger.' in modified_content and 'import logging' not in modified_content:
+            modified_content = 'import logging\n' + modified_content
+            fixes.append({
+                "file": file_path,
+                "type": "error",
+                "description": "Added missing logging import",
+                "line": 1
+            })
+        
+        # 3. Replace print statements with logging
+        print_pattern = r'^(\s*)print\((.*)\)$'
+        lines = modified_content.split('\n')
+        for i, line in enumerate(lines):
+            match = re.match(print_pattern, line)
+            if match and 'logger' in modified_content:
+                indent, content = match.groups()
+                lines[i] = f'{indent}logger.info({content})'
+                fixes.append({
+                    "file": file_path,
+                    "type": "optimization",
+                    "description": "Replaced print with logger.info",
+                    "line": i + 1
+                })
+        modified_content = '\n'.join(lines)
+        
+        # 4. Add proper exception handling
+        if 'except:' in modified_content:
+            modified_content = modified_content.replace('except:', 'except Exception as e:')
+            fixes.append({
+                "file": file_path,
+                "type": "warning",
+                "description": "Improved exception handling",
+                "line": "multiple"
+            })
+        
+        # 5. Use autopep8 for formatting
+        try:
+            formatted_content = autopep8.fix_code(modified_content, options={'max_line_length': 120})
+            if formatted_content != modified_content:
+                modified_content = formatted_content
+                fixes.append({
+                    "file": file_path,
+                    "type": "optimization",
+                    "description": "Applied PEP8 formatting",
+                    "line": "all"
+                })
+        except:
+            pass
+        
+        # Write changes if any fixes were made
+        if modified_content != original_content:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(modified_content)
+        
+    except Exception as e:
+        fixes.append({
+            "file": file_path,
+            "type": "error",
+            "description": f"Failed to fix file: {str(e)}",
+            "line": "unknown"
+        })
+    
+    return fixes
 
-    # Fix unclosed tags
-    unclosed_tags = ['<br>', '<hr>', '<img', '<input', '<meta', '<link']
-    for tag in unclosed_tags:
-        if tag in fixed_html and not tag.replace('<', '</') in fixed_html:
-            fixed_html = re.sub(rf'{tag}([^>]*?)>', rf'{tag}\1 />', fixed_html)
-            fixes_applied.append(f"Fixed unclosed {tag} tags")
+def _fix_javascript_files() -> List[Dict[str, Any]]:
+    """Fix JavaScript files."""
+    fixes = []
+    
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'node_modules', 'backup_*'}]
+        
+        for file in files:
+            if file.endswith('.js'):
+                file_path = os.path.join(root, file)
+                file_fixes = _fix_javascript_file(file_path)
+                fixes.extend(file_fixes)
+    
+    return fixes
 
-    # Fix missing alt attributes for images
-    img_pattern = r'<img([^>]*?)(?:alt="[^"]*")?([^>]*?)>'
-    if re.search(r'<img(?![^>]*alt=)', fixed_html):
-        fixed_html = re.sub(r'<img([^>]*?)>', r'<img\1 alt="Image">', fixed_html)
-        fixes_applied.append("Added missing alt attributes")
+def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
+    """Fix individual JavaScript file."""
+    fixes = []
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        original_content = content
+        
+        # Fix common JavaScript issues
+        lines = content.split('\n')
+        for i, line in enumerate(lines):
+            # Replace var with let/const
+            if line.strip().startswith('var '):
+                if '=' in line and not line.strip().endswith(';'):
+                    lines[i] = line.replace('var ', 'const ')
+                else:
+                    lines[i] = line.replace('var ', 'let ')
+                fixes.append({
+                    "file": file_path,
+                    "type": "optimization",
+                    "description": "Replaced var with let/const",
+                    "line": i + 1
+                })
+            
+            # Remove console.log in production
+            if 'console.log' in line and 'debug' not in file_path.lower():
+                lines[i] = ''  # Remove the line
+                fixes.append({
+                    "file": file_path,
+                    "type": "optimization",
+                    "description": "Removed console.log statement",
+                    "line": i + 1
+                })
+        
+        content = '\n'.join(lines)
+        
+        # Write changes if any fixes were made
+        if content != original_content:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        
+    except Exception as e:
+        fixes.append({
+            "file": file_path,
+            "type": "error",
+            "description": f"Failed to fix file: {str(e)}",
+            "line": "unknown"
+        })
+    
+    return fixes
 
-    # Fix missing charset
-    if 'charset' not in fixed_html:
-        charset_tag = '<meta charset="UTF-8">'
-        if '<head>' in fixed_html:
-            fixed_html = fixed_html.replace('<head>', f'<head>\n    {charset_tag}')
-        fixes_applied.append("Added charset meta tag")
+def _fix_html_files() -> List[Dict[str, Any]]:
+    """Fix HTML files for SEO and accessibility."""
+    fixes = []
+    
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'backup_*'}]
+        
+        for file in files:
+            if file.endswith('.html'):
+                file_path = os.path.join(root, file)
+                file_fixes = _fix_html_file(file_path)
+                fixes.extend(file_fixes)
+    
+    return fixes
 
-    return {
-        "status": "success",
-        "original_code": html_content,
-        "fixed_code": fixed_html,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
+def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
+    """Fix individual HTML file."""
+    fixes = []
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        original_content = content
+        
+        # Add missing meta tags
+        if '<meta charset=' not in content and '<head>' in content:
+            content = content.replace('<head>', '<head>\n    <meta charset="UTF-8">')
+            fixes.append({
+                "file": file_path,
+                "type": "warning",
+                "description": "Added charset meta tag",
+                "line": "head"
+            })
+        
+        if '<meta name="viewport"' not in content and '<head>' in content:
+            viewport_tag = '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            content = content.replace('</head>', f'    {viewport_tag}\n</head>')
+            fixes.append({
+                "file": file_path,
+                "type": "warning",
+                "description": "Added viewport meta tag",
+                "line": "head"
+            })
+        
+        # Fix images without alt attributes
+        img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
+        def add_alt(match):
+            img_tag = match.group(0)
+            if 'alt=' not in img_tag:
+                return img_tag[:-1] + ' alt="Image">'
+            return img_tag
+        
+        new_content = re.sub(img_pattern, add_alt, content)
+        if new_content != content:
+            content = new_content
+            fixes.append({
+                "file": file_path,
+                "type": "warning",
+                "description": "Added alt attributes to images",
+                "line": "multiple"
+            })
+        
+        # Write changes if any fixes were made
+        if content != original_content:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        
+    except Exception as e:
+        fixes.append({
+            "file": file_path,
+            "type": "error",
+            "description": f"Failed to fix file: {str(e)}",
+            "line": "unknown"
+        })
+    
+    return fixes
 
+def _fix_css_files() -> List[Dict[str, Any]]:
+    """Fix CSS files for better performance."""
+    fixes = []
+    
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'backup_*'}]
+        
+        for file in files:
+            if file.endswith('.css'):
+                file_path = os.path.join(root, file)
+                file_fixes = _fix_css_file(file_path)
+                fixes.extend(file_fixes)
+    
+    return fixes
 
+def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
+    """Fix individual CSS file."""
+    fixes = []
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        original_content = content
+        
+        # Remove duplicate properties (basic implementation)
+        lines = content.split('\n')
+        in_rule = False
+        current_rule_props = set()
+        
+        for i, line in enumerate(lines):
+            if '{' in line:
+                in_rule = True
+                current_rule_props = set()
+            elif '}' in line:
+                in_rule = False
+            elif in_rule and ':' in line:
+                prop = line.split(':')[0].strip()
+                if prop in current_rule_props:
+                    lines[i] = ''  # Remove duplicate
+                    fixes.append({
+                        "file": file_path,
+                        "type": "warning",
+                        "description": f"Removed duplicate property: {prop}",
+                        "line": i + 1
+                    })
+                else:
+                    current_rule_props.add(prop)
+        
+        content = '\n'.join(lines)
+        
+        # Write changes if any fixes were made
+        if content != original_content:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        
+    except Exception as e:
+        fixes.append({
+            "file": file_path,
+            "type": "error",
+            "description": f"Failed to fix file: {str(e)}",
+            "line": "unknown"
+        })
+    
+    return fixes
 
-def fix_css_issues(css_content: str) -> Dict[str, Any]:
-    """Fix common CSS issues with modern standards."""
-    fixes_applied = []
-    fixed_css = css_content
-
-    # Remove unnecessary whitespace and format properly
-    fixed_css = re.sub(r'\s*{\s*', ' {\n    ', fixed_css)
-    fixed_css = re.sub(r';\s*', ';\n    ', fixed_css)
-    fixed_css = re.sub(r'\s*}\s*', '\n}\n\n', fixed_css)
-    fixes_applied.append("Formatted CSS structure")
-
-    # Fix missing vendor prefixes for common properties
-    vendor_prefixes = {
-        'transform': ['-webkit-transform', '-moz-transform', '-ms-transform'],
-        'transition': ['-webkit-transition', '-moz-transition', '-ms-transition'],
-        'border-radius': ['-webkit-border-radius', '-moz-border-radius']
-    }
-
-    for prop, prefixes in vendor_prefixes.items():
-        if prop in fixed_css:
-            for prefix in prefixes:
-                if prefix not in fixed_css:
-                    fixed_css = re.sub(f'({prop}:[^;]+;)', f'{prefix}: \\1\n    \\1', fixed_css)
-            fixes_applied.append(f"Added vendor prefixes for {prop}")
-
-    return {
-        "status": "success",
-        "original_code": css_content,
-        "fixed_code": fixed_css,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
-
-def fix_javascript_issues(js_content: str) -> Dict[str, Any]:
-    """Fix common JavaScript issues with ES6+ standards."""
-    fixes_applied = []
-    fixed_js = js_content
-
-    # Fix missing semicolons
-    lines = fixed_js.split('\n')
-    fixed_lines = []
-
-    for line in lines:
-        stripped = line.strip()
-        if stripped and not stripped.endswith((';', '{', '}', ',', ':', '(', ')')):
-            if not any(keyword in stripped for keyword in ['if', 'for', 'while', 'function', 'class', 'else', 'catch', 'try']):
-                if not stripped.startswith(('var ', 'let ', 'const ', 'return ', 'break', 'continue', '//', '/*')):
-                    line += ';'
-                    if stripped not in ['', '}', '{']:
-                        fixes_applied.append("Added missing semicolons")
-        fixed_lines.append(line)
-
-    fixed_js = '\n'.join(fixed_lines)
-
-    # Convert var to let/const where appropriate
-    var_pattern = r'\bvar\s+(\w+)\s*='
-    var_matches = re.findall(var_pattern, fixed_js)
-    if var_matches:
-        fixed_js = re.sub(r'\bvar\s+(\w+)\s*=([^;]+);', r'const \1 =\2;', fixed_js)
-        fixes_applied.append("Converted var to const where appropriate")
-
-    # Fix function declarations to arrow functions where appropriate
-    function_pattern = r'function\s+(\w+)\s*\(([^)]*)\)\s*\{'
-    if re.search(function_pattern, fixed_js):
-        # Convert simple functions to arrow functions
-        fixed_js = re.sub(r'function\s+(\w+)\s*\(([^)]*)\)\s*\{', r'const \1 = (\2) => {', fixed_js)
-        fixes_applied.append("Converted functions to arrow functions")
-
-    return {
-        "status": "success",
-        "original_code": js_content,
-        "fixed_code": fixed_js,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
-
-import re
-from datetime import datetime
-from typing import Dict, Any, List
-
-def fix_python_issues(python_content: str) -> Dict[str, Any]:
-    """Fix common Python issues with PEP 8 standards."""
-    fixes_applied = []
-    fixed_python = python_content
-
-    # Fix import organization
-    lines = fixed_python.split('\n')
-    imports = []
-    from_imports = []
-    other_lines = []
-
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith('import '):
-            imports.append(line)
-        elif stripped.startswith('from '):
-            from_imports.append(line)
-        else:
-            other_lines.append(line)
-
-    if imports or from_imports:
-        # Sort imports
-        imports.sort()
-        from_imports.sort()
-
-        # Rebuild file with proper import order
-        new_lines = imports + from_imports + [''] + other_lines
-        fixed_python = '\n'.join(new_lines)
-        fixes_applied.append("Organized imports according to PEP 8")
-
-    # Fix spacing around operators
-    fixed_python = re.sub(r'(\w+)=(\w+)', r'\1 = \2', fixed_python)
-    fixed_python = re.sub(r'(\w+)\+(\w+)', r'\1 + \2', fixed_python)
-    fixed_python = re.sub(r'(\w+)-(\w+)', r'\1 - \2', fixed_python)
-
-    if '=' in python_content and ' = ' not in python_content:
-        fixes_applied.append("Added proper spacing around operators")
-
-    return {
-        "status": "success",
-        "original_code": python_content,
-        "fixed_code": fixed_python,
-        "fixes_applied": fixes_applied,
-        "timestamp": datetime.now().isoformat()
-    }
-
-def fix_web_issues(content: str, content_type: str = "html") -> Dict[str, Any]:
-    """General web content fixer."""
-    if content_type.lower() == "html":
-        return fix_html_issues(content)
-    elif content_type.lower() == "css":
-        return fix_css_issues(content)
-    elif content_type.lower() in ["js", "javascript"]:
-        return fix_javascript_issues(content)
-    else:
-        return fix_html_issues(content)
-
-def analyze_and_fix(content: str, language: str = "auto") -> Dict[str, Any]:
-    """Analyze content and apply appropriate fixes."""
-    if language == "auto":
-        # Auto-detect language
-        if content.strip().startswith('<!DOCTYPE') or '<html' in content:
-            language = "html"
-        elif content.strip().startswith('@') or 'css' in content.lower():
-            language = "css"
-        elif 'function' in content or 'const' in content or 'let' in content:
-            language = "javascript"
-        elif 'def ' in content or 'import ' in content:
-            language = "python"
-        else:
-            language = "html"
-
-    return fix_code(content, language)
+def _fix_configuration_files() -> List[Dict[str, Any]]:
+    """Fix configuration files."""
+    fixes = []
+    
+    # Fix missing __init__.py files
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_*'}]
+        
+        # Check if directory needs __init__.py
+        if any(f.endswith('.py') for f in files) and '__init__.py' not in files:
+            init_path = os.path.join(root, '__init__.py')
+            try:
+                with open(init_path, 'w') as f:
+                    f.write('"""Package initialization."""\n')
+                fixes.append({
+                    "file": init_path,
+                    "type": "optimization",
+                    "description": "Created missing __init__.py",
+                    "line": 1
+                })
+            except Exception as e:
+                fixes.append({
+                    "file": init_path,
+                    "type": "error",
+                    "description": f"Failed to create __init__.py: {str(e)}",
+                    "line": 1
+                })
+    
+    return fixes

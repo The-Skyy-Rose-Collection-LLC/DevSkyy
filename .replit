@@ -14,7 +14,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+args = "python main.py"
 
 [[workflows.workflow]]
 name = "Continuous Monitoring"
