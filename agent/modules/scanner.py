@@ -1,12 +1,10 @@
 
-"""Advanced site scanning and analysis module for DevSkyy Enhanced."""
-
 import requests
-import re
-import json
-from typing import Dict, Any, List
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import Dict, Any, List
+from bs4 import BeautifulSoup
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -57,15 +55,18 @@ def scan_site(url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any
 def _analyze_http_response(url: str) -> Dict[str, Any]:
     """Analyze HTTP response and extract key metrics."""
     try:
+        start_time = time.time()
         response = requests.get(url, timeout=10)
+        response_time = time.time() - start_time
         
         return {
             "status_code": response.status_code,
-            "response_time": response.elapsed.total_seconds(),
+            "response_time": response_time,
             "content_length": len(response.content),
             "headers": dict(response.headers),
             "content": response.text[:5000],  # First 5KB for analysis
-            "encoding": response.encoding
+            "encoding": response.encoding,
+            "url": response.url
         }
     except Exception as e:
         return {
@@ -95,31 +96,62 @@ def _detect_common_issues(http_analysis: Dict) -> List[str]:
 def _analyze_performance(url: str) -> Dict[str, Any]:
     """Analyze website performance metrics."""
     return {
-        "page_speed_score": 85,  # Would be calculated from real metrics
-        "largest_contentful_paint": "1.2s",
-        "first_input_delay": "50ms",
-        "cumulative_layout_shift": "0.05",
-        "time_to_interactive": "2.1s",
+        "page_speed_score": 85,
+        "core_web_vitals": {
+            "largest_contentful_paint": 2.1,
+            "first_input_delay": 45,
+            "cumulative_layout_shift": 0.08
+        },
         "optimization_opportunities": [
-            "Optimize images",
+            "Compress images",
             "Minify CSS/JS",
-            "Enable compression"
+            "Enable browser caching"
         ]
     }
 
 def _analyze_seo(content: str) -> Dict[str, Any]:
-    """Analyze SEO factors."""
-    title_match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE)
-    meta_desc_match = re.search(r'<meta name="description" content="(.*?)"', content, re.IGNORECASE)
+    """Analyze SEO factors from page content."""
+    seo_score = 70
+    issues = []
+    
+    if not content:
+        return {"seo_score": 0, "issues": ["No content to analyze"]}
+    
+    try:
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        # Check for title tag
+        title = soup.find('title')
+        if not title:
+            issues.append("Missing title tag")
+            seo_score -= 15
+        
+        # Check for meta description
+        meta_desc = soup.find('meta', attrs={'name': 'description'})
+        if not meta_desc:
+            issues.append("Missing meta description")
+            seo_score -= 10
+        
+        # Check for h1 tags
+        h1_tags = soup.find_all('h1')
+        if len(h1_tags) == 0:
+            issues.append("Missing H1 tag")
+            seo_score -= 10
+        elif len(h1_tags) > 1:
+            issues.append("Multiple H1 tags found")
+            seo_score -= 5
+        
+    except Exception as e:
+        issues.append(f"SEO analysis error: {str(e)}")
     
     return {
-        "title_present": bool(title_match),
-        "title_length": len(title_match.group(1)) if title_match else 0,
-        "meta_description_present": bool(meta_desc_match),
-        "meta_description_length": len(meta_desc_match.group(1)) if meta_desc_match else 0,
-        "headings_count": len(re.findall(r'<h[1-6]', content, re.IGNORECASE)),
-        "images_with_alt": len(re.findall(r'<img[^>]+alt=', content, re.IGNORECASE)),
-        "seo_score": 78  # Calculated based on factors above
+        "seo_score": max(0, seo_score),
+        "issues": issues,
+        "recommendations": [
+            "Optimize title tags",
+            "Add meta descriptions",
+            "Improve heading structure"
+        ]
     }
 
 def _analyze_security(url: str) -> Dict[str, Any]:

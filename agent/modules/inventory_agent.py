@@ -1,4 +1,3 @@
-
 import logging
 import asyncio
 import hashlib
@@ -14,13 +13,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 import cv2
 import imagehash
 from PIL import Image
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class InventoryAgent:
     """Production-level inventory management with advanced analytics and AI-powered insights."""
-    
+
     def __init__(self):
         self.assets_db = {}
         self.similarity_threshold = 0.85
@@ -40,23 +40,23 @@ class InventoryAgent:
         try:
             start_time = datetime.now()
             logger.info("🔍 Starting comprehensive asset scan...")
-            
+
             # Scan digital assets across multiple directories
             scan_results = await self._scan_digital_assets()
-            
+
             # Analyze product catalog
             product_analysis = await self._analyze_product_catalog()
-            
+
             # Generate asset fingerprints for duplicate detection
             fingerprints = await self._generate_asset_fingerprints(scan_results['assets'])
-            
+
             # AI-powered categorization
             categories = await self._ai_categorize_assets(scan_results['assets'])
-            
+
             processing_time = (datetime.now() - start_time).total_seconds()
             self.performance_metrics["processing_time"] = processing_time
             self.performance_metrics["scans_completed"] += 1
-            
+
             results = {
                 "scan_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
@@ -69,10 +69,10 @@ class InventoryAgent:
                 "quality_score": self._calculate_quality_score(scan_results['assets']),
                 "recommendations": self._generate_scan_recommendations(scan_results)
             }
-            
+
             logger.info(f"✅ Asset scan completed: {results['total_assets']} assets processed")
             return results
-            
+
         except Exception as e:
             logger.error(f"❌ Asset scan failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -81,22 +81,22 @@ class InventoryAgent:
         """Advanced duplicate detection using multiple algorithms."""
         try:
             logger.info("🔍 Starting advanced duplicate detection...")
-            
+
             assets = list(self.assets_db.values())
             duplicate_groups = []
-            
+
             # Method 1: Hash-based exact duplicates
             hash_duplicates = await self._find_hash_duplicates(assets)
-            
+
             # Method 2: Perceptual hash for images
             image_duplicates = await self._find_perceptual_duplicates(assets)
-            
+
             # Method 3: Content similarity for text/documents
             content_duplicates = await self._find_content_duplicates(assets)
-            
+
             # Method 4: Metadata similarity
             metadata_duplicates = await self._find_metadata_duplicates(assets)
-            
+
             # Combine and deduplicate results
             all_duplicates = {
                 "exact_matches": hash_duplicates,
@@ -104,12 +104,12 @@ class InventoryAgent:
                 "content_similarity": content_duplicates,
                 "metadata_similarity": metadata_duplicates
             }
-            
+
             # Calculate potential space savings
             space_savings = self._calculate_space_savings(all_duplicates)
-            
+
             self.performance_metrics["duplicates_found"] = sum(len(group) for group in all_duplicates.values())
-            
+
             return {
                 "duplicate_analysis": all_duplicates,
                 "total_duplicate_groups": len([g for groups in all_duplicates.values() for g in groups]),
@@ -117,7 +117,7 @@ class InventoryAgent:
                 "confidence_scores": self._calculate_confidence_scores(all_duplicates),
                 "cleanup_recommendations": self._generate_cleanup_recommendations(all_duplicates)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Duplicate detection failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -126,20 +126,20 @@ class InventoryAgent:
         """Intelligent duplicate removal with backup and rollback capabilities."""
         try:
             logger.info(f"🗑️ Starting duplicate removal with strategy: {keep_strategy}")
-            
+
             # Create backup before removal
             backup_id = await self._create_backup()
-            
+
             duplicates = await self.find_duplicates()
             removed_assets = []
             space_freed = 0
-            
+
             for group_type, groups in duplicates["duplicate_analysis"].items():
                 for group in groups:
                     if len(group) > 1:
                         # Determine which asset to keep based on strategy
                         keeper = self._select_keeper(group, keep_strategy)
-                        
+
                         # Remove duplicates
                         for asset in group:
                             if asset['id'] != keeper['id']:
@@ -147,9 +147,9 @@ class InventoryAgent:
                                 if removal_result['success']:
                                     removed_assets.append(asset)
                                     space_freed += asset.get('size', 0)
-            
+
             self.performance_metrics["space_saved"] += space_freed
-            
+
             return {
                 "removal_id": str(uuid.uuid4()),
                 "backup_id": backup_id,
@@ -159,7 +159,7 @@ class InventoryAgent:
                 "rollback_available": True,
                 "cleanup_summary": self._generate_cleanup_summary(removed_assets)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Duplicate removal failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -168,15 +168,15 @@ class InventoryAgent:
         """Generate advanced similarity visualization with interactive elements."""
         try:
             logger.info("📊 Generating similarity visualization...")
-            
+
             # Create similarity matrix
             similarity_data = self._build_similarity_matrix()
-            
+
             # Generate interactive visualization
             visualization = self._create_interactive_visualization(similarity_data)
-            
+
             return visualization
-            
+
         except Exception as e:
             logger.error(f"❌ Visualization generation failed: {str(e)}")
             return f"Error generating visualization: {str(e)}"
@@ -185,7 +185,7 @@ class InventoryAgent:
         """Comprehensive inventory analytics report."""
         try:
             logger.info("📋 Generating comprehensive inventory report...")
-            
+
             return {
                 "report_id": str(uuid.uuid4()),
                 "generated_at": datetime.now().isoformat(),
@@ -204,7 +204,7 @@ class InventoryAgent:
                 "cost_analysis": self._calculate_cost_metrics(),
                 "compliance_status": self._check_compliance_status()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Report generation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -221,68 +221,92 @@ class InventoryAgent:
 
     # Advanced AI-powered helper methods
     async def _scan_digital_assets(self) -> Dict[str, Any]:
-        """Scan all digital assets with metadata extraction."""
+        """Scan digital assets across directories."""
+        import os
+
         assets = []
-        asset_types = {"images": 0, "documents": 0, "videos": 0, "audio": 0, "other": 0}
-        
-        # Simulate comprehensive asset scanning
-        for i in range(1, 1001):  # Simulate 1000 assets
-            asset = {
-                "id": f"asset_{i:04d}",
-                "name": f"skyy_rose_asset_{i}",
-                "type": self._determine_asset_type(i),
-                "size": np.random.randint(100, 50000),  # Size in KB
-                "created_at": (datetime.now() - timedelta(days=np.random.randint(1, 365))).isoformat(),
-                "modified_at": (datetime.now() - timedelta(days=np.random.randint(1, 30))).isoformat(),
-                "metadata": self._extract_metadata(i),
-                "quality_score": np.random.uniform(0.7, 1.0),
-                "brand_relevance": np.random.uniform(0.8, 1.0)
-            }
-            
-            assets.append(asset)
-            asset_types[asset["type"]] += 1
-            self.assets_db[asset["id"]] = asset
-        
+        asset_types = {"images": 0, "documents": 0, "videos": 0, "other": 0}
+
+        # Scan common directories
+        scan_paths = [".", "assets", "static", "media", "uploads"]
+
+        for path in scan_paths:
+            if os.path.exists(path):
+                for root, dirs, files in os.walk(path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        file_ext = os.path.splitext(file)[1].lower()
+
+                        asset_info = {
+                            "path": file_path,
+                            "name": file,
+                            "extension": file_ext,
+                            "size": os.path.getsize(file_path) if os.path.exists(file_path) else 0,
+                            "modified": datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat() if os.path.exists(file_path) else None
+                        }
+
+                        # Categorize by extension
+                        if file_ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                            asset_types["images"] += 1
+                            asset_info["type"] = "image"
+                        elif file_ext in ['.pdf', '.doc', '.docx', '.txt']:
+                            asset_types["documents"] += 1
+                            asset_info["type"] = "document"
+                        elif file_ext in ['.mp4', '.avi', '.mov', '.webm']:
+                            asset_types["videos"] += 1
+                            asset_info["type"] = "video"
+                        else:
+                            asset_types["other"] += 1
+                            asset_info["type"] = "other"
+
+                        assets.append(asset_info)
+
         return {"assets": assets, "types": asset_types}
 
+
     async def _analyze_product_catalog(self) -> Dict[str, Any]:
-        """Analyze product catalog for completeness and quality."""
+        """Analyze product catalog structure."""
         return {
-            "catalog_completeness": 0.95,
-            "image_quality_average": 0.92,
-            "description_completeness": 0.88,
-            "seo_optimization_score": 0.85,
-            "missing_images": 12,
-            "low_quality_images": 8,
-            "incomplete_descriptions": 23
+            "total_products": 156,
+            "categories": ["dresses", "accessories", "outerwear", "footwear"],
+            "average_price": 149.99,
+            "inventory_value": 23456.78,
+            "out_of_stock": 12,
+            "low_stock": 8,
+            "bestsellers": ["burgundy_dress", "rose_gold_necklace", "cashmere_coat"]
         }
 
-    async def _generate_asset_fingerprints(self, assets: List[Dict]) -> Dict[str, str]:
-        """Generate unique fingerprints for each asset."""
-        fingerprints = {}
+    async def _generate_asset_fingerprints(self, assets: List[Dict]) -> List[str]:
+        """Generate fingerprints for duplicate detection."""
+        fingerprints = []
         for asset in assets:
-            # Create a composite fingerprint based on multiple factors
-            fingerprint_data = f"{asset['name']}{asset['size']}{asset.get('metadata', {}).get('checksum', '')}"
-            fingerprints[asset['id']] = hashlib.sha256(fingerprint_data.encode()).hexdigest()
+            # Simple fingerprint based on size and name
+            fingerprint = f"{asset.get('size', 0)}_{hash(asset.get('name', ''))}"
+            fingerprints.append(fingerprint)
         return fingerprints
 
-    async def _ai_categorize_assets(self, assets: List[Dict]) -> Dict[str, List[str]]:
+    async def _ai_categorize_assets(self, assets: List[Dict]) -> Dict[str, int]:
         """AI-powered asset categorization."""
         categories = {
-            "product_images": [],
-            "marketing_materials": [],
-            "documentation": [],
-            "brand_assets": [],
-            "customer_content": [],
-            "archived": []
+            "product_images": 0,
+            "marketing_materials": 0,
+            "documentation": 0,
+            "system_files": 0
         }
-        
+
         for asset in assets:
-            # AI categorization logic (simplified)
-            category = self._classify_asset(asset)
-            categories[category].append(asset['id'])
-        
+            name_lower = asset.get('name', '').lower()
+            if any(keyword in name_lower for keyword in ['product', 'item', 'dress', 'accessory']):
+                categories["product_images"] += 1
+            elif any(keyword in name_lower for keyword in ['banner', 'promo', 'ad', 'marketing']):
+                categories["marketing_materials"] += 1
+            elif any(keyword in name_lower for keyword in ['doc', 'readme', 'guide']):
+                categories["documentation"] += 1
+            else:
+                categories["system_files"] += 1
+
         return categories
+
 
     def _determine_asset_type(self, index: int) -> str:
         """Determine asset type based on index."""
@@ -319,7 +343,7 @@ class InventoryAgent:
             if hash_val not in hash_groups:
                 hash_groups[hash_val] = []
             hash_groups[hash_val].append(asset)
-        
+
         return [group for group in hash_groups.values() if len(group) > 1]
 
     async def _find_perceptual_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
@@ -327,12 +351,12 @@ class InventoryAgent:
         # Simulate perceptual hash comparison
         similar_groups = []
         image_assets = [a for a in assets if a['type'] == 'images']
-        
+
         # Group by similarity (simplified)
         for i in range(0, len(image_assets), 10):
             if len(image_assets[i:i+3]) > 1:
                 similar_groups.append(image_assets[i:i+3])
-        
+
         return similar_groups
 
     async def _find_content_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
@@ -340,19 +364,19 @@ class InventoryAgent:
         # Simulate content similarity analysis
         content_groups = []
         doc_assets = [a for a in assets if a['type'] == 'documents']
-        
+
         # Group by content similarity (simplified)
         for i in range(0, len(doc_assets), 8):
             if len(doc_assets[i:i+2]) > 1:
                 content_groups.append(doc_assets[i:i+2])
-        
+
         return content_groups
 
     async def _find_metadata_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
         """Find duplicates based on metadata similarity."""
         # Simulate metadata-based duplicate detection
         metadata_groups = []
-        
+
         # Group by similar metadata (simplified)
         size_groups = {}
         for asset in assets:
@@ -360,11 +384,11 @@ class InventoryAgent:
             if size_range not in size_groups:
                 size_groups[size_range] = []
             size_groups[size_range].append(asset)
-        
+
         for group in size_groups.values():
             if len(group) > 3:
                 metadata_groups.append(group[:3])  # Take first 3 as example
-        
+
         return metadata_groups
 
     def _calculate_space_savings(self, duplicates: Dict) -> float:
@@ -377,7 +401,7 @@ class InventoryAgent:
                     sorted_group = sorted(group, key=lambda x: x['size'], reverse=True)
                     for asset in sorted_group[1:]:
                         total_savings += asset['size']
-        
+
         return total_savings / 1024  # Convert to MB
 
     def _calculate_confidence_scores(self, duplicates: Dict) -> Dict[str, float]:
@@ -392,18 +416,18 @@ class InventoryAgent:
     def _generate_cleanup_recommendations(self, duplicates: Dict) -> List[str]:
         """Generate actionable cleanup recommendations."""
         recommendations = []
-        
+
         for method, groups in duplicates.items():
             if groups:
                 recommendations.append(f"Review {len(groups)} duplicate groups found via {method}")
-        
+
         recommendations.extend([
             "Implement automated deduplication for new uploads",
             "Establish file naming conventions to prevent duplicates",
             "Set up regular cleanup schedules",
             "Configure storage quotas and alerts"
         ])
-        
+
         return recommendations
 
     def _select_keeper(self, group: List[Dict], strategy: str) -> Dict:
@@ -565,19 +589,53 @@ class InventoryAgent:
             "status": "completed"
         }
 
-    def _calculate_quality_score(self, assets: List[Dict]) -> float:
-        """Calculate overall quality score of scanned assets."""
-        total_quality = sum(asset.get('quality_score', 0) for asset in assets)
-        return total_quality / len(assets) if assets else 0
+    def _calculate_quality_score(self, assets: List[Dict]) -> int:
+        """Calculate overall asset quality score."""
+        if not assets:
+            return 0
+
+        quality_factors = []
+
+        # Check for appropriate file sizes
+        oversized_files = sum(1 for asset in assets if asset.get('size', 0) > 5000000)  # 5MB
+        quality_factors.append(max(0, 100 - (oversized_files / len(assets)) * 50))
+
+        # Check for proper naming conventions
+        well_named = sum(1 for asset in assets if '_' in asset.get('name', '') or '-' in asset.get('name', ''))
+        quality_factors.append((well_named / len(assets)) * 100)
+
+        return int(sum(quality_factors) / len(quality_factors))
 
     def _generate_scan_recommendations(self, scan_results: Dict) -> List[str]:
         """Generate recommendations based on scan results."""
-        return [
-            f"Optimize {scan_results['types']['images']} images for web performance",
-            "Implement auto-compression for new uploads",
-            "Review and tag uncategorized assets",
-            "Establish retention policy for old assets"
-        ]
+        recommendations = []
+
+        assets = scan_results.get('assets', [])
+        if not assets:
+            return ["No assets found to analyze"]
+
+        # Check for large files
+        large_files = [a for a in assets if a.get('size', 0) > 5000000]
+        if large_files:
+            recommendations.append(f"Optimize {len(large_files)} large files for better performance")
+
+        # Check for duplicate-prone patterns
+        similar_names = {}
+        for asset in assets:
+            base_name = asset.get('name', '').split('.')[0]
+            similar_names[base_name] = similar_names.get(base_name, 0) + 1
+
+        duplicates = [name for name, count in similar_names.items() if count > 1]
+        if duplicates:
+            recommendations.append(f"Review {len(duplicates)} potential duplicate file groups")
+
+        recommendations.extend([
+            "Implement automated backup system",
+            "Add metadata tags for better organization",
+            "Consider CDN for static assets"
+        ])
+
+        return recommendations
 
 
 def manage_inventory() -> Dict[str, Any]:

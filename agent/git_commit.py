@@ -1,128 +1,118 @@
 
 import subprocess
-import os
+import logging
 from datetime import datetime
 from typing import Dict, Any
-from agent.config.ssh_config import ssh_config
+
+logger = logging.getLogger(__name__)
 
 def commit_fixes(fixed_code: Dict[str, Any]) -> Dict[str, Any]:
     """Commit fixes to git repository."""
     try:
         # Add all changes
-        subprocess.run(['git', 'add', '.'], check=True, cwd='.')
+        subprocess.run(["git", "add", "."], check=True, capture_output=True)
         
         # Create commit message
-        commit_message = f"DevSkyy fixes applied: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        if 'fixes_applied' in fixed_code:
-            commit_message += f" - {', '.join(fixed_code['fixes_applied'])}"
+        commit_message = f"DevSkyy Auto-Fix: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        if isinstance(fixed_code, dict) and "fixes_applied" in fixed_code:
+            fixes = fixed_code["fixes_applied"]
+            if fixes:
+                commit_message += f" - Applied: {', '.join(fixes)}"
         
         # Commit changes
-        result = subprocess.run(['git', 'commit', '-m', commit_message], 
-                              capture_output=True, text=True, cwd='.')
+        result = subprocess.run(
+            ["git", "commit", "-m", commit_message],
+            check=True,
+            capture_output=True,
+            text=True
+        )
         
+        logger.info(f"✅ Successfully committed fixes: {commit_message}")
         return {
-            "status": "success" if result.returncode == 0 else "failed",
+            "status": "success",
             "commit_message": commit_message,
-            "output": result.stdout,
-            "error": result.stderr if result.returncode != 0 else None
+            "timestamp": datetime.now().isoformat()
         }
         
     except subprocess.CalledProcessError as e:
+        logger.warning(f"⚠️ Git commit failed: {e}")
         return {
             "status": "failed",
             "error": str(e),
-            "output": getattr(e, 'output', '')
+            "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
+        logger.error(f"❌ Unexpected error during commit: {e}")
         return {
-            "status": "failed",
-            "error": str(e)
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
         }
 
 def commit_all_changes() -> Dict[str, Any]:
-    """Commit all current changes to git with SSH authentication."""
+    """Commit all current changes to git repository."""
     try:
-        # Setup SSH key first
-        ssh_setup = ssh_config.setup_ssh_key()
-        if ssh_setup["status"] != "success":
-            return ssh_setup
-        
-        # Set Git SSH command
-        git_ssh_command = ssh_config.get_git_ssh_command()
-        env = os.environ.copy()
-        env['GIT_SSH_COMMAND'] = git_ssh_command
-        
-        # Check if there are changes
-        status_result = subprocess.run(['git', 'status', '--porcelain'], 
-                                     capture_output=True, text=True, cwd='.', env=env)
+        # Check if there are changes to commit
+        status_result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            check=True,
+            capture_output=True,
+            text=True
+        )
         
         if not status_result.stdout.strip():
             return {
                 "status": "no_changes",
                 "message": "No changes to commit",
-                "ssh_setup": ssh_setup
+                "timestamp": datetime.now().isoformat()
             }
         
         # Add all changes
-        subprocess.run(['git', 'add', '.'], check=True, cwd='.', env=env)
+        subprocess.run(["git", "add", "."], check=True, capture_output=True)
         
-        # Set Git user if not already set
-        subprocess.run(['git', 'config', 'user.email', 'devskyy@skyyrose.com'], 
-                      capture_output=True, cwd='.', env=env)
-        subprocess.run(['git', 'config', 'user.name', 'DevSkyy Agent'], 
-                      capture_output=True, cwd='.', env=env)
+        # Create commit message
+        commit_message = f"DevSkyy Platform Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         
-        # Commit with timestamp
-        commit_message = f"DevSkyy automated commit: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        commit_result = subprocess.run(['git', 'commit', '-m', commit_message], 
-                                     capture_output=True, text=True, cwd='.', env=env)
+        # Commit changes
+        commit_result = subprocess.run(
+            ["git", "commit", "-m", commit_message],
+            check=True,
+            capture_output=True,
+            text=True
+        )
         
-        # Push to origin
-        push_result = subprocess.run(['git', 'push', 'origin', 'main'], 
-                                   capture_output=True, text=True, cwd='.', env=env)
+        # Try to push to origin
+        try:
+            push_result = subprocess.run(
+                ["git", "push", "origin", "main"],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            push_status = "success"
+        except subprocess.CalledProcessError as push_error:
+            logger.warning(f"⚠️ Git push failed: {push_error}")
+            push_status = "push_failed"
         
+        logger.info(f"✅ Successfully committed all changes: {commit_message}")
         return {
             "status": "success",
             "commit_message": commit_message,
-            "commit_output": commit_result.stdout,
-            "push_output": push_result.stdout,
-            "ssh_setup": ssh_setup,
+            "push_status": push_status,
             "timestamp": datetime.now().isoformat()
         }
         
     except subprocess.CalledProcessError as e:
+        logger.warning(f"⚠️ Git operation failed: {e}")
         return {
             "status": "failed",
             "error": str(e),
-            "output": getattr(e, 'output', ''),
-            "ssh_command": git_ssh_command if 'git_ssh_command' in locals() else None
+            "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
+        logger.error(f"❌ Unexpected error during commit: {e}")
         return {
-            "status": "failed",
-            "error": str(e)
-        }
-
-def get_git_status() -> Dict[str, Any]:
-    """Get current git repository status."""
-    try:
-        # Get status
-        status_result = subprocess.run(['git', 'status', '--porcelain'], 
-                                     capture_output=True, text=True, cwd='.')
-        
-        # Get log
-        log_result = subprocess.run(['git', 'log', '--oneline', '-5'], 
-                                  capture_output=True, text=True, cwd='.')
-        
-        return {
-            "status": "success",
-            "changes": status_result.stdout.strip().split('\n') if status_result.stdout.strip() else [],
-            "recent_commits": log_result.stdout.strip().split('\n') if log_result.stdout.strip() else [],
-            "has_changes": bool(status_result.stdout.strip())
-        }
-        
-    except Exception as e:
-        return {
-            "status": "failed",
-            "error": str(e)
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
         }
