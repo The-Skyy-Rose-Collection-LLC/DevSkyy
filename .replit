@@ -2,7 +2,7 @@ modules = ["python-3.12", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cargo", "glibcLocales", "libGL", "libGLU", "libiconv", "libxcrypt", "python313Packages.pytest", "rustc"]
+packages = ["cargo", "freetype", "glibcLocales", "lcms2", "libGL", "libGLU", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "python313Packages.pytest", "rustc", "tcl", "tk", "zlib"]
 
 [workflows]
 runButton = "Run"
