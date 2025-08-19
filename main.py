@@ -403,6 +403,37 @@ def get_site_report(website_url: str) -> Dict[str, Any]:
     return site_comm_agent.generate_comprehensive_report(website_url)
 
 
+# EXPERIMENTAL: Neural Agent Upgrades
+@app.post("/experimental/quantum-inventory")
+async def quantum_inventory_optimization() -> Dict[str, Any]:
+    """EXPERIMENTAL: Quantum inventory optimization."""
+    return await inventory_agent.quantum_asset_optimization()
+
+@app.post("/experimental/blockchain-audit")
+async def blockchain_financial_audit() -> Dict[str, Any]:
+    """EXPERIMENTAL: Blockchain financial audit."""
+    return await financial_agent.experimental_blockchain_audit()
+
+@app.post("/experimental/neural-commerce/{customer_id}")
+async def neural_commerce_session(customer_id: str) -> Dict[str, Any]:
+    """EXPERIMENTAL: Neural commerce experience."""
+    return await ecommerce_agent.experimental_neural_commerce_session(customer_id)
+
+@app.post("/experimental/quantum-wordpress")
+async def quantum_wordpress_optimization() -> Dict[str, Any]:
+    """EXPERIMENTAL: Quantum WordPress optimization."""
+    return await wordpress_agent.experimental_quantum_wordpress_optimization()
+
+@app.post("/experimental/neural-code")
+async def neural_code_generation(requirements: str, language: str = "javascript") -> Dict[str, Any]:
+    """EXPERIMENTAL: Neural code generation."""
+    return await web_dev_agent.experimental_neural_code_generation(requirements, language)
+
+@app.post("/experimental/neural-communication")
+async def neural_communication_analysis(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
+    """EXPERIMENTAL: Neural communication analysis."""
+    return await site_comm_agent.experimental_neural_communication_analysis(website_url)
+
 # Enhanced DevSkyy Workflow Endpoint with Brand Intelligence
 @app.post("/devskyy/full-optimization")
 async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
