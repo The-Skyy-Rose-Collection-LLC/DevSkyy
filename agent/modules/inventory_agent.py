@@ -370,6 +370,8 @@ class InventoryAgent:
             if len(doc_assets[i:i+2]) > 1:
                 content_groups.append(doc_assets[i:i+2])
 
+        return content_groups)
+
         return content_groups
 
     async def _find_metadata_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
