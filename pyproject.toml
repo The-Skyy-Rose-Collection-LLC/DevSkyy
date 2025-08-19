@@ -21,4 +21,7 @@ dependencies = [
     "sqlalchemy",
     "uvicorn>=0.35.0",
     "replit-object-storage>=1.0.2",
+    "setuptools>=80.9.0",
+    "wheel>=0.45.1",
+    "cython>=3.1.3",
 ]
