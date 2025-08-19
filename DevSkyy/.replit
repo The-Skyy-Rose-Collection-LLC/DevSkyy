@@ -2,9 +2,10 @@ modules = ["python-3.12", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cairo", "cargo", "ffmpeg-full", "freetype", "geckodriver", "ghostscript", "glibcLocales", "gobject-introspection", "gtk3", "lcms2", "libGL", "libGLU", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "pkg-config", "python313Packages.pytest", "qhull", "rustc", "tcl", "tk", "xcodebuild", "zlib"]
+packages = ["glibcLocales", "libGL", "libGLU", "libxcrypt", "python313Packages.pytest"]
 
 [workflows]
+runButton = "Run"
 
 [[workflows.workflow]]
 name = "Run"
@@ -28,5 +29,3 @@ args = '''python -c "from main import monitor_wordpress_continuously, monitor_we
 localPort = 8000
 externalPort = 80
 
-[deployment]
-run = ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8000"]
