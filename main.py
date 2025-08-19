@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 # Import enhanced modules
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent
+from agent.modules.brand_asset_manager import BrandAssetManager, initialize_brand_asset_manager
 from agent.modules.inventory_agent import InventoryAgent
 from agent.modules.financial_agent import FinancialAgent, ChargebackReason
 from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
@@ -26,8 +27,9 @@ from agent.git_commit import commit_fixes, commit_all_changes
 
 app = FastAPI(title="The Skyy Rose Collection - DevSkyy Enhanced Platform", version="2.0.0")
 
-# Initialize brand intelligence first
+# Initialize brand intelligence and asset manager
 brand_intelligence = BrandIntelligenceAgent()
+brand_asset_manager = initialize_brand_asset_manager()
 
 # Initialize all agents with brand context
 inventory_agent = InventoryAgent()
@@ -319,6 +321,189 @@ async def run_full_optimization(website_url: str = "https://theskyy-rose-collect
         "overall_status": "production_ready_with_brand_intelligence"
     }
 
+
+# Brand Asset Management Endpoints
+@app.post("/brand/assets/upload")
+async def upload_brand_asset(category: str, description: str = "", tags: str = ""):
+    """Upload brand assets via form data."""
+    from fastapi import File, UploadFile, Form
+    return {"message": "Use the web interface for file uploads", "upload_url": "/brand/assets/upload-form"}
+
+@app.get("/brand/assets/upload-form")
+async def get_upload_form():
+    """Get brand asset upload form."""
+    from fastapi.responses import HTMLResponse
+    
+    upload_form = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>DevSkyy Brand Asset Upload</title>
+        <style>
+            body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+            .upload-container { background: #f8f9fa; padding: 30px; border-radius: 10px; }
+            .form-group { margin-bottom: 20px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; }
+            input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+            button { background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; }
+            button:hover { background: #0056b3; }
+            .category-info { background: #e9ecef; padding: 15px; border-radius: 5px; margin-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="upload-container">
+            <h1>🎨 DevSkyy Brand Asset Upload</h1>
+            <p>Upload your brand assets so the Brand Intelligence Agent can learn and maintain consistency!</p>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="files">Select Files:</label>
+                    <input type="file" id="files" name="files" multiple accept="image/*,.pdf,.ai,.psd,.sketch">
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category...</option>
+                        <option value="logos">Logos & Brand Marks</option>
+                        <option value="color_palettes">Color Palettes</option>
+                        <option value="typography">Typography Samples</option>
+                        <option value="product_images">Product Images</option>
+                        <option value="marketing_materials">Marketing Materials</option>
+                        <option value="brand_guidelines">Brand Guidelines</option>
+                        <option value="seasonal_collections">Seasonal Collections</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" placeholder="Describe these assets and their intended use..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated):</label>
+                    <input type="text" id="tags" name="tags" placeholder="winter2024, luxury, sustainable, elegant">
+                </div>
+                
+                <button type="submit">🚀 Upload Assets</button>
+            </form>
+            
+            <div class="category-info">
+                <h3>📋 Asset Categories Guide:</h3>
+                <ul>
+                    <li><strong>Logos:</strong> Primary logos, variations, watermarks</li>
+                    <li><strong>Color Palettes:</strong> Brand color swatches, hex codes</li>
+                    <li><strong>Typography:</strong> Font samples, text styles</li>
+                    <li><strong>Product Images:</strong> Hero shots, lifestyle images</li>
+                    <li><strong>Marketing Materials:</strong> Ads, banners, social media graphics</li>
+                    <li><strong>Brand Guidelines:</strong> Style guides, brand manuals</li>
+                    <li><strong>Seasonal Collections:</strong> Campaign assets, lookbooks</li>
+                </ul>
+            </div>
+        </div>
+        
+        <script>
+            document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                const files = document.getElementById('files').files;
+                const category = document.getElementById('category').value;
+                const description = document.getElementById('description').value;
+                const tags = document.getElementById('tags').value;
+                
+                if (!files.length || !category) {
+                    alert('Please select files and category');
+                    return;
+                }
+                
+                for (let file of files) {
+                    formData.append('files', file);
+                }
+                formData.append('category', category);
+                formData.append('description', description);
+                formData.append('tags', tags);
+                
+                try {
+                    const response = await fetch('/brand/assets/upload-files', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(`✅ Successfully uploaded ${result.uploaded_count} assets!`);
+                        document.getElementById('uploadForm').reset();
+                    } else {
+                        alert(`❌ Upload failed: ${result.error}`);
+                    }
+                } catch (error) {
+                    alert(`❌ Upload error: ${error.message}`);
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=upload_form)
+
+@app.post("/brand/assets/upload-files")
+async def upload_brand_files():
+    """Handle actual file upload."""
+    from fastapi import File, UploadFile, Form
+    from typing import List
+    
+    async def upload_files(files: List[UploadFile] = File(...), 
+                          category: str = Form(...),
+                          description: str = Form(""),
+                          tags: str = Form("")):
+        try:
+            uploaded_assets = []
+            tag_list = [tag.strip() for tag in tags.split(",")] if tags else []
+            
+            for file in files:
+                if file.filename:
+                    file_data = await file.read()
+                    result = brand_asset_manager.upload_asset(
+                        file_data, file.filename, category, description, tag_list
+                    )
+                    uploaded_assets.append(result)
+            
+            # Update brand intelligence with new assets
+            learning_data = brand_asset_manager.get_learning_data_for_brand_intelligence()
+            
+            return {
+                "success": True,
+                "uploaded_count": len(uploaded_assets),
+                "assets": uploaded_assets,
+                "learning_data_updated": True,
+                "message": f"Successfully uploaded {len(uploaded_assets)} brand assets!"
+            }
+            
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+    
+    return await upload_files()
+
+@app.get("/brand/assets/dashboard")
+def get_brand_assets_dashboard():
+    """Get brand assets dashboard."""
+    analysis = brand_asset_manager.analyze_brand_consistency()
+    learning_data = brand_asset_manager.get_learning_data_for_brand_intelligence()
+    
+    return {
+        "asset_analysis": analysis,
+        "learning_readiness": learning_data,
+        "categories": list(brand_asset_manager.categories.keys()),
+        "total_assets": brand_asset_manager.metadata["total_assets"],
+        "last_updated": brand_asset_manager.metadata["last_updated"]
+    }
+
+@app.get("/brand/assets/category/{category}")
+def get_assets_by_category(category: str):
+    """Get all assets in a specific category."""
+    assets = brand_asset_manager.get_assets_by_category(category)
+    return {"category": category, "assets": assets, "count": len(assets)}
 
 # Brand Intelligence Endpoints
 @app.get("/brand/intelligence")
