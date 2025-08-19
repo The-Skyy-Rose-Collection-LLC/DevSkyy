@@ -1,99 +1,83 @@
 
 import jwt
 import bcrypt
+import sqlite3
 import os
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
+from pathlib import Path
 import secrets
 import re
 from fastapi import HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import logging
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
-from sqlalchemy.sql import func
 
 logger = logging.getLogger(__name__)
-Base = declarative_base()
-
-class User(Base):
-    __tablename__ = "users"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    first_name = Column(String)
-    last_name = Column(String)
-    role = Column(String, default="user")
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login = Column(DateTime(timezone=True))
-    failed_login_attempts = Column(Integer, default=0)
-    locked_until = Column(DateTime(timezone=True))
-    email_verified = Column(Boolean, default=False)
-    verification_token = Column(String)
-    reset_token = Column(String)
-    reset_token_expires = Column(DateTime(timezone=True))
-    
-    sessions = relationship("UserSession", back_populates="user")
-    preferences = relationship("UserPreference", back_populates="user", uselist=False)
-
-class UserSession(Base):
-    __tablename__ = "user_sessions"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    token_hash = Column(String, unique=True)
-    expires_at = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    ip_address = Column(String)
-    user_agent = Column(Text)
-    is_active = Column(Boolean, default=True)
-    
-    user = relationship("User", back_populates="sessions")
-
-class UserPreference(Base):
-    __tablename__ = "user_preferences"
-    
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    theme = Column(String, default="light")
-    notifications_enabled = Column(Boolean, default=True)
-    marketing_emails = Column(Boolean, default=False)
-    dashboard_layout = Column(String, default="default")
-    timezone = Column(String, default="UTC")
-    language = Column(String, default="en")
-    
-    user = relationship("User", back_populates="preferences")
 
 class AuthManager:
     """Comprehensive authentication and user management system."""
     
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
-        self.database_url = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
+        self.db_path = "devskyy_users.db"
         self.security = HTTPBearer()
-        self.engine = create_engine(self.database_url)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self.init_database()
     
     def init_database(self):
-        """Initialize PostgreSQL database with secure schema."""
-        try:
-            Base.metadata.create_all(bind=self.engine)
-            logger.info("Database tables created successfully")
-        except Exception as e:
-            logger.error(f"Failed to initialize database: {str(e)}")
-            raise
-    
-    def get_db(self):
-        """Get database session."""
-        db = self.SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
+        """Initialize user database with secure schema."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                first_name TEXT,
+                last_name TEXT,
+                role TEXT DEFAULT 'user',
+                is_active BOOLEAN DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP,
+                failed_login_attempts INTEGER DEFAULT 0,
+                locked_until TIMESTAMP,
+                email_verified BOOLEAN DEFAULT 0,
+                verification_token TEXT,
+                reset_token TEXT,
+                reset_token_expires TIMESTAMP
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                token_hash TEXT UNIQUE,
+                expires_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                ip_address TEXT,
+                user_agent TEXT,
+                is_active BOOLEAN DEFAULT 1,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_preferences (
+                user_id INTEGER PRIMARY KEY,
+                theme TEXT DEFAULT 'light',
+                notifications_enabled BOOLEAN DEFAULT 1,
+                marketing_emails BOOLEAN DEFAULT 0,
+                dashboard_layout TEXT DEFAULT 'default',
+                timezone TEXT DEFAULT 'UTC',
+                language TEXT DEFAULT 'en',
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
     
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt."""
@@ -142,95 +126,104 @@ class AuthManager:
         if not password_validation["valid"]:
             return {"success": False, "error": password_validation["errors"]}
         
-        db = self.SessionLocal()
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
         
         try:
             # Check if user already exists
-            existing_user = db.query(User).filter(
-                (User.email == email) | (User.username == username)
-            ).first()
-            
-            if existing_user:
+            cursor.execute("SELECT id FROM users WHERE email = ? OR username = ?", (email, username))
+            if cursor.fetchone():
                 return {"success": False, "error": "User with this email or username already exists"}
             
             # Hash password and create user
             password_hash = self.hash_password(password)
             verification_token = secrets.token_urlsafe(32)
             
-            new_user = User(
-                email=email,
-                username=username,
-                password_hash=password_hash,
-                first_name=first_name,
-                last_name=last_name,
-                verification_token=verification_token
-            )
+            cursor.execute('''
+                INSERT INTO users (email, username, password_hash, first_name, last_name, verification_token)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (email, username, password_hash, first_name, last_name, verification_token))
             
-            db.add(new_user)
-            db.flush()  # Get user ID
+            user_id = cursor.lastrowid
             
             # Create default preferences
-            user_prefs = UserPreference(user_id=new_user.id)
-            db.add(user_prefs)
+            cursor.execute('''
+                INSERT INTO user_preferences (user_id) VALUES (?)
+            ''', (user_id,))
             
-            db.commit()
+            conn.commit()
             
             return {
                 "success": True,
-                "user_id": new_user.id,
+                "user_id": user_id,
                 "message": "User created successfully",
                 "verification_token": verification_token
             }
             
         except Exception as e:
-            db.rollback()
+            conn.rollback()
             logger.error(f"Error creating user: {str(e)}")
             return {"success": False, "error": "Failed to create user"}
         finally:
-            db.close()
+            conn.close()
     
     def authenticate_user(self, email: str, password: str, ip_address: str = "", 
                          user_agent: str = "") -> Dict[str, Any]:
         """Authenticate user and create session."""
         
-        db = self.SessionLocal()
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
         
         try:
             # Get user data
-            user = db.query(User).filter(User.email == email).first()
+            cursor.execute('''
+                SELECT id, username, password_hash, is_active, failed_login_attempts, 
+                       locked_until, email_verified
+                FROM users WHERE email = ?
+            ''', (email,))
             
-            if not user:
+            user_data = cursor.fetchone()
+            if not user_data:
                 return {"success": False, "error": "Invalid credentials"}
             
+            user_id, username, password_hash, is_active, failed_attempts, locked_until, email_verified = user_data
+            
             # Check if account is locked
-            if user.locked_until and user.locked_until > datetime.now():
+            if locked_until and datetime.fromisoformat(locked_until) > datetime.now():
                 return {"success": False, "error": "Account temporarily locked due to failed login attempts"}
             
             # Check if account is active
-            if not user.is_active:
+            if not is_active:
                 return {"success": False, "error": "Account is deactivated"}
             
             # Verify password
-            if not self.verify_password(password, user.password_hash):
+            if not self.verify_password(password, password_hash):
                 # Increment failed attempts
-                user.failed_login_attempts += 1
+                new_failed_attempts = failed_attempts + 1
+                locked_until_time = None
                 
-                if user.failed_login_attempts >= 5:
-                    user.locked_until = datetime.now() + timedelta(minutes=30)
+                if new_failed_attempts >= 5:
+                    locked_until_time = (datetime.now() + timedelta(minutes=30)).isoformat()
                 
-                db.commit()
+                cursor.execute('''
+                    UPDATE users SET failed_login_attempts = ?, locked_until = ?
+                    WHERE id = ?
+                ''', (new_failed_attempts, locked_until_time, user_id))
+                conn.commit()
+                
                 return {"success": False, "error": "Invalid credentials"}
             
             # Reset failed attempts on successful login
-            user.failed_login_attempts = 0
-            user.locked_until = None
-            user.last_login = datetime.now()
+            cursor.execute('''
+                UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = ?
+                WHERE id = ?
+            ''', (datetime.now().isoformat(), user_id))
             
             # Create JWT token
             token_payload = {
-                "user_id": user.id,
-                "username": user.username,
-                "email": user.email,
+                "user_id": user_id,
+                "username": username,
+                "email": email,
                 "exp": datetime.utcnow() + timedelta(hours=24),
                 "iat": datetime.utcnow()
             }
@@ -239,18 +232,14 @@ class AuthManager:
             
             # Store session
             token_hash = bcrypt.hashpw(token.encode(), bcrypt.gensalt()).decode()
-            expires_at = datetime.now() + timedelta(hours=24)
+            expires_at = (datetime.now() + timedelta(hours=24)).isoformat()
             
-            new_session = UserSession(
-                user_id=user.id,
-                token_hash=token_hash,
-                expires_at=expires_at,
-                ip_address=ip_address,
-                user_agent=user_agent
-            )
+            cursor.execute('''
+                INSERT INTO user_sessions (user_id, token_hash, expires_at, ip_address, user_agent)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, token_hash, expires_at, ip_address, user_agent))
             
-            db.add(new_session)
-            db.commit()
+            conn.commit()
             
             return {
                 "success": True,
@@ -258,10 +247,10 @@ class AuthManager:
                 "token_type": "bearer",
                 "expires_in": 86400,
                 "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "email_verified": bool(user.email_verified)
+                    "id": user_id,
+                    "username": username,
+                    "email": email,
+                    "email_verified": bool(email_verified)
                 }
             }
             
@@ -269,7 +258,7 @@ class AuthManager:
             logger.error(f"Authentication error: {str(e)}")
             return {"success": False, "error": "Authentication failed"}
         finally:
-            db.close()
+            conn.close()
     
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify JWT token and return user data."""
@@ -277,22 +266,20 @@ class AuthManager:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
             
             # Check if session is still valid
-            db = self.SessionLocal()
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
             
-            try:
-                session = db.query(UserSession).filter(
-                    UserSession.user_id == payload["user_id"],
-                    UserSession.expires_at > datetime.now(),
-                    UserSession.is_active == True
-                ).first()
-                
-                if not session:
-                    return None
-                
-                return payload
-                
-            finally:
-                db.close()
+            cursor.execute('''
+                SELECT id FROM user_sessions 
+                WHERE user_id = ? AND expires_at > ? AND is_active = 1
+            ''', (payload["user_id"], datetime.now().isoformat()))
+            
+            if not cursor.fetchone():
+                conn.close()
+                return None
+            
+            conn.close()
+            return payload
             
         except jwt.ExpiredSignatureError:
             return None
@@ -315,47 +302,56 @@ class AuthManager:
     
     def get_user_profile(self, user_id: int) -> Dict[str, Any]:
         """Get complete user profile data."""
-        db = self.SessionLocal()
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
         
         try:
-            # Get user data with preferences
-            user = db.query(User).filter(User.id == user_id).first()
+            # Get user data
+            cursor.execute('''
+                SELECT id, email, username, first_name, last_name, role, 
+                       created_at, last_login, email_verified
+                FROM users WHERE id = ?
+            ''', (user_id,))
             
-            if not user:
+            user_data = cursor.fetchone()
+            if not user_data:
                 return {"error": "User not found"}
             
-            # Get active sessions count
-            active_sessions = db.query(UserSession).filter(
-                UserSession.user_id == user_id,
-                UserSession.expires_at > datetime.now(),
-                UserSession.is_active == True
-            ).count()
+            # Get preferences
+            cursor.execute('''
+                SELECT theme, notifications_enabled, marketing_emails, 
+                       dashboard_layout, timezone, language
+                FROM user_preferences WHERE user_id = ?
+            ''', (user_id,))
             
-            # Get or create preferences
-            prefs = user.preferences
-            if not prefs:
-                prefs = UserPreference(user_id=user_id)
-                db.add(prefs)
-                db.commit()
+            prefs_data = cursor.fetchone()
+            
+            # Get active sessions count
+            cursor.execute('''
+                SELECT COUNT(*) FROM user_sessions 
+                WHERE user_id = ? AND expires_at > ? AND is_active = 1
+            ''', (user_id, datetime.now().isoformat()))
+            
+            active_sessions = cursor.fetchone()[0]
             
             return {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "role": user.role,
-                "created_at": user.created_at.isoformat() if user.created_at else None,
-                "last_login": user.last_login.isoformat() if user.last_login else None,
-                "email_verified": bool(user.email_verified),
+                "id": user_data[0],
+                "email": user_data[1],
+                "username": user_data[2],
+                "first_name": user_data[3],
+                "last_name": user_data[4],
+                "role": user_data[5],
+                "created_at": user_data[6],
+                "last_login": user_data[7],
+                "email_verified": bool(user_data[8]),
                 "active_sessions": active_sessions,
                 "preferences": {
-                    "theme": prefs.theme,
-                    "notifications_enabled": bool(prefs.notifications_enabled),
-                    "marketing_emails": bool(prefs.marketing_emails),
-                    "dashboard_layout": prefs.dashboard_layout,
-                    "timezone": prefs.timezone,
-                    "language": prefs.language
+                    "theme": prefs_data[0] if prefs_data else "light",
+                    "notifications_enabled": bool(prefs_data[1]) if prefs_data else True,
+                    "marketing_emails": bool(prefs_data[2]) if prefs_data else False,
+                    "dashboard_layout": prefs_data[3] if prefs_data else "default",
+                    "timezone": prefs_data[4] if prefs_data else "UTC",
+                    "language": prefs_data[5] if prefs_data else "en"
                 }
             }
             
@@ -363,7 +359,7 @@ class AuthManager:
             logger.error(f"Error getting user profile: {str(e)}")
             return {"error": "Failed to retrieve profile"}
         finally:
-            db.close()
+            conn.close()
     
     def logout_user(self, token: str) -> Dict[str, Any]:
         """Logout user by invalidating session."""
@@ -371,23 +367,23 @@ class AuthManager:
         if not payload:
             return {"success": False, "error": "Invalid token"}
         
-        db = self.SessionLocal()
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
         
         try:
-            # Deactivate all sessions for this user
-            db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"],
-                UserSession.is_active == True
-            ).update({"is_active": False})
+            cursor.execute('''
+                UPDATE user_sessions SET is_active = 0 
+                WHERE user_id = ? AND is_active = 1
+            ''', (payload["user_id"],))
             
-            db.commit()
+            conn.commit()
             return {"success": True, "message": "Logged out successfully"}
             
         except Exception as e:
             logger.error(f"Logout error: {str(e)}")
             return {"success": False, "error": "Logout failed"}
         finally:
-            db.close()
+            conn.close()
 
 # Initialize authentication manager
 auth_manager = AuthManager()

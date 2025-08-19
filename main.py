@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Request, Form
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import uvicorn
 import logging
 import asyncio
@@ -11,6 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import enhanced modules
+from agent.modules.auth_manager import AuthManager, auth_manager
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent
 from agent.modules.brand_asset_manager import BrandAssetManager, initialize_brand_asset_manager
 from agent.modules.inventory_agent import InventoryAgent
@@ -71,9 +73,9 @@ def run() -> dict:
 
 @app.get("/")
 async def root():
-    """Redirect to the comprehensive agent dashboard."""
+    """DevSkyy Enhanced Platform - Authentication Gateway."""
     from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/agent-dashboard", status_code=302)
+    return RedirectResponse(url="/auth/login-form", status_code=302)
 
 
 # Inventory Management Endpoints
@@ -278,10 +280,13 @@ def get_site_report(website_url: str) -> Dict[str, Any]:
     return site_comm_agent.generate_comprehensive_report(website_url)
 
 
-# Enhanced DevSkyy Workflow Endpoint with Brand Intelligence
+# Enhanced DevSkyy Workflow Endpoint with Brand Intelligence (Protected)
 @app.post("/devskyy/full-optimization")
-async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
-    """Run comprehensive DevSkyy optimization with brand-aware agents."""
+async def run_full_optimization(
+    website_url: str = "https://theskyy-rose-collection.com",
+    current_user: Dict = Depends(auth_manager.get_current_user)
+) -> Dict[str, Any]:
+    """Run comprehensive DevSkyy optimization with brand-aware agents (Authenticated Users Only)."""
 
     # Execute brand learning cycle first
     brand_learning = await brand_intelligence.continuous_learning_cycle()
@@ -504,6 +509,292 @@ def get_assets_by_category(category: str):
     """Get all assets in a specific category."""
     assets = brand_asset_manager.get_assets_by_category(category)
     return {"category": category, "assets": assets, "count": len(assets)}
+
+# Authentication Endpoints
+@app.post("/auth/signup")
+async def signup(
+    email: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    first_name: str = Form(""),
+    last_name: str = Form("")
+) -> Dict[str, Any]:
+    """User registration endpoint."""
+    try:
+        result = auth_manager.create_user(email, username, password, first_name, last_name)
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "message": "Account created successfully",
+                "user_id": result["user_id"]
+            }
+        else:
+            raise HTTPException(status_code=400, detail=result["error"])
+            
+    except Exception as e:
+        logger.error(f"Signup error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Registration failed")
+
+@app.post("/auth/login")
+async def login(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...)
+) -> Dict[str, Any]:
+    """User login endpoint."""
+    try:
+        ip_address = request.client.host if request.client else ""
+        user_agent = request.headers.get("user-agent", "")
+        
+        result = auth_manager.authenticate_user(email, password, ip_address, user_agent)
+        
+        if result["success"]:
+            return result
+        else:
+            raise HTTPException(status_code=401, detail=result["error"])
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Authentication failed")
+
+@app.post("/auth/logout")
+async def logout(current_user: Dict = Depends(auth_manager.get_current_user)) -> Dict[str, Any]:
+    """User logout endpoint."""
+    try:
+        # Get token from the authorization header
+        from fastapi import Request
+        async def get_token_from_request(request: Request):
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                return auth_header.split(" ")[1]
+            return None
+        
+        return {"success": True, "message": "Logged out successfully"}
+        
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Logout failed")
+
+@app.get("/auth/profile")
+async def get_profile(current_user: Dict = Depends(auth_manager.get_current_user)) -> Dict[str, Any]:
+    """Get current user profile."""
+    try:
+        profile = auth_manager.get_user_profile(current_user["user_id"])
+        
+        if "error" in profile:
+            raise HTTPException(status_code=404, detail=profile["error"])
+        
+        return {
+            "success": True,
+            "profile": profile,
+            "auth_status": "authenticated"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Profile retrieval error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve profile")
+
+@app.get("/auth/dashboard")
+async def get_user_dashboard(current_user: Dict = Depends(auth_manager.get_current_user)) -> Dict[str, Any]:
+    """Get personalized user dashboard with DevSkyy data."""
+    try:
+        profile = auth_manager.get_user_profile(current_user["user_id"])
+        
+        # Get DevSkyy agent status for this user
+        agents_status = await get_agents_status()
+        
+        # Get brand intelligence specific to user
+        brand_context = brand_intelligence.get_brand_context_for_agent("user_dashboard")
+        
+        return {
+            "success": True,
+            "user": {
+                "id": current_user["user_id"],
+                "username": current_user["username"],
+                "email": current_user["email"]
+            },
+            "profile": profile,
+            "devskyy_agents": agents_status,
+            "brand_intelligence": brand_context,
+            "dashboard_layout": profile.get("preferences", {}).get("dashboard_layout", "default"),
+            "quick_actions": [
+                {"action": "upload_brand_assets", "url": "/brand/assets/upload-form"},
+                {"action": "run_optimization", "url": "/devskyy/full-optimization"},
+                {"action": "view_analytics", "url": "/analytics/report"},
+                {"action": "agent_dashboard", "url": "/agent-dashboard"}
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Dashboard error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to load dashboard")
+
+@app.get("/auth/login-form")
+async def get_login_form():
+    """Get login/signup form."""
+    from fastapi.responses import HTMLResponse
+    
+    auth_form = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>DevSkyy Authentication</title>
+        <style>
+            body { font-family: Arial, sans-serif; max-width: 500px; margin: 100px auto; padding: 20px; background: #f5f5f5; }
+            .auth-container { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            .form-group { margin-bottom: 20px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+            input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+            button { width: 100%; background: #007bff; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+            button:hover { background: #0056b3; }
+            .toggle-form { text-align: center; margin-top: 20px; }
+            .toggle-form a { color: #007bff; text-decoration: none; }
+            .hidden { display: none; }
+            .success { color: green; margin-bottom: 20px; }
+            .error { color: red; margin-bottom: 20px; }
+            h1 { text-align: center; color: #333; margin-bottom: 30px; }
+            .devskyy-brand { color: #007bff; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="auth-container">
+            <h1><span class="devskyy-brand">DevSkyy</span> Authentication</h1>
+            
+            <div id="message"></div>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <h2>Login to DevSkyy</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit">🚀 Login to DevSkyy</button>
+                <div class="toggle-form">
+                    <p>Don't have an account? <a href="#" onclick="toggleForms()">Sign up here</a></p>
+                </div>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signupForm" class="hidden">
+                <h2>Create DevSkyy Account</h2>
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupUsername">Username:</label>
+                    <input type="text" id="signupUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupFirstName">First Name:</label>
+                    <input type="text" id="signupFirstName" name="first_name">
+                </div>
+                <div class="form-group">
+                    <label for="signupLastName">Last Name:</label>
+                    <input type="text" id="signupLastName" name="last_name">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password:</label>
+                    <input type="password" id="signupPassword" name="password" required>
+                    <small>Must be 8+ characters with uppercase, lowercase, number, and special character</small>
+                </div>
+                <button type="submit">🌟 Create DevSkyy Account</button>
+                <div class="toggle-form">
+                    <p>Already have an account? <a href="#" onclick="toggleForms()">Login here</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <script>
+            function toggleForms() {
+                const loginForm = document.getElementById('loginForm');
+                const signupForm = document.getElementById('signupForm');
+                
+                loginForm.classList.toggle('hidden');
+                signupForm.classList.toggle('hidden');
+                clearMessage();
+            }
+            
+            function showMessage(message, type = 'error') {
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            }
+            
+            function clearMessage() {
+                document.getElementById('message').innerHTML = '';
+            }
+            
+            // Handle login
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearMessage();
+                
+                const formData = new FormData(e.target);
+                
+                try {
+                    const response = await fetch('/auth/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        localStorage.setItem('devskyy_token', result.access_token);
+                        showMessage('Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/auth/dashboard';
+                        }, 1500);
+                    } else {
+                        showMessage(result.detail || 'Login failed');
+                    }
+                } catch (error) {
+                    showMessage('Login error: ' + error.message);
+                }
+            });
+            
+            // Handle signup
+            document.getElementById('signupForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearMessage();
+                
+                const formData = new FormData(e.target);
+                
+                try {
+                    const response = await fetch('/auth/signup', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        showMessage('Account created successfully! Please login.', 'success');
+                        setTimeout(() => {
+                            toggleForms();
+                        }, 2000);
+                    } else {
+                        showMessage(result.detail || 'Signup failed');
+                    }
+                } catch (error) {
+                    showMessage('Signup error: ' + error.message);
+                }
+            });
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=auth_form)
 
 # Brand Intelligence Endpoints
 @app.get("/brand/intelligence")
