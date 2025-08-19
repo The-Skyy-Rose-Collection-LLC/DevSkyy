@@ -1,0 +1,31 @@
+modules = ["python-3.12", "postgresql-16"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["glibcLocales", "libGL", "libGLU", "libxcrypt", "python313Packages.pytest"]
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 44005262
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+
+[[workflows.workflow]]
+name = "Continuous Monitoring"
+author = 44005262
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = '''python -c "from main import monitor_wordpress_continuously, monitor_web_development_continuously, manage_avatar_chatbot_continuously; import time; while True: wp=monitor_wordpress_continuously(); dev=monitor_web_development_continuously(); chat=manage_avatar_chatbot_continuously(); print(f'WordPress: {wp[\"overall_status\"]} | Development: {dev[\"development_status\"]} | Chatbot: {chat[\"chatbot_status\"]}'); time.sleep(300)"'''
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
