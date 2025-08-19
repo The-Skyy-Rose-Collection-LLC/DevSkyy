@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+
+from fastapi import FastAPI, HTTPException
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 import uvicorn
 import logging
 import asyncio
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,26 +14,16 @@ logger = logging.getLogger(__name__)
 # Import enhanced modules
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent
 from agent.modules.inventory_agent import InventoryAgent
-from agent.modules.financial_agent import FinancialAgent
-from agent.modules.ecommerce_agent import EcommerceAgent
-from agent.modules.wordpress_agent import WordPressAgent
-from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
-from agent.modules.scanner import scan_site
-from agent.modules.fixer import fix_code
+from agent.modules.financial_agent import FinancialAgent, ChargebackReason
+from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
 from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
 from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues
 from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
-from agent.modules.inventory_agent import InventoryAgent
-from agent.modules.financial_agent import FinancialAgent, ChargebackReason
-from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
-from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
 from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
+from agent.modules.scanner import scan_site
+from agent.modules.fixer import fix_code
 from agent.scheduler.cron import schedule_hourly_job
-from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
-from typing import Dict, Any, List
-import json
-import asyncio
-from datetime import datetime # Imported datetime
+from agent.git_commit import commit_fixes, commit_all_changes
 
 app = FastAPI(title="The Skyy Rose Collection - DevSkyy Enhanced Platform", version="2.0.0")
 
@@ -392,7 +384,11 @@ async def push_to_github():
         raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
 
 # Start enhanced learning system on import
-enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)
+try:
+    enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)
+except Exception as e:
+    logger.error(f"Failed to start enhanced learning system: {e}")
+    enhanced_learning_status = {"status": "failed", "error": str(e)}
 
 @app.get("/learning/status")
 def get_learning_status() -> Dict[str, Any]:
