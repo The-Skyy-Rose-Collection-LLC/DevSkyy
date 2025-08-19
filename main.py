@@ -422,4 +422,5 @@ if __name__ == "__main__":
     print("🌟 Brand Intelligence: MAXIMUM")
     print("📚 Continuous Learning: ACTIVE")
     print("⚡ Setting the Bar for AI Agents")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    print("🌐 Server starting on http://0.0.0.0:5000")
+    uvicorn.run(app, host="0.0.0.0", port=5000)
