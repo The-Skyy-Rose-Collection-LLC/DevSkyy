@@ -68,9 +68,10 @@ def run() -> dict:
 
 
 @app.get("/")
-def root() -> dict:
-    """Health check endpoint."""
-    return {"message": "The Skyy Rose Collection Platform Online ✨"}
+async def root():
+    """Redirect to the comprehensive agent dashboard."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/agent-dashboard", status_code=302)
 
 
 # Inventory Management Endpoints
