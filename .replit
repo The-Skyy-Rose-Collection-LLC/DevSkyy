@@ -28,3 +28,6 @@ args = '''python -c "from main import monitor_wordpress_continuously, monitor_we
 [[ports]]
 localPort = 8000
 externalPort = 80
+
+[deployment]
+run = ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8000"]
