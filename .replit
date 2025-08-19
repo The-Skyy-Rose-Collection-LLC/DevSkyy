@@ -1,8 +1,8 @@
-modules = ["python-3.12", "postgresql-16"]
+modules = ["python-3.12", "postgresql-16", "python-base-3.13"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["cargo", "freetype", "glibcLocales", "lcms2", "libGL", "libGLU", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "python313Packages.pytest", "rustc", "stdenv.cc.cc.lib", "tcl", "tk", "zlib"]
+packages = ["cargo", "freetype", "glibcLocales", "imagemagickBig", "lcms2", "libGL", "libGLU", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "python313Packages.pytest", "rustc", "stdenv.cc.cc.lib", "tcl", "tk", "zlib"]
 
 [workflows]
 runButton = "Run"
@@ -28,4 +28,7 @@ args = '''python -c "from main import monitor_wordpress_continuously, monitor_we
 [[ports]]
 localPort = 8000
 externalPort = 80
+
+[objectStorage]
+defaultBucketID = "replit-objstore-34b89646-5899-4d64-b398-985c8022cbf2"
 
