@@ -7,9 +7,6 @@ from agent.modules.site_communication_agent import SiteCommunicationAgent, commu
 from agent.modules.inventory_agent import InventoryAgent
 from agent.modules.financial_agent import FinancialAgent, ChargebackReason
 from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
-from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
-from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues
-from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
 from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
 from agent.scheduler.cron import schedule_hourly_job

@@ -22,6 +22,11 @@ async def communicate_with_site() -> Dict[str, Any]:
         "agent_status": "optimal"
     }
 
+from typing import Dict, Any, List
+from datetime import datetime
+import asyncio
+import requests
+
 class SiteCommunicationAgent:
     """Agent for communicating with website chatbots and gathering insights."""
     

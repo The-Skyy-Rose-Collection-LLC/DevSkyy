@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 import re
 import json
 from datetime import datetime
+import requests
 
 class WebDevelopmentAgent:
     """Web development and code optimization agent."""
