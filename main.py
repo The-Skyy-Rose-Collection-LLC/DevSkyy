@@ -126,7 +126,7 @@ customer_service_agent = CustomerServiceAgent()
 security_agent = SecurityAgent()
 performance_agent = PerformanceAgent()
 task_risk_manager = TaskRiskManager()
-integration_manager = create_agent_assignment_manager()
+agent_assignment_manager = create_agent_assignment_manager()
 
 # Inject brand intelligence into all agents
 for agent_name, agent in [
@@ -705,10 +705,10 @@ async def get_supported_services() -> Dict[str, Any]:
     """Get all supported integration services."""
     try:
         return {
-            "supported_services": integration_manager.supported_services,
-            "total_services": sum(len(services) for services in integration_manager.supported_services.values()),
-            "service_categories": list(integration_manager.supported_services.keys()),
-            "security_features": integration_manager.security_manager
+            "supported_services": agent_assignment_manager.supported_services,
+            "total_services": sum(len(services) for services in agent_assignment_manager.supported_services.values()),
+            "service_categories": list(agent_assignment_manager.supported_services.keys()),
+            "security_features": agent_assignment_manager.security_manager
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -725,7 +725,7 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
         if not all([agent_type, service_type, service_name]):
             raise HTTPException(status_code=400, detail="Missing required fields")
         
-        return await integration_manager.create_integration(agent_type, service_type, service_name, credentials)
+        return await agent_assignment_manager.create_integration(agent_type, service_type, service_name, credentials)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -733,7 +733,7 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
 async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
     """Get all integrations for a specific agent."""
     try:
-        return await integration_manager.get_agent_integrations(agent_type)
+        return await agent_assignment_manager.get_agent_integrations(agent_type)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -741,7 +741,7 @@ async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
 async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
     """Sync data from integrated service."""
     try:
-        return await integration_manager.sync_integration_data(integration_id)
+        return await agent_assignment_manager.sync_integration_data(integration_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -750,22 +750,22 @@ async def get_integrations_overview() -> Dict[str, Any]:
     """Get overview of all integrations across agents."""
     try:
         overview = {
-            "total_integrations": len(integration_manager.integrations),
-            "active_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "active"]),
-            "pending_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "pending"]),
-            "error_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "error"]),
+            "total_integrations": len(agent_assignment_manager.integrations),
+            "active_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "active"]),
+            "pending_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "pending"]),
+            "error_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "error"]),
             "integrations_by_agent": {},
             "popular_services": {},
             "health_summary": {}
         }
         
         # Calculate integrations by agent
-        for agent_type, integration_ids in integration_manager.agent_integrations.items():
+        for agent_type, integration_ids in agent_assignment_manager.agent_integrations.items():
             overview["integrations_by_agent"][agent_type] = len(integration_ids)
         
         # Calculate popular services
         service_counts = {}
-        for integration in integration_manager.integrations.values():
+        for integration in agent_assignment_manager.integrations.values():
             service_name = integration["service_name"]
             service_counts[service_name] = service_counts.get(service_name, 0) + 1
         
