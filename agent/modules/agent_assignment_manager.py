@@ -84,9 +84,13 @@ class AgentAssignmentManager:
             "performance": {
                 "name": "Performance Guru",
                 "icon": "⚡",
-                "specialties": ["code_optimization", "speed_enhancement", "security_analysis", "debugging"],
-                "suitable_roles": ["performance_optimization", "frontend_beauty", "design_automation"],
-                "luxury_expertise": 88
+                "specialties": ["code_optimization", "speed_enhancement", "security_analysis", "debugging", "24_7_monitoring", "auto_fixes"],
+                "suitable_roles": ["performance_optimization", "frontend_beauty", "design_automation", "system_monitoring"],
+                "luxury_expertise": 97,
+                "24_7_capability": True,
+                "auto_fix_enabled": True,
+                "proactive_monitoring": True,
+                "system_guardian": True
             },
             "customer_service": {
                 "name": "Experience Concierge",
