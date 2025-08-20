@@ -5,6 +5,8 @@ import IntegrationDashboard from './IntegrationDashboard'
 
 const AgentDashboard = ({ agents, loading, onRefresh }) => {
   const [selectedAgent, setSelectedAgent] = useState(null)
+  const [showIntegrations, setShowIntegrations] = useState(false)
+  const [selectedAgentForIntegration, setSelectedAgentForIntegration] = useState(null)
   const [filterBy, setFilterBy] = useState('all') // all, high_performance, needs_attention
 
   const getFilteredAgents = () => {
