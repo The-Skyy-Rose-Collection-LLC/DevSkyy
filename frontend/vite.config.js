@@ -20,7 +20,12 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0',
-    allowedHosts: ['webfix-mission.preview.emergentagent.com', '.emergent.host'],
+    allowedHosts: [
+      'webfix-mission.preview.emergentagent.com', 
+      '.emergent.host',
+      'agent-dashboard-25.preview.emergentagent.com',
+      '.emergentagent.com'
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:8001',
