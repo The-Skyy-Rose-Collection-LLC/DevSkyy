@@ -53,6 +53,7 @@ class ProductRequest(BaseModel):
 
     @validator('price')
     def price_must_be_greater_than_cost(cls, v, values):
+        """TODO: Add docstring for price_must_be_greater_than_cost."""
         if 'cost' in values and v <= values['cost']:
             raise ValueError('Price must be greater than cost')
         return v

@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 import logging
 import sys
 import os
+import subprocess
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
@@ -24,6 +25,7 @@ from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_ri
 from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes  # Imported commit_all_changes
+from agent.modules.enhanced_autofix import EnhancedAutoFix, run_auto_fix_session, quick_fix
 from typing import Dict, Any, List
 import json
 import asyncio
@@ -171,6 +173,35 @@ def run() -> dict:
     except Exception as e:
         logger.error(f"DevSkyy workflow failed: {e}")
         raise HTTPException(status_code=500, detail="Workflow execution failed")
+
+
+@app.post("/run/enhanced")
+async def run_enhanced() -> dict:
+    """Enhanced DevSkyy workflow with advanced auto-fix capabilities."""
+    try:
+        logger.info("🚀 Starting Enhanced DevSkyy agent workflow")
+
+        # Run enhanced auto-fix
+        autofix_result = await run_enhanced_autofix(
+            create_branch=False,  # Don't create branch for main workflow
+            auto_commit=True
+        )
+
+        # Run traditional workflow components
+        schedule_hourly_job()
+
+        result = {
+            "status": "enhanced_completed",
+            "autofix_results": autofix_result,
+            "workflow_enhanced": True,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        logger.info("✅ Enhanced DevSkyy agent workflow completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Enhanced DevSkyy workflow failed: {e}")
+        raise HTTPException(status_code=500, detail="Enhanced workflow execution failed")
 
 
 @app.get("/")
@@ -325,6 +356,7 @@ def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
 
 @app.post("/customers/create")
 def create_customer(email: str, first_name: str, last_name: str,
+    """TODO: Add docstring for create_customer."""
                     phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
     return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
@@ -1068,6 +1100,112 @@ async def push_to_github():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
+
+# Enhanced Auto-Fix Endpoints
+
+
+@app.post("/autofix/enhanced")
+async def run_enhanced_autofix(
+    create_branch: bool = True,
+    branch_name: str = None,
+    auto_commit: bool = True,
+    fix_types: List[str] = None
+) -> Dict[str, Any]:
+    """Run enhanced auto-fix session with advanced code analysis and branch management."""
+    try:
+        logger.info("🚀 Starting Enhanced Auto-Fix session...")
+        autofix = EnhancedAutoFix()
+        result = autofix.run_enhanced_autofix(
+            create_branch=create_branch,
+            branch_name=branch_name,
+            auto_commit=auto_commit,
+            fix_types=fix_types
+        )
+        logger.info("✅ Enhanced Auto-Fix session completed")
+        return result
+    except Exception as e:
+        logger.error(f"Enhanced Auto-Fix failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Enhanced Auto-Fix failed: {str(e)}")
+
+
+@app.post("/autofix/quick")
+async def run_quick_autofix() -> Dict[str, Any]:
+    """Run quick auto-fix without branch creation - perfect for immediate fixes."""
+    try:
+        logger.info("⚡ Starting Quick Auto-Fix...")
+        result = quick_fix()
+        logger.info("✅ Quick Auto-Fix completed")
+        return result
+    except Exception as e:
+        logger.error(f"Quick Auto-Fix failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Quick Auto-Fix failed: {str(e)}")
+
+
+@app.post("/autofix/session")
+async def run_autofix_session(
+    create_branch: bool = True,
+    branch_name: str = None,
+    auto_commit: bool = True
+) -> Dict[str, Any]:
+    """Run a complete auto-fix session with customizable options."""
+    try:
+        logger.info("🔧 Starting Auto-Fix session...")
+        result = run_auto_fix_session(
+            create_branch=create_branch,
+            branch_name=branch_name,
+            auto_commit=auto_commit
+        )
+        logger.info("✅ Auto-Fix session completed")
+        return result
+    except Exception as e:
+        logger.error(f"Auto-Fix session failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Auto-Fix session failed: {str(e)}")
+
+
+@app.get("/autofix/status")
+async def get_autofix_status() -> Dict[str, Any]:
+    """Get status of auto-fix capabilities and recent activity."""
+    try:
+        # Get git branch info
+        current_branch = None
+        try:
+            result = subprocess.run(['git', 'branch', '--show-current'],
+                                    capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                current_branch = result.stdout.strip()
+        except:
+            pass
+
+        # Get recent commits
+        recent_commits = []
+        try:
+            result = subprocess.run(['git', 'log', '--oneline', '-5'],
+                                    capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                recent_commits = result.stdout.strip().split('\n')
+        except:
+            pass
+
+        return {
+            "autofix_enabled": True,
+            "current_branch": current_branch,
+            "recent_commits": recent_commits[:3],  # Last 3 commits
+            "capabilities": {
+                "enhanced_analysis": True,
+                "branch_management": True,
+                "auto_commit": True,
+                "python_enhancement": True,
+                "javascript_modernization": True,
+                "security_scanning": True,
+                "performance_optimization": True,
+                "documentation_improvement": True,
+                "structure_optimization": True
+            },
+            "supported_languages": ["Python", "JavaScript", "HTML", "CSS", "JSON", "YAML"],
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Start enhanced learning system on import
 enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)

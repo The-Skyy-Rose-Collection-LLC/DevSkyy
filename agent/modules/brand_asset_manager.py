@@ -61,6 +61,7 @@ class BrandAssetManager:
             json.dump(self.metadata, f, indent=2)
 
     def upload_asset(self, file_data: bytes, filename: str, category: str,
+        """TODO: Add docstring for upload_asset."""
                      description: str = "", tags: List[str] = None) -> Dict[str, Any]:
         """Upload a brand asset."""
         try:

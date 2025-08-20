@@ -116,6 +116,7 @@ class WebDevelopmentAgent:
         img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
 
         def add_alt(match):
+            """TODO: Add docstring for add_alt."""
             img_tag = match.group(0)
             if 'alt=' not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'

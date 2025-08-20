@@ -58,6 +58,7 @@ class EcommerceAgent:
         logger.info("🛍️ Production Ecommerce Agent Initialized with Neural Commerce")
 
     def add_product(self, name: str, category: ProductCategory, price: float, cost: float,
+        """TODO: Add docstring for add_product."""
                     stock_quantity: int, sku: str, sizes: List[str], colors: List[str],
                     description: str, images: List[str] = None, tags: List[str] = None) -> Dict[str, Any]:
         """Add product with comprehensive validation and optimization."""
