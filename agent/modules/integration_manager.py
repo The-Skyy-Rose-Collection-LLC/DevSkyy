@@ -11,6 +11,7 @@ import base64
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class IntegrationType(Enum):
     WEBSITE = "website"
     SOCIAL_MEDIA = "social_media"
@@ -21,6 +22,7 @@ class IntegrationType(Enum):
     ANALYTICS = "analytics"
     CRM = "crm"
 
+
 class IntegrationStatus(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
@@ -28,9 +30,10 @@ class IntegrationStatus(Enum):
     ERROR = "error"
     SUSPENDED = "suspended"
 
+
 class IntegrationManager:
     """Universal Integration Manager for connecting external services to agents."""
-    
+
     def __init__(self):
         self.integrations = {}
         self.agent_integrations = {}
@@ -185,19 +188,19 @@ class IntegrationManager:
         """Create a new integration between an agent and external service."""
         try:
             integration_id = str(uuid.uuid4())
-            
+
             # Validate service support
             if not self._validate_service_support(service_type, service_name):
                 return {"error": f"Service {service_name} not supported", "status": "failed"}
-            
+
             # Validate credentials
             validation_result = await self._validate_credentials(service_type, service_name, credentials)
             if not validation_result["valid"]:
                 return {"error": validation_result["error"], "status": "validation_failed"}
-            
+
             # Encrypt and store credentials
             encrypted_credentials = self._encrypt_credentials(credentials)
-            
+
             # Create integration record
             integration = {
                 "id": integration_id,
@@ -215,15 +218,15 @@ class IntegrationManager:
                 "error_count": 0,
                 "success_count": 0
             }
-            
+
             # Store integration
             self.integrations[integration_id] = integration
-            
+
             # Add to agent integrations
             if agent_type not in self.agent_integrations:
                 self.agent_integrations[agent_type] = []
             self.agent_integrations[agent_type].append(integration_id)
-            
+
             # Test connection
             test_result = await self._test_integration_connection(integration_id)
             if test_result["success"]:
@@ -233,7 +236,7 @@ class IntegrationManager:
                 integration["status"] = IntegrationStatus.ERROR.value
                 integration["error_message"] = test_result["error"]
                 logger.error(f"❌ Integration {integration_id} failed connection test")
-            
+
             return {
                 "integration_id": integration_id,
                 "status": integration["status"],
@@ -242,7 +245,7 @@ class IntegrationManager:
                 "webhook_url": integration["webhook_url"],
                 "data_sync_preview": self._generate_sync_preview(integration)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Integration creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -252,14 +255,14 @@ class IntegrationManager:
         try:
             agent_integrations = self.agent_integrations.get(agent_type, [])
             integrations_data = []
-            
+
             for integration_id in agent_integrations:
                 if integration_id in self.integrations:
                     integration = self.integrations[integration_id].copy()
                     # Remove sensitive data for response
                     integration.pop("credentials", None)
                     integrations_data.append(integration)
-            
+
             return {
                 "agent_type": agent_type,
                 "total_integrations": len(integrations_data),
@@ -268,7 +271,7 @@ class IntegrationManager:
                 "available_services": self._get_available_services_for_agent(agent_type),
                 "integration_health": self._calculate_integration_health(integrations_data)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to get agent integrations: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -278,18 +281,18 @@ class IntegrationManager:
         try:
             if integration_id not in self.integrations:
                 return {"error": "Integration not found", "status": "failed"}
-            
+
             integration = self.integrations[integration_id]
-            
+
             if integration["status"] != IntegrationStatus.ACTIVE.value:
                 return {"error": "Integration not active", "status": "failed"}
-            
+
             # Decrypt credentials
             credentials = self._decrypt_credentials(integration["credentials"])
-            
+
             # Perform data sync based on service type
             sync_result = await self._perform_data_sync(integration, credentials)
-            
+
             # Update integration status
             if sync_result["success"]:
                 integration["last_sync"] = datetime.now().isoformat()
@@ -299,28 +302,28 @@ class IntegrationManager:
                 integration["error_count"] += 1
                 if integration["error_count"] > 5:
                     integration["status"] = IntegrationStatus.ERROR.value
-            
+
             return sync_result
-            
+
         except Exception as e:
             logger.error(f"❌ Data sync failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
         """Validate if service is supported."""
-        return (service_type in self.supported_services and 
+        return (service_type in self.supported_services and
                 service_name in self.supported_services[service_type])
 
     async def _validate_credentials(self, service_type: str, service_name: str, credentials: Dict[str, Any]) -> Dict[str, Any]:
         """Validate provided credentials."""
         service_config = self.supported_services[service_type][service_name]
         required_fields = service_config["required_fields"]
-        
+
         # Check required fields
         for field in required_fields:
             if field not in credentials or not credentials[field]:
                 return {"valid": False, "error": f"Missing required field: {field}"}
-        
+
         # Additional validation logic can be added here
         return {"valid": True}
 
@@ -351,7 +354,7 @@ class IntegrationManager:
                 }
             }
         }
-        
+
         return mappings.get(agent_type, {}).get(service_type, {})
 
     async def _test_integration_connection(self, integration_id: str) -> Dict[str, Any]:
@@ -377,26 +380,26 @@ class IntegrationManager:
             "brand_intelligence": ["social_media", "analytics", "crm"],
             "customer_service": ["crm", "email_marketing", "social_media"]
         }
-        
+
         compatible_services = agent_service_compatibility.get(agent_type, [])
         available = {}
-        
+
         for service_type in compatible_services:
             if service_type in self.supported_services:
                 available[service_type] = list(self.supported_services[service_type].keys())
-        
+
         return available
 
     def _calculate_integration_health(self, integrations: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Calculate overall health of agent integrations."""
         if not integrations:
             return {"status": "no_integrations", "score": 0}
-        
+
         active_count = len([i for i in integrations if i["status"] == "active"])
         error_count = len([i for i in integrations if i["status"] == "error"])
-        
+
         health_score = (active_count / len(integrations)) * 100
-        
+
         return {
             "status": "healthy" if health_score > 80 else "needs_attention" if health_score > 50 else "critical",
             "score": round(health_score, 1),
@@ -408,16 +411,16 @@ class IntegrationManager:
     def _generate_health_recommendations(self, integrations: List[Dict[str, Any]]) -> List[str]:
         """Generate recommendations for improving integration health."""
         recommendations = []
-        
+
         error_integrations = [i for i in integrations if i["status"] == "error"]
         if error_integrations:
             recommendations.append(f"Fix {len(error_integrations)} failed integrations")
-        
-        old_syncs = [i for i in integrations if i["last_sync"] and 
-                    (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1]
+
+        old_syncs = [i for i in integrations if i["last_sync"] and
+                     (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1]
         if old_syncs:
             recommendations.append(f"Update {len(old_syncs)} integrations with stale data")
-        
+
         return recommendations
 
     async def _perform_data_sync(self, integration: Dict[str, Any], credentials: Dict[str, Any]) -> Dict[str, Any]:
@@ -440,6 +443,7 @@ class IntegrationManager:
             "credential_expiry_monitoring": "enabled",
             "oauth_token_refresh": "automatic"
         }
+
 
 def create_integration_manager() -> IntegrationManager:
     """Factory function to create integration manager."""

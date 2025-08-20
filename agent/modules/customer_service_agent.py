@@ -10,9 +10,10 @@ import os
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class CustomerServiceAgent:
     """Luxury customer service specialist with fashion industry expertise."""
-    
+
     def __init__(self):
         self.agent_type = "customer_service"
         self.brand_context = {}
@@ -43,7 +44,7 @@ class CustomerServiceAgent:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
         try:
             logger.info("💝 Analyzing luxury customer satisfaction metrics...")
-            
+
             analysis = {
                 "overall_satisfaction": 4.7,
                 "satisfaction_by_channel": {
@@ -65,7 +66,7 @@ class CustomerServiceAgent:
                     "personal_shopper_usage": 67
                 }
             }
-            
+
             return {
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
@@ -73,7 +74,7 @@ class CustomerServiceAgent:
                 "improvement_recommendations": self._generate_service_recommendations(analysis),
                 "risk_assessment": self._assess_service_risks(analysis)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Customer satisfaction analysis failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -90,7 +91,7 @@ class CustomerServiceAgent:
                 "effort": "High",
                 "pros": [
                     "24/7 availability for global customers",
-                    "Consistent brand voice and recommendations", 
+                    "Consistent brand voice and recommendations",
                     "Scalable without increasing headcount",
                     "Personalized styling based on purchase history"
                 ],
@@ -118,6 +119,7 @@ class CustomerServiceAgent:
                 "impact_score": 85
             }
         }
+
 
 def optimize_customer_service() -> Dict[str, Any]:
     """Main function to optimize customer service operations."""

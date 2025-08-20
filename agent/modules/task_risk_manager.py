@@ -9,17 +9,20 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class RiskLevel(Enum):
     CRITICAL = "critical"
-    HIGH = "high" 
+    HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
+
 
 class TaskPriority(Enum):
     URGENT = "urgent"
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
+
 
 class TaskCategory(Enum):
     WEBSITE_STABILITY = "website_stability"
@@ -30,9 +33,10 @@ class TaskCategory(Enum):
     PERFORMANCE = "performance"
     BRAND_PROTECTION = "brand_protection"
 
+
 class TaskRiskManager:
     """Centralized task and risk management system for all agents."""
-    
+
     def __init__(self):
         self.tasks = {}
         self.risk_assessments = {}
@@ -46,13 +50,13 @@ class TaskRiskManager:
         """Create a new task with comprehensive risk assessment."""
         try:
             task_id = str(uuid.uuid4())
-            
+
             # Assess task risk
             risk_assessment = await self._assess_task_risk(task_data, agent_type)
-            
+
             # Determine priority based on risk and impact
             priority = self._calculate_task_priority(risk_assessment, task_data)
-            
+
             # Create comprehensive task record
             task = {
                 "id": task_id,
@@ -73,15 +77,15 @@ class TaskRiskManager:
                 "created_at": datetime.now().isoformat(),
                 "assigned_to": agent_type
             }
-            
+
             self.tasks[task_id] = task
-            
+
             return {
                 "task_id": task_id,
                 "task": task,
                 "risk_assessment": risk_assessment
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Task creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -90,13 +94,13 @@ class TaskRiskManager:
         """Get prioritized task list with risk-based sorting."""
         try:
             logger.info("📊 Generating prioritized task list...")
-            
+
             # Apply filters
             filtered_tasks = self._apply_task_filters(self.tasks, filters or {})
-            
+
             # Sort by priority and risk
             sorted_tasks = self._sort_tasks_by_priority_risk(filtered_tasks)
-            
+
             return {
                 "total_tasks": len(sorted_tasks),
                 "high_risk_tasks": len([t for t in sorted_tasks if t["risk_level"] in ["critical", "high"]]),
@@ -104,7 +108,7 @@ class TaskRiskManager:
                 "tasks": sorted_tasks,
                 "generated_at": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Task list generation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -113,7 +117,7 @@ class TaskRiskManager:
         """Comprehensive task risk assessment."""
         risk_factors = []
         impact_score = 50  # Base score
-        
+
         # Category-based risk assessment
         category = task_data.get("category", "performance")
         if category == "website_stability":
@@ -125,7 +129,7 @@ class TaskRiskManager:
         elif category == "revenue_impact":
             impact_score = 75
             risk_factors.extend(["sales_disruption", "customer_churn"])
-        
+
         # Determine overall risk level
         if impact_score > 80:
             overall_risk = RiskLevel.CRITICAL.value
@@ -135,7 +139,7 @@ class TaskRiskManager:
             overall_risk = RiskLevel.MEDIUM.value
         else:
             overall_risk = RiskLevel.LOW.value
-        
+
         return {
             "overall_risk_level": overall_risk,
             "impact_score": impact_score,
@@ -146,7 +150,7 @@ class TaskRiskManager:
     def _calculate_task_priority(self, risk_assessment: Dict, task_data: Dict) -> TaskPriority:
         """Calculate task priority based on risk and business impact."""
         impact_score = risk_assessment["impact_score"]
-        
+
         if impact_score > 80:
             return TaskPriority.URGENT
         elif impact_score > 60:
@@ -159,29 +163,29 @@ class TaskRiskManager:
     def _apply_task_filters(self, tasks: Dict, filters: Dict) -> List[Dict]:
         """Apply filters to task list."""
         filtered_tasks = []
-        
+
         for task in tasks.values():
             # Filter by status
             if filters.get("status") and task["status"] not in filters["status"]:
                 continue
-            
-            # Filter by priority  
+
+            # Filter by priority
             if filters.get("priority") and task["priority"] not in filters["priority"]:
                 continue
-            
+
             # Filter by risk level
             if filters.get("risk_level") and task["risk_level"] not in filters["risk_level"]:
                 continue
-            
+
             filtered_tasks.append(task)
-        
+
         return filtered_tasks
 
     def _sort_tasks_by_priority_risk(self, tasks: List[Dict]) -> List[Dict]:
         """Sort tasks by priority and risk level."""
         priority_order = {"urgent": 4, "high": 3, "medium": 2, "low": 1}
         risk_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-        
+
         return sorted(tasks, key=lambda t: (
             priority_order.get(t["priority"], 0),
             risk_order.get(t["risk_level"], 0),
@@ -193,7 +197,7 @@ class TaskRiskManager:
         return {
             "color_palette": {
                 "rose_gold": "#E8B4B8",
-                "gold": "#FFD700", 
+                "gold": "#FFD700",
                 "silver": "#C0C0C0",
                 "black": "#000000",
                 "white": "#FFFFFF"
@@ -210,12 +214,13 @@ class TaskRiskManager:
                     "personality": "detail_oriented_curator"
                 },
                 "financial": {
-                    "color": "gold", 
+                    "color": "gold",
                     "style": "premium_professional",
                     "personality": "strategic_wealth_advisor"
                 }
             }
         }
+
 
 def manage_tasks_and_risks() -> Dict[str, Any]:
     """Main function to manage tasks and risks across all agents."""

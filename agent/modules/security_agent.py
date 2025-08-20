@@ -10,9 +10,10 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class SecurityAgent:
     """Cybersecurity specialist for luxury e-commerce protection."""
-    
+
     def __init__(self):
         self.agent_type = "security"
         self.brand_context = {}
@@ -34,7 +35,7 @@ class SecurityAgent:
         """Comprehensive security assessment for luxury e-commerce."""
         try:
             logger.info("🛡️ Conducting comprehensive security assessment...")
-            
+
             assessment = {
                 "overall_security_score": 94.5,
                 "vulnerability_scan": {
@@ -60,7 +61,7 @@ class SecurityAgent:
                     "brand_reputation": {"risk_score": 30, "mitigation": "continuous_monitoring"}
                 }
             }
-            
+
             return {
                 "assessment_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
@@ -68,7 +69,7 @@ class SecurityAgent:
                 "recommendations": self._generate_security_recommendations(assessment),
                 "risk_prioritization": self._prioritize_security_risks(assessment)
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Security assessment failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -78,7 +79,7 @@ class SecurityAgent:
         recommendations = [
             {
                 "priority": "CRITICAL",
-                "risk_level": "HIGH", 
+                "risk_level": "HIGH",
                 "title": "Implement Advanced Bot Protection",
                 "description": "Deploy AI-powered bot detection to protect against automated attacks and scraping",
                 "impact": "Prevent credential stuffing and inventory hoarding attacks",
@@ -104,31 +105,32 @@ class SecurityAgent:
     def _prioritize_security_risks(self, assessment: Dict) -> List[Dict[str, Any]]:
         """Prioritize security risks based on impact and likelihood."""
         risks = []
-        
+
         # Analyze luxury-specific risks
         luxury_risks = assessment.get("luxury_specific_risks", {})
         for risk_type, risk_data in luxury_risks.items():
             risk_score = risk_data.get("risk_score", 0)
-            
+
             if risk_score > 25:
                 priority = "HIGH"
             else:
                 priority = "MEDIUM"
-                
+
             risks.append({
                 "risk_type": risk_type,
                 "priority": priority,
                 "score": risk_score,
                 "mitigation": risk_data.get("mitigation", "")
             })
-        
+
         return sorted(risks, key=lambda x: x["score"], reverse=True)
+
 
 def secure_luxury_platform() -> Dict[str, Any]:
     """Main function to secure luxury e-commerce platform."""
     agent = SecurityAgent()
     return {
-        "status": "security_optimized", 
+        "status": "security_optimized",
         "security_score": 94.5,
         "threat_level": "LOW",
         "compliance_status": "FULL",

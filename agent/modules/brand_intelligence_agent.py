@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+
 class BrandIntelligenceAgent:
     """
     Production-level Brand Intelligence Agent for The Skyy Rose Collection.
@@ -35,7 +36,7 @@ class BrandIntelligenceAgent:
 
         self.brand_colors = {
             "primary": "#E6B8A2",  # Rose gold
-            "secondary": "#2C3E50", # Deep navy
+            "secondary": "#2C3E50",  # Deep navy
             "accent": "#F8F9FA",   # Soft white
             "luxury": "#C9A96E"    # Champagne gold
         }
@@ -61,7 +62,7 @@ class BrandIntelligenceAgent:
 
         self.uploaded_assets = {}
         self.learning_from_assets = False
-        
+
         logger.info("🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection")
 
     def analyze_brand_assets(self) -> Dict[str, Any]:
@@ -410,15 +411,16 @@ class BrandIntelligenceAgent:
 
         try:
             response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
-                {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
-            ],
-            temperature=0.5,
-            max_tokens=150
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system",
+                     "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
+                    {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
+                ],
+                temperature=0.5,
+                max_tokens=150
             )
-            
+
             sentiment_data = json.loads(response.choices[0].message.content)
             sentiment_data["timestamp"] = datetime.now().isoformat()
             logger.info("✅ Brand sentiment analyzed successfully using OpenAI")
@@ -433,29 +435,28 @@ class BrandIntelligenceAgent:
                 "timestamp": datetime.now().isoformat()
             }
 
-
     def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
         """Learn from uploaded brand assets to enhance intelligence."""
         try:
             self.uploaded_assets = asset_data
             self.learning_from_assets = True
-            
+
             # Analyze visual consistency
             visual_analysis = self._analyze_visual_assets(asset_data.get("visual_assets", {}))
-            
+
             # Extract brand patterns
             brand_patterns = self._extract_brand_patterns(asset_data)
-            
+
             # Update brand understanding
             enhanced_insights = self._generate_asset_insights(visual_analysis, brand_patterns)
-            
+
             # Update theme evolution based on assets
             if asset_data.get("seasonal_collections"):
                 self._update_seasonal_understanding(asset_data["seasonal_collections"])
-            
+
             # EXPERIMENTAL: Neural Brand DNA Analysis
             neural_brand_dna = self._experimental_neural_brand_analysis(asset_data)
-            
+
             return {
                 "learning_status": "completed",
                 "assets_processed": asset_data.get("total_learning_sources", 0),
@@ -467,11 +468,11 @@ class BrandIntelligenceAgent:
                 "experimental_features_active": True,
                 "timestamp": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"Asset learning failed: {str(e)}")
             return {"error": str(e), "learning_status": "failed"}
-    
+
     def _experimental_neural_brand_analysis(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
         """EXPERIMENTAL: Advanced neural analysis of brand DNA patterns."""
         return {
@@ -487,7 +488,7 @@ class BrandIntelligenceAgent:
                 "Sustainability messaging creates 76% stronger emotional bonds"
             ]
         }
-    
+
     def _analyze_visual_assets(self, visual_assets: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze visual brand assets for consistency."""
         return {
@@ -501,7 +502,7 @@ class BrandIntelligenceAgent:
                 "Use high-quality product photography standards"
             ]
         }
-    
+
     def _extract_brand_patterns(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
         """Extract recurring brand patterns from assets."""
         return {
@@ -511,22 +512,23 @@ class BrandIntelligenceAgent:
             "seasonal_consistency": True,
             "quality_standards": "Premium"
         }
-    
+
     def _generate_asset_insights(self, visual_analysis: Dict, patterns: Dict) -> List[str]:
         """Generate insights from asset analysis."""
         return [
             "Brand visual identity shows strong luxury positioning",
-            "Sustainability messaging is consistent across materials", 
+            "Sustainability messaging is consistent across materials",
             "Product photography maintains premium quality standards",
             "Color palette reinforces elegance and sophistication",
             "Marketing materials align with empowerment themes"
         ]
-    
+
     def _update_seasonal_understanding(self, seasonal_assets: List[Dict]):
         """Update seasonal understanding from collection assets."""
         self.theme_evolution["asset_informed"] = True
         self.theme_evolution["collection_count"] = len(seasonal_assets)
         self.theme_evolution["visual_evolution"] = "Data-driven from uploaded collections"
+
 
 def initialize_brand_intelligence() -> BrandIntelligenceAgent:
     """Initialize the brand intelligence system."""

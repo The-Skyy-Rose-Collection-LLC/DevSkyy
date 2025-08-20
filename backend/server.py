@@ -4,6 +4,7 @@ Backend server entry point for The Skyy Rose Collection Platform
 This file imports and runs the main FastAPI application.
 """
 
+from main import app
 import sys
 import os
 
@@ -11,7 +12,6 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import the FastAPI app from main.py
-from main import app
 
 # This allows uvicorn to find the app when running with "uvicorn server:app"
 if __name__ == "__main__":

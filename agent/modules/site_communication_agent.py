@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 async def communicate_with_site() -> Dict[str, Any]:
     """Main function to communicate with site and gather insights."""
     agent = SiteCommunicationAgent()
@@ -20,6 +21,7 @@ async def communicate_with_site() -> Dict[str, Any]:
         "last_communication": datetime.now().isoformat(),
         "agent_status": "optimal"
     }
+
 
 class SiteCommunicationAgent:
     """Agent for communicating with website chatbots and gathering insights."""
@@ -391,6 +393,8 @@ class SiteCommunicationAgent:
 
 # The following functions are duplicates from the original code and were not modified.
 # They are kept here for completeness as per instructions.
+
+
 async def communicate_with_site() -> Dict[str, Any]:
     """Main function for site communication."""
     agent = SiteCommunicationAgent()
@@ -402,6 +406,7 @@ async def communicate_with_site() -> Dict[str, Any]:
         "last_check": datetime.now().isoformat(),
         "agent_status": "active"
     }
+
 
 async def communicate_with_site() -> Dict[str, Any]:
     """Communicate with site and gather insights."""

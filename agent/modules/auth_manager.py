@@ -17,9 +17,10 @@ from sqlalchemy.sql import func
 logger = logging.getLogger(__name__)
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     username = Column(String, unique=True, index=True, nullable=False)
@@ -36,13 +37,14 @@ class User(Base):
     verification_token = Column(String)
     reset_token = Column(String)
     reset_token_expires = Column(DateTime(timezone=True))
-    
+
     sessions = relationship("UserSession", back_populates="user")
     preferences = relationship("UserPreference", back_populates="user", uselist=False)
 
+
 class UserSession(Base):
     __tablename__ = "user_sessions"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     token_hash = Column(String, unique=True)
@@ -51,12 +53,13 @@ class UserSession(Base):
     ip_address = Column(String)
     user_agent = Column(Text)
     is_active = Column(Boolean, default=True)
-    
+
     user = relationship("User", back_populates="sessions")
+
 
 class UserPreference(Base):
     __tablename__ = "user_preferences"
-    
+
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     theme = Column(String, default="light")
     notifications_enabled = Column(Boolean, default=True)
@@ -64,20 +67,22 @@ class UserPreference(Base):
     dashboard_layout = Column(String, default="default")
     timezone = Column(String, default="UTC")
     language = Column(String, default="en")
-    
+
     user = relationship("User", back_populates="preferences")
+
 
 class AuthManager:
     """Comprehensive authentication and user management system."""
-    
+
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
-        self.database_url = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
+        self.database_url = os.getenv(
+            "DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
         self.security = HTTPBearer()
         self.engine = create_engine(self.database_url)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         self.init_database()
-    
+
     def init_database(self):
         """Initialize PostgreSQL database with secure schema."""
         try:
@@ -86,7 +91,7 @@ class AuthManager:
         except Exception as e:
             logger.error(f"Failed to initialize database: {str(e)}")
             raise
-    
+
     def get_db(self):
         """Get database session."""
         db = self.SessionLocal()
@@ -94,69 +99,70 @@ class AuthManager:
             yield db
         finally:
             db.close()
-    
+
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt."""
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-    
+
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify password against hash."""
         return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
-    
+
     def validate_email(self, email: str) -> bool:
         """Validate email format."""
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
-    
+
     def validate_password(self, password: str) -> Dict[str, Any]:
         """Validate password strength."""
         errors = []
-        
+
         if len(password) < 8:
             errors.append("Password must be at least 8 characters long")
-        
+
         if not re.search(r'[A-Z]', password):
             errors.append("Password must contain at least one uppercase letter")
-        
+
         if not re.search(r'[a-z]', password):
             errors.append("Password must contain at least one lowercase letter")
-        
+
         if not re.search(r'\d', password):
             errors.append("Password must contain at least one number")
-        
+
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
             errors.append("Password must contain at least one special character")
-        
+
         return {"valid": len(errors) == 0, "errors": errors}
-    
-    def create_user(self, email: str, username: str, password: str, 
-                   first_name: str = "", last_name: str = "") -> Dict[str, Any]:
+
+    def create_user(self, email: str, username: str, password: str,
+                    """TODO: Add docstring for create_user."""
+                    first_name: str = "", last_name: str = "") -> Dict[str, Any]:
         """Create new user account with validation."""
-        
+
         # Validate input
         if not self.validate_email(email):
             return {"success": False, "error": "Invalid email format"}
-        
+
         password_validation = self.validate_password(password)
         if not password_validation["valid"]:
             return {"success": False, "error": password_validation["errors"]}
-        
+
         db = self.SessionLocal()
-        
+
         try:
             # Check if user already exists
             existing_user = db.query(User).filter(
                 (User.email == email) | (User.username == username)
             ).first()
-            
+
             if existing_user:
                 return {"success": False, "error": "User with this email or username already exists"}
-            
+
             # Hash password and create user
             password_hash = self.hash_password(password)
             verification_token = secrets.token_urlsafe(32)
-            
+
             new_user = User(
                 email=email,
                 username=username,
@@ -165,67 +171,67 @@ class AuthManager:
                 last_name=last_name,
                 verification_token=verification_token
             )
-            
+
             db.add(new_user)
             db.flush()  # Get user ID
-            
+
             # Create default preferences
             user_prefs = UserPreference(user_id=new_user.id)
             db.add(user_prefs)
-            
+
             db.commit()
-            
+
             return {
                 "success": True,
                 "user_id": new_user.id,
                 "message": "User created successfully",
                 "verification_token": verification_token
             }
-            
+
         except Exception as e:
             db.rollback()
             logger.error(f"Error creating user: {str(e)}")
             return {"success": False, "error": "Failed to create user"}
         finally:
             db.close()
-    
-    def authenticate_user(self, email: str, password: str, ip_address: str = "", 
-                         user_agent: str = "") -> Dict[str, Any]:
+
+    def authenticate_user(self, email: str, password: str, ip_address: str = "",
+                          user_agent: str = "") -> Dict[str, Any]:
         """Authenticate user and create session."""
-        
+
         db = self.SessionLocal()
-        
+
         try:
             # Get user data
             user = db.query(User).filter(User.email == email).first()
-            
+
             if not user:
                 return {"success": False, "error": "Invalid credentials"}
-            
+
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.now():
                 return {"success": False, "error": "Account temporarily locked due to failed login attempts"}
-            
+
             # Check if account is active
             if not user.is_active:
                 return {"success": False, "error": "Account is deactivated"}
-            
+
             # Verify password
             if not self.verify_password(password, user.password_hash):
                 # Increment failed attempts
                 user.failed_login_attempts += 1
-                
+
                 if user.failed_login_attempts >= 5:
                     user.locked_until = datetime.now() + timedelta(minutes=30)
-                
+
                 db.commit()
                 return {"success": False, "error": "Invalid credentials"}
-            
+
             # Reset failed attempts on successful login
             user.failed_login_attempts = 0
             user.locked_until = None
             user.last_login = datetime.now()
-            
+
             # Create JWT token
             token_payload = {
                 "user_id": user.id,
@@ -234,13 +240,13 @@ class AuthManager:
                 "exp": datetime.utcnow() + timedelta(hours=24),
                 "iat": datetime.utcnow()
             }
-            
+
             token = jwt.encode(token_payload, self.secret_key, algorithm="HS256")
-            
+
             # Store session
             token_hash = bcrypt.hashpw(token.encode(), bcrypt.gensalt()).decode()
             expires_at = datetime.now() + timedelta(hours=24)
-            
+
             new_session = UserSession(
                 user_id=user.id,
                 token_hash=token_hash,
@@ -248,10 +254,10 @@ class AuthManager:
                 ip_address=ip_address,
                 user_agent=user_agent
             )
-            
+
             db.add(new_session)
             db.commit()
-            
+
             return {
                 "success": True,
                 "access_token": token,
@@ -264,80 +270,80 @@ class AuthManager:
                     "email_verified": bool(user.email_verified)
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"Authentication error: {str(e)}")
             return {"success": False, "error": "Authentication failed"}
         finally:
             db.close()
-    
+
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify JWT token and return user data."""
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
-            
+
             # Check if session is still valid
             db = self.SessionLocal()
-            
+
             try:
                 session = db.query(UserSession).filter(
                     UserSession.user_id == payload["user_id"],
                     UserSession.expires_at > datetime.now(),
                     UserSession.is_active == True
                 ).first()
-                
+
                 if not session:
                     return None
-                
+
                 return payload
-                
+
             finally:
                 db.close()
-            
+
         except jwt.ExpiredSignatureError:
             return None
         except jwt.InvalidTokenError:
             return None
-    
+
     def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
         """Dependency to get current authenticated user."""
         token = credentials.credentials
         payload = self.verify_token(token)
-        
+
         if not payload:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid or expired token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         return payload
-    
+
     def get_user_profile(self, user_id: int) -> Dict[str, Any]:
         """Get complete user profile data."""
         db = self.SessionLocal()
-        
+
         try:
             # Get user data with preferences
             user = db.query(User).filter(User.id == user_id).first()
-            
+
             if not user:
                 return {"error": "User not found"}
-            
+
             # Get active sessions count
             active_sessions = db.query(UserSession).filter(
                 UserSession.user_id == user_id,
                 UserSession.expires_at > datetime.now(),
                 UserSession.is_active == True
             ).count()
-            
+
             # Get or create preferences
             prefs = user.preferences
             if not prefs:
                 prefs = UserPreference(user_id=user_id)
                 db.add(prefs)
                 db.commit()
-            
+
             return {
                 "id": user.id,
                 "email": user.email,
@@ -358,36 +364,37 @@ class AuthManager:
                     "language": prefs.language
                 }
             }
-            
+
         except Exception as e:
             logger.error(f"Error getting user profile: {str(e)}")
             return {"error": "Failed to retrieve profile"}
         finally:
             db.close()
-    
+
     def logout_user(self, token: str) -> Dict[str, Any]:
         """Logout user by invalidating session."""
         payload = self.verify_token(token)
         if not payload:
             return {"success": False, "error": "Invalid token"}
-        
+
         db = self.SessionLocal()
-        
+
         try:
             # Deactivate all sessions for this user
             db.query(UserSession).filter(
                 UserSession.user_id == payload["user_id"],
                 UserSession.is_active == True
             ).update({"is_active": False})
-            
+
             db.commit()
             return {"success": True, "message": "Logged out successfully"}
-            
+
         except Exception as e:
             logger.error(f"Logout error: {str(e)}")
             return {"success": False, "error": "Logout failed"}
         finally:
             db.close()
+
 
 # Initialize authentication manager
 auth_manager = AuthManager()

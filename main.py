@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 import logging
 import sys
 import os
+import subprocess
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
@@ -27,13 +28,28 @@ from agent.modules.wordpress_direct_service import WordPressDirectService, creat
 from agent.modules.woocommerce_integration_service import WooCommerceIntegrationService, create_woocommerce_integration_service
 from agent.modules.openai_intelligence_service import OpenAIIntelligenceService, create_openai_intelligence_service
 from agent.scheduler.cron import schedule_hourly_job
-from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
+from agent.git_commit import commit_fixes, commit_all_changes  # Imported commit_all_changes
+
+# Import enhanced autofix directly to avoid dependency issues
+import importlib.util
+from pathlib import Path
+enhanced_autofix_spec = importlib.util.spec_from_file_location(
+    "enhanced_autofix", 
+    Path(__file__).parent / "agent" / "modules" / "enhanced_autofix.py"
+)
+enhanced_autofix_module = importlib.util.module_from_spec(enhanced_autofix_spec)
+enhanced_autofix_spec.loader.exec_module(enhanced_autofix_module)
+
+# Extract classes and functions
+EnhancedAutoFix = enhanced_autofix_module.EnhancedAutoFix
+run_auto_fix_session = enhanced_autofix_module.run_auto_fix_session
+quick_fix = enhanced_autofix_module.quick_fix
 from typing import Dict, Any, List
 import json
 import asyncio
 from datetime import datetime, timedelta
 from models import (
-    PaymentRequest, ProductRequest, CustomerRequest, OrderRequest, 
+    PaymentRequest, ProductRequest, CustomerRequest, OrderRequest,
     ChargebackRequest, CodeAnalysisRequest, WebsiteAnalysisRequest
 )
 from dotenv import load_dotenv
@@ -42,7 +58,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(
-    title="The Skyy Rose Collection - DevSkyy Enhanced Platform", 
+    title="The Skyy Rose Collection - DevSkyy Enhanced Platform",
     version="2.0.0",
     description="Production-grade AI-powered platform for luxury e-commerce",
     docs_url="/docs",
@@ -70,11 +86,13 @@ app.add_middleware(
 )
 
 app.add_middleware(
-    TrustedHostMiddleware, 
+    TrustedHostMiddleware,
     allowed_hosts=["*"]  # Configure for your domain in production
 )
 
 # Global exception handlers
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url}")
@@ -88,6 +106,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         }
     )
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation error: {exc} - {request.url}")
@@ -100,6 +119,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "path": str(request.url)
         }
     )
+
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
@@ -177,6 +197,35 @@ def run() -> dict:
         raise HTTPException(status_code=500, detail="Workflow execution failed")
 
 
+@app.post("/run/enhanced")
+async def run_enhanced() -> dict:
+    """Enhanced DevSkyy workflow with advanced auto-fix capabilities."""
+    try:
+        logger.info("🚀 Starting Enhanced DevSkyy agent workflow")
+
+        # Run enhanced auto-fix
+        autofix_result = await run_enhanced_autofix(
+            create_branch=False,  # Don't create branch for main workflow
+            auto_commit=True
+        )
+
+        # Run traditional workflow components
+        schedule_hourly_job()
+
+        result = {
+            "status": "enhanced_completed",
+            "autofix_results": autofix_result,
+            "workflow_enhanced": True,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        logger.info("✅ Enhanced DevSkyy agent workflow completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Enhanced DevSkyy workflow failed: {e}")
+        raise HTTPException(status_code=500, detail="Enhanced workflow execution failed")
+
+
 @app.get("/")
 def root() -> dict:
     """Health check endpoint."""
@@ -186,6 +235,7 @@ def root() -> dict:
         "version": "2.0.0",
         "environment": "production"
     }
+
 
 @app.get("/health")
 def health_check() -> dict:
@@ -206,6 +256,7 @@ def health_check() -> dict:
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=503, detail="Service temporarily unavailable")
+
 
 @app.get("/metrics")
 def get_metrics() -> dict:
@@ -267,7 +318,7 @@ def process_payment(payment_data: PaymentRequest) -> Dict[str, Any]:
     try:
         logger.info(f"Processing payment for customer {payment_data.customer_id}")
         result = financial_agent.process_payment(
-            payment_data.amount, payment_data.currency, payment_data.customer_id, 
+            payment_data.amount, payment_data.currency, payment_data.customer_id,
             payment_data.product_id, payment_data.payment_method.value, payment_data.gateway
         )
         logger.info("Payment processed successfully")
@@ -307,9 +358,9 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
     try:
         logger.info(f"Adding product: {product_data.name}")
         result = ecommerce_agent.add_product(
-            product_data.name, product_data.category, product_data.price, 
+            product_data.name, product_data.category, product_data.price,
             product_data.cost, product_data.stock_quantity, product_data.sku,
-            product_data.sizes, product_data.colors, product_data.description, 
+            product_data.sizes, product_data.colors, product_data.description,
             product_data.images, product_data.tags
         )
         logger.info("Product added successfully")
@@ -327,14 +378,15 @@ def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
 
 @app.post("/customers/create")
 def create_customer(email: str, first_name: str, last_name: str,
-                   phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
+                    """TODO: Add docstring for create_customer."""
+                    phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
     return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
 
 
 @app.post("/orders/create")
 def create_order(customer_id: str, items: List[Dict[str, Any]],
-                shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
+                 shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
     """Create a new order."""
     return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
 
@@ -571,7 +623,7 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "expertise_focus": "multi_language_mastery_and_optimization"
             }
         }
-        
+
         return {
             "total_agents": len(agent_statuses),
             "average_health": sum(agent["health"] for agent in agent_statuses.values()) / len(agent_statuses),
@@ -581,9 +633,10 @@ def get_all_agents_status() -> Dict[str, Any]:
             "fashion_guru_theme": "luxury_rose_gold_collection",
             "last_updated": datetime.now().isoformat()
         }
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/tasks/prioritized")
 async def get_prioritized_tasks(
@@ -600,11 +653,12 @@ async def get_prioritized_tasks(
             filters["agent_type"] = agent_type
         if priority:
             filters["priority"] = priority.split(",")
-        
+
         return await task_risk_manager.get_prioritized_task_list(filters)
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/tasks/create")
 async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -612,9 +666,10 @@ async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
     try:
         agent_type = task_data.get("agent_type", "general")
         return await task_risk_manager.create_task(agent_type, task_data)
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.put("/tasks/{task_id}/status")
 async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -623,15 +678,18 @@ async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[
         status = status_data.get("status", "unknown")
         updates = status_data.get("updates", {})
         return await task_risk_manager.update_task_status(task_id, status, updates)
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # SEO Marketing Agent Endpoints
+
+
 @app.get("/seo/analysis")
 async def get_seo_analysis() -> Dict[str, Any]:
     """Get comprehensive SEO analysis with fashion trend insights."""
     return await seo_marketing_agent.analyze_seo_performance()
+
 
 @app.post("/marketing/campaign")
 async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -640,11 +698,14 @@ async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, 
     target_audience = campaign_data.get("target_audience", "luxury_customers")
     return await seo_marketing_agent.create_marketing_campaign(campaign_type, target_audience)
 
-# Customer Service Agent Endpoints  
+# Customer Service Agent Endpoints
+
+
 @app.get("/customer-service/satisfaction")
 async def get_customer_satisfaction() -> Dict[str, Any]:
     """Get comprehensive customer satisfaction analysis."""
     return await customer_service_agent.analyze_customer_satisfaction()
+
 
 @app.post("/customer-service/inquiry")
 async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -655,10 +716,13 @@ async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any
     return await customer_service_agent.handle_customer_inquiry(inquiry_type, customer_tier, urgency)
 
 # Security Agent Endpoints
+
+
 @app.get("/security/assessment")
 async def get_security_assessment() -> Dict[str, Any]:
     """Get comprehensive security assessment for luxury e-commerce."""
     return await security_agent.security_assessment()
+
 
 @app.post("/security/fraud-check")
 async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -666,25 +730,31 @@ async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, 
     return await security_agent.fraud_detection_analysis(transaction_data)
 
 # Performance Agent Endpoints
+
+
 @app.get("/performance/analysis")
 async def get_performance_analysis() -> Dict[str, Any]:
     """Get comprehensive site performance analysis."""
     return await performance_agent.analyze_site_performance()
+
 
 @app.get("/performance/realtime")
 async def get_realtime_performance() -> Dict[str, Any]:
     """Get real-time performance metrics and alerts."""
     return await performance_agent.monitor_real_time_performance()
 
+
 @app.post("/performance/code-analysis")
 async def analyze_code_performance(code_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal code analysis and optimization for any programming language."""
     return await performance_agent.analyze_and_fix_code(code_data)
 
+
 @app.post("/performance/debug-error")
 async def debug_application_error(error_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal debugging for any web application error."""
     return await performance_agent.debug_application_error(error_data)
+
 
 @app.post("/performance/optimize-fullstack")
 async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -692,15 +762,19 @@ async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[st
     return await performance_agent.optimize_full_stack_performance(stack_data)
 
 # Enhanced Financial Agent Endpoints
+
+
 @app.post("/financial/tax-preparation")
 async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive tax preparation and optimization service."""
     return await financial_agent.prepare_tax_returns(tax_data)
 
+
 @app.post("/financial/credit-analysis")
 async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive business credit analysis and improvement planning."""
     return await financial_agent.analyze_business_credit(credit_data)
+
 
 @app.post("/financial/advisory")
 async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
@@ -708,6 +782,8 @@ async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[s
     return await financial_agent.provide_financial_advisory(advisory_request)
 
 # Integration Management Endpoints
+
+
 @app.get("/integrations/services")
 async def get_supported_services() -> Dict[str, Any]:
     """Get all supported integration services."""
@@ -721,6 +797,7 @@ async def get_supported_services() -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/integrations/create")
 async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new integration between an agent and external service."""
@@ -729,13 +806,14 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
         service_type = integration_data.get("service_type")
         service_name = integration_data.get("service_name")
         credentials = integration_data.get("credentials", {})
-        
+
         if not all([agent_type, service_type, service_name]):
             raise HTTPException(status_code=400, detail="Missing required fields")
-        
+
         return await agent_assignment_manager.create_integration(agent_type, service_type, service_name, credentials)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/integrations/agent/{agent_type}")
 async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
@@ -745,6 +823,7 @@ async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/integrations/{integration_id}/sync")
 async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
     """Sync data from integrated service."""
@@ -752,6 +831,7 @@ async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
         return await agent_assignment_manager.sync_integration_data(integration_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/integrations/status")
 async def get_integrations_overview() -> Dict[str, Any]:
@@ -766,24 +846,26 @@ async def get_integrations_overview() -> Dict[str, Any]:
             "popular_services": {},
             "health_summary": {}
         }
-        
+
         # Calculate integrations by agent
         for agent_type, integration_ids in agent_assignment_manager.agent_integrations.items():
             overview["integrations_by_agent"][agent_type] = len(integration_ids)
-        
+
         # Calculate popular services
         service_counts = {}
         for integration in agent_assignment_manager.integrations.values():
             service_name = integration["service_name"]
             service_counts[service_name] = service_counts.get(service_name, 0) + 1
-        
+
         overview["popular_services"] = dict(sorted(service_counts.items(), key=lambda x: x[1], reverse=True)[:5])
-        
+
         return overview
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # Frontend Agent Assignment Endpoints
+
+
 @app.post("/frontend/assign-agents")
 async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, Any]:
     """Assign agents specifically for frontend procedures with strict frontend-only focus."""
@@ -791,6 +873,7 @@ async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, 
         return await agent_assignment_manager.assign_frontend_agents(frontend_request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/frontend/agents/status")
 async def get_frontend_agent_status() -> Dict[str, Any]:
@@ -800,6 +883,7 @@ async def get_frontend_agent_status() -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/frontend/collections/create")
 async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a luxury collection page designed like top-selling landing pages."""
@@ -807,6 +891,7 @@ async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict
         return await agent_assignment_manager.create_luxury_collection_page(collection_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/frontend/monitoring/24-7")
 async def get_24_7_monitoring_status() -> Dict[str, Any]:
@@ -816,6 +901,7 @@ async def get_24_7_monitoring_status() -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/frontend/optimize-workload")
 async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize frontend agent workload distribution."""
@@ -823,6 +909,7 @@ async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Di
         return await agent_assignment_manager.optimize_agent_workload(optimization_request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/frontend/assignments/{role}")
 async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
@@ -1402,6 +1489,8 @@ async def setup_woocommerce_integration(site_url: str):
     logger.info(f"🛒 WooCommerce integration configured for {site_url}")
 
 # Risk Management Endpoints
+
+
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
     """Get comprehensive risk dashboard with prioritization."""
@@ -1409,7 +1498,7 @@ async def get_risk_dashboard() -> Dict[str, Any]:
         # Get risks from all agents
         security_assessment = await security_agent.security_assessment()
         performance_analysis = await performance_agent.analyze_site_performance()
-        
+
         risk_summary = {
             "overall_risk_level": "MEDIUM",
             "critical_risks": 0,
@@ -1434,7 +1523,7 @@ async def get_risk_dashboard() -> Dict[str, Any]:
                 "attention_needed": ["revenue_optimization"]
             }
         }
-        
+
         return {
             "risk_summary": risk_summary,
             "last_updated": datetime.now().isoformat(),
@@ -1447,34 +1536,40 @@ async def get_risk_dashboard() -> Dict[str, Any]:
                 }
             }
         }
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/experimental/quantum-inventory")
 async def quantum_inventory_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum inventory optimization."""
     return await inventory_agent.quantum_asset_optimization()
 
+
 @app.post("/experimental/blockchain-audit")
 async def blockchain_financial_audit() -> Dict[str, Any]:
     """EXPERIMENTAL: Blockchain financial audit."""
     return await financial_agent.experimental_blockchain_audit()
+
 
 @app.post("/experimental/neural-commerce/{customer_id}")
 async def neural_commerce_session(customer_id: str) -> Dict[str, Any]:
     """EXPERIMENTAL: Neural commerce experience."""
     return await ecommerce_agent.experimental_neural_commerce_session(customer_id)
 
+
 @app.post("/experimental/quantum-wordpress")
 async def quantum_wordpress_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum WordPress optimization."""
     return await wordpress_agent.experimental_quantum_wordpress_optimization()
 
+
 @app.post("/experimental/neural-code")
 async def neural_code_generation(requirements: str, language: str = "javascript") -> Dict[str, Any]:
     """EXPERIMENTAL: Neural code generation."""
     return await web_dev_agent.experimental_neural_code_generation(requirements, language)
+
 
 @app.post("/experimental/neural-communication")
 async def neural_communication_analysis(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
@@ -1482,6 +1577,8 @@ async def neural_communication_analysis(website_url: str = "https://theskyy-rose
     return await site_comm_agent.experimental_neural_communication_analysis(website_url)
 
 # Enhanced DevSkyy Workflow Endpoint with Brand Intelligence
+
+
 @app.post("/devskyy/full-optimization")
 async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
     """Run comprehensive DevSkyy optimization with brand-aware agents."""
@@ -1531,20 +1628,24 @@ def get_brand_intelligence() -> Dict[str, Any]:
     """Get comprehensive brand intelligence analysis."""
     return brand_intelligence.analyze_brand_assets()
 
+
 @app.get("/brand/context/{agent_type}")
 def get_brand_context(agent_type: str) -> Dict[str, Any]:
     """Get brand context for specific agent type."""
     return brand_intelligence.get_brand_context_for_agent(agent_type)
+
 
 @app.post("/brand/learning-cycle")
 async def run_learning_cycle() -> Dict[str, Any]:
     """Execute continuous brand learning cycle."""
     return await brand_intelligence.continuous_learning_cycle()
 
+
 @app.get("/brand/latest-drop")
 def get_latest_drop() -> Dict[str, Any]:
     """Get information about the latest product drop."""
     return brand_intelligence._get_latest_drop()
+
 
 @app.get("/brand/evolution")
 def get_brand_evolution() -> Dict[str, Any]:
@@ -1556,6 +1657,8 @@ def get_brand_evolution() -> Dict[str, Any]:
     }
 
 # Enhanced Combined Dashboard Endpoint
+
+
 @app.get("/dashboard")
 async def get_dashboard():
     """Get comprehensive business dashboard."""
@@ -1575,6 +1678,7 @@ async def get_dashboard():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/github/push")
 async def push_to_github():
     """Push all current changes to GitHub repository."""
@@ -1588,8 +1692,115 @@ async def push_to_github():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
 
+# Enhanced Auto-Fix Endpoints
+
+
+@app.post("/autofix/enhanced")
+async def run_enhanced_autofix(
+    create_branch: bool = True,
+    branch_name: str = None,
+    auto_commit: bool = True,
+    fix_types: List[str] = None
+) -> Dict[str, Any]:
+    """Run enhanced auto-fix session with advanced code analysis and branch management."""
+    try:
+        logger.info("🚀 Starting Enhanced Auto-Fix session...")
+        autofix = EnhancedAutoFix()
+        result = autofix.run_enhanced_autofix(
+            create_branch=create_branch,
+            branch_name=branch_name,
+            auto_commit=auto_commit,
+            fix_types=fix_types
+        )
+        logger.info("✅ Enhanced Auto-Fix session completed")
+        return result
+    except Exception as e:
+        logger.error(f"Enhanced Auto-Fix failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Enhanced Auto-Fix failed: {str(e)}")
+
+
+@app.post("/autofix/quick")
+async def run_quick_autofix() -> Dict[str, Any]:
+    """Run quick auto-fix without branch creation - perfect for immediate fixes."""
+    try:
+        logger.info("⚡ Starting Quick Auto-Fix...")
+        result = quick_fix()
+        logger.info("✅ Quick Auto-Fix completed")
+        return result
+    except Exception as e:
+        logger.error(f"Quick Auto-Fix failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Quick Auto-Fix failed: {str(e)}")
+
+
+@app.post("/autofix/session")
+async def run_autofix_session(
+    create_branch: bool = True,
+    branch_name: str = None,
+    auto_commit: bool = True
+) -> Dict[str, Any]:
+    """Run a complete auto-fix session with customizable options."""
+    try:
+        logger.info("🔧 Starting Auto-Fix session...")
+        result = run_auto_fix_session(
+            create_branch=create_branch,
+            branch_name=branch_name,
+            auto_commit=auto_commit
+        )
+        logger.info("✅ Auto-Fix session completed")
+        return result
+    except Exception as e:
+        logger.error(f"Auto-Fix session failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Auto-Fix session failed: {str(e)}")
+
+
+@app.get("/autofix/status")
+async def get_autofix_status() -> Dict[str, Any]:
+    """Get status of auto-fix capabilities and recent activity."""
+    try:
+        # Get git branch info
+        current_branch = None
+        try:
+            result = subprocess.run(['git', 'branch', '--show-current'],
+                                    capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                current_branch = result.stdout.strip()
+        except:
+            pass
+
+        # Get recent commits
+        recent_commits = []
+        try:
+            result = subprocess.run(['git', 'log', '--oneline', '-5'],
+                                    capture_output=True, text=True, timeout=10)
+            if result.returncode == 0:
+                recent_commits = result.stdout.strip().split('\n')
+        except:
+            pass
+
+        return {
+            "autofix_enabled": True,
+            "current_branch": current_branch,
+            "recent_commits": recent_commits[:3],  # Last 3 commits
+            "capabilities": {
+                "enhanced_analysis": True,
+                "branch_management": True,
+                "auto_commit": True,
+                "python_enhancement": True,
+                "javascript_modernization": True,
+                "security_scanning": True,
+                "performance_optimization": True,
+                "documentation_improvement": True,
+                "structure_optimization": True
+            },
+            "supported_languages": ["Python", "JavaScript", "HTML", "CSS", "JSON", "YAML"],
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Start enhanced learning system on import
 enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)
+
 
 @app.get("/learning/status")
 def get_learning_status() -> Dict[str, Any]:
@@ -1603,6 +1814,8 @@ def get_learning_status() -> Dict[str, Any]:
     }
 
 # Continuous monitoring functions for workflow
+
+
 def monitor_wordpress_continuously() -> Dict[str, Any]:
     """Continuously monitor WordPress/Divi performance."""
     return {
@@ -1611,6 +1824,7 @@ def monitor_wordpress_continuously() -> Dict[str, Any]:
         "issues_detected": 0,
         "last_check": datetime.now().isoformat()
     }
+
 
 def monitor_web_development_continuously() -> Dict[str, Any]:
     """Continuously monitor web development status."""
@@ -1621,6 +1835,7 @@ def monitor_web_development_continuously() -> Dict[str, Any]:
         "last_scan": datetime.now().isoformat()
     }
 
+
 def manage_avatar_chatbot_continuously() -> Dict[str, Any]:
     """Continuously manage avatar chatbot system."""
     return {
@@ -1630,11 +1845,12 @@ def manage_avatar_chatbot_continuously() -> Dict[str, Any]:
         "last_update": datetime.now().isoformat()
     }
 
+
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting DevSkyy Enhanced - The Future of AI Agents")
-    print("🌟 Brand Intelligence: MAXIMUM")
-    print("📚 Continuous Learning: ACTIVE")
-    print("⚡ Setting the Bar for AI Agents")
-    print("🌐 Server starting on http://0.0.0.0:5000")
+    logger.info("🚀 Starting DevSkyy Enhanced - The Future of AI Agents")
+    logger.info("🌟 Brand Intelligence: MAXIMUM")
+    logger.info("📚 Continuous Learning: ACTIVE")
+    logger.info("⚡ Setting the Bar for AI Agents")
+    logger.info("🌐 Server starting on http://0.0.0.0:5000")
     uvicorn.run(app, host="0.0.0.0", port=5000)

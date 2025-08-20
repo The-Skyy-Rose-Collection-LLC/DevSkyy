@@ -10,6 +10,7 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def scan_site() -> Dict[str, Any]:
     """
     Comprehensive site scanning with advanced error detection and analysis.
@@ -58,7 +59,8 @@ def scan_site() -> Dict[str, Any]:
         security = _security_scan()
         scan_results["security_issues"] = security
 
-        logger.info(f"✅ Scan completed: {scan_results['files_scanned']} files, {len(scan_results['errors_found'])} errors found")
+        logger.info(
+            f"✅ Scan completed: {scan_results['files_scanned']} files, {len(scan_results['errors_found'])} errors found")
 
         return scan_results
 
@@ -70,6 +72,7 @@ def scan_site() -> Dict[str, Any]:
             "timestamp": datetime.now().isoformat()
         }
 
+
 def _scan_project_files() -> List[str]:
     """Scan all project files for analysis."""
     files = []
@@ -80,7 +83,8 @@ def _scan_project_files() -> List[str]:
     # Scan current directory recursively
     for root, dirs, filenames in os.walk('.'):
         # Skip common directories to ignore
-        dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'node_modules', '__pycache__', 'venv', '.git'}]
+        dirs[:] = [d for d in dirs if not d.startswith(
+            '.') and d not in {'node_modules', '__pycache__', 'venv', '.git'}]
 
         for filename in filenames:
             file_path = os.path.join(root, filename)
@@ -88,6 +92,7 @@ def _scan_project_files() -> List[str]:
                 files.append(file_path)
 
     return files
+
 
 def _analyze_file(file_path: str) -> Dict[str, Any]:
     """Analyze individual file for issues."""
@@ -122,6 +127,7 @@ def _analyze_file(file_path: str) -> Dict[str, Any]:
         analysis["errors"].append(f"File read error: {str(e)}")
 
     return analysis
+
 
 def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze Python file for syntax and common issues."""
@@ -159,6 +165,7 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
+
 def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze JavaScript file for common issues."""
     errors = []
@@ -180,6 +187,7 @@ def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
             warnings.append(f"Line {i}: Possible missing semicolon")
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
+
 
 def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze HTML file for SEO and accessibility issues."""
@@ -204,6 +212,7 @@ def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
+
 def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze CSS file for performance and best practices."""
     errors = []
@@ -227,6 +236,7 @@ def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
             properties_in_rule.append(prop)
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
+
 
 def _check_site_health() -> Dict[str, Any]:
     """Check if the site is accessible and responsive."""
@@ -271,6 +281,7 @@ def _check_site_health() -> Dict[str, Any]:
 
     return health_check
 
+
 def _analyze_performance() -> Dict[str, Any]:
     """Analyze performance metrics."""
     return {
@@ -284,6 +295,7 @@ def _analyze_performance() -> Dict[str, Any]:
         "estimated_load_time": "< 3 seconds",
         "performance_score": 85
     }
+
 
 def _security_scan() -> List[str]:
     """Perform basic security scan."""
