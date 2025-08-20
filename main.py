@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 # Production middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for your domain in production
+    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
