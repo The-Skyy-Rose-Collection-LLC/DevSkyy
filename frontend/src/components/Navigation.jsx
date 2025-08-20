@@ -11,6 +11,14 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       gradient: 'from-rose-gold to-luxury-gold'
     },
     {
+      id: 'frontend',
+      label: 'Frontend Elite',
+      icon: '🎨',
+      description: 'Frontend Specialists',
+      gradient: 'from-purple-500 to-pink-500',
+      badge: 'LIVE'
+    },
+    {
       id: 'tasks',
       label: 'Task Atelier',
       icon: '📋',
