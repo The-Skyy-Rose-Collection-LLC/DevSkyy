@@ -15,6 +15,11 @@ from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_dev
 from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
 from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
+from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing
+from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service
+from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
+from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
+from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
