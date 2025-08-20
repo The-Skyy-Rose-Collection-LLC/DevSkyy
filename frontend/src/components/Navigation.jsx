@@ -19,6 +19,14 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       badge: 'LIVE'
     },
     {
+      id: 'wordpress',
+      label: 'WordPress',
+      icon: '🌐',
+      description: 'Site Connection',
+      gradient: 'from-emerald-500 to-blue-500',
+      badge: 'NEW'
+    },
+    {
       id: 'tasks',
       label: 'Task Atelier',
       icon: '📋',
@@ -64,11 +72,24 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
               </div>
               
               {/* Badge for counts */}
-              {item.badge > 0 && (
+              {item.badge && typeof item.badge === 'number' && item.badge > 0 && (
                 <motion.div
                   className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {item.badge}
+                </motion.div>
+              )}
+              
+              {/* Badge for text labels like 'NEW' or 'LIVE' */}
+              {item.badge && typeof item.badge === 'string' && (
+                <motion.div
+                  className={`absolute -top-2 -right-2 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center ${
+                    item.badge === 'NEW' ? 'bg-emerald-500 animate-pulse' : 'bg-purple-500'
+                  }`}
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   {item.badge}
                 </motion.div>

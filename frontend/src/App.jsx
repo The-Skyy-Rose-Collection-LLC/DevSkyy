@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import AgentDashboard from './components/AgentDashboard'
 import FrontendAgentManager from './components/FrontendAgentManager'
+import WordPressConnection from './components/WordPressConnection'
 import TaskManager from './components/TaskManager'
 import RiskDashboard from './components/RiskDashboard'
 import Header from './components/Header'
@@ -190,6 +191,18 @@ function App() {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <FrontendAgentManager />
+            </motion.div>
+          )}
+
+          {currentView === 'wordpress' && (
+            <motion.div
+              key="wordpress"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <WordPressConnection />
             </motion.div>
           )}
 
