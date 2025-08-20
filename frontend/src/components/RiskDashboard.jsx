@@ -379,7 +379,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           <span className="mr-2">🔄</span>
           Refresh Risk Analysis
         </button>
-      </div>
+      </motion.div>
     </div>
   )
 }
