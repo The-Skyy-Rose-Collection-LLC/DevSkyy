@@ -22,6 +22,7 @@ from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
 from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
 from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
 from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
+from agent.modules.wordpress_integration_service import WordPressIntegrationService, create_wordpress_integration_service
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
