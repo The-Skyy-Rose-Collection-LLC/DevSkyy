@@ -51,9 +51,13 @@ class AgentAssignmentManager:
             "design_automation": {
                 "name": "Design Virtuoso",
                 "icon": "🎨",
-                "specialties": ["ui_design", "ux_optimization", "visual_systems", "frontend_development"],
-                "suitable_roles": ["frontend_beauty", "design_automation", "customer_experience"],
-                "luxury_expertise": 98
+                "specialties": ["ui_design", "ux_optimization", "visual_systems", "frontend_development", "luxury_aesthetics", "collection_pages"],
+                "suitable_roles": ["frontend_beauty", "design_automation", "customer_experience", "collection_design"],
+                "luxury_expertise": 99,
+                "24_7_capability": True,
+                "revenue_critical": True,
+                "user_friendly_focus": True,
+                "collection_specialist": True
             },
             "social_media_automation": {
                 "name": "Social Media Maven",
