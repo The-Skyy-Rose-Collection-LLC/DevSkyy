@@ -130,7 +130,14 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
               agentId={agentId}
               agentData={agentData}
               isSelected={selectedAgent === agentId}
-              onClick={() => setSelectedAgent(selectedAgent === agentId ? null : agentId)}
+              onClick={(action) => {
+                if (action === 'integrations') {
+                  setSelectedAgentForIntegration(agentId)
+                  setShowIntegrations(true)
+                } else {
+                  setSelectedAgent(selectedAgent === agentId ? null : agentId)
+                }
+              }}
             />
           </motion.div>
         ))}
