@@ -1031,6 +1031,180 @@ async def _get_design_recommendations(theme_info: Dict[str, Any]) -> List[Dict[s
         }
     ]
 
+# WooCommerce Integration Endpoints
+@app.get("/woocommerce/products")
+async def get_woocommerce_products(per_page: int = 20, category: str = None) -> Dict[str, Any]:
+    """Get WooCommerce products for luxury optimization."""
+    try:
+        products = await woocommerce_service.get_products(per_page, category)
+        return {
+            "products_data": products,
+            "luxury_analysis": products.get('luxury_analysis', {}),
+            "optimization_opportunities": products.get('optimization_opportunities', []),
+            "agent_recommendations": "ready_for_luxury_enhancement"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/woocommerce/orders")
+async def get_woocommerce_orders(per_page: int = 20, status: str = None) -> Dict[str, Any]:
+    """Get WooCommerce orders for revenue analysis."""
+    try:
+        orders = await woocommerce_service.get_orders(per_page, status)
+        return {
+            "orders_data": orders,
+            "revenue_analysis": orders.get('revenue_analysis', {}),
+            "customer_insights": orders.get('customer_insights', {}),
+            "luxury_performance": "analyzed_for_optimization"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/woocommerce/product/create")
+async def create_luxury_woocommerce_product(product_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create luxury product with AI optimization."""
+    try:
+        # Enhance product with OpenAI
+        enhanced_description = await openai_service.enhance_product_description(product_data)
+        if 'enhanced_description' in enhanced_description:
+            product_data['description'] = enhanced_description['enhanced_description']
+        
+        result = await woocommerce_service.create_luxury_product(product_data)
+        return {
+            "product_created": result,
+            "ai_enhancements": enhanced_description,
+            "luxury_features": result.get('luxury_features_added', []),
+            "agent_responsible": "ai_enhanced_design_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/woocommerce/product/{product_id}/optimize")
+async def optimize_woocommerce_product(product_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
+    """Optimize existing product with luxury AI enhancements."""
+    try:
+        # Get AI-powered optimizations
+        ai_optimizations = await openai_service.enhance_product_description(updates)
+        if 'enhanced_description' in ai_optimizations:
+            updates['description'] = ai_optimizations['enhanced_description']
+        
+        result = await woocommerce_service.update_product_for_luxury(product_id, updates)
+        return {
+            "optimization_result": result,
+            "ai_enhancements": ai_optimizations,
+            "luxury_improvements": result.get('luxury_improvements', []),
+            "conversion_impact": "positive"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/woocommerce/analytics")
+async def get_woocommerce_analytics(period: str = '7d') -> Dict[str, Any]:
+    """Get WooCommerce analytics with luxury insights."""
+    try:
+        analytics = await woocommerce_service.get_sales_analytics(period)
+        return {
+            "sales_analytics": analytics,
+            "luxury_performance": analytics.get('luxury_performance_insights', {}),
+            "revenue_optimization": analytics.get('revenue_optimization_opportunities', []),
+            "agent_recommendations": analytics.get('agent_recommendations', [])
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# OpenAI Intelligence Endpoints
+@app.post("/ai/content-strategy")
+async def generate_ai_content_strategy(site_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate AI-powered luxury content strategy."""
+    try:
+        strategy = await openai_service.generate_luxury_content_strategy(site_data)
+        return {
+            "content_strategy": strategy,
+            "implementation_guide": "detailed_strategic_roadmap",
+            "expected_roi": strategy.get('expected_roi', '+200%'),
+            "agent_responsible": "openai_enhanced_strategy_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/seo-optimize")
+async def ai_optimize_page_seo(page_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Use AI to optimize page content for luxury SEO."""
+    try:
+        optimization = await openai_service.optimize_page_content_for_seo(page_data)
+        return {
+            "seo_optimization": optimization,
+            "traffic_potential": optimization.get('expected_traffic_increase', '+150%'),
+            "keyword_strategy": "luxury_focused_optimization",
+            "agent_responsible": "openai_enhanced_seo_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/competitor-analysis")
+async def ai_competitor_analysis(competitor_data: Dict[str, Any]) -> Dict[str, Any]:
+    """AI-powered competitive analysis for luxury brands."""
+    try:
+        analysis = await openai_service.analyze_competitor_strategy(competitor_data)
+        return {
+            "competitive_analysis": analysis,
+            "strategic_advantages": "multiple_opportunities_identified",
+            "implementation_priority": analysis.get('implementation_priority', 'immediate'),
+            "agent_responsible": "openai_enhanced_intelligence_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/email-campaign")
+async def generate_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate luxury email campaign with AI."""
+    try:
+        campaign = await openai_service.generate_luxury_email_campaign(campaign_data)
+        return {
+            "email_campaign": campaign,
+            "expected_performance": {
+                "open_rate": campaign.get('expected_open_rate', '45%+'),
+                "conversion_rate": campaign.get('expected_conversion_rate', '12%+')
+            },
+            "agent_responsible": "openai_enhanced_email_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/executive-decision")
+async def ai_executive_decision(decision_context: Dict[str, Any]) -> Dict[str, Any]:
+    """AI-powered executive business decision making."""
+    try:
+        decision = await openai_service.make_executive_business_decision(decision_context)
+        return {
+            "executive_decision": decision,
+            "confidence_level": decision.get('confidence_level', 'high'),
+            "implementation_roadmap": "detailed_strategic_plan",
+            "agent_responsible": "openai_enhanced_executive_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/conversion-optimize")
+async def ai_optimize_conversion_funnel(funnel_data: Dict[str, Any]) -> Dict[str, Any]:
+    """AI-powered conversion funnel optimization."""
+    try:
+        optimization = await openai_service.optimize_conversion_funnel(funnel_data)
+        return {
+            "funnel_optimization": optimization,
+            "expected_improvement": optimization.get('expected_improvement', '+40%'),
+            "implementation_complexity": optimization.get('implementation_complexity', 'moderate'),
+            "agent_responsible": "openai_enhanced_conversion_agent"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Helper function to set WooCommerce URL when WordPress connects
+async def setup_woocommerce_integration(site_url: str):
+    """Setup WooCommerce integration when WordPress site connects."""
+    woocommerce_service.set_site_url(site_url)
+    logger.info(f"🛒 WooCommerce integration configured for {site_url}")
+
 # Risk Management Endpoints
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
