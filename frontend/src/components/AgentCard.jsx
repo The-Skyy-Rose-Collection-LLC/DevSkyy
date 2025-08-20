@@ -50,10 +50,16 @@ const AgentCard = ({ agentId, agentData, isSelected, isExpanded, showDetails, on
       achievements: ["Created 15+ premium layouts", "Improved page speed by 40%", "Enhanced mobile experience"]
     },
     web_development: {
-      title: "Performance Perfectionist",
-      specialties: ["Code Optimization", "Performance Monitoring", "Security Hardening", "Technical SEO"],
-      currentFocus: "Optimizing site performance for luxury customer expectations",
-      achievements: ["Achieved 95+ PageSpeed score", "Reduced load time by 60%", "Fixed 23 critical issues"]
+      title: "Universal Web Development Guru",
+      specialties: ["Multi-Language Mastery", "Full-Stack Optimization", "Universal Debugging", "Performance Engineering"],
+      currentFocus: "Analyzing and optimizing code across all programming languages with AI-powered solutions",
+      achievements: ["Fixed 500+ cross-language issues", "Achieved 95+ PageSpeed scores", "Reduced load time by 65%", "Mastered 20+ programming languages"]
+    },
+    performance: {
+      title: "Universal Code & Performance Guru",
+      specialties: ["Multi-Language Code Analysis", "Universal Debugging", "Full-Stack Optimization", "Performance Engineering"],
+      currentFocus: "Providing comprehensive code analysis and optimization for any programming language",
+      achievements: ["Mastered 20+ programming languages", "Fixed critical security vulnerabilities", "Achieved 44% performance improvements", "Implemented automated debugging systems"]
     },
     customer_service: {
       title: "Luxury Service Concierge",
