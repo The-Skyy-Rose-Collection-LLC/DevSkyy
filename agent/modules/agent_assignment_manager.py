@@ -62,16 +62,24 @@ class AgentAssignmentManager:
             "social_media_automation": {
                 "name": "Social Media Maven",
                 "icon": "📱",
-                "specialties": ["content_strategy", "engagement_optimization", "trend_analysis", "influencer_relations"],
+                "specialties": ["content_strategy", "engagement_optimization", "trend_analysis", "influencer_relations", "brand_storytelling", "executive_content"],
                 "suitable_roles": ["social_media", "content_creation", "brand_management"],
-                "luxury_expertise": 92
+                "luxury_expertise": 96,
+                "24_7_capability": True,
+                "third_party_integrations": ["twitter", "instagram", "facebook", "tiktok", "pinterest"],
+                "automation_level": "advanced",
+                "executive_reporting": True
             },
             "email_sms_automation": {
                 "name": "Communication Specialist",
                 "icon": "💌",
-                "specialties": ["personalized_messaging", "automation_workflows", "customer_segmentation", "conversion_optimization"],
+                "specialties": ["personalized_messaging", "automation_workflows", "customer_segmentation", "conversion_optimization", "luxury_communication"],
                 "suitable_roles": ["email_sms", "customer_experience", "content_creation"],
-                "luxury_expertise": 90
+                "luxury_expertise": 94,
+                "24_7_capability": True,
+                "third_party_integrations": ["sendgrid", "mailgun", "twilio", "constant_contact"],
+                "automation_level": "advanced",
+                "vip_customer_focus": True
             },
             "performance": {
                 "name": "Performance Guru",
