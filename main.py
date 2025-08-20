@@ -132,6 +132,7 @@ performance_agent = PerformanceAgent()
 task_risk_manager = TaskRiskManager()
 agent_assignment_manager = create_agent_assignment_manager()
 wordpress_service = create_wordpress_integration_service()
+wordpress_direct = create_wordpress_direct_service()
 woocommerce_service = create_woocommerce_integration_service()
 openai_service = create_openai_intelligence_service()
 
