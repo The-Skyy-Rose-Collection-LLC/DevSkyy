@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ModernWordPressDashboard from './ModernWordPressDashboard'
 import AutomationDashboard from './AutomationDashboard'
-import AgentDashboard from './AgentDashboard'
+import StreetAgentDashboard from './StreetAgentDashboard'
 import FrontendAgentManager from './FrontendAgentManager'
 import TaskManager from './TaskManager'
 import RiskDashboard from './RiskDashboard'
@@ -16,56 +16,56 @@ const ModernApp = () => {
     uptime: '99.9%'
   })
 
-  // Developer mode navigation items
+  // Developer mode navigation items with streetwear aesthetic
   const navItems = [
     {
       id: 'agents',
-      label: 'AI Agents',
-      icon: '🤖',
-      gradient: 'from-blue-500 to-cyan-500',
-      description: 'Agent Control Center'
+      label: 'Street Gurus',
+      icon: '👾',
+      gradient: 'from-purple-500 via-pink-500 to-cyan-500',
+      description: 'Animated AI Agents'
     },
     {
       id: 'automation',
       label: 'Automation',
       icon: '⚡',
-      gradient: 'from-purple-500 to-pink-500',
-      description: 'Marketing Automation'
+      gradient: 'from-yellow-500 via-orange-500 to-red-500',
+      description: 'Marketing Empire'
     },
     {
       id: 'wordpress',
       label: 'WordPress',
       icon: '🌐',
       gradient: 'from-emerald-500 to-blue-500',
-      description: 'Site Management'
+      description: 'Site Command'
     },
     {
       id: 'frontend',
       label: 'Frontend',
       icon: '🎨',
-      gradient: 'from-orange-500 to-red-500',
-      description: 'UI Development'
+      gradient: 'from-indigo-500 to-purple-500',
+      description: 'UI Studio'
     },
     {
       id: 'tasks',
       label: 'Tasks',
       icon: '📋',
-      gradient: 'from-indigo-500 to-purple-500',
-      description: 'Task Management'
+      gradient: 'from-teal-500 to-cyan-500',
+      description: 'Mission Control'
     },
     {
       id: 'monitoring',
-      label: 'Monitoring',
+      label: 'Analytics',
       icon: '📊',
       gradient: 'from-green-500 to-emerald-500',
-      description: 'System Health'
+      description: 'Performance Hub'
     }
   ]
 
   const renderCurrentView = () => {
     switch (currentView) {
       case 'agents':
-        return <AgentDashboard />
+        return <StreetAgentDashboard />
       case 'automation':
         return <AutomationDashboard />
       case 'wordpress':
@@ -77,7 +77,7 @@ const ModernApp = () => {
       case 'monitoring':
         return <RiskDashboard />
       default:
-        return <AgentDashboard />
+        return <StreetAgentDashboard />
     }
   }
 
@@ -95,13 +95,29 @@ const ModernApp = () => {
         {/* Logo/Header */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <motion.div 
+              className="w-8 h-8 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-lg flex items-center justify-center"
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{
+                rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                scale: { duration: 2, repeat: Infinity }
+              }}
+            >
               <span className="text-sm font-bold">SR</span>
-            </div>
+            </motion.div>
             {!sidebarCollapsed && (
               <div>
-                <h1 className="text-lg font-bold">Skyy Rose</h1>
-                <p className="text-xs text-gray-400">Developer Console</p>
+                <motion.h1 
+                  className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                  animate={{ opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  Skyy Rose
+                </motion.h1>
+                <p className="text-xs text-gray-400">Fashion AI Platform</p>
               </div>
             )}
           </div>
@@ -119,14 +135,22 @@ const ModernApp = () => {
         {/* System Status */}
         {!sidebarCollapsed && (
           <div className="p-4 border-b border-gray-800">
-            <div className="bg-gray-800/50 rounded-lg p-3">
+            <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">System Health</span>
-                <span className="text-emerald-400 text-xs">●</span>
+                <span className="text-xs text-gray-400">Platform Status</span>
+                <motion.span 
+                  className="text-emerald-400 text-xs"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  ● LIVE
+                </motion.span>
               </div>
-              <div className="text-sm font-semibold text-white">{systemStatus.health}%</div>
+              <div className="text-sm font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                {systemStatus.health}% GOD MODE
+              </div>
               <div className="text-xs text-gray-500">
-                {systemStatus.activeAgents} agents • {systemStatus.uptime} uptime
+                {systemStatus.activeAgents} street gurus • {systemStatus.uptime} uptime
               </div>
             </div>
           </div>
@@ -144,10 +168,19 @@ const ModernApp = () => {
                     ? 'bg-gradient-to-r ' + item.gradient + ' text-white shadow-lg'
                     : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                 }`}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.02, x: 2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <span className="text-lg">{item.icon}</span>
+                <motion.span 
+                  className="text-lg"
+                  animate={currentView === item.id ? {
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 10, -10, 0]
+                  } : {}}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {item.icon}
+                </motion.span>
                 {!sidebarCollapsed && (
                   <div className="text-left">
                     <div className="font-medium text-sm">{item.label}</div>
@@ -163,8 +196,15 @@ const ModernApp = () => {
         {!sidebarCollapsed && (
           <div className="p-4 border-t border-gray-800">
             <div className="text-xs text-gray-500">
-              <div>v2.1.0 • Developer Mode</div>
-              <div className="mt-1">Last sync: Just now</div>
+              <div className="flex items-center space-x-2">
+                <motion.div
+                  className="w-2 h-2 bg-purple-500 rounded-full"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span>v3.0.0 • Fashion GOD MODE</span>
+              </div>
+              <div className="mt-1">Dominating since 2025</div>
             </div>
           </div>
         )}
@@ -176,9 +216,15 @@ const ModernApp = () => {
         <div className="bg-gray-900/95 backdrop-blur-xl border-b border-gray-800 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold capitalize">
+              <motion.h1 
+                className="text-xl font-bold capitalize bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent"
+                key={currentView}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 {navItems.find(item => item.id === currentView)?.label} Console
-              </h1>
+              </motion.h1>
               <p className="text-sm text-gray-400">
                 {navItems.find(item => item.id === currentView)?.description}
               </p>
@@ -187,35 +233,58 @@ const ModernApp = () => {
             <div className="flex items-center space-x-4">
               {/* Status Indicators */}
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
+                <motion.div 
+                  className="flex items-center space-x-2"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-400">Live</span>
-                </div>
-                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-400">Street Mode</span>
+                </motion.div>
+                <motion.div 
+                  className="flex items-center space-x-2"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+                >
                   <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                   <span className="text-xs text-gray-400">Connected</span>
-                </div>
-                <div className="flex items-center space-x-2">
+                </motion.div>
+                <motion.div 
+                  className="flex items-center space-x-2"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
+                >
                   <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  <span className="text-xs text-gray-400">AI Active</span>
-                </div>
+                  <span className="text-xs text-gray-400">GOD MODE</span>
+                </motion.div>
               </div>
               
               {/* Actions */}
               <div className="flex items-center space-x-2">
-                <button className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg transition-colors text-xs">
+                <motion.button 
+                  className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-lg transition-colors text-xs"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   ⚙️ Settings
-                </button>
-                <button className="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg transition-colors text-xs">
+                </motion.button>
+                <motion.button 
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-3 py-2 rounded-lg transition-colors text-xs font-semibold"
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 0 20px rgba(168, 85, 247, 0.4)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   🚀 Deploy
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/20">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
@@ -229,6 +298,26 @@ const ModernApp = () => {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
+
+      {/* Floating particles for extra flair */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-purple-400 rounded-full opacity-30"
+            animate={{
+              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              opacity: [0, 0.3, 0],
+            }}
+            transition={{
+              duration: 10 + Math.random() * 10,
+              repeat: Infinity,
+              delay: i * 2,
+            }}
+          />
+        ))}
       </div>
     </div>
   )
