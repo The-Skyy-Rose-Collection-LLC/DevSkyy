@@ -55,6 +55,8 @@ const WordPressConnection = () => {
       setLoading(false)
     }
   }
+
+  const getAuthUrl = async () => {
     try {
       setLoading(true)
       setError('')
