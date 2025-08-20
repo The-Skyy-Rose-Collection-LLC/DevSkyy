@@ -26,6 +26,9 @@ from agent.modules.wordpress_integration_service import WordPressIntegrationServ
 from agent.modules.wordpress_direct_service import WordPressDirectService, create_wordpress_direct_service
 from agent.modules.woocommerce_integration_service import WooCommerceIntegrationService, create_woocommerce_integration_service
 from agent.modules.openai_intelligence_service import OpenAIIntelligenceService, create_openai_intelligence_service
+from agent.modules.social_media_automation_agent import SocialMediaAutomationAgent
+from agent.modules.email_sms_automation_agent import EmailSMSAutomationAgent  
+from agent.modules.design_automation_agent import DesignAutomationAgent
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
