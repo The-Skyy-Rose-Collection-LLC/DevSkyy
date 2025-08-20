@@ -30,6 +30,10 @@ from models import (
     PaymentRequest, ProductRequest, CustomerRequest, OrderRequest, 
     ChargebackRequest, CodeAnalysisRequest, WebsiteAnalysisRequest
 )
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = FastAPI(
     title="The Skyy Rose Collection - DevSkyy Enhanced Platform", 
