@@ -63,6 +63,9 @@ class PerformanceAgent:
         self.universal_debugger = self._initialize_universal_debugger()
         self.performance_optimizer = self._initialize_performance_optimizer()
         
+        # Initialize OpenAI client for god mode optimization
+        self.openai_client = openai.OpenAI()
+        
         logger.info("🚀 Universal Web Development Guru initialized with Multi-Language Mastery")
 
     async def analyze_site_performance(self) -> Dict[str, Any]:
