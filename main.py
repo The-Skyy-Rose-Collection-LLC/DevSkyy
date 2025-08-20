@@ -25,7 +25,21 @@ from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_ri
 from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes  # Imported commit_all_changes
-from agent.modules.enhanced_autofix import EnhancedAutoFix, run_auto_fix_session, quick_fix
+
+# Import enhanced autofix directly to avoid dependency issues
+import importlib.util
+from pathlib import Path
+enhanced_autofix_spec = importlib.util.spec_from_file_location(
+    "enhanced_autofix", 
+    Path(__file__).parent / "agent" / "modules" / "enhanced_autofix.py"
+)
+enhanced_autofix_module = importlib.util.module_from_spec(enhanced_autofix_spec)
+enhanced_autofix_spec.loader.exec_module(enhanced_autofix_module)
+
+# Extract classes and functions
+EnhancedAutoFix = enhanced_autofix_module.EnhancedAutoFix
+run_auto_fix_session = enhanced_autofix_module.run_auto_fix_session
+quick_fix = enhanced_autofix_module.quick_fix
 from typing import Dict, Any, List
 import json
 import asyncio
