@@ -1751,6 +1751,88 @@ async def execute_quick_action(action_data: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/wordpress/recent-fixes")
+async def get_wordpress_recent_fixes() -> Dict[str, Any]:
+    """Get recent WordPress fixes made by agents."""
+    try:
+        return {
+            "fixes": [
+                {
+                    "id": 1,
+                    "title": "Optimized Core Web Vitals",
+                    "agent": "Performance Agent",
+                    "impact": "35% faster loading",
+                    "timestamp": "2 hours ago",
+                    "status": "completed",
+                    "type": "performance"
+                },
+                {
+                    "id": 2,
+                    "title": "Enhanced Mobile Responsive Design",
+                    "agent": "Design Agent",
+                    "impact": "Better mobile UX",
+                    "timestamp": "4 hours ago", 
+                    "status": "completed",
+                    "type": "design"
+                },
+                {
+                    "id": 3,
+                    "title": "Security Headers Implementation",
+                    "agent": "Security Agent",
+                    "impact": "Improved security score",
+                    "timestamp": "6 hours ago",
+                    "status": "completed",
+                    "type": "security"
+                },
+                {
+                    "id": 4,
+                    "title": "SEO Meta Tags Optimization",
+                    "agent": "SEO Agent",
+                    "impact": "Better search rankings",
+                    "timestamp": "8 hours ago",
+                    "status": "completed",
+                    "type": "seo"
+                }
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/upcoming-tasks")
+async def get_wordpress_upcoming_tasks() -> Dict[str, Any]:
+    """Get upcoming WordPress tasks for agents."""
+    try:
+        return {
+            "tasks": [
+                {
+                    "id": 1,
+                    "title": "Love Hurts Collection Page Creation",
+                    "agent": "Design Agent",
+                    "priority": "high",
+                    "eta": "30 minutes",
+                    "type": "content"
+                },
+                {
+                    "id": 2,
+                    "title": "WooCommerce Integration Enhancement",
+                    "agent": "E-commerce Agent",
+                    "priority": "medium",
+                    "eta": "2 hours",
+                    "type": "ecommerce"
+                },
+                {
+                    "id": 3,
+                    "title": "Brand Consistency Audit",
+                    "agent": "Brand Agent",
+                    "priority": "low",
+                    "eta": "4 hours",
+                    "type": "branding"
+                }
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Enhanced DevSkyy Workflow Endpoint with Brand Intelligence
 @app.post("/devskyy/full-optimization")
 async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
