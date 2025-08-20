@@ -767,6 +767,36 @@ class OpenAIGodModeTester:
             self.log_test("WordPress Posts Analysis", False, f"Exception: {str(e)}")
             return False
     
+    def test_woocommerce_integration_after_wordpress_connection(self):
+        """Test WooCommerce integration after WordPress connection."""
+        try:
+            # Test WooCommerce products endpoint
+            response = self.session.get(f"{self.base_url}/woocommerce/products?per_page=5")
+            success = response.status_code == 200
+            
+            if success:
+                data = response.json()
+                products_data = data.get('products_data', {})
+                luxury_analysis = data.get('luxury_analysis', {})
+                optimization_opportunities = data.get('optimization_opportunities', [])
+                
+                details = f"Products retrieved: {len(products_data.get('products', []))}"
+                if luxury_analysis:
+                    details += f", Luxury analysis: available"
+                if optimization_opportunities:
+                    details += f", Optimization opportunities: {len(optimization_opportunities)}"
+            else:
+                details = f"Status code: {response.status_code}"
+                if response.text:
+                    details += f", Response: {response.text[:100]}"
+            
+            self.log_test("WooCommerce Integration", success, details)
+            return success
+            
+        except Exception as e:
+            self.log_test("WooCommerce Integration", False, f"Exception: {str(e)}")
+            return False
+    
     def run_wordpress_direct_connection_tests(self):
         """Run WordPress direct connection test suite."""
         print("\n🌐 Testing WordPress Direct Connection Functionality:")
@@ -784,7 +814,10 @@ class OpenAIGodModeTester:
         # Test posts analysis
         posts_analysis_success = self.test_wordpress_posts_analysis()
         
-        return connection_success and site_info_success and site_status_success and posts_analysis_success
+        # Test WooCommerce integration
+        woocommerce_success = self.test_woocommerce_integration_after_wordpress_connection()
+        
+        return connection_success and site_info_success and site_status_success and posts_analysis_success and woocommerce_success
 
 def main():
     """Main testing function for WordPress Direct Connection."""
