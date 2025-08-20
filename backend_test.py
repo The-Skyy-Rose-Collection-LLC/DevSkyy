@@ -646,7 +646,7 @@ class OpenAIGodModeTester:
         """Test WordPress direct connection functionality."""
         try:
             # Test direct connection endpoint
-            response = self.session.post(f"{self.base_url}/api/wordpress/connect-direct")
+            response = self.session.post(f"{self.base_url}/wordpress/connect-direct")
             success = response.status_code == 200
             
             if success:
