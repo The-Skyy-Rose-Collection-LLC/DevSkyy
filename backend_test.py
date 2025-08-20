@@ -739,7 +739,7 @@ class OpenAIGodModeTester:
         """Test WordPress posts analysis endpoint."""
         try:
             # Test posts analysis endpoint
-            response = self.session.get(f"{self.base_url}/api/wordpress/posts-analysis")
+            response = self.session.get(f"{self.base_url}/wordpress/posts-analysis")
             success = response.status_code == 200
             
             if success:
