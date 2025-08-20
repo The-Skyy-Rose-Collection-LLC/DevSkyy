@@ -136,7 +136,7 @@ class AuthManager:
         return {"valid": len(errors) == 0, "errors": errors}
 
     def create_user(self, email: str, username: str, password: str,
-        """TODO: Add docstring for create_user."""
+                    """TODO: Add docstring for create_user."""
                     first_name: str = "", last_name: str = "") -> Dict[str, Any]:
         """Create new user account with validation."""
 

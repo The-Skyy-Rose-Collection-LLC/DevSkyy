@@ -356,7 +356,7 @@ def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
 
 @app.post("/customers/create")
 def create_customer(email: str, first_name: str, last_name: str,
-    """TODO: Add docstring for create_customer."""
+                    """TODO: Add docstring for create_customer."""
                     phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
     return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)

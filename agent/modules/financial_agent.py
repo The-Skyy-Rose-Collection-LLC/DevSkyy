@@ -110,7 +110,7 @@ class FinancialAgent:
         logger.info("💰 Production Financial Agent Initialized with Blockchain Intelligence")
 
     def process_payment(self, amount: float, currency: str, customer_id: str,
-        """TODO: Add docstring for process_payment."""
+                        """TODO: Add docstring for process_payment."""
                         product_id: str, payment_method: str, gateway: str = "stripe") -> Dict[str, Any]:
         """Process payment with comprehensive fraud detection and validation."""
         try:

@@ -1,5 +1,5 @@
 """
-Enhanced Auto-Fix Module for DevSkyy Platform
+Enhanced Auto-Fix Module for DevSkyy Platform (Simplified)
 Provides advanced code analysis, fixing, and branch management
 """
 import os
@@ -13,10 +13,9 @@ import tempfile
 import shutil
 from pathlib import Path
 
-# Import existing modules
+# Import existing modules using importlib
 import importlib.util
 import sys
-from pathlib import Path
 
 # Get the current directory to import other modules
 current_dir = Path(__file__).parent
@@ -51,14 +50,11 @@ class EnhancedAutoFix:
         self.fixes_applied = []
 
     def run_enhanced_autofix(self,
-        """TODO: Add docstring for run_enhanced_autofix."""
                              create_branch: bool = True,
                              branch_name: Optional[str] = None,
                              auto_commit: bool = True,
                              fix_types: List[str] = None) -> Dict[str, Any]:
-        """
-        Run enhanced auto-fix workflow with advanced features
-        """
+        """Run enhanced auto-fix workflow with advanced features"""
         try:
             logger.info("🚀 Starting Enhanced Auto-Fix Session...")
 
@@ -190,21 +186,9 @@ class EnhancedAutoFix:
         # Add enhanced fixes
         enhanced_fixes = []
 
-        # Additional Python fixes
-        python_enhancements = self._apply_python_enhancements()
-        enhanced_fixes.extend(python_enhancements)
-
-        # JavaScript modernization
-        js_enhancements = self._apply_javascript_modernization()
-        enhanced_fixes.extend(js_enhancements)
-
-        # Security improvements
+        # Additional security improvements
         security_fixes = self._apply_security_fixes()
         enhanced_fixes.extend(security_fixes)
-
-        # Performance optimizations
-        performance_fixes = self._apply_performance_optimizations()
-        enhanced_fixes.extend(performance_fixes)
 
         # Merge results
         if "fixes_applied" not in fix_results:
@@ -213,186 +197,6 @@ class EnhancedAutoFix:
         fix_results["enhanced_fixes_count"] = len(enhanced_fixes)
 
         return fix_results
-
-    def _apply_python_enhancements(self) -> List[Dict[str, Any]]:
-        """Apply advanced Python code enhancements"""
-        fixes = []
-
-        for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_*'}]
-
-            for file in files:
-                if file.endswith('.py'):
-                    file_path = os.path.join(root, file)
-                    file_fixes = self._enhance_python_file(file_path)
-                    fixes.extend(file_fixes)
-
-        return fixes
-
-    def _enhance_python_file(self, file_path: str) -> List[Dict[str, Any]]:
-        """Apply advanced Python enhancements to a file"""
-        fixes = []
-
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            original_content = content
-
-            # Add type hints where missing
-            if 'from typing import' not in content and ('def ' in content or 'class ' in content):
-                # Add basic typing import
-                lines = content.split('\n')
-                import_inserted = False
-                for i, line in enumerate(lines):
-                    if line.startswith('import ') or line.startswith('from '):
-                        continue
-                    else:
-                        lines.insert(i, 'from typing import Dict, Any, List, Optional')
-                        import_inserted = True
-                        break
-
-                if import_inserted:
-                    content = '\n'.join(lines)
-                    fixes.append({
-                        "file": file_path,
-                        "type": "enhancement",
-                        "description": "Added typing imports for better type safety",
-                        "line": "imports"
-                    })
-
-            # Add docstrings to functions without them
-            lines = content.split('\n')
-            for i, line in enumerate(lines):
-                if line.strip().startswith('def ') and '"""' not in line:
-                    # Check if next line has docstring
-                    if i + 1 < len(lines) and '"""' not in lines[i + 1]:
-                        # Extract function name
-                        func_match = re.match(r'\s*def\s+(\w+)', line)
-                        if func_match:
-                            func_name = func_match.group(1)
-                            if not func_name.startswith('_'):  # Only public functions
-                                indent = len(line) - len(line.lstrip())
-                                docstring = f'{" " * (indent + 4)}"""TODO: Add docstring for {func_name}."""'
-                                lines.insert(i + 1, docstring)
-                                fixes.append({
-                                    "file": file_path,
-                                    "type": "enhancement",
-                                    "description": f"Added TODO docstring for function {func_name}",
-                                    "line": i + 1
-                                })
-                                break  # Only add one per file to avoid conflicts
-
-            content = '\n'.join(lines)
-
-            # Apply f-string optimization
-            # Replace old-style string formatting
-            fstring_pattern = r'["\']([^"\']*)\{[^}]*\}([^"\']*)["\']\.format\([^)]*\)'
-            if re.search(fstring_pattern, content):
-                # Simple f-string conversion (basic cases only)
-                content = re.sub(
-                    r'"([^"]*)\{\}([^"]*)"\.format\(([^)]+)\)',
-                    r'f"\1{\3}\2"',
-                    content
-                )
-                fixes.append({
-                    "file": file_path,
-                    "type": "optimization",
-                    "description": "Converted string.format() to f-strings",
-                    "line": "multiple"
-                })
-
-            # Write changes if any fixes were made
-            if content != original_content:
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
-
-        except Exception as e:
-            fixes.append({
-                "file": file_path,
-                "type": "error",
-                "description": f"Failed to enhance Python file: {str(e)}",
-                "line": "unknown"
-            })
-
-        return fixes
-
-    def _apply_javascript_modernization(self) -> List[Dict[str, Any]]:
-        """Apply JavaScript modernization fixes"""
-        fixes = []
-
-        for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'node_modules', 'backup_*'}]
-
-            for file in files:
-                if file.endswith('.js'):
-                    file_path = os.path.join(root, file)
-                    file_fixes = self._modernize_javascript_file(file_path)
-                    fixes.extend(file_fixes)
-
-        return fixes
-
-    def _modernize_javascript_file(self, file_path: str) -> List[Dict[str, Any]]:
-        """Modernize JavaScript file"""
-        fixes = []
-
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            original_content = content
-
-            # Convert function declarations to arrow functions (simple cases)
-            lines = content.split('\n')
-            for i, line in enumerate(lines):
-                # Convert simple function expressions
-                if 'function(' in line and '=' in line:
-                    # Simple conversion: var fn = function() -> const fn = () =>
-                    arrow_line = re.sub(
-                        r'(\w+)\s*=\s*function\s*\(',
-                        r'\1 = (',
-                        line
-                    )
-                    arrow_line = re.sub(
-                        r'\)\s*\{',
-                        r') => {',
-                        arrow_line
-                    )
-                    if arrow_line != line:
-                        lines[i] = arrow_line
-                        fixes.append({
-                            "file": file_path,
-                            "type": "modernization",
-                            "description": "Converted function expression to arrow function",
-                            "line": i + 1
-                        })
-
-            content = '\n'.join(lines)
-
-            # Add 'use strict' if not present
-            if "'use strict'" not in content and '"use strict"' not in content:
-                content = "'use strict';\n\n" + content
-                fixes.append({
-                    "file": file_path,
-                    "type": "enhancement",
-                    "description": "Added 'use strict' directive",
-                    "line": 1
-                })
-
-            # Write changes if any fixes were made
-            if content != original_content:
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
-
-        except Exception as e:
-            fixes.append({
-                "file": file_path,
-                "type": "error",
-                "description": f"Failed to modernize JavaScript file: {str(e)}",
-                "line": "unknown"
-            })
-
-        return fixes
 
     def _apply_security_fixes(self) -> List[Dict[str, Any]]:
         """Apply security-related fixes"""
@@ -432,55 +236,6 @@ class EnhancedAutoFix:
 
         return fixes
 
-    def _apply_performance_optimizations(self) -> List[Dict[str, Any]]:
-        """Apply performance optimization fixes"""
-        fixes = []
-
-        # Add performance-related fixes
-        for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_*'}]
-
-            for file in files:
-                if file.endswith('.py'):
-                    file_path = os.path.join(root, file)
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-
-                        original_content = content
-
-                        # Optimize list comprehensions (simple cases)
-                        # Convert simple for loops to list comprehensions where appropriate
-                        lines = content.split('\n')
-                        in_simple_loop = False
-                        loop_start = -1
-
-                        for i, line in enumerate(lines):
-                            stripped = line.strip()
-
-                            # Simple pattern: for item in items: result.append(item.something)
-                            if stripped.startswith('for ') and ' in ' in stripped and ':' in stripped:
-                                in_simple_loop = True
-                                loop_start = i
-                            elif in_simple_loop and stripped.startswith('result.append(') and loop_start >= 0:
-                                # This is a simple case we can optimize
-                                fixes.append({
-                                    "file": file_path,
-                                    "type": "performance_hint",
-                                    "description": f"Consider list comprehension at line {loop_start + 1}",
-                                    "line": loop_start + 1
-                                })
-                                in_simple_loop = False
-                                loop_start = -1
-                            elif in_simple_loop and stripped and not stripped.startswith('result.append('):
-                                in_simple_loop = False
-                                loop_start = -1
-
-                    except Exception:
-                        continue
-
-        return fixes
-
     def _apply_advanced_fixes(self) -> Dict[str, Any]:
         """Apply advanced fixes beyond basic code fixing"""
         advanced_fixes = {
@@ -492,11 +247,6 @@ class EnhancedAutoFix:
                 "structure": 0
             }
         }
-
-        # Add README improvements
-        readme_fixes = self._improve_documentation()
-        advanced_fixes["fixes_applied"].extend(readme_fixes)
-        advanced_fixes["categories"]["documentation"] = len(readme_fixes)
 
         # Add configuration improvements
         config_fixes = self._improve_configuration()
@@ -510,45 +260,6 @@ class EnhancedAutoFix:
 
         return advanced_fixes
 
-    def _improve_documentation(self) -> List[Dict[str, Any]]:
-        """Improve project documentation"""
-        fixes = []
-
-        # Check if README exists and has basic sections
-        readme_path = "README.md"
-        if os.path.exists(readme_path):
-            try:
-                with open(readme_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-
-                # Check for missing sections
-                missing_sections = []
-
-                if "## Installation" not in content:
-                    missing_sections.append("Installation")
-                if "## Usage" not in content:
-                    missing_sections.append("Usage")
-                if "## Contributing" not in content:
-                    missing_sections.append("Contributing")
-
-                if missing_sections:
-                    fixes.append({
-                        "file": readme_path,
-                        "type": "documentation",
-                        "description": f"README missing sections: {', '.join(missing_sections)}",
-                        "line": "end"
-                    })
-
-            except Exception as e:
-                fixes.append({
-                    "file": readme_path,
-                    "type": "error",
-                    "description": f"Failed to analyze README: {str(e)}",
-                    "line": "unknown"
-                })
-
-        return fixes
-
     def _improve_configuration(self) -> List[Dict[str, Any]]:
         """Improve project configuration"""
         fixes = []
@@ -561,30 +272,6 @@ class EnhancedAutoFix:
                 "description": "Missing .env.example file for environment setup guidance",
                 "line": 1
             })
-
-        # Check for proper .gitignore
-        if os.path.exists(".gitignore"):
-            try:
-                with open(".gitignore", 'r', encoding='utf-8') as f:
-                    gitignore_content = f.read()
-
-                # Check for common entries
-                common_ignores = [".env", "__pycache__/", "*.log", "node_modules/"]
-                missing_ignores = [
-                    ignore for ignore in common_ignores
-                    if ignore not in gitignore_content
-                ]
-
-                if missing_ignores:
-                    fixes.append({
-                        "file": ".gitignore",
-                        "type": "configuration",
-                        "description": f"Missing .gitignore entries: {', '.join(missing_ignores)}",
-                        "line": "end"
-                    })
-
-            except Exception:
-                pass
 
         return fixes
 
@@ -628,8 +315,7 @@ class EnhancedAutoFix:
             "optimization": 0,
             "enhancement": 0,
             "security": 0,
-            "performance": 0,
-            "documentation": 0,
+            "configuration": 0,
             "structure": 0
         }
 
@@ -639,8 +325,6 @@ class EnhancedAutoFix:
                 fix_counts[fix_type] += 1
             elif "security" in fix_type:
                 fix_counts["security"] += 1
-            elif "performance" in fix_type:
-                fix_counts["performance"] += 1
 
         # Build message
         title = f"🤖 Enhanced Auto-Fix - {timestamp}"
@@ -656,10 +340,8 @@ class EnhancedAutoFix:
             summary_parts.append(f"✨ {fix_counts['enhancement']} enhancements")
         if fix_counts["security"]:
             summary_parts.append(f"🔒 {fix_counts['security']} security improvements")
-        if fix_counts["performance"]:
-            summary_parts.append(f"🚀 {fix_counts['performance']} performance improvements")
-        if fix_counts["documentation"]:
-            summary_parts.append(f"📚 {fix_counts['documentation']} documentation improvements")
+        if fix_counts["configuration"]:
+            summary_parts.append(f"⚙️ {fix_counts['configuration']} configuration improvements")
         if fix_counts["structure"]:
             summary_parts.append(f"🏗️ {fix_counts['structure']} structure improvements")
 
