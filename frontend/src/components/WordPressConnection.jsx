@@ -196,25 +196,55 @@ const WordPressConnection = () => {
               )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <p className="text-orange-600 text-lg">
-                Authorize access to activate your luxury brand agents
+                Connect your WordPress site to activate your luxury brand agents
               </p>
               
-              <button
-                className="luxury-button px-8 py-4 text-lg"
-                onClick={getAuthUrl}
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                    Connecting...
-                  </span>
-                ) : (
-                  'Connect WordPress Site'
-                )}
-              </button>
+              {/* Direct Connection - Primary Method */}
+              <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-200">
+                <div className="text-center space-y-4">
+                  <div className="text-emerald-600 text-2xl font-semibold flex items-center justify-center gap-2">
+                    ⚡ <span>Direct Connection (Recommended)</span>
+                  </div>
+                  <p className="text-emerald-700 text-sm">
+                    Instant secure connection using your WordPress application password. No redirects needed!
+                  </p>
+                  <button
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105"
+                    onClick={connectDirectly}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                        Connecting to skyyrose.co...
+                      </span>
+                    ) : (
+                      '🚀 Connect WordPress Site Directly'
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* OAuth Alternative - Secondary Method */}
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-4 border border-gray-200">
+                <div className="text-center space-y-3">
+                  <div className="text-gray-600 text-sm font-medium">
+                    Alternative: OAuth Method (Less Reliable)
+                  </div>
+                  <button
+                    className="bg-gradient-to-r from-gray-500 to-slate-500 hover:from-gray-600 hover:to-slate-600 text-white font-medium px-6 py-2 rounded-xl shadow transition-all duration-300 text-sm"
+                    onClick={getAuthUrl}
+                    disabled={loading}
+                  >
+                    {loading ? 'Loading...' : 'Try OAuth Method'}
+                  </button>
+                  <p className="text-xs text-gray-500">
+                    Note: OAuth method may experience connection issues. Direct connection is preferred.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
