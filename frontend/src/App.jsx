@@ -6,6 +6,7 @@ import FrontendAgentManager from './components/FrontendAgentManager'
 import WordPressConnection from './components/WordPressConnection'
 import TaskManager from './components/TaskManager'
 import RiskDashboard from './components/RiskDashboard'
+import AutomationDashboard from './components/AutomationDashboard'
 import Header from './components/Header'
 import Navigation from './components/Navigation'
 
