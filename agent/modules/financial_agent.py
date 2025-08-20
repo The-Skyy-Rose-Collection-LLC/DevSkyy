@@ -51,6 +51,55 @@ class FinancialAgent:
             "chargeback_threshold": 0.01  # 1%
         }
         self.brand_context = {}
+        
+        # ENHANCED FINANCIAL SERVICES - Tax, Credit, Advisory
+        self.tax_services = {
+            "preparation": ["Business Tax Returns", "Personal Tax Returns", "Quarterly Estimates", "Tax Planning"],
+            "compliance": ["IRS Compliance", "State Tax Requirements", "International Tax", "Sales Tax Management"],
+            "optimization": ["Deduction Maximization", "Tax Strategy Planning", "Entity Structure Optimization"],
+            "audit_support": ["IRS Audit Defense", "Documentation Management", "Representation Services"]
+        }
+        
+        self.advisory_services = {
+            "business_planning": ["Financial Forecasting", "Budget Creation", "Cash Flow Management", "Investment Planning"],
+            "risk_management": ["Insurance Analysis", "Risk Assessment", "Contingency Planning", "Asset Protection"],
+            "growth_strategies": ["Funding Options", "Expansion Planning", "Acquisition Analysis", "Exit Strategies"],
+            "performance_analysis": ["KPI Tracking", "Profitability Analysis", "Cost Optimization", "ROI Analysis"]
+        }
+        
+        self.credit_services = {
+            "monitoring": ["Business Credit Score Tracking", "Credit Report Analysis", "Alert Systems"],
+            "building": ["Credit Building Strategies", "Tradeline Management", "Payment History Optimization"],
+            "repair": ["Dispute Management", "Credit Error Correction", "Negative Item Removal"],
+            "optimization": ["Credit Utilization Management", "Mix Optimization", "Length of Credit History"]
+        }
+        
+        # INTEGRATION CAPABILITIES
+        self.banking_integrations = {
+            "supported_banks": ["Chase", "Bank of America", "Wells Fargo", "Citibank", "Capital One", "US Bank"],
+            "business_accounts": ["Checking", "Savings", "Credit Lines", "Merchant Services"],
+            "payment_processors": ["Stripe", "PayPal", "Square", "Authorize.net", "Braintree"],
+            "accounting_software": ["QuickBooks", "Xero", "FreshBooks", "Wave", "Sage"]
+        }
+        
+        # Enhanced financial metrics
+        self.financial_metrics = {
+            "revenue": 0,
+            "expenses": 0,
+            "profit_margin": 0,
+            "cash_flow": 0,
+            "accounts_receivable": 0,
+            "accounts_payable": 0,
+            "tax_liability": 0,
+            "business_credit_score": 0,
+            "quarterly_estimates": 0,
+            "deductible_expenses": 0
+        }
+        
+        # EXPERIMENTAL: Enhanced AI Financial Intelligence
+        self.tax_optimization_engine = self._initialize_tax_engine()
+        self.credit_improvement_system = self._initialize_credit_system()
+        self.integration_manager = self._initialize_integration_manager()
         # EXPERIMENTAL: Blockchain-based financial intelligence
         self.blockchain_ledger = self._initialize_blockchain_ledger()
         self.defi_analytics = self._initialize_defi_analytics()
