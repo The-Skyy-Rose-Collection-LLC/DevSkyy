@@ -433,8 +433,7 @@ class BrandIntelligenceAgent:
                 "timestamp": datetime.now().isoformat()
             }
 
-
-def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
+    def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
         """Learn from uploaded brand assets to enhance intelligence."""
         try:
             self.uploaded_assets = asset_data
