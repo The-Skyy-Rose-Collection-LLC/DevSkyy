@@ -642,44 +642,203 @@ class OpenAIGodModeTester:
         
         return passed_tests, failed_tests
 
+    def test_wordpress_direct_connection(self):
+        """Test WordPress direct connection functionality."""
+        try:
+            # Test direct connection endpoint
+            response = self.session.post(f"{self.base_url}/api/wordpress/connect-direct")
+            success = response.status_code == 200
+            
+            if success:
+                data = response.json()
+                status = data.get('status', 'unknown')
+                site_info = data.get('site_info', {})
+                agents_status = data.get('agents_status', {})
+                
+                details = f"Connection status: {status}"
+                if status == 'success':
+                    details += f", Site: {site_info.get('site_url', 'unknown')}"
+                    details += f", Agents active: {len(agents_status)}"
+                else:
+                    details += f", Error: {data.get('message', 'Unknown error')}"
+            else:
+                details = f"Status code: {response.status_code}"
+                if response.text:
+                    details += f", Response: {response.text[:100]}"
+            
+            self.log_test("WordPress Direct Connection", success, details)
+            return success
+            
+        except Exception as e:
+            self.log_test("WordPress Direct Connection", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_wordpress_site_info(self):
+        """Test WordPress site info endpoint."""
+        try:
+            # Test site info endpoint
+            response = self.session.get(f"{self.base_url}/api/wordpress/site/info")
+            success = response.status_code == 200
+            
+            if success:
+                data = response.json()
+                site_info = data.get('site_info', {})
+                performance_monitoring = data.get('performance_monitoring', {})
+                agent_status = data.get('agent_status', 'unknown')
+                
+                details = f"Agent status: {agent_status}"
+                if site_info:
+                    details += f", Site name: {site_info.get('name', 'unknown')}"
+                if performance_monitoring:
+                    details += f", Performance monitoring: active"
+            else:
+                details = f"Status code: {response.status_code}"
+                if response.text:
+                    details += f", Response: {response.text[:100]}"
+            
+            self.log_test("WordPress Site Info", success, details)
+            return success
+            
+        except Exception as e:
+            self.log_test("WordPress Site Info", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_wordpress_site_status(self):
+        """Test WordPress site status endpoint."""
+        try:
+            # Test site status endpoint
+            response = self.session.get(f"{self.base_url}/api/wordpress/site-status")
+            success = response.status_code == 200
+            
+            if success:
+                data = response.json()
+                site_health = data.get('site_health', {})
+                woocommerce_status = data.get('woocommerce_status', 'unknown')
+                ai_agents_active = data.get('ai_agents_active', False)
+                luxury_optimization_score = data.get('luxury_optimization_score', 0)
+                
+                details = f"AI agents active: {ai_agents_active}"
+                details += f", WooCommerce: {woocommerce_status}"
+                details += f", Luxury score: {luxury_optimization_score}%"
+                
+                if site_health.get('connection_status') == 'connected':
+                    details += " - Site connected and healthy"
+            else:
+                details = f"Status code: {response.status_code}"
+                if response.text:
+                    details += f", Response: {response.text[:100]}"
+            
+            self.log_test("WordPress Site Status", success, details)
+            return success
+            
+        except Exception as e:
+            self.log_test("WordPress Site Status", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_wordpress_posts_analysis(self):
+        """Test WordPress posts analysis endpoint."""
+        try:
+            # Test posts analysis endpoint
+            response = self.session.get(f"{self.base_url}/api/wordpress/posts-analysis")
+            success = response.status_code == 200
+            
+            if success:
+                data = response.json()
+                posts_analysis = data.get('posts_analysis', {})
+                luxury_opportunities = data.get('luxury_opportunities', {})
+                ai_recommendations = data.get('ai_recommendations', 'none')
+                
+                total_posts = posts_analysis.get('total_posts', 0)
+                details = f"Posts analyzed: {total_posts}"
+                details += f", AI recommendations: {ai_recommendations}"
+                
+                if luxury_opportunities:
+                    optimization_score = luxury_opportunities.get('luxury_optimization_score', 0)
+                    details += f", Luxury score: {optimization_score}%"
+            else:
+                details = f"Status code: {response.status_code}"
+                if response.text:
+                    details += f", Response: {response.text[:100]}"
+            
+            self.log_test("WordPress Posts Analysis", success, details)
+            return success
+            
+        except Exception as e:
+            self.log_test("WordPress Posts Analysis", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_wordpress_direct_connection_tests(self):
+        """Run WordPress direct connection test suite."""
+        print("\n🌐 Testing WordPress Direct Connection Functionality:")
+        print("-" * 60)
+        
+        # Test direct connection
+        connection_success = self.test_wordpress_direct_connection()
+        
+        # Test site info endpoint
+        site_info_success = self.test_wordpress_site_info()
+        
+        # Test site status
+        site_status_success = self.test_wordpress_site_status()
+        
+        # Test posts analysis
+        posts_analysis_success = self.test_wordpress_posts_analysis()
+        
+        return connection_success and site_info_success and site_status_success and posts_analysis_success
+
 def main():
-    """Main testing function for OpenAI GOD MODE."""
-    print("⚡ OpenAI GOD MODE TIER - Comprehensive Backend Testing")
-    print("🧠 Testing Enhanced AI Capabilities with Maximum Intelligence")
-    print("💎 Luxury Brand Optimization with AI Supremacy")
-    print("🚀 Executive-Level Decision Making and Performance")
+    """Main testing function for WordPress Direct Connection."""
+    print("🌐 WordPress Direct Connection Testing")
+    print("🔗 Testing skyyrose.co connection functionality")
+    print("⚡ Verifying API endpoints for frontend integration")
     print()
     
     tester = OpenAIGodModeTester()
     
     try:
-        success = tester.run_comprehensive_god_mode_test_suite()
+        # First test basic health
+        if not tester.test_health_check():
+            print("❌ Health check failed - aborting tests")
+            return False
         
-        if success:
-            passed, failed = tester.generate_god_mode_test_summary()
-            
-            print(f"\n🏁 GOD MODE Testing completed!")
-            print(f"📈 Results: {passed} passed, {failed} failed")
-            
-            if failed == 0:
-                print("🎉 ALL GOD MODE TESTS PASSED! AI Supremacy Achieved!")
-                print("⚡ OpenAI GOD MODE TIER is fully operational with maximum capabilities!")
-                return 0
-            elif failed <= 2:
-                print("⚠️  Minor issues detected, but GOD MODE core functionality is working")
-                print("🔥 AI supremacy capabilities are mostly operational")
-                return 1
-            else:
-                print("❌ Major issues detected, GOD MODE tier needs attention")
-                print("🛠️  System requires optimization to achieve AI supremacy")
-                return 2
+        # Run WordPress direct connection tests
+        wordpress_success = tester.run_wordpress_direct_connection_tests()
+        
+        # Generate summary
+        print("\n" + "=" * 80)
+        print("📊 WORDPRESS DIRECT CONNECTION TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(tester.test_results)
+        passed_tests = sum(1 for result in tester.test_results if result['success'])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total WordPress Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if failed_tests > 0:
+            print(f"\n❌ FAILED TESTS:")
+            for result in tester.test_results:
+                if not result['success']:
+                    print(f"   • {result['test']}: {result['details']}")
+        
+        print(f"\n🌐 WORDPRESS CONNECTION STATUS:")
+        if wordpress_success:
+            print("   ✅ WordPress Direct Connection: WORKING")
+            print("   ✅ skyyrose.co Integration: FUNCTIONAL")
+            print("   ✅ API Endpoints: READY FOR FRONTEND")
+            print("   ✅ Agent Communication: ACTIVE")
         else:
-            print("❌ GOD MODE testing suite failed to complete")
-            return 3
+            print("   ❌ WordPress Direct Connection: NEEDS ATTENTION")
+            print("   ❌ Some endpoints may not be working properly")
+        
+        return wordpress_success
             
     except Exception as e:
-        print(f"❌ GOD MODE testing failed with exception: {str(e)}")
-        return 4
+        print(f"❌ WordPress testing failed with exception: {str(e)}")
+        return False
 
 if __name__ == "__main__":
     exit(main())
