@@ -8,20 +8,90 @@ import sys
 import os
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
-from agent.modules.inventory_agent import InventoryAgent
-from agent.modules.financial_agent import FinancialAgent, ChargebackReason
-from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
-from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
-from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues
-from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
-from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
-from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
-from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing
-from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service
-from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
-from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
-from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
-from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
+
+# Import optional agent modules
+try:
+    from agent.modules.inventory_agent import InventoryAgent
+except ImportError:
+    InventoryAgent = None
+
+try:
+    from agent.modules.financial_agent import FinancialAgent, ChargebackReason
+except ImportError:
+    FinancialAgent = None
+    ChargebackReason = None
+
+try:
+    from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
+except ImportError:
+    EcommerceAgent = None
+    ProductCategory = None
+    OrderStatus = None
+
+try:
+    from agent.modules.wordpress_agent import WordPressAgent, optimize_wordpress_performance
+except ImportError:
+    WordPressAgent = None
+    optimize_wordpress_performance = None
+
+try:
+    from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues
+except ImportError:
+    WebDevelopmentAgent = None
+    fix_web_development_issues = None
+
+try:
+    from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
+except ImportError:
+    SiteCommunicationAgent = None
+    communicate_with_site = None
+
+try:
+    from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
+except ImportError:
+    BrandIntelligenceAgent = None
+    initialize_brand_intelligence = None
+
+try:
+    from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
+except ImportError:
+    start_enhanced_learning_system = None
+
+try:
+    from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing
+except ImportError:
+    SEOMarketingAgent = None
+    optimize_seo_marketing = None
+
+try:
+    from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service
+except ImportError:
+    CustomerServiceAgent = None
+    optimize_customer_service = None
+
+try:
+    from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
+except ImportError:
+    SecurityAgent = None
+    secure_luxury_platform = None
+
+try:
+    from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
+except ImportError:
+    PerformanceAgent = None
+    optimize_site_performance = None
+
+try:
+    from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
+except ImportError:
+    TaskRiskManager = None
+    manage_tasks_and_risks = None
+
+try:
+    from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
+except ImportError:
+    AgentAssignmentManager = None
+    create_agent_assignment_manager = None
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes  # Imported commit_all_changes
 from typing import Dict, Any, List
@@ -113,42 +183,43 @@ async def general_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# Initialize brand intelligence first
-brand_intelligence = BrandIntelligenceAgent()
+# Initialize brand intelligence first (if available)
+brand_intelligence = BrandIntelligenceAgent() if BrandIntelligenceAgent else None
 
-# Initialize all agents with brand context
-inventory_agent = InventoryAgent()
-financial_agent = FinancialAgent()
-ecommerce_agent = EcommerceAgent()
-wordpress_agent = WordPressAgent()
-web_dev_agent = WebDevelopmentAgent()
-site_comm_agent = SiteCommunicationAgent()
+# Initialize agents conditionally based on availability
+inventory_agent = InventoryAgent() if InventoryAgent else None
+financial_agent = FinancialAgent() if FinancialAgent else None
+ecommerce_agent = EcommerceAgent() if EcommerceAgent else None
+wordpress_agent = WordPressAgent() if WordPressAgent else None
+web_dev_agent = WebDevelopmentAgent() if WebDevelopmentAgent else None
+site_comm_agent = SiteCommunicationAgent() if SiteCommunicationAgent else None
 
-# Initialize new specialized agents
-seo_marketing_agent = SEOMarketingAgent()
-customer_service_agent = CustomerServiceAgent()
-security_agent = SecurityAgent()
-performance_agent = PerformanceAgent()
-task_risk_manager = TaskRiskManager()
-agent_assignment_manager = create_agent_assignment_manager()
+# Initialize new specialized agents (if available)
+seo_marketing_agent = SEOMarketingAgent() if SEOMarketingAgent else None
+customer_service_agent = CustomerServiceAgent() if CustomerServiceAgent else None
+security_agent = SecurityAgent() if SecurityAgent else None
+performance_agent = PerformanceAgent() if PerformanceAgent else None
+task_risk_manager = TaskRiskManager() if TaskRiskManager else None
+agent_assignment_manager = create_agent_assignment_manager() if create_agent_assignment_manager else None
 
-# Inject brand intelligence into all agents
-for agent_name, agent in [
-    ("inventory", inventory_agent),
-    ("financial", financial_agent),
-    ("ecommerce", ecommerce_agent),
-    ("wordpress", wordpress_agent),
-    ("web_development", web_dev_agent),
-    ("site_communication", site_comm_agent),
-    ("seo_marketing", seo_marketing_agent),
-    ("customer_service", customer_service_agent),
-    ("security", security_agent),
-    ("performance", performance_agent)
-]:
-    if hasattr(agent, 'brand_context'):
-        agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
-    else:
-        setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
+# Inject brand intelligence into all agents (if brand intelligence is available)
+if brand_intelligence:
+    for agent_name, agent in [
+        ("inventory", inventory_agent),
+        ("financial", financial_agent),
+        ("ecommerce", ecommerce_agent),
+        ("wordpress", wordpress_agent),
+        ("web_development", web_dev_agent),
+        ("site_communication", site_comm_agent),
+        ("seo_marketing", seo_marketing_agent),
+        ("customer_service", customer_service_agent),
+        ("security", security_agent),
+        ("performance", performance_agent)
+    ]:
+        if agent and hasattr(agent, 'brand_context'):
+            agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
+        elif agent:
+            setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
 
 
 def run_agent() -> dict:
@@ -171,6 +242,75 @@ def run() -> dict:
     except Exception as e:
         logger.error(f"DevSkyy workflow failed: {e}")
         raise HTTPException(status_code=500, detail="Workflow execution failed")
+
+
+@app.post("/auto-fix-pr")
+def auto_fix_pull_request() -> Dict[str, Any]:
+    """
+    Automatically fix code issues in a pull request context.
+    Scans for issues, applies fixes, and commits them to the current branch.
+    """
+    try:
+        logger.info("🔧 Starting auto-fix for pull request...")
+
+        # Scan for issues
+        logger.info("🔍 Scanning code for issues...")
+        scan_results = scan_site()
+
+        if scan_results.get("status") != "completed":
+            return {
+                "status": "failed",
+                "error": "Code scanning failed",
+                "details": scan_results
+            }
+
+        # Apply fixes
+        logger.info("🛠️ Applying automatic fixes...")
+        fix_results = fix_code(scan_results)
+
+        if fix_results.get("status") != "completed":
+            return {
+                "status": "failed",
+                "error": "Code fixing failed",
+                "details": fix_results
+            }
+
+        # Commit fixes to the PR branch
+        logger.info("📝 Committing fixes to pull request...")
+        commit_results = commit_fixes(fix_results)
+
+        logger.info("✅ Auto-fix pull request completed successfully")
+
+        return {
+            "status": "success",
+            "message": "Auto-fix completed for pull request",
+            "scan_results": {
+                "files_scanned": scan_results.get("files_scanned", 0),
+                "errors_found": len(scan_results.get("errors_found", [])),
+                "warnings_found": len(scan_results.get("warnings", [])),
+            },
+            "fix_results": {
+                "files_fixed": fix_results.get("files_fixed", 0),
+                "errors_fixed": fix_results.get("errors_fixed", 0),
+                "warnings_fixed": fix_results.get("warnings_fixed", 0),
+                "optimizations_applied": fix_results.get("optimizations_applied", 0),
+            },
+            "commit_results": {
+                "status": commit_results.get("status"),
+                "commit_hash": commit_results.get("commit_hash"),
+                "files_committed": commit_results.get("files_committed", 0),
+                "pushed_to_remote": commit_results.get("pushed_to_remote", False),
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Auto-fix pull request failed: {e}")
+        return {
+            "status": "failed",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 
 @app.get("/")
@@ -225,6 +365,9 @@ def get_metrics() -> dict:
 @app.post("/inventory/scan")
 def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
+    if not inventory_agent:
+        raise HTTPException(status_code=503, detail="Inventory agent not available")
+
     assets = inventory_agent.scan_assets()
     duplicates = inventory_agent.find_duplicates()
 
@@ -238,12 +381,18 @@ def scan_inventory() -> Dict[str, Any]:
 @app.get("/inventory/report")
 def get_inventory_report() -> Dict[str, Any]:
     """Get comprehensive inventory report."""
+    if not inventory_agent:
+        raise HTTPException(status_code=503, detail="Inventory agent not available")
+
     return inventory_agent.generate_report()
 
 
 @app.post("/inventory/cleanup")
 def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
     """Remove duplicate assets."""
+    if not inventory_agent:
+        raise HTTPException(status_code=503, detail="Inventory agent not available")
+
     if keep_strategy not in ["latest", "largest", "first"]:
         raise HTTPException(status_code=400, detail="Invalid keep_strategy")
 
@@ -254,6 +403,9 @@ def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
 @app.get("/inventory/visualize")
 def visualize_similarities() -> Dict[str, str]:
     """Get visual representation of asset similarities."""
+    if not inventory_agent:
+        raise HTTPException(status_code=503, detail="Inventory agent not available")
+
     visualization = inventory_agent.visualize_similarities()
     return {"visualization": visualization}
 

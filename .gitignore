@@ -138,6 +138,7 @@ temp/
 *.log
 *.tmp
 backup/
+backup_*/
 attached_assets/
 DevSkyy/
 fixed_code.txt
