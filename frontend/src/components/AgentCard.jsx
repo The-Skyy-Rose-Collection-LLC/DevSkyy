@@ -232,8 +232,14 @@ const AgentCard = ({ agentId, agentData, isSelected, isExpanded, showDetails, on
             <button className="flex-1 bg-luxury-gradient text-white py-2 px-4 rounded-lg font-medium hover:shadow-gold-glow transition-all duration-300">
               View Tasks
             </button>
-            <button className="flex-1 bg-white border border-rose-gold text-rose-gold py-2 px-4 rounded-lg font-medium hover:bg-rose-gold hover:text-white transition-all duration-300">
-              Settings
+            <button 
+              className="flex-1 bg-white border border-rose-gold text-rose-gold py-2 px-4 rounded-lg font-medium hover:bg-rose-gold hover:text-white transition-all duration-300"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (onClick) onClick('integrations')
+              }}
+            >
+              🔗 Integrations
             </button>
           </div>
         </motion.div>
