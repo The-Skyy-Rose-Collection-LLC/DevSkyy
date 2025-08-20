@@ -707,7 +707,7 @@ class OpenAIGodModeTester:
         """Test WordPress site status endpoint."""
         try:
             # Test site status endpoint
-            response = self.session.get(f"{self.base_url}/api/wordpress/site-status")
+            response = self.session.get(f"{self.base_url}/wordpress/site-status")
             success = response.status_code == 200
             
             if success:
