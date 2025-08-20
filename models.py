@@ -88,5 +88,5 @@ class CodeAnalysisRequest(BaseModel):
     language: str = Field(..., min_length=1, description="Programming language")
 
 class WebsiteAnalysisRequest(BaseModel):
-    website_url: str = Field(..., regex=r'^https?://', description="Valid website URL")
+    website_url: str = Field(..., pattern=r'^https?://', description="Valid website URL")
     api_key: Optional[str] = Field(default=None, description="API key if required")
