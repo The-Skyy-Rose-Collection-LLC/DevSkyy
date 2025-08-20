@@ -228,20 +228,20 @@ const WordPressConnection = () => {
               </div>
 
               {/* OAuth Alternative - Secondary Method */}
-              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-4 border border-gray-200">
-                <div className="text-center space-y-3">
-                  <div className="text-gray-600 text-sm font-medium">
-                    Alternative: OAuth Method (Less Reliable)
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-3 border border-gray-300 opacity-75">
+                <div className="text-center space-y-2">
+                  <div className="text-gray-500 text-xs font-medium flex items-center justify-center gap-1">
+                    ⚠️ Alternative: OAuth Method (Not Recommended)
                   </div>
                   <button
-                    className="bg-gradient-to-r from-gray-500 to-slate-500 hover:from-gray-600 hover:to-slate-600 text-white font-medium px-6 py-2 rounded-xl shadow transition-all duration-300 text-sm"
+                    className="bg-gradient-to-r from-gray-400 to-slate-400 hover:from-gray-500 hover:to-slate-500 text-white font-medium px-4 py-1.5 rounded-lg shadow transition-all duration-300 text-xs opacity-80"
                     onClick={getAuthUrl}
                     disabled={loading}
                   >
-                    {loading ? 'Loading...' : 'Try OAuth Method'}
+                    {loading ? 'Loading...' : 'Try OAuth (Less Reliable)'}
                   </button>
-                  <p className="text-xs text-gray-500">
-                    Note: OAuth method may experience connection issues. Direct connection is preferred.
+                  <p className="text-xs text-gray-400">
+                    ⚠️ Warning: OAuth method may experience connection issues. Direct connection is strongly preferred for reliable results.
                   </p>
                 </div>
               </div>
