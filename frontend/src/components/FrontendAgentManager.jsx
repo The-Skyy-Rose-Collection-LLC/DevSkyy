@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
+import WordPressConnection from './WordPressConnection'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
