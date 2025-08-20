@@ -4,6 +4,8 @@ import uuid
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import json
+import openai
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,7 +28,16 @@ class CustomerServiceAgent:
             "satisfaction_target": 4.8,  # Out of 5
             "personalization_level": "premium"
         }
-        logger.info("💎 Customer Service Agent initialized with Luxury AI Experience")
+        # OpenAI GOD MODE Integration
+        api_key = os.getenv('OPENAI_API_KEY')
+        if api_key:
+            self.openai_client = openai.OpenAI(api_key=api_key)
+            self.god_mode_active = True
+            logger.info("💎 Customer Service Agent initialized with OpenAI GOD MODE")
+        else:
+            self.openai_client = None
+            self.god_mode_active = False
+            logger.warning("💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)")
 
     async def analyze_customer_satisfaction(self) -> Dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""

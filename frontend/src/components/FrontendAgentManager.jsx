@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
+import WordPressConnection from './WordPressConnection'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_BACKEND_URL || '/api'
 
 const FrontendAgentManager = () => {
   const [frontendAgents, setFrontendAgents] = useState({})
@@ -105,6 +106,9 @@ const FrontendAgentManager = () => {
           Dedicated frontend specialists working exclusively on user-facing luxury experiences while seamlessly communicating with backend systems.
         </p>
       </motion.div>
+
+      {/* WordPress Connection Section */}
+      <WordPressConnection />
 
       {/* 24/7 Monitoring Status */}
       <motion.div
