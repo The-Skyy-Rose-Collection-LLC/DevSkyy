@@ -683,6 +683,98 @@ async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[st
     """Comprehensive full-stack performance optimization."""
     return await performance_agent.optimize_full_stack_performance(stack_data)
 
+# Enhanced Financial Agent Endpoints
+@app.post("/financial/tax-preparation")
+async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive tax preparation and optimization service."""
+    return await financial_agent.prepare_tax_returns(tax_data)
+
+@app.post("/financial/credit-analysis")
+async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive business credit analysis and improvement planning."""
+    return await financial_agent.analyze_business_credit(credit_data)
+
+@app.post("/financial/advisory")
+async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive financial advisory services for business growth."""
+    return await financial_agent.provide_financial_advisory(advisory_request)
+
+# Integration Management Endpoints
+@app.get("/integrations/services")
+async def get_supported_services() -> Dict[str, Any]:
+    """Get all supported integration services."""
+    try:
+        return {
+            "supported_services": integration_manager.supported_services,
+            "total_services": sum(len(services) for services in integration_manager.supported_services.values()),
+            "service_categories": list(integration_manager.supported_services.keys()),
+            "security_features": integration_manager.security_manager
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/create")
+async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a new integration between an agent and external service."""
+    try:
+        agent_type = integration_data.get("agent_type")
+        service_type = integration_data.get("service_type")
+        service_name = integration_data.get("service_name")
+        credentials = integration_data.get("credentials", {})
+        
+        if not all([agent_type, service_type, service_name]):
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        return await integration_manager.create_integration(agent_type, service_type, service_name, credentials)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/integrations/agent/{agent_type}")
+async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
+    """Get all integrations for a specific agent."""
+    try:
+        return await integration_manager.get_agent_integrations(agent_type)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/{integration_id}/sync")
+async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
+    """Sync data from integrated service."""
+    try:
+        return await integration_manager.sync_integration_data(integration_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/integrations/status")
+async def get_integrations_overview() -> Dict[str, Any]:
+    """Get overview of all integrations across agents."""
+    try:
+        overview = {
+            "total_integrations": len(integration_manager.integrations),
+            "active_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "active"]),
+            "pending_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "pending"]),
+            "error_integrations": len([i for i in integration_manager.integrations.values() if i["status"] == "error"]),
+            "integrations_by_agent": {},
+            "popular_services": {},
+            "health_summary": {}
+        }
+        
+        # Calculate integrations by agent
+        for agent_type, integration_ids in integration_manager.agent_integrations.items():
+            overview["integrations_by_agent"][agent_type] = len(integration_ids)
+        
+        # Calculate popular services
+        service_counts = {}
+        for integration in integration_manager.integrations.values():
+            service_name = integration["service_name"]
+            service_counts[service_name] = service_counts.get(service_name, 0) + 1
+        
+        overview["popular_services"] = dict(sorted(service_counts.items(), key=lambda x: x[1], reverse=True)[:5])
+        
+        return overview
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Risk Management Endpoints
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
