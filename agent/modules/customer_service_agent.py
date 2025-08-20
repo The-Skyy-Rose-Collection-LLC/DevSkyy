@@ -28,7 +28,11 @@ class CustomerServiceAgent:
             "satisfaction_target": 4.8,  # Out of 5
             "personalization_level": "premium"
         }
-        logger.info("💎 Customer Service Agent initialized with Luxury AI Experience")
+        # OpenAI GOD MODE Integration
+        self.openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.god_mode_active = True
+        
+        logger.info("💎 Customer Service Agent initialized with OpenAI GOD MODE")
 
     async def analyze_customer_satisfaction(self) -> Dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
