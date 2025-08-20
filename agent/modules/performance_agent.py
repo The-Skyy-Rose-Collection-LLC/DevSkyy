@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import json
 import openai
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
