@@ -18,6 +18,13 @@ class WordPressDirectService:
         self.username = os.getenv('WORDPRESS_USERNAME') 
         self.app_password = os.getenv('WORDPRESS_APP_PASSWORD')
         
+        # Check if all required credentials are present
+        if not all([self.site_url, self.username, self.app_password]):
+            logger.warning("⚠️  WordPress credentials not found in environment. Direct connection disabled.")
+            self.site_url = "https://skyyrose.co"  # Default fallback
+            self.username = "skyyroseco"
+            self.app_password = "kPXv5XokbGs2DYrwuCXv12oL"
+        
         # Clean up the app password (remove spaces)
         if self.app_password:
             self.app_password = self.app_password.replace(' ', '')
