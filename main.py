@@ -114,6 +114,13 @@ wordpress_agent = WordPressAgent()
 web_dev_agent = WebDevelopmentAgent()
 site_comm_agent = SiteCommunicationAgent()
 
+# Initialize new specialized agents
+seo_marketing_agent = SEOMarketingAgent()
+customer_service_agent = CustomerServiceAgent()
+security_agent = SecurityAgent()
+performance_agent = PerformanceAgent()
+task_risk_manager = TaskRiskManager()
+
 # Inject brand intelligence into all agents
 for agent_name, agent in [
     ("inventory", inventory_agent),
@@ -121,7 +128,11 @@ for agent_name, agent in [
     ("ecommerce", ecommerce_agent),
     ("wordpress", wordpress_agent),
     ("web_development", web_dev_agent),
-    ("site_communication", site_comm_agent)
+    ("site_communication", site_comm_agent),
+    ("seo_marketing", seo_marketing_agent),
+    ("customer_service", customer_service_agent),
+    ("security", security_agent),
+    ("performance", performance_agent)
 ]:
     if hasattr(agent, 'brand_context'):
         agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
