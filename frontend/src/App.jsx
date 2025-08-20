@@ -194,6 +194,18 @@ function App() {
             </motion.div>
           )}
 
+          {currentView === 'wordpress' && (
+            <motion.div
+              key="wordpress"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <WordPressConnection />
+            </motion.div>
+          )}
+
           {currentView === 'tasks' && (
             <motion.div
               key="tasks"
