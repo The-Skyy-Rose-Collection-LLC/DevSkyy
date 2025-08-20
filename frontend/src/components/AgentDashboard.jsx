@@ -185,6 +185,17 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Integration Dashboard */}
+      {showIntegrations && selectedAgentForIntegration && (
+        <IntegrationDashboard
+          selectedAgent={selectedAgentForIntegration}
+          onClose={() => {
+            setShowIntegrations(false)
+            setSelectedAgentForIntegration(null)
+          }}
+        />
+      )}
     </div>
   )
 }
