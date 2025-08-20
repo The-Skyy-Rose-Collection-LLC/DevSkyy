@@ -641,12 +641,6 @@ async def get_seo_analysis() -> Dict[str, Any]:
     """Get comprehensive SEO analysis with fashion trend insights."""
     return await seo_marketing_agent.analyze_seo_performance()
 
-@app.post("/marketing/campaign")
-async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Create AI-powered marketing campaign for luxury fashion."""
-    campaign_type = campaign_data.get("type", "seasonal_collection")
-    target_audience = campaign_data.get("target_audience", "luxury_customers")
-    return await seo_marketing_agent.create_marketing_campaign(campaign_type, target_audience)
 
 # Customer Service Agent Endpoints  
 @app.get("/customer-service/satisfaction")
