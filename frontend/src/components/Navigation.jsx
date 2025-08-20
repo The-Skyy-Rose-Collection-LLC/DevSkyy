@@ -11,12 +11,20 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       gradient: 'from-rose-gold to-luxury-gold'
     },
     {
+      id: 'automation',
+      label: 'Automation Empire',
+      icon: '🚀',
+      description: 'Social/Email/SMS/Theme',
+      gradient: 'from-blue-500 to-purple-500',
+      badge: 'NEW'
+    },
+    {
       id: 'frontend',
       label: 'Frontend Elite',
       icon: '🎨',
       description: 'Frontend Specialists',
       gradient: 'from-purple-500 to-pink-500',
-      badge: 'LIVE'
+      badge: 'BETA'
     },
     {
       id: 'wordpress',
