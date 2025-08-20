@@ -30,7 +30,31 @@ const WordPressConnection = () => {
     }
   }
 
-  const getAuthUrl = async () => {
+  const connectDirectly = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      
+      const response = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
+      
+      if (response.data.status === 'success') {
+        setConnectionStatus('connected')
+        setSiteInfo(response.data.site_info)
+        setAgentStatus(response.data.agents_status)
+        
+        // Show success message
+        alert(`✅ ${response.data.message}`)
+      } else {
+        setError(response.data.message || 'Connection failed')
+      }
+      
+    } catch (error) {
+      setError('Direct connection failed. Please check your credentials.')
+      console.error('Direct connection error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
     try {
       setLoading(true)
       setError('')
