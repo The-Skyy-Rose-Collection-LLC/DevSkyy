@@ -139,6 +139,11 @@ wordpress_direct = create_wordpress_direct_service()
 woocommerce_service = create_woocommerce_integration_service()
 openai_service = create_openai_intelligence_service()
 
+# Initialize automation agents
+social_media_automation_agent = SocialMediaAutomationAgent()
+email_sms_automation_agent = EmailSMSAutomationAgent()
+design_automation_agent = DesignAutomationAgent()
+
 # Inject brand intelligence into all agents
 for agent_name, agent in [
     ("inventory", inventory_agent),
