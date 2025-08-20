@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import AgentCard from './AgentCard'
+import IntegrationDashboard from './IntegrationDashboard'
 
 const AgentDashboard = ({ agents, loading, onRefresh }) => {
   const [selectedAgent, setSelectedAgent] = useState(null)
