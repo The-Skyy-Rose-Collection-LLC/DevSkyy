@@ -19,6 +19,14 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       badge: 'LIVE'
     },
     {
+      id: 'wordpress',
+      label: 'WordPress',
+      icon: '🌐',
+      description: 'Site Connection',
+      gradient: 'from-emerald-500 to-blue-500',
+      badge: 'NEW'
+    },
+    {
       id: 'tasks',
       label: 'Task Atelier',
       icon: '📋',
