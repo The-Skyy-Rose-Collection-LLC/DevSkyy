@@ -896,6 +896,61 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
         logger.error(f"❌ Callback handling failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/auth/wordpress/callback")
+async def wordpress_auth_callback_get(
+    code: str = None, 
+    error: str = None,
+    error_description: str = None,
+    state: str = None
+) -> Dict[str, Any]:
+    """Handle WordPress OAuth GET callback."""
+    try:
+        logger.info(f"🔄 GET callback - code: {code[:10] if code else None}, error: {error}")
+        
+        if error:
+            logger.error(f"❌ OAuth GET error: {error} - {error_description}")
+            return {
+                "status": "error", 
+                "error": error,
+                "error_description": error_description,
+                "redirect_url": "https://devskyy.app?auth=failed"
+            }
+        
+        if not code:
+            logger.error("❌ No authorization code in GET callback")
+            return {
+                "status": "error",
+                "message": "No authorization code received",
+                "redirect_url": "https://devskyy.app?auth=failed"
+            }
+        
+        logger.info(f"✅ Processing GET callback code: {code[:10]}...")
+        result = await wordpress_service.exchange_code_for_token(code)
+        
+        if result.get('status') == 'success':
+            logger.info("🎉 WordPress GET callback successful!")
+            return {
+                "status": "success",
+                "message": "WordPress connected successfully!",
+                "redirect_url": "https://devskyy.app?auth=success",
+                "site_info": result.get('site_info')
+            }
+        else:
+            logger.error(f"❌ GET callback token exchange failed: {result.get('message')}")
+            return {
+                "status": "error", 
+                "message": result.get('message'),
+                "redirect_url": "https://devskyy.app?auth=failed"
+            }
+            
+    except Exception as e:
+        logger.error(f"❌ GET callback failed: {str(e)}")
+        return {
+            "status": "error",
+            "message": str(e),
+            "redirect_url": "https://devskyy.app?auth=failed"
+        }
+
 @app.get("/wordpress/site/info")
 async def get_wordpress_site_info() -> Dict[str, Any]:
     """Get WordPress site information and agent status."""
