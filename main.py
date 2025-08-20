@@ -836,25 +836,46 @@ async def get_wordpress_auth_url(state: str = None) -> Dict[str, Any]:
     """Get WordPress OAuth authorization URL."""
     try:
         auth_url = wordpress_service.generate_auth_url(state)
+        logger.info(f"🔗 Generated auth URL: {auth_url}")
         return {
             "auth_url": auth_url,
             "status": "ready_for_authorization",
-            "instructions": "Visit this URL to authorize your WordPress site for agent access"
+            "instructions": "Visit this URL to authorize your WordPress site for agent access",
+            "redirect_uri": wordpress_service.redirect_uri,
+            "client_id": wordpress_service.client_id
         }
     except Exception as e:
+        logger.error(f"Auth URL generation failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/wordpress/auth/callback")
 async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, Any]:
     """Handle WordPress OAuth callback and exchange code for token."""
     try:
+        logger.info(f"🔄 Received callback data: {callback_data}")
+        
         authorization_code = callback_data.get('code')
+        error = callback_data.get('error')
+        error_description = callback_data.get('error_description')
+        
+        if error:
+            logger.error(f"❌ OAuth error: {error} - {error_description}")
+            return {
+                "status": "error", 
+                "error": error,
+                "error_description": error_description,
+                "debug_info": "WordPress OAuth authorization failed"
+            }
+        
         if not authorization_code:
+            logger.error("❌ No authorization code received")
             raise HTTPException(status_code=400, detail="Authorization code required")
         
+        logger.info(f"✅ Exchanging code for token: {authorization_code[:10]}...")
         result = await wordpress_service.exchange_code_for_token(authorization_code)
         
         if result.get('status') == 'success':
+            logger.info("🎉 WordPress connection successful!")
             return {
                 "status": "wordpress_connected",
                 "message": "🎉 WordPress site connected! Your 4 luxury agents are now working on your site.",
@@ -868,9 +889,11 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
                 ]
             }
         else:
-            return {"status": "error", "message": result.get('message')}
+            logger.error(f"❌ Token exchange failed: {result.get('message')}")
+            return {"status": "error", "message": result.get('message'), "debug_info": result}
             
     except Exception as e:
+        logger.error(f"❌ Callback handling failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/wordpress/site/info")
