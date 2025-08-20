@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom luxury styles */
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #E8B4B8 0%, #FFD700 50%, #C0C0C0 100%);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  .fashion-card {
+    @apply bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-luxury hover:shadow-gold-glow transition-all duration-300 hover:-translate-y-2;
+  }
+
+  .luxury-button {
+    @apply bg-luxury-gradient text-white font-semibold py-3 px-6 rounded-full shadow-elegant hover:shadow-luxury transition-all duration-300 hover:scale-105;
+  }
+
+  .agent-avatar {
+    @apply w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-elegant animate-float;
+  }
+
+  .risk-indicator {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .risk-critical {
+    @apply bg-red-100 text-red-800 border border-red-200;
+  }
+
+  .risk-high {
+    @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+  }
+
+  .risk-medium {
+    @apply bg-rose-gold/20 text-rose-gold border border-rose-gold/30;
+  }
+
+  .risk-low {
+    @apply bg-green-100 text-green-800 border border-green-200;
+  }
+
+  .priority-urgent {
+    @apply bg-red-500 text-white;
+  }
+
+  .priority-high {
+    @apply bg-orange-500 text-white;
+  }
+
+  .priority-medium {
+    @apply bg-luxury-gold text-fashion-black;
+  }
+
+  .priority-low {
+    @apply bg-elegant-silver text-fashion-black;
+  }
+}
+
+/* Custom scrollbar for luxury feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(232, 180, 184, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #E8B4B8, #FFD700);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #FFD700, #E8B4B8);
+}
+
+/* Animation classes for luxury transitions */
+.luxury-enter {
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+}
+
+.luxury-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.6s ease-out;
+}
+
+.luxury-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.luxury-exit-active {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+  transition: all 0.4s ease-in;
+}

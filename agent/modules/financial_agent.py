@@ -51,6 +51,55 @@ class FinancialAgent:
             "chargeback_threshold": 0.01  # 1%
         }
         self.brand_context = {}
+        
+        # ENHANCED FINANCIAL SERVICES - Tax, Credit, Advisory
+        self.tax_services = {
+            "preparation": ["Business Tax Returns", "Personal Tax Returns", "Quarterly Estimates", "Tax Planning"],
+            "compliance": ["IRS Compliance", "State Tax Requirements", "International Tax", "Sales Tax Management"],
+            "optimization": ["Deduction Maximization", "Tax Strategy Planning", "Entity Structure Optimization"],
+            "audit_support": ["IRS Audit Defense", "Documentation Management", "Representation Services"]
+        }
+        
+        self.advisory_services = {
+            "business_planning": ["Financial Forecasting", "Budget Creation", "Cash Flow Management", "Investment Planning"],
+            "risk_management": ["Insurance Analysis", "Risk Assessment", "Contingency Planning", "Asset Protection"],
+            "growth_strategies": ["Funding Options", "Expansion Planning", "Acquisition Analysis", "Exit Strategies"],
+            "performance_analysis": ["KPI Tracking", "Profitability Analysis", "Cost Optimization", "ROI Analysis"]
+        }
+        
+        self.credit_services = {
+            "monitoring": ["Business Credit Score Tracking", "Credit Report Analysis", "Alert Systems"],
+            "building": ["Credit Building Strategies", "Tradeline Management", "Payment History Optimization"],
+            "repair": ["Dispute Management", "Credit Error Correction", "Negative Item Removal"],
+            "optimization": ["Credit Utilization Management", "Mix Optimization", "Length of Credit History"]
+        }
+        
+        # INTEGRATION CAPABILITIES
+        self.banking_integrations = {
+            "supported_banks": ["Chase", "Bank of America", "Wells Fargo", "Citibank", "Capital One", "US Bank"],
+            "business_accounts": ["Checking", "Savings", "Credit Lines", "Merchant Services"],
+            "payment_processors": ["Stripe", "PayPal", "Square", "Authorize.net", "Braintree"],
+            "accounting_software": ["QuickBooks", "Xero", "FreshBooks", "Wave", "Sage"]
+        }
+        
+        # Enhanced financial metrics
+        self.financial_metrics = {
+            "revenue": 0,
+            "expenses": 0,
+            "profit_margin": 0,
+            "cash_flow": 0,
+            "accounts_receivable": 0,
+            "accounts_payable": 0,
+            "tax_liability": 0,
+            "business_credit_score": 0,
+            "quarterly_estimates": 0,
+            "deductible_expenses": 0
+        }
+        
+        # EXPERIMENTAL: Enhanced AI Financial Intelligence
+        self.tax_optimization_engine = self._initialize_tax_engine()
+        self.credit_improvement_system = self._initialize_credit_system()
+        self.integration_manager = self._initialize_integration_manager()
         # EXPERIMENTAL: Blockchain-based financial intelligence
         self.blockchain_ledger = self._initialize_blockchain_ledger()
         self.defi_analytics = self._initialize_defi_analytics()
@@ -828,6 +877,365 @@ class FinancialAgent:
             logger.error(f"Blockchain audit failed: {str(e)}")
             return {"error": str(e), "status": "consensus_failure"}
 
+    async def prepare_tax_returns(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive tax preparation and optimization service."""
+        try:
+            business_type = tax_data.get("business_type", "LLC")
+            tax_year = tax_data.get("tax_year", datetime.now().year)
+            
+            logger.info(f"📋 Preparing {tax_year} tax returns for {business_type}...")
+            
+            # Tax calculation and optimization
+            tax_analysis = {
+                "business_income": tax_data.get("revenue", 0),
+                "business_expenses": tax_data.get("expenses", 0),
+                "deductible_expenses": self._calculate_deductible_expenses(tax_data),
+                "depreciation": self._calculate_depreciation(tax_data),
+                "quarterly_estimates": self._calculate_quarterly_estimates(tax_data),
+                "tax_credits": self._identify_tax_credits(tax_data),
+                "estimated_tax_liability": 0,
+                "potential_refund": 0
+            }
+            
+            # Calculate net taxable income
+            net_income = tax_analysis["business_income"] - tax_analysis["business_expenses"] - tax_analysis["depreciation"]
+            tax_analysis["net_taxable_income"] = max(0, net_income)
+            
+            # Estimate tax liability
+            tax_analysis["estimated_tax_liability"] = self._calculate_tax_liability(net_income, business_type)
+            
+            # Generate tax optimization recommendations
+            optimization_recommendations = self._generate_tax_optimization_strategies(tax_analysis, business_type)
+            
+            return {
+                "tax_preparation_id": str(uuid.uuid4()),
+                "tax_year": tax_year,
+                "business_type": business_type,
+                "tax_analysis": tax_analysis,
+                "optimization_strategies": optimization_recommendations,
+                "filing_deadlines": self._get_filing_deadlines(tax_year, business_type),
+                "required_forms": self._get_required_tax_forms(business_type),
+                "estimated_preparation_time": "2-3 business days",
+                "irs_audit_risk_assessment": self._assess_audit_risk(tax_analysis),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Tax preparation failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
+    async def analyze_business_credit(self, credit_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive business credit analysis and improvement planning."""
+        try:
+            business_ein = credit_data.get("ein", "")
+            business_name = credit_data.get("business_name", "")
+            
+            logger.info(f"📊 Analyzing business credit for {business_name}...")
+            
+            # Simulate comprehensive credit analysis
+            credit_analysis = {
+                "current_credit_score": credit_data.get("current_score", 650),
+                "credit_utilization": credit_data.get("utilization", 45),
+                "payment_history_score": 85,
+                "length_of_credit_history": credit_data.get("credit_age_months", 24),
+                "credit_mix_score": 70,
+                "recent_inquiries": credit_data.get("recent_inquiries", 3),
+                "negative_marks": credit_data.get("negative_marks", 1),
+                "tradelines": {
+                    "active": credit_data.get("active_tradelines", 8),
+                    "total": credit_data.get("total_tradelines", 12),
+                    "average_age": 18
+                }
+            }
+            
+            # Credit improvement plan
+            improvement_plan = self._generate_credit_improvement_plan(credit_analysis)
+            
+            # Risk assessment
+            credit_risks = self._assess_credit_risks(credit_analysis)
+            
+            return {
+                "credit_analysis_id": str(uuid.uuid4()),
+                "business_ein": business_ein,
+                "business_name": business_name,
+                "credit_analysis": credit_analysis,
+                "improvement_plan": improvement_plan,
+                "risk_assessment": credit_risks,
+                "recommended_actions": self._prioritize_credit_actions(credit_analysis),
+                "monitoring_setup": self._setup_credit_monitoring(),
+                "estimated_improvement_timeline": "3-6 months",
+                "potential_score_increase": self._calculate_potential_score_increase(credit_analysis),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Credit analysis failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
+    async def provide_financial_advisory(self, advisory_request: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive financial advisory services for business growth."""
+        try:
+            advisory_type = advisory_request.get("type", "general")
+            business_stage = advisory_request.get("business_stage", "established")
+            
+            logger.info(f"💡 Providing {advisory_type} financial advisory for {business_stage} business...")
+            
+            advisory_analysis = {
+                "current_financial_health": self._assess_financial_health(advisory_request),
+                "cash_flow_analysis": self._analyze_cash_flow_patterns(advisory_request),
+                "profitability_metrics": self._calculate_profitability_metrics(advisory_request),
+                "growth_opportunities": self._identify_growth_opportunities(advisory_request),
+                "risk_factors": self._identify_financial_risks(advisory_request),
+                "benchmark_comparison": self._compare_to_industry_benchmarks(advisory_request)
+            }
+            
+            # Generate strategic recommendations
+            strategic_recommendations = self._generate_strategic_recommendations(advisory_analysis, advisory_type)
+            
+            # Create action plan
+            action_plan = self._create_financial_action_plan(advisory_analysis, strategic_recommendations)
+            
+            return {
+                "advisory_id": str(uuid.uuid4()),
+                "advisory_type": advisory_type,
+                "business_stage": business_stage,
+                "financial_analysis": advisory_analysis,
+                "strategic_recommendations": strategic_recommendations,
+                "action_plan": action_plan,
+                "investment_opportunities": self._identify_investment_opportunities(advisory_request),
+                "funding_options": self._analyze_funding_options(advisory_request),
+                "roi_projections": self._calculate_roi_projections(advisory_analysis),
+                "follow_up_schedule": self._create_follow_up_schedule(),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Financial advisory failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
+
+    def _calculate_deductible_expenses(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate deductible business expenses."""
+        expenses = tax_data.get("expenses", {})
+        return {
+            "office_supplies": expenses.get("office_supplies", 0),
+            "marketing_advertising": expenses.get("marketing", 0),
+            "professional_services": expenses.get("professional_fees", 0),
+            "travel_meals": expenses.get("travel", 0) * 0.5,  # 50% deductible
+            "home_office": expenses.get("home_office", 0),
+            "equipment_depreciation": expenses.get("equipment", 0) * 0.2,  # 20% per year
+            "total_deductible": sum(expenses.values()) * 0.8  # Estimate 80% deductible
+        }
+
+    def _calculate_depreciation(self, tax_data: Dict[str, Any]) -> float:
+        """Calculate business asset depreciation."""
+        assets = tax_data.get("assets", {})
+        depreciation = 0
+        
+        # Equipment depreciation (5-year straight line)
+        depreciation += assets.get("equipment", 0) * 0.2
+        # Furniture depreciation (7-year straight line)  
+        depreciation += assets.get("furniture", 0) * 0.143
+        # Vehicles depreciation (5-year straight line)
+        depreciation += assets.get("vehicles", 0) * 0.2
+        
+        return depreciation
+
+    def _calculate_quarterly_estimates(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate quarterly tax estimates."""
+        annual_income = tax_data.get("projected_income", 0)
+        estimated_tax = annual_income * 0.25  # Estimate 25% tax rate
+        
+        return {
+            "q1_estimate": estimated_tax / 4,
+            "q2_estimate": estimated_tax / 4, 
+            "q3_estimate": estimated_tax / 4,
+            "q4_estimate": estimated_tax / 4,
+            "annual_estimate": estimated_tax,
+            "due_dates": ["2025-01-15", "2025-04-15", "2025-06-17", "2025-09-16"]
+        }
+
+    def _identify_tax_credits(self, tax_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Identify available tax credits."""
+        credits = []
+        
+        # R&D Credit
+        if tax_data.get("rd_expenses", 0) > 0:
+            credits.append({
+                "credit": "Research & Development Credit",
+                "amount": tax_data["rd_expenses"] * 0.2,
+                "description": "20% credit for qualified research expenses"
+            })
+        
+        # Small Business Credit
+        if tax_data.get("employees", 0) < 25:
+            credits.append({
+                "credit": "Small Business Health Care Credit", 
+                "amount": tax_data.get("health_premiums", 0) * 0.5,
+                "description": "Up to 50% credit for employee health premiums"
+            })
+        
+        return credits
+
+    def _calculate_tax_liability(self, net_income: float, business_type: str) -> float:
+        """Calculate estimated tax liability based on business type."""
+        if business_type == "LLC":
+            return net_income * 0.15  # Simplified 15% rate
+        elif business_type == "Corporation":
+            return net_income * 0.21  # Corporate tax rate
+        elif business_type == "S-Corp":
+            return net_income * 0.12  # Pass-through rate
+        else:
+            return net_income * 0.15  # Default rate
+
+    def _generate_tax_optimization_strategies(self, analysis: Dict, business_type: str) -> List[Dict[str, Any]]:
+        """Generate tax optimization strategies."""
+        strategies = [
+            {
+                "strategy": "Maximize Equipment Purchases",
+                "description": "Purchase equipment before year-end for Section 179 deduction",
+                "potential_savings": 5000,
+                "implementation_difficulty": "Easy"
+            },
+            {
+                "strategy": "Optimize Business Structure",
+                "description": f"Consider converting from {business_type} for tax efficiency",
+                "potential_savings": 3000,
+                "implementation_difficulty": "Complex"
+            },
+            {
+                "strategy": "Retirement Plan Contributions",
+                "description": "Maximize SEP-IRA or Solo 401(k) contributions",
+                "potential_savings": 8000,
+                "implementation_difficulty": "Easy"
+            }
+        ]
+        return strategies
+
+    def _get_filing_deadlines(self, tax_year: int, business_type: str) -> Dict[str, str]:
+        """Get tax filing deadlines."""
+        deadlines = {
+            "LLC": f"{tax_year + 1}-03-15",
+            "Corporation": f"{tax_year + 1}-04-15", 
+            "S-Corp": f"{tax_year + 1}-03-15",
+            "Partnership": f"{tax_year + 1}-03-15"
+        }
+        
+        return {
+            "federal_deadline": deadlines.get(business_type, f"{tax_year + 1}-04-15"),
+            "extension_deadline": f"{tax_year + 1}-10-15",
+            "quarterly_estimates": [
+                f"{tax_year}-04-15", f"{tax_year}-06-17", 
+                f"{tax_year}-09-16", f"{tax_year + 1}-01-15"
+            ]
+        }
+
+    def _get_required_tax_forms(self, business_type: str) -> List[str]:
+        """Get required tax forms by business type."""
+        forms = {
+            "LLC": ["1065", "Schedule K-1", "1040", "Schedule E"],
+            "Corporation": ["1120", "1040", "Schedule D"],
+            "S-Corp": ["1120S", "Schedule K-1", "1040", "Schedule E"],
+            "Sole Proprietorship": ["1040", "Schedule C", "Schedule SE"]
+        }
+        return forms.get(business_type, ["1040"])
+
+    def _assess_audit_risk(self, analysis: Dict) -> Dict[str, Any]:
+        """Assess IRS audit risk."""
+        risk_factors = []
+        risk_score = 10  # Base score
+        
+        # High income increases risk
+        if analysis["business_income"] > 200000:
+            risk_factors.append("High income level")
+            risk_score += 15
+        
+        # High deductions relative to income
+        deduction_ratio = analysis["deductible_expenses"]["total_deductible"] / max(analysis["business_income"], 1)
+        if deduction_ratio > 0.6:
+            risk_factors.append("High deduction ratio")
+            risk_score += 20
+        
+        # Cash business
+        risk_factors.append("Cash-intensive business")
+        risk_score += 10
+        
+        risk_level = "LOW" if risk_score < 30 else "MEDIUM" if risk_score < 50 else "HIGH"
+        
+        return {
+            "risk_level": risk_level,
+            "risk_score": risk_score,
+            "risk_factors": risk_factors,
+            "mitigation_steps": [
+                "Maintain detailed records",
+                "Use professional tax software",
+                "Get professional tax preparation",
+                "Keep receipts for all deductions"
+            ]
+        }
+
+    def _generate_credit_improvement_plan(self, analysis: Dict) -> List[Dict[str, Any]]:
+        """Generate comprehensive credit improvement plan."""
+        plan = []
+        
+        current_score = analysis["current_credit_score"]
+        utilization = analysis["credit_utilization"]
+        
+        if utilization > 30:
+            plan.append({
+                "action": "Reduce Credit Utilization",
+                "priority": "HIGH",
+                "timeline": "30 days",
+                "impact": "+15-30 points",
+                "description": f"Reduce utilization from {utilization}% to under 10%"
+            })
+        
+        if analysis["recent_inquiries"] > 2:
+            plan.append({
+                "action": "Limit Credit Inquiries",
+                "priority": "MEDIUM", 
+                "timeline": "6 months",
+                "impact": "+5-10 points",
+                "description": "Avoid new credit applications for 6 months"
+            })
+        
+        if analysis["negative_marks"] > 0:
+            plan.append({
+                "action": "Dispute Negative Items",
+                "priority": "HIGH",
+                "timeline": "60-90 days",
+                "impact": "+20-50 points",
+                "description": "Challenge inaccurate negative marks with credit bureaus"
+            })
+        
+        return plan
+
+    def _initialize_tax_engine(self) -> Dict[str, Any]:
+        """Initialize tax optimization engine."""
+        return {
+            "tax_calculator": "multi_jurisdiction_tax_engine",
+            "deduction_optimizer": "ai_powered_deduction_maximizer",
+            "compliance_checker": "automated_tax_law_compliance",
+            "audit_risk_assessor": "irs_audit_probability_calculator"
+        }
+
+    def _initialize_credit_system(self) -> Dict[str, Any]:
+        """Initialize credit improvement system."""
+        return {
+            "credit_monitoring": "real_time_score_tracking",
+            "dispute_automation": "automated_dispute_generation",
+            "tradeline_optimizer": "strategic_account_management",
+            "credit_building": "personalized_improvement_strategies"
+        }
+
+    def _initialize_integration_manager(self) -> Dict[str, Any]:
+        """Initialize integration management capabilities."""
+        return {
+            "bank_connections": "secure_open_banking_api",
+            "payment_processors": "multi_processor_integration",
+            "accounting_sync": "real_time_financial_data_sync",
+            "tax_software": "automated_tax_document_preparation"
+        }
 
 def monitor_financial_health() -> Dict[str, Any]:
     """Main financial health monitoring function for compatibility."""

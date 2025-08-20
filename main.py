@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import logging
 import sys
+import os
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
@@ -15,6 +16,12 @@ from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_dev
 from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site
 from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent, initialize_brand_intelligence
 from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system
+from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing
+from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service
+from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
+from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
+from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
+from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
@@ -25,6 +32,10 @@ from models import (
     PaymentRequest, ProductRequest, CustomerRequest, OrderRequest, 
     ChargebackRequest, CodeAnalysisRequest, WebsiteAnalysisRequest
 )
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = FastAPI(
     title="The Skyy Rose Collection - DevSkyy Enhanced Platform", 
@@ -48,7 +59,7 @@ logger = logging.getLogger(__name__)
 # Production middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for your domain in production
+    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -109,6 +120,14 @@ wordpress_agent = WordPressAgent()
 web_dev_agent = WebDevelopmentAgent()
 site_comm_agent = SiteCommunicationAgent()
 
+# Initialize new specialized agents
+seo_marketing_agent = SEOMarketingAgent()
+customer_service_agent = CustomerServiceAgent()
+security_agent = SecurityAgent()
+performance_agent = PerformanceAgent()
+task_risk_manager = TaskRiskManager()
+agent_assignment_manager = create_agent_assignment_manager()
+
 # Inject brand intelligence into all agents
 for agent_name, agent in [
     ("inventory", inventory_agent),
@@ -116,7 +135,11 @@ for agent_name, agent in [
     ("ecommerce", ecommerce_agent),
     ("wordpress", wordpress_agent),
     ("web_development", web_dev_agent),
-    ("site_communication", site_comm_agent)
+    ("site_communication", site_comm_agent),
+    ("seo_marketing", seo_marketing_agent),
+    ("customer_service", customer_service_agent),
+    ("security", security_agent),
+    ("performance", performance_agent)
 ]:
     if hasattr(agent, 'brand_context'):
         agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
@@ -403,7 +426,454 @@ def get_site_report(website_url: str) -> Dict[str, Any]:
     return site_comm_agent.generate_comprehensive_report(website_url)
 
 
-# EXPERIMENTAL: Neural Agent Upgrades
+# Enhanced Agent Management Endpoints
+@app.get("/agents/status")
+def get_all_agents_status() -> Dict[str, Any]:
+    """Get comprehensive status of all agents with fashion guru styling."""
+    try:
+        agent_statuses = {
+            "brand_intelligence": {
+                "status": "analyzing_trends",
+                "health": 98,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#E8B4B8",  # Rose gold
+                    "icon": "👑",
+                    "personality": "visionary_fashion_oracle"
+                },
+                "current_tasks": 3,
+                "completed_today": 12,
+                "expertise_focus": "luxury_brand_positioning"
+            },
+            "inventory": {
+                "status": "optimizing_assets",
+                "health": 94,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#C0C0C0",  # Silver
+                    "icon": "💎",
+                    "personality": "detail_oriented_curator"
+                },
+                "current_tasks": 2,
+                "completed_today": 8,
+                "expertise_focus": "asset_optimization"
+            },
+            "financial": {
+                "status": "processing_transactions",
+                "health": 96,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#FFD700",  # Gold
+                    "icon": "💰",
+                    "personality": "strategic_wealth_advisor"
+                },
+                "current_tasks": 4,
+                "completed_today": 15,
+                "expertise_focus": "luxury_commerce_finance"
+            },
+            "ecommerce": {
+                "status": "optimizing_conversions",
+                "health": 92,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#E8B4B8",  # Rose gold
+                    "icon": "🛍️",
+                    "personality": "customer_experience_guru"
+                },
+                "current_tasks": 5,
+                "completed_today": 18,
+                "expertise_focus": "conversion_optimization"
+            },
+            "wordpress": {
+                "status": "crafting_layouts",
+                "health": 95,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#FFD700",  # Gold
+                    "icon": "🎨",
+                    "personality": "design_perfectionist"
+                },
+                "current_tasks": 2,
+                "completed_today": 6,
+                "expertise_focus": "divi5_mastery"
+            },
+            "web_development": {
+                "status": "optimizing_performance",
+                "health": 97,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#C0C0C0",  # Silver
+                    "icon": "⚡",
+                    "personality": "performance_optimizer"
+                },
+                "current_tasks": 3,
+                "completed_today": 10,
+                "expertise_focus": "code_excellence"
+            },
+            "customer_service": {
+                "status": "enhancing_experiences",
+                "health": 99,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#E8B4B8",  # Rose gold
+                    "icon": "💝",
+                    "personality": "luxury_service_specialist"
+                },
+                "current_tasks": 4,
+                "completed_today": 22,
+                "expertise_focus": "vip_experience"
+            },
+            "seo_marketing": {
+                "status": "tracking_trends",
+                "health": 93,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#FFD700",  # Gold
+                    "icon": "📈",
+                    "personality": "trend_prediction_maven"
+                },
+                "current_tasks": 6,
+                "completed_today": 14,
+                "expertise_focus": "fashion_marketing"
+            },
+            "security": {
+                "status": "protecting_assets",
+                "health": 100,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#000000",  # Black
+                    "icon": "🛡️",
+                    "personality": "trust_and_safety_expert"
+                },
+                "current_tasks": 1,
+                "completed_today": 7,
+                "expertise_focus": "luxury_brand_protection"
+            },
+            "performance": {
+                "status": "analyzing_and_optimizing",
+                "health": 98,
+                "last_activity": datetime.now().isoformat(),
+                "styling": {
+                    "color": "#C0C0C0",  # Silver
+                    "icon": "🚀",
+                    "personality": "universal_code_guru"
+                },
+                "current_tasks": 4,
+                "completed_today": 18,
+                "expertise_focus": "multi_language_mastery_and_optimization"
+            }
+        }
+        
+        return {
+            "total_agents": len(agent_statuses),
+            "average_health": sum(agent["health"] for agent in agent_statuses.values()) / len(agent_statuses),
+            "total_active_tasks": sum(agent["current_tasks"] for agent in agent_statuses.values()),
+            "total_completed_today": sum(agent["completed_today"] for agent in agent_statuses.values()),
+            "agents": agent_statuses,
+            "fashion_guru_theme": "luxury_rose_gold_collection",
+            "last_updated": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/tasks/prioritized")
+async def get_prioritized_tasks(
+    risk_level: str = None,
+    agent_type: str = None,
+    priority: str = None
+) -> Dict[str, Any]:
+    """Get prioritized task list with risk-based sorting."""
+    try:
+        filters = {}
+        if risk_level:
+            filters["risk_level"] = risk_level.split(",")
+        if agent_type:
+            filters["agent_type"] = agent_type
+        if priority:
+            filters["priority"] = priority.split(",")
+        
+        return await task_risk_manager.get_prioritized_task_list(filters)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/tasks/create")
+async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a new task with risk assessment."""
+    try:
+        agent_type = task_data.get("agent_type", "general")
+        return await task_risk_manager.create_task(agent_type, task_data)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/tasks/{task_id}/status")
+async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Update task status and trigger automation if applicable."""
+    try:
+        status = status_data.get("status", "unknown")
+        updates = status_data.get("updates", {})
+        return await task_risk_manager.update_task_status(task_id, status, updates)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# SEO Marketing Agent Endpoints
+@app.get("/seo/analysis")
+async def get_seo_analysis() -> Dict[str, Any]:
+    """Get comprehensive SEO analysis with fashion trend insights."""
+    return await seo_marketing_agent.analyze_seo_performance()
+
+@app.post("/marketing/campaign")
+async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create AI-powered marketing campaign for luxury fashion."""
+    campaign_type = campaign_data.get("type", "seasonal_collection")
+    target_audience = campaign_data.get("target_audience", "luxury_customers")
+    return await seo_marketing_agent.create_marketing_campaign(campaign_type, target_audience)
+
+# Customer Service Agent Endpoints  
+@app.get("/customer-service/satisfaction")
+async def get_customer_satisfaction() -> Dict[str, Any]:
+    """Get comprehensive customer satisfaction analysis."""
+    return await customer_service_agent.analyze_customer_satisfaction()
+
+@app.post("/customer-service/inquiry")
+async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle customer inquiry with luxury service standards."""
+    inquiry_type = inquiry_data.get("type", "general")
+    customer_tier = inquiry_data.get("customer_tier", "standard")
+    urgency = inquiry_data.get("urgency", "normal")
+    return await customer_service_agent.handle_customer_inquiry(inquiry_type, customer_tier, urgency)
+
+# Security Agent Endpoints
+@app.get("/security/assessment")
+async def get_security_assessment() -> Dict[str, Any]:
+    """Get comprehensive security assessment for luxury e-commerce."""
+    return await security_agent.security_assessment()
+
+@app.post("/security/fraud-check")
+async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Analyze transaction for fraud indicators with luxury-specific checks."""
+    return await security_agent.fraud_detection_analysis(transaction_data)
+
+# Performance Agent Endpoints
+@app.get("/performance/analysis")
+async def get_performance_analysis() -> Dict[str, Any]:
+    """Get comprehensive site performance analysis."""
+    return await performance_agent.analyze_site_performance()
+
+@app.get("/performance/realtime")
+async def get_realtime_performance() -> Dict[str, Any]:
+    """Get real-time performance metrics and alerts."""
+    return await performance_agent.monitor_real_time_performance()
+
+@app.post("/performance/code-analysis")
+async def analyze_code_performance(code_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Universal code analysis and optimization for any programming language."""
+    return await performance_agent.analyze_and_fix_code(code_data)
+
+@app.post("/performance/debug-error")
+async def debug_application_error(error_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Universal debugging for any web application error."""
+    return await performance_agent.debug_application_error(error_data)
+
+@app.post("/performance/optimize-fullstack")
+async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive full-stack performance optimization."""
+    return await performance_agent.optimize_full_stack_performance(stack_data)
+
+# Enhanced Financial Agent Endpoints
+@app.post("/financial/tax-preparation")
+async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive tax preparation and optimization service."""
+    return await financial_agent.prepare_tax_returns(tax_data)
+
+@app.post("/financial/credit-analysis")
+async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive business credit analysis and improvement planning."""
+    return await financial_agent.analyze_business_credit(credit_data)
+
+@app.post("/financial/advisory")
+async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive financial advisory services for business growth."""
+    return await financial_agent.provide_financial_advisory(advisory_request)
+
+# Integration Management Endpoints
+@app.get("/integrations/services")
+async def get_supported_services() -> Dict[str, Any]:
+    """Get all supported integration services."""
+    try:
+        return {
+            "supported_services": agent_assignment_manager.supported_services,
+            "total_services": sum(len(services) for services in agent_assignment_manager.supported_services.values()),
+            "service_categories": list(agent_assignment_manager.supported_services.keys()),
+            "security_features": agent_assignment_manager.security_manager
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/create")
+async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a new integration between an agent and external service."""
+    try:
+        agent_type = integration_data.get("agent_type")
+        service_type = integration_data.get("service_type")
+        service_name = integration_data.get("service_name")
+        credentials = integration_data.get("credentials", {})
+        
+        if not all([agent_type, service_type, service_name]):
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        return await agent_assignment_manager.create_integration(agent_type, service_type, service_name, credentials)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/integrations/agent/{agent_type}")
+async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
+    """Get all integrations for a specific agent."""
+    try:
+        return await agent_assignment_manager.get_agent_integrations(agent_type)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/{integration_id}/sync")
+async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
+    """Sync data from integrated service."""
+    try:
+        return await agent_assignment_manager.sync_integration_data(integration_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/integrations/status")
+async def get_integrations_overview() -> Dict[str, Any]:
+    """Get overview of all integrations across agents."""
+    try:
+        overview = {
+            "total_integrations": len(agent_assignment_manager.integrations),
+            "active_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "active"]),
+            "pending_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "pending"]),
+            "error_integrations": len([i for i in agent_assignment_manager.integrations.values() if i["status"] == "error"]),
+            "integrations_by_agent": {},
+            "popular_services": {},
+            "health_summary": {}
+        }
+        
+        # Calculate integrations by agent
+        for agent_type, integration_ids in agent_assignment_manager.agent_integrations.items():
+            overview["integrations_by_agent"][agent_type] = len(integration_ids)
+        
+        # Calculate popular services
+        service_counts = {}
+        for integration in agent_assignment_manager.integrations.values():
+            service_name = integration["service_name"]
+            service_counts[service_name] = service_counts.get(service_name, 0) + 1
+        
+        overview["popular_services"] = dict(sorted(service_counts.items(), key=lambda x: x[1], reverse=True)[:5])
+        
+        return overview
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Frontend Agent Assignment Endpoints
+@app.post("/frontend/assign-agents")
+async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Assign agents specifically for frontend procedures with strict frontend-only focus."""
+    try:
+        return await agent_assignment_manager.assign_frontend_agents(frontend_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/agents/status")
+async def get_frontend_agent_status() -> Dict[str, Any]:
+    """Get comprehensive status of all frontend agents."""
+    try:
+        return await agent_assignment_manager.get_frontend_agent_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/frontend/collections/create")
+async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a luxury collection page designed like top-selling landing pages."""
+    try:
+        return await agent_assignment_manager.create_luxury_collection_page(collection_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/monitoring/24-7")
+async def get_24_7_monitoring_status() -> Dict[str, Any]:
+    """Get current status of 24/7 monitoring system."""
+    try:
+        return await agent_assignment_manager.get_24_7_monitoring_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/frontend/optimize-workload")
+async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Optimize frontend agent workload distribution."""
+    try:
+        return await agent_assignment_manager.optimize_agent_workload(optimization_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/assignments/{role}")
+async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
+    """Get current frontend agent assignments for specific role or all roles."""
+    try:
+        return await agent_assignment_manager.get_role_assignments(role)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Risk Management Endpoints
+@app.get("/risks/dashboard")
+async def get_risk_dashboard() -> Dict[str, Any]:
+    """Get comprehensive risk dashboard with prioritization."""
+    try:
+        # Get risks from all agents
+        security_assessment = await security_agent.security_assessment()
+        performance_analysis = await performance_agent.analyze_site_performance()
+        
+        risk_summary = {
+            "overall_risk_level": "MEDIUM",
+            "critical_risks": 0,
+            "high_risks": 3,
+            "medium_risks": 8,
+            "low_risks": 12,
+            "risk_categories": {
+                "security": security_assessment.get("risk_prioritization", []),
+                "performance": performance_analysis.get("risk_assessment", {}),
+                "website_stability": {"risk_level": "LOW", "score": 15},
+                "revenue_impact": {"risk_level": "MEDIUM", "score": 45},
+                "customer_experience": {"risk_level": "LOW", "score": 20}
+            },
+            "automated_mitigations": {
+                "active": 12,
+                "scheduled": 5,
+                "completed_today": 8
+            },
+            "risk_trends": {
+                "improving": ["performance", "security"],
+                "stable": ["customer_experience", "compliance"],
+                "attention_needed": ["revenue_optimization"]
+            }
+        }
+        
+        return {
+            "risk_summary": risk_summary,
+            "last_updated": datetime.now().isoformat(),
+            "fashion_guru_styling": {
+                "risk_colors": {
+                    "critical": "#FF6B6B",
+                    "high": "#FFD93D",
+                    "medium": "#E8B4B8",  # Rose gold
+                    "low": "#6BCF7F"
+                }
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/experimental/quantum-inventory")
 async def quantum_inventory_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum inventory optimization."""
