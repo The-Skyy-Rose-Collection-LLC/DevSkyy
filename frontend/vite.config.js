@@ -24,7 +24,11 @@ export default defineConfig({
       'webfix-mission.preview.emergentagent.com', 
       '.emergent.host',
       'agent-dashboard-25.preview.emergentagent.com',
-      '.emergentagent.com'
+      '.emergentagent.com',
+      'Devskyy.app',
+      '.Devskyy.app',
+      'devskyy.app',
+      '.devskyy.app'
     ],
     proxy: {
       '/api': {
