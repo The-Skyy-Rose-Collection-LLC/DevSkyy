@@ -775,6 +775,55 @@ async def get_integrations_overview() -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Frontend Agent Assignment Endpoints
+@app.post("/frontend/assign-agents")
+async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Assign agents specifically for frontend procedures with strict frontend-only focus."""
+    try:
+        return await agent_assignment_manager.assign_frontend_agents(frontend_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/agents/status")
+async def get_frontend_agent_status() -> Dict[str, Any]:
+    """Get comprehensive status of all frontend agents."""
+    try:
+        return await agent_assignment_manager.get_frontend_agent_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/frontend/collections/create")
+async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create a luxury collection page designed like top-selling landing pages."""
+    try:
+        return await agent_assignment_manager.create_luxury_collection_page(collection_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/monitoring/24-7")
+async def get_24_7_monitoring_status() -> Dict[str, Any]:
+    """Get current status of 24/7 monitoring system."""
+    try:
+        return await agent_assignment_manager.get_24_7_monitoring_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/frontend/optimize-workload")
+async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Optimize frontend agent workload distribution."""
+    try:
+        return await agent_assignment_manager.optimize_agent_workload(optimization_request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/frontend/assignments/{role}")
+async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
+    """Get current frontend agent assignments for specific role or all roles."""
+    try:
+        return await agent_assignment_manager.get_role_assignments(role)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Risk Management Endpoints
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
