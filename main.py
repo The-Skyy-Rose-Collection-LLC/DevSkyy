@@ -21,7 +21,7 @@ from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_
 from agent.modules.security_agent import SecurityAgent, secure_luxury_platform
 from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance
 from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks
-from agent.modules.integration_manager import IntegrationManager, create_integration_manager
+from agent.modules.agent_assignment_manager import AgentAssignmentManager, create_agent_assignment_manager
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes # Imported commit_all_changes
 from typing import Dict, Any, List
@@ -126,7 +126,7 @@ customer_service_agent = CustomerServiceAgent()
 security_agent = SecurityAgent()
 performance_agent = PerformanceAgent()
 task_risk_manager = TaskRiskManager()
-integration_manager = create_integration_manager()
+integration_manager = create_agent_assignment_manager()
 
 # Inject brand intelligence into all agents
 for agent_name, agent in [
