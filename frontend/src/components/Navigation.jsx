@@ -32,7 +32,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       icon: '🌐',
       description: 'Site Connection',
       gradient: 'from-emerald-500 to-blue-500',
-      badge: 'NEW'
+      badge: 'ACTIVE'
     },
     {
       id: 'tasks',
