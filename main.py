@@ -131,6 +131,8 @@ performance_agent = PerformanceAgent()
 task_risk_manager = TaskRiskManager()
 agent_assignment_manager = create_agent_assignment_manager()
 wordpress_service = create_wordpress_integration_service()
+woocommerce_service = create_woocommerce_integration_service()
+openai_service = create_openai_intelligence_service()
 
 # Inject brand intelligence into all agents
 for agent_name, agent in [
