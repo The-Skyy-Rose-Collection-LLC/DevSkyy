@@ -1146,33 +1146,28 @@ class OpenAIGodModeTester:
         return passed_tests, failed_tests
 
 def main():
-    """Main testing function for WordPress Direct Connection."""
-    print("🌐 WordPress Direct Connection Testing")
-    print("🔗 Testing skyyrose.co connection functionality")
-    print("⚡ Verifying API endpoints for frontend integration")
+    """Main testing function for Automation Empire."""
+    print("🚀 Automation Empire Comprehensive Testing")
+    print("💎 Testing Luxury Streetwear Brand Automation Features")
+    print("⚡ Verifying all automation endpoints and integrations")
     print()
     
     tester = OpenAIGodModeTester()
     
     try:
-        # First test basic health
-        if not tester.test_health_check():
-            print("❌ Health check failed - aborting tests")
-            return False
+        # Run automation empire tests
+        automation_success = tester.run_automation_empire_test_suite()
         
-        # Run WordPress direct connection tests
-        wordpress_success = tester.run_wordpress_direct_connection_tests()
-        
-        # Generate summary
+        # Generate final summary
         print("\n" + "=" * 80)
-        print("📊 WORDPRESS DIRECT CONNECTION TEST SUMMARY")
+        print("📊 AUTOMATION EMPIRE FINAL TEST SUMMARY")
         print("=" * 80)
         
         total_tests = len(tester.test_results)
         passed_tests = sum(1 for result in tester.test_results if result['success'])
         failed_tests = total_tests - passed_tests
         
-        print(f"Total WordPress Tests: {total_tests}")
+        print(f"Total Tests: {total_tests}")
         print(f"✅ Passed: {passed_tests}")
         print(f"❌ Failed: {failed_tests}")
         print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
@@ -1183,20 +1178,23 @@ def main():
                 if not result['success']:
                     print(f"   • {result['test']}: {result['details']}")
         
-        print(f"\n🌐 WORDPRESS CONNECTION STATUS:")
-        if wordpress_success:
-            print("   ✅ WordPress Direct Connection: WORKING")
-            print("   ✅ skyyrose.co Integration: FUNCTIONAL")
-            print("   ✅ API Endpoints: READY FOR FRONTEND")
-            print("   ✅ Agent Communication: ACTIVE")
+        print(f"\n🚀 AUTOMATION EMPIRE STATUS:")
+        if automation_success:
+            print("   ✅ AUTOMATION EMPIRE: FULLY OPERATIONAL")
+            print("   ✅ LUXURY BRANDING: INTEGRATED THROUGHOUT")
+            print("   ✅ SOCIAL MEDIA: CAMPAIGNS & CONNECTIONS WORKING")
+            print("   ✅ EMAIL & SMS: TCPA COMPLIANT & AI-POWERED")
+            print("   ✅ WORDPRESS THEMES: BRAND ASSET DEPLOYMENT READY")
+            print("   ✅ QUICK ACTIONS: ALL AUTOMATION TYPES FUNCTIONAL")
+            print("   ✅ READY FOR PRODUCTION DEPLOYMENT")
         else:
-            print("   ❌ WordPress Direct Connection: NEEDS ATTENTION")
-            print("   ❌ Some endpoints may not be working properly")
+            print("   ❌ AUTOMATION EMPIRE: NEEDS ATTENTION")
+            print("   ❌ Some automation features require fixes")
         
-        return wordpress_success
+        return automation_success
             
     except Exception as e:
-        print(f"❌ WordPress testing failed with exception: {str(e)}")
+        print(f"❌ Automation empire testing failed with exception: {str(e)}")
         return False
 
 if __name__ == "__main__":
