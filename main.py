@@ -1308,7 +1308,7 @@ async def run_full_optimization(website_url: str = "https://theskyy-rose-collect
     basic_result = run_agent()
 
     # WordPress/Divi optimization with brand awareness
-    wordpress_result = optimize_wordpress_performance()
+    wordpress_result = await wordpress_agent.optimize_wordpress_god_mode({"site_url": website_url})
 
     # Web development fixes with brand context
     webdev_result = fix_web_development_issues()
