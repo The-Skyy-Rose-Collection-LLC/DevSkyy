@@ -550,6 +550,210 @@ class PerformanceAgent:
             "database_query_time": {"before": 120, "after": 45, "improvement": "62% faster"}
         }
 
+    def _detect_code_smells(self, code: str, language: str) -> List[Dict[str, Any]]:
+        """Detect code smells and maintainability issues."""
+        smells = []
+        
+        if language in ["javascript", "typescript"]:
+            if "var " in code:
+                smells.append({
+                    "type": "DEPRECATED_VAR",
+                    "severity": "LOW",
+                    "description": "Use 'let' or 'const' instead of 'var'",
+                    "fix": "Replace 'var' with 'let' or 'const' for better scoping"
+                })
+        elif language == "python":
+            if "import *" in code:
+                smells.append({
+                    "type": "WILDCARD_IMPORT",
+                    "severity": "MEDIUM", 
+                    "description": "Wildcard imports reduce code readability",
+                    "fix": "Import specific functions/classes instead of using *"
+                })
+        
+        return smells
+
+    def _identify_optimizations(self, code: str, language: str) -> List[Dict[str, Any]]:
+        """Identify optimization opportunities."""
+        optimizations = []
+        
+        if language in ["javascript", "typescript"]:
+            if "addEventListener" in code:
+                optimizations.append({
+                    "type": "EVENT_DELEGATION",
+                    "description": "Consider using event delegation for better performance",
+                    "impact": "Reduced memory usage and better performance"
+                })
+        elif language == "python":
+            if "list(" in code and "generator" not in code:
+                optimizations.append({
+                    "type": "GENERATOR_OPTIMIZATION",
+                    "description": "Consider using generators for memory efficiency",
+                    "impact": "Reduced memory consumption for large datasets"
+                })
+        
+        return optimizations
+
+    def _check_best_practices(self, code: str, language: str) -> List[Dict[str, Any]]:
+        """Check for best practice violations."""
+        violations = []
+        
+        if language in ["javascript", "typescript"]:
+            if "==" in code and "===" not in code:
+                violations.append({
+                    "type": "LOOSE_EQUALITY",
+                    "severity": "MEDIUM",
+                    "description": "Use strict equality (===) instead of loose equality (==)",
+                    "fix": "Replace == with === for type-safe comparisons"
+                })
+        elif language == "python":
+            if "except:" in code:
+                violations.append({
+                    "type": "BARE_EXCEPT",
+                    "severity": "HIGH",
+                    "description": "Bare except clauses catch all exceptions",
+                    "fix": "Specify exception types or use 'except Exception:'"
+                })
+        
+        return violations
+
+    def _analyze_dependencies(self, code: str, language: str) -> Dict[str, Any]:
+        """Analyze code dependencies."""
+        if language in ["javascript", "typescript"]:
+            imports = code.count("import ")
+            requires = code.count("require(")
+            return {
+                "import_count": imports,
+                "require_count": requires,
+                "outdated_patterns": requires > 0,
+                "recommendations": ["Use ES6 imports instead of require()"] if requires > 0 else []
+            }
+        elif language == "python":
+            imports = code.count("import ")
+            return {
+                "import_count": imports,
+                "relative_imports": code.count("from ."),
+                "recommendations": ["Consider absolute imports for better clarity"]
+            }
+        return {"analysis": "No dependency analysis for this language"}
+
+    def _detect_memory_leaks(self, code: str, language: str) -> List[Dict[str, Any]]:
+        """Detect potential memory leaks."""
+        leaks = []
+        
+        if language in ["javascript", "typescript"]:
+            if "setInterval" in code and "clearInterval" not in code:
+                leaks.append({
+                    "type": "UNCLEANED_INTERVAL",
+                    "severity": "HIGH", 
+                    "description": "setInterval without clearInterval can cause memory leaks",
+                    "fix": "Always clear intervals when component unmounts"
+                })
+            if "addEventListener" in code and "removeEventListener" not in code:
+                leaks.append({
+                    "type": "UNCLEANED_EVENT_LISTENER",
+                    "severity": "MEDIUM",
+                    "description": "Event listeners without cleanup can cause memory leaks",
+                    "fix": "Remove event listeners when no longer needed"
+                })
+        
+        return leaks
+
+    def _assess_scalability(self, code: str, language: str) -> Dict[str, Any]:
+        """Assess code scalability concerns."""
+        concerns = []
+        
+        if "O(n²)" in code or ("for " in code and code.count("for ") > 1):
+            concerns.append({
+                "type": "NESTED_LOOPS",
+                "severity": "MEDIUM",
+                "description": "Nested loops may not scale well with large datasets",
+                "recommendation": "Consider algorithmic optimization or data structure changes"
+            })
+        
+        return {
+            "scalability_score": 85 - len(concerns) * 10,
+            "concerns": concerns,
+            "recommendations": [
+                "Profile with realistic data sizes",
+                "Consider caching strategies",
+                "Implement pagination for large datasets"
+            ]
+        }
+
+    def _generate_optimization_suggestions(self, language: str) -> List[Dict[str, Any]]:
+        """Generate language-specific optimization suggestions."""
+        suggestions = []
+        
+        if language in ["javascript", "typescript"]:
+            suggestions.extend([
+                {
+                    "category": "Performance",
+                    "suggestions": [
+                        "Use requestAnimationFrame for animations",
+                        "Implement code splitting with dynamic imports",
+                        "Use Web Workers for CPU-intensive tasks",
+                        "Optimize bundle size with tree shaking"
+                    ]
+                },
+                {
+                    "category": "Memory",
+                    "suggestions": [
+                        "Use WeakMap/WeakSet to prevent memory leaks",
+                        "Implement proper cleanup in useEffect",
+                        "Avoid creating functions in render methods",
+                        "Use React.memo for expensive components"
+                    ]
+                }
+            ])
+        elif language == "python":
+            suggestions.extend([
+                {
+                    "category": "Performance", 
+                    "suggestions": [
+                        "Use list comprehensions instead of loops",
+                        "Implement caching with functools.lru_cache",
+                        "Use asyncio for I/O-bound operations",
+                        "Profile with cProfile for optimization targets"
+                    ]
+                },
+                {
+                    "category": "Memory",
+                    "suggestions": [
+                        "Use generators for large data processing",
+                        "Implement __slots__ for memory-efficient classes",
+                        "Use weakref for circular reference prevention",
+                        "Profile memory usage with memory_profiler"
+                    ]
+                }
+            ])
+        
+        return suggestions
+
+    def _suggest_performance_improvements(self, analysis: Dict, language: str) -> List[Dict[str, Any]]:
+        """Suggest specific performance improvements based on analysis."""
+        improvements = []
+        
+        issue_count = len(analysis.get("performance_issues", []))
+        if issue_count > 0:
+            improvements.append({
+                "priority": "HIGH",
+                "title": f"Fix {issue_count} Performance Issues",
+                "description": "Address identified performance bottlenecks",
+                "estimated_impact": "20-40% performance improvement"
+            })
+        
+        security_count = len(analysis.get("security_vulnerabilities", []))
+        if security_count > 0:
+            improvements.append({
+                "priority": "CRITICAL",
+                "title": f"Fix {security_count} Security Vulnerabilities",
+                "description": "Address security issues that could compromise the application",
+                "estimated_impact": "Critical security enhancement"
+            })
+        
+        return improvements
+
 def optimize_site_performance() -> Dict[str, Any]:
     """Main function to optimize site performance."""
     agent = PerformanceAgent()
