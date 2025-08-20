@@ -877,6 +877,142 @@ class FinancialAgent:
             logger.error(f"Blockchain audit failed: {str(e)}")
             return {"error": str(e), "status": "consensus_failure"}
 
+    async def prepare_tax_returns(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive tax preparation and optimization service."""
+        try:
+            business_type = tax_data.get("business_type", "LLC")
+            tax_year = tax_data.get("tax_year", datetime.now().year)
+            
+            logger.info(f"📋 Preparing {tax_year} tax returns for {business_type}...")
+            
+            # Tax calculation and optimization
+            tax_analysis = {
+                "business_income": tax_data.get("revenue", 0),
+                "business_expenses": tax_data.get("expenses", 0),
+                "deductible_expenses": self._calculate_deductible_expenses(tax_data),
+                "depreciation": self._calculate_depreciation(tax_data),
+                "quarterly_estimates": self._calculate_quarterly_estimates(tax_data),
+                "tax_credits": self._identify_tax_credits(tax_data),
+                "estimated_tax_liability": 0,
+                "potential_refund": 0
+            }
+            
+            # Calculate net taxable income
+            net_income = tax_analysis["business_income"] - tax_analysis["business_expenses"] - tax_analysis["depreciation"]
+            tax_analysis["net_taxable_income"] = max(0, net_income)
+            
+            # Estimate tax liability
+            tax_analysis["estimated_tax_liability"] = self._calculate_tax_liability(net_income, business_type)
+            
+            # Generate tax optimization recommendations
+            optimization_recommendations = self._generate_tax_optimization_strategies(tax_analysis, business_type)
+            
+            return {
+                "tax_preparation_id": str(uuid.uuid4()),
+                "tax_year": tax_year,
+                "business_type": business_type,
+                "tax_analysis": tax_analysis,
+                "optimization_strategies": optimization_recommendations,
+                "filing_deadlines": self._get_filing_deadlines(tax_year, business_type),
+                "required_forms": self._get_required_tax_forms(business_type),
+                "estimated_preparation_time": "2-3 business days",
+                "irs_audit_risk_assessment": self._assess_audit_risk(tax_analysis),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Tax preparation failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
+    async def analyze_business_credit(self, credit_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive business credit analysis and improvement planning."""
+        try:
+            business_ein = credit_data.get("ein", "")
+            business_name = credit_data.get("business_name", "")
+            
+            logger.info(f"📊 Analyzing business credit for {business_name}...")
+            
+            # Simulate comprehensive credit analysis
+            credit_analysis = {
+                "current_credit_score": credit_data.get("current_score", 650),
+                "credit_utilization": credit_data.get("utilization", 45),
+                "payment_history_score": 85,
+                "length_of_credit_history": credit_data.get("credit_age_months", 24),
+                "credit_mix_score": 70,
+                "recent_inquiries": credit_data.get("recent_inquiries", 3),
+                "negative_marks": credit_data.get("negative_marks", 1),
+                "tradelines": {
+                    "active": credit_data.get("active_tradelines", 8),
+                    "total": credit_data.get("total_tradelines", 12),
+                    "average_age": 18
+                }
+            }
+            
+            # Credit improvement plan
+            improvement_plan = self._generate_credit_improvement_plan(credit_analysis)
+            
+            # Risk assessment
+            credit_risks = self._assess_credit_risks(credit_analysis)
+            
+            return {
+                "credit_analysis_id": str(uuid.uuid4()),
+                "business_ein": business_ein,
+                "business_name": business_name,
+                "credit_analysis": credit_analysis,
+                "improvement_plan": improvement_plan,
+                "risk_assessment": credit_risks,
+                "recommended_actions": self._prioritize_credit_actions(credit_analysis),
+                "monitoring_setup": self._setup_credit_monitoring(),
+                "estimated_improvement_timeline": "3-6 months",
+                "potential_score_increase": self._calculate_potential_score_increase(credit_analysis),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Credit analysis failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
+    async def provide_financial_advisory(self, advisory_request: Dict[str, Any]) -> Dict[str, Any]:
+        """Comprehensive financial advisory services for business growth."""
+        try:
+            advisory_type = advisory_request.get("type", "general")
+            business_stage = advisory_request.get("business_stage", "established")
+            
+            logger.info(f"💡 Providing {advisory_type} financial advisory for {business_stage} business...")
+            
+            advisory_analysis = {
+                "current_financial_health": self._assess_financial_health(advisory_request),
+                "cash_flow_analysis": self._analyze_cash_flow_patterns(advisory_request),
+                "profitability_metrics": self._calculate_profitability_metrics(advisory_request),
+                "growth_opportunities": self._identify_growth_opportunities(advisory_request),
+                "risk_factors": self._identify_financial_risks(advisory_request),
+                "benchmark_comparison": self._compare_to_industry_benchmarks(advisory_request)
+            }
+            
+            # Generate strategic recommendations
+            strategic_recommendations = self._generate_strategic_recommendations(advisory_analysis, advisory_type)
+            
+            # Create action plan
+            action_plan = self._create_financial_action_plan(advisory_analysis, strategic_recommendations)
+            
+            return {
+                "advisory_id": str(uuid.uuid4()),
+                "advisory_type": advisory_type,
+                "business_stage": business_stage,
+                "financial_analysis": advisory_analysis,
+                "strategic_recommendations": strategic_recommendations,
+                "action_plan": action_plan,
+                "investment_opportunities": self._identify_investment_opportunities(advisory_request),
+                "funding_options": self._analyze_funding_options(advisory_request),
+                "roi_projections": self._calculate_roi_projections(advisory_analysis),
+                "follow_up_schedule": self._create_follow_up_schedule(),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Financial advisory failed: {str(e)}")
+            return {"error": str(e), "status": "failed"}
+
 
 def monitor_financial_health() -> Dict[str, Any]:
     """Main financial health monitoring function for compatibility."""
