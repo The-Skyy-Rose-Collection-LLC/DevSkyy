@@ -2000,6 +2000,156 @@ class AgentAssignmentManager:
         except Exception as e:
             logger.error(f"❌ Get assignments failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
+    
+    def _get_agent_primary_metrics(self, agent_id: str) -> List[str]:
+        """Get primary metrics for monitoring a specific agent."""
+        agent_metrics = {
+            "design_automation": [
+                "ui_consistency_score",
+                "user_satisfaction_rating",
+                "design_completion_time",
+                "brand_compliance_percentage",
+                "responsive_design_quality"
+            ],
+            "performance": [
+                "page_load_time",
+                "core_web_vitals_score",
+                "error_rate",
+                "uptime_percentage",
+                "optimization_impact"
+            ],
+            "wordpress": [
+                "component_functionality",
+                "cms_integration_success",
+                "maintenance_efficiency",
+                "plugin_compatibility",
+                "content_management_ease"
+            ],
+            "brand_intelligence": [
+                "brand_consistency_score",
+                "strategic_accuracy",
+                "trend_prediction_success",
+                "market_analysis_quality",
+                "executive_decision_impact"
+            ]
+        }
+        
+        return agent_metrics.get(agent_id, [
+            "task_completion_rate",
+            "quality_score",
+            "response_time",
+            "user_satisfaction"
+        ])
+    
+    def _get_agent_alert_thresholds(self, agent_id: str) -> Dict[str, Any]:
+        """Get alert thresholds for a specific agent."""
+        return {
+            "performance_degradation": "below_90%",
+            "error_rate_spike": "above_1%",
+            "response_time_slow": "above_5_seconds",
+            "quality_drop": "below_85%",
+            "availability_low": "below_95%"
+        }
+    
+    def _get_agent_reporting_frequency(self, agent_id: str) -> str:
+        """Get reporting frequency for a specific agent."""
+        frequency_map = {
+            "design_automation": "hourly",
+            "performance": "every_30_minutes",
+            "wordpress": "daily",
+            "brand_intelligence": "daily"
+        }
+        return frequency_map.get(agent_id, "hourly")
+    
+    def _get_agent_auto_remediation_rules(self, agent_id: str) -> List[str]:
+        """Get auto-remediation rules for a specific agent."""
+        remediation_rules = {
+            "design_automation": [
+                "auto_fix_css_inconsistencies",
+                "revert_to_last_known_good_design",
+                "apply_brand_guideline_corrections"
+            ],
+            "performance": [
+                "restart_optimization_processes",
+                "clear_performance_caches",
+                "apply_emergency_performance_fixes"
+            ],
+            "wordpress": [
+                "restart_wordpress_services",
+                "clear_plugin_caches",
+                "revert_problematic_updates"
+            ],
+            "brand_intelligence": [
+                "reapply_brand_guidelines",
+                "escalate_to_human_review",
+                "activate_brand_protection_mode"
+            ]
+        }
+        return remediation_rules.get(agent_id, ["escalate_to_human_review"])
+    
+    def _setup_frontend_alerting_rules(self) -> Dict[str, Any]:
+        """Setup alerting rules for frontend monitoring."""
+        return {
+            "critical_alerts": {
+                "site_down": {"threshold": "immediate", "escalation": "emergency"},
+                "performance_degradation": {"threshold": "30_seconds", "escalation": "high"},
+                "security_breach": {"threshold": "immediate", "escalation": "emergency"}
+            },
+            "warning_alerts": {
+                "slow_response_time": {"threshold": "5_minutes", "escalation": "medium"},
+                "high_error_rate": {"threshold": "2_minutes", "escalation": "medium"},
+                "brand_inconsistency": {"threshold": "10_minutes", "escalation": "low"}
+            },
+            "notification_channels": [
+                "email_alerts",
+                "slack_notifications", 
+                "dashboard_alerts",
+                "mobile_push_notifications"
+            ]
+        }
+    
+    def _setup_frontend_dashboard_config(self) -> Dict[str, Any]:
+        """Setup frontend monitoring dashboard configuration."""
+        return {
+            "dashboard_layout": {
+                "overview_section": ["system_health", "active_agents", "current_tasks"],
+                "performance_section": ["response_times", "error_rates", "uptime_stats"],
+                "agent_section": ["agent_status", "workload_distribution", "efficiency_metrics"],
+                "brand_section": ["consistency_scores", "luxury_metrics", "customer_satisfaction"]
+            },
+            "refresh_intervals": {
+                "real_time_metrics": "5_seconds",
+                "performance_charts": "30_seconds",
+                "agent_status": "1_minute",
+                "brand_metrics": "5_minutes"
+            },
+            "visualization_types": {
+                "performance_metrics": "line_charts",
+                "agent_workload": "pie_charts",
+                "system_health": "gauge_charts",
+                "trend_analysis": "area_charts"
+            }
+        }
+    
+    def _setup_frontend_reporting_schedule(self) -> Dict[str, Any]:
+        """Setup frontend monitoring reporting schedule."""
+        return {
+            "daily_reports": {
+                "time": "09:00_UTC",
+                "recipients": ["frontend_team", "management"],
+                "content": ["performance_summary", "agent_efficiency", "issues_resolved"]
+            },
+            "weekly_reports": {
+                "time": "monday_10:00_UTC",
+                "recipients": ["executive_team", "stakeholders"],
+                "content": ["strategic_overview", "trend_analysis", "optimization_recommendations"]
+            },
+            "monthly_reports": {
+                "time": "first_monday_10:00_UTC",
+                "recipients": ["board_members", "investors"],
+                "content": ["business_impact", "roi_analysis", "future_roadmap"]
+            }
+        }
 
 def create_agent_assignment_manager() -> AgentAssignmentManager:
     """Factory function to create agent assignment manager."""
