@@ -1,19 +1,20 @@
+#!/usr/bin/env python3
 """
-Production startup script for the AI Agent Dashboard.
-Handles database connections, environment setup, and graceful startup.
+Startup script for Skyy Rose AI Agent Management Platform
+Handles graceful startup, database connections, and WordPress auto-connection
 """
-import os
-import sys
-import logging
-import asyncio
-from typing import Optional
-import certifi
-from motor.motor_asyncio import AsyncIOMotorClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+import asyncio
+import logging
+import sys
+from pathlib import Path
+
+# Add the project root to Python path
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+from motor.motor_asyncio import AsyncIOMotorClient
+from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
 # Configure logging
 logging.basicConfig(
@@ -22,161 +23,99 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class DatabaseConnection:
-    """Handles MongoDB connection with Atlas support."""
-    
+class SkyRoseStartup:
     def __init__(self):
-        self.client: Optional[AsyncIOMotorClient] = None
-        self.db = None
+        self.mongodb_client = None
+        self.wordpress_service = None
         
-    async def connect(self) -> bool:
-        """Connect to MongoDB with fallback options."""
-        mongo_url = self._get_mongo_url()
-        
+    async def initialize_database(self):
+        """Initialize MongoDB connection."""
         try:
-            # Determine connection type
-            if self._is_atlas_connection(mongo_url):
-                self.client = await self._connect_to_atlas(mongo_url)
-            else:
-                self.client = await self._connect_to_local(mongo_url)
+            import os
+            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/skyy_rose_agents')
+            
+            logger.info("🔄 Initializing MongoDB connection...")
+            self.mongodb_client = AsyncIOMotorClient(mongo_url)
             
             # Test connection
-            await self.client.admin.command('ping')
+            await self.mongodb_client.admin.command('ismaster')
+            logger.info("✅ MongoDB connection established successfully")
             
-            # Get database
-            db_name = self._extract_db_name(mongo_url)
-            self.db = self.client[db_name]
-            
-            logger.info(f"✅ Successfully connected to MongoDB: {db_name}")
             return True
             
         except Exception as e:
             logger.error(f"❌ MongoDB connection failed: {str(e)}")
             return False
     
-    def _get_mongo_url(self) -> str:
-        """Get MongoDB URL from environment variables."""
-        # Check for production Atlas URL first
-        atlas_url = os.getenv('MONGODB_URI')
-        if atlas_url:
-            logger.info("🌍 Using MongoDB Atlas connection")
-            return atlas_url
-        
-        # Fallback to local development URL
-        local_url = os.getenv('MONGO_URL', 'mongodb://localhost:27017/ai_agent_dashboard')
-        logger.info("🔧 Using local MongoDB connection")
-        return local_url
-    
-    def _is_atlas_connection(self, url: str) -> bool:
-        """Check if the URL is for MongoDB Atlas."""
-        return 'mongodb+srv://' in url or 'mongodb.net' in url
-    
-    async def _connect_to_atlas(self, url: str) -> AsyncIOMotorClient:
-        """Connect to MongoDB Atlas with proper SSL configuration."""
-        return AsyncIOMotorClient(
-            url,
-            tls=True,
-            tlsCAFile=certifi.where(),
-            retryWrites=True,
-            w='majority',
-            serverSelectionTimeoutMS=30000,
-            connectTimeoutMS=30000,
-            socketTimeoutMS=30000,
-            maxPoolSize=10,
-            minPoolSize=1
-        )
-    
-    async def _connect_to_local(self, url: str) -> AsyncIOMotorClient:
-        """Connect to local MongoDB."""
-        return AsyncIOMotorClient(
-            url,
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=5000,
-            socketTimeoutMS=5000
-        )
-    
-    def _extract_db_name(self, url: str) -> str:
-        """Extract database name from MongoDB URL."""
-        if '/' in url:
-            parts = url.split('/')
-            if len(parts) > 3:
-                db_name = parts[-1].split('?')[0]  # Remove query parameters
-                if db_name:
-                    return db_name
-        return 'ai_agent_dashboard'  # Default database name
-    
-    async def close(self):
-        """Close the database connection."""
-        if self.client:
-            self.client.close()
-            logger.info("📡 Database connection closed")
-
-# Global database instance
-db_connection = DatabaseConnection()
-
-async def startup_sequence():
-    """Execute startup sequence for the application."""
-    logger.info("🚀 Starting AI Agent Dashboard...")
-    
-    # Connect to database
-    connected = await db_connection.connect()
-    if not connected:
-        logger.warning("⚠️  Database connection failed, running in limited mode")
-    
-    # Initialize other services
-    await initialize_services()
-    
-    logger.info("✅ Startup sequence complete")
-
-async def initialize_services():
-    """Initialize application services."""
-    try:
-        # Initialize OpenAI client
-        openai_key = os.getenv('OPENAI_API_KEY')
-        if openai_key:
-            logger.info("🧠 OpenAI integration enabled")
-        else:
-            logger.warning("⚠️  OpenAI API key not found")
-        
-        # Initialize other services as needed
-        logger.info("⚙️  Services initialized")
-        
-    except Exception as e:
-        logger.error(f"❌ Service initialization failed: {str(e)}")
-
-async def shutdown_sequence():
-    """Execute shutdown sequence for the application."""
-    logger.info("🛑 Shutting down AI Agent Dashboard...")
-    
-    # Close database connection
-    await db_connection.close()
-    
-    logger.info("✅ Shutdown sequence complete")
-
-def get_database():
-    """Get the database instance."""
-    return db_connection.db
-
-def health_check() -> dict:
-    """Perform application health check."""
-    health = {
-        "status": "healthy",
-        "database": "disconnected",
-        "services": "operational",
-        "timestamp": asyncio.get_event_loop().time()
-    }
-    
-    if db_connection.client:
+    async def initialize_wordpress_connection(self):
+        """Auto-connect to WordPress on startup."""
         try:
-            # Quick ping to check database
-            asyncio.create_task(db_connection.client.admin.command('ping'))
-            health["database"] = "connected"
-        except:
-            health["database"] = "disconnected"
-            health["status"] = "degraded"
+            logger.info("🔄 Initializing WordPress auto-connection...")
+            
+            self.wordpress_service = create_wordpress_direct_service()
+            
+            # Attempt auto-connection
+            connection_result = await self.wordpress_service.connect_and_verify()
+            
+            if connection_result.get('status') == 'connected':
+                logger.info("✅ WordPress auto-connection successful!")
+                logger.info(f"   └─ Connected to: {connection_result.get('site_url', 'skyyrose.co')}")
+                logger.info(f"   └─ Site health: {connection_result.get('health', 'Unknown')}")
+                return True
+            else:
+                logger.warning("⚠️ WordPress auto-connection failed - will retry on first request")
+                return False
+                
+        except Exception as e:
+            logger.error(f"❌ WordPress auto-connection error: {str(e)}")
+            return False
     
-    return health
+    async def run_startup_sequence(self):
+        """Run complete startup sequence."""
+        logger.info("🚀 Starting Skyy Rose AI Agent Platform...")
+        
+        # Initialize database
+        db_success = await self.initialize_database()
+        if not db_success:
+            logger.error("💥 Critical: Database initialization failed!")
+            return False
+        
+        # Auto-connect WordPress (non-critical)
+        wp_success = await self.initialize_wordpress_connection()
+        if wp_success:
+            logger.info("✅ WordPress integration ready")
+        else:
+            logger.info("ℹ️ WordPress will connect on first request")
+        
+        logger.info("🎉 Skyy Rose platform startup complete!")
+        logger.info("   ├─ 🤖 AI Agents: Ready")
+        logger.info("   ├─ 💾 Database: Connected") 
+        logger.info("   ├─ 🌐 WordPress: " + ("Connected" if wp_success else "Standby"))
+        logger.info("   └─ ⚡ Automation: Active")
+        
+        return True
+    
+    async def shutdown(self):
+        """Graceful shutdown."""
+        logger.info("🔄 Shutting down services...")
+        
+        if self.mongodb_client:
+            self.mongodb_client.close()
+            logger.info("✅ MongoDB connection closed")
+        
+        logger.info("👋 Skyy Rose platform shutdown complete")
+
+# Global startup instance
+startup_manager = SkyRoseStartup()
+
+async def startup():
+    """Main startup function."""
+    return await startup_manager.run_startup_sequence()
+
+async def shutdown():
+    """Main shutdown function."""
+    await startup_manager.shutdown()
 
 if __name__ == "__main__":
-    # Run startup sequence for testing
-    asyncio.run(startup_sequence())
+    # Run startup sequence directly
+    asyncio.run(startup())
