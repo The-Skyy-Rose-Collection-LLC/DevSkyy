@@ -126,6 +126,7 @@ customer_service_agent = CustomerServiceAgent()
 security_agent = SecurityAgent()
 performance_agent = PerformanceAgent()
 task_risk_manager = TaskRiskManager()
+integration_manager = create_integration_manager()
 
 # Inject brand intelligence into all agents
 for agent_name, agent in [
