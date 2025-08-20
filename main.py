@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import logging
 import sys
+import os
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
