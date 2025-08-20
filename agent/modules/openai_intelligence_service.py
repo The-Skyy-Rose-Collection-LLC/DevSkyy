@@ -13,11 +13,14 @@ class OpenAIIntelligenceService:
     
     def __init__(self):
         self.api_key = os.getenv('OPENAI_API_KEY')
-        openai.api_key = self.api_key
         
-        self.client = openai.OpenAI(api_key=self.api_key)
-        
-        logger.info("🧠 OpenAI Intelligence Service initialized for luxury agent enhancement")
+        if self.api_key:
+            openai.api_key = self.api_key
+            self.client = openai.OpenAI(api_key=self.api_key)
+            logger.info("🧠 OpenAI Intelligence Service initialized for luxury agent enhancement")
+        else:
+            self.client = None
+            logger.warning("🧠 OpenAI Intelligence Service initialized without API key")
     
     async def enhance_product_description(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to create luxury product descriptions."""
