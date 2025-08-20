@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 class AgentRole(Enum):
     FRONTEND_BEAUTY = "frontend_beauty"
+    FRONTEND_UI_UX = "frontend_ui_ux"
+    FRONTEND_PERFORMANCE = "frontend_performance"
+    FRONTEND_COMPONENTS = "frontend_components"
+    FRONTEND_TESTING = "frontend_testing"
     SOCIAL_MEDIA = "social_media"
     EMAIL_SMS = "email_sms"
     DESIGN_AUTOMATION = "design_automation"
