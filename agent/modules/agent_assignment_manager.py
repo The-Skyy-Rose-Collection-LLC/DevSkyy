@@ -133,9 +133,16 @@ class AgentAssignmentManager:
             }
         }
         
-        # Enhanced role definitions for luxury operations
+        # Enhanced role definitions for luxury operations with dedicated frontend assignments
         self.default_assignments = {
-            AgentRole.FRONTEND_BEAUTY.value: ["design_automation", "wordpress", "performance"],
+            # DEDICATED FRONTEND AGENTS - These work STRICTLY on frontend
+            AgentRole.FRONTEND_BEAUTY.value: ["design_automation"],  # Primary frontend beauty agent
+            AgentRole.FRONTEND_UI_UX.value: ["design_automation", "brand_intelligence"],  # UI/UX specialists
+            AgentRole.FRONTEND_PERFORMANCE.value: ["performance"],  # Frontend performance only
+            AgentRole.FRONTEND_COMPONENTS.value: ["wordpress", "design_automation"],  # Component development
+            AgentRole.FRONTEND_TESTING.value: ["performance", "security"],  # Frontend testing specialists
+            
+            # BACKEND/FULL-STACK AGENTS - These handle backend and coordination
             AgentRole.SOCIAL_MEDIA.value: ["social_media_automation", "brand_intelligence"],
             AgentRole.EMAIL_SMS.value: ["email_sms_automation", "customer_service"],
             AgentRole.DESIGN_AUTOMATION.value: ["design_automation", "brand_intelligence"],
@@ -143,6 +150,164 @@ class AgentAssignmentManager:
             AgentRole.CONTENT_CREATION.value: ["brand_intelligence", "social_media_automation"],
             AgentRole.BRAND_MANAGEMENT.value: ["brand_intelligence", "customer_service"],
             AgentRole.CUSTOMER_EXPERIENCE.value: ["customer_service", "design_automation"]
+        }
+        
+        # Frontend Agent Specializations and Responsibilities
+        self.frontend_agent_assignments = {
+            "design_automation": {
+                "role": "Lead Frontend Beauty & UI/UX Specialist",
+                "frontend_responsibilities": [
+                    "luxury_ui_design_implementation",
+                    "visual_hierarchy_optimization", 
+                    "brand_consistency_enforcement",
+                    "responsive_design_mastery",
+                    "collection_page_creation",
+                    "user_interface_components",
+                    "frontend_animations_and_interactions",
+                    "luxury_aesthetic_maintenance",
+                    "mobile_first_design_implementation",
+                    "conversion_optimization_through_design"
+                ],
+                "backend_communication": {
+                    "data_requirements": ["user_preferences", "product_data", "analytics_metrics"],
+                    "api_endpoints_used": ["/api/products", "/api/users", "/api/analytics", "/api/collections"],
+                    "real_time_sync": ["user_interactions", "conversion_data", "a_b_test_results"],
+                    "communication_frequency": "real_time_for_user_data_every_5min_for_analytics"
+                },
+                "exclusive_frontend_focus": True,
+                "backend_dependency": "data_only_no_backend_logic"
+            },
+            
+            "performance": {
+                "role": "Frontend Performance Optimization Specialist", 
+                "frontend_responsibilities": [
+                    "frontend_code_optimization",
+                    "javascript_performance_tuning",
+                    "css_optimization_and_minification",
+                    "image_optimization_and_lazy_loading",
+                    "bundle_size_optimization",
+                    "frontend_caching_strategies",
+                    "core_web_vitals_optimization",
+                    "frontend_error_monitoring",
+                    "client_side_performance_analytics",
+                    "frontend_security_implementation"
+                ],
+                "backend_communication": {
+                    "data_requirements": ["performance_metrics", "error_logs", "user_behavior_data"],
+                    "api_endpoints_used": ["/api/performance", "/api/metrics", "/api/errors"],
+                    "real_time_sync": ["performance_alerts", "error_notifications", "metric_thresholds"],
+                    "communication_frequency": "continuous_monitoring_every_30_seconds"
+                },
+                "exclusive_frontend_focus": True,
+                "backend_dependency": "metrics_and_monitoring_data_only"
+            },
+            
+            "wordpress": {
+                "role": "Frontend Component & Divi Specialist",
+                "frontend_responsibilities": [
+                    "divi_5_component_development",
+                    "wordpress_frontend_customization",
+                    "custom_css_and_styling",
+                    "frontend_plugin_integration",
+                    "theme_customization_and_optimization",
+                    "frontend_security_implementation",
+                    "mobile_responsive_components",
+                    "frontend_seo_optimization",
+                    "custom_frontend_functionality",
+                    "woocommerce_frontend_enhancement"
+                ],
+                "backend_communication": {
+                    "data_requirements": ["content_data", "product_information", "user_roles", "site_settings"],
+                    "api_endpoints_used": ["/api/content", "/api/products", "/api/settings", "/api/users"],
+                    "real_time_sync": ["content_updates", "product_changes", "user_permissions"],
+                    "communication_frequency": "every_10_minutes_for_content_real_time_for_user_actions"
+                },
+                "exclusive_frontend_focus": True,
+                "backend_dependency": "content_and_configuration_data_only"
+            },
+            
+            "brand_intelligence": {
+                "role": "Frontend Brand Consistency & Strategy Coordinator",
+                "frontend_responsibilities": [
+                    "brand_guideline_enforcement_on_frontend",
+                    "visual_identity_consistency_across_ui",
+                    "luxury_brand_aesthetic_supervision", 
+                    "frontend_content_strategy_implementation",
+                    "brand_voice_consistency_in_ui_text",
+                    "competitive_analysis_for_frontend_improvements",
+                    "trend_integration_in_frontend_design",
+                    "brand_story_telling_through_ui_elements",
+                    "executive_level_frontend_decision_making",
+                    "frontend_innovation_and_trend_adoption"
+                ],
+                "backend_communication": {
+                    "data_requirements": ["brand_analytics", "market_trends", "competitor_data", "customer_insights"],
+                    "api_endpoints_used": ["/api/brand", "/api/analytics", "/api/trends", "/api/insights"],
+                    "real_time_sync": ["brand_performance_metrics", "trend_alerts", "competitive_updates"],
+                    "communication_frequency": "hourly_for_trends_daily_for_deep_analysis"
+                },
+                "exclusive_frontend_focus": True,
+                "backend_dependency": "strategic_data_and_analytics_only"
+            }
+        }
+        
+        # Frontend-Backend Communication Protocols
+        self.frontend_backend_protocols = {
+            "data_sync_methods": {
+                "real_time": ["websocket_connections", "sse_events", "polling_for_critical_data"],
+                "scheduled": ["hourly_analytics_sync", "daily_content_updates", "weekly_performance_reports"],
+                "on_demand": ["user_action_triggers", "admin_panel_requests", "emergency_updates"]
+            },
+            "communication_rules": {
+                "frontend_agents_forbidden_from": [
+                    "database_direct_access",
+                    "server_configuration_changes", 
+                    "backend_logic_implementation",
+                    "api_endpoint_creation",
+                    "server_side_security_configuration"
+                ],
+                "frontend_agents_must_use": [
+                    "designated_api_endpoints_only",
+                    "standard_data_formats",
+                    "approved_communication_channels",
+                    "security_token_authentication",
+                    "rate_limited_api_calls"
+                ]
+            },
+            "error_handling": {
+                "backend_unavailable": "graceful_degradation_with_cached_data",
+                "api_rate_limits": "intelligent_batching_and_queuing",
+                "data_inconsistency": "frontend_validation_with_backend_reconciliation",
+                "authentication_failure": "secure_redirect_to_login_with_state_preservation"
+            }
+        }
+        
+        # Frontend Agent Coordination Matrix
+        self.frontend_coordination_matrix = {
+            "design_automation_leads": {
+                "ui_ux_decisions": ["all_visual_design", "user_experience_flows", "interaction_patterns"],
+                "coordinates_with": ["performance", "brand_intelligence", "wordpress"],
+                "decision_authority": "final_say_on_visual_design_and_ux",
+                "escalation_path": "brand_intelligence_for_strategic_conflicts"
+            },
+            "performance_leads": {
+                "technical_optimization": ["code_performance", "loading_speeds", "technical_seo"],
+                "coordinates_with": ["design_automation", "wordpress"],
+                "decision_authority": "final_say_on_performance_optimizations",
+                "escalation_path": "design_automation_for_ux_performance_conflicts"
+            },
+            "wordpress_leads": {
+                "component_development": ["divi_components", "wordpress_specific_features", "cms_integration"],
+                "coordinates_with": ["design_automation", "performance"],
+                "decision_authority": "final_say_on_wordpress_divi_implementation",
+                "escalation_path": "design_automation_for_design_conflicts"
+            },
+            "brand_intelligence_oversees": {
+                "strategic_alignment": ["brand_consistency", "market_positioning", "competitive_advantage"],
+                "coordinates_with": ["all_frontend_agents"],
+                "decision_authority": "strategic_veto_power_on_brand_inconsistent_decisions",
+                "escalation_path": "executive_decision_engine"
+            }
         }
         
         # Collection page specifications
