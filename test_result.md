@@ -623,7 +623,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "OpenAI GOD MODE TIER testing completed"
+    - "WordPress Connection UI Testing completed successfully"
     - "WordPress Direct Connection testing completed"
     - "Customer Service Agent endpoint fix needed"
     - "Security Agent fraud detection endpoint fix needed"
@@ -631,7 +631,7 @@ test_plan:
     - "Customer Service Agent with GOD MODE"
     - "Security Agent with GOD MODE"
   test_all: true
-  test_priority: "wordpress_direct_connection_completed"
+  test_priority: "wordpress_ui_testing_completed"
 
   - task: "WordPress Direct Connection Testing"
     implemented: true
