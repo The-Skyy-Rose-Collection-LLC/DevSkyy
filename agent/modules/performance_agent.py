@@ -65,7 +65,11 @@ class PerformanceAgent:
         self.performance_optimizer = self._initialize_performance_optimizer()
         
         # Initialize OpenAI client for god mode optimization
-        self.openai_client = openai.OpenAI()
+        api_key = os.getenv('OPENAI_API_KEY')
+        if api_key:
+            self.openai_client = openai.OpenAI(api_key=api_key)
+        else:
+            self.openai_client = None
         
         logger.info("🚀 Universal Web Development Guru initialized with Multi-Language Mastery")
 
