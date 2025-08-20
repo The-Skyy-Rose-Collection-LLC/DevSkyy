@@ -130,7 +130,7 @@ const WordPressConnection = () => {
           WordPress Site Connection
         </h2>
         <p className="text-gray-600 text-lg font-elegant max-w-3xl mx-auto">
-          Connect your WordPress site to activate your 4 specialized luxury agents for 24/7 optimization and brand enhancement.
+          Connect your WordPress site using our secure direct connection method to activate your 4 specialized luxury agents for 24/7 optimization and brand enhancement.
         </p>
       </motion.div>
 
