@@ -107,6 +107,9 @@ const FrontendAgentManager = () => {
         </p>
       </motion.div>
 
+      {/* WordPress Connection Section */}
+      <WordPressConnection />
+
       {/* 24/7 Monitoring Status */}
       <motion.div
         className="bg-gradient-to-r from-rose-gold/10 to-luxury-gold/10 rounded-3xl p-6 border border-rose-gold/20"
