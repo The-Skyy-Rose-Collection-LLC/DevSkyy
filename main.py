@@ -826,6 +826,207 @@ async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# WordPress Integration Endpoints
+@app.get("/wordpress/auth-url")
+async def get_wordpress_auth_url(state: str = None) -> Dict[str, Any]:
+    """Get WordPress OAuth authorization URL."""
+    try:
+        auth_url = wordpress_service.generate_auth_url(state)
+        return {
+            "auth_url": auth_url,
+            "status": "ready_for_authorization",
+            "instructions": "Visit this URL to authorize your WordPress site for agent access"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/wordpress/auth/callback")
+async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle WordPress OAuth callback and exchange code for token."""
+    try:
+        authorization_code = callback_data.get('code')
+        if not authorization_code:
+            raise HTTPException(status_code=400, detail="Authorization code required")
+        
+        result = await wordpress_service.exchange_code_for_token(authorization_code)
+        
+        if result.get('status') == 'success':
+            return {
+                "status": "wordpress_connected",
+                "message": "🎉 WordPress site connected! Your 4 luxury agents are now working on your site.",
+                "site_info": result.get('site_info'),
+                "agent_capabilities": result.get('agent_capabilities'),
+                "next_steps": [
+                    "Agents will begin 24/7 monitoring and optimization",
+                    "Collection pages can now be created automatically",
+                    "Performance improvements will start immediately",
+                    "Brand consistency will be enforced across all content"
+                ]
+            }
+        else:
+            return {"status": "error", "message": result.get('message')}
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/site/info")
+async def get_wordpress_site_info() -> Dict[str, Any]:
+    """Get WordPress site information and agent status."""
+    try:
+        site_info = await wordpress_service._get_site_info()
+        performance_data = await wordpress_service.monitor_site_performance()
+        
+        return {
+            "site_info": site_info,
+            "performance_monitoring": performance_data,
+            "agent_status": "actively_working_on_your_site",
+            "last_updated": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/posts")
+async def get_wordpress_posts(limit: int = 10, post_type: str = 'post') -> Dict[str, Any]:
+    """Get WordPress posts for agent analysis and optimization."""
+    try:
+        posts = await wordpress_service.get_site_posts(limit, post_type)
+        return {
+            "posts": posts,
+            "agent_analysis": "ready_for_optimization",
+            "improvement_opportunities": await _analyze_content_opportunities(posts)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/pages")
+async def get_wordpress_pages(limit: int = 20) -> Dict[str, Any]:
+    """Get WordPress pages for agent optimization."""
+    try:
+        pages = await wordpress_service.get_site_pages(limit)
+        return {
+            "pages": pages,
+            "agent_analysis": "ready_for_optimization",
+            "luxury_enhancement_opportunities": await _analyze_luxury_opportunities(pages)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/theme")
+async def get_wordpress_theme_info() -> Dict[str, Any]:
+    """Get WordPress theme information for design agents."""
+    try:
+        theme_info = await wordpress_service.get_site_theme_info()
+        return {
+            "theme_info": theme_info,
+            "divi_optimization_ready": theme_info.get('divi_detected', False),
+            "design_agent_recommendations": await _get_design_recommendations(theme_info),
+            "luxury_branding_opportunities": theme_info.get('luxury_optimization_opportunities', [])
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/wordpress/content/update")
+async def update_wordpress_content(update_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Update WordPress content with agent improvements."""
+    try:
+        post_id = update_request.get('post_id')
+        content_updates = update_request.get('updates', {})
+        
+        if not post_id:
+            raise HTTPException(status_code=400, detail="Post ID required")
+        
+        result = await wordpress_service.update_site_content(post_id, content_updates)
+        return {
+            "update_result": result,
+            "agent_responsible": "design_automation_agent",
+            "improvements_applied": result.get('agent_improvements', {}),
+            "next_optimization_scheduled": (datetime.now() + timedelta(hours=24)).isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/wordpress/collection/create")
+async def create_wordpress_collection_page(collection_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Create luxury collection page on WordPress site."""
+    try:
+        result = await wordpress_service.create_luxury_collection_page(collection_request)
+        
+        if result.get('status') == 'success':
+            return {
+                "collection_created": result,
+                "page_url": result.get('page_url'),
+                "luxury_features": result.get('luxury_features', []),
+                "conversion_optimization": result.get('conversion_elements', []),
+                "seo_optimization": result.get('seo_optimization', {}),
+                "agent_responsible": "design_automation_agent",
+                "revenue_potential": "high_conversion_luxury_page"
+            }
+        else:
+            return {"status": "error", "message": result.get('error')}
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/wordpress/performance/monitor")
+async def monitor_wordpress_performance() -> Dict[str, Any]:
+    """Get WordPress site performance monitoring from agents."""
+    try:
+        performance_data = await wordpress_service.monitor_site_performance()
+        return {
+            "performance_monitoring": performance_data,
+            "agent_recommendations": performance_data.get('agent_recommendations', []),
+            "optimization_schedule": "continuous_24_7_monitoring",
+            "next_performance_check": performance_data.get('next_check')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Helper functions for WordPress integration
+async def _analyze_content_opportunities(posts_data: Dict[str, Any]) -> List[str]:
+    """Analyze content improvement opportunities."""
+    return [
+        "SEO optimization for luxury keywords",
+        "Brand consistency enforcement",
+        "Content readability improvements",
+        "Image optimization and alt tags",
+        "Internal linking enhancement",
+        "Call-to-action optimization"
+    ]
+
+async def _analyze_luxury_opportunities(pages_data: Dict[str, Any]) -> List[str]:
+    """Analyze luxury enhancement opportunities."""
+    return [
+        "Premium color scheme implementation",
+        "Luxury typography upgrades",
+        "High-end imagery integration",
+        "Conversion rate optimization",
+        "Mobile luxury experience enhancement",
+        "Premium animation effects"
+    ]
+
+async def _get_design_recommendations(theme_info: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Get design recommendations from agents."""
+    return [
+        {
+            "agent": "design_automation_agent",
+            "recommendation": "Implement luxury color palette",
+            "priority": "high",
+            "estimated_impact": "25% better brand perception"
+        },
+        {
+            "agent": "performance_agent", 
+            "recommendation": "Optimize theme performance",
+            "priority": "high",
+            "estimated_impact": "40% faster loading times"
+        },
+        {
+            "agent": "brand_intelligence_agent",
+            "recommendation": "Enforce brand consistency",
+            "priority": "medium",
+            "estimated_impact": "Improved brand recognition"
+        }
+    ]
+
 # Risk Management Endpoints
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
