@@ -666,6 +666,21 @@ async def get_realtime_performance() -> Dict[str, Any]:
     """Get real-time performance metrics and alerts."""
     return await performance_agent.monitor_real_time_performance()
 
+@app.post("/performance/code-analysis")
+async def analyze_code_performance(code_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Universal code analysis and optimization for any programming language."""
+    return await performance_agent.analyze_and_fix_code(code_data)
+
+@app.post("/performance/debug-error")
+async def debug_application_error(error_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Universal debugging for any web application error."""
+    return await performance_agent.debug_application_error(error_data)
+
+@app.post("/performance/optimize-fullstack")
+async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Comprehensive full-stack performance optimization."""
+    return await performance_agent.optimize_full_stack_performance(stack_data)
+
 # Risk Management Endpoints
 @app.get("/risks/dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
