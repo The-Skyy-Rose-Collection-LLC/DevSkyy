@@ -548,17 +548,17 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "expertise_focus": "luxury_brand_protection"
             },
             "performance": {
-                "status": "monitoring_speed",
-                "health": 94,
+                "status": "analyzing_and_optimizing",
+                "health": 98,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {
                     "color": "#C0C0C0",  # Silver
-                    "icon": "⚡",
-                    "personality": "speed_optimization_guru"
+                    "icon": "🚀",
+                    "personality": "universal_code_guru"
                 },
-                "current_tasks": 2,
-                "completed_today": 9,
-                "expertise_focus": "luxury_performance_standards"
+                "current_tasks": 4,
+                "completed_today": 18,
+                "expertise_focus": "multi_language_mastery_and_optimization"
             }
         }
         
