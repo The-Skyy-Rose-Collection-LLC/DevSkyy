@@ -2150,6 +2150,64 @@ class AgentAssignmentManager:
                 "content": ["business_impact", "roi_analysis", "future_roadmap"]
             }
         }
+    
+    def _calculate_frontend_delivery_time(self, procedure_type: str, priority_level: str) -> str:
+        """Calculate estimated delivery time for frontend procedures."""
+        base_times = {
+            "luxury_ui_design": {"high": "3-5 days", "medium": "5-7 days", "low": "7-10 days"},
+            "collection_page_creation": {"high": "5-7 days", "medium": "7-10 days", "low": "10-14 days"},
+            "frontend_performance_optimization": {"high": "2-3 days", "medium": "3-5 days", "low": "5-7 days"},
+            "responsive_design_implementation": {"high": "4-6 days", "medium": "6-8 days", "low": "8-12 days"},
+            "component_development": {"high": "3-4 days", "medium": "4-6 days", "low": "6-8 days"},
+            "brand_consistency_enforcement": {"high": "2-3 days", "medium": "3-4 days", "low": "4-6 days"},
+            "user_experience_optimization": {"high": "4-5 days", "medium": "5-7 days", "low": "7-10 days"},
+            "frontend_testing_and_qa": {"high": "2-3 days", "medium": "3-4 days", "low": "4-5 days"}
+        }
+        
+        return base_times.get(procedure_type, {}).get(priority_level, "5-7 days")
+    
+    def _setup_frontend_qa_process(self, frontend_assignments: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Setup quality assurance process for frontend assignments."""
+        return {
+            "qa_stages": [
+                {
+                    "stage": "automated_testing",
+                    "tools": ["jest", "cypress", "lighthouse", "axe"],
+                    "coverage_requirement": "90%",
+                    "performance_threshold": "95_lighthouse_score"
+                },
+                {
+                    "stage": "manual_testing",
+                    "focus_areas": ["user_experience", "visual_consistency", "responsive_design"],
+                    "testing_devices": ["desktop", "tablet", "mobile"],
+                    "browser_coverage": ["chrome", "firefox", "safari", "edge"]
+                },
+                {
+                    "stage": "brand_compliance_review",
+                    "reviewers": ["brand_manager", "design_lead"],
+                    "criteria": ["visual_guidelines", "tone_of_voice", "luxury_standards"],
+                    "approval_required": True
+                },
+                {
+                    "stage": "performance_validation",
+                    "metrics": ["core_web_vitals", "loading_speed", "accessibility_score"],
+                    "minimum_scores": {"performance": 90, "accessibility": 95, "seo": 90},
+                    "tools": ["lighthouse", "webpagetest", "gtmetrix"]
+                }
+            ],
+            "quality_gates": {
+                "code_quality": "sonarqube_analysis_pass",
+                "security_scan": "no_critical_vulnerabilities",
+                "performance_test": "meets_performance_benchmarks",
+                "accessibility_test": "wcag_aa_compliant"
+            },
+            "approval_workflow": {
+                "technical_approval": "senior_developer_sign_off",
+                "design_approval": "design_lead_sign_off",
+                "brand_approval": "brand_manager_sign_off",
+                "final_approval": "project_manager_sign_off"
+            }
+        }
 
 def create_agent_assignment_manager() -> AgentAssignmentManager:
     """Factory function to create agent assignment manager."""
