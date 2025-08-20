@@ -35,7 +35,7 @@ class WordPressIntegrationService:
             'client_id': self.client_id,
             'redirect_uri': self.redirect_uri,
             'response_type': 'code',
-            'scope': 'global',  # Full access for agents
+            'scope': 'auth,sites,posts,media,stats',  # Specific scopes instead of global
             'state': state or f"luxury_agents_{datetime.now().timestamp()}"
         }
         
