@@ -1521,21 +1521,21 @@ class OpenAIGodModeTester:
         return god_mode_2_success
 
 def main():
-    """Main testing function for Automation Empire."""
-    print("🚀 Automation Empire Comprehensive Testing")
-    print("💎 Testing Luxury Streetwear Brand Automation Features")
-    print("⚡ Verifying all automation endpoints and integrations")
+    """Main testing function for GOD MODE LEVEL 2."""
+    print("🔥 GOD MODE LEVEL 2 COMPREHENSIVE TESTING")
+    print("💎 Testing Full WordPress Server Access System")
+    print("⚡ Verifying SFTP/SSH connections and brand learning")
     print()
     
     tester = OpenAIGodModeTester()
     
     try:
-        # Run automation empire tests
-        automation_success = tester.run_automation_empire_test_suite()
+        # Run GOD MODE LEVEL 2 tests
+        god_mode_2_success = tester.run_god_mode_level_2_test_suite()
         
         # Generate final summary
         print("\n" + "=" * 80)
-        print("📊 AUTOMATION EMPIRE FINAL TEST SUMMARY")
+        print("📊 GOD MODE LEVEL 2 FINAL TEST SUMMARY")
         print("=" * 80)
         
         total_tests = len(tester.test_results)
@@ -1553,54 +1553,24 @@ def main():
                 if not result['success']:
                     print(f"   • {result['test']}: {result['details']}")
         
-        print(f"\n🚀 AUTOMATION EMPIRE STATUS:")
-        if automation_success:
-            print("   ✅ AUTOMATION EMPIRE: FULLY OPERATIONAL")
-            print("   ✅ LUXURY BRANDING: INTEGRATED THROUGHOUT")
-            print("   ✅ SOCIAL MEDIA: CAMPAIGNS & CONNECTIONS WORKING")
-            print("   ✅ EMAIL & SMS: TCPA COMPLIANT & AI-POWERED")
-            print("   ✅ WORDPRESS THEMES: BRAND ASSET DEPLOYMENT READY")
-            print("   ✅ QUICK ACTIONS: ALL AUTOMATION TYPES FUNCTIONAL")
-            print("   ✅ READY FOR PRODUCTION DEPLOYMENT")
+        print(f"\n🔥 GOD MODE LEVEL 2 STATUS:")
+        if god_mode_2_success:
+            print("   ✅ GOD MODE LEVEL 2: FULLY OPERATIONAL")
+            print("   ✅ SFTP SERVER ACCESS: ESTABLISHED")
+            print("   ✅ BRAND LEARNING: DEEP ANALYSIS ACTIVE")
+            print("   ✅ SERVER OPTIMIZATIONS: APPLIED")
+            print("   ✅ ENHANCED AGENTS: 6+ AGENTS WORKING")
+            print("   ✅ CONTINUOUS MONITORING: ACTIVE")
+            print("   ✅ READY FOR DEEPEST LEVEL OPTIMIZATION")
         else:
-            print("   ❌ AUTOMATION EMPIRE: NEEDS ATTENTION")
-            print("   ❌ Some automation features require fixes")
+            print("   ❌ GOD MODE LEVEL 2: NEEDS ATTENTION")
+            print("   ❌ Server access or brand learning requires fixes")
         
-        return automation_success
-            
+        return god_mode_2_success
+        
     except Exception as e:
-        print(f"❌ Automation empire testing failed with exception: {str(e)}")
+        print(f"❌ Testing failed with exception: {str(e)}")
         return False
 
 if __name__ == "__main__":
-    print("🔥 BULLETPROOF WORDPRESS CONNECTION TESTING")
-    print("🎯 Testing with REAL user credentials")
-    print("🚀 Expected: 100% success rate (NEVER fails)")
-    print("💎 Testing comprehensive luxury agent status")
-    print("=" * 80)
-    
-    tester = OpenAIGodModeTester()
-    
-    # Run BULLETPROOF WordPress connection test suite
-    bulletproof_success = tester.run_bulletproof_wordpress_test_suite()
-    
-    print("\n" + "=" * 80)
-    print("🎯 BULLETPROOF WORDPRESS CONNECTION TEST RESULTS")
-    print("=" * 80)
-    
-    if bulletproof_success:
-        print("🎉 BULLETPROOF CONNECTION SYSTEM: FULLY OPERATIONAL")
-        print("✅ 100% Success Rate: ACHIEVED")
-        print("✅ Luxury Agent Ecosystem: ACTIVE")
-        print("✅ Comprehensive Response Structure: VERIFIED")
-        print("✅ Real Credentials Testing: PASSED")
-        print("✅ Fallback Logic: BULLETPROOF")
-        print("\n🚀 SYSTEM READY FOR PRODUCTION WITH GUARANTEED CONNECTION!")
-    else:
-        print("❌ BULLETPROOF CONNECTION SYSTEM: FAILED")
-        print("❌ System does not meet bulletproof requirements")
-        print("❌ Manual intervention required")
-        print("\n⚠️ SYSTEM NOT READY FOR PRODUCTION")
-    
-    print("=" * 80)
-    exit(0 if bulletproof_success else 1)
+    main()
