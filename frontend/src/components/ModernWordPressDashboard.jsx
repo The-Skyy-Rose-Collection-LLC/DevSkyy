@@ -20,7 +20,13 @@ const ModernWordPressDashboard = () => {
   }, []) // Empty dependency array to run only once
 
   const autoConnectWordPress = async () => {
+    if (isConnecting) {
+      console.log('⚠️ Connection already in progress, skipping...')
+      return
+    }
+    
     try {
+      setIsConnecting(true)
       console.log('🔄 Starting WordPress auto-connection...')
       console.log('🔧 API_BASE_URL:', API_BASE_URL)
       setConnectionStatus('connecting')
@@ -63,6 +69,7 @@ const ModernWordPressDashboard = () => {
     } finally {
       console.log('🏁 Setting loading to false')
       setLoading(false)
+      setIsConnecting(false)
     }
   }
 
