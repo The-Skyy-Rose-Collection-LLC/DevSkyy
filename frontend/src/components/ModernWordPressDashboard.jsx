@@ -18,12 +18,17 @@ const ModernWordPressDashboard = () => {
 
   const autoConnectWordPress = async () => {
     try {
+      console.log('🔄 Starting WordPress auto-connection...')
+      console.log('🔧 API_BASE_URL:', API_BASE_URL)
       setConnectionStatus('connecting')
       
       // Auto-connect on component mount - use the bulletproof endpoint
+      console.log('📡 Making POST request to:', `${API_BASE_URL}/wordpress/connect-direct`)
       const connectResponse = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
+      console.log('✅ Connect response received:', connectResponse.data)
       
       if (connectResponse.data.status === 'success') {
+        console.log('✅ Connection successful, setting status to connected')
         setConnectionStatus('connected')
         
         // Also try GOD MODE Level 2 connection
@@ -36,18 +41,21 @@ const ModernWordPressDashboard = () => {
           console.log('Server access attempted, continuing with standard connection')
         }
         
+        console.log('📊 Fetching WordPress data...')
         await fetchWordPressData()
       } else {
+        console.log('⚠️ Connection response status not success, but continuing with bulletproof system')
         setConnectionStatus('connected') // Always show connected due to bulletproof system
         await fetchWordPressData()
       }
       
     } catch (error) {
-      console.error('Auto-connection failed:', error)
+      console.error('❌ Auto-connection failed:', error)
       // With bulletproof system, always show connected
       setConnectionStatus('connected')
       await fetchWordPressData()
     } finally {
+      console.log('🏁 Setting loading to false')
       setLoading(false)
     }
   }
