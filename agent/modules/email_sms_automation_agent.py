@@ -326,7 +326,7 @@ class EmailSMSAutomationAgent:
                 "personalization_level": "medium"
             }
         }
-        
+
         return strategies.get(campaign_type, strategies["promotional"])
 
     def _create_email_sequence(self, campaign_type: str, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
