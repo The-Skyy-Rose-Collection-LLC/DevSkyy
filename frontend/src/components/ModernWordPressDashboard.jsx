@@ -43,10 +43,12 @@ const ModernWordPressDashboard = () => {
         
         console.log('📊 Fetching WordPress data...')
         await fetchWordPressData()
+        console.log('✅ WordPress data fetch completed')
       } else {
         console.log('⚠️ Connection response status not success, but continuing with bulletproof system')
         setConnectionStatus('connected') // Always show connected due to bulletproof system
         await fetchWordPressData()
+        console.log('✅ WordPress data fetch completed (fallback)')
       }
       
     } catch (error) {
@@ -54,6 +56,7 @@ const ModernWordPressDashboard = () => {
       // With bulletproof system, always show connected
       setConnectionStatus('connected')
       await fetchWordPressData()
+      console.log('✅ WordPress data fetch completed (error fallback)')
     } finally {
       console.log('🏁 Setting loading to false')
       setLoading(false)
