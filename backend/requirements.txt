@@ -12,3 +12,4 @@ passlib[bcrypt]==1.7.4
 openai==1.55.3
 certifi==2024.8.30
 dnspython==2.7.0
+paramiko==3.5.0

@@ -304,6 +304,31 @@ class EmailSMSAutomationAgent:
 
         return strategies.get(campaign_type, strategies["seasonal_campaign"])
 
+    def _generate_sms_strategy(self, campaign_type: str, target_segments: List[str]) -> Dict[str, Any]:
+        """Generate comprehensive SMS marketing strategy."""
+        strategies = {
+            "promotional": {
+                "objective": "drive_immediate_sales_with_urgency",
+                "message_themes": ["flash_sales", "limited_time_offers", "exclusive_discounts"],
+                "luxury_positioning": "vip_exclusive_access",
+                "personalization_level": "high"
+            },
+            "flash_sale": {
+                "objective": "create_urgency_for_luxury_purchases",
+                "message_themes": ["time_sensitive_offers", "limited_inventory", "exclusive_access"],
+                "luxury_positioning": "members_only_flash_access",
+                "personalization_level": "very_high"
+            },
+            "new_arrivals": {
+                "objective": "announce_luxury_collection_launches",
+                "message_themes": ["first_access", "preview_collections", "styling_alerts"],
+                "luxury_positioning": "insider_fashion_intelligence",
+                "personalization_level": "medium"
+            }
+        }
+        
+        return strategies.get(campaign_type, strategies["promotional"])
+
     def _create_email_sequence(self, campaign_type: str, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Create detailed email sequence for campaign."""
         if campaign_type == "welcome_series":
