@@ -11,10 +11,13 @@ const ModernWordPressDashboard = () => {
   const [upcomingTasks, setUpcomingTasks] = useState([])
   const [performance, setPerformance] = useState({})
   const [loading, setLoading] = useState(true)
+  const [isConnecting, setIsConnecting] = useState(false) // Prevent multiple simultaneous connections
 
   useEffect(() => {
-    autoConnectWordPress()
-  }, [])
+    if (!isConnecting) {
+      autoConnectWordPress()
+    }
+  }, []) // Empty dependency array to run only once
 
   const autoConnectWordPress = async () => {
     try {
