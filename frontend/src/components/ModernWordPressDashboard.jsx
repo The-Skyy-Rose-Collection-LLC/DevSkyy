@@ -62,20 +62,28 @@ const ModernWordPressDashboard = () => {
 
   const fetchWordPressData = async () => {
     try {
+      console.log('📊 Fetching WordPress data from multiple endpoints...')
       const [healthResponse, fixesResponse, tasksResponse] = await Promise.all([
         axios.get(`${API_BASE_URL}/wordpress/site-status`),
         axios.get(`${API_BASE_URL}/wordpress/recent-fixes`),
         axios.get(`${API_BASE_URL}/wordpress/upcoming-tasks`)
       ])
 
+      console.log('📊 Health response:', healthResponse.data)
+      console.log('🔧 Fixes response:', fixesResponse.data)
+      console.log('📋 Tasks response:', tasksResponse.data)
+
       setSiteHealth(healthResponse.data.site_health || {})
       setRecentFixes(fixesResponse.data.fixes || mockRecentFixes)
       setUpcomingTasks(tasksResponse.data.tasks || mockUpcomingTasks)
       setPerformance(healthResponse.data.performance || mockPerformance)
 
+      console.log('✅ All WordPress data fetched and state updated')
+
     } catch (error) {
-      console.error('Failed to fetch WordPress data:', error)
+      console.error('❌ Failed to fetch WordPress data:', error)
       // Use mock data for demonstration
+      console.log('🎭 Using mock data as fallback')
       setSiteHealth(mockSiteHealth)
       setRecentFixes(mockRecentFixes)
       setUpcomingTasks(mockUpcomingTasks)
