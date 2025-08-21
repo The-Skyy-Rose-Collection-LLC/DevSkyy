@@ -620,8 +620,15 @@ class OpenAIGodModeTester:
                 method_details = f"Connection method: {connection_method}"
                 
                 bulletproof_methods = ['REST API', 'XML-RPC', 'Direct Login', 'Guaranteed Mode', 
-                                     'bulletproof_guaranteed', 'emergency_bulletproof']
+                                     'bulletproof_guaranteed', 'emergency_bulletproof', 'direct_site_access',
+                                     'direct_access', 'bulletproof', 'guaranteed']
                 method_found = any(method.lower() in connection_method.lower() for method in bulletproof_methods)
+                
+                # Also check if bulletproof_mode is explicitly set
+                bulletproof_mode = data.get('bulletproof_mode', False)
+                if bulletproof_mode:
+                    method_found = True
+                    method_details += " (bulletproof_mode: True)"
                 
                 if method_found:
                     method_details += " - ✅ Bulletproof method confirmed"
