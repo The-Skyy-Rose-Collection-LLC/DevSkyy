@@ -239,14 +239,14 @@ def get_metrics() -> dict:
 
 # Inventory Management Endpoints
 @app.post("/inventory/scan")
-def scan_inventory() -> Dict[str, Any]:
+async def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
-    assets = inventory_agent.scan_assets()
-    duplicates = inventory_agent.find_duplicates()
+    assets = await inventory_agent.scan_assets()
+    duplicates = await inventory_agent.find_duplicates()
 
     return {
-        "total_assets": len(assets),
-        "duplicate_groups": len(duplicates),
+        "total_assets": assets.get("total_assets", 0) if isinstance(assets, dict) else len(assets),
+        "duplicate_groups": len(duplicates) if duplicates else 0,
         "scan_completed": True
     }
 
