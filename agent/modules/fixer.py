@@ -12,6 +12,7 @@ import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
     """
     Comprehensive code fixing based on scan results.
@@ -59,7 +60,8 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
         fix_results["files_fixed"] = len(set(fix["file"] for fix in fix_results["fixes_applied"]))
         fix_results["errors_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "error")
         fix_results["warnings_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning")
-        fix_results["optimizations_applied"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization")
+        fix_results["optimizations_applied"] = sum(
+            1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization")
 
         logger.info(f"✅ Code fixing completed: {fix_results['files_fixed']} files fixed")
 
@@ -73,6 +75,7 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
             "timestamp": datetime.now().isoformat()
         }
 
+
 def _create_backup():
     """Create backup of current codebase."""
     try:
@@ -83,7 +86,8 @@ def _create_backup():
         # Copy important files
         files_to_backup = []
         for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'node_modules', 'backup_*'}]
+            dirs[:] = [d for d in dirs if not d.startswith(
+                '.') and d not in {'__pycache__', 'node_modules', 'backup_*'}]
             for file in files:
                 if file.endswith(('.py', '.js', '.html', '.css', '.json', '.md', '.txt', '.yml', '.yaml')):
                     files_to_backup.append(os.path.join(root, file))
@@ -113,6 +117,7 @@ def _fix_python_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual Python file."""
@@ -163,8 +168,8 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         modified_content = '\n'.join(lines)
 
         # 4. Add proper exception handling
-        if 'except:' in modified_content:
-            modified_content = modified_content.replace('except:', 'except Exception as e:')
+        if 'except Exception as e:' in modified_content:
+            modified_content = modified_content.replace('except Exception as e:', 'except Exception as e:')
             fixes.append({
                 "file": file_path,
                 "type": "warning",
@@ -184,7 +189,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
                         "description": "Applied PEP8 formatting",
                         "line": "all"
                     })
-            except:
+            except Exception as e:
                 pass
 
         # Write changes if any fixes were made
@@ -202,6 +207,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_javascript_files() -> List[Dict[str, Any]]:
     """Fix JavaScript files."""
     fixes = []
@@ -216,6 +222,7 @@ def _fix_javascript_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual JavaScript file."""
@@ -270,6 +277,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_html_files() -> List[Dict[str, Any]]:
     """Fix HTML files for SEO and accessibility."""
     fixes = []
@@ -284,6 +292,7 @@ def _fix_html_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual HTML file."""
@@ -317,7 +326,9 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
         # Fix images without alt attributes
         img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
+
         def add_alt(match):
+            """TODO: Add docstring for add_alt."""
             img_tag = match.group(0)
             if 'alt=' not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'
@@ -348,6 +359,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_css_files() -> List[Dict[str, Any]]:
     """Fix CSS files for better performance."""
     fixes = []
@@ -362,6 +374,7 @@ def _fix_css_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual CSS file."""
@@ -414,6 +427,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_configuration_files() -> List[Dict[str, Any]]:
     """Fix configuration files."""
     fixes = []
@@ -441,7 +455,7 @@ def _fix_configuration_files() -> List[Dict[str, Any]]:
                     "description": f"Failed to create __init__.py: {str(e)}",
                     "line": 1
                 })
-    
+
     # Add more configuration file fixes here as needed
     # e.g., JSON validation, YAML formatting, etc.
 

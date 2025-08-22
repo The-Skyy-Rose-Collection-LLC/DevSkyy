@@ -22,7 +22,7 @@ from .brand_intelligence_agent import BrandIntelligenceAgent
 
 __all__ = [
     'scan_site',
-    'fix_code', 
+    'fix_code',
     'InventoryAgent',
     'FinancialAgent',
     'EcommerceAgent',

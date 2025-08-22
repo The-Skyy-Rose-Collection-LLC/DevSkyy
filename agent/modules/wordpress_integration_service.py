@@ -10,9 +10,10 @@ from urllib.parse import urlencode, parse_qs, urlparse
 
 logger = logging.getLogger(__name__)
 
+
 class WordPressIntegrationService:
     """WordPress REST API integration service for luxury brand agent management."""
-    
+
     def __init__(self):
         self.client_id = os.getenv('WORDPRESS_CLIENT_ID')
         self.client_secret = os.getenv('WORDPRESS_CLIENT_SECRET')
@@ -20,15 +21,15 @@ class WordPressIntegrationService:
         self.token_url = os.getenv('WORDPRESS_TOKEN_URL')
         self.authorize_url = os.getenv('WORDPRESS_AUTHORIZE_URL')
         self.api_base = os.getenv('WORDPRESS_API_BASE')
-        
+
         self.access_token = None
         self.refresh_token = None
         self.token_expires_at = None
         self.site_id = None
         self.site_url = None
-        
+
         logger.info("🌐 WordPress Integration Service initialized for luxury brand agents")
-    
+
     def generate_auth_url(self, state: str = None) -> str:
         """Generate WordPress OAuth authorization URL."""
         params = {
@@ -38,11 +39,11 @@ class WordPressIntegrationService:
             'scope': 'auth,sites,posts,media,stats',  # Specific scopes instead of global
             'state': state or f"luxury_agents_{datetime.now().timestamp()}"
         }
-        
+
         auth_url = f"{self.authorize_url}?{urlencode(params)}"
         logger.info(f"🔗 Generated WordPress auth URL for luxury brand integration")
         return auth_url
-    
+
     async def exchange_code_for_token(self, authorization_code: str) -> Dict[str, Any]:
         """Exchange authorization code for access token."""
         try:
@@ -53,20 +54,20 @@ class WordPressIntegrationService:
                 'grant_type': 'authorization_code',
                 'code': authorization_code
             }
-            
+
             response = requests.post(self.token_url, data=token_data)
             response.raise_for_status()
-            
+
             token_info = response.json()
-            
+
             self.access_token = token_info.get('access_token')
             self.refresh_token = token_info.get('refresh_token')
             expires_in = token_info.get('expires_in', 3600)
             self.token_expires_at = datetime.now() + timedelta(seconds=expires_in)
-            
+
             # Get site information
             await self._get_site_info()
-            
+
             logger.info("✅ WordPress OAuth token exchange successful - Agents ready to work!")
             return {
                 'status': 'success',
@@ -74,26 +75,26 @@ class WordPressIntegrationService:
                 'site_info': await self._get_site_info(),
                 'agent_capabilities': self._get_agent_capabilities()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ WordPress token exchange failed: {str(e)}")
             return {'status': 'error', 'message': str(e)}
-    
+
     async def _get_site_info(self) -> Dict[str, Any]:
         """Get WordPress site information."""
         try:
             headers = {'Authorization': f'Bearer {self.access_token}'}
             response = requests.get(f"{self.api_base}/sites/me", headers=headers)
             response.raise_for_status()
-            
+
             site_data = response.json()
             sites = site_data.get('sites', [])
-            
+
             if sites:
                 primary_site = sites[0]  # Use first site
                 self.site_id = primary_site.get('ID')
                 self.site_url = primary_site.get('URL')
-                
+
                 return {
                     'site_id': self.site_id,
                     'site_url': self.site_url,
@@ -103,13 +104,13 @@ class WordPressIntegrationService:
                     'capabilities': primary_site.get('capabilities', {}),
                     'total_sites': len(sites)
                 }
-            
+
             return {'message': 'No sites found'}
-            
+
         except Exception as e:
             logger.error(f"Failed to get site info: {str(e)}")
             return {'error': str(e)}
-    
+
     def _get_agent_capabilities(self) -> Dict[str, List[str]]:
         """Define what each agent can do with WordPress."""
         return {
@@ -154,136 +155,136 @@ class WordPressIntegrationService:
                 'coordinate_marketing_content'
             ]
         }
-    
+
     async def get_site_posts(self, limit: int = 10, post_type: str = 'post') -> Dict[str, Any]:
         """Get WordPress site posts for agent analysis."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             headers = {'Authorization': f'Bearer {self.access_token}'}
             params = {
                 'number': limit,
                 'type': post_type,
                 'fields': 'ID,title,content,excerpt,date,modified,status,format,featured_image,categories,tags'
             }
-            
+
             response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params
             )
             response.raise_for_status()
-            
+
             return response.json()
-            
+
         except Exception as e:
             logger.error(f"Failed to get posts: {str(e)}")
             return {'error': str(e)}
-    
+
     async def get_site_pages(self, limit: int = 20) -> Dict[str, Any]:
         """Get WordPress site pages for agent optimization."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             headers = {'Authorization': f'Bearer {self.access_token}'}
             params = {
                 'number': limit,
                 'status': 'publish',
                 'fields': 'ID,title,content,excerpt,date,modified,status,featured_image,parent'
             }
-            
+
             response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params
             )
             response.raise_for_status()
-            
+
             return response.json()
-            
+
         except Exception as e:
             logger.error(f"Failed to get pages: {str(e)}")
             return {'error': str(e)}
-    
+
     async def get_site_theme_info(self) -> Dict[str, Any]:
         """Get current theme information for design agents."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             headers = {'Authorization': f'Bearer {self.access_token}'}
-            
+
             response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/themes/mine",
                 headers=headers
             )
             response.raise_for_status()
-            
+
             theme_data = response.json()
-            
+
             # Also get site customization options
             customizer_response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/customizer",
                 headers=headers
             )
-            
+
             customizer_data = {}
             if customizer_response.status_code == 200:
                 customizer_data = customizer_response.json()
-            
+
             return {
                 'theme_info': theme_data,
                 'customizer_options': customizer_data,
                 'divi_detected': 'divi' in theme_data.get('name', '').lower(),
                 'luxury_optimization_opportunities': await self._analyze_luxury_opportunities(theme_data)
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to get theme info: {str(e)}")
             return {'error': str(e)}
-    
+
     async def update_site_content(self, post_id: int, content_updates: Dict[str, Any]) -> Dict[str, Any]:
         """Update WordPress content with agent improvements."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             headers = {
                 'Authorization': f'Bearer {self.access_token}',
                 'Content-Type': 'application/json'
             }
-            
+
             response = requests.post(
                 f"{self.api_base}/sites/{self.site_id}/posts/{post_id}",
                 headers=headers,
                 json=content_updates
             )
             response.raise_for_status()
-            
+
             updated_post = response.json()
-            
+
             logger.info(f"✅ Content updated by agents: Post {post_id}")
             return {
                 'status': 'success',
                 'updated_post': updated_post,
                 'agent_improvements': self._analyze_content_improvements(content_updates)
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to update content: {str(e)}")
             return {'error': str(e)}
-    
+
     async def create_luxury_collection_page(self, collection_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create a luxury collection page optimized for conversions."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             # Generate luxury page content
             page_content = await self._generate_luxury_page_content(collection_data)
-            
+
             page_data = {
                 'title': collection_data.get('title', 'Luxury Collection'),
                 'content': page_content,
@@ -299,21 +300,21 @@ class WordPressIntegrationService:
                     {'key': 'creation_date', 'value': datetime.now().isoformat()}
                 ]
             }
-            
+
             headers = {
                 'Authorization': f'Bearer {self.access_token}',
                 'Content-Type': 'application/json'
             }
-            
+
             response = requests.post(
                 f"{self.api_base}/sites/{self.site_id}/posts/new",
                 headers=headers,
                 json=page_data
             )
             response.raise_for_status()
-            
+
             created_page = response.json()
-            
+
             logger.info(f"🎨 Luxury collection page created: {created_page.get('ID')}")
             return {
                 'status': 'success',
@@ -323,33 +324,33 @@ class WordPressIntegrationService:
                 'seo_optimization': await self._apply_seo_optimization(created_page.get('ID')),
                 'conversion_elements': self._get_conversion_elements(collection_data)
             }
-            
+
         except Exception as e:
             logger.error(f"Failed to create collection page: {str(e)}")
             return {'error': str(e)}
-    
+
     async def monitor_site_performance(self) -> Dict[str, Any]:
         """Monitor WordPress site performance for agents."""
         try:
             if not await self._ensure_valid_token():
                 return {'error': 'Invalid token'}
-            
+
             headers = {'Authorization': f'Bearer {self.access_token}'}
-            
+
             # Get site stats
             stats_response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/stats",
                 headers=headers,
                 params={'period': 'day', 'date': datetime.now().strftime('%Y-%m-%d')}
             )
-            
+
             performance_data = {}
             if stats_response.status_code == 200:
                 performance_data = stats_response.json()
-            
+
             # Analyze performance for agent actions
             performance_analysis = await self._analyze_performance_metrics(performance_data)
-            
+
             return {
                 'site_stats': performance_data,
                 'performance_analysis': performance_analysis,
@@ -357,24 +358,24 @@ class WordPressIntegrationService:
                 'monitoring_timestamp': datetime.now().isoformat(),
                 'next_check': (datetime.now() + timedelta(hours=1)).isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"Performance monitoring failed: {str(e)}")
             return {'error': str(e)}
-    
+
     async def _ensure_valid_token(self) -> bool:
         """Ensure we have a valid access token."""
         if not self.access_token:
             return False
-        
+
         if self.token_expires_at and datetime.now() >= self.token_expires_at:
             # Token expired, try refresh
             if self.refresh_token:
                 return await self._refresh_access_token()
             return False
-        
+
         return True
-    
+
     async def _refresh_access_token(self) -> bool:
         """Refresh the access token."""
         try:
@@ -384,32 +385,32 @@ class WordPressIntegrationService:
                 'grant_type': 'refresh_token',
                 'refresh_token': self.refresh_token
             }
-            
+
             response = requests.post(self.token_url, data=refresh_data)
             response.raise_for_status()
-            
+
             token_info = response.json()
-            
+
             self.access_token = token_info.get('access_token')
             if 'refresh_token' in token_info:
                 self.refresh_token = token_info['refresh_token']
-            
+
             expires_in = token_info.get('expires_in', 3600)
             self.token_expires_at = datetime.now() + timedelta(seconds=expires_in)
-            
+
             logger.info("🔄 WordPress access token refreshed successfully")
             return True
-            
+
         except Exception as e:
             logger.error(f"Token refresh failed: {str(e)}")
             return False
-    
+
     async def _generate_luxury_page_content(self, collection_data: Dict[str, Any]) -> str:
         """Generate luxury page content with Divi builder elements."""
         collection_type = collection_data.get('collection_type', 'premium')
         title = collection_data.get('title', 'Luxury Collection')
         description = collection_data.get('description', 'Exclusive luxury items')
-        
+
         # Divi-optimized content with luxury styling
         content = f"""
 [et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]
@@ -463,15 +464,15 @@ Investment pieces designed to appreciate in value and be treasured for generatio
 [/et_pb_row]
 [/et_pb_section]
 """
-        
+
         return content
-    
+
     async def _analyze_luxury_opportunities(self, theme_data: Dict[str, Any]) -> List[str]:
         """Analyze opportunities for luxury brand improvements."""
         opportunities = []
-        
+
         theme_name = theme_data.get('name', '').lower()
-        
+
         if 'divi' in theme_name:
             opportunities.extend([
                 'Optimize Divi builder for luxury aesthetics',
@@ -479,7 +480,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
                 'Add luxury typography combinations',
                 'Create custom Divi modules for collections'
             ])
-        
+
         opportunities.extend([
             'Implement luxury brand color palette',
             'Add premium font combinations',
@@ -487,9 +488,9 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             'Add conversion-optimized layouts',
             'Implement luxury animation effects'
         ])
-        
+
         return opportunities
-    
+
     async def _analyze_performance_metrics(self, stats_data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze performance metrics for agent recommendations."""
         return {
@@ -502,7 +503,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             'optimization_priority': 'high',
             'agent_action_required': True
         }
-    
+
     async def _get_performance_recommendations(self, analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Get performance recommendations for agents."""
         return [
@@ -525,25 +526,25 @@ Investment pieces designed to appreciate in value and be treasured for generatio
                 'estimated_impact': '+15% performance boost'
             }
         ]
-    
+
     def _analyze_content_improvements(self, updates: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze what improvements were made by agents."""
         improvements = []
-        
+
         if 'title' in updates:
             improvements.append('SEO-optimized title enhancement')
         if 'content' in updates:
             improvements.append('Content quality and readability improvement')
         if 'excerpt' in updates:
             improvements.append('Meta description optimization')
-        
+
         return {
             'improvements_made': improvements,
             'seo_impact': 'positive',
             'user_experience_impact': 'enhanced',
             'brand_consistency': 'maintained'
         }
-    
+
     async def _get_luxury_page_features(self, page_data: Dict[str, Any]) -> List[str]:
         """Get luxury features of the created page."""
         return [
@@ -554,7 +555,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             'SEO-optimized structure',
             'Brand-consistent styling'
         ]
-    
+
     async def _apply_seo_optimization(self, page_id: int) -> Dict[str, Any]:
         """Apply SEO optimization to the page."""
         return {
@@ -565,7 +566,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             'internal_linking_enhanced': True,
             'loading_speed_optimized': True
         }
-    
+
     def _get_conversion_elements(self, collection_data: Dict[str, Any]) -> List[str]:
         """Get conversion elements added to the page."""
         return [
@@ -578,6 +579,8 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         ]
 
 # Factory function
+
+
 def create_wordpress_integration_service() -> WordPressIntegrationService:
     """Create WordPress integration service instance."""
     return WordPressIntegrationService()

@@ -4,12 +4,14 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
 
+
 class ProductCategoryEnum(str, Enum):
     jewelry = "jewelry"
     accessories = "accessories"
     clothing = "clothing"
     beauty = "beauty"
     home = "home"
+
 
 class OrderStatusEnum(str, Enum):
     pending = "pending"
@@ -18,12 +20,14 @@ class OrderStatusEnum(str, Enum):
     delivered = "delivered"
     cancelled = "cancelled"
 
+
 class PaymentMethodEnum(str, Enum):
     credit_card = "credit_card"
     debit_card = "debit_card"
     paypal = "paypal"
     apple_pay = "apple_pay"
     google_pay = "google_pay"
+
 
 class PaymentRequest(BaseModel):
     amount: float = Field(..., gt=0, description="Payment amount must be greater than 0")
@@ -32,6 +36,7 @@ class PaymentRequest(BaseModel):
     product_id: str = Field(..., min_length=1, description="Product ID is required")
     payment_method: PaymentMethodEnum
     gateway: str = Field(default="stripe", description="Payment gateway")
+
 
 class ProductRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200, description="Product name")
@@ -48,9 +53,11 @@ class ProductRequest(BaseModel):
 
     @validator('price')
     def price_must_be_greater_than_cost(cls, v, values):
+        """TODO: Add docstring for price_must_be_greater_than_cost."""
         if 'cost' in values and v <= values['cost']:
             raise ValueError('Price must be greater than cost')
         return v
+
 
 class CustomerRequest(BaseModel):
     email: EmailStr = Field(..., description="Valid email address")
@@ -59,6 +66,7 @@ class CustomerRequest(BaseModel):
     phone: Optional[str] = Field(default="", max_length=20, description="Phone number")
     preferences: Optional[Dict[str, Any]] = Field(default=None, description="Customer preferences")
 
+
 class AddressModel(BaseModel):
     street: str = Field(..., min_length=5, description="Street address")
     city: str = Field(..., min_length=2, description="City name")
@@ -66,11 +74,13 @@ class AddressModel(BaseModel):
     postal_code: str = Field(..., min_length=3, description="Postal/ZIP code")
     country: str = Field(..., min_length=2, description="Country code")
 
+
 class OrderItem(BaseModel):
     product_id: str = Field(..., min_length=1, description="Product ID")
     quantity: int = Field(..., gt=0, description="Quantity must be greater than 0")
     size: Optional[str] = Field(default=None, description="Selected size")
     color: Optional[str] = Field(default=None, description="Selected color")
+
 
 class OrderRequest(BaseModel):
     customer_id: str = Field(..., min_length=1, description="Customer ID")
@@ -78,14 +88,17 @@ class OrderRequest(BaseModel):
     shipping_address: AddressModel
     billing_address: Optional[AddressModel] = Field(default=None, description="Billing address")
 
+
 class ChargebackRequest(BaseModel):
     transaction_id: str = Field(..., min_length=1, description="Transaction ID")
     reason: str = Field(..., min_length=3, description="Chargeback reason")
     amount: Optional[float] = Field(default=None, gt=0, description="Chargeback amount")
 
+
 class CodeAnalysisRequest(BaseModel):
     code: str = Field(..., min_length=1, description="Code to analyze")
     language: str = Field(..., min_length=1, description="Programming language")
+
 
 class WebsiteAnalysisRequest(BaseModel):
     website_url: str = Field(..., pattern=r'^https?://', description="Valid website URL")

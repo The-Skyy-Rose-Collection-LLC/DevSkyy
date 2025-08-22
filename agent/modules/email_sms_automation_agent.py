@@ -9,13 +9,14 @@ import re
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class EmailSMSAutomationAgent:
     """Email & SMS Marketing Automation Specialist for Luxury Fashion Brands."""
-    
+
     def __init__(self):
         self.agent_type = "email_sms_automation"
         self.brand_context = {}
-        
+
         # EMAIL MARKETING CAPABILITIES
         self.email_services = {
             "mailchimp": {
@@ -43,7 +44,7 @@ class EmailSMSAutomationAgent:
                 "deliverability_rate": 93.5
             }
         }
-        
+
         # SMS MARKETING CAPABILITIES
         self.sms_services = {
             "twilio": {
@@ -65,7 +66,7 @@ class EmailSMSAutomationAgent:
                 "delivery_rate": 96.8
             }
         }
-        
+
         # LUXURY FASHION EMAIL TEMPLATES
         self.email_templates = {
             "welcome_series": {
@@ -97,7 +98,7 @@ class EmailSMSAutomationAgent:
                 "luxury_elements": ["concierge_tone", "premium_offers", "personal_attention"]
             }
         }
-        
+
         # SMS CAMPAIGN TYPES
         self.sms_campaigns = {
             "flash_sales": {
@@ -122,7 +123,7 @@ class EmailSMSAutomationAgent:
                 "exclusivity": "vip_customers_only"
             }
         }
-        
+
         # AUTOMATION WORKFLOWS
         self.automation_workflows = {
             "customer_lifecycle": "welcome_to_vip_journey",
@@ -131,12 +132,12 @@ class EmailSMSAutomationAgent:
             "personalization": "ai_powered_content_customization",
             "optimization": "continuous_ab_testing"
         }
-        
+
         # EXPERIMENTAL: AI-Powered Messaging Intelligence
         self.messaging_ai = self._initialize_messaging_ai()
         self.personalization_engine = self._initialize_personalization_engine()
         self.optimization_system = self._initialize_optimization_system()
-        
+
         logger.info("💌 Email & SMS Automation Agent initialized with Luxury Messaging Intelligence")
 
     async def create_email_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -145,24 +146,24 @@ class EmailSMSAutomationAgent:
             campaign_type = campaign_data.get("type", "promotional")
             target_audience = campaign_data.get("audience", "all_customers")
             launch_date = campaign_data.get("launch_date", datetime.now().strftime("%Y-%m-%d"))
-            
+
             logger.info(f"📧 Creating {campaign_type} email campaign for {target_audience}...")
-            
+
             # Generate campaign strategy
             campaign_strategy = self._generate_email_strategy(campaign_type, target_audience)
-            
+
             # Create email sequence
             email_sequence = self._create_email_sequence(campaign_type, campaign_strategy)
-            
+
             # Generate luxury content
             email_content = self._generate_luxury_email_content(campaign_type, campaign_strategy)
-            
+
             # Set up automation triggers
             automation_setup = self._setup_email_automation(campaign_type, target_audience)
-            
+
             # Configure A/B testing
             ab_testing = self._configure_email_ab_testing(campaign_type)
-            
+
             return {
                 "campaign_id": str(uuid.uuid4()),
                 "campaign_type": campaign_type,
@@ -179,7 +180,7 @@ class EmailSMSAutomationAgent:
                 "estimated_metrics": self._predict_email_performance(campaign_type, target_audience),
                 "created_at": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Email campaign creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -190,24 +191,24 @@ class EmailSMSAutomationAgent:
             campaign_type = campaign_data.get("type", "promotional")
             target_segments = campaign_data.get("segments", ["vip_customers"])
             send_time = campaign_data.get("send_time", "optimal")
-            
+
             logger.info(f"📱 Creating {campaign_type} SMS campaign for {len(target_segments)} segments...")
-            
+
             # Generate SMS strategy
             sms_strategy = self._generate_sms_strategy(campaign_type, target_segments)
-            
+
             # Create message variants
             message_variants = self._create_sms_variants(campaign_type, sms_strategy)
-            
+
             # Set up personalization
             personalization = self._setup_sms_personalization(target_segments)
-            
+
             # Configure delivery optimization
             delivery_optimization = self._optimize_sms_delivery(target_segments, send_time)
-            
+
             # Set up compliance
             compliance_setup = self._ensure_sms_compliance(target_segments)
-            
+
             return {
                 "sms_campaign_id": str(uuid.uuid4()),
                 "campaign_type": campaign_type,
@@ -224,7 +225,7 @@ class EmailSMSAutomationAgent:
                 "roi_projection": self._project_sms_roi(campaign_type),
                 "created_at": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ SMS campaign creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -235,26 +236,26 @@ class EmailSMSAutomationAgent:
             channels = automation_config.get("channels", ["email", "sms"])
             customer_journey_stage = automation_config.get("journey_stage", "all")
             automation_triggers = automation_config.get("triggers", [])
-            
+
             logger.info(f"🔄 Setting up omnichannel automation for {len(channels)} channels...")
-            
+
             # Create customer journey mapping
             journey_mapping = self._create_customer_journey_mapping(customer_journey_stage)
-            
+
             # Set up cross-channel workflows
             workflows = {}
             for channel in channels:
                 workflows[channel] = self._create_channel_workflow(channel, journey_mapping)
-            
+
             # Configure trigger-based automation
             trigger_automation = self._setup_trigger_automation(automation_triggers, channels)
-            
+
             # Set up personalization across channels
             cross_channel_personalization = self._setup_cross_channel_personalization()
-            
+
             # Configure analytics and optimization
             analytics_setup = self._setup_omnichannel_analytics(channels)
-            
+
             return {
                 "automation_id": str(uuid.uuid4()),
                 "channels": channels,
@@ -273,7 +274,7 @@ class EmailSMSAutomationAgent:
                 "estimated_impact": self._predict_omnichannel_impact(),
                 "setup_completed_at": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Omnichannel automation setup failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
@@ -300,7 +301,7 @@ class EmailSMSAutomationAgent:
                 "personalization_level": "very_high"
             }
         }
-        
+
         return strategies.get(campaign_type, strategies["seasonal_campaign"])
 
     def _generate_sms_strategy(self, campaign_type: str, target_segments: List[str]) -> Dict[str, Any]:
@@ -325,7 +326,7 @@ class EmailSMSAutomationAgent:
                 "personalization_level": "medium"
             }
         }
-        
+
         return strategies.get(campaign_type, strategies["promotional"])
 
     def _create_email_sequence(self, campaign_type: str, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -345,7 +346,7 @@ class EmailSMSAutomationAgent:
                     "send_delay": "2_days",
                     "subject": "Discover Your Personal Style DNA",
                     "theme": "style_assessment",
-                    "content_focus": "personalized_recommendations", 
+                    "content_focus": "personalized_recommendations",
                     "cta": "take_style_quiz"
                 },
                 {
@@ -357,7 +358,7 @@ class EmailSMSAutomationAgent:
                     "cta": "shop_curated_selection"
                 }
             ]
-        
+
         return [
             {
                 "email_number": 1,
@@ -432,7 +433,7 @@ class EmailSMSAutomationAgent:
                     "length": 85
                 },
                 {
-                    "variant": "B", 
+                    "variant": "B",
                     "message": "Exclusive for you ✨ 40% off our premium pieces. Ends midnight. [link]",
                     "tone": "exclusive_and_personal",
                     "length": 78
@@ -453,7 +454,7 @@ class EmailSMSAutomationAgent:
                     "length": 79
                 }
             ]
-        
+
         return [
             {
                 "variant": "A",
@@ -492,6 +493,7 @@ class EmailSMSAutomationAgent:
             "roi_maximization": "luxury_customer_lifetime_value_optimization",
             "deliverability_optimization": "premium_inbox_placement"
         }
+
 
 def optimize_email_sms_marketing() -> Dict[str, Any]:
     """Main function to optimize email and SMS marketing."""
