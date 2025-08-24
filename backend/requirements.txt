@@ -19,6 +19,6 @@ schedule==1.2.2
 opencv-python==4.10.0.84
 scikit-learn==1.5.2
 numpy==2.2.1
-imagehash==4.3.1
+imagehash==4.3.2
 Pillow==10.4.0
-hashlib2==1.0.1
+email-validator==2.2.0
