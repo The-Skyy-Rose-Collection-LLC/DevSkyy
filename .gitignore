@@ -139,7 +139,15 @@ temp/
 *.tmp
 backup/
 backup_*/
+backup_[0-9]*/
 attached_assets/
 DevSkyy/
 fixed_code.txt
 test_*.py
+
+# Backup and temporary files with timestamps
+backup_[0-9]*
+*_backup
+*.bak
+*.ps
+*.eps
