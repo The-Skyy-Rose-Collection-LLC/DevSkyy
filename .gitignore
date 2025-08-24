@@ -151,3 +151,12 @@ backup_[0-9]*
 *.bak
 *.ps
 *.eps
+
+# Jekyll specific
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+Gemfile.lock
+.bundle/
