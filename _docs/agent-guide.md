@@ -10,15 +10,39 @@ Learn how to configure and optimize the 7 AI agents in The Skyy Rose Collection 
 
 ## Agent Overview
 
-The platform includes 7 specialized AI agents that work together to optimize your luxury e-commerce business:
+The platform includes 14+ specialized AI agents with C-Suite and Director level expertise that work together to optimize your luxury e-commerce business:
 
-1. **InventoryAgent** - Digital asset management
-2. **FinancialAgent** - Payment processing & analytics
-3. **EcommerceAgent** - Customer experience optimization
-4. **WordPressAgent** - WordPress/Divi optimization
-5. **WebDevelopmentAgent** - Code analysis & fixing
-6. **SiteCommunicationAgent** - Customer interaction & insights
-7. **BrandIntelligenceAgent** - Brand learning & evolution
+### Executive Level Agents
+1. **BrandIntelligenceAgent** - Chief Brand Strategist & Senior Luxury Market Intelligence Director
+2. **AgentAssignmentManager** - Chief Operations Officer & Executive Agent Coordination Director
+
+### WordPress & Development Specialists
+3. **WordPressAgent** - Senior WordPress Architect & Production-Level Divi 5 Specialist
+4. **WebDevelopmentAgent** - Principal Software Engineer & Senior Full-Stack Development Lead
+5. **PerformanceAgent** - Senior Performance Engineering Lead & Frontend Optimization Specialist
+
+### Frontend Animation Specialists
+6. **FrontendBeautyAgent** - Senior Frontend Animation Director & Visual Experience Architect
+7. **FrontendComponentsAgent** - Senior Component Architecture Lead & Production Systems Specialist
+8. **FrontendPerformanceAgent** - Senior Performance Engineering Lead & Animation Optimization Specialist
+
+### E-commerce & Business Intelligence
+9. **FinancialAgent** - Chief Financial Officer & Senior Tax Advisory Specialist
+10. **EcommerceAgent** - Chief Revenue Officer & Senior E-commerce Analytics Director
+11. **InventoryAgent** - Chief Technology Officer & Senior Digital Asset Management Director
+
+### Creative & Marketing
+12. **DesignAutomationAgent** - Creative Director & Senior Luxury Design Automation Specialist
+13. **SocialMediaAutomationAgent** - Chief Marketing Officer & Senior Social Media Strategy Director
+14. **EmailSMSAutomationAgent** - Senior Director of Customer Engagement & Luxury Communication Specialist
+15. **SEOMarketingAgent** - Senior Director of SEO Strategy & Viral Marketing Architect
+
+### Security & Communication
+16. **SecurityAgent** - Chief Information Security Officer & Senior Cybersecurity Architect
+17. **SiteCommunicationAgent** - Senior Customer Insights Director & Communication Analytics Lead
+
+### Customer Service Operations
+18. **CustomerServiceAgent** - Chief Customer Officer & Senior Luxury Customer Experience Director
 
 ## Configuration Files
 
