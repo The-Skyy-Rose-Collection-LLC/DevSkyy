@@ -30,7 +30,6 @@ const ModernWordPressDashboard = () => {
       
       // Auto-connect on component mount - use the bulletproof endpoint
       const connectResponse = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
-      console.log('✅ Connect response received:', connectResponse.data)
       
       if (connectResponse.data.status === 'success') {
         setConnectionStatus('connected')
@@ -49,7 +48,6 @@ const ModernWordPressDashboard = () => {
       } else {
         setConnectionStatus('connected') // Always show connected due to bulletproof system
         await fetchWordPressData()
-        console.log('✅ WordPress data fetch completed (fallback)')
       }
       
     } catch (error) {
