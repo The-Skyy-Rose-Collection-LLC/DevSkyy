@@ -1,0 +1,63 @@
+# Site settings
+title: The Skyy Rose Collection - DevSkyy Platform
+email: contact@skyyrose.co
+description: >-
+  Luxury AI-powered platform for e-commerce management, featuring comprehensive 
+  website optimization, automated business intelligence, and advanced brand analytics.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://SkyyRoseLLC.github.io/DevSkyy" # the base hostname & protocol for your site
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - frontend/
+  - backend/
+  - agent/
+  - node_modules/
+  - scripts/
+  - tests/
+  - "*.py"
+  - "*.lock"
+  - "*.json"
+  - ".git*"
+  - ".replit"
+  - ".emergent/"
+  - "main.py"
+  - "startup.py"
+  - "config.py"
+  - "models.py"
+  - "pyproject.toml"
+  - "uv.lock"
+  - "*_test.py"
+  - "*test*.html"
+  - "*test*.md"
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# SEO and social
+author: The Skyy Rose Collection
+twitter:
+  username: skyyroseco
+logo: /assets/images/logo.png
+
+# Site navigation
+header_pages:
+  - index.md
+  - docs/installation.md
+  - docs/api-reference.md
+  - docs/agent-guide.md
