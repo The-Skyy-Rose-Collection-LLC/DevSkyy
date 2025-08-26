@@ -1,0 +1,581 @@
+/**
+ * Skyy Rose AI Agents - Admin Styles
+ * 
+ * @package SkyyRoseAIAgents
+ * @since 1.0.0
+ */
+
+/* Main Dashboard Styles */
+.skyy-rose-dashboard {
+    max-width: 1200px;
+}
+
+.skyy-rose-overview {
+    margin: 20px 0;
+}
+
+.overview-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.overview-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.overview-card .card-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.overview-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.overview-card .card-value {
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.overview-card .card-value .unit {
+    font-size: 18px;
+    color: #666;
+}
+
+.overview-card .card-trend,
+.overview-card .card-meta {
+    font-size: 12px;
+    color: #666;
+}
+
+.overview-card .card-trend.up {
+    color: #28a745;
+}
+
+.overview-card .card-trend.down {
+    color: #dc3545;
+}
+
+/* Performance Card */
+.performance-card .card-value {
+    color: #007cba;
+}
+
+/* Security Card */
+.security-card .card-value.security-low {
+    color: #28a745;
+}
+
+.security-card .card-value.security-medium {
+    color: #ffc107;
+}
+
+.security-card .card-value.security-high,
+.security-card .card-value.security-critical {
+    color: #dc3545;
+}
+
+/* Dashboard Content Layout */
+.skyy-rose-dashboard-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .skyy-rose-dashboard-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dashboard Widgets */
+.dashboard-widget {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-widget h2 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 10px;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.widget-header h2 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+/* Agent Status Cards */
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.agent-status-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 15px;
+    transition: all 0.2s ease;
+}
+
+.agent-status-card.enabled {
+    border-left: 4px solid #28a745;
+}
+
+.agent-status-card.disabled {
+    border-left: 4px solid #6c757d;
+    opacity: 0.7;
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.agent-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.agent-info h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.agent-meta {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.agent-status-card.enabled .status-indicator {
+    background: #28a745;
+}
+
+.agent-status-card.disabled .status-indicator {
+    background: #6c757d;
+}
+
+.agent-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 12px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-weight: bold;
+}
+
+.agent-actions {
+    margin-top: 10px;
+}
+
+/* Recent Activities */
+.activities-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    font-size: 16px;
+    margin-right: 10px;
+    margin-top: 2px;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.activity-meta {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    gap: 10px;
+}
+
+.activity-status {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.activity-status.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.activity-status.status-running {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.activity-status.status-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.activity-error {
+    margin-top: 5px;
+    padding: 5px 8px;
+    background: #f8d7da;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #721c24;
+}
+
+.no-activities {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+/* Performance Widget */
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.metric {
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #007cba;
+}
+
+.metric-value .unit {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Security Widget */
+.security-status {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.security-status.security-low {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.security-status.security-medium {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+}
+
+.security-status.security-high,
+.security-status.security-critical {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.security-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.security-level {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.security-details {
+    font-size: 14px;
+    color: #666;
+}
+
+.security-metrics {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 12px;
+}
+
+.security-metrics .metric {
+    background: transparent;
+    padding: 0;
+    text-align: left;
+}
+
+/* Quick Actions */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.action-button {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 15px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+
+.action-button:hover {
+    border-color: #007cba;
+    background: #f8f9fa;
+}
+
+.action-icon {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.action-label {
+    font-weight: 500;
+}
+
+.bulk-actions {
+    text-align: center;
+}
+
+/* Analytics Section */
+.skyy-rose-analytics-section {
+    margin-top: 30px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.chart-container {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.chart-container h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+}
+
+/* Agents Page */
+.skyy-rose-agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.agent-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.agent-card.enabled {
+    border-left: 4px solid #28a745;
+}
+
+.agent-card.disabled {
+    border-left: 4px solid #6c757d;
+    opacity: 0.7;
+}
+
+.agent-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.agent-card .agent-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.agent-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+
+.agent-card p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.agent-status {
+    margin-bottom: 15px;
+}
+
+.agent-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007cba;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 782px) {
+    .overview-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .agents-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skyy-rose-agents-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Settings Page */
+.nav-tab-wrapper {
+    margin-bottom: 20px;
+}
+
+.tab-content {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0 0 4px 4px;
+    padding: 20px;
+}
+
+/* Notifications */
+.notice.skyy-rose-notice {
+    border-left: 4px solid #007cba;
+}
+
+.notice.skyy-rose-notice.notice-success {
+    border-left-color: #28a745;
+}
+
+.notice.skyy-rose-notice.notice-error {
+    border-left-color: #dc3545;
+}
+
+.notice.skyy-rose-notice.notice-warning {
+    border-left-color: #ffc107;
+}
