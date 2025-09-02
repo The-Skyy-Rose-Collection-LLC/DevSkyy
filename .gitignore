@@ -132,6 +132,18 @@ replit.nix
 .DS_Store
 Thumbs.db
 
+# Node.js / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.eslintcache
+.stylelintcache
+build/
+dist/
+
 # Project specific
 logs/
 temp/
@@ -144,6 +156,13 @@ attached_assets/
 DevSkyy/
 fixed_code.txt
 test_*.py
+dev-tools/
+
+# WordPress plugin specific
+wp-config.php
+.htaccess
+error_log
+debug.log
 
 # Backup and temporary files with timestamps
 backup_[0-9]*

@@ -1,3 +1,16 @@
-# Previous content of agent/__init__.py before the specified commit
+"""
+DevSkyy Agent Package
 
-# Your restored code goes here
+This package contains all the specialized AI agents for comprehensive 
+website management, optimization, and monitoring.
+"""
+
+__version__ = "2.0.0"
+__author__ = "DevSkyy Enhanced Platform"
+
+# Agent modules import handler
+import sys
+import os
+
+# Add current directory to Python path to enable relative imports
+sys.path.insert(0, os.path.dirname(__file__))
