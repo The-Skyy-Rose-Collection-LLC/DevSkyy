@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import axios from 'axios'
 import SocialMediaAutomation from './SocialMediaAutomation'
 import EmailAutomation from './EmailAutomation'

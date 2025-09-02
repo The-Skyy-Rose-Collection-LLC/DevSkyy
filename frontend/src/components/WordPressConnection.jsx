@@ -60,7 +60,6 @@ const WordPressConnection = () => {
         }
       } catch (serverError) {
         // Continue with regular connection
-        console.log('Server access attempted, continuing with standard connection')
       }
       
       // Show success message

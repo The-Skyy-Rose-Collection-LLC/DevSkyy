@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_BACKEND_URL || '/api'
@@ -21,43 +21,33 @@ const ModernWordPressDashboard = () => {
 
   const autoConnectWordPress = async () => {
     if (isConnecting) {
-      console.log('⚠️ Connection already in progress, skipping...')
       return
     }
     
     try {
       setIsConnecting(true)
-      console.log('🔄 Starting WordPress auto-connection...')
-      console.log('🔧 API_BASE_URL:', API_BASE_URL)
       setConnectionStatus('connecting')
       
       // Auto-connect on component mount - use the bulletproof endpoint
-      console.log('📡 Making POST request to:', `${API_BASE_URL}/wordpress/connect-direct`)
       const connectResponse = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
-      console.log('✅ Connect response received:', connectResponse.data)
       
       if (connectResponse.data.status === 'success') {
-        console.log('✅ Connection successful, setting status to connected')
         setConnectionStatus('connected')
         
         // Also try GOD MODE Level 2 connection
         try {
           const serverResponse = await axios.post(`${API_BASE_URL}/wordpress/server-access`)
           if (serverResponse.data.god_mode_level >= 2) {
-            console.log('🔥 GOD MODE Level 2 activated!')
+            // GOD MODE Level 2 activated
           }
         } catch (serverError) {
-          console.log('Server access attempted, continuing with standard connection')
+          // Server access attempted, continuing with standard connection
         }
         
-        console.log('📊 Fetching WordPress data...')
         await fetchWordPressData()
-        console.log('✅ WordPress data fetch completed')
       } else {
-        console.log('⚠️ Connection response status not success, but continuing with bulletproof system')
         setConnectionStatus('connected') // Always show connected due to bulletproof system
         await fetchWordPressData()
-        console.log('✅ WordPress data fetch completed (fallback)')
       }
       
     } catch (error) {
@@ -65,9 +55,7 @@ const ModernWordPressDashboard = () => {
       // With bulletproof system, always show connected
       setConnectionStatus('connected')
       await fetchWordPressData()
-      console.log('✅ WordPress data fetch completed (error fallback)')
     } finally {
-      console.log('🏁 Setting loading to false')
       setLoading(false)
       setIsConnecting(false)
     }
@@ -75,28 +63,20 @@ const ModernWordPressDashboard = () => {
 
   const fetchWordPressData = async () => {
     try {
-      console.log('📊 Fetching WordPress data from multiple endpoints...')
       const [healthResponse, fixesResponse, tasksResponse] = await Promise.all([
         axios.get(`${API_BASE_URL}/wordpress/site-status`),
         axios.get(`${API_BASE_URL}/wordpress/recent-fixes`),
         axios.get(`${API_BASE_URL}/wordpress/upcoming-tasks`)
       ])
 
-      console.log('📊 Health response:', healthResponse.data)
-      console.log('🔧 Fixes response:', fixesResponse.data)
-      console.log('📋 Tasks response:', tasksResponse.data)
-
       setSiteHealth(healthResponse.data.site_health || {})
       setRecentFixes(fixesResponse.data.fixes || mockRecentFixes)
       setUpcomingTasks(tasksResponse.data.tasks || mockUpcomingTasks)
       setPerformance(healthResponse.data.performance || mockPerformance)
 
-      console.log('✅ All WordPress data fetched and state updated')
-
     } catch (error) {
       console.error('❌ Failed to fetch WordPress data:', error)
       // Use mock data for demonstration
-      console.log('🎭 Using mock data as fallback')
       setSiteHealth(mockSiteHealth)
       setRecentFixes(mockRecentFixes)
       setUpcomingTasks(mockUpcomingTasks)

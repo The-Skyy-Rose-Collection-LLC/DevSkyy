@@ -14,8 +14,7 @@
     "@heroicons/react": "^2.0.18",
     "framer-motion": "^12.23.12",
     "axios": "^1.6.7",
-    "socket.io-client": "^4.7.4",
-    "react-beautiful-dnd": "^13.1.1"
+    "socket.io-client": "^4.7.4"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
