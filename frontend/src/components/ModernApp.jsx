@@ -10,11 +10,58 @@ import RiskDashboard from './RiskDashboard'
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [systemStatus, setSystemStatus] = useState({
     health: 96.2,
     activeAgents: 10,
     uptime: '99.9%'
   })
+  
+  // Risk dashboard state
+  const [riskData, setRiskData] = useState({
+    overall_risk_level: 'LOW',
+    critical_risks: 0,
+    high_risks: 1,
+    medium_risks: 2,
+    low_risks: 6
+  })
+  const [riskLoading, setRiskLoading] = useState(false)
+
+  // Check for mobile on mount and window resize
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      // Auto-collapse sidebar on mobile
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true)
+      }
+    }
+    
+    checkIfMobile()
+    window.addEventListener('resize', checkIfMobile)
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
+
+  // Function to refresh risk data
+  const refreshRiskData = async () => {
+    setRiskLoading(true)
+    try {
+      // Simulate API call - in production this would fetch from your backend
+      setTimeout(() => {
+        setRiskData({
+          overall_risk_level: 'LOW',
+          critical_risks: 0,
+          high_risks: 1,
+          medium_risks: 2,
+          low_risks: 6
+        })
+        setRiskLoading(false)
+      }, 1000)
+    } catch (error) {
+      console.error('Error fetching risk data:', error)
+      setRiskLoading(false)
+    }
+  }
 
   // Developer mode navigation items with streetwear aesthetic
   const navItems = [
@@ -75,20 +122,58 @@ const ModernApp = () => {
       case 'tasks':
         return <TaskManager />
       case 'monitoring':
-        return <RiskDashboard />
+        return <RiskDashboard 
+          risks={riskData} 
+          loading={riskLoading} 
+          onRefresh={refreshRiskData} 
+        />
       default:
         return <StreetAgentDashboard />
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col md:flex-row">
+      {/* Mobile Header */}
+      {isMobile && (
+        <div className="bg-gray-900/95 backdrop-blur-xl border-b border-gray-800 p-4 flex items-center justify-between md:hidden">
+          <div className="flex items-center space-x-3">
+            <motion.div 
+              className="w-8 h-8 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-lg flex items-center justify-center"
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{
+                rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                scale: { duration: 2, repeat: Infinity }
+              }}
+            >
+              <span className="text-sm font-bold">SR</span>
+            </motion.div>
+            <motion.h1 
+              className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+            >
+              Skyy Rose
+            </motion.h1>
+          </div>
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="w-8 h-8 bg-gray-800 border border-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors"
+          >
+            <span className="text-sm">☰</span>
+          </button>
+        </div>
+      )}
+
       {/* Sidebar */}
       <motion.div
         className={`bg-gray-900/95 backdrop-blur-xl border-r border-gray-800 flex flex-col ${
-          sidebarCollapsed ? 'w-16' : 'w-64'
+          isMobile 
+            ? (sidebarCollapsed ? 'hidden' : 'absolute inset-0 z-50 w-full') 
+            : (sidebarCollapsed ? 'w-16' : 'w-64')
         } transition-all duration-300`}
-        initial={{ x: -100 }}
+        initial={{ x: isMobile ? 0 : -100 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.5 }}
       >
@@ -210,14 +295,25 @@ const ModernApp = () => {
         )}
       </motion.div>
 
+      {/* Mobile Sidebar Overlay */}
+      {isMobile && !sidebarCollapsed && (
+        <motion.div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setSidebarCollapsed(true)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Top Bar */}
-        <div className="bg-gray-900/95 backdrop-blur-xl border-b border-gray-800 px-6 py-4">
+        <div className="bg-gray-900/95 backdrop-blur-xl border-b border-gray-800 px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0 flex-1">
               <motion.h1 
-                className="text-xl font-bold capitalize bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent"
+                className="text-lg md:text-xl font-bold capitalize bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent truncate"
                 key={currentView}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -225,12 +321,12 @@ const ModernApp = () => {
               >
                 {navItems.find(item => item.id === currentView)?.label} Console
               </motion.h1>
-              <p className="text-sm text-gray-400">
+              <p className="text-xs md:text-sm text-gray-400 truncate">
                 {navItems.find(item => item.id === currentView)?.description}
               </p>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4 ml-4">
               {/* Status Indicators */}
               <div className="flex items-center space-x-3">
                 <motion.div 
@@ -284,7 +380,7 @@ const ModernApp = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/20">
+        <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900/20 p-4 md:p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
@@ -292,7 +388,7 @@ const ModernApp = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="h-full"
+              className="h-full w-full max-w-full"
             >
               {renderCurrentView()}
             </motion.div>
