@@ -124,7 +124,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: 'Critical', value: risks.critical_risks || 0, color: 'text-red-600', bg: 'bg-red-100' },
             { label: 'High', value: risks.high_risks || 0, color: 'text-orange-600', bg: 'bg-orange-100' },
@@ -147,7 +147,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
 
       {/* Risk Categories Grid */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
         initial="hidden"
         animate="visible"
         variants={{
@@ -265,7 +265,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           Automated Risk Response System
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200">
             <div className="text-3xl font-bold text-green-600 mb-2">12</div>
             <div className="text-sm font-medium text-gray-700">Active Mitigations</div>
@@ -326,7 +326,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           Risk Trend Analysis
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="p-4 bg-green-50 rounded-xl border border-green-200">
             <h4 className="font-semibold text-green-800 mb-2 flex items-center">
               <span className="mr-2">📉</span>
