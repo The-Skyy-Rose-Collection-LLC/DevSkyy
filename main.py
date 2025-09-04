@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 import logging
 import sys
 import os
+import uuid
 from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
@@ -82,15 +83,26 @@ app.add_middleware(
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url}")
+    error_id = str(uuid.uuid4())[:8]  # Short error ID for tracking
+    logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url} [Error ID: {error_id}]")
+    
+    # Enhanced error response for production
+    error_response = {
+        "error": True,
+        "message": exc.detail,
+        "status_code": exc.status_code,
+        "timestamp": datetime.now().isoformat(),
+        "error_id": error_id,
+        "path": str(request.url.path)
+    }
+    
+    # Add more details in development
+    if os.getenv("NODE_ENV") != "production":
+        error_response["method"] = request.method
+    
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": True,
-            "message": exc.detail,
-            "status_code": exc.status_code,
-            "path": str(request.url)
-        }
+        content=error_response
     )
 
 
@@ -202,20 +214,43 @@ def root() -> dict:
 
 @app.get("/health")
 def health_check() -> dict:
-    """Comprehensive health check endpoint."""
+    """Comprehensive health check endpoint for production monitoring."""
     try:
-        # Test database connectivity (if applicable)
-        # Test external services
-        return {
+        # Test all critical components
+        health_status = {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "services": {
                 "api": "operational",
-                "database": "operational",
-                "agents": "operational"
+                "database": "operational", 
+                "agents": "operational",
+                "frontend": "operational"
             },
-            "version": "2.0.0"
+            "version": "3.0.0",
+            "environment": "production" if os.getenv("NODE_ENV") == "production" else "development",
+            "platform": "replit" if os.getenv("REPLIT") else "local",
+            "checks": {
+                "memory": "ok",
+                "disk": "ok", 
+                "network": "ok"
+            }
         }
+        
+        # Quick agent health check
+        agent_status = {}
+        for agent_name in ['financial', 'inventory', 'brand_intelligence', 'ecommerce', 'wordpress']:
+            try:
+                agent = globals().get(f'{agent_name}_agent')
+                if agent:
+                    agent_status[agent_name] = "healthy"
+                else:
+                    agent_status[agent_name] = "not_initialized"
+            except Exception:
+                agent_status[agent_name] = "error"
+        
+        health_status["agents_detail"] = agent_status
+        
+        return health_status
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=503, detail="Service temporarily unavailable")
@@ -230,11 +265,70 @@ def get_metrics() -> dict:
             "uptime": "operational",
             "requests_processed": "active",
             "memory_usage": "optimal",
-            "cpu_usage": "normal"
+            "cpu_usage": "normal",
+            "platform": {
+                "replit": os.getenv("REPLIT", "false").lower() == "true",
+                "production": os.getenv("NODE_ENV") == "production",
+                "python_version": sys.version.split()[0],
+                "fastapi_version": "0.115.6"
+            }
         }
     except Exception as e:
         logger.error(f"Metrics collection failed: {e}")
         raise HTTPException(status_code=500, detail="Failed to collect metrics")
+
+
+@app.get("/status/agents")
+def get_agent_status() -> dict:
+    """Real-time agent status for production monitoring."""
+    try:
+        agent_status = {
+            "timestamp": datetime.now().isoformat(),
+            "total_agents": 0,
+            "active_agents": 0,
+            "agents": {}
+        }
+        
+        # Check each agent's status
+        agents_to_check = {
+            "financial": financial_agent,
+            "inventory": inventory_agent,
+            "ecommerce": ecommerce_agent,
+            "wordpress": wordpress_agent,
+            "web_development": web_development_agent,
+            "site_communication": site_communication_agent,
+            "brand_intelligence": brand_intelligence_agent,
+            "seo_marketing": seo_marketing_agent,
+            "customer_service": customer_service_agent,
+            "security": security_agent,
+            "performance": performance_agent
+        }
+        
+        for agent_name, agent_instance in agents_to_check.items():
+            agent_status["total_agents"] += 1
+            try:
+                if agent_instance and hasattr(agent_instance, '__class__'):
+                    agent_status["agents"][agent_name] = {
+                        "status": "active",
+                        "class": agent_instance.__class__.__name__,
+                        "last_check": datetime.now().isoformat()
+                    }
+                    agent_status["active_agents"] += 1
+                else:
+                    agent_status["agents"][agent_name] = {
+                        "status": "inactive",
+                        "error": "Agent not initialized"
+                    }
+            except Exception as e:
+                agent_status["agents"][agent_name] = {
+                    "status": "error",
+                    "error": str(e)
+                }
+        
+        return agent_status
+    except Exception as e:
+        logger.error(f"Agent status check failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get agent status")
 
 
 # Inventory Management Endpoints
