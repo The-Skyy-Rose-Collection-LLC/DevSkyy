@@ -15,13 +15,51 @@ class OpenAIIntelligenceService:
     def __init__(self):
         self.api_key = os.getenv('OPENAI_API_KEY')
 
+        # Support both legacy (openai<=0.28) and new SDK (openai>=1.0)
+        self.client = None
         if self.api_key:
-            openai.api_key = self.api_key
-            self.client = openai.OpenAI(api_key=self.api_key)
-            logger.info("🧠 OpenAI Intelligence Service initialized for luxury agent enhancement")
+            try:
+                # New SDK style: from openai import OpenAI; client.chat.completions.create(...)
+                # We access via openai.OpenAI only if present on the module
+                OpenAIClass = getattr(openai, 'OpenAI', None)
+                if OpenAIClass is not None:
+                    self.client = OpenAIClass(api_key=self.api_key)
+                else:
+                    # Legacy style: global api_key with ChatCompletion
+                    openai.api_key = self.api_key
+                logger.info("🧠 OpenAI Intelligence Service initialized")
+            except Exception as init_error:
+                logger.error(f"Failed to initialize OpenAI client: {init_error}")
+                self.client = None
         else:
-            self.client = None
             logger.warning("🧠 OpenAI Intelligence Service initialized without API key")
+
+    def _use_new_client(self) -> bool:
+        return self.client is not None and hasattr(self.client, 'chat')
+
+    def _create_chat_completion(self, messages: List[Dict[str, str]], max_tokens: int, temperature: float) -> Optional[str]:
+        """Create a chat completion using whichever SDK is available. Returns content or None."""
+        try:
+            if self._use_new_client():
+                response = self.client.chat.completions.create(
+                    model=os.getenv('OPENAI_MODEL', 'gpt-4o-mini'),
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature
+                )
+                return response.choices[0].message.content
+            # Legacy fallback
+            if hasattr(openai, 'ChatCompletion'):
+                response = openai.ChatCompletion.create(
+                    model=os.getenv('OPENAI_MODEL', 'gpt-4'),
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature
+                )
+                return response['choices'][0]['message']['content']
+        except Exception as e:
+            logger.error(f"OpenAI chat completion failed: {str(e)}")
+        return None
 
     async def enhance_product_description(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to create luxury product descriptions."""
@@ -46,8 +84,10 @@ class OpenAIIntelligenceService:
             Format as HTML with proper styling for e-commerce.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            enhanced_description = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a luxury brand copywriter specializing in high-end product descriptions that convert browsers into buyers."},
                     {"role": "user", "content": prompt}
@@ -56,7 +96,8 @@ class OpenAIIntelligenceService:
                 temperature=0.7
             )
 
-            enhanced_description = response.choices[0].message.content
+            if enhanced_description is None:
+                return {'error': 'Failed to generate description'}
 
             logger.info(f"✨ Enhanced product description created with OpenAI")
 
@@ -97,8 +138,10 @@ class OpenAIIntelligenceService:
             Focus on premium positioning and high-value customer acquisition.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            strategy = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a luxury brand strategist and digital marketing expert specializing in high-end consumer brands."},
                     {"role": "user", "content": prompt}
@@ -107,7 +150,8 @@ class OpenAIIntelligenceService:
                 temperature=0.6
             )
 
-            strategy = response.choices[0].message.content
+            if strategy is None:
+                return {'error': 'Failed to generate content strategy'}
 
             logger.info("🎯 Luxury content strategy generated with OpenAI")
 
@@ -147,8 +191,10 @@ class OpenAIIntelligenceService:
             Maintain luxury brand voice while optimizing for search engines.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            seo_optimization = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are an SEO expert specializing in luxury brand optimization and high-end consumer search behavior."},
                     {"role": "user", "content": prompt}
@@ -157,7 +203,8 @@ class OpenAIIntelligenceService:
                 temperature=0.5
             )
 
-            seo_optimization = response.choices[0].message.content
+            if seo_optimization is None:
+                return {'error': 'Failed to generate SEO optimization'}
 
             logger.info("🔍 SEO optimization completed with OpenAI")
 
@@ -196,8 +243,10 @@ class OpenAIIntelligenceService:
             Focus on actionable strategies that can be implemented immediately.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            competitive_analysis = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a luxury brand strategist and competitive intelligence expert with deep knowledge of premium market dynamics."},
                     {"role": "user", "content": prompt}
@@ -206,7 +255,8 @@ class OpenAIIntelligenceService:
                 temperature=0.6
             )
 
-            competitive_analysis = response.choices[0].message.content
+            if competitive_analysis is None:
+                return {'error': 'Failed to generate competitive analysis'}
 
             logger.info("🏆 Competitive analysis completed with OpenAI")
 
@@ -246,8 +296,10 @@ class OpenAIIntelligenceService:
             Include luxury design elements and premium positioning.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            email_campaign = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a luxury email marketing specialist who creates campaigns that achieve 40%+ open rates and high conversion for premium brands."},
                     {"role": "user", "content": prompt}
@@ -256,7 +308,8 @@ class OpenAIIntelligenceService:
                 temperature=0.7
             )
 
-            email_campaign = response.choices[0].message.content
+            if email_campaign is None:
+                return {'error': 'Failed to generate email campaign'}
 
             logger.info("💌 Luxury email campaign generated with OpenAI")
 
@@ -296,8 +349,10 @@ class OpenAIIntelligenceService:
             Encourage high-quality engagement from affluent audience.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            social_content = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a luxury social media strategist who creates viral content for high-end brands with sophisticated audiences."},
                     {"role": "user", "content": prompt}
@@ -306,7 +361,8 @@ class OpenAIIntelligenceService:
                 temperature=0.8
             )
 
-            social_content = response.choices[0].message.content
+            if social_content is None:
+                return {'error': 'Failed to generate social content'}
 
             logger.info("📱 Luxury social media content generated with OpenAI")
 
@@ -347,8 +403,10 @@ class OpenAIIntelligenceService:
             Make decisions that prioritize long-term brand value and premium positioning.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            business_decision = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a seasoned luxury brand CEO with 20+ years of experience in premium market strategy, known for making data-driven decisions that enhance brand prestige and profitability."},
                     {"role": "user", "content": prompt}
@@ -357,7 +415,8 @@ class OpenAIIntelligenceService:
                 temperature=0.4
             )
 
-            business_decision = response.choices[0].message.content
+            if business_decision is None:
+                return {'error': 'Failed to generate executive decision'}
 
             logger.info("🎯 Executive business decision generated with OpenAI")
 
@@ -398,8 +457,10 @@ class OpenAIIntelligenceService:
             Focus on luxury customer psychology and premium buying behavior.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
+            if not self.api_key:
+                return {'error': 'OPENAI_API_KEY not configured'}
+
+            funnel_optimization = self._create_chat_completion(
                 messages=[
                     {"role": "system", "content": "You are a conversion rate optimization expert specializing in luxury e-commerce with deep understanding of affluent consumer behavior."},
                     {"role": "user", "content": prompt}
@@ -408,7 +469,8 @@ class OpenAIIntelligenceService:
                 temperature=0.5
             )
 
-            funnel_optimization = response.choices[0].message.content
+            if funnel_optimization is None:
+                return {'error': 'Failed to generate funnel optimization'}
 
             logger.info("🎯 Conversion funnel optimization completed with OpenAI")
 

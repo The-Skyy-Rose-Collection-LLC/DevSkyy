@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ModernWordPressDashboard from './ModernWordPressDashboard'
-import AutomationDashboard from './AutomationDashboard'
-import StreetAgentDashboard from './StreetAgentDashboard'
-import FrontendAgentManager from './FrontendAgentManager'
-import TaskManager from './TaskManager'
-import RiskDashboard from './RiskDashboard'
+const ModernWordPressDashboard = React.lazy(() => import('./ModernWordPressDashboard'))
+const AutomationDashboard = React.lazy(() => import('./AutomationDashboard'))
+const StreetAgentDashboard = React.lazy(() => import('./StreetAgentDashboard'))
+const FrontendAgentManager = React.lazy(() => import('./FrontendAgentManager'))
+const TaskManager = React.lazy(() => import('./TaskManager'))
+const RiskDashboard = React.lazy(() => import('./RiskDashboard'))
 
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents')
@@ -294,27 +294,34 @@ const ModernApp = () => {
               transition={{ duration: 0.3 }}
               className="h-full"
             >
-              {renderCurrentView()}
+              <Suspense fallback={<div className="p-6 text-gray-400">Loading…</div>}>
+                {renderCurrentView()}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
-      {/* Floating particles for extra flair */}
+      {/* Floating particles for extra flair (deterministic for SSR/build stability) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(5)].map((_, i) => (
+        {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-purple-400 rounded-full opacity-30"
+            initial={{
+              x: (i + 1) * 100,
+              y: (i + 1) * 80,
+              opacity: 0
+            }}
             animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-              opacity: [0, 0.3, 0],
+              x: [(i + 1) * 100, (i + 2) * 120],
+              y: [(i + 1) * 80, (i + 2) * 90],
+              opacity: [0, 0.3, 0]
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: 14 + i * 2,
               repeat: Infinity,
-              delay: i * 2,
+              delay: i * 1.5
             }}
           />
         ))}
