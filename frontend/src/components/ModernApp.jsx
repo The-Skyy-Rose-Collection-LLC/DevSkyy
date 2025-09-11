@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ModernWordPressDashboard from './ModernWordPressDashboard'
-import AutomationDashboard from './AutomationDashboard'
-import StreetAgentDashboard from './StreetAgentDashboard'
-import FrontendAgentManager from './FrontendAgentManager'
-import TaskManager from './TaskManager'
-import RiskDashboard from './RiskDashboard'
+
+// Lazy load components for better performance
+const ModernWordPressDashboard = lazy(() => import('./ModernWordPressDashboard'))
+const AutomationDashboard = lazy(() => import('./AutomationDashboard'))
+const StreetAgentDashboard = lazy(() => import('./StreetAgentDashboard'))
+const FrontendAgentManager = lazy(() => import('./FrontendAgentManager'))
+const TaskManager = lazy(() => import('./TaskManager'))
+const RiskDashboard = lazy(() => import('./RiskDashboard'))
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <motion.div
+      className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+    />
+  </div>
+)
 
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents')
@@ -294,7 +307,9 @@ const ModernApp = () => {
               transition={{ duration: 0.3 }}
               className="h-full"
             >
-              {renderCurrentView()}
+              <Suspense fallback={<LoadingSpinner />}>
+                {renderCurrentView()}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>
