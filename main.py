@@ -40,6 +40,7 @@ from models import (
     ChargebackRequest, CodeAnalysisRequest, WebsiteAnalysisRequest
 )
 from dotenv import load_dotenv
+from config import config as app_config
 
 # Load environment variables
 load_dotenv()
@@ -63,18 +64,36 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Production middleware
+# Production middleware (use environment-specific config)
+ENV = os.getenv('APP_ENV', 'default')
+ActiveConfig = app_config.get(ENV, app_config['default'])
+cors_origins = os.getenv("CORS_ORIGINS")
+if cors_origins:
+    allow_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+else:
+    allow_origins = getattr(ActiveConfig, 'CORS_ORIGINS', ["http://localhost:3000"]) or ["http://localhost:3000"]
+
+trusted_hosts_env = os.getenv("TRUSTED_HOSTS")
+if trusted_hosts_env:
+    allowed_hosts = [host.strip() for host in trusted_hosts_env.split(",") if host.strip()]
+else:
+    allowed_hosts = getattr(ActiveConfig, 'TRUSTED_HOSTS', ["*"]) or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Avoid wildcard hosts in production
+if ENV == 'production' and allowed_hosts == ["*"]:
+    allowed_hosts = [ActiveConfig.BRAND_DOMAIN] if hasattr(ActiveConfig, 'BRAND_DOMAIN') else ["theskyy-rose-collection.com"]
+
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"]  # Configure for your domain in production
+    allowed_hosts=allowed_hosts
 )
 
 # Global exception handlers

@@ -9,29 +9,23 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: false,
+    minify: 'esbuild',
+    terserOptions: undefined,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           animations: ['framer-motion'],
           http: ['axios']
-        }
+        },
+        compact: true
       }
-    }
+    },
+    target: 'es2018'
   },
   server: {
     port: 3000,
     host: '0.0.0.0',
-    allowedHosts: [
-      'webfix-mission.preview.emergentagent.com', 
-      '.emergent.host',
-      'agent-dashboard-25.preview.emergentagent.com',
-      '.emergentagent.com',
-      'Devskyy.app',
-      '.Devskyy.app',
-      'devskyy.app',
-      '.devskyy.app'
-    ],
     proxy: {
       '/api': {
         target: 'http://localhost:8001',
@@ -43,5 +37,8 @@ export default defineConfig({
   define: {
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || '/api'),
     'process.env.REACT_APP_BACKEND_URL': JSON.stringify(process.env.REACT_APP_BACKEND_URL || '/api')
+  },
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : []
   }
 })
