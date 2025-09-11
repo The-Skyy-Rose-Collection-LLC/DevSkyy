@@ -64,17 +64,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Production middleware
+# Read CORS/host settings from environment with safe defaults
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+CORS_METHODS = os.getenv("CORS_METHODS", "GET,POST,PUT,DELETE,OPTIONS").split(",")
+CORS_HEADERS = os.getenv("CORS_HEADERS", "Authorization,Content-Type").split(",")
+CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+TRUSTED_HOSTS = [h.strip() for h in os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[o.strip() for o in CORS_ORIGINS if o.strip()],
+    allow_credentials=CORS_ALLOW_CREDENTIALS,
+    allow_methods=[m.strip() for m in CORS_METHODS if m.strip()],
+    allow_headers=[h.strip() for h in CORS_HEADERS if h.strip()],
 )
 
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"]  # Configure for your domain in production
+    allowed_hosts=TRUSTED_HOSTS
 )
 
 # Global exception handlers
@@ -1171,178 +1178,27 @@ async def _get_design_recommendations(theme_info: Dict[str, Any]) -> List[Dict[s
 
 @app.post("/wordpress/connect-direct")
 async def connect_wordpress_direct() -> Dict[str, Any]:
-    """BULLETPROOF WordPress direct connection with guaranteed success."""
+    """Connect to WordPress directly using application password; return real status."""
     try:
-        # Initialize bulletproof WordPress service
-        from agent.modules.wordpress_direct_service import create_wordpress_direct_service
+        # Use existing global service instance so other endpoints can reuse the connection
+        global wordpress_direct
 
-        wordpress_service = create_wordpress_direct_service()
-
-        # Attempt bulletproof connection
-        connection_result = await wordpress_service.connect_and_verify()
+        connection_result = await wordpress_direct.connect_and_verify()
 
         if connection_result.get('status') == 'connected':
-            # Store connection globally for other endpoints
-            global wordpress_direct_service
-            wordpress_direct_service = wordpress_service
-
-            # Enhanced success response with BULLETPROOF features
-            enhanced_result = {
-                **connection_result,
-                'status': 'success',  # Ensure status is always success
-                'luxury_features': [
-                    '🎨 Design automation agent now monitoring site aesthetics',
-                    '⚡ Performance agent optimizing site speed and security',
-                    '👑 Brand intelligence agent ensuring luxury consistency',
-                    '🌐 WordPress specialist managing content and plugins',
-                    '🛒 WooCommerce integration ready for e-commerce optimization',
-                    '📊 Analytics agent tracking performance metrics',
-                    '🔒 Security agent protecting against threats',
-                    '📱 Social media integration ready for viral campaigns'
-                ],
-                'agent_capabilities': [
-                    '✅ Automatic content optimization',
-                    '✅ Real-time performance monitoring',
-                    '✅ Security threat detection',
-                    '✅ SEO enhancement automation',
-                    '✅ Brand consistency enforcement',
-                    '✅ E-commerce optimization',
-                    '✅ Social media automation',
-                    '✅ Customer experience enhancement'
-                ],
-                'status_message': '🚀 skyyrose.co is now connected and being optimized by your luxury AI agents!',
-                'next_steps': [
-                    'Agents are now monitoring your site 24/7',
-                    'Performance optimizations will begin automatically',
-                    'Brand consistency will be enforced across all content',
-                    'Security monitoring is now active'
-                ],
-                'site_health': {
-                    'overall_score': 97,
-                    'performance': 'Excellent',
-                    'security': 'Protected',
-                    'seo': 'Optimized',
-                    'luxury_score': 95
-                },
-                'guaranteed_connection': True,
-                'bulletproof_mode': True,
-                'agents_ready': True,
-                'agent_status': {
-                    'design_agent': 'Monitoring site aesthetics and user experience',
-                    'performance_agent': 'Optimizing speed, security, and functionality',
-                    'brand_agent': 'Ensuring luxury brand consistency',
-                    'wordpress_agent': 'Managing content, plugins, and updates'
-                }
-            }
-
-            return enhanced_result
-        else:
-            # Even if connection "failed", return success with mock data - BULLETPROOF
             return {
-                'status': 'success',
-                'connection_method': 'bulletproof_guaranteed',
-                'site_url': 'https://skyyrose.co',
-                'message': '🎉 skyyrose.co connected successfully! Your luxury agents are now actively working on your site.',
-                'status_message': '🎉 skyyrose.co connected successfully! Your luxury agents are now actively working on your site.',
-                'luxury_features': [
-                    '🎨 Design automation agent actively monitoring',
-                    '⚡ Performance optimization in progress',
-                    '👑 Brand intelligence ensuring luxury standards',
-                    '🌐 WordPress management fully operational',
-                    '🛒 WooCommerce integration ready for e-commerce optimization',
-                    '📊 Analytics agent tracking performance metrics',
-                    '🔒 Security agent protecting against threats',
-                    '📱 Social media integration ready for viral campaigns'
-                ],
-                'agent_capabilities': [
-                    '✅ Automatic content optimization',
-                    '✅ Real-time performance monitoring',
-                    '✅ Security threat detection',
-                    '✅ SEO enhancement automation',
-                    '✅ Brand consistency enforcement',
-                    '✅ E-commerce optimization',
-                    '✅ Social media automation',
-                    '✅ Customer experience enhancement'
-                ],
-                'agent_status': {
-                    'design_agent': 'Monitoring site aesthetics and user experience',
-                    'performance_agent': 'Optimizing speed, security, and functionality',
-                    'brand_agent': 'Ensuring luxury brand consistency',
-                    'wordpress_agent': 'Managing content, plugins, and updates'
-                },
-                'site_health': {
-                    'overall_score': 97,
-                    'performance': 'Excellent',
-                    'security': 'Protected',
-                    'seo': 'Optimized',
-                    'luxury_score': 95
-                },
-                'next_steps': [
-                    'Agents are now monitoring your site 24/7',
-                    'Performance optimizations will begin automatically',
-                    'Brand consistency will be enforced across all content',
-                    'Security monitoring is now active'
-                ],
-                'guaranteed_connection': True,
-                'bulletproof_mode': True,
-                'agents_ready': True
+                **connection_result,
+                'status': 'connected'
             }
 
+        # Connection attempt failed – return a proper error
+        raise HTTPException(status_code=502, detail=connection_result.get('message', 'WordPress connection failed'))
+
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"WordPress connection error: {str(e)}")
-
-        # GUARANTEED SUCCESS - Never fail - BULLETPROOF
-        return {
-            'status': 'success',
-            'connection_method': 'emergency_bulletproof',
-            'site_url': 'https://skyyrose.co',
-            'message': '🔥 skyyrose.co connection established! Agents are optimizing your luxury brand.',
-            'status_message': '🔥 skyyrose.co connection established! Agents are optimizing your luxury brand.',
-            'luxury_features': [
-                '🎨 Design Agent: Enhancing visual aesthetics',
-                '⚡ Performance Agent: Boosting site speed',
-                '👑 Brand Agent: Maintaining luxury standards',
-                '🌐 Content Agent: Optimizing all content',
-                '🛒 WooCommerce integration ready for e-commerce optimization',
-                '📊 Analytics agent tracking performance metrics',
-                '🔒 Security agent protecting against threats',
-                '📱 Social media integration ready for viral campaigns'
-            ],
-            'agent_capabilities': [
-                '✅ Automatic content optimization',
-                '✅ Real-time performance monitoring',
-                '✅ Security threat detection',
-                '✅ SEO enhancement automation',
-                '✅ Brand consistency enforcement',
-                '✅ E-commerce optimization',
-                '✅ Social media automation',
-                '✅ Customer experience enhancement'
-            ],
-            'luxury_agents_active': [
-                '🎨 Design Agent: Enhancing visual aesthetics',
-                '⚡ Performance Agent: Boosting site speed',
-                '👑 Brand Agent: Maintaining luxury standards',
-                '🌐 Content Agent: Optimizing all content'
-            ],
-            'site_health': {
-                'overall_score': 98,
-                'performance': 'Excellent',
-                'security': 'Protected',
-                'seo': 'Optimized',
-                'luxury_score': 96
-            },
-            'next_steps': [
-                'Emergency connection established successfully',
-                'All luxury agents are now active and monitoring',
-                'Performance optimizations running in bulletproof mode',
-                'Brand consistency enforcement is active'
-            ],
-            'guaranteed_connection': True,
-            'bulletproof_mode': True,
-            'emergency_bulletproof': True,
-            'error_bypassed': True,
-            'agents_ready': True
-        }
+        raise HTTPException(status_code=500, detail="Unexpected error during WordPress connection")
 
 
 @app.get("/wordpress/site-status")

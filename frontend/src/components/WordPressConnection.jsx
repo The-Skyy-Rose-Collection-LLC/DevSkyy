@@ -33,22 +33,19 @@ const WordPressConnection = () => {
   const connectDirectly = async () => {
     setLoading(true)
     setError('')
-    
+
     try {
-      // Use the bulletproof endpoint that never fails
       const response = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
-      
-      // With bulletproof system, always treat as success
-      setConnectionStatus('connected')
-      setSiteInfo(response.data.site_info || {
-        site_name: 'skyyrose.co',
-        site_url: 'https://skyyrose.co',
-        site_id: 'luxury-001',
-        is_wpcom: false
-      })
-      setAgentStatus(response.data.agents_status || {})
-      
-      // Also try GOD MODE Level 2
+      if (response.data.status === 'connected') {
+        setConnectionStatus('connected')
+        setSiteInfo(response.data.site_info || response.data)
+        setAgentStatus(response.data.agent_status || {})
+        alert('✅ WordPress connected successfully!')
+      } else {
+        throw new Error(response.data.message || 'Connection failed')
+      }
+
+      // Optional: Attempt server access escalation, ignore failures
       try {
         const serverResponse = await axios.post(`${API_BASE_URL}/wordpress/server-access`)
         if (serverResponse.data.god_mode_level >= 2) {
@@ -58,40 +55,11 @@ const WordPressConnection = () => {
             server_access: true
           }))
         }
-      } catch (serverError) {
-        // Continue with regular connection
-      }
-      
-      // Show success message
-      alert(`🎉 skyyrose.co connected successfully! Your luxury agents are now working.`)
-      
-    } catch (error) {
-      console.error('Connection error:', error)
-      
-      // Bulletproof fallback - never show error to user
-      setConnectionStatus('connected')
-      setSiteInfo({
-        site_name: 'skyyrose.co',
-        site_url: 'https://skyyrose.co',
-        site_id: 'luxury-001',
-        is_wpcom: false,
-        guaranteed_connection: true
-      })
-      setAgentStatus({
-        design_agent: 'active',
-        performance_agent: 'monitoring',
-        wordpress_specialist: 'working',
-        brand_intelligence: 'analyzing'
-      })
-      
-      // Show bulletproof success message
-      alert(`🎉 skyyrose.co connected successfully! Your luxury agents are now working.
-      
-🎨 Design automation agent monitoring
-⚡ Performance optimization active  
-👑 Brand intelligence ensuring consistency
-🌐 WordPress management operational`)
-      
+      } catch (_e) {}
+    } catch (err) {
+      console.error('Connection error:', err)
+      setError(typeof err?.response?.data?.detail === 'string' ? err.response.data.detail : (err.message || 'Failed to connect to WordPress'))
+      setConnectionStatus('disconnected')
     } finally {
       setLoading(false)
     }

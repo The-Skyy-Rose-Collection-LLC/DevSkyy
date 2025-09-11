@@ -251,9 +251,17 @@ def _check_site_health() -> Dict[str, Any]:
     try:
         # Try to check local development server
         test_urls = [
+            # Common FastAPI defaults
             "http://localhost:8000",
             "http://0.0.0.0:8000",
-            "http://127.0.0.1:8000"
+            "http://127.0.0.1:8000",
+            # Project-specific ports
+            "http://localhost:5000",
+            "http://127.0.0.1:5000",
+            "http://0.0.0.0:5000",
+            "http://localhost:8001",
+            "http://127.0.0.1:8001",
+            "http://0.0.0.0:8001",
         ]
 
         for url in test_urls:
