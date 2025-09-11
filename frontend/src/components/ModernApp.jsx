@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ModernWordPressDashboard from './ModernWordPressDashboard'
-import AutomationDashboard from './AutomationDashboard'
-import StreetAgentDashboard from './StreetAgentDashboard'
-import FrontendAgentManager from './FrontendAgentManager'
-import TaskManager from './TaskManager'
-import RiskDashboard from './RiskDashboard'
+
+// Lazy load heavy views to reduce initial bundle size
+const ModernWordPressDashboard = lazy(() => import('./ModernWordPressDashboard'))
+const AutomationDashboard = lazy(() => import('./AutomationDashboard'))
+const StreetAgentDashboard = lazy(() => import('./StreetAgentDashboard'))
+const FrontendAgentManager = lazy(() => import('./FrontendAgentManager'))
+const TaskManager = lazy(() => import('./TaskManager'))
+const RiskDashboard = lazy(() => import('./RiskDashboard'))
 
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents')
@@ -294,7 +296,9 @@ const ModernApp = () => {
               transition={{ duration: 0.3 }}
               className="h-full"
             >
-              {renderCurrentView()}
+              <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-gray-400">Loading…</div>}>
+                {renderCurrentView()}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>
