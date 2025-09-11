@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build --mode production",
+    "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
     "preview": "vite preview",
-    "start": "vite --host 0.0.0.0 --port 3000"
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "lint": "eslint src --ext .js,.jsx --fix",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^18.0.0",

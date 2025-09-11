@@ -1,6 +1,7 @@
 import os
 import requests
 import logging
+import re
 from typing import Dict, Any, List
 from datetime import datetime
 import time
@@ -310,9 +311,28 @@ def _security_scan() -> List[str]:
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                         content = f.read()
 
-                    # Check for hardcoded credentials
-                    if any(keyword in content.lower() for keyword in ['password =', 'api_key =', 'secret =']):
-                        security_issues.append(f"{file_path}: Possible hardcoded credentials")
+                    # Check for hardcoded credentials with more specific patterns
+                    credential_patterns = [
+                        r'password\s*=\s*["\'][^"\']+["\']',  # password = "actual_password"
+                        r'api_key\s*=\s*["\'][^"\']+["\']',  # api_key = "actual_key"
+                        r'secret\s*=\s*["\'][^"\']+["\']',   # secret = "actual_secret"
+                        r'password\s*=\s*[^"\'\s][^"\'\n]+',  # password = actual_password (no quotes)
+                        r'api_key\s*=\s*[^"\'\s][^"\'\n]+',  # api_key = actual_key (no quotes)
+                        r'secret\s*=\s*[^"\'\s][^"\'\n]+'    # secret = actual_secret (no quotes)
+                    ]
+                    
+                    for pattern in credential_patterns:
+                        if re.search(pattern, content, re.IGNORECASE):
+                            # Additional check to avoid false positives
+                            if not any(exclude in content.lower() for exclude in [
+                                'password = ""', 'password = \'\'', 'api_key = ""', 'api_key = \'\'',
+                                'secret = ""', 'secret = \'\'', 'password = None', 'api_key = None',
+                                'secret = None', 'password = os.getenv', 'api_key = os.getenv',
+                                'secret = os.getenv', 'password = config', 'api_key = config',
+                                'secret = config'
+                            ]):
+                                security_issues.append(f"{file_path}: Possible hardcoded credentials detected")
+                                break
 
                     # Check for SQL injection risks
                     if 'execute(' in content and '%' in content:

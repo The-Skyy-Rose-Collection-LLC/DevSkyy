@@ -386,29 +386,49 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
         original_content = content
 
-        # Remove duplicate properties (basic implementation)
+        # Remove duplicate properties (improved implementation)
         lines = content.split('\n')
         in_rule = False
-        current_rule_props = set()
+        current_rule_props = {}  # Changed to dict to track line numbers
+        brace_count = 0
 
         for i, line in enumerate(lines):
-            if '{' in line:
+            # Count braces to properly handle nested rules
+            brace_count += line.count('{')
+            brace_count -= line.count('}')
+            
+            if '{' in line and brace_count == 1:
                 in_rule = True
-                current_rule_props = set()
-            elif '}' in line:
+                current_rule_props = {}
+            elif '}' in line and brace_count == 0:
                 in_rule = False
-            elif in_rule and ':' in line:
-                prop = line.split(':')[0].strip()
-                if prop in current_rule_props:
-                    lines[i] = ''  # Remove duplicate
-                    fixes.append({
-                        "file": file_path,
-                        "type": "warning",
-                        "description": f"Removed duplicate property: {prop}",
-                        "line": i + 1
-                    })
-                else:
-                    current_rule_props.add(prop)
+            elif in_rule and ':' in line and not line.strip().startswith('/*'):
+                # Extract property name more carefully
+                prop_part = line.split(':')[0].strip()
+                # Handle pseudo-selectors and media queries
+                if not any(char in prop_part for char in ['@', '&', ':', '(', ')', '[']):
+                    prop = prop_part.split()[-1]  # Get the last word (actual property)
+                    if prop and prop not in ['hover', 'focus', 'active', 'before', 'after', 'first-child', 'last-child']:
+                        if prop in current_rule_props:
+                            # Only remove if it's truly a duplicate (same property, not different values)
+                            if current_rule_props[prop] != line.strip():
+                                lines[i] = ''  # Remove duplicate
+                                fixes.append({
+                                    "file": file_path,
+                                    "type": "warning",
+                                    "description": f"Removed duplicate property: {prop}",
+                                    "line": i + 1
+                                })
+                            else:
+                                # Keep the last occurrence, remove the previous one
+                                prev_line = current_rule_props[prop]
+                                for j in range(len(lines)):
+                                    if lines[j].strip() == prev_line:
+                                        lines[j] = ''
+                                        break
+                                current_rule_props[prop] = line.strip()
+                        else:
+                            current_rule_props[prop] = line.strip()
 
         content = '\n'.join(lines)
 
