@@ -14,8 +14,20 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           animations: ['framer-motion'],
-          http: ['axios']
-        }
+          http: ['axios'],
+          icons: ['@heroicons/react']
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
       }
     }
   },
