@@ -29,6 +29,8 @@ from agent.modules.openai_intelligence_service import OpenAIIntelligenceService,
 from agent.modules.social_media_automation_agent import SocialMediaAutomationAgent
 from agent.modules.email_sms_automation_agent import EmailSMSAutomationAgent
 from agent.modules.design_automation_agent import DesignAutomationAgent
+from agent.modules.cache_manager import cache_manager, cached, start_cache_cleanup
+from agent.modules.database_optimizer import db_connection_pool, index_optimizer, get_database_stats, optimize_query
 from agent.scheduler.cron import schedule_hourly_job
 from agent.git_commit import commit_fixes, commit_all_changes  # Imported commit_all_changes
 from typing import Dict, Any, List
@@ -120,51 +122,83 @@ async def general_exception_handler(request: Request, exc: Exception):
         }
     )
 
-# Initialize brand intelligence first
-brand_intelligence = BrandIntelligenceAgent()
+# Global agent cache for lazy initialization
+_agent_cache = {}
+_brand_intelligence = None
 
-# Initialize all agents with brand context
-inventory_agent = InventoryAgent()
-financial_agent = FinancialAgent()
-ecommerce_agent = EcommerceAgent()
-wordpress_agent = WordPressAgent()
-web_dev_agent = WebDevelopmentAgent()
-site_comm_agent = SiteCommunicationAgent()
+def get_brand_intelligence():
+    """Get or create brand intelligence agent (singleton pattern)."""
+    global _brand_intelligence
+    if _brand_intelligence is None:
+        _brand_intelligence = BrandIntelligenceAgent()
+    return _brand_intelligence
 
-# Initialize new specialized agents
-seo_marketing_agent = SEOMarketingAgent()
-customer_service_agent = CustomerServiceAgent()
-security_agent = SecurityAgent()
-performance_agent = PerformanceAgent()
-task_risk_manager = TaskRiskManager()
-agent_assignment_manager = create_agent_assignment_manager()
-wordpress_service = create_wordpress_integration_service()
-wordpress_direct = create_wordpress_direct_service()
-woocommerce_service = create_woocommerce_integration_service()
-openai_service = create_openai_intelligence_service()
+def get_agent(agent_name: str):
+    """Get or create agent instance (lazy initialization with caching)."""
+    global _agent_cache
+    
+    if agent_name not in _agent_cache:
+        # Agent factory mapping
+        agent_factories = {
+            "inventory": lambda: InventoryAgent(),
+            "financial": lambda: FinancialAgent(),
+            "ecommerce": lambda: EcommerceAgent(),
+            "wordpress": lambda: WordPressAgent(),
+            "web_development": lambda: WebDevelopmentAgent(),
+            "site_communication": lambda: SiteCommunicationAgent(),
+            "seo_marketing": lambda: SEOMarketingAgent(),
+            "customer_service": lambda: CustomerServiceAgent(),
+            "security": lambda: SecurityAgent(),
+            "performance": lambda: PerformanceAgent(),
+            "task_risk_manager": lambda: TaskRiskManager(),
+            "agent_assignment_manager": lambda: create_agent_assignment_manager(),
+            "wordpress_service": lambda: create_wordpress_integration_service(),
+            "wordpress_direct": lambda: create_wordpress_direct_service(),
+            "woocommerce_service": lambda: create_woocommerce_integration_service(),
+            "openai_service": lambda: create_openai_intelligence_service(),
+            "social_media_automation": lambda: SocialMediaAutomationAgent(),
+            "email_sms_automation": lambda: EmailSMSAutomationAgent(),
+            "design_automation": lambda: DesignAutomationAgent()
+        }
+        
+        if agent_name in agent_factories:
+            _agent_cache[agent_name] = agent_factories[agent_name]()
+            
+            # Inject brand intelligence for applicable agents
+            if agent_name in ["inventory", "financial", "ecommerce", "wordpress", 
+                            "web_development", "site_communication", "seo_marketing", 
+                            "customer_service", "security", "performance"]:
+                brand_intelligence = get_brand_intelligence()
+                agent = _agent_cache[agent_name]
+                if hasattr(agent, 'brand_context'):
+                    agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
+                else:
+                    setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
+        else:
+            raise ValueError(f"Unknown agent: {agent_name}")
+    
+    return _agent_cache[agent_name]
 
-# Initialize automation agents
-social_media_automation_agent = SocialMediaAutomationAgent()
-email_sms_automation_agent = EmailSMSAutomationAgent()
-design_automation_agent = DesignAutomationAgent()
-
-# Inject brand intelligence into all agents
-for agent_name, agent in [
-    ("inventory", inventory_agent),
-    ("financial", financial_agent),
-    ("ecommerce", ecommerce_agent),
-    ("wordpress", wordpress_agent),
-    ("web_development", web_dev_agent),
-    ("site_communication", site_comm_agent),
-    ("seo_marketing", seo_marketing_agent),
-    ("customer_service", customer_service_agent),
-    ("security", security_agent),
-    ("performance", performance_agent)
-]:
-    if hasattr(agent, 'brand_context'):
-        agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
-    else:
-        setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
+# Convenience functions for backward compatibility
+def get_inventory_agent(): return get_agent("inventory")
+def get_financial_agent(): return get_agent("financial")
+def get_ecommerce_agent(): return get_agent("ecommerce")
+def get_wordpress_agent(): return get_agent("wordpress")
+def get_web_dev_agent(): return get_agent("web_development")
+def get_site_comm_agent(): return get_agent("site_communication")
+def get_seo_marketing_agent(): return get_agent("seo_marketing")
+def get_customer_service_agent(): return get_agent("customer_service")
+def get_security_agent(): return get_agent("security")
+def get_performance_agent(): return get_agent("performance")
+def get_task_risk_manager(): return get_agent("task_risk_manager")
+def get_agent_assignment_manager(): return get_agent("agent_assignment_manager")
+def get_wordpress_service(): return get_agent("wordpress_service")
+def get_wordpress_direct(): return get_agent("wordpress_direct")
+def get_woocommerce_service(): return get_agent("woocommerce_service")
+def get_openai_service(): return get_agent("openai_service")
+def get_social_media_automation_agent(): return get_agent("social_media_automation")
+def get_email_sms_automation_agent(): return get_agent("email_sms_automation")
+def get_design_automation_agent(): return get_agent("design_automation")
 
 
 def run_agent() -> dict:
@@ -225,22 +259,103 @@ def health_check() -> dict:
 def get_metrics() -> dict:
     """System metrics endpoint for monitoring."""
     try:
+        cache_stats = cache_manager.get_stats()
         return {
             "timestamp": datetime.now().isoformat(),
             "uptime": "operational",
             "requests_processed": "active",
             "memory_usage": "optimal",
-            "cpu_usage": "normal"
+            "cpu_usage": "normal",
+            "cache_stats": cache_stats
         }
     except Exception as e:
         logger.error(f"Metrics collection failed: {e}")
         raise HTTPException(status_code=500, detail="Failed to collect metrics")
 
 
+@app.get("/cache/stats")
+def get_cache_stats() -> Dict[str, Any]:
+    """Get cache statistics."""
+    return cache_manager.get_stats()
+
+
+@app.post("/cache/clear")
+def clear_cache() -> Dict[str, Any]:
+    """Clear all cache entries."""
+    cache_manager.clear()
+    return {"message": "Cache cleared successfully", "timestamp": datetime.now().isoformat()}
+
+
+# Database Optimization Endpoints
+@app.get("/database/stats")
+def get_database_performance_stats() -> Dict[str, Any]:
+    """Get database performance statistics."""
+    return get_database_stats()
+
+
+@app.post("/database/optimize")
+async def optimize_database_queries() -> Dict[str, Any]:
+    """Run database optimization analysis."""
+    try:
+        # Analyze common query patterns
+        query_patterns = [
+            "SELECT * FROM products WHERE category = ?",
+            "SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC",
+            "SELECT p.*, c.name FROM products p JOIN categories c ON p.category_id = c.id"
+        ]
+        
+        # Get index recommendations
+        recommendations = index_optimizer.analyze_table("products", query_patterns)
+        
+        return {
+            "optimization_status": "completed",
+            "recommendations": recommendations,
+            "database_stats": get_database_stats(),
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Database optimization failed: {e}")
+        raise HTTPException(status_code=500, detail="Database optimization failed")
+
+
+@app.get("/database/health")
+async def check_database_health() -> Dict[str, Any]:
+    """Check database health and performance."""
+    try:
+        stats = get_database_stats()
+        
+        # Calculate health score
+        query_stats = stats['query_optimizer']
+        health_score = 100
+        
+        if query_stats['slow_query_rate'] > 20:
+            health_score -= 30
+        if query_stats['cache_hit_rate'] < 50:
+            health_score -= 20
+        if stats['connection_pool']['connection_stats']['errors'] > 10:
+            health_score -= 25
+        
+        return {
+            "health_score": max(0, health_score),
+            "status": "healthy" if health_score > 80 else "needs_attention",
+            "database_stats": stats,
+            "recommendations": [
+                "Add indexes for frequently queried columns",
+                "Enable query caching for repeated queries",
+                "Optimize slow queries identified in analysis"
+            ] if health_score < 80 else ["Database performance is optimal"],
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        raise HTTPException(status_code=500, detail="Database health check failed")
+
+
 # Inventory Management Endpoints
 @app.post("/inventory/scan")
 async def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
+    inventory_agent = get_inventory_agent()
     assets = await inventory_agent.scan_assets()
     duplicates = await inventory_agent.find_duplicates()
 
@@ -252,9 +367,10 @@ async def scan_inventory() -> Dict[str, Any]:
 
 
 @app.get("/inventory/report")
+@cached(ttl=300)  # Cache for 5 minutes
 def get_inventory_report() -> Dict[str, Any]:
     """Get comprehensive inventory report."""
-    return inventory_agent.generate_report()
+    return get_inventory_agent().generate_report()
 
 
 @app.post("/inventory/cleanup")
@@ -263,14 +379,14 @@ def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
     if keep_strategy not in ["latest", "largest", "first"]:
         raise HTTPException(status_code=400, detail="Invalid keep_strategy")
 
-    result = inventory_agent.remove_duplicates(keep_strategy)
+    result = get_inventory_agent().remove_duplicates(keep_strategy)
     return result
 
 
 @app.get("/inventory/visualize")
 def visualize_similarities() -> Dict[str, str]:
     """Get visual representation of asset similarities."""
-    visualization = inventory_agent.visualize_similarities()
+    visualization = get_inventory_agent().visualize_similarities()
     return {"visualization": visualization}
 
 
@@ -2292,7 +2408,10 @@ async def push_to_github():
         raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
 
 # Start enhanced learning system on import
-enhanced_learning_status = start_enhanced_learning_system(brand_intelligence)
+enhanced_learning_status = start_enhanced_learning_system(get_brand_intelligence())
+
+# Start cache cleanup background task
+start_cache_cleanup()
 
 
 @app.get("/learning/status")

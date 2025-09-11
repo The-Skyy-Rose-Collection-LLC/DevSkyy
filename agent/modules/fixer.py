@@ -386,29 +386,43 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
         original_content = content
 
-        # Remove duplicate properties (basic implementation)
+        # Remove duplicate properties (improved implementation)
         lines = content.split('\n')
         in_rule = False
-        current_rule_props = set()
+        current_rule_props = {}  # Use dict to track line numbers
+        rule_start_line = 0
 
         for i, line in enumerate(lines):
-            if '{' in line:
+            stripped_line = line.strip()
+            
+            # Check for rule start
+            if '{' in stripped_line and not stripped_line.startswith('/*'):
                 in_rule = True
-                current_rule_props = set()
-            elif '}' in line:
+                current_rule_props = {}
+                rule_start_line = i
+            # Check for rule end
+            elif '}' in stripped_line and in_rule:
                 in_rule = False
-            elif in_rule and ':' in line:
-                prop = line.split(':')[0].strip()
-                if prop in current_rule_props:
-                    lines[i] = ''  # Remove duplicate
-                    fixes.append({
-                        "file": file_path,
-                        "type": "warning",
-                        "description": f"Removed duplicate property: {prop}",
-                        "line": i + 1
-                    })
-                else:
-                    current_rule_props.add(prop)
+                current_rule_props = {}
+            # Process property within rule
+            elif in_rule and ':' in stripped_line and not stripped_line.startswith('/*'):
+                # Extract property name (before colon)
+                prop_part = stripped_line.split(':')[0].strip()
+                # Only consider it a property if it's not a comment and has valid CSS property format
+                if prop_part and not prop_part.startswith('/*') and not prop_part.startswith('*'):
+                    # Check if this property already exists in current rule
+                    if prop_part in current_rule_props:
+                        # Remove the duplicate line
+                        lines[i] = ''
+                        fixes.append({
+                            "file": file_path,
+                            "type": "warning",
+                            "description": f"Removed duplicate property: {prop_part}",
+                            "line": i + 1
+                        })
+                    else:
+                        # Store the property and its line number
+                        current_rule_props[prop_part] = i
 
         content = '\n'.join(lines)
 

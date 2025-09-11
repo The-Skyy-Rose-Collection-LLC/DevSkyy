@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ModernWordPressDashboard from './ModernWordPressDashboard'
-import AutomationDashboard from './AutomationDashboard'
-import StreetAgentDashboard from './StreetAgentDashboard'
-import FrontendAgentManager from './FrontendAgentManager'
-import TaskManager from './TaskManager'
-import RiskDashboard from './RiskDashboard'
+
+// Lazy load components for better performance
+const ModernWordPressDashboard = lazy(() => import('./ModernWordPressDashboard'))
+const AutomationDashboard = lazy(() => import('./AutomationDashboard'))
+const StreetAgentDashboard = lazy(() => import('./StreetAgentDashboard'))
+const FrontendAgentManager = lazy(() => import('./FrontendAgentManager'))
+const TaskManager = lazy(() => import('./TaskManager'))
+const RiskDashboard = lazy(() => import('./RiskDashboard'))
+
+// Loading component for Suspense fallback
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <motion.div
+      className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full"
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+    />
+  </div>
+)
 
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents')
@@ -63,22 +76,22 @@ const ModernApp = () => {
   ]
 
   const renderCurrentView = () => {
-    switch (currentView) {
-      case 'agents':
-        return <StreetAgentDashboard />
-      case 'automation':
-        return <AutomationDashboard />
-      case 'wordpress':
-        return <ModernWordPressDashboard />
-      case 'frontend':
-        return <FrontendAgentManager />
-      case 'tasks':
-        return <TaskManager />
-      case 'monitoring':
-        return <RiskDashboard />
-      default:
-        return <StreetAgentDashboard />
+    const components = {
+      'agents': StreetAgentDashboard,
+      'automation': AutomationDashboard,
+      'wordpress': ModernWordPressDashboard,
+      'frontend': FrontendAgentManager,
+      'tasks': TaskManager,
+      'monitoring': RiskDashboard
     }
+    
+    const Component = components[currentView] || StreetAgentDashboard
+    
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <Component />
+      </Suspense>
+    )
   }
 
   return (
