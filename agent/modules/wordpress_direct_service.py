@@ -15,28 +15,30 @@ class WordPressDirectService:
     """Direct WordPress connection using Application Password - No OAuth needed!"""
 
     def __init__(self):
-        # HARDCODED BULLETPROOF CREDENTIALS - GUARANTEED CONNECTION
-        self.site_url = "https://skyyrose.co"
-        self.username = "skyyroseco"
-        self.password = "_LoveHurts107_"  # Real WordPress login password
+        # ----- SECURITY NOTE --------------------------------------------------
+        # Direct credentials MUST NOT be hard-coded in source control. Doing so
+        # leaks production passwords and grants attackers full access to the
+        # WordPress installation. We now rely exclusively on environment
+        # variables which can be injected at deploy time (e.g. via Docker
+        # secrets, CI secrets, or a .env file that is **never** committed).
+        # ---------------------------------------------------------------------
+
+        self.site_url = os.getenv("WORDPRESS_SITE_URL")
+        self.username = os.getenv("WORDPRESS_USERNAME")
+        self.password = os.getenv("WORDPRESS_PASSWORD")
         self.use_basic_auth = True
 
-        # Try environment variables first (optional)
-        env_site_url = os.getenv('WORDPRESS_SITE_URL')
-        env_username = os.getenv('WORDPRESS_USERNAME')
-        env_password = os.getenv('WORDPRESS_PASSWORD')
+        # Fail fast if any credential is missing – safer than silently falling
+        # back to an insecure default or, worse, assuming connection success.
+        if not all([self.site_url, self.username, self.password]):
+            raise ValueError(
+                "WordPress credentials not found in environment. Set "
+                "WORDPRESS_SITE_URL, WORDPRESS_USERNAME and WORDPRESS_PASSWORD "
+                "to enable the direct service."
+            )
 
-        if env_site_url and env_username and env_password:
-            self.site_url = env_site_url
-            self.username = env_username
-            self.password = env_password
-            logger.info("🔧 Using environment WordPress credentials")
-        else:
-            logger.info("🔒 Using hardcoded WordPress credentials for guaranteed connection")
-
-        # Clean up the password (remove any extra spaces/characters)
-        if self.password:
-            self.password = self.password.strip()
+        # Clean up the password (remove any extra whitespace)
+        self.password = self.password.strip()
 
         # WordPress REST API base URL
         self.api_base = f"{self.site_url.rstrip('/')}/wp-json/wp/v2"
@@ -55,7 +57,7 @@ class WordPressDirectService:
         self.connected = False
         self.site_info = {}
 
-        logger.info(f"🔥 WordPress BULLETPROOF Service initialized for {self.site_url}")
+        logger.info(f"🔥 WordPress Direct Service initialized for {self.site_url}")
         logger.info(f"👤 Username: {self.username}")
         logger.info(f"🔑 Authentication: Basic Auth (Guaranteed Connection)")
 
@@ -81,9 +83,12 @@ class WordPressDirectService:
                 logger.warning(f"⚠️ {method_name} failed: {str(e)}")
                 continue
 
-        # Final fallback - assume connection and return mock data
-        logger.info("🚀 Using guaranteed connection mode")
-        return self._guaranteed_connection_response()
+        # All connection attempts failed. Bubble up a clear error instead of
+        # returning fabricated success data. This prevents the application from
+        # operating under a false sense of security and avoids misleading the
+        # user about the connection status.
+        logger.error("❌ All WordPress connection methods failed")
+        raise ConnectionError("Unable to connect to WordPress with the provided credentials")
 
     async def _try_rest_api_connection(self) -> Dict[str, Any]:
         """Try REST API connection with user credentials."""
@@ -198,39 +203,8 @@ class WordPressDirectService:
             logger.error(f"❌ Direct access failed: {str(e)}")
             raise e
 
-    def _guaranteed_connection_response(self) -> Dict[str, Any]:
-        """Guaranteed connection response - always returns success."""
-        self.connected = True
-
-        return {
-            'status': 'connected',
-            'method': 'GUARANTEED_MODE',
-            'site_url': self.site_url,
-            'user_info': {
-                'id': 1,
-                'username': self.username,
-                'name': 'Skyy Rose Admin',
-                'email': 'admin@skyyrose.co',
-                'capabilities': {
-                    'administrator': True,
-                    'edit_posts': True,
-                    'edit_pages': True,
-                    'manage_options': True
-                }
-            },
-            'site_info': {
-                'name': 'Skyy Rose Co',
-                'description': 'Luxury Streetwear Brand',
-                'url': self.site_url,
-                'home': self.site_url
-            },
-            'connection_method': 'guaranteed_bulletproof',
-            'agents_ready': True,
-            'health': 'excellent',
-            'authenticated': True,
-            'luxury_agents_active': True,
-            'message': '🎉 WordPress connection established! Your luxury agents are now monitoring and optimizing skyyrose.co 24/7.'
-        }
+    # NOTE: _guaranteed_connection_response removed – silent success paths are
+    # dangerous. Connection failures must be surfaced to upstream callers.
 
     async def _setup_woocommerce_integration(self):
         """Setup WooCommerce integration with the connected site."""

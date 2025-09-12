@@ -352,7 +352,8 @@ class InventoryAgent:
         """Find visually similar images using perceptual hashing."""
         # Simulate perceptual hash comparison
         similar_groups = []
-        image_assets = [a for a in assets if a['type'] == 'images']
+        # Assets are tagged with the singular string 'image' during scanning.
+        image_assets = [a for a in assets if a.get('type') == 'image']
 
         # Group by similarity (simplified)
         for i in range(0, len(image_assets), 10):
@@ -435,7 +436,8 @@ class InventoryAgent:
     def _select_keeper(self, group: List[Dict], strategy: str) -> Dict:
         """Select which asset to keep based on strategy."""
         if strategy == "latest":
-            return max(group, key=lambda x: x['modified_at'])
+            # Use the existing 'modified' key recorded during scanning.
+            return max(group, key=lambda x: x.get('modified', 0))
         elif strategy == "largest":
             return max(group, key=lambda x: x['size'])
         elif strategy == "highest_quality":
