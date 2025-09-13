@@ -14,6 +14,7 @@ import cv2
 import imagehash
 from PIL import Image
 import os
+from .image_processing_agent import ImageProcessingAgent
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,10 +35,12 @@ class InventoryAgent:
             "processing_time": 0
         }
         self.brand_context = {}
+        # Enhanced image processing capabilities
+        self.image_processor = ImageProcessingAgent()
         # EXPERIMENTAL: Quantum inventory optimization
         self.quantum_optimizer = self._initialize_quantum_optimizer()
         self.predictive_demand_engine = self._initialize_predictive_engine()
-        logger.info("🎯 Production Inventory Agent Initialized with Quantum Optimization")
+        logger.info("🎯 Production Inventory Agent Initialized with Enhanced Image Processing")
 
     async def scan_assets(self) -> Dict[str, Any]:
         """Comprehensive asset scanning with AI-powered analysis."""
@@ -289,7 +292,7 @@ class InventoryAgent:
         return fingerprints
 
     async def _ai_categorize_assets(self, assets: List[Dict]) -> Dict[str, int]:
-        """AI-powered asset categorization."""
+        """AI-powered asset categorization with enhanced image processing."""
         categories = {
             "product_images": 0,
             "marketing_materials": 0,
@@ -298,17 +301,48 @@ class InventoryAgent:
         }
 
         for asset in assets:
-            name_lower = asset.get('name', '').lower()
-            if any(keyword in name_lower for keyword in ['product', 'item', 'dress', 'accessory']):
-                categories["product_images"] += 1
-            elif any(keyword in name_lower for keyword in ['banner', 'promo', 'ad', 'marketing']):
-                categories["marketing_materials"] += 1
-            elif any(keyword in name_lower for keyword in ['doc', 'readme', 'guide']):
-                categories["documentation"] += 1
+            # Use enhanced image categorization for image assets
+            if asset.get('type') == 'image' and 'path' in asset:
+                try:
+                    categorization_result = await self.image_processor.ai_categorize_image(
+                        asset['path'], 
+                        custom_categories=['luxury_fashion', 'streetwear', 'accessories']
+                    )
+                    
+                    primary_category = categorization_result.get('primary_category', 'unknown')
+                    
+                    # Map AI categories to inventory categories
+                    if primary_category in ['dress', 'top', 'accessory', 'luxury_fashion', 'streetwear']:
+                        categories["product_images"] += 1
+                    elif primary_category in ['banner', 'promotional', 'marketing']:
+                        categories["marketing_materials"] += 1
+                    else:
+                        categories["system_files"] += 1
+                        
+                    # Store detailed categorization in asset metadata
+                    asset['ai_categorization'] = categorization_result
+                    
+                except Exception as e:
+                    logger.warning(f"AI categorization failed for {asset.get('name', 'unknown')}: {str(e)}")
+                    # Fallback to name-based categorization
+                    self._fallback_categorization(asset, categories)
             else:
-                categories["system_files"] += 1
+                # Use existing name-based categorization for non-images
+                self._fallback_categorization(asset, categories)
 
         return categories
+    
+    def _fallback_categorization(self, asset: Dict, categories: Dict[str, int]):
+        """Fallback categorization method based on asset name."""
+        name_lower = asset.get('name', '').lower()
+        if any(keyword in name_lower for keyword in ['product', 'item', 'dress', 'accessory']):
+            categories["product_images"] += 1
+        elif any(keyword in name_lower for keyword in ['banner', 'promo', 'ad', 'marketing']):
+            categories["marketing_materials"] += 1
+        elif any(keyword in name_lower for keyword in ['doc', 'readme', 'guide']):
+            categories["documentation"] += 1
+        else:
+            categories["system_files"] += 1
 
     def _determine_asset_type(self, index: int) -> str:
         """Determine asset type based on index."""
@@ -349,17 +383,45 @@ class InventoryAgent:
         return [group for group in hash_groups.values() if len(group) > 1]
 
     async def _find_perceptual_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
-        """Find visually similar images using perceptual hashing."""
-        # Simulate perceptual hash comparison
+        """Find visually similar images using enhanced perceptual hashing and deep learning."""
+        # Get image assets
+        image_assets = [a for a in assets if a.get('type') == 'image' and 'path' in a]
+        
+        if len(image_assets) < 2:
+            return []
+            
+        try:
+            # Use enhanced duplicate detection from image processor
+            image_paths = [asset['path'] for asset in image_assets]
+            duplicate_result = await self.image_processor.detect_duplicates_advanced(image_paths)
+            
+            # Convert paths back to asset objects
+            duplicate_groups = []
+            for path_group in duplicate_result.get('duplicate_groups', []):
+                asset_group = []
+                for path in path_group:
+                    # Find asset object by path
+                    matching_assets = [a for a in image_assets if a.get('path') == path]
+                    if matching_assets:
+                        asset_group.append(matching_assets[0])
+                
+                if len(asset_group) > 1:
+                    duplicate_groups.append(asset_group)
+            
+            return duplicate_groups
+            
+        except Exception as e:
+            logger.error(f"Enhanced duplicate detection failed: {str(e)}")
+            # Fallback to original simple method
+            return await self._simple_perceptual_duplicates(image_assets)
+    
+    async def _simple_perceptual_duplicates(self, image_assets: List[Dict]) -> List[List[Dict]]:
+        """Simple fallback perceptual duplicate detection."""
         similar_groups = []
-        # Assets are tagged with the singular string 'image' during scanning.
-        image_assets = [a for a in assets if a.get('type') == 'image']
-
         # Group by similarity (simplified)
         for i in range(0, len(image_assets), 10):
             if len(image_assets[i:i+3]) > 1:
                 similar_groups.append(image_assets[i:i+3])
-
         return similar_groups
 
     async def _find_content_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
@@ -416,7 +478,217 @@ class InventoryAgent:
             "metadata_similarity": 0.65
         }
 
-    def _generate_cleanup_recommendations(self, duplicates: Dict) -> List[str]:
+    async def analyze_image_quality(self) -> Dict[str, Any]:
+        """Analyze image quality across all assets."""
+        try:
+            logger.info("🔍 Starting comprehensive image quality analysis...")
+            
+            # Get all image assets
+            assets = list(self.assets_db.values())
+            image_assets = [a for a in assets if a.get('type') == 'image' and 'path' in a]
+            
+            quality_results = {
+                'total_images_analyzed': len(image_assets),
+                'quality_summary': {
+                    'excellent': 0,
+                    'good': 0,
+                    'fair': 0,
+                    'poor': 0
+                },
+                'issues_found': {
+                    'blurry_images': 0,
+                    'overexposed_images': 0,
+                    'underexposed_images': 0,
+                    'noisy_images': 0,
+                    'low_contrast_images': 0
+                },
+                'detailed_analysis': [],
+                'recommendations': []
+            }
+            
+            for asset in image_assets:
+                try:
+                    analysis = await self.image_processor.analyze_image_quality(asset['path'])
+                    
+                    # Categorize quality
+                    overall_score = analysis.get('overall', {}).get('score', 0)
+                    grade = analysis.get('overall', {}).get('grade', 'F')
+                    
+                    if grade in ['A']:
+                        quality_results['quality_summary']['excellent'] += 1
+                    elif grade in ['B']:
+                        quality_results['quality_summary']['good'] += 1
+                    elif grade in ['C']:
+                        quality_results['quality_summary']['fair'] += 1
+                    else:
+                        quality_results['quality_summary']['poor'] += 1
+                    
+                    # Count specific issues
+                    if analysis.get('blur', {}).get('is_blurry', False):
+                        quality_results['issues_found']['blurry_images'] += 1
+                    
+                    if analysis.get('brightness', {}).get('is_overexposed', False):
+                        quality_results['issues_found']['overexposed_images'] += 1
+                    
+                    if analysis.get('brightness', {}).get('is_underexposed', False):
+                        quality_results['issues_found']['underexposed_images'] += 1
+                    
+                    if analysis.get('noise', {}).get('is_noisy', False):
+                        quality_results['issues_found']['noisy_images'] += 1
+                    
+                    if analysis.get('contrast', {}).get('is_low_contrast', False):
+                        quality_results['issues_found']['low_contrast_images'] += 1
+                    
+                    # Store detailed analysis
+                    asset_analysis = {
+                        'asset_name': asset.get('name', 'unknown'),
+                        'path': asset['path'],
+                        'overall_score': overall_score,
+                        'grade': grade,
+                        'recommendations': analysis.get('overall', {}).get('recommendations', [])
+                    }
+                    quality_results['detailed_analysis'].append(asset_analysis)
+                    
+                except Exception as e:
+                    logger.warning(f"Quality analysis failed for {asset.get('name', 'unknown')}: {str(e)}")
+            
+            # Generate overall recommendations
+            quality_results['recommendations'] = self._generate_quality_recommendations(quality_results)
+            
+            return quality_results
+            
+        except Exception as e:
+            logger.error(f"❌ Image quality analysis failed: {str(e)}")
+            return {'error': str(e), 'total_images_analyzed': 0}
+    
+    async def bulk_process_images(self, operations: Dict[str, Any]) -> Dict[str, Any]:
+        """Bulk process images with specified operations."""
+        try:
+            logger.info("🔄 Starting bulk image processing...")
+            
+            # Get all image assets
+            assets = list(self.assets_db.values())
+            image_assets = [a for a in assets if a.get('type') == 'image' and 'path' in a]
+            image_paths = [asset['path'] for asset in image_assets]
+            
+            # Use image processor for bulk operations
+            results = await self.image_processor.bulk_process_images(image_paths, operations)
+            
+            # Update performance metrics
+            self.performance_metrics['bulk_operations_completed'] = results.get('processed', 0)
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"❌ Bulk image processing failed: {str(e)}")
+            return {'error': str(e), 'processed': 0}
+    
+    async def generate_alt_text_for_images(self) -> Dict[str, Any]:
+        """Generate AI-powered alt text for all images."""
+        try:
+            logger.info("📝 Generating alt text for images...")
+            
+            # Get all image assets
+            assets = list(self.assets_db.values())
+            image_assets = [a for a in assets if a.get('type') == 'image' and 'path' in a]
+            
+            alt_text_results = {
+                'total_images_processed': 0,
+                'successful_generations': 0,
+                'failed_generations': 0,
+                'alt_texts': {}
+            }
+            
+            for asset in image_assets:
+                try:
+                    # Generate context from asset metadata
+                    context = self._build_context_for_alt_text(asset)
+                    
+                    alt_text_result = await self.image_processor.generate_alt_text(
+                        asset['path'], 
+                        context
+                    )
+                    
+                    if 'error' not in alt_text_result:
+                        alt_text_results['alt_texts'][asset.get('name', 'unknown')] = {
+                            'alt_text': alt_text_result['alt_text'],
+                            'confidence': alt_text_result.get('confidence', 0.8),
+                            'context_used': context
+                        }
+                        alt_text_results['successful_generations'] += 1
+                        
+                        # Store alt text in asset metadata
+                        asset['alt_text'] = alt_text_result['alt_text']
+                    else:
+                        alt_text_results['failed_generations'] += 1
+                    
+                    alt_text_results['total_images_processed'] += 1
+                    
+                except Exception as e:
+                    logger.warning(f"Alt text generation failed for {asset.get('name', 'unknown')}: {str(e)}")
+                    alt_text_results['failed_generations'] += 1
+            
+            return alt_text_results
+            
+        except Exception as e:
+            logger.error(f"❌ Alt text generation failed: {str(e)}")
+            return {'error': str(e), 'total_images_processed': 0}
+    
+    def _generate_quality_recommendations(self, quality_results: Dict[str, Any]) -> List[str]:
+        """Generate overall quality improvement recommendations."""
+        recommendations = []
+        issues = quality_results['issues_found']
+        total_images = quality_results['total_images_analyzed']
+        
+        if total_images == 0:
+            return ["No images found for analysis"]
+        
+        # Calculate percentages
+        blur_percentage = (issues['blurry_images'] / total_images) * 100
+        exposure_percentage = ((issues['overexposed_images'] + issues['underexposed_images']) / total_images) * 100
+        noise_percentage = (issues['noisy_images'] / total_images) * 100
+        
+        if blur_percentage > 20:
+            recommendations.append(f"{blur_percentage:.1f}% of images are blurry - consider camera stability training")
+        
+        if exposure_percentage > 15:
+            recommendations.append(f"{exposure_percentage:.1f}% of images have exposure issues - review lighting setup")
+        
+        if noise_percentage > 10:
+            recommendations.append(f"{noise_percentage:.1f}% of images are noisy - consider lower ISO settings")
+        
+        poor_quality_percentage = (quality_results['quality_summary']['poor'] / total_images) * 100
+        if poor_quality_percentage > 25:
+            recommendations.append("High percentage of poor quality images - consider quality control measures")
+        
+        if not recommendations:
+            recommendations.append("Overall image quality is good - maintain current standards")
+        
+        return recommendations
+    
+    def _build_context_for_alt_text(self, asset: Dict[str, Any]) -> str:
+        """Build context for alt text generation from asset metadata."""
+        context_parts = []
+        
+        # Use asset name
+        name = asset.get('name', '')
+        if name:
+            context_parts.append(f"Image named {name}")
+        
+        # Use AI categorization if available
+        ai_cat = asset.get('ai_categorization', {})
+        if ai_cat and 'primary_category' in ai_cat:
+            category = ai_cat['primary_category']
+            if category != 'unknown':
+                context_parts.append(f"categorized as {category}")
+        
+        # Use metadata if available
+        metadata = asset.get('metadata', {})
+        if metadata:
+            if 'dimensions' in metadata:
+                context_parts.append(f"with dimensions {metadata['dimensions']}")
+        
+        return " ".join(context_parts)
         """Generate actionable cleanup recommendations."""
         recommendations = []
 
