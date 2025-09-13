@@ -2339,14 +2339,16 @@ async def run_full_optimization(website_url: str = "https://theskyy-rose-collect
 
 # Brand Intelligence Endpoints
 @app.get("/brand/intelligence")
-def get_brand_intelligence() -> Dict[str, Any]:
+def get_brand_intelligence_api() -> Dict[str, Any]:
     """Get comprehensive brand intelligence analysis."""
+    brand_intelligence = get_brand_intelligence()
     return brand_intelligence.analyze_brand_assets()
 
 
 @app.get("/brand/context/{agent_type}")
 def get_brand_context(agent_type: str) -> Dict[str, Any]:
     """Get brand context for specific agent type."""
+    brand_intelligence = get_brand_intelligence()
     return brand_intelligence.get_brand_context_for_agent(agent_type)
 
 
