@@ -6,7 +6,16 @@ from datetime import datetime, timedelta
 import json
 
 # Import the server access module
-from .wordpress_server_access import create_wordpress_server_access
+try:
+    from .wordpress_server_access import create_wordpress_server_access
+except ImportError:
+    try:
+        from agent.modules.wordpress_server_access import create_wordpress_server_access
+    except ImportError:
+        # Fallback if module not available
+        def create_wordpress_server_access():
+            logger.warning("WordPress server access not available")
+            return None
 
 logger = logging.getLogger(__name__)
 

@@ -298,6 +298,162 @@ def _analyze_performance() -> Dict[str, Any]:
     }
 
 
+def scan_agents_only() -> Dict[str, Any]:
+    """
+    Scan and analyze all agent modules specifically.
+    Returns comprehensive health metrics for agents.
+    """
+    logger.info("🤖 Starting comprehensive agent analysis...")
+    
+    result = {
+        "agent_modules": {
+            "total_agents": 0,
+            "functional_agents": 0,
+            "agents_with_issues": 0,
+            "summary": {
+                "importable": [],
+                "import_errors": [],
+                "missing_dependencies": [],
+                "performance_issues": [],
+                "security_concerns": []
+            }
+        },
+        "timestamp": datetime.now().isoformat(),
+        "scan_type": "agents_only"
+    }
+    
+    agents_analyzed = _analyze_all_agents()
+    result["agent_modules"].update(agents_analyzed)
+    
+    logger.info(f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working")
+    return result
+
+
+def _analyze_all_agents() -> Dict[str, Any]:
+    """Analyze all agent modules in the system."""
+    import importlib.util
+    import sys
+    
+    agents_dir = Path("agent/modules")
+    if not agents_dir.exists():
+        return {
+            "total_agents": 0,
+            "functional_agents": 0,
+            "agents_with_issues": 0,
+            "summary": {
+                "importable": [],
+                "import_errors": [],
+                "missing_dependencies": [],
+                "performance_issues": [],
+                "security_concerns": []
+            }
+        }
+    
+    agent_files = list(agents_dir.glob("*_agent.py"))
+    total_agents = len(agent_files)
+    functional_agents = 0
+    import_errors = []
+    missing_deps = []
+    performance_issues = []
+    security_concerns = []
+    importable = []
+    
+    for agent_file in agent_files:
+        agent_name = agent_file.stem
+        try:
+            # Try to import the agent
+            spec = importlib.util.spec_from_file_location(agent_name, agent_file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            
+            functional_agents += 1
+            importable.append(agent_name)
+            
+            # Analyze the agent for issues
+            agent_analysis = _analyze_single_agent(agent_file)
+            if agent_analysis["performance_issues"]:
+                performance_issues.extend(agent_analysis["performance_issues"])
+            if agent_analysis["security_concerns"]:
+                security_concerns.extend(agent_analysis["security_concerns"])
+                
+        except ImportError as e:
+            import_errors.append({"agent": agent_name, "error": str(e)})
+            # Try to extract missing dependency
+            if "No module named" in str(e):
+                dep_name = str(e).split("'")[1] if "'" in str(e) else "unknown"
+                missing_deps.append({"agent": agent_name, "dependency": dep_name})
+        except Exception as e:
+            import_errors.append({"agent": agent_name, "error": str(e)})
+    
+    agents_with_issues = total_agents - functional_agents
+    
+    return {
+        "total_agents": total_agents,
+        "functional_agents": functional_agents,
+        "agents_with_issues": agents_with_issues,
+        "summary": {
+            "importable": importable,
+            "import_errors": import_errors,
+            "missing_dependencies": missing_deps,
+            "performance_issues": performance_issues,
+            "security_concerns": security_concerns
+        }
+    }
+
+
+def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
+    """Analyze a single agent file for issues."""
+    performance_issues = []
+    security_concerns = []
+    
+    try:
+        with open(agent_file, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        
+        agent_name = agent_file.stem
+        
+        # Check for performance issues
+        if "while True:" in content and "time.sleep" not in content:
+            performance_issues.append({
+                "agent": agent_name,
+                "issue": "Potential infinite loop detected"
+            })
+        
+        if "requests.get" in content and "timeout" not in content:
+            performance_issues.append({
+                "agent": agent_name,
+                "issue": "HTTP requests without timeout"
+            })
+        
+        # Check for security concerns
+        credential_patterns = [
+            (r'password\s*=\s*["\'][^"\']{8,}["\']', "Potential hardcoded password detected"),
+            (r'api_key\s*=\s*["\'][^"\']{20,}["\']', "Potential hardcoded API key detected"),
+            (r'secret\s*=\s*["\'][^"\']{16,}["\']', "Potential hardcoded secret detected"),
+        ]
+        
+        for pattern, message in credential_patterns:
+            if re.search(pattern, content, re.IGNORECASE):
+                security_concerns.append({
+                    "agent": agent_name,
+                    "concern": message
+                })
+        
+        if "eval(" in content:
+            security_concerns.append({
+                "agent": agent_name,
+                "concern": "Unsafe eval() usage detected"
+            })
+            
+    except Exception as e:
+        logger.warning(f"Could not analyze {agent_file}: {e}")
+    
+    return {
+        "performance_issues": performance_issues,
+        "security_concerns": security_concerns
+    }
+
+
 def _security_scan() -> List[str]:
     """Perform basic security scan."""
     security_issues = []

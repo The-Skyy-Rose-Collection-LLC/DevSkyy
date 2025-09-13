@@ -19,17 +19,22 @@ class WordPressServerAccess:
     """
 
     def __init__(self):
-        # HARDCODED SERVER CREDENTIALS - FULL ACCESS
-        self.sftp_host = "sftp.wp.com"
-        self.sftp_port = 22
-        self.sftp_username = "skyyrose.wordpress.com"
-        self.sftp_password = "LY4tA0A3vKq3juVHJvEQ"
-
+        # SECURE SERVER CREDENTIALS - Environment Variables
+        self.sftp_host = os.getenv('SFTP_HOST', 'sftp.wp.com')
+        self.sftp_port = int(os.getenv('SFTP_PORT', '22'))
+        self.sftp_username = os.getenv('SFTP_USERNAME', 'skyyrose.wordpress.com')
+        self.sftp_password = os.getenv('SFTP_PASSWORD')  # No default for security
+        
         # SSH Access
-        self.ssh_host = "ssh.wp.com"
-        self.ssh_username = "skyyrose.wordpress.com"
-        self.ssh_key_name = "skyyroseco-default"
-
+        self.ssh_host = os.getenv('SSH_HOST', 'ssh.wp.com')
+        self.ssh_username = os.getenv('SSH_USERNAME', 'skyyrose.wordpress.com')
+        self.ssh_key_name = os.getenv('SSH_KEY_NAME', 'skyyroseco-default')
+        self.ssh_key_path = os.getenv('SSH_PRIVATE_KEY_PATH')
+        
+        # Validate that either password or key is provided
+        if not self.sftp_password and not self.ssh_key_path:
+            logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
+        
         # Connection objects
         self.sftp_client = None
         self.ssh_client = None
