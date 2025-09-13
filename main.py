@@ -6,7 +6,7 @@ from fastapi.exceptions import RequestValidationError
 import logging
 import sys
 import os
-from agent.modules.scanner import scan_site
+from agent.modules.scanner import scan_site, scan_agents_only
 from agent.modules.fixer import fix_code
 from agent.modules.inventory_agent import InventoryAgent
 from agent.modules.financial_agent import FinancialAgent, ChargebackReason
@@ -349,6 +349,42 @@ async def check_database_health() -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Database health check failed: {e}")
         raise HTTPException(status_code=500, detail="Database health check failed")
+
+
+# Agent Scanning Endpoints
+@app.post("/scan/agents")
+async def scan_agents() -> Dict[str, Any]:
+    """Dedicated agent analysis endpoint - scan all agent modules for health and issues."""
+    try:
+        logger.info("Starting comprehensive agent scan")
+        result = scan_agents_only()
+        logger.info("Agent scan completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Agent scan failed: {e}")
+        raise HTTPException(status_code=500, detail="Agent scan failed")
+
+
+@app.post("/scan/site")
+def scan_site_endpoint() -> Dict[str, Any]:
+    """Enhanced site scan including comprehensive agent analysis."""
+    try:
+        logger.info("Starting enhanced site scan")
+        site_result = scan_site()
+        agent_result = scan_agents_only()
+        
+        # Combine results
+        enhanced_result = {
+            **site_result,
+            "agent_analysis": agent_result.get("agent_modules", {}),
+            "scan_type": "comprehensive"
+        }
+        
+        logger.info("Enhanced site scan completed successfully")
+        return enhanced_result
+    except Exception as e:
+        logger.error(f"Enhanced site scan failed: {e}")
+        raise HTTPException(status_code=500, detail="Enhanced site scan failed")
 
 
 # Inventory Management Endpoints
