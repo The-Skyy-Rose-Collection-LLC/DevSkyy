@@ -1,6 +1,6 @@
 
 from typing import Dict, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class CustomerServiceAgent:
@@ -85,7 +85,7 @@ The Skyy Rose Collection Team"""
         overdue_tickets = []
 
         for ticket in open_tickets:
-            hours_elapsed = (datetime.utcnow() - ticket["created_at"]).total_seconds() / 3600
+            hours_elapsed = (datetime.now(timezone.utc) - ticket["created_at"]).total_seconds() / 3600
             if hours_elapsed > self.response_time_threshold:
                 overdue_tickets.append({
                     "ticket_id": ticket["id"],
@@ -123,13 +123,13 @@ The Skyy Rose Collection Team"""
             {
                 "id": "TK001",
                 "category": "shipping",
-                "created_at": datetime.utcnow() - timedelta(hours=3),
+                "created_at": datetime.now(timezone.utc) - timedelta(hours=3),
                 "priority": "NORMAL"
             },
             {
                 "id": "TK002",
                 "category": "returns",
-                "created_at": datetime.utcnow() - timedelta(hours=1),
+                "created_at": datetime.now(timezone.utc) - timedelta(hours=1),
                 "priority": "HIGH"
             }
         ]
