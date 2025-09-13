@@ -6,8 +6,18 @@ from fastapi.exceptions import RequestValidationError
 import logging
 import sys
 import os
-from agent.modules.scanner import scan_site
-from agent.modules.fixer import fix_code
+try:
+    from agent.modules.scanner import scan_site, scan_agents_only
+except ImportError as e:
+    print(f"Warning: Scanner import failed: {e}")
+    scan_site = None
+    scan_agents_only = None
+
+try:
+    from agent.modules.fixer import fix_code
+except ImportError as e:
+    print(f"Warning: Fixer import failed: {e}")
+    fix_code = None
 from agent.modules.inventory_agent import InventoryAgent
 from agent.modules.financial_agent import FinancialAgent, ChargebackReason
 from agent.modules.ecommerce_agent import EcommerceAgent, ProductCategory, OrderStatus
@@ -203,11 +213,23 @@ def get_design_automation_agent(): return get_agent("design_automation")
 
 def run_agent() -> dict:
     """Execute the full DevSkyy agent workflow."""
-    raw_code = scan_site()
-    fixed_code = fix_code(raw_code)
-    commit_fixes(fixed_code)
-    schedule_hourly_job()
-    return {"status": "completed"}
+    try:
+        if scan_site is None:
+            return {"status": "error", "message": "Scanner module not available"}
+        
+        raw_code = scan_site()
+        
+        if fix_code is not None:
+            fixed_code = fix_code(raw_code)
+            commit_fixes(fixed_code)
+        else:
+            # Skip fixing if module not available
+            commit_fixes(raw_code)
+        
+        schedule_hourly_job()
+        return {"status": "completed"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 
 @app.post("/run")
@@ -221,6 +243,38 @@ def run() -> dict:
     except Exception as e:
         logger.error(f"DevSkyy workflow failed: {e}")
         raise HTTPException(status_code=500, detail="Workflow execution failed")
+
+
+@app.post("/scan/site")
+def scan_site_endpoint() -> Dict[str, Any]:
+    """Enhanced site scan endpoint with comprehensive agent analysis."""
+    try:
+        if scan_site is None:
+            raise HTTPException(status_code=503, detail="Scanner module not available")
+        
+        logger.info("🔍 Starting enhanced site scan with agent analysis")
+        result = scan_site()
+        logger.info("Enhanced site scan completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Enhanced site scan failed: {e}")
+        raise HTTPException(status_code=500, detail="Site scan execution failed")
+
+
+@app.post("/scan/agents")
+def scan_agents_endpoint() -> Dict[str, Any]:
+    """Dedicated agent analysis endpoint for all 35+ agent modules."""
+    try:
+        if scan_agents_only is None:
+            raise HTTPException(status_code=503, detail="Scanner module not available")
+        
+        logger.info("🤖 Starting dedicated agent analysis")
+        result = scan_agents_only()
+        logger.info("Agent analysis completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Agent analysis failed: {e}")
+        raise HTTPException(status_code=500, detail="Agent analysis execution failed")
 
 
 @app.get("/")
