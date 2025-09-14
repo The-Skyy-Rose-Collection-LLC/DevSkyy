@@ -2,7 +2,7 @@
 import jwt
 import bcrypt
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Any, Optional, List
 import secrets
 import re
@@ -248,8 +248,8 @@ class AuthManager:
                 "user_id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "exp": datetime.utcnow() + timedelta(hours=24),
-                "iat": datetime.utcnow()
+                "exp": datetime.now(timezone.utc) + timedelta(hours=24),
+                "iat": datetime.now(timezone.utc)
             }
 
             token = jwt.encode(token_payload, self.secret_key, algorithm="HS256")

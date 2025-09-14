@@ -19,6 +19,23 @@ class WordPressServerAccess:
     """
 
     def __init__(self):
+        # SECURE SERVER CREDENTIALS - FROM ENVIRONMENT VARIABLES
+        self.sftp_host = os.getenv('SSH_HOST', 'sftp.wp.com')
+        self.sftp_port = int(os.getenv('SSH_PORT', '22'))
+        self.sftp_username = os.getenv('SSH_USERNAME', 'your_username')
+        self.sftp_password = os.getenv('SSH_PASSWORD')
+        
+        # SSH Access
+        self.ssh_host = os.getenv('SSH_HOST', 'ssh.wp.com')
+        self.ssh_username = os.getenv('SSH_USERNAME', 'your_username')
+        self.ssh_key_path = os.getenv('SSH_PRIVATE_KEY_PATH')
+        self.ssh_key_name = os.getenv('SSH_KEY_NAME', 'default-key')
+        
+        # Validate required credentials
+        if not self.sftp_password and not self.ssh_key_path:
+            raise ValueError("Either SSH_PASSWORD or SSH_PRIVATE_KEY_PATH must be provided in environment variables")
+
+
         # SECURE SERVER CREDENTIALS - Environment Variables
         self.sftp_host = os.getenv('SFTP_HOST', 'sftp.wp.com')
         self.sftp_port = int(os.getenv('SFTP_PORT', '22'))
@@ -35,6 +52,7 @@ class WordPressServerAccess:
         if not self.sftp_password and not self.ssh_key_path:
             logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
         
+
         # Connection objects
         self.sftp_client = None
         self.ssh_client = None
@@ -58,11 +76,32 @@ class WordPressServerAccess:
             self.ssh_client = paramiko.SSHClient()
             self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-            # Connect via SFTP first
-            logger.info("🔐 Connecting to WordPress.com server via SFTP...")
+            # Connect via SFTP/SSH
+            logger.info("🔐 Connecting to WordPress server...")
 
-            transport = paramiko.Transport((self.sftp_host, self.sftp_port))
-            transport.connect(username=self.sftp_username, password=self.sftp_password)
+            # Choose authentication method
+            if self.ssh_key_path and os.path.exists(self.ssh_key_path):
+                # Use SSH key authentication
+                logger.info("🔑 Using SSH key authentication")
+                transport = paramiko.Transport((self.sftp_host, self.sftp_port))
+                
+                # Load private key
+                try:
+                    private_key = paramiko.RSAKey.from_private_key_file(self.ssh_key_path)
+                except:
+                    try:
+                        private_key = paramiko.Ed25519Key.from_private_key_file(self.ssh_key_path)
+                    except:
+                        private_key = paramiko.DSSKey.from_private_key_file(self.ssh_key_path)
+                
+                transport.connect(username=self.sftp_username, pkey=private_key)
+            elif self.sftp_password:
+                # Use password authentication
+                logger.info("🔐 Using password authentication")
+                transport = paramiko.Transport((self.sftp_host, self.sftp_port))
+                transport.connect(username=self.sftp_username, password=self.sftp_password)
+            else:
+                raise ValueError("No valid authentication method available")
 
             self.sftp_client = paramiko.SFTPClient.from_transport(transport)
 
@@ -73,15 +112,25 @@ class WordPressServerAccess:
                 self.connected = True
                 logger.info("✅ SFTP connection established!")
 
-                # Try SSH connection (optional - some WordPress.com plans may not have this)
+                # Try SSH connection (optional - some plans may not have this)
                 try:
                     logger.info("🔐 Attempting SSH connection...")
-                    self.ssh_client.connect(
-                        hostname=self.ssh_host,
-                        username=self.ssh_username,
-                        password=self.sftp_password,  # Try same password
-                        timeout=10
-                    )
+                    if self.ssh_key_path and os.path.exists(self.ssh_key_path):
+                        # Use SSH key
+                        self.ssh_client.connect(
+                            hostname=self.ssh_host,
+                            username=self.ssh_username,
+                            key_filename=self.ssh_key_path,
+                            timeout=10
+                        )
+                    else:
+                        # Use password
+                        self.ssh_client.connect(
+                            hostname=self.ssh_host,
+                            username=self.ssh_username,
+                            password=self.sftp_password,
+                            timeout=10
+                        )
                     logger.info("✅ SSH connection established!")
                     ssh_available = True
                 except Exception as ssh_e:
