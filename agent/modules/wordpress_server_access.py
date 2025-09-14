@@ -56,7 +56,7 @@ class WordPressServerAccess:
         try:
             # Create SSH client
             self.ssh_client = paramiko.SSHClient()
-            self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.ssh_client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
             # Connect via SFTP first
             logger.info("🔐 Connecting to WordPress.com server via SFTP...")
