@@ -84,7 +84,8 @@ def commit_all_changes() -> Dict[str, Any]:
             return add_result
 
         # Generate commit message for manual commit
-        commit_message = f"Manual commit - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\nUpdated platform with latest changes"
+        commit_message = f"Manual commit - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                            }\n\nUpdated platform with latest changes"
 
         # Commit
         commit_result = _git_commit(commit_message)

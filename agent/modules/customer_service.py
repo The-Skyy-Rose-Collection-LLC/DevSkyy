@@ -41,7 +41,7 @@ class CustomerServiceAgent:
         """Generate automated responses for common inquiries."""
         responses = {
             "shipping": f"""Dear {customer_name},
-            
+
 Thank you for contacting The Skyy Rose Collection. We've received your shipping inquiry.
 
 Your order status and tracking information can be found in your account dashboard. Most orders are processed within 1-2 business days and arrive within 3-5 business days.
@@ -52,7 +52,7 @@ Best regards,
 The Skyy Rose Collection Team""",
 
             "returns": f"""Dear {customer_name},
-            
+
 Thank you for reaching out regarding a return.
 
 We offer a 30-day return policy for unworn items in original packaging. To initiate a return:
@@ -67,7 +67,7 @@ Best regards,
 The Skyy Rose Collection Team""",
 
             "general": f"""Dear {customer_name},
-            
+
 Thank you for contacting The Skyy Rose Collection. We've received your inquiry and will respond within 24 hours.
 
 For immediate assistance, you can also check our FAQ section or live chat during business hours.

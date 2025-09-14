@@ -29,6 +29,11 @@ from agent.modules.openai_intelligence_service import OpenAIIntelligenceService,
 from agent.modules.social_media_automation_agent import SocialMediaAutomationAgent
 from agent.modules.email_sms_automation_agent import EmailSMSAutomationAgent
 from agent.modules.design_automation_agent import DesignAutomationAgent
+from agent.modules.marketing_content_generation_agent import MarketingContentGenerationAgent
+from agent.modules.advanced_code_generation_agent import AdvancedCodeGenerationAgent
+from agent.modules.brand_asset_manager import BrandAssetManager
+from agent.modules.auth_manager import AuthManager
+from agent.modules.enhanced_brand_intelligence_agent import EnhancedBrandIntelligenceAgent
 from agent.modules.cache_manager import cache_manager, cached, start_cache_cleanup
 from agent.modules.database_optimizer import db_connection_pool, index_optimizer, get_database_stats, optimize_query
 from agent.scheduler.cron import schedule_hourly_job
@@ -126,6 +131,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 _agent_cache = {}
 _brand_intelligence = None
 
+
 def get_brand_intelligence():
     """Get or create brand intelligence agent (singleton pattern)."""
     global _brand_intelligence
@@ -133,10 +139,11 @@ def get_brand_intelligence():
         _brand_intelligence = BrandIntelligenceAgent()
     return _brand_intelligence
 
+
 def get_agent(agent_name: str):
     """Get or create agent instance (lazy initialization with caching)."""
     global _agent_cache
-    
+
     if agent_name not in _agent_cache:
         # Agent factory mapping
         agent_factories = {
@@ -158,16 +165,23 @@ def get_agent(agent_name: str):
             "openai_service": lambda: create_openai_intelligence_service(),
             "social_media_automation": lambda: SocialMediaAutomationAgent(),
             "email_sms_automation": lambda: EmailSMSAutomationAgent(),
-            "design_automation": lambda: DesignAutomationAgent()
+            "design_automation": lambda: DesignAutomationAgent(),
+            "marketing_content_generation": lambda: MarketingContentGenerationAgent(),
+            "advanced_code_generation": lambda: AdvancedCodeGenerationAgent(),
+            "brand_asset_manager": lambda: BrandAssetManager(),
+            "auth_manager": lambda: AuthManager(),
+            "enhanced_brand_intelligence": lambda: EnhancedBrandIntelligenceAgent()
         }
-        
+
         if agent_name in agent_factories:
             _agent_cache[agent_name] = agent_factories[agent_name]()
-            
+
             # Inject brand intelligence for applicable agents
-            if agent_name in ["inventory", "financial", "ecommerce", "wordpress", 
-                            "web_development", "site_communication", "seo_marketing", 
-                            "customer_service", "security", "performance"]:
+            if agent_name in ["inventory", "financial", "ecommerce", "wordpress",
+                              "web_development", "site_communication", "seo_marketing",
+                              "customer_service", "security", "performance",
+                              "marketing_content_generation", "advanced_code_generation",
+                              "brand_asset_manager", "auth_manager"]:
                 brand_intelligence = get_brand_intelligence()
                 agent = _agent_cache[agent_name]
                 if hasattr(agent, 'brand_context'):
@@ -176,10 +190,12 @@ def get_agent(agent_name: str):
                     setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
-    
+
     return _agent_cache[agent_name]
 
 # Convenience functions for backward compatibility
+
+
 def get_inventory_agent(): return get_agent("inventory")
 def get_financial_agent(): return get_agent("financial")
 def get_ecommerce_agent(): return get_agent("ecommerce")
@@ -199,6 +215,11 @@ def get_openai_service(): return get_agent("openai_service")
 def get_social_media_automation_agent(): return get_agent("social_media_automation")
 def get_email_sms_automation_agent(): return get_agent("email_sms_automation")
 def get_design_automation_agent(): return get_agent("design_automation")
+def get_marketing_content_generation_agent(): return get_agent("marketing_content_generation")
+def get_advanced_code_generation_agent(): return get_agent("advanced_code_generation")
+def get_brand_asset_manager(): return get_agent("brand_asset_manager")
+def get_auth_manager(): return get_agent("auth_manager")
+def get_enhanced_brand_intelligence_agent(): return get_agent("enhanced_brand_intelligence")
 
 
 def run_agent() -> dict:
@@ -303,10 +324,10 @@ async def optimize_database_queries() -> Dict[str, Any]:
             "SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC",
             "SELECT p.*, c.name FROM products p JOIN categories c ON p.category_id = c.id"
         ]
-        
+
         # Get index recommendations
         recommendations = index_optimizer.analyze_table("products", query_patterns)
-        
+
         return {
             "optimization_status": "completed",
             "recommendations": recommendations,
@@ -323,18 +344,18 @@ async def check_database_health() -> Dict[str, Any]:
     """Check database health and performance."""
     try:
         stats = get_database_stats()
-        
+
         # Calculate health score
         query_stats = stats['query_optimizer']
         health_score = 100
-        
+
         if query_stats['slow_query_rate'] > 20:
             health_score -= 30
         if query_stats['cache_hit_rate'] < 50:
             health_score -= 20
         if stats['connection_pool']['connection_stats']['errors'] > 10:
             health_score -= 25
-        
+
         return {
             "health_score": max(0, health_score),
             "status": "healthy" if health_score > 80 else "needs_attention",
@@ -372,14 +393,14 @@ def scan_site_endpoint() -> Dict[str, Any]:
         logger.info("Starting enhanced site scan")
         site_result = scan_site()
         agent_result = scan_agents_only()
-        
+
         # Combine results
         enhanced_result = {
             **site_result,
             "agent_analysis": agent_result.get("agent_modules", {}),
             "scan_type": "comprehensive"
         }
-        
+
         logger.info("Enhanced site scan completed successfully")
         return enhanced_result
     except Exception as e:
@@ -2407,6 +2428,128 @@ def get_brand_evolution() -> Dict[str, Any]:
         "theme_evolution": brand_intelligence.theme_evolution,
         "recent_changes": brand_intelligence._track_brand_changes(),
         "upcoming_updates": brand_intelligence._analyze_seasonal_content()
+    }
+
+# Marketing Content Generation Agent Endpoints
+
+
+@app.get("/marketing/content-generation")
+async def get_marketing_content_generation() -> Dict[str, Any]:
+    """Get marketing content generation capabilities."""
+    agent = get_marketing_content_generation_agent()
+    return {
+        "agent_status": "active",
+        "capabilities": [
+            "Social media campaigns",
+            "Email marketing sequences",
+            "SEO-optimized blog content",
+            "Influencer collaboration strategies",
+            "Performance tracking"
+        ],
+        "brand_context": getattr(agent, 'brand_context', {}),
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+@app.post("/marketing/generate-campaign")
+async def generate_marketing_campaign(campaign_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate a marketing campaign."""
+    agent = get_marketing_content_generation_agent()
+    if hasattr(agent, 'generate_viral_campaign'):
+        return await agent.generate_viral_campaign(campaign_request)
+    return {"error": "Campaign generation not implemented", "status": "pending"}
+
+# Advanced Code Generation Agent Endpoints
+
+
+@app.get("/code-generation")
+async def get_code_generation_capabilities() -> Dict[str, Any]:
+    """Get code generation capabilities."""
+    agent = get_advanced_code_generation_agent()
+    templates_available = []
+    if hasattr(agent, 'templates'):
+        templates_available = list(agent.templates.keys())
+
+    return {
+        "agent_status": "active",
+        "capabilities": [
+            "Full-stack applications",
+            "React components",
+            "FastAPI endpoints",
+            "WordPress themes and plugins",
+            "Marketing content and campaigns"
+        ],
+        "templates_available": templates_available,
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+@app.post("/code-generation/generate")
+async def generate_code(code_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate code based on requirements."""
+    agent = get_advanced_code_generation_agent()
+    if hasattr(agent, 'generate_application'):
+        return await agent.generate_application(code_request)
+    return {"error": "Code generation not implemented", "status": "pending"}
+
+# Brand Asset Manager Endpoints
+
+
+@app.get("/brand/assets")
+async def get_brand_assets() -> Dict[str, Any]:
+    """Get brand asset management overview."""
+    agent = get_brand_asset_manager()
+    asset_categories = []
+    if hasattr(agent, 'categories'):
+        asset_categories = list(agent.categories.keys())
+
+    return {
+        "agent_status": "active",
+        "asset_categories": asset_categories,
+        "total_assets": 0,  # Will be implemented with actual asset counting
+        "storage_path": str(getattr(agent, 'storage_path', '')),
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+@app.post("/brand/assets/upload")
+async def upload_brand_asset(asset_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Upload a brand asset."""
+    agent = get_brand_asset_manager()
+    if hasattr(agent, 'upload_asset'):
+        return await agent.upload_asset(asset_data)
+    return {"error": "Asset upload not implemented", "status": "pending"}
+
+# Auth Manager Endpoints
+
+
+@app.get("/auth/status")
+async def get_auth_status() -> Dict[str, Any]:
+    """Get authentication system status."""
+    agent = get_auth_manager()
+    return {
+        "agent_status": "active",
+        "auth_methods": ["jwt", "oauth", "api_key"],
+        "security_level": "high",
+        "timestamp": datetime.now().isoformat()
+    }
+
+# Enhanced Brand Intelligence Endpoints
+
+
+@app.get("/brand/enhanced-intelligence")
+async def get_enhanced_brand_intelligence() -> Dict[str, Any]:
+    """Get enhanced brand intelligence analysis."""
+    agent = get_enhanced_brand_intelligence_agent()
+    return {
+        "agent_status": "active",
+        "enhanced_features": [
+            "Advanced trend analysis",
+            "Competitive intelligence",
+            "Brand sentiment monitoring",
+            "Market positioning insights"
+        ],
+        "timestamp": datetime.now().isoformat()
     }
 
 # Enhanced Combined Dashboard Endpoint

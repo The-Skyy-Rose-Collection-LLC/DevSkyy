@@ -106,7 +106,7 @@ class AgentAssignmentManager:
                 "vip_customer_focus": True
             },
             "performance": {
-                "name": "Senior Performance Engineering Lead & Frontend Optimization Specialist", 
+                "name": "Senior Performance Engineering Lead & Frontend Optimization Specialist",
                 "job_title": "Senior Performance Engineering Lead & Principal Frontend Performance Architect",
                 "department": "Performance Engineering & Site Optimization Division",
                 "seniority_level": "Senior/Principal Engineer Level (Performance Tech Lead)",

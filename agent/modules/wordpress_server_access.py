@@ -24,17 +24,17 @@ class WordPressServerAccess:
         self.sftp_port = int(os.getenv('SFTP_PORT', '22'))
         self.sftp_username = os.getenv('SFTP_USERNAME', 'skyyrose.wordpress.com')
         self.sftp_password = os.getenv('SFTP_PASSWORD')  # No default for security
-        
+
         # SSH Access
         self.ssh_host = os.getenv('SSH_HOST', 'ssh.wp.com')
         self.ssh_username = os.getenv('SSH_USERNAME', 'skyyrose.wordpress.com')
         self.ssh_key_name = os.getenv('SSH_KEY_NAME', 'skyyroseco-default')
         self.ssh_key_path = os.getenv('SSH_PRIVATE_KEY_PATH')
-        
+
         # Validate that either password or key is provided
         if not self.sftp_password and not self.ssh_key_path:
             logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
-        
+
         # Connection objects
         self.sftp_client = None
         self.ssh_client = None
