@@ -79,21 +79,33 @@ class AuthManager:
         self.database_url = os.getenv(
             "DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
         self.security = HTTPBearer()
-        self.engine = create_engine(self.database_url)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self.init_database()
+        self.engine = None
+        self.SessionLocal = None
+        # Delay database initialization until needed
+        try:
+            self.init_database()
+        except Exception as e:
+            logger.warning(f"Database initialization failed, will retry when needed: {str(e)}")
+            self._db_initialized = False
 
     def init_database(self):
         """Initialize PostgreSQL database with secure schema."""
         try:
+            if not self.engine:
+                self.engine = create_engine(self.database_url)
+                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
+            self._db_initialized = True
         except Exception as e:
             logger.error(f"Failed to initialize database: {str(e)}")
+            self._db_initialized = False
             raise
 
     def get_db(self):
         """Get database session."""
+        if not self._db_initialized:
+            self.init_database()
         db = self.SessionLocal()
         try:
             yield db
@@ -395,5 +407,15 @@ class AuthManager:
             db.close()
 
 
-# Initialize authentication manager
-auth_manager = AuthManager()
+# Global auth manager instance (lazy initialization)
+_auth_manager = None
+
+def get_auth_manager():
+    """Get or create the global auth manager instance."""
+    global _auth_manager
+    if _auth_manager is None:
+        _auth_manager = AuthManager()
+    return _auth_manager
+
+# For backward compatibility
+auth_manager = None  # Will be initialized when needed
