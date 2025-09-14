@@ -1,6 +1,6 @@
 
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Any
 
 
@@ -21,7 +21,7 @@ class FinancialAgent:
             "chargeback_rate": chargeback_rate,
             "threshold_exceeded": chargeback_rate > self.chargeback_threshold,
             "recent_chargebacks": len(recent_chargebacks),
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         if alert_data["threshold_exceeded"]:
@@ -80,7 +80,7 @@ class FinancialAgent:
             "total_processed": total_processed,
             "discrepancies": discrepancies,
             "status": "CLEAN" if not discrepancies else "NEEDS_REVIEW",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
     def _fetch_recent_chargebacks(self) -> List[Dict]:

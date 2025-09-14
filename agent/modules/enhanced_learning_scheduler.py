@@ -500,32 +500,8 @@ def get_learning_system_status() -> Dict[str, Any]:
     return _global_scheduler.get_learning_status()
 
 
-logger = logging.getLogger(__name__)
-
-
-def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
-    """Start the enhanced learning system."""
-    try:
-        logger.info("🚀 Starting Enhanced Learning System")
-
-        return {
-            "status": "active",
-            "learning_modules": [
-                "Brand Intelligence",
-                "Market Analysis",
-                "Customer Behavior",
-                "Performance Optimization"
-            ],
-            "frequency": "continuous",
-            "last_update": datetime.now().isoformat(),
-            "confidence_level": "high"
-        }
-    except Exception as e:
-        logger.error(f"Failed to start learning system: {str(e)}")
-        return {
-            "status": "failed",
-            "error": str(e)
-        }
+# Global scheduler instance
+_global_scheduler = None
 
 
 async def run_learning_cycle() -> Dict[str, Any]:
