@@ -56,7 +56,11 @@ def setup():
     # Install Python dependencies
     logger.info("📦 Installing Python dependencies...")
     run_command([sys.executable, "-m", "pip", "install", "-r", "backend/requirements.txt"])
-    run_command([sys.executable, "-m", "pip", "install", "pytest", "pytest-asyncio", "black", "flake8", "mypy"])
+    dev_requirements_path = PROJECT_ROOT / "requirements-dev.txt"
+    if dev_requirements_path.exists():
+        run_command([sys.executable, "-m", "pip", "install", "-r", str(dev_requirements_path)])
+    else:
+        logger.warning("requirements-dev.txt not found. Skipping dev dependencies install.")
     
     # Install frontend dependencies
     if FRONTEND_DIR.exists():
