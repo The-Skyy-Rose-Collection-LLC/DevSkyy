@@ -410,12 +410,14 @@ class AuthManager:
 # Global auth manager instance (lazy initialization)
 _auth_manager = None
 
+
 def get_auth_manager():
     """Get or create the global auth manager instance."""
     global _auth_manager
     if _auth_manager is None:
         _auth_manager = AuthManager()
     return _auth_manager
+
 
 # For backward compatibility
 auth_manager = None  # Will be initialized when needed

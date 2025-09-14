@@ -394,7 +394,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
         for i, line in enumerate(lines):
             stripped_line = line.strip()
-            
+
             # Check for rule start
             if '{' in stripped_line and not stripped_line.startswith('/*'):
                 in_rule = True

@@ -54,7 +54,7 @@
             $('.nav-tab').click(function(e) {
                 e.preventDefault();
                 
-                var target = $(this).attr('href');
+                let target = $(this).attr('href');
                 
                 // Update tab states
                 $('.nav-tab').removeClass('nav-tab-active');
@@ -83,9 +83,9 @@
         runAgentAction: function(e) {
             e.preventDefault();
             
-            var $button = $(this);
-            var agent = $button.data('agent');
-            var action = $button.data('action');
+            let $button = $(this);
+            let agent = $button.data('agent');
+            let action = $button.data('action');
             
             if (!agent || !action) {
                 SkyyRoseDashboard.showNotification('error', skyyRoseAI.strings.error);
@@ -112,8 +112,8 @@
                 return;
             }
 
-            var $button = $(this);
-            var agents = [
+            let $button = $(this);
+            const agents = [
                 { agent: 'brand_intelligence', action: 'analyze_brand' },
                 { agent: 'inventory', action: 'scan_assets' },
                 { agent: 'performance', action: 'check_performance' },
@@ -130,7 +130,7 @@
          * Execute agent action via AJAX
          */
         executeAgentAction: function(agent, action, $button) {
-            var originalText = $button.text();
+            let originalText = $button.text();
             
             $button.prop('disabled', true)
                    .addClass('loading')
@@ -151,7 +151,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    var errorMessage = skyyRoseAI.strings.error;
+                    let errorMessage = skyyRoseAI.strings.error;
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
@@ -176,7 +176,7 @@
                 return;
             }
 
-            var currentAgent = agents[index];
+            let currentAgent = agents[index];
             
             $.ajax({
                 url: '/wp-json/skyy-rose-ai/v1/agents/' + currentAgent.agent + '/' + currentAgent.action,
@@ -242,7 +242,7 @@
          * Update recent activities list
          */
         updateRecentActivities: function(activities) {
-            var $activitiesList = $('.activities-list');
+            let $activitiesList = $('.activities-list');
             if (!$activitiesList.length || !activities) return;
 
             // Clear existing activities
@@ -255,7 +255,7 @@
 
             // Add new activities
             activities.forEach(function(activity) {
-                var activityHtml = SkyyRoseDashboard.buildActivityHtml(activity);
+                let activityHtml = SkyyRoseDashboard.buildActivityHtml(activity);
                 $activitiesList.append(activityHtml);
             });
         },
@@ -264,10 +264,10 @@
          * Build activity HTML
          */
         buildActivityHtml: function(activity) {
-            var icon = SkyyRoseDashboard.getAgentIcon(activity.agent_type);
-            var agentName = SkyyRoseDashboard.getAgentDisplayName(activity.agent_type);
-            var actionName = SkyyRoseDashboard.formatActionName(activity.action);
-            var timeAgo = SkyyRoseDashboard.timeAgo(activity.created_at);
+            let icon = SkyyRoseDashboard.getAgentIcon(activity.agent_type);
+            let agentName = SkyyRoseDashboard.getAgentDisplayName(activity.agent_type);
+            let actionName = SkyyRoseDashboard.formatActionName(activity.action);
+            let timeAgo = SkyyRoseDashboard.timeAgo(activity.created_at);
             
             return '<div class="activity-item status-' + activity.status + '">' +
                    '<div class="activity-icon">' + icon + '</div>' +
@@ -292,7 +292,7 @@
                 $('.performance-card .card-value').html(performance.score + '<span class="unit">%</span>');
                 
                 // Update trend
-                var $trend = $('.performance-card .card-trend');
+                let $trend = $('.performance-card .card-trend');
                 $trend.removeClass('up down').addClass(performance.trend);
             }
         },
@@ -302,7 +302,7 @@
          */
         updateSecurityWidget: function(security) {
             if (security.threat_level !== undefined) {
-                var $securityStatus = $('.security-status');
+                let $securityStatus = $('.security-status');
                 $securityStatus.removeClass('security-low security-medium security-high security-critical')
                               .addClass('security-' + security.threat_level);
                 
@@ -315,8 +315,8 @@
          * Show notification
          */
         showNotification: function(type, message) {
-            var noticeClass = 'notice notice-' + (type === 'error' ? 'error' : 'success');
-            var $notice = $('<div class="' + noticeClass + ' is-dismissible skyy-rose-notice">' +
+            let noticeClass = 'notice notice-' + (type === 'error' ? 'error' : 'success');
+            const $notice = $('<div class="' + noticeClass + ' is-dismissible skyy-rose-notice">' +
                            '<p>' + message + '</p>' +
                            '<button type="button" class="notice-dismiss">' +
                            '<span class="screen-reader-text">Dismiss this notice.</span>' +
@@ -350,7 +350,7 @@
          * Helper functions
          */
         getAgentIcon: function(agentType) {
-            var icons = {
+            const icons = {
                 'brand_intelligence': '🎨',
                 'inventory': '📦',
                 'wordpress': '🌐',
@@ -361,7 +361,7 @@
         },
 
         getAgentDisplayName: function(agentType) {
-            var names = {
+            const names = {
                 'brand_intelligence': 'Brand Intelligence',
                 'inventory': 'Inventory',
                 'wordpress': 'WordPress',
@@ -376,12 +376,12 @@
         },
 
         timeAgo: function(dateString) {
-            var now = new Date();
-            var past = new Date(dateString);
-            var diffMs = now - past;
-            var diffMins = Math.floor(diffMs / 60000);
-            var diffHours = Math.floor(diffMins / 60);
-            var diffDays = Math.floor(diffHours / 24);
+            let now = new Date();
+            let past = new Date(dateString);
+            let diffMs = now - past;
+            let diffMins = Math.floor(diffMs / 60000);
+            let diffHours = Math.floor(diffMins / 60);
+            let diffDays = Math.floor(diffHours / 24);
 
             if (diffMins < 1) return 'Just now';
             if (diffMins < 60) return diffMins + ' min ago';

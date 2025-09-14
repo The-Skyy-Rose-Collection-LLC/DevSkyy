@@ -294,14 +294,14 @@ class PerformanceAgent:
         try:
             prompt = f"""
             CODE OPTIMIZATION - GOD MODE INTELLIGENCE
-            
+
             Code Language: {code_analysis.get('language', 'Multiple')}
             Performance Issues: {json.dumps(code_analysis.get('issues', []), indent=2)}
             Current Performance Score: {code_analysis.get('performance_score', 0)}/100
             Target: 98+ Performance Score
-            
+
             ADVANCED OPTIMIZATION ANALYSIS:
-            1. Critical Performance Bottlenecks Identification  
+            1. Critical Performance Bottlenecks Identification
             2. Memory Optimization Strategies
             3. Database Query Optimization (10x speed improvements)
             4. Caching Layer Implementation
@@ -311,7 +311,7 @@ class PerformanceAgent:
             8. Server-Side Rendering Optimization
             9. Bundle Size Reduction (50%+ reduction)
             10. Real-Time Performance Monitoring Setup
-            
+
             Provide code-level optimizations that achieve 98+ performance scores.
             Include specific implementation steps and expected performance gains.
             """
