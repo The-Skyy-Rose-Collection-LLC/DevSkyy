@@ -413,8 +413,8 @@ def scan_site_endpoint() -> Dict[str, Any]:
 async def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
     inventory_agent = get_inventory_agent()
-    assets = await inventory_agent.scan_assets()
-    duplicates = await inventory_agent.find_duplicates()
+    assets = await get_inventory_agent().scan_assets()
+    duplicates = await get_inventory_agent().find_duplicates()
 
     return {
         "total_assets": assets.get("total_assets", 0) if isinstance(assets, dict) else len(assets),
@@ -453,7 +453,7 @@ def process_payment(payment_data: PaymentRequest) -> Dict[str, Any]:
     """Process a payment transaction."""
     try:
         logger.info(f"Processing payment for customer {payment_data.customer_id}")
-        result = financial_agent.process_payment(
+        result = get_financial_agent().process_payment(
             payment_data.amount, payment_data.currency, payment_data.customer_id,
             payment_data.product_id, payment_data.payment_method.value, payment_data.gateway
         )
@@ -472,19 +472,19 @@ def create_chargeback(transaction_id: str, reason: str, amount: float = None) ->
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid chargeback reason")
 
-    return financial_agent.create_chargeback(transaction_id, chargeback_reason, amount)
+    return get_financial_agent().create_chargeback(transaction_id, chargeback_reason, amount)
 
 
 @app.post("/chargebacks/{chargeback_id}/evidence")
 def submit_chargeback_evidence(chargeback_id: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
     """Submit evidence for a chargeback dispute."""
-    return financial_agent.submit_chargeback_evidence(chargeback_id, evidence)
+    return get_financial_agent().submit_chargeback_evidence(chargeback_id, evidence)
 
 
 @app.get("/financial/dashboard")
 def get_financial_dashboard() -> Dict[str, Any]:
     """Get comprehensive financial dashboard."""
-    return financial_agent.get_financial_dashboard()
+    return get_financial_agent().get_financial_dashboard()
 
 
 # Ecommerce Management Endpoints
@@ -493,7 +493,7 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
     """Add a new product to the catalog."""
     try:
         logger.info(f"Adding product: {product_data.name}")
-        result = ecommerce_agent.add_product(
+        result = get_ecommerce_agent().add_product(
             product_data.name, product_data.category, product_data.price,
             product_data.cost, product_data.stock_quantity, product_data.sku,
             product_data.sizes, product_data.colors, product_data.description,
@@ -509,33 +509,33 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
 @app.post("/inventory/{product_id}/update")
 def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
     """Update product inventory levels."""
-    return ecommerce_agent.update_inventory(product_id, quantity_change)
+    return get_ecommerce_agent().update_inventory(product_id, quantity_change)
 
 
 @app.post("/customers/create")
 def create_customer(email: str, first_name: str, last_name: str,
                     phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
-    return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
+    return get_ecommerce_agent().create_customer(email, first_name, last_name, phone, None, preferences)
 
 
 @app.post("/orders/create")
 def create_order(customer_id: str, items: List[Dict[str, Any]],
                  shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
     """Create a new order."""
-    return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
+    return get_ecommerce_agent().create_order(customer_id, items, shipping_address, billing_address)
 
 
 @app.get("/customers/{customer_id}/recommendations")
 def get_recommendations(customer_id: str, limit: int = 5) -> List[Dict[str, Any]]:
     """Get product recommendations for a customer."""
-    return ecommerce_agent.get_product_recommendations(customer_id, limit)
+    return get_ecommerce_agent().get_product_recommendations(customer_id, limit)
 
 
 @app.get("/analytics/report")
 def get_analytics_report() -> Dict[str, Any]:
     """Get comprehensive analytics report."""
-    return ecommerce_agent.generate_analytics_report()
+    return get_ecommerce_agent().generate_analytics_report()
 
 
 # WordPress/Divi Management Endpoints
@@ -893,19 +893,19 @@ async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[st
 @app.post("/financial/tax-preparation")
 async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive tax preparation and optimization service."""
-    return await financial_agent.prepare_tax_returns(tax_data)
+    return await get_financial_agent().prepare_tax_returns(tax_data)
 
 
 @app.post("/financial/credit-analysis")
 async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive business credit analysis and improvement planning."""
-    return await financial_agent.analyze_business_credit(credit_data)
+    return await get_financial_agent().analyze_business_credit(credit_data)
 
 
 @app.post("/financial/advisory")
 async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive financial advisory services for business growth."""
-    return await financial_agent.provide_financial_advisory(advisory_request)
+    return await get_financial_agent().provide_financial_advisory(advisory_request)
 
 # Integration Management Endpoints
 
@@ -1844,19 +1844,19 @@ async def get_risk_dashboard() -> Dict[str, Any]:
 @app.post("/experimental/quantum-inventory")
 async def quantum_inventory_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum inventory optimization."""
-    return await inventory_agent.quantum_asset_optimization()
+    return await get_inventory_agent().quantum_asset_optimization()
 
 
 @app.post("/experimental/blockchain-audit")
 async def blockchain_financial_audit() -> Dict[str, Any]:
     """EXPERIMENTAL: Blockchain financial audit."""
-    return await financial_agent.experimental_blockchain_audit()
+    return await get_financial_agent().experimental_blockchain_audit()
 
 
 @app.post("/experimental/neural-commerce/{customer_id}")
 async def neural_commerce_session(customer_id: str) -> Dict[str, Any]:
     """EXPERIMENTAL: Neural commerce experience."""
-    return await ecommerce_agent.experimental_neural_commerce_session(customer_id)
+    return await get_ecommerce_agent().experimental_neural_commerce_session(customer_id)
 
 
 @app.post("/experimental/quantum-wordpress")
@@ -2560,9 +2560,9 @@ async def get_dashboard():
     """Get comprehensive business dashboard."""
     try:
         # Get metrics from all agents
-        inventory_metrics = inventory_agent.get_metrics()
-        financial_metrics = financial_agent.get_financial_overview()
-        ecommerce_metrics = ecommerce_agent.get_analytics_dashboard()
+        inventory_metrics = get_inventory_agent().get_metrics()
+        financial_metrics = get_financial_agent().get_financial_overview()
+        ecommerce_metrics = get_ecommerce_agent().get_analytics_dashboard()
 
         return {
             "platform_status": "OPERATIONAL",
