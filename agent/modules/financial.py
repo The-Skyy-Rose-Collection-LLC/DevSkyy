@@ -1,7 +1,7 @@
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List
 
 import requests
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Any
 
 
 class FinancialAgent:
@@ -21,7 +21,7 @@ class FinancialAgent:
             "chargeback_rate": chargeback_rate,
             "threshold_exceeded": chargeback_rate > self.chargeback_threshold,
             "recent_chargebacks": len(recent_chargebacks),
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
         if alert_data["threshold_exceeded"]:
@@ -54,7 +54,7 @@ class FinancialAgent:
             "fraud_score": fraud_score,
             "risk_level": "HIGH" if fraud_score > self.fraud_score_threshold else "LOW",
             "indicators": indicators,
-            "recommended_action": "BLOCK" if fraud_score > 80 else "REVIEW" if fraud_score > 50 else "APPROVE"
+            "recommended_action": "BLOCK" if fraud_score > 80 else "REVIEW" if fraud_score > 50 else "APPROVE",
         }
 
     def reconcile_payments(self) -> Dict[str, Any]:
@@ -70,17 +70,19 @@ class FinancialAgent:
             total_processed += processor_data.get("amount", 0)
 
             if processor_data.get("discrepancy"):
-                discrepancies.append({
-                    "processor": processor,
-                    "amount": processor_data["discrepancy"],
-                    "type": processor_data.get("discrepancy_type", "unknown")
-                })
+                discrepancies.append(
+                    {
+                        "processor": processor,
+                        "amount": processor_data["discrepancy"],
+                        "type": processor_data.get("discrepancy_type", "unknown"),
+                    }
+                )
 
         return {
             "total_processed": total_processed,
             "discrepancies": discrepancies,
             "status": "CLEAN" if not discrepancies else "NEEDS_REVIEW",
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     def _fetch_recent_chargebacks(self) -> List[Dict]:
@@ -88,7 +90,7 @@ class FinancialAgent:
         # Simulate API call to payment processor
         return [
             {"id": "cb_1", "amount": 150.00, "reason": "fraudulent"},
-            {"id": "cb_2", "amount": 89.99, "reason": "product_not_received"}
+            {"id": "cb_2", "amount": 89.99, "reason": "product_not_received"},
         ]
 
     def _calculate_chargeback_rate(self, chargebacks: List[Dict]) -> float:
@@ -103,11 +105,7 @@ class FinancialAgent:
     def _fetch_processor_data(self, processor: str) -> Dict:
         """Fetch data from payment processor."""
         # Simulate processor API calls
-        return {
-            "processor": processor,
-            "amount": 5000.00,
-            "discrepancy": None
-        }
+        return {"processor": processor, "amount": 5000.00, "discrepancy": None}
 
 
 def monitor_financial_health() -> Dict[str, Any]:
@@ -120,6 +118,9 @@ def monitor_financial_health() -> Dict[str, Any]:
     return {
         "chargebacks": chargeback_status,
         "reconciliation": reconciliation_status,
-        "overall_status": "HEALTHY" if not chargeback_status["threshold_exceeded"]
-        and reconciliation_status["status"] == "CLEAN" else "NEEDS_ATTENTION"
+        "overall_status": (
+            "HEALTHY"
+            if not chargeback_status["threshold_exceeded"] and reconciliation_status["status"] == "CLEAN"
+            else "NEEDS_ATTENTION"
+        ),
     }

@@ -1,10 +1,12 @@
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, patch
 
 import pytest
-from unittest.mock import patch, MagicMock
+
+from agent.modules.customer_service import (CustomerServiceAgent,
+                                            handle_customer_service)
 from agent.modules.financial import FinancialAgent, monitor_financial_health
 from agent.modules.inventory import InventoryAgent, manage_inventory
-from agent.modules.customer_service import CustomerServiceAgent, handle_customer_service
 from agent.modules.marketing import MarketingAgent, optimize_marketing
 
 
@@ -22,11 +24,7 @@ class TestFinancialAgent:
 
     def test_fraud_detection(self):
         agent = FinancialAgent()
-        transaction = {
-            "country": "XX",
-            "transactions_last_hour": 6,
-            "amount": 1500
-        }
+        transaction = {"country": "XX", "transactions_last_hour": 6, "amount": 1500}
 
         result = agent.detect_fraud(transaction)
 

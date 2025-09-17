@@ -1,12 +1,11 @@
-
-import logging
-import os
-import json
-from datetime import datetime
-from typing import Dict, Any, List, Optional
-from pathlib import Path
 import base64
+import json
+import logging
 import mimetypes
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ class BrandAssetManager:
             "product_images": self.storage_path / "product_images",
             "marketing_materials": self.storage_path / "marketing_materials",
             "brand_guidelines": self.storage_path / "brand_guidelines",
-            "seasonal_collections": self.storage_path / "seasonal_collections"
+            "seasonal_collections": self.storage_path / "seasonal_collections",
         }
 
         # Create category directories
@@ -44,24 +43,25 @@ class BrandAssetManager:
     def _load_metadata(self):
         """Load asset metadata from storage."""
         if self.metadata_file.exists():
-            with open(self.metadata_file, 'r') as f:
+            with open(self.metadata_file, "r") as f:
                 self.metadata = json.load(f)
         else:
             self.metadata = {
                 "assets": {},
                 "upload_history": [],
                 "total_assets": 0,
-                "last_updated": datetime.now().isoformat()
+                "last_updated": datetime.now().isoformat(),
             }
 
     def _save_metadata(self):
         """Save asset metadata to storage."""
         self.metadata["last_updated"] = datetime.now().isoformat()
-        with open(self.metadata_file, 'w') as f:
+        with open(self.metadata_file, "w") as f:
             json.dump(self.metadata, f, indent=2)
 
-    def upload_asset(self, file_data: bytes, filename: str, category: str,
-                     description: str = "", tags: List[str] = None) -> Dict[str, Any]:
+    def upload_asset(
+        self, file_data: bytes, filename: str, category: str, description: str = "", tags: List[str] = None
+    ) -> Dict[str, Any]:
         """Upload a brand asset."""
         try:
             if category not in self.categories:
@@ -76,7 +76,7 @@ class BrandAssetManager:
 
             # Save file
             asset_path = self.categories[category] / f"{asset_id}{file_ext}"
-            with open(asset_path, 'wb') as f:
+            with open(asset_path, "wb") as f:
                 f.write(file_data)
 
             # Create metadata entry
@@ -90,17 +90,15 @@ class BrandAssetManager:
                 "file_size": len(file_data),
                 "mime_type": mime_type,
                 "upload_date": datetime.now().isoformat(),
-                "analysis_status": "pending"
+                "analysis_status": "pending",
             }
 
             # Store metadata
             self.metadata["assets"][asset_id] = asset_metadata
             self.metadata["total_assets"] += 1
-            self.metadata["upload_history"].append({
-                "asset_id": asset_id,
-                "timestamp": datetime.now().isoformat(),
-                "action": "upload"
-            })
+            self.metadata["upload_history"].append(
+                {"asset_id": asset_id, "timestamp": datetime.now().isoformat(), "action": "upload"}
+            )
 
             self._save_metadata()
 
@@ -110,7 +108,7 @@ class BrandAssetManager:
                 "asset_id": asset_id,
                 "message": f"Asset '{filename}' uploaded successfully",
                 "category": category,
-                "file_path": str(asset_path)
+                "file_path": str(asset_path),
             }
 
         except Exception as e:
@@ -119,10 +117,7 @@ class BrandAssetManager:
 
     def get_assets_by_category(self, category: str) -> List[Dict[str, Any]]:
         """Get all assets in a specific category."""
-        return [
-            asset for asset in self.metadata["assets"].values()
-            if asset["category"] == category
-        ]
+        return [asset for asset in self.metadata["assets"].values() if asset["category"] == category]
 
     def get_asset_info(self, asset_id: str) -> Optional[Dict[str, Any]]:
         """Get detailed information about a specific asset."""
@@ -134,7 +129,7 @@ class BrandAssetManager:
             "total_assets": self.metadata["total_assets"],
             "categories_used": {},
             "recent_uploads": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Category analysis
@@ -146,9 +141,7 @@ class BrandAssetManager:
 
         # Recent uploads (last 7)
         analysis["recent_uploads"] = sorted(
-            self.metadata["upload_history"],
-            key=lambda x: x["timestamp"],
-            reverse=True
+            self.metadata["upload_history"], key=lambda x: x["timestamp"], reverse=True
         )[:7]
 
         # Generate recommendations
@@ -169,13 +162,13 @@ class BrandAssetManager:
             "visual_assets": {
                 "logos": self.get_assets_by_category("logos"),
                 "product_images": self.get_assets_by_category("product_images"),
-                "marketing_materials": self.get_assets_by_category("marketing_materials")
+                "marketing_materials": self.get_assets_by_category("marketing_materials"),
             },
             "brand_guidelines": self.get_assets_by_category("brand_guidelines"),
             "seasonal_collections": self.get_assets_by_category("seasonal_collections"),
             "asset_analysis": self.analyze_brand_consistency(),
             "total_learning_sources": self.metadata["total_assets"],
-            "last_updated": self.metadata["last_updated"]
+            "last_updated": self.metadata["last_updated"],
         }
 
         return learning_data

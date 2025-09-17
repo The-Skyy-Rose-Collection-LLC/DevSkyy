@@ -1,10 +1,9 @@
-
+import logging
 import os
 import subprocess
-import logging
 from datetime import datetime
-from typing import Dict, Any, List
 from pathlib import Path
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ def commit_fixes(fixes_applied: Dict[str, Any]) -> Dict[str, Any]:
         logger.info("📝 Starting Git commit process...")
 
         # Ensure we're in a Git repository
-        if not Path('.git').exists():
+        if not Path(".git").exists():
             return _init_git_repo()
 
         # Configure Git if not configured
@@ -46,16 +45,12 @@ def commit_fixes(fixes_applied: Dict[str, Any]) -> Dict[str, Any]:
             "files_committed": add_result.get("files_added", 0),
             "commit_message": commit_message,
             "pushed_to_remote": push_result.get("success", False),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
         logger.error(f"❌ Git commit failed: {str(e)}")
-        return {
-            "status": "failed",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }
+        return {"status": "failed", "error": str(e), "timestamp": datetime.now().isoformat()}
 
 
 def commit_all_changes() -> Dict[str, Any]:
@@ -69,11 +64,7 @@ def commit_all_changes() -> Dict[str, Any]:
         # Check Git status
         status_result = _git_status()
         if not status_result["has_changes"]:
-            return {
-                "status": "no_changes",
-                "message": "No changes to commit",
-                "timestamp": datetime.now().isoformat()
-            }
+            return {"status": "no_changes", "message": "No changes to commit", "timestamp": datetime.now().isoformat()}
 
         # Ensure Git is configured
         _configure_git()
@@ -84,7 +75,9 @@ def commit_all_changes() -> Dict[str, Any]:
             return add_result
 
         # Generate commit message for manual commit
-        commit_message = f"Manual commit - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\nUpdated platform with latest changes"
+        commit_message = (
+            f"Manual commit - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\nUpdated platform with latest changes"
+        )
 
         # Commit
         commit_result = _git_commit(commit_message)
@@ -99,24 +92,19 @@ def commit_all_changes() -> Dict[str, Any]:
             "commit_hash": commit_result.get("commit_hash"),
             "files_committed": add_result.get("files_added", 0),
             "pushed_to_remote": push_result.get("success", False),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
         logger.error(f"❌ Failed to commit all changes: {str(e)}")
-        return {
-            "status": "failed",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }
+        return {"status": "failed", "error": str(e), "timestamp": datetime.now().isoformat()}
 
 
 def _init_git_repo() -> Dict[str, Any]:
     """Initialize a new Git repository."""
     try:
         # Initialize repo
-        result = subprocess.run(
-            ['git', 'init'], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(["git", "init"], capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             return {"status": "failed", "error": "Failed to initialize Git repository"}
 
@@ -171,7 +159,7 @@ backup_*/
 .pythonlibs/
         """.strip()
 
-        with open('.gitignore', 'w') as f:
+        with open(".gitignore", "w") as f:
             f.write(gitignore_content)
 
         logger.info("✅ Git repository initialized")
@@ -185,18 +173,14 @@ def _configure_git() -> None:
     """Configure Git with default settings."""
     try:
         # Check if user.name is configured
-        result = subprocess.run(
-            ['git', 'config', 'user.name'], capture_output=True, text=True, timeout=10)
+        result = subprocess.run(["git", "config", "user.name"], capture_output=True, text=True, timeout=10)
         if result.returncode != 0 or not result.stdout.strip():
-            subprocess.run(['git', 'config', 'user.name',
-                           'DevSkyy Enhanced Platform'], timeout=10)
+            subprocess.run(["git", "config", "user.name", "DevSkyy Enhanced Platform"], timeout=10)
 
         # Check if user.email is configured
-        result = subprocess.run(
-            ['git', 'config', 'user.email'], capture_output=True, text=True, timeout=10)
+        result = subprocess.run(["git", "config", "user.email"], capture_output=True, text=True, timeout=10)
         if result.returncode != 0 or not result.stdout.strip():
-            subprocess.run(['git', 'config', 'user.email',
-                           'devskyy@theskyy-rose-collection.com'], timeout=10)
+            subprocess.run(["git", "config", "user.email", "devskyy@theskyy-rose-collection.com"], timeout=10)
 
         logger.info("✅ Git configuration verified")
 
@@ -207,16 +191,15 @@ def _configure_git() -> None:
 def _git_status() -> Dict[str, Any]:
     """Check Git repository status."""
     try:
-        result = subprocess.run(
-            ['git', 'status', '--porcelain'], capture_output=True, text=True, timeout=10)
+        result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10)
         if result.returncode != 0:
             return {"has_changes": False, "error": "Failed to get Git status"}
 
         changes = result.stdout.strip()
         return {
             "has_changes": bool(changes),
-            "changes": changes.split('\n') if changes else [],
-            "clean": not bool(changes)
+            "changes": changes.split("\n") if changes else [],
+            "clean": not bool(changes),
         }
 
     except Exception as e:
@@ -227,156 +210,107 @@ def _git_add_files() -> Dict[str, Any]:
     """Add modified files to Git staging area."""
     try:
         # Add Python files
-        result = subprocess.run(['git', 'add', '*.py'],
-                                capture_output=True, text=True, timeout=30)
+        result = subprocess.run(["git", "add", "*.py"], capture_output=True, text=True, timeout=30)
 
         # Add other important files
-        important_files = ['main.py', 'README.md', '.gitignore']
+        important_files = ["main.py", "README.md", ".gitignore"]
         for file in important_files:
             if os.path.exists(file):
-                subprocess.run(['git', 'add', file], timeout=10)
+                subprocess.run(["git", "add", file], timeout=10)
 
         # Get status to count added files
-        status_result = subprocess.run(['git', 'status', '--porcelain', '--cached'],
-                                       capture_output=True, text=True, timeout=10)
+        status_result = subprocess.run(
+            ["git", "status", "--porcelain", "--cached"], capture_output=True, text=True, timeout=10
+        )
 
-        files_added = len(
-            [line for line in status_result.stdout.strip().split('\n') if line.strip()])
+        files_added = len([line for line in status_result.stdout.strip().split("\n") if line.strip()])
 
-        return {
-            "success": True,
-            "files_added": files_added
-        }
+        return {"success": True, "files_added": files_added}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def _git_add_all() -> Dict[str, Any]:
     """Add all files to Git staging area."""
     try:
-        result = subprocess.run(['git', 'add', '.'],
-                                capture_output=True, text=True, timeout=30)
+        result = subprocess.run(["git", "add", "."], capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             return {"success": False, "error": "Failed to add files to Git"}
 
         # Get count of staged files
-        status_result = subprocess.run(['git', 'status', '--porcelain', '--cached'],
-                                       capture_output=True, text=True, timeout=10)
+        status_result = subprocess.run(
+            ["git", "status", "--porcelain", "--cached"], capture_output=True, text=True, timeout=10
+        )
 
-        files_added = len(
-            [line for line in status_result.stdout.strip().split('\n') if line.strip()])
+        files_added = len([line for line in status_result.stdout.strip().split("\n") if line.strip()])
 
-        return {
-            "success": True,
-            "files_added": files_added
-        }
+        return {"success": True, "files_added": files_added}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def _git_commit(message: str) -> Dict[str, Any]:
     """Commit staged changes with the provided message."""
     try:
-        result = subprocess.run(['git', 'commit', '-m', message],
-                                capture_output=True, text=True, timeout=30)
+        result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, timeout=30)
 
         if result.returncode != 0:
             # Check if there are no changes to commit
             if "nothing to commit" in result.stdout.lower():
-                return {
-                    "success": True,
-                    "message": "No changes to commit",
-                    "commit_hash": None
-                }
-            return {
-                "success": False,
-                "error": f"Commit failed: {result.stderr or result.stdout}"
-            }
+                return {"success": True, "message": "No changes to commit", "commit_hash": None}
+            return {"success": False, "error": f"Commit failed: {result.stderr or result.stdout}"}
 
         # Extract commit hash
         commit_hash = None
         try:
-            hash_result = subprocess.run(['git', 'rev-parse', 'HEAD'],
-                                         capture_output=True, text=True, timeout=10)
+            hash_result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10)
             if hash_result.returncode == 0:
                 commit_hash = hash_result.stdout.strip()[:8]  # Short hash
         except:
             pass
 
-        return {
-            "success": True,
-            "commit_hash": commit_hash,
-            "output": result.stdout
-        }
+        return {"success": True, "commit_hash": commit_hash, "output": result.stdout}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def _git_push() -> Dict[str, Any]:
     """Push commits to remote repository."""
     try:
         # Check if remote exists
-        result = subprocess.run(
-            ['git', 'remote'], capture_output=True, text=True, timeout=10)
+        result = subprocess.run(["git", "remote"], capture_output=True, text=True, timeout=10)
         if result.returncode != 0 or not result.stdout.strip():
-            return {
-                "success": False,
-                "error": "No remote repository configured"
-            }
+            return {"success": False, "error": "No remote repository configured"}
 
         # Get current branch name
-        current_branch_result = subprocess.run(['git', 'branch', '--show-current'],
-                                               capture_output=True, text=True, timeout=10)
+        current_branch_result = subprocess.run(
+            ["git", "branch", "--show-current"], capture_output=True, text=True, timeout=10
+        )
         if current_branch_result.returncode != 0:
-            return {
-                "success": False,
-                "error": "Failed to get current branch name"
-            }
+            return {"success": False, "error": "Failed to get current branch name"}
 
         current_branch = current_branch_result.stdout.strip()
         if not current_branch:
-            return {
-                "success": False,
-                "error": "No current branch detected"
-            }
+            return {"success": False, "error": "No current branch detected"}
 
         # Try to push current branch
-        result = subprocess.run(['git', 'push', 'origin', current_branch],
-                                capture_output=True, text=True, timeout=60)
+        result = subprocess.run(["git", "push", "origin", current_branch], capture_output=True, text=True, timeout=60)
 
         if result.returncode == 0:
-            return {
-                "success": True,
-                "output": result.stdout
-            }
+            return {"success": True, "output": result.stdout}
         else:
-            return {
-                "success": False,
-                "error": f"Push failed: {result.stderr or result.stdout}"
-            }
+            return {"success": False, "error": f"Push failed: {result.stderr or result.stdout}"}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
 
 
 def _generate_commit_message(fixes_applied: Dict[str, Any]) -> str:
     """Generate detailed commit message based on fixes applied."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if not fixes_applied or not fixes_applied.get("fixes_applied"):
         return f"DevSkyy Enhanced Platform Update - {timestamp}\n\nGeneral improvements and optimizations"
@@ -386,8 +320,7 @@ def _generate_commit_message(fixes_applied: Dict[str, Any]) -> str:
     # Count fix types
     errors_fixed = sum(1 for fix in fixes if fix.get("type") == "error")
     warnings_fixed = sum(1 for fix in fixes if fix.get("type") == "warning")
-    optimizations = sum(
-        1 for fix in fixes if fix.get("type") == "optimization")
+    optimizations = sum(1 for fix in fixes if fix.get("type") == "optimization")
 
     # Build commit message
     title = f"DevSkyy Enhanced Platform Auto-Fix - {timestamp}"
@@ -411,8 +344,7 @@ def _generate_commit_message(fixes_applied: Dict[str, Any]) -> str:
     if len(fixes) <= 10:  # Only add details for reasonable number of fixes
         message_parts.append("Details:")
         for fix in fixes[:10]:  # Limit to first 10 fixes
-            file_name = fix.get("file", "unknown").split(
-                '/')[-1]  # Get just filename
+            file_name = fix.get("file", "unknown").split("/")[-1]  # Get just filename
             description = fix.get("description", "Unknown fix")
             message_parts.append(f"- {file_name}: {description}")
 

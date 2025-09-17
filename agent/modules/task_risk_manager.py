@@ -1,10 +1,10 @@
-import logging
 import asyncio
+import json
+import logging
 import uuid
-from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from enum import Enum
-import json
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -75,16 +75,12 @@ class TaskRiskManager:
                 "mitigation_strategies": risk_assessment["mitigation_strategies"],
                 "status": "pending",
                 "created_at": datetime.now().isoformat(),
-                "assigned_to": agent_type
+                "assigned_to": agent_type,
             }
 
             self.tasks[task_id] = task
 
-            return {
-                "task_id": task_id,
-                "task": task,
-                "risk_assessment": risk_assessment
-            }
+            return {"task_id": task_id, "task": task, "risk_assessment": risk_assessment}
 
         except Exception as e:
             logger.error(f"❌ Task creation failed: {str(e)}")
@@ -106,7 +102,7 @@ class TaskRiskManager:
                 "high_risk_tasks": len([t for t in sorted_tasks if t["risk_level"] in ["critical", "high"]]),
                 "urgent_tasks": len([t for t in sorted_tasks if t["priority"] == "urgent"]),
                 "tasks": sorted_tasks,
-                "generated_at": datetime.now().isoformat()
+                "generated_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -144,7 +140,7 @@ class TaskRiskManager:
             "overall_risk_level": overall_risk,
             "impact_score": impact_score,
             "risk_factors": risk_factors,
-            "mitigation_strategies": []
+            "mitigation_strategies": [],
         }
 
     def _calculate_task_priority(self, risk_assessment: Dict, task_data: Dict) -> TaskPriority:
@@ -186,11 +182,15 @@ class TaskRiskManager:
         priority_order = {"urgent": 4, "high": 3, "medium": 2, "low": 1}
         risk_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
 
-        return sorted(tasks, key=lambda t: (
-            priority_order.get(t["priority"], 0),
-            risk_order.get(t["risk_level"], 0),
-            t["estimated_impact"]
-        ), reverse=True)
+        return sorted(
+            tasks,
+            key=lambda t: (
+                priority_order.get(t["priority"], 0),
+                risk_order.get(t["risk_level"], 0),
+                t["estimated_impact"],
+            ),
+            reverse=True,
+        )
 
     def _initialize_agent_styling(self) -> Dict[str, Any]:
         """Initialize fashion guru styling configuration for agents."""
@@ -200,25 +200,25 @@ class TaskRiskManager:
                 "gold": "#FFD700",
                 "silver": "#C0C0C0",
                 "black": "#000000",
-                "white": "#FFFFFF"
+                "white": "#FFFFFF",
             },
             "agent_personas": {
                 "brand_intelligence": {
                     "color": "rose_gold",
                     "style": "sophisticated_trendsetter",
-                    "personality": "visionary_fashion_oracle"
+                    "personality": "visionary_fashion_oracle",
                 },
                 "inventory": {
                     "color": "silver",
                     "style": "organized_minimalist",
-                    "personality": "detail_oriented_curator"
+                    "personality": "detail_oriented_curator",
                 },
                 "financial": {
                     "color": "gold",
                     "style": "premium_professional",
-                    "personality": "strategic_wealth_advisor"
-                }
-            }
+                    "personality": "strategic_wealth_advisor",
+                },
+            },
         }
 
 
@@ -230,5 +230,5 @@ def manage_tasks_and_risks() -> Dict[str, Any]:
         "active_tasks": len(manager.tasks),
         "risk_monitoring": "enabled",
         "fashion_guru_styling": "activated",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }

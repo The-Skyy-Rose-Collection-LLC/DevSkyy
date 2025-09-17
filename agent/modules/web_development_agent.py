@@ -1,9 +1,10 @@
-from typing import Dict, Any, List
-import re
 import json
-from datetime import datetime
-import requests
 import logging
+import re
+from datetime import datetime
+from typing import Any, Dict, List
+
+from .telemetry import Telemetry
 
 logger = logging.getLogger(__name__)
 
@@ -13,11 +14,12 @@ class WebDevelopmentAgent:
 
     def __init__(self):
         self.agent_type = "web_development"
+        self.telemetry = Telemetry("web_development")
         self.brand_context = {}
         self.code_quality_rules = {
             "javascript": ["no-unused-vars", "consistent-return", "no-console"],
             "python": ["line-too-long", "unused-import", "undefined-name"],
-            "css": ["duplicate-properties", "unknown-properties", "vendor-prefixes"]
+            "css": ["duplicate-properties", "unknown-properties", "vendor-prefixes"],
         }
         # EXPERIMENTAL: Neural code generation and optimization
         self.neural_code_engine = self._initialize_neural_code_engine()
@@ -31,20 +33,23 @@ class WebDevelopmentAgent:
         suggestions = []
         score = 85  # Base score
 
+        with self.telemetry.span("analyze_code_quality"):
+            pass
+
         if language.lower() == "python":
-            lines = code.split('\n')
+            lines = code.split("\n")
             for i, line in enumerate(lines, 1):
                 if len(line) > 120:
                     issues.append(f"Line {i}: Line too long ({len(line)} chars)")
                     score -= 2
-                if line.strip().startswith('print('):
+                if line.strip().startswith("print("):
                     suggestions.append(f"Line {i}: Consider using logging instead of print")
 
         elif language.lower() == "javascript":
-            if 'var ' in code:
+            if "var " in code:
                 suggestions.append("Use let/const instead of var")
                 score -= 10
-            if 'console.log' in code:
+            if "console.log" in code:
                 suggestions.append("Remove console.log statements")
                 score -= 5
 
@@ -57,9 +62,9 @@ class WebDevelopmentAgent:
             "recommendations": [
                 "Follow PEP 8 standards" if language.lower() == "python" else "Follow ESLint standards",
                 "Add proper documentation",
-                "Include error handling"
+                "Include error handling",
             ],
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def fix_code_issues(self, code: str, language: str) -> Dict[str, Any]:
@@ -70,23 +75,23 @@ class WebDevelopmentAgent:
         if language.lower() == "javascript":
             # Replace var with let/const
             if "var " in fixed_code:
-                fixed_code = re.sub(r'\bvar\b', 'let', fixed_code)
+                fixed_code = re.sub(r"\bvar\b", "let", fixed_code)
                 fixes_applied.append("Replaced 'var' with 'let'")
 
             # Remove console.log statements
             if "console.log" in fixed_code:
-                fixed_code = re.sub(r'console\.log\([^)]*\);\s*', '', fixed_code)
+                fixed_code = re.sub(r"console\.log\([^)]*\);\s*", "", fixed_code)
                 fixes_applied.append("Removed console.log statements")
 
         elif language.lower() == "python":
             # Basic Python formatting
-            lines = fixed_code.split('\n')
+            lines = fixed_code.split("\n")
             fixed_lines = []
             for line in lines:
                 # Remove trailing whitespace
                 cleaned_line = line.rstrip()
                 fixed_lines.append(cleaned_line)
-            fixed_code = '\n'.join(fixed_lines)
+            fixed_code = "\n".join(fixed_lines)
             fixes_applied.append("Removed trailing whitespace")
 
         return {
@@ -94,7 +99,7 @@ class WebDevelopmentAgent:
             "fixed_code": fixed_code,
             "fixes_applied": fixes_applied,
             "improvement_score": len(fixes_applied) * 10,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def optimize_page_structure(self, html_content: str) -> Dict[str, Any]:
@@ -103,13 +108,13 @@ class WebDevelopmentAgent:
         optimized_html = html_content
 
         # Add missing meta tags
-        if '<meta charset=' not in optimized_html and '<head>' in optimized_html:
-            optimized_html = optimized_html.replace('<head>', '<head>\n    <meta charset="UTF-8">')
+        if "<meta charset=" not in optimized_html and "<head>" in optimized_html:
+            optimized_html = optimized_html.replace("<head>", '<head>\n    <meta charset="UTF-8">')
             optimizations.append("Added charset meta tag")
 
-        if '<meta name="viewport"' not in optimized_html and '<head>' in optimized_html:
+        if '<meta name="viewport"' not in optimized_html and "<head>" in optimized_html:
             viewport_tag = '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            optimized_html = optimized_html.replace('</head>', f'    {viewport_tag}\n</head>')
+            optimized_html = optimized_html.replace("</head>", f"    {viewport_tag}\n</head>")
             optimizations.append("Added viewport meta tag")
 
         # Add alt attributes to images
@@ -118,7 +123,7 @@ class WebDevelopmentAgent:
         def add_alt(match):
             """TODO: Add docstring for add_alt."""
             img_tag = match.group(0)
-            if 'alt=' not in img_tag:
+            if "alt=" not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'
             return img_tag
 
@@ -132,7 +137,7 @@ class WebDevelopmentAgent:
             "optimized_html": optimized_html,
             "optimizations_applied": optimizations,
             "seo_score": 85 + len(optimizations) * 5,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def _initialize_neural_code_engine(self) -> Dict[str, Any]:
@@ -143,7 +148,7 @@ class WebDevelopmentAgent:
             "code_completion_accuracy": "99.4%",
             "bug_prediction": "94.7%",
             "optimization_suggestions": "real_time",
-            "neural_refactoring": "enabled"
+            "neural_refactoring": "enabled",
         }
 
     def _initialize_quantum_debugging(self) -> Dict[str, Any]:
@@ -153,7 +158,7 @@ class WebDevelopmentAgent:
             "parallel_execution_paths": "infinite",
             "bug_superposition": "resolved",
             "entangled_variable_tracking": "active",
-            "quantum_breakpoints": "non_destructive"
+            "quantum_breakpoints": "non_destructive",
         }
 
     def _initialize_ai_architecture(self) -> Dict[str, Any]:
@@ -163,7 +168,7 @@ class WebDevelopmentAgent:
             "architecture_generation": "genetic_algorithms",
             "performance_prediction": "99.2%",
             "scalability_analysis": "automated",
-            "security_hardening": "ai_powered"
+            "security_hardening": "ai_powered",
         }
 
     async def experimental_neural_code_generation(self, requirements: str, language: str) -> Dict[str, Any]:
@@ -212,36 +217,36 @@ export default NeuralGeneratedSolution;
                     "maintainability": 97.8,
                     "performance_prediction": 94.2,
                     "security_score": 98.9,
-                    "bug_probability": 0.003
+                    "bug_probability": 0.003,
                 },
                 "quantum_debugging": {
                     "potential_bugs": 0,
                     "optimization_opportunities": 5,
                     "execution_paths_analyzed": 1247,
-                    "quantum_advantage": "34.7x faster debugging"
+                    "quantum_advantage": "34.7x faster debugging",
                 },
                 "ai_architecture": {
                     "design_patterns": ["singleton", "factory", "observer"],
                     "scalability_rating": "enterprise",
                     "cloud_readiness": 99.1,
-                    "microservices_compatibility": True
+                    "microservices_compatibility": True,
                 },
                 "experimental_features": [
                     "Neural code completion",
                     "Quantum bug prediction",
                     "AI-powered refactoring",
                     "Predictive performance optimization",
-                    "Automated security hardening"
+                    "Automated security hardening",
                 ],
                 "code_metrics": {
                     "lines_generated": 47,
                     "functions_created": 5,
                     "classes_designed": 1,
-                    "documentation_coverage": "100%"
+                    "documentation_coverage": "100%",
                 },
                 "confidence_score": 99.4,
                 "status": "neural_generation_complete",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -256,5 +261,5 @@ def fix_web_development_issues() -> Dict[str, Any]:
         "issues_fixed": 0,
         "optimizations_applied": 5,
         "performance_improvements": "Applied code quality standards",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }

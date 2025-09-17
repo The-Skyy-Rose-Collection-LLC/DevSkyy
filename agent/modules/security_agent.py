@@ -1,11 +1,11 @@
-import logging
 import asyncio
-import uuid
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
 import hashlib
-import secrets
 import json
+import logging
+import secrets
+import uuid
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,13 +21,13 @@ class SecurityAgent:
             "threat_level": "LOW",
             "vulnerabilities_detected": 0,
             "incidents_resolved": 0,
-            "compliance_score": 0
+            "compliance_score": 0,
         }
         self.luxury_security_standards = {
             "data_protection": "PCI_DSS_Level_1",
             "customer_privacy": "GDPR_CCPA_compliant",
             "fraud_prevention": "advanced_ml_models",
-            "brand_protection": "comprehensive_monitoring"
+            "brand_protection": "comprehensive_monitoring",
         }
         logger.info("🔒 Security Agent initialized with Advanced Threat Intelligence")
 
@@ -43,23 +43,23 @@ class SecurityAgent:
                     "high": 1,
                     "medium": 3,
                     "low": 7,
-                    "last_scan": datetime.now().isoformat()
+                    "last_scan": datetime.now().isoformat(),
                 },
                 "compliance_status": {
                     "pci_dss": {"status": "compliant", "score": 98, "expiry": "2025-12-31"},
-                    "gdpr": {"status": "compliant", "score": 96, "last_audit": "2024-11-15"}
+                    "gdpr": {"status": "compliant", "score": 96, "last_audit": "2024-11-15"},
                 },
                 "threat_landscape": {
                     "active_threats": 2,
                     "blocked_attacks": 156,
                     "fraud_attempts": 23,
-                    "brand_impersonation_sites": 4
+                    "brand_impersonation_sites": 4,
                 },
                 "luxury_specific_risks": {
                     "high_value_transactions": {"risk_score": 25, "mitigation": "enhanced_verification"},
                     "vip_customer_data": {"risk_score": 15, "mitigation": "additional_encryption"},
-                    "brand_reputation": {"risk_score": 30, "mitigation": "continuous_monitoring"}
-                }
+                    "brand_reputation": {"risk_score": 30, "mitigation": "continuous_monitoring"},
+                },
             }
 
             return {
@@ -67,7 +67,7 @@ class SecurityAgent:
                 "timestamp": datetime.now().isoformat(),
                 "security_assessment": assessment,
                 "recommendations": self._generate_security_recommendations(assessment),
-                "risk_prioritization": self._prioritize_security_risks(assessment)
+                "risk_prioritization": self._prioritize_security_risks(assessment),
             }
 
         except Exception as e:
@@ -88,16 +88,16 @@ class SecurityAgent:
                     "Protects against sophisticated bot attacks",
                     "Preserves inventory for legitimate customers",
                     "Reduces server load from malicious traffic",
-                    "Improves site performance for real users"
+                    "Improves site performance for real users",
                 ],
                 "cons": [
                     "May occasionally challenge legitimate users",
                     "Requires ongoing tuning and maintenance",
                     "Additional infrastructure costs",
-                    "False positives can impact customer experience"
+                    "False positives can impact customer experience",
                 ],
                 "automation_potential": "High",
-                "estimated_completion": "2 weeks"
+                "estimated_completion": "2 weeks",
             }
         ]
         return recommendations
@@ -116,12 +116,14 @@ class SecurityAgent:
             else:
                 priority = "MEDIUM"
 
-            risks.append({
-                "risk_type": risk_type,
-                "priority": priority,
-                "score": risk_score,
-                "mitigation": risk_data.get("mitigation", "")
-            })
+            risks.append(
+                {
+                    "risk_type": risk_type,
+                    "priority": priority,
+                    "score": risk_score,
+                    "mitigation": risk_data.get("mitigation", ""),
+                }
+            )
 
         return sorted(risks, key=lambda x: x["score"], reverse=True)
 
@@ -134,5 +136,5 @@ def secure_luxury_platform() -> Dict[str, Any]:
         "security_score": 94.5,
         "threat_level": "LOW",
         "compliance_status": "FULL",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
