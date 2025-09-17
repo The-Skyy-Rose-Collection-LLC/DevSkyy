@@ -1,7 +1,8 @@
 from typing import Dict, Any, List
 import asyncio
 import json
-import requests
+from . import http_client
+from .telemetry import Telemetry
 from datetime import datetime
 import random
 import uuid
@@ -32,6 +33,7 @@ class SiteCommunicationAgent:
         self.customer_feedback_db = []
         self.market_insights_cache = {}
         self.agent_type = "site_communication"
+        self.telemetry = Telemetry("site_communication")
         logger.info("💬 Site Communication Agent initialized")
 
     async def connect_to_chatbot(self, website_url: str, api_key: str = None) -> Dict[str, Any]:
@@ -102,7 +104,8 @@ class SiteCommunicationAgent:
 
         try:
             # Make actual request to check site health
-            response = requests.get(website_url, timeout=10)
+            with self.telemetry.span("gather_site_health"):
+                response = http_client.get(website_url, timeout=10)
 
             health_data = {
                 "website": website_url,
@@ -131,7 +134,7 @@ class SiteCommunicationAgent:
 
             return health_data
 
-        except requests.RequestException as e:
+        except Exception as e:
             return {
                 "website": website_url,
                 "timestamp": datetime.now().isoformat(),

@@ -1,5 +1,6 @@
 import os
-import requests
+from . import http_client
+from .telemetry import Telemetry
 import logging
 import re
 from typing import Dict, Any, List
@@ -17,6 +18,7 @@ def scan_site() -> Dict[str, Any]:
     Comprehensive site scanning with advanced error detection and analysis.
     Production-level implementation with full error handling.
     """
+    telemetry = Telemetry("scanner")
     try:
         logger.info("🔍 Starting comprehensive site scan...")
 
@@ -49,7 +51,8 @@ def scan_site() -> Dict[str, Any]:
                 scan_results["optimizations"].extend(file_analysis["optimizations"])
 
         # Perform live site check if URL is available
-        site_health = _check_site_health()
+        with telemetry.span("check_site_health"):
+            site_health = _check_site_health()
         scan_results["site_health"] = site_health
 
         # Performance analysis
@@ -260,7 +263,7 @@ def _check_site_health() -> Dict[str, Any]:
         for url in test_urls:
             try:
                 start_time = time.time()
-                response = requests.get(url, timeout=5)
+                response = http_client.get(url)
                 response_time = (time.time() - start_time) * 1000
 
                 health_check.update({

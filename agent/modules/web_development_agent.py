@@ -2,7 +2,7 @@ from typing import Dict, Any, List
 import re
 import json
 from datetime import datetime
-import requests
+from .telemetry import Telemetry
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,6 +13,7 @@ class WebDevelopmentAgent:
 
     def __init__(self):
         self.agent_type = "web_development"
+        self.telemetry = Telemetry("web_development")
         self.brand_context = {}
         self.code_quality_rules = {
             "javascript": ["no-unused-vars", "consistent-return", "no-console"],
@@ -30,6 +31,9 @@ class WebDevelopmentAgent:
         issues = []
         suggestions = []
         score = 85  # Base score
+
+        with self.telemetry.span("analyze_code_quality"):
+            pass
 
         if language.lower() == "python":
             lines = code.split('\n')
