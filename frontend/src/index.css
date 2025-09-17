@@ -1,9 +1,39 @@
 /* Import Luxury Fonts FIRST */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* TailwindCSS v4 Theme Configuration */
+@theme {
+  --color-rose-gold: #E8B4B8;
+  --color-luxury-gold: #FFD700;
+  --color-elegant-silver: #C0C0C0;
+  --color-fashion-black: #000000;
+  --color-pearl-white: #FFFFFF;
+  --color-burgundy: #800020;
+  --color-champagne: #F7E7CE;
+  --color-platinum: #E5E4E2;
+  --color-rich-black: #1A1A1A;
+  --color-streetwear-red: #FF0000;
+  --color-luxury-brown: #8B4513;
+
+  --font-family-fashion: 'Playfair Display', serif;
+  --font-family-elegant: 'Inter', sans-serif;
+  --font-family-luxury: 'Crimson Text', serif;
+  --font-family-script: 'Dancing Script', cursive;
+
+  --animate-fade-in-elegant: fadeInElegant 0.8s ease-in-out;
+  --animate-slide-in-luxury: slideInLuxury 0.6s ease-out;
+  --animate-pulse-gold: pulseGold 2s ease-in-out infinite;
+  --animate-sparkle-success: sparkleSuccess 1.5s ease-in-out;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-luxury-float: luxury-float 3s ease-in-out infinite;
+  --animate-gold-shimmer: gold-shimmer 2s infinite;
+
+  --shadow-luxury: 0 25px 50px -12px rgba(232, 180, 184, 0.25);
+  --shadow-elegant: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --shadow-gold-glow: 0 0 30px rgba(255, 215, 0, 0.3);
+}
 
 /* Custom Luxury Brand Colors */
 :root {
@@ -16,17 +46,21 @@
   --luxury-brown: #8B4513;
 }
 
-/* Custom Font Classes */
-.font-fashion {
-  font-family: 'Playfair Display', serif;
+/* Custom Font Classes - TailwindCSS v4 Compatible */
+@utility font-fashion {
+  font-family: theme(fontFamily.fashion, 'Playfair Display', serif);
 }
 
-.font-elegant {
-  font-family: 'Inter', sans-serif;
+@utility font-elegant {
+  font-family: theme(fontFamily.elegant, 'Inter', sans-serif);
 }
 
-.font-script {
-  font-family: 'Dancing Script', cursive;
+@utility font-script {
+  font-family: theme(fontFamily.script, 'Dancing Script', cursive);
+}
+
+@utility font-luxury {
+  font-family: theme(fontFamily.luxury, 'Crimson Text', serif);
 }
 
 /* Custom Luxury Colors */
@@ -231,7 +265,7 @@
 
 /* Custom Focus States */
 .focus-luxury:focus {
-  @apply outline-none ring-2 ring-luxury-gold ring-opacity-50 border-luxury-gold;
+  @apply outline-none ring-2 ring-luxury-gold/50 border-luxury-gold;
 }
 
 /* Luxury Animation Delays */
