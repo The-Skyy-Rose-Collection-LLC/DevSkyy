@@ -11,8 +11,7 @@ from pathlib import Path
 
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from agent.modules.wordpress_direct_service import \
-    create_wordpress_direct_service
+from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
