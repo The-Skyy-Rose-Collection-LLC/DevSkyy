@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class ProductCategoryEnum(str, Enum):
@@ -51,7 +51,7 @@ class ProductRequest(BaseModel):
     images: Optional[List[str]] = Field(default=None, description="Product image URLs")
     tags: Optional[List[str]] = Field(default=None, description="Product tags")
 
-    @validator("price")
+    @field_validator("price")
     def price_must_be_greater_than_cost(cls, v, values):
         """TODO: Add docstring for price_must_be_greater_than_cost."""
         if "cost" in values and v <= values["cost"]:

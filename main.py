@@ -27,14 +27,12 @@ try:
 except Exception:
     InventoryAgent = None  # type: ignore
 try:
-    from agent.modules.financial_agent import (  # type: ignore
-        ChargebackReason, FinancialAgent)
+    from agent.modules.financial_agent import ChargebackReason, FinancialAgent  # type: ignore
 except Exception:
     FinancialAgent = None  # type: ignore
     ChargebackReason = None  # type: ignore
 try:
-    from agent.modules.ecommerce_agent import (EcommerceAgent,  # type: ignore
-                                               OrderStatus, ProductCategory)
+    from agent.modules.ecommerce_agent import EcommerceAgent, OrderStatus, ProductCategory  # type: ignore
 except Exception:
     EcommerceAgent = None  # type: ignore
     ProductCategory = None  # type: ignore
@@ -44,8 +42,7 @@ try:
 except Exception:
     WordPressAgent = None  # type: ignore
 try:
-    from agent.modules.web_development_agent import (  # type: ignore
-        WebDevelopmentAgent, fix_web_development_issues)
+    from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues  # type: ignore
 except Exception:
     WebDevelopmentAgent = None  # type: ignore
 
@@ -54,8 +51,7 @@ except Exception:
 
 
 try:
-    from agent.modules.site_communication_agent import (  # type: ignore
-        SiteCommunicationAgent, communicate_with_site)
+    from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site  # type: ignore
 except Exception:
     SiteCommunicationAgent = None  # type: ignore
 
@@ -65,7 +61,9 @@ except Exception:
 
 try:
     from agent.modules.brand_intelligence_agent import (  # type: ignore
-        BrandIntelligenceAgent, initialize_brand_intelligence)
+        BrandIntelligenceAgent,
+        initialize_brand_intelligence,
+    )
 except Exception:
     BrandIntelligenceAgent = None  # type: ignore
 
@@ -74,8 +72,7 @@ except Exception:
 
 
 try:
-    from agent.modules.enhanced_learning_scheduler import \
-        start_enhanced_learning_system  # type: ignore
+    from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system  # type: ignore
 except Exception:
 
     def start_enhanced_learning_system(*args, **kwargs):  # type: ignore
@@ -83,8 +80,7 @@ except Exception:
 
 
 try:
-    from agent.modules.seo_marketing_agent import (  # type: ignore
-        SEOMarketingAgent, optimize_seo_marketing)
+    from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing  # type: ignore
 except Exception:
     SEOMarketingAgent = None  # type: ignore
 
@@ -93,8 +89,7 @@ except Exception:
 
 
 try:
-    from agent.modules.customer_service_agent import (  # type: ignore
-        CustomerServiceAgent, optimize_customer_service)
+    from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service  # type: ignore
 except Exception:
     CustomerServiceAgent = None  # type: ignore
 
@@ -103,8 +98,7 @@ except Exception:
 
 
 try:
-    from agent.modules.security_agent import (SecurityAgent,  # type: ignore
-                                              secure_luxury_platform)
+    from agent.modules.security_agent import SecurityAgent, secure_luxury_platform  # type: ignore
 except Exception:
     SecurityAgent = None  # type: ignore
 
@@ -113,8 +107,7 @@ except Exception:
 
 
 try:
-    from agent.modules.performance_agent import (  # type: ignore
-        PerformanceAgent, optimize_site_performance)
+    from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance  # type: ignore
 except Exception:
     PerformanceAgent = None  # type: ignore
 
@@ -123,8 +116,7 @@ except Exception:
 
 
 try:
-    from agent.modules.task_risk_manager import (  # type: ignore
-        TaskRiskManager, manage_tasks_and_risks)
+    from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks  # type: ignore
 except Exception:
     TaskRiskManager = None  # type: ignore
 
@@ -134,7 +126,9 @@ except Exception:
 
 try:
     from agent.modules.agent_assignment_manager import (  # type: ignore
-        AgentAssignmentManager, create_agent_assignment_manager)
+        AgentAssignmentManager,
+        create_agent_assignment_manager,
+    )
 except Exception:
     AgentAssignmentManager = None  # type: ignore
 
@@ -144,7 +138,9 @@ except Exception:
 
 try:
     from agent.modules.wordpress_integration_service import (  # type: ignore
-        WordPressIntegrationService, create_wordpress_integration_service)
+        WordPressIntegrationService,
+        create_wordpress_integration_service,
+    )
 except Exception:
     WordPressIntegrationService = None  # type: ignore
 
@@ -154,7 +150,9 @@ except Exception:
 
 try:
     from agent.modules.wordpress_direct_service import (  # type: ignore
-        WordPressDirectService, create_wordpress_direct_service)
+        WordPressDirectService,
+        create_wordpress_direct_service,
+    )
 except Exception:
     WordPressDirectService = None  # type: ignore
 
@@ -164,7 +162,9 @@ except Exception:
 
 try:
     from agent.modules.woocommerce_integration_service import (  # type: ignore
-        WooCommerceIntegrationService, create_woocommerce_integration_service)
+        WooCommerceIntegrationService,
+        create_woocommerce_integration_service,
+    )
 except Exception:
     WooCommerceIntegrationService = None  # type: ignore
 
@@ -174,7 +174,9 @@ except Exception:
 
 try:
     from agent.modules.openai_intelligence_service import (  # type: ignore
-        OpenAIIntelligenceService, create_openai_intelligence_service)
+        OpenAIIntelligenceService,
+        create_openai_intelligence_service,
+    )
 except Exception:
     OpenAIIntelligenceService = None  # type: ignore
 
@@ -183,23 +185,19 @@ except Exception:
 
 
 try:
-    from agent.modules.social_media_automation_agent import \
-        SocialMediaAutomationAgent  # type: ignore
+    from agent.modules.social_media_automation_agent import SocialMediaAutomationAgent  # type: ignore
 except Exception:
     SocialMediaAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.email_sms_automation_agent import \
-        EmailSMSAutomationAgent  # type: ignore
+    from agent.modules.email_sms_automation_agent import EmailSMSAutomationAgent  # type: ignore
 except Exception:
     EmailSMSAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.design_automation_agent import \
-        DesignAutomationAgent  # type: ignore
+    from agent.modules.design_automation_agent import DesignAutomationAgent  # type: ignore
 except Exception:
     DesignAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.cache_manager import (cache_manager,  # type: ignore
-                                             cached, start_cache_cleanup)
+    from agent.modules.cache_manager import cache_manager, cached, start_cache_cleanup  # type: ignore
 except Exception:
     cache_manager = None  # type: ignore
 
@@ -215,8 +213,11 @@ except Exception:
 
 try:
     from agent.modules.database_optimizer import (  # type: ignore
-        db_connection_pool, get_database_stats, index_optimizer,
-        optimize_query)
+        db_connection_pool,
+        get_database_stats,
+        index_optimizer,
+        optimize_query,
+    )
 except Exception:
     db_connection_pool = None  # type: ignore
     index_optimizer = None  # type: ignore
@@ -247,27 +248,15 @@ except Exception:
         return {"status": "unavailable"}
 
 
-import asyncio
-import json
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 
-from models import (ChargebackRequest, CodeAnalysisRequest, CustomerRequest,
-                    OrderRequest, PaymentRequest, ProductRequest,
-                    WebsiteAnalysisRequest)
+from models import PaymentRequest, ProductRequest
 
 # Load environment variables
 load_dotenv()
-
-app = FastAPI(
-    title="The Skyy Rose Collection - DevSkyy Enhanced Platform",
-    version="2.0.0",
-    description="Production-grade AI-powered platform for luxury e-commerce",
-    docs_url="/docs",
-    redoc_url="/redoc",
-)
 
 # Configure logging
 logging.basicConfig(
@@ -276,6 +265,28 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("app.log")],
 )
 logger = logging.getLogger(__name__)
+
+# Initialize agents at startup using modern lifespan
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan handler."""
+    # Startup
+    await startup_event()
+    yield
+    # Shutdown (if needed)
+    pass
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="The Skyy Rose Collection - DevSkyy Enhanced Platform",
+    version="2.0.0",
+    description="Production-grade AI-powered platform for luxury e-commerce",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    lifespan=lifespan,
+)
 
 # Production middleware
 app.add_middleware(
@@ -323,10 +334,55 @@ _agent_cache = {}
 _brand_intelligence = None
 
 
+# Initialize global agents
+def initialize_agents():
+    """Initialize all agents at startup."""
+    global _agent_cache, _brand_intelligence
+
+    try:
+        if BrandIntelligenceAgent:
+            _brand_intelligence = BrandIntelligenceAgent()
+
+        # Initialize agents if classes are available
+        if InventoryAgent:
+            _agent_cache["inventory"] = InventoryAgent()
+        if FinancialAgent:
+            _agent_cache["financial"] = FinancialAgent()
+        if EcommerceAgent:
+            _agent_cache["ecommerce"] = EcommerceAgent()
+        if WordPressAgent:
+            _agent_cache["wordpress"] = WordPressAgent()
+        if WebDevelopmentAgent:
+            _agent_cache["web_development"] = WebDevelopmentAgent()
+        if SiteCommunicationAgent:
+            _agent_cache["site_communication"] = SiteCommunicationAgent()
+        if SEOMarketingAgent:
+            _agent_cache["seo_marketing"] = SEOMarketingAgent()
+        if CustomerServiceAgent:
+            _agent_cache["customer_service"] = CustomerServiceAgent()
+        if SecurityAgent:
+            _agent_cache["security"] = SecurityAgent()
+        if PerformanceAgent:
+            _agent_cache["performance"] = PerformanceAgent()
+        if AgentAssignmentManager:
+            _agent_cache["agent_assignment"] = AgentAssignmentManager()
+        if TaskRiskManager:
+            _agent_cache["task_risk"] = TaskRiskManager()
+        if SocialMediaAutomationAgent:
+            _agent_cache["social_media"] = SocialMediaAutomationAgent()
+        if EmailSMSAutomationAgent:
+            _agent_cache["email_sms"] = EmailSMSAutomationAgent()
+        if DesignAutomationAgent:
+            _agent_cache["design"] = DesignAutomationAgent()
+
+    except Exception as e:
+        logger.warning(f"Failed to initialize some agents: {e}")
+
+
 def get_brand_intelligence():
     """Get or create brand intelligence agent (singleton pattern)."""
     global _brand_intelligence
-    if _brand_intelligence is None:
+    if _brand_intelligence is None and BrandIntelligenceAgent:
         _brand_intelligence = BrandIntelligenceAgent()
     return _brand_intelligence
 
@@ -336,19 +392,19 @@ def get_agent(agent_name: str):
     global _agent_cache
 
     if agent_name not in _agent_cache:
-        # Agent factory mapping
+        # Agent factory mapping with safety checks
         agent_factories = {
-            "inventory": lambda: InventoryAgent(),
-            "financial": lambda: FinancialAgent(),
-            "ecommerce": lambda: EcommerceAgent(),
-            "wordpress": lambda: WordPressAgent(),
-            "web_development": lambda: WebDevelopmentAgent(),
-            "site_communication": lambda: SiteCommunicationAgent(),
-            "seo_marketing": lambda: SEOMarketingAgent(),
-            "customer_service": lambda: CustomerServiceAgent(),
-            "security": lambda: SecurityAgent(),
-            "performance": lambda: PerformanceAgent(),
-            "task_risk_manager": lambda: TaskRiskManager(),
+            "inventory": lambda: InventoryAgent() if InventoryAgent else None,
+            "financial": lambda: FinancialAgent() if FinancialAgent else None,
+            "ecommerce": lambda: EcommerceAgent() if EcommerceAgent else None,
+            "wordpress": lambda: WordPressAgent() if WordPressAgent else None,
+            "web_development": lambda: WebDevelopmentAgent() if WebDevelopmentAgent else None,
+            "site_communication": lambda: SiteCommunicationAgent() if SiteCommunicationAgent else None,
+            "seo_marketing": lambda: SEOMarketingAgent() if SEOMarketingAgent else None,
+            "customer_service": lambda: CustomerServiceAgent() if CustomerServiceAgent else None,
+            "security": lambda: SecurityAgent() if SecurityAgent else None,
+            "performance": lambda: PerformanceAgent() if PerformanceAgent else None,
+            "task_risk_manager": lambda: TaskRiskManager() if TaskRiskManager else None,
             "agent_assignment_manager": lambda: create_agent_assignment_manager(),
             "wordpress_service": lambda: create_wordpress_integration_service(),
             "wordpress_direct": lambda: create_wordpress_direct_service(),
@@ -462,6 +518,72 @@ def get_email_sms_automation_agent():
 
 def get_design_automation_agent():
     return get_agent("design_automation")
+
+
+# Initialize agent variables for endpoint use
+inventory_agent = None
+financial_agent = None
+ecommerce_agent = None
+wordpress_agent = None
+web_dev_agent = None
+site_comm_agent = None
+seo_marketing_agent = None
+customer_service_agent = None
+security_agent = None
+performance_agent = None
+task_risk_manager = None
+agent_assignment_manager = None
+wordpress_service = None
+wordpress_direct = None
+woocommerce_service = None
+openai_service = None
+social_media_automation_agent = None
+email_sms_automation_agent = None
+design_automation_agent = None
+brand_intelligence = None
+
+
+# Agents will be initialized via lifespan handler defined above
+
+async def startup_event():
+    """Initialize all agents at application startup."""
+    global inventory_agent, financial_agent, ecommerce_agent, wordpress_agent
+    global web_dev_agent, site_comm_agent, seo_marketing_agent, customer_service_agent
+    global security_agent, performance_agent, task_risk_manager, agent_assignment_manager
+    global wordpress_service, wordpress_direct, woocommerce_service, openai_service
+    global social_media_automation_agent, email_sms_automation_agent, design_automation_agent
+    global brand_intelligence
+
+    logger.info("Initializing DevSkyy agents...")
+
+    try:
+        # Initialize agents safely
+        inventory_agent = get_inventory_agent()
+        financial_agent = get_financial_agent()
+        ecommerce_agent = get_ecommerce_agent()
+        wordpress_agent = get_wordpress_agent()
+        web_dev_agent = get_web_dev_agent()
+        site_comm_agent = get_site_comm_agent()
+        seo_marketing_agent = get_seo_marketing_agent()
+        customer_service_agent = get_customer_service_agent()
+        security_agent = get_security_agent()
+        performance_agent = get_performance_agent()
+        task_risk_manager = get_task_risk_manager()
+        agent_assignment_manager = get_agent_assignment_manager()
+        wordpress_service = get_wordpress_service()
+        wordpress_direct = get_wordpress_direct()
+        woocommerce_service = get_woocommerce_service()
+        openai_service = get_openai_service()
+        social_media_automation_agent = get_social_media_automation_agent()
+        email_sms_automation_agent = get_email_sms_automation_agent()
+        design_automation_agent = get_design_automation_agent()
+        brand_intelligence = get_brand_intelligence()
+
+        logger.info("All DevSkyy agents initialized successfully!")
+
+    except Exception as e:
+        logger.warning(f"Some agents failed to initialize: {e}")
+        logger.info("Application will continue with available agents")
 
 
 def run_agent() -> dict:
@@ -1569,8 +1691,7 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
     """BULLETPROOF WordPress direct connection with guaranteed success."""
     try:
         # Initialize bulletproof WordPress service
-        from agent.modules.wordpress_direct_service import \
-            create_wordpress_direct_service
+        from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
         wordpress_service = create_wordpress_direct_service()
 
@@ -2441,10 +2562,8 @@ async def initialize_wordpress_server_access() -> Dict[str, Any]:
     """Initialize GOD MODE LEVEL 2: Full WordPress server access for deep optimization."""
     try:
         # Initialize enhanced server access
-        from agent.modules.enhanced_brand_intelligence_agent import \
-            create_enhanced_brand_intelligence_agent
-        from agent.modules.wordpress_server_access import \
-            create_wordpress_server_access
+        from agent.modules.enhanced_brand_intelligence_agent import create_enhanced_brand_intelligence_agent
+        from agent.modules.wordpress_server_access import create_wordpress_server_access
 
         logger.info("🚀 Initializing GOD MODE LEVEL 2 - Full Server Access")
 
