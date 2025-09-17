@@ -13,13 +13,13 @@ motor==3.6.0
 dnspython==2.7.0
 
 # HTTP & API
-requests==2.32.3
-python-multipart==0.0.17
+requests==2.32.4
+python-multipart==0.0.18
 aiofiles==24.1.0
 httpx==0.28.1
 
 # Authentication & Security
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.8.30
@@ -67,7 +67,7 @@ celery==5.4.0
 
 # Backend auth & ORM
 SQLAlchemy==2.0.35
-PyJWT==2.9.0
+PyJWT==2.10.1
 bcrypt==4.2.0
 
 # Async Redis client used by backend/advanced_cache_system.py

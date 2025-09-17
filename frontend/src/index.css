@@ -7,13 +7,13 @@
 
 /* Custom Luxury Brand Colors */
 :root {
-  --rose-gold: #E8B4B8;
-  --luxury-gold: #FFD700;
-  --elegant-silver: #C0C0C0;
-  --rich-black: #1A1A1A;
-  --pure-white: #FFFFFF;
-  --streetwear-red: #FF0000;
-  --luxury-brown: #8B4513;
+  --rose-gold: #e8b4b8;
+  --luxury-gold: #ffd700;
+  --elegant-silver: #c0c0c0;
+  --rich-black: #1a1a1a;
+  --pure-white: #ffffff;
+  --streetwear-red: #ff0000;
+  --luxury-brown: #8b4513;
 }
 
 /* Custom Font Classes */
@@ -30,52 +30,106 @@
 }
 
 /* Custom Luxury Colors */
-.text-rose-gold { color: var(--rose-gold); }
-.text-luxury-gold { color: var(--luxury-gold); }
-.text-elegant-silver { color: var(--elegant-silver); }
-.text-rich-black { color: var(--rich-black); }
-.text-streetwear-red { color: var(--streetwear-red); }
-.text-luxury-brown { color: var(--luxury-brown); }
+.text-rose-gold {
+  color: var(--rose-gold);
+}
+.text-luxury-gold {
+  color: var(--luxury-gold);
+}
+.text-elegant-silver {
+  color: var(--elegant-silver);
+}
+.text-rich-black {
+  color: var(--rich-black);
+}
+.text-streetwear-red {
+  color: var(--streetwear-red);
+}
+.text-luxury-brown {
+  color: var(--luxury-brown);
+}
 
-.bg-rose-gold { background-color: var(--rose-gold); }
-.bg-luxury-gold { background-color: var(--luxury-gold); }
-.bg-elegant-silver { background-color: var(--elegant-silver); }
-.bg-rich-black { background-color: var(--rich-black); }
-.bg-streetwear-red { background-color: var(--streetwear-red); }
-.bg-luxury-brown { background-color: var(--luxury-brown); }
+.bg-rose-gold {
+  background-color: var(--rose-gold);
+}
+.bg-luxury-gold {
+  background-color: var(--luxury-gold);
+}
+.bg-elegant-silver {
+  background-color: var(--elegant-silver);
+}
+.bg-rich-black {
+  background-color: var(--rich-black);
+}
+.bg-streetwear-red {
+  background-color: var(--streetwear-red);
+}
+.bg-luxury-brown {
+  background-color: var(--luxury-brown);
+}
 
-.border-rose-gold { border-color: var(--rose-gold); }
-.border-luxury-gold { border-color: var(--luxury-gold); }
-.border-elegant-silver { border-color: var(--elegant-silver); }
+.border-rose-gold {
+  border-color: var(--rose-gold);
+}
+.border-luxury-gold {
+  border-color: var(--luxury-gold);
+}
+.border-elegant-silver {
+  border-color: var(--elegant-silver);
+}
 
 /* Custom Gradients */
-.from-rose-gold { --tw-gradient-from: var(--rose-gold); }
-.to-luxury-gold { --tw-gradient-to: var(--luxury-gold); }
-.via-luxury-gold { --tw-gradient-stops: var(--tw-gradient-from), var(--luxury-gold), var(--tw-gradient-to); }
-.to-elegant-silver { --tw-gradient-to: var(--elegant-silver); }
+.from-rose-gold {
+  --tw-gradient-from: var(--rose-gold);
+}
+.to-luxury-gold {
+  --tw-gradient-to: var(--luxury-gold);
+}
+.via-luxury-gold {
+  --tw-gradient-stops:
+    var(--tw-gradient-from), var(--luxury-gold), var(--tw-gradient-to);
+}
+.to-elegant-silver {
+  --tw-gradient-to: var(--elegant-silver);
+}
 
 /* Luxury Shadow Effects */
 .shadow-luxury {
-  box-shadow: 0 10px 25px -5px rgba(232, 180, 184, 0.1), 0 10px 10px -5px rgba(232, 180, 184, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(232, 180, 184, 0.1),
+    0 10px 10px -5px rgba(232, 180, 184, 0.04);
 }
 
 .shadow-gold-glow {
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), 0 10px 25px -5px rgba(255, 215, 0, 0.1);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.3),
+    0 10px 25px -5px rgba(255, 215, 0, 0.1);
 }
 
 .shadow-elegant {
-  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.05), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 4px 14px 0 rgba(0, 0, 0, 0.05),
+    0 2px 4px 0 rgba(0, 0, 0, 0.02);
 }
 
 /* Premium Animation Effects */
 @keyframes luxury-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes gold-shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 .animate-luxury-float {
@@ -200,11 +254,11 @@
   .text-luxury-heading {
     @apply text-3xl;
   }
-  
+
   .card-luxury {
     @apply p-4 rounded-2xl;
   }
-  
+
   .btn-luxury {
     @apply py-2 px-4 text-sm;
   }
@@ -235,8 +289,18 @@
 }
 
 /* Luxury Animation Delays */
-.delay-luxury-1 { animation-delay: 0.1s; }
-.delay-luxury-2 { animation-delay: 0.2s; }
-.delay-luxury-3 { animation-delay: 0.3s; }
-.delay-luxury-4 { animation-delay: 0.4s; }
-.delay-luxury-5 { animation-delay: 0.5s; }
+.delay-luxury-1 {
+  animation-delay: 0.1s;
+}
+.delay-luxury-2 {
+  animation-delay: 0.2s;
+}
+.delay-luxury-3 {
+  animation-delay: 0.3s;
+}
+.delay-luxury-4 {
+  animation-delay: 0.4s;
+}
+.delay-luxury-5 {
+  animation-delay: 0.5s;
+}

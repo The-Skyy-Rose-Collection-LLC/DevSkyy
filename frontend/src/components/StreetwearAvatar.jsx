@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const StreetwearAvatar = ({ 
-  agentType, 
-  status, 
-  health, 
+const StreetwearAvatar = ({
+  agentType,
+  status,
+  health,
   isActive = false,
   size = 'large',
-  showBubble = true 
+  showBubble = true,
 }) => {
-  const [currentAnimation, setCurrentAnimation] = useState('idle')
-  const [thoughtBubble, setThoughtBubble] = useState('')
+  const [currentAnimation, setCurrentAnimation] = useState('idle');
+  const [thoughtBubble, setThoughtBubble] = useState('');
 
   // Avatar configurations for each agent type
   const avatarConfigs = {
@@ -21,7 +21,7 @@ const StreetwearAvatar = ({
         top: 'cropped-hoodie-rose-gold',
         bottom: 'high-waist-cargo-black',
         shoes: 'chunky-designer-sneakers',
-        accessories: ['luxury-chain', 'rose-gold-watch', 'designer-cap']
+        accessories: ['luxury-chain', 'rose-gold-watch', 'designer-cap'],
       },
       personality: 'confident-trendsetter',
       colors: ['#E8B4B8', '#FFD700', '#C0C0C0'],
@@ -30,8 +30,8 @@ const StreetwearAvatar = ({
         '🔮 Reading fashion futures...',
         '👑 Analyzing luxury trends...',
         '✨ Crafting brand magic...',
-        '🎨 Designing viral moments...'
-      ]
+        '🎨 Designing viral moments...',
+      ],
     },
     performance: {
       name: 'Speed Demon',
@@ -40,7 +40,7 @@ const StreetwearAvatar = ({
         top: 'tech-bomber-neon-blue',
         bottom: 'techwear-pants-black',
         shoes: 'performance-runners',
-        accessories: ['smart-glasses', 'fitness-tracker', 'holographic-chain']
+        accessories: ['smart-glasses', 'fitness-tracker', 'holographic-chain'],
       },
       personality: 'energetic-optimizer',
       colors: ['#00FFFF', '#0080FF', '#FF6600'],
@@ -49,8 +49,8 @@ const StreetwearAvatar = ({
         '⚡ Optimizing at light speed...',
         '🚀 Boosting performance 300%...',
         '💨 Breaking speed records...',
-        '🔥 Unleashing maximum power...'
-      ]
+        '🔥 Unleashing maximum power...',
+      ],
     },
     content: {
       name: 'Story Weaver',
@@ -59,7 +59,7 @@ const StreetwearAvatar = ({
         top: 'oversized-graphic-tee',
         bottom: 'paint-splattered-jeans',
         shoes: 'classic-high-tops',
-        accessories: ['creative-headphones', 'vintage-camera', 'art-badge']
+        accessories: ['creative-headphones', 'vintage-camera', 'art-badge'],
       },
       personality: 'creative-storyteller',
       colors: ['#FF69B4', '#9400D3', '#00CED1'],
@@ -68,8 +68,8 @@ const StreetwearAvatar = ({
         '📝 Crafting viral stories...',
         '🎭 Weaving brand narratives...',
         '💡 Sparking creative genius...',
-        '🌟 Creating content magic...'
-      ]
+        '🌟 Creating content magic...',
+      ],
     },
     financial: {
       name: 'Money Guru',
@@ -78,7 +78,7 @@ const StreetwearAvatar = ({
         top: 'designer-blazer-gold',
         bottom: 'tailored-pants-black',
         shoes: 'luxury-loafers',
-        accessories: ['gold-chain', 'diamond-watch', 'money-clip']
+        accessories: ['gold-chain', 'diamond-watch', 'money-clip'],
       },
       personality: 'wealth-strategist',
       colors: ['#FFD700', '#228B22', '#B8860B'],
@@ -87,8 +87,8 @@ const StreetwearAvatar = ({
         '💰 Multiplying revenue streams...',
         '📊 Optimizing profit margins...',
         '💎 Building wealth empires...',
-        '🏦 Securing financial futures...'
-      ]
+        '🏦 Securing financial futures...',
+      ],
     },
     customer_service: {
       name: 'Vibe Curator',
@@ -97,7 +97,7 @@ const StreetwearAvatar = ({
         top: 'soft-sweater-pastels',
         bottom: 'trendy-midi-skirt',
         shoes: 'comfortable-sneakers',
-        accessories: ['heart-necklace', 'smile-pin', 'customer-badge']
+        accessories: ['heart-necklace', 'smile-pin', 'customer-badge'],
       },
       personality: 'empathetic-helper',
       colors: ['#FFB6C1', '#87CEEB', '#98FB98'],
@@ -106,8 +106,8 @@ const StreetwearAvatar = ({
         '💖 Spreading customer love...',
         '🤝 Building relationships...',
         '😊 Creating happy moments...',
-        '✨ Delivering perfect service...'
-      ]
+        '✨ Delivering perfect service...',
+      ],
     },
     security: {
       name: 'Cyber Guardian',
@@ -116,7 +116,7 @@ const StreetwearAvatar = ({
         top: 'tactical-hoodie-black',
         bottom: 'cargo-pants-dark',
         shoes: 'stealth-boots',
-        accessories: ['security-badge', 'tech-visor', 'encrypted-chain']
+        accessories: ['security-badge', 'tech-visor', 'encrypted-chain'],
       },
       personality: 'protective-vigilant',
       colors: ['#FF0000', '#800080', '#2F4F4F'],
@@ -125,8 +125,8 @@ const StreetwearAvatar = ({
         '🛡️ Scanning for threats...',
         '🔒 Fortifying defenses...',
         '⚔️ Eliminating vulnerabilities...',
-        '🚨 Protecting your empire...'
-      ]
+        '🚨 Protecting your empire...',
+      ],
     },
     seo_marketing: {
       name: 'Viral Architect',
@@ -135,7 +135,7 @@ const StreetwearAvatar = ({
         top: 'trending-crop-top',
         bottom: 'high-fashion-leggings',
         shoes: 'platform-sneakers',
-        accessories: ['trending-hashtag-chain', 'viral-pin', 'influencer-ring']
+        accessories: ['trending-hashtag-chain', 'viral-pin', 'influencer-ring'],
       },
       personality: 'trend-amplifier',
       colors: ['#FF1493', '#00FF7F', '#FF8C00'],
@@ -144,8 +144,8 @@ const StreetwearAvatar = ({
         '📈 Going viral in 3...2...1...',
         '🔥 Trending worldwide...',
         '#️⃣ Hashtag domination...',
-        '🌟 Amplifying your reach...'
-      ]
+        '🌟 Amplifying your reach...',
+      ],
     },
     design_automation: {
       name: 'Pixel Perfectionist',
@@ -154,7 +154,11 @@ const StreetwearAvatar = ({
         top: 'holographic-jacket',
         bottom: 'designer-shorts',
         shoes: 'led-sneakers',
-        accessories: ['design-glasses', 'color-palette-chain', 'creativity-badge']
+        accessories: [
+          'design-glasses',
+          'color-palette-chain',
+          'creativity-badge',
+        ],
       },
       personality: 'perfectionist-innovator',
       colors: ['#FF6347', '#4169E1', '#32CD32'],
@@ -163,8 +167,8 @@ const StreetwearAvatar = ({
         '🎨 Crafting pixel perfection...',
         '✨ Designing the future...',
         '🌈 Harmonizing colors...',
-        '💫 Creating visual magic...'
-      ]
+        '💫 Creating visual magic...',
+      ],
     },
     inventory: {
       name: 'Stock Sensei',
@@ -173,17 +177,25 @@ const StreetwearAvatar = ({
         top: 'clean-button-up',
         bottom: 'organized-cargo-pants',
         shoes: 'efficient-sneakers',
-        accessories: ['inventory-scanner', 'organization-pin', 'efficiency-watch']
+        accessories: [
+          'inventory-scanner',
+          'organization-pin',
+          'efficiency-watch',
+        ],
       },
       personality: 'methodical-organizer',
       colors: ['#708090', '#20B2AA', '#DDA0DD'],
-      animations: ['organizing-items', 'scanning-inventory', 'efficiency-boost'],
+      animations: [
+        'organizing-items',
+        'scanning-inventory',
+        'efficiency-boost',
+      ],
       thoughts: [
         '📦 Organizing inventory zen...',
         '🔍 Tracking every item...',
         '⚡ Optimizing stock levels...',
-        '📊 Predicting demand...'
-      ]
+        '📊 Predicting demand...',
+      ],
     },
     social_media: {
       name: 'Hype Machine',
@@ -192,7 +204,7 @@ const StreetwearAvatar = ({
         top: 'viral-graphic-tee',
         bottom: 'trending-joggers',
         shoes: 'hype-sneakers',
-        accessories: ['social-chain', 'follower-badge', 'viral-ring']
+        accessories: ['social-chain', 'follower-badge', 'viral-ring'],
       },
       personality: 'energetic-connector',
       colors: ['#FF69B4', '#00BFFF', '#FFD700'],
@@ -201,42 +213,46 @@ const StreetwearAvatar = ({
         '📱 Creating viral content...',
         '🔥 Building the hype...',
         '💫 Connecting communities...',
-        '🚀 Boosting engagement...'
-      ]
-    }
-  }
+        '🚀 Boosting engagement...',
+      ],
+    },
+  };
 
-  const config = avatarConfigs[agentType] || avatarConfigs.brand_intelligence
-  
+  const config = avatarConfigs[agentType] || avatarConfigs.brand_intelligence;
+
   useEffect(() => {
     // Cycle through animations based on status
     const animationCycle = () => {
-      const animations = config.animations
-      setCurrentAnimation(animations[Math.floor(Math.random() * animations.length)])
-      
-      if (showBubble) {
-        setThoughtBubble(config.thoughts[Math.floor(Math.random() * config.thoughts.length)])
-      }
-    }
+      const animations = config.animations;
+      setCurrentAnimation(
+        animations[Math.floor(Math.random() * animations.length)]
+      );
 
-    animationCycle()
-    const interval = setInterval(animationCycle, 3000 + Math.random() * 2000)
-    return () => clearInterval(interval)
-  }, [status, config.animations, config.thoughts, showBubble])
+      if (showBubble) {
+        setThoughtBubble(
+          config.thoughts[Math.floor(Math.random() * config.thoughts.length)]
+        );
+      }
+    };
+
+    animationCycle();
+    const interval = setInterval(animationCycle, 3000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, [status, config.animations, config.thoughts, showBubble]);
 
   const getStatusColor = () => {
-    if (health > 95) return '#00FF00'
-    if (health > 80) return '#FFD700'
-    if (health > 60) return '#FF8C00'
-    return '#FF4500'
-  }
+    if (health > 95) return '#00FF00';
+    if (health > 80) return '#FFD700';
+    if (health > 60) return '#FF8C00';
+    return '#FF4500';
+  };
 
   const avatarSize = {
     small: 'w-12 h-16',
     medium: 'w-16 h-24',
     large: 'w-20 h-32',
-    xl: 'w-32 h-48'
-  }
+    xl: 'w-32 h-48',
+  };
 
   return (
     <div className="relative flex flex-col items-center">
@@ -264,14 +280,17 @@ const StreetwearAvatar = ({
         }}
         transition={{
           scale: { duration: 2, repeat: isActive ? Infinity : 0 },
-          rotate: { duration: 1, repeat: currentAnimation === 'viral-dance' ? Infinity : 0 }
+          rotate: {
+            duration: 1,
+            repeat: currentAnimation === 'viral-dance' ? Infinity : 0,
+          },
         }}
       >
         {/* Glow Effect */}
         <motion.div
           className="absolute inset-0 rounded-2xl blur-md opacity-50"
           style={{
-            background: `linear-gradient(45deg, ${config.colors[0]}, ${config.colors[1]}, ${config.colors[2]})`
+            background: `linear-gradient(45deg, ${config.colors[0]}, ${config.colors[1]}, ${config.colors[2]})`,
           }}
           animate={{
             opacity: [0.3, 0.7, 0.3],
@@ -285,10 +304,10 @@ const StreetwearAvatar = ({
         {/* Avatar Body */}
         <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700">
           {/* Head */}
-          <motion.div 
+          <motion.div
             className="absolute top-1 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full"
             style={{
-              background: `linear-gradient(135deg, ${config.colors[0]}, ${config.colors[1]})`
+              background: `linear-gradient(135deg, ${config.colors[0]}, ${config.colors[1]})`,
             }}
             animate={{
               y: currentAnimation === 'creative-flow' ? [-1, 1, -1] : 0,
@@ -297,37 +316,46 @@ const StreetwearAvatar = ({
           />
 
           {/* Body/Torso */}
-          <motion.div 
+          <motion.div
             className="absolute top-6 left-1/2 transform -translate-x-1/2 w-8 h-12 rounded-lg"
             style={{
-              background: `linear-gradient(180deg, ${config.colors[1]}, ${config.colors[2]})`
+              background: `linear-gradient(180deg, ${config.colors[1]}, ${config.colors[2]})`,
             }}
             animate={{
-              scaleY: currentAnimation === 'performance-check' ? [1, 1.1, 1] : 1,
+              scaleY:
+                currentAnimation === 'performance-check' ? [1, 1.1, 1] : 1,
             }}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
 
           {/* Arms */}
-          <motion.div 
+          <motion.div
             className="absolute top-8 left-2 w-2 h-6 rounded-full bg-gradient-to-b from-gray-400 to-gray-600"
             animate={{
-              rotate: currentAnimation === 'helping-gesture' ? [0, 45, 0] : 
-                     currentAnimation === 'creative-flow' ? [0, -30, 0] : 0,
+              rotate:
+                currentAnimation === 'helping-gesture'
+                  ? [0, 45, 0]
+                  : currentAnimation === 'creative-flow'
+                    ? [0, -30, 0]
+                    : 0,
             }}
             transition={{ duration: 1, repeat: Infinity }}
           />
-          <motion.div 
+          <motion.div
             className="absolute top-8 right-2 w-2 h-6 rounded-full bg-gradient-to-b from-gray-400 to-gray-600"
             animate={{
-              rotate: currentAnimation === 'helping-gesture' ? [0, -45, 0] : 
-                     currentAnimation === 'creative-flow' ? [0, 30, 0] : 0,
+              rotate:
+                currentAnimation === 'helping-gesture'
+                  ? [0, -45, 0]
+                  : currentAnimation === 'creative-flow'
+                    ? [0, 30, 0]
+                    : 0,
             }}
             transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
           />
 
           {/* Legs */}
-          <motion.div 
+          <motion.div
             className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1"
             animate={{
               y: currentAnimation === 'speed-boost' ? [-2, 0, -2] : 0,
@@ -385,15 +413,16 @@ const StreetwearAvatar = ({
             {agentType === 'brand_intelligence' && (
               <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-8 h-2 bg-gradient-to-r from-rose-gold to-luxury-gold rounded-full opacity-80" />
             )}
-            
+
             {/* Glasses for design agents */}
-            {(agentType === 'design_automation' || agentType === 'performance') && (
+            {(agentType === 'design_automation' ||
+              agentType === 'performance') && (
               <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-gray-300 rounded-full opacity-70" />
             )}
-            
+
             {/* Chain accessory for social/financial agents */}
             {(agentType === 'social_media' || agentType === 'financial') && (
-              <motion.div 
+              <motion.div
                 className="absolute top-7 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full opacity-80"
                 animate={{
                   scale: [1, 1.1, 1],
@@ -429,7 +458,9 @@ const StreetwearAvatar = ({
         transition={{ delay: 0.3 }}
       >
         <div className="text-xs font-bold text-white">{config.name}</div>
-        <div className="text-xs text-gray-400 capitalize">{config.personality.replace('-', ' ')}</div>
+        <div className="text-xs text-gray-400 capitalize">
+          {config.personality.replace('-', ' ')}
+        </div>
       </motion.div>
 
       {/* Floating Particles */}
@@ -439,7 +470,9 @@ const StreetwearAvatar = ({
             <motion.div
               key={i}
               className="absolute w-1 h-1 rounded-full"
-              style={{ backgroundColor: config.colors[i % config.colors.length] }}
+              style={{
+                backgroundColor: config.colors[i % config.colors.length],
+              }}
               animate={{
                 x: [Math.random() * 40 - 20, Math.random() * 40 - 20],
                 y: [Math.random() * 40 - 20, Math.random() * 40 - 20],
@@ -455,7 +488,7 @@ const StreetwearAvatar = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default StreetwearAvatar
+export default StreetwearAvatar;

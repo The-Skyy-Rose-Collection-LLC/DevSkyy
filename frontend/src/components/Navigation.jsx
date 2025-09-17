@@ -1,5 +1,5 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const Navigation = ({ currentView, onViewChange, taskCounts }) => {
   const navItems = [
@@ -8,7 +8,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       label: 'Agent Gallery',
       icon: '👑',
       description: 'Fashion Guru Showcase',
-      gradient: 'from-rose-gold to-luxury-gold'
+      gradient: 'from-rose-gold to-luxury-gold',
     },
     {
       id: 'automation',
@@ -16,7 +16,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       icon: '🚀',
       description: 'Social/Email/SMS/Theme',
       gradient: 'from-blue-500 to-purple-500',
-      badge: 'NEW'
+      badge: 'NEW',
     },
     {
       id: 'frontend',
@@ -24,7 +24,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       icon: '🎨',
       description: 'Frontend Specialists',
       gradient: 'from-purple-500 to-pink-500',
-      badge: 'BETA'
+      badge: 'BETA',
     },
     {
       id: 'wordpress',
@@ -32,7 +32,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       icon: '🌐',
       description: 'Site Connection',
       gradient: 'from-emerald-500 to-blue-500',
-      badge: 'ACTIVE'
+      badge: 'ACTIVE',
     },
     {
       id: 'tasks',
@@ -40,17 +40,17 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
       icon: '📋',
       description: 'Priority Workshop',
       gradient: 'from-luxury-gold to-elegant-silver',
-      badge: taskCounts.active
+      badge: taskCounts.active,
     },
     {
       id: 'risks',
       label: 'Risk Boutique',
       icon: '⚠️',
-      description: 'Protection Suite', 
+      description: 'Protection Suite',
       gradient: 'from-elegant-silver to-rose-gold',
-      badge: taskCounts.high_risk
-    }
-  ]
+      badge: taskCounts.high_risk,
+    },
+  ];
 
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-elegant border-b border-rose-gold/20">
@@ -78,23 +78,27 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
                   <div className="text-xs opacity-80">{item.description}</div>
                 </div>
               </div>
-              
+
               {/* Badge for counts */}
-              {item.badge && typeof item.badge === 'number' && item.badge > 0 && (
-                <motion.div
-                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {item.badge}
-                </motion.div>
-              )}
-              
+              {item.badge &&
+                typeof item.badge === 'number' &&
+                item.badge > 0 && (
+                  <motion.div
+                    className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {item.badge}
+                  </motion.div>
+                )}
+
               {/* Badge for text labels like 'NEW' or 'LIVE' */}
               {item.badge && typeof item.badge === 'string' && (
                 <motion.div
                   className={`absolute -top-2 -right-2 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[24px] text-center ${
-                    item.badge === 'NEW' ? 'bg-emerald-500 animate-pulse' : 'bg-purple-500'
+                    item.badge === 'NEW'
+                      ? 'bg-emerald-500 animate-pulse'
+                      : 'bg-purple-500'
                   }`}
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -117,7 +121,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
         </div>
 
         {/* Quick Action Bar */}
-        <motion.div 
+        <motion.div
           className="flex items-center justify-center py-2 space-x-6 border-t border-rose-gold/10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -138,7 +142,7 @@ const Navigation = ({ currentView, onViewChange, taskCounts }) => {
         </motion.div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navigation
+export default Navigation;

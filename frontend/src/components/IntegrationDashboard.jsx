@@ -1,85 +1,94 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const IntegrationDashboard = ({ selectedAgent, onClose }) => {
-  const [integrations, setIntegrations] = useState([])
-  const [availableServices, setAvailableServices] = useState({})
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [syncing, setSyncing] = useState({})
+  const [integrations, setIntegrations] = useState([]);
+  const [availableServices, setAvailableServices] = useState({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState({});
 
   useEffect(() => {
     if (selectedAgent) {
-      fetchAgentIntegrations()
-      fetchAvailableServices()
+      fetchAgentIntegrations();
+      fetchAvailableServices();
     }
-  }, [selectedAgent])
+  }, [selectedAgent]);
 
   const fetchAgentIntegrations = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/integrations/agent/${selectedAgent}`)
-      setIntegrations(response.data.integrations || [])
+      const response = await axios.get(
+        `${API_BASE_URL}/integrations/agent/${selectedAgent}`
+      );
+      setIntegrations(response.data.integrations || []);
     } catch (error) {
-      console.error('Failed to fetch integrations:', error)
-      setIntegrations([])
+      console.error('Failed to fetch integrations:', error);
+      setIntegrations([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchAvailableServices = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/integrations/services`)
-      setAvailableServices(response.data.supported_services || {})
+      const response = await axios.get(`${API_BASE_URL}/integrations/services`);
+      setAvailableServices(response.data.supported_services || {});
     } catch (error) {
-      console.error('Failed to fetch services:', error)
+      console.error('Failed to fetch services:', error);
     }
-  }
+  };
 
-  const handleSync = async (integrationId) => {
-    setSyncing(prev => ({ ...prev, [integrationId]: true }))
+  const handleSync = async integrationId => {
+    setSyncing(prev => ({ ...prev, [integrationId]: true }));
     try {
-      await axios.post(`${API_BASE_URL}/integrations/${integrationId}/sync`)
-      await fetchAgentIntegrations() // Refresh data
+      await axios.post(`${API_BASE_URL}/integrations/${integrationId}/sync`);
+      await fetchAgentIntegrations(); // Refresh data
     } catch (error) {
-      console.error('Sync failed:', error)
+      console.error('Sync failed:', error);
     } finally {
-      setSyncing(prev => ({ ...prev, [integrationId]: false }))
+      setSyncing(prev => ({ ...prev, [integrationId]: false }));
     }
-  }
+  };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     const colors = {
       active: 'bg-green-500',
       pending: 'bg-yellow-500',
       error: 'bg-red-500',
-      inactive: 'bg-gray-500'
-    }
-    return colors[status] || colors.inactive
-  }
+      inactive: 'bg-gray-500',
+    };
+    return colors[status] || colors.inactive;
+  };
 
   const getServiceIcon = (serviceType, serviceName) => {
     const icons = {
       banking: { chase: '🏦', bank_of_america: '🏛️', wells_fargo: '🏪' },
-      social_media: { facebook: '📘', instagram: '📸', twitter: '🐦', linkedin: '💼', tiktok: '📱', youtube: '📺' },
+      social_media: {
+        facebook: '📘',
+        instagram: '📸',
+        twitter: '🐦',
+        linkedin: '💼',
+        tiktok: '📱',
+        youtube: '📺',
+      },
       payment_processors: { stripe: '💳', paypal: '💰', square: '⬜' },
       websites: { wordpress: '🌐', shopify: '🛍️', custom_site: '⚡' },
       accounting_software: { quickbooks: '📊', xero: '📈' },
-      analytics: { google_analytics: '📊' }
-    }
-    return icons[serviceType]?.[serviceName] || '🔗'
-  }
+      analytics: { google_analytics: '📊' },
+    };
+    return icons[serviceType]?.[serviceName] || '🔗';
+  };
 
   const agentNames = {
     brand_intelligence: 'Brand Oracle',
     financial: 'Wealth Advisor',
     ecommerce: 'Experience Guru',
     seo_marketing: 'Marketing Maven',
-    customer_service: 'Service Concierge'
-  }
+    customer_service: 'Service Concierge',
+  };
 
   if (loading) {
     return (
@@ -92,11 +101,13 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
         <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-rose-gold border-t-luxury-gold rounded-full animate-spin mb-4 mx-auto"></div>
-            <p className="text-gray-600 font-elegant">Loading integrations...</p>
+            <p className="text-gray-600 font-elegant">
+              Loading integrations...
+            </p>
           </div>
         </div>
       </motion.div>
-    )
+    );
   }
 
   return (
@@ -112,7 +123,7 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -121,7 +132,8 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
               Integration Hub
             </h2>
             <p className="text-gray-600">
-              Connect {agentNames[selectedAgent] || selectedAgent} to external services
+              Connect {agentNames[selectedAgent] || selectedAgent} to external
+              services
             </p>
           </div>
           <button
@@ -177,7 +189,7 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
 
           {integrations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {integrations.map((integration) => (
+              {integrations.map(integration => (
                 <motion.div
                   key={integration.id}
                   className="fashion-card"
@@ -186,7 +198,10 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center space-x-3">
                       <div className="text-3xl">
-                        {getServiceIcon(integration.service_type, integration.service_name)}
+                        {getServiceIcon(
+                          integration.service_type,
+                          integration.service_name
+                        )}
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-800 capitalize">
@@ -197,20 +212,26 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
                         </p>
                       </div>
                     </div>
-                    <div className={`w-3 h-3 rounded-full ${getStatusColor(integration.status)}`}></div>
+                    <div
+                      className={`w-3 h-3 rounded-full ${getStatusColor(integration.status)}`}
+                    ></div>
                   </div>
 
                   <div className="mb-3">
-                    <div className="text-xs text-gray-500 mb-1">Capabilities</div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Capabilities
+                    </div>
                     <div className="flex flex-wrap gap-1">
-                      {integration.capabilities?.slice(0, 2).map((capability, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-rose-gold/20 text-rose-gold rounded text-xs"
-                        >
-                          {capability.replace(/_/g, ' ')}
-                        </span>
-                      ))}
+                      {integration.capabilities
+                        ?.slice(0, 2)
+                        .map((capability, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-rose-gold/20 text-rose-gold rounded text-xs"
+                          >
+                            {capability.replace(/_/g, ' ')}
+                          </span>
+                        ))}
                       {integration.capabilities?.length > 2 && (
                         <span className="text-xs text-gray-500">
                           +{integration.capabilities.length - 2} more
@@ -220,8 +241,15 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                    <span>Last sync: {integration.last_sync ? new Date(integration.last_sync).toLocaleDateString() : 'Never'}</span>
-                    <span className="capitalize">{integration.sync_frequency}</span>
+                    <span>
+                      Last sync:{' '}
+                      {integration.last_sync
+                        ? new Date(integration.last_sync).toLocaleDateString()
+                        : 'Never'}
+                    </span>
+                    <span className="capitalize">
+                      {integration.sync_frequency}
+                    </span>
                   </div>
 
                   <div className="flex space-x-2">
@@ -231,8 +259,14 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
                           ? 'bg-luxury-gradient text-white hover:shadow-gold-glow'
                           : 'bg-gray-100 text-gray-500 cursor-not-allowed'
                       }`}
-                      onClick={() => integration.status === 'active' && handleSync(integration.id)}
-                      disabled={integration.status !== 'active' || syncing[integration.id]}
+                      onClick={() =>
+                        integration.status === 'active' &&
+                        handleSync(integration.id)
+                      }
+                      disabled={
+                        integration.status !== 'active' ||
+                        syncing[integration.id]
+                      }
                     >
                       {syncing[integration.id] ? '⏳' : '🔄'} Sync
                     </button>
@@ -246,8 +280,12 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-xl">
               <div className="text-4xl mb-4">🔗</div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">No Integrations Yet</h3>
-              <p className="text-gray-500 mb-4">Connect your first service to get started</p>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                No Integrations Yet
+              </h3>
+              <p className="text-gray-500 mb-4">
+                Connect your first service to get started
+              </p>
               <button
                 className="luxury-button"
                 onClick={() => setShowCreateModal(true)}
@@ -265,7 +303,7 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
             Available Services
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {Object.entries(availableServices).map(([serviceType, services]) => 
+            {Object.entries(availableServices).map(([serviceType, services]) =>
               Object.entries(services).map(([serviceName, serviceInfo]) => (
                 <motion.div
                   key={`${serviceType}-${serviceName}`}
@@ -298,43 +336,51 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
         />
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
-const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices, onIntegrationCreated }) => {
-  const [selectedServiceType, setSelectedServiceType] = useState('')
-  const [selectedService, setSelectedService] = useState('')
-  const [credentials, setCredentials] = useState({})
-  const [creating, setCreating] = useState(false)
+const CreateIntegrationModal = ({
+  isOpen,
+  onClose,
+  agentType,
+  availableServices,
+  onIntegrationCreated,
+}) => {
+  const [selectedServiceType, setSelectedServiceType] = useState('');
+  const [selectedService, setSelectedService] = useState('');
+  const [credentials, setCredentials] = useState({});
+  const [creating, setCreating] = useState(false);
 
   const handleCreate = async () => {
-    if (!selectedServiceType || !selectedService) return
+    if (!selectedServiceType || !selectedService) return;
 
-    setCreating(true)
+    setCreating(true);
     try {
       await axios.post(`${API_BASE_URL}/integrations/create`, {
         agent_type: agentType,
         service_type: selectedServiceType,
         service_name: selectedService,
-        credentials
-      })
-      
-      onIntegrationCreated()
-      onClose()
-      
-      // Reset form
-      setSelectedServiceType('')
-      setSelectedService('')
-      setCredentials({})
-    } catch (error) {
-      console.error('Failed to create integration:', error)
-    } finally {
-      setCreating(false)
-    }
-  }
+        credentials,
+      });
 
-  const serviceInfo = selectedServiceType && selectedService ? 
-    availableServices[selectedServiceType]?.[selectedService] : null
+      onIntegrationCreated();
+      onClose();
+
+      // Reset form
+      setSelectedServiceType('');
+      setSelectedService('');
+      setCredentials({});
+    } catch (error) {
+      console.error('Failed to create integration:', error);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const serviceInfo =
+    selectedServiceType && selectedService
+      ? availableServices[selectedServiceType]?.[selectedService]
+      : null;
 
   return (
     <AnimatePresence>
@@ -351,7 +397,7 @@ const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices,
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <h3 className="text-xl font-fashion font-bold text-gray-800 mb-4">
               Add New Integration
@@ -364,10 +410,10 @@ const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices,
               </label>
               <select
                 value={selectedServiceType}
-                onChange={(e) => {
-                  setSelectedServiceType(e.target.value)
-                  setSelectedService('')
-                  setCredentials({})
+                onChange={e => {
+                  setSelectedServiceType(e.target.value);
+                  setSelectedService('');
+                  setCredentials({});
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-luxury-gold"
               >
@@ -388,14 +434,16 @@ const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices,
                 </label>
                 <select
                   value={selectedService}
-                  onChange={(e) => {
-                    setSelectedService(e.target.value)
-                    setCredentials({})
+                  onChange={e => {
+                    setSelectedService(e.target.value);
+                    setCredentials({});
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-luxury-gold"
                 >
                   <option value="">Select a service...</option>
-                  {Object.entries(availableServices[selectedServiceType] || {}).map(([serviceName, info]) => (
+                  {Object.entries(
+                    availableServices[selectedServiceType] || {}
+                  ).map(([serviceName, info]) => (
                     <option key={serviceName} value={serviceName}>
                       {info.name}
                     </option>
@@ -413,16 +461,27 @@ const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices,
                 {serviceInfo.required_fields.map(field => (
                   <div key={field} className="mb-3">
                     <input
-                      type={field.toLowerCase().includes('secret') || field.toLowerCase().includes('key') ? 'password' : 'text'}
+                      type={
+                        field.toLowerCase().includes('secret') ||
+                        field.toLowerCase().includes('key')
+                          ? 'password'
+                          : 'text'
+                      }
                       placeholder={field.replace(/_/g, ' ').toUpperCase()}
                       value={credentials[field] || ''}
-                      onChange={(e) => setCredentials(prev => ({ ...prev, [field]: e.target.value }))}
+                      onChange={e =>
+                        setCredentials(prev => ({
+                          ...prev,
+                          [field]: e.target.value,
+                        }))
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-luxury-gold text-sm"
                     />
                   </div>
                 ))}
                 <div className="text-xs text-gray-500 mb-2">
-                  Auth Type: {serviceInfo.auth_type.replace(/_/g, ' ').toUpperCase()}
+                  Auth Type:{' '}
+                  {serviceInfo.auth_type.replace(/_/g, ' ').toUpperCase()}
                 </div>
               </div>
             )}
@@ -447,7 +506,7 @@ const CreateIntegrationModal = ({ isOpen, onClose, agentType, availableServices,
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default IntegrationDashboard
+export default IntegrationDashboard;

@@ -3,11 +3,11 @@ uvicorn==0.34.0
 pymongo>=4.9,<4.10
 python-dotenv==1.0.1
 pydantic==2.10.4
-requests==2.32.3
-python-multipart==0.0.17
+requests==2.32.4
+python-multipart==0.0.18
 aiofiles==24.1.0
 motor==3.6.0
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
 openai==1.55.3
 certifi==2024.8.30

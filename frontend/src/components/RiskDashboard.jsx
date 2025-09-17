@@ -1,18 +1,26 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const RiskDashboard = ({ risks, loading, onRefresh }) => {
-  const [selectedRiskCategory, setSelectedRiskCategory] = useState(null)
+  const [selectedRiskCategory, setSelectedRiskCategory] = useState(null);
 
-  const getRiskColor = (level) => {
+  const getRiskColor = level => {
     const colors = {
       CRITICAL: { bg: 'bg-red-500', text: 'text-red-600', light: 'bg-red-50' },
-      HIGH: { bg: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50' },
-      MEDIUM: { bg: 'bg-yellow-500', text: 'text-yellow-600', light: 'bg-yellow-50' },
-      LOW: { bg: 'bg-green-500', text: 'text-green-600', light: 'bg-green-50' }
-    }
-    return colors[level] || colors.MEDIUM
-  }
+      HIGH: {
+        bg: 'bg-orange-500',
+        text: 'text-orange-600',
+        light: 'bg-orange-50',
+      },
+      MEDIUM: {
+        bg: 'bg-yellow-500',
+        text: 'text-yellow-600',
+        light: 'bg-yellow-50',
+      },
+      LOW: { bg: 'bg-green-500', text: 'text-green-600', light: 'bg-green-50' },
+    };
+    return colors[level] || colors.MEDIUM;
+  };
 
   const riskCategories = [
     {
@@ -22,16 +30,16 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
       description: 'Cybersecurity and brand protection',
       risk_level: 'LOW',
       impact: 'Brand reputation and customer trust',
-      mitigation: 'Advanced threat detection active'
+      mitigation: 'Advanced threat detection active',
     },
     {
       id: 'performance',
-      name: 'Site Performance', 
+      name: 'Site Performance',
       icon: '⚡',
       description: 'Speed and user experience',
       risk_level: 'MEDIUM',
       impact: 'Customer satisfaction and conversions',
-      mitigation: 'Performance monitoring and optimization'
+      mitigation: 'Performance monitoring and optimization',
     },
     {
       id: 'financial',
@@ -40,16 +48,16 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
       description: 'Payment processing and fraud',
       risk_level: 'LOW',
       impact: 'Revenue and transaction security',
-      mitigation: 'Multi-layer fraud protection'
+      mitigation: 'Multi-layer fraud protection',
     },
     {
       id: 'compliance',
       name: 'Regulatory Compliance',
       icon: '📋',
       description: 'GDPR, PCI DSS, and industry standards',
-      risk_level: 'LOW', 
+      risk_level: 'LOW',
       impact: 'Legal and operational continuity',
-      mitigation: 'Continuous compliance monitoring'
+      mitigation: 'Continuous compliance monitoring',
     },
     {
       id: 'customer',
@@ -58,7 +66,7 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
       description: 'Service quality and satisfaction',
       risk_level: 'MEDIUM',
       impact: 'Customer retention and brand loyalty',
-      mitigation: 'AI-powered service optimization'
+      mitigation: 'AI-powered service optimization',
     },
     {
       id: 'inventory',
@@ -67,9 +75,9 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
       description: 'Digital assets and inventory',
       risk_level: 'LOW',
       impact: 'Operational efficiency',
-      mitigation: 'Automated asset optimization'
-    }
-  ]
+      mitigation: 'Automated asset optimization',
+    },
+  ];
 
   if (loading) {
     return (
@@ -80,10 +88,12 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           animate={{ opacity: 1 }}
         >
           <div className="w-16 h-16 border-4 border-elegant-silver border-t-rose-gold rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-gray-600 font-elegant">Analyzing risk landscape...</p>
+          <p className="text-gray-600 font-elegant">
+            Analyzing risk landscape...
+          </p>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
@@ -99,7 +109,9 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           Risk Protection Suite
         </h2>
         <p className="text-gray-600 text-lg font-elegant max-w-2xl mx-auto">
-          Your comprehensive risk management dashboard, designed to protect and preserve your luxury brand's integrity across all operational dimensions.
+          Your comprehensive risk management dashboard, designed to protect and
+          preserve your luxury brand's integrity across all operational
+          dimensions.
         </p>
       </motion.div>
 
@@ -114,11 +126,17 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           <h3 className="text-2xl font-fashion font-bold text-gray-800 mb-2">
             Overall Risk Status
           </h3>
-          <div className={`inline-flex items-center px-6 py-3 rounded-full text-lg font-bold ${getRiskColor(risks.overall_risk_level || 'MEDIUM').bg} text-white shadow-elegant`}>
+          <div
+            className={`inline-flex items-center px-6 py-3 rounded-full text-lg font-bold ${getRiskColor(risks.overall_risk_level || 'MEDIUM').bg} text-white shadow-elegant`}
+          >
             <span className="mr-2">
-              {risks.overall_risk_level === 'CRITICAL' ? '🚨' : 
-               risks.overall_risk_level === 'HIGH' ? '⚠️' : 
-               risks.overall_risk_level === 'MEDIUM' ? '📊' : '✅'}
+              {risks.overall_risk_level === 'CRITICAL'
+                ? '🚨'
+                : risks.overall_risk_level === 'HIGH'
+                  ? '⚠️'
+                  : risks.overall_risk_level === 'MEDIUM'
+                    ? '📊'
+                    : '✅'}
             </span>
             {risks.overall_risk_level || 'MEDIUM'} RISK
           </div>
@@ -126,10 +144,30 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: 'Critical', value: risks.critical_risks || 0, color: 'text-red-600', bg: 'bg-red-100' },
-            { label: 'High', value: risks.high_risks || 0, color: 'text-orange-600', bg: 'bg-orange-100' },
-            { label: 'Medium', value: risks.medium_risks || 0, color: 'text-yellow-600', bg: 'bg-yellow-100' },
-            { label: 'Low', value: risks.low_risks || 0, color: 'text-green-600', bg: 'bg-green-100' }
+            {
+              label: 'Critical',
+              value: risks.critical_risks || 0,
+              color: 'text-red-600',
+              bg: 'bg-red-100',
+            },
+            {
+              label: 'High',
+              value: risks.high_risks || 0,
+              color: 'text-orange-600',
+              bg: 'bg-orange-100',
+            },
+            {
+              label: 'Medium',
+              value: risks.medium_risks || 0,
+              color: 'text-yellow-600',
+              bg: 'bg-yellow-100',
+            },
+            {
+              label: 'Low',
+              value: risks.low_risks || 0,
+              color: 'text-green-600',
+              bg: 'bg-green-100',
+            },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -138,8 +176,12 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
             >
-              <div className={`text-3xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
-              <div className="text-sm font-medium text-gray-700">{stat.label} Risk</div>
+              <div className={`text-3xl font-bold ${stat.color} mb-1`}>
+                {stat.value}
+              </div>
+              <div className="text-sm font-medium text-gray-700">
+                {stat.label} Risk
+              </div>
             </motion.div>
           ))}
         </div>
@@ -155,33 +197,37 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           visible: {
             opacity: 1,
             transition: {
-              staggerChildren: 0.1
-            }
-          }
+              staggerChildren: 0.1,
+            },
+          },
         }}
       >
         {riskCategories.map((category, index) => (
           <motion.div
             key={category.id}
             className={`fashion-card cursor-pointer transition-all duration-300 border-l-4 ${getRiskColor(category.risk_level).light} hover:shadow-gold-glow ${
-              selectedRiskCategory === category.id ? 'ring-2 ring-luxury-gold' : ''
+              selectedRiskCategory === category.id
+                ? 'ring-2 ring-luxury-gold'
+                : ''
             }`}
             variants={{
               hidden: { opacity: 0, y: 30, scale: 0.9 },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
+              visible: {
+                opacity: 1,
+                y: 0,
                 scale: 1,
                 transition: {
                   duration: 0.5,
-                  ease: "easeOut"
-                }
-              }
+                  ease: 'easeOut',
+                },
+              },
             }}
             whileHover={{ y: -5, scale: 1.02 }}
-            onClick={() => setSelectedRiskCategory(
-              selectedRiskCategory === category.id ? null : category.id
-            )}
+            onClick={() =>
+              setSelectedRiskCategory(
+                selectedRiskCategory === category.id ? null : category.id
+              )
+            }
           >
             {/* Category Header */}
             <div className="flex items-start justify-between mb-4">
@@ -198,8 +244,10 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
                   </p>
                 </div>
               </div>
-              
-              <div className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(category.risk_level).bg} text-white`}>
+
+              <div
+                className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(category.risk_level).bg} text-white`}
+              >
                 {category.risk_level}
               </div>
             </div>
@@ -227,18 +275,31 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
             <div className="mt-4">
               <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                 <span>Risk Health</span>
-                <span>{category.risk_level === 'LOW' ? '95%' : category.risk_level === 'MEDIUM' ? '75%' : '50%'}</span>
+                <span>
+                  {category.risk_level === 'LOW'
+                    ? '95%'
+                    : category.risk_level === 'MEDIUM'
+                      ? '75%'
+                      : '50%'}
+                </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <motion.div
                   className={`h-2 rounded-full ${
-                    category.risk_level === 'LOW' ? 'bg-green-500' :
-                    category.risk_level === 'MEDIUM' ? 'bg-yellow-500' : 'bg-red-500'
+                    category.risk_level === 'LOW'
+                      ? 'bg-green-500'
+                      : category.risk_level === 'MEDIUM'
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500'
                   }`}
                   initial={{ width: 0 }}
-                  animate={{ 
-                    width: category.risk_level === 'LOW' ? '95%' : 
-                           category.risk_level === 'MEDIUM' ? '75%' : '50%' 
+                  animate={{
+                    width:
+                      category.risk_level === 'LOW'
+                        ? '95%'
+                        : category.risk_level === 'MEDIUM'
+                          ? '75%'
+                          : '50%',
                   }}
                   transition={{ duration: 1, delay: index * 0.1 }}
                 />
@@ -268,20 +329,32 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-green-50 rounded-xl border border-green-200">
             <div className="text-3xl font-bold text-green-600 mb-2">12</div>
-            <div className="text-sm font-medium text-gray-700">Active Mitigations</div>
-            <div className="text-xs text-gray-500 mt-1">Running continuously</div>
+            <div className="text-sm font-medium text-gray-700">
+              Active Mitigations
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              Running continuously
+            </div>
           </div>
 
           <div className="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
             <div className="text-3xl font-bold text-blue-600 mb-2">5</div>
-            <div className="text-sm font-medium text-gray-700">Scheduled Actions</div>
-            <div className="text-xs text-gray-500 mt-1">Planned for execution</div>
+            <div className="text-sm font-medium text-gray-700">
+              Scheduled Actions
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              Planned for execution
+            </div>
           </div>
 
           <div className="text-center p-4 bg-luxury-gold/10 rounded-xl border border-luxury-gold/30">
             <div className="text-3xl font-bold text-luxury-gold mb-2">8</div>
-            <div className="text-sm font-medium text-gray-700">Resolved Today</div>
-            <div className="text-xs text-gray-500 mt-1">Successfully mitigated</div>
+            <div className="text-sm font-medium text-gray-700">
+              Resolved Today
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              Successfully mitigated
+            </div>
           </div>
         </div>
 
@@ -292,19 +365,42 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
           </h4>
           <div className="space-y-2">
             {[
-              { time: '2 min ago', action: 'Blocked suspicious IP attempting credential stuffing', status: 'resolved' },
-              { time: '15 min ago', action: 'Optimized image compression for better page speed', status: 'completed' },
-              { time: '1 hour ago', action: 'Updated security headers for enhanced protection', status: 'completed' },
-              { time: '3 hours ago', action: 'Cleaned duplicate assets to improve storage efficiency', status: 'completed' }
+              {
+                time: '2 min ago',
+                action: 'Blocked suspicious IP attempting credential stuffing',
+                status: 'resolved',
+              },
+              {
+                time: '15 min ago',
+                action: 'Optimized image compression for better page speed',
+                status: 'completed',
+              },
+              {
+                time: '1 hour ago',
+                action: 'Updated security headers for enhanced protection',
+                status: 'completed',
+              },
+              {
+                time: '3 hours ago',
+                action:
+                  'Cleaned duplicate assets to improve storage efficiency',
+                status: 'completed',
+              },
             ].map((action, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
+              <div
+                key={index}
+                className="flex items-center justify-between text-sm"
+              >
                 <span className="text-gray-700">{action.action}</span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs text-gray-500">{action.time}</span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    action.status === 'resolved' ? 'bg-green-100 text-green-800' : 
-                    'bg-blue-100 text-blue-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      action.status === 'resolved'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
                     {action.status}
                   </span>
                 </div>
@@ -347,7 +443,9 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
             <div className="space-y-1">
               <div className="text-sm text-gray-700">• Customer Experience</div>
               <div className="text-sm text-gray-700">• Asset Management</div>
-              <div className="text-sm text-gray-700">• Financial Operations</div>
+              <div className="text-sm text-gray-700">
+                • Financial Operations
+              </div>
             </div>
           </div>
 
@@ -358,7 +456,9 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
             </h4>
             <div className="space-y-1">
               <div className="text-sm text-gray-700">• Market Competition</div>
-              <div className="text-sm text-gray-700">• Revenue Optimization</div>
+              <div className="text-sm text-gray-700">
+                • Revenue Optimization
+              </div>
               <div className="text-sm text-gray-700">• Brand Positioning</div>
             </div>
           </div>
@@ -372,16 +472,13 @@ const RiskDashboard = ({ risks, loading, onRefresh }) => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
       >
-        <button
-          className="luxury-button"
-          onClick={onRefresh}
-        >
+        <button className="luxury-button" onClick={onRefresh}>
           <span className="mr-2">🔄</span>
           Refresh Risk Analysis
         </button>
       </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default RiskDashboard
+export default RiskDashboard;
