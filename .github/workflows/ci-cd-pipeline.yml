@@ -60,7 +60,7 @@ jobs:
           safety check
 
       - name: Upload security report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-report
@@ -105,7 +105,7 @@ jobs:
           name: backend-coverage
 
       - name: Store coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: htmlcov/
@@ -139,7 +139,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: frontend/dist/
@@ -252,7 +252,7 @@ jobs:
           "
 
       - name: Upload scan report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: daily-scan-report
           path: daily-scan-report.json
