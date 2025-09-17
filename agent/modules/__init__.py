@@ -9,6 +9,7 @@ __version__ = "2.0.0"
 __author__ = "DevSkyy Enhanced Platform"
 
 from .fixer import fix_code
+
 # Lightweight exports only to avoid import side-effects during testing/runtime.
 # Importing heavy modules at package import time causes unnecessary dependency
 # requirements and slows down test discovery. Consumers should import specific
