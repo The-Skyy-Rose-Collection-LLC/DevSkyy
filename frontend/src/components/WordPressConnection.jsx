@@ -13,7 +13,7 @@ const WordPressConnection = () => {
   const [siteInfo, setSiteInfo] = useState(null);
   const [, setAgentStatus] = useState({});
   const [loading, setLoading] = useState(false);
-  const [, setError] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     checkConnectionStatus();
@@ -27,7 +27,7 @@ const WordPressConnection = () => {
         setSiteInfo(response.data.site_info);
         setAgentStatus(response.data.performance_monitoring);
       }
-    } catch (_error) {
+    } catch {
       // Not connected yet
       setConnectionStatus('disconnected');
     }
@@ -67,7 +67,7 @@ const WordPressConnection = () => {
             server_access: true,
           }));
         }
-        } catch (_serverError) {
+        } catch {
         // Continue with regular connection
       }
 
@@ -488,7 +488,7 @@ const WordPressConnection = () => {
 
       {/* Error Display */}
       <AnimatePresence>
-        {false && (
+        {error && (
           <motion.div
             className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -498,7 +498,7 @@ const WordPressConnection = () => {
             <div className="text-red-600 font-medium mb-2">
               Connection Error
             </div>
-            <div className="text-red-500 text-sm">Error occurred</div>
+            <div className="text-red-500 text-sm">{error}</div>
             <button
               className="mt-4 px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
               onClick={() => setError('')}
