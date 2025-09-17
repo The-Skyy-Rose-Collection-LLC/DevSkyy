@@ -27,14 +27,13 @@ try:
 except Exception:
     InventoryAgent = None  # type: ignore
 try:
-    from agent.modules.financial_agent import (  # type: ignore
-        ChargebackReason, FinancialAgent)
+    from agent.modules.financial_agent import ChargebackReason, FinancialAgent  # type: ignore
 except Exception:
     FinancialAgent = None  # type: ignore
     ChargebackReason = None  # type: ignore
 try:
-    from agent.modules.ecommerce_agent import (EcommerceAgent,  # type: ignore
-                                               OrderStatus, ProductCategory)
+    from agent.modules.ecommerce_agent import EcommerceAgent  # type: ignore
+    from agent.modules.ecommerce_agent import OrderStatus, ProductCategory
 except Exception:
     EcommerceAgent = None  # type: ignore
     ProductCategory = None  # type: ignore
@@ -44,8 +43,7 @@ try:
 except Exception:
     WordPressAgent = None  # type: ignore
 try:
-    from agent.modules.web_development_agent import (  # type: ignore
-        WebDevelopmentAgent, fix_web_development_issues)
+    from agent.modules.web_development_agent import WebDevelopmentAgent, fix_web_development_issues  # type: ignore
 except Exception:
     WebDevelopmentAgent = None  # type: ignore
 
@@ -54,8 +52,7 @@ except Exception:
 
 
 try:
-    from agent.modules.site_communication_agent import (  # type: ignore
-        SiteCommunicationAgent, communicate_with_site)
+    from agent.modules.site_communication_agent import SiteCommunicationAgent, communicate_with_site  # type: ignore
 except Exception:
     SiteCommunicationAgent = None  # type: ignore
 
@@ -65,7 +62,9 @@ except Exception:
 
 try:
     from agent.modules.brand_intelligence_agent import (  # type: ignore
-        BrandIntelligenceAgent, initialize_brand_intelligence)
+        BrandIntelligenceAgent,
+        initialize_brand_intelligence,
+    )
 except Exception:
     BrandIntelligenceAgent = None  # type: ignore
 
@@ -74,8 +73,7 @@ except Exception:
 
 
 try:
-    from agent.modules.enhanced_learning_scheduler import \
-        start_enhanced_learning_system  # type: ignore
+    from agent.modules.enhanced_learning_scheduler import start_enhanced_learning_system  # type: ignore
 except Exception:
 
     def start_enhanced_learning_system(*args, **kwargs):  # type: ignore
@@ -83,8 +81,7 @@ except Exception:
 
 
 try:
-    from agent.modules.seo_marketing_agent import (  # type: ignore
-        SEOMarketingAgent, optimize_seo_marketing)
+    from agent.modules.seo_marketing_agent import SEOMarketingAgent, optimize_seo_marketing  # type: ignore
 except Exception:
     SEOMarketingAgent = None  # type: ignore
 
@@ -93,8 +90,7 @@ except Exception:
 
 
 try:
-    from agent.modules.customer_service_agent import (  # type: ignore
-        CustomerServiceAgent, optimize_customer_service)
+    from agent.modules.customer_service_agent import CustomerServiceAgent, optimize_customer_service  # type: ignore
 except Exception:
     CustomerServiceAgent = None  # type: ignore
 
@@ -103,8 +99,8 @@ except Exception:
 
 
 try:
-    from agent.modules.security_agent import (SecurityAgent,  # type: ignore
-                                              secure_luxury_platform)
+    from agent.modules.security_agent import SecurityAgent  # type: ignore
+    from agent.modules.security_agent import secure_luxury_platform
 except Exception:
     SecurityAgent = None  # type: ignore
 
@@ -113,8 +109,7 @@ except Exception:
 
 
 try:
-    from agent.modules.performance_agent import (  # type: ignore
-        PerformanceAgent, optimize_site_performance)
+    from agent.modules.performance_agent import PerformanceAgent, optimize_site_performance  # type: ignore
 except Exception:
     PerformanceAgent = None  # type: ignore
 
@@ -123,8 +118,7 @@ except Exception:
 
 
 try:
-    from agent.modules.task_risk_manager import (  # type: ignore
-        TaskRiskManager, manage_tasks_and_risks)
+    from agent.modules.task_risk_manager import TaskRiskManager, manage_tasks_and_risks  # type: ignore
 except Exception:
     TaskRiskManager = None  # type: ignore
 
@@ -134,7 +128,9 @@ except Exception:
 
 try:
     from agent.modules.agent_assignment_manager import (  # type: ignore
-        AgentAssignmentManager, create_agent_assignment_manager)
+        AgentAssignmentManager,
+        create_agent_assignment_manager,
+    )
 except Exception:
     AgentAssignmentManager = None  # type: ignore
 
@@ -144,7 +140,9 @@ except Exception:
 
 try:
     from agent.modules.wordpress_integration_service import (  # type: ignore
-        WordPressIntegrationService, create_wordpress_integration_service)
+        WordPressIntegrationService,
+        create_wordpress_integration_service,
+    )
 except Exception:
     WordPressIntegrationService = None  # type: ignore
 
@@ -154,7 +152,9 @@ except Exception:
 
 try:
     from agent.modules.wordpress_direct_service import (  # type: ignore
-        WordPressDirectService, create_wordpress_direct_service)
+        WordPressDirectService,
+        create_wordpress_direct_service,
+    )
 except Exception:
     WordPressDirectService = None  # type: ignore
 
@@ -164,7 +164,9 @@ except Exception:
 
 try:
     from agent.modules.woocommerce_integration_service import (  # type: ignore
-        WooCommerceIntegrationService, create_woocommerce_integration_service)
+        WooCommerceIntegrationService,
+        create_woocommerce_integration_service,
+    )
 except Exception:
     WooCommerceIntegrationService = None  # type: ignore
 
@@ -174,7 +176,9 @@ except Exception:
 
 try:
     from agent.modules.openai_intelligence_service import (  # type: ignore
-        OpenAIIntelligenceService, create_openai_intelligence_service)
+        OpenAIIntelligenceService,
+        create_openai_intelligence_service,
+    )
 except Exception:
     OpenAIIntelligenceService = None  # type: ignore
 
@@ -183,23 +187,20 @@ except Exception:
 
 
 try:
-    from agent.modules.social_media_automation_agent import \
-        SocialMediaAutomationAgent  # type: ignore
+    from agent.modules.social_media_automation_agent import SocialMediaAutomationAgent  # type: ignore
 except Exception:
     SocialMediaAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.email_sms_automation_agent import \
-        EmailSMSAutomationAgent  # type: ignore
+    from agent.modules.email_sms_automation_agent import EmailSMSAutomationAgent  # type: ignore
 except Exception:
     EmailSMSAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.design_automation_agent import \
-        DesignAutomationAgent  # type: ignore
+    from agent.modules.design_automation_agent import DesignAutomationAgent  # type: ignore
 except Exception:
     DesignAutomationAgent = None  # type: ignore
 try:
-    from agent.modules.cache_manager import (cache_manager,  # type: ignore
-                                             cached, start_cache_cleanup)
+    from agent.modules.cache_manager import cache_manager  # type: ignore
+    from agent.modules.cache_manager import cached, start_cache_cleanup
 except Exception:
     cache_manager = None  # type: ignore
 
@@ -215,8 +216,11 @@ except Exception:
 
 try:
     from agent.modules.database_optimizer import (  # type: ignore
-        db_connection_pool, get_database_stats, index_optimizer,
-        optimize_query)
+        db_connection_pool,
+        get_database_stats,
+        index_optimizer,
+        optimize_query,
+    )
 except Exception:
     db_connection_pool = None  # type: ignore
     index_optimizer = None  # type: ignore
@@ -254,9 +258,15 @@ from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 
-from models import (ChargebackRequest, CodeAnalysisRequest, CustomerRequest,
-                    OrderRequest, PaymentRequest, ProductRequest,
-                    WebsiteAnalysisRequest)
+from models import (
+    ChargebackRequest,
+    CodeAnalysisRequest,
+    CustomerRequest,
+    OrderRequest,
+    PaymentRequest,
+    ProductRequest,
+    WebsiteAnalysisRequest,
+)
 
 # Load environment variables
 load_dotenv()
@@ -1569,8 +1579,7 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
     """BULLETPROOF WordPress direct connection with guaranteed success."""
     try:
         # Initialize bulletproof WordPress service
-        from agent.modules.wordpress_direct_service import \
-            create_wordpress_direct_service
+        from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
         wordpress_service = create_wordpress_direct_service()
 
@@ -2441,10 +2450,8 @@ async def initialize_wordpress_server_access() -> Dict[str, Any]:
     """Initialize GOD MODE LEVEL 2: Full WordPress server access for deep optimization."""
     try:
         # Initialize enhanced server access
-        from agent.modules.enhanced_brand_intelligence_agent import \
-            create_enhanced_brand_intelligence_agent
-        from agent.modules.wordpress_server_access import \
-            create_wordpress_server_access
+        from agent.modules.enhanced_brand_intelligence_agent import create_enhanced_brand_intelligence_agent
+        from agent.modules.wordpress_server_access import create_wordpress_server_access
 
         logger.info("🚀 Initializing GOD MODE LEVEL 2 - Full Server Access")
 
