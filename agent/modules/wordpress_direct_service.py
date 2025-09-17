@@ -203,8 +203,7 @@ class WordPressDirectService:
         """Setup WooCommerce integration with the connected site."""
         try:
             # Import WooCommerce service
-            from agent.modules.woocommerce_integration_service import \
-                woocommerce_service
+            from agent.modules.woocommerce_integration_service import woocommerce_service
 
             # Set the site URL for WooCommerce
             woocommerce_service.set_site_url(self.site_url)
