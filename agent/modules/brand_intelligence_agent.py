@@ -1,10 +1,11 @@
-import logging
-from datetime import datetime
-from typing import Dict, Any, List, Optional
 import asyncio
 import json
+import logging
 import os
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import openai
 from dotenv import load_dotenv
 
@@ -25,33 +26,33 @@ class BrandIntelligenceAgent:
             "elegance": "Sophisticated and timeless designs",
             "empowerment": "Empowering women through beautiful fashion",
             "sustainability": "Eco-conscious and ethical practices",
-            "innovation": "Cutting-edge design and technology"
+            "innovation": "Cutting-edge design and technology",
         }
 
         self.target_demographics = {
             "primary": "Women aged 25-45, fashion-conscious, higher income",
             "secondary": "Young professionals, fashion enthusiasts, luxury buyers",
-            "psychographics": "Quality-focused, brand-loyal, socially conscious"
+            "psychographics": "Quality-focused, brand-loyal, socially conscious",
         }
 
         self.brand_colors = {
             "primary": "#E6B8A2",  # Rose gold
             "secondary": "#2C3E50",  # Deep navy
-            "accent": "#F8F9FA",   # Soft white
-            "luxury": "#C9A96E"    # Champagne gold
+            "accent": "#F8F9FA",  # Soft white
+            "luxury": "#C9A96E",  # Champagne gold
         }
 
         self.theme_evolution = {
             "current_season": "Winter 2024",
             "dominant_themes": ["Elegant Minimalism", "Sustainable Luxury", "Empowered Femininity"],
             "color_trends": ["Warm Neutrals", "Deep Jewel Tones", "Metallic Accents"],
-            "style_direction": "Contemporary Classic with Modern Edge"
+            "style_direction": "Contemporary Classic with Modern Edge",
         }
 
         self.competitive_landscape = {
             "direct_competitors": ["Reformation", "Everlane", "& Other Stories"],
             "positioning": "Premium sustainable fashion with personalized experience",
-            "unique_value_prop osition": "Curated luxury meets conscious consumption"
+            "unique_value_prop osition": "Curated luxury meets conscious consumption",
         }
 
         # Initialize OpenAI client
@@ -73,18 +74,18 @@ class BrandIntelligenceAgent:
                     "name": self.brand_name,
                     "values": self.brand_values,
                     "color_palette": self.brand_colors,
-                    "brand_essence": "Sophisticated, sustainable, empowering fashion for modern women"
+                    "brand_essence": "Sophisticated, sustainable, empowering fashion for modern women",
                 },
                 "market_positioning": {
                     "segment": "Premium Contemporary",
                     "price_point": "Mid-to-High Luxury",
                     "target_demographics": self.target_demographics,
-                    "competitive_advantage": "Sustainable luxury with personalized shopping experience"
+                    "competitive_advantage": "Sustainable luxury with personalized shopping experience",
                 },
                 "current_trends": self.theme_evolution,
                 "brand_health_score": self._calculate_brand_health(),
                 "recommendations": self._generate_brand_recommendations(),
-                "analysis_timestamp": datetime.now().isoformat()
+                "analysis_timestamp": datetime.now().isoformat(),
             }
         except Exception as e:
             logger.error(f"Brand analysis failed: {str(e)}")
@@ -96,7 +97,7 @@ class BrandIntelligenceAgent:
             "brand_name": self.brand_name,
             "brand_voice": "Sophisticated, warm, and empowering",
             "key_values": list(self.brand_values.keys()),
-            "target_audience": self.target_demographics["primary"]
+            "target_audience": self.target_demographics["primary"],
         }
 
         agent_specific_context = {
@@ -104,38 +105,38 @@ class BrandIntelligenceAgent:
                 "product_categories": ["Dresses", "Tops", "Bottoms", "Outerwear", "Accessories"],
                 "quality_standards": "Premium materials only",
                 "sustainability_focus": "Eco-friendly and ethically sourced",
-                "size_range": "XS-XXL with inclusive sizing"
+                "size_range": "XS-XXL with inclusive sizing",
             },
             "financial": {
                 "pricing_strategy": "Premium positioning with value emphasis",
                 "discount_policy": "Limited strategic discounts to maintain exclusivity",
                 "payment_preferences": "Secure, multiple options including installments",
-                "revenue_goals": "Sustainable growth with customer retention focus"
+                "revenue_goals": "Sustainable growth with customer retention focus",
             },
             "ecommerce": {
                 "shopping_experience": "Personalized, intuitive, luxurious",
                 "product_presentation": "High-quality imagery with detailed descriptions",
                 "customer_service": "White-glove service with personal touch",
-                "return_policy": "Generous and customer-friendly"
+                "return_policy": "Generous and customer-friendly",
             },
             "wordpress": {
                 "design_aesthetic": "Clean, elegant, mobile-first",
                 "performance_priority": "Fast loading, seamless navigation",
                 "seo_focus": "Fashion keywords, local optimization",
-                "conversion_optimization": "Clear CTAs, trust signals, social proof"
+                "conversion_optimization": "Clear CTAs, trust signals, social proof",
             },
             "web_development": {
                 "code_standards": "Clean, maintainable, accessible",
                 "performance_targets": "Sub-3 second load times",
                 "mobile_optimization": "Mobile-first responsive design",
-                "security_requirements": "PCI compliance, data protection"
+                "security_requirements": "PCI compliance, data protection",
             },
             "site_communication": {
                 "tone_of_voice": "Warm, professional, inspiring",
                 "communication_style": "Personalized and relationship-focused",
                 "customer_touchpoints": "Email, SMS, live chat, social media",
-                "brand_messaging": "Empowerment through sustainable luxury"
-            }
+                "brand_messaging": "Empowerment through sustainable luxury",
+            },
         }
 
         context = {**base_context, **agent_specific_context.get(agent_type, {})}
@@ -169,16 +170,12 @@ class BrandIntelligenceAgent:
                 "strategy_updates": strategy_updates,
                 "actionable_insights": insights,
                 "next_cycle_scheduled": (datetime.now().timestamp() + 3600),  # 1 hour
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"Brand learning cycle failed: {str(e)}")
-            return {
-                "status": "failed",
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }
+            return {"status": "failed", "error": str(e), "timestamp": datetime.now().isoformat()}
 
     async def _analyze_market_trends(self) -> Dict[str, Any]:
         """Analyze current fashion and retail market trends."""
@@ -188,22 +185,22 @@ class BrandIntelligenceAgent:
                 "Sustainable luxury materials",
                 "Minimalist designs with statement pieces",
                 "Neutral color palettes with pops of color",
-                "Size inclusive fashion"
+                "Size inclusive fashion",
             ],
             "retail_trends": [
                 "Personalized shopping experiences",
                 "Social commerce integration",
                 "Virtual try-on technology",
-                "Subscription-based models"
+                "Subscription-based models",
             ],
             "consumer_behavior": [
                 "Increased focus on sustainability",
                 "Preference for quality over quantity",
                 "Mobile-first shopping",
-                "Social media influence on purchases"
+                "Social media influence on purchases",
             ],
             "trend_confidence": 85,
-            "sources": ["Fashion Week Reports", "Retail Analytics", "Consumer Surveys"]
+            "sources": ["Fashion Week Reports", "Retail Analytics", "Consumer Surveys"],
         }
 
     def _track_brand_performance(self) -> Dict[str, Any]:
@@ -212,22 +209,15 @@ class BrandIntelligenceAgent:
             "brand_awareness": {
                 "score": 78,
                 "trend": "increasing",
-                "metrics": ["Social mentions", "Search volume", "Brand recall"]
+                "metrics": ["Social mentions", "Search volume", "Brand recall"],
             },
             "customer_satisfaction": {
                 "score": 92,
                 "trend": "stable",
-                "metrics": ["Reviews", "NPS", "Repeat purchases"]
+                "metrics": ["Reviews", "NPS", "Repeat purchases"],
             },
-            "market_share": {
-                "score": 15,
-                "trend": "growing",
-                "category": "Premium sustainable fashion"
-            },
-            "brand_equity": {
-                "score": 85,
-                "components": ["Recognition", "Loyalty", "Perceived quality"]
-            }
+            "market_share": {"score": 15, "trend": "growing", "category": "Premium sustainable fashion"},
+            "brand_equity": {"score": 85, "components": ["Recognition", "Loyalty", "Perceived quality"]},
         }
 
     async def _analyze_customer_sentiment(self) -> Dict[str, Any]:
@@ -236,24 +226,15 @@ class BrandIntelligenceAgent:
         return {
             "overall_sentiment": "positive",
             "sentiment_score": 4.2,
-            "positive_themes": [
-                "Product quality",
-                "Customer service",
-                "Brand values alignment",
-                "Shopping experience"
-            ],
-            "improvement_areas": [
-                "Price perception",
-                "Size availability",
-                "Shipping times"
-            ],
+            "positive_themes": ["Product quality", "Customer service", "Brand values alignment", "Shopping experience"],
+            "improvement_areas": ["Price perception", "Size availability", "Shipping times"],
             "sentiment_sources": [
                 "Product reviews",
                 "Social media mentions",
                 "Customer service interactions",
-                "Survey responses"
+                "Survey responses",
             ],
-            "recommendation": "Maintain current quality standards while addressing price value communication"
+            "recommendation": "Maintain current quality standards while addressing price value communication",
         }
 
     def _update_brand_strategies(self, market_analysis: Dict, sentiment_analysis: Dict) -> Dict[str, Any]:
@@ -262,50 +243,52 @@ class BrandIntelligenceAgent:
             "product_strategy": {
                 "focus": "Expand sustainable luxury line",
                 "new_categories": ["Workwear", "Casual luxury"],
-                "priority": "high"
+                "priority": "high",
             },
             "marketing_strategy": {
                 "channels": ["Instagram", "TikTok", "Email marketing"],
                 "messaging": "Sustainable luxury for everyday elegance",
-                "influencer_partnerships": "Micro-influencers in sustainability space"
+                "influencer_partnerships": "Micro-influencers in sustainability space",
             },
             "customer_experience": {
                 "improvements": ["Virtual styling", "Size advisory", "Sustainability tracking"],
-                "personalization": "AI-driven product recommendations"
+                "personalization": "AI-driven product recommendations",
             },
             "pricing_strategy": {
                 "approach": "Value-based pricing with clear sustainability premiums",
-                "promotions": "Limited strategic sales during key seasons"
-            }
+                "promotions": "Limited strategic sales during key seasons",
+            },
         }
 
-    def _generate_actionable_insights(self, market_analysis: Dict, performance_metrics: Dict, sentiment_analysis: Dict) -> List[Dict[str, Any]]:
+    def _generate_actionable_insights(
+        self, market_analysis: Dict, performance_metrics: Dict, sentiment_analysis: Dict
+    ) -> List[Dict[str, Any]]:
         """Generate actionable insights from all analyses."""
         return [
             {
                 "insight": "Increase sustainable material communication",
                 "priority": "high",
                 "action": "Create detailed sustainability pages and product certifications",
-                "expected_impact": "Improved brand differentiation and customer trust"
+                "expected_impact": "Improved brand differentiation and customer trust",
             },
             {
                 "insight": "Expand size inclusivity messaging",
                 "priority": "medium",
                 "action": "Feature diverse models and sizing guides prominently",
-                "expected_impact": "Broader market appeal and improved conversion"
+                "expected_impact": "Broader market appeal and improved conversion",
             },
             {
                 "insight": "Optimize mobile shopping experience",
                 "priority": "high",
                 "action": "Implement mobile-first design improvements",
-                "expected_impact": "Increased mobile conversion rates"
+                "expected_impact": "Increased mobile conversion rates",
             },
             {
                 "insight": "Develop premium loyalty program",
                 "priority": "medium",
                 "action": "Create tiered loyalty with exclusive experiences",
-                "expected_impact": "Improved customer retention and lifetime value"
-            }
+                "expected_impact": "Improved customer retention and lifetime value",
+            },
         ]
 
     def _calculate_brand_health(self) -> int:
@@ -329,7 +312,7 @@ class BrandIntelligenceAgent:
             "Implement AI-driven personalization",
             "Create brand collaboration opportunities",
             "Develop mobile app for enhanced customer experience",
-            "Increase social responsibility initiatives visibility"
+            "Increase social responsibility initiatives visibility",
         ]
 
     def _get_latest_drop(self) -> Dict[str, Any]:
@@ -342,16 +325,12 @@ class BrandIntelligenceAgent:
                 "Cashmere Blend Coats",
                 "Sustainable Silk Blouses",
                 "Eco-Wool Sweaters",
-                "Statement Accessories"
+                "Statement Accessories",
             ],
             "color_palette": ["Camel", "Deep Navy", "Cream", "Rose Gold"],
             "price_range": "$120-$450",
-            "sustainability_features": [
-                "Recycled materials",
-                "Ethical manufacturing",
-                "Carbon-neutral shipping"
-            ],
-            "marketing_focus": "Timeless pieces for conscious consumers"
+            "sustainability_features": ["Recycled materials", "Ethical manufacturing", "Carbon-neutral shipping"],
+            "marketing_focus": "Timeless pieces for conscious consumers",
         }
 
     def _track_brand_changes(self) -> List[Dict[str, Any]]:
@@ -361,20 +340,20 @@ class BrandIntelligenceAgent:
                 "change_type": "visual_identity",
                 "description": "Updated logo with more sustainable imagery",
                 "date": "2024-01-01",
-                "impact": "Stronger sustainability association"
+                "impact": "Stronger sustainability association",
             },
             {
                 "change_type": "product_line",
                 "description": "Introduced recycled material collection",
                 "date": "2024-01-10",
-                "impact": "Enhanced eco-conscious positioning"
+                "impact": "Enhanced eco-conscious positioning",
             },
             {
                 "change_type": "messaging",
                 "description": "Emphasized empowerment and sustainability equally",
                 "date": "2024-01-05",
-                "impact": "Broader appeal to conscious consumers"
-            }
+                "impact": "Broader appeal to conscious consumers",
+            },
         ]
 
     def _analyze_seasonal_content(self) -> Dict[str, Any]:
@@ -384,18 +363,18 @@ class BrandIntelligenceAgent:
             "upcoming_themes": [
                 "Spring Renewal - Fresh, sustainable styles",
                 "Summer Elegance - Lightweight luxury pieces",
-                "Fall Sophistication - Timeless professional wear"
+                "Fall Sophistication - Timeless professional wear",
             ],
             "content_calendar": {
                 "January": "New Year, New Sustainable You",
                 "February": "Love for the Planet Valentine's",
-                "March": "Spring Sustainable Fashion Week"
+                "March": "Spring Sustainable Fashion Week",
             },
             "trend_predictions": [
                 "Increased demand for versatile pieces",
                 "Growing interest in rental/subscription models",
-                "Rise of digital fashion experiences"
-            ]
+                "Rise of digital fashion experiences",
+            ],
         }
 
     def analyze_brand_sentiment(self, content: str) -> Dict[str, Any]:
@@ -406,19 +385,21 @@ class BrandIntelligenceAgent:
                 "confidence": 0.5,
                 "keywords": ["analysis", "unavailable"],
                 "summary": "OpenAI analysis unavailable - using fallback",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system",
-                     "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
-                    {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
+                    {
+                        "role": "system",
+                        "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",
+                    },
+                    {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"},
                 ],
                 temperature=0.5,
-                max_tokens=150
+                max_tokens=150,
             )
 
             sentiment_data = json.loads(response.choices[0].message.content)
@@ -432,7 +413,7 @@ class BrandIntelligenceAgent:
                 "confidence": 0.0,
                 "keywords": ["analysis", "error"],
                 "summary": f"Error during OpenAI sentiment analysis: {str(e)}",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
     def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -466,7 +447,7 @@ class BrandIntelligenceAgent:
                 "neural_brand_dna": neural_brand_dna,
                 "confidence_boost": "+35%",
                 "experimental_features_active": True,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -485,8 +466,8 @@ class BrandIntelligenceAgent:
             "neural_insights": [
                 "Brand messaging shows 94% alignment with target psychographics",
                 "Color palette triggers premium perception in 87% of neural pathways",
-                "Sustainability messaging creates 76% stronger emotional bonds"
-            ]
+                "Sustainability messaging creates 76% stronger emotional bonds",
+            ],
         }
 
     def _analyze_visual_assets(self, visual_assets: Dict[str, Any]) -> Dict[str, Any]:
@@ -494,13 +475,15 @@ class BrandIntelligenceAgent:
         return {
             "logo_variations": len(visual_assets.get("logos", [])),
             "product_image_quality": "high" if len(visual_assets.get("product_images", [])) > 5 else "building",
-            "marketing_consistency": "strong" if len(visual_assets.get("marketing_materials", [])) > 3 else "developing",
+            "marketing_consistency": (
+                "strong" if len(visual_assets.get("marketing_materials", [])) > 3 else "developing"
+            ),
             "visual_cohesion_score": 85,
             "recommendations": [
                 "Maintain consistent color usage across all materials",
                 "Ensure logo appears consistently in all contexts",
-                "Use high-quality product photography standards"
-            ]
+                "Use high-quality product photography standards",
+            ],
         }
 
     def _extract_brand_patterns(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -510,7 +493,7 @@ class BrandIntelligenceAgent:
             "style_patterns": ["Minimalist", "Elegant", "Sustainable"],
             "messaging_themes": ["Luxury", "Empowerment", "Sustainability"],
             "seasonal_consistency": True,
-            "quality_standards": "Premium"
+            "quality_standards": "Premium",
         }
 
     def _generate_asset_insights(self, visual_analysis: Dict, patterns: Dict) -> List[str]:
@@ -520,7 +503,7 @@ class BrandIntelligenceAgent:
             "Sustainability messaging is consistent across materials",
             "Product photography maintains premium quality standards",
             "Color palette reinforces elegance and sophistication",
-            "Marketing materials align with empowerment themes"
+            "Marketing materials align with empowerment themes",
         ]
 
     def _update_seasonal_understanding(self, seasonal_assets: List[Dict]):

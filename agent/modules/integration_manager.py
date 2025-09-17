@@ -1,12 +1,12 @@
-import logging
 import asyncio
+import base64
+import hashlib
+import json
+import logging
 import uuid
-from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from enum import Enum
-import json
-import hashlib
-import base64
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,22 +50,22 @@ class IntegrationManager:
                     "icon": "🌐",
                     "auth_type": "api_key",
                     "required_fields": ["site_url", "api_key", "username"],
-                    "capabilities": ["content_management", "plugin_management", "theme_customization", "analytics"]
+                    "capabilities": ["content_management", "plugin_management", "theme_customization", "analytics"],
                 },
                 "shopify": {
                     "name": "Shopify",
                     "icon": "🛍️",
                     "auth_type": "oauth",
                     "required_fields": ["shop_domain", "access_token"],
-                    "capabilities": ["product_management", "order_processing", "inventory_sync", "analytics"]
+                    "capabilities": ["product_management", "order_processing", "inventory_sync", "analytics"],
                 },
                 "custom_site": {
                     "name": "Custom Website",
                     "icon": "⚡",
                     "auth_type": "api_key",
                     "required_fields": ["domain", "api_endpoint", "api_key"],
-                    "capabilities": ["data_sync", "performance_monitoring", "analytics_integration"]
-                }
+                    "capabilities": ["data_sync", "performance_monitoring", "analytics_integration"],
+                },
             },
             "social_media": {
                 "facebook": {
@@ -73,43 +73,43 @@ class IntegrationManager:
                     "icon": "📘",
                     "auth_type": "oauth",
                     "required_fields": ["page_id", "access_token"],
-                    "capabilities": ["post_management", "ad_management", "analytics", "customer_insights"]
+                    "capabilities": ["post_management", "ad_management", "analytics", "customer_insights"],
                 },
                 "instagram": {
                     "name": "Instagram",
                     "icon": "📸",
                     "auth_type": "oauth",
                     "required_fields": ["account_id", "access_token"],
-                    "capabilities": ["content_publishing", "story_management", "analytics", "influencer_tracking"]
+                    "capabilities": ["content_publishing", "story_management", "analytics", "influencer_tracking"],
                 },
                 "twitter": {
                     "name": "Twitter/X",
                     "icon": "🐦",
                     "auth_type": "oauth",
                     "required_fields": ["api_key", "api_secret", "access_token", "access_token_secret"],
-                    "capabilities": ["tweet_management", "analytics", "trend_monitoring", "engagement_tracking"]
+                    "capabilities": ["tweet_management", "analytics", "trend_monitoring", "engagement_tracking"],
                 },
                 "linkedin": {
                     "name": "LinkedIn",
                     "icon": "💼",
                     "auth_type": "oauth",
                     "required_fields": ["company_id", "access_token"],
-                    "capabilities": ["business_posts", "professional_networking", "lead_generation", "analytics"]
+                    "capabilities": ["business_posts", "professional_networking", "lead_generation", "analytics"],
                 },
                 "tiktok": {
                     "name": "TikTok",
                     "icon": "📱",
                     "auth_type": "oauth",
                     "required_fields": ["account_id", "access_token"],
-                    "capabilities": ["video_publishing", "trend_analysis", "audience_insights", "ad_management"]
+                    "capabilities": ["video_publishing", "trend_analysis", "audience_insights", "ad_management"],
                 },
                 "youtube": {
                     "name": "YouTube",
                     "icon": "📺",
                     "auth_type": "oauth",
                     "required_fields": ["channel_id", "access_token"],
-                    "capabilities": ["video_management", "analytics", "monetization", "audience_insights"]
-                }
+                    "capabilities": ["video_management", "analytics", "monetization", "audience_insights"],
+                },
             },
             "banking": {
                 "chase": {
@@ -117,22 +117,32 @@ class IntegrationManager:
                     "icon": "🏦",
                     "auth_type": "secure_oauth",
                     "required_fields": ["account_number", "routing_number", "access_token"],
-                    "capabilities": ["account_monitoring", "transaction_analysis", "cash_flow_tracking", "payment_processing"]
+                    "capabilities": [
+                        "account_monitoring",
+                        "transaction_analysis",
+                        "cash_flow_tracking",
+                        "payment_processing",
+                    ],
                 },
                 "bank_of_america": {
                     "name": "Bank of America",
                     "icon": "🏛️",
                     "auth_type": "secure_oauth",
                     "required_fields": ["account_number", "access_token"],
-                    "capabilities": ["account_monitoring", "transaction_analysis", "wire_transfers", "credit_monitoring"]
+                    "capabilities": [
+                        "account_monitoring",
+                        "transaction_analysis",
+                        "wire_transfers",
+                        "credit_monitoring",
+                    ],
                 },
                 "wells_fargo": {
                     "name": "Wells Fargo",
                     "icon": "🏪",
                     "auth_type": "secure_oauth",
                     "required_fields": ["account_number", "access_token"],
-                    "capabilities": ["business_banking", "merchant_services", "loan_management", "investment_tracking"]
-                }
+                    "capabilities": ["business_banking", "merchant_services", "loan_management", "investment_tracking"],
+                },
             },
             "payment_processors": {
                 "stripe": {
@@ -140,22 +150,22 @@ class IntegrationManager:
                     "icon": "💳",
                     "auth_type": "api_key",
                     "required_fields": ["publishable_key", "secret_key"],
-                    "capabilities": ["payment_processing", "subscription_management", "analytics", "fraud_detection"]
+                    "capabilities": ["payment_processing", "subscription_management", "analytics", "fraud_detection"],
                 },
                 "paypal": {
                     "name": "PayPal",
                     "icon": "💰",
                     "auth_type": "oauth",
                     "required_fields": ["client_id", "client_secret"],
-                    "capabilities": ["payment_processing", "invoice_management", "dispute_resolution", "analytics"]
+                    "capabilities": ["payment_processing", "invoice_management", "dispute_resolution", "analytics"],
                 },
                 "square": {
                     "name": "Square",
                     "icon": "⬜",
                     "auth_type": "oauth",
                     "required_fields": ["application_id", "access_token"],
-                    "capabilities": ["payment_processing", "inventory_management", "pos_integration", "analytics"]
-                }
+                    "capabilities": ["payment_processing", "inventory_management", "pos_integration", "analytics"],
+                },
             },
             "accounting_software": {
                 "quickbooks": {
@@ -163,15 +173,25 @@ class IntegrationManager:
                     "icon": "📊",
                     "auth_type": "oauth",
                     "required_fields": ["company_id", "access_token"],
-                    "capabilities": ["financial_reporting", "invoice_management", "expense_tracking", "tax_preparation"]
+                    "capabilities": [
+                        "financial_reporting",
+                        "invoice_management",
+                        "expense_tracking",
+                        "tax_preparation",
+                    ],
                 },
                 "xero": {
                     "name": "Xero",
                     "icon": "📈",
                     "auth_type": "oauth",
                     "required_fields": ["tenant_id", "access_token"],
-                    "capabilities": ["accounting_automation", "bank_reconciliation", "financial_reporting", "tax_compliance"]
-                }
+                    "capabilities": [
+                        "accounting_automation",
+                        "bank_reconciliation",
+                        "financial_reporting",
+                        "tax_compliance",
+                    ],
+                },
             },
             "analytics": {
                 "google_analytics": {
@@ -179,12 +199,14 @@ class IntegrationManager:
                     "icon": "📊",
                     "auth_type": "oauth",
                     "required_fields": ["property_id", "access_token"],
-                    "capabilities": ["web_analytics", "conversion_tracking", "audience_insights", "goal_monitoring"]
+                    "capabilities": ["web_analytics", "conversion_tracking", "audience_insights", "goal_monitoring"],
                 }
-            }
+            },
         }
 
-    async def create_integration(self, agent_type: str, service_type: str, service_name: str, credentials: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_integration(
+        self, agent_type: str, service_type: str, service_name: str, credentials: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create a new integration between an agent and external service."""
         try:
             integration_id = str(uuid.uuid4())
@@ -216,7 +238,7 @@ class IntegrationManager:
                 "data_mapping": self._create_data_mapping(agent_type, service_type, service_name),
                 "webhook_url": f"/webhooks/{integration_id}",
                 "error_count": 0,
-                "success_count": 0
+                "success_count": 0,
             }
 
             # Store integration
@@ -243,7 +265,7 @@ class IntegrationManager:
                 "service_info": self.supported_services[service_type][service_name],
                 "capabilities": integration["capabilities"],
                 "webhook_url": integration["webhook_url"],
-                "data_sync_preview": self._generate_sync_preview(integration)
+                "data_sync_preview": self._generate_sync_preview(integration),
             }
 
         except Exception as e:
@@ -269,7 +291,7 @@ class IntegrationManager:
                 "active_integrations": len([i for i in integrations_data if i["status"] == "active"]),
                 "integrations": integrations_data,
                 "available_services": self._get_available_services_for_agent(agent_type),
-                "integration_health": self._calculate_integration_health(integrations_data)
+                "integration_health": self._calculate_integration_health(integrations_data),
             }
 
         except Exception as e:
@@ -311,10 +333,11 @@ class IntegrationManager:
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
         """Validate if service is supported."""
-        return (service_type in self.supported_services and
-                service_name in self.supported_services[service_type])
+        return service_type in self.supported_services and service_name in self.supported_services[service_type]
 
-    async def _validate_credentials(self, service_type: str, service_name: str, credentials: Dict[str, Any]) -> Dict[str, Any]:
+    async def _validate_credentials(
+        self, service_type: str, service_name: str, credentials: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Validate provided credentials."""
         service_config = self.supported_services[service_type][service_name]
         required_fields = service_config["required_fields"]
@@ -346,12 +369,12 @@ class IntegrationManager:
             "financial": {
                 "banking": {
                     "transaction_mapping": {"amount": "amount", "date": "transaction_date", "description": "memo"},
-                    "account_mapping": {"balance": "current_balance", "account_type": "account_category"}
+                    "account_mapping": {"balance": "current_balance", "account_type": "account_category"},
                 },
                 "payment_processors": {
                     "payment_mapping": {"amount": "gross_amount", "fee": "stripe_fee", "net": "net_amount"},
-                    "customer_mapping": {"email": "customer_email", "name": "customer_name"}
-                }
+                    "customer_mapping": {"email": "customer_email", "name": "customer_name"},
+                },
             }
         }
 
@@ -368,7 +391,7 @@ class IntegrationManager:
             "data_types": ["transactions", "account_balances", "customer_data"],
             "sync_frequency": integration["sync_frequency"],
             "estimated_records": "~150 per sync",
-            "data_retention": "90 days"
+            "data_retention": "90 days",
         }
 
     def _get_available_services_for_agent(self, agent_type: str) -> Dict[str, List[str]]:
@@ -378,7 +401,7 @@ class IntegrationManager:
             "seo_marketing": ["social_media", "analytics", "email_marketing"],
             "ecommerce": ["websites", "payment_processors", "analytics"],
             "brand_intelligence": ["social_media", "analytics", "crm"],
-            "customer_service": ["crm", "email_marketing", "social_media"]
+            "customer_service": ["crm", "email_marketing", "social_media"],
         }
 
         compatible_services = agent_service_compatibility.get(agent_type, [])
@@ -405,7 +428,7 @@ class IntegrationManager:
             "score": round(health_score, 1),
             "active_integrations": active_count,
             "error_integrations": error_count,
-            "recommendations": self._generate_health_recommendations(integrations)
+            "recommendations": self._generate_health_recommendations(integrations),
         }
 
     def _generate_health_recommendations(self, integrations: List[Dict[str, Any]]) -> List[str]:
@@ -416,8 +439,11 @@ class IntegrationManager:
         if error_integrations:
             recommendations.append(f"Fix {len(error_integrations)} failed integrations")
 
-        old_syncs = [i for i in integrations if i["last_sync"] and
-                     (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1]
+        old_syncs = [
+            i
+            for i in integrations
+            if i["last_sync"] and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
+        ]
         if old_syncs:
             recommendations.append(f"Update {len(old_syncs)} integrations with stale data")
 
@@ -431,7 +457,7 @@ class IntegrationManager:
             "records_synced": 47,
             "sync_duration_ms": 1200,
             "data_types": ["transactions", "balances"],
-            "next_sync": (datetime.now() + timedelta(hours=1)).isoformat()
+            "next_sync": (datetime.now() + timedelta(hours=1)).isoformat(),
         }
 
     def _initialize_security_manager(self) -> Dict[str, Any]:
@@ -441,7 +467,7 @@ class IntegrationManager:
             "key_rotation_schedule": "monthly",
             "access_logging": "enabled",
             "credential_expiry_monitoring": "enabled",
-            "oauth_token_refresh": "automatic"
+            "oauth_token_refresh": "automatic",
         }
 
 

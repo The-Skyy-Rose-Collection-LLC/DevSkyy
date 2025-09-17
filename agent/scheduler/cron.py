@@ -1,11 +1,11 @@
-
-import schedule
-import time
+import asyncio
 import logging
 import threading
+import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, Callable
-import asyncio
+from typing import Any, Callable, Dict
+
+import schedule
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class CronScheduler:
                 "created": datetime.now().isoformat(),
                 "last_run": None,
                 "run_count": 0,
-                "errors": 0
+                "errors": 0,
             }
 
             logger.info(f"✅ Scheduled job {job_id} with interval: {interval}")
@@ -103,7 +103,7 @@ class CronScheduler:
             "last_run": job_info["last_run"],
             "run_count": job_info["run_count"],
             "errors": job_info["errors"],
-            "next_run": str(job_info["job"].next_run) if job_info["job"].next_run else None
+            "next_run": str(job_info["job"].next_run) if job_info["job"].next_run else None,
         }
 
     def list_all_jobs(self) -> Dict[str, Any]:
@@ -111,7 +111,7 @@ class CronScheduler:
         return {
             "total_jobs": len(self.jobs),
             "running": self.running,
-            "jobs": {job_id: self.get_job_status(job_id) for job_id in self.jobs}
+            "jobs": {job_id: self.get_job_status(job_id) for job_id in self.jobs},
         }
 
 
@@ -128,9 +128,9 @@ def schedule_hourly_job() -> Dict[str, Any]:
         logger.info("⏰ Setting up hourly DevSkyy agent workflow...")
 
         # Import the main functions
-        from ..modules.scanner import scan_site
-        from ..modules.fixer import fix_code
         from ..git_commit import commit_fixes
+        from ..modules.fixer import fix_code
+        from ..modules.scanner import scan_site
 
         def automated_workflow():
             """The automated workflow that runs every hour."""
@@ -154,7 +154,7 @@ def schedule_hourly_job() -> Dict[str, Any]:
                     logger.info("✅ No issues found, system is healthy")
 
                 # Update job statistics
-                job_id = getattr(automated_workflow, 'job_id', None)
+                job_id = getattr(automated_workflow, "job_id", None)
                 if job_id and job_id in _global_scheduler.jobs:
                     _global_scheduler.jobs[job_id]["last_run"] = datetime.now().isoformat()
                     _global_scheduler.jobs[job_id]["run_count"] += 1
@@ -165,7 +165,7 @@ def schedule_hourly_job() -> Dict[str, Any]:
                 logger.error(f"❌ Automated workflow failed: {str(e)}")
 
                 # Update error count
-                job_id = getattr(automated_workflow, 'job_id', None)
+                job_id = getattr(automated_workflow, "job_id", None)
                 if job_id and job_id in _global_scheduler.jobs:
                     _global_scheduler.jobs[job_id]["errors"] += 1
 
@@ -183,15 +183,12 @@ def schedule_hourly_job() -> Dict[str, Any]:
             "interval": "hourly",
             "next_run": str(schedule.jobs[0].next_run) if schedule.jobs else "within 1 hour",
             "scheduler_running": _global_scheduler.running,
-            "message": "DevSkyy agent workflow scheduled successfully"
+            "message": "DevSkyy agent workflow scheduled successfully",
         }
 
     except Exception as e:
         logger.error(f"❌ Failed to schedule hourly job: {str(e)}")
-        return {
-            "status": "failed",
-            "error": str(e)
-        }
+        return {"status": "failed", "error": str(e)}
 
 
 def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> Dict[str, Any]:
@@ -202,17 +199,10 @@ def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> Dict[str
         if not _global_scheduler.running:
             _global_scheduler.start_scheduler()
 
-        return {
-            "status": "scheduled",
-            "job_id": job_id,
-            "interval": interval
-        }
+        return {"status": "scheduled", "job_id": job_id, "interval": interval}
 
     except Exception as e:
-        return {
-            "status": "failed",
-            "error": str(e)
-        }
+        return {"status": "failed", "error": str(e)}
 
 
 def get_scheduler_status() -> Dict[str, Any]:
