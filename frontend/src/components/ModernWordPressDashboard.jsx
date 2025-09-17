@@ -47,7 +47,7 @@ const ModernWordPressDashboard = () => {
           if (serverResponse.data.god_mode_level >= 2) {
             // GOD MODE Level 2 activated
           }
-        } catch (serverError) {
+        } catch (_serverError) {
           // Server access attempted, continuing with standard connection
         }
 

@@ -239,7 +239,7 @@ const TaskManager = ({
               },
             }}
           >
-            {filteredTasks.map((task, index) => (
+            {filteredTasks.map((task, _index) => (
               <motion.div
                 key={task.id}
                 variants={{

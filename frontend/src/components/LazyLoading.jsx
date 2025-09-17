@@ -225,7 +225,7 @@ export const useIntersectionObserver = (options = {}) => {
 
 // Lazy loading container component
 export const LazyContainer = ({ children, className = '', fallback }) => {
-  const [ref, isIntersecting, hasIntersected] = useIntersectionObserver();
+  const [ref, , hasIntersected] = useIntersectionObserver();
 
   return (
     <div ref={ref} className={className}>

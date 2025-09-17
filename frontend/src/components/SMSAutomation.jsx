@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 const API_BASE_URL =
@@ -16,7 +16,7 @@ const SMSAutomation = () => {
   });
   const [automationFlows, setAutomationFlows] = useState([]);
   const [templates, setTemplates] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSMSData();
@@ -167,7 +167,7 @@ const SMSAutomation = () => {
 
   const createCampaign = async campaignData => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}/marketing/sms-campaign`,
         {
           ...campaignData,

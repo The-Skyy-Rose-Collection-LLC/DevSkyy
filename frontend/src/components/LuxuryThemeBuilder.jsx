@@ -11,7 +11,7 @@ const LuxuryThemeBuilder = () => {
   const [themeElements, setThemeElements] = useState({});
   const [brandAssets, setBrandAssets] = useState({});
   const [pageLayouts, setPageLayouts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [selectedLayout, setSelectedLayout] = useState('homepage');
 
   // Brand asset URLs from uploaded files

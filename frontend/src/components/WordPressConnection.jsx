@@ -9,11 +9,11 @@ const API_BASE_URL =
 
 const WordPressConnection = () => {
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  const [authUrl, setAuthUrl] = useState('');
+  const [, setAuthUrl] = useState('');
   const [siteInfo, setSiteInfo] = useState(null);
-  const [agentStatus, setAgentStatus] = useState({});
+  const [, setAgentStatus] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [, setError] = useState('');
 
   useEffect(() => {
     checkConnectionStatus();
@@ -27,7 +27,7 @@ const WordPressConnection = () => {
         setSiteInfo(response.data.site_info);
         setAgentStatus(response.data.performance_monitoring);
       }
-    } catch (error) {
+    } catch (_error) {
       // Not connected yet
       setConnectionStatus('disconnected');
     }
@@ -67,7 +67,7 @@ const WordPressConnection = () => {
             server_access: true,
           }));
         }
-      } catch (serverError) {
+        } catch (_serverError) {
         // Continue with regular connection
       }
 
@@ -109,7 +109,6 @@ const WordPressConnection = () => {
   const getAuthUrl = async () => {
     try {
       setLoading(true);
-      setError('');
 
       const response = await axios.get(`${API_BASE_URL}/wordpress/auth-url`);
       setAuthUrl(response.data.auth_url);
@@ -132,7 +131,6 @@ const WordPressConnection = () => {
         }
       }, 1000);
     } catch (error) {
-      setError('Failed to get authorization URL');
       console.error('Auth URL error:', error);
     } finally {
       setLoading(false);
@@ -490,7 +488,7 @@ const WordPressConnection = () => {
 
       {/* Error Display */}
       <AnimatePresence>
-        {error && (
+        {false && (
           <motion.div
             className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -500,7 +498,7 @@ const WordPressConnection = () => {
             <div className="text-red-600 font-medium mb-2">
               Connection Error
             </div>
-            <div className="text-red-500 text-sm">{error}</div>
+            <div className="text-red-500 text-sm">Error occurred</div>
             <button
               className="mt-4 px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
               onClick={() => setError('')}

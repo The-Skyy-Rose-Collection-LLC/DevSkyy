@@ -304,7 +304,7 @@ const IntegrationDashboard = ({ selectedAgent, onClose }) => {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {Object.entries(availableServices).map(([serviceType, services]) =>
-              Object.entries(services).map(([serviceName, serviceInfo]) => (
+              Object.entries(services).map(([serviceName, _serviceInfo]) => (
                 <motion.div
                   key={`${serviceType}-${serviceName}`}
                   className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-center hover:bg-rose-gold/10 hover:border-rose-gold/30 transition-all cursor-pointer"

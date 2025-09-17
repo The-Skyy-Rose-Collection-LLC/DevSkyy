@@ -14,7 +14,7 @@ const API_BASE_URL =
 const AutomationDashboard = () => {
   const [currentTab, setCurrentTab] = useState('overview');
   const [automationStats, setAutomationStats] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     fetchAutomationStats();
@@ -111,7 +111,7 @@ const AutomationDashboard = () => {
 
   const executeQuickAction = async action => {
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}/automation/quick-action`,
         {
           action: action,

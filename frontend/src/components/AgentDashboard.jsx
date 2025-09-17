@@ -112,7 +112,7 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           },
         }}
       >
-        {filteredAgents.map(([agentId, agentData], index) => (
+        {filteredAgents.map(([agentId, agentData], _index) => (
           <motion.div
             key={agentId}
             variants={{

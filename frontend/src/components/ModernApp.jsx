@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Lazy load components for better performance
@@ -25,7 +25,7 @@ const LoadingSpinner = () => (
 const ModernApp = () => {
   const [currentView, setCurrentView] = useState('agents');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [systemStatus, setSystemStatus] = useState({
+  const [systemStatus] = useState({
     health: 96.2,
     activeAgents: 10,
     uptime: '99.9%',

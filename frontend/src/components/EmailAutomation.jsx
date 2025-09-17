@@ -16,7 +16,7 @@ const EmailAutomation = () => {
     growth: 0,
   });
   const [automationFlows, setAutomationFlows] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     fetchEmailData();
@@ -154,7 +154,7 @@ const EmailAutomation = () => {
 
   const createCampaign = async campaignData => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/ai/email-campaign`, {
+      await axios.post(`${API_BASE_URL}/ai/email-campaign`, {
         ...campaignData,
         brand_voice: 'luxury_streetwear',
         target_segments: ['vip_customers', 'luxury_collectors'],

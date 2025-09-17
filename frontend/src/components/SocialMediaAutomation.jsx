@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 const API_BASE_URL =
@@ -16,8 +16,8 @@ const SocialMediaAutomation = () => {
     twitter: { connected: false, followers: 0, engagement: 0 },
   });
   const [automationRules, setAutomationRules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPlatform, setSelectedPlatform] = useState('instagram');
+  const [, setLoading] = useState(true);
+  const [selectedPlatform] = useState('instagram');
 
   useEffect(() => {
     fetchSocialData();
@@ -96,7 +96,7 @@ const SocialMediaAutomation = () => {
 
   const createCampaign = async campaignData => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/marketing/campaign`, {
+      await axios.post(`${API_BASE_URL}/marketing/campaign`, {
         ...campaignData,
         type: 'social_media_luxury',
       });
