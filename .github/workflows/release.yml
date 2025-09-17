@@ -30,6 +30,7 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Build and push
+        id: bp
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -37,3 +38,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/devskyy:${{ steps.vars.outputs.version }}
             ghcr.io/${{ github.repository_owner }}/devskyy:latest
+      - name: Print image digest
+        run: |
+          echo "Image digest: ${{ steps.bp.outputs.digest }}"
