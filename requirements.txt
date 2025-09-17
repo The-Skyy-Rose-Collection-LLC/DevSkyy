@@ -61,6 +61,14 @@ psutil==6.1.0
 
 # Additional utilities for enhanced functionality
 click==8.1.8
-python-slugify==8.0.5
+python-slugify==8.0.4
 redis==5.2.1
 celery==5.4.0
+
+# Backend auth & ORM
+SQLAlchemy==2.0.35
+PyJWT==2.9.0
+bcrypt==4.2.0
+
+# Async Redis client used by backend/advanced_cache_system.py
+aioredis==2.0.1
