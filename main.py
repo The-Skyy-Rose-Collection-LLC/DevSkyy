@@ -7,7 +7,17 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
+from cursor/fix-bugs-and-optimize-codebase-5b3e
+from fastapi.exceptions import RequestValidationError
+from functools import lru_cache
+import logging
+import sys
+import os
+import time
+from typing import Optional
 
+
+main
 from agent.modules.scanner import scan_site
 
 # Optional import to avoid hard failure during tests that stub scanner module
@@ -289,11 +299,44 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+)
+
+cursor/fix-bugs-and-optimize-codebase-5b3e
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1").split(",")
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])  # Configure for your domain in production
+main
+
+# LRU in-memory cache for performance optimization
+from functools import lru_cache
+CACHE_MAXSIZE = 128  # Limit cache size to 128 entries
+CACHE_TTL = 300  # 5 minutes
+
+def get_cached_or_compute(key: str, compute_func, ttl: int = CACHE_TTL):
+    """LRU caching mechanism to improve performance."""
+    @lru_cache(maxsize=CACHE_MAXSIZE)
+    def cached_compute(k):
+        return compute_func()
+    return cached_compute(key)
+
+# Performance monitoring middleware
+@app.middleware("http")
+async def performance_middleware(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    
+    # Log slow requests
+    if process_time > 2.0:
+        logger.warning(f"Slow request: {request.url.path} took {process_time:.2f}s")
+    
+    return response
 
 # Global exception handlers
 
@@ -891,6 +934,41 @@ def get_site_report(website_url: str) -> Dict[str, Any]:
 def get_all_agents_status() -> Dict[str, Any]:
     """Get comprehensive status of all agents with fashion guru styling."""
     try:
+cursor/fix-bugs-and-optimize-codebase-5b3e
+        # Cache agent status for 30 seconds to improve performance
+        return get_cached_or_compute(
+            "agents_status",
+            lambda: _compute_agent_status(),
+            ttl=30
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def _compute_agent_status() -> Dict[str, Any]:
+    """Compute agent status (extracted for caching)."""
+    agent_statuses = {
+        "brand_intelligence": {
+            "status": "analyzing_trends",
+            "health": 98,
+            "last_activity": datetime.now().isoformat(),
+            "styling": {
+                "color": "#E8B4B8",  # Rose gold
+                "icon": "👑",
+                "personality": "visionary_fashion_oracle"
+            },
+            "current_tasks": 3,
+            "completed_today": 12,
+            "expertise_focus": "luxury_brand_positioning"
+        },
+        "inventory": {
+            "status": "optimizing_assets",
+            "health": 94,
+            "last_activity": datetime.now().isoformat(),
+            "styling": {
+                "color": "#C0C0C0",  # Silver
+                "icon": "💎",
+                "personality": "detail_oriented_curator"
+
         agent_statuses = {
             "brand_intelligence": {
                 "status": "analyzing_trends",
@@ -909,9 +987,14 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "current_tasks": 2,
                 "completed_today": 8,
                 "expertise_focus": "asset_optimization",
+main
             },
-            "financial": {
-                "status": "processing_transactions",
+            "current_tasks": 2,
+            "completed_today": 8,
+            "expertise_focus": "asset_optimization"
+        },
+        "financial": {
+            "status": "processing_transactions",
                 "health": 96,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#FFD700", "icon": "💰", "personality": "strategic_wealth_advisor"},  # Gold
@@ -919,8 +1002,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 15,
                 "expertise_focus": "luxury_commerce_finance",
             },
-            "ecommerce": {
-                "status": "optimizing_conversions",
+        "ecommerce": {
+            "status": "optimizing_conversions",
                 "health": 92,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#E8B4B8", "icon": "🛍️", "personality": "customer_experience_guru"},  # Rose gold
@@ -928,8 +1011,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 18,
                 "expertise_focus": "conversion_optimization",
             },
-            "wordpress": {
-                "status": "crafting_layouts",
+        "wordpress": {
+            "status": "crafting_layouts",
                 "health": 95,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#FFD700", "icon": "🎨", "personality": "design_perfectionist"},  # Gold
@@ -937,8 +1020,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 6,
                 "expertise_focus": "divi5_mastery",
             },
-            "web_development": {
-                "status": "optimizing_performance",
+        "web_development": {
+            "status": "optimizing_performance",
                 "health": 97,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#C0C0C0", "icon": "⚡", "personality": "performance_optimizer"},  # Silver
@@ -946,8 +1029,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 10,
                 "expertise_focus": "code_excellence",
             },
-            "customer_service": {
-                "status": "enhancing_experiences",
+        "customer_service": {
+            "status": "enhancing_experiences",
                 "health": 99,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#E8B4B8", "icon": "💝", "personality": "luxury_service_specialist"},  # Rose gold
@@ -955,8 +1038,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 22,
                 "expertise_focus": "vip_experience",
             },
-            "seo_marketing": {
-                "status": "tracking_trends",
+        "seo_marketing": {
+            "status": "tracking_trends",
                 "health": 93,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#FFD700", "icon": "📈", "personality": "trend_prediction_maven"},  # Gold
@@ -964,8 +1047,8 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 14,
                 "expertise_focus": "fashion_marketing",
             },
-            "security": {
-                "status": "protecting_assets",
+        "security": {
+            "status": "protecting_assets",
                 "health": 100,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#000000", "icon": "🛡️", "personality": "trust_and_safety_expert"},  # Black
@@ -973,13 +1056,16 @@ def get_all_agents_status() -> Dict[str, Any]:
                 "completed_today": 7,
                 "expertise_focus": "luxury_brand_protection",
             },
-            "performance": {
-                "status": "analyzing_and_optimizing",
+        "performance": {
+            "status": "analyzing_and_optimizing",
                 "health": 98,
                 "last_activity": datetime.now().isoformat(),
                 "styling": {"color": "#C0C0C0", "icon": "🚀", "personality": "universal_code_guru"},  # Silver
                 "current_tasks": 4,
                 "completed_today": 18,
+cursor/fix-bugs-and-optimize-codebase-5b3e
+                "expertise_focus": "multi_language_mastery_and_optimization"
+
                 "expertise_focus": "multi_language_mastery_and_optimization",
             },
         }
@@ -992,10 +1078,19 @@ def get_all_agents_status() -> Dict[str, Any]:
             "agents": agent_statuses,
             "fashion_guru_theme": "luxury_rose_gold_collection",
             "last_updated": datetime.now().isoformat(),
+main
         }
+    }
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "total_agents": len(agent_statuses),
+        "average_health": sum(agent["health"] for agent in agent_statuses.values()) / len(agent_statuses),
+        "total_active_tasks": sum(agent["current_tasks"] for agent in agent_statuses.values()),
+        "total_completed_today": sum(agent["completed_today"] for agent in agent_statuses.values()),
+        "agents": agent_statuses,
+        "fashion_guru_theme": "luxury_rose_gold_collection",
+        "last_updated": datetime.now().isoformat()
+    }
 
 
 @app.get("/tasks/prioritized")

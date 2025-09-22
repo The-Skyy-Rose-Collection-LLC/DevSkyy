@@ -12,8 +12,11 @@ load_dotenv()
 
 class Config:
     """Base configuration."""
+ cursor/fix-bugs-and-optimize-codebase-5b3e
+    SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32).hex()
 
     SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
+ main
     DEBUG = False
     TESTING = False
 

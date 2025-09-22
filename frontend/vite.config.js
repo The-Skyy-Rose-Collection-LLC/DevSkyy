@@ -22,6 +22,25 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
+cursor/fix-bugs-and-optimize-codebase-5b3e
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          animations: ['framer-motion'],
+          http: ['axios'],
+          icons: ['@heroicons/react']
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+
         manualChunks: (id) => {
           // Vendor chunks
           if (id.includes('node_modules')) {
@@ -60,6 +79,7 @@ export default defineConfig({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+main
       }
     },
     chunkSizeWarningLimit: 500,

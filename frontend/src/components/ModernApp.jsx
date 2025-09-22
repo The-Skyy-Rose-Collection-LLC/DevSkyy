@@ -1,7 +1,11 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+ cursor/fix-bugs-and-optimize-codebase-5b3e
+// Lazy load components to reduce initial bundle size
+
 // Lazy load components for better performance
+main
 const ModernWordPressDashboard = lazy(() => import('./ModernWordPressDashboard'))
 const AutomationDashboard = lazy(() => import('./AutomationDashboard'))
 const StreetAgentDashboard = lazy(() => import('./StreetAgentDashboard'))
@@ -9,7 +13,11 @@ const FrontendAgentManager = lazy(() => import('./FrontendAgentManager'))
 const TaskManager = lazy(() => import('./TaskManager'))
 const RiskDashboard = lazy(() => import('./RiskDashboard'))
 
+cursor/fix-bugs-and-optimize-codebase-5b3e
+// Loading component
+
 // Loading component for Suspense fallback
+main
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-64">
     <motion.div
@@ -17,6 +25,10 @@ const LoadingSpinner = () => (
       animate={{ rotate: 360 }}
       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
     />
+cursor/fix-bugs-and-optimize-codebase-5b3e
+    <span className="ml-3 text-gray-400">Loading...</span>
+
+main
   </div>
 )
 
@@ -307,7 +319,9 @@ const ModernApp = () => {
               transition={{ duration: 0.3 }}
               className="h-full"
             >
-              {renderCurrentView()}
+              <Suspense fallback={<LoadingSpinner />}>
+                {renderCurrentView()}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </div>
