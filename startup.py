@@ -4,12 +4,14 @@ Startup script for Skyy Rose AI Agent Management Platform
 Handles graceful startup, database connections, and WordPress auto-connection
 """
 
-from agent.modules.wordpress_direct_service import create_wordpress_direct_service
-from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
 import logging
 import sys
 from pathlib import Path
+
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
@@ -17,10 +19,7 @@ sys.path.insert(0, str(project_root))
 
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -33,13 +32,14 @@ class SkyRoseStartup:
         """Initialize MongoDB connection."""
         try:
             import os
-            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/skyy_rose_agents')
+
+            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017/skyy_rose_agents")
 
             logger.info("🔄 Initializing MongoDB connection...")
             self.mongodb_client = AsyncIOMotorClient(mongo_url)
 
             # Test connection
-            await self.mongodb_client.admin.command('ismaster')
+            await self.mongodb_client.admin.command("ismaster")
             logger.info("✅ MongoDB connection established successfully")
 
             return True
@@ -58,7 +58,7 @@ class SkyRoseStartup:
             # Attempt auto-connection
             connection_result = await self.wordpress_service.connect_and_verify()
 
-            if connection_result.get('status') == 'connected':
+            if connection_result.get("status") == "connected":
                 logger.info("✅ WordPress auto-connection successful!")
                 logger.info(f"   └─ Connected to: {connection_result.get('site_url', 'skyyrose.co')}")
                 logger.info(f"   └─ Site health: {connection_result.get('health', 'Unknown')}")
@@ -119,6 +119,7 @@ async def startup():
 async def shutdown():
     """Main shutdown function."""
     await startup_manager.shutdown()
+
 
 if __name__ == "__main__":
     # Run startup sequence directly

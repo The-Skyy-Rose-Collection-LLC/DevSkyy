@@ -1,6 +1,5 @@
-
-from typing import Dict, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List
 
 
 class CustomerServiceAgent:
@@ -17,7 +16,7 @@ class CustomerServiceAgent:
             "returns": ["return", "refund", "exchange", "damaged"],
             "payment": ["payment", "charge", "card", "billing"],
             "product": ["product", "quality", "defect", "broken"],
-            "account": ["account", "login", "password", "profile"]
+            "account": ["account", "login", "password", "profile"],
         }
 
         content_lower = ticket_content.lower()
@@ -34,7 +33,7 @@ class CustomerServiceAgent:
             "category": best_category,
             "confidence": confidence,
             "suggested_priority": "HIGH" if "urgent" in content_lower or "emergency" in content_lower else "NORMAL",
-            "auto_response_available": best_category in ["shipping", "returns"]
+            "auto_response_available": best_category in ["shipping", "returns"],
         }
 
     def generate_auto_response(self, category: str, customer_name: str = "Valued Customer") -> str:
@@ -50,7 +49,6 @@ If you need immediate assistance, please reply with your order number.
 
 Best regards,
 The Skyy Rose Collection Team""",
-
             "returns": f"""Dear {customer_name},
             
 Thank you for reaching out regarding a return.
@@ -65,7 +63,6 @@ Refunds are processed within 5-7 business days after we receive your return.
 
 Best regards,
 The Skyy Rose Collection Team""",
-
             "general": f"""Dear {customer_name},
             
 Thank you for contacting The Skyy Rose Collection. We've received your inquiry and will respond within 24 hours.
@@ -73,7 +70,7 @@ Thank you for contacting The Skyy Rose Collection. We've received your inquiry a
 For immediate assistance, you can also check our FAQ section or live chat during business hours.
 
 Best regards,
-The Skyy Rose Collection Team"""
+The Skyy Rose Collection Team""",
         }
 
         return responses.get(category, responses["general"])
@@ -85,20 +82,22 @@ The Skyy Rose Collection Team"""
         overdue_tickets = []
 
         for ticket in open_tickets:
-            hours_elapsed = (datetime.utcnow() - ticket["created_at"]).total_seconds() / 3600
+            hours_elapsed = (datetime.now(timezone.utc) - ticket["created_at"]).total_seconds() / 3600
             if hours_elapsed > self.response_time_threshold:
-                overdue_tickets.append({
-                    "ticket_id": ticket["id"],
-                    "hours_overdue": hours_elapsed - self.response_time_threshold,
-                    "category": ticket["category"]
-                })
+                overdue_tickets.append(
+                    {
+                        "ticket_id": ticket["id"],
+                        "hours_overdue": hours_elapsed - self.response_time_threshold,
+                        "category": ticket["category"],
+                    }
+                )
 
         return {
             "total_open_tickets": len(open_tickets),
             "overdue_tickets": len(overdue_tickets),
             "overdue_details": overdue_tickets,
             "average_response_time": 1.5,  # Simulated average in hours
-            "performance_status": "GOOD" if len(overdue_tickets) == 0 else "NEEDS_ATTENTION"
+            "performance_status": "GOOD" if len(overdue_tickets) == 0 else "NEEDS_ATTENTION",
         }
 
     def analyze_satisfaction(self) -> Dict[str, Any]:
@@ -113,8 +112,10 @@ The Skyy Rose Collection Team"""
             "average_rating": average_rating,
             "total_responses": len(recent_ratings),
             "low_ratings_count": len(low_ratings),
-            "satisfaction_status": "EXCELLENT" if average_rating >= 4.5 else "GOOD" if average_rating >= 4.0 else "NEEDS_IMPROVEMENT",
-            "trend": "IMPROVING"  # Simulated trend
+            "satisfaction_status": (
+                "EXCELLENT" if average_rating >= 4.5 else "GOOD" if average_rating >= 4.0 else "NEEDS_IMPROVEMENT"
+            ),
+            "trend": "IMPROVING",  # Simulated trend
         }
 
     def _fetch_open_tickets(self) -> List[Dict]:
@@ -123,15 +124,15 @@ The Skyy Rose Collection Team"""
             {
                 "id": "TK001",
                 "category": "shipping",
-                "created_at": datetime.utcnow() - timedelta(hours=3),
-                "priority": "NORMAL"
+                "created_at": datetime.now(timezone.utc) - timedelta(hours=3),
+                "priority": "NORMAL",
             },
             {
                 "id": "TK002",
                 "category": "returns",
-                "created_at": datetime.utcnow() - timedelta(hours=1),
-                "priority": "HIGH"
-            }
+                "created_at": datetime.now(timezone.utc) - timedelta(hours=1),
+                "priority": "HIGH",
+            },
         ]
 
 
@@ -145,7 +146,10 @@ def handle_customer_service() -> Dict[str, Any]:
     return {
         "response_metrics": response_metrics,
         "satisfaction_metrics": satisfaction_metrics,
-        "overall_status": "OPTIMAL" if response_metrics["performance_status"] == "GOOD"
-        and satisfaction_metrics["satisfaction_status"] in ["EXCELLENT", "GOOD"]
-        else "NEEDS_ATTENTION"
+        "overall_status": (
+            "OPTIMAL"
+            if response_metrics["performance_status"] == "GOOD"
+            and satisfaction_metrics["satisfaction_status"] in ["EXCELLENT", "GOOD"]
+            else "NEEDS_ATTENTION"
+        ),
     }

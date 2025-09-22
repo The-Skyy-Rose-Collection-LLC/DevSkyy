@@ -1,14 +1,12 @@
-
-from typing import Dict, Any
-from datetime import datetime
 import asyncio
 import logging
-import schedule
-import time
-from datetime import datetime, timedelta
-from typing import Dict, Any, List
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
+
+import schedule
 
 logger = logging.getLogger(__name__)
 
@@ -51,15 +49,12 @@ class EnhancedLearningScheduler:
                 "learning_cycles_scheduled": 4,
                 "next_hourly_cycle": self._get_next_run_time("hourly"),
                 "next_deep_analysis": self._get_next_run_time("deep"),
-                "system_version": "2.0.0"
+                "system_version": "2.0.0",
             }
 
         except Exception as e:
             logger.error(f"❌ Failed to start learning system: {str(e)}")
-            return {
-                "status": "failed",
-                "error": str(e)
-            }
+            return {"status": "failed", "error": str(e)}
 
     def _run_scheduler(self):
         """Run the continuous learning scheduler."""
@@ -88,7 +83,7 @@ class EnhancedLearningScheduler:
                 "timestamp": datetime.now().isoformat(),
                 "brand_updates": brand_update,
                 "performance_improvement": self._calculate_improvement(),
-                "next_cycle": (datetime.now() + timedelta(hours=1)).isoformat()
+                "next_cycle": (datetime.now() + timedelta(hours=1)).isoformat(),
             }
 
             self.learning_history.append(learning_result)
@@ -122,7 +117,7 @@ class EnhancedLearningScheduler:
                 "brand_analysis": brand_analysis,
                 "learning_patterns": learning_patterns,
                 "optimizations": optimization_results,
-                "intelligence_score": self._calculate_intelligence_score()
+                "intelligence_score": self._calculate_intelligence_score(),
             }
 
             self.learning_history.append(learning_result)
@@ -156,7 +151,7 @@ class EnhancedLearningScheduler:
                 "agent_updates": agent_updates,
                 "strategic_insights": strategic_insights,
                 "performance_optimization": performance_optimization,
-                "overall_improvement": self._calculate_overall_improvement()
+                "overall_improvement": self._calculate_overall_improvement(),
             }
 
             self.learning_history.append(learning_result)
@@ -189,7 +184,7 @@ class EnhancedLearningScheduler:
                 "weekly_trends": weekly_trends,
                 "system_optimization": system_optimization,
                 "algorithm_updates": algorithm_updates,
-                "weekly_report": weekly_report
+                "weekly_report": weekly_report,
             }
 
             self.learning_history.append(learning_result)
@@ -211,8 +206,8 @@ class EnhancedLearningScheduler:
             "learning_score": results.get("learning_cycle_status") == "completed",
             "brand_intelligence_score": results.get("brand_learning", {}).get("confidence", 0),
             "system_health": 0.95,  # Would be calculated from actual metrics
-            "response_time": 1.2,   # Would be measured
-            "accuracy_improvement": 0.02  # Would be calculated
+            "response_time": 1.2,  # Would be measured
+            "accuracy_improvement": 0.02,  # Would be calculated
         }
 
         self.performance_metrics[cycle_type].append(metrics)
@@ -228,9 +223,7 @@ class EnhancedLearningScheduler:
 
         # Simple improvement calculation based on recent learning cycles
         recent_cycles = self.learning_history[-5:]  # Last 5 cycles
-        improvement_sum = sum(
-            cycle.get("performance_improvement", 0) for cycle in recent_cycles
-        )
+        improvement_sum = sum(cycle.get("performance_improvement", 0) for cycle in recent_cycles)
 
         return round(improvement_sum / len(recent_cycles), 2)
 
@@ -242,8 +235,9 @@ class EnhancedLearningScheduler:
         recent_cycles = self.learning_history[-10:]
 
         # Analyze success rates
-        successful_cycles = sum(1 for cycle in recent_cycles
-                                if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed")
+        successful_cycles = sum(
+            1 for cycle in recent_cycles if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
+        )
 
         success_rate = successful_cycles / len(recent_cycles)
 
@@ -256,16 +250,12 @@ class EnhancedLearningScheduler:
             "success_rate": round(success_rate, 2),
             "average_improvement": round(avg_improvement, 3),
             "trend": "improving" if avg_improvement > 0.01 else "stable",
-            "learning_efficiency": round(success_rate * avg_improvement, 3)
+            "learning_efficiency": round(success_rate * avg_improvement, 3),
         }
 
     async def _optimize_agent_performance(self) -> Dict[str, Any]:
         """Optimize performance of all agents."""
-        optimization_results = {
-            "agents_optimized": 0,
-            "performance_gains": {},
-            "optimizations_applied": []
-        }
+        optimization_results = {"agents_optimized": 0, "performance_gains": {}, "optimizations_applied": []}
 
         # Simulate agent optimization
         agents = ["brand_intelligence", "inventory", "financial", "ecommerce", "wordpress", "web_development"]
@@ -289,8 +279,11 @@ class EnhancedLearningScheduler:
 
         # Factor in learning success rate
         if self.learning_history:
-            recent_success = sum(1 for cycle in self.learning_history[-5:]
-                                 if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed")
+            recent_success = sum(
+                1
+                for cycle in self.learning_history[-5:]
+                if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
+            )
             success_factor = recent_success / min(5, len(self.learning_history))
             base_score += success_factor * 0.2
 
@@ -309,14 +302,14 @@ class EnhancedLearningScheduler:
                 "financial": 0.98,
                 "ecommerce": 0.91,
                 "wordpress": 0.89,
-                "web_development": 0.93
+                "web_development": 0.93,
             },
             "learning_effectiveness": 0.87,
             "optimization_opportunities": [
                 "Improve WordPress agent response time",
                 "Enhance ecommerce recommendation accuracy",
-                "Optimize inventory scanning algorithms"
-            ]
+                "Optimize inventory scanning algorithms",
+            ],
         }
 
     async def _update_all_agents(self) -> Dict[str, Any]:
@@ -329,9 +322,9 @@ class EnhancedLearningScheduler:
                 "Improved financial fraud detection",
                 "Optimized ecommerce recommendation engine",
                 "Updated WordPress performance analysis",
-                "Enhanced web development code analysis"
+                "Enhanced web development code analysis",
             ],
-            "learning_model_version": "2.1.0"
+            "learning_model_version": "2.1.0",
         }
 
     def _generate_strategic_insights(self) -> List[str]:
@@ -342,7 +335,7 @@ class EnhancedLearningScheduler:
             "Ecommerce conversion optimization is performing above industry standards",
             "WordPress performance monitoring needs enhancement for mobile optimization",
             "Web development code quality scores are consistently high",
-            "Inventory management is efficiently preventing stockouts"
+            "Inventory management is efficiently preventing stockouts",
         ]
 
     async def _comprehensive_optimization(self) -> Dict[str, Any]:
@@ -352,7 +345,7 @@ class EnhancedLearningScheduler:
             "performance_improvement": 0.08,  # 8% improvement
             "memory_optimization": "Reduced memory usage by 15%",
             "speed_optimization": "Improved response times by 12%",
-            "accuracy_improvement": "Enhanced prediction accuracy by 6%"
+            "accuracy_improvement": "Enhanced prediction accuracy by 6%",
         }
 
     def _analyze_weekly_trends(self) -> Dict[str, Any]:
@@ -362,7 +355,7 @@ class EnhancedLearningScheduler:
             "average_performance_score": 0.94,
             "improvement_trend": "positive",
             "peak_performance_hours": ["10:00-12:00", "14:00-16:00"],
-            "optimization_effectiveness": 0.89
+            "optimization_effectiveness": 0.89,
         }
 
     async def _optimize_system_parameters(self) -> Dict[str, Any]:
@@ -372,7 +365,7 @@ class EnhancedLearningScheduler:
             "learning_rate_adjustments": "Optimized for current performance",
             "memory_allocation_optimized": True,
             "process_scheduling_improved": True,
-            "cache_optimization_applied": True
+            "cache_optimization_applied": True,
         }
 
     def _update_learning_algorithms(self) -> Dict[str, Any]:
@@ -383,10 +376,10 @@ class EnhancedLearningScheduler:
                 "Advanced pattern recognition",
                 "Improved anomaly detection",
                 "Enhanced predictive modeling",
-                "Better context understanding"
+                "Better context understanding",
             ],
             "algorithm_version": "2.1.0",
-            "performance_impact": "+12% accuracy improvement"
+            "performance_impact": "+12% accuracy improvement",
         }
 
     def _generate_weekly_report(self) -> Dict[str, Any]:
@@ -398,18 +391,18 @@ class EnhancedLearningScheduler:
                 "Maintained 99.5% system uptime",
                 "Improved learning efficiency by 8%",
                 "Enhanced brand intelligence accuracy",
-                "Optimized all agent performance metrics"
+                "Optimized all agent performance metrics",
             ],
             "areas_for_improvement": [
                 "Mobile performance optimization",
                 "Real-time analytics enhancement",
-                "Cross-agent communication optimization"
+                "Cross-agent communication optimization",
             ],
             "next_week_goals": [
                 "Implement advanced ML models",
                 "Enhance real-time monitoring",
-                "Improve cross-platform compatibility"
-            ]
+                "Improve cross-platform compatibility",
+            ],
         }
 
     def _calculate_overall_improvement(self) -> float:
@@ -456,8 +449,8 @@ class EnhancedLearningScheduler:
             "next_cycles": {
                 "hourly": self._get_next_run_time("hourly"),
                 "deep_analysis": self._get_next_run_time("deep"),
-                "comprehensive": self._get_next_run_time("daily")
-            }
+                "comprehensive": self._get_next_run_time("daily"),
+            },
         }
 
     def stop_learning_system(self) -> Dict[str, Any]:
@@ -469,7 +462,7 @@ class EnhancedLearningScheduler:
             "status": "stopped",
             "total_cycles_completed": len(self.learning_history),
             "final_intelligence_score": self._calculate_intelligence_score(),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
 
@@ -492,40 +485,13 @@ def get_learning_system_status() -> Dict[str, Any]:
     global _global_scheduler
 
     if _global_scheduler is None:
-        return {
-            "status": "not_initialized",
-            "message": "Learning system has not been started"
-        }
+        return {"status": "not_initialized", "message": "Learning system has not been started"}
 
     return _global_scheduler.get_learning_status()
 
 
-logger = logging.getLogger(__name__)
-
-
-def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
-    """Start the enhanced learning system."""
-    try:
-        logger.info("🚀 Starting Enhanced Learning System")
-
-        return {
-            "status": "active",
-            "learning_modules": [
-                "Brand Intelligence",
-                "Market Analysis",
-                "Customer Behavior",
-                "Performance Optimization"
-            ],
-            "frequency": "continuous",
-            "last_update": datetime.now().isoformat(),
-            "confidence_level": "high"
-        }
-    except Exception as e:
-        logger.error(f"Failed to start learning system: {str(e)}")
-        return {
-            "status": "failed",
-            "error": str(e)
-        }
+# Global scheduler instance
+_global_scheduler = None
 
 
 async def run_learning_cycle() -> Dict[str, Any]:
@@ -534,5 +500,5 @@ async def run_learning_cycle() -> Dict[str, Any]:
         "cycle_completed": True,
         "insights_generated": 5,
         "patterns_identified": 3,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }

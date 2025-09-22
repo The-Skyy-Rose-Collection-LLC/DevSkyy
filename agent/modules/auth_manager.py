@@ -1,17 +1,17 @@
-
-import jwt
-import bcrypt
-import os
-from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List
-import secrets
-import re
-from fastapi import HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import logging
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, ForeignKey
+import os
+import re
+import secrets
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import bcrypt
+import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
+from sqlalchemy.orm import Session, relationship, sessionmaker
 from sqlalchemy.sql import func
 
 logger = logging.getLogger(__name__)
@@ -77,23 +77,37 @@ class AuthManager:
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
         self.database_url = os.getenv(
-            "DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
+            "DATABASE_URL",
+            "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require",
+        )
         self.security = HTTPBearer()
-        self.engine = create_engine(self.database_url)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self.init_database()
+        self.engine = None
+        self.SessionLocal = None
+        # Delay database initialization until needed
+        try:
+            self.init_database()
+        except Exception as e:
+            logger.warning(f"Database initialization failed, will retry when needed: {str(e)}")
+            self._db_initialized = False
 
     def init_database(self):
         """Initialize PostgreSQL database with secure schema."""
         try:
+            if not self.engine:
+                self.engine = create_engine(self.database_url)
+                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
+            self._db_initialized = True
         except Exception as e:
             logger.error(f"Failed to initialize database: {str(e)}")
+            self._db_initialized = False
             raise
 
     def get_db(self):
         """Get database session."""
+        if not self._db_initialized:
+            self.init_database()
         db = self.SessionLocal()
         try:
             yield db
@@ -103,15 +117,15 @@ class AuthManager:
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt."""
         salt = bcrypt.gensalt()
-        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify password against hash."""
-        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
     def validate_email(self, email: str) -> bool:
         """Validate email format."""
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
     def validate_password(self, password: str) -> Dict[str, Any]:
@@ -121,13 +135,13 @@ class AuthManager:
         if len(password) < 8:
             errors.append("Password must be at least 8 characters long")
 
-        if not re.search(r'[A-Z]', password):
+        if not re.search(r"[A-Z]", password):
             errors.append("Password must contain at least one uppercase letter")
 
-        if not re.search(r'[a-z]', password):
+        if not re.search(r"[a-z]", password):
             errors.append("Password must contain at least one lowercase letter")
 
-        if not re.search(r'\d', password):
+        if not re.search(r"\d", password):
             errors.append("Password must contain at least one number")
 
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
@@ -135,8 +149,9 @@ class AuthManager:
 
         return {"valid": len(errors) == 0, "errors": errors}
 
-    def create_user(self, email: str, username: str, password: str,
-                    first_name: str = "", last_name: str = "") -> Dict[str, Any]:
+    def create_user(
+        self, email: str, username: str, password: str, first_name: str = "", last_name: str = ""
+    ) -> Dict[str, Any]:
         """Create new user account with validation."""
 
         # Validate input
@@ -151,9 +166,7 @@ class AuthManager:
 
         try:
             # Check if user already exists
-            existing_user = db.query(User).filter(
-                (User.email == email) | (User.username == username)
-            ).first()
+            existing_user = db.query(User).filter((User.email == email) | (User.username == username)).first()
 
             if existing_user:
                 return {"success": False, "error": "User with this email or username already exists"}
@@ -168,7 +181,7 @@ class AuthManager:
                 password_hash=password_hash,
                 first_name=first_name,
                 last_name=last_name,
-                verification_token=verification_token
+                verification_token=verification_token,
             )
 
             db.add(new_user)
@@ -184,7 +197,7 @@ class AuthManager:
                 "success": True,
                 "user_id": new_user.id,
                 "message": "User created successfully",
-                "verification_token": verification_token
+                "verification_token": verification_token,
             }
 
         except Exception as e:
@@ -194,8 +207,9 @@ class AuthManager:
         finally:
             db.close()
 
-    def authenticate_user(self, email: str, password: str, ip_address: str = "",
-                          user_agent: str = "") -> Dict[str, Any]:
+    def authenticate_user(
+        self, email: str, password: str, ip_address: str = "", user_agent: str = ""
+    ) -> Dict[str, Any]:
         """Authenticate user and create session."""
 
         db = self.SessionLocal()
@@ -237,7 +251,7 @@ class AuthManager:
                 "username": user.username,
                 "email": user.email,
                 "exp": datetime.utcnow() + timedelta(hours=24),
-                "iat": datetime.utcnow()
+                "iat": datetime.utcnow(),
             }
 
             token = jwt.encode(token_payload, self.secret_key, algorithm="HS256")
@@ -251,7 +265,7 @@ class AuthManager:
                 token_hash=token_hash,
                 expires_at=expires_at,
                 ip_address=ip_address,
-                user_agent=user_agent
+                user_agent=user_agent,
             )
 
             db.add(new_session)
@@ -266,8 +280,8 @@ class AuthManager:
                     "id": user.id,
                     "username": user.username,
                     "email": user.email,
-                    "email_verified": bool(user.email_verified)
-                }
+                    "email_verified": bool(user.email_verified),
+                },
             }
 
         except Exception as e:
@@ -285,11 +299,15 @@ class AuthManager:
             db = self.SessionLocal()
 
             try:
-                session = db.query(UserSession).filter(
-                    UserSession.user_id == payload["user_id"],
-                    UserSession.expires_at > datetime.now(),
-                    UserSession.is_active == True
-                ).first()
+                session = (
+                    db.query(UserSession)
+                    .filter(
+                        UserSession.user_id == payload["user_id"],
+                        UserSession.expires_at > datetime.now(),
+                        UserSession.is_active == True,
+                    )
+                    .first()
+                )
 
                 if not session:
                     return None
@@ -330,11 +348,15 @@ class AuthManager:
                 return {"error": "User not found"}
 
             # Get active sessions count
-            active_sessions = db.query(UserSession).filter(
-                UserSession.user_id == user_id,
-                UserSession.expires_at > datetime.now(),
-                UserSession.is_active == True
-            ).count()
+            active_sessions = (
+                db.query(UserSession)
+                .filter(
+                    UserSession.user_id == user_id,
+                    UserSession.expires_at > datetime.now(),
+                    UserSession.is_active == True,
+                )
+                .count()
+            )
 
             # Get or create preferences
             prefs = user.preferences
@@ -360,8 +382,8 @@ class AuthManager:
                     "marketing_emails": bool(prefs.marketing_emails),
                     "dashboard_layout": prefs.dashboard_layout,
                     "timezone": prefs.timezone,
-                    "language": prefs.language
-                }
+                    "language": prefs.language,
+                },
             }
 
         except Exception as e:
@@ -381,8 +403,7 @@ class AuthManager:
         try:
             # Deactivate all sessions for this user
             db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"],
-                UserSession.is_active == True
+                UserSession.user_id == payload["user_id"], UserSession.is_active == True
             ).update({"is_active": False})
 
             db.commit()
@@ -395,5 +416,17 @@ class AuthManager:
             db.close()
 
 
-# Initialize authentication manager
-auth_manager = AuthManager()
+# Global auth manager instance (lazy initialization)
+_auth_manager = None
+
+
+def get_auth_manager():
+    """Get or create the global auth manager instance."""
+    global _auth_manager
+    if _auth_manager is None:
+        _auth_manager = AuthManager()
+    return _auth_manager
+
+
+# For backward compatibility
+auth_manager = None  # Will be initialized when needed

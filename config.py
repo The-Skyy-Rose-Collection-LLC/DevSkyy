@@ -1,9 +1,10 @@
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 """
 Production Configuration for The Skyy Rose Collection Platform
 """
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,16 +12,20 @@ load_dotenv()
 
 class Config:
     """Base configuration."""
+ cursor/fix-bugs-and-optimize-codebase-5b3e
     SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32).hex()
+
+    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
+ main
     DEBUG = False
     TESTING = False
 
     # Database
-    DATABASE_URL = os.environ.get('DATABASE_URL') or 'sqlite:///app.db'
+    DATABASE_URL = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
 
     # API Keys
-    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-    STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY")
 
     # Brand Settings
     BRAND_NAME = "The Skyy Rose Collection"
@@ -36,6 +41,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development configuration."""
+
     DEBUG = True
     CORS_ORIGINS = ["*"]
     TRUSTED_HOSTS = ["*"]
@@ -43,6 +49,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     """Production configuration."""
+
     DEBUG = False
 
     # Enhanced security for production
@@ -53,14 +60,15 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     """Testing configuration."""
+
     TESTING = True
-    DATABASE_URL = 'sqlite:///:memory:'
+    DATABASE_URL = "sqlite:///:memory:"
 
 
 # Configuration mapping
 config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'testing': TestingConfig,
-    'default': DevelopmentConfig
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "testing": TestingConfig,
+    "default": DevelopmentConfig,
 }

@@ -1,6 +1,5 @@
-
-from typing import Dict, List, Any
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
 
 class MarketingAgent:
@@ -17,30 +16,29 @@ class MarketingAgent:
 
         for campaign in campaigns:
             metrics = self._calculate_campaign_metrics(campaign)
-            performance_data.append({
-                "campaign_id": campaign["id"],
-                "campaign_name": campaign["name"],
-                "engagement_rate": metrics["engagement_rate"],
-                "conversion_rate": metrics["conversion_rate"],
-                "roi": metrics["roi"],
-                "status": "PERFORMING" if metrics["engagement_rate"] > self.engagement_threshold else "UNDERPERFORMING"
-            })
+            performance_data.append(
+                {
+                    "campaign_id": campaign["id"],
+                    "campaign_name": campaign["name"],
+                    "engagement_rate": metrics["engagement_rate"],
+                    "conversion_rate": metrics["conversion_rate"],
+                    "roi": metrics["roi"],
+                    "status": (
+                        "PERFORMING" if metrics["engagement_rate"] > self.engagement_threshold else "UNDERPERFORMING"
+                    ),
+                }
+            )
 
         return {
             "campaigns": performance_data,
             "total_campaigns": len(campaigns),
-            "underperforming_count": len([c for c in performance_data if c["status"] == "UNDERPERFORMING"])
+            "underperforming_count": len([c for c in performance_data if c["status"] == "UNDERPERFORMING"]),
         }
 
     def segment_customers(self) -> Dict[str, Any]:
         """Segment customers for targeted marketing."""
         customers = self._fetch_customer_data()
-        segments = {
-            "high_value": [],
-            "frequent_buyers": [],
-            "at_risk": [],
-            "new_customers": []
-        }
+        segments = {"high_value": [], "frequent_buyers": [], "at_risk": [], "new_customers": []}
 
         for customer in customers:
             # High value customers (>$1000 lifetime value)
@@ -62,7 +60,7 @@ class MarketingAgent:
         return {
             "segments": {k: len(v) for k, v in segments.items()},
             "segment_details": segments,
-            "total_customers": len(customers)
+            "total_customers": len(customers),
         }
 
     def generate_personalized_offers(self, customer_segment: str) -> Dict[str, Any]:
@@ -72,26 +70,26 @@ class MarketingAgent:
                 "type": "VIP_EARLY_ACCESS",
                 "discount": 15,
                 "message": "Exclusive early access to our new collection + 15% off",
-                "urgency": "LIMITED_TIME"
+                "urgency": "LIMITED_TIME",
             },
             "frequent_buyers": {
                 "type": "LOYALTY_REWARD",
                 "discount": 20,
                 "message": "Thank you for being a loyal customer! Enjoy 20% off your next purchase",
-                "urgency": "EXPIRES_SOON"
+                "urgency": "EXPIRES_SOON",
             },
             "at_risk": {
                 "type": "WIN_BACK",
                 "discount": 25,
                 "message": "We miss you! Come back with 25% off + free shipping",
-                "urgency": "LIMITED_TIME"
+                "urgency": "LIMITED_TIME",
             },
             "new_customers": {
                 "type": "WELCOME_SERIES",
                 "discount": 10,
                 "message": "Welcome to Skyy Rose! Complete your look with 10% off",
-                "urgency": "NEW_CUSTOMER"
-            }
+                "urgency": "NEW_CUSTOMER",
+            },
         }
 
         return offers.get(customer_segment, offers["new_customers"])
@@ -105,24 +103,28 @@ class MarketingAgent:
             performance = self._get_channel_performance(channel)
 
             if performance["roas"] < 3.0:  # Return on Ad Spend below 3x
-                optimization_suggestions.append({
-                    "channel": channel,
-                    "current_roas": performance["roas"],
-                    "suggestion": "REDUCE_SPEND" if performance["roas"] < 2.0 else "OPTIMIZE_TARGETING",
-                    "recommended_action": f"Pause underperforming ads and reallocate budget"
-                })
+                optimization_suggestions.append(
+                    {
+                        "channel": channel,
+                        "current_roas": performance["roas"],
+                        "suggestion": "REDUCE_SPEND" if performance["roas"] < 2.0 else "OPTIMIZE_TARGETING",
+                        "recommended_action": f"Pause underperforming ads and reallocate budget",
+                    }
+                )
             elif performance["roas"] > 5.0:
-                optimization_suggestions.append({
-                    "channel": channel,
-                    "current_roas": performance["roas"],
-                    "suggestion": "INCREASE_SPEND",
-                    "recommended_action": f"Scale successful campaigns"
-                })
+                optimization_suggestions.append(
+                    {
+                        "channel": channel,
+                        "current_roas": performance["roas"],
+                        "suggestion": "INCREASE_SPEND",
+                        "recommended_action": f"Scale successful campaigns",
+                    }
+                )
 
         return {
             "optimization_suggestions": optimization_suggestions,
             "total_monthly_spend": 15000,  # Example spend
-            "recommended_reallocation": len(optimization_suggestions) > 0
+            "recommended_reallocation": len(optimization_suggestions) > 0,
         }
 
     def _fetch_active_campaigns(self) -> List[Dict]:
@@ -130,7 +132,7 @@ class MarketingAgent:
         return [
             {"id": "CAMP001", "name": "Holiday Collection 2024", "type": "email"},
             {"id": "CAMP002", "name": "Instagram Stories Ads", "type": "social"},
-            {"id": "CAMP003", "name": "Google Shopping Campaign", "type": "ppc"}
+            {"id": "CAMP003", "name": "Google Shopping Campaign", "type": "ppc"},
         ]
 
     def _calculate_campaign_metrics(self, campaign: Dict) -> Dict[str, float]:
@@ -139,7 +141,7 @@ class MarketingAgent:
         return {
             "engagement_rate": 0.045,  # 4.5%
             "conversion_rate": 0.025,  # 2.5%
-            "roi": 4.2  # 4.2x return on investment
+            "roi": 4.2,  # 4.2x return on investment
         }
 
     def _fetch_customer_data(self) -> List[Dict]:
@@ -151,7 +153,7 @@ class MarketingAgent:
                 "orders_6_months": 8,
                 "days_since_last_purchase": 15,
                 "days_since_first_purchase": 180,
-                "total_orders": 12
+                "total_orders": 12,
             },
             {
                 "id": "CUST002",
@@ -159,8 +161,8 @@ class MarketingAgent:
                 "orders_6_months": 2,
                 "days_since_last_purchase": 120,
                 "days_since_first_purchase": 365,
-                "total_orders": 5
-            }
+                "total_orders": 5,
+            },
         ]
 
     def _get_channel_performance(self, channel: str) -> Dict[str, float]:
@@ -170,7 +172,7 @@ class MarketingAgent:
             "facebook": {"roas": 4.2, "cpm": 8.50, "ctr": 1.8},
             "google": {"roas": 5.8, "cpm": 12.00, "ctr": 2.1},
             "instagram": {"roas": 3.1, "cpm": 9.75, "ctr": 1.5},
-            "tiktok": {"roas": 2.9, "cpm": 7.25, "ctr": 2.8}
+            "tiktok": {"roas": 2.9, "cpm": 7.25, "ctr": 2.8},
         }
 
         return performance_data.get(channel, {"roas": 3.0, "cpm": 10.0, "ctr": 1.5})
@@ -188,5 +190,6 @@ def optimize_marketing() -> Dict[str, Any]:
         "campaign_performance": campaign_performance,
         "customer_segments": customer_segments,
         "ad_optimization": ad_optimization,
-        "action_required": campaign_performance["underperforming_count"] > 0 or ad_optimization["recommended_reallocation"]
+        "action_required": campaign_performance["underperforming_count"] > 0
+        or ad_optimization["recommended_reallocation"],
     }

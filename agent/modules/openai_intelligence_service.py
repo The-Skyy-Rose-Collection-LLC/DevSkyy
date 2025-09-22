@@ -1,10 +1,11 @@
-import os
-import openai
 import asyncio
-import logging
-from typing import Dict, Any, List, Optional
-from datetime import datetime
 import json
+import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import openai
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ class OpenAIIntelligenceService:
     """OpenAI integration service for enhanced agent intelligence and decision making."""
 
     def __init__(self):
-        self.api_key = os.getenv('OPENAI_API_KEY')
+        self.api_key = os.getenv("OPENAI_API_KEY")
 
         if self.api_key:
             openai.api_key = self.api_key
@@ -49,11 +50,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a luxury brand copywriter specializing in high-end product descriptions that convert browsers into buyers."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a luxury brand copywriter specializing in high-end product descriptions that convert browsers into buyers.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=500,
-                temperature=0.7
+                temperature=0.7,
             )
 
             enhanced_description = response.choices[0].message.content
@@ -61,16 +65,16 @@ class OpenAIIntelligenceService:
             logger.info(f"✨ Enhanced product description created with OpenAI")
 
             return {
-                'enhanced_description': enhanced_description,
-                'original_description': product_data.get('description', ''),
-                'improvement_type': 'luxury_copywriting_enhancement',
-                'agent_responsible': 'openai_enhanced_content_agent',
-                'estimated_conversion_improvement': '+35%'
+                "enhanced_description": enhanced_description,
+                "original_description": product_data.get("description", ""),
+                "improvement_type": "luxury_copywriting_enhancement",
+                "agent_responsible": "openai_enhanced_content_agent",
+                "estimated_conversion_improvement": "+35%",
             }
 
         except Exception as e:
             logger.error(f"OpenAI product description enhancement failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def generate_luxury_content_strategy(self, site_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate AI-powered luxury content strategy."""
@@ -100,11 +104,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a luxury brand strategist and digital marketing expert specializing in high-end consumer brands."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a luxury brand strategist and digital marketing expert specializing in high-end consumer brands.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=1500,
-                temperature=0.6
+                temperature=0.6,
             )
 
             strategy = response.choices[0].message.content
@@ -112,16 +119,16 @@ class OpenAIIntelligenceService:
             logger.info("🎯 Luxury content strategy generated with OpenAI")
 
             return {
-                'content_strategy': strategy,
-                'strategy_type': 'ai_powered_luxury_strategy',
-                'implementation_priority': 'high',
-                'expected_roi': '+200%_brand_value_increase',
-                'agent_responsible': 'openai_enhanced_strategy_agent'
+                "content_strategy": strategy,
+                "strategy_type": "ai_powered_luxury_strategy",
+                "implementation_priority": "high",
+                "expected_roi": "+200%_brand_value_increase",
+                "agent_responsible": "openai_enhanced_strategy_agent",
             }
 
         except Exception as e:
             logger.error(f"Content strategy generation failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def optimize_page_content_for_seo(self, page_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to optimize page content for luxury SEO."""
@@ -150,11 +157,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are an SEO expert specializing in luxury brand optimization and high-end consumer search behavior."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are an SEO expert specializing in luxury brand optimization and high-end consumer search behavior.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=800,
-                temperature=0.5
+                temperature=0.5,
             )
 
             seo_optimization = response.choices[0].message.content
@@ -162,16 +172,16 @@ class OpenAIIntelligenceService:
             logger.info("🔍 SEO optimization completed with OpenAI")
 
             return {
-                'seo_optimization': seo_optimization,
-                'optimization_type': 'ai_powered_luxury_seo',
-                'expected_traffic_increase': '+150%',
-                'keyword_targeting': 'luxury_focused',
-                'agent_responsible': 'openai_enhanced_seo_agent'
+                "seo_optimization": seo_optimization,
+                "optimization_type": "ai_powered_luxury_seo",
+                "expected_traffic_increase": "+150%",
+                "keyword_targeting": "luxury_focused",
+                "agent_responsible": "openai_enhanced_seo_agent",
             }
 
         except Exception as e:
             logger.error(f"SEO optimization failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def analyze_competitor_strategy(self, competitor_data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze competitor strategies using OpenAI."""
@@ -199,11 +209,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a luxury brand strategist and competitive intelligence expert with deep knowledge of premium market dynamics."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a luxury brand strategist and competitive intelligence expert with deep knowledge of premium market dynamics.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=1200,
-                temperature=0.6
+                temperature=0.6,
             )
 
             competitive_analysis = response.choices[0].message.content
@@ -211,16 +224,16 @@ class OpenAIIntelligenceService:
             logger.info("🏆 Competitive analysis completed with OpenAI")
 
             return {
-                'competitive_analysis': competitive_analysis,
-                'analysis_type': 'ai_powered_competitive_intelligence',
-                'strategic_advantages_identified': 'multiple',
-                'implementation_priority': 'immediate',
-                'agent_responsible': 'openai_enhanced_intelligence_agent'
+                "competitive_analysis": competitive_analysis,
+                "analysis_type": "ai_powered_competitive_intelligence",
+                "strategic_advantages_identified": "multiple",
+                "implementation_priority": "immediate",
+                "agent_responsible": "openai_enhanced_intelligence_agent",
             }
 
         except Exception as e:
             logger.error(f"Competitive analysis failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def generate_luxury_email_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate luxury email campaign content."""
@@ -249,11 +262,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a luxury email marketing specialist who creates campaigns that achieve 40%+ open rates and high conversion for premium brands."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a luxury email marketing specialist who creates campaigns that achieve 40%+ open rates and high conversion for premium brands.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=1000,
-                temperature=0.7
+                temperature=0.7,
             )
 
             email_campaign = response.choices[0].message.content
@@ -261,16 +277,16 @@ class OpenAIIntelligenceService:
             logger.info("💌 Luxury email campaign generated with OpenAI")
 
             return {
-                'email_campaign': email_campaign,
-                'campaign_type': 'ai_powered_luxury_email',
-                'expected_open_rate': '45%+',
-                'expected_conversion_rate': '12%+',
-                'agent_responsible': 'openai_enhanced_email_agent'
+                "email_campaign": email_campaign,
+                "campaign_type": "ai_powered_luxury_email",
+                "expected_open_rate": "45%+",
+                "expected_conversion_rate": "12%+",
+                "agent_responsible": "openai_enhanced_email_agent",
             }
 
         except Exception as e:
             logger.error(f"Email campaign generation failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def create_luxury_social_media_content(self, content_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate luxury social media content."""
@@ -299,11 +315,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a luxury social media strategist who creates viral content for high-end brands with sophisticated audiences."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a luxury social media strategist who creates viral content for high-end brands with sophisticated audiences.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=800,
-                temperature=0.8
+                temperature=0.8,
             )
 
             social_content = response.choices[0].message.content
@@ -311,16 +330,16 @@ class OpenAIIntelligenceService:
             logger.info("📱 Luxury social media content generated with OpenAI")
 
             return {
-                'social_content': social_content,
-                'content_type': 'ai_powered_luxury_social',
-                'engagement_potential': 'high',
-                'brand_alignment': 'premium_positioning',
-                'agent_responsible': 'openai_enhanced_social_agent'
+                "social_content": social_content,
+                "content_type": "ai_powered_luxury_social",
+                "engagement_potential": "high",
+                "brand_alignment": "premium_positioning",
+                "agent_responsible": "openai_enhanced_social_agent",
             }
 
         except Exception as e:
             logger.error(f"Social media content generation failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def make_executive_business_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI for executive-level business decision making."""
@@ -350,11 +369,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a seasoned luxury brand CEO with 20+ years of experience in premium market strategy, known for making data-driven decisions that enhance brand prestige and profitability."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a seasoned luxury brand CEO with 20+ years of experience in premium market strategy, known for making data-driven decisions that enhance brand prestige and profitability.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=1200,
-                temperature=0.4
+                temperature=0.4,
             )
 
             business_decision = response.choices[0].message.content
@@ -362,16 +384,16 @@ class OpenAIIntelligenceService:
             logger.info("🎯 Executive business decision generated with OpenAI")
 
             return {
-                'executive_decision': business_decision,
-                'decision_type': 'ai_powered_executive_strategy',
-                'confidence_level': 'high',
-                'implementation_priority': decision_context.get('priority', 'high'),
-                'agent_responsible': 'openai_enhanced_executive_agent'
+                "executive_decision": business_decision,
+                "decision_type": "ai_powered_executive_strategy",
+                "confidence_level": "high",
+                "implementation_priority": decision_context.get("priority", "high"),
+                "agent_responsible": "openai_enhanced_executive_agent",
             }
 
         except Exception as e:
             logger.error(f"Executive decision making failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
 
     async def optimize_conversion_funnel(self, funnel_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to optimize luxury conversion funnels."""
@@ -401,11 +423,14 @@ class OpenAIIntelligenceService:
             response = self.client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a conversion rate optimization expert specializing in luxury e-commerce with deep understanding of affluent consumer behavior."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a conversion rate optimization expert specializing in luxury e-commerce with deep understanding of affluent consumer behavior.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=1000,
-                temperature=0.5
+                temperature=0.5,
             )
 
             funnel_optimization = response.choices[0].message.content
@@ -413,16 +438,17 @@ class OpenAIIntelligenceService:
             logger.info("🎯 Conversion funnel optimization completed with OpenAI")
 
             return {
-                'funnel_optimization': funnel_optimization,
-                'optimization_type': 'ai_powered_luxury_conversion',
-                'expected_improvement': '+40%_conversion_rate',
-                'implementation_complexity': 'moderate',
-                'agent_responsible': 'openai_enhanced_conversion_agent'
+                "funnel_optimization": funnel_optimization,
+                "optimization_type": "ai_powered_luxury_conversion",
+                "expected_improvement": "+40%_conversion_rate",
+                "implementation_complexity": "moderate",
+                "agent_responsible": "openai_enhanced_conversion_agent",
             }
 
         except Exception as e:
             logger.error(f"Conversion funnel optimization failed: {str(e)}")
-            return {'error': str(e)}
+            return {"error": str(e)}
+
 
 # Factory function
 
