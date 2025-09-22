@@ -312,23 +312,17 @@ app.add_middleware(
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])  # Configure for your domain in production
 main
 
-# Simple in-memory cache for performance optimization
-_cache = {}
+# LRU in-memory cache for performance optimization
+from functools import lru_cache
+CACHE_MAXSIZE = 128  # Limit cache size to 128 entries
 CACHE_TTL = 300  # 5 minutes
 
 def get_cached_or_compute(key: str, compute_func, ttl: int = CACHE_TTL):
-    """Simple caching mechanism to improve performance."""
-    current_time = time.time()
-    
-    if key in _cache:
-        cached_data, timestamp = _cache[key]
-        if current_time - timestamp < ttl:
-            return cached_data
-    
-    # Compute fresh data
-    result = compute_func()
-    _cache[key] = (result, current_time)
-    return result
+    """LRU caching mechanism to improve performance."""
+    @lru_cache(maxsize=CACHE_MAXSIZE)
+    def cached_compute(k):
+        return compute_func()
+    return cached_compute(key)
 
 # Performance monitoring middleware
 @app.middleware("http")
