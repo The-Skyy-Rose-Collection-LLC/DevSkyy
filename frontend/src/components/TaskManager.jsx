@@ -1,63 +1,77 @@
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import TaskCard from './TaskCard'
-import CreateTaskModal from './CreateTaskModal'
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import TaskCard from './TaskCard';
+import CreateTaskModal from './CreateTaskModal';
 
-const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) => {
-  const [selectedTask, setSelectedTask] = useState(null)
-  const [filterBy, setFilterBy] = useState('all') // all, urgent, high, medium, low
-  const [sortBy, setSortBy] = useState('priority') // priority, risk, created
-  const [showCreateModal, setShowCreateModal] = useState(false)
+const TaskManager = ({
+  tasks,
+  loading,
+  onTaskUpdate,
+  onCreateTask,
+  onRefresh,
+}) => {
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [filterBy, setFilterBy] = useState('all'); // all, urgent, high, medium, low
+  const [sortBy, setSortBy] = useState('priority'); // priority, risk, created
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getFilteredAndSortedTasks = () => {
-    if (!tasks) return []
+    if (!tasks) return [];
 
-    let filtered = [...tasks]
+    let filtered = [...tasks];
 
     // Apply filters
     if (filterBy !== 'all') {
       filtered = filtered.filter(task => {
-        if (filterBy === 'urgent') return task.priority === 'urgent'
-        if (filterBy === 'high') return task.priority === 'high' || task.risk_level === 'high'
-        if (filterBy === 'medium') return task.priority === 'medium' || task.risk_level === 'medium'
-        if (filterBy === 'low') return task.priority === 'low' || task.risk_level === 'low'
-        return true
-      })
+        if (filterBy === 'urgent') return task.priority === 'urgent';
+        if (filterBy === 'high')
+          return task.priority === 'high' || task.risk_level === 'high';
+        if (filterBy === 'medium')
+          return task.priority === 'medium' || task.risk_level === 'medium';
+        if (filterBy === 'low')
+          return task.priority === 'low' || task.risk_level === 'low';
+        return true;
+      });
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       if (sortBy === 'priority') {
-        const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 }
-        return priorityOrder[b.priority] - priorityOrder[a.priority]
+        const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
       }
       if (sortBy === 'risk') {
-        const riskOrder = { critical: 4, high: 3, medium: 2, low: 1 }
-        return riskOrder[b.risk_level] - riskOrder[a.risk_level]
+        const riskOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+        return riskOrder[b.risk_level] - riskOrder[a.risk_level];
       }
       if (sortBy === 'created') {
-        return new Date(b.created_at || Date.now()) - new Date(a.created_at || Date.now())
+        return (
+          new Date(b.created_at || Date.now()) -
+          new Date(a.created_at || Date.now())
+        );
       }
-      return 0
-    })
+      return 0;
+    });
 
-    return filtered
-  }
+    return filtered;
+  };
 
-  const filteredTasks = getFilteredAndSortedTasks()
+  const filteredTasks = getFilteredAndSortedTasks();
 
   const getTaskStats = () => {
-    if (!tasks) return { total: 0, urgent: 0, high_risk: 0, completed: 0 }
-    
+    if (!tasks) return { total: 0, urgent: 0, high_risk: 0, completed: 0 };
+
     return {
       total: tasks.length,
       urgent: tasks.filter(t => t.priority === 'urgent').length,
-      high_risk: tasks.filter(t => t.risk_level === 'high' || t.risk_level === 'critical').length,
-      completed: tasks.filter(t => t.status === 'completed').length
-    }
-  }
+      high_risk: tasks.filter(
+        t => t.risk_level === 'high' || t.risk_level === 'critical'
+      ).length,
+      completed: tasks.filter(t => t.status === 'completed').length,
+    };
+  };
 
-  const stats = getTaskStats()
+  const stats = getTaskStats();
 
   if (loading) {
     return (
@@ -68,10 +82,12 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
           animate={{ opacity: 1 }}
         >
           <div className="w-16 h-16 border-4 border-luxury-gold border-t-rose-gold rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-gray-600 font-elegant">Organizing your luxury task atelier...</p>
+          <p className="text-gray-600 font-elegant">
+            Organizing your luxury task atelier...
+          </p>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
@@ -87,7 +103,8 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
           Task Atelier
         </h2>
         <p className="text-gray-600 text-lg font-elegant max-w-2xl mx-auto">
-          Your curated collection of high-priority tasks, expertly organized by risk and impact to ensure your luxury brand maintains its excellence.
+          Your curated collection of high-priority tasks, expertly organized by
+          risk and impact to ensure your luxury brand maintains its excellence.
         </p>
       </motion.div>
 
@@ -99,10 +116,30 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
         transition={{ duration: 0.6, delay: 0.1 }}
       >
         {[
-          { label: 'Total Tasks', value: stats.total, color: 'bg-rose-gold', icon: '📋' },
-          { label: 'Urgent', value: stats.urgent, color: 'bg-red-500', icon: '🚨' },
-          { label: 'High Risk', value: stats.high_risk, color: 'bg-orange-500', icon: '⚠️' },
-          { label: 'Completed', value: stats.completed, color: 'bg-green-500', icon: '✅' }
+          {
+            label: 'Total Tasks',
+            value: stats.total,
+            color: 'bg-rose-gold',
+            icon: '📋',
+          },
+          {
+            label: 'Urgent',
+            value: stats.urgent,
+            color: 'bg-red-500',
+            icon: '🚨',
+          },
+          {
+            label: 'High Risk',
+            value: stats.high_risk,
+            color: 'bg-orange-500',
+            icon: '⚠️',
+          },
+          {
+            label: 'Completed',
+            value: stats.completed,
+            color: 'bg-green-500',
+            icon: '✅',
+          },
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -111,10 +148,14 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center text-white text-xl mx-auto mb-3 shadow-elegant`}>
+            <div
+              className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center text-white text-xl mx-auto mb-3 shadow-elegant`}
+            >
               {stat.icon}
             </div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{stat.value}</div>
+            <div className="text-3xl font-bold text-gray-800 mb-1">
+              {stat.value}
+            </div>
             <div className="text-sm text-gray-600">{stat.label}</div>
           </motion.div>
         ))}
@@ -134,8 +175,8 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
             { id: 'urgent', label: 'Urgent', icon: '🚨' },
             { id: 'high', label: 'High Priority', icon: '⚠️' },
             { id: 'medium', label: 'Medium', icon: '📊' },
-            { id: 'low', label: 'Low', icon: '📝' }
-          ].map((filter) => (
+            { id: 'low', label: 'Low', icon: '📝' },
+          ].map(filter => (
             <button
               key={filter.id}
               className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
@@ -156,7 +197,7 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
           {/* Sort Dropdown */}
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={e => setSortBy(e.target.value)}
             className="px-4 py-2 bg-white/90 border border-rose-gold/30 rounded-lg font-medium text-gray-700 focus:ring-2 focus:ring-luxury-gold focus:border-luxury-gold transition-all duration-300"
           >
             <option value="priority">Sort by Priority</option>
@@ -193,30 +234,30 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
               visible: {
                 opacity: 1,
                 transition: {
-                  staggerChildren: 0.1
-                }
-              }
+                  staggerChildren: 0.1,
+                },
+              },
             }}
           >
-            {filteredTasks.map((task, index) => (
+            {filteredTasks.map((task, _index) => (
               <motion.div
                 key={task.id}
                 variants={{
                   hidden: { opacity: 0, y: 30, scale: 0.9 },
-                  visible: { 
-                    opacity: 1, 
-                    y: 0, 
+                  visible: {
+                    opacity: 1,
+                    y: 0,
                     scale: 1,
                     transition: {
                       duration: 0.4,
-                      ease: "easeOut"
-                    }
-                  }
+                      ease: 'easeOut',
+                    },
+                  },
                 }}
               >
                 <TaskCard
                   task={task}
-                  onUpdate={(updates) => onTaskUpdate(task.id, updates)}
+                  onUpdate={updates => onTaskUpdate(task.id, updates)}
                   onClick={() => setSelectedTask(task)}
                 />
               </motion.div>
@@ -233,7 +274,8 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
               No Tasks Found
             </h3>
             <p className="text-gray-500 mb-6">
-              Your atelier is pristine! Create a new task or adjust your filters.
+              Your atelier is pristine! Create a new task or adjust your
+              filters.
             </p>
             <button
               className="luxury-button"
@@ -267,11 +309,11 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <TaskCard
               task={selectedTask}
-              onUpdate={(updates) => onTaskUpdate(selectedTask.id, updates)}
+              onUpdate={updates => onTaskUpdate(selectedTask.id, updates)}
               isExpanded={true}
               showDetails={true}
             />
@@ -279,7 +321,7 @@ const TaskManager = ({ tasks, loading, onTaskUpdate, onCreateTask, onRefresh }) 
         </motion.div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TaskManager
+export default TaskManager;

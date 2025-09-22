@@ -1,162 +1,175 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_BACKEND_URL || '/api'
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.REACT_APP_BACKEND_URL ||
+  '/api';
 
 const WordPressConnection = () => {
-  const [connectionStatus, setConnectionStatus] = useState('disconnected')
-  const [authUrl, setAuthUrl] = useState('')
-  const [siteInfo, setSiteInfo] = useState(null)
-  const [agentStatus, setAgentStatus] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const [, setAuthUrl] = useState('');
+  const [siteInfo, setSiteInfo] = useState(null);
+  const [, setAgentStatus] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    checkConnectionStatus()
-  }, [])
+    checkConnectionStatus();
+  }, []);
 
   const checkConnectionStatus = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/wordpress/site/info`)
+      const response = await axios.get(`${API_BASE_URL}/wordpress/site/info`);
       if (response.data.site_info && !response.data.site_info.error) {
-        setConnectionStatus('connected')
-        setSiteInfo(response.data.site_info)
-        setAgentStatus(response.data.performance_monitoring)
+        setConnectionStatus('connected');
+        setSiteInfo(response.data.site_info);
+        setAgentStatus(response.data.performance_monitoring);
       }
-    } catch (error) {
+    } catch {
       // Not connected yet
-      setConnectionStatus('disconnected')
+      setConnectionStatus('disconnected');
     }
-  }
+  };
 
   const connectDirectly = async () => {
-    setLoading(true)
-    setError('')
-    
+    setLoading(true);
+    setError('');
+
     try {
       // Use the bulletproof endpoint that never fails
-      const response = await axios.post(`${API_BASE_URL}/wordpress/connect-direct`)
-      
+      const response = await axios.post(
+        `${API_BASE_URL}/wordpress/connect-direct`
+      );
+
       // With bulletproof system, always treat as success
-      setConnectionStatus('connected')
-      setSiteInfo(response.data.site_info || {
-        site_name: 'skyyrose.co',
-        site_url: 'https://skyyrose.co',
-        site_id: 'luxury-001',
-        is_wpcom: false
-      })
-      setAgentStatus(response.data.agents_status || {})
-      
+      setConnectionStatus('connected');
+      setSiteInfo(
+        response.data.site_info || {
+          site_name: 'skyyrose.co',
+          site_url: 'https://skyyrose.co',
+          site_id: 'luxury-001',
+          is_wpcom: false,
+        }
+      );
+      setAgentStatus(response.data.agents_status || {});
+
       // Also try GOD MODE Level 2
       try {
-        const serverResponse = await axios.post(`${API_BASE_URL}/wordpress/server-access`)
+        const serverResponse = await axios.post(
+          `${API_BASE_URL}/wordpress/server-access`
+        );
         if (serverResponse.data.god_mode_level >= 2) {
           setSiteInfo(prevInfo => ({
             ...prevInfo,
             god_mode_level: serverResponse.data.god_mode_level,
-            server_access: true
-          }))
+            server_access: true,
+          }));
         }
-      } catch (serverError) {
+        } catch {
         // Continue with regular connection
       }
-      
+
       // Show success message
-      alert(`🎉 skyyrose.co connected successfully! Your luxury agents are now working.`)
-      
+      alert(
+        `🎉 skyyrose.co connected successfully! Your luxury agents are now working.`
+      );
     } catch (error) {
-      console.error('Connection error:', error)
-      
+      console.error('Connection error:', error);
+
       // Bulletproof fallback - never show error to user
-      setConnectionStatus('connected')
+      setConnectionStatus('connected');
       setSiteInfo({
         site_name: 'skyyrose.co',
         site_url: 'https://skyyrose.co',
         site_id: 'luxury-001',
         is_wpcom: false,
-        guaranteed_connection: true
-      })
+        guaranteed_connection: true,
+      });
       setAgentStatus({
         design_agent: 'active',
         performance_agent: 'monitoring',
         wordpress_specialist: 'working',
-        brand_intelligence: 'analyzing'
-      })
-      
+        brand_intelligence: 'analyzing',
+      });
+
       // Show bulletproof success message
       alert(`🎉 skyyrose.co connected successfully! Your luxury agents are now working.
       
 🎨 Design automation agent monitoring
 ⚡ Performance optimization active  
 👑 Brand intelligence ensuring consistency
-🌐 WordPress management operational`)
-      
+🌐 WordPress management operational`);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getAuthUrl = async () => {
     try {
-      setLoading(true)
-      setError('')
-      
-      const response = await axios.get(`${API_BASE_URL}/wordpress/auth-url`)
-      setAuthUrl(response.data.auth_url)
-      
+      setLoading(true);
+
+      const response = await axios.get(`${API_BASE_URL}/wordpress/auth-url`);
+      setAuthUrl(response.data.auth_url);
+
       // Open WordPress authorization in new window
       const authWindow = window.open(
         response.data.auth_url,
         'wordpress_auth',
         'width=600,height=700,scrollbars=yes,resizable=yes'
-      )
-      
+      );
+
       // Listen for the auth completion
       const checkClosed = setInterval(() => {
         if (authWindow.closed) {
-          clearInterval(checkClosed)
+          clearInterval(checkClosed);
           // Check if connection was successful
           setTimeout(() => {
-            checkConnectionStatus()
-          }, 2000)
+            checkConnectionStatus();
+          }, 2000);
         }
-      }, 1000)
-      
+      }, 1000);
     } catch (error) {
-      setError('Failed to get authorization URL')
-      console.error('Auth URL error:', error)
+      console.error('Auth URL error:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const createCollectionPage = async (collectionType) => {
+  const createCollectionPage = async collectionType => {
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       const collectionData = {
         title: `Luxury ${collectionType.replace('_', ' ')} Collection`,
         collection_type: collectionType,
-        description: 'Exclusive luxury collection featuring premium items crafted for discerning customers.',
-        featured_image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
-        hero_image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200'
-      }
-      
-      const response = await axios.post(`${API_BASE_URL}/wordpress/collection/create`, collectionData)
-      
+        description:
+          'Exclusive luxury collection featuring premium items crafted for discerning customers.',
+        featured_image:
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
+        hero_image:
+          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200',
+      };
+
+      const response = await axios.post(
+        `${API_BASE_URL}/wordpress/collection/create`,
+        collectionData
+      );
+
       if (response.data.collection_created.status === 'success') {
         // Show success message
-        alert(`✅ Collection page created successfully!\nURL: ${response.data.page_url}`)
+        alert(
+          `✅ Collection page created successfully!\nURL: ${response.data.page_url}`
+        );
       }
-      
     } catch (error) {
-      console.error('Collection creation failed:', error)
-      alert('❌ Failed to create collection page. Please try again.')
+      console.error('Collection creation failed:', error);
+      alert('❌ Failed to create collection page. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-8">
@@ -171,15 +184,17 @@ const WordPressConnection = () => {
           WordPress Site Connection
         </h2>
         <p className="text-gray-600 text-lg font-elegant max-w-3xl mx-auto">
-          Connect your WordPress site using our secure direct connection method to activate your 4 specialized luxury agents for 24/7 optimization and brand enhancement.
+          Connect your WordPress site using our secure direct connection method
+          to activate your 4 specialized luxury agents for 24/7 optimization and
+          brand enhancement.
         </p>
       </motion.div>
 
       {/* Connection Status */}
       <motion.div
         className={`rounded-3xl p-8 border-2 ${
-          connectionStatus === 'connected' 
-            ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200' 
+          connectionStatus === 'connected'
+            ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200'
             : 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200'
         }`}
         initial={{ opacity: 0, scale: 0.95 }}
@@ -187,30 +202,39 @@ const WordPressConnection = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="text-center">
-          <div className={`text-6xl mb-4 ${
-            connectionStatus === 'connected' ? 'text-emerald-500' : 'text-orange-500'
-          }`}>
+          <div
+            className={`text-6xl mb-4 ${
+              connectionStatus === 'connected'
+                ? 'text-emerald-500'
+                : 'text-orange-500'
+            }`}
+          >
             {connectionStatus === 'connected' ? '✅' : '🔗'}
           </div>
-          
-          <h3 className={`text-2xl font-fashion font-semibold mb-3 ${
-            connectionStatus === 'connected' ? 'text-emerald-700' : 'text-orange-700'
-          }`}>
-            {connectionStatus === 'connected' 
-              ? 'WordPress Site Connected!' 
-              : 'Connect Your WordPress Site'
-            }
+
+          <h3
+            className={`text-2xl font-fashion font-semibold mb-3 ${
+              connectionStatus === 'connected'
+                ? 'text-emerald-700'
+                : 'text-orange-700'
+            }`}
+          >
+            {connectionStatus === 'connected'
+              ? 'WordPress Site Connected!'
+              : 'Connect Your WordPress Site'}
           </h3>
-          
+
           {connectionStatus === 'connected' ? (
             <div className="space-y-4">
               <p className="text-emerald-600 text-lg">
                 🎉 Your luxury agents are now actively working on your site!
               </p>
-              
+
               {siteInfo && (
                 <div className="bg-white rounded-2xl p-6 mt-6">
-                  <h4 className="font-semibold text-gray-800 mb-4">Connected Site Information</h4>
+                  <h4 className="font-semibold text-gray-800 mb-4">
+                    Connected Site Information
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                     <div>
                       <span className="text-gray-600">Site Name:</span>
@@ -219,7 +243,11 @@ const WordPressConnection = () => {
                     <div>
                       <span className="text-gray-600">Site URL:</span>
                       <div className="font-medium text-blue-600">
-                        <a href={siteInfo.site_url} target="_blank" rel="noopener noreferrer">
+                        <a
+                          href={siteInfo.site_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           {siteInfo.site_url}
                         </a>
                       </div>
@@ -230,7 +258,9 @@ const WordPressConnection = () => {
                     </div>
                     <div>
                       <span className="text-gray-600">WordPress.com:</span>
-                      <div className="font-medium">{siteInfo.is_wpcom ? 'Yes' : 'No'}</div>
+                      <div className="font-medium">
+                        {siteInfo.is_wpcom ? 'Yes' : 'No'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -241,7 +271,7 @@ const WordPressConnection = () => {
               <p className="text-orange-600 text-lg">
                 Connect your WordPress site to activate your luxury brand agents
               </p>
-              
+
               {/* Direct Connection - Primary Method */}
               <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-200">
                 <div className="text-center space-y-4">
@@ -249,7 +279,8 @@ const WordPressConnection = () => {
                     ⚡ <span>Direct Connection (Recommended)</span>
                   </div>
                   <p className="text-emerald-700 text-sm">
-                    Instant secure connection using your WordPress application password. No redirects needed!
+                    Instant secure connection using your WordPress application
+                    password. No redirects needed!
                   </p>
                   <button
                     className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105"
@@ -282,7 +313,9 @@ const WordPressConnection = () => {
                     {loading ? 'Loading...' : 'Try OAuth (Less Reliable)'}
                   </button>
                   <p className="text-xs text-gray-400">
-                    ⚠️ Warning: OAuth method may experience connection issues. Direct connection is strongly preferred for reliable results.
+                    ⚠️ Warning: OAuth method may experience connection issues.
+                    Direct connection is strongly preferred for reliable
+                    results.
                   </p>
                 </div>
               </div>
@@ -301,8 +334,8 @@ const WordPressConnection = () => {
             hidden: { opacity: 0 },
             visible: {
               opacity: 1,
-              transition: { staggerChildren: 0.1 }
-            }
+              transition: { staggerChildren: 0.1 },
+            },
           }}
         >
           {[
@@ -314,8 +347,8 @@ const WordPressConnection = () => {
                 'Divi Theme Optimization',
                 'Luxury Color Schemes',
                 'Mobile Responsiveness',
-                'Brand Consistency'
-              ]
+                'Brand Consistency',
+              ],
             },
             {
               name: 'Performance Agent',
@@ -325,8 +358,8 @@ const WordPressConnection = () => {
                 'Speed Optimization',
                 'Image Compression',
                 'Caching Management',
-                'Core Web Vitals'
-              ]
+                'Core Web Vitals',
+              ],
             },
             {
               name: 'WordPress Specialist',
@@ -336,8 +369,8 @@ const WordPressConnection = () => {
                 'Content Management',
                 'Plugin Optimization',
                 'Security Enhancement',
-                'Database Cleanup'
-              ]
+                'Database Cleanup',
+              ],
             },
             {
               name: 'Brand Intelligence',
@@ -347,16 +380,16 @@ const WordPressConnection = () => {
                 'Brand Guidelines',
                 'Content Strategy',
                 'Market Analysis',
-                'Luxury Positioning'
-              ]
-            }
+                'Luxury Positioning',
+              ],
+            },
           ].map((agent, index) => (
             <motion.div
               key={index}
               className="bg-white rounded-3xl p-6 shadow-luxury border border-gray-100 hover:shadow-gold-glow transition-all duration-300"
               variants={{
                 hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0 }
+                visible: { opacity: 1, y: 0 },
               }}
             >
               <div className="text-center mb-4">
@@ -370,9 +403,14 @@ const WordPressConnection = () => {
               </div>
 
               <div className="space-y-2">
-                <h5 className="text-sm font-medium text-gray-700">Capabilities:</h5>
+                <h5 className="text-sm font-medium text-gray-700">
+                  Capabilities:
+                </h5>
                 {agent.capabilities.map((capability, capIndex) => (
-                  <div key={capIndex} className="text-xs text-gray-600 bg-gray-50 rounded-lg p-2">
+                  <div
+                    key={capIndex}
+                    className="text-xs text-gray-600 bg-gray-50 rounded-lg p-2"
+                  >
                     • {capability}
                   </div>
                 ))}
@@ -394,36 +432,39 @@ const WordPressConnection = () => {
             Create Luxury Collection Pages
           </h3>
           <p className="text-gray-600 text-center mb-8">
-            Let your agents create high-converting collection pages with luxury aesthetics and Divi optimization.
+            Let your agents create high-converting collection pages with luxury
+            aesthetics and Divi optimization.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { 
-                type: 'rose_gold_collection', 
-                name: 'Rose Gold Elegance', 
+              {
+                type: 'rose_gold_collection',
+                name: 'Rose Gold Elegance',
                 color: 'from-pink-400 to-rose-400',
-                description: 'Timeless elegance meets modern sophistication'
+                description: 'Timeless elegance meets modern sophistication',
               },
-              { 
-                type: 'luxury_gold_collection', 
-                name: 'Luxury Gold Statement', 
+              {
+                type: 'luxury_gold_collection',
+                name: 'Luxury Gold Statement',
                 color: 'from-yellow-400 to-amber-400',
-                description: 'Bold statements for discerning connoisseurs'
+                description: 'Bold statements for discerning connoisseurs',
               },
-              { 
-                type: 'elegant_silver_collection', 
-                name: 'Elegant Silver', 
+              {
+                type: 'elegant_silver_collection',
+                name: 'Elegant Silver',
                 color: 'from-gray-400 to-slate-400',
-                description: 'Refined elegance for modern luxury lifestyle'
-              }
-            ].map((collection) => (
+                description: 'Refined elegance for modern luxury lifestyle',
+              },
+            ].map(collection => (
               <motion.div
                 key={collection.type}
                 className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300"
                 whileHover={{ scale: 1.02 }}
               >
-                <div className={`w-full h-32 bg-gradient-to-r ${collection.color} rounded-xl mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
+                <div
+                  className={`w-full h-32 bg-gradient-to-r ${collection.color} rounded-xl mb-4 flex items-center justify-center text-white text-2xl font-bold`}
+                >
                   {collection.name.split(' ')[0]}
                 </div>
                 <h4 className="font-fashion font-semibold text-gray-800 mb-2">
@@ -454,7 +495,9 @@ const WordPressConnection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <div className="text-red-600 font-medium mb-2">Connection Error</div>
+            <div className="text-red-600 font-medium mb-2">
+              Connection Error
+            </div>
             <div className="text-red-500 text-sm">{error}</div>
             <button
               className="mt-4 px-6 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
@@ -466,7 +509,7 @@ const WordPressConnection = () => {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+  );
+};
 
-export default WordPressConnection
+export default WordPressConnection;

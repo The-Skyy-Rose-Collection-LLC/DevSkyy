@@ -1,30 +1,31 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import AgentCard from './AgentCard'
-import IntegrationDashboard from './IntegrationDashboard'
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import AgentCard from './AgentCard';
+import IntegrationDashboard from './IntegrationDashboard';
 
 const AgentDashboard = ({ agents, loading, onRefresh }) => {
-  const [selectedAgent, setSelectedAgent] = useState(null)
-  const [showIntegrations, setShowIntegrations] = useState(false)
-  const [selectedAgentForIntegration, setSelectedAgentForIntegration] = useState(null)
-  const [filterBy, setFilterBy] = useState('all') // all, high_performance, needs_attention
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [showIntegrations, setShowIntegrations] = useState(false);
+  const [selectedAgentForIntegration, setSelectedAgentForIntegration] =
+    useState(null);
+  const [filterBy, setFilterBy] = useState('all'); // all, high_performance, needs_attention
 
   const getFilteredAgents = () => {
-    if (!agents) return []
-    
-    const agentList = Object.entries(agents)
-    
+    if (!agents) return [];
+
+    const agentList = Object.entries(agents);
+
     switch (filterBy) {
       case 'high_performance':
-        return agentList.filter(([_, agent]) => agent.health > 95)
+        return agentList.filter(([_, agent]) => agent.health > 95);
       case 'needs_attention':
-        return agentList.filter(([_, agent]) => agent.health < 90)
+        return agentList.filter(([_, agent]) => agent.health < 90);
       default:
-        return agentList
+        return agentList;
     }
-  }
+  };
 
-  const filteredAgents = getFilteredAgents()
+  const filteredAgents = getFilteredAgents();
 
   if (loading) {
     return (
@@ -35,10 +36,12 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           animate={{ opacity: 1 }}
         >
           <div className="w-16 h-16 border-4 border-rose-gold border-t-luxury-gold rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-gray-600 font-elegant">Consulting with Fashion Gurus...</p>
+          <p className="text-gray-600 font-elegant">
+            Consulting with Fashion Gurus...
+          </p>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
@@ -54,7 +57,9 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           Fashion Guru Collective
         </h2>
         <p className="text-gray-600 text-lg font-elegant max-w-2xl mx-auto">
-          Meet your elite team of AI fashion specialists, each expertly crafted to elevate your luxury e-commerce experience with unmatched sophistication and style.
+          Meet your elite team of AI fashion specialists, each expertly crafted
+          to elevate your luxury e-commerce experience with unmatched
+          sophistication and style.
         </p>
       </motion.div>
 
@@ -69,8 +74,8 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           {[
             { id: 'all', label: 'All Gurus', icon: '👑' },
             { id: 'high_performance', label: 'Star Performers', icon: '⭐' },
-            { id: 'needs_attention', label: 'Needs Attention', icon: '🎯' }
-          ].map((filter) => (
+            { id: 'needs_attention', label: 'Needs Attention', icon: '🎯' },
+          ].map(filter => (
             <button
               key={filter.id}
               className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
@@ -86,10 +91,7 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           ))}
         </div>
 
-        <button
-          className="luxury-button"
-          onClick={onRefresh}
-        >
+        <button className="luxury-button" onClick={onRefresh}>
           <span className="mr-2">🔄</span>
           Refresh Gallery
         </button>
@@ -105,37 +107,37 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
           visible: {
             opacity: 1,
             transition: {
-              staggerChildren: 0.1
-            }
-          }
+              staggerChildren: 0.1,
+            },
+          },
         }}
       >
-        {filteredAgents.map(([agentId, agentData], index) => (
+        {filteredAgents.map(([agentId, agentData], _index) => (
           <motion.div
             key={agentId}
             variants={{
               hidden: { opacity: 0, y: 30, scale: 0.9 },
-              visible: { 
-                opacity: 1, 
-                y: 0, 
+              visible: {
+                opacity: 1,
+                y: 0,
                 scale: 1,
                 transition: {
                   duration: 0.5,
-                  ease: "easeOut"
-                }
-              }
+                  ease: 'easeOut',
+                },
+              },
             }}
           >
             <AgentCard
               agentId={agentId}
               agentData={agentData}
               isSelected={selectedAgent === agentId}
-              onClick={(action) => {
+              onClick={action => {
                 if (action === 'integrations') {
-                  setSelectedAgentForIntegration(agentId)
-                  setShowIntegrations(true)
+                  setSelectedAgentForIntegration(agentId);
+                  setShowIntegrations(true);
                 } else {
-                  setSelectedAgent(selectedAgent === agentId ? null : agentId)
+                  setSelectedAgent(selectedAgent === agentId ? null : agentId);
                 }
               }}
             />
@@ -174,7 +176,7 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <AgentCard
               agentId={selectedAgent}
@@ -191,13 +193,13 @@ const AgentDashboard = ({ agents, loading, onRefresh }) => {
         <IntegrationDashboard
           selectedAgent={selectedAgentForIntegration}
           onClose={() => {
-            setShowIntegrations(false)
-            setSelectedAgentForIntegration(null)
+            setShowIntegrations(false);
+            setSelectedAgentForIntegration(null);
           }}
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default AgentDashboard
+export default AgentDashboard;
