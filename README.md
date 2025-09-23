@@ -827,13 +827,32 @@ npm run dev
 npm run build
 ```
 
-### Docker Deployment (Optional)
+### Docker Deployment (Production Ready)
 ```bash
-# Build and run with Docker
-docker-compose up -d
+# Method 1: Docker Compose (Recommended - includes MongoDB)
+docker compose up -d
 
 # Access at http://localhost:8000
+# MongoDB automatically configured at localhost:27017
+
+# Method 2: Docker only (requires external MongoDB)
+docker build -t devskyy-api .
+docker run -p 8000:8000 --env-file .env devskyy-api
+
+# Verify deployment
+curl http://localhost:8000/health
+
+# Stop services
+docker compose down
 ```
+
+#### Docker Configuration
+The Docker setup includes:
+- **SSL certificate handling** for secure pip installations
+- **Optimized layering** for faster builds
+- **Multi-service orchestration** with MongoDB
+- **Environment variable support** via .env file
+- **Production-ready networking** and volume management
 
 ### WordPress Plugin Deployment (Production Ready)
 The DevSkyy platform includes a production-ready WordPress plugin with enterprise-level features:
