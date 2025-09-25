@@ -1,10 +1,8 @@
-import asyncio
-import json
 import logging
 import random
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -162,7 +160,7 @@ class SocialMediaAutomationAgent:
         try:
             platforms = automation_config.get("platforms", [])
             content_types = automation_config.get("content_types", ["product_showcase", "lifestyle"])
-            posting_frequency = automation_config.get("frequency", "daily")
+            automation_config.get("frequency", "daily")
 
             logger.info(f"🤖 Setting up automation for {len(platforms)} platforms...")
 

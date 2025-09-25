@@ -11,14 +11,11 @@ This agent specializes in:
 - Performance tracking and optimization
 """
 
-import json
 import logging
 import os
-import random
-import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import openai
 
@@ -196,7 +193,7 @@ class MarketingContentGenerationAgent:
         try:
             campaign_objective = campaign_spec.get("objective", "brand_awareness")
             budget_range = campaign_spec.get("budget", "medium")
-            target_audience = campaign_spec.get("audience", "luxury_consumers")
+            campaign_spec.get("audience", "luxury_consumers")
 
             influencer_campaign = {
                 "campaign_id": f"influencer_{campaign_objective}_{int(datetime.now().timestamp())}",
@@ -244,7 +241,7 @@ class MarketingContentGenerationAgent:
 
         try:
             content_type = content_spec.get("type", "blog_content")
-            target_keywords = content_spec.get("keywords", [])
+            content_spec.get("keywords", [])
             content_volume = content_spec.get("monthly_content", 12)
 
             seo_strategy = {
@@ -291,7 +288,6 @@ class MarketingContentGenerationAgent:
 
         try:
             product_name = launch_spec.get("product_name", "New Collection")
-            launch_date = launch_spec.get("launch_date", datetime.now() + timedelta(days=30))
             channels = launch_spec.get("channels", ["social", "email", "pr", "advertising"])
 
             launch_campaign = {
@@ -492,7 +488,7 @@ Visual Requirements: {visual_requirements}
         return {
             "email_number": email_number,
             "subject_line": email_subjects.get(sequence_type, ["Luxury Awaits"])[email_number - 1],
-            "preview_text": f"Discover what makes Skyy Rose exceptional...",
+            "preview_text": "Discover what makes Skyy Rose exceptional...",
             "send_delay": f"{(email_number - 1) * 3} days after trigger",
             "content_structure": {
                 "header": "Luxury brand header with logo",
@@ -582,9 +578,15 @@ Visual Requirements: {visual_requirements}
     def _generate_sample_content(self, platform: str, campaign_spec: Dict[str, Any], day: int) -> str:
         """Generate sample content for platform."""
         content_samples = {
-            "instagram": f"Day {day + 1}: Luxury meets innovation in every detail ✨ #SkyyRose #LuxuryFashion",
-            "tiktok": f"Day {day + 1}: Behind the scenes of luxury craftsmanship 👑 #LuxuryFashion #SkyyRose",
-            "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",
+            "instagram": f"Day {
+                day +
+                1}: Luxury meets innovation in every detail ✨ #SkyyRose #LuxuryFashion",
+            "tiktok": f"Day {
+                day +
+                1}: Behind the scenes of luxury craftsmanship 👑 #LuxuryFashion #SkyyRose",
+            "twitter": f"Day {
+                day +
+                1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",
         }
 
         return content_samples.get(platform, f"Day {day + 1}: Luxury content for {platform}")

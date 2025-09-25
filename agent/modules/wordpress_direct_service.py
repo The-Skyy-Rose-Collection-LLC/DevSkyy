@@ -1,10 +1,7 @@
-import asyncio
-import base64
-import json
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -60,7 +57,7 @@ class WordPressDirectService:
 
         logger.info(f"🔥 WordPress Direct Service initialized for {self.site_url}")
         logger.info(f"👤 Username: {self.username}")
-        logger.info(f"🔑 Authentication: Basic Auth (Guaranteed Connection)")
+        logger.info("🔑 Authentication: Basic Auth (Guaranteed Connection)")
 
     async def connect_and_verify(self) -> Dict[str, Any]:
         """BULLETPROOF WordPress connection with multiple fallback methods."""

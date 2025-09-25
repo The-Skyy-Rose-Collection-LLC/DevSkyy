@@ -1,10 +1,8 @@
-import asyncio
-import json
 import logging
 import os
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List
 
 import openai
 
@@ -114,7 +112,7 @@ class CustomerServiceAgent:
 
 def optimize_customer_service() -> Dict[str, Any]:
     """Main function to optimize customer service operations."""
-    agent = CustomerServiceAgent()
+    CustomerServiceAgent()
     return {
         "status": "customer_service_optimized",
         "satisfaction_score": 4.7,

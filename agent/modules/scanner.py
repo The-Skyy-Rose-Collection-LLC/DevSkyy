@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import re
@@ -6,6 +5,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
+
+import requests
 
 from . import http_client
 from .telemetry import Telemetry
@@ -321,7 +322,9 @@ def scan_agents_only() -> Dict[str, Any]:
     result["agent_modules"].update(agents_analyzed)
 
     logger.info(
-        f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working"
+        f"✅ Agent analysis completed: {
+            result['agent_modules']['functional_agents']}/{
+            result['agent_modules']['total_agents']} agents working"
     )
     return result
 
@@ -329,7 +332,6 @@ def scan_agents_only() -> Dict[str, Any]:
 def _analyze_all_agents() -> Dict[str, Any]:
     """Analyze all agent modules in the system."""
     import importlib.util
-    import sys
 
     agents_dir = Path("agent/modules")
     if not agents_dir.exists():

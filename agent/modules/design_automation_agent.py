@@ -1,10 +1,7 @@
-import asyncio
-import json
 import logging
-import random
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -488,10 +485,10 @@ class DesignAutomationAgent:
     --deep-black: #0A0A0A;
     --pearl-white: #FEFEFE;
     --champagne: #F7E7CE;
-    
+
     --font-luxury: 'Playfair Display', serif;
     --font-elegant: 'Inter', sans-serif;
-    
+
     --shadow-elegant: 0 4px 24px rgba(232, 180, 184, 0.15);
     --shadow-luxury: 0 8px 40px rgba(232, 180, 184, 0.25);
 }
@@ -547,7 +544,7 @@ class LuxuryInteractions {
         this.initHoverEffects();
         this.initFormInteractions();
     }
-    
+
     initScrollAnimations() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -556,30 +553,30 @@ class LuxuryInteractions {
                 }
             });
         }, { threshold: 0.1 });
-        
+
         document.querySelectorAll('.animate-on-scroll').forEach(el => {
             observer.observe(el);
         });
     }
-    
+
     initHoverEffects() {
         document.querySelectorAll('.luxury-card').forEach(card => {
             card.addEventListener('mouseenter', () => {
                 card.style.transform = 'translateY(-8px) scale(1.02)';
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0) scale(1)';
             });
         });
     }
-    
+
     initFormInteractions() {
         document.querySelectorAll('.luxury-input').forEach(input => {
             input.addEventListener('focus', () => {
                 input.parentElement.classList.add('focused');
             });
-            
+
             input.addEventListener('blur', () => {
                 if (!input.value) {
                     input.parentElement.classList.remove('focused');
@@ -704,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
             section_type = section_data.get("type", "hero_section")
             brand_style = section_data.get("brand_style", "luxury_streetwear")
             content = section_data.get("content", {})
-            luxury_optimization = section_data.get("luxury_optimization", True)
+            section_data.get("luxury_optimization", True)
 
             logger.info(f"🎨 Creating custom {section_type} with {brand_style} styling...")
 
