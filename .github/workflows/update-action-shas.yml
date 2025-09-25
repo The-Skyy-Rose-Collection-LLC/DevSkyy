@@ -1,0 +1,313 @@
+name: Auto-Update GitHub Action SHAs
+
+on:
+  schedule:
+    # Run weekly on Mondays at 2 AM UTC for security compliance
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (preview changes only)'
+        required: false
+        default: 'false'
+        type: boolean
+      verbose:
+        description: 'Enable verbose logging'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  update-action-shas:
+    runs-on: ubuntu-latest
+    name: Update Action SHAs for Security Compliance
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Validate script and config files
+        run: |
+          echo "🔍 Validating update script..."
+          python3 -c "
+          import json
+          from pathlib import Path
+          from update_action_shas import ActionSHAUpdater
+          
+          # Validate script can be imported
+          print('✅ Script imports successfully')
+          
+          # Validate config file
+          config_path = Path('action_sha_config.json')
+          if config_path.exists():
+              with open(config_path) as f:
+                  config = json.load(f)
+              print(f'✅ Config file valid with {len(config.get(\"actions_to_update\", {}))} actions configured')
+          else:
+              print('⚠️ Config file not found, using defaults')
+          
+          print('✅ Validation completed')
+          "
+
+      - name: Run SHA update process
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚀 Starting GitHub Actions SHA update process..."
+          
+          # Determine flags based on inputs
+          DRY_RUN_FLAG=""
+          VERBOSE_FLAG=""
+          
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            DRY_RUN_FLAG="--dry-run"
+            echo "🔍 Running in DRY-RUN mode"
+          fi
+          
+          if [[ "${{ github.event.inputs.verbose }}" == "true" ]]; then
+            VERBOSE_FLAG="--verbose"
+            echo "📝 Verbose logging enabled"
+          fi
+          
+          # Run the update script
+          python3 update_action_shas.py \
+            --config action_sha_config.json \
+            --report sha_update_report.json \
+            $DRY_RUN_FLAG \
+            $VERBOSE_FLAG
+
+      - name: Upload update report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sha-update-report
+          path: |
+            sha_update_report.json
+            sha_update.log
+          retention-days: 30
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "🔹 No changes made to workflow files"
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected in workflow files"
+            echo "Modified files:"
+            git diff --name-only
+          fi
+
+      - name: Create Pull Request with updates
+        if: steps.changes.outputs.changes == 'true' && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read the update report
+            let report = {};
+            try {
+              const reportData = fs.readFileSync('sha_update_report.json', 'utf8');
+              report = JSON.parse(reportData);
+            } catch (error) {
+              console.log('Could not read update report:', error.message);
+            }
+            
+            // Create branch name with timestamp
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+            const branchName = `security/auto-update-action-shas-${timestamp}`;
+            
+            // Create commit message
+            const updatedCount = Object.keys(report.updated_actions || {}).length;
+            const commitMessage = `🔒 Auto-update GitHub Action SHAs for security compliance
+            
+            Updated ${updatedCount} GitHub Actions to use commit SHAs instead of tags:
+            ${Object.entries(report.updated_actions || {}).map(([action, sha]) => 
+              `- ${action} → ${sha.substring(0, 8)}...`).join('\n')}
+            
+            Security Benefits:
+            - Prevents supply chain attacks through immutable references
+            - Ensures reproducible builds with exact version control
+            - Meets enterprise security compliance requirements
+            - Provides tamper-proof action references
+            
+            Generated by: update_action_shas.py
+            Report: See workflow artifacts for detailed update report`;
+            
+            // Configure git
+            await exec.exec('git', ['config', 'user.name', 'github-actions[bot]']);
+            await exec.exec('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com']);
+            
+            // Create and switch to new branch
+            await exec.exec('git', ['checkout', '-b', branchName]);
+            
+            // Add changes and commit
+            await exec.exec('git', ['add', '.github/workflows/']);
+            await exec.exec('git', ['commit', '-m', commitMessage]);
+            
+            // Push branch
+            await exec.exec('git', ['push', 'origin', branchName]);
+            
+            // Create PR body
+            const prBody = `## 🔒 Automated Security Update: GitHub Action SHA Pinning
+
+            This PR automatically updates GitHub Actions from version tags to commit SHAs for enhanced security compliance.
+
+            ### 📊 Update Summary
+            - **Actions updated**: ${updatedCount}
+            - **Failed updates**: ${report.summary?.total_failed || 0}
+            - **Success rate**: ${report.summary?.success_rate?.toFixed(1) || 100}%
+            - **Update timestamp**: ${report.timestamp || new Date().toISOString()}
+
+            ### 🔄 Updated Actions
+            ${Object.entries(report.updated_actions || {}).map(([action, sha]) => 
+              `- \`${action}\` → \`${sha.substring(0, 12)}...\``).join('\n')}
+
+            ### 🛡️ Security Benefits
+            - **Immutable References**: SHAs cannot be changed, preventing supply chain attacks
+            - **Exact Version Control**: Ensures workflows use the exact code that was tested
+            - **Attack Prevention**: Prevents malicious updates to existing action tags
+            - **Compliance**: Meets enterprise security requirements for CI/CD pipelines
+
+            ### 📋 Review Guidelines
+            1. ✅ Verify that all updated SHAs are from official action repositories
+            2. ✅ Check that workflow syntax remains valid
+            3. ✅ Confirm that no functionality is broken by the updates
+            4. ✅ Review the detailed update report in workflow artifacts
+
+            ### 🔍 How to Verify Updates
+            Each SHA corresponds to the latest release tag of the respective action:
+            - Visit the action's repository (e.g., \`actions/checkout\`)
+            - Navigate to the releases page
+            - Verify the SHA matches the latest stable release
+
+            ---
+            
+            🤖 This PR was automatically generated by the \`update-action-shas.yml\` workflow.
+            📊 Detailed update report available in workflow artifacts.
+            🔧 Configuration: \`action_sha_config.json\``;
+
+            // Create the pull request
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔒 Auto-update GitHub Action SHAs for security compliance`,
+              head: branchName,
+              base: 'main',
+              body: prBody,
+              draft: false
+            });
+
+            console.log(`✅ Created pull request #${pr.number}: ${pr.html_url}`);
+
+            // Add labels
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['security', 'automated', 'dependencies', 'github-actions']
+              });
+            } catch (error) {
+              console.log('Could not add labels:', error.message);
+            }
+
+      - name: Create summary comment
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Read the update report
+            let report = {};
+            try {
+              const reportData = fs.readFileSync('sha_update_report.json', 'utf8');
+              report = JSON.parse(reportData);
+            } catch (error) {
+              console.log('Could not read update report');
+              report = { summary: { total_updated: 0, total_failed: 0, success_rate: 0 } };
+            }
+            
+            const summary = `## 🔒 GitHub Actions SHA Update Summary
+            
+            | Metric | Value |
+            |--------|--------|
+            | Actions Updated | ${report.summary?.total_updated || 0} |
+            | Failed Updates | ${report.summary?.total_failed || 0} |
+            | Success Rate | ${report.summary?.success_rate?.toFixed(1) || 100}% |
+            | Dry Run Mode | ${{ github.event.inputs.dry_run || 'false' }} |
+            
+            ${Object.keys(report.updated_actions || {}).length > 0 ? `
+            ### ✅ Successfully Updated Actions
+            ${Object.entries(report.updated_actions || {}).map(([action, sha]) => 
+              `- \`${action}\` → \`${sha.substring(0, 12)}...\``).join('\n')}
+            ` : ''}
+            
+            ${(report.failed_updates || []).length > 0 ? `
+            ### ❌ Failed Updates
+            ${(report.failed_updates || []).map(action => `- \`${action}\``).join('\n')}
+            ` : ''}
+            
+            📊 Detailed report available in workflow artifacts.`;
+            
+            console.log(summary);
+            core.summary.addRaw(summary);
+            await core.summary.write();
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = '🚨 GitHub Actions SHA Update Failed';
+            const body = `The automated GitHub Actions SHA update process has failed.
+            
+            **Workflow**: ${context.workflow}
+            **Run ID**: ${context.runId}
+            **Run URL**: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+            
+            Please review the logs and take appropriate action to maintain security compliance.
+            
+            **Common causes:**
+            - GitHub API rate limiting
+            - Network connectivity issues
+            - Invalid action references
+            - Permission problems
+            
+            **Recommended actions:**
+            1. Check the workflow logs for specific error messages
+            2. Verify GitHub API access and rate limits
+            3. Run the script manually if needed: \`python3 update_action_shas.py --config action_sha_config.json\`
+            4. Update the configuration if actions have been removed or renamed`;
+
+            // Create an issue for the failure
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'security', 'automated', 'needs-attention']
+            });
