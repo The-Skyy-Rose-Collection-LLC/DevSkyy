@@ -3,7 +3,7 @@ import os
 import re
 import secrets
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import bcrypt
 import jwt
@@ -11,7 +11,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import func
 
 logger = logging.getLogger(__name__)
@@ -304,7 +304,7 @@ class AuthManager:
                     .filter(
                         UserSession.user_id == payload["user_id"],
                         UserSession.expires_at > datetime.now(),
-                        UserSession.is_active == True,
+                        UserSession.is_active,
                     )
                     .first()
                 )
@@ -353,7 +353,7 @@ class AuthManager:
                 .filter(
                     UserSession.user_id == user_id,
                     UserSession.expires_at > datetime.now(),
-                    UserSession.is_active == True,
+                    UserSession.is_active,
                 )
                 .count()
             )
@@ -402,9 +402,9 @@ class AuthManager:
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"], UserSession.is_active == True
-            ).update({"is_active": False})
+            db.query(UserSession).filter(UserSession.user_id == payload["user_id"], UserSession.is_active).update(
+                {"is_active": False}
+            )
 
             db.commit()
             return {"success": True, "message": "Logged out successfully"}

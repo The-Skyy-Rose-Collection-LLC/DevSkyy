@@ -5,14 +5,10 @@ Provides advanced code analysis, fixing, and branch management
 
 # Import existing modules using importlib
 import importlib.util
-import json
 import logging
 import os
 import re
-import shutil
 import subprocess
-import sys
-import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional

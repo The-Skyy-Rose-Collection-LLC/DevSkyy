@@ -1,20 +1,10 @@
-import asyncio
 import hashlib
-import json
 import logging
-import os
 import uuid
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
-import cv2
-import imagehash
 import numpy as np
-from PIL import Image
-from sklearn.cluster import DBSCAN
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -83,7 +73,6 @@ class InventoryAgent:
             logger.info("🔍 Starting advanced duplicate detection...")
 
             assets = list(self.assets_db.values())
-            duplicate_groups = []
 
             # Method 1: Hash-based exact duplicates
             hash_duplicates = await self._find_hash_duplicates(assets)

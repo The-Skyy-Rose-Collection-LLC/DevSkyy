@@ -1,11 +1,7 @@
-import asyncio
-import hashlib
-import json
 import logging
-import secrets
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -130,7 +126,7 @@ class SecurityAgent:
 
 def secure_luxury_platform() -> Dict[str, Any]:
     """Main function to secure luxury e-commerce platform."""
-    agent = SecurityAgent()
+    SecurityAgent()
     return {
         "status": "security_optimized",
         "security_score": 94.5,

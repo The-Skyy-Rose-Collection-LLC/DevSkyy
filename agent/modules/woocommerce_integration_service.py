@@ -1,10 +1,6 @@
-import asyncio
-import base64
-import json
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 from requests.auth import HTTPBasicAuth

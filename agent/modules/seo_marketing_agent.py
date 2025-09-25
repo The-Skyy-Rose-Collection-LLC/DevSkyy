@@ -1,11 +1,7 @@
-import asyncio
-import json
 import logging
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
-
-import requests
+from datetime import datetime
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -150,7 +146,7 @@ class SEOMarketingAgent:
 
 def optimize_seo_marketing() -> Dict[str, Any]:
     """Main function to optimize SEO and marketing efforts."""
-    agent = SEOMarketingAgent()
+    SEOMarketingAgent()
     return {
         "status": "seo_marketing_optimized",
         "performance_score": 87.5,

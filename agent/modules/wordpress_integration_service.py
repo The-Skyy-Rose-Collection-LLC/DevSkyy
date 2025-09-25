@@ -1,11 +1,8 @@
-import asyncio
-import base64
-import json
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
-from urllib.parse import parse_qs, urlencode, urlparse
+from typing import Any, Dict, List
+from urllib.parse import urlencode
 
 import requests
 
@@ -42,7 +39,7 @@ class WordPressIntegrationService:
         }
 
         auth_url = f"{self.authorize_url}?{urlencode(params)}"
-        logger.info(f"🔗 Generated WordPress auth URL for luxury brand integration")
+        logger.info("🔗 Generated WordPress auth URL for luxury brand integration")
         return auth_url
 
     async def exchange_code_for_token(self, authorization_code: str) -> Dict[str, Any]:

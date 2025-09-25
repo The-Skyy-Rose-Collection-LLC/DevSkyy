@@ -1,10 +1,9 @@
 import asyncio
-import json
 import logging
 import uuid
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -665,7 +664,7 @@ class AgentAssignmentManager:
                     if metric == "response_time" and value > threshold:
                         issues_detected.append(f"High response time: {value}s")
                     elif metric == "error_rate" and value > threshold:
-                        issues_detected.append(f"High error rate: {value*100:.2f}%")
+                        issues_detected.append(f"High error rate: {value * 100:.2f}%")
 
             if issues_detected and self.auto_fix_enabled:
                 await self._apply_auto_fixes("performance", issues_detected)
@@ -897,7 +896,7 @@ class AgentAssignmentManager:
         """Generate compelling content for the collection page."""
         return {
             "headlines": {
-                "primary": f"Experience Luxury Redefined",
+                "primary": "Experience Luxury Redefined",
                 "secondary": collection_spec["story"],
                 "cta_headlines": ["Shop the Collection", "Discover Your Style", "Join the Elite"],
             },
@@ -1030,7 +1029,6 @@ class AgentAssignmentManager:
         try:
             procedure_type = frontend_request.get("procedure_type")
             priority_level = frontend_request.get("priority", "medium")
-            user_facing_impact = frontend_request.get("user_facing", True)
 
             # Determine which frontend agents should handle this procedure
             frontend_assignments = self._determine_frontend_agent_assignments(procedure_type, priority_level)
@@ -1882,8 +1880,6 @@ class AgentAssignmentManager:
 
     def _identify_task_dependencies(self, agent_id: str, template: Dict[str, List[str]]) -> List[str]:
         """Identify task dependencies for an agent."""
-        dependencies = []
-
         # Define common dependencies between agents
         dependency_map = {
             "design_automation": ["brand_intelligence"],
@@ -2182,120 +2178,6 @@ class AgentAssignmentManager:
                 "brand_management": "strategic_alignment_active",
             },
         }
-
-    async def optimize_agent_workload(self, optimization_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Optimize frontend agent workload distribution."""
-        try:
-            optimization_type = optimization_request.get("optimization_type", "balanced")
-            target_metrics = optimization_request.get("target_metrics", [])
-
-            logger.info(f"⚖️ Optimizing agent workload with {optimization_type} method...")
-
-            # Analyze current workload
-            workload_analysis = self._analyze_current_workload()
-
-            # Generate optimization recommendations
-            optimization_result = {
-                "optimization_type": optimization_type,
-                "current_efficiency": workload_analysis["efficiency_score"],
-                "target_efficiency": 95.0,
-                "agent_assignments": [
-                    {
-                        "agent_id": "design_automation",
-                        "current_utilization": "85%",
-                        "recommended_utilization": "80%",
-                        "task_redistribution": ["move_2_low_priority_tasks_to_wordpress"],
-                    },
-                    {
-                        "agent_id": "performance",
-                        "current_utilization": "92%",
-                        "recommended_utilization": "88%",
-                        "task_redistribution": ["delegate_monitoring_tasks_to_automated_systems"],
-                    },
-                ],
-                "efficiency_improvement": "+7.5%",
-                "estimated_completion_time_reduction": "15%",
-                "resource_optimization": {
-                    "cpu_usage_reduction": "12%",
-                    "memory_optimization": "8%",
-                    "response_time_improvement": "20%",
-                },
-                "implementation_timeline": "immediate",
-                "monitoring_adjustments": {
-                    "increased_automation": True,
-                    "load_balancing_enabled": True,
-                    "priority_queue_optimization": True,
-                },
-            }
-
-            return {
-                "optimization_result": optimization_result,
-                "status": "optimization_completed",
-                "timestamp": datetime.now().isoformat(),
-            }
-
-        except Exception as e:
-            logger.error(f"❌ Workload optimization failed: {str(e)}")
-            return {"error": str(e), "status": "failed"}
-
-    async def get_role_assignments(self, role: str = None) -> Dict[str, Any]:
-        """Get current frontend agent assignments for specific role or all roles."""
-        try:
-            if role and role != "all":
-                # Get assignments for specific role
-                assignments = []
-                if role in self.agent_assignments:
-                    agent_ids = self.agent_assignments[role]
-                    for agent_id in agent_ids:
-                        if agent_id in self.available_agents:
-                            assignments.append(
-                                {
-                                    "agent_id": agent_id,
-                                    "agent_name": self.available_agents[agent_id]["name"],
-                                    "role": role,
-                                    "responsibilities": self.available_agents[agent_id]["specialties"],
-                                    "status": "active",
-                                    "luxury_expertise": self.available_agents[agent_id]["luxury_expertise"],
-                                    "workload": "optimal",
-                                }
-                            )
-
-                return {
-                    "role": role,
-                    "assignments": assignments,
-                    "total_agents": len(assignments),
-                    "coordination_status": self._get_coordination_status(role),
-                    "last_updated": datetime.now().isoformat(),
-                }
-            else:
-                # Get all role assignments
-                all_assignments = {}
-                for role_key, agent_ids in self.agent_assignments.items():
-                    role_assignments = []
-                    for agent_id in agent_ids:
-                        if agent_id in self.available_agents:
-                            role_assignments.append(
-                                {
-                                    "agent_id": agent_id,
-                                    "agent_name": self.available_agents[agent_id]["name"],
-                                    "responsibilities": self.available_agents[agent_id]["specialties"],
-                                    "status": "active",
-                                    "luxury_expertise": self.available_agents[agent_id]["luxury_expertise"],
-                                }
-                            )
-                    all_assignments[role_key] = role_assignments
-
-                return {
-                    "all_assignments": all_assignments,
-                    "total_roles": len(all_assignments),
-                    "total_agents": sum(len(assignments) for assignments in all_assignments.values()),
-                    "coordination_status": self._get_coordination_status(),
-                    "last_updated": datetime.now().isoformat(),
-                }
-
-        except Exception as e:
-            logger.error(f"❌ Get assignments failed: {str(e)}")
-            return {"error": str(e), "status": "failed"}
 
     def _get_agent_primary_metrics(self, agent_id: str) -> List[str]:
         """Get primary metrics for monitoring a specific agent."""

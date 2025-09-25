@@ -1,11 +1,9 @@
-import asyncio
-import json
 import logging
 import uuid
 from datetime import datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -356,13 +354,13 @@ class EcommerceAgent:
             customer = self.customers[customer_id]
 
             # Collaborative filtering
-            collaborative_recs = self._collaborative_filtering(customer)
+            self._collaborative_filtering(customer)
 
             # Content-based filtering
-            content_recs = self._content_based_filtering(customer)
+            self._content_based_filtering(customer)
 
             # Trending products
-            trending_recs = self._get_trending_products()
+            self._get_trending_products()
 
             # Personalized scoring
             all_recommendations = []
@@ -597,14 +595,6 @@ class EcommerceAgent:
     def _predict_demand(self, product: Dict) -> Dict[str, Any]:
         """Predict demand for new product."""
         # Simplified demand prediction
-        category_demand = {
-            "necklaces": {"high": 0.4, "medium": 0.4, "low": 0.2},
-            "rings": {"high": 0.3, "medium": 0.5, "low": 0.2},
-            "earrings": {"high": 0.35, "medium": 0.45, "low": 0.2},
-        }
-
-        base_demand = category_demand.get(product["category"], {"high": 0.3, "medium": 0.5, "low": 0.2})
-
         return {
             "expected_monthly_sales": np.random.randint(15, 45),
             "demand_level": "medium",
@@ -1284,7 +1274,7 @@ class EcommerceAgent:
             if customer_id not in self.customers:
                 return {"error": "Customer not found", "status": "failed"}
 
-            customer = self.customers[customer_id]
+            self.customers[customer_id]
 
             return {
                 "session_id": str(uuid.uuid4()),

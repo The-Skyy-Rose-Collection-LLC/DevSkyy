@@ -1,10 +1,9 @@
 import asyncio
-import json
 import logging
 import random
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from . import http_client
 from .telemetry import Telemetry
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 async def communicate_with_site() -> Dict[str, Any]:
     """Main function to communicate with site and gather insights."""
-    agent = SiteCommunicationAgent()
+    SiteCommunicationAgent()
 
     return {
         "communication_status": "active",
@@ -377,31 +376,3 @@ class SiteCommunicationAgent:
         except Exception as e:
             logger.error(f"Neural communication analysis failed: {str(e)}")
             return {"error": str(e), "status": "neural_overload"}
-
-
-# The following functions are duplicates from the original code and were not modified.
-# They are kept here for completeness as per instructions.
-
-
-async def communicate_with_site() -> Dict[str, Any]:
-    """Main function for site communication."""
-    agent = SiteCommunicationAgent()
-
-    return {
-        "connection_status": "connected",
-        "insights_gathered": True,
-        "communication_health": "excellent",
-        "last_check": datetime.now().isoformat(),
-        "agent_status": "active",
-    }
-
-
-async def communicate_with_site() -> Dict[str, Any]:
-    """Communicate with site and gather insights."""
-    return {
-        "communication_status": "active",
-        "insights_gathered": 10,
-        "customer_interactions": 25,
-        "response_quality": "excellent",
-        "timestamp": datetime.now().isoformat(),
-    }

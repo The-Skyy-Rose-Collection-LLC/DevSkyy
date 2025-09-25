@@ -1,12 +1,9 @@
-import asyncio
 import fnmatch
-import json
 import logging
 import os
 import tempfile
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import paramiko
 
@@ -132,7 +129,7 @@ class WordPressServerAccess:
                     attrs = self.sftp_client.lstat(item)
                     if attrs.st_mode & 0o40000:  # Directory
                         wp_dirs.append(item)
-                except:
+                except BaseException:
                     continue
 
             return {
@@ -323,7 +320,7 @@ class WordPressServerAccess:
                         attrs = self.sftp_client.lstat(file_name)
                         if attrs.st_size > 5 * 1024 * 1024:  # Files larger than 5MB
                             large_files.append({"file": file_name, "size_mb": round(attrs.st_size / (1024 * 1024), 2)})
-                    except:
+                    except BaseException:
                         continue
 
                 if large_files:
@@ -414,7 +411,7 @@ class WordPressServerAccess:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as backup:
                     backup.write(existing_htaccess)
                     self.sftp_client.put(backup.name, ".htaccess.backup")
-            except:
+            except BaseException:
                 pass  # File doesn't exist, that's ok
 
             # Upload new .htaccess
@@ -439,9 +436,9 @@ class WordPressServerAccess:
             permissions_checked = 0
             for file_name in security_files:
                 try:
-                    attrs = self.sftp_client.lstat(file_name)
+                    self.sftp_client.lstat(file_name)
                     permissions_checked += 1
-                except:
+                except BaseException:
                     continue
 
             logger.info(f"✅ Checked permissions on {permissions_checked} security files")
@@ -466,7 +463,7 @@ class WordPressServerAccess:
                             self.sftp_client.remove(file_name)
                             files_cleaned += 1
                             logger.info(f"🗑️ Cleaned temporary file: {file_name}")
-                        except:
+                        except BaseException:
                             continue
 
             return files_cleaned > 0
@@ -479,7 +476,7 @@ class WordPressServerAccess:
         """Continuously learn about the brand from server files."""
         try:
             # Update brand intelligence every hour
-            learning_results = await self._start_brand_learning()
+            await self._start_brand_learning()
 
             # Compare with previous learning to detect changes
             brand_evolution = {

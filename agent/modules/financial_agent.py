@@ -1,10 +1,8 @@
-import asyncio
 import hashlib
-import json
 import logging
 import uuid
 from datetime import datetime, timedelta
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -456,7 +454,6 @@ class FinancialAgent:
         # Update revenue counters
         # Update transaction success rates
         # Update fraud detection accuracy
-        pass
 
     def _calculate_settlement_date(self) -> str:
         """Calculate estimated settlement date."""
@@ -1161,7 +1158,7 @@ class FinancialAgent:
         """Generate comprehensive credit improvement plan."""
         plan = []
 
-        current_score = analysis["current_credit_score"]
+        analysis["current_credit_score"]
         utilization = analysis["credit_utilization"]
 
         if utilization > 30:

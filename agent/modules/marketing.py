@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 
@@ -108,7 +107,7 @@ class MarketingAgent:
                         "channel": channel,
                         "current_roas": performance["roas"],
                         "suggestion": "REDUCE_SPEND" if performance["roas"] < 2.0 else "OPTIMIZE_TARGETING",
-                        "recommended_action": f"Pause underperforming ads and reallocate budget",
+                        "recommended_action": "Pause underperforming ads and reallocate budget",
                     }
                 )
             elif performance["roas"] > 5.0:
@@ -117,7 +116,7 @@ class MarketingAgent:
                         "channel": channel,
                         "current_roas": performance["roas"],
                         "suggestion": "INCREASE_SPEND",
-                        "recommended_action": f"Scale successful campaigns",
+                        "recommended_action": "Scale successful campaigns",
                     }
                 )
 

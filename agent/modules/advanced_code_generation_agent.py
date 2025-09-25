@@ -11,14 +11,9 @@ This agent can:
 - Optimize existing codebases
 """
 
-import ast
-import json
 import logging
 import os
-import re
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import openai
 
@@ -272,7 +267,6 @@ class AdvancedCodeGenerationAgent:
 
         try:
             campaign_type = campaign_spec.get("type", "product_launch")
-            target_audience = campaign_spec.get("audience", "luxury_consumers")
             channels = campaign_spec.get("channels", ["social", "email", "web"])
 
             marketing_content = {}
@@ -377,9 +371,9 @@ import { motion } from 'framer-motion';
 
 const {component_name} = ({props}) => {{
     {state_hooks}
-    
+
     {effects}
-    
+
     return (
         <motion.div
             className="{css_classes}"
@@ -432,16 +426,16 @@ if (!defined('ABSPATH')) {{
 }}
 
 class {class_name} {{
-    
+
     public function __construct() {{
         add_action('init', [$this, 'init']);
         {additional_hooks}
     }}
-    
+
     public function init() {{
         {initialization_code}
     }}
-    
+
     {additional_methods}
 }}
 
@@ -491,27 +485,22 @@ new {class_name}();
     async def _generate_frontend_structure(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
         """Generate frontend application structure."""
         # Implementation for frontend generation
-        pass
 
     async def _generate_backend_api(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
         """Generate backend API structure."""
         # Implementation for backend generation
-        pass
 
     async def _generate_react_component_code(self, name: str, type: str, features: List[str]) -> str:
         """Generate React component code."""
         # Implementation for React component generation
-        pass
 
     async def _generate_social_media_content(self, campaign_spec: Dict[str, Any]) -> Dict[str, Any]:
         """Generate social media marketing content."""
         # Implementation for social media content generation
-        pass
 
     async def _analyze_codebase(self, codebase_path: str) -> Dict[str, Any]:
         """Analyze existing codebase for optimization opportunities."""
         # Implementation for codebase analysis
-        pass
 
     def _estimate_development_time(self, requirements: Dict[str, Any]) -> str:
         """Estimate development time for generated project."""

@@ -2,8 +2,6 @@ import asyncio
 import hashlib
 import json
 import logging
-import os
-import pickle
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any, Dict, Optional, Union
@@ -112,7 +110,6 @@ class CacheManager:
     def cleanup_expired(self) -> int:
         """Remove expired entries and return count of removed items."""
         expired_keys = []
-        current_time = datetime.now()
 
         for key, entry in self.cache.items():
             if self._is_expired(entry["timestamp"], entry["ttl"]):
