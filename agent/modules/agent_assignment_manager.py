@@ -2179,8 +2179,6 @@ class AgentAssignmentManager:
             },
         }
 
-
-
     def _get_agent_primary_metrics(self, agent_id: str) -> List[str]:
         """Get primary metrics for monitoring a specific agent."""
         agent_metrics = {

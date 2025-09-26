@@ -2,11 +2,12 @@ import json
 import logging
 import os
 import re
-import requests
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
+
+import requests
 
 from . import http_client
 from .telemetry import Telemetry

@@ -401,9 +401,9 @@ class AuthManager:
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"], UserSession.is_active
-            ).update({"is_active": False})
+            db.query(UserSession).filter(UserSession.user_id == payload["user_id"], UserSession.is_active).update(
+                {"is_active": False}
+            )
 
             db.commit()
             return {"success": True, "message": "Logged out successfully"}

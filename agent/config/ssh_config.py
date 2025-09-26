@@ -60,8 +60,7 @@ Host *
         key_path = ssh_dir / "id_rsa"
         if not key_path.exists():
             logger.info(
-                "ℹ️ SSH key not found. Generate one with: "
-                "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
+                "ℹ️ SSH key not found. Generate one with: " "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
             )
 
         return {

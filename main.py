@@ -8,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 
-from agent.modules.scanner import scan_site
 from agent.modules.fixer import fix_code
+from agent.modules.scanner import scan_site
 
 # Optional heavy imports: define fallbacks if unavailable during testing
 try:
@@ -243,10 +243,7 @@ from typing import Any, Dict
 
 from dotenv import load_dotenv
 
-from models import (
-    PaymentRequest,
-    ProductRequest,
-)
+from models import PaymentRequest, ProductRequest
 
 # Load environment variables
 load_dotenv()
@@ -1129,7 +1126,9 @@ async def get_supported_services() -> Dict[str, Any]:
     try:
         return {
             "supported_services": get_agent_assignment_manager().supported_services,
-            "total_services": sum(len(services) for services in get_agent_assignment_manager().supported_services.values()),
+            "total_services": sum(
+                len(services) for services in get_agent_assignment_manager().supported_services.values()
+            ),
             "service_categories": list(get_agent_assignment_manager().supported_services.keys()),
             "security_features": get_agent_assignment_manager().security_manager,
         }
@@ -1149,7 +1148,9 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
         if not all([agent_type, service_type, service_name]):
             raise HTTPException(status_code=400, detail="Missing required fields")
 
-        return await get_agent_assignment_manager().create_integration(agent_type, service_type, service_name, credentials)
+        return await get_agent_assignment_manager().create_integration(
+            agent_type, service_type, service_name, credentials
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
