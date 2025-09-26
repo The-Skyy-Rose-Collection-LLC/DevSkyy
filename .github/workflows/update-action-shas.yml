@@ -29,13 +29,13 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -96,7 +96,7 @@ jobs:
             $VERBOSE_FLAG
 
       - name: Upload update report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: sha-update-report
@@ -120,7 +120,7 @@ jobs:
 
       - name: Create Pull Request with updates
         if: steps.changes.outputs.changes == 'true' && github.event.inputs.dry_run != 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
         with:
           script: |
             const fs = require('fs');
@@ -236,7 +236,7 @@ jobs:
 
       - name: Create summary comment
         if: always()
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
         with:
           script: |
             const fs = require('fs');
@@ -279,7 +279,7 @@ jobs:
 
       - name: Notify on failure
         if: failure()
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
         with:
           script: |
             const title = '🚨 GitHub Actions SHA Update Failed';

@@ -76,10 +76,9 @@ class AuthManager:
 
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
-        self.database_url = os.getenv(
-            "DATABASE_URL",
-            "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require",
-        )
+        self.database_url = os.getenv("DATABASE_URL")
+        if not self.database_url:
+            raise ValueError("DATABASE_URL environment variable must be set for security")
         self.security = HTTPBearer()
         self.engine = None
         self.SessionLocal = None

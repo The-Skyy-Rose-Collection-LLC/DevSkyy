@@ -13,7 +13,9 @@ load_dotenv()
 class Config:
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable must be set for security")
     DEBUG = False
     TESTING = False
 
@@ -40,8 +42,8 @@ class DevelopmentConfig(Config):
     """Development configuration."""
 
     DEBUG = True
-    CORS_ORIGINS = ["*"]
-    TRUSTED_HOSTS = ["*"]
+    CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    TRUSTED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 class ProductionConfig(Config):
@@ -60,6 +62,7 @@ class TestingConfig(Config):
 
     TESTING = True
     DATABASE_URL = "sqlite:///:memory:"
+    SECRET_KEY = "test-secret-key"  # Allow test secret key
 
 
 # Configuration mapping

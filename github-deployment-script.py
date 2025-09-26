@@ -132,7 +132,7 @@ class GitHubDeployment:
 
             urllib.request.urlopen("https://github.com", timeout=5)
             return True
-        except:
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
             return False
 
     def create_backup(self):

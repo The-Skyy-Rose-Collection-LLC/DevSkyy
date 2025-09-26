@@ -268,7 +268,7 @@ def _git_commit(message: str) -> Dict[str, Any]:
             hash_result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10)
             if hash_result.returncode == 0:
                 commit_hash = hash_result.stdout.strip()[:8]  # Short hash
-        except:
+        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
             pass
 
         return {"success": True, "commit_hash": commit_hash, "output": result.stdout}
