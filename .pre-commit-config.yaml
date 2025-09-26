@@ -18,4 +18,5 @@ repos:
     rev: 1.8.6
     hooks:
       - id: bandit
-        args: [-ll, -r, ., --exclude=tests]
+        args: [-ll, --exclude=tests]
+        files: \.py$

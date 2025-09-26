@@ -1,8 +1,6 @@
-import base64
 import json
 import logging
 import mimetypes
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
