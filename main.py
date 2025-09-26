@@ -10,14 +10,6 @@ from fastapi.responses import JSONResponse
 
 from agent.modules.scanner import scan_site
 
-# Optional import to avoid hard failure during tests that stub scanner module
-try:
-    from agent.modules.scanner import scan_agents_only  # type: ignore
-except Exception:  # ImportError or AttributeError when stubbed in tests
-
-    def scan_agents_only():  # type: ignore
-        return {"status": "unavailable"}
-
 
 from agent.modules.fixer import fix_code
 
@@ -250,19 +242,14 @@ except Exception:
 
 import asyncio
 import json
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from datetime import datetime
+from typing import Any, Dict
 
 from dotenv import load_dotenv
 
 from models import (
-    ChargebackRequest,
-    CodeAnalysisRequest,
-    CustomerRequest,
-    OrderRequest,
     PaymentRequest,
     ProductRequest,
-    WebsiteAnalysisRequest,
 )
 
 # Load environment variables
@@ -706,7 +693,7 @@ def process_payment(payment_data: PaymentRequest) -> Dict[str, Any]:
     """Process a payment transaction."""
     try:
         logger.info(f"Processing payment for customer {payment_data.customer_id}")
-        result = financial_agent.process_payment(
+        result = get_financial_agent().process_payment(
             payment_data.amount,
             payment_data.currency,
             payment_data.customer_id,
@@ -729,19 +716,19 @@ def create_chargeback(transaction_id: str, reason: str, amount: float = None) ->
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid chargeback reason")
 
-    return financial_agent.create_chargeback(transaction_id, chargeback_reason, amount)
+    return get_financial_agent().create_chargeback(transaction_id, chargeback_reason, amount)
 
 
 @app.post("/chargebacks/{chargeback_id}/evidence")
 def submit_chargeback_evidence(chargeback_id: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
     """Submit evidence for a chargeback dispute."""
-    return financial_agent.submit_chargeback_evidence(chargeback_id, evidence)
+    return get_financial_agent().submit_chargeback_evidence(chargeback_id, evidence)
 
 
 @app.get("/financial/dashboard")
 def get_financial_dashboard() -> Dict[str, Any]:
     """Get comprehensive financial dashboard."""
-    return financial_agent.get_financial_dashboard()
+    return get_financial_agent().get_financial_dashboard()
 
 
 # Ecommerce Management Endpoints
@@ -750,7 +737,7 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
     """Add a new product to the catalog."""
     try:
         logger.info(f"Adding product: {product_data.name}")
-        result = ecommerce_agent.add_product(
+        result = get_ecommerce_agent().add_product(
             product_data.name,
             product_data.category,
             product_data.price,
@@ -773,7 +760,7 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
 @app.post("/inventory/{product_id}/update")
 def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
     """Update product inventory levels."""
-    return ecommerce_agent.update_inventory(product_id, quantity_change)
+    return get_ecommerce_agent().update_inventory(product_id, quantity_change)
 
 
 @app.post("/customers/create")
@@ -781,7 +768,7 @@ def create_customer(
     email: str, first_name: str, last_name: str, phone: str = "", preferences: Dict[str, Any] = None
 ) -> Dict[str, Any]:
     """Create a new customer profile."""
-    return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
+    return get_ecommerce_agent().create_customer(email, first_name, last_name, phone, None, preferences)
 
 
 @app.post("/orders/create")
@@ -792,51 +779,51 @@ def create_order(
     billing_address: Dict[str, str] = None,
 ) -> Dict[str, Any]:
     """Create a new order."""
-    return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
+    return get_ecommerce_agent().create_order(customer_id, items, shipping_address, billing_address)
 
 
 @app.get("/customers/{customer_id}/recommendations")
 def get_recommendations(customer_id: str, limit: int = 5) -> List[Dict[str, Any]]:
     """Get product recommendations for a customer."""
-    return ecommerce_agent.get_product_recommendations(customer_id, limit)
+    return get_ecommerce_agent().get_product_recommendations(customer_id, limit)
 
 
 @app.get("/analytics/report")
 def get_analytics_report() -> Dict[str, Any]:
     """Get comprehensive analytics report."""
-    return ecommerce_agent.generate_analytics_report()
+    return get_ecommerce_agent().generate_analytics_report()
 
 
 # WordPress/Divi Management Endpoints
 @app.post("/wordpress/analyze-layout")
 def analyze_divi_layout(layout_data: str) -> Dict[str, Any]:
     """Analyze Divi layout structure and performance."""
-    return wordpress_agent.analyze_divi_layout(layout_data)
+    return get_wordpress_agent().analyze_divi_layout(layout_data)
 
 
 @app.post("/wordpress/fix-layout")
 def fix_divi_layout(layout_data: str) -> Dict[str, Any]:
     """Fix Divi layout issues and optimize structure."""
-    return wordpress_agent.fix_divi_layout_issues(layout_data)
+    return get_wordpress_agent().fix_divi_layout_issues(layout_data)
 
 
 @app.post("/wordpress/generate-css")
 def generate_custom_css(requirements: Dict[str, Any]) -> Dict[str, str]:
     """Generate production-ready custom CSS for Divi."""
-    css = wordpress_agent.generate_divi_custom_css(requirements)
+    css = get_wordpress_agent().generate_divi_custom_css(requirements)
     return {"custom_css": css}
 
 
 @app.get("/wordpress/audit-woocommerce")
 def audit_woocommerce() -> Dict[str, Any]:
     """Audit WooCommerce configuration and performance."""
-    return wordpress_agent.audit_woocommerce_setup()
+    return get_wordpress_agent().audit_woocommerce_setup()
 
 
 @app.post("/wordpress/generate-layout/{layout_type}")
 def generate_divi_layout(layout_type: str) -> Dict[str, str]:
     """Generate production-ready Divi 5 layout structures."""
-    layout = wordpress_agent.generate_divi_5_layout(layout_type)
+    layout = get_wordpress_agent().generate_divi_5_layout(layout_type)
     return {"layout_code": layout, "layout_type": layout_type}
 
 
@@ -844,50 +831,50 @@ def generate_divi_layout(layout_type: str) -> Dict[str, str]:
 @app.post("/webdev/analyze-code")
 def analyze_code(code: str, language: str) -> Dict[str, Any]:
     """Analyze code quality and identify issues."""
-    return web_dev_agent.analyze_code_quality(code, language)
+    return get_web_dev_agent().analyze_code_quality(code, language)
 
 
 @app.post("/webdev/fix-code")
 def fix_code_issues(code: str, language: str) -> Dict[str, Any]:
     """Automatically fix common code issues."""
-    return web_dev_agent.fix_code_issues(code, language)
+    return get_web_dev_agent().fix_code_issues(code, language)
 
 
 @app.post("/webdev/optimize-structure")
 def optimize_page_structure(html_content: str) -> Dict[str, Any]:
     """Optimize HTML page structure for SEO and performance."""
-    return web_dev_agent.optimize_page_structure(html_content)
+    return get_web_dev_agent().optimize_page_structure(html_content)
 
 
 # Site Communication & Insights Endpoints
 @app.post("/site/connect-chatbot")
 async def connect_chatbot(website_url: str, api_key: str = None) -> Dict[str, Any]:
     """Connect to website chatbot for insights."""
-    return await site_comm_agent.connect_to_chatbot(website_url, api_key)
+    return await get_site_comm_agent().connect_to_chatbot(website_url, api_key)
 
 
 @app.get("/site/health-insights")
 def get_site_health(website_url: str) -> Dict[str, Any]:
     """Get comprehensive site health insights."""
-    return site_comm_agent.gather_site_health_insights(website_url)
+    return get_site_comm_agent().gather_site_health_insights(website_url)
 
 
 @app.get("/site/customer-feedback")
 def get_customer_feedback(website_url: str) -> Dict[str, Any]:
     """Analyze customer feedback and sentiment."""
-    return site_comm_agent.analyze_customer_feedback(website_url)
+    return get_site_comm_agent().analyze_customer_feedback(website_url)
 
 
 @app.get("/site/market-insights")
 def get_market_insights(website_url: str) -> Dict[str, Any]:
     """Get target market insights and behavior analysis."""
-    return site_comm_agent.get_target_market_insights(website_url)
+    return get_site_comm_agent().get_target_market_insights(website_url)
 
 
 @app.get("/site/comprehensive-report")
 def get_site_report(website_url: str) -> Dict[str, Any]:
     """Generate comprehensive site insights report."""
-    return site_comm_agent.generate_comprehensive_report(website_url)
+    return get_site_comm_agent().generate_comprehensive_report(website_url)
 
 
 # Enhanced Agent Management Endpoints
@@ -1014,7 +1001,7 @@ async def get_prioritized_tasks(risk_level: str = None, agent_type: str = None, 
         if priority:
             filters["priority"] = priority.split(",")
 
-        return await task_risk_manager.get_prioritized_task_list(filters)
+        return await get_task_risk_manager().get_prioritized_task_list(filters)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1025,7 +1012,7 @@ async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new task with risk assessment."""
     try:
         agent_type = task_data.get("agent_type", "general")
-        return await task_risk_manager.create_task(agent_type, task_data)
+        return await get_task_risk_manager().create_task(agent_type, task_data)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1037,7 +1024,7 @@ async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[
     try:
         status = status_data.get("status", "unknown")
         updates = status_data.get("updates", {})
-        return await task_risk_manager.update_task_status(task_id, status, updates)
+        return await get_task_risk_manager().update_task_status(task_id, status, updates)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1049,14 +1036,14 @@ async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[
 @app.get("/seo/analysis")
 async def get_seo_analysis() -> Dict[str, Any]:
     """Get comprehensive SEO analysis with fashion trend insights."""
-    return await seo_marketing_agent.analyze_seo_performance()
+    return await get_seo_marketing_agent().analyze_seo_performance()
 
 
 # Customer Service Agent Endpoints
 @app.get("/customer-service/satisfaction")
 async def get_customer_satisfaction() -> Dict[str, Any]:
     """Get comprehensive customer satisfaction analysis."""
-    return await customer_service_agent.analyze_customer_satisfaction()
+    return await get_customer_service_agent().analyze_customer_satisfaction()
 
 
 @app.post("/customer-service/inquiry")
@@ -1065,7 +1052,7 @@ async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any
     inquiry_type = inquiry_data.get("type", "general")
     customer_tier = inquiry_data.get("customer_tier", "standard")
     urgency = inquiry_data.get("urgency", "normal")
-    return await customer_service_agent.handle_customer_inquiry(inquiry_type, customer_tier, urgency)
+    return await get_customer_service_agent().handle_customer_inquiry(inquiry_type, customer_tier, urgency)
 
 
 # Security Agent Endpoints
@@ -1074,13 +1061,13 @@ async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any
 @app.get("/security/assessment")
 async def get_security_assessment() -> Dict[str, Any]:
     """Get comprehensive security assessment for luxury e-commerce."""
-    return await security_agent.security_assessment()
+    return await get_security_agent().security_assessment()
 
 
 @app.post("/security/fraud-check")
 async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, Any]:
     """Analyze transaction for fraud indicators with luxury-specific checks."""
-    return await security_agent.fraud_detection_analysis(transaction_data)
+    return await get_security_agent().fraud_detection_analysis(transaction_data)
 
 
 # Performance Agent Endpoints
@@ -1089,31 +1076,31 @@ async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, 
 @app.get("/performance/analysis")
 async def get_performance_analysis() -> Dict[str, Any]:
     """Get comprehensive site performance analysis."""
-    return await performance_agent.analyze_site_performance()
+    return await get_performance_agent().analyze_site_performance()
 
 
 @app.get("/performance/realtime")
 async def get_realtime_performance() -> Dict[str, Any]:
     """Get real-time performance metrics and alerts."""
-    return await performance_agent.monitor_real_time_performance()
+    return await get_performance_agent().monitor_real_time_performance()
 
 
 @app.post("/performance/code-analysis")
 async def analyze_code_performance(code_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal code analysis and optimization for any programming language."""
-    return await performance_agent.analyze_and_fix_code(code_data)
+    return await get_performance_agent().analyze_and_fix_code(code_data)
 
 
 @app.post("/performance/debug-error")
 async def debug_application_error(error_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal debugging for any web application error."""
-    return await performance_agent.debug_application_error(error_data)
+    return await get_performance_agent().debug_application_error(error_data)
 
 
 @app.post("/performance/optimize-fullstack")
 async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive full-stack performance optimization."""
-    return await performance_agent.optimize_full_stack_performance(stack_data)
+    return await get_performance_agent().optimize_full_stack_performance(stack_data)
 
 
 # Enhanced Financial Agent Endpoints
@@ -1122,19 +1109,19 @@ async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[st
 @app.post("/financial/tax-preparation")
 async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive tax preparation and optimization service."""
-    return await financial_agent.prepare_tax_returns(tax_data)
+    return await get_financial_agent().prepare_tax_returns(tax_data)
 
 
 @app.post("/financial/credit-analysis")
 async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive business credit analysis and improvement planning."""
-    return await financial_agent.analyze_business_credit(credit_data)
+    return await get_financial_agent().analyze_business_credit(credit_data)
 
 
 @app.post("/financial/advisory")
 async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive financial advisory services for business growth."""
-    return await financial_agent.provide_financial_advisory(advisory_request)
+    return await get_financial_agent().provide_financial_advisory(advisory_request)
 
 
 # Integration Management Endpoints
@@ -1145,10 +1132,10 @@ async def get_supported_services() -> Dict[str, Any]:
     """Get all supported integration services."""
     try:
         return {
-            "supported_services": agent_assignment_manager.supported_services,
-            "total_services": sum(len(services) for services in agent_assignment_manager.supported_services.values()),
-            "service_categories": list(agent_assignment_manager.supported_services.keys()),
-            "security_features": agent_assignment_manager.security_manager,
+            "supported_services": get_agent_assignment_manager().supported_services,
+            "total_services": sum(len(services) for services in get_agent_assignment_manager().supported_services.values()),
+            "service_categories": list(get_agent_assignment_manager().supported_services.keys()),
+            "security_features": get_agent_assignment_manager().security_manager,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1166,7 +1153,7 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
         if not all([agent_type, service_type, service_name]):
             raise HTTPException(status_code=400, detail="Missing required fields")
 
-        return await agent_assignment_manager.create_integration(agent_type, service_type, service_name, credentials)
+        return await get_agent_assignment_manager().create_integration(agent_type, service_type, service_name, credentials)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1175,7 +1162,7 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
 async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
     """Get all integrations for a specific agent."""
     try:
-        return await agent_assignment_manager.get_agent_integrations(agent_type)
+        return await get_agent_assignment_manager().get_agent_integrations(agent_type)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1184,7 +1171,7 @@ async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
 async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
     """Sync data from integrated service."""
     try:
-        return await agent_assignment_manager.sync_integration_data(integration_id)
+        return await get_agent_assignment_manager().sync_integration_data(integration_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1194,15 +1181,15 @@ async def get_integrations_overview() -> Dict[str, Any]:
     """Get overview of all integrations across agents."""
     try:
         overview = {
-            "total_integrations": len(agent_assignment_manager.integrations),
+            "total_integrations": len(get_agent_assignment_manager().integrations),
             "active_integrations": len(
-                [i for i in agent_assignment_manager.integrations.values() if i["status"] == "active"]
+                [i for i in get_agent_assignment_manager().integrations.values() if i["status"] == "active"]
             ),
             "pending_integrations": len(
-                [i for i in agent_assignment_manager.integrations.values() if i["status"] == "pending"]
+                [i for i in get_agent_assignment_manager().integrations.values() if i["status"] == "pending"]
             ),
             "error_integrations": len(
-                [i for i in agent_assignment_manager.integrations.values() if i["status"] == "error"]
+                [i for i in get_agent_assignment_manager().integrations.values() if i["status"] == "error"]
             ),
             "integrations_by_agent": {},
             "popular_services": {},
@@ -1210,12 +1197,12 @@ async def get_integrations_overview() -> Dict[str, Any]:
         }
 
         # Calculate integrations by agent
-        for agent_type, integration_ids in agent_assignment_manager.agent_integrations.items():
+        for agent_type, integration_ids in get_agent_assignment_manager().agent_integrations.items():
             overview["integrations_by_agent"][agent_type] = len(integration_ids)
 
         # Calculate popular services
         service_counts = {}
-        for integration in agent_assignment_manager.integrations.values():
+        for integration in get_agent_assignment_manager().integrations.values():
             service_name = integration["service_name"]
             service_counts[service_name] = service_counts.get(service_name, 0) + 1
 
@@ -1233,7 +1220,7 @@ async def get_integrations_overview() -> Dict[str, Any]:
 async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, Any]:
     """Assign agents specifically for frontend procedures with strict frontend-only focus."""
     try:
-        return await agent_assignment_manager.assign_frontend_agents(frontend_request)
+        return await get_agent_assignment_manager().assign_frontend_agents(frontend_request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1242,7 +1229,7 @@ async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, 
 async def get_frontend_agent_status() -> Dict[str, Any]:
     """Get comprehensive status of all frontend agents."""
     try:
-        return await agent_assignment_manager.get_frontend_agent_status()
+        return await get_agent_assignment_manager().get_frontend_agent_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1251,7 +1238,7 @@ async def get_frontend_agent_status() -> Dict[str, Any]:
 async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a luxury collection page designed like top-selling landing pages."""
     try:
-        return await agent_assignment_manager.create_luxury_collection_page(collection_data)
+        return await get_agent_assignment_manager().create_luxury_collection_page(collection_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1260,7 +1247,7 @@ async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict
 async def get_24_7_monitoring_status() -> Dict[str, Any]:
     """Get current status of 24/7 monitoring system."""
     try:
-        return await agent_assignment_manager.get_24_7_monitoring_status()
+        return await get_agent_assignment_manager().get_24_7_monitoring_status()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1269,7 +1256,7 @@ async def get_24_7_monitoring_status() -> Dict[str, Any]:
 async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize frontend agent workload distribution."""
     try:
-        return await agent_assignment_manager.optimize_agent_workload(optimization_request)
+        return await get_agent_assignment_manager().optimize_agent_workload(optimization_request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1278,7 +1265,7 @@ async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Di
 async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
     """Get current frontend agent assignments for specific role or all roles."""
     try:
-        return await agent_assignment_manager.get_role_assignments(role)
+        return await get_agent_assignment_manager().get_role_assignments(role)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1290,14 +1277,14 @@ async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
 async def get_wordpress_auth_url(state: str = None) -> Dict[str, Any]:
     """Get WordPress OAuth authorization URL."""
     try:
-        auth_url = wordpress_service.generate_auth_url(state)
+        auth_url = get_wordpress_service().generate_auth_url(state)
         logger.info(f"🔗 Generated auth URL: {auth_url}")
         return {
             "auth_url": auth_url,
             "status": "ready_for_authorization",
             "instructions": "Visit this URL to authorize your WordPress site for agent access",
-            "redirect_uri": wordpress_service.redirect_uri,
-            "client_id": wordpress_service.client_id,
+            "redirect_uri": get_wordpress_service().redirect_uri,
+            "client_id": get_wordpress_service().client_id,
         }
     except Exception as e:
         logger.error(f"Auth URL generation failed: {str(e)}")
@@ -1328,7 +1315,7 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
             raise HTTPException(status_code=400, detail="Authorization code required")
 
         logger.info(f"✅ Exchanging code for token: {authorization_code[:10]}...")
-        result = await wordpress_service.exchange_code_for_token(authorization_code)
+        result = await get_wordpress_service().exchange_code_for_token(authorization_code)
 
         if result.get("status") == "success":
             logger.info("🎉 WordPress connection successful!")
@@ -1379,7 +1366,7 @@ async def wordpress_auth_callback_get(
             }
 
         logger.info(f"✅ Processing GET callback code: {code[:10]}...")
-        result = await wordpress_service.exchange_code_for_token(code)
+        result = await get_wordpress_service().exchange_code_for_token(code)
 
         if result.get("status") == "success":
             logger.info("🎉 WordPress GET callback successful!")
@@ -1406,8 +1393,8 @@ async def wordpress_auth_callback_get(
 async def get_wordpress_site_info() -> Dict[str, Any]:
     """Get WordPress site information and agent status."""
     try:
-        site_info = await wordpress_service._get_site_info()
-        performance_data = await wordpress_service.monitor_site_performance()
+        site_info = await get_wordpress_service()._get_site_info()
+        performance_data = await get_wordpress_service().monitor_site_performance()
 
         return {
             "site_info": site_info,
@@ -1423,7 +1410,7 @@ async def get_wordpress_site_info() -> Dict[str, Any]:
 async def get_wordpress_posts(limit: int = 10, post_type: str = "post") -> Dict[str, Any]:
     """Get WordPress posts for agent analysis and optimization."""
     try:
-        posts = await wordpress_service.get_site_posts(limit, post_type)
+        posts = await get_wordpress_service().get_site_posts(limit, post_type)
         return {
             "posts": posts,
             "agent_analysis": "ready_for_optimization",
@@ -1437,7 +1424,7 @@ async def get_wordpress_posts(limit: int = 10, post_type: str = "post") -> Dict[
 async def get_wordpress_pages(limit: int = 20) -> Dict[str, Any]:
     """Get WordPress pages for agent optimization."""
     try:
-        pages = await wordpress_service.get_site_pages(limit)
+        pages = await get_wordpress_service().get_site_pages(limit)
         return {
             "pages": pages,
             "agent_analysis": "ready_for_optimization",
@@ -1451,7 +1438,7 @@ async def get_wordpress_pages(limit: int = 20) -> Dict[str, Any]:
 async def get_wordpress_theme_info() -> Dict[str, Any]:
     """Get WordPress theme information for design agents."""
     try:
-        theme_info = await wordpress_service.get_site_theme_info()
+        theme_info = await get_wordpress_service().get_site_theme_info()
         return {
             "theme_info": theme_info,
             "divi_optimization_ready": theme_info.get("divi_detected", False),
@@ -1472,7 +1459,7 @@ async def update_wordpress_content(update_request: Dict[str, Any]) -> Dict[str, 
         if not post_id:
             raise HTTPException(status_code=400, detail="Post ID required")
 
-        result = await wordpress_service.update_site_content(post_id, content_updates)
+        result = await get_wordpress_service().update_site_content(post_id, content_updates)
         return {
             "update_result": result,
             "agent_responsible": "design_automation_agent",
@@ -1487,7 +1474,7 @@ async def update_wordpress_content(update_request: Dict[str, Any]) -> Dict[str, 
 async def create_wordpress_collection_page(collection_request: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury collection page on WordPress site."""
     try:
-        result = await wordpress_service.create_luxury_collection_page(collection_request)
+        result = await get_wordpress_service().create_luxury_collection_page(collection_request)
 
         if result.get("status") == "success":
             return {
@@ -1510,7 +1497,7 @@ async def create_wordpress_collection_page(collection_request: Dict[str, Any]) -
 async def monitor_wordpress_performance() -> Dict[str, Any]:
     """Get WordPress site performance monitoring from agents."""
     try:
-        performance_data = await wordpress_service.monitor_site_performance()
+        performance_data = await get_wordpress_service().monitor_site_performance()
         return {
             "performance_monitoring": performance_data,
             "agent_recommendations": performance_data.get("agent_recommendations", []),
@@ -1755,21 +1742,21 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
 async def get_wordpress_site_status() -> Dict[str, Any]:
     """Get comprehensive WordPress site status and agent activity."""
     try:
-        if not wordpress_direct.connected:
+        if not get_wordpress_direct().connected:
             # Try to auto-connect
-            connection_result = await wordpress_direct.connect_and_verify()
+            connection_result = await get_wordpress_direct().connect_and_verify()
             if connection_result.get("status") != "connected":
                 return {"status": "disconnected", "message": "WordPress site not connected"}
 
-        site_health = await wordpress_direct.get_site_health()
-        posts_data = await wordpress_direct.get_site_posts(5)
-        pages_data = await wordpress_direct.get_site_pages(10)
+        site_health = await get_wordpress_direct().get_site_health()
+        posts_data = await get_wordpress_direct().get_site_posts(5)
+        pages_data = await get_wordpress_direct().get_site_pages(10)
 
         return {
             "site_health": site_health,
             "recent_posts": posts_data,
             "pages_analysis": pages_data,
-            "woocommerce_status": "integrated" if woocommerce_service.base_url else "ready_to_integrate",
+            "woocommerce_status": "integrated" if get_woocommerce_service().base_url else "ready_to_integrate",
             "ai_agents_active": True,
             "luxury_optimization_score": 92,
             "last_updated": datetime.now().isoformat(),
@@ -1787,7 +1774,7 @@ async def create_wordpress_luxury_page(page_request: Dict[str, Any]) -> Dict[str
             return {"error": "WordPress site not connected"}
 
         # Enhance page data with AI
-        enhanced_content = await openai_service.enhance_product_description(
+        enhanced_content = await get_openai_service().enhance_product_description(
             {
                 "name": page_request.get("title", "Luxury Page"),
                 "description": page_request.get("content", "Premium content"),
@@ -1842,7 +1829,7 @@ async def get_wordpress_posts_analysis() -> Dict[str, Any]:
 async def get_woocommerce_products(per_page: int = 20, category: str = None) -> Dict[str, Any]:
     """Get WooCommerce products for luxury optimization."""
     try:
-        products = await woocommerce_service.get_products(per_page, category)
+        products = await get_woocommerce_service().get_products(per_page, category)
         return {
             "products_data": products,
             "luxury_analysis": products.get("luxury_analysis", {}),
@@ -1857,7 +1844,7 @@ async def get_woocommerce_products(per_page: int = 20, category: str = None) -> 
 async def get_woocommerce_orders(per_page: int = 20, status: str = None) -> Dict[str, Any]:
     """Get WooCommerce orders for revenue analysis."""
     try:
-        orders = await woocommerce_service.get_orders(per_page, status)
+        orders = await get_woocommerce_service().get_orders(per_page, status)
         return {
             "orders_data": orders,
             "revenue_analysis": orders.get("revenue_analysis", {}),
@@ -1873,11 +1860,11 @@ async def create_luxury_woocommerce_product(product_data: Dict[str, Any]) -> Dic
     """Create luxury product with AI optimization."""
     try:
         # Enhance product with OpenAI
-        enhanced_description = await openai_service.enhance_product_description(product_data)
+        enhanced_description = await get_openai_service().enhance_product_description(product_data)
         if "enhanced_description" in enhanced_description:
             product_data["description"] = enhanced_description["enhanced_description"]
 
-        result = await woocommerce_service.create_luxury_product(product_data)
+        result = await get_woocommerce_service().create_luxury_product(product_data)
         return {
             "product_created": result,
             "ai_enhancements": enhanced_description,
@@ -1893,11 +1880,11 @@ async def optimize_woocommerce_product(product_id: int, updates: Dict[str, Any])
     """Optimize existing product with luxury AI enhancements."""
     try:
         # Get AI-powered optimizations
-        ai_optimizations = await openai_service.enhance_product_description(updates)
+        ai_optimizations = await get_openai_service().enhance_product_description(updates)
         if "enhanced_description" in ai_optimizations:
             updates["description"] = ai_optimizations["enhanced_description"]
 
-        result = await woocommerce_service.update_product_for_luxury(product_id, updates)
+        result = await get_woocommerce_service().update_product_for_luxury(product_id, updates)
         return {
             "optimization_result": result,
             "ai_enhancements": ai_optimizations,
@@ -1912,7 +1899,7 @@ async def optimize_woocommerce_product(product_id: int, updates: Dict[str, Any])
 async def get_woocommerce_analytics(period: str = "7d") -> Dict[str, Any]:
     """Get WooCommerce analytics with luxury insights."""
     try:
-        analytics = await woocommerce_service.get_sales_analytics(period)
+        analytics = await get_woocommerce_service().get_sales_analytics(period)
         return {
             "sales_analytics": analytics,
             "luxury_performance": analytics.get("luxury_performance_insights", {}),
@@ -1930,7 +1917,7 @@ async def get_woocommerce_analytics(period: str = "7d") -> Dict[str, Any]:
 async def generate_ai_content_strategy(site_data: Dict[str, Any]) -> Dict[str, Any]:
     """Generate AI-powered luxury content strategy."""
     try:
-        strategy = await openai_service.generate_luxury_content_strategy(site_data)
+        strategy = await get_openai_service().generate_luxury_content_strategy(site_data)
         return {
             "content_strategy": strategy,
             "implementation_guide": "detailed_strategic_roadmap",
@@ -1945,7 +1932,7 @@ async def generate_ai_content_strategy(site_data: Dict[str, Any]) -> Dict[str, A
 async def ai_optimize_page_seo(page_data: Dict[str, Any]) -> Dict[str, Any]:
     """Use AI to optimize page content for luxury SEO."""
     try:
-        optimization = await openai_service.optimize_page_content_for_seo(page_data)
+        optimization = await get_openai_service().optimize_page_content_for_seo(page_data)
         return {
             "seo_optimization": optimization,
             "traffic_potential": optimization.get("expected_traffic_increase", "+150%"),
@@ -1960,7 +1947,7 @@ async def ai_optimize_page_seo(page_data: Dict[str, Any]) -> Dict[str, Any]:
 async def ai_competitor_analysis(competitor_data: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered competitive analysis for luxury brands."""
     try:
-        analysis = await openai_service.analyze_competitor_strategy(competitor_data)
+        analysis = await get_openai_service().analyze_competitor_strategy(competitor_data)
         return {
             "competitive_analysis": analysis,
             "strategic_advantages": "multiple_opportunities_identified",
@@ -1975,7 +1962,7 @@ async def ai_competitor_analysis(competitor_data: Dict[str, Any]) -> Dict[str, A
 async def generate_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Generate luxury email campaign with AI."""
     try:
-        campaign = await openai_service.generate_luxury_email_campaign(campaign_data)
+        campaign = await get_openai_service().generate_luxury_email_campaign(campaign_data)
         return {
             "email_campaign": campaign,
             "expected_performance": {
@@ -1992,7 +1979,7 @@ async def generate_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str,
 async def ai_executive_decision(decision_context: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered executive business decision making."""
     try:
-        decision = await openai_service.make_executive_business_decision(decision_context)
+        decision = await get_openai_service().make_executive_business_decision(decision_context)
         return {
             "executive_decision": decision,
             "confidence_level": decision.get("confidence_level", "high"),
@@ -2007,7 +1994,7 @@ async def ai_executive_decision(decision_context: Dict[str, Any]) -> Dict[str, A
 async def ai_optimize_conversion_funnel(funnel_data: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered conversion funnel optimization."""
     try:
-        optimization = await openai_service.optimize_conversion_funnel(funnel_data)
+        optimization = await get_openai_service().optimize_conversion_funnel(funnel_data)
         return {
             "funnel_optimization": optimization,
             "expected_improvement": optimization.get("expected_improvement", "+40%"),
@@ -2023,7 +2010,7 @@ async def ai_optimize_conversion_funnel(funnel_data: Dict[str, Any]) -> Dict[str
 
 async def setup_woocommerce_integration(site_url: str):
     """Setup WooCommerce integration when WordPress site connects."""
-    woocommerce_service.set_site_url(site_url)
+    get_woocommerce_service().set_site_url(site_url)
     logger.info(f"🛒 WooCommerce integration configured for {site_url}")
 
 
@@ -2564,24 +2551,24 @@ async def run_full_optimization(website_url: str = "https://theskyy-rose-collect
     """Run comprehensive DevSkyy optimization with brand-aware agents."""
 
     # Execute brand learning cycle first
-    brand_learning = await brand_intelligence.continuous_learning_cycle()
+    brand_learning = await get_brand_intelligence().continuous_learning_cycle()
 
     # Update all agents with latest brand context
     for agent_name, agent in [
-        ("inventory", inventory_agent),
-        ("financial", financial_agent),
-        ("ecommerce", ecommerce_agent),
-        ("wordpress", wordpress_agent),
-        ("web_development", web_dev_agent),
-        ("site_communication", site_comm_agent),
+        ("inventory", get_inventory_agent()),
+        ("financial", get_financial_agent()),
+        ("ecommerce", get_ecommerce_agent()),
+        ("wordpress", get_wordpress_agent()),
+        ("web_development", get_web_dev_agent()),
+        ("site_communication", get_site_comm_agent()),
     ]:
-        agent.brand_context = brand_intelligence.get_brand_context_for_agent(agent_name)
+        agent.brand_context = get_brand_intelligence().get_brand_context_for_agent(agent_name)
 
     # Run basic DevSkyy workflow
     basic_result = run_agent()
 
     # WordPress/Divi optimization with brand awareness
-    wordpress_result = await wordpress_agent.optimize_wordpress_god_mode({"site_url": website_url})
+    wordpress_result = await get_wordpress_agent().optimize_wordpress_god_mode({"site_url": website_url})
 
     # Web development fixes with brand context
     webdev_result = fix_web_development_issues()
@@ -2620,22 +2607,22 @@ def get_brand_context(agent_type: str) -> Dict[str, Any]:
 @app.post("/brand/learning-cycle")
 async def run_learning_cycle() -> Dict[str, Any]:
     """Execute continuous brand learning cycle."""
-    return await brand_intelligence.continuous_learning_cycle()
+    return await get_brand_intelligence().continuous_learning_cycle()
 
 
 @app.get("/brand/latest-drop")
 def get_latest_drop() -> Dict[str, Any]:
     """Get information about the latest product drop."""
-    return brand_intelligence._get_latest_drop()
+    return get_brand_intelligence()._get_latest_drop()
 
 
 @app.get("/brand/evolution")
 def get_brand_evolution() -> Dict[str, Any]:
     """Get brand evolution timeline and changes."""
     return {
-        "theme_evolution": brand_intelligence.theme_evolution,
-        "recent_changes": brand_intelligence._track_brand_changes(),
-        "upcoming_updates": brand_intelligence._analyze_seasonal_content(),
+        "theme_evolution": get_brand_intelligence().theme_evolution,
+        "recent_changes": get_brand_intelligence()._track_brand_changes(),
+        "upcoming_updates": get_brand_intelligence()._analyze_seasonal_content(),
     }
 
 
