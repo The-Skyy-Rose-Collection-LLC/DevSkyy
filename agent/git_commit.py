@@ -3,7 +3,7 @@ import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -210,7 +210,7 @@ def _git_add_files() -> Dict[str, Any]:
     """Add modified files to Git staging area."""
     try:
         # Add Python files
-        result = subprocess.run(["git", "add", "*.py"], capture_output=True, text=True, timeout=30)
+        subprocess.run(["git", "add", "*.py"], capture_output=True, text=True, timeout=30)
 
         # Add other important files
         important_files = ["main.py", "README.md", ".gitignore"]

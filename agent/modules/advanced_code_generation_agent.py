@@ -11,14 +11,10 @@ This agent can:
 - Optimize existing codebases
 """
 
-import ast
 import json
 import logging
 import os
-import re
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import openai
 
@@ -272,7 +268,6 @@ class AdvancedCodeGenerationAgent:
 
         try:
             campaign_type = campaign_spec.get("type", "product_launch")
-            target_audience = campaign_spec.get("audience", "luxury_consumers")
             channels = campaign_spec.get("channels", ["social", "email", "web"])
 
             marketing_content = {}
@@ -377,10 +372,7 @@ import { motion } from 'framer-motion';
 
 const {component_name} = ({props}) => {{
     {state_hooks}
-    
-    {effects}
-    
-    return (
+    {effects}    return (
         <motion.div
             className="{css_classes}"
             {animations}

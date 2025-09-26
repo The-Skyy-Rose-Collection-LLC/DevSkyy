@@ -9,8 +9,6 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 
 from agent.modules.scanner import scan_site
-
-
 from agent.modules.fixer import fix_code
 
 # Optional heavy imports: define fallbacks if unavailable during testing
@@ -240,8 +238,6 @@ except Exception:
         return {"status": "unavailable"}
 
 
-import asyncio
-import json
 from datetime import datetime
 from typing import Any, Dict
 
@@ -331,7 +327,7 @@ def get_brand_intelligence():
 
 def get_agent(agent_name: str):
     """Get or create agent instance (lazy initialization with caching)."""
-    global _agent_cache
+    # Global agent cache for performance optimization
 
     if agent_name not in _agent_cache:
         # Agent factory mapping

@@ -3,9 +3,9 @@ import hashlib
 import json
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import wraps
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -272,8 +272,6 @@ class IndexOptimizer:
 
         # Analyze common query patterns
         for query in query_patterns:
-            query_lower = query.lower()
-
             # Find WHERE clause columns
             where_columns = self._extract_where_columns(query)
             for column in where_columns:
@@ -284,7 +282,7 @@ class IndexOptimizer:
                             "column": column,
                             "type": "SINGLE_COLUMN",
                             "priority": "HIGH",
-                            "reason": f"Frequently used in WHERE clauses",
+                            "reason": "Frequently used in WHERE clauses",
                             "estimated_improvement": "50-80%",
                         }
                     )

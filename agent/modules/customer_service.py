@@ -40,7 +40,7 @@ class CustomerServiceAgent:
         """Generate automated responses for common inquiries."""
         responses = {
             "shipping": f"""Dear {customer_name},
-            
+
 Thank you for contacting The Skyy Rose Collection. We've received your shipping inquiry.
 
 Your order status and tracking information can be found in your account dashboard. Most orders are processed within 1-2 business days and arrive within 3-5 business days.

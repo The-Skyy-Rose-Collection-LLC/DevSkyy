@@ -3,7 +3,7 @@ import os
 import re
 import secrets
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import bcrypt
 import jwt
@@ -303,7 +303,7 @@ class AuthManager:
                     .filter(
                         UserSession.user_id == payload["user_id"],
                         UserSession.expires_at > datetime.now(),
-                        UserSession.is_active == True,
+                        UserSession.is_active,
                     )
                     .first()
                 )
@@ -352,7 +352,7 @@ class AuthManager:
                 .filter(
                     UserSession.user_id == user_id,
                     UserSession.expires_at > datetime.now(),
-                    UserSession.is_active == True,
+                    UserSession.is_active,
                 )
                 .count()
             )
@@ -402,7 +402,7 @@ class AuthManager:
         try:
             # Deactivate all sessions for this user
             db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"], UserSession.is_active == True
+                UserSession.user_id == payload["user_id"], UserSession.is_active
             ).update({"is_active": False})
 
             db.commit()
