@@ -132,7 +132,7 @@ class WordPressServerAccess:
                     attrs = self.sftp_client.lstat(item)
                     if attrs.st_mode & 0o40000:  # Directory
                         wp_dirs.append(item)
-                except:
+                except (OSError, IOError, FileNotFoundError):
                     continue
 
             return {
@@ -414,7 +414,7 @@ class WordPressServerAccess:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as backup:
                     backup.write(existing_htaccess)
                     self.sftp_client.put(backup.name, ".htaccess.backup")
-            except:
+            except (OSError, IOError, FileNotFoundError):
                 pass  # File doesn't exist, that's ok
 
             # Upload new .htaccess
@@ -441,7 +441,7 @@ class WordPressServerAccess:
                 try:
                     attrs = self.sftp_client.lstat(file_name)
                     permissions_checked += 1
-                except:
+                except (OSError, IOError, FileNotFoundError):
                     continue
 
             logger.info(f"✅ Checked permissions on {permissions_checked} security files")
@@ -466,7 +466,7 @@ class WordPressServerAccess:
                             self.sftp_client.remove(file_name)
                             files_cleaned += 1
                             logger.info(f"🗑️ Cleaned temporary file: {file_name}")
-                        except:
+                        except (OSError, IOError, FileNotFoundError):
                             continue
 
             return files_cleaned > 0

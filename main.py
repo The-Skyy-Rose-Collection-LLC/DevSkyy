@@ -285,15 +285,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Production middleware
+# Get environment configuration
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+trusted_hosts = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
+    allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
 )
 
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])  # Configure for your domain in production
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
 
 # Global exception handlers
 
