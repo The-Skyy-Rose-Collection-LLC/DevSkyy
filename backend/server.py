@@ -12,9 +12,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from main import app
 
-# Import the FastAPI app from main.py
-
-# This allows uvicorn to find the app when running with "uvicorn server:app"
 if __name__ == "__main__":
     import uvicorn
 
