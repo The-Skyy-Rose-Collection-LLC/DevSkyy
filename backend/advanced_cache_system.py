@@ -97,11 +97,13 @@ class AdvancedCacheManager:
         """Serialize value for storage."""
         try:
             if self.config.enable_compression:
-                # Use pickle for complex objects, JSON for simple ones
+                # Only serialize JSON-compatible types for security
                 if isinstance(value, (dict, list, str, int, float, bool, type(None))):
                     return json.dumps(value)
                 else:
-                    return pickle.dumps(value).hex()
+                    # Convert non-JSON types to string representation for security
+                    logger.warning(f"Converting non-JSON type {type(value)} to string for security")
+                    return json.dumps(str(value))
             else:
                 return json.dumps(value)
         except Exception as e:
@@ -114,12 +116,9 @@ class AdvancedCacheManager:
             # Try JSON first
             return json.loads(value)
         except json.JSONDecodeError:
-            try:
-                # Try pickle if JSON fails
-                return pickle.loads(bytes.fromhex(value))
-            except Exception as e:
-                logger.error(f"Deserialization error: {e}")
-                return value
+            # Log warning about unsupported pickle data
+            logger.warning("Pickle deserialization is disabled for security reasons. Data may be lost.")
+            return None
 
     def _update_memory_cache_lru(self, key: str):
         """Update LRU order for memory cache."""
