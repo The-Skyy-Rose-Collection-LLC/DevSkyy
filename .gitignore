@@ -171,6 +171,11 @@ backup_[0-9]*
 *.ps
 *.eps
 
+# SHA Updater generated files
+sha_update.log
+sha_update_report.json
+.github/workflows_backup/
+
 # Jekyll specific
 _site/
 .sass-cache/
