@@ -4,7 +4,7 @@ pymongo>=4.9,<4.10
 python-dotenv==1.0.1
 pydantic==2.10.4
 requests==2.32.3
-python-multipart==0.0.17
+python-multipart==0.0.18
 aiofiles==24.1.0
 motor==3.6.0
 python-jose[cryptography]==3.3.0
