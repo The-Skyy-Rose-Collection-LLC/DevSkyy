@@ -240,9 +240,6 @@ except Exception:
         return {"status": "unavailable"}
 
 
-from datetime import datetime
-from typing import Any, Dict
-
 from dotenv import load_dotenv
 
 from models import PaymentRequest, ProductRequest

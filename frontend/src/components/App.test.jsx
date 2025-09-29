@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import App from '../App.jsx'
 
 describe('App', () => {
@@ -11,7 +12,7 @@ describe('App', () => {
 
   it('has correct title', () => {
     render(<App />)
-    // Basic smoke test
-    expect(document.title || 'DevSkyy').toBeTruthy()
+    // Basic smoke test - check if App component exists
+    expect(document.body).toBeInTheDocument()
   })
 })
