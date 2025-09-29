@@ -1,6 +1,8 @@
 import logging
 import os
 import sys
+from datetime import datetime, timedelta
+from typing import Dict, List, Any
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -9,7 +11,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 
 from agent.modules.fixer import fix_code
-from agent.modules.scanner import scan_site
+from agent.modules.scanner import scan_site, scan_agents_only
 
 # Optional heavy imports: define fallbacks if unavailable during testing
 try:
@@ -1767,6 +1769,7 @@ async def get_wordpress_site_status() -> Dict[str, Any]:
 async def create_wordpress_luxury_page(page_request: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury page directly on WordPress site."""
     try:
+        wordpress_direct = get_wordpress_direct()
         if not wordpress_direct.connected:
             return {"error": "WordPress site not connected"}
 
@@ -1803,6 +1806,7 @@ async def create_wordpress_luxury_page(page_request: Dict[str, Any]) -> Dict[str
 async def get_wordpress_posts_analysis() -> Dict[str, Any]:
     """Get AI-powered analysis of WordPress posts for luxury optimization."""
     try:
+        wordpress_direct = get_wordpress_direct()
         if not wordpress_direct.connected:
             return {"error": "WordPress site not connected"}
 
@@ -2019,8 +2023,8 @@ async def get_risk_dashboard() -> Dict[str, Any]:
     """Get comprehensive risk dashboard with prioritization."""
     try:
         # Get risks from all agents
-        security_assessment = await security_agent.security_assessment()
-        performance_analysis = await performance_agent.analyze_site_performance()
+        security_assessment = await get_security_agent().security_assessment()
+        performance_analysis = await get_performance_agent().analyze_site_performance()
 
         risk_summary = {
             "overall_risk_level": "MEDIUM",
@@ -2063,37 +2067,37 @@ async def get_risk_dashboard() -> Dict[str, Any]:
 @app.post("/experimental/quantum-inventory")
 async def quantum_inventory_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum inventory optimization."""
-    return await inventory_agent.quantum_asset_optimization()
+    return await get_inventory_agent().quantum_asset_optimization()
 
 
 @app.post("/experimental/blockchain-audit")
 async def blockchain_financial_audit() -> Dict[str, Any]:
     """EXPERIMENTAL: Blockchain financial audit."""
-    return await financial_agent.experimental_blockchain_audit()
+    return await get_financial_agent().experimental_blockchain_audit()
 
 
 @app.post("/experimental/neural-commerce/{customer_id}")
 async def neural_commerce_session(customer_id: str) -> Dict[str, Any]:
     """EXPERIMENTAL: Neural commerce experience."""
-    return await ecommerce_agent.experimental_neural_commerce_session(customer_id)
+    return await get_ecommerce_agent().experimental_neural_commerce_session(customer_id)
 
 
 @app.post("/experimental/quantum-wordpress")
 async def quantum_wordpress_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum WordPress optimization."""
-    return await wordpress_agent.experimental_quantum_wordpress_optimization()
+    return await get_wordpress_agent().experimental_quantum_wordpress_optimization()
 
 
 @app.post("/experimental/neural-code")
 async def neural_code_generation(requirements: str, language: str = "javascript") -> Dict[str, Any]:
     """EXPERIMENTAL: Neural code generation."""
-    return await web_dev_agent.experimental_neural_code_generation(requirements, language)
+    return await get_web_dev_agent().experimental_neural_code_generation(requirements, language)
 
 
 @app.post("/experimental/neural-communication")
 async def neural_communication_analysis(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
     """EXPERIMENTAL: Neural communication analysis."""
-    return await site_comm_agent.experimental_neural_communication_analysis(website_url)
+    return await get_site_comm_agent().experimental_neural_communication_analysis(website_url)
 
 
 # Comprehensive Automation Empire Endpoints
@@ -2164,9 +2168,9 @@ async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, 
 
         # AI enhance campaign content
         if campaign_type == "social_media_luxury":
-            enhanced_content = await social_media_automation_agent.create_luxury_campaign(campaign_data)
+            enhanced_content = await get_social_media_automation_agent().create_luxury_campaign(campaign_data)
         elif campaign_type == "email_luxury":
-            enhanced_content = await email_sms_automation_agent.create_email_campaign(campaign_data)
+            enhanced_content = await get_email_sms_automation_agent().create_email_campaign(campaign_data)
         else:
             enhanced_content = {"message": "Campaign created with basic optimization"}
 
@@ -2211,7 +2215,7 @@ async def connect_social_platform(connection_data: Dict[str, Any]) -> Dict[str, 
 async def create_sms_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create SMS marketing campaign with luxury focus."""
     try:
-        enhanced_message = await email_sms_automation_agent.create_sms_campaign(
+        enhanced_message = await get_email_sms_automation_agent().create_sms_campaign(
             {**campaign_data, "brand_voice": "luxury_streetwear", "compliance": "TCPA_compliant"}
         )
 
@@ -2233,7 +2237,7 @@ async def create_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, A
         brand_voice = campaign_data.get("brand_voice", "luxury_streetwear")
         target_segments = campaign_data.get("target_segments", ["vip_customers"])
 
-        enhanced_campaign = await email_sms_automation_agent.create_email_campaign(
+        enhanced_campaign = await get_email_sms_automation_agent().create_email_campaign(
             {**campaign_data, "ai_optimization": True, "brand_voice": brand_voice, "personalization": "advanced"}
         )
 
@@ -2257,7 +2261,7 @@ async def deploy_wordpress_theme(theme_data: Dict[str, Any]) -> Dict[str, Any]:
         brand_assets = theme_data.get("brand_assets", {})
 
         # Deploy theme using design automation agent
-        deployment_result = await design_automation_agent.deploy_luxury_theme(
+        deployment_result = await get_design_automation_agent().deploy_luxury_theme(
             {
                 "layout": layout_id,
                 "brand_assets": brand_assets,
@@ -2286,7 +2290,7 @@ async def create_custom_section(section_data: Dict[str, Any]) -> Dict[str, Any]:
         section_type = section_data.get("type")
         brand_style = section_data.get("brand_style", "luxury_streetwear")
 
-        custom_section = await design_automation_agent.create_custom_section(
+        custom_section = await get_design_automation_agent().create_custom_section(
             {**section_data, "luxury_optimization": True, "brand_integration": True}
         )
 
@@ -2631,9 +2635,9 @@ async def get_dashboard():
     """Get comprehensive business dashboard."""
     try:
         # Get metrics from all agents
-        inventory_metrics = inventory_agent.get_metrics()
-        financial_metrics = financial_agent.get_financial_overview()
-        ecommerce_metrics = ecommerce_agent.get_analytics_dashboard()
+        inventory_metrics = get_inventory_agent().get_metrics()
+        financial_metrics = get_financial_agent().get_financial_overview()
+        ecommerce_metrics = get_ecommerce_agent().get_analytics_dashboard()
 
         return {
             "platform_status": "OPERATIONAL",
