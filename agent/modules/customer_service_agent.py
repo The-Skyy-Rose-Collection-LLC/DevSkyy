@@ -128,13 +128,15 @@ class CustomerServiceAgent:
         except Exception as e:
             logger.error(f"❌ ML model initialization failed: {str(e)}")
             # Set default performance metrics if initialization fails
-            self.model_performance.update({
-                "sentiment_accuracy": 0.0,
-                "classification_accuracy": 0.0,
-                "segmentation_score": 0.0,
-                "last_training": None,
-                "training_samples": 0,
-            })
+            self.model_performance.update(
+                {
+                    "sentiment_accuracy": 0.0,
+                    "classification_accuracy": 0.0,
+                    "segmentation_score": 0.0,
+                    "last_training": None,
+                    "training_samples": 0,
+                }
+            )
 
     def _generate_synthetic_training_data(self) -> Dict[str, Any]:
         """Generate synthetic training data for ML models."""
