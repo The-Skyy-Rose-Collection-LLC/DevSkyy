@@ -1,0 +1,118 @@
+# Enhanced GitHub Actions Workflow for TypeScript Projects
+# This addresses common internal error issues
+
+name: Test and Lint (Enhanced)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # Prevent infinite runs
+    
+    # Add resource limits
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4  # Updated from v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4  # Updated from v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm ci --prefer-offline --no-audit
+      timeout-minutes: 10
+      
+    - name: Type checking
+      run: |
+        npx tsc --noEmit
+      timeout-minutes: 5
+      continue-on-error: false
+      
+    - name: Run linting
+      run: |
+        npm run lint
+      timeout-minutes: 5
+      continue-on-error: false
+      
+    - name: Run tests
+      run: |
+        npm test
+      timeout-minutes: 15
+      continue-on-error: false
+      
+    - name: Build project
+      run: |
+        npm run build
+      timeout-minutes: 10
+      continue-on-error: false
+
+# Alternative minimal version for troubleshooting
+---
+name: Test and Lint (Minimal Debug)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debug-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Debug environment
+      run: |
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        echo "Available memory: $(free -h)"
+        echo "Disk space: $(df -h)"
+        
+    - name: Install dependencies (with verbose output)
+      run: |
+        npm ci --verbose --prefer-offline --no-audit
+      timeout-minutes: 10
+      
+    - name: Check package.json scripts
+      run: |
+        echo "Available scripts:"
+        npm run
+      timeout-minutes: 2
+      
+    - name: Run tests (step 5 equivalent)
+      run: |
+        npm test
+      timeout-minutes: 10
+      continue-on-error: true  # Don't fail on first error
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          coverage/
+          test-results/
+          *.log
