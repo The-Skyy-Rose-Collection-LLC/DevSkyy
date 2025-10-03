@@ -160,9 +160,7 @@ class MultiModelAIOrchestrator:
             if use_ensemble:
                 return await self._ensemble_generate(prompt, task_type, max_tokens, temperature)
             else:
-                return await self._single_model_generate(
-                    prompt, task_type, max_tokens, temperature
-                )
+                return await self._single_model_generate(prompt, task_type, max_tokens, temperature)
 
         except Exception as e:
             logger.error(f"❌ Multi-model generation failed: {e}")
@@ -256,9 +254,7 @@ Create the optimal combined response that leverages the strengths of each."""
             "timestamp": datetime.now().isoformat(),
         }
 
-    async def _call_claude(
-        self, model_name: str, prompt: str, max_tokens: int, temperature: float
-    ) -> str:
+    async def _call_claude(self, model_name: str, prompt: str, max_tokens: int, temperature: float) -> str:
         """Call Anthropic Claude model."""
         try:
             client = self.models["claude"]["client"]
@@ -277,9 +273,7 @@ Create the optimal combined response that leverages the strengths of each."""
             logger.error(f"Claude call failed: {e}")
             raise
 
-    async def _call_openai(
-        self, model_name: str, prompt: str, max_tokens: int, temperature: float
-    ) -> str:
+    async def _call_openai(self, model_name: str, prompt: str, max_tokens: int, temperature: float) -> str:
         """Call OpenAI model."""
         try:
             client = self.models["openai"]["client"]
@@ -298,9 +292,7 @@ Create the optimal combined response that leverages the strengths of each."""
             logger.error(f"OpenAI call failed: {e}")
             raise
 
-    async def _call_gemini(
-        self, model_name: str, prompt: str, max_tokens: int, temperature: float
-    ) -> str:
+    async def _call_gemini(self, model_name: str, prompt: str, max_tokens: int, temperature: float) -> str:
         """Call Google Gemini model."""
         try:
             api_key = self.models["gemini"]["api_key"]
@@ -330,9 +322,7 @@ Create the optimal combined response that leverages the strengths of each."""
             logger.error(f"Gemini call failed: {e}")
             raise
 
-    async def _call_mistral(
-        self, model_name: str, prompt: str, max_tokens: int, temperature: float
-    ) -> str:
+    async def _call_mistral(self, model_name: str, prompt: str, max_tokens: int, temperature: float) -> str:
         """Call Mistral AI model."""
         try:
             api_key = self.models["mistral"]["api_key"]
@@ -362,9 +352,7 @@ Create the optimal combined response that leverages the strengths of each."""
             logger.error(f"Mistral call failed: {e}")
             raise
 
-    async def _call_together(
-        self, model_name: str, prompt: str, max_tokens: int, temperature: float
-    ) -> str:
+    async def _call_together(self, model_name: str, prompt: str, max_tokens: int, temperature: float) -> str:
         """Call Together AI model (Llama, Mixtral, etc.)."""
         try:
             api_key = self.models["together"]["api_key"]
@@ -422,14 +410,10 @@ Create the optimal combined response that leverages the strengths of each."""
 
                         duration = (datetime.now() - start_time).total_seconds()
 
-                        platform_results.append(
-                            {"prompt": prompt, "response_time": duration, "success": True}
-                        )
+                        platform_results.append({"prompt": prompt, "response_time": duration, "success": True})
 
                     except Exception as e:
-                        platform_results.append(
-                            {"prompt": prompt, "error": str(e), "success": False}
-                        )
+                        platform_results.append({"prompt": prompt, "error": str(e), "success": False})
 
                 results[platform] = platform_results
 
@@ -447,9 +431,7 @@ ai_orchestrator = create_multi_model_orchestrator()
 
 
 # Convenience functions
-async def ai_generate(
-    prompt: str, task_type: str = "general", use_best: bool = True
-) -> str:
+async def ai_generate(prompt: str, task_type: str = "general", use_best: bool = True) -> str:
     """Generate using optimal AI model."""
     result = await ai_orchestrator.generate(prompt, task_type, use_ensemble=not use_best)
     return result.get("response", "")
