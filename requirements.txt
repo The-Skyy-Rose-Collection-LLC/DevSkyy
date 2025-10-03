@@ -27,7 +27,7 @@ certifi==2024.12.14  # Latest security certificates
 # AI & ML - Advanced Models
 anthropic==0.39.0  # Claude Sonnet 4.5 - Advanced reasoning and analysis
 openai==1.55.3  # GPT-4 and DALL-E integration
-transformers==4.46.3  # Hugging Face transformers for state-of-the-art NLP
+transformers==4.53.0  # Hugging Face transformers for state-of-the-art NLP
 torch==2.5.1  # PyTorch for deep learning
 torchvision==0.20.1  # Computer vision models
 diffusers==0.31.0  # Stable Diffusion and advanced image generation
