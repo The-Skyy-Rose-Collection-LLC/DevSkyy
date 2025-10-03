@@ -14,7 +14,7 @@ dnspython==2.7.0
 
 # HTTP & API
 requests==2.32.3
-python-multipart==0.0.17
+python-multipart==0.0.18  # Security update
 aiofiles==24.1.0
 httpx==0.28.1
 
@@ -22,7 +22,7 @@ httpx==0.28.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
-certifi==2024.8.30
+certifi==2024.12.14  # Latest security certificates
 
 # AI & ML - Advanced Models
 anthropic==0.39.0  # Claude Sonnet 4.5 - Advanced reasoning and analysis
@@ -41,7 +41,7 @@ lightgbm==4.5.0  # Fast gradient boosting framework
 
 # Computer Vision & Image Processing
 opencv-python==4.10.0.84
-Pillow==10.4.0
+Pillow==11.0.0  # Updated to latest for security fixes
 imagehash==4.3.2
 
 # Web Scraping & Parsing
