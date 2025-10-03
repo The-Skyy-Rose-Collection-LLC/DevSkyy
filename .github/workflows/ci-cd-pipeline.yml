@@ -224,40 +224,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python -c "
-          from agent.modules.scanner import scan_site
-          from agent.modules.performance_agent import PerformanceAgent
-          from agent.modules.security_agent import SecurityAgent
-          import json
-          from datetime import datetime
-          
-          print('🔍 Starting daily website scan...')
-          
-          # Run comprehensive scan
-          scan_results = scan_site()
-          
-          # Performance analysis
-          perf_agent = PerformanceAgent()
-          perf_results = perf_agent.analyze_site_performance()
-          
-          # Security analysis
-          sec_agent = SecurityAgent()
-          sec_results = sec_agent.security_assessment()
-          
-          # Compile report
-          report = {
-              'timestamp': datetime.now().isoformat(),
-              'scan_results': scan_results,
-              'performance_analysis': perf_results,
-              'security_assessment': sec_results
-          }
-          
-          # Save report
-          with open('daily-scan-report.json', 'w') as f:
-              json.dump(report, f, indent=2)
-          
-          print('✅ Daily scan completed successfully')
-          "
+          python scripts/daily_scan_runner.py
 
       - name: Upload scan report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
