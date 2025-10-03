@@ -20,9 +20,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agent.modules.continuous_learning_background_agent import (
-    create_learning_agent,
-)
+from agent.modules.continuous_learning_background_agent import create_learning_agent
 
 logging.basicConfig(
     level=logging.INFO,
