@@ -35,7 +35,7 @@ class Config:
 
     # Security
     CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
-    TRUSTED_HOSTS = ["theskyy-rose-collection.com", "*.replit.app"]
+    TRUSTED_HOSTS = ["theskyy-rose-collection.com"]
 
 
 class DevelopmentConfig(Config):
