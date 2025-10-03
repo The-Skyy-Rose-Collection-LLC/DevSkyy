@@ -57,34 +57,19 @@ class VoiceAudioContentAgent:
         self.brand_voices = {
             "luxury_female": {
                 "voice_id": "21m00Tcm4TlvDq8ikWAM",  # Rachel - warm, confident
-                "settings": {
-                    "stability": 0.75,
-                    "similarity_boost": 0.85,
-                    "style": 0.6,
-                    "use_speaker_boost": True
-                },
-                "description": "Sophisticated, warm female voice for luxury presentations"
+                "settings": {"stability": 0.75, "similarity_boost": 0.85, "style": 0.6, "use_speaker_boost": True},
+                "description": "Sophisticated, warm female voice for luxury presentations",
             },
             "luxury_male": {
                 "voice_id": "pNInz6obpgDQGcFmaJgB",  # Adam - deep, professional
-                "settings": {
-                    "stability": 0.8,
-                    "similarity_boost": 0.8,
-                    "style": 0.5,
-                    "use_speaker_boost": True
-                },
-                "description": "Deep, confident male voice for brand authority"
+                "settings": {"stability": 0.8, "similarity_boost": 0.8, "style": 0.5, "use_speaker_boost": True},
+                "description": "Deep, confident male voice for brand authority",
             },
             "narrator": {
                 "voice_id": "flq6f7yk4E4fJM5XTYuZ",  # Michael - clear narrator
-                "settings": {
-                    "stability": 0.85,
-                    "similarity_boost": 0.75,
-                    "style": 0.4,
-                    "use_speaker_boost": False
-                },
-                "description": "Clear, engaging narrator for product stories"
-            }
+                "settings": {"stability": 0.85, "similarity_boost": 0.75, "style": 0.4, "use_speaker_boost": False},
+                "description": "Clear, engaging narrator for product stories",
+            },
         }
 
         # Audio templates for different content types
@@ -93,26 +78,26 @@ class VoiceAudioContentAgent:
                 "intro_music": "luxury_ambient",
                 "voice": "luxury_female",
                 "pacing": "elegant",
-                "background_volume": 0.3
+                "background_volume": 0.3,
             },
             "brand_story": {
                 "intro_music": "emotional_piano",
                 "voice": "narrator",
                 "pacing": "storytelling",
-                "background_volume": 0.2
+                "background_volume": 0.2,
             },
             "announcement": {
                 "intro_music": "corporate_upbeat",
                 "voice": "luxury_male",
                 "pacing": "dynamic",
-                "background_volume": 0.25
+                "background_volume": 0.25,
             },
             "podcast": {
                 "intro_music": "podcast_intro",
                 "voice": "conversational",
                 "pacing": "natural",
-                "background_volume": 0.15
-            }
+                "background_volume": 0.15,
+            },
         }
 
         # Storage for generated audio
@@ -127,7 +112,7 @@ class VoiceAudioContentAgent:
         voice_style: str = "luxury_female",
         content_type: str = "product_showcase",
         add_music: bool = True,
-        output_format: str = "mp3"
+        output_format: str = "mp3",
     ) -> Dict[str, Any]:
         """
         Generate premium voice content with customizable style and music.
@@ -149,20 +134,14 @@ class VoiceAudioContentAgent:
             enhanced_text = await self._enhance_text_for_speech(text, content_type)
 
             # 2. Generate speech with ElevenLabs
-            audio_data = await self._generate_elevenlabs_speech(
-                enhanced_text, voice_style
-            )
+            audio_data = await self._generate_elevenlabs_speech(enhanced_text, voice_style)
 
             if not audio_data:
                 # Fallback to OpenAI TTS
-                audio_data = await self._generate_openai_speech(
-                    enhanced_text, voice_style
-                )
+                audio_data = await self._generate_openai_speech(enhanced_text, voice_style)
 
             # 3. Process and enhance audio
-            processed_audio = await self._process_audio(
-                audio_data, content_type, add_music
-            )
+            processed_audio = await self._process_audio(audio_data, content_type, add_music)
 
             # 4. Save audio file
             filename = f"{content_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{output_format}"
@@ -181,24 +160,18 @@ class VoiceAudioContentAgent:
                 "content_type": content_type,
                 "has_music": add_music,
                 "text_length": len(text),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
             logger.info(f"✅ Voice content generated: {filename}")
 
-            return {
-                "success": True,
-                "audio": metadata,
-                "enhanced_text": enhanced_text
-            }
+            return {"success": True, "audio": metadata, "enhanced_text": enhanced_text}
 
         except Exception as e:
             logger.error(f"❌ Voice content generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _enhance_text_for_speech(
-        self, text: str, content_type: str
-    ) -> str:
+    async def _enhance_text_for_speech(self, text: str, content_type: str) -> str:
         """
         Enhance text with SSML or natural pauses for better speech output.
         """
@@ -222,7 +195,7 @@ Return the enhanced text optimized for voice generation."""
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3
+                temperature=0.3,
             )
 
             return response.content[0].text
@@ -231,9 +204,7 @@ Return the enhanced text optimized for voice generation."""
             logger.warning(f"Text enhancement failed, using original: {e}")
             return text
 
-    async def _generate_elevenlabs_speech(
-        self, text: str, voice_style: str
-    ) -> Optional[bytes]:
+    async def _generate_elevenlabs_speech(self, text: str, voice_style: str) -> Optional[bytes]:
         """
         Generate speech using ElevenLabs API.
         """
@@ -242,23 +213,13 @@ Return the enhanced text optimized for voice generation."""
                 logger.warning("ElevenLabs API key not configured")
                 return None
 
-            voice_config = self.brand_voices.get(
-                voice_style, self.brand_voices["luxury_female"]
-            )
+            voice_config = self.brand_voices.get(voice_style, self.brand_voices["luxury_female"])
 
             url = f"{self.elevenlabs_base_url}/text-to-speech/{voice_config['voice_id']}"
 
-            headers = {
-                "Accept": "audio/mpeg",
-                "Content-Type": "application/json",
-                "xi-api-key": self.elevenlabs_key
-            }
+            headers = {"Accept": "audio/mpeg", "Content-Type": "application/json", "xi-api-key": self.elevenlabs_key}
 
-            data = {
-                "text": text,
-                "model_id": "eleven_monolingual_v1",
-                "voice_settings": voice_config["settings"]
-            }
+            data = {"text": text, "model_id": "eleven_monolingual_v1", "voice_settings": voice_config["settings"]}
 
             async with httpx.AsyncClient(timeout=60.0) as client:
                 response = await client.post(url, json=data, headers=headers)
@@ -273,9 +234,7 @@ Return the enhanced text optimized for voice generation."""
             logger.error(f"ElevenLabs generation failed: {e}")
             return None
 
-    async def _generate_openai_speech(
-        self, text: str, voice_style: str
-    ) -> bytes:
+    async def _generate_openai_speech(self, text: str, voice_style: str) -> bytes:
         """
         Generate speech using OpenAI's TTS as fallback.
         """
@@ -283,8 +242,8 @@ Return the enhanced text optimized for voice generation."""
             # Map voice styles to OpenAI voices
             voice_map = {
                 "luxury_female": "nova",  # Most natural female voice
-                "luxury_male": "onyx",    # Deep male voice
-                "narrator": "alloy"       # Neutral narrator
+                "luxury_male": "onyx",  # Deep male voice
+                "narrator": "alloy",  # Neutral narrator
             }
 
             voice = voice_map.get(voice_style, "nova")
@@ -293,7 +252,7 @@ Return the enhanced text optimized for voice generation."""
                 model="tts-1-hd",  # High quality model
                 voice=voice,
                 input=text,
-                speed=0.95  # Slightly slower for luxury feel
+                speed=0.95,  # Slightly slower for luxury feel
             )
 
             # Convert response to bytes
@@ -308,9 +267,7 @@ Return the enhanced text optimized for voice generation."""
             # Return empty audio as last resort
             return b""
 
-    async def _process_audio(
-        self, audio_data: bytes, content_type: str, add_music: bool
-    ) -> AudioSegment:
+    async def _process_audio(self, audio_data: bytes, content_type: str, add_music: bool) -> AudioSegment:
         """
         Process and enhance audio with effects and optional background music.
         """
@@ -326,9 +283,7 @@ Return the enhanced text optimized for voice generation."""
             audio = audio.fade_in(500).fade_out(500)
 
             # 3. Adjust for content type
-            template = self.audio_templates.get(
-                content_type, self.audio_templates["product_showcase"]
-            )
+            template = self.audio_templates.get(content_type, self.audio_templates["product_showcase"])
 
             if add_music:
                 # Add background music (simplified - would integrate with music library)
@@ -347,9 +302,7 @@ Return the enhanced text optimized for voice generation."""
             # Return original audio if processing fails
             return AudioSegment.from_file(io.BytesIO(audio_data))
 
-    async def transcribe_audio(
-        self, audio_path: Union[str, Path], language: str = "en"
-    ) -> Dict[str, Any]:
+    async def transcribe_audio(self, audio_path: Union[str, Path], language: str = "en") -> Dict[str, Any]:
         """
         Transcribe audio to text using OpenAI Whisper.
 
@@ -370,38 +323,35 @@ Return the enhanced text optimized for voice generation."""
             # Transcribe with Whisper
             with open(audio_path, "rb") as audio_file:
                 response = await self.openai.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=audio_file,
-                    language=language,
-                    response_format="verbose_json"
+                    model="whisper-1", file=audio_file, language=language, response_format="verbose_json"
                 )
 
             # Extract segments for detailed analysis
             segments = []
-            if hasattr(response, 'segments'):
+            if hasattr(response, "segments"):
                 for segment in response.segments:
-                    segments.append({
-                        "start": segment.start,
-                        "end": segment.end,
-                        "text": segment.text,
-                        "confidence": getattr(segment, 'confidence', 0.9)
-                    })
+                    segments.append(
+                        {
+                            "start": segment.start,
+                            "end": segment.end,
+                            "text": segment.text,
+                            "confidence": getattr(segment, "confidence", 0.9),
+                        }
+                    )
 
             return {
                 "transcription": response.text,
-                "language": response.language if hasattr(response, 'language') else language,
-                "duration": response.duration if hasattr(response, 'duration') else 0,
+                "language": response.language if hasattr(response, "language") else language,
+                "duration": response.duration if hasattr(response, "duration") else 0,
                 "segments": segments,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"❌ Audio transcription failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_voice_sentiment(
-        self, audio_path: Union[str, Path]
-    ) -> Dict[str, Any]:
+    async def analyze_voice_sentiment(self, audio_path: Union[str, Path]) -> Dict[str, Any]:
         """
         Analyze sentiment and emotions from voice audio.
 
@@ -439,7 +389,7 @@ Consider this is for a luxury fashion brand customer interaction."""
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3
+                temperature=0.3,
             )
 
             analysis_text = response.content[0].text
@@ -449,7 +399,7 @@ Consider this is for a luxury fashion brand customer interaction."""
                 "transcription": text,
                 "sentiment_analysis": analysis_text,
                 "audio_file": str(audio_path),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -462,7 +412,7 @@ Consider this is for a luxury fashion brand customer interaction."""
         episode_title: str,
         intro_text: Optional[str] = None,
         outro_text: Optional[str] = None,
-        voice_style: str = "narrator"
+        voice_style: str = "narrator",
     ) -> Dict[str, Any]:
         """
         Create a complete podcast episode with intro, main content, and outro.
@@ -491,21 +441,15 @@ Consider this is for a luxury fashion brand customer interaction."""
             segments = []
 
             # Intro
-            intro_audio = await self.generate_voice_content(
-                intro_text, voice_style, "podcast", add_music=True
-            )
+            intro_audio = await self.generate_voice_content(intro_text, voice_style, "podcast", add_music=True)
             segments.append(intro_audio)
 
             # Main content
-            main_audio = await self.generate_voice_content(
-                script, voice_style, "podcast", add_music=False
-            )
+            main_audio = await self.generate_voice_content(script, voice_style, "podcast", add_music=False)
             segments.append(main_audio)
 
             # Outro
-            outro_audio = await self.generate_voice_content(
-                outro_text, voice_style, "podcast", add_music=True
-            )
+            outro_audio = await self.generate_voice_content(outro_text, voice_style, "podcast", add_music=True)
             segments.append(outro_audio)
 
             # Combine segments
@@ -521,16 +465,14 @@ Consider this is for a luxury fashion brand customer interaction."""
                 "episode_title": episode_title,
                 "duration": combined_audio.get("duration", 0),
                 "segments": len(segments),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"❌ Podcast creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _combine_audio_segments(
-        self, segments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def _combine_audio_segments(self, segments: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Combine multiple audio segments into one file.
         """
@@ -552,21 +494,14 @@ Consider this is for a luxury fashion brand customer interaction."""
             output_path = self.audio_storage / f"combined_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
             combined.export(output_path, format="mp3")
 
-            return {
-                "file_path": str(output_path),
-                "duration": len(combined) / 1000.0  # Convert to seconds
-            }
+            return {"file_path": str(output_path), "duration": len(combined) / 1000.0}  # Convert to seconds
 
         except Exception as e:
             logger.error(f"Audio combination failed: {e}")
             return {"error": str(e)}
 
     async def generate_audio_ad(
-        self,
-        product_name: str,
-        product_description: str,
-        call_to_action: str,
-        duration_seconds: int = 30
+        self, product_name: str, product_description: str, call_to_action: str, duration_seconds: int = 30
     ) -> Dict[str, Any]:
         """
         Generate a complete audio advertisement for a product.
@@ -602,17 +537,14 @@ Format: Write the exact script to be read."""
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=500,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7
+                temperature=0.7,
             )
 
             ad_script = response.content[0].text
 
             # Generate voice ad
             audio_result = await self.generate_voice_content(
-                ad_script,
-                voice_style="luxury_female",
-                content_type="announcement",
-                add_music=True
+                ad_script, voice_style="luxury_female", content_type="announcement", add_music=True
             )
 
             return {
@@ -621,7 +553,7 @@ Format: Write the exact script to be read."""
                 "script": ad_script,
                 "product_name": product_name,
                 "duration_target": duration_seconds,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
