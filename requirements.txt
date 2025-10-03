@@ -24,10 +24,20 @@ passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.8.30
 
-# AI & ML
-openai==1.55.3
+# AI & ML - Advanced Models
+anthropic==0.39.0  # Claude Sonnet 4.5 - Advanced reasoning and analysis
+openai==1.55.3  # GPT-4 and DALL-E integration
+transformers==4.46.3  # Hugging Face transformers for state-of-the-art NLP
+torch==2.5.1  # PyTorch for deep learning
+torchvision==0.20.1  # Computer vision models
+diffusers==0.31.0  # Stable Diffusion and advanced image generation
+sentence-transformers==3.3.1  # Semantic search and embeddings
 scikit-learn==1.5.2
 numpy==2.2.1
+pandas==2.2.3  # Data analysis and manipulation
+tensorflow==2.18.0  # TensorFlow for ML models
+xgboost==2.1.3  # Advanced gradient boosting
+lightgbm==4.5.0  # Fast gradient boosting framework
 
 # Computer Vision & Image Processing
 opencv-python==4.10.0.84
@@ -72,3 +82,48 @@ bcrypt==4.2.0
 
 # Async Redis client used by backend/advanced_cache_system.py
 aioredis==2.0.1
+
+# Social Media & Marketing APIs
+facebook-sdk==3.1.0  # Meta/Facebook Graph API
+instagrapi==2.1.2  # Instagram advanced automation
+tweepy==4.14.0  # Twitter/X API
+google-api-python-client==2.154.0  # YouTube, Google Ads
+linkedin-api==2.3.0  # LinkedIn automation
+
+# Voice & Audio Processing
+elevenlabs==1.10.2  # Advanced text-to-speech
+whisper==1.1.10  # Speech recognition and transcription
+pydub==0.25.1  # Audio manipulation
+speechrecognition==3.11.0  # Voice recognition
+
+# Advanced NLP & Sentiment Analysis
+textblob==0.18.0.post0  # Sentiment analysis
+vaderSentiment==3.3.2  # Social media sentiment
+spacy==3.8.3  # Advanced NLP
+nltk==3.9.1  # Natural language toolkit
+
+# Blockchain & NFT (for luxury digital assets)
+web3==7.6.0  # Ethereum and blockchain integration
+eth-account==0.13.4  # Ethereum account management
+
+# Advanced Data Science
+joblib==1.4.2  # Model persistence
+scipy==1.14.1  # Scientific computing
+statsmodels==0.14.4  # Statistical modeling
+seaborn==0.13.2  # Data visualization
+matplotlib==3.9.3  # Plotting
+
+# Reinforcement Learning
+gym==0.26.2  # RL environments
+stable-baselines3==2.4.0  # RL algorithms
+
+# Code Analysis & Self-Healing
+autopep8==2.0.4  # Already included above
+astroid==3.3.5  # Python code analysis
+pylint==3.3.2  # Code quality checker
+radon==6.0.1  # Code metrics
+vulture==2.13  # Dead code detection
+
+# WordPress & CMS Integration
+python-wordpress-xmlrpc==2.3  # WordPress XML-RPC
+woocommerce==3.0.0  # WooCommerce API
