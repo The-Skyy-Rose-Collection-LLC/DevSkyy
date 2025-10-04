@@ -57,7 +57,12 @@ class WordPressServerAccess:
         try:
             # Create SSH client
             self.ssh_client = paramiko.SSHClient()
-            self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            # Load known hosts from file (default ~/.ssh/known_hosts or configurable)
+            known_hosts_path = os.getenv('SSH_KNOWN_HOSTS_PATH', str(Path.home() / '.ssh' / 'known_hosts'))
+            self.ssh_client.load_system_host_keys()
+            if os.path.exists(known_hosts_path):
+                self.ssh_client.load_host_keys(known_hosts_path)
+            self.ssh_client.set_missing_host_key_policy(paramiko.WarningPolicy())
 
             # Connect via SFTP first
             logger.info("🔐 Connecting to WordPress.com server via SFTP...")
