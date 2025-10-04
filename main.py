@@ -239,7 +239,7 @@ except Exception:
 
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 
