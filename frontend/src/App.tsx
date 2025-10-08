@@ -20,7 +20,7 @@ function App() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<ModernApp />} />
-            <Route path="/avatar" element={<FuturisticAvatarDashboard userId="user123" />} />
+            <Route path="/avatar/:userId" element={<FuturisticAvatarDashboard />} />
             <Route path="/dashboard" element={<ModernApp />} />
           </Routes>
         </Suspense>
