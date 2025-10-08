@@ -56,7 +56,37 @@ jobs:
     
     - name: Deploy to server
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-      run: |
-        echo "Deployment would happen here"
-        echo "Image: ${{ steps.meta.outputs.tags }}"
-      # Add actual deployment commands here
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        port: ${{ secrets.DEPLOY_PORT || 22 }}
+        script_stop: true
+        script: |
+          set -euo pipefail
+          IMAGE_TAG="${{ steps.meta.outputs.tags }}"
+          echo "Pulling image: ${IMAGE_TAG}"
+          docker pull "${IMAGE_TAG}"
+          echo "Updating services with docker-compose"
+          export IMAGE_TAG="${IMAGE_TAG}"
+          cd ${{ secrets.DEPLOY_WORKDIR }}
+          docker compose pull
+          docker compose up -d
+          echo "Pruning old images (optional)"
+          docker image prune -f
+          echo "Waiting for services to become healthy"
+          docker compose ps
+          # Optional: health check for a web service
+          if [ -n "${HEALTHCHECK_URL:-}" ]; then
+            for i in $(seq 1 30); do
+              if curl -fsS "$HEALTHCHECK_URL" >/dev/null; then
+                echo "Health check passed"
+                exit 0
+              fi
+              echo "Waiting for service... ($i/30)"
+              sleep 5
+            done
+            echo "Health check failed"
+            exit 1
+          fi
