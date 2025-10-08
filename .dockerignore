@@ -1,60 +1,66 @@
-# Git
-.git
-.gitignore
-
 # Python
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .Python
-*.egg-info
-.pytest_cache
+venv/
+env/
+ENV/
+.venv/
+
+# Testing
+.pytest_cache/
 .coverage
+htmlcov/
+.tox/
 
-# Development files
-.env
-.env.local
-.env.example
-
-# Node.js
-node_modules
-npm-debug.log
-yarn-error.log
-
-# IDE
-.vscode
-.idea
+# IDEs
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# Temporary files
-*.tmp
-*.temp
-.DS_Store
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+.env.local
+*.env
+
+# Logs
+logs/
+*.log
 
 # Documentation
-*.md
 docs/
-_docs/
+*.md
 
-# Tests
-tests/
-test_*.py
-*_test.py
+# CI/CD
+.github/
 
 # Build artifacts
 build/
 dist/
-*.log
+*.egg-info/
 
-# Jekyll
-_site/
-.jekyll-cache/
-.jekyll-metadata
-Gemfile
-Gemfile.lock
+# OS
+.DS_Store
+Thumbs.db
 
-# Replit specific
-.replit
-.emergent
+# Temporary
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+mongo-data/

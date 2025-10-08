@@ -1,0 +1,37 @@
+[flake8]
+max-line-length = 120
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    build,
+    dist,
+    frontend,
+    node_modules,
+    .eggs,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache
+
+# Ignore common warnings that don't affect code quality
+ignore =
+    E203,  # whitespace before ':'
+    E501,  # line too long (handled by max-line-length)
+    W503,  # line break before binary operator
+    W504,  # line break after binary operator
+    F401,  # imported but unused (handled by project structure)
+    F403,  # unable to detect undefined names from star imports
+    E402,  # module level import not at top of file
+
+per-file-ignores =
+    __init__.py:F401,F403
+    */migrations/*.py:E501
+    */tests/*.py:F401,F841
+
+# Error codes to always check
+select = E,W,F,C,N
+
+# Complexity
+max-complexity = 15
