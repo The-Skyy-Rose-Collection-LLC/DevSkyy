@@ -4,7 +4,8 @@ Setup configuration for package distribution
 """
 
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # Read README for long description
 readme_file = Path(__file__).parent / "README.md"
