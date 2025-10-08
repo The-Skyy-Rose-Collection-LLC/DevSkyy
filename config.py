@@ -1,9 +1,8 @@
-from typing import Any, Dict, List, Optional
-
 """
 Production Configuration for The Skyy Rose Collection Platform
 """
 import os
+from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 

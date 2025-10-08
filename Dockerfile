@@ -16,7 +16,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     && update-ca-certificates
 
 # Copy and install deps first (better layer caching)
-COPY backend/requirements.txt ./
+COPY requirements.txt ./
 RUN pip install --upgrade pip --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
     && pip install -r requirements.txt --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org
 
