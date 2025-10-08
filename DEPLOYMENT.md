@@ -312,7 +312,8 @@ curl -X POST https://yourdomain.com/api/v1/auth/login \
 ### 2. Run Safety Check
 
 ```bash
-python3 production_safety_check.py
+# Skipped: production_safety_check.py not included in this repository.
+# Perform manual verification using the health and docs endpoints above.
 ```
 
 ### 3. Setup Monitoring
