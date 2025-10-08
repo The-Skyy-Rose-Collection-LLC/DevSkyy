@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import re
@@ -331,7 +330,6 @@ def scan_agents_only() -> Dict[str, Any]:
 def _analyze_all_agents() -> Dict[str, Any]:
     """Analyze all agent modules in the system."""
     import importlib.util
-    import sys
 
     agents_dir = Path("agent/modules")
     if not agents_dir.exists():

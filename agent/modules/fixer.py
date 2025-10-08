@@ -1,5 +1,3 @@
-import ast
-import json
 import logging
 import os
 import re
@@ -181,7 +179,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
                             "line": "all",
                         }
                     )
-            except Exception as e:
+            except Exception:
                 pass
 
         # Write changes if any fixes were made
@@ -373,7 +371,6 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
         lines = content.split("\n")
         in_rule = False
         current_rule_props = {}  # Use dict to track line numbers
-        rule_start_line = 0
 
         for i, line in enumerate(lines):
             stripped_line = line.strip()
@@ -382,7 +379,6 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
             if "{" in stripped_line and not stripped_line.startswith("/*"):
                 in_rule = True
                 current_rule_props = {}
-                rule_start_line = i
             # Check for rule end
             elif "}" in stripped_line and in_rule:
                 in_rule = False
