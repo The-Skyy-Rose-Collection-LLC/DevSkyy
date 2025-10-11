@@ -239,7 +239,7 @@ except Exception:
 
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 
@@ -267,7 +267,7 @@ logger = logging.getLogger(__name__)
 # Production middleware
 # Get environment configuration
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-trusted_hosts = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1").split(",")
+trusted_hosts = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
 
 app.add_middleware(
     CORSMiddleware,
