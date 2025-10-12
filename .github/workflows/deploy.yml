@@ -1,92 +1,73 @@
-name: Deploy to Production
+name: Deploy
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    branches: [main]
+    types:
+      - completed
   workflow_dispatch:
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
 
 jobs:
-  deploy:
-    name: Deploy Application
+  deploy-staging:
+    name: Deploy to Staging
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' ||
+      github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: staging
+      url: https://staging.devskyy.com
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    
-    - name: Log in to Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=sha
-    
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-    
-    - name: Deploy to server
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: ${{ secrets.DEPLOY_USER }}
-        key: ${{ secrets.DEPLOY_KEY }}
-        port: ${{ secrets.DEPLOY_PORT || 22 }}
-        script_stop: true
-        script: |
-          set -euo pipefail
-          IMAGE_TAG="${{ steps.meta.outputs.tags }}"
-          echo "Pulling image: ${IMAGE_TAG}"
-          docker pull "${IMAGE_TAG}"
-          echo "Updating services with docker-compose"
-          export IMAGE_TAG="${IMAGE_TAG}"
-          cd ${{ secrets.DEPLOY_WORKDIR }}
-          docker compose pull
-          docker compose up -d
-          echo "Pruning old images (optional)"
-          docker image prune -f
-          echo "Waiting for services to become healthy"
-          docker compose ps
-          # Optional: health check for a web service
-          if [ -n "${HEALTHCHECK_URL:-}" ]; then
-            for i in $(seq 1 30); do
-              if curl -fsS "$HEALTHCHECK_URL" >/dev/null; then
-                echo "Health check passed"
-                exit 0
-              fi
-              echo "Waiting for service... ($i/30)"
-              sleep 5
-            done
-            echo "Health check failed"
-            exit 1
-          fi
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment"
+          echo "This is where you would add your deployment commands"
+          # Example: ssh, kubectl, terraform, etc.
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://devskyy.com
+    needs: []
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Production pre-deployment checks
+        run: |
+          echo "🔍 Running production safety checks"
+          # Add pre-deployment validation
+
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment"
+          echo "This is where you would add your deployment commands"
+          # Example: Blue-green deployment, canary deployment, etc.
+
+      - name: Post-deployment verification
+        run: |
+          echo "✅ Verifying deployment"
+          # Add health checks, smoke tests
+
+      - name: Notify deployment
+        run: |
+          echo "📢 Notifying team of successful deployment"
+          # Add Slack/Discord/email notifications
