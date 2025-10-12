@@ -43,7 +43,7 @@ safety==3.2.11  # Vulnerability scanning
 anthropic==0.69.0  # Latest version
 openai==2.3.0  # Latest version
 transformers==4.47.1  # Updated
-torch==2.2.2  # KNOWN VULNERABILITY: PYSEC-2025-41 (RCE) - Fix version 2.6.0 not yet released on PyPI
+torch==2.8.0  # KNOWN VULNERABILITY: PYSEC-2025-41 (RCE) - Fix version 2.6.0 not yet released on PyPI
 torchvision==0.18.1  # Matching torch 2.2.2 compatibility
 # MITIGATION: Only load models from trusted sources, never use torch.load() with untrusted data
 diffusers==0.31.0
