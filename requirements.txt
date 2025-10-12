@@ -7,7 +7,7 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.10.4
 python-dotenv==1.0.1
-starlette==0.41.3  # FastAPI dependency, pinned for security
+starlette==0.47.2  # FastAPI dependency, pinned for security
 
 # Database (Enterprise-Grade)
 # SQLAlchemy (Primary - works with SQLite, PostgreSQL, MySQL)
