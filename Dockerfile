@@ -16,6 +16,7 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     && update-ca-certificates
 
 # Copy and install deps first (better layer caching)
+COPY requirements.txt .
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 

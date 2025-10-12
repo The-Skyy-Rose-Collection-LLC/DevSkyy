@@ -107,8 +107,10 @@ class DatabaseManager:
     async def health_check(self):
         """Check database health"""
         try:
+            from sqlalchemy import text
+
             async with AsyncSessionLocal() as session:
-                await session.execute("SELECT 1")
+                await session.execute(text("SELECT 1"))
                 return {
                     "status": "healthy",
                     "connected": True,

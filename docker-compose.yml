@@ -1,20 +1,73 @@
+version: '3.8'
+
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: skyyrose/devskyy-api:latest
+    container_name: devskyy-api
     ports:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/devSkyy
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - devskyy-network
+
   mongodb:
     image: mongo:7.0
+    container_name: devskyy-mongodb
     ports:
       - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=devSkyy
     volumes:
       - mongo-data:/data/db
+      - mongo-config:/data/configdb
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    networks:
+      - devskyy-network
+
 volumes:
   mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
+
+networks:
+  devskyy-network:
+    driver: bridge
