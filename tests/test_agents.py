@@ -1,8 +1,3 @@
-from typing import Any, Dict, List, Optional
-from unittest.mock import MagicMock, patch
-
-import pytest
-
 from agent.modules.customer_service import CustomerServiceAgent, handle_customer_service
 from agent.modules.financial import FinancialAgent, monitor_financial_health
 from agent.modules.inventory import InventoryAgent, manage_inventory

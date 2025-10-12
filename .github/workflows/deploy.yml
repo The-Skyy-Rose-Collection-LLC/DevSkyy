@@ -1,0 +1,73 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' ||
+      github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: staging
+      url: https://staging.devskyy.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment"
+          echo "This is where you would add your deployment commands"
+          # Example: ssh, kubectl, terraform, etc.
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://devskyy.com
+    needs: []
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Production pre-deployment checks
+        run: |
+          echo "🔍 Running production safety checks"
+          # Add pre-deployment validation
+
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment"
+          echo "This is where you would add your deployment commands"
+          # Example: Blue-green deployment, canary deployment, etc.
+
+      - name: Post-deployment verification
+        run: |
+          echo "✅ Verifying deployment"
+          # Add health checks, smoke tests
+
+      - name: Notify deployment
+        run: |
+          echo "📢 Notifying team of successful deployment"
+          # Add Slack/Discord/email notifications

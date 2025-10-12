@@ -2,7 +2,6 @@ import importlib
 import sys
 import types
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient

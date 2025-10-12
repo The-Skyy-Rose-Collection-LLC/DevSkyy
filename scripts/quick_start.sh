@@ -15,7 +15,7 @@ echo "✅ Node.js version: $node_version"
 
 # Install Python dependencies
 echo "📦 Installing Python backend dependencies..."
-pip install -r backend/requirements.txt --user --no-cache-dir
+pip install -r requirements.txt --user --no-cache-dir
 
 if [ $? -eq 0 ]; then
     echo "✅ Python dependencies installed successfully"

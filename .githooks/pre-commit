@@ -1,0 +1,24 @@
+#!/bin/bash
+# Pre-commit hook to format Python code before committing
+# This prevents the GitHub auto-format action from creating conflicting commits
+
+# Check if black and isort are installed
+if command -v black &> /dev/null && command -v isort &> /dev/null; then
+    echo "🎨 Formatting Python files before commit..."
+
+    # Get list of Python files to be committed
+    PYTHON_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$')
+
+    if [ -n "$PYTHON_FILES" ]; then
+        # Format with black and isort
+        echo "$PYTHON_FILES" | xargs black --quiet 2>/dev/null
+        echo "$PYTHON_FILES" | xargs isort --quiet 2>/dev/null
+
+        # Re-add formatted files
+        echo "$PYTHON_FILES" | xargs git add
+
+        echo "✅ Python files formatted"
+    fi
+fi
+
+exit 0

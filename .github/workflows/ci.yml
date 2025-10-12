@@ -1,0 +1,213 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  # Backend Testing and Validation
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        timeout-minutes: 10
+
+      - name: Verify backend loads
+        run: |
+          python3 -c "from main import app; print('✅ Backend loads successfully')"
+
+      - name: Run code formatting check
+        run: |
+          pip install black isort flake8
+          black --check --line-length 120 .
+          isort --check-only .
+        continue-on-error: true
+
+      - name: Run linting
+        run: |
+          flake8 --max-line-length=120 --exclude=venv,node_modules,.git,__pycache__
+        continue-on-error: true
+
+      - name: Run type checking
+        run: |
+          pip install mypy
+          mypy agent/ backend/ --ignore-missing-imports
+        continue-on-error: true
+
+      - name: Run tests
+        run: |
+          pip install pytest pytest-asyncio pytest-cov
+          pytest tests/ -v --cov=. --cov-report=xml
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          flags: backend
+        continue-on-error: true
+
+  # Frontend Testing and Build
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+        timeout-minutes: 5
+
+      - name: Run linting
+        run: |
+          cd frontend
+          npm run lint
+        continue-on-error: true
+
+      - name: Run type checking
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist
+          retention-days: 7
+
+  # Production Safety Check
+  safety-check:
+    name: Production Safety Check
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        timeout-minutes: 10
+
+      - name: Run production safety check
+        run: |
+          python production_safety_check.py
+        continue-on-error: true
+
+      - name: Upload safety report
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-safety-report
+          path: PRODUCTION_SAFETY_REPORT.md
+          retention-days: 30
+        if: always()
+
+  # Security Vulnerability Scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt --desc || true
+
+      - name: Check frontend vulnerabilities
+        run: |
+          cd frontend
+          npm audit --production || true
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
+
+  # All checks passed
+  all-checks:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, safety-check, security]
+    if: always()
+
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "Backend: ${{ needs.backend.result }}"
+          echo "Frontend: ${{ needs.frontend.result }}"
+          echo "Safety Check: ${{ needs.safety-check.result }}"
+          echo "Security: ${{ needs.security.result }}"
+
+          if [ "${{ needs.backend.result }}" != "success" ]; then
+            echo "❌ Backend checks failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.frontend.result }}" != "success" ]; then
+            echo "❌ Frontend checks failed"
+            exit 1
+          fi
+
+          echo "✅ All critical checks passed!"

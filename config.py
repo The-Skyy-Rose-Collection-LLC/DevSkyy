@@ -1,9 +1,9 @@
-from typing import Any, Dict, List, Optional
-
 """
 Production Configuration for The Skyy Rose Collection Platform
 """
+
 import os
+from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 
@@ -35,7 +35,7 @@ class Config:
 
     # Security
     CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
-    TRUSTED_HOSTS = ["theskyy-rose-collection.com", "*.replit.app"]
+    TRUSTED_HOSTS = ["theskyy-rose-collection.com"]
 
 
 class DevelopmentConfig(Config):
