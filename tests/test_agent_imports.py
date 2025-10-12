@@ -26,142 +26,142 @@ def test_core_utility_imports():
 
 def test_customer_service_agent_import():
     """Test CustomerServiceAgent can be imported."""
-    try:
-        from agent.modules import CustomerServiceAgent
-        assert CustomerServiceAgent is not None
-        assert CustomerServiceAgent.__name__ == "CustomerServiceAgent"
-    except ImportError as e:
-        pytest.skip(f"CustomerServiceAgent not available: {e}")
+    from agent.modules import CustomerServiceAgent
+    
+    if CustomerServiceAgent is None:
+        pytest.skip("CustomerServiceAgent not available due to missing dependencies")
+    
+    assert CustomerServiceAgent.__name__ == "CustomerServiceAgent"
 
 
 def test_design_automation_agent_import():
     """Test DesignAutomationAgent can be imported."""
-    try:
-        from agent.modules import DesignAutomationAgent
-        assert DesignAutomationAgent is not None
-        assert DesignAutomationAgent.__name__ == "DesignAutomationAgent"
-    except ImportError as e:
-        pytest.skip(f"DesignAutomationAgent not available: {e}")
+    from agent.modules import DesignAutomationAgent
+    
+    if DesignAutomationAgent is None:
+        pytest.skip("DesignAutomationAgent not available due to missing dependencies")
+    
+    assert DesignAutomationAgent.__name__ == "DesignAutomationAgent"
 
 
 def test_email_sms_automation_agent_import():
     """Test EmailSMSAutomationAgent can be imported."""
-    try:
-        from agent.modules import EmailSMSAutomationAgent
-        assert EmailSMSAutomationAgent is not None
-        assert EmailSMSAutomationAgent.__name__ == "EmailSMSAutomationAgent"
-    except ImportError as e:
-        pytest.skip(f"EmailSMSAutomationAgent not available: {e}")
+    from agent.modules import EmailSMSAutomationAgent
+    
+    if EmailSMSAutomationAgent is None:
+        pytest.skip("EmailSMSAutomationAgent not available due to missing dependencies")
+    
+    assert EmailSMSAutomationAgent.__name__ == "EmailSMSAutomationAgent"
 
 
 def test_financial_agent_import():
     """Test FinancialAgent can be imported."""
-    try:
-        from agent.modules import FinancialAgent
-        assert FinancialAgent is not None
-        assert FinancialAgent.__name__ == "FinancialAgent"
-    except ImportError as e:
-        pytest.skip(f"FinancialAgent not available: {e}")
+    from agent.modules import FinancialAgent
+    
+    if FinancialAgent is None:
+        pytest.skip("FinancialAgent not available due to missing dependencies")
+    
+    assert FinancialAgent.__name__ == "FinancialAgent"
 
 
 def test_social_media_automation_agent_import():
     """Test SocialMediaAutomationAgent can be imported."""
-    try:
-        from agent.modules import SocialMediaAutomationAgent
-        assert SocialMediaAutomationAgent is not None
-        assert SocialMediaAutomationAgent.__name__ == "SocialMediaAutomationAgent"
-    except ImportError as e:
-        pytest.skip(f"SocialMediaAutomationAgent not available: {e}")
+    from agent.modules import SocialMediaAutomationAgent
+    
+    if SocialMediaAutomationAgent is None:
+        pytest.skip("SocialMediaAutomationAgent not available due to missing dependencies")
+    
+    assert SocialMediaAutomationAgent.__name__ == "SocialMediaAutomationAgent"
 
 
 def test_performance_agent_import():
     """Test PerformanceAgent can be imported."""
-    try:
-        from agent.modules import PerformanceAgent
-        assert PerformanceAgent is not None
-        assert PerformanceAgent.__name__ == "PerformanceAgent"
-    except ImportError as e:
-        pytest.skip(f"PerformanceAgent not available: {e}")
+    from agent.modules import PerformanceAgent
+    
+    if PerformanceAgent is None:
+        pytest.skip("PerformanceAgent not available due to missing dependencies")
+    
+    assert PerformanceAgent.__name__ == "PerformanceAgent"
 
 
 def test_security_agent_import():
     """Test SecurityAgent can be imported."""
-    try:
-        from agent.modules import SecurityAgent
-        assert SecurityAgent is not None
-        assert SecurityAgent.__name__ == "SecurityAgent"
-    except ImportError as e:
-        pytest.skip(f"SecurityAgent not available: {e}")
+    from agent.modules import SecurityAgent
+    
+    if SecurityAgent is None:
+        pytest.skip("SecurityAgent not available due to missing dependencies")
+    
+    assert SecurityAgent.__name__ == "SecurityAgent"
 
 
 def test_inventory_agent_import():
     """Test InventoryAgent can be imported."""
-    try:
-        from agent.modules import InventoryAgent
-        assert InventoryAgent is not None
-        assert InventoryAgent.__name__ == "InventoryAgent"
-    except ImportError as e:
-        pytest.skip(f"InventoryAgent not available: {e}")
+    from agent.modules import InventoryAgent
+    
+    if InventoryAgent is None:
+        pytest.skip("InventoryAgent not available due to missing dependencies")
+    
+    assert InventoryAgent.__name__ == "InventoryAgent"
 
 
 def test_web_development_agent_import():
     """Test WebDevelopmentAgent can be imported."""
-    try:
-        from agent.modules import WebDevelopmentAgent
-        assert WebDevelopmentAgent is not None
-        assert WebDevelopmentAgent.__name__ == "WebDevelopmentAgent"
-    except ImportError as e:
-        pytest.skip(f"WebDevelopmentAgent not available: {e}")
+    from agent.modules import WebDevelopmentAgent
+    
+    if WebDevelopmentAgent is None:
+        pytest.skip("WebDevelopmentAgent not available due to missing dependencies")
+    
+    assert WebDevelopmentAgent.__name__ == "WebDevelopmentAgent"
 
 
 def test_wordpress_agent_import():
     """Test WordPressAgent can be imported."""
-    try:
-        from agent.modules import WordPressAgent
-        assert WordPressAgent is not None
-        assert WordPressAgent.__name__ == "WordPressAgent"
-    except ImportError as e:
-        pytest.skip(f"WordPressAgent not available: {e}")
+    from agent.modules import WordPressAgent
+    
+    if WordPressAgent is None:
+        pytest.skip("WordPressAgent not available due to missing dependencies")
+    
+    assert WordPressAgent.__name__ == "WordPressAgent"
 
 
 def test_site_communication_agent_import():
     """Test SiteCommunicationAgent can be imported."""
-    try:
-        from agent.modules import SiteCommunicationAgent
-        assert SiteCommunicationAgent is not None
-        assert SiteCommunicationAgent.__name__ == "SiteCommunicationAgent"
-    except ImportError as e:
-        pytest.skip(f"SiteCommunicationAgent not available: {e}")
+    from agent.modules import SiteCommunicationAgent
+    
+    if SiteCommunicationAgent is None:
+        pytest.skip("SiteCommunicationAgent not available due to missing dependencies")
+    
+    assert SiteCommunicationAgent.__name__ == "SiteCommunicationAgent"
 
 
 def test_brand_intelligence_agent_import():
     """Test BrandIntelligenceAgent can be imported."""
-    try:
-        from agent.modules import BrandIntelligenceAgent
-        assert BrandIntelligenceAgent is not None
-        assert BrandIntelligenceAgent.__name__ == "BrandIntelligenceAgent"
-    except ImportError as e:
-        pytest.skip(f"BrandIntelligenceAgent not available: {e}")
+    from agent.modules import BrandIntelligenceAgent
+    
+    if BrandIntelligenceAgent is None:
+        pytest.skip("BrandIntelligenceAgent not available due to missing dependencies")
+    
+    assert BrandIntelligenceAgent.__name__ == "BrandIntelligenceAgent"
 
 
 def test_seo_marketing_agent_import():
     """Test SEOMarketingAgent can be imported."""
-    try:
-        from agent.modules import SEOMarketingAgent
-        assert SEOMarketingAgent is not None
-        assert SEOMarketingAgent.__name__ == "SEOMarketingAgent"
-    except ImportError as e:
-        pytest.skip(f"SEOMarketingAgent not available: {e}")
+    from agent.modules import SEOMarketingAgent
+    
+    if SEOMarketingAgent is None:
+        pytest.skip("SEOMarketingAgent not available due to missing dependencies")
+    
+    assert SEOMarketingAgent.__name__ == "SEOMarketingAgent"
 
 
 def test_ecommerce_agent_import():
     """Test EcommerceAgent can be imported."""
-    try:
-        from agent.modules import EcommerceAgent
-        assert EcommerceAgent is not None
-        assert EcommerceAgent.__name__ == "EcommerceAgent"
-    except ImportError as e:
-        pytest.skip(f"EcommerceAgent not available: {e}")
+    from agent.modules import EcommerceAgent
+    
+    if EcommerceAgent is None:
+        pytest.skip("EcommerceAgent not available due to missing dependencies")
+    
+    assert EcommerceAgent.__name__ == "EcommerceAgent"
 
 
 def test_all_agents_in_all_list():
