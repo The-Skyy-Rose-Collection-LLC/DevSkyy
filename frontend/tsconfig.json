@@ -1,29 +1,51 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    /* Language and Environment */
+    "target": "ES2022",                                  /* Use latest stable ECMAScript features */
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],            /* Latest library features */
+    "jsx": "react-jsx",                                  /* React 18+ JSX transform */
+    "useDefineForClassFields": true,                     /* Modern class fields */
+
+    /* Modules */
+    "module": "ESNext",                                  /* Latest module system */
+    "moduleResolution": "bundler",                       /* Vite bundler resolution */
+    "resolveJsonModule": true,                           /* Import JSON files */
+    "allowImportingTsExtensions": true,                  /* Import .ts/.tsx files */
+
+    /* Emit */
+    "noEmit": true,                                      /* Vite handles compilation */
+    "isolatedModules": true,                             /* Required for Vite */
+
+    /* Interop Constraints */
+    "esModuleInterop": true,                             /* CommonJS/ESM compatibility */
+    "allowSyntheticDefaultImports": true,                /* Better import defaults */
+    "forceConsistentCasingInFileNames": true,            /* Enforce consistent casing */
+
+    /* Type Checking - Strict Mode */
+    "strict": true,                                      /* Enable all strict checks */
+    "noUnusedLocals": true,                              /* Error on unused locals */
+    "noUnusedParameters": true,                          /* Error on unused parameters */
+    "noFallthroughCasesInSwitch": true,                  /* Error on switch fallthrough */
+    "noImplicitReturns": true,                           /* Error on missing returns */
+    "noUncheckedIndexedAccess": true,                    /* Safer array/object access */
+    "noImplicitOverride": true,                          /* Require explicit override */
+    "noPropertyAccessFromIndexSignature": true,          /* Safer index signatures */
+
+    /* Advanced */
+    "skipLibCheck": true,                                /* Skip type checking of .d.ts files */
+    "allowJs": false,                                    /* Only TypeScript files */
+    "incremental": true,                                 /* Faster subsequent builds */
+
+    /* Path Mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@types/*": ["src/types/*"],
+      "@styles/*": ["src/styles/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["src/**/*.old/**", "node_modules"],
+  "exclude": ["src/**/*.old/**", "node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

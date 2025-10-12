@@ -35,9 +35,18 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build --mode analyze",
+    "build:staging": "tsc && vite build --mode staging",
     "preview": "vite preview",
-    "lint": "eslint src --ext ts,tsx",
-    "format": "prettier --write 'src/**/*.{ts,tsx,css}'"
+    "preview:host": "vite preview --host",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext ts,tsx --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,css,json}'",
+    "format:check": "prettier --check 'src/**/*.{ts,tsx,css,json}'",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.vite",
+    "clean:full": "rm -rf dist node_modules/.vite node_modules package-lock.json && npm install"
   }
 }
