@@ -3,11 +3,11 @@
 # Last security audit: 2025-10-02
 
 # Core Framework (Latest Secure Versions)
-fastapi==0.115.6
+fastapi==0.119.0
 uvicorn[standard]==0.34.0
 pydantic==2.10.4
 python-dotenv==1.0.1
-starlette==0.41.3  # FastAPI dependency, pinned for security
+starlette==0.48.0  # FastAPI dependency, security updated (GHSA-2c2j-9gv5-cj73 fixed)
 
 # Database (Enterprise-Grade)
 # SQLAlchemy (Primary - works with SQLite, PostgreSQL, MySQL)
@@ -18,7 +18,7 @@ asyncpg==0.30.0  # Async PostgreSQL driver (optional)
 # MongoDB removed - using SQLAlchemy exclusively
 
 # HTTP & API (Security Updates)
-requests==2.32.3
+requests==2.32.4  # Security fix GHSA-9hjg-9r4m-mvj7
 python-multipart==0.0.18
 aiofiles==24.1.0
 httpx==0.28.1
@@ -28,7 +28,7 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.12.14
-cryptography==44.0.0  # Latest for security
+cryptography==46.0.2  # Latest for security (multiple CVEs fixed)
 PyJWT==2.10.1  # Updated
 bcrypt==4.2.1  # Latest
 argon2-cffi==23.1.0  # Additional password hashing
