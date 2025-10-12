@@ -68,7 +68,7 @@ lxml==5.3.0  # Security update
 autopep8==2.3.1  # Updated
 black==24.10.0
 isort==5.13.2
-flake8==7.1.1
+flake8==7.3.0
 pylint==3.3.2
 mypy==1.13.0  # Type checking
 radon==6.0.1
