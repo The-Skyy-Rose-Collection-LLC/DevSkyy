@@ -31,7 +31,7 @@ jobs:
 
       - name: Build and push
         id: bp
-        uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25
+        uses: docker/build-push-action@9e436ba9f2d7bcd1d038c8e55d039d37896ddc5d
         with:
           context: .
           push: true
