@@ -7,10 +7,10 @@ uvicorn==0.34.0
 pydantic==2.10.4
 python-dotenv==1.0.1
 
-# Database
-pymongo>=4.9,<4.10
-motor==3.6.0
-dnspython==2.7.0
+# Database - MongoDB removed per deployment requirements
+# pymongo>=4.9,<4.10  # REMOVED: No MongoDB usage allowed
+# motor==3.6.0  # REMOVED: No MongoDB usage allowed
+# dnspython==2.7.0  # REMOVED: MongoDB dependency
 
 # HTTP & API
 requests==2.32.3
