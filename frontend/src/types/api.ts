@@ -55,13 +55,11 @@ export interface ApiEndpoints {
 }
 
 export class ApiClient {
-  private config: ApiClientConfig
-
-  constructor(config: ApiClientConfig) {
-    this.config = config
+  constructor(_config: ApiClientConfig) {
+    // Config stored for future implementation
   }
 
-  async request<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async request<T>(_endpoint: string, _options?: RequestOptions): Promise<ApiResponse<T>> {
     // Implementation would go here
     throw new Error('Not implemented')
   }
