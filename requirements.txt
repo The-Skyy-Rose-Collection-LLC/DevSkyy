@@ -10,9 +10,12 @@ python-dotenv==1.0.1
 starlette==0.41.3  # FastAPI dependency, pinned for security
 
 # Database (Enterprise-Grade)
-pymongo==4.10.1  # Updated to latest
-motor==3.6.0
-dnspython==2.7.0
+# SQLAlchemy (Primary - works with SQLite, PostgreSQL, MySQL)
+SQLAlchemy==2.0.36
+aiosqlite==0.20.0  # Async SQLite driver
+asyncpg==0.30.0  # Async PostgreSQL driver (optional)
+
+# MongoDB removed - using SQLAlchemy exclusively
 
 # HTTP & API (Security Updates)
 requests==2.32.3

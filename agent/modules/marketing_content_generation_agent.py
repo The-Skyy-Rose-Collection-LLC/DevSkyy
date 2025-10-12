@@ -11,14 +11,11 @@ This agent specializes in:
 - Performance tracking and optimization
 """
 
-import json
 import logging
 import os
-import random
-import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import openai
 
@@ -196,7 +193,7 @@ class MarketingContentGenerationAgent:
         try:
             campaign_objective = campaign_spec.get("objective", "brand_awareness")
             budget_range = campaign_spec.get("budget", "medium")
-            target_audience = campaign_spec.get("audience", "luxury_consumers")
+            campaign_spec.get("audience", "luxury_consumers")
 
             influencer_campaign = {
                 "campaign_id": f"influencer_{campaign_objective}_{int(datetime.now().timestamp())}",
@@ -244,7 +241,7 @@ class MarketingContentGenerationAgent:
 
         try:
             content_type = content_spec.get("type", "blog_content")
-            target_keywords = content_spec.get("keywords", [])
+            content_spec.get("keywords", [])
             content_volume = content_spec.get("monthly_content", 12)
 
             seo_strategy = {

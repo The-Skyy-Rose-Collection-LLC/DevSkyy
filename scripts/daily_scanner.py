@@ -13,23 +13,16 @@ This module provides:
 """
 
 import asyncio
-import base64
-import io
 import json
 import logging
 import re
 import time
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-from urllib.parse import urljoin, urlparse
+from datetime import datetime
+from typing import Any, Dict, List
+from urllib.parse import urlparse
 
 import aiohttp
-import cv2
-import numpy as np
-import requests
 from bs4 import BeautifulSoup
-from PIL import Image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

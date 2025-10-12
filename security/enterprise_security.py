@@ -14,29 +14,22 @@ Features:
 """
 
 import base64
-import hashlib
 import hmac
-import json
 import logging
 import os
 import re
 import secrets
-import time
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 import jwt
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
-from fastapi import HTTPException, Request, Response, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
+from fastapi import HTTPException, Request
+from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 logger = logging.getLogger(__name__)

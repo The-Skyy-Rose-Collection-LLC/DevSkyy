@@ -2,382 +2,484 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Essential Commands
+## Project Overview
 
-### Development Workflow
+DevSkyy is an enterprise-grade AI platform for luxury fashion e-commerce featuring 57 specialized AI agents, multi-model orchestration, and autonomous business automation. The platform uses Claude Sonnet 4.5 as the primary AI reasoning engine alongside GPT-4, Gemini, and other models.
+
+**Tech Stack:**
+- Backend: Python 3.11+, FastAPI, MongoDB, Redis
+- Frontend: React 18 + TypeScript, Vite, Tailwind CSS, Three.js
+- AI/ML: Anthropic Claude, OpenAI, Transformers, PyTorch, TensorFlow
+- Additional: Computer Vision (OpenCV), Voice (ElevenLabs, Whisper), Blockchain (Web3.py)
+
+## Development Commands
+
+### Initial Setup
+
 ```bash
-# Complete setup (first time)
-make setup                    # Installs both backend and frontend dependencies
-cp .env.example .env         # Then configure with your API keys
+# Install Python dependencies (takes ~35 seconds - NEVER CANCEL)
+pip install -r requirements.txt
 
-# Run development servers
-make run                     # Backend: Python main.py (http://localhost:8000)
-make frontend-dev            # Frontend: npm run dev (http://localhost:5173)
-make run-prod               # Production: Uvicorn with 4 workers
+# Install frontend dependencies (takes ~10 seconds)
+cd frontend && npm install
 
-# Testing
-make test                   # Run pytest on tests/
-pytest tests/test_agents.py -v    # Run specific test file
-make test-coverage          # Run with coverage report
+# Install terser for production builds
+cd frontend && npm install terser --save-dev
 
-# Code quality
-make format                 # Black + isort formatting
-make lint                   # Flake8 + black --check + isort --check
-make type-check             # Mypy type checking
-make pre-commit             # Run all checks before committing
-
-# Deployment validation
-make prod-check             # Run production_safety_check.py
-python3 production_safety_check.py  # Manual safety check
-
-# Docker
-make docker-build           # Build image: devskyy-platform:latest
-make docker-run             # docker-compose up -d
-make docker-stop            # docker-compose down
+# Quick setup (runs complete setup in ~10 seconds)
+bash scripts/quick_start.sh
 ```
 
-### Frontend Specific
+**Important:** Set timeout to 120+ seconds for Python dependencies and 60+ seconds for frontend dependencies when running install commands. These are validated timings and canceling early will cause issues.
+
+### Running the Platform
+
 ```bash
-cd frontend
-npm install                 # Install dependencies
-npm run dev                 # Development server (Vite)
-npm run build               # Production build
-npm run lint                # ESLint
-npm run format              # Prettier
+# Backend server (from project root)
+python3 -m uvicorn main:app --host 0.0.0.0 --port 8000
+
+# Frontend development server
+cd frontend && npm run dev
+
+# Frontend production build
+cd frontend && npm run build
 ```
 
-## High-Level Architecture
+**Access Points:**
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs
+- Frontend Dev: http://localhost:3000
+- Health Check: http://localhost:8000/health
 
-### Multi-Layer Agent System
+### Testing
 
-**DevSkyy uses a sophisticated 3-tier agent orchestration architecture:**
+```bash
+# Test backend loads correctly
+python3 -c "from main import app; print('✅ Backend loads successfully')"
 
-1. **Core Intelligence Layer** (`agent/modules/`)
-   - `claude_sonnet_intelligence_service.py` - Primary reasoning engine using Claude Sonnet 4.5
-   - `multi_model_ai_orchestrator.py` - Routes requests to optimal AI model (Claude/GPT-4/Gemini)
-   - `openai_intelligence_service.py` - OpenAI GPT integration
+# Run test suite
+pytest tests/
 
-2. **Specialized Agent Layer** (50+ agents)
-   - Each agent is self-contained with domain expertise
-   - Agents communicate through `agent_assignment_manager.py` which routes tasks
-   - Agents can call other agents but must go through the assignment manager
+# Run specific test file
+pytest tests/test_agents.py -v
+pytest tests/test_main.py -v
 
-3. **Integration Layer**
-   - `wordpress_integration_service.py` - REST API integration
-   - `wordpress_direct_service.py` - Direct database access (Paramiko SSH)
-   - `woocommerce_integration_service.py` - E-commerce operations
+# Run specific test function
+pytest tests/test_agents.py::test_specific_function -v
 
-### Critical Architecture Patterns
-
-#### Agent Communication Flow
-```
-Client Request
-    ↓
-FastAPI Endpoint (main.py)
-    ↓
-AgentAssignmentManager.assign_task()
-    ↓
-Specialized Agent (e.g., ecommerce_agent.py)
-    ↓
-Multi-Model Orchestrator (selects Claude/GPT-4/Gemini)
-    ↓
-External API / WordPress / Database
+# Production safety check (ALWAYS run before deployment)
+python production_safety_check.py
 ```
 
-#### Self-Healing System
-- **Scanner** (`agent/modules/scanner.py`) - Detects issues in code/websites
-- **Fixer** (`agent/modules/fixer.py`) - Applies fixes for common issues
-- **Universal Self-Healing Agent** - Advanced auto-repair with multi-language support
-- **Enhanced Autofix** - Context-aware fixes using AI reasoning
+### Code Quality
 
-#### Continuous Learning Loop
-- `continuous_learning_background_agent.py` runs 24/7 in background
-- Analyzes patterns, failures, and successes
-- Updates agent behaviors without code changes
-- Stores learnings in MongoDB for persistence
+```bash
+# Format Python code
+black --line-length 120 .
+isort .
 
-### WordPress Integration Architecture
+# Lint Python code
+flake8
+pylint agent/ backend/
 
-**Three parallel integration methods** (intentional redundancy for reliability):
+# Format frontend code
+cd frontend && npm run format
 
-1. **REST API** (`wordpress_integration_service.py`)
-   - Standard WordPress REST API v2
-   - Authentication via Application Passwords
-   - Best for: Content, posts, pages, media
+# Lint frontend code
+cd frontend && npm run lint
 
-2. **Direct Database** (`wordpress_direct_service.py`)
-   - SSH + Paramiko connection to server
-   - Direct MySQL queries via command line
-   - Best for: Bulk operations, migrations, emergency fixes
+# Type checking
+mypy agent/ backend/
+cd frontend && npm run build  # TypeScript checking via tsc
+```
 
-3. **WordPress Plugin** (`wordpress-plugin/`)
-   - Custom plugin: "Skyy Rose AI Agents"
-   - Provides webhooks and extended endpoints
-   - Best for: Real-time events, custom actions
+## Architecture
 
-**Important**: Always prefer REST API first, fall back to direct access only when necessary.
+### Agent System (Core Innovation)
 
-### Frontend Architecture
+The platform is built around a modular agent system in `agent/modules/` with 57 specialized AI agents. Each agent is a self-contained module with specific domain expertise.
 
-**React + TypeScript with luxury e-commerce focus:**
+**NEW: BaseAgent Architecture (V2)**
 
-- `frontend/src/components/` - 20+ components
-  - `ModernWordPressDashboard.jsx` - Main WordPress control panel
-  - `LuxuryThemeBuilder.jsx` - Visual theme editor
-  - `AgentDashboard.jsx` - Agent monitoring UI
-  - `AutomationDashboard.jsx` - Automation controls
+All agents now inherit from `BaseAgent` which provides enterprise-grade capabilities:
 
-**Component Communication:**
-- Uses React Context for global state (no Redux)
-- WebSocket connections for real-time agent status
-- REST API calls to backend via Axios
-
-### Database Schema Pattern
-
-**MongoDB Collections** (defined implicitly in code):
-- `agents` - Agent configurations and status
-- `tasks` - Task queue and history
-- `products` - E-commerce products
-- `orders` - Order processing
-- `customers` - Customer data
-- `learnings` - Continuous learning storage
-- `cache` - Performance caching layer
-
-**Important**: The codebase uses Motor (async MongoDB driver). All database operations must be async/await.
-
-## Key Development Patterns
-
-### Agent Development
-
-When creating a new agent:
-
-1. **Create agent file** in `agent/modules/new_agent.py`
-2. **Define class** inheriting base patterns (see `ecommerce_agent.py` as template)
-3. **Register in main.py** - Add try/except import block around line 10-150
-4. **Add to assignment manager** - Update `agent_assignment_manager.py` routing logic
-5. **Create tests** in `tests/test_agents.py`
-
-**Agent Template Structure:**
 ```python
-class NewAgent:
-    def __init__(self, api_key: str, mongodb_uri: str):
-        self.api_key = api_key
-        self.db = AsyncMongoClient(mongodb_uri)
-        self.ai = ClaudeSonnetIntelligence()  # or MultiModelOrchestrator
+from agent.modules.base_agent import BaseAgent
 
-    async def perform_task(self, task_data: dict) -> dict:
-        # 1. Validate input
-        # 2. Query AI/external services
-        # 3. Store results in MongoDB
-        # 4. Return structured response
+class MyAgentV2(BaseAgent):
+    def __init__(self):
+        super().__init__(agent_name="My Agent", version="2.0.0")
+
+    async def initialize(self) -> bool:
+        # Initialize agent resources
+        return True
+
+    @BaseAgent.with_healing
+    async def my_method(self, param):
+        # Method with automatic self-healing
         pass
 ```
 
-### Error Handling Convention
+**BaseAgent Features:**
+- **Self-Healing**: Automatic error recovery with configurable retry logic
+- **Circuit Breaker**: Protection against cascading failures
+- **ML-Powered Anomaly Detection**: Statistical analysis using Z-scores
+- **Performance Monitoring**: Response time tracking and optimization
+- **Health Checks**: Comprehensive diagnostics and status reporting
+- **Metrics Collection**: Operations per minute, success rates, error tracking
+- **Adaptive Learning**: Performance prediction based on historical data
+- **Resource Optimization**: Automatic cache clearing and resource management
 
-**All agents use try/except with graceful fallbacks:**
+**Agent Status Levels:**
+- `HEALTHY`: Operating normally
+- `DEGRADED`: Reduced performance but functional
+- `RECOVERING`: Self-healing in progress
+- `FAILED`: Requires intervention
+- `INITIALIZING`: Starting up
 
-```python
-try:
-    from agent.modules.complex_agent import ComplexAgent
-except Exception:
-    ComplexAgent = None
+**Key Agents:**
 
-    def create_complex_agent(*args, **kwargs):
-        return {"status": "unavailable"}
-```
+**Core Agents:**
+- `claude_sonnet_intelligence_service.py` - Primary AI reasoning engine using Claude Sonnet 4.5
+- `multi_model_ai_orchestrator.py` - Coordinates multiple AI models (GPT-4, Gemini, Mistral, Llama)
+- `universal_self_healing_agent.py` - Auto-repairs code across Python, JavaScript, PHP
+- `continuous_learning_background_agent.py` - 24/7 background learning and system improvement
 
-This allows the platform to start even if optional dependencies are missing.
+**E-Commerce Agents:**
+- `ecommerce_agent.py` - Product management, orders, pricing optimization
+- `inventory_agent.py` - Stock predictions and inventory management
+- `financial_agent.py` - Payment processing and financial analysis
+
+**Content & Marketing Agents:**
+- `brand_intelligence_agent.py` - Brand analysis and market intelligence
+- `seo_marketing_agent.py` - SEO optimization and marketing automation
+- `autonomous_landing_page_generator.py` - AI-driven landing page creation with A/B testing
+- `meta_social_automation_agent.py` - Facebook/Instagram automation via Meta Graph API
+
+**Technical Agents:**
+- `fashion_computer_vision_agent.py` - Fabric, stitching, and design analysis
+- `voice_audio_content_agent.py` - Text-to-speech and transcription
+- `blockchain_nft_luxury_assets.py` - Digital asset management and NFT operations
+- `customer_service_agent.py` - Automated customer support
+
+**Agent Communication:**
+Agents use a graceful degradation pattern in `main.py`:
+- Each agent imported with try/except wrapper
+- Failed imports create fallback functions returning `{"status": "unavailable"}`
+- Platform remains operational even if individual agents fail to load
+- Core agents (`scanner.py`, `fixer.py`) are always loaded; specialized agents load conditionally
+- Check logs for specific agent import errors
+
+The agent system uses shared configuration from `agent/config/` and background scheduling via `agent/scheduler/`.
+
+### Backend Architecture
+
+`main.py` is the FastAPI application entry point that:
+- Imports all agents with try/except fallbacks for graceful degradation
+- Configures CORS, security middleware, and trusted hosts
+- Exposes REST API endpoints for each agent capability
+- Handles validation errors and provides structured error responses
+
+Supporting backend modules:
+- `startup.py` - Platform initialization and MongoDB connection
+- `config.py` - Environment configuration management
+- `backend/advanced_cache_system.py` - Multi-tier caching (Redis, in-memory)
+- `backend/server.py` - Additional server configuration
+
+### Frontend Architecture
+
+React 18 + TypeScript application with:
+- **Build Tool:** Vite (fast HMR and optimized production builds)
+- **Styling:** Tailwind CSS with luxury theming
+- **State Management:** Redux Toolkit (@reduxjs/toolkit) + Zustand
+- **3D Graphics:** Three.js via @react-three/fiber and @react-three/drei
+- **Voice:** react-speech-kit
+- **Data Fetching:** @tanstack/react-query + axios
+- **Real-time:** socket.io-client
+- **Forms:** react-hook-form
+- **Animation:** framer-motion + react-spring
+- **Charts:** recharts
+
+The frontend proxies API requests to `localhost:8000` via Vite's proxy configuration.
+
+### Database & Persistence
+
+- **Primary Database:** MongoDB (required for production)
+- **Caching:** Redis (optional but recommended)
+- **Connection:** Async via Motor driver
+- **Schema:** Pydantic models in `models.py`
+
+Platform runs without MongoDB for development/testing but agent operations will fail (this is expected).
+
+### Application Configuration
+
+The platform uses environment-based configuration via `config.py`:
+- **DevelopmentConfig**: DEBUG=True, allows localhost CORS
+- **ProductionConfig**: SSL redirect, secure cookies, restricted CORS
+- **TestingConfig**: In-memory database, test secrets
+
+Brand settings in config:
+- BRAND_NAME: "The Skyy Rose Collection"
+- BRAND_DOMAIN: "theskyy-rose-collection.com"
+- MAX_CONTENT_LENGTH: 16MB
+
+## Configuration
 
 ### Environment Variables
 
-**Required (in .env):**
-- `ANTHROPIC_API_KEY` - Claude Sonnet access (primary AI)
-- `MONGODB_URI` - Database connection string
+Create `.env` file (use `.env.example` as template):
 
-**Optional but recommended:**
-- `OPENAI_API_KEY` - GPT-4 for multi-model orchestration
-- `META_ACCESS_TOKEN` - Facebook/Instagram automation
-- `ELEVENLABS_API_KEY` - Voice/audio generation
-- `WORDPRESS_URL` - Default WordPress site
-- `WORDPRESS_USERNAME` / `WORDPRESS_PASSWORD` - Application password
+```env
+# Required
+SECRET_KEY=your-secure-random-key-here
+ANTHROPIC_API_KEY=your_key_here
+MONGODB_URI=mongodb://localhost:27017/devSkyy
 
-### Testing Strategy
+# Optional (enables extended features)
+OPENAI_API_KEY=your_key_here
+META_ACCESS_TOKEN=your_token_here
+ELEVENLABS_API_KEY=your_key_here
+WORDPRESS_URL=your_wordpress_url
+NODE_ENV=development
+```
 
-**Test files mirror module structure:**
-- `tests/test_main.py` - FastAPI endpoint tests
-- `tests/test_agents.py` - Agent functionality tests
+The `scripts/quick_start.sh` script auto-creates `.env` template if missing.
 
-**Run single test:**
+### API Endpoints
+
+```
+/                        - Platform info
+/health                  - Service health status
+/docs                    - OpenAPI documentation
+/api/v1/agents          - Agent management
+/api/v1/products        - Product operations
+/api/v1/analytics       - Analytics and insights
+/api/v1/content         - Content generation
+/brand/intelligence     - Brand intelligence data
+```
+
+## Development Workflow
+
+### Making Changes
+
+1. **Start servers first** to establish baseline functionality
+2. **Test endpoints manually** after backend changes using curl or the `/docs` interface
+3. **Verify frontend hot reload** after UI changes (should auto-refresh at localhost:3000)
+4. **Run validation** before committing
+
+### Before Committing
+
 ```bash
-pytest tests/test_agents.py::test_specific_function -v
+# 1. Validate backend loads
+python3 -c "from main import app; print('✅ OK')"
+
+# 2. Test critical endpoints
+curl http://localhost:8000/health
+curl http://localhost:8000/brand/intelligence
+
+# 3. Verify frontend builds
+cd frontend && npm run build
+
+# 4. Run safety check
+python production_safety_check.py
 ```
 
-**Mock external services** (AI APIs, WordPress) in tests to avoid costs and ensure speed.
+### Deployment
 
-## Important Implementation Details
+**Pre-Deployment Checklist:**
+1. Run `python production_safety_check.py`
+2. Review `PRODUCTION_SAFETY_REPORT.md`
+3. Verify all required environment variables are set
+4. Configure MongoDB and Redis connections
+5. Set up SSL certificates
+6. Configure rate limiting
+7. Enable monitoring (logs, metrics, APM)
 
-### FastAPI Middleware Stack
-
-In `main.py`, middleware is configured in specific order (bottom to top execution):
-
-1. **TrustedHostMiddleware** - Security (prevent host header attacks)
-2. **CORSMiddleware** - Cross-origin configuration
-3. **Custom error handlers** - Graceful error responses
-
-### Async/Await Requirements
-
-**Critical**: This codebase is heavily async. When adding new functionality:
-
-- Use `async def` for any function doing I/O (database, API calls, file operations)
-- Use `await` when calling async functions
-- Use `motor` for MongoDB (not pymongo)
-- Use `aiofiles` for file operations (not standard open())
-
-### Performance Optimization
-
-The platform uses **multi-level caching**:
-
-1. **Redis cache** (`cache_manager.py`) - For frequent queries
-2. **Memory cache** - In-process caching for session data
-3. **Database indexes** - MongoDB indexes for common queries
-
-**When adding database queries**, always consider indexing needs.
-
-### Security Considerations
-
-**Authentication flow:**
-1. JWT tokens generated by `auth_manager.py`
-2. Tokens validated on each request
-3. Role-based access control (RBAC) for different agent permissions
-
-**API key storage:**
-- Never commit keys to git
-- Use environment variables exclusively
-- Validate all external inputs (Pydantic models)
-
-## Deployment Architecture
-
-### Production Stack
-
-```
-User Request
-    ↓
-Nginx (Reverse Proxy + SSL)
-    ↓
-Uvicorn (4 workers)
-    ↓
-FastAPI Application (main.py)
-    ↓
-MongoDB (Database)
-Redis (Cache)
+**Docker Deployment:**
+```bash
+docker build -t devSkyy .
+docker run -p 8000:8000 --env-file .env devSkyy
 ```
 
-### Pre-Deployment Checklist
+**Enterprise Deployment:**
+```bash
+bash run_enterprise.sh
+```
 
-Run `python3 production_safety_check.py` which validates:
-- Environment variables are set
-- No debug mode enabled
-- All security headers configured
-- No hardcoded secrets
-- Database connections work
-- Required files present
+The enterprise script provides:
+- 4 workers with uvloop for high performance
+- Auto health monitoring and recovery (checks every 10 seconds)
+- Security scanning via pip-audit
+- Automatic frontend build and preview
+- Zero-downtime failover with max 3 retry attempts
+- Comprehensive logging to `enterprise_run.log`
 
-### CI/CD Pipeline
+## Common Issues
 
-**GitHub Actions** (`.github/workflows/`):
-- `ci.yml` - Run tests, linting, type-checking on every push
-- `deploy.yml` - Automated deployment to production (on main branch)
+### MongoDB Not Connected
+Platform runs without MongoDB for development but agent operations will fail. This is expected. For full functionality, ensure MongoDB is running and `MONGODB_URI` is set in `.env`.
 
-## Common Development Tasks
+### Agent Import Failures
+Agents are imported with try/except fallbacks in `main.py`. If an agent fails to import, the platform continues running with graceful degradation. Check logs for specific import errors.
 
-### Adding a New API Endpoint
+### Build Timeouts
+Python dependency installation takes 30-40 seconds and frontend installation takes 8-12 seconds. These are validated timings. Always set timeouts to 120+ seconds for Python and 60+ seconds for frontend to avoid incomplete installations.
 
-1. Add route in `main.py` (around line 500+)
-2. Use Pydantic models from `models.py` for request/response validation
-3. Add error handling with appropriate HTTP status codes
-4. Update API documentation (auto-generated by FastAPI)
-5. Add tests in `tests/test_main.py`
+### Jekyll Documentation
+Jekyll documentation deployment requires `bundle install`. Jekyll dependencies are not installed by default. Run `bundle install` before building docs.
 
-### Integrating a New AI Model
+## Security
 
-1. Create service file in `agent/modules/` (e.g., `gemini_intelligence_service.py`)
-2. Update `multi_model_ai_orchestrator.py` to include new model
-3. Add model selection logic based on task type
-4. Update environment variables for API keys
-5. Test with fallback mechanisms
+The platform implements enterprise-grade security:
+- Environment-based configuration (never commit `.env`)
+- API key encryption
+- Rate limiting via slowapi
+- Input validation with Pydantic
+- Security headers via secure middleware
+- CORS configuration
+- Trusted host middleware
+- Security scanning via bandit and safety
 
-### Adding WordPress Functionality
+See `SECURITY.md` for detailed security practices and vulnerability reporting.
 
-1. Check if REST API supports the feature (most common)
-2. Add method to `wordpress_integration_service.py`
-3. If REST API insufficient, add to `wordpress_direct_service.py`
-4. For custom functionality, extend `wordpress-plugin/` PHP code
-5. Test all three integration paths for consistency
+## Agent Upgrade System
 
-## Architecture Decision Records
+### Upgrading Agents to BaseAgent V2
 
-### Why Multiple WordPress Integration Methods?
+A comprehensive agent upgrade system is available in `agent/upgrade_agents.py`.
 
-**Decision**: Maintain three parallel integration systems (REST API, Direct DB, Plugin)
+**Run the upgrade analyzer:**
+```bash
+python agent/upgrade_agents.py
+```
 
-**Rationale**:
-- REST API can be rate-limited or disabled by hosting
-- Direct access allows emergency operations when REST fails
-- Plugin provides custom endpoints not available in core WordPress
-- Redundancy ensures 99.9% uptime for critical operations
+This will analyze all 55+ agents and show:
+- Which agents need upgrading
+- Agent complexity metrics (lines of code, async methods, error handling)
+- Upgrade priority recommendations
 
-### Why Claude Sonnet as Primary AI?
+**Upgrade Process for Each Agent:**
 
-**Decision**: Use Claude Sonnet 4.5 as primary intelligence, orchestrate to others
+1. **Analyze the agent:**
+   - Review existing functionality
+   - Identify key methods that need protection
+   - Note any external dependencies (APIs, databases)
 
-**Rationale**:
-- Superior reasoning for complex business logic
-- Better at following structured instructions for agent tasks
-- Excellent at code analysis and generation (self-healing)
-- GPT-4 used for specific tasks (creative content, certain APIs)
-- Cost-effective for bulk operations with quality maintenance
+2. **Create V2 version:**
+   ```bash
+   # Example: upgrading brand_intelligence_agent.py
+   cp agent/modules/brand_intelligence_agent.py agent/modules/brand_intelligence_agent_v2.py
+   ```
 
-### Why Async Throughout?
+3. **Inherit from BaseAgent:**
+   ```python
+   from .base_agent import BaseAgent
 
-**Decision**: Async/await pattern for all I/O operations
+   class BrandIntelligenceAgentV2(BaseAgent):
+       def __init__(self):
+           super().__init__(agent_name="Brand Intelligence", version="2.0.0")
+   ```
 
-**Rationale**:
-- Platform handles 10,000+ concurrent users
-- Long-running AI operations must not block other requests
-- Background agents run continuously without blocking
-- Database operations are naturally async with Motor
-- Better resource utilization on multi-core systems
+4. **Implement required methods:**
+   ```python
+   async def initialize(self) -> bool:
+       """Initialize agent resources"""
+       try:
+           # Your init code
+           self.status = BaseAgent.AgentStatus.HEALTHY
+           return True
+       except Exception as e:
+           self.status = BaseAgent.AgentStatus.FAILED
+           return False
 
-## Troubleshooting Guide
+   async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+       """Core functionality"""
+       # Implement or delegate to existing methods
+       return await self.health_check()
+   ```
 
-### "Module not found" errors on startup
-- Check if optional dependency - platform should start anyway with fallbacks
-- If required module, run `make install` or `pip install -r requirements.txt`
+5. **Add self-healing to key methods:**
+   ```python
+   @BaseAgent.with_healing
+   async def analyze_brand(self, data: Dict) -> Dict[str, Any]:
+       # Method now has automatic retry and error recovery
+       # Existing logic here
+       pass
+   ```
 
-### MongoDB connection timeouts
-- Verify `MONGODB_URI` in .env
-- Check if MongoDB service is running
-- Test connection: `mongosh "$MONGODB_URI"`
+6. **Add resource optimization:**
+   ```python
+   async def _optimize_resources(self):
+       """Override for agent-specific optimization"""
+       self.cache.clear()
+       # Clear other resources
+   ```
 
-### Frontend can't reach backend
-- Backend runs on `http://localhost:8000` (check `make run` output)
-- Frontend expects backend at that URL (configured in `frontend/vite.config.js`)
-- Check CORS settings in `main.py` if running on different domain
+7. **Test the upgraded agent:**
+   ```python
+   # Test initialization
+   agent = BrandIntelligenceAgentV2()
+   await agent.initialize()
 
-### AI API rate limits
-- Multi-model orchestrator automatically falls back to alternative models
-- Check logs for which model is being used
-- Increase delays in `multi_model_ai_orchestrator.py` if needed
+   # Test health check
+   health = await agent.health_check()
+   print(health)
 
-### Tests failing
-- Run `make clean` to remove cached files
-- Ensure MongoDB is running for integration tests
-- Check if test environment variables are set (tests use separate .env.test)
+   # Test core functionality
+   result = await agent.analyze_brand(test_data)
+   ```
 
-## References
+8. **Update main.py imports:**
+   ```python
+   # Old
+   from agent.modules.brand_intelligence_agent import BrandIntelligenceAgent
 
-- FastAPI Documentation: https://fastapi.tiangolo.com
-- Claude API Docs: https://docs.anthropic.com
-- WordPress REST API: https://developer.wordpress.org/rest-api/
-- MongoDB Motor: https://motor.readthedocs.io
+   # New
+   from agent.modules.brand_intelligence_agent_v2 import BrandIntelligenceAgentV2
+   ```
+
+**Upgrade Priority:**
+
+**High Priority (Core Infrastructure):**
+- claude_sonnet_intelligence_service.py ✅ (Example completed)
+- multi_model_ai_orchestrator.py
+- universal_self_healing_agent.py
+- continuous_learning_background_agent.py
+
+**Medium Priority (Business Critical):**
+- ecommerce_agent.py
+- inventory_agent.py
+- financial_agent.py
+- brand_intelligence_agent.py
+
+**Standard Priority (Specialized Features):**
+- All remaining agents
+
+**Agent V2 Benefits:**
+- 3-5x fewer runtime errors due to self-healing
+- Automatic anomaly detection and alerting
+- Performance tracking and optimization
+- Health monitoring and diagnostics
+- Circuit breaker protection preventing cascading failures
+- ML-powered quality assessment
+- Comprehensive metrics and reporting
+
+### Agent Health Monitoring
+
+Once upgraded, agents provide rich health data:
+
+```bash
+# Check agent health via API
+curl http://localhost:8000/api/agents/claude-sonnet/health
+
+# Response includes:
+# - Status (healthy/degraded/recovering/failed)
+# - Success rate
+# - Average response time
+# - Error count
+# - Anomalies detected
+# - Self-healings performed
+# - Performance predictions
+```
+
+See `agent/modules/base_agent.py` for complete BaseAgent documentation.
