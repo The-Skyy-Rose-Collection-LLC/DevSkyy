@@ -41,8 +41,8 @@ bandit==1.8.0  # Security linting
 safety==3.2.11  # Vulnerability scanning
 
 # AI & ML (Latest Stable)
-anthropic==0.39.0
-openai==1.56.2  # Updated
+anthropic==0.69.0  # Latest version
+openai==2.3.0  # Latest version
 transformers==4.47.1  # Updated
 torch==2.5.1
 torchvision==0.20.1
