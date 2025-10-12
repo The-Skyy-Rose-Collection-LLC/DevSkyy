@@ -28,7 +28,7 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.12.14
-cryptography==44.0.0  # Latest for security
+cryptography==44.0.1  # Latest for security
 PyJWT==2.10.1  # Updated
 bcrypt==4.2.1  # Latest
 argon2-cffi==23.1.0  # Additional password hashing
