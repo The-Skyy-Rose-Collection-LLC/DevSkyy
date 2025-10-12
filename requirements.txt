@@ -49,7 +49,7 @@ torchvision==0.20.1
 diffusers==0.31.0
 sentence-transformers==3.3.1
 scikit-learn==1.5.2
-numpy==1.26.4  # Compatible version
+numpy==2.3.3  # Compatible version
 pandas==2.2.3
 tensorflow==2.18.0
 xgboost==2.1.3
