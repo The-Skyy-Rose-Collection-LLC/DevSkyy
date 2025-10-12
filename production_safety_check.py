@@ -131,7 +131,8 @@ class ProductionSafetyCheck:
             # Core APIs
             "ANTHROPIC_API_KEY": {"critical": True, "description": "Claude AI access"},
             "OPENAI_API_KEY": {"critical": False, "description": "OpenAI GPT access"},
-            "MONGODB_URI": {"critical": True, "description": "Database connection"},
+            # NOTE: MongoDB removed per deployment requirements
+            # "MONGODB_URI": {"critical": True, "description": "Database connection"},
             # Social Media
             "META_ACCESS_TOKEN": {"critical": False, "description": "Facebook/Instagram API"},
             "TWITTER_API_KEY": {"critical": False, "description": "Twitter/X API"},

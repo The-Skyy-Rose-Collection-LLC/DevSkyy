@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
 Startup script for Skyy Rose AI Agent Management Platform
-Handles graceful startup, database connections, and WordPress auto-connection
+Handles graceful startup and WordPress auto-connection
+NOTE: MongoDB removed per deployment requirements - no database connections
 """
 
 import asyncio
 import logging
 import sys
 from pathlib import Path
-
-from motor.motor_asyncio import AsyncIOMotorClient
 
 from agent.modules.wordpress_direct_service import create_wordpress_direct_service
 
@@ -25,28 +24,7 @@ logger = logging.getLogger(__name__)
 
 class SkyRoseStartup:
     def __init__(self):
-        self.mongodb_client = None
         self.wordpress_service = None
-
-    async def initialize_database(self):
-        """Initialize MongoDB connection."""
-        try:
-            import os
-
-            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017/skyy_rose_agents")
-
-            logger.info("🔄 Initializing MongoDB connection...")
-            self.mongodb_client = AsyncIOMotorClient(mongo_url)
-
-            # Test connection
-            await self.mongodb_client.admin.command("ismaster")
-            logger.info("✅ MongoDB connection established successfully")
-
-            return True
-
-        except Exception as e:
-            logger.error(f"❌ MongoDB connection failed: {str(e)}")
-            return False
 
     async def initialize_wordpress_connection(self):
         """Auto-connect to WordPress on startup."""
@@ -75,12 +53,6 @@ class SkyRoseStartup:
         """Run complete startup sequence."""
         logger.info("🚀 Starting Skyy Rose AI Agent Platform...")
 
-        # Initialize database
-        db_success = await self.initialize_database()
-        if not db_success:
-            logger.error("💥 Critical: Database initialization failed!")
-            return False
-
         # Auto-connect WordPress (non-critical)
         wp_success = await self.initialize_wordpress_connection()
         if wp_success:
@@ -90,7 +62,6 @@ class SkyRoseStartup:
 
         logger.info("🎉 Skyy Rose platform startup complete!")
         logger.info("   ├─ 🤖 AI Agents: Ready")
-        logger.info("   ├─ 💾 Database: Connected")
         logger.info("   ├─ 🌐 WordPress: " + ("Connected" if wp_success else "Standby"))
         logger.info("   └─ ⚡ Automation: Active")
 
@@ -99,11 +70,6 @@ class SkyRoseStartup:
     async def shutdown(self):
         """Graceful shutdown."""
         logger.info("🔄 Shutting down services...")
-
-        if self.mongodb_client:
-            self.mongodb_client.close()
-            logger.info("✅ MongoDB connection closed")
-
         logger.info("👋 Skyy Rose platform shutdown complete")
 
 

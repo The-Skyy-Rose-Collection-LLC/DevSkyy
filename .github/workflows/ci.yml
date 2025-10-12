@@ -15,16 +15,7 @@ jobs:
     name: Test Backend
     runs-on: ubuntu-latest
     
-    services:
-      mongodb:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # NOTE: MongoDB service removed per deployment requirements
     
     steps:
     - name: Checkout code
@@ -44,7 +35,6 @@ jobs:
     
     - name: Run tests
       env:
-        MONGODB_URI: mongodb://localhost:27017/test
         SECRET_KEY: test-secret-key
       run: |
         pytest tests/ -v --cov=. --cov-report=xml --cov-report=term

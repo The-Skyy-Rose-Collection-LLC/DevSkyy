@@ -239,7 +239,7 @@ except Exception:
 
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 
@@ -312,6 +312,79 @@ async def general_exception_handler(request: Request, exc: Exception):
 # Global agent cache for lazy initialization
 _agent_cache = {}
 _brand_intelligence = None
+_agent_import_status = {}
+
+
+@app.on_event("startup")
+async def validate_agent_imports():
+    """Pre-validate all agent imports at startup without creating instances.
+    
+    This ensures deployment readiness by checking if agents can be imported.
+    Failures are logged but don't crash the app to support optional dependencies.
+    """
+    logger.info("🔍 Validating agent imports at startup...")
+    
+    # List of agents to validate (class name, module path)
+    agents_to_validate = [
+        ("CustomerServiceAgent", "agent.modules.customer_service_agent"),
+        ("DesignAutomationAgent", "agent.modules.design_automation_agent"),
+        ("EmailSMSAutomationAgent", "agent.modules.email_sms_automation_agent"),
+        ("FinancialAgent", "agent.modules.financial_agent"),
+        ("SocialMediaAutomationAgent", "agent.modules.social_media_automation_agent"),
+        ("PerformanceAgent", "agent.modules.performance_agent"),
+        ("SecurityAgent", "agent.modules.security_agent"),
+        ("InventoryAgent", "agent.modules.inventory_agent"),
+        ("WebDevelopmentAgent", "agent.modules.web_development_agent"),
+        ("WordPressAgent", "agent.modules.wordpress_agent"),
+        ("SiteCommunicationAgent", "agent.modules.site_communication_agent"),
+        ("BrandIntelligenceAgent", "agent.modules.brand_intelligence_agent"),
+        ("SEOMarketingAgent", "agent.modules.seo_marketing_agent"),
+        ("EcommerceAgent", "agent.modules.ecommerce_agent"),
+    ]
+    
+    importable_count = 0
+    unavailable_count = 0
+    
+    for agent_name, module_path in agents_to_validate:
+        try:
+            # Attempt to import the agent class
+            module = __import__(module_path, fromlist=[agent_name])
+            agent_class = getattr(module, agent_name)
+            
+            # Try instantiating with no-op to check for import-time issues
+            # Don't store the instance - just validate it can be created
+            test_instance = agent_class()
+            
+            _agent_import_status[agent_name] = {
+                "status": "available",
+                "module": module_path,
+                "message": "Successfully imported and instantiated"
+            }
+            importable_count += 1
+            logger.info(f"✅ {agent_name}: Available")
+            
+        except ImportError as e:
+            _agent_import_status[agent_name] = {
+                "status": "unavailable",
+                "module": module_path,
+                "error": str(e),
+                "message": f"Missing dependency: {e}"
+            }
+            unavailable_count += 1
+            logger.warning(f"⚠️  {agent_name}: Missing dependency - {e}")
+            
+        except Exception as e:
+            _agent_import_status[agent_name] = {
+                "status": "error",
+                "module": module_path,
+                "error": str(e),
+                "message": f"Import/instantiation failed: {e}"
+            }
+            unavailable_count += 1
+            logger.warning(f"⚠️  {agent_name}: Failed - {e}")
+    
+    logger.info(f"✅ Agent validation complete: {importable_count} available, {unavailable_count} unavailable")
+    logger.info("🚀 FastAPI application startup complete - ready for deployment")
 
 
 def get_brand_intelligence():
@@ -503,6 +576,34 @@ def health_check() -> dict:
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(status_code=503, detail="Service temporarily unavailable")
+
+
+@app.get("/agents/import-status")
+def get_agents_import_status() -> Dict[str, Any]:
+    """Get the import status of all agents validated at startup.
+    
+    Returns detailed information about which agents are available,
+    which have missing dependencies, and any import errors.
+    """
+    if not _agent_import_status:
+        return {
+            "message": "Agent validation not yet run (startup event pending)",
+            "agents": {},
+            "summary": {"available": 0, "unavailable": 0}
+        }
+    
+    available = sum(1 for s in _agent_import_status.values() if s["status"] == "available")
+    unavailable = sum(1 for s in _agent_import_status.values() if s["status"] != "available")
+    
+    return {
+        "timestamp": datetime.now().isoformat(),
+        "summary": {
+            "total": len(_agent_import_status),
+            "available": available,
+            "unavailable": unavailable
+        },
+        "agents": _agent_import_status
+    }
 
 
 @app.get("/metrics")

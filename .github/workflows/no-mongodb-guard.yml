@@ -1,0 +1,41 @@
+name: No MongoDB Guard
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  check-no-mongodb:
+    name: Enforce No MongoDB References
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Check for MongoDB references
+      run: |
+        echo "🔍 Scanning for MongoDB references..."
+        
+        # Check for mongodb/pymongo in Python files and configs
+        if grep -RinE "from (motor|pymongo)" --include="*.py" . 2>/dev/null; then
+          echo "❌ FAILED: Found MongoDB/PyMongo imports in Python code"
+          exit 1
+        fi
+        
+        if grep -RinE "AsyncIOMotorClient|MongoClient" --include="*.py" . 2>/dev/null; then
+          echo "❌ FAILED: Found MongoDB client instantiation in Python code"
+          exit 1
+        fi
+        
+        # Allow MongoDB mentions in comments or strings as documentation only
+        # Check for actual usage patterns
+        if grep -RinE "mongodb://" --include="*.py" --include="*.yml" --include="*.yaml" . 2>/dev/null | grep -v "^[[:space:]]*#" | grep -v "NOTE:" | grep -v "REMOVED:"; then
+          echo "❌ FAILED: Found MongoDB connection strings in configuration"
+          exit 1
+        fi
+        
+        echo "✅ SUCCESS: No active MongoDB usage detected"
+        echo "ℹ️  MongoDB references are only allowed in comments for documentation"
