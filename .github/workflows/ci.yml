@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
@@ -61,7 +61,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@7f8b4b4bde536c465e797be725022faffa36fbe3
         with:
           files: ./coverage.xml
           flags: backend
@@ -74,10 +74,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee109
         with:
           node-version: '20'
           cache: 'npm'
@@ -106,7 +106,7 @@ jobs:
           npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: frontend-build
           path: frontend/dist
@@ -120,10 +120,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
         with:
           python-version: '3.11'
 
@@ -139,7 +139,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload safety report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: production-safety-report
           path: PRODUCTION_SAFETY_REPORT.md
@@ -153,10 +153,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
         with:
           python-version: '3.11'
 
@@ -171,7 +171,7 @@ jobs:
           npm audit --production || true
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@915b19ead16fc68b9b03f2a5e8b23c1f7c0ea2bd
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -180,7 +180,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@f779452ac5af1c261dce0346a8b332a8cab67b52
         with:
           sarif_file: 'trivy-results.sarif'
         continue-on-error: true
