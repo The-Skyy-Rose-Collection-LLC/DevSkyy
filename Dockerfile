@@ -2,7 +2,7 @@
 # Optimized for production deployment
 
 # Stage 1: Base Python image
-FROM python:3.11-slim as base
+FROM python:3.13-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -23,19 +23,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Stage 2: Dependencies
-FROM base as dependencies
+FROM base AS dependencies
 
 WORKDIR /tmp
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY requirements.minimal.txt requirements.txt
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Stage 3: Application
-FROM base as application
+FROM base AS application
 
 WORKDIR /app
 
