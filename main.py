@@ -779,6 +779,318 @@ async def performance_metrics():
 
 
 # ============================================================================
+# WORDPRESS THEME BUILDER ENDPOINTS
+# ============================================================================
+@app.post("/api/wordpress/theme/generate")
+async def generate_wordpress_theme(request: Dict[str, Any]):
+    """Generate WordPress/Elementor theme"""
+    try:
+        from agent.wordpress.theme_builder import ElementorThemeBuilder
+
+        builder = ElementorThemeBuilder(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+        result = await builder.generate_theme(
+            brand_info=request.get("brand_info", {}),
+            theme_type=request.get("theme_type", "luxury_fashion"),
+            pages=request.get("pages")
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Theme generation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/wordpress/theme/export")
+async def export_wordpress_theme(request: Dict[str, Any]):
+    """Export WordPress theme"""
+    try:
+        from agent.wordpress.theme_builder import ElementorThemeBuilder
+
+        builder = ElementorThemeBuilder(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+        result = await builder.export_theme(
+            theme=request.get("theme", {}),
+            format=request.get("format", "json")
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Theme export failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# ECOMMERCE AUTOMATION ENDPOINTS
+# ============================================================================
+@app.post("/api/ecommerce/products")
+async def create_product(request: Dict[str, Any]):
+    """Create product with ML enhancements"""
+    try:
+        from agent.ecommerce.product_manager import ProductManager
+
+        manager = ProductManager()
+
+        result = await manager.create_product(
+            product_data=request,
+            auto_generate=request.get("auto_generate", True)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Product creation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/products/bulk")
+async def bulk_import_products(request: Dict[str, Any]):
+    """Bulk import products"""
+    try:
+        from agent.ecommerce.product_manager import ProductManager
+
+        manager = ProductManager()
+
+        result = await manager.bulk_import_products(
+            products=request.get("products", [])
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Bulk import failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/pricing/optimize")
+async def optimize_pricing(request: Dict[str, Any]):
+    """Optimize product pricing using ML"""
+    try:
+        from agent.ecommerce.pricing_engine import DynamicPricingEngine
+
+        pricing = DynamicPricingEngine()
+
+        result = await pricing.optimize_price(
+            product_data=request.get("product_data", {}),
+            market_data=request.get("market_data", {})
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Price optimization failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/pricing/strategy")
+async def create_pricing_strategy(request: Dict[str, Any]):
+    """Create pricing strategy"""
+    try:
+        from agent.ecommerce.pricing_engine import DynamicPricingEngine
+
+        pricing = DynamicPricingEngine()
+
+        result = await pricing.create_pricing_strategy(
+            strategy_type=request.get("strategy_type", "clearance"),
+            products=request.get("products", [])
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Pricing strategy creation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/pricing/ab-test")
+async def create_ab_test(request: Dict[str, Any]):
+    """Create A/B price test"""
+    try:
+        from agent.ecommerce.pricing_engine import DynamicPricingEngine
+
+        pricing = DynamicPricingEngine()
+
+        result = await pricing.ab_test_pricing(
+            product_id=request.get("product_id"),
+            price_variant_a=request.get("price_variant_a"),
+            price_variant_b=request.get("price_variant_b"),
+            duration_days=request.get("duration_days", 14)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"A/B test creation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/inventory/forecast")
+async def forecast_inventory(request: Dict[str, Any]):
+    """Forecast inventory demand"""
+    try:
+        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
+
+        inventory = InventoryOptimizer()
+
+        result = await inventory.forecast_demand(
+            product_id=request.get("product_id"),
+            historical_sales=request.get("historical_sales", []),
+            forecast_periods=request.get("forecast_periods", 30)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Inventory forecast failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/inventory/reorder")
+async def calculate_reorder_point(request: Dict[str, Any]):
+    """Calculate optimal reorder point"""
+    try:
+        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
+
+        inventory = InventoryOptimizer()
+
+        result = await inventory.calculate_reorder_point(
+            product_data=request.get("product_data", {}),
+            sales_data=request.get("sales_data", {})
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Reorder calculation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/inventory/deadstock")
+async def identify_dead_stock(request: Dict[str, Any]):
+    """Identify dead stock"""
+    try:
+        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
+
+        inventory = InventoryOptimizer()
+
+        result = await inventory.identify_dead_stock(
+            inventory=request.get("inventory", []),
+            threshold_days=request.get("threshold_days", 90)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Dead stock identification failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ecommerce/inventory/optimize")
+async def optimize_stock_levels(request: Dict[str, Any]):
+    """Optimize stock levels"""
+    try:
+        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
+
+        inventory = InventoryOptimizer()
+
+        result = await inventory.optimize_stock_levels(
+            products=request.get("products", []),
+            target_service_level=request.get("target_service_level", 0.95)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Stock optimization failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/ecommerce/products/{product_id}/analytics")
+async def get_product_analytics(product_id: str):
+    """Get product analytics"""
+    try:
+        from agent.ecommerce.product_manager import ProductManager
+
+        manager = ProductManager()
+
+        result = await manager.get_product_analytics(product_id)
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Analytics retrieval failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# MACHINE LEARNING ENDPOINTS
+# ============================================================================
+@app.post("/api/ml/fashion/analyze-trend")
+async def analyze_fashion_trend(request: Dict[str, Any]):
+    """Analyze fashion trends"""
+    try:
+        from agent.ml_models.fashion_ml import FashionMLEngine
+
+        ml = FashionMLEngine()
+
+        result = await ml.analyze_trend(
+            historical_data=request.get("historical_data", {}),
+            forecast_periods=request.get("forecast_periods", 12)
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Trend analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ml/fashion/optimize-pricing")
+async def ml_optimize_pricing(request: Dict[str, Any]):
+    """ML-powered price optimization"""
+    try:
+        from agent.ml_models.fashion_ml import FashionMLEngine
+
+        ml = FashionMLEngine()
+
+        result = await ml.optimize_pricing(
+            product_features=request.get("product_features", {}),
+            market_data=request.get("market_data", {})
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"ML pricing optimization failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ml/fashion/segment-customers")
+async def segment_customers(request: Dict[str, Any]):
+    """Segment customers using ML"""
+    try:
+        from agent.ml_models.fashion_ml import FashionMLEngine
+
+        ml = FashionMLEngine()
+
+        result = await ml.segment_customers(
+            customer_data=request.get("customer_data", [])
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Customer segmentation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ml/fashion/recommend-size")
+async def recommend_size(request: Dict[str, Any]):
+    """Recommend size based on measurements"""
+    try:
+        from agent.ml_models.fashion_ml import FashionMLEngine
+
+        ml = FashionMLEngine()
+
+        result = await ml.recommend_size(
+            measurements=request.get("measurements", {}),
+            brand_sizing=request.get("brand_sizing", "standard")
+        )
+
+        return {"status": "success", "data": result}
+    except Exception as e:
+        logger.error(f"Size recommendation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
 # DEVELOPMENT MODE
 # ============================================================================
 if __name__ == "__main__":
