@@ -1,2 +1,0 @@
-- name: Checkout
-  uses: actions/checkout@d32f905c75822c24435e99d5280fefb0ea6cf2fe

@@ -1,3 +1,8 @@
+# Git
+.git/
+.gitignore
+.github/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -8,59 +13,53 @@ venv/
 env/
 ENV/
 .venv/
+*.egg-info/
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Node
-node_modules/
-frontend/node_modules/
-frontend/dist/
-frontend/build/
-
-# Git
-.git/
-.gitignore
-
-# Environment
-.env
-.env.local
-*.env
+tests/
 
 # Logs
 logs/
 *.log
 
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mongo-data/
+devskyy.db
+data/
+
+# Environment
+.env
+.env.*
+!.env.example
+
 # Documentation
 docs/
 *.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
 
 # CI/CD
 .github/
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# OS
-.DS_Store
-Thumbs.db
-
 # Temporary
 tmp/
 temp/
+*.backup
+*.old
 
-# Database
-*.db
-*.sqlite
-mongo-data/
+# Build artifacts
+dist/
+build/

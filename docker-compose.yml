@@ -1,22 +1,30 @@
 version: '3.8'
 
 services:
+  # DevSkyy API
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: skyyrose/devskyy-api:latest
     container_name: devskyy-api
+    restart: unless-stopped
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     environment:
-      - MONGODB_URI=mongodb://mongodb:27017/devSkyy
+      - SECRET_KEY=${SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./devskyy.db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
     depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: unless-stopped
+      - redis
+      - postgres
+    networks:
+      - devskyy-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -31,42 +39,103 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: devskyy-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
     networks:
       - devskyy-network
-
-  mongodb:
-    image: mongo:7.0
-    container_name: devskyy-mongodb
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=devSkyy
-    volumes:
-      - mongo-data:/data/db
-      - mongo-config:/data/configdb
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: devskyy-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-devskyy}
+      - POSTGRES_USER=${POSTGRES_USER:-devskyy}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - devskyy-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devskyy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: devskyy-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - devskyy-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Grafana Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: devskyy-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - devskyy-network
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
 volumes:
-  mongo-data:
-    driver: local
-  mongo-config:
-    driver: local
+  redis-data:
+  postgres-data:
+  prometheus-data:
+  grafana-data:
 
 networks:
   devskyy-network:
