@@ -5,7 +5,7 @@ Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 import jwt
@@ -128,14 +128,14 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.now(),
+            "iat": datetime.now(timezone.utc),
             "token_type": "access",
         }
     )
@@ -155,12 +155,12 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
         Encoded JWT refresh token
     """
     to_encode = data.copy()
-    expire = datetime.now() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.now(),
+            "iat": datetime.now(timezone.utc),
             "token_type": "refresh",
         }
     )
@@ -222,7 +222,7 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             detail=f"{token_type.capitalize()} token expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except jwt.JWTError as e:
+    except Exception as e:
         logger.error(f"JWT validation error: {e}")
         raise credentials_exception
 
