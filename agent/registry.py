@@ -16,7 +16,7 @@ import importlib
 import inspect
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import ExecutionPriority, orchestrator

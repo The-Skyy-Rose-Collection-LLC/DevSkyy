@@ -43,11 +43,11 @@ class ProductManager:
             "clothing": {
                 "women": ["dresses", "tops", "bottoms", "outerwear", "activewear", "intimates"],
                 "men": ["shirts", "pants", "suits", "outerwear", "activewear", "underwear"],
-                "unisex": ["t-shirts", "hoodies", "jackets", "sweatpants"]
+                "unisex": ["t-shirts", "hoodies", "jackets", "sweatpants"],
             },
             "accessories": ["bags", "jewelry", "watches", "belts", "hats", "scarves", "sunglasses"],
             "footwear": ["sneakers", "boots", "heels", "sandals", "flats", "loafers"],
-            "seasonal": ["spring-summer", "fall-winter", "resort", "holiday"]
+            "seasonal": ["spring-summer", "fall-winter", "resort", "holiday"],
         }
 
     def _initialize_attributes(self) -> Dict[str, List]:
@@ -55,25 +55,46 @@ class ProductManager:
         return {
             "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
             "colors": [
-                "black", "white", "gray", "navy", "beige", "brown",
-                "red", "blue", "green", "yellow", "pink", "purple"
+                "black",
+                "white",
+                "gray",
+                "navy",
+                "beige",
+                "brown",
+                "red",
+                "blue",
+                "green",
+                "yellow",
+                "pink",
+                "purple",
             ],
             "materials": [
-                "cotton", "polyester", "silk", "wool", "cashmere",
-                "linen", "leather", "denim", "velvet", "satin"
+                "cotton",
+                "polyester",
+                "silk",
+                "wool",
+                "cashmere",
+                "linen",
+                "leather",
+                "denim",
+                "velvet",
+                "satin",
             ],
             "styles": [
-                "casual", "formal", "business", "evening", "sport",
-                "vintage", "modern", "minimalist", "bohemian"
+                "casual",
+                "formal",
+                "business",
+                "evening",
+                "sport",
+                "vintage",
+                "modern",
+                "minimalist",
+                "bohemian",
             ],
-            "fits": ["slim", "regular", "relaxed", "oversized", "tailored"]
+            "fits": ["slim", "regular", "relaxed", "oversized", "tailored"],
         }
 
-    async def create_product(
-        self,
-        product_data: Dict[str, Any],
-        auto_generate: bool = True
-    ) -> Dict[str, Any]:
+    async def create_product(self, product_data: Dict[str, Any], auto_generate: bool = True) -> Dict[str, Any]:
         """
         Create a new product with ML enhancements
 
@@ -132,16 +153,16 @@ class ProductManager:
                     "track_quantity": True,
                     "quantity": product_data.get("quantity", 0),
                     "allow_backorders": product_data.get("allow_backorders", False),
-                    "low_stock_threshold": 5
+                    "low_stock_threshold": 5,
                 },
                 "shipping": {
                     "weight": product_data.get("weight"),
                     "dimensions": product_data.get("dimensions"),
-                    "fragile": product_data.get("fragile", False)
+                    "fragile": product_data.get("fragile", False),
                 },
                 "status": "draft",
                 "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat()
+                "updated_at": datetime.utcnow().isoformat(),
             }
 
             # Store product
@@ -149,11 +170,7 @@ class ProductManager:
 
             logger.info(f"✅ Product created: {product_id}")
 
-            return {
-                "success": True,
-                "product": product,
-                "product_id": product_id
-            }
+            return {"success": True, "product": product, "product_id": product_id}
 
         except Exception as e:
             logger.error(f"Product creation failed: {e}")
@@ -174,9 +191,7 @@ class ProductManager:
                 Make it persuasive for luxury fashion shoppers."""
 
                 message = self.anthropic.messages.create(
-                    model="claude-sonnet-4-20250514",
-                    max_tokens=200,
-                    messages=[{"role": "user", "content": prompt}]
+                    model="claude-sonnet-4-20250514", max_tokens=200, messages=[{"role": "user", "content": prompt}]
                 )
 
                 return message.content[0].text.strip()
@@ -195,17 +210,19 @@ class ProductManager:
         return {
             "meta_title": f"{name} | Premium {category.title()}",
             "meta_description": f"Shop {name}. {product_data.get('description', '')[:150]}",
-            "keywords": ", ".join([
-                name.lower(),
-                category,
-                product_data.get("material", ""),
-                product_data.get("style", ""),
-                "luxury fashion",
-                "designer"
-            ]),
+            "keywords": ", ".join(
+                [
+                    name.lower(),
+                    category,
+                    product_data.get("material", ""),
+                    product_data.get("style", ""),
+                    "luxury fashion",
+                    "designer",
+                ]
+            ),
             "og_title": name,
             "og_description": product_data.get("description", "")[:200],
-            "og_image": product_data.get("images", [None])[0] if product_data.get("images") else None
+            "og_image": product_data.get("images", [None])[0] if product_data.get("images") else None,
         }
 
     async def _auto_categorize(self, product_data: Dict) -> str:
@@ -249,7 +266,7 @@ class ProductManager:
                     "price": base_price,
                     "quantity": product_data.get("quantity_per_variant", 10),
                     "image": None,  # Would link to color-specific image
-                    "barcode": None
+                    "barcode": None,
                 }
                 variants.append(variant)
 
@@ -267,7 +284,7 @@ class ProductManager:
             "leather": 3.5,
             "wool": 2.5,
             "cotton": 2.0,
-            "polyester": 1.8
+            "polyester": 1.8,
         }
 
         material = product_data.get("material", "cotton")
@@ -310,15 +327,13 @@ class ProductManager:
     def _generate_slug(self, name: str) -> str:
         """Generate URL-friendly slug"""
         import re
+
         slug = name.lower()
-        slug = re.sub(r'[^a-z0-9]+', '-', slug)
-        slug = slug.strip('-')
+        slug = re.sub(r"[^a-z0-9]+", "-", slug)
+        slug = slug.strip("-")
         return slug
 
-    async def bulk_import_products(
-        self,
-        products: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def bulk_import_products(self, products: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Bulk import products with ML enhancements
 
@@ -331,11 +346,7 @@ class ProductManager:
         try:
             logger.info(f"📦 Bulk importing {len(products)} products")
 
-            results = {
-                "success": [],
-                "failed": [],
-                "total": len(products)
-            }
+            results = {"success": [], "failed": [], "total": len(products)}
 
             for product_data in products:
                 result = await self.create_product(product_data, auto_generate=True)
@@ -343,10 +354,7 @@ class ProductManager:
                 if result.get("success"):
                     results["success"].append(result["product_id"])
                 else:
-                    results["failed"].append({
-                        "product": product_data.get("name"),
-                        "error": result.get("error")
-                    })
+                    results["failed"].append({"product": product_data.get("name"), "error": result.get("error")})
 
             logger.info(f"✅ Imported {len(results['success'])}/{len(products)} products")
 
@@ -354,18 +362,14 @@ class ProductManager:
                 "success": True,
                 "imported": len(results["success"]),
                 "failed": len(results["failed"]),
-                "details": results
+                "details": results,
             }
 
         except Exception as e:
             logger.error(f"Bulk import failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def optimize_product_images(
-        self,
-        product_id: str,
-        images: List[str]
-    ) -> Dict[str, Any]:
+    async def optimize_product_images(self, product_id: str, images: List[str]) -> Dict[str, Any]:
         """
         Optimize product images using ML
 
@@ -380,19 +384,21 @@ class ProductManager:
             optimizations = []
 
             for image_url in images:
-                optimizations.append({
-                    "original": image_url,
-                    "optimized": image_url,  # Would process through image optimization service
-                    "size_reduction": "35%",
-                    "format": "webp",
-                    "alt_text": await self._generate_image_alt_text(product_id, image_url)
-                })
+                optimizations.append(
+                    {
+                        "original": image_url,
+                        "optimized": image_url,  # Would process through image optimization service
+                        "size_reduction": "35%",
+                        "format": "webp",
+                        "alt_text": await self._generate_image_alt_text(product_id, image_url),
+                    }
+                )
 
             return {
                 "success": True,
                 "product_id": product_id,
                 "images_optimized": len(optimizations),
-                "optimizations": optimizations
+                "optimizations": optimizations,
             }
 
         except Exception as e:
@@ -427,13 +433,13 @@ class ProductManager:
                     "views": np.random.randint(100, 10000),
                     "add_to_cart_rate": round(np.random.uniform(0.05, 0.25), 3),
                     "conversion_rate": round(np.random.uniform(0.01, 0.08), 3),
-                    "average_time_on_page": round(np.random.uniform(30, 180), 1)
+                    "average_time_on_page": round(np.random.uniform(30, 180), 1),
                 },
                 "recommendations": [
                     "Consider adding more product images",
                     "Optimize product description for SEO",
-                    "Test different price points"
-                ]
+                    "Test different price points",
+                ],
             }
 
         except Exception as e:

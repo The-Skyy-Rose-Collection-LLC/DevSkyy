@@ -35,11 +35,7 @@ class DynamicPricingEngine:
 
         logger.info("💰 Dynamic Pricing Engine initialized")
 
-    async def optimize_price(
-        self,
-        product_data: Dict[str, Any],
-        market_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_price(self, product_data: Dict[str, Any], market_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Calculate optimal price for a product
 
@@ -111,15 +107,11 @@ class DynamicPricingEngine:
             price_range = {
                 "min": round(optimal_price * 0.9, 2),
                 "recommended": round(optimal_price, 2),
-                "max": round(optimal_price * 1.1, 2)
+                "max": round(optimal_price * 1.1, 2),
             }
 
             # Calculate expected impact
-            expected_revenue = await self._calculate_expected_revenue(
-                optimal_price,
-                demand_score,
-                elasticity
-            )
+            expected_revenue = await self._calculate_expected_revenue(optimal_price, demand_score, elasticity)
 
             return {
                 "success": True,
@@ -134,24 +126,16 @@ class DynamicPricingEngine:
                     "inventory": inventory_level,
                     "age_days": age_days,
                     "competitor_avg": competitor_avg,
-                    "elasticity": elasticity
+                    "elasticity": elasticity,
                 },
-                "recommendations": await self._get_pricing_recommendations(
-                    product_data,
-                    optimal_price,
-                    base_price
-                )
+                "recommendations": await self._get_pricing_recommendations(product_data, optimal_price, base_price),
             }
 
         except Exception as e:
             logger.error(f"Price optimization failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _calculate_elasticity(
-        self,
-        product_data: Dict,
-        market_data: Dict
-    ) -> float:
+    async def _calculate_elasticity(self, product_data: Dict, market_data: Dict) -> float:
         """Calculate price elasticity of demand"""
         # Simplified elasticity calculation
         # In production, this would use historical price/demand data
@@ -166,12 +150,7 @@ class DynamicPricingEngine:
         else:
             return -1.0  # Unit elastic
 
-    async def _calculate_expected_revenue(
-        self,
-        price: float,
-        demand_score: float,
-        elasticity: float
-    ) -> float:
+    async def _calculate_expected_revenue(self, price: float, demand_score: float, elasticity: float) -> float:
         """Calculate expected revenue at given price"""
         # Revenue = Price × Demand
         # Demand changes based on price elasticity
@@ -181,10 +160,7 @@ class DynamicPricingEngine:
         return revenue
 
     async def _get_pricing_recommendations(
-        self,
-        product_data: Dict,
-        optimal_price: float,
-        current_price: float
+        self, product_data: Dict, optimal_price: float, current_price: float
     ) -> List[str]:
         """Generate pricing recommendations"""
         recommendations = []
@@ -192,27 +168,17 @@ class DynamicPricingEngine:
         price_change = ((optimal_price / current_price) - 1) * 100
 
         if abs(price_change) > 10:
-            recommendations.append(
-                f"Consider gradual price adjustment of {price_change:.1f}% over 2-3 weeks"
-            )
+            recommendations.append(f"Consider gradual price adjustment of {price_change:.1f}% over 2-3 weeks")
 
         if product_data.get("inventory", 0) > 100:
-            recommendations.append(
-                "High inventory detected - consider promotional pricing"
-            )
+            recommendations.append("High inventory detected - consider promotional pricing")
 
         if product_data.get("age_days", 0) > 90:
-            recommendations.append(
-                "Product aging - implement clearance strategy"
-            )
+            recommendations.append("Product aging - implement clearance strategy")
 
         return recommendations
 
-    async def create_pricing_strategy(
-        self,
-        strategy_type: str,
-        products: List[Dict]
-    ) -> Dict[str, Any]:
+    async def create_pricing_strategy(self, strategy_type: str, products: List[Dict]) -> Dict[str, Any]:
         """
         Create pricing strategy for multiple products
 
@@ -230,26 +196,13 @@ class DynamicPricingEngine:
                         {"age_days": 60, "discount": 0.15},
                         {"age_days": 90, "discount": 0.25},
                         {"age_days": 120, "discount": 0.40},
-                        {"age_days": 180, "discount": 0.60}
+                        {"age_days": 180, "discount": 0.60},
                     ],
-                    "additional_inventory_discount": 0.10
+                    "additional_inventory_discount": 0.10,
                 },
-                "seasonal": {
-                    "spring": 1.05,
-                    "summer": 1.10,
-                    "fall": 1.0,
-                    "winter": 0.95
-                },
-                "competitive": {
-                    "match_competitor": True,
-                    "undercut_by": 0.05,  # 5%
-                    "minimum_margin": 0.30
-                },
-                "premium": {
-                    "base_multiplier": 1.20,
-                    "scarcity_bonus": 1.15,
-                    "quality_bonus": 1.10
-                }
+                "seasonal": {"spring": 1.05, "summer": 1.10, "fall": 1.0, "winter": 0.95},
+                "competitive": {"match_competitor": True, "undercut_by": 0.05, "minimum_margin": 0.30},  # 5%
+                "premium": {"base_multiplier": 1.20, "scarcity_bonus": 1.15, "quality_bonus": 1.10},
             }
 
             strategy = strategies.get(strategy_type, {})
@@ -260,7 +213,7 @@ class DynamicPricingEngine:
                 update = {
                     "product_id": product.get("id"),
                     "current_price": product.get("price"),
-                    "strategy": strategy_type
+                    "strategy": strategy_type,
                 }
 
                 if strategy_type == "clearance":
@@ -285,7 +238,7 @@ class DynamicPricingEngine:
                 "success": True,
                 "strategy_type": strategy_type,
                 "products_affected": len(pricing_updates),
-                "pricing_updates": pricing_updates
+                "pricing_updates": pricing_updates,
             }
 
         except Exception as e:
@@ -293,11 +246,7 @@ class DynamicPricingEngine:
             return {"success": False, "error": str(e)}
 
     async def ab_test_pricing(
-        self,
-        product_id: str,
-        price_variant_a: float,
-        price_variant_b: float,
-        duration_days: int = 14
+        self, product_id: str, price_variant_a: float, price_variant_b: float, duration_days: int = 14
     ) -> Dict[str, Any]:
         """
         Set up A/B test for pricing
@@ -318,34 +267,19 @@ class DynamicPricingEngine:
                 "test_id": test_id,
                 "product_id": product_id,
                 "variants": {
-                    "A": {
-                        "price": price_variant_a,
-                        "traffic_split": 0.5
-                    },
-                    "B": {
-                        "price": price_variant_b,
-                        "traffic_split": 0.5
-                    }
+                    "A": {"price": price_variant_a, "traffic_split": 0.5},
+                    "B": {"price": price_variant_b, "traffic_split": 0.5},
                 },
                 "start_date": datetime.utcnow().isoformat(),
                 "end_date": (datetime.utcnow() + timedelta(days=duration_days)).isoformat(),
-                "metrics_tracked": [
-                    "conversion_rate",
-                    "revenue_per_visitor",
-                    "cart_additions",
-                    "page_views"
-                ],
+                "metrics_tracked": ["conversion_rate", "revenue_per_visitor", "cart_additions", "page_views"],
                 "min_sample_size": 1000,
-                "confidence_level": 0.95
+                "confidence_level": 0.95,
             }
 
             logger.info(f"🧪 A/B test created: {test_id}")
 
-            return {
-                "success": True,
-                "test": test_config,
-                "estimated_completion": f"{duration_days} days"
-            }
+            return {"success": True, "test": test_config, "estimated_completion": f"{duration_days} days"}
 
         except Exception as e:
             logger.error(f"A/B test creation failed: {e}")

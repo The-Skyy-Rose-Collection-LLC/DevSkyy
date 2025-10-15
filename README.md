@@ -174,7 +174,7 @@ forecast = await inventory.forecast_demand(
 
 ### Prerequisites
 - Python 3.11+
-- MongoDB 4.4+
+- Database: SQLite (auto-created) or PostgreSQL/MySQL (optional for production)
 - Redis (optional, recommended for production)
 - Node.js 18+ (for frontend)
 
@@ -184,7 +184,9 @@ Create `.env` file with:
 ```env
 # Required
 ANTHROPIC_API_KEY=your_key_here
-MONGODB_URI=mongodb://localhost:27017/devSkyy
+
+# Optional - Database (defaults to SQLite if not set)
+DATABASE_URL=sqlite+aiosqlite:///./devskyy.db
 
 # Optional (for extended features)
 OPENAI_API_KEY=your_key_here
@@ -252,7 +254,7 @@ pytest tests/test_agents.py -v
 1. Run `python production_safety_check.py`
 2. Review `PRODUCTION_SAFETY_REPORT.md`
 3. Set all required environment variables
-4. Configure MongoDB and Redis
+4. Configure production database (PostgreSQL/MySQL recommended) and Redis
 5. Set up SSL certificates
 6. Configure rate limiting
 7. Enable monitoring (logs, metrics)

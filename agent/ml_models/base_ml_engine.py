@@ -51,11 +51,7 @@ class BaseMLEngine(ABC):
         """Make predictions with confidence scores"""
         pass
 
-    async def preprocess_data(
-        self,
-        data: np.ndarray,
-        fit: bool = False
-    ) -> np.ndarray:
+    async def preprocess_data(self, data: np.ndarray, fit: bool = False) -> np.ndarray:
         """
         Preprocess and normalize data
 
@@ -76,20 +72,12 @@ class BaseMLEngine(ABC):
             return data
 
     async def split_data(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        test_size: float = 0.2,
-        random_state: int = 42
+        self, X: np.ndarray, y: np.ndarray, test_size: float = 0.2, random_state: int = 42
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Split data into training and testing sets"""
         return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
-    async def evaluate_model(
-        self,
-        X_test: np.ndarray,
-        y_test: np.ndarray
-    ) -> Dict[str, float]:
+    async def evaluate_model(self, X_test: np.ndarray, y_test: np.ndarray) -> Dict[str, float]:
         """
         Evaluate model performance
 
@@ -104,11 +92,11 @@ class BaseMLEngine(ABC):
 
             metrics = {
                 "accuracy": float(accuracy_score(y_test, predictions)),
-                "precision": float(precision_score(y_test, predictions, average='weighted', zero_division=0)),
-                "recall": float(recall_score(y_test, predictions, average='weighted', zero_division=0)),
-                "f1_score": float(f1_score(y_test, predictions, average='weighted', zero_division=0)),
+                "precision": float(precision_score(y_test, predictions, average="weighted", zero_division=0)),
+                "recall": float(recall_score(y_test, predictions, average="weighted", zero_division=0)),
+                "f1_score": float(f1_score(y_test, predictions, average="weighted", zero_division=0)),
                 "avg_confidence": float(np.mean(confidence)),
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
             self.performance_metrics = metrics
@@ -121,16 +109,12 @@ class BaseMLEngine(ABC):
     async def get_feature_importance(self) -> Optional[Dict[str, float]]:
         """Get feature importance scores if model supports it"""
         try:
-            if hasattr(self.model, 'feature_importances_'):
+            if hasattr(self.model, "feature_importances_"):
                 return {
-                    f"feature_{i}": float(importance)
-                    for i, importance in enumerate(self.model.feature_importances_)
+                    f"feature_{i}": float(importance) for i, importance in enumerate(self.model.feature_importances_)
                 }
-            elif hasattr(self.model, 'coef_'):
-                return {
-                    f"feature_{i}": float(abs(coef))
-                    for i, coef in enumerate(self.model.coef_[0])
-                }
+            elif hasattr(self.model, "coef_"):
+                return {f"feature_{i}": float(abs(coef)) for i, coef in enumerate(self.model.coef_[0])}
             return None
         except Exception as e:
             logger.error(f"Failed to get feature importance: {e}")
@@ -148,7 +132,7 @@ class BaseMLEngine(ABC):
                 "is_trained": self.is_trained,
                 "version": self.version,
                 "performance_metrics": self.performance_metrics,
-                "training_history": self.training_history
+                "training_history": self.training_history,
             }
 
             joblib.dump(model_data, path)
@@ -189,14 +173,11 @@ class BaseMLEngine(ABC):
             "is_trained": self.is_trained,
             "performance_metrics": self.performance_metrics,
             "training_history": self.training_history[-5:],  # Last 5 training sessions
-            "model_type": str(type(self.model).__name__) if self.model else None
+            "model_type": str(type(self.model).__name__) if self.model else None,
         }
 
     async def continuous_learning(
-        self,
-        new_X: np.ndarray,
-        new_y: np.ndarray,
-        retrain_threshold: float = 0.1
+        self, new_X: np.ndarray, new_y: np.ndarray, retrain_threshold: float = 0.1
     ) -> Dict[str, Any]:
         """
         Implement continuous learning
@@ -229,13 +210,10 @@ class BaseMLEngine(ABC):
                         "previous_f1": prev_f1,
                         "current_f1": current_f1,
                         "new_f1": train_result.get("f1_score"),
-                        "improvement": train_result.get("f1_score", 0) - prev_f1
+                        "improvement": train_result.get("f1_score", 0) - prev_f1,
                     }
 
-            return {
-                "action": "no_action_needed",
-                "metrics": current_metrics
-            }
+            return {"action": "no_action_needed", "metrics": current_metrics}
 
         except Exception as e:
             logger.error(f"Continuous learning failed: {e}")

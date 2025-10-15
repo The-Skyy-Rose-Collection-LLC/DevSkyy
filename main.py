@@ -792,7 +792,7 @@ async def generate_wordpress_theme(request: Dict[str, Any]):
         result = await builder.generate_theme(
             brand_info=request.get("brand_info", {}),
             theme_type=request.get("theme_type", "luxury_fashion"),
-            pages=request.get("pages")
+            pages=request.get("pages"),
         )
 
         return {"status": "success", "data": result}
@@ -809,10 +809,7 @@ async def export_wordpress_theme(request: Dict[str, Any]):
 
         builder = ElementorThemeBuilder(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-        result = await builder.export_theme(
-            theme=request.get("theme", {}),
-            format=request.get("format", "json")
-        )
+        result = await builder.export_theme(theme=request.get("theme", {}), format=request.get("format", "json"))
 
         return {"status": "success", "data": result}
     except Exception as e:
@@ -831,10 +828,7 @@ async def create_product(request: Dict[str, Any]):
 
         manager = ProductManager()
 
-        result = await manager.create_product(
-            product_data=request,
-            auto_generate=request.get("auto_generate", True)
-        )
+        result = await manager.create_product(product_data=request, auto_generate=request.get("auto_generate", True))
 
         return {"status": "success", "data": result}
     except Exception as e:
@@ -850,9 +844,7 @@ async def bulk_import_products(request: Dict[str, Any]):
 
         manager = ProductManager()
 
-        result = await manager.bulk_import_products(
-            products=request.get("products", [])
-        )
+        result = await manager.bulk_import_products(products=request.get("products", []))
 
         return {"status": "success", "data": result}
     except Exception as e:
@@ -869,8 +861,7 @@ async def optimize_pricing(request: Dict[str, Any]):
         pricing = DynamicPricingEngine()
 
         result = await pricing.optimize_price(
-            product_data=request.get("product_data", {}),
-            market_data=request.get("market_data", {})
+            product_data=request.get("product_data", {}), market_data=request.get("market_data", {})
         )
 
         return {"status": "success", "data": result}
@@ -888,8 +879,7 @@ async def create_pricing_strategy(request: Dict[str, Any]):
         pricing = DynamicPricingEngine()
 
         result = await pricing.create_pricing_strategy(
-            strategy_type=request.get("strategy_type", "clearance"),
-            products=request.get("products", [])
+            strategy_type=request.get("strategy_type", "clearance"), products=request.get("products", [])
         )
 
         return {"status": "success", "data": result}
@@ -910,7 +900,7 @@ async def create_ab_test(request: Dict[str, Any]):
             product_id=request.get("product_id"),
             price_variant_a=request.get("price_variant_a"),
             price_variant_b=request.get("price_variant_b"),
-            duration_days=request.get("duration_days", 14)
+            duration_days=request.get("duration_days", 14),
         )
 
         return {"status": "success", "data": result}
@@ -930,7 +920,7 @@ async def forecast_inventory(request: Dict[str, Any]):
         result = await inventory.forecast_demand(
             product_id=request.get("product_id"),
             historical_sales=request.get("historical_sales", []),
-            forecast_periods=request.get("forecast_periods", 30)
+            forecast_periods=request.get("forecast_periods", 30),
         )
 
         return {"status": "success", "data": result}
@@ -948,8 +938,7 @@ async def calculate_reorder_point(request: Dict[str, Any]):
         inventory = InventoryOptimizer()
 
         result = await inventory.calculate_reorder_point(
-            product_data=request.get("product_data", {}),
-            sales_data=request.get("sales_data", {})
+            product_data=request.get("product_data", {}), sales_data=request.get("sales_data", {})
         )
 
         return {"status": "success", "data": result}
@@ -967,8 +956,7 @@ async def identify_dead_stock(request: Dict[str, Any]):
         inventory = InventoryOptimizer()
 
         result = await inventory.identify_dead_stock(
-            inventory=request.get("inventory", []),
-            threshold_days=request.get("threshold_days", 90)
+            inventory=request.get("inventory", []), threshold_days=request.get("threshold_days", 90)
         )
 
         return {"status": "success", "data": result}
@@ -986,8 +974,7 @@ async def optimize_stock_levels(request: Dict[str, Any]):
         inventory = InventoryOptimizer()
 
         result = await inventory.optimize_stock_levels(
-            products=request.get("products", []),
-            target_service_level=request.get("target_service_level", 0.95)
+            products=request.get("products", []), target_service_level=request.get("target_service_level", 0.95)
         )
 
         return {"status": "success", "data": result}
@@ -1024,8 +1011,7 @@ async def analyze_fashion_trend(request: Dict[str, Any]):
         ml = FashionMLEngine()
 
         result = await ml.analyze_trend(
-            historical_data=request.get("historical_data", {}),
-            forecast_periods=request.get("forecast_periods", 12)
+            historical_data=request.get("historical_data", {}), forecast_periods=request.get("forecast_periods", 12)
         )
 
         return {"status": "success", "data": result}
@@ -1043,8 +1029,7 @@ async def ml_optimize_pricing(request: Dict[str, Any]):
         ml = FashionMLEngine()
 
         result = await ml.optimize_pricing(
-            product_features=request.get("product_features", {}),
-            market_data=request.get("market_data", {})
+            product_features=request.get("product_features", {}), market_data=request.get("market_data", {})
         )
 
         return {"status": "success", "data": result}
@@ -1061,9 +1046,7 @@ async def segment_customers(request: Dict[str, Any]):
 
         ml = FashionMLEngine()
 
-        result = await ml.segment_customers(
-            customer_data=request.get("customer_data", [])
-        )
+        result = await ml.segment_customers(customer_data=request.get("customer_data", []))
 
         return {"status": "success", "data": result}
     except Exception as e:
@@ -1080,8 +1063,7 @@ async def recommend_size(request: Dict[str, Any]):
         ml = FashionMLEngine()
 
         result = await ml.recommend_size(
-            measurements=request.get("measurements", {}),
-            brand_sizing=request.get("brand_sizing", "standard")
+            measurements=request.get("measurements", {}), brand_sizing=request.get("brand_sizing", "standard")
         )
 
         return {"status": "success", "data": result}

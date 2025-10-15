@@ -16,7 +16,6 @@ import logging
 import os
 import re
 import time
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path

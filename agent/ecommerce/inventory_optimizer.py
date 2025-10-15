@@ -34,10 +34,7 @@ class InventoryOptimizer:
         logger.info("📊 Inventory Optimizer initialized")
 
     async def forecast_demand(
-        self,
-        product_id: str,
-        historical_sales: List[int],
-        forecast_periods: int = 30
+        self, product_id: str, historical_sales: List[int], forecast_periods: int = 30
     ) -> Dict[str, Any]:
         """
         Forecast product demand using ML
@@ -52,10 +49,7 @@ class InventoryOptimizer:
         """
         try:
             if len(historical_sales) < 14:
-                return {
-                    "success": False,
-                    "error": "Insufficient historical data (minimum 14 days required)"
-                }
+                return {"success": False, "error": "Insufficient historical data (minimum 14 days required)"}
 
             # Prepare time series features
             X = np.array([[i, i % 7, i % 30] for i in range(len(historical_sales))])
@@ -65,10 +59,12 @@ class InventoryOptimizer:
             self.forecast_model.fit(X, y)
 
             # Generate forecast
-            future_X = np.array([
-                [len(historical_sales) + i, (len(historical_sales) + i) % 7, (len(historical_sales) + i) % 30]
-                for i in range(forecast_periods)
-            ])
+            future_X = np.array(
+                [
+                    [len(historical_sales) + i, (len(historical_sales) + i) % 7, (len(historical_sales) + i) % 30]
+                    for i in range(forecast_periods)
+                ]
+            )
 
             forecast = self.forecast_model.predict(future_X)
 
@@ -89,26 +85,22 @@ class InventoryOptimizer:
                     "predicted_demand": forecast.tolist(),
                     "confidence_lower": np.maximum(0, confidence_lower).tolist(),
                     "confidence_upper": confidence_upper.tolist(),
-                    "total_forecasted_units": int(np.sum(forecast))
+                    "total_forecasted_units": int(np.sum(forecast)),
                 },
                 "analysis": {
                     "trend": trend,
                     "average_daily_sales": round(float(np.mean(historical_sales)), 2),
                     "peak_demand_day": int(np.argmax(forecast)),
-                    "volatility": round(float(np.std(historical_sales) / np.mean(historical_sales)), 3)
+                    "volatility": round(float(np.std(historical_sales) / np.mean(historical_sales)), 3),
                 },
-                "forecast_period_days": forecast_periods
+                "forecast_period_days": forecast_periods,
             }
 
         except Exception as e:
             logger.error(f"Demand forecasting failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def calculate_reorder_point(
-        self,
-        product_data: Dict[str, Any],
-        sales_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def calculate_reorder_point(self, product_data: Dict[str, Any], sales_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Calculate optimal reorder point and quantity
 
@@ -160,18 +152,14 @@ class InventoryOptimizer:
                 "urgency": "high" if days_until_stockout < 7 else "medium" if days_until_stockout < 14 else "low",
                 "days_until_stockout": round(days_until_stockout, 1),
                 "safety_stock": int(safety_stock),
-                "lead_time_days": lead_time_days
+                "lead_time_days": lead_time_days,
             }
 
         except Exception as e:
             logger.error(f"Reorder point calculation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def identify_dead_stock(
-        self,
-        inventory: List[Dict[str, Any]],
-        threshold_days: int = 90
-    ) -> Dict[str, Any]:
+    async def identify_dead_stock(self, inventory: List[Dict[str, Any]], threshold_days: int = 90) -> Dict[str, Any]:
         """
         Identify slow-moving and dead stock
 
@@ -195,42 +183,45 @@ class InventoryOptimizer:
                 value_locked = quantity * cost
 
                 if days_since_sale >= threshold_days:
-                    dead_stock.append({
-                        "product_id": item.get("id"),
-                        "product_name": item.get("name"),
-                        "quantity": quantity,
-                        "days_since_sale": days_since_sale,
-                        "value_locked": value_locked,
-                        "recommendation": "Aggressive clearance" if days_since_sale > 180 else "Promotional pricing"
-                    })
+                    dead_stock.append(
+                        {
+                            "product_id": item.get("id"),
+                            "product_name": item.get("name"),
+                            "quantity": quantity,
+                            "days_since_sale": days_since_sale,
+                            "value_locked": value_locked,
+                            "recommendation": (
+                                "Aggressive clearance" if days_since_sale > 180 else "Promotional pricing"
+                            ),
+                        }
+                    )
                     total_value_locked += value_locked
 
                 elif days_since_sale >= threshold_days / 2:
-                    slow_moving.append({
-                        "product_id": item.get("id"),
-                        "product_name": item.get("name"),
-                        "quantity": quantity,
-                        "days_since_sale": days_since_sale,
-                        "value_locked": value_locked,
-                        "recommendation": "Monitor closely, consider promotions"
-                    })
+                    slow_moving.append(
+                        {
+                            "product_id": item.get("id"),
+                            "product_name": item.get("name"),
+                            "quantity": quantity,
+                            "days_since_sale": days_since_sale,
+                            "value_locked": value_locked,
+                            "recommendation": "Monitor closely, consider promotions",
+                        }
+                    )
 
             return {
                 "success": True,
                 "dead_stock": {
                     "count": len(dead_stock),
                     "items": dead_stock,
-                    "total_value_locked": round(total_value_locked, 2)
+                    "total_value_locked": round(total_value_locked, 2),
                 },
-                "slow_moving": {
-                    "count": len(slow_moving),
-                    "items": slow_moving
-                },
+                "slow_moving": {"count": len(slow_moving), "items": slow_moving},
                 "recommendations": [
                     f"Implement clearance strategy for {len(dead_stock)} items",
                     f"Total capital locked: ${total_value_locked:,.2f}",
-                    "Consider bundling slow-moving items with bestsellers"
-                ]
+                    "Consider bundling slow-moving items with bestsellers",
+                ],
             }
 
         except Exception as e:
@@ -238,9 +229,7 @@ class InventoryOptimizer:
             return {"success": False, "error": str(e)}
 
     async def optimize_stock_levels(
-        self,
-        products: List[Dict[str, Any]],
-        target_service_level: float = 0.95
+        self, products: List[Dict[str, Any]], target_service_level: float = 0.95
     ) -> Dict[str, Any]:
         """
         Optimize stock levels across all products
@@ -273,15 +262,17 @@ class InventoryOptimizer:
                 difference = optimal_stock - current_stock
                 value_change = difference * cost
 
-                recommendations.append({
-                    "product_id": product.get("id"),
-                    "product_name": product.get("name"),
-                    "current_stock": current_stock,
-                    "optimal_stock": int(optimal_stock),
-                    "adjustment_needed": int(difference),
-                    "value_change": round(value_change, 2),
-                    "action": "increase" if difference > 0 else "decrease" if difference < 0 else "maintain"
-                })
+                recommendations.append(
+                    {
+                        "product_id": product.get("id"),
+                        "product_name": product.get("name"),
+                        "current_stock": current_stock,
+                        "optimal_stock": int(optimal_stock),
+                        "adjustment_needed": int(difference),
+                        "value_change": round(value_change, 2),
+                        "action": "increase" if difference > 0 else "decrease" if difference < 0 else "maintain",
+                    }
+                )
 
                 if difference > 0:
                     total_investment_needed += value_change
@@ -296,8 +287,8 @@ class InventoryOptimizer:
                 "financial_impact": {
                     "investment_needed": round(total_investment_needed, 2),
                     "capital_release_possible": round(total_reduction_possible, 2),
-                    "net_change": round(total_investment_needed - total_reduction_possible, 2)
-                }
+                    "net_change": round(total_investment_needed - total_reduction_possible, 2),
+                },
             }
 
         except Exception as e:

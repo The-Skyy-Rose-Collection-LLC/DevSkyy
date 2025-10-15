@@ -11,7 +11,6 @@ Features:
 - Integration with orchestrator
 """
 
-import asyncio
 import logging
 import os
 import re

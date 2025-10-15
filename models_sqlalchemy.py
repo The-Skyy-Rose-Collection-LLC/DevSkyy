@@ -4,8 +4,9 @@ Database models using SQLAlchemy ORM
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
+from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
 
 from database import Base
@@ -180,12 +181,9 @@ class InMemoryStorage:
 memory_storage = InMemoryStorage()
 
 
-from typing import Any, Dict, List, Optional
-
 # ============================================================================
 # PYDANTIC REQUEST/RESPONSE MODELS (for FastAPI validation)
 # ============================================================================
-from pydantic import BaseModel, Field
 
 
 class ProductRequest(BaseModel):
