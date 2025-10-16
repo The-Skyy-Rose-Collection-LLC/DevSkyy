@@ -190,7 +190,7 @@ dynaconf==3.2.8
 # API Documentation
 flasgger==0.9.7.1
 apispec==6.7.1
-pydantic-openapi-schema==1.6.1
+pydantic-openapi-schema==1.5.1
 
 # Security Compliance
 pycryptodome==3.21.0  # Encryption
