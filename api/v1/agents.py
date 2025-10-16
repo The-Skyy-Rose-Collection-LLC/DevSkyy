@@ -581,7 +581,7 @@ async def batch_execute(request: BatchRequest, current_user: TokenData = Depends
 
         for operation in request.operations:
             agent_name = operation.get("agent")
-            parameters = operation.get("parameters", {})
+            _parameters = operation.get("parameters", {})  # noqa: F841
 
             # Execute agent based on name
             # This would route to the appropriate agent endpoint

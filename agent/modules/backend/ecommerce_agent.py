@@ -602,7 +602,7 @@ class EcommerceAgent:
             "earrings": {"high": 0.35, "medium": 0.45, "low": 0.2},
         }
 
-        base_demand = category_demand.get(product["category"], {"high": 0.3, "medium": 0.5, "low": 0.2})
+        _base_demand = category_demand.get(product["category"], {"high": 0.3, "medium": 0.5, "low": 0.2})  # noqa: F841
 
         return {
             "expected_monthly_sales": random.randint(15, 44),

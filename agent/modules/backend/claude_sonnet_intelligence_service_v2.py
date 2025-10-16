@@ -93,7 +93,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
                 return False
 
             # Test API connection
-            test_response = await self.client.messages.create(
+            _test_response = await self.client.messages.create(  # noqa: F841
                 model=self.model,
                 max_tokens=10,
                 messages=[{"role": "user", "content": "test"}],

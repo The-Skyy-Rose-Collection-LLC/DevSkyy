@@ -428,7 +428,7 @@ async def startup_event():
     # Run initial health checks
     logger.info("🏥 Running initial health checks...")
     try:
-        health_results = await health_monitor.run_all_checks()
+        _health_results = await health_monitor.run_all_checks()  # noqa: F841
         overall_status, message = health_monitor.get_overall_status()
         logger.info(f"   {message}")
     except Exception as e:

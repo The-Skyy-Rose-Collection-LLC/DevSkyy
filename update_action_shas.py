@@ -249,7 +249,7 @@ class ActionSHAUpdater:
         with open(filepath, "r") as f:
             content = f.read()
 
-        original_content = content
+        _original_content = content  # noqa: F841
         updates_made = 0
 
         # Process each action
