@@ -32,7 +32,11 @@ async def health_check():
     results = await health_monitor.run_all_checks()
     overall_status, message = health_monitor.get_overall_status()
 
-    return {"status": overall_status, "message": message, "checks": {name: result.model_dump() for name, result in results.items()}}
+    return {
+        "status": overall_status,
+        "message": message,
+        "checks": {name: result.model_dump() for name, result in results.items()},
+    }
 
 
 @router.get("/health/detailed", dependencies=[Depends(require_admin)])

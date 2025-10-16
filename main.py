@@ -268,14 +268,14 @@ async def rate_limit_middleware(request: Request, call_next):
             content={
                 "error": True,
                 "message": "Rate limit exceeded. Please try again later.",
-                "rate_limit": rate_limit_info
+                "rate_limit": rate_limit_info,
             },
             headers={
                 "X-RateLimit-Limit": str(rate_limit_info["limit"]),
                 "X-RateLimit-Remaining": str(rate_limit_info["remaining"]),
                 "X-RateLimit-Reset": str(rate_limit_info["reset"]),
-                "Retry-After": "60"
-            }
+                "Retry-After": "60",
+            },
         )
 
     # Process request

@@ -338,9 +338,11 @@ class PerformanceTracker:
         return {
             "requests": self.request_count[endpoint],
             "errors": self.error_count[endpoint],
-            "error_rate": (self.error_count[endpoint] / self.request_count[endpoint] * 100)
-            if self.request_count[endpoint] > 0
-            else 0,
+            "error_rate": (
+                (self.error_count[endpoint] / self.request_count[endpoint] * 100)
+                if self.request_count[endpoint] > 0
+                else 0
+            ),
             "latency_ms": {
                 "min": sorted_durations[0],
                 "max": sorted_durations[-1],

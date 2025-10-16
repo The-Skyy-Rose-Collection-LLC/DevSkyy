@@ -25,6 +25,7 @@ from security.jwt_auth import create_access_token, create_refresh_token
 # Pytest Configuration
 # ============================================================================
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create event loop for async tests"""
@@ -36,6 +37,7 @@ def event_loop():
 # ============================================================================
 # Database Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_db_engine():
@@ -54,11 +56,7 @@ def test_db_engine():
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine):
     """Create database session for testing"""
-    TestingSessionLocal = sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind=test_db_engine
-    )
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
     session = TestingSessionLocal()
     try:
         yield session
@@ -69,6 +67,7 @@ def test_db_session(test_db_engine):
 # ============================================================================
 # FastAPI Test Client Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_client() -> Generator[TestClient, None, None]:
@@ -81,6 +80,7 @@ def test_client() -> Generator[TestClient, None, None]:
 async def async_test_client() -> AsyncGenerator:
     """Create async FastAPI test client"""
     from httpx import AsyncClient
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
@@ -88,6 +88,7 @@ async def async_test_client() -> AsyncGenerator:
 # ============================================================================
 # Authentication Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_user_data():
@@ -98,7 +99,7 @@ def test_user_data():
         "username": "testuser",
         "full_name": "Test User",
         "role": "admin",
-        "permissions": ["read", "write", "admin"]
+        "permissions": ["read", "write", "admin"],
     }
 
 
@@ -124,16 +125,14 @@ def auth_headers(test_access_token):
 # Mock Data Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def mock_ai_response():
     """Mock AI API response"""
     return {
         "response": "This is a test AI response",
         "model": "claude-3-5-sonnet-20241022",
-        "usage": {
-            "input_tokens": 10,
-            "output_tokens": 25
-        }
+        "usage": {"input_tokens": 10, "output_tokens": 25},
     }
 
 
@@ -145,7 +144,7 @@ def mock_project_data():
         "name": "Test Project",
         "description": "A test project for unit testing",
         "status": "active",
-        "owner": "test_user_001"
+        "owner": "test_user_001",
     }
 
 
@@ -157,13 +156,14 @@ def mock_agent_data():
         "name": "Test Agent",
         "type": "autonomous",
         "capabilities": ["code_generation", "testing"],
-        "status": "active"
+        "status": "active",
     }
 
 
 # ============================================================================
 # Environment Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_env_vars(monkeypatch):
@@ -180,6 +180,7 @@ def test_env_vars(monkeypatch):
 # Cleanup Fixtures
 # ============================================================================
 
+
 @pytest.fixture(autouse=True)
 def cleanup_after_test():
     """Cleanup after each test"""
@@ -192,10 +193,12 @@ def cleanup_after_test():
 # Performance Testing Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def performance_timer():
     """Timer for performance tests"""
     import time
+
     start_time = time.time()
     yield lambda: time.time() - start_time
 
@@ -204,9 +207,11 @@ def performance_timer():
 # Mocking Fixtures
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def mock_external_api(monkeypatch):
     """Mock external API calls"""
+
     class MockResponse:
         def __init__(self, json_data, status_code=200):
             self.json_data = json_data
@@ -227,6 +232,7 @@ def mock_external_api(monkeypatch):
         return MockResponse({"message": "Mock created"}, 201)
 
     import requests
+
     monkeypatch.setattr(requests, "get", mock_get)
     monkeypatch.setattr(requests, "post", mock_post)
 
@@ -235,25 +241,29 @@ def mock_external_api(monkeypatch):
 # Test Data Generators
 # ============================================================================
 
+
 @pytest.fixture(scope="function")
 def generate_test_users():
     """Generate multiple test users"""
+
     def _generate(count=5):
         return [
             {
                 "user_id": f"user_{i:03d}",
                 "email": f"user{i}@test.com",
                 "username": f"testuser{i}",
-                "role": "user" if i % 2 == 0 else "admin"
+                "role": "user" if i % 2 == 0 else "admin",
             }
             for i in range(count)
         ]
+
     return _generate
 
 
 # ============================================================================
 # Pytest Hooks for Custom Behavior
 # ============================================================================
+
 
 def pytest_configure(config):
     """Configure pytest with custom markers"""

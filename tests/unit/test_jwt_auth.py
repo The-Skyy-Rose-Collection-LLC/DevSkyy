@@ -15,7 +15,7 @@ from security.jwt_auth import (
     SECRET_KEY,
     ALGORITHM,
     ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS
+    REFRESH_TOKEN_EXPIRE_DAYS,
 )
 
 
@@ -132,11 +132,7 @@ class TestJWTTokenVerification:
     def test_verify_token_with_wrong_secret(self, test_user_data):
         """Test that token signed with different secret is rejected"""
         # Create token with different secret
-        wrong_secret_token = jwt.encode(
-            test_user_data,
-            "wrong_secret_key",
-            algorithm=ALGORITHM
-        )
+        wrong_secret_token = jwt.encode(test_user_data, "wrong_secret_key", algorithm=ALGORITHM)
 
         result = verify_token(wrong_secret_token)
         assert result is None
@@ -164,10 +160,7 @@ class TestJWTTokenPayload:
     def test_get_token_payload_expired_token(self, test_user_data):
         """Test payload extraction from expired token (should still work)"""
         # Create expired token
-        expired_token = create_access_token(
-            data=test_user_data,
-            expires_delta=timedelta(minutes=-1)
-        )
+        expired_token = create_access_token(data=test_user_data, expires_delta=timedelta(minutes=-1))
 
         # Payload extraction should work even for expired tokens
         payload = get_token_payload(expired_token)
@@ -229,11 +222,7 @@ class TestJWTEdgeCases:
 
     def test_create_token_with_special_characters(self):
         """Test token creation with special characters in data"""
-        data = {
-            "user_id": "user@#$%^&*()",
-            "email": "test+special@example.com",
-            "name": "Test O'Reilly"
-        }
+        data = {"user_id": "user@#$%^&*()", "email": "test+special@example.com", "name": "Test O'Reilly"}
 
         token = create_access_token(data=data)
         payload = get_token_payload(token)
@@ -246,7 +235,7 @@ class TestJWTEdgeCases:
         large_data = {
             "user_id": "test_001",
             "permissions": ["perm_" + str(i) for i in range(100)],
-            "metadata": {"key_" + str(i): "value_" + str(i) for i in range(50)}
+            "metadata": {"key_" + str(i): "value_" + str(i) for i in range(50)},
         }
 
         token = create_access_token(data=large_data)
@@ -268,6 +257,7 @@ class TestJWTEdgeCases:
 # ============================================================================
 # Performance Tests
 # ============================================================================
+
 
 @pytest.mark.slow
 class TestJWTPerformance:

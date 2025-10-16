@@ -314,7 +314,9 @@ class WebhookManager:
 
         return delivery_id
 
-    async def _send_webhook(self, subscription: WebhookSubscription, payload: WebhookPayload, delivery: WebhookDelivery):
+    async def _send_webhook(
+        self, subscription: WebhookSubscription, payload: WebhookPayload, delivery: WebhookDelivery
+    ):
         """
         Send webhook with retry logic
 

@@ -52,9 +52,7 @@ class BatchRequest(BaseModel):
 
 
 @router.post("/scanner/execute", response_model=AgentExecuteResponse)
-async def execute_scanner(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def execute_scanner(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Scanner Agent - Code and site analysis"""
     try:
         from agent.modules.backend.scanner import scanner_agent
@@ -74,9 +72,7 @@ async def execute_scanner(
 
 
 @router.post("/scanner-v2/execute", response_model=AgentExecuteResponse)
-async def execute_scanner_v2(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def execute_scanner_v2(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Scanner Agent V2 - Enhanced scanner with security scanning"""
     try:
         from agent.modules.backend.scanner_v2 import scanner_agent
@@ -462,9 +458,7 @@ async def execute_customer_service(
 
 
 @router.post("/voice-audio/execute", response_model=AgentExecuteResponse)
-async def execute_voice_audio(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def execute_voice_audio(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Voice/Audio Content Agent - Voice synthesis and processing"""
     try:
         from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
@@ -511,9 +505,7 @@ async def execute_blockchain_nft(
 
 
 @router.post("/code-generation/execute", response_model=AgentExecuteResponse)
-async def execute_code_generation(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)
-):
+async def execute_code_generation(request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Advanced Code Generation Agent - AI code generation"""
     try:
         from agent.modules.backend.advanced_code_generation_agent import agent as codegen_agent
@@ -553,9 +545,7 @@ async def execute_security(request: AgentExecuteRequest, current_user: TokenData
 
 
 @router.post("/performance/execute", response_model=AgentExecuteResponse)
-async def execute_performance(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def execute_performance(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Performance Agent - Performance analysis and optimization"""
     try:
         from agent.modules.backend.performance_agent import agent as perf_agent
