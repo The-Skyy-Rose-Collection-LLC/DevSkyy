@@ -194,7 +194,7 @@ pydantic-openapi-schema==1.5.1
 
 # Security Compliance
 pycryptodome==3.21.0  # Encryption
-python-owasp==1.4.0  # OWASP tools
+# python-owasp==1.4.0  # OWASP tools - Package does not exist in PyPI
 pyotp==2.9.0  # 2FA/MFA
 python-secrets==25.2.0  # Secrets management
 
