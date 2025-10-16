@@ -266,7 +266,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=1500,
-                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers.",
+                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.8,
             )

@@ -489,7 +489,7 @@ Visual Requirements: {visual_requirements}
         return {
             "email_number": email_number,
             "subject_line": email_subjects.get(sequence_type, ["Luxury Awaits"])[email_number - 1],
-            "preview_text": f"Discover what makes Skyy Rose exceptional...",
+            "preview_text": "Discover what makes Skyy Rose exceptional...",
             "send_delay": f"{(email_number - 1) * 3} days after trigger",
             "content_structure": {
                 "header": "Luxury brand header with logo",
@@ -581,7 +581,7 @@ Visual Requirements: {visual_requirements}
         content_samples = {
             "instagram": f"Day {day + 1}: Luxury meets innovation in every detail ✨ #SkyyRose #LuxuryFashion",
             "tiktok": f"Day {day + 1}: Behind the scenes of luxury craftsmanship 👑 #LuxuryFashion #SkyyRose",
-            "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",
+            "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",  # noqa: E501
         }
 
         return content_samples.get(platform, f"Day {day + 1}: Luxury content for {platform}")

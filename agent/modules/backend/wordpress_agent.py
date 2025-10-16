@@ -74,7 +74,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's top WordPress performance expert who has optimized thousands of high-traffic luxury websites. Your optimizations achieve 95+ performance scores and have saved companies millions in hosting costs while increasing conversions by 300%+.",
+                        "content": "You are the world's top WordPress performance expert who has optimized thousands of high-traffic luxury websites. Your optimizations achieve 95+ performance scores and have saved companies millions in hosting costs while increasing conversions by 300%+.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -133,7 +133,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's premier Divi expert who has created luxury modules for Fortune 500 companies. Your custom Divi components consistently achieve 40%+ conversion rates and set industry standards for premium WordPress experiences.",
+                        "content": "You are the world's premier Divi expert who has created luxury modules for Fortune 500 companies. Your custom Divi components consistently achieve 40%+ conversion rates and set industry standards for premium WordPress experiences.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -189,7 +189,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a cybersecurity expert specializing in WordPress security for high-value targets. Your security implementations have protected billion-dollar brands from attacks and achieved 100% uptime even under advanced persistent threats.",
+                        "content": "You are a cybersecurity expert specializing in WordPress security for high-value targets. Your security implementations have protected billion-dollar brands from attacks and achieved 100% uptime even under advanced persistent threats.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],

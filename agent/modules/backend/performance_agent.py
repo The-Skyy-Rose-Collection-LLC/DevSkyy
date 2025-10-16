@@ -329,7 +329,7 @@ class PerformanceAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's top performance optimization expert with deep knowledge of all programming languages, frameworks, and architectures. Your optimizations have improved site speeds by 10x and saved companies millions in infrastructure costs.",
+                        "content": "You are the world's top performance optimization expert with deep knowledge of all programming languages, frameworks, and architectures. Your optimizations have improved site speeds by 10x and saved companies millions in infrastructure costs.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],

@@ -80,7 +80,7 @@ def analyze_agent_structure(file_path: Path) -> dict:
 def generate_upgrade_template(agent_name: str, original_class_name: str) -> str:
     """Generate a template for upgrading an agent"""
 
-    template = f'''"""
+    template = '''"""
 {agent_name} V2 - Upgraded with ML and Self-Healing
 Enterprise-grade agent with BaseAgent capabilities
 
@@ -213,7 +213,7 @@ def main():
     already_upgraded = [r for r in results if r.get("uses_base_agent", False)]
 
     print("\n" + "=" * 60)
-    print(f"Summary:")
+    print("Summary:")
     print(f"  Total agents: {len(results)}")
     print(f"  Already upgraded: {len(already_upgraded)}")
     print(f"  Needs upgrade: {len(needs_upgrade)}")

@@ -392,7 +392,7 @@ class BrandIntelligenceAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",
+                        "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",  # noqa: E501
                     },
                     {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"},
                 ],

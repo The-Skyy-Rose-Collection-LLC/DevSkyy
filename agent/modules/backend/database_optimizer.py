@@ -297,7 +297,7 @@ class IndexOptimizer:
                             "column": column,
                             "type": "SINGLE_COLUMN",
                             "priority": "MEDIUM",
-                            "reason": f"Used in ORDER BY clauses",
+                            "reason": "Used in ORDER BY clauses",
                             "estimated_improvement": "30-60%",
                         }
                     )
@@ -312,7 +312,7 @@ class IndexOptimizer:
                             "column": column,
                             "type": "SINGLE_COLUMN",
                             "priority": "HIGH",
-                            "reason": f"Used in JOIN operations",
+                            "reason": "Used in JOIN operations",
                             "estimated_improvement": "60-90%",
                         }
                     )

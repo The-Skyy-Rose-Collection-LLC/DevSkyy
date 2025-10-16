@@ -212,7 +212,7 @@ class EnhancedAutoFix:
                                     {
                                         "file": file_path,
                                         "type": "security_warning",
-                                        "description": "Potential hardcoded secret detected - consider using environment variables",
+                                        "description": "Potential hardcoded secret detected - consider using environment variables",  # noqa: E501
                                         "line": "multiple",
                                     }
                                 )

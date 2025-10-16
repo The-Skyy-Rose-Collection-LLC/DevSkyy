@@ -682,7 +682,7 @@ contract SkyyRoseMembership {
                 "points_balance": 1000 if tier == "platinum" else 500 if tier == "gold" else 100,
                 "nft_metadata": {
                     "name": f"Skyy Rose {tier_data['name']} Card",
-                    "description": f"Exclusive membership to The Skyy Rose Collection",
+                    "description": "Exclusive membership to The Skyy Rose Collection",
                     "image": f"https://skyyrose.com/membership/{tier}.jpg",
                     "attributes": [
                         {"trait_type": "Tier", "value": tier.capitalize()},
@@ -922,7 +922,7 @@ async def main():
     )
 
     if cert_result["status"] == "success":
-        print(f"✅ Certificate Created")
+        print("✅ Certificate Created")
         print(f"🔐 Fingerprint: {cert_result['certificate']['fingerprint'][:16]}...")
         print(f"🔗 Verify at: {cert_result['certificate']['verification_url']}")
 

@@ -430,7 +430,7 @@ Consider this is for a luxury fashion brand customer interaction."""
                 intro_text = f"Welcome to The Skyy Rose Collection Podcast. Today's episode: {episode_title}."
 
             if not outro_text:
-                outro_text = "Thank you for listening to The Skyy Rose Collection Podcast. Visit us at theskyy-rose-collection.com for more exclusive content."
+                outro_text = "Thank you for listening to The Skyy Rose Collection Podcast. Visit us at theskyy-rose-collection.com for more exclusive content."  # noqa: E501
 
             # Generate all audio segments
             segments = []

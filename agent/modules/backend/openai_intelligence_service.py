@@ -25,7 +25,7 @@ class OpenAIIntelligenceService:
     async def enhance_product_description(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to create luxury product descriptions."""
         try:
-            prompt = f"""
+            prompt = """
             Create a luxury, premium product description for the following product:
             
             Product Name: {product_data.get('name', 'Luxury Item')}
@@ -50,7 +50,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a luxury brand copywriter specializing in high-end product descriptions that convert browsers into buyers.",
+                        "content": "You are a luxury brand copywriter specializing in high-end product descriptions that convert browsers into buyers.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -60,7 +60,7 @@ class OpenAIIntelligenceService:
 
             enhanced_description = response.choices[0].message.content
 
-            logger.info(f"✨ Enhanced product description created with OpenAI")
+            logger.info("✨ Enhanced product description created with OpenAI")
 
             return {
                 "enhanced_description": enhanced_description,
@@ -77,7 +77,7 @@ class OpenAIIntelligenceService:
     async def generate_luxury_content_strategy(self, site_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate AI-powered luxury content strategy."""
         try:
-            prompt = f"""
+            prompt = """
             Analyze this luxury brand website and create a comprehensive content strategy:
             
             Site Name: {site_data.get('site_name', 'Luxury Brand')}
@@ -104,7 +104,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a luxury brand strategist and digital marketing expert specializing in high-end consumer brands.",
+                        "content": "You are a luxury brand strategist and digital marketing expert specializing in high-end consumer brands.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -131,7 +131,7 @@ class OpenAIIntelligenceService:
     async def optimize_page_content_for_seo(self, page_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to optimize page content for luxury SEO."""
         try:
-            prompt = f"""
+            prompt = """
             Optimize this webpage content for luxury brand SEO:
             
             Page Title: {page_data.get('title', 'Luxury Page')}
@@ -157,7 +157,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are an SEO expert specializing in luxury brand optimization and high-end consumer search behavior.",
+                        "content": "You are an SEO expert specializing in luxury brand optimization and high-end consumer search behavior.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -184,7 +184,7 @@ class OpenAIIntelligenceService:
     async def analyze_competitor_strategy(self, competitor_data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze competitor strategies using OpenAI."""
         try:
-            prompt = f"""
+            prompt = """
             Analyze these luxury brand competitors and provide strategic insights:
             
             Our Brand: {competitor_data.get('our_brand', 'Luxury Brand')}
@@ -209,7 +209,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a luxury brand strategist and competitive intelligence expert with deep knowledge of premium market dynamics.",
+                        "content": "You are a luxury brand strategist and competitive intelligence expert with deep knowledge of premium market dynamics.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -236,7 +236,7 @@ class OpenAIIntelligenceService:
     async def generate_luxury_email_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate luxury email campaign content."""
         try:
-            prompt = f"""
+            prompt = """
             Create a luxury email marketing campaign:
             
             Campaign Type: {campaign_data.get('type', 'product_launch')}
@@ -262,7 +262,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a luxury email marketing specialist who creates campaigns that achieve 40%+ open rates and high conversion for premium brands.",
+                        "content": "You are a luxury email marketing specialist who creates campaigns that achieve 40%+ open rates and high conversion for premium brands.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -289,7 +289,7 @@ class OpenAIIntelligenceService:
     async def create_luxury_social_media_content(self, content_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate luxury social media content."""
         try:
-            prompt = f"""
+            prompt = """
             Create luxury social media content:
             
             Platform: {content_request.get('platform', 'instagram')}
@@ -315,7 +315,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a luxury social media strategist who creates viral content for high-end brands with sophisticated audiences.",
+                        "content": "You are a luxury social media strategist who creates viral content for high-end brands with sophisticated audiences.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -342,7 +342,7 @@ class OpenAIIntelligenceService:
     async def make_executive_business_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI for executive-level business decision making."""
         try:
-            prompt = f"""
+            prompt = """
             As a luxury brand CEO, analyze this business situation and make a strategic decision:
             
             Situation: {decision_context.get('situation', 'business_decision_needed')}
@@ -369,7 +369,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a seasoned luxury brand CEO with 20+ years of experience in premium market strategy, known for making data-driven decisions that enhance brand prestige and profitability.",
+                        "content": "You are a seasoned luxury brand CEO with 20+ years of experience in premium market strategy, known for making data-driven decisions that enhance brand prestige and profitability.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -396,7 +396,7 @@ class OpenAIIntelligenceService:
     async def optimize_conversion_funnel(self, funnel_data: Dict[str, Any]) -> Dict[str, Any]:
         """Use OpenAI to optimize luxury conversion funnels."""
         try:
-            prompt = f"""
+            prompt = """
             Optimize this luxury brand conversion funnel:
             
             Current Funnel Stages: {', '.join(funnel_data.get('stages', []))}
@@ -423,7 +423,7 @@ class OpenAIIntelligenceService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a conversion rate optimization expert specializing in luxury e-commerce with deep understanding of affluent consumer behavior.",
+                        "content": "You are a conversion rate optimization expert specializing in luxury e-commerce with deep understanding of affluent consumer behavior.",  # noqa: E501
                     },
                     {"role": "user", "content": prompt},
                 ],

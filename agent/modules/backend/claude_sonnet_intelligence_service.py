@@ -149,7 +149,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=1500,
-                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers. Your words create desire and justify premium pricing.",
+                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers. Your words create desire and justify premium pricing.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.8,
             )
@@ -179,7 +179,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             if not self.client:
                 return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""As a luxury brand strategist, create a comprehensive marketing plan for The Skyy Rose Collection.
+            prompt = f"""As a luxury brand strategist, create a comprehensive marketing plan for The Skyy Rose Collection.  # noqa: E501
 
 Business Data:
 {json.dumps(business_data, indent=2)}
@@ -203,7 +203,7 @@ Make it actionable, specific, and focused on luxury market best practices."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=4096,
-                system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",
+                system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
             )
@@ -254,7 +254,7 @@ Provide actionable insights for luxury market domination."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3000,
-                system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",
+                system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.6,
             )
@@ -304,7 +304,7 @@ Focus on luxury customer behavior and premium positioning."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3000,
-                system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",
+                system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
             )
@@ -359,7 +359,7 @@ Provide complete, working code that can be deployed immediately."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=4096,
-                system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",
+                system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
             )
@@ -410,7 +410,7 @@ Focus on insights that drive business value for a luxury brand."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=2500,
-                system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",
+                system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
             )
@@ -465,7 +465,7 @@ Focus on The Skyy Rose Collection's brand values: exclusivity, elegance, quality
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3500,
-                system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",
+                system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",  # noqa: E501
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.9,  # Higher creativity for viral content
             )

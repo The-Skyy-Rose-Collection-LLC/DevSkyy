@@ -39,7 +39,7 @@ class WordPressIntegrationService:
         }
 
         auth_url = f"{self.authorize_url}?{urlencode(params)}"
-        logger.info(f"🔗 Generated WordPress auth URL for luxury brand integration")
+        logger.info("🔗 Generated WordPress auth URL for luxury brand integration")
         return auth_url
 
     async def exchange_code_for_token(self, authorization_code: str) -> Dict[str, Any]:
@@ -384,32 +384,32 @@ class WordPressIntegrationService:
         description = collection_data.get("description", "Exclusive luxury items")
 
         # Divi-optimized content with luxury styling
-        content = f"""
-[et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]
+        content = """
+[et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]  # noqa: E501
 [et_pb_column type="1_2" specialty_columns="2"]
 [et_pb_row_inner admin_label="Hero Content"]
 [et_pb_column_inner type="4_4"]
-[et_pb_text admin_label="Collection Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="3.5rem" text_color="#D4AF37" header_font="Playfair Display||||||||" header_text_color="#2C2C2C" header_font_size="4rem" custom_margin="0px||20px||false|false"]
+[et_pb_text admin_label="Collection Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="3.5rem" text_color="#D4AF37" header_font="Playfair Display||||||||" header_text_color="#2C2C2C" header_font_size="4rem" custom_margin="0px||20px||false|false"]  # noqa: E501
 <h1>{title}</h1>
 [/et_pb_text]
-[et_pb_text admin_label="Collection Description" _builder_version="4.16" text_font="Montserrat||||||||" text_font_size="1.2rem" text_color="#666666" text_line_height="1.8em" custom_margin="0px||30px||false|false"]
+[et_pb_text admin_label="Collection Description" _builder_version="4.16" text_font="Montserrat||||||||" text_font_size="1.2rem" text_color="#666666" text_line_height="1.8em" custom_margin="0px||30px||false|false"]  # noqa: E501
 <p>{description}</p>
 [/et_pb_text]
-[et_pb_button button_text="Explore Collection" button_alignment="left" admin_label="CTA Button" _builder_version="4.16" custom_button="on" button_text_color="#FFFFFF" button_bg_color="#D4AF37" button_border_width="0px" button_border_radius="30px" button_font="Montserrat|600|||||||" button_font_size="1rem" custom_padding="15px|40px|15px|40px|true|true" button_bg_color_hover="#B8860B" custom_css_main_element="transition: all 0.3s ease;||box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);"]
+[et_pb_button button_text="Explore Collection" button_alignment="left" admin_label="CTA Button" _builder_version="4.16" custom_button="on" button_text_color="#FFFFFF" button_bg_color="#D4AF37" button_border_width="0px" button_border_radius="30px" button_font="Montserrat|600|||||||" button_font_size="1rem" custom_padding="15px|40px|15px|40px|true|true" button_bg_color_hover="#B8860B" custom_css_main_element="transition: all 0.3s ease;||box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);"]  # noqa: E501
 [/et_pb_button]
 [/et_pb_column_inner]
 [/et_pb_row_inner]
 [/et_pb_column]
 [et_pb_column type="1_2"]
-[et_pb_image src="{collection_data.get('hero_image', '')}" admin_label="Hero Image" _builder_version="4.16" custom_css_main_element="border-radius: 20px;||box-shadow: 0 20px 40px rgba(0,0,0,0.1);"]
+[et_pb_image src="{collection_data.get('hero_image', '')}" admin_label="Hero Image" _builder_version="4.16" custom_css_main_element="border-radius: 20px;||box-shadow: 0 20px 40px rgba(0,0,0,0.1);"]  # noqa: E501
 [/et_pb_image]
 [/et_pb_column]
 [/et_pb_section]
 
-[et_pb_section fb_built="1" admin_label="Product Showcase" _builder_version="4.16" background_color="#F8F8F8" custom_padding="80px||80px||true|false"]
+[et_pb_section fb_built="1" admin_label="Product Showcase" _builder_version="4.16" background_color="#F8F8F8" custom_padding="80px||80px||true|false"]  # noqa: E501
 [et_pb_row admin_label="Products Grid"]
 [et_pb_column type="4_4"]
-[et_pb_text admin_label="Section Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#2C2C2C" text_orientation="center" custom_margin="0px||50px||false|false"]
+[et_pb_text admin_label="Section Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#2C2C2C" text_orientation="center" custom_margin="0px||50px||false|false"]  # noqa: E501
 <h2>Featured Items</h2>
 [/et_pb_text]
 [/et_pb_column]
@@ -417,19 +417,19 @@ class WordPressIntegrationService:
 <!-- Product grid will be populated by WooCommerce integration -->
 [/et_pb_section]
 
-[et_pb_section fb_built="1" admin_label="Luxury Features" _builder_version="4.16" background_color="#2C2C2C" custom_padding="80px||80px||true|false"]
+[et_pb_section fb_built="1" admin_label="Luxury Features" _builder_version="4.16" background_color="#2C2C2C" custom_padding="80px||80px||true|false"]  # noqa: E501
 [et_pb_row admin_label="Features Content"]
 [et_pb_column type="4_4"]
-[et_pb_text admin_label="Features Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#D4AF37" text_orientation="center" custom_margin="0px||30px||false|false"]
+[et_pb_text admin_label="Features Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#D4AF37" text_orientation="center" custom_margin="0px||30px||false|false"]  # noqa: E501
 <h2>Why Choose Our {collection_type.title()} Collection</h2>
 [/et_pb_text]
-[et_pb_blurb title="Premium Quality" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 1" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
+[et_pb_blurb title="Premium Quality" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 1" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]  # noqa: E501
 Handcrafted with the finest materials and attention to detail that defines luxury.
 [/et_pb_blurb]
-[et_pb_blurb title="Exclusive Design" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 2" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
+[et_pb_blurb title="Exclusive Design" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 2" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]  # noqa: E501
 Limited edition pieces that showcase exceptional craftsmanship and unique aesthetics.
 [/et_pb_blurb]
-[et_pb_blurb title="Lifetime Value" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 3" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
+[et_pb_blurb title="Lifetime Value" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 3" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]  # noqa: E501
 Investment pieces designed to appreciate in value and be treasured for generations.
 [/et_pb_blurb]
 [/et_pb_column]

@@ -201,7 +201,7 @@ load_dotenv()
 app = FastAPI(
     title="DevSkyy Enterprise Platform",
     version="5.1.0",
-    description="Enterprise-grade platform with JWT auth, AES-256 encryption, webhooks, and monitoring. 54 AI agents with comprehensive REST API. Zero MongoDB - Pure SQLAlchemy.",
+    description="Enterprise-grade platform with JWT auth, AES-256 encryption, webhooks, and monitoring. 54 AI agents with comprehensive REST API. Zero MongoDB - Pure SQLAlchemy.",  # noqa: E501
     docs_url="/docs",
     redoc_url="/redoc",
 )

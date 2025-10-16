@@ -628,7 +628,7 @@ class ElementorThemeBuilder:
             adjusted = tuple(max(0, min(255, int(c + (c * percent / 100)))) for c in rgb)
 
             return "#{:02x}{:02x}{:02x}".format(*adjusted)
-        except:
+        except Exception:
             return hex_color
 
     async def export_theme(self, theme: Dict[str, Any], format: str = "json") -> Dict[str, Any]:

@@ -384,7 +384,7 @@ class EnhancedLearningScheduler:
     def _generate_weekly_report(self) -> Dict[str, Any]:
         """Generate comprehensive weekly performance report."""
         return {
-            "report_period": f"{(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')} to {datetime.now().strftime('%Y-%m-%d')}",
+            "report_period": f"{(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')} to {datetime.now().strftime('%Y-%m-%d')}",  # noqa: E501
             "overall_performance": "Excellent",
             "key_achievements": [
                 "Maintained 99.5% system uptime",
