@@ -6,12 +6,12 @@ Metrics, traces, logs, and health checks for production systems
 import asyncio
 import logging
 import os
-import psutil
 import time
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+import psutil
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)

@@ -3,10 +3,10 @@ API Rate Limiting for Grade A+ API Score
 Implements token bucket algorithm with Redis backend
 """
 
-import time
-from typing import Optional, Dict
-from collections import defaultdict
 import threading
+import time
+from collections import defaultdict
+from typing import Dict, Optional
 
 
 class RateLimiter:

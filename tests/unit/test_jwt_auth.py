@@ -3,19 +3,20 @@ DevSkyy Enterprise - JWT Authentication Unit Tests
 Comprehensive tests for JWT token creation, validation, and security
 """
 
-import pytest
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
+
+import pytest
+from jose import JWTError, jwt
 
 from security.jwt_auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ALGORITHM,
+    REFRESH_TOKEN_EXPIRE_DAYS,
+    SECRET_KEY,
     create_access_token,
     create_refresh_token,
-    verify_token,
     get_token_payload,
-    SECRET_KEY,
-    ALGORITHM,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS,
+    verify_token,
 )
 
 

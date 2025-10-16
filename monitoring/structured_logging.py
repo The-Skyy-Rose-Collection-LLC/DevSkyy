@@ -3,12 +3,12 @@ Structured Logging for Grade A+ Infrastructure Score
 JSON-formatted logs for easy parsing and analysis
 """
 
-import logging
 import json
+import logging
 import sys
+import traceback
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
-import traceback
 
 
 class JSONFormatter(logging.Formatter):

@@ -7,8 +7,8 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor
 from sklearn.cluster import KMeans
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 
 from .base_ml_engine import BaseMLEngine
 

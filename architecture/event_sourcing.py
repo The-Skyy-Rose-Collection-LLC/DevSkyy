@@ -3,12 +3,12 @@ Event Sourcing Pattern for Grade A+ Architecture
 Stores state changes as a sequence of events for audit and replay
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
-from datetime import datetime, timezone
-from pydantic import BaseModel
 import uuid
+from abc import ABC, abstractmethod
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
+from pydantic import BaseModel
 
 # ============================================================================
 # EVENT BASE CLASSES

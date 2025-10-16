@@ -14,56 +14,51 @@ from typing import Any, Dict
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-
-# ============================================================================
-# ENTERPRISE SECURITY & AUTHENTICATION
-# ============================================================================
-from security.jwt_auth import get_current_active_user, require_developer
-from security.encryption import aes_encryption
-from security.input_validation import validation_middleware, csp
-from security.secure_headers import security_headers_manager
-
-# ============================================================================
-# API ENHANCEMENTS - GRADE A+
-# ============================================================================
-from api.rate_limiting import rate_limiter, get_client_identifier
-from api.pagination import PaginationParams, create_paginated_response
-
-# ============================================================================
-# WEBHOOKS & MONITORING
-# ============================================================================
-from webhooks.webhook_system import webhook_manager, WebhookEvent
-from monitoring.observability import (
-    metrics_collector,
-    health_monitor,
-    performance_tracker,
-    HealthStatus,
-)
-from monitoring.structured_logging import structured_logger
-
-# ============================================================================
-# ARCHITECTURE - GRADE A+
-# ============================================================================
-from architecture.cqrs import command_bus, query_bus
-from architecture.event_sourcing import event_store
-
-# ============================================================================
-# API V1 ROUTERS
-# ============================================================================
-from api.v1 import agents as agents_router
-from api.v1 import auth as auth_router
-from api.v1 import webhooks as webhooks_router
-from api.v1 import monitoring as monitoring_router
 
 # ============================================================================
 # CORE AGENTS - Direct imports (always loaded)
 # ============================================================================
 from agent.modules.backend.fixer import fix_code
 from agent.modules.backend.scanner import scan_site
+from api.pagination import PaginationParams, create_paginated_response
+
+# ============================================================================
+# API ENHANCEMENTS - GRADE A+
+# ============================================================================
+from api.rate_limiting import get_client_identifier, rate_limiter
+
+# ============================================================================
+# API V1 ROUTERS
+# ============================================================================
+from api.v1 import agents as agents_router
+from api.v1 import auth as auth_router
+from api.v1 import monitoring as monitoring_router
+from api.v1 import webhooks as webhooks_router
+
+# ============================================================================
+# ARCHITECTURE - GRADE A+
+# ============================================================================
+from architecture.cqrs import command_bus, query_bus
+from architecture.event_sourcing import event_store
+from monitoring.observability import HealthStatus, health_monitor, metrics_collector, performance_tracker
+from monitoring.structured_logging import structured_logger
+from security.encryption import aes_encryption
+from security.input_validation import csp, validation_middleware
+
+# ============================================================================
+# ENTERPRISE SECURITY & AUTHENTICATION
+# ============================================================================
+from security.jwt_auth import get_current_active_user, require_developer
+from security.secure_headers import security_headers_manager
+
+# ============================================================================
+# WEBHOOKS & MONITORING
+# ============================================================================
+from webhooks.webhook_system import WebhookEvent, webhook_manager
 
 # ============================================================================
 # LAZY AGENT LOADER - Import on demand for fast startup

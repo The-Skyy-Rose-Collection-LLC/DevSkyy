@@ -3,12 +3,12 @@ CQRS (Command Query Responsibility Segregation) Pattern
 Separates read and write operations for better scalability and maintainability
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, TypeVar, Optional
-from datetime import datetime, timezone
-from pydantic import BaseModel
 import uuid
+from abc import ABC, abstractmethod
+from datetime import datetime, timezone
+from typing import Any, Dict, Generic, Optional, TypeVar
 
+from pydantic import BaseModel
 
 # ============================================================================
 # BASE TYPES

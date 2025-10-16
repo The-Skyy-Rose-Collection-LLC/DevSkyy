@@ -11,14 +11,14 @@ This script:
 5. Preserves comments and formatting
 """
 
+import json
 import os
 import re
 import sys
-import json
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-from urllib.request import urlopen, Request
+from typing import Dict, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 # GitHub API base URL
 GITHUB_API = "https://api.github.com"

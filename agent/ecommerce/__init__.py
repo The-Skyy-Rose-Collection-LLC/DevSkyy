@@ -6,12 +6,12 @@ Full-stack fashion ecommerce with ML-powered automation
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .product_manager import ProductManager
-    from .inventory_optimizer import InventoryOptimizer
-    from .pricing_engine import DynamicPricingEngine
-    from .order_automation import OrderAutomation
-    from .customer_intelligence import CustomerIntelligence
     from .analytics_engine import EcommerceAnalytics
+    from .customer_intelligence import CustomerIntelligence
+    from .inventory_optimizer import InventoryOptimizer
+    from .order_automation import OrderAutomation
+    from .pricing_engine import DynamicPricingEngine
+    from .product_manager import ProductManager
 
 __all__ = [
     "ProductManager",

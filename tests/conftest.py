@@ -3,9 +3,10 @@ DevSkyy Enterprise - Test Fixtures and Configuration
 Provides reusable fixtures for unit, integration, and API tests
 """
 
-import pytest
 import asyncio
 from typing import AsyncGenerator, Generator
+
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,7 +20,6 @@ from models_sqlalchemy import Base
 
 # Import security modules
 from security.jwt_auth import create_access_token, create_refresh_token
-
 
 # ============================================================================
 # Pytest Configuration

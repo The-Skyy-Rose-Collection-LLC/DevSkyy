@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class BaseMLEngine(ABC):
             predictions, confidence = await self.predict(X_test)
 
             # Calculate metrics
-            from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+            from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
             metrics = {
                 "accuracy": float(accuracy_score(y_test, predictions)),
