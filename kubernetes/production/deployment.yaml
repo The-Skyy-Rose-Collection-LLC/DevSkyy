@@ -1,0 +1,358 @@
+---
+# DevSkyy Enterprise - Production Deployment
+# Blue-Green deployment strategy for zero-downtime updates
+# Image: cloud://skyyrosellc/devskyy_linux-amd64
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production
+  labels:
+    name: production
+    environment: production
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devskyy-config
+  namespace: production
+data:
+  ENVIRONMENT: "production"
+  HOST: "0.0.0.0"
+  PORT: "8000"
+  WORKERS: "4"
+  LOG_LEVEL: "INFO"
+  DATABASE_URL: "postgresql://devskyy:password@postgres-service:5432/devskyy"
+
+---
+# Secret for sensitive data (create manually or via CI/CD)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: devskyy-secrets
+  namespace: production
+type: Opaque
+stringData:
+  JWT_SECRET_KEY: "your-jwt-secret-key-change-me"
+  ENCRYPTION_MASTER_KEY: "your-encryption-key-change-me"
+  ANTHROPIC_API_KEY: "sk-ant-your-key-here"
+  OPENAI_API_KEY: "sk-your-key-here"
+  DOCKER_USERNAME: "skyyrosellc"
+  DOCKER_PASSWORD: "your-docker-password"
+
+---
+# Blue Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devskyy-blue
+  namespace: production
+  labels:
+    app: devskyy
+    version: blue
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devskyy
+      version: blue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: devskyy
+        version: blue
+        tier: backend
+    spec:
+      # Pull from Docker Cloud registry
+      imagePullSecrets:
+        - name: docker-cloud-credentials
+
+      containers:
+        - name: devskyy
+          image: cloud://skyyrosellc/devskyy_linux-amd64:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          # Environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: devskyy-config
+
+          # Environment variables from Secrets
+          env:
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: JWT_SECRET_KEY
+            - name: ENCRYPTION_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: ENCRYPTION_MASTER_KEY
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: ANTHROPIC_API_KEY
+
+          # Resource limits
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          # Volume mounts
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: data
+              mountPath: /app/data
+
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: devskyy-data-pvc
+
+---
+# Green Deployment (for blue-green deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devskyy-green
+  namespace: production
+  labels:
+    app: devskyy
+    version: green
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devskyy
+      version: green
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: devskyy
+        version: green
+        tier: backend
+    spec:
+      imagePullSecrets:
+        - name: docker-cloud-credentials
+
+      containers:
+        - name: devskyy
+          image: cloud://skyyrosellc/devskyy_linux-amd64:latest
+          imagePullPolicy: Always
+
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: devskyy-config
+
+          env:
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: JWT_SECRET_KEY
+            - name: ENCRYPTION_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: ENCRYPTION_MASTER_KEY
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: devskyy-secrets
+                  key: ANTHROPIC_API_KEY
+
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "2Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+
+          livenessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /api/v1/monitoring/health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: data
+              mountPath: /app/data
+
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: devskyy-data-pvc
+
+---
+# Service (switches between blue and green)
+apiVersion: v1
+kind: Service
+metadata:
+  name: devskyy-service
+  namespace: production
+  labels:
+    app: devskyy
+spec:
+  type: LoadBalancer
+  selector:
+    app: devskyy
+    version: blue  # Change to 'green' for switching
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 8000
+      protocol: TCP
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: devskyy-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: devskyy-blue  # Autoscale active deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# PersistentVolumeClaim for data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: devskyy-data-pvc
+  namespace: production
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+
+---
+# Ingress for external access
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devskyy-ingress
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+spec:
+  tls:
+    - hosts:
+        - api.devskyy.com
+      secretName: devskyy-tls
+  rules:
+    - host: api.devskyy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: devskyy-service
+                port:
+                  number: 80
+
+---
+# Docker Cloud registry secret (create with kubectl)
+# kubectl create secret docker-registry docker-cloud-credentials \
+#   --docker-server=cloud://skyyrosellc \
+#   --docker-username=skyyrosellc \
+#   --docker-password=your-password \
+#   --namespace=production
