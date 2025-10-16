@@ -6,12 +6,10 @@ Comprehensive tests for JWT token creation, validation, and security
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from jose import JWTError, jwt
+from jose import jwt
 
 from security.jwt_auth import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
     ALGORITHM,
-    REFRESH_TOKEN_EXPIRE_DAYS,
     SECRET_KEY,
     create_access_token,
     create_refresh_token,

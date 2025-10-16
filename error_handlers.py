@@ -3,14 +3,12 @@ Centralized Error Handlers for DevSkyy Platform
 Enterprise-grade error handling with proper logging and user feedback
 """
 
-import logging
 import traceback
 from typing import Any, Dict, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 
 from logger_config import get_logger
 

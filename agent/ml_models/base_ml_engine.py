@@ -3,11 +3,10 @@ Base ML Engine
 Foundational machine learning capabilities for all agents
 """
 
-import asyncio
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -44,12 +43,10 @@ class BaseMLEngine(ABC):
     @abstractmethod
     async def train(self, X: np.ndarray, y: np.ndarray, **kwargs) -> Dict[str, Any]:
         """Train the ML model"""
-        pass
 
     @abstractmethod
     async def predict(self, X: np.ndarray, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence scores"""
-        pass
 
     async def preprocess_data(self, data: np.ndarray, fit: bool = False) -> np.ndarray:
         """

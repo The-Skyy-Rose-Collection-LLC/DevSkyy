@@ -186,7 +186,6 @@ def cleanup_after_test():
     """Cleanup after each test"""
     yield
     # Add any cleanup logic here
-    pass
 
 
 # ============================================================================

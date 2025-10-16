@@ -67,7 +67,6 @@ class CommandHandler(ABC, Generic[TCommand, TResult]):
         Returns:
             Result of command execution
         """
-        pass
 
 
 class QueryHandler(ABC, Generic[TQuery, TResult]):
@@ -84,7 +83,6 @@ class QueryHandler(ABC, Generic[TQuery, TResult]):
         Returns:
             Result of query execution
         """
-        pass
 
 
 # ============================================================================

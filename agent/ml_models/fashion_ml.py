@@ -4,7 +4,7 @@ Advanced machine learning for fashion industry applications
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 from sklearn.cluster import KMeans

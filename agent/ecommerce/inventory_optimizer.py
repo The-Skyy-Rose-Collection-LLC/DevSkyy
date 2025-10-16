@@ -4,8 +4,7 @@ ML-powered inventory management and forecasting
 """
 
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor

@@ -170,7 +170,6 @@ class AggregateRoot(ABC):
         Args:
             event: Domain event to apply
         """
-        pass
 
     def raise_event(self, event: DomainEvent):
         """
@@ -217,19 +216,16 @@ class AggregateRoot(ABC):
 class AgentCreatedEvent(DomainEvent):
     """Event raised when an agent is created"""
 
-    pass
 
 
 class AgentUpdatedEvent(DomainEvent):
     """Event raised when an agent is updated"""
 
-    pass
 
 
 class AgentDeletedEvent(DomainEvent):
     """Event raised when an agent is deleted"""
 
-    pass
 
 
 # ============================================================================

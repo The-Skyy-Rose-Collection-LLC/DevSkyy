@@ -24,7 +24,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 # ============================================================================
 from agent.modules.backend.fixer import fix_code
 from agent.modules.backend.scanner import scan_site
-from api.pagination import PaginationParams, create_paginated_response
 
 # ============================================================================
 # API ENHANCEMENTS - GRADE A+
@@ -42,23 +41,18 @@ from api.v1 import webhooks as webhooks_router
 # ============================================================================
 # ARCHITECTURE - GRADE A+
 # ============================================================================
-from architecture.cqrs import command_bus, query_bus
-from architecture.event_sourcing import event_store
 from monitoring.observability import HealthStatus, health_monitor, metrics_collector, performance_tracker
-from monitoring.structured_logging import structured_logger
-from security.encryption import aes_encryption
 from security.input_validation import csp, validation_middleware
 
 # ============================================================================
 # ENTERPRISE SECURITY & AUTHENTICATION
 # ============================================================================
-from security.jwt_auth import get_current_active_user, require_developer
 from security.secure_headers import security_headers_manager
 
 # ============================================================================
 # WEBHOOKS & MONITORING
 # ============================================================================
-from webhooks.webhook_system import WebhookEvent, webhook_manager
+from webhooks.webhook_system import webhook_manager
 
 # ============================================================================
 # LAZY AGENT LOADER - Import on demand for fast startup
@@ -381,7 +375,7 @@ async def agent_orchestrator_health_check():
 async def security_manager_health_check():
     """Check security manager status"""
     try:
-        from agent.security_manager import security_manager
+        pass
 
         return HealthStatus.HEALTHY, "Security manager operational", {}
     except Exception as e:
@@ -443,7 +437,6 @@ async def startup_event():
     # Initialize agents
     logger.info("🤖 Initializing agent systems...")
     try:
-        from agent.orchestrator import orchestrator
         from agent.registry import registry
 
         # Discover and register agents

@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from security.jwt_auth import (
-    LoginRequest,
     RegisterRequest,
     TokenData,
     TokenResponse,
@@ -19,9 +18,7 @@ from security.jwt_auth import (
     UserRole,
     create_user_tokens,
     get_current_active_user,
-    hash_password,
     user_manager,
-    verify_password,
     verify_token,
 )
 

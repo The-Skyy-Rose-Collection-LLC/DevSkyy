@@ -6,10 +6,10 @@ Protection against SQL injection, XSS, command injection, and other attacks
 import html
 import logging
 import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Union
 
 from fastapi import HTTPException, Request, status
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

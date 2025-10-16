@@ -4,7 +4,6 @@ System metrics, health checks, and performance monitoring
 """
 
 import logging
-from typing import Dict, List
 
 from fastapi import APIRouter, Depends
 

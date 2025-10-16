@@ -16,12 +16,10 @@ import hashlib
 import json
 import logging
 import os
-import pickle
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict
 
 import aioredis
 import redis

@@ -17,7 +17,7 @@ async def init_database():
     try:
         # Import database modules
         import models_sqlalchemy  # Import models to register them with Base
-        from database import Base, db_manager, engine, init_db
+        from database import db_manager, init_db
         from database_config import DATABASE_URL, DB_PROVIDER
 
         logger.info(f"🗄️  Database Provider: {DB_PROVIDER}")
@@ -85,7 +85,6 @@ async def init_database():
 async def verify_models():
     """Verify all models are properly registered"""
     import models_sqlalchemy
-    from database import Base
 
     logger.info("\n🔍 Verifying SQLAlchemy models...")
 

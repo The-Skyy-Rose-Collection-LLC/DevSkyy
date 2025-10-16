@@ -6,7 +6,6 @@ Reliable webhook delivery with retry logic, authentication, and event management
 import asyncio
 import hashlib
 import hmac
-import json
 import logging
 import time
 from datetime import datetime

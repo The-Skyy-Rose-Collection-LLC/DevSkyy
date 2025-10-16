@@ -5,10 +5,9 @@ Metrics, traces, logs, and health checks for production systems
 
 import asyncio
 import logging
-import os
 import time
 from collections import defaultdict, deque
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import psutil
