@@ -81,7 +81,7 @@ pytest-cov==6.0.0  # Updated
 pytest-env==1.1.5
 
 # Performance & Monitoring
-psutil==6.1.1  # Updated
+psutil==6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)
 prometheus-client==0.22.0  # Metrics
 sentry-sdk==2.19.0  # Error tracking
 elastic-apm==6.24.0  # APM
