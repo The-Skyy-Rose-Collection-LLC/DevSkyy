@@ -217,15 +217,12 @@ class AgentCreatedEvent(DomainEvent):
     """Event raised when an agent is created"""
 
 
-
 class AgentUpdatedEvent(DomainEvent):
     """Event raised when an agent is updated"""
 
 
-
 class AgentDeletedEvent(DomainEvent):
     """Event raised when an agent is deleted"""
-
 
 
 # ============================================================================
