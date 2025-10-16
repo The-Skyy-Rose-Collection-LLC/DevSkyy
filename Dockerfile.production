@@ -20,11 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY requirements.txt .
+# Copy requirements (lightweight production version)
+COPY requirements-production.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install Python dependencies (excludes heavy ML libs to reduce size)
+RUN pip install --no-cache-dir --user -r requirements-production.txt
 
 # ============================================================================
 # Stage 2: Production Runtime
