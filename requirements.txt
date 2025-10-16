@@ -111,7 +111,7 @@ elevenlabs==1.12.0  # Updated
 openai-whisper==20240930  # Latest whisper
 pydub==0.25.1
 speechrecognition==3.12.0  # Updated
-pyaudio==0.2.14  # Audio I/O
+# pyaudio==0.2.14  # Audio I/O - Disabled: requires PortAudio system libraries not available in Docker
 
 # NLP & Sentiment Analysis
 textblob==0.18.0.post0
