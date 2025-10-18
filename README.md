@@ -147,6 +147,49 @@ forecast = await inventory.forecast_demand(
 - Customer behavior prediction
 - Inventory demand forecasting
 - Dynamic pricing optimization
+
+**ML Infrastructure:**
+- **Model Registry**: Version control for ML models with stage management (development/staging/production)
+- **Distributed Caching**: Redis-based caching with in-memory fallback for high-performance predictions
+- **Model Explainability**: SHAP-based interpretability for understanding predictions
+- **Automated Retraining**: Scheduled background retraining for continuous improvement
+- **Model Comparison**: Side-by-side metric comparison for A/B testing
+
+**Example Usage:**
+```python
+from ml.model_registry import model_registry, ModelStage
+from ml.redis_cache import redis_cache
+from ml.explainability import explainer
+
+# Register a trained model
+metadata = model_registry.register_model(
+    model=trained_model,
+    model_name="fashion_trend_predictor",
+    version="2.1.0",
+    model_type="classifier",
+    metrics={"accuracy": 0.95, "f1": 0.93},
+    parameters={"n_estimators": 100}
+)
+
+# Promote to production
+model_registry.promote_model("fashion_trend_predictor", "2.1.0", ModelStage.PRODUCTION)
+
+# Use cached predictions for performance
+cache_key = f"prediction:{product_id}"
+prediction = redis_cache.get(cache_key)
+if not prediction:
+    model = model_registry.load_model("fashion_trend_predictor", stage=ModelStage.PRODUCTION)
+    prediction = model.predict(features)
+    redis_cache.set(cache_key, prediction, ttl=3600)
+
+# Explain prediction with SHAP
+explanation = explainer.explain_prediction(
+    model_name="fashion_trend_predictor",
+    X=features,
+    feature_names=["price", "season", "color", "material"]
+)
+print(f"Top features: {explanation['top_features']}")
+```
 - Product recommendation
 
 ### AI Capabilities
@@ -226,6 +269,17 @@ DevSkyy/
 - `/api/v1/gdpr/delete` - Delete/anonymize user data (Article 17)
 - `/api/v1/gdpr/retention-policy` - Data retention information
 - `/api/v1/gdpr/requests` - Admin view of data subject requests
+
+**ML Infrastructure:**
+- `/api/v1/ml/registry/models` - List all registered models
+- `/api/v1/ml/registry/models/{name}/versions` - List model versions
+- `/api/v1/ml/registry/models/{name}/{version}` - Get model metadata
+- `/api/v1/ml/registry/models/{name}/{version}/promote` - Promote model stage
+- `/api/v1/ml/registry/models/{name}/compare` - Compare model versions
+- `/api/v1/ml/cache/stats` - Cache performance statistics
+- `/api/v1/ml/cache/clear` - Clear model cache (admin)
+- `/api/v1/ml/explain/prediction` - SHAP-based prediction explanation
+- `/api/v1/ml/health` - ML infrastructure health check
 
 ### Agent Modules
 

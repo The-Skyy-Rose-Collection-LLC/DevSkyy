@@ -36,6 +36,7 @@ from api.rate_limiting import get_client_identifier, rate_limiter
 from api.v1 import agents as agents_router
 from api.v1 import auth as auth_router
 from api.v1 import gdpr as gdpr_router
+from api.v1 import ml as ml_router
 from api.v1 import monitoring as monitoring_router
 from api.v1 import webhooks as webhooks_router
 
@@ -491,6 +492,9 @@ app.include_router(monitoring_router.router, prefix="/api/v1", tags=["v1-monitor
 
 # GDPR Compliance
 app.include_router(gdpr_router.router, prefix="/api/v1", tags=["v1-gdpr"])
+
+# ML Infrastructure
+app.include_router(ml_router.router, prefix="/api/v1", tags=["v1-ml"])
 
 
 # ============================================================================

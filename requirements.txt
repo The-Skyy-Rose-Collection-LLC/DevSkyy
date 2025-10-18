@@ -142,6 +142,7 @@ optuna==4.1.0  # Hyperparameter optimization
 mlflow==3.1.0  # ML lifecycle - Security fixes: PYSEC-2025-52, CSRF still present (need 2.20.3 for full fix)
 # KNOWN VULNERABILITY: GHSA-wf7f-8fxf-xfxc (RCE via malicious PyTorch model) - No fix available
 # MITIGATION: Never load untrusted PyTorch models
+shap==0.46.0  # Model explainability - SHAP values for interpretability
 
 # Code Analysis
 astroid==3.3.8  # Updated
