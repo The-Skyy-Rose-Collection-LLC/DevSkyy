@@ -384,7 +384,7 @@ class WordPressIntegrationService:
         description = collection_data.get("description", "Exclusive luxury items")
 
         # Divi-optimized content with luxury styling
-        content = f"""
+        content = """
 [et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]  # noqa: E501
 [et_pb_column type="1_2" specialty_columns="2"]
 [et_pb_row_inner admin_label="Hero Content"]

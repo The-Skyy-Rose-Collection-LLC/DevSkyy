@@ -481,6 +481,8 @@ def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
 
 def get_learning_system_status() -> Dict[str, Any]:
     """Get the status of the global learning system."""
+    global _global_scheduler
+
     if _global_scheduler is None:
         return {"status": "not_initialized", "message": "Learning system has not been started"}
 
