@@ -35,6 +35,7 @@ from api.rate_limiting import get_client_identifier, rate_limiter
 # ============================================================================
 from api.v1 import agents as agents_router
 from api.v1 import auth as auth_router
+from api.v1 import gdpr as gdpr_router
 from api.v1 import monitoring as monitoring_router
 from api.v1 import webhooks as webhooks_router
 
@@ -428,7 +429,7 @@ async def startup_event():
     # Run initial health checks
     logger.info("🏥 Running initial health checks...")
     try:
-        _health_results = await health_monitor.run_all_checks()  # noqa: F841
+        health_results = await health_monitor.run_all_checks()
         overall_status, message = health_monitor.get_overall_status()
         logger.info(f"   {message}")
     except Exception as e:
@@ -487,6 +488,9 @@ app.include_router(webhooks_router.router, prefix="/api/v1", tags=["v1-webhooks"
 
 # Monitoring & Observability
 app.include_router(monitoring_router.router, prefix="/api/v1", tags=["v1-monitoring"])
+
+# GDPR Compliance
+app.include_router(gdpr_router.router, prefix="/api/v1", tags=["v1-gdpr"])
 
 
 # ============================================================================

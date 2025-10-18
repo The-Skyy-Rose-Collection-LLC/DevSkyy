@@ -214,10 +214,18 @@ DevSkyy/
 ## 🔧 Configuration
 
 ### API Endpoints
-- `/api/v1/agents` - Agent management
-- `/api/v1/products` - Product operations
-- `/api/v1/analytics` - Analytics and insights
-- `/api/v1/content` - Content generation
+
+**Core Services:**
+- `/api/v1/agents` - Agent management and execution
+- `/api/v1/auth` - JWT authentication and user management
+- `/api/v1/webhooks` - Webhook subscription and management
+- `/api/v1/monitoring` - Health checks, metrics, and observability
+
+**GDPR Compliance:**
+- `/api/v1/gdpr/export` - Export user data (Article 15)
+- `/api/v1/gdpr/delete` - Delete/anonymize user data (Article 17)
+- `/api/v1/gdpr/retention-policy` - Data retention information
+- `/api/v1/gdpr/requests` - Admin view of data subject requests
 
 ### Agent Modules
 
@@ -320,10 +328,15 @@ docker run -p 8000:8000 --env-file .env devSkyy
 - ✅ Continuous security monitoring
 - ✅ Complete audit trail
 
-**GDPR:**
+**GDPR (Full Compliance):**
+- ✅ **Article 15 - Right of Access**: `/api/v1/gdpr/export` endpoint for complete data export
+- ✅ **Article 17 - Right to Erasure**: `/api/v1/gdpr/delete` endpoint for data deletion
+- ✅ **Article 13 - Right to Information**: `/api/v1/gdpr/retention-policy` endpoint
 - ✅ Data protection libraries secured
-- ✅ Encryption packages fully patched
+- ✅ Encryption packages fully patched (AES-256-GCM)
 - ✅ Zero data leakage vulnerabilities
+- ✅ Audit trail for all data subject requests
+- ✅ Anonymization option for legal/audit retention
 
 **PCI-DSS:**
 - ✅ Payment processing libraries secured

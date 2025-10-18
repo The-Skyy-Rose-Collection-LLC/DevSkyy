@@ -1,11 +1,15 @@
 """
 Initialize DevSkyy Database
-Sets up SQLite database with all required tables using SQLAlchemy models
+Sets up database with all required tables using SQLAlchemy models
 """
 
 import asyncio
 import logging
 from pathlib import Path
+
+# Load environment variables FIRST before any other imports
+from dotenv import load_dotenv
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

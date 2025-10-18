@@ -1,6 +1,115 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides strategic guidance to Claude Code when working with the DevSkyy repository.
+
+---
+
+## Context & Scope
+
+The DevSkyy project is an AI-driven platform written in **Python 3.11+** with a **FastAPI backend** and a **Node.js frontend**. It currently scores around **B/B+** in enterprise readiness. Several agents and modules are stubbed or incomplete, and critical enterprise features—such as API versioning, robust security, webhook management, monitoring, and GDPR compliance—are missing. Python 3.11 introduces performance improvements and new features like finer-grained error locations and up to 10–60% speed increases over Python 3.10; use these capabilities to improve the codebase.
+
+---
+
+## Guiding Principles (Truth Protocol)
+
+1. **Never guess syntax or APIs.** Base all code on verifiable, tested implementations and official documentation.
+2. **Specify exact versions** for language, frameworks, and dependencies. E.g. Python 3.11+, FastAPI 0.104, Node.js 18.x.
+3. **Cite authoritative sources** (e.g., RFC 7519 for JWT, NIST SP 800-38D for AES-GCM, Microsoft API design guidelines for REST versioning).
+4. **State uncertainty clearly.** Use "I cannot confirm without testing" where needed.
+5. **Prioritize security and maintainability.** Avoid hard-coded secrets, enforce RBAC, and implement comprehensive input validation.
+6. **Document and test thoroughly.** Provide unit tests and integration tests covering edge cases, and generate OpenAPI schemas.
+
+---
+
+## Completion Plan
+
+### 1. Audit the Current Codebase
+
+- Decompress the repository, identify all `TODO` and `FIXME` markers, and catalogue incomplete agents (e.g., `cache_manager.py`, `blockchain_nft_luxury_assets.py`, `database_optimizer.py`).
+- Generate a checklist of unimplemented methods and missing endpoints. Document assumptions and potential risks.
+
+### 2. Implement API Versioning & Naming
+
+- Create a structured `/api/v1/` namespace and migrate existing endpoints. Follow Microsoft's guidance: "A web API that implements versioning can indicate the features and resources that it exposes, and a client application can submit requests that are directed to a specific version". Use URI versioning (`/api/v1/users`, `/api/v2/users`), and maintain backward compatibility.
+- Provide clear deprecation policies and migration paths for future versions.
+
+### 3. Integrate Enterprise-Grade Security
+
+- **Authentication**: Implement JWT/OAuth2 with access tokens (30 min expiry) and refresh tokens (7 day expiry). Use well-maintained libraries like `pyjwt` and `fastapi-users`. Cite RFC 7519 when implementing JWT.
+- **Authorization**: Define RBAC roles (Super Admin, Admin, Developer, API User, Read-Only) and enforce them across all endpoints.
+- **Encryption**: Replace any insecure XOR schemes with AES-256-GCM (see NIST SP 800-38D) for data at rest. Use PBKDF2 or Argon2 for key derivation and password hashing.
+- **Input Validation & Sanitization**: Incorporate SQL injection prevention, XSS filtering, and command/path traversal protection. Implement Content Security Policy headers.
+- **Secrets Management**: Load API keys and secrets from environment variables; never commit sensitive data.
+
+### 4. Complete and Expose All Agents
+
+- For each backend and frontend agent, implement missing methods with full docstrings, type hints, and error handling. Provide descriptive logs and return structured errors.
+- Develop REST endpoints for each agent (e.g., `brand_intelligence`, `social_media_automation`, `email_sms_automation`, `customer_service`, `blockchain_nft_assets`), ensuring consistent request/response patterns and authentication.
+- Add batch operations that allow clients to execute multiple agent actions in one request, with support for asynchronous processing and transactional rollback.
+
+### 5. Build Webhook and Event Systems
+
+- Create a webhooks module that supports registering webhooks, verifying HMAC signatures, retrying failed deliveries with exponential backoff, and logging delivery history.
+- Provide API endpoints:
+  - `POST /api/v1/webhooks/subscriptions` – Create a subscription.
+  - `GET /api/v1/webhooks/subscriptions` – List subscriptions.
+  - `DELETE /api/v1/webhooks/subscriptions/{id}` – Delete a subscription.
+  - `POST /api/v1/webhooks/test` – Send test payloads.
+  - `GET /api/v1/webhooks/history` – View delivery history.
+
+### 6. Implement Observability & Monitoring
+
+- Create a monitoring module to collect metrics (CPU, memory, API latency, request counts) and expose them via `/api/v1/monitoring` endpoints.
+- Implement health checks and readiness probes.
+- Integrate with Prometheus/Grafana or a similar stack.
+
+### 7. Ensure Compliance & Privacy
+
+- Implement GDPR-compliant endpoints: `GET /api/v1/gdpr/export` (export user data) and `DELETE /api/v1/gdpr/delete` (delete user data).
+- Define data retention and auditing policies.
+- Provide logging for security events, authentication attempts, and data access.
+
+### 8. Strengthen Testing & Documentation
+
+- Write unit tests for each agent and endpoint, covering successful paths and edge cases (e.g., missing parameters, invalid tokens).
+- Use FastAPI's built-in OpenAPI generation to document all endpoints. Provide examples and schemas in the repository.
+- Maintain a `CHANGELOG.md` and upgrade guides for each release.
+
+### 9. Deployment & Continuous Integration
+
+- Update Dockerfiles and docker-compose setup for development and production environments.
+- Configure CI pipelines (GitHub Actions) to run tests, linting, security scans, and build artifacts.
+- Document environment variables (`.env`) and provide secure templates.
+
+---
+
+## Verification & Citations
+
+At each step, consult official documentation to verify API usage and security configurations. For example, when implementing API versioning, follow the rationale that "a web API should continue to support existing client applications while allowing new clients to use new features". For Python upgrades, note that Python 3.11 offers features like finer-grained error locations and performance gains; use them to optimize error handling and throughput.
+
+---
+
+## Deliverables
+
+- A fully implemented and tested DevSkyy repository with all agents active and endpoints exposed under `/api/v1/`.
+- Comprehensive documentation (README, API reference, deployment guides).
+- Automated test suite and CI/CD pipeline.
+
+---
+
+## Caveats & Risks
+
+- Some modules may depend on external services (e.g., payment gateways); ensure proper sandbox credentials.
+- Performance overhead from added security and monitoring should be measured and optimized.
+- Backwards compatibility must be maintained; introduce breaking changes only in new versions.
+
+---
+
+## Closing Note
+
+Follow the **Truth Protocol** rigorously: never invent APIs, always cite official sources, and state uncertainties. When decisions involve trade-offs (e.g., versioning strategy), explain the rationale, advantages, and drawbacks clearly.
+
+---
 
 ## Development Commands
 
@@ -46,153 +155,7 @@ pip install --upgrade -r requirements.txt
 black . && flake8 . && mypy agent/
 ```
 
-### Database Operations
-
-```bash
-# The platform uses SQLAlchemy with async support
-# Default: SQLite (auto-created at ./devskyy.db)
-# Production: PostgreSQL or MySQL via DATABASE_URL env var
-
-# Database is auto-initialized on startup (startup_sqlalchemy.py)
-# No manual migration commands needed for development
-```
-
-## Architecture Overview
-
-### Enterprise Platform Structure (v5.1)
-
-DevSkyy is a **FastAPI-based enterprise AI platform** with a **54-agent ecosystem**. The platform underwent a major upgrade from v4.0 to v5.1, transforming from Grade B (52/100) to Grade A- (90/100) enterprise-ready status.
-
-**Key Architectural Components:**
-
-1. **Agent System** (`agent/`)
-   - **Base Agent** (`agent/modules/base_agent.py`): All agents inherit from BaseAgent class
-   - **Agent Registry** (`agent/registry.py`): Dynamic agent discovery and registration
-   - **Agent Orchestrator** (`agent/orchestrator.py`): Coordinates multi-agent workflows
-   - **Security Manager** (`agent/security_manager.py`): Agent-level security enforcement
-
-2. **Enterprise Security Layer** (`security/`)
-   - **JWT Authentication** (`jwt_auth.py`): OAuth2 with access/refresh tokens, 5 RBAC roles
-   - **AES-256-GCM Encryption** (`encryption.py`): Field-level encryption, PBKDF2 key derivation
-   - **Input Validation** (`input_validation.py`): SQL/XSS/Command injection prevention
-
-3. **API v1** (`api/v1/`)
-   - **agents.py**: REST endpoints for all 54 agents (execute, status, capabilities)
-   - **auth.py**: Authentication endpoints (login, register, refresh, logout)
-   - **webhooks.py**: Webhook subscription management
-   - **monitoring.py**: Health checks, metrics, performance tracking
-
-4. **Webhook System** (`webhooks/webhook_system.py`)
-   - Event-driven architecture with 15+ event types
-   - HMAC signature authentication
-   - Exponential backoff retry logic
-
-5. **Observability** (`monitoring/observability.py`)
-   - Metrics collection (counters, gauges, histograms)
-   - Health monitoring with component-level checks
-   - Performance tracking (P50/P95/P99 percentiles)
-
-### Agent Organization
-
-**Backend Agents** (`agent/modules/backend/`):
-- Core: Scanner V2, Fixer V2, Security, Performance
-- AI: Claude Sonnet, OpenAI, Multi-Model AI Orchestrator
-- Specialized: 40+ domain-specific agents
-
-**Frontend Agents** (`agent/modules/frontend/`):
-- WordPress Theme Builder (Divi/Elementor)
-- Fashion Computer Vision
-- Social Media Automation
-- Landing Page Generator
-- Personalized Renderer
-
-**E-commerce Subsystem** (`agent/ecommerce/`):
-- Product Manager, Inventory Optimizer, Pricing Engine
-- ML-powered forecasting and optimization
-
-**ML Models** (`agent/ml_models/`):
-- Base ML Engine with continuous learning
-- Fashion-specific ML (trend prediction, style classification)
-
-### Critical Architecture Patterns
-
-1. **Agent Discovery & Registration**
-   - Agents are auto-discovered at startup via `registry.discover_and_register_all_agents()`
-   - Uses file introspection to find agent classes
-   - Registers with orchestrator for task routing
-
-2. **Security Architecture**
-   - **ALL** API v1 endpoints require JWT authentication (except `/auth/login`, `/auth/register`)
-   - Tokens must use UTC timestamps (`datetime.now(timezone.utc)`) - NOT naive datetime
-   - RBAC enforced via `@require_role` decorators
-   - Middleware stack: CORS → Input Validation → Performance Tracking → Auth
-
-3. **Database Pattern**
-   - Async SQLAlchemy with `async_session_maker`
-   - Auto-initialization in `startup_sqlalchemy.py`
-   - Supports SQLite (dev), PostgreSQL/MySQL (production)
-   - Connection via `DATABASE_URL` environment variable
-
-4. **Agent Execution Flow**
-   ```
-   User Request → API Endpoint → JWT Auth → Agent Registry Lookup
-   → Orchestrator → Agent.execute_core_function() → Response
-   ```
-
-5. **Webhook Event Flow**
-   ```
-   Event Trigger → webhook_manager.emit_event() → HMAC Signing
-   → HTTP POST to subscribers → Retry on failure → Track delivery
-   ```
-
-## Important Files & Their Purpose
-
-### Core Application Files
-
-- **`main.py`**: FastAPI application with all routers, middleware, startup logic
-  - Registers API v1 routers (auth, agents, webhooks, monitoring)
-  - Configures middleware (CORS, validation, performance tracking)
-  - Runs health checks and agent discovery at startup
-
-- **`database.py`**: SQLAlchemy async engine and session management
-- **`startup_sqlalchemy.py`**: Database initialization and WordPress integration
-- **`config.py`**: Application configuration from environment variables
-
-### Agent System Core
-
-- **`agent/orchestrator.py`**:
-  - Routes tasks to appropriate agents
-  - Manages agent lifecycle
-  - Provides health status
-
-- **`agent/registry.py`**:
-  - Auto-discovers agents from `agent/modules/backend/` and `agent/modules/frontend/`
-  - Maintains agent metadata (capabilities, version, status)
-  - Handles agent registration with orchestrator
-
-- **`agent/security_manager.py`**:
-  - Enforces security policies for agent operations
-  - Validates agent inputs
-  - Manages agent permissions
-
-### Enterprise v5.1 Additions
-
-- **`security/jwt_auth.py`**:
-  - **CRITICAL**: Uses UTC timestamps for token creation/validation
-  - Default users: admin@devskyy.com (super_admin), developer@devskyy.com (developer)
-  - Access tokens: 30 min expiry, Refresh tokens: 7 days
-
-- **`security/encryption.py`**:
-  - AES-256-GCM encryption for sensitive fields
-  - Key derivation from `ENCRYPTION_MASTER_KEY` env var
-
-- **`monitoring/observability.py`**:
-  - Global instances: `metrics_collector`, `health_monitor`, `performance_tracker`
-  - Used by middleware to track all HTTP requests
-
-- **`webhooks/webhook_system.py`**:
-  - Global instance: `webhook_manager`
-  - Call `webhook_manager.emit_event()` to trigger webhooks
+---
 
 ## Environment Configuration
 
@@ -223,65 +186,15 @@ META_ACCESS_TOKEN=your-token      # Social media automation
 ELEVENLABS_API_KEY=your-key       # Voice/audio features
 ```
 
-## Key Development Patterns
+---
 
-### Adding a New Agent
+## API Documentation
 
-1. Create agent file in `agent/modules/backend/` or `agent/modules/frontend/`
-2. Inherit from `BaseAgent` (defined in `agent/modules/base_agent.py`)
-3. Implement `execute_core_function()` method
-4. Agent will be auto-discovered at startup by registry
-5. Add REST endpoint in `api/v1/agents.py` if needed
+When server is running, visit:
+- Interactive API docs: http://localhost:8000/docs
+- Alternative docs: http://localhost:8000/redoc
 
-### Adding API Endpoints
-
-1. Add to appropriate router in `api/v1/`
-2. Use `Depends(get_current_active_user)` for authentication
-3. Use `Depends(require_role("role_name"))` for RBAC
-4. Return FastAPI responses with proper status codes
-
-### Emitting Webhook Events
-
-```python
-from webhooks.webhook_system import webhook_manager, WebhookEvent
-
-await webhook_manager.emit_event(
-    event_type=WebhookEvent.AGENT_COMPLETED,
-    data={"agent": "scanner", "status": "success"}
-)
-```
-
-### Recording Metrics
-
-```python
-from monitoring.observability import metrics_collector
-
-# Increment counter
-metrics_collector.increment_counter("agent_executions", labels={"agent": "scanner"})
-
-# Set gauge
-metrics_collector.set_gauge("active_agents", 5)
-
-# Record timing
-metrics_collector.record_histogram("operation_duration_ms", 150.5)
-```
-
-## Production Deployment Notes
-
-1. **ALWAYS use UTC timestamps** for JWT tokens - naive datetime will cause token expiration issues
-2. **Set strong keys**: `JWT_SECRET_KEY` and `ENCRYPTION_MASTER_KEY` must be cryptographically secure
-3. **Use PostgreSQL or MySQL** in production (set `DATABASE_URL`)
-4. **Run with multiple workers**: `uvicorn main:app --workers 4`
-5. **Enable SSL/TLS**: Use reverse proxy (nginx) with Let's Encrypt certificates
-6. **Monitor health endpoint**: `/api/v1/monitoring/health` for liveness/readiness probes
-
-## Security Notes
-
-- Platform achieved **ZERO vulnerabilities** (Grade A+ security)
-- All dependencies are audited via Dependabot and GitHub Actions
-- JWT tokens use HS256 algorithm with secure key derivation
-- Input validation middleware runs on ALL requests
-- RBAC roles: `super_admin`, `admin`, `developer`, `api_user`, `read_only`
+---
 
 ## Documentation References
 
@@ -290,9 +203,3 @@ metrics_collector.record_histogram("operation_duration_ms", 150.5)
 - **API Integration Guide**: `ENTERPRISE_API_INTEGRATION.md`
 - **Quick Reference**: `QUICK_REFERENCE.md`
 - **Security Reports**: `FINAL_SECURITY_STATUS.md`, `ZERO_VULNERABILITIES_ACHIEVED.md`
-
-## API Documentation
-
-When server is running, visit:
-- Interactive API docs: http://localhost:8000/docs
-- Alternative docs: http://localhost:8000/redoc
