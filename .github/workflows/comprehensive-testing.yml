@@ -39,6 +39,12 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+
+      - name: 'Notify Vercel - Test Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: tests'
+        if: always()
   lint:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -67,6 +73,12 @@ jobs:
 
       - name: Type check (mypy)
         run: mypy . --ignore-missing-imports || true
+
+      - name: 'Notify Vercel - Lint Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: lint'
+        if: always()
 
   security:
     name: Security Scan
@@ -103,6 +115,12 @@ jobs:
             pip-audit-report.json
             safety-report.json
 
+      - name: 'Notify Vercel - Security Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: security'
+        if: always()
+
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
@@ -123,6 +141,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: 'Notify Vercel - Build Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: build'
+        if: always()
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -134,6 +158,12 @@ jobs:
 
       - name: Deploy notification
         run: echo "🚀 Ready to deploy to production"
+
+      - name: 'Notify Vercel - Deploy Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: deploy'
+        if: always()
 
       # Add your deployment steps here
       # Example for Railway:

@@ -1,0 +1,54 @@
+name: Deployment Status Notifications
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline", "Vercel Integration Pipeline"]
+    types:
+      - completed
+
+jobs:
+  notify-deployment-status:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: 'Notify Vercel - CI/CD Complete'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: ci-cd-complete'
+        if: github.event.workflow_run.name == 'CI/CD Pipeline'
+
+      - name: 'Notify Vercel - Vercel Pipeline Complete'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: vercel-complete'
+        if: github.event.workflow_run.name == 'Vercel Integration Pipeline'
+
+      - name: 'Notify Vercel - All Systems Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: all-systems'
+        if: always()
+
+  deployment-health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    
+    steps:
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Health check deployed application
+        run: |
+          # Add your health check URL here
+          # curl -f https://your-vercel-app.vercel.app/health || exit 1
+          echo "Health check would run here"
+
+      - name: 'Notify Vercel - Health Check Status'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: 'Vercel - dev-skyy: health-check'
+        if: always()
