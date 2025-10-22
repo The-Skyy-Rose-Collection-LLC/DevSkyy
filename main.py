@@ -16,10 +16,27 @@ from fastapi import FastAPI, HTTPException, Request, status
 from prometheus_client import Counter, Histogram, generate_latest  # noqa: F401 - Reserved for Phase 5 monitoring
 import asyncio  # noqa: F401 - Reserved for Phase 3 async enhancements
 
-# Phase 2 Infrastructure Hardening Imports
-from api.security_middleware import SecurityMiddleware
-from logging_config import setup_logging, security_logger, error_logger, structured_logger
-from error_handling import error_handler, DevSkyError, ErrorCode, ErrorSeverity
+# Phase 2 Infrastructure Hardening Imports (with error handling)
+try:
+    from api.security_middleware import SecurityMiddleware
+    SECURITY_MIDDLEWARE_AVAILABLE = True
+except ImportError:
+    SECURITY_MIDDLEWARE_AVAILABLE = False
+    print("Warning: Security middleware not available")
+
+try:
+    from logging_config import setup_logging, security_logger, error_logger, structured_logger
+    STRUCTURED_LOGGING_AVAILABLE = True
+except ImportError:
+    STRUCTURED_LOGGING_AVAILABLE = False
+    print("Warning: Structured logging not available")
+
+try:
+    from error_handling import error_handler, DevSkyError, ErrorCode, ErrorSeverity
+    ERROR_HANDLING_AVAILABLE = True
+except ImportError:
+    ERROR_HANDLING_AVAILABLE = False
+    print("Warning: Enhanced error handling not available")
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -303,9 +320,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure enhanced structured logging (Phase 2)
-setup_logging()
-logger = structured_logger
+# Configure enhanced structured logging (Phase 2) - with fallback
+if STRUCTURED_LOGGING_AVAILABLE:
+    setup_logging()
+    logger = structured_logger
+else:
+    # Fallback to basic logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)]
+    )
+    logger = logging.getLogger(__name__)
 
 # ============================================================================
 # MIDDLEWARE
@@ -330,7 +356,11 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(BaseHTTPMiddleware, dispatch=validation_middleware)
 
 # Add Phase 2 Security Middleware (comprehensive security enforcement)
-app.add_middleware(SecurityMiddleware)
+if SECURITY_MIDDLEWARE_AVAILABLE:
+    app.add_middleware(SecurityMiddleware)
+    logger.info("✅ Security middleware enabled")
+else:
+    logger.warning("⚠️ Security middleware not available - using basic security")
 
 
 # Add rate limiting middleware (Grade A+ API)
