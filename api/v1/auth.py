@@ -4,6 +4,7 @@ JWT/OAuth2 authentication with user management
 """
 
 import logging
+
 # datetime not needed in this module
 from typing import Dict
 
@@ -50,10 +51,7 @@ async def register(request: EnhancedRegisterRequest):
 
         # Create user with enhanced validation
         user = user_manager.create_user(
-            email=request.email,
-            username=request.username,
-            password=request.password,
-            role=request.role
+            email=request.email, username=request.username, password=request.password, role=request.role
         )
 
         # Log security event

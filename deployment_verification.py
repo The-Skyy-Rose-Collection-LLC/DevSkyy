@@ -198,7 +198,7 @@ class DeploymentVerifier:
 
             # Test connection
             with engine.connect() as conn:
-                result = conn.execute(text("SELECT 1"))
+                conn.execute(text("SELECT 1"))
                 self.check("Database connection", True)
 
             # Check tables

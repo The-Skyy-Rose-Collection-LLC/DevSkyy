@@ -411,12 +411,12 @@ class WordPressSEOOptimizer:
             changefreq = page.get("changefreq", "weekly")
             lastmod = page.get("lastmod", datetime.now().strftime("%Y-%m-%d"))
 
-            sitemap += f"  <url>\n"
+            sitemap += "  <url>\n"
             sitemap += f"    <loc>{url}</loc>\n"
             sitemap += f"    <lastmod>{lastmod}</lastmod>\n"
             sitemap += f"    <changefreq>{changefreq}</changefreq>\n"
             sitemap += f"    <priority>{priority}</priority>\n"
-            sitemap += f"  </url>\n"
+            sitemap += "  </url>\n"
 
         sitemap += "</urlset>"
 

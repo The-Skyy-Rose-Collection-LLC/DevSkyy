@@ -605,7 +605,5 @@ async def auto_save_knowledge():
 
 
 # Start auto-save task
-import sys
-
 if __name__ == "__main__":
     asyncio.run(auto_save_knowledge())

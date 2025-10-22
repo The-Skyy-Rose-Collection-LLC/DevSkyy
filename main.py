@@ -19,6 +19,7 @@ import asyncio  # noqa: F401 - Reserved for Phase 3 async enhancements
 # Phase 2 Infrastructure Hardening Imports (with error handling)
 try:
     from api.security_middleware import SecurityMiddleware
+
     SECURITY_MIDDLEWARE_AVAILABLE = True
 except ImportError:
     SECURITY_MIDDLEWARE_AVAILABLE = False
@@ -26,13 +27,15 @@ except ImportError:
 
 try:
     from logging_config import setup_logging, structured_logger
+
     STRUCTURED_LOGGING_AVAILABLE = True
 except ImportError:
     STRUCTURED_LOGGING_AVAILABLE = False
     print("Warning: Structured logging not available")
 
 try:
-    from error_handling import DevSkyError, ErrorCode, ErrorSeverity
+    from error_handling import DevSkyError, ErrorCode, ErrorSeverity  # noqa: F401
+
     ERROR_HANDLING_AVAILABLE = True
 except ImportError:
     ERROR_HANDLING_AVAILABLE = False
@@ -329,7 +332,7 @@ else:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler(sys.stdout)]
+        handlers=[logging.StreamHandler(sys.stdout)],
     )
     logger = logging.getLogger(__name__)
 

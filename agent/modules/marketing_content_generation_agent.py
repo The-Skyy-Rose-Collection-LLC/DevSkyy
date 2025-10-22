@@ -294,7 +294,7 @@ class MarketingContentGenerationAgent:
             launch_campaign = {
                 "campaign_id": f"launch_{product_name.lower().replace(' ', '_')}_{int(datetime.now().timestamp())}",
                 "product_name": product_name,
-                "launch_date": launch_date.isoformat() if hasattr(launch_date, 'isoformat') else str(launch_date),
+                "launch_date": launch_date.isoformat() if hasattr(launch_date, "isoformat") else str(launch_date),
                 "pre_launch_strategy": await self._create_pre_launch_strategy(launch_spec),
                 "launch_day_strategy": await self._create_launch_day_strategy(launch_spec),
                 "post_launch_strategy": await self._create_post_launch_strategy(launch_spec),

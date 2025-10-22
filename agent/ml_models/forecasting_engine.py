@@ -17,7 +17,10 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error  # noqa: F401 - Reserved for Phase 3 model evaluation
+from sklearn.metrics import (  # noqa: F401
+    mean_absolute_error,
+    mean_squared_error,
+)  # Reserved for Phase 3 model evaluation
 import tensorflow as tf  # noqa: F401 - Reserved for Phase 3 deep learning models
 
 logger = logging.getLogger(__name__)

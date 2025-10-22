@@ -77,7 +77,9 @@ async def execute_scanner(request: AgentExecutionRequest, current_user: TokenDat
 
 
 @router.post("/scanner-v2/execute", response_model=AgentExecuteResponse)
-async def execute_scanner_v2(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_scanner_v2(
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
+):
     """Execute Scanner Agent V2 - Enhanced scanner with security scanning"""
     try:
         from agent.modules.backend.scanner_v2 import scanner_agent
@@ -463,7 +465,9 @@ async def execute_customer_service(
 
 
 @router.post("/voice-audio/execute", response_model=AgentExecuteResponse)
-async def execute_voice_audio(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_voice_audio(
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
+):
     """Execute Voice/Audio Content Agent - Voice synthesis and processing"""
     try:
         from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
@@ -550,7 +554,9 @@ async def execute_security(request: AgentExecutionRequest, current_user: TokenDa
 
 
 @router.post("/performance/execute", response_model=AgentExecuteResponse)
-async def execute_performance(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_performance(
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
+):
     """Execute Performance Agent - Performance analysis and optimization"""
     try:
         from agent.modules.backend.performance_agent import agent as perf_agent

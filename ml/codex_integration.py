@@ -401,13 +401,13 @@ Provide specific, actionable feedback."""
         frameworks = lang_config.get("framework_hints", [])
 
         message = f"You are an expert {language} programmer. "
-        message += f"Generate clean, well-documented, production-ready code. "
+        message += "Generate clean, well-documented, production-ready code. "
 
         if frameworks:
             message += f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
 
         if context:
-            message += f"\n\nAdditional context:\n" + "\n".join(context)
+            message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 

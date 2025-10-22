@@ -5,6 +5,7 @@ Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 
 import logging
 import os
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
@@ -27,17 +28,12 @@ TOKEN_BLACKLIST_EXPIRE_HOURS = 24  # How long to keep blacklisted tokens
 
 # Password hashing - Enhanced
 pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=12  # Increased rounds for better security
+    schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12  # Increased rounds for better security
 )
 
 # Security schemes
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 security_bearer = HTTPBearer()
-
-# Security tracking
-from collections import defaultdict
 
 # Track failed login attempts
 failed_login_attempts = defaultdict(list)
@@ -129,6 +125,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # ENHANCED SECURITY FUNCTIONS
 # ============================================================================
 
+
 def is_account_locked(email: str) -> bool:
     """Check if account is locked due to failed login attempts"""
     if email in locked_accounts:
@@ -149,10 +146,7 @@ def record_failed_login(email: str) -> bool:
 
     # Clean old attempts (older than 1 hour)
     hour_ago = now - timedelta(hours=1)
-    failed_login_attempts[email] = [
-        attempt for attempt in failed_login_attempts[email]
-        if attempt > hour_ago
-    ]
+    failed_login_attempts[email] = [attempt for attempt in failed_login_attempts[email] if attempt > hour_ago]
 
     # Add current failed attempt
     failed_login_attempts[email].append(now)
