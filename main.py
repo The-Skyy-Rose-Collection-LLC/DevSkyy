@@ -25,6 +25,7 @@ import os
 import sys
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Any, Dict
 
 import structlog
@@ -929,6 +930,25 @@ async def scan_website():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def scan_site():
+    """Placeholder scan function"""
+    try:
+        # Simulate a basic scan
+        return {
+            "issues_found": 0,
+            "scan_time": "2024-01-01T00:00:00Z",
+            "status": "completed"
+        }
+    except Exception as e:
+        logger.error(f"Scan failed: {e}")
+        return {
+            "issues_found": -1,
+            "scan_time": "2024-01-01T00:00:00Z",
+            "status": "failed",
+            "error": str(e)
+        }
 
 
 def fix_code(issues: Dict[str, Any]) -> Dict[str, Any]:
