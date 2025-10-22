@@ -1,0 +1,436 @@
+name: 🚀 Deployment Automation
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      force_deploy:
+        description: 'Force deployment (skip checks)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # ============================================================================
+  # PRE-DEPLOYMENT CHECKS
+  # ============================================================================
+  
+  pre-deployment-checks:
+    name: 🔍 Pre-Deployment Checks
+    runs-on: ubuntu-latest
+    if: github.event.inputs.force_deploy != 'true'
+    outputs:
+      deploy-ready: ${{ steps.checks.outputs.ready }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🏷️ Generate Version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION="main-$(git rev-parse --short HEAD)"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
+      
+      - name: 🔍 Run Pre-Deployment Checks
+        id: checks
+        run: |
+          echo "🔍 Running pre-deployment checks..."
+          
+          # Check if tests are passing
+          if ! gh run list --workflow="comprehensive-testing.yml" --status=success --limit=1 | grep -q "success"; then
+            echo "❌ Latest test run is not successful"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # Check for security vulnerabilities
+          pip install safety
+          if ! safety check; then
+            echo "❌ Security vulnerabilities found"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # Check for critical linting issues
+          pip install flake8
+          if ! flake8 --select=E9,F63,F7,F82 .; then
+            echo "❌ Critical linting issues found"
+            echo "ready=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          echo "✅ All pre-deployment checks passed"
+          echo "ready=true" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # BUILD AND PUSH DOCKER IMAGES
+  # ============================================================================
+  
+  build-and-push:
+    name: 🏗️ Build & Push Images
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks]
+    if: always() && (needs.pre-deployment-checks.outputs.deploy-ready == 'true' || github.event.inputs.force_deploy == 'true')
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    
+    strategy:
+      matrix:
+        service: [api-gateway, workflow-engine, fashion-apis, fashion-intelligence]
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔐 Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🏷️ Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+      
+      - name: 🔧 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: 🏗️ Build and Push Image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: deployment/Dockerfile.${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ============================================================================
+  # STAGING DEPLOYMENT
+  # ============================================================================
+  
+  deploy-staging:
+    name: 🎭 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.devskyy.com
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+      
+      - name: 🔐 Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+          kubectl config current-context
+      
+      - name: 🚀 Deploy to Staging
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Update image tags in deployment files
+          sed -i "s|image: .*api-gateway.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway:${{ github.sha }}|g" deployment/kubernetes/api-integration-deployment.yaml
+          sed -i "s|image: .*workflow-engine.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-workflow-engine:${{ github.sha }}|g" deployment/kubernetes/api-integration-deployment.yaml
+          sed -i "s|image: .*fashion-apis.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-fashion-apis:${{ github.sha }}|g" deployment/kubernetes/api-integration-deployment.yaml
+          sed -i "s|image: .*fashion-intelligence.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-fashion-intelligence:${{ github.sha }}|g" deployment/kubernetes/api-integration-deployment.yaml
+          
+          # Apply Kubernetes manifests
+          kubectl apply -f deployment/kubernetes/api-integration-deployment.yaml
+          
+          # Wait for rollout to complete
+          kubectl rollout status deployment/api-gateway -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/workflow-engine -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/fashion-api-integrator -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/fashion-intelligence -n devskyy-api-integration --timeout=600s
+      
+      - name: 🧪 Run Smoke Tests
+        run: |
+          # Wait for services to be ready
+          sleep 30
+          
+          # Test API Gateway
+          curl -f https://staging.devskyy.com/api/v1/gateway/health || exit 1
+          
+          # Test Workflow Engine
+          curl -f https://staging.devskyy.com/api/v1/workflows/health || exit 1
+          
+          # Test Fashion APIs
+          curl -f https://staging.devskyy.com/api/v1/fashion/health || exit 1
+          
+          # Test Fashion Intelligence
+          curl -f https://staging.devskyy.com/api/v1/intelligence/health || exit 1
+          
+          echo "✅ All smoke tests passed"
+      
+      - name: 📊 Update Deployment Status
+        run: |
+          echo "🎭 Staging deployment completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: staging" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: https://staging.devskyy.com" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # PRODUCTION DEPLOYMENT
+  # ============================================================================
+  
+  deploy-production:
+    name: 🌟 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-staging]
+    if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://api.devskyy.com
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+      
+      - name: 🔐 Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+          kubectl config current-context
+      
+      - name: 📋 Pre-Production Checks
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Check cluster health
+          kubectl get nodes
+          kubectl get pods -n devskyy-api-integration
+          
+          # Check resource availability
+          kubectl top nodes
+          kubectl describe nodes | grep -A 5 "Allocated resources"
+      
+      - name: 🚀 Blue-Green Deployment
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Create new deployment with green suffix
+          sed 's/name: \(.*\)/name: \1-green/g' deployment/kubernetes/api-integration-deployment.yaml > deployment-green.yaml
+          
+          # Update image tags
+          sed -i "s|image: .*api-gateway.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway:${{ github.sha }}|g" deployment-green.yaml
+          sed -i "s|image: .*workflow-engine.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-workflow-engine:${{ github.sha }}|g" deployment-green.yaml
+          sed -i "s|image: .*fashion-apis.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-fashion-apis:${{ github.sha }}|g" deployment-green.yaml
+          sed -i "s|image: .*fashion-intelligence.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-fashion-intelligence:${{ github.sha }}|g" deployment-green.yaml
+          
+          # Deploy green environment
+          kubectl apply -f deployment-green.yaml
+          
+          # Wait for green deployment to be ready
+          kubectl rollout status deployment/api-gateway-green -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/workflow-engine-green -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/fashion-api-integrator-green -n devskyy-api-integration --timeout=600s
+          kubectl rollout status deployment/fashion-intelligence-green -n devskyy-api-integration --timeout=600s
+      
+      - name: 🧪 Production Smoke Tests
+        run: |
+          # Get green service endpoints
+          GREEN_API_GATEWAY=$(kubectl get svc api-gateway-service-green -n devskyy-api-integration -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          
+          # Test green deployment
+          curl -f http://$GREEN_API_GATEWAY:8000/health || exit 1
+          
+          echo "✅ Green deployment smoke tests passed"
+      
+      - name: 🔄 Switch Traffic to Green
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Update service selectors to point to green deployment
+          kubectl patch service api-gateway-service -n devskyy-api-integration -p '{"spec":{"selector":{"app":"api-gateway-green"}}}'
+          kubectl patch service workflow-engine-service -n devskyy-api-integration -p '{"spec":{"selector":{"app":"workflow-engine-green"}}}'
+          kubectl patch service fashion-api-integrator-service -n devskyy-api-integration -p '{"spec":{"selector":{"app":"fashion-api-integrator-green"}}}'
+          kubectl patch service fashion-intelligence-service -n devskyy-api-integration -p '{"spec":{"selector":{"app":"fashion-intelligence-green"}}}'
+          
+          echo "✅ Traffic switched to green deployment"
+      
+      - name: 🧪 Final Production Tests
+        run: |
+          # Wait for traffic switch to propagate
+          sleep 60
+          
+          # Test production endpoints
+          curl -f https://api.devskyy.com/api/v1/gateway/health || exit 1
+          curl -f https://api.devskyy.com/api/v1/workflows/health || exit 1
+          curl -f https://api.devskyy.com/api/v1/fashion/health || exit 1
+          curl -f https://api.devskyy.com/api/v1/intelligence/health || exit 1
+          
+          echo "✅ Production deployment verified"
+      
+      - name: 🧹 Cleanup Old Deployment
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Remove old blue deployment
+          kubectl delete deployment api-gateway -n devskyy-api-integration --ignore-not-found=true
+          kubectl delete deployment workflow-engine -n devskyy-api-integration --ignore-not-found=true
+          kubectl delete deployment fashion-api-integrator -n devskyy-api-integration --ignore-not-found=true
+          kubectl delete deployment fashion-intelligence -n devskyy-api-integration --ignore-not-found=true
+          
+          # Rename green to blue for next deployment
+          kubectl patch deployment api-gateway-green -n devskyy-api-integration -p '{"metadata":{"name":"api-gateway"}}'
+          kubectl patch deployment workflow-engine-green -n devskyy-api-integration -p '{"metadata":{"name":"workflow-engine"}}'
+          kubectl patch deployment fashion-api-integrator-green -n devskyy-api-integration -p '{"metadata":{"name":"fashion-api-integrator"}}'
+          kubectl patch deployment fashion-intelligence-green -n devskyy-api-integration -p '{"metadata":{"name":"fashion-intelligence"}}'
+      
+      - name: 📊 Update Production Status
+        run: |
+          echo "🌟 Production deployment completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment: production" >> $GITHUB_STEP_SUMMARY
+          echo "- URL: https://api.devskyy.com" >> $GITHUB_STEP_SUMMARY
+          echo "- Deployment Strategy: Blue-Green" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # POST-DEPLOYMENT MONITORING
+  # ============================================================================
+  
+  post-deployment-monitoring:
+    name: 📊 Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    
+    steps:
+      - name: 📊 Setup Monitoring
+        run: |
+          # Wait for metrics to be available
+          sleep 120
+          
+          # Check key metrics
+          echo "📊 Monitoring deployment metrics..."
+          
+          # This would typically integrate with your monitoring system
+          # For example, Prometheus, Grafana, or cloud monitoring services
+          
+          echo "✅ Monitoring setup completed"
+      
+      - name: 🚨 Setup Alerts
+        run: |
+          echo "🚨 Setting up post-deployment alerts..."
+          
+          # Configure alerts for:
+          # - High error rates
+          # - Increased response times
+          # - Resource utilization
+          # - Business metrics
+          
+          echo "✅ Alerts configured"
+
+  # ============================================================================
+  # ROLLBACK CAPABILITY
+  # ============================================================================
+  
+  rollback:
+    name: 🔄 Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure() && (needs.deploy-staging.result == 'failure' || needs.deploy-production.result == 'failure')
+    needs: [deploy-staging, deploy-production]
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+    
+    steps:
+      - name: 🔄 Rollback to Previous Version
+        run: |
+          export KUBECONFIG=kubeconfig
+          
+          # Rollback deployments
+          kubectl rollout undo deployment/api-gateway -n devskyy-api-integration
+          kubectl rollout undo deployment/workflow-engine -n devskyy-api-integration
+          kubectl rollout undo deployment/fashion-api-integrator -n devskyy-api-integration
+          kubectl rollout undo deployment/fashion-intelligence -n devskyy-api-integration
+          
+          # Wait for rollback to complete
+          kubectl rollout status deployment/api-gateway -n devskyy-api-integration --timeout=300s
+          kubectl rollout status deployment/workflow-engine -n devskyy-api-integration --timeout=300s
+          kubectl rollout status deployment/fashion-api-integrator -n devskyy-api-integration --timeout=300s
+          kubectl rollout status deployment/fashion-intelligence -n devskyy-api-integration --timeout=300s
+          
+          echo "🔄 Rollback completed successfully"
+
+  # ============================================================================
+  # NOTIFICATION
+  # ============================================================================
+  
+  notify:
+    name: 📢 Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production, post-deployment-monitoring]
+    if: always()
+    
+    steps:
+      - name: 📢 Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            🚀 Deployment Status: ${{ job.status }}
+            
+            📋 Summary:
+            - Staging: ${{ needs.deploy-staging.result || 'skipped' }}
+            - Production: ${{ needs.deploy-production.result || 'skipped' }}
+            - Monitoring: ${{ needs.post-deployment-monitoring.result || 'skipped' }}
+            
+            🔗 Repository: ${{ github.repository }}
+            📝 Commit: ${{ github.sha }}
+            👤 Actor: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

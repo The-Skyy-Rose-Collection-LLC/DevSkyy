@@ -1,0 +1,565 @@
+name: 🧪 Comprehensive Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/*', 'hotfix/*' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - unit
+          - integration
+          - e2e
+          - performance
+          - security
+      coverage_threshold:
+        description: 'Coverage threshold percentage'
+        required: false
+        default: '80'
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || '80' }}
+  TEST_DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_devskyy
+  REDIS_URL: redis://localhost:6379/1
+  ELASTICSEARCH_URL: http://localhost:9200
+
+jobs:
+  # ============================================================================
+  # SETUP AND PREPARATION
+  # ============================================================================
+  
+  setup:
+    name: 🔧 Setup Test Environment
+    runs-on: ubuntu-latest
+    outputs:
+      test-matrix: ${{ steps.test-matrix.outputs.matrix }}
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🔑 Generate Cache Key
+        id: cache-key
+        run: |
+          echo "key=test-deps-${{ runner.os }}-${{ hashFiles('**/requirements*.txt', '**/package*.json', '**/poetry.lock') }}" >> $GITHUB_OUTPUT
+      
+      - name: 📋 Generate Test Matrix
+        id: test-matrix
+        run: |
+          if [[ "${{ github.event.inputs.test_type }}" == "all" || "${{ github.event.inputs.test_type }}" == "" ]]; then
+            echo 'matrix=["unit", "integration", "e2e", "performance", "security"]' >> $GITHUB_OUTPUT
+          else
+            echo 'matrix=["${{ github.event.inputs.test_type }}"]' >> $GITHUB_OUTPUT
+          fi
+
+  # ============================================================================
+  # UNIT TESTS
+  # ============================================================================
+  
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: contains(fromJson(needs.setup.outputs.test-matrix), 'unit')
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+        test-group: ['core', 'agents', 'api', 'ml', 'fashion']
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+          pip install pytest-cov pytest-xdist pytest-mock pytest-asyncio
+      
+      - name: 🧪 Run Unit Tests - ${{ matrix.test-group }}
+        run: |
+          case "${{ matrix.test-group }}" in
+            "core")
+              pytest tests/unit/test_core/ -v --cov=core --cov-report=xml:coverage-core.xml --junitxml=junit-core.xml -n auto
+              ;;
+            "agents")
+              pytest tests/unit/test_agents/ -v --cov=agents --cov-report=xml:coverage-agents.xml --junitxml=junit-agents.xml -n auto
+              ;;
+            "api")
+              pytest tests/unit/test_api/ -v --cov=api --cov-report=xml:coverage-api.xml --junitxml=junit-api.xml -n auto
+              ;;
+            "ml")
+              pytest tests/unit/test_ml/ -v --cov=ml --cov-report=xml:coverage-ml.xml --junitxml=junit-ml.xml -n auto
+              ;;
+            "fashion")
+              pytest tests/unit/test_fashion/ -v --cov=fashion --cov-report=xml:coverage-fashion.xml --junitxml=junit-fashion.xml -n auto
+              ;;
+          esac
+      
+      - name: 📊 Upload Coverage Reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage-${{ matrix.test-group }}.xml
+          flags: unit,${{ matrix.test-group }}
+          name: unit-${{ matrix.test-group }}-py${{ matrix.python-version }}
+      
+      - name: 📋 Upload Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Tests - ${{ matrix.test-group }} (Python ${{ matrix.python-version }})
+          path: junit-${{ matrix.test-group }}.xml
+          reporter: java-junit
+
+  # ============================================================================
+  # INTEGRATION TESTS
+  # ============================================================================
+  
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: contains(fromJson(needs.setup.outputs.test-matrix), 'integration')
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_devskyy
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      elasticsearch:
+        image: elasticsearch:8.11.0
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ports:
+          - 9200:9200
+        options: >-
+          --health-cmd "curl -f http://localhost:9200/_cluster/health || exit 1"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+          pip install pytest-cov pytest-asyncio pytest-mock
+      
+      - name: 🗄️ Setup Test Database
+        run: |
+          python -c "
+          import asyncio
+          import asyncpg
+          
+          async def setup_db():
+              conn = await asyncpg.connect('${{ env.TEST_DATABASE_URL }}')
+              await conn.execute('CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"')
+              await conn.close()
+          
+          asyncio.run(setup_db())
+          "
+      
+      - name: 🔧 Run Database Migrations
+        run: |
+          python -m alembic upgrade head
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+      
+      - name: 🔗 Run Integration Tests
+        run: |
+          pytest tests/integration/ -v \
+            --cov=. \
+            --cov-report=xml:coverage-integration.xml \
+            --junitxml=junit-integration.xml \
+            --timeout=300
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          ELASTICSEARCH_URL: ${{ env.ELASTICSEARCH_URL }}
+      
+      - name: 📊 Upload Coverage Reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage-integration.xml
+          flags: integration
+          name: integration-tests
+      
+      - name: 📋 Upload Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Integration Tests
+          path: junit-integration.xml
+          reporter: java-junit
+
+  # ============================================================================
+  # END-TO-END TESTS
+  # ============================================================================
+  
+  e2e-tests:
+    name: 🎭 End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: contains(fromJson(needs.setup.outputs.test-matrix), 'e2e')
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_devskyy
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+      
+      - name: 📦 Install Playwright
+        run: |
+          npm install -g @playwright/test
+          playwright install ${{ matrix.browser }}
+      
+      - name: 🚀 Start Application
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          ENVIRONMENT: test
+      
+      - name: 🎭 Run E2E Tests - ${{ matrix.browser }}
+        run: |
+          playwright test --browser=${{ matrix.browser }} --reporter=junit
+        env:
+          BASE_URL: http://localhost:8000
+      
+      - name: 📋 Upload Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: E2E Tests - ${{ matrix.browser }}
+          path: test-results/junit.xml
+          reporter: java-junit
+      
+      - name: 📸 Upload Screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: e2e-screenshots-${{ matrix.browser }}
+          path: test-results/
+
+  # ============================================================================
+  # PERFORMANCE TESTS
+  # ============================================================================
+  
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: contains(fromJson(needs.setup.outputs.test-matrix), 'performance')
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_devskyy
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+          pip install locust pytest-benchmark
+      
+      - name: 🚀 Start Application
+        run: |
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+          ENVIRONMENT: test
+      
+      - name: ⚡ Run Performance Tests
+        run: |
+          # Run benchmark tests
+          pytest tests/performance/ --benchmark-json=benchmark-results.json -v
+          
+          # Run load tests with Locust
+          locust -f tests/performance/locustfile.py --headless \
+            --users 100 --spawn-rate 10 --run-time 60s \
+            --host http://localhost:8000 \
+            --html performance-report.html
+      
+      - name: 📊 Upload Performance Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: |
+            benchmark-results.json
+            performance-report.html
+
+  # ============================================================================
+  # SECURITY TESTS
+  # ============================================================================
+  
+  security-tests:
+    name: 🔒 Security Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: contains(fromJson(needs.setup.outputs.test-matrix), 'security')
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+          pip install bandit safety pytest-security
+      
+      - name: 🔍 Run Security Linting (Bandit)
+        run: |
+          bandit -r . -f json -o bandit-report.json || true
+          bandit -r . -f txt
+      
+      - name: 🛡️ Check Dependencies (Safety)
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check
+      
+      - name: 🔒 Run Security Tests
+        run: |
+          pytest tests/security/ -v --junitxml=junit-security.xml
+      
+      - name: 📋 Upload Security Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-results
+          path: |
+            bandit-report.json
+            safety-report.json
+            junit-security.xml
+
+  # ============================================================================
+  # COVERAGE ANALYSIS
+  # ============================================================================
+  
+  coverage-analysis:
+    name: 📊 Coverage Analysis
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: always() && (needs.unit-tests.result == 'success' || needs.integration-tests.result == 'success')
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 📊 Download Coverage Reports
+        uses: actions/download-artifact@v3
+        with:
+          path: coverage-reports
+      
+      - name: 🔍 Analyze Coverage
+        run: |
+          pip install coverage
+          
+          # Combine coverage reports
+          coverage combine coverage-reports/*/coverage*.xml || true
+          
+          # Generate coverage report
+          coverage report --show-missing
+          coverage html -d coverage-html
+          
+          # Check coverage threshold
+          coverage report --fail-under=${{ env.COVERAGE_THRESHOLD }}
+      
+      - name: 📊 Upload Coverage HTML
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-html-report
+          path: coverage-html/
+
+  # ============================================================================
+  # TEST SUMMARY
+  # ============================================================================
+  
+  test-summary:
+    name: 📋 Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, e2e-tests, performance-tests, security-tests, coverage-analysis]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate Test Summary
+        run: |
+          echo "# 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "## Test Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result == 'success' && '✅ Passed' || needs.unit-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result == 'success' && '✅ Passed' || needs.integration-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || needs.e2e-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | ${{ needs.performance-tests.result == 'success' && '✅ Passed' || needs.performance-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Tests | ${{ needs.security-tests.result == 'success' && '✅ Passed' || needs.security-tests.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Analysis | ${{ needs.coverage-analysis.result == 'success' && '✅ Passed' || needs.coverage-analysis.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Coverage Threshold" >> $GITHUB_STEP_SUMMARY
+          echo "Target: ${{ env.COVERAGE_THRESHOLD }}%" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.unit-tests.result }}" == "success" && "${{ needs.integration-tests.result }}" == "success" ]]; then
+            echo "✅ All critical tests passed - Ready for deployment" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some tests failed - Review and fix issues before deployment" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: 🚨 Notify on Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: "🚨 Test pipeline failed for ${{ github.repository }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: ✅ Notify on Success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: "✅ All tests passed for ${{ github.repository }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
