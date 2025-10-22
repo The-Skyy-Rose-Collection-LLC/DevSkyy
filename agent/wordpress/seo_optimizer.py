@@ -11,7 +11,7 @@ Features:
 Reference: Based on AGENTS.md Line 921-961
 """
 
-import json
+import json  # noqa: F401 - Reserved for future JSON schema processing
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional

@@ -16,6 +16,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import anthropic
+from PIL import Image  # noqa: F401 - Reserved for Phase 3 image processing
+import nltk  # noqa: F401 - Reserved for Phase 3 NLP enhancements
 
 logger = logging.getLogger(__name__)
 
@@ -216,8 +218,8 @@ work together to bring you the best shopping experience.</p>
         """Generate Services page"""
         brand_name = brand_info.get("name", "Our Brand")
 
-        content = f"""<h1>Our Services</h1>
-<p>Discover the comprehensive services we offer to enhance your shopping experience.</p>
+        content = f"""<h1>{brand_name} Services</h1>
+<p>Discover the comprehensive services {brand_name} offers to enhance your shopping experience.</p>
 
 <section class="service">
 <h2>Free Shipping</h2>

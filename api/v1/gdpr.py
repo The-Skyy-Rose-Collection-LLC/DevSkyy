@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from security.jwt_auth import TokenData, get_current_active_user, require_admin, user_manager
 
@@ -134,7 +134,7 @@ async def export_user_data(
                 "api_calls": [],
                 "data_access_logs": [],
             }
-            logger.info(f"   ✓ Including audit logs in export")
+            logger.info(f"   ✓ Including audit logs in export")  # noqa: F541 - Consistent logging format
 
         # Include activity history if requested
         if request.include_activity_history:
@@ -143,7 +143,7 @@ async def export_user_data(
                 "webhook_subscriptions": [],
                 "api_usage_statistics": {},
             }
-            logger.info(f"   ✓ Including activity history in export")
+            logger.info(f"   ✓ Including activity history in export")  # noqa: F541 - Consistent logging format
 
         # Generate export metadata
         import uuid
@@ -229,7 +229,7 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
 
         if request.anonymize_instead_of_delete:
             # Anonymization approach - retain data for legal/audit purposes
-            logger.info(f"   → Anonymizing user data instead of deletion")
+            logger.info(f"   → Anonymizing user data instead of deletion")  # noqa: F541 - Consistent logging format
 
             # Anonymize personal information
             anonymized_user_data = {
@@ -241,6 +241,7 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
             deleted_records["personal_information"] = 1
             retained_records["audit_logs"] = 1  # Keep audit logs for legal compliance
             retained_records["transaction_history"] = 1  # Keep for financial records
+            retained_records["anonymized_profile"] = anonymized_user_data
 
             logger.info(f"   ✓ User data anonymized: {current_user.email}")
 

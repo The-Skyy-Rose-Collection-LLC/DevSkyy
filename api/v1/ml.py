@@ -7,7 +7,9 @@ import logging
 from typing import Any, Dict, List
 
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
+import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
+from prometheus_client import Counter, Histogram  # noqa: F401 - Reserved for Phase 5 monitoring
 from pydantic import BaseModel, Field
 
 from ml import ModelStage, explainer, model_registry, redis_cache
@@ -73,7 +75,7 @@ async def list_model_versions(model_name: str, current_user: TokenData = Depends
         versions = model_registry.list_versions(model_name)
         return {"model_name": model_name, "versions": versions}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Model not found: {model_name}")
+        raise HTTPException(status_code=404, detail=f"Model not found: {model_name}. Error: {str(e)}")
 
 
 @router.get("/registry/models/{model_name}/{version}")

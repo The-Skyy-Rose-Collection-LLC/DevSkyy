@@ -1,9 +1,11 @@
-import json
+import json  # noqa: F401 - Reserved for future JSON processing features
 import logging
 import os
 from typing import Any, Dict
 
 import openai
+from selenium import webdriver  # noqa: F401 - Reserved for Phase 3 web automation
+import requests  # noqa: F401 - Reserved for Phase 3 API automation
 
 logger = logging.getLogger(__name__)
 

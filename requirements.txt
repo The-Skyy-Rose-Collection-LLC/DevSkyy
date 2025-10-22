@@ -64,6 +64,11 @@ imagehash==4.3.2
 beautifulsoup4==4.12.3
 lxml==5.3.0  # Security update
 
+# Web Automation (Phase 3 Enhancement)
+selenium==4.27.1  # Web automation
+playwright==1.49.1  # Modern web automation
+webdriver-manager==4.0.2  # WebDriver management
+
 # Code Quality & Security Analysis
 autopep8==2.3.1  # Updated
 black==24.10.0
@@ -85,6 +90,11 @@ psutil==6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)
 prometheus-client==0.22.0  # Metrics
 sentry-sdk==2.19.0  # Error tracking
 elastic-apm==6.24.0  # APM
+
+# Advanced Monitoring (Phase 5 Enhancement)
+grafana-api==1.0.3  # Grafana integration
+structlog==24.4.0  # Structured logging
+py-cpuinfo==9.0.0  # System information
 
 # Additional Enterprise Tools
 click==8.1.8

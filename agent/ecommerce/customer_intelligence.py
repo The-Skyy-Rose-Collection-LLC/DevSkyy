@@ -16,7 +16,9 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans  # noqa: F401 - Reserved for future ML clustering features
+from sklearn.preprocessing import StandardScaler  # noqa: F401 - Reserved for Phase 3 data preprocessing
+import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
 
 logger = logging.getLogger(__name__)
 

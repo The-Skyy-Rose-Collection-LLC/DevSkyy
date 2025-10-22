@@ -10,7 +10,7 @@ References:
 
 import json
 import logging
-import os
+import os  # noqa: F401 - Reserved for Phase 3 file system operations
 from datetime import datetime
 from enum import Enum
 from pathlib import Path

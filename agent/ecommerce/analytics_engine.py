@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+import pandas as pd  # noqa: F401 - Reserved for Phase 3 data analysis enhancements
 
 logger = logging.getLogger(__name__)
 

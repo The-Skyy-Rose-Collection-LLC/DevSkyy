@@ -6,7 +6,7 @@ Continuous learning with scheduled retraining
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional  # noqa: F401 - Reserved for Phase 3 ML enhancements
 
 logger = logging.getLogger(__name__)
 

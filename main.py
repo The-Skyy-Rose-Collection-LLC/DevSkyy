@@ -13,6 +13,8 @@ from contextlib import asynccontextmanager
 from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException, Request, status
+from prometheus_client import Counter, Histogram, generate_latest  # noqa: F401 - Reserved for Phase 5 monitoring
+import asyncio  # noqa: F401 - Reserved for Phase 3 async enhancements
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware

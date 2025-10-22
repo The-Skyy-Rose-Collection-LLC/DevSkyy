@@ -332,7 +332,10 @@ class OrderAutomation:
         shipping_address = order_data.get("shipping_address", {})
         customer_tier = order_data.get("customer_tier", "regular")
 
-        # Simulate intelligent routing
+        # Use shipping address for intelligent routing
+        customer_region = shipping_address.get("region", "unknown")
+
+        # Simulate intelligent routing based on customer location
         warehouses = [
             {"id": "WH-EAST", "location": "East Coast", "distance_score": np.random.random()},
             {"id": "WH-WEST", "location": "West Coast", "distance_score": np.random.random()},

@@ -383,8 +383,8 @@ class WordPressIntegrationService:
         title = collection_data.get("title", "Luxury Collection")
         description = collection_data.get("description", "Exclusive luxury items")
 
-        # Divi-optimized content with luxury styling
-        content = """
+        # Divi-optimized content with luxury styling using collection data
+        content = f"""
 [et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]  # noqa: E501
 [et_pb_column type="1_2" specialty_columns="2"]
 [et_pb_row_inner admin_label="Hero Content"]
@@ -394,6 +394,7 @@ class WordPressIntegrationService:
 [/et_pb_text]
 [et_pb_text admin_label="Collection Description" _builder_version="4.16" text_font="Montserrat||||||||" text_font_size="1.2rem" text_color="#666666" text_line_height="1.8em" custom_margin="0px||30px||false|false"]  # noqa: E501
 <p>{description}</p>
+<p class="collection-type">Collection Type: {collection_type.title()}</p>
 [/et_pb_text]
 [et_pb_button button_text="Explore Collection" button_alignment="left" admin_label="CTA Button" _builder_version="4.16" custom_button="on" button_text_color="#FFFFFF" button_bg_color="#D4AF37" button_border_width="0px" button_border_radius="30px" button_font="Montserrat|600|||||||" button_font_size="1rem" custom_padding="15px|40px|15px|40px|true|true" button_bg_color_hover="#B8860B" custom_css_main_element="transition: all 0.3s ease;||box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);"]  # noqa: E501
 [/et_pb_button]

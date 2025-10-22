@@ -21,7 +21,7 @@ async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
-        import models_sqlalchemy  # Import models to register them with Base
+        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
         from database import db_manager, init_db
         from database_config import DATABASE_URL, DB_PROVIDER
 

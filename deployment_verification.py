@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -230,7 +230,7 @@ class DeploymentVerifier:
         self.section("Verifying ML Infrastructure")
 
         try:
-            from ml.model_registry import model_registry
+            from ml.model_registry import model_registry  # noqa: F401 - Import verification
 
             self.check("Model registry import", True)
 
@@ -251,11 +251,11 @@ class DeploymentVerifier:
             stats = redis_cache.stats()
             self.info(f"Cache mode: {stats['mode']}")
 
-            from ml.explainability import explainer
+            from ml.explainability import explainer  # noqa: F401 - Import verification
 
             self.check("Explainability import", True)
 
-            from ml.auto_retrain import auto_retrainer
+            from ml.auto_retrain import auto_retrainer  # noqa: F401 - Import verification
 
             self.check("Auto-retrainer import", True)
 
