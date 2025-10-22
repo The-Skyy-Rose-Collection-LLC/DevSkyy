@@ -378,29 +378,18 @@ class SiteCommunicationAgent:
             return {"error": str(e), "status": "neural_overload"}
 
 
-# The following functions are duplicates from the original code and were not modified.
-# They are kept here for completeness as per instructions.
-
-
-async def communicate_with_site() -> Dict[str, Any]:
-    """Main function for site communication."""
-    SiteCommunicationAgent()
-
-    return {
-        "connection_status": "connected",
-        "insights_gathered": True,
-        "communication_health": "excellent",
-        "last_check": datetime.now().isoformat(),
-        "agent_status": "active",
-    }
-
-
+# Main communication function
 async def communicate_with_site() -> Dict[str, Any]:
     """Communicate with site and gather insights."""
+    agent = SiteCommunicationAgent()
+
     return {
         "communication_status": "active",
         "insights_gathered": 10,
         "customer_interactions": 25,
         "response_quality": "excellent",
+        "connection_status": "connected",
+        "communication_health": "excellent",
+        "agent_status": "active",
         "timestamp": datetime.now().isoformat(),
     }

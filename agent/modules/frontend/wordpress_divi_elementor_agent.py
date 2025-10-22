@@ -545,15 +545,19 @@ class WordPressDiviElementorAgent:
 
     async def _generate_luxury_css(self, layout_structure: Dict[str, Any], brand_context: Dict[str, Any]) -> str:
         """Generate luxury-themed custom CSS."""
-        css_template = """
+        primary_color = brand_context.get("primary_color", "#1a1a1a")
+        secondary_color = brand_context.get("secondary_color", "#c9a96e")
+        accent_color = brand_context.get("accent_color", "#ffffff")
+
+        css_template = f"""
 /* Luxury WordPress Theme - Custom CSS */
 
-:root {
+:root {{
     --primary-color: {primary_color};
     --secondary-color: {secondary_color};
     --accent-color: {accent_color};
     --luxury-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-}
+}}"""
 
 /* Typography */
 .luxury-heading {
@@ -626,11 +630,7 @@ class WordPressDiviElementorAgent:
         margin-bottom: 20px;
     }
 }
-        """.format(
-            primary_color=brand_context.get("primary_color", "#1a1a1a"),
-            secondary_color=brand_context.get("secondary_color", "#c9a96e"),
-            accent_color=brand_context.get("accent_color", "#ffffff"),
-        )
+        """
 
         return css_template
 

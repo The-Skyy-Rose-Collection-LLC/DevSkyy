@@ -81,7 +81,7 @@ class RedisCache:
         if self.mode == "redis" and self.client:
             try:
                 self.client.delete(hashed_key)
-            except:
+            except Exception:
                 pass
         if hashed_key in self.memory_cache:
             del self.memory_cache[hashed_key]
@@ -91,7 +91,7 @@ class RedisCache:
         if self.mode == "redis" and self.client:
             try:
                 self.client.flushdb()
-            except:
+            except Exception:
                 pass
         self.memory_cache.clear()
 
@@ -101,7 +101,7 @@ class RedisCache:
             try:
                 info = self.client.info("stats")
                 return {"mode": "redis", "total_commands_processed": info.get("total_commands_processed", 0)}
-            except:
+            except Exception:
                 return {"mode": "redis", "status": "error"}
         return {"mode": "memory", "size": len(self.memory_cache)}
 

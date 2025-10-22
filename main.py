@@ -1082,7 +1082,7 @@ async def export_wordpress_theme(request: Dict[str, Any]):
 # ECOMMERCE AUTOMATION ENDPOINTS
 # ============================================================================
 @app.post("/api/ecommerce/products")
-async def create_product(request: Dict[str, Any]):
+async def create_enhanced_product(request: Dict[str, Any]):
     """Create product with ML enhancements"""
     try:
         from agent.ecommerce.product_manager import ProductManager
