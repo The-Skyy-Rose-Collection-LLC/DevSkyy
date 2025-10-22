@@ -415,7 +415,10 @@ contract SkyyRoseMembership {
 
             collection = self.collections.get(collection_type)
             if not collection:
-                return {"error": f"Collection {collection_type} not found", "status": "failed"}
+                return {
+                    "error": f"Collection {collection_type} not found",
+                    "status": "failed",
+                }
 
             # Generate NFT metadata
             metadata = await self._generate_nft_metadata(item_data, collection)
@@ -435,7 +438,9 @@ contract SkyyRoseMembership {
                 "owner": owner_address,
                 "metadata_uri": f"ipfs://{ipfs_hash}",
                 "network": network,
-                "contract_address": self._get_contract_address(collection_type, network),
+                "contract_address": self._get_contract_address(
+                    collection_type, network
+                ),
                 "mint_date": datetime.now().isoformat(),
                 "benefits": collection["benefits"],
                 "transaction": {
@@ -453,23 +458,33 @@ contract SkyyRoseMembership {
                 "status": "success",
                 "nft": mint_result,
                 "message": f"Successfully minted {collection['name']} NFT #{token_id}",
-                "explorer_url": self._get_explorer_url(mint_result["transaction"]["hash"], network),
+                "explorer_url": self._get_explorer_url(
+                    mint_result["transaction"]["hash"], network
+                ),
             }
 
         except Exception as e:
             logger.error(f"NFT minting failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_nft_metadata(self, item_data: Dict[str, Any], collection: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_nft_metadata(
+        self, item_data: Dict[str, Any], collection: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate NFT metadata for luxury item."""
         metadata = {
             "name": f"{collection['name']} - {item_data['name']}",
-            "description": item_data.get("description", "Exclusive luxury fashion NFT from The Skyy Rose Collection"),
+            "description": item_data.get(
+                "description",
+                "Exclusive luxury fashion NFT from The Skyy Rose Collection",
+            ),
             "image": item_data.get("image", "https://skyyrose.com/nft/placeholder.jpg"),
             "external_url": "https://skyyrose.com/nft",
             "attributes": [
                 {"trait_type": "Collection", "value": collection["name"]},
-                {"trait_type": "Category", "value": item_data.get("category", "Fashion")},
+                {
+                    "trait_type": "Category",
+                    "value": item_data.get("category", "Fashion"),
+                },
                 {"trait_type": "Rarity", "value": item_data.get("rarity", "Rare")},
                 {"trait_type": "Season", "value": item_data.get("season", "2024")},
                 {"trait_type": "Designer", "value": "The Skyy Rose Collection"},
@@ -483,14 +498,21 @@ contract SkyyRoseMembership {
 
         # Add luxury-specific attributes
         if item_data.get("material"):
-            metadata["attributes"].append({"trait_type": "Material", "value": item_data["material"]})
+            metadata["attributes"].append(
+                {"trait_type": "Material", "value": item_data["material"]}
+            )
 
         if item_data.get("craftsmanship"):
-            metadata["attributes"].append({"trait_type": "Craftsmanship", "value": item_data["craftsmanship"]})
+            metadata["attributes"].append(
+                {"trait_type": "Craftsmanship", "value": item_data["craftsmanship"]}
+            )
 
         if item_data.get("limited_edition"):
             metadata["attributes"].append(
-                {"trait_type": "Edition", "value": f"{item_data['edition_number']}/{collection['max_supply']}"}
+                {
+                    "trait_type": "Edition",
+                    "value": f"{item_data['edition_number']}/{collection['max_supply']}",
+                }
             )
 
         return metadata
@@ -505,7 +527,9 @@ contract SkyyRoseMembership {
         logger.info(f"📦 Stored metadata on IPFS: {ipfs_hash}")
         return ipfs_hash
 
-    def _generate_token_id(self, collection_type: str, item_data: Dict[str, Any]) -> int:
+    def _generate_token_id(
+        self, collection_type: str, item_data: Dict[str, Any]
+    ) -> int:
         """Generate unique token ID."""
         # In production, would be managed by smart contract
         base_id = {
@@ -534,7 +558,9 @@ contract SkyyRoseMembership {
             },
         }
 
-        return addresses.get(network, {}).get(collection_type, "0x0000000000000000000000000000000000000000")
+        return addresses.get(network, {}).get(
+            collection_type, "0x0000000000000000000000000000000000000000"
+        )
 
     async def _store_nft_record(self, mint_result: Dict[str, Any]) -> None:
         """Store NFT record in database."""
@@ -576,7 +602,9 @@ contract SkyyRoseMembership {
                 "item_id": item_id,
                 "item_name": item_details["name"],
                 "collection": item_details.get("collection", "Skyy Rose Collection"),
-                "manufacture_date": item_details.get("manufacture_date", datetime.now().isoformat()),
+                "manufacture_date": item_details.get(
+                    "manufacture_date", datetime.now().isoformat()
+                ),
                 "materials": item_details.get("materials", []),
                 "craftsman": item_details.get("craftsman", "Skyy Rose Atelier"),
                 "fingerprint": fingerprint,
@@ -603,7 +631,9 @@ contract SkyyRoseMembership {
         data = f"{item_id}{item_details.get('name')}{datetime.now().isoformat()}"
         return hashlib.sha256(data.encode()).hexdigest()
 
-    async def verify_authenticity(self, item_id: str, fingerprint: str) -> Dict[str, Any]:
+    async def verify_authenticity(
+        self, item_id: str, fingerprint: str
+    ) -> Dict[str, Any]:
         """
         Verify item authenticity using blockchain.
 
@@ -627,7 +657,11 @@ contract SkyyRoseMembership {
                 "is_authentic": is_authentic,
                 "fingerprint": fingerprint,
                 "verification_date": datetime.now().isoformat(),
-                "certificate_url": f"https://verify.skyyrose.com/{fingerprint}" if is_authentic else None,
+                "certificate_url": (
+                    f"https://verify.skyyrose.com/{fingerprint}"
+                    if is_authentic
+                    else None
+                ),
             }
 
         except Exception as e:
@@ -658,12 +692,23 @@ contract SkyyRoseMembership {
                 },
                 "gold": {
                     "name": "Gold Member",
-                    "benefits": ["15% discount", "vip_access", "personal_stylist", "free_shipping"],
+                    "benefits": [
+                        "15% discount",
+                        "vip_access",
+                        "personal_stylist",
+                        "free_shipping",
+                    ],
                     "price": 0.25,
                 },
                 "platinum": {
                     "name": "Platinum Member",
-                    "benefits": ["25% discount", "first_access", "concierge", "exclusive_collections", "lifetime_vip"],
+                    "benefits": [
+                        "25% discount",
+                        "first_access",
+                        "concierge",
+                        "exclusive_collections",
+                        "lifetime_vip",
+                    ],
                     "price": 0.5,
                 },
             }
@@ -679,7 +724,9 @@ contract SkyyRoseMembership {
                 "benefits": tier_data["benefits"],
                 "join_date": datetime.now().isoformat(),
                 "expiry_date": (datetime.now() + timedelta(days=365)).isoformat(),
-                "points_balance": 1000 if tier == "platinum" else 500 if tier == "gold" else 100,
+                "points_balance": (
+                    1000 if tier == "platinum" else 500 if tier == "gold" else 100
+                ),
                 "nft_metadata": {
                     "name": f"Skyy Rose {tier_data['name']} Card",
                     "description": "Exclusive membership to The Skyy Rose Collection",
@@ -815,7 +862,9 @@ contract SkyyRoseMembership {
                             benefits["services"].append(benefit)
 
             # Calculate total benefits
-            total_discount = 25 if len(owned_nfts) > 2 else 15 if len(owned_nfts) > 1 else 10
+            total_discount = (
+                25 if len(owned_nfts) > 2 else 15 if len(owned_nfts) > 1 else 10
+            )
 
             return {
                 "status": "success",
@@ -848,7 +897,10 @@ contract SkyyRoseMembership {
         try:
             collection = self.collections.get(collection_type)
             if not collection:
-                return {"error": f"Collection {collection_type} not found", "status": "failed"}
+                return {
+                    "error": f"Collection {collection_type} not found",
+                    "status": "failed",
+                }
 
             royalty_config = {
                 "collection": collection["name"],
@@ -859,7 +911,9 @@ contract SkyyRoseMembership {
                 "platforms": ["opensea", "rarible", "looksrare"],
             }
 
-            logger.info(f"💰 Enabled {royalty_percentage}% royalties for {collection['name']}")
+            logger.info(
+                f"💰 Enabled {royalty_percentage}% royalties for {collection['name']}"
+            )
 
             return {
                 "status": "success",
@@ -963,7 +1017,9 @@ async def main():
 
     # Check NFT holder benefits
     print("\n🎁 Checking NFT Holder Benefits...")
-    benefits = await blockchain.get_nft_benefits("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7")
+    benefits = await blockchain.get_nft_benefits(
+        "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7"
+    )
 
     if benefits["status"] == "success":
         print(f"✅ VIP Status: {benefits['vip_status']}")

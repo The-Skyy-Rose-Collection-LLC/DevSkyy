@@ -36,7 +36,9 @@ class SiteCommunicationAgent:
         self.telemetry = Telemetry("site_communication")
         logger.info("💬 Site Communication Agent initialized")
 
-    async def connect_to_chatbot(self, website_url: str, api_key: str = None) -> Dict[str, Any]:
+    async def connect_to_chatbot(
+        self, website_url: str, api_key: str = None
+    ) -> Dict[str, Any]:
         """Connect to website chatbot for real-time insights."""
 
         try:
@@ -88,7 +90,11 @@ class SiteCommunicationAgent:
             ],
             "customer_satisfaction": 4.3,
             "response_accuracy": 92,
-            "popular_products": ["Rose Gold Necklace", "Elegant Evening Dress", "Signature Handbag"],
+            "popular_products": [
+                "Rose Gold Necklace",
+                "Elegant Evening Dress",
+                "Signature Handbag",
+            ],
             "peak_hours": ["2PM-4PM", "7PM-9PM"],
             "conversion_assistance": "23%",
         }
@@ -106,10 +112,14 @@ class SiteCommunicationAgent:
             health_data = {
                 "website": website_url,
                 "timestamp": datetime.now().isoformat(),
-                "uptime_status": "online" if response.status_code == 200 else "issues_detected",
+                "uptime_status": (
+                    "online" if response.status_code == 200 else "issues_detected"
+                ),
                 "response_time": round(response.elapsed.total_seconds() * 1000, 2),
                 "status_code": response.status_code,
-                "ssl_certificate": "valid" if website_url.startswith("https") else "missing",
+                "ssl_certificate": (
+                    "valid" if website_url.startswith("https") else "missing"
+                ),
                 "mobile_friendly": True,
                 "page_speed_score": random.randint(85, 98),
                 "seo_score": random.randint(88, 96),
@@ -119,7 +129,10 @@ class SiteCommunicationAgent:
 
             # Performance analysis
             if health_data["response_time"] > 3000:
-                health_data["recommendations"] = ["Optimize server response time", "Enable caching"]
+                health_data["recommendations"] = [
+                    "Optimize server response time",
+                    "Enable caching",
+                ]
             elif health_data["response_time"] > 2000:
                 health_data["recommendations"] = ["Consider CDN implementation"]
             else:
@@ -169,14 +182,18 @@ class SiteCommunicationAgent:
                 "feedback_count": data["count"],
                 "average_rating": round(data["avg_rating"], 2),
                 "sentiment": (
-                    "positive" if data["avg_rating"] >= 4 else "neutral" if data["avg_rating"] >= 3 else "negative"
+                    "positive"
+                    if data["avg_rating"] >= 4
+                    else "neutral" if data["avg_rating"] >= 3 else "negative"
                 ),
             }
 
         # Generate action items
         for category, insights in sentiment_analysis["category_insights"].items():
             if insights["sentiment"] == "negative":
-                sentiment_analysis["action_items"].append(f"Address {category} concerns - low rating detected")
+                sentiment_analysis["action_items"].append(
+                    f"Address {category} concerns - low rating detected"
+                )
             elif insights["feedback_count"] > 2:
                 sentiment_analysis["trending_topics"].append(category)
 
@@ -190,17 +207,32 @@ class SiteCommunicationAgent:
             "website": website_url,
             "analysis_date": datetime.now().isoformat(),
             "demographic_data": {
-                "age_groups": {"18-24": "22%", "25-34": "35%", "35-44": "28%", "45-54": "12%", "55+": "3%"},
+                "age_groups": {
+                    "18-24": "22%",
+                    "25-34": "35%",
+                    "35-44": "28%",
+                    "45-54": "12%",
+                    "55+": "3%",
+                },
                 "geographic_distribution": {
                     "north_america": "65%",
                     "europe": "20%",
                     "asia_pacific": "12%",
                     "other": "3%",
                 },
-                "income_brackets": {"high": "40%", "medium_high": "35%", "medium": "20%", "other": "5%"},
+                "income_brackets": {
+                    "high": "40%",
+                    "medium_high": "35%",
+                    "medium": "20%",
+                    "other": "5%",
+                },
             },
             "behavior_patterns": {
-                "preferred_devices": {"mobile": "68%", "desktop": "28%", "tablet": "4%"},
+                "preferred_devices": {
+                    "mobile": "68%",
+                    "desktop": "28%",
+                    "tablet": "4%",
+                },
                 "shopping_times": {
                     "peak_hours": ["12PM-2PM", "6PM-8PM"],
                     "peak_days": ["Thursday", "Friday", "Saturday"],
@@ -217,8 +249,15 @@ class SiteCommunicationAgent:
             },
             "marketing_insights": {
                 "effective_channels": ["Instagram", "Email", "Google Ads"],
-                "content_preferences": ["Product videos", "Style guides", "Behind-the-scenes"],
-                "seasonal_trends": ["Spring collections popular", "Holiday jewelry peak"],
+                "content_preferences": [
+                    "Product videos",
+                    "Style guides",
+                    "Behind-the-scenes",
+                ],
+                "seasonal_trends": [
+                    "Spring collections popular",
+                    "Holiday jewelry peak",
+                ],
             },
         }
 
@@ -234,13 +273,19 @@ class SiteCommunicationAgent:
         market_insights = self.get_target_market_insights(website_url)
 
         # Check for chatbot connection
-        chatbot_data = self.chatbot_connections.get(website_url, {"status": "not_connected"})
+        chatbot_data = self.chatbot_connections.get(
+            website_url, {"status": "not_connected"}
+        )
 
         comprehensive_report = {
             "website": website_url,
             "report_generated": datetime.now().isoformat(),
             "executive_summary": {
-                "overall_health": "excellent" if site_health.get("uptime_status") == "online" else "needs_attention",
+                "overall_health": (
+                    "excellent"
+                    if site_health.get("uptime_status") == "online"
+                    else "needs_attention"
+                ),
                 "customer_satisfaction": customer_feedback["sentiment_score"],
                 "market_position": "strong",
                 "technical_performance": site_health.get("page_speed_score", 0),
@@ -309,7 +354,9 @@ class SiteCommunicationAgent:
             "optimization_algorithms": "quantum_annealing",
         }
 
-    async def experimental_neural_communication_analysis(self, website_url: str) -> Dict[str, Any]:
+    async def experimental_neural_communication_analysis(
+        self, website_url: str
+    ) -> Dict[str, Any]:
         """EXPERIMENTAL: Neural-powered communication analysis."""
         try:
             logger.info(f"🧠 Analyzing communication patterns for {website_url}")

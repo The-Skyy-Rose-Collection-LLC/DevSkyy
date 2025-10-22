@@ -87,21 +87,27 @@ class MetricsCollector:
     # METRIC RECORDING
     # ========================================================================
 
-    def increment_counter(self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None):
+    def increment_counter(
+        self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
+    ):
         """Increment a counter metric"""
         key = self._make_key(name, labels)
         self.counters[key] += value
 
         self._record_metric(name, MetricType.COUNTER, self.counters[key], labels or {})
 
-    def set_gauge(self, name: str, value: float, labels: Optional[Dict[str, str]] = None):
+    def set_gauge(
+        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
+    ):
         """Set a gauge metric"""
         key = self._make_key(name, labels)
         self.gauges[key] = value
 
         self._record_metric(name, MetricType.GAUGE, value, labels or {})
 
-    def record_histogram(self, name: str, value: float, labels: Optional[Dict[str, str]] = None):
+    def record_histogram(
+        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
+    ):
         """Record a histogram value"""
         key = self._make_key(name, labels)
         self.histograms[key].append(value)
@@ -112,9 +118,17 @@ class MetricsCollector:
 
         self._record_metric(name, MetricType.HISTOGRAM, value, labels or {})
 
-    def _record_metric(self, name: str, metric_type: MetricType, value: float, labels: Dict[str, str]):
+    def _record_metric(
+        self, name: str, metric_type: MetricType, value: float, labels: Dict[str, str]
+    ):
         """Record a metric data point"""
-        metric = Metric(name=name, type=metric_type, value=value, labels=labels, timestamp=datetime.now())
+        metric = Metric(
+            name=name,
+            type=metric_type,
+            value=value,
+            labels=labels,
+            timestamp=datetime.now(),
+        )
 
         self.metrics[name].append(metric)
 
@@ -136,12 +150,16 @@ class MetricsCollector:
         key = self._make_key(name, labels)
         return self.counters.get(key, 0.0)
 
-    def get_gauge(self, name: str, labels: Optional[Dict[str, str]] = None) -> Optional[float]:
+    def get_gauge(
+        self, name: str, labels: Optional[Dict[str, str]] = None
+    ) -> Optional[float]:
         """Get current gauge value"""
         key = self._make_key(name, labels)
         return self.gauges.get(key)
 
-    def get_histogram_stats(self, name: str, labels: Optional[Dict[str, str]] = None) -> Dict[str, float]:
+    def get_histogram_stats(
+        self, name: str, labels: Optional[Dict[str, str]] = None
+    ) -> Dict[str, float]:
         """Get histogram statistics"""
         key = self._make_key(name, labels)
         values = self.histograms.get(key, [])
@@ -168,7 +186,9 @@ class MetricsCollector:
         return {
             "counters": dict(self.counters),
             "gauges": dict(self.gauges),
-            "histograms": {k: self.get_histogram_stats(k) for k in self.histograms.keys()},
+            "histograms": {
+                k: self.get_histogram_stats(k) for k in self.histograms.keys()
+            },
             "uptime_seconds": time.time() - self.start_time,
         }
 
@@ -288,10 +308,21 @@ class HealthMonitor:
             return HealthStatus.HEALTHY, "All systems operational"
 
         if any(s == HealthStatus.UNHEALTHY for s in statuses):
-            unhealthy = [name for name, check in self.last_results.items() if check.status == HealthStatus.UNHEALTHY]
-            return HealthStatus.UNHEALTHY, f"Unhealthy components: {', '.join(unhealthy)}"
+            unhealthy = [
+                name
+                for name, check in self.last_results.items()
+                if check.status == HealthStatus.UNHEALTHY
+            ]
+            return (
+                HealthStatus.UNHEALTHY,
+                f"Unhealthy components: {', '.join(unhealthy)}",
+            )
 
-        degraded = [name for name, check in self.last_results.items() if check.status == HealthStatus.DEGRADED]
+        degraded = [
+            name
+            for name, check in self.last_results.items()
+            if check.status == HealthStatus.DEGRADED
+        ]
         return HealthStatus.DEGRADED, f"Degraded components: {', '.join(degraded)}"
 
 
@@ -354,7 +385,10 @@ class PerformanceTracker:
 
     def get_all_stats(self) -> Dict[str, Any]:
         """Get all endpoint statistics"""
-        return {endpoint: self.get_endpoint_stats(endpoint) for endpoint in self.endpoint_metrics.keys()}
+        return {
+            endpoint: self.get_endpoint_stats(endpoint)
+            for endpoint in self.endpoint_metrics.keys()
+        }
 
 
 # ============================================================================
@@ -365,7 +399,13 @@ class PerformanceTracker:
 class Span:
     """Trace span"""
 
-    def __init__(self, trace_id: str, span_id: str, operation: str, parent_id: Optional[str] = None):
+    def __init__(
+        self,
+        trace_id: str,
+        span_id: str,
+        operation: str,
+        parent_id: Optional[str] = None,
+    ):
         self.trace_id = trace_id
         self.span_id = span_id
         self.operation = operation

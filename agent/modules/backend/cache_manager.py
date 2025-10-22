@@ -37,7 +37,9 @@ class CacheManager:
         """Evict least recently used items when cache is full."""
         if len(self.cache) >= self.max_size:
             # Remove oldest accessed item
-            oldest_key = min(self.access_times.keys(), key=lambda k: self.access_times[k])
+            oldest_key = min(
+                self.access_times.keys(), key=lambda k: self.access_times[k]
+            )
             del self.cache[oldest_key]
             del self.access_times[oldest_key]
             logger.info(f"Evicted LRU cache entry: {oldest_key}")
@@ -72,7 +74,11 @@ class CacheManager:
         if len(self.cache) >= self.max_size and cache_key not in self.cache:
             self._evict_lru()
 
-        self.cache[cache_key] = {"value": value, "timestamp": datetime.now(), "ttl": ttl}
+        self.cache[cache_key] = {
+            "value": value,
+            "timestamp": datetime.now(),
+            "ttl": ttl,
+        }
         self.access_times[cache_key] = datetime.now()
         logger.debug(f"Cached value for key: {cache_key}")
 
@@ -137,7 +143,12 @@ def cached(ttl: int = 300, key_prefix: str = ""):
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
             # Generate cache key
-            cache_key = {"func": func.__name__, "args": args, "kwargs": kwargs, "prefix": key_prefix}
+            cache_key = {
+                "func": func.__name__,
+                "args": args,
+                "kwargs": kwargs,
+                "prefix": key_prefix,
+            }
 
             # Try to get from cache
             result = cache_manager.get(cache_key)
@@ -156,7 +167,12 @@ def cached(ttl: int = 300, key_prefix: str = ""):
         @wraps(func)
         def sync_wrapper(*args, **kwargs):
             # Generate cache key
-            cache_key = {"func": func.__name__, "args": args, "kwargs": kwargs, "prefix": key_prefix}
+            cache_key = {
+                "func": func.__name__,
+                "args": args,
+                "kwargs": kwargs,
+                "prefix": key_prefix,
+            }
 
             # Try to get from cache
             result = cache_manager.get(cache_key)
@@ -236,7 +252,7 @@ class ConnectionPool:
                 socket_connect_timeout=5,
                 socket_timeout=5,
                 retry_on_timeout=True,
-                health_check_interval=30
+                health_check_interval=30,
             )
 
             # Test the connection
@@ -279,6 +295,8 @@ def start_cache_cleanup():
         logger.info("Started cache cleanup background task")
     except RuntimeError as e:
         if "no running event loop" in str(e):
-            logger.info("No event loop available, cache cleanup will start when server starts")
+            logger.info(
+                "No event loop available, cache cleanup will start when server starts"
+            )
         else:
             raise

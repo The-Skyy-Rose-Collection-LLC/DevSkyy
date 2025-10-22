@@ -17,7 +17,11 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error  # noqa: F401 - Reserved for Phase 3 model evaluation
+from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluation
+    mean_absolute_error,
+    mean_squared_error,
+)
+
 # TensorFlow disabled due to system compatibility issues
 # Will be re-enabled in Phase 3 with proper system requirements
 TENSORFLOW_AVAILABLE = False
@@ -72,11 +76,17 @@ class ForecastingEngine:
         if method == "linear":
             forecast, lower, upper = self._linear_forecast(historical_data, periods)
         elif method == "rf":
-            forecast, lower, upper = self._random_forest_forecast(historical_data, periods)
+            forecast, lower, upper = self._random_forest_forecast(
+                historical_data, periods
+            )
         elif method == "seasonal":
-            forecast, lower, upper = self._seasonal_forecast(historical_data, periods, seasonality)
+            forecast, lower, upper = self._seasonal_forecast(
+                historical_data, periods, seasonality
+            )
         else:
-            forecast, lower, upper = self._random_forest_forecast(historical_data, periods)
+            forecast, lower, upper = self._random_forest_forecast(
+                historical_data, periods
+            )
 
         return {
             "forecast": forecast,
@@ -92,7 +102,9 @@ class ForecastingEngine:
             },
         }
 
-    def _linear_forecast(self, data: List[float], periods: int) -> Tuple[List[float], List[float], List[float]]:
+    def _linear_forecast(
+        self, data: List[float], periods: int
+    ) -> Tuple[List[float], List[float], List[float]]:
         """Linear regression forecast"""
         X = np.array(range(len(data))).reshape(-1, 1)
         y = np.array(data)
@@ -113,7 +125,9 @@ class ForecastingEngine:
 
         return forecast, lower, upper
 
-    def _random_forest_forecast(self, data: List[float], periods: int) -> Tuple[List[float], List[float], List[float]]:
+    def _random_forest_forecast(
+        self, data: List[float], periods: int
+    ) -> Tuple[List[float], List[float], List[float]]:
         """Random Forest forecast with feature engineering"""
         # Create features: lag features, rolling stats, etc.
         features = []
@@ -145,7 +159,13 @@ class ForecastingEngine:
 
         for _ in range(periods):
             last_values = current_data[-window_size:]
-            feature = [current_data[-1], last_values[0], np.mean(last_values), np.std(last_values), len(current_data)]
+            feature = [
+                current_data[-1],
+                last_values[0],
+                np.mean(last_values),
+                np.std(last_values),
+                len(current_data),
+            ]
 
             prediction = model.predict([feature])[0]
             forecast.append(prediction)
@@ -260,11 +280,16 @@ class ForecastingEngine:
             "direction": direction,
             "slope": float(slope),
             "strength": float(r_squared),
-            "percentage_change": (data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0,
+            "percentage_change": (
+                (data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0
+            ),
         }
 
     async def forecast_revenue(
-        self, historical_revenue: List[float], historical_orders: List[int], periods: int = 30
+        self,
+        historical_revenue: List[float],
+        historical_orders: List[int],
+        periods: int = 30,
     ) -> Dict[str, Any]:
         """
         Forecast revenue considering order volume and AOV
@@ -278,14 +303,18 @@ class ForecastingEngine:
             Revenue forecast with breakdown
         """
         # Calculate AOV trend
-        aov = [r / o if o > 0 else 0 for r, o in zip(historical_revenue, historical_orders)]
+        aov = [
+            r / o if o > 0 else 0 for r, o in zip(historical_revenue, historical_orders)
+        ]
 
         # Forecast orders and AOV separately
         order_forecast = await self.forecast_demand(historical_orders, periods, "auto")
         aov_forecast = await self.forecast_demand(aov, periods, "linear")
 
         # Calculate revenue forecast
-        revenue_forecast = [o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"])]
+        revenue_forecast = [
+            o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"])
+        ]
 
         return {
             "revenue_forecast": revenue_forecast,
@@ -297,19 +326,23 @@ class ForecastingEngine:
                 "lower": [
                     o * a
                     for o, a in zip(
-                        order_forecast["confidence_interval_lower"], aov_forecast["confidence_interval_lower"]
+                        order_forecast["confidence_interval_lower"],
+                        aov_forecast["confidence_interval_lower"],
                     )
                 ],
                 "upper": [
                     o * a
                     for o, a in zip(
-                        order_forecast["confidence_interval_upper"], aov_forecast["confidence_interval_upper"]
+                        order_forecast["confidence_interval_upper"],
+                        aov_forecast["confidence_interval_upper"],
                     )
                 ],
             },
         }
 
-    async def detect_anomalies(self, data: List[float], sensitivity: float = 2.0) -> Dict[str, Any]:
+    async def detect_anomalies(
+        self, data: List[float], sensitivity: float = 2.0
+    ) -> Dict[str, Any]:
         """
         Detect anomalies in time series data
 
@@ -353,7 +386,9 @@ class ForecastingEngine:
             "sensitivity": sensitivity,
         }
 
-    def calculate_forecast_accuracy(self, actual: List[float], forecast: List[float]) -> Dict[str, float]:
+    def calculate_forecast_accuracy(
+        self, actual: List[float], forecast: List[float]
+    ) -> Dict[str, float]:
         """
         Calculate forecast accuracy metrics
 
@@ -381,4 +416,9 @@ class ForecastingEngine:
         ss_tot = np.sum((actual - np.mean(actual)) ** 2)
         r_squared = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
 
-        return {"mae": float(mae), "rmse": float(rmse), "mape": float(mape), "r_squared": float(r_squared)}
+        return {
+            "mae": float(mae),
+            "rmse": float(rmse),
+            "mape": float(mape),
+            "r_squared": float(r_squared),
+        }

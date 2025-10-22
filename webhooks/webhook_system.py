@@ -204,7 +204,9 @@ class WebhookManager:
 
         return subs
 
-    def update_subscription(self, subscription_id: str, **kwargs) -> Optional[WebhookSubscription]:
+    def update_subscription(
+        self, subscription_id: str, **kwargs
+    ) -> Optional[WebhookSubscription]:
         """Update subscription"""
         subscription = self.subscriptions.get(subscription_id)
 
@@ -234,7 +236,10 @@ class WebhookManager:
     # ========================================================================
 
     async def emit_event(
-        self, event_type: WebhookEvent, data: Dict[str, Any], metadata: Optional[Dict[str, Any]] = None
+        self,
+        event_type: WebhookEvent,
+        data: Dict[str, Any],
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> List[str]:
         """
         Emit an event and trigger all subscribed webhooks
@@ -250,13 +255,21 @@ class WebhookManager:
         event_id = str(uuid4())
 
         payload = WebhookPayload(
-            event_id=event_id, event_type=event_type, timestamp=datetime.now(), data=data, metadata=metadata or {}
+            event_id=event_id,
+            event_type=event_type,
+            timestamp=datetime.now(),
+            data=data,
+            metadata=metadata or {},
         )
 
         logger.info(f"📤 Emitting event: {event_type.value} (ID: {event_id})")
 
         # Find subscriptions for this event
-        subscriptions = [s for s in self.subscriptions.values() if s.active and event_type in s.events]
+        subscriptions = [
+            s
+            for s in self.subscriptions.values()
+            if s.active and event_type in s.events
+        ]
 
         if not subscriptions:
             logger.debug(f"No active subscriptions for event: {event_type.value}")
@@ -282,7 +295,9 @@ class WebhookManager:
     # WEBHOOK DELIVERY
     # ========================================================================
 
-    async def _deliver_webhook(self, subscription: WebhookSubscription, payload: WebhookPayload) -> str:
+    async def _deliver_webhook(
+        self, subscription: WebhookSubscription, payload: WebhookPayload
+    ) -> str:
         """
         Deliver webhook to endpoint
 
@@ -314,7 +329,10 @@ class WebhookManager:
         return delivery_id
 
     async def _send_webhook(
-        self, subscription: WebhookSubscription, payload: WebhookPayload, delivery: WebhookDelivery
+        self,
+        subscription: WebhookSubscription,
+        payload: WebhookPayload,
+        delivery: WebhookDelivery,
     ):
         """
         Send webhook with retry logic
@@ -331,7 +349,9 @@ class WebhookManager:
                 # Update delivery record
                 delivery.attempts = attempt + 1
                 delivery.last_attempt = datetime.now()
-                delivery.status = WebhookStatus.RETRYING if attempt > 0 else WebhookStatus.PENDING
+                delivery.status = (
+                    WebhookStatus.RETRYING if attempt > 0 else WebhookStatus.PENDING
+                )
 
                 # Prepare request
                 payload_json = payload.model_dump_json()
@@ -349,10 +369,15 @@ class WebhookManager:
                 }
 
                 # Send request
-                logger.debug(f"Sending webhook to {subscription.endpoint} (attempt {attempt + 1}/{max_retries + 1})")
+                logger.debug(
+                    f"Sending webhook to {subscription.endpoint} (attempt {attempt + 1}/{max_retries + 1})"
+                )
 
                 response = await self.client.post(
-                    str(subscription.endpoint), content=payload_json, headers=headers, timeout=subscription.timeout
+                    str(subscription.endpoint),
+                    content=payload_json,
+                    headers=headers,
+                    timeout=subscription.timeout,
                 )
 
                 # Update delivery record
@@ -362,11 +387,15 @@ class WebhookManager:
                 # Check if successful
                 if 200 <= response.status_code < 300:
                     delivery.status = WebhookStatus.SENT
-                    logger.info(f"✅ Webhook delivered: {delivery.delivery_id} -> {subscription.endpoint}")
+                    logger.info(
+                        f"✅ Webhook delivered: {delivery.delivery_id} -> {subscription.endpoint}"
+                    )
                     return
 
                 # Non-2xx response
-                delivery.error_message = f"HTTP {response.status_code}: {response.text[:200]}"
+                delivery.error_message = (
+                    f"HTTP {response.status_code}: {response.text[:200]}"
+                )
                 logger.warning(f"⚠️  Webhook delivery failed: {delivery.error_message}")
 
             except Exception as e:
@@ -375,7 +404,9 @@ class WebhookManager:
 
             # Wait before retry
             if attempt < max_retries:
-                await asyncio.sleep(subscription.retry_delay * (2**attempt))  # Exponential backoff
+                await asyncio.sleep(
+                    subscription.retry_delay * (2**attempt)
+                )  # Exponential backoff
 
         # All retries failed
         delivery.status = WebhookStatus.FAILED
@@ -392,7 +423,9 @@ class WebhookManager:
         Returns:
             HMAC signature
         """
-        signature = hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        signature = hmac.new(
+            secret.encode(), payload.encode(), hashlib.sha256
+        ).hexdigest()
         return f"sha256={signature}"
 
     @staticmethod
@@ -408,7 +441,9 @@ class WebhookManager:
         Returns:
             True if signature is valid
         """
-        expected_signature = hmac.new(secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        expected_signature = hmac.new(
+            secret.encode(), payload.encode(), hashlib.sha256
+        ).hexdigest()
         expected_signature = f"sha256={expected_signature}"
 
         return hmac.compare_digest(signature, expected_signature)
@@ -422,7 +457,10 @@ class WebhookManager:
         return self.deliveries.get(delivery_id)
 
     def list_deliveries(
-        self, subscription_id: Optional[str] = None, status: Optional[WebhookStatus] = None, limit: int = 100
+        self,
+        subscription_id: Optional[str] = None,
+        status: Optional[WebhookStatus] = None,
+        limit: int = 100,
     ) -> List[WebhookDelivery]:
         """List deliveries with optional filters"""
         deliveries = list(self.deliveries.values())
@@ -490,7 +528,11 @@ class WebhookManager:
         total_deliveries = len(deliveries)
         successful = sum(1 for d in deliveries if d.status == WebhookStatus.SENT)
         failed = sum(1 for d in deliveries if d.status == WebhookStatus.FAILED)
-        pending = sum(1 for d in deliveries if d.status in [WebhookStatus.PENDING, WebhookStatus.RETRYING])
+        pending = sum(
+            1
+            for d in deliveries
+            if d.status in [WebhookStatus.PENDING, WebhookStatus.RETRYING]
+        )
 
         return {
             "subscriptions": {
@@ -503,7 +545,9 @@ class WebhookManager:
                 "successful": successful,
                 "failed": failed,
                 "pending": pending,
-                "success_rate": (successful / total_deliveries * 100) if total_deliveries > 0 else 0,
+                "success_rate": (
+                    (successful / total_deliveries * 100) if total_deliveries > 0 else 0
+                ),
             },
         }
 

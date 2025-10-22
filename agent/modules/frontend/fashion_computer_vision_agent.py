@@ -55,7 +55,9 @@ class FashionComputerVisionAgent:
         # Load CLIP for fashion understanding
         try:
             self.clip_model = CLIPModel.from_pretrained("openai/clip-vit-large-patch14")
-            self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
+            self.clip_processor = CLIPProcessor.from_pretrained(
+                "openai/clip-vit-large-patch14"
+            )
             self.clip_model.to(self.device)
             logger.info("✅ CLIP model loaded for fashion analysis")
         except Exception as e:
@@ -64,7 +66,9 @@ class FashionComputerVisionAgent:
 
         # Load ViT for detailed image features
         try:
-            self.vit_processor = ViTImageProcessor.from_pretrained("google/vit-large-patch16-224")
+            self.vit_processor = ViTImageProcessor.from_pretrained(
+                "google/vit-large-patch16-224"
+            )
             self.vit_model = ViTModel.from_pretrained("google/vit-large-patch16-224")
             self.vit_model.to(self.device)
             logger.info("✅ ViT model loaded for detailed analysis")
@@ -100,11 +104,21 @@ class FashionComputerVisionAgent:
                 "visual_cues": ["visible_fibers", "matte", "thick"],
             },
             "leather": {
-                "characteristics": ["durable", "structured", "luxury", "aged_beautifully"],
+                "characteristics": [
+                    "durable",
+                    "structured",
+                    "luxury",
+                    "aged_beautifully",
+                ],
                 "visual_cues": ["grain_pattern", "natural_variations", "sheen"],
             },
             "linen": {
-                "characteristics": ["breathable", "natural", "wrinkles_easily", "casual_luxury"],
+                "characteristics": [
+                    "breathable",
+                    "natural",
+                    "wrinkles_easily",
+                    "casual_luxury",
+                ],
                 "visual_cues": ["visible_weave", "natural_color", "texture"],
             },
             "cashmere": {
@@ -145,7 +159,9 @@ class FashionComputerVisionAgent:
 
         logger.info("🎨 Fashion Computer Vision Agent initialized")
 
-    async def analyze_fashion_image(self, image_path: Union[str, Path, Image.Image]) -> Dict[str, Any]:
+    async def analyze_fashion_image(
+        self, image_path: Union[str, Path, Image.Image]
+    ) -> Dict[str, Any]:
         """
         Comprehensive fashion image analysis including:
         - Fabric identification
@@ -221,12 +237,18 @@ class FashionComputerVisionAgent:
             weave_pattern = self._detect_weave_pattern(img_gray)
 
             # Identify fabric type using features
-            fabric_predictions = self._predict_fabric_type(texture_features, sheen_level, weave_pattern)
+            fabric_predictions = self._predict_fabric_type(
+                texture_features, sheen_level, weave_pattern
+            )
 
             return {
-                "primary_fabric": fabric_predictions[0] if fabric_predictions else "unknown",
+                "primary_fabric": (
+                    fabric_predictions[0] if fabric_predictions else "unknown"
+                ),
                 "fabric_confidence": fabric_predictions[1] if fabric_predictions else 0,
-                "alternative_fabrics": fabric_predictions[2:] if len(fabric_predictions) > 2 else [],
+                "alternative_fabrics": (
+                    fabric_predictions[2:] if len(fabric_predictions) > 2 else []
+                ),
                 "texture_score": texture_features["complexity"],
                 "sheen_level": sheen_level,
                 "weave_visible": weave_pattern["visible"],
@@ -246,7 +268,9 @@ class FashionComputerVisionAgent:
         # Gabor filter for texture
         gabor_kernels = []
         for theta in np.arange(0, np.pi, np.pi / 4):
-            kernel = cv2.getGaborKernel((21, 21), 5.0, theta, 10.0, 0.5, 0, ktype=cv2.CV_32F)
+            kernel = cv2.getGaborKernel(
+                (21, 21), 5.0, theta, 10.0, 0.5, 0, ktype=cv2.CV_32F
+            )
             gabor_kernels.append(kernel)
 
         features = []
@@ -333,7 +357,9 @@ class FashionComputerVisionAgent:
         """
         Get characteristics of identified fabric.
         """
-        return self.fabric_types.get(fabric_type, {"characteristics": [], "visual_cues": []})
+        return self.fabric_types.get(
+            fabric_type, {"characteristics": [], "visual_cues": []}
+        )
 
     async def _analyze_stitching(self, image: Image.Image) -> Dict[str, Any]:
         """
@@ -347,12 +373,16 @@ class FashionComputerVisionAgent:
             edges = cv2.Canny(gray, 50, 150)
 
             # Hough line detection for straight stitches
-            lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100, minLineLength=30, maxLineGap=10)
+            lines = cv2.HoughLinesP(
+                edges, 1, np.pi / 180, threshold=100, minLineLength=30, maxLineGap=10
+            )
 
             stitch_count = len(lines) if lines is not None else 0
 
             # Analyze stitch uniformity
-            uniformity = self._analyze_stitch_uniformity(lines) if lines is not None else 0
+            uniformity = (
+                self._analyze_stitch_uniformity(lines) if lines is not None else 0
+            )
 
             # Detect stitch type
             stitch_types = self._detect_stitch_types(edges, lines)
@@ -360,7 +390,11 @@ class FashionComputerVisionAgent:
             return {
                 "stitches_detected": stitch_count,
                 "stitch_uniformity": uniformity,
-                "stitch_quality": "excellent" if uniformity > 0.8 else "good" if uniformity > 0.6 else "fair",
+                "stitch_quality": (
+                    "excellent"
+                    if uniformity > 0.8
+                    else "good" if uniformity > 0.6 else "fair"
+                ),
                 "detected_stitch_types": stitch_types,
                 "visible_stitching": stitch_count > 10,
             }
@@ -390,7 +424,9 @@ class FashionComputerVisionAgent:
 
         return 0.0
 
-    def _detect_stitch_types(self, edges: np.ndarray, lines: Optional[np.ndarray]) -> List[str]:
+    def _detect_stitch_types(
+        self, edges: np.ndarray, lines: Optional[np.ndarray]
+    ) -> List[str]:
         """
         Detect types of stitches present.
         """
@@ -404,7 +440,9 @@ class FashionComputerVisionAgent:
                 stitch_types.append("topstitch")
 
         # Detect zigzag patterns
-        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(
+            edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
         for contour in contours:
             if len(contour) > 10:
                 # Approximate contour
@@ -428,7 +466,9 @@ class FashionComputerVisionAgent:
             gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
             _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-            contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(
+                binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
 
             if contours:
                 # Get largest contour (garment outline)
@@ -448,8 +488,14 @@ class FashionComputerVisionAgent:
 
                 return {
                     "cut_type": silhouette_type,
-                    "cut_description": self.garment_cuts.get(silhouette_type, "Unknown cut"),
-                    "fit_type": "fitted" if solidity > 0.8 else "flowing" if solidity < 0.5 else "semi_fitted",
+                    "cut_description": self.garment_cuts.get(
+                        silhouette_type, "Unknown cut"
+                    ),
+                    "fit_type": (
+                        "fitted"
+                        if solidity > 0.8
+                        else "flowing" if solidity < 0.5 else "semi_fitted"
+                    ),
                     "silhouette_complexity": len(largest_contour),
                     "shape_metrics": {
                         "area": float(area),
@@ -458,7 +504,10 @@ class FashionComputerVisionAgent:
                     },
                 }
 
-            return {"cut_type": "unknown", "message": "Could not detect garment outline"}
+            return {
+                "cut_type": "unknown",
+                "message": "Could not detect garment outline",
+            }
 
         except Exception as e:
             logger.error(f"❌ Cut analysis failed: {e}")
@@ -523,7 +572,11 @@ class FashionComputerVisionAgent:
             quality_level = (
                 "excellent"
                 if quality_score > 0.8
-                else "good" if quality_score > 0.6 else "fair" if quality_score > 0.4 else "poor"
+                else (
+                    "good"
+                    if quality_score > 0.6
+                    else "fair" if quality_score > 0.4 else "poor"
+                )
             )
 
             return {
@@ -561,7 +614,9 @@ class FashionComputerVisionAgent:
             ]
 
             # Process image and text
-            inputs = self.clip_processor(text=style_categories, images=image, return_tensors="pt", padding=True)
+            inputs = self.clip_processor(
+                text=style_categories, images=image, return_tensors="pt", padding=True
+            )
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
             # Get predictions
@@ -700,7 +755,9 @@ Provide detailed, expert fashion analysis.""",
         assessment = {
             "luxury_tier": self._determine_luxury_tier(fabric, quality),
             "craftsmanship_rating": quality.get("quality_level", "unknown"),
-            "authenticity_confidence": "high" if quality.get("quality_score", 0) > 0.7 else "medium",
+            "authenticity_confidence": (
+                "high" if quality.get("quality_score", 0) > 0.7 else "medium"
+            ),
             "estimated_value_range": self._estimate_value_range(fabric, quality, style),
             "recommended_use": style.get("primary_style", "versatile wear"),
         }
@@ -778,7 +835,10 @@ Provide detailed, expert fashion analysis.""",
             ).images[0]
 
             # Save image
-            output_path = Path("generated_fashion") / f"fashion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            output_path = (
+                Path("generated_fashion")
+                / f"fashion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            )
             output_path.parent.mkdir(exist_ok=True)
             image.save(output_path)
 

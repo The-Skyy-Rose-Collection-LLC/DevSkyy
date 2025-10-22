@@ -49,7 +49,13 @@ class AdvancedCacheManager:
         self.redis_client = None
         self.async_redis_client = None
         self.memory_cache = {}
-        self.cache_stats = {"hits": 0, "misses": 0, "sets": 0, "deletes": 0, "errors": 0}
+        self.cache_stats = {
+            "hits": 0,
+            "misses": 0,
+            "sets": 0,
+            "deletes": 0,
+            "errors": 0,
+        }
         self.memory_cache_order = []  # For LRU implementation
         self._initialize_redis()
 
@@ -100,7 +106,9 @@ class AdvancedCacheManager:
                     return json.dumps(value)
                 else:
                     # Convert non-JSON types to string representation for security
-                    logger.warning(f"Converting non-JSON type {type(value)} to string for security")
+                    logger.warning(
+                        f"Converting non-JSON type {type(value)} to string for security"
+                    )
                     return json.dumps(str(value))
             else:
                 return json.dumps(value)
@@ -115,7 +123,9 @@ class AdvancedCacheManager:
             return json.loads(value)
         except json.JSONDecodeError:
             # Log warning about unsupported pickle data
-            logger.warning("Pickle deserialization is disabled for security reasons. Data may be lost.")
+            logger.warning(
+                "Pickle deserialization is disabled for security reasons. Data may be lost."
+            )
             return None
 
     def _update_memory_cache_lru(self, key: str):
@@ -152,7 +162,10 @@ class AdvancedCacheManager:
                         value = self._deserialize_value(redis_value)
 
                         # Store in memory cache for faster access
-                        self.memory_cache[cache_key] = {"value": value, "timestamp": time.time()}
+                        self.memory_cache[cache_key] = {
+                            "value": value,
+                            "timestamp": time.time(),
+                        }
                         self._update_memory_cache_lru(cache_key)
 
                         self.cache_stats["hits"] += 1
@@ -169,7 +182,9 @@ class AdvancedCacheManager:
             self.cache_stats["errors"] += 1
             return default
 
-    async def aget(self, key: str, namespace: str = "default", default: Any = None) -> Any:
+    async def aget(
+        self, key: str, namespace: str = "default", default: Any = None
+    ) -> Any:
         """
         Get value from cache (asynchronous).
         """
@@ -193,7 +208,10 @@ class AdvancedCacheManager:
                         value = self._deserialize_value(redis_value)
 
                         # Store in memory cache
-                        self.memory_cache[cache_key] = {"value": value, "timestamp": time.time()}
+                        self.memory_cache[cache_key] = {
+                            "value": value,
+                            "timestamp": time.time(),
+                        }
                         self._update_memory_cache_lru(cache_key)
 
                         self.cache_stats["hits"] += 1
@@ -210,7 +228,9 @@ class AdvancedCacheManager:
             self.cache_stats["errors"] += 1
             return default
 
-    def set(self, key: str, value: Any, ttl: int = None, namespace: str = "default") -> bool:
+    def set(
+        self, key: str, value: Any, ttl: int = None, namespace: str = "default"
+    ) -> bool:
         """
         Set value in cache (synchronous).
         Stores in both memory and Redis cache.
@@ -220,7 +240,11 @@ class AdvancedCacheManager:
             ttl = ttl or self.config.default_ttl
 
             # Store in memory cache
-            self.memory_cache[cache_key] = {"value": value, "timestamp": time.time(), "ttl": ttl}
+            self.memory_cache[cache_key] = {
+                "value": value,
+                "timestamp": time.time(),
+                "ttl": ttl,
+            }
             self._update_memory_cache_lru(cache_key)
 
             # Store in Redis cache
@@ -240,7 +264,9 @@ class AdvancedCacheManager:
             self.cache_stats["errors"] += 1
             return False
 
-    async def aset(self, key: str, value: Any, ttl: int = None, namespace: str = "default") -> bool:
+    async def aset(
+        self, key: str, value: Any, ttl: int = None, namespace: str = "default"
+    ) -> bool:
         """
         Set value in cache (asynchronous).
         """
@@ -249,7 +275,11 @@ class AdvancedCacheManager:
             ttl = ttl or self.config.default_ttl
 
             # Store in memory cache
-            self.memory_cache[cache_key] = {"value": value, "timestamp": time.time(), "ttl": ttl}
+            self.memory_cache[cache_key] = {
+                "value": value,
+                "timestamp": time.time(),
+                "ttl": ttl,
+            }
             self._update_memory_cache_lru(cache_key)
 
             # Store in Redis cache
@@ -259,7 +289,9 @@ class AdvancedCacheManager:
             if self.async_redis_client:
                 try:
                     serialized_value = self._serialize_value(value)
-                    await self.async_redis_client.setex(cache_key, ttl, serialized_value)
+                    await self.async_redis_client.setex(
+                        cache_key, ttl, serialized_value
+                    )
                 except Exception as e:
                     logger.error(f"Async Redis set error: {e}")
                     self.cache_stats["errors"] += 1
@@ -342,7 +374,9 @@ class AdvancedCacheManager:
 
             # Clear from memory cache
             keys_to_delete = [
-                key for key in self.memory_cache.keys() if key.startswith(f"{self.config.cache_prefix}{namespace}:")
+                key
+                for key in self.memory_cache.keys()
+                if key.startswith(f"{self.config.cache_prefix}{namespace}:")
             ]
             for key in keys_to_delete:
                 del self.memory_cache[key]
@@ -371,18 +405,25 @@ class AdvancedCacheManager:
         Get cache statistics.
         """
         total_requests = self.cache_stats["hits"] + self.cache_stats["misses"]
-        hit_rate = (self.cache_stats["hits"] / total_requests * 100) if total_requests > 0 else 0
+        hit_rate = (
+            (self.cache_stats["hits"] / total_requests * 100)
+            if total_requests > 0
+            else 0
+        )
 
         return {
             "cache_stats": self.cache_stats,
             "hit_rate": f"{hit_rate:.2f}%",
             "memory_cache_size": len(self.memory_cache),
             "memory_cache_max_size": self.config.max_memory_cache_size,
-            "redis_connected": self.redis_client is not None and self.redis_client.ping(),
+            "redis_connected": self.redis_client is not None
+            and self.redis_client.ping(),
             "async_redis_connected": self.async_redis_client is not None,
         }
 
-    def warm_cache(self, warmup_data: Dict[str, Any], namespace: str = "warmup") -> bool:
+    def warm_cache(
+        self, warmup_data: Dict[str, Any], namespace: str = "warmup"
+    ) -> bool:
         """
         Warm the cache with frequently accessed data.
         """
@@ -440,7 +481,9 @@ def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = Non
     return decorator
 
 
-def async_cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = None):
+def async_cached(
+    ttl: int = 3600, namespace: str = "default", key_func: Callable = None
+):
     """
     Decorator for caching async function results.
     """
@@ -485,7 +528,9 @@ class DatabaseCacheManager:
         self.cache_manager = cache_manager
         self.namespace = "database"
 
-    def cache_query_result(self, query: str, params: tuple, result: Any, ttl: int = 300):
+    def cache_query_result(
+        self, query: str, params: tuple, result: Any, ttl: int = 300
+    ):
         """
         Cache database query result.
         """
@@ -518,7 +563,9 @@ class APICacheManager:
         self.cache_manager = cache_manager
         self.namespace = "api"
 
-    def cache_api_response(self, endpoint: str, params: Dict[str, Any], response: Any, ttl: int = 600):
+    def cache_api_response(
+        self, endpoint: str, params: Dict[str, Any], response: Any, ttl: int = 600
+    ):
         """
         Cache API response.
         """
@@ -563,7 +610,11 @@ def initialize_cache_system():
     warmup_data = {
         "brand_colors": ["#E8B4B8", "#C9A96E", "#FFD700", "#C0C0C0"],
         "luxury_keywords": ["luxury", "premium", "exclusive", "designer"],
-        "agent_capabilities": ["brand_intelligence", "performance_optimization", "security_monitoring"],
+        "agent_capabilities": [
+            "brand_intelligence",
+            "performance_optimization",
+            "security_monitoring",
+        ],
     }
 
     cache_manager.warm_cache(warmup_data, "system")
@@ -579,7 +630,9 @@ async def example_usage():
     cache_manager = get_cache_manager()
 
     # Basic cache operations
-    await cache_manager.aset("user:123", {"name": "John", "email": "john@example.com"}, ttl=1800)
+    await cache_manager.aset(
+        "user:123", {"name": "John", "email": "john@example.com"}, ttl=1800
+    )
     user_data = await cache_manager.aget("user:123")
     print(f"Cached user data: {user_data}")
 

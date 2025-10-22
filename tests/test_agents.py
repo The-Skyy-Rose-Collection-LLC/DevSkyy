@@ -89,7 +89,12 @@ class TestMarketingAgent:
 
         assert "segments" in result
         assert "total_customers" in result
-        expected_segments = ["high_value", "frequent_buyers", "at_risk", "new_customers"]
+        expected_segments = [
+            "high_value",
+            "frequent_buyers",
+            "at_risk",
+            "new_customers",
+        ]
         for segment in expected_segments:
             assert segment in result["segments"]
 

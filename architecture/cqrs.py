@@ -124,7 +124,9 @@ class CommandBus:
         """
         command_type = type(command)
         if command_type not in self._handlers:
-            raise ValueError(f"No handler registered for command type: {command_type.__name__}")
+            raise ValueError(
+                f"No handler registered for command type: {command_type.__name__}"
+            )
 
         handler = self._handlers[command_type]
         return await handler.handle(command)
@@ -164,7 +166,9 @@ class QueryBus:
         """
         query_type = type(query)
         if query_type not in self._handlers:
-            raise ValueError(f"No handler registered for query type: {query_type.__name__}")
+            raise ValueError(
+                f"No handler registered for query type: {query_type.__name__}"
+            )
 
         handler = self._handlers[query_type]
         return await handler.handle(query)
@@ -238,7 +242,12 @@ class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[Dict]]):
             Agent details or None if not found
         """
         # Implementation would fetch from read model/cache
-        return {"agent_id": query.agent_id, "name": "Example Agent", "type": "backend", "status": "active"}
+        return {
+            "agent_id": query.agent_id,
+            "name": "Example Agent",
+            "type": "backend",
+            "status": "active",
+        }
 
 
 # Register handlers (would be done at startup)

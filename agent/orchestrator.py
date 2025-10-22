@@ -167,7 +167,9 @@ class AgentOrchestrator:
                 for dep in dependencies:
                     self.reverse_dependencies[dep].add(agent_name)
 
-            logger.info(f"✅ Registered agent: {agent_name} with capabilities: {capabilities}")
+            logger.info(
+                f"✅ Registered agent: {agent_name} with capabilities: {capabilities}"
+            )
             return True
 
         except Exception as e:
@@ -228,7 +230,9 @@ class AgentOrchestrator:
         # Find agents with required capabilities
         capable_agents = self._find_agents_with_capabilities(required_capabilities)
         if not capable_agents:
-            return {"error": f"No agents found with capabilities: {required_capabilities}"}
+            return {
+                "error": f"No agents found with capabilities: {required_capabilities}"
+            }
 
         # Resolve execution order based on dependencies
         execution_order = self._resolve_dependencies(capable_agents)
@@ -321,7 +325,9 @@ class AgentOrchestrator:
             task.error = str(e)
             return {"error": str(e), "task_id": task_id}
 
-    def _find_agents_with_capabilities(self, required_capabilities: List[str]) -> List[str]:
+    def _find_agents_with_capabilities(
+        self, required_capabilities: List[str]
+    ) -> List[str]:
         """Find all agents that have the required capabilities"""
         capable_agents = []
 
@@ -331,7 +337,9 @@ class AgentOrchestrator:
                 capable_agents.append(agent_name)
 
         # Sort by priority
-        capable_agents.sort(key=lambda name: self.agent_capabilities[name].priority.value)
+        capable_agents.sort(
+            key=lambda name: self.agent_capabilities[name].priority.value
+        )
 
         return capable_agents
 
@@ -377,7 +385,9 @@ class AgentOrchestrator:
     # CIRCUIT BREAKER PATTERN
     # ============================================================================
 
-    def _is_circuit_open(self, agent_name: str, threshold: int = 5, timeout: int = 60) -> bool:
+    def _is_circuit_open(
+        self, agent_name: str, threshold: int = 5, timeout: int = 60
+    ) -> bool:
         """Check if circuit breaker is open for an agent"""
         breaker = self.circuit_breakers[agent_name]
 
@@ -385,7 +395,10 @@ class AgentOrchestrator:
             return False
 
         # Check if timeout has passed
-        if breaker["opened_at"] and (datetime.now() - breaker["opened_at"]).seconds > timeout:
+        if (
+            breaker["opened_at"]
+            and (datetime.now() - breaker["opened_at"]).seconds > timeout
+        ):
             # Try to close circuit (half-open state)
             breaker["state"] = "half-open"
             return False
@@ -405,7 +418,11 @@ class AgentOrchestrator:
     def _reset_circuit_breaker(self, agent_name: str):
         """Reset circuit breaker after successful execution"""
         if agent_name in self.circuit_breakers:
-            self.circuit_breakers[agent_name] = {"failures": 0, "opened_at": None, "state": "closed"}
+            self.circuit_breakers[agent_name] = {
+                "failures": 0,
+                "opened_at": None,
+                "state": "closed",
+            }
 
     # ============================================================================
     # MONITORING & METRICS
@@ -454,7 +471,9 @@ class AgentOrchestrator:
             "total_tasks": len(self.tasks),
             "agent_health": agent_health,
             "system_status": (
-                "healthy" if all(a.status != AgentStatus.FAILED for a in self.agents.values()) else "degraded"
+                "healthy"
+                if all(a.status != AgentStatus.FAILED for a in self.agents.values())
+                else "degraded"
             ),
         }
 
@@ -474,7 +493,11 @@ class AgentOrchestrator:
 
     def share_data(self, key: str, value: Any, ttl: Optional[int] = None):
         """Share data between agents"""
-        self.shared_context[key] = {"value": value, "timestamp": datetime.now(), "ttl": ttl}
+        self.shared_context[key] = {
+            "value": value,
+            "timestamp": datetime.now(),
+            "ttl": ttl,
+        }
 
     def get_shared_data(self, key: str) -> Optional[Any]:
         """Get shared data"""
@@ -491,7 +514,9 @@ class AgentOrchestrator:
 
         return data.get("value")
 
-    async def broadcast_to_agents(self, message: Dict[str, Any], agent_names: Optional[List[str]] = None):
+    async def broadcast_to_agents(
+        self, message: Dict[str, Any], agent_names: Optional[List[str]] = None
+    ):
         """Broadcast a message to multiple agents"""
         target_agents = agent_names if agent_names else list(self.agents.keys())
 

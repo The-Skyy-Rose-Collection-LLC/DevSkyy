@@ -7,8 +7,12 @@ import logging
 
 from fastapi import APIRouter, Depends
 
-from monitoring.observability import health_monitor, metrics_collector, performance_tracker
-from security.jwt_auth import TokenData, get_current_active_user, require_admin
+from monitoring.observability import (
+    health_monitor,
+    metrics_collector,
+    performance_tracker,
+)
+from security.jwt_auth import get_current_active_user, require_admin, TokenData
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +43,9 @@ async def health_check():
 
 
 @router.get("/health/detailed", dependencies=[Depends(require_admin)])
-async def detailed_health_check(current_user: TokenData = Depends(get_current_active_user)):
+async def detailed_health_check(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Detailed health check (admin only)
 
@@ -95,7 +101,10 @@ async def get_gauges(current_user: TokenData = Depends(get_current_active_user))
 @router.get("/metrics/histograms")
 async def get_histograms(current_user: TokenData = Depends(get_current_active_user)):
     """Get all histogram metrics with statistics"""
-    histograms = {name: metrics_collector.get_histogram_stats(name) for name in metrics_collector.histograms.keys()}
+    histograms = {
+        name: metrics_collector.get_histogram_stats(name)
+        for name in metrics_collector.histograms.keys()
+    }
 
     return {"histograms": histograms}
 
@@ -106,7 +115,9 @@ async def get_histograms(current_user: TokenData = Depends(get_current_active_us
 
 
 @router.get("/performance")
-async def get_performance_stats(current_user: TokenData = Depends(get_current_active_user)):
+async def get_performance_stats(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Get API performance statistics
 
@@ -118,7 +129,9 @@ async def get_performance_stats(current_user: TokenData = Depends(get_current_ac
 
 
 @router.get("/performance/{endpoint:path}")
-async def get_endpoint_performance(endpoint: str, current_user: TokenData = Depends(get_current_active_user)):
+async def get_endpoint_performance(
+    endpoint: str, current_user: TokenData = Depends(get_current_active_user)
+):
     """
     Get performance statistics for a specific endpoint
 
@@ -135,7 +148,9 @@ async def get_endpoint_performance(endpoint: str, current_user: TokenData = Depe
 
 
 @router.get("/system")
-async def get_system_metrics(current_user: TokenData = Depends(get_current_active_user)):
+async def get_system_metrics(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Get system resource metrics
 
@@ -147,7 +162,9 @@ async def get_system_metrics(current_user: TokenData = Depends(get_current_activ
     return {
         "cpu_percent": metrics_collector.get_gauge("system_cpu_percent"),
         "memory_percent": metrics_collector.get_gauge("system_memory_percent"),
-        "memory_available_mb": metrics_collector.get_gauge("system_memory_available_mb"),
+        "memory_available_mb": metrics_collector.get_gauge(
+            "system_memory_available_mb"
+        ),
         "disk_percent": metrics_collector.get_gauge("system_disk_percent"),
         "disk_free_gb": metrics_collector.get_gauge("system_disk_free_gb"),
         "network_sent_mb": metrics_collector.get_gauge("system_network_sent_mb"),

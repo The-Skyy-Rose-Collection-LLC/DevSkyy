@@ -64,7 +64,9 @@ class CronScheduler:
             return
 
         self.running = True
-        self.scheduler_thread = threading.Thread(target=self._run_scheduler, daemon=True)
+        self.scheduler_thread = threading.Thread(
+            target=self._run_scheduler, daemon=True
+        )
         self.scheduler_thread.start()
 
         logger.info("🚀 Cron scheduler started")
@@ -102,7 +104,9 @@ class CronScheduler:
             "last_run": job_info["last_run"],
             "run_count": job_info["run_count"],
             "errors": job_info["errors"],
-            "next_run": str(job_info["job"].next_run) if job_info["job"].next_run else None,
+            "next_run": (
+                str(job_info["job"].next_run) if job_info["job"].next_run else None
+            ),
         }
 
     def list_all_jobs(self) -> Dict[str, Any]:
@@ -138,12 +142,16 @@ def schedule_hourly_job() -> Dict[str, Any]:
 
                 # Step 1: Scan the site
                 scan_results = scan_site()
-                logger.info(f"📊 Scan completed: {scan_results.get('files_scanned', 0)} files scanned")
+                logger.info(
+                    f"📊 Scan completed: {scan_results.get('files_scanned', 0)} files scanned"
+                )
 
                 # Step 2: Fix any issues found
                 if scan_results.get("errors_found") or scan_results.get("warnings"):
                     fix_results = fix_code(scan_results)
-                    logger.info(f"🔧 Fixes applied: {fix_results.get('files_fixed', 0)} files fixed")
+                    logger.info(
+                        f"🔧 Fixes applied: {fix_results.get('files_fixed', 0)} files fixed"
+                    )
 
                     # Step 3: Commit fixes if any were made
                     if fix_results.get("files_fixed", 0) > 0:
@@ -155,7 +163,9 @@ def schedule_hourly_job() -> Dict[str, Any]:
                 # Update job statistics
                 job_id = getattr(automated_workflow, "job_id", None)
                 if job_id and job_id in _global_scheduler.jobs:
-                    _global_scheduler.jobs[job_id]["last_run"] = datetime.now().isoformat()
+                    _global_scheduler.jobs[job_id][
+                        "last_run"
+                    ] = datetime.now().isoformat()
                     _global_scheduler.jobs[job_id]["run_count"] += 1
 
                 logger.info("✅ Automated workflow completed successfully")
@@ -180,7 +190,9 @@ def schedule_hourly_job() -> Dict[str, Any]:
             "status": "scheduled",
             "job_id": job_id,
             "interval": "hourly",
-            "next_run": str(schedule.jobs[0].next_run) if schedule.jobs else "within 1 hour",
+            "next_run": (
+                str(schedule.jobs[0].next_run) if schedule.jobs else "within 1 hour"
+            ),
             "scheduler_running": _global_scheduler.running,
             "message": "DevSkyy agent workflow scheduled successfully",
         }

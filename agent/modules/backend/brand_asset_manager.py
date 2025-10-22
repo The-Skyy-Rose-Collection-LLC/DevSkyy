@@ -58,12 +58,19 @@ class BrandAssetManager:
             json.dump(self.metadata, f, indent=2)
 
     def upload_asset(
-        self, file_data: bytes, filename: str, category: str, description: str = "", tags: List[str] = None
+        self,
+        file_data: bytes,
+        filename: str,
+        category: str,
+        description: str = "",
+        tags: List[str] = None,
     ) -> Dict[str, Any]:
         """Upload a brand asset."""
         try:
             if category not in self.categories:
-                return {"error": f"Invalid category. Available: {list(self.categories.keys())}"}
+                return {
+                    "error": f"Invalid category. Available: {list(self.categories.keys())}"
+                }
 
             # Generate unique asset ID
             asset_id = f"{category}_{len(self.metadata['assets'])}_{int(datetime.now().timestamp())}"
@@ -95,7 +102,11 @@ class BrandAssetManager:
             self.metadata["assets"][asset_id] = asset_metadata
             self.metadata["total_assets"] += 1
             self.metadata["upload_history"].append(
-                {"asset_id": asset_id, "timestamp": datetime.now().isoformat(), "action": "upload"}
+                {
+                    "asset_id": asset_id,
+                    "timestamp": datetime.now().isoformat(),
+                    "action": "upload",
+                }
             )
 
             self._save_metadata()
@@ -115,7 +126,11 @@ class BrandAssetManager:
 
     def get_assets_by_category(self, category: str) -> List[Dict[str, Any]]:
         """Get all assets in a specific category."""
-        return [asset for asset in self.metadata["assets"].values() if asset["category"] == category]
+        return [
+            asset
+            for asset in self.metadata["assets"].values()
+            if asset["category"] == category
+        ]
 
     def get_asset_info(self, asset_id: str) -> Optional[Dict[str, Any]]:
         """Get detailed information about a specific asset."""
@@ -144,13 +159,19 @@ class BrandAssetManager:
 
         # Generate recommendations
         if analysis["categories_used"].get("logos", 0) == 0:
-            analysis["recommendations"].append("Upload logo variations for brand consistency analysis")
+            analysis["recommendations"].append(
+                "Upload logo variations for brand consistency analysis"
+            )
 
         if analysis["categories_used"].get("color_palettes", 0) == 0:
-            analysis["recommendations"].append("Add color palette references for visual harmony checks")
+            analysis["recommendations"].append(
+                "Add color palette references for visual harmony checks"
+            )
 
         if analysis["total_assets"] < 5:
-            analysis["recommendations"].append("Upload more assets for comprehensive brand analysis")
+            analysis["recommendations"].append(
+                "Upload more assets for comprehensive brand analysis"
+            )
 
         return analysis
 
@@ -160,7 +181,9 @@ class BrandAssetManager:
             "visual_assets": {
                 "logos": self.get_assets_by_category("logos"),
                 "product_images": self.get_assets_by_category("product_images"),
-                "marketing_materials": self.get_assets_by_category("marketing_materials"),
+                "marketing_materials": self.get_assets_by_category(
+                    "marketing_materials"
+                ),
             },
             "brand_guidelines": self.get_assets_by_category("brand_guidelines"),
             "seasonal_collections": self.get_assets_by_category("seasonal_collections"),

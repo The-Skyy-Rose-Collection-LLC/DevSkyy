@@ -90,7 +90,8 @@ class InputSanitizer:
             if re.search(pattern, value, re.IGNORECASE):
                 logger.warning(f"🚨 SQL injection attempt detected: {value[:100]}")
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid input: potential SQL injection detected"
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid input: potential SQL injection detected",
                 )
 
         # Escape single quotes
@@ -225,7 +226,9 @@ class InputValidationMiddleware:
         self.strict_mode = strict_mode
         self.sanitizer = InputSanitizer()
 
-    async def validate_request_data(self, data: Union[Dict, List, str]) -> Union[Dict, List, str]:
+    async def validate_request_data(
+        self, data: Union[Dict, List, str]
+    ) -> Union[Dict, List, str]:
         """
         Recursively validate and sanitize request data
 
@@ -236,7 +239,10 @@ class InputValidationMiddleware:
             Sanitized data
         """
         if isinstance(data, dict):
-            return {key: await self.validate_request_data(value) for key, value in data.items()}
+            return {
+                key: await self.validate_request_data(value)
+                for key, value in data.items()
+            }
 
         elif isinstance(data, list):
             return [await self.validate_request_data(item) for item in data]

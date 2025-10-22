@@ -111,7 +111,8 @@ def setup_logging(
             console_formatter = StructuredFormatter()
         else:
             console_formatter = ColoredFormatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
             )
 
         console_handler.setFormatter(console_formatter)
@@ -122,7 +123,10 @@ def setup_logging(
         if enable_rotating:
             # Rotating file handler (10MB per file, keep 5 backups)
             file_handler = logging.handlers.RotatingFileHandler(
-                log_file, maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"  # 10MB
+                log_file,
+                maxBytes=10 * 1024 * 1024,
+                backupCount=5,
+                encoding="utf-8",  # 10MB
             )
         else:
             file_handler = logging.FileHandler(log_file, encoding="utf-8")
@@ -141,7 +145,9 @@ def setup_logging(
         root_logger.addHandler(file_handler)
 
     # Log initial configuration
-    root_logger.info(f"Logging configured - Level: {log_level}, File: {log_file if enable_file else 'Disabled'}")
+    root_logger.info(
+        f"Logging configured - Level: {log_level}, File: {log_file if enable_file else 'Disabled'}"
+    )
 
     return root_logger
 
@@ -174,7 +180,9 @@ def log_execution_time(func):
             return result
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}")
+            logger.error(
+                f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}"
+            )
             raise
 
     return wrapper
@@ -195,7 +203,9 @@ def log_async_execution_time(func):
             return result
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}")
+            logger.error(
+                f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}"
+            )
             raise
 
     return wrapper

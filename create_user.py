@@ -11,7 +11,12 @@ from getpass import getpass
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from security.jwt_auth import UserRole, create_access_token, create_refresh_token, user_manager
+from security.jwt_auth import (
+    create_access_token,
+    create_refresh_token,
+    user_manager,
+    UserRole,
+)
 
 
 def create_user_interactive():
@@ -63,7 +68,9 @@ def create_user_interactive():
 
     try:
         # Create the user
-        user = user_manager.create_user(email=email, username=username, password=password, role=role)
+        user = user_manager.create_user(
+            email=email, username=username, password=password, role=role
+        )
 
         print(f"\n✅ User created successfully!")
         print(f"   User ID: {user.user_id}")
@@ -80,11 +87,21 @@ def create_user_interactive():
 
             # Generate test tokens
             access_token = create_access_token(
-                {"user_id": user.user_id, "email": user.email, "username": user.username, "role": user.role}
+                {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "username": user.username,
+                    "role": user.role,
+                }
             )
 
             refresh_token = create_refresh_token(
-                {"user_id": user.user_id, "email": user.email, "username": user.username, "role": user.role}
+                {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "username": user.username,
+                    "role": user.role,
+                }
             )
 
             print("✅ JWT tokens generated successfully!")
@@ -108,10 +125,14 @@ def create_user_interactive():
         return False
 
 
-def create_user_programmatic(username: str, email: str, password: str, role: str = UserRole.API_USER):
+def create_user_programmatic(
+    username: str, email: str, password: str, role: str = UserRole.API_USER
+):
     """Create a user programmatically"""
     try:
-        user = user_manager.create_user(email=email, username=username, password=password, role=role)
+        user = user_manager.create_user(
+            email=email, username=username, password=password, role=role
+        )
 
         # Test authentication
         auth_user = user_manager.authenticate_user(username, password)
@@ -155,7 +176,12 @@ def test_authentication():
 
         # Generate tokens
         access_token = create_access_token(
-            {"user_id": user.user_id, "email": user.email, "username": user.username, "role": user.role}
+            {
+                "user_id": user.user_id,
+                "email": user.email,
+                "username": user.username,
+                "role": user.role,
+            }
         )
 
         print(f"   Access Token: {access_token[:50]}...")

@@ -16,7 +16,12 @@ class CustomerServiceAgent:
     def __init__(self):
         self.agent_type = "customer_service"
         self.brand_context = {}
-        self.service_metrics = {"response_time": 0, "resolution_rate": 0, "satisfaction_score": 0, "ticket_volume": 0}
+        self.service_metrics = {
+            "response_time": 0,
+            "resolution_rate": 0,
+            "satisfaction_score": 0,
+            "ticket_volume": 0,
+        }
         self.luxury_service_standards = {
             "response_time_sla": 300,  # 5 minutes for luxury brands
             "resolution_time_sla": 3600,  # 1 hour for complex issues
@@ -32,7 +37,9 @@ class CustomerServiceAgent:
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning("💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)")
+            logger.warning(
+                "💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)"
+            )
 
     async def analyze_customer_satisfaction(self) -> Dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
@@ -41,12 +48,21 @@ class CustomerServiceAgent:
 
             analysis = {
                 "overall_satisfaction": 4.7,
-                "satisfaction_by_channel": {"live_chat": 4.9, "email": 4.6, "phone": 4.8, "social_media": 4.5},
+                "satisfaction_by_channel": {
+                    "live_chat": 4.9,
+                    "email": 4.6,
+                    "phone": 4.8,
+                    "social_media": 4.5,
+                },
                 "customer_sentiment_analysis": {
                     "positive": 78,
                     "neutral": 18,
                     "negative": 4,
-                    "trending_topics": ["quality excellence", "fast shipping", "styling help"],
+                    "trending_topics": [
+                        "quality excellence",
+                        "fast shipping",
+                        "styling help",
+                    ],
                 },
                 "vip_customer_metrics": {
                     "satisfaction": 4.9,
@@ -60,7 +76,9 @@ class CustomerServiceAgent:
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
                 "satisfaction_analysis": analysis,
-                "improvement_recommendations": self._generate_service_recommendations(analysis),
+                "improvement_recommendations": self._generate_service_recommendations(
+                    analysis
+                ),
                 "risk_assessment": self._assess_service_risks(analysis),
             }
 

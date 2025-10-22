@@ -9,8 +9,8 @@ from typing import Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, HttpUrl
 
-from security.jwt_auth import TokenData, get_current_active_user, require_developer
-from webhooks.webhook_system import WebhookEvent, WebhookSubscription, webhook_manager
+from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from webhooks.webhook_system import webhook_manager, WebhookEvent, WebhookSubscription
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,11 @@ class TestWebhookRequest(BaseModel):
 # ============================================================================
 
 
-@router.post("/subscriptions", response_model=WebhookSubscription, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/subscriptions",
+    response_model=WebhookSubscription,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_webhook_subscription(
     request: CreateWebhookRequest, current_user: TokenData = Depends(require_developer)
 ):
@@ -69,13 +73,18 @@ async def create_webhook_subscription(
             metadata={"created_by": current_user.email},
         )
 
-        logger.info(f"Webhook subscription created by {current_user.email}: {subscription.subscription_id}")
+        logger.info(
+            f"Webhook subscription created by {current_user.email}: {subscription.subscription_id}"
+        )
 
         return subscription
 
     except Exception as e:
         logger.error(f"Failed to create webhook subscription: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create subscription")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create subscription",
+        )
 
 
 @router.get("/subscriptions", response_model=List[WebhookSubscription])
@@ -93,19 +102,25 @@ async def list_webhook_subscriptions(
 
 
 @router.get("/subscriptions/{subscription_id}", response_model=WebhookSubscription)
-async def get_webhook_subscription(subscription_id: str, current_user: TokenData = Depends(get_current_active_user)):
+async def get_webhook_subscription(
+    subscription_id: str, current_user: TokenData = Depends(get_current_active_user)
+):
     """Get a specific webhook subscription"""
     subscription = webhook_manager.get_subscription(subscription_id)
 
     if not subscription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
 
     return subscription
 
 
 @router.patch("/subscriptions/{subscription_id}", response_model=WebhookSubscription)
 async def update_webhook_subscription(
-    subscription_id: str, request: UpdateWebhookRequest, current_user: TokenData = Depends(require_developer)
+    subscription_id: str,
+    request: UpdateWebhookRequest,
+    current_user: TokenData = Depends(require_developer),
 ):
     """
     Update a webhook subscription
@@ -120,15 +135,21 @@ async def update_webhook_subscription(
     subscription = webhook_manager.update_subscription(subscription_id, **update_data)
 
     if not subscription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
 
     logger.info(f"Webhook subscription updated: {subscription_id}")
 
     return subscription
 
 
-@router.delete("/subscriptions/{subscription_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_webhook_subscription(subscription_id: str, current_user: TokenData = Depends(require_developer)):
+@router.delete(
+    "/subscriptions/{subscription_id}", status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_webhook_subscription(
+    subscription_id: str, current_user: TokenData = Depends(require_developer)
+):
     """
     Delete a webhook subscription
 
@@ -137,7 +158,9 @@ async def delete_webhook_subscription(subscription_id: str, current_user: TokenD
     success = webhook_manager.delete_subscription(subscription_id)
 
     if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
 
     logger.info(f"Webhook subscription deleted: {subscription_id}")
 
@@ -161,24 +184,32 @@ async def list_webhook_deliveries(
 
     View delivery history and status.
     """
-    deliveries = webhook_manager.list_deliveries(subscription_id=subscription_id, status=status_filter, limit=limit)
+    deliveries = webhook_manager.list_deliveries(
+        subscription_id=subscription_id, status=status_filter, limit=limit
+    )
 
     return [delivery.model_dump() for delivery in deliveries]
 
 
 @router.get("/deliveries/{delivery_id}")
-async def get_webhook_delivery(delivery_id: str, current_user: TokenData = Depends(get_current_active_user)):
+async def get_webhook_delivery(
+    delivery_id: str, current_user: TokenData = Depends(get_current_active_user)
+):
     """Get a specific webhook delivery"""
     delivery = webhook_manager.get_delivery(delivery_id)
 
     if not delivery:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Delivery not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Delivery not found"
+        )
 
     return delivery.model_dump()
 
 
 @router.post("/deliveries/{delivery_id}/retry")
-async def retry_webhook_delivery(delivery_id: str, current_user: TokenData = Depends(require_developer)):
+async def retry_webhook_delivery(
+    delivery_id: str, current_user: TokenData = Depends(require_developer)
+):
     """
     Retry a failed webhook delivery
 
@@ -187,7 +218,9 @@ async def retry_webhook_delivery(delivery_id: str, current_user: TokenData = Dep
     success = await webhook_manager.retry_delivery(delivery_id)
 
     if not success:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot retry this delivery")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot retry this delivery"
+        )
 
     logger.info(f"Webhook delivery retried: {delivery_id}")
 
@@ -200,7 +233,9 @@ async def retry_webhook_delivery(delivery_id: str, current_user: TokenData = Dep
 
 
 @router.post("/test")
-async def test_webhook(request: TestWebhookRequest, current_user: TokenData = Depends(require_developer)):
+async def test_webhook(
+    request: TestWebhookRequest, current_user: TokenData = Depends(require_developer)
+):
     """
     Send a test webhook
 
@@ -210,7 +245,11 @@ async def test_webhook(request: TestWebhookRequest, current_user: TokenData = De
         # Emit test event
         delivery_ids = await webhook_manager.emit_event(
             event_type=WebhookEvent.CUSTOM,
-            data={"message": "This is a test webhook", "test": True, "triggered_by": current_user.email},
+            data={
+                "message": "This is a test webhook",
+                "test": True,
+                "triggered_by": current_user.email,
+            },
             metadata={"test": True},
         )
 
@@ -218,7 +257,10 @@ async def test_webhook(request: TestWebhookRequest, current_user: TokenData = De
 
     except Exception as e:
         logger.error(f"Failed to send test webhook: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to send test webhook")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send test webhook",
+        )
 
 
 # ============================================================================
@@ -227,7 +269,9 @@ async def test_webhook(request: TestWebhookRequest, current_user: TokenData = De
 
 
 @router.get("/statistics")
-async def get_webhook_statistics(current_user: TokenData = Depends(get_current_active_user)):
+async def get_webhook_statistics(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Get webhook statistics
 

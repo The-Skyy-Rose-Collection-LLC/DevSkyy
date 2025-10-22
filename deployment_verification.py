@@ -9,7 +9,6 @@ import os
 import sys
 from pathlib import Path
 
-
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
@@ -100,7 +99,8 @@ class DeploymentVerifier:
                 # Handle runtime errors during import (e.g., NumPy compatibility issues)
                 if "NumPy" in str(e) or "_ARRAY_API" in str(e):
                     self.warn(
-                        f"{description} ({module_name})", f"Version compatibility issue (non-critical): {str(e)[:80]}"
+                        f"{description} ({module_name})",
+                        f"Version compatibility issue (non-critical): {str(e)[:80]}",
                     )
                 else:
                     self.check(f"{description} ({module_name})", False, str(e))
@@ -185,7 +185,9 @@ class DeploymentVerifier:
             # Just verify the URL format and skip actual connection test
             if "asyncpg" in db_url or "postgresql+asyncpg" in db_url:
                 self.info("Async database detected - skipping connection test")
-                self.warn("Database connection test skipped", "AsyncPG requires async context")
+                self.warn(
+                    "Database connection test skipped", "AsyncPG requires async context"
+                )
                 return True
 
             # For sync databases, test the connection
@@ -193,7 +195,9 @@ class DeploymentVerifier:
             from sqlalchemy.pool import NullPool
 
             # Create engine with sync driver
-            sync_url = db_url.replace("+asyncpg", "").replace("asyncpg://", "postgresql://")
+            sync_url = db_url.replace("+asyncpg", "").replace(
+                "asyncpg://", "postgresql://"
+            )
             engine = create_engine(sync_url, poolclass=NullPool)
 
             # Test connection
@@ -220,7 +224,10 @@ class DeploymentVerifier:
         except Exception as e:
             # Don't fail on async database connection issues
             if "asyncpg" in str(e) or "greenlet" in str(e):
-                self.warn("Database connection test", f"Skipped for async driver: {str(e)[:50]}")
+                self.warn(
+                    "Database connection test",
+                    f"Skipped for async driver: {str(e)[:50]}",
+                )
                 return True
             self.check("Database connection", False, str(e))
             return False
@@ -230,7 +237,9 @@ class DeploymentVerifier:
         self.section("Verifying ML Infrastructure")
 
         try:
-            from ml.model_registry import model_registry  # noqa: F401 - Import verification
+            from ml.model_registry import (  # noqa: F401 - Import verification
+                model_registry,
+            )
 
             self.check("Model registry import", True)
 
@@ -255,7 +264,9 @@ class DeploymentVerifier:
 
             self.check("Explainability import", True)
 
-            from ml.auto_retrain import auto_retrainer  # noqa: F401 - Import verification
+            from ml.auto_retrain import (  # noqa: F401 - Import verification
+                auto_retrainer,
+            )
 
             self.check("Auto-retrainer import", True)
 
@@ -327,8 +338,12 @@ class DeploymentVerifier:
                 except Exception as verify_error:
                     # This is actually expected - verify_token raises HTTPException
                     # when used outside of FastAPI context
-                    if "Could not validate" in str(verify_error) or "401" in str(verify_error):
-                        self.info("JWT verification requires FastAPI request context (expected)")
+                    if "Could not validate" in str(verify_error) or "401" in str(
+                        verify_error
+                    ):
+                        self.info(
+                            "JWT verification requires FastAPI request context (expected)"
+                        )
                         self.check("JWT token system operational", True)
                     else:
                         raise verify_error
@@ -397,12 +412,16 @@ class DeploymentVerifier:
 
         if self.failed == 0:
             logger.info(f"{GREEN}{'=' * 70}{RESET}")
-            logger.info(f"{GREEN}✓ DEPLOYMENT READY - All critical checks passed{RESET}")
+            logger.info(
+                f"{GREEN}✓ DEPLOYMENT READY - All critical checks passed{RESET}"
+            )
             logger.info(f"{GREEN}{'=' * 70}{RESET}\n")
             return 0
         else:
             logger.error(f"{RED}{'=' * 70}{RESET}")
-            logger.error(f"{RED}✗ DEPLOYMENT NOT READY - {self.failed} critical failures{RESET}")
+            logger.error(
+                f"{RED}✗ DEPLOYMENT NOT READY - {self.failed} critical failures{RESET}"
+            )
             logger.error(f"{RED}{'=' * 70}{RESET}\n")
             return 1
 

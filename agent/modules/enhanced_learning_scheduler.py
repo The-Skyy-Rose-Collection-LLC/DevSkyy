@@ -27,7 +27,10 @@ class EnhancedLearningScheduler:
         """Start the enhanced learning system with scheduled cycles."""
         try:
             if self.learning_active:
-                return {"status": "already_running", "message": "Learning system is already active"}
+                return {
+                    "status": "already_running",
+                    "message": "Learning system is already active",
+                }
 
             self.learning_active = True
 
@@ -203,7 +206,9 @@ class EnhancedLearningScheduler:
         metrics = {
             "timestamp": current_time,
             "learning_score": results.get("learning_cycle_status") == "completed",
-            "brand_intelligence_score": results.get("brand_learning", {}).get("confidence", 0),
+            "brand_intelligence_score": results.get("brand_learning", {}).get(
+                "confidence", 0
+            ),
             "system_health": 0.95,  # Would be calculated from actual metrics
             "response_time": 1.2,  # Would be measured
             "accuracy_improvement": 0.02,  # Would be calculated
@@ -213,7 +218,9 @@ class EnhancedLearningScheduler:
 
         # Keep only last 30 entries per cycle type
         if len(self.performance_metrics[cycle_type]) > 30:
-            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][-30:]
+            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][
+                -30:
+            ]
 
     def _calculate_improvement(self) -> float:
         """Calculate performance improvement percentage."""
@@ -222,26 +229,36 @@ class EnhancedLearningScheduler:
 
         # Simple improvement calculation based on recent learning cycles
         recent_cycles = self.learning_history[-5:]  # Last 5 cycles
-        improvement_sum = sum(cycle.get("performance_improvement", 0) for cycle in recent_cycles)
+        improvement_sum = sum(
+            cycle.get("performance_improvement", 0) for cycle in recent_cycles
+        )
 
         return round(improvement_sum / len(recent_cycles), 2)
 
     def _analyze_learning_patterns(self) -> Dict[str, Any]:
         """Analyze patterns in learning history."""
         if len(self.learning_history) < 5:
-            return {"status": "insufficient_data", "cycles_analyzed": len(self.learning_history)}
+            return {
+                "status": "insufficient_data",
+                "cycles_analyzed": len(self.learning_history),
+            }
 
         recent_cycles = self.learning_history[-10:]
 
         # Analyze success rates
         successful_cycles = sum(
-            1 for cycle in recent_cycles if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
+            1
+            for cycle in recent_cycles
+            if cycle.get("brand_updates", {}).get("learning_cycle_status")
+            == "completed"
         )
 
         success_rate = successful_cycles / len(recent_cycles)
 
         # Identify improvement trends
-        improvements = [cycle.get("performance_improvement", 0) for cycle in recent_cycles]
+        improvements = [
+            cycle.get("performance_improvement", 0) for cycle in recent_cycles
+        ]
         avg_improvement = sum(improvements) / len(improvements)
 
         return {
@@ -254,16 +271,29 @@ class EnhancedLearningScheduler:
 
     async def _optimize_agent_performance(self) -> Dict[str, Any]:
         """Optimize performance of all agents."""
-        optimization_results = {"agents_optimized": 0, "performance_gains": {}, "optimizations_applied": []}
+        optimization_results = {
+            "agents_optimized": 0,
+            "performance_gains": {},
+            "optimizations_applied": [],
+        }
 
         # Simulate agent optimization
-        agents = ["brand_intelligence", "inventory", "financial", "ecommerce", "wordpress", "web_development"]
+        agents = [
+            "brand_intelligence",
+            "inventory",
+            "financial",
+            "ecommerce",
+            "wordpress",
+            "web_development",
+        ]
 
         for agent in agents:
             # Simulate optimization
             performance_gain = 0.05  # 5% improvement
             optimization_results["performance_gains"][agent] = performance_gain
-            optimization_results["optimizations_applied"].append(f"Optimized {agent} agent algorithms")
+            optimization_results["optimizations_applied"].append(
+                f"Optimized {agent} agent algorithms"
+            )
             optimization_results["agents_optimized"] += 1
 
         return optimization_results
@@ -281,7 +311,8 @@ class EnhancedLearningScheduler:
             recent_success = sum(
                 1
                 for cycle in self.learning_history[-5:]
-                if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
+                if cycle.get("brand_updates", {}).get("learning_cycle_status")
+                == "completed"
             )
             success_factor = recent_success / min(5, len(self.learning_history))
             base_score += success_factor * 0.2
@@ -411,13 +442,19 @@ class EnhancedLearningScheduler:
 
         # Compare recent performance with earlier performance
         recent_cycles = self.learning_history[-7:]
-        earlier_cycles = self.learning_history[-14:-7] if len(self.learning_history) >= 14 else []
+        earlier_cycles = (
+            self.learning_history[-14:-7] if len(self.learning_history) >= 14 else []
+        )
 
         if not earlier_cycles:
             return 0.05
 
-        recent_avg = sum(cycle.get("performance_improvement", 0) for cycle in recent_cycles) / len(recent_cycles)
-        earlier_avg = sum(cycle.get("performance_improvement", 0) for cycle in earlier_cycles) / len(earlier_cycles)
+        recent_avg = sum(
+            cycle.get("performance_improvement", 0) for cycle in recent_cycles
+        ) / len(recent_cycles)
+        earlier_avg = sum(
+            cycle.get("performance_improvement", 0) for cycle in earlier_cycles
+        ) / len(earlier_cycles)
 
         return round(recent_avg - earlier_avg, 3)
 
@@ -426,13 +463,19 @@ class EnhancedLearningScheduler:
         now = datetime.now()
 
         if cycle_type == "hourly":
-            next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+            next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(
+                hours=1
+            )
         elif cycle_type == "deep":
-            next_run = now.replace(hour=(now.hour // 6 + 1) * 6, minute=0, second=0, microsecond=0)
+            next_run = now.replace(
+                hour=(now.hour // 6 + 1) * 6, minute=0, second=0, microsecond=0
+            )
             if next_run <= now:
                 next_run += timedelta(hours=6)
         else:
-            next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+            next_run = now.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            ) + timedelta(days=1)
 
         return next_run.isoformat()
 
@@ -484,7 +527,10 @@ def get_learning_system_status() -> Dict[str, Any]:
     global _global_scheduler
 
     if _global_scheduler is None:
-        return {"status": "not_initialized", "message": "Learning system has not been started"}
+        return {
+            "status": "not_initialized",
+            "message": "Learning system has not been started",
+        }
 
     return _global_scheduler.get_learning_status()
 

@@ -165,7 +165,9 @@ class ActionSHAUpdater:
                 return self.fetch_sha_for_branch(repo, tag)
             elif e.code == 403:
                 # Rate limited - use known SHA if available
-                self.log(f"API rate limited for {repo}@{tag}, checking fallback", "WARNING")
+                self.log(
+                    f"API rate limited for {repo}@{tag}, checking fallback", "WARNING"
+                )
                 return None
             else:
                 self.log(f"HTTP error fetching {repo}@{tag}: {e}", "ERROR")
@@ -221,7 +223,10 @@ class ActionSHAUpdater:
 
                 # Skip if already a commit SHA (40 hex chars)
                 if re.match(r"^[0-9a-f]{40}$", version):
-                    self.log(f"  Line {i}: {action}@{version[:8]}... (already SHA)", "VERBOSE")
+                    self.log(
+                        f"  Line {i}: {action}@{version[:8]}... (already SHA)",
+                        "VERBOSE",
+                    )
                     continue
 
                 actions.append((action, version, i))
@@ -283,9 +288,15 @@ class ActionSHAUpdater:
             if not self.dry_run:
                 with open(filepath, "w") as f:
                     f.write(content)
-                self.log(f"  ✅ Updated {filepath.name} ({updates_made} change(s))", "SUCCESS")
+                self.log(
+                    f"  ✅ Updated {filepath.name} ({updates_made} change(s))",
+                    "SUCCESS",
+                )
             else:
-                self.log(f"  [DRY RUN] Would update {filepath.name} ({updates_made} change(s))", "INFO")
+                self.log(
+                    f"  [DRY RUN] Would update {filepath.name} ({updates_made} change(s))",
+                    "INFO",
+                )
             return True
 
         return False
@@ -301,7 +312,9 @@ class ActionSHAUpdater:
             "total_actions": 0,
         }
 
-        workflow_files = list(workflows_dir.glob("*.yml")) + list(workflows_dir.glob("*.yaml"))
+        workflow_files = list(workflows_dir.glob("*.yml")) + list(
+            workflows_dir.glob("*.yaml")
+        )
 
         if not workflow_files:
             self.log(f"No workflow files found in {workflows_dir}", "WARNING")
@@ -323,9 +336,18 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Update GitHub Actions to use commit SHAs instead of tags")
-    parser.add_argument("--dry-run", "-d", action="store_true", help="Preview changes without modifying files")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
+    parser = argparse.ArgumentParser(
+        description="Update GitHub Actions to use commit SHAs instead of tags"
+    )
+    parser.add_argument(
+        "--dry-run",
+        "-d",
+        action="store_true",
+        help="Preview changes without modifying files",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose logging"
+    )
     parser.add_argument(
         "--workflows-dir",
         "-w",
@@ -372,7 +394,9 @@ def main():
         print("\n💡 Next steps:")
         print("  1. Review changes: git diff .github/workflows/")
         print("  2. Test workflows in a branch")
-        print("  3. Commit: git add .github/workflows/ && git commit -m 'security: Update actions to use commit SHAs'")
+        print(
+            "  3. Commit: git add .github/workflows/ && git commit -m 'security: Update actions to use commit SHAs'"
+        )
         print("  4. Push: git push")
     else:
         print("\n✅ All workflows already use commit SHAs!")

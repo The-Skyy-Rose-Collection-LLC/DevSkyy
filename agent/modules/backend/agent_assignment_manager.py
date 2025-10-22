@@ -57,7 +57,12 @@ class AgentAssignmentManager:
                     "executive_decisions",
                     "luxury_fashion_intelligence",
                 ],
-                "suitable_roles": ["brand_management", "content_creation", "social_media", "executive_oversight"],
+                "suitable_roles": [
+                    "brand_management",
+                    "content_creation",
+                    "social_media",
+                    "executive_oversight",
+                ],
                 "certifications": [
                     "Brand Strategy Expert",
                     "Market Intelligence Professional",
@@ -130,7 +135,12 @@ class AgentAssignmentManager:
                     "viral_content_creation",
                     "luxury_fashion_marketing",
                 ],
-                "suitable_roles": ["social_media", "content_creation", "brand_management", "viral_marketing"],
+                "suitable_roles": [
+                    "social_media",
+                    "content_creation",
+                    "brand_management",
+                    "viral_marketing",
+                ],
                 "certifications": [
                     "Digital Marketing Expert",
                     "Viral Content Specialist",
@@ -148,7 +158,13 @@ class AgentAssignmentManager:
                 ],
                 "luxury_expertise": 96,
                 "24_7_capability": True,
-                "third_party_integrations": ["twitter", "instagram", "facebook", "tiktok", "pinterest"],
+                "third_party_integrations": [
+                    "twitter",
+                    "instagram",
+                    "facebook",
+                    "tiktok",
+                    "pinterest",
+                ],
                 "automation_level": "advanced",
                 "executive_reporting": True,
             },
@@ -162,10 +178,19 @@ class AgentAssignmentManager:
                     "conversion_optimization",
                     "luxury_communication",
                 ],
-                "suitable_roles": ["email_sms", "customer_experience", "content_creation"],
+                "suitable_roles": [
+                    "email_sms",
+                    "customer_experience",
+                    "content_creation",
+                ],
                 "luxury_expertise": 94,
                 "24_7_capability": True,
-                "third_party_integrations": ["sendgrid", "mailgun", "twilio", "constant_contact"],
+                "third_party_integrations": [
+                    "sendgrid",
+                    "mailgun",
+                    "twilio",
+                    "constant_contact",
+                ],
                 "automation_level": "advanced",
                 "vip_customer_focus": True,
             },
@@ -207,21 +232,40 @@ class AgentAssignmentManager:
             "customer_service": {
                 "name": "Experience Concierge",
                 "icon": "💝",
-                "specialties": ["luxury_service", "customer_satisfaction", "vip_management", "support_automation"],
-                "suitable_roles": ["customer_experience", "email_sms", "brand_management"],
+                "specialties": [
+                    "luxury_service",
+                    "customer_satisfaction",
+                    "vip_management",
+                    "support_automation",
+                ],
+                "suitable_roles": [
+                    "customer_experience",
+                    "email_sms",
+                    "brand_management",
+                ],
                 "luxury_expertise": 94,
             },
             "financial": {
                 "name": "Wealth Advisor",
                 "icon": "💰",
-                "specialties": ["business_strategy", "financial_optimization", "roi_analysis", "growth_planning"],
+                "specialties": [
+                    "business_strategy",
+                    "financial_optimization",
+                    "roi_analysis",
+                    "growth_planning",
+                ],
                 "suitable_roles": ["brand_management", "performance_optimization"],
                 "luxury_expertise": 85,
             },
             "security": {
                 "name": "Brand Guardian",
                 "icon": "🛡️",
-                "specialties": ["brand_protection", "security_analysis", "compliance", "risk_management"],
+                "specialties": [
+                    "brand_protection",
+                    "security_analysis",
+                    "compliance",
+                    "risk_management",
+                ],
                 "suitable_roles": ["brand_management", "performance_optimization"],
                 "luxury_expertise": 87,
             },
@@ -384,8 +428,17 @@ class AgentAssignmentManager:
             "seo_marketing": {
                 "name": "Growth Strategist",
                 "icon": "📈",
-                "specialties": ["seo_optimization", "content_marketing", "conversion_tracking", "analytics"],
-                "suitable_roles": ["content_creation", "social_media", "performance_optimization"],
+                "specialties": [
+                    "seo_optimization",
+                    "content_marketing",
+                    "conversion_tracking",
+                    "analytics",
+                ],
+                "suitable_roles": [
+                    "content_creation",
+                    "social_media",
+                    "performance_optimization",
+                ],
                 "luxury_expertise": 89,
             },
         }
@@ -393,19 +446,47 @@ class AgentAssignmentManager:
         # Enhanced role definitions for luxury operations with dedicated frontend assignments
         self.default_assignments = {
             # DEDICATED FRONTEND AGENTS - These work STRICTLY on frontend
-            AgentRole.FRONTEND_BEAUTY.value: ["design_automation"],  # Primary frontend beauty agent
-            AgentRole.FRONTEND_UI_UX.value: ["design_automation", "brand_intelligence"],  # UI/UX specialists
-            AgentRole.FRONTEND_PERFORMANCE.value: ["performance"],  # Frontend performance only
-            AgentRole.FRONTEND_COMPONENTS.value: ["wordpress", "design_automation"],  # Component development
-            AgentRole.FRONTEND_TESTING.value: ["performance", "security"],  # Frontend testing specialists
+            AgentRole.FRONTEND_BEAUTY.value: [
+                "design_automation"
+            ],  # Primary frontend beauty agent
+            AgentRole.FRONTEND_UI_UX.value: [
+                "design_automation",
+                "brand_intelligence",
+            ],  # UI/UX specialists
+            AgentRole.FRONTEND_PERFORMANCE.value: [
+                "performance"
+            ],  # Frontend performance only
+            AgentRole.FRONTEND_COMPONENTS.value: [
+                "wordpress",
+                "design_automation",
+            ],  # Component development
+            AgentRole.FRONTEND_TESTING.value: [
+                "performance",
+                "security",
+            ],  # Frontend testing specialists
             # BACKEND/FULL-STACK AGENTS - These handle backend and coordination
-            AgentRole.SOCIAL_MEDIA.value: ["social_media_automation", "brand_intelligence"],
+            AgentRole.SOCIAL_MEDIA.value: [
+                "social_media_automation",
+                "brand_intelligence",
+            ],
             AgentRole.EMAIL_SMS.value: ["email_sms_automation", "customer_service"],
-            AgentRole.DESIGN_AUTOMATION.value: ["design_automation", "brand_intelligence"],
+            AgentRole.DESIGN_AUTOMATION.value: [
+                "design_automation",
+                "brand_intelligence",
+            ],
             AgentRole.PERFORMANCE_OPTIMIZATION.value: ["performance", "security"],
-            AgentRole.CONTENT_CREATION.value: ["brand_intelligence", "social_media_automation"],
-            AgentRole.BRAND_MANAGEMENT.value: ["brand_intelligence", "customer_service"],
-            AgentRole.CUSTOMER_EXPERIENCE.value: ["customer_service", "design_automation"],
+            AgentRole.CONTENT_CREATION.value: [
+                "brand_intelligence",
+                "social_media_automation",
+            ],
+            AgentRole.BRAND_MANAGEMENT.value: [
+                "brand_intelligence",
+                "customer_service",
+            ],
+            AgentRole.CUSTOMER_EXPERIENCE.value: [
+                "customer_service",
+                "design_automation",
+            ],
         }
 
         # Frontend Agent Specializations and Responsibilities
@@ -425,9 +506,22 @@ class AgentAssignmentManager:
                     "conversion_optimization_through_design",
                 ],
                 "backend_communication": {
-                    "data_requirements": ["user_preferences", "product_data", "analytics_metrics"],
-                    "api_endpoints_used": ["/api/products", "/api/users", "/api/analytics", "/api/collections"],
-                    "real_time_sync": ["user_interactions", "conversion_data", "a_b_test_results"],
+                    "data_requirements": [
+                        "user_preferences",
+                        "product_data",
+                        "analytics_metrics",
+                    ],
+                    "api_endpoints_used": [
+                        "/api/products",
+                        "/api/users",
+                        "/api/analytics",
+                        "/api/collections",
+                    ],
+                    "real_time_sync": [
+                        "user_interactions",
+                        "conversion_data",
+                        "a_b_test_results",
+                    ],
                     "communication_frequency": "real_time_for_user_data_every_5min_for_analytics",
                 },
                 "exclusive_frontend_focus": True,
@@ -448,9 +542,21 @@ class AgentAssignmentManager:
                     "frontend_security_implementation",
                 ],
                 "backend_communication": {
-                    "data_requirements": ["performance_metrics", "error_logs", "user_behavior_data"],
-                    "api_endpoints_used": ["/api/performance", "/api/metrics", "/api/errors"],
-                    "real_time_sync": ["performance_alerts", "error_notifications", "metric_thresholds"],
+                    "data_requirements": [
+                        "performance_metrics",
+                        "error_logs",
+                        "user_behavior_data",
+                    ],
+                    "api_endpoints_used": [
+                        "/api/performance",
+                        "/api/metrics",
+                        "/api/errors",
+                    ],
+                    "real_time_sync": [
+                        "performance_alerts",
+                        "error_notifications",
+                        "metric_thresholds",
+                    ],
                     "communication_frequency": "continuous_monitoring_every_30_seconds",
                 },
                 "exclusive_frontend_focus": True,
@@ -471,9 +577,23 @@ class AgentAssignmentManager:
                     "woocommerce_frontend_enhancement",
                 ],
                 "backend_communication": {
-                    "data_requirements": ["content_data", "product_information", "user_roles", "site_settings"],
-                    "api_endpoints_used": ["/api/content", "/api/products", "/api/settings", "/api/users"],
-                    "real_time_sync": ["content_updates", "product_changes", "user_permissions"],
+                    "data_requirements": [
+                        "content_data",
+                        "product_information",
+                        "user_roles",
+                        "site_settings",
+                    ],
+                    "api_endpoints_used": [
+                        "/api/content",
+                        "/api/products",
+                        "/api/settings",
+                        "/api/users",
+                    ],
+                    "real_time_sync": [
+                        "content_updates",
+                        "product_changes",
+                        "user_permissions",
+                    ],
                     "communication_frequency": "every_10_minutes_for_content_real_time_for_user_actions",
                 },
                 "exclusive_frontend_focus": True,
@@ -494,9 +614,23 @@ class AgentAssignmentManager:
                     "frontend_innovation_and_trend_adoption",
                 ],
                 "backend_communication": {
-                    "data_requirements": ["brand_analytics", "market_trends", "competitor_data", "customer_insights"],
-                    "api_endpoints_used": ["/api/brand", "/api/analytics", "/api/trends", "/api/insights"],
-                    "real_time_sync": ["brand_performance_metrics", "trend_alerts", "competitive_updates"],
+                    "data_requirements": [
+                        "brand_analytics",
+                        "market_trends",
+                        "competitor_data",
+                        "customer_insights",
+                    ],
+                    "api_endpoints_used": [
+                        "/api/brand",
+                        "/api/analytics",
+                        "/api/trends",
+                        "/api/insights",
+                    ],
+                    "real_time_sync": [
+                        "brand_performance_metrics",
+                        "trend_alerts",
+                        "competitive_updates",
+                    ],
                     "communication_frequency": "hourly_for_trends_daily_for_deep_analysis",
                 },
                 "exclusive_frontend_focus": True,
@@ -507,9 +641,21 @@ class AgentAssignmentManager:
         # Frontend-Backend Communication Protocols
         self.frontend_backend_protocols = {
             "data_sync_methods": {
-                "real_time": ["websocket_connections", "sse_events", "polling_for_critical_data"],
-                "scheduled": ["hourly_analytics_sync", "daily_content_updates", "weekly_performance_reports"],
-                "on_demand": ["user_action_triggers", "admin_panel_requests", "emergency_updates"],
+                "real_time": [
+                    "websocket_connections",
+                    "sse_events",
+                    "polling_for_critical_data",
+                ],
+                "scheduled": [
+                    "hourly_analytics_sync",
+                    "daily_content_updates",
+                    "weekly_performance_reports",
+                ],
+                "on_demand": [
+                    "user_action_triggers",
+                    "admin_panel_requests",
+                    "emergency_updates",
+                ],
             },
             "communication_rules": {
                 "frontend_agents_forbidden_from": [
@@ -538,25 +684,41 @@ class AgentAssignmentManager:
         # Frontend Agent Coordination Matrix
         self.frontend_coordination_matrix = {
             "design_automation_leads": {
-                "ui_ux_decisions": ["all_visual_design", "user_experience_flows", "interaction_patterns"],
+                "ui_ux_decisions": [
+                    "all_visual_design",
+                    "user_experience_flows",
+                    "interaction_patterns",
+                ],
                 "coordinates_with": ["performance", "brand_intelligence", "wordpress"],
                 "decision_authority": "final_say_on_visual_design_and_ux",
                 "escalation_path": "brand_intelligence_for_strategic_conflicts",
             },
             "performance_leads": {
-                "technical_optimization": ["code_performance", "loading_speeds", "technical_seo"],
+                "technical_optimization": [
+                    "code_performance",
+                    "loading_speeds",
+                    "technical_seo",
+                ],
                 "coordinates_with": ["design_automation", "wordpress"],
                 "decision_authority": "final_say_on_performance_optimizations",
                 "escalation_path": "design_automation_for_ux_performance_conflicts",
             },
             "wordpress_leads": {
-                "component_development": ["divi_components", "wordpress_specific_features", "cms_integration"],
+                "component_development": [
+                    "divi_components",
+                    "wordpress_specific_features",
+                    "cms_integration",
+                ],
                 "coordinates_with": ["design_automation", "performance"],
                 "decision_authority": "final_say_on_wordpress_divi_implementation",
                 "escalation_path": "design_automation_for_design_conflicts",
             },
             "brand_intelligence_oversees": {
-                "strategic_alignment": ["brand_consistency", "market_positioning", "competitive_advantage"],
+                "strategic_alignment": [
+                    "brand_consistency",
+                    "market_positioning",
+                    "competitive_advantage",
+                ],
                 "coordinates_with": ["all_frontend_agents"],
                 "decision_authority": "strategic_veto_power_on_brand_inconsistent_decisions",
                 "escalation_path": "executive_decision_engine",
@@ -570,21 +732,36 @@ class AgentAssignmentManager:
                 "color_palette": ["#E8B4B8", "#D4AF37", "#F5F5F5", "#2C2C2C"],
                 "story": "Timeless elegance meets modern sophistication",
                 "target_aesthetic": "luxury_minimalism",
-                "conversion_elements": ["hero_video", "social_proof", "scarcity_indicators", "premium_cta"],
+                "conversion_elements": [
+                    "hero_video",
+                    "social_proof",
+                    "scarcity_indicators",
+                    "premium_cta",
+                ],
             },
             "luxury_gold_collection": {
                 "theme": "Luxury Gold Statement",
                 "color_palette": ["#FFD700", "#B8860B", "#FFFFFF", "#1C1C1C"],
                 "story": "Bold statements for the discerning connoisseur",
                 "target_aesthetic": "opulent_luxury",
-                "conversion_elements": ["interactive_gallery", "vip_access", "exclusive_previews", "concierge_service"],
+                "conversion_elements": [
+                    "interactive_gallery",
+                    "vip_access",
+                    "exclusive_previews",
+                    "concierge_service",
+                ],
             },
             "elegant_silver_collection": {
                 "theme": "Elegant Silver Sophistication",
                 "color_palette": ["#C0C0C0", "#708090", "#F8F8FF", "#36454F"],
                 "story": "Refined elegance for the modern luxury lifestyle",
                 "target_aesthetic": "contemporary_elegance",
-                "conversion_elements": ["lifestyle_imagery", "testimonials", "size_guide", "care_instructions"],
+                "conversion_elements": [
+                    "lifestyle_imagery",
+                    "testimonials",
+                    "size_guide",
+                    "care_instructions",
+                ],
             },
         }
 
@@ -615,7 +792,9 @@ class AgentAssignmentManager:
         # Flag for monitoring start
         self.monitoring_started = False
 
-        logger.info("👥 Elite Agent Assignment Manager initialized with 24/7 luxury operations")
+        logger.info(
+            "👥 Elite Agent Assignment Manager initialized with 24/7 luxury operations"
+        )
 
     async def _start_24_7_monitoring(self):
         """Start the 24/7 monitoring and auto-fix system."""
@@ -639,7 +818,9 @@ class AgentAssignmentManager:
                 if self.executive_mode:
                     await self._executive_decision_engine()
 
-                await asyncio.sleep(self.monitoring_config["check_intervals"]["performance"])
+                await asyncio.sleep(
+                    self.monitoring_config["check_intervals"]["performance"]
+                )
 
             except Exception as e:
                 logger.error(f"❌ 24/7 monitoring error: {str(e)}")
@@ -684,7 +865,9 @@ class AgentAssignmentManager:
             }
 
             if ux_metrics["bounce_rate"] > 25.0 and self.auto_fix_enabled:
-                await self._apply_auto_fixes("user_experience", ["High bounce rate detected"])
+                await self._apply_auto_fixes(
+                    "user_experience", ["High bounce rate detected"]
+                )
 
         except Exception as e:
             logger.error(f"UX monitoring failed: {str(e)}")
@@ -700,8 +883,13 @@ class AgentAssignmentManager:
                 "cart_abandonment_rate": 35.0,
             }
 
-            if revenue_metrics["cart_abandonment_rate"] > 40.0 and self.auto_fix_enabled:
-                await self._apply_auto_fixes("revenue", ["High cart abandonment detected"])
+            if (
+                revenue_metrics["cart_abandonment_rate"] > 40.0
+                and self.auto_fix_enabled
+            ):
+                await self._apply_auto_fixes(
+                    "revenue", ["High cart abandonment detected"]
+                )
 
         except Exception as e:
             logger.error(f"Revenue monitoring failed: {str(e)}")
@@ -718,7 +906,9 @@ class AgentAssignmentManager:
             }
 
             if brand_metrics["sentiment_score"] < 85.0 and self.auto_fix_enabled:
-                await self._apply_auto_fixes("brand_reputation", ["Brand sentiment declining"])
+                await self._apply_auto_fixes(
+                    "brand_reputation", ["Brand sentiment declining"]
+                )
 
         except Exception as e:
             logger.error(f"Brand monitoring failed: {str(e)}")
@@ -735,7 +925,9 @@ class AgentAssignmentManager:
             }
 
             # Make executive decisions
-            executive_decisions = await self._make_executive_decisions(business_intelligence)
+            executive_decisions = await self._make_executive_decisions(
+                business_intelligence
+            )
 
             # Implement approved strategic changes
             for decision in executive_decisions:
@@ -752,11 +944,23 @@ class AgentAssignmentManager:
 
             fix_strategies = {
                 "performance": {
-                    "High response time": ["optimize_database_queries", "enable_caching", "compress_assets"],
-                    "High error rate": ["restart_services", "update_error_handling", "increase_resources"],
+                    "High response time": [
+                        "optimize_database_queries",
+                        "enable_caching",
+                        "compress_assets",
+                    ],
+                    "High error rate": [
+                        "restart_services",
+                        "update_error_handling",
+                        "increase_resources",
+                    ],
                 },
                 "user_experience": {
-                    "High bounce rate": ["improve_page_speed", "enhance_first_impression", "optimize_mobile_experience"]
+                    "High bounce rate": [
+                        "improve_page_speed",
+                        "enhance_first_impression",
+                        "optimize_mobile_experience",
+                    ]
                 },
                 "revenue": {
                     "High cart abandonment": [
@@ -788,16 +992,25 @@ class AgentAssignmentManager:
         """Execute a specific type of fix."""
         # Simulate fix execution
         await asyncio.sleep(0.1)  # Simulate fix time
-        return {"fix": fix_type, "status": "applied", "timestamp": datetime.now().isoformat()}
+        return {
+            "fix": fix_type,
+            "status": "applied",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-    async def create_luxury_collection_page(self, collection_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_luxury_collection_page(
+        self, collection_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create a luxury collection page designed like top-selling landing pages."""
         try:
             collection_name = collection_data.get("collection_name")
             collection_type = collection_data.get("type", "rose_gold_collection")
 
             if collection_type not in self.collection_pages:
-                return {"error": f"Unknown collection type: {collection_type}", "status": "failed"}
+                return {
+                    "error": f"Unknown collection type: {collection_type}",
+                    "status": "failed",
+                }
 
             collection_spec = self.collection_pages[collection_type]
 
@@ -826,18 +1039,42 @@ class AgentAssignmentManager:
                     },
                     "storytelling_section": {
                         "content_type": "immersive_narrative",
-                        "visual_elements": ["behind_the_scenes", "craftsmanship_videos", "designer_interviews"],
-                        "emotional_triggers": ["exclusivity", "heritage", "craftsmanship"],
+                        "visual_elements": [
+                            "behind_the_scenes",
+                            "craftsmanship_videos",
+                            "designer_interviews",
+                        ],
+                        "emotional_triggers": [
+                            "exclusivity",
+                            "heritage",
+                            "craftsmanship",
+                        ],
                     },
                     "social_proof": {
-                        "elements": ["celebrity_endorsements", "influencer_content", "customer_testimonials"],
+                        "elements": [
+                            "celebrity_endorsements",
+                            "influencer_content",
+                            "customer_testimonials",
+                        ],
                         "display_format": "elegant_carousel",
                         "real_time_updates": True,
                     },
                     "conversion_optimization": {
-                        "scarcity_indicators": ["limited_edition_badges", "stock_counters", "time_sensitive_offers"],
-                        "trust_signals": ["security_badges", "return_policy", "concierge_service"],
-                        "personalization": ["recommended_items", "size_suggestions", "styling_advice"],
+                        "scarcity_indicators": [
+                            "limited_edition_badges",
+                            "stock_counters",
+                            "time_sensitive_offers",
+                        ],
+                        "trust_signals": [
+                            "security_badges",
+                            "return_policy",
+                            "concierge_service",
+                        ],
+                        "personalization": [
+                            "recommended_items",
+                            "size_suggestions",
+                            "styling_advice",
+                        ],
                     },
                 },
                 "color_palette": collection_spec["color_palette"],
@@ -866,13 +1103,17 @@ class AgentAssignmentManager:
             }
 
             # Generate conversion-optimized content
-            page_content = await self._generate_collection_content(collection_spec, collection_data)
+            page_content = await self._generate_collection_content(
+                collection_spec, collection_data
+            )
 
             # Configure A/B testing
             ab_testing_config = await self._setup_collection_ab_testing(collection_type)
 
             # Setup analytics and tracking
-            analytics_config = await self._configure_collection_analytics(collection_name)
+            analytics_config = await self._configure_collection_analytics(
+                collection_name
+            )
 
             logger.info(f"🎨 Created luxury collection page: {collection_name}")
 
@@ -892,13 +1133,19 @@ class AgentAssignmentManager:
             logger.error(f"❌ Collection page creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_collection_content(self, collection_spec: Dict, collection_data: Dict) -> Dict[str, Any]:
+    async def _generate_collection_content(
+        self, collection_spec: Dict, collection_data: Dict
+    ) -> Dict[str, Any]:
         """Generate compelling content for the collection page."""
         return {
             "headlines": {
                 "primary": "Experience Luxury Redefined",
                 "secondary": collection_spec["story"],
-                "cta_headlines": ["Shop the Collection", "Discover Your Style", "Join the Elite"],
+                "cta_headlines": [
+                    "Shop the Collection",
+                    "Discover Your Style",
+                    "Join the Elite",
+                ],
             },
             "product_descriptions": {
                 "style": "luxury_copywriting",
@@ -912,20 +1159,33 @@ class AgentAssignmentManager:
             },
         }
 
-    async def _setup_collection_ab_testing(self, collection_type: str) -> Dict[str, Any]:
+    async def _setup_collection_ab_testing(
+        self, collection_type: str
+    ) -> Dict[str, Any]:
         """Setup A/B testing for collection page optimization."""
         return {
             "tests": [
-                {"element": "hero_cta", "variants": ["Shop Now", "Explore Collection", "Discover Luxury"]},
-                {"element": "product_layout", "variants": ["grid", "masonry", "carousel"]},
-                {"element": "color_scheme", "variants": ["primary", "secondary", "seasonal"]},
+                {
+                    "element": "hero_cta",
+                    "variants": ["Shop Now", "Explore Collection", "Discover Luxury"],
+                },
+                {
+                    "element": "product_layout",
+                    "variants": ["grid", "masonry", "carousel"],
+                },
+                {
+                    "element": "color_scheme",
+                    "variants": ["primary", "secondary", "seasonal"],
+                },
             ],
             "success_metrics": ["conversion_rate", "engagement_time", "scroll_depth"],
             "test_duration": "14_days",
             "confidence_level": "95%",
         }
 
-    async def _configure_collection_analytics(self, collection_name: str) -> Dict[str, Any]:
+    async def _configure_collection_analytics(
+        self, collection_name: str
+    ) -> Dict[str, Any]:
         """Configure comprehensive analytics for collection pages."""
         return {
             "tracking_events": [
@@ -939,18 +1199,41 @@ class AgentAssignmentManager:
                 "size_guide_open",
                 "wishlist_add",
             ],
-            "custom_dimensions": ["collection_name", "visitor_type", "device_category", "traffic_source"],
-            "conversion_funnels": ["awareness", "interest", "consideration", "purchase", "advocacy"],
+            "custom_dimensions": [
+                "collection_name",
+                "visitor_type",
+                "device_category",
+                "traffic_source",
+            ],
+            "conversion_funnels": [
+                "awareness",
+                "interest",
+                "consideration",
+                "purchase",
+                "advocacy",
+            ],
             "revenue_attribution": "multi_touch_attribution_model",
         }
 
     async def _analyze_market_trends(self) -> Dict[str, Any]:
         """Analyze current market trends for executive decisions."""
         return {
-            "trending_styles": ["sustainable_luxury", "digital_fashion", "personalized_experiences"],
+            "trending_styles": [
+                "sustainable_luxury",
+                "digital_fashion",
+                "personalized_experiences",
+            ],
             "market_growth": 12.5,
-            "competitor_movements": ["premium_positioning", "digital_transformation", "customer_experience_focus"],
-            "opportunities": ["ai_personalization", "virtual_experiences", "sustainable_practices"],
+            "competitor_movements": [
+                "premium_positioning",
+                "digital_transformation",
+                "customer_experience_focus",
+            ],
+            "opportunities": [
+                "ai_personalization",
+                "virtual_experiences",
+                "sustainable_practices",
+            ],
         }
 
     async def _analyze_competitors(self) -> Dict[str, Any]:
@@ -963,16 +1246,38 @@ class AgentAssignmentManager:
                 "exclusive_collections",
             ],
             "market_positioning": "premium_luxury_with_innovation_focus",
-            "competitive_advantages": ["technology_integration", "brand_heritage", "customer_loyalty"],
+            "competitive_advantages": [
+                "technology_integration",
+                "brand_heritage",
+                "customer_loyalty",
+            ],
         }
 
     async def _analyze_customer_behavior(self) -> Dict[str, Any]:
         """Analyze customer behavior patterns for strategic insights."""
         return {
-            "customer_segments": ["luxury_enthusiasts", "tech_savvy_millennials", "premium_collectors"],
-            "behavior_patterns": ["mobile_first_shopping", "social_media_influence", "experience_over_product"],
-            "preference_trends": ["personalization", "exclusivity", "sustainability", "digital_experiences"],
-            "loyalty_drivers": ["exceptional_service", "exclusive_access", "brand_heritage", "innovation"],
+            "customer_segments": [
+                "luxury_enthusiasts",
+                "tech_savvy_millennials",
+                "premium_collectors",
+            ],
+            "behavior_patterns": [
+                "mobile_first_shopping",
+                "social_media_influence",
+                "experience_over_product",
+            ],
+            "preference_trends": [
+                "personalization",
+                "exclusivity",
+                "sustainability",
+                "digital_experiences",
+            ],
+            "loyalty_drivers": [
+                "exceptional_service",
+                "exclusive_access",
+                "brand_heritage",
+                "innovation",
+            ],
         }
 
     async def _identify_revenue_opportunities(self) -> Dict[str, Any]:
@@ -983,12 +1288,26 @@ class AgentAssignmentManager:
                 "cart_abandonment_recovery",
                 "personalized_recommendations",
             ],
-            "medium_term_opportunities": ["subscription_services", "vip_memberships", "limited_editions"],
-            "long_term_opportunities": ["market_expansion", "brand_partnerships", "technology_licensing"],
-            "revenue_potential": {"immediate": "15-25%", "medium_term": "30-50%", "long_term": "100%+"},
+            "medium_term_opportunities": [
+                "subscription_services",
+                "vip_memberships",
+                "limited_editions",
+            ],
+            "long_term_opportunities": [
+                "market_expansion",
+                "brand_partnerships",
+                "technology_licensing",
+            ],
+            "revenue_potential": {
+                "immediate": "15-25%",
+                "medium_term": "30-50%",
+                "long_term": "100%+",
+            },
         }
 
-    async def _make_executive_decisions(self, business_intelligence: Dict[str, Any]) -> List[Dict[str, Any]]:
+    async def _make_executive_decisions(
+        self, business_intelligence: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Make executive-level strategic decisions based on business intelligence."""
         decisions = [
             {
@@ -1024,17 +1343,23 @@ class AgentAssignmentManager:
         # Implementation would be handled by specific agents based on decision type
         return {"decision": decision["decision"], "status": "implementation_started"}
 
-    async def assign_frontend_agents(self, frontend_request: Dict[str, Any]) -> Dict[str, Any]:
+    async def assign_frontend_agents(
+        self, frontend_request: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Assign agents specifically for frontend procedures with strict frontend-only focus."""
         try:
             procedure_type = frontend_request.get("procedure_type")
             priority_level = frontend_request.get("priority", "medium")
 
             # Determine which frontend agents should handle this procedure
-            frontend_assignments = self._determine_frontend_agent_assignments(procedure_type, priority_level)
+            frontend_assignments = self._determine_frontend_agent_assignments(
+                procedure_type, priority_level
+            )
 
             # Set up frontend-backend communication protocols
-            communication_setup = await self._setup_frontend_backend_communication(frontend_assignments)
+            communication_setup = await self._setup_frontend_backend_communication(
+                frontend_assignments
+            )
 
             # Create frontend-only task assignments
             task_assignments = await self._create_frontend_task_assignments(
@@ -1042,7 +1367,9 @@ class AgentAssignmentManager:
             )
 
             # Configure monitoring for frontend agents
-            monitoring_config = self._configure_frontend_monitoring(frontend_assignments)
+            monitoring_config = self._configure_frontend_monitoring(
+                frontend_assignments
+            )
 
             logger.info(
                 f"🎨 Assigned frontend agents for {procedure_type}: {[a['agent_id'] for a in frontend_assignments]}"
@@ -1057,8 +1384,12 @@ class AgentAssignmentManager:
                 "monitoring_configuration": monitoring_config,
                 "backend_communication_rules": self._get_backend_communication_rules(),
                 "frontend_restrictions": self._get_frontend_restrictions(),
-                "expected_delivery": self._calculate_frontend_delivery_time(procedure_type, priority_level),
-                "quality_assurance": self._setup_frontend_qa_process(frontend_assignments),
+                "expected_delivery": self._calculate_frontend_delivery_time(
+                    procedure_type, priority_level
+                ),
+                "quality_assurance": self._setup_frontend_qa_process(
+                    frontend_assignments
+                ),
                 "assigned_at": datetime.now().isoformat(),
             }
 
@@ -1066,7 +1397,9 @@ class AgentAssignmentManager:
             logger.error(f"❌ Frontend agent assignment failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def _determine_frontend_agent_assignments(self, procedure_type: str, priority_level: str) -> List[Dict[str, Any]]:
+    def _determine_frontend_agent_assignments(
+        self, procedure_type: str, priority_level: str
+    ) -> List[Dict[str, Any]]:
         """Determine which frontend agents should handle specific procedures."""
 
         frontend_procedure_mapping = {
@@ -1130,7 +1463,9 @@ class AgentAssignmentManager:
                 "workload_percentage": 60,
                 "decision_authority": "high",
                 "frontend_focus": "exclusive",
-                "specialization": self.frontend_agent_assignments[primary_agent]["frontend_responsibilities"],
+                "specialization": self.frontend_agent_assignments[primary_agent][
+                    "frontend_responsibilities"
+                ],
             }
         )
 
@@ -1139,12 +1474,16 @@ class AgentAssignmentManager:
             assignments.append(
                 {
                     "agent_id": supporting_agent,
-                    "agent_name": self.frontend_agent_assignments[supporting_agent]["role"],
+                    "agent_name": self.frontend_agent_assignments[supporting_agent][
+                        "role"
+                    ],
                     "responsibility_level": "supporting_specialist",
                     "workload_percentage": 30 // len(assignment_config["supporting"]),
                     "decision_authority": "medium",
                     "frontend_focus": "exclusive",
-                    "specialization": self.frontend_agent_assignments[supporting_agent]["frontend_responsibilities"],
+                    "specialization": self.frontend_agent_assignments[supporting_agent][
+                        "frontend_responsibilities"
+                    ],
                 }
             )
 
@@ -1153,18 +1492,24 @@ class AgentAssignmentManager:
             assignments.append(
                 {
                     "agent_id": consultation_agent,
-                    "agent_name": self.frontend_agent_assignments[consultation_agent]["role"],
+                    "agent_name": self.frontend_agent_assignments[consultation_agent][
+                        "role"
+                    ],
                     "responsibility_level": "consultant",
                     "workload_percentage": 10 // len(assignment_config["consultation"]),
                     "decision_authority": "advisory",
                     "frontend_focus": "exclusive",
-                    "specialization": self.frontend_agent_assignments[consultation_agent]["frontend_responsibilities"],
+                    "specialization": self.frontend_agent_assignments[
+                        consultation_agent
+                    ]["frontend_responsibilities"],
                 }
             )
 
         return assignments
 
-    async def _setup_frontend_backend_communication(self, frontend_assignments: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _setup_frontend_backend_communication(
+        self, frontend_assignments: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Setup communication protocols between frontend agents and backend."""
 
         communication_channels = {}
@@ -1174,10 +1519,18 @@ class AgentAssignmentManager:
             agent_config = self.frontend_agent_assignments[agent_id]
 
             communication_channels[agent_id] = {
-                "allowed_api_endpoints": agent_config["backend_communication"]["api_endpoints_used"],
-                "data_requirements": agent_config["backend_communication"]["data_requirements"],
-                "sync_frequency": agent_config["backend_communication"]["communication_frequency"],
-                "real_time_subscriptions": agent_config["backend_communication"]["real_time_sync"],
+                "allowed_api_endpoints": agent_config["backend_communication"][
+                    "api_endpoints_used"
+                ],
+                "data_requirements": agent_config["backend_communication"][
+                    "data_requirements"
+                ],
+                "sync_frequency": agent_config["backend_communication"][
+                    "communication_frequency"
+                ],
+                "real_time_subscriptions": agent_config["backend_communication"][
+                    "real_time_sync"
+                ],
                 "authentication_method": "jwt_token_with_agent_scope",
                 "rate_limits": self._calculate_agent_rate_limits(agent_id),
                 "error_handling": "graceful_degradation_with_caching",
@@ -1204,7 +1557,10 @@ class AgentAssignmentManager:
         }
 
     async def _create_frontend_task_assignments(
-        self, procedure_type: str, frontend_assignments: List[Dict[str, Any]], priority_level: str
+        self,
+        procedure_type: str,
+        frontend_assignments: List[Dict[str, Any]],
+        priority_level: str,
     ) -> Dict[str, Any]:
         """Create specific task assignments for frontend agents."""
 
@@ -1222,7 +1578,10 @@ class AgentAssignmentManager:
                     "validate_luxury_aesthetic_standards",
                     "provide_competitive_design_insights",
                 ],
-                "performance": ["optimize_css_performance", "validate_design_performance_impact"],
+                "performance": [
+                    "optimize_css_performance",
+                    "validate_design_performance_impact",
+                ],
             },
             "collection_page_creation": {
                 "design_automation": [
@@ -1277,10 +1636,18 @@ class AgentAssignmentManager:
                 task_breakdown[agent_id] = {
                     "agent_name": assignment["agent_name"],
                     "tasks": template[agent_id],
-                    "estimated_hours": self._calculate_task_hours(template[agent_id], priority_level),
-                    "dependencies": self._identify_task_dependencies(agent_id, template),
-                    "deliverables": self._define_task_deliverables(agent_id, template[agent_id]),
-                    "quality_criteria": self._define_quality_criteria(agent_id, procedure_type),
+                    "estimated_hours": self._calculate_task_hours(
+                        template[agent_id], priority_level
+                    ),
+                    "dependencies": self._identify_task_dependencies(
+                        agent_id, template
+                    ),
+                    "deliverables": self._define_task_deliverables(
+                        agent_id, template[agent_id]
+                    ),
+                    "quality_criteria": self._define_quality_criteria(
+                        agent_id, procedure_type
+                    ),
                 }
 
         return {
@@ -1290,33 +1657,74 @@ class AgentAssignmentManager:
             "quality_gates": self._setup_quality_gates(task_breakdown),
         }
 
-    def _configure_frontend_monitoring(self, frontend_assignments: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _configure_frontend_monitoring(
+        self, frontend_assignments: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Configure monitoring specifically for frontend agents."""
 
         monitoring_config = {
             "performance_metrics": {
-                "page_load_times": {"threshold": "2_seconds", "check_frequency": "continuous"},
-                "first_contentful_paint": {"threshold": "1.2_seconds", "check_frequency": "continuous"},
-                "largest_contentful_paint": {"threshold": "2.5_seconds", "check_frequency": "continuous"},
-                "cumulative_layout_shift": {"threshold": "0.1", "check_frequency": "continuous"},
-                "first_input_delay": {"threshold": "100_milliseconds", "check_frequency": "continuous"},
+                "page_load_times": {
+                    "threshold": "2_seconds",
+                    "check_frequency": "continuous",
+                },
+                "first_contentful_paint": {
+                    "threshold": "1.2_seconds",
+                    "check_frequency": "continuous",
+                },
+                "largest_contentful_paint": {
+                    "threshold": "2.5_seconds",
+                    "check_frequency": "continuous",
+                },
+                "cumulative_layout_shift": {
+                    "threshold": "0.1",
+                    "check_frequency": "continuous",
+                },
+                "first_input_delay": {
+                    "threshold": "100_milliseconds",
+                    "check_frequency": "continuous",
+                },
             },
             "user_experience_metrics": {
                 "bounce_rate": {"threshold": "25%", "check_frequency": "hourly"},
-                "session_duration": {"minimum": "3_minutes", "check_frequency": "hourly"},
+                "session_duration": {
+                    "minimum": "3_minutes",
+                    "check_frequency": "hourly",
+                },
                 "conversion_rate": {"minimum": "8%", "check_frequency": "daily"},
-                "user_satisfaction_score": {"minimum": "95%", "check_frequency": "daily"},
+                "user_satisfaction_score": {
+                    "minimum": "95%",
+                    "check_frequency": "daily",
+                },
             },
             "technical_metrics": {
-                "javascript_errors": {"threshold": "0.1%", "check_frequency": "real_time"},
+                "javascript_errors": {
+                    "threshold": "0.1%",
+                    "check_frequency": "real_time",
+                },
                 "css_rendering_issues": {"threshold": "0", "check_frequency": "hourly"},
-                "mobile_responsiveness": {"score_minimum": "98%", "check_frequency": "daily"},
-                "accessibility_compliance": {"score_minimum": "95%", "check_frequency": "daily"},
+                "mobile_responsiveness": {
+                    "score_minimum": "98%",
+                    "check_frequency": "daily",
+                },
+                "accessibility_compliance": {
+                    "score_minimum": "95%",
+                    "check_frequency": "daily",
+                },
             },
             "brand_consistency_metrics": {
-                "visual_brand_compliance": {"score_minimum": "98%", "check_frequency": "hourly"},
-                "luxury_aesthetic_score": {"minimum": "95%", "check_frequency": "daily"},
-                "brand_voice_consistency": {"score_minimum": "97%", "check_frequency": "daily"},
+                "visual_brand_compliance": {
+                    "score_minimum": "98%",
+                    "check_frequency": "hourly",
+                },
+                "luxury_aesthetic_score": {
+                    "minimum": "95%",
+                    "check_frequency": "daily",
+                },
+                "brand_voice_consistency": {
+                    "score_minimum": "97%",
+                    "check_frequency": "daily",
+                },
             },
         }
 
@@ -1408,13 +1816,23 @@ class AgentAssignmentManager:
                     "agent_name": config["role"],
                     "status": "active_and_focused_on_frontend",
                     "current_tasks": await self._get_agent_current_tasks(agent_id),
-                    "performance_metrics": await self._get_agent_performance_metrics(agent_id),
-                    "backend_communication_status": await self._get_backend_comm_status(agent_id),
+                    "performance_metrics": await self._get_agent_performance_metrics(
+                        agent_id
+                    ),
+                    "backend_communication_status": await self._get_backend_comm_status(
+                        agent_id
+                    ),
                     "frontend_specializations": config["frontend_responsibilities"],
-                    "work_quality_score": await self._calculate_work_quality_score(agent_id),
-                    "user_impact_metrics": await self._get_user_impact_metrics(agent_id),
+                    "work_quality_score": await self._calculate_work_quality_score(
+                        agent_id
+                    ),
+                    "user_impact_metrics": await self._get_user_impact_metrics(
+                        agent_id
+                    ),
                     "last_activity": datetime.now().isoformat(),
-                    "next_scheduled_task": await self._get_next_scheduled_task(agent_id),
+                    "next_scheduled_task": await self._get_next_scheduled_task(
+                        agent_id
+                    ),
                 }
                 frontend_status[agent_id] = status
 
@@ -1437,33 +1855,77 @@ class AgentAssignmentManager:
     def _calculate_agent_rate_limits(self, agent_id: str) -> Dict[str, int]:
         """Calculate appropriate rate limits for each agent."""
         base_limits = {
-            "design_automation": {"requests_per_minute": 120, "requests_per_hour": 5000},
+            "design_automation": {
+                "requests_per_minute": 120,
+                "requests_per_hour": 5000,
+            },
             "performance": {"requests_per_minute": 200, "requests_per_hour": 8000},
             "wordpress": {"requests_per_minute": 100, "requests_per_hour": 4000},
-            "brand_intelligence": {"requests_per_minute": 80, "requests_per_hour": 3000},
+            "brand_intelligence": {
+                "requests_per_minute": 80,
+                "requests_per_hour": 3000,
+            },
         }
-        return base_limits.get(agent_id, {"requests_per_minute": 60, "requests_per_hour": 2000})
+        return base_limits.get(
+            agent_id, {"requests_per_minute": 60, "requests_per_hour": 2000}
+        )
 
     async def _get_agent_current_tasks(self, agent_id: str) -> List[Dict[str, Any]]:
         """Get current tasks for a specific frontend agent."""
         # Simulate current tasks based on agent specialization
         task_examples = {
             "design_automation": [
-                {"task": "Optimizing collection page hero section", "progress": "75%", "priority": "high"},
-                {"task": "Implementing responsive design for mobile", "progress": "90%", "priority": "medium"},
-                {"task": "Creating luxury UI components", "progress": "45%", "priority": "high"},
+                {
+                    "task": "Optimizing collection page hero section",
+                    "progress": "75%",
+                    "priority": "high",
+                },
+                {
+                    "task": "Implementing responsive design for mobile",
+                    "progress": "90%",
+                    "priority": "medium",
+                },
+                {
+                    "task": "Creating luxury UI components",
+                    "progress": "45%",
+                    "priority": "high",
+                },
             ],
             "performance": [
-                {"task": "Frontend performance optimization", "progress": "85%", "priority": "critical"},
-                {"task": "Core Web Vitals improvement", "progress": "60%", "priority": "high"},
+                {
+                    "task": "Frontend performance optimization",
+                    "progress": "85%",
+                    "priority": "critical",
+                },
+                {
+                    "task": "Core Web Vitals improvement",
+                    "progress": "60%",
+                    "priority": "high",
+                },
             ],
             "wordpress": [
-                {"task": "Custom Divi component development", "progress": "70%", "priority": "medium"},
-                {"task": "WooCommerce frontend enhancement", "progress": "55%", "priority": "high"},
+                {
+                    "task": "Custom Divi component development",
+                    "progress": "70%",
+                    "priority": "medium",
+                },
+                {
+                    "task": "WooCommerce frontend enhancement",
+                    "progress": "55%",
+                    "priority": "high",
+                },
             ],
             "brand_intelligence": [
-                {"task": "Brand consistency audit", "progress": "95%", "priority": "high"},
-                {"task": "Luxury aesthetic validation", "progress": "80%", "priority": "medium"},
+                {
+                    "task": "Brand consistency audit",
+                    "progress": "95%",
+                    "priority": "high",
+                },
+                {
+                    "task": "Luxury aesthetic validation",
+                    "progress": "80%",
+                    "priority": "medium",
+                },
             ],
         }
         return task_examples.get(agent_id, [])
@@ -1534,7 +1996,9 @@ class AgentAssignmentManager:
             "customer_experience_improvements": 5,
         }
 
-    async def assign_agents_to_role(self, assignment_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def assign_agents_to_role(
+        self, assignment_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Assign specific agents to handle a particular role."""
         try:
             role = assignment_data.get("role")
@@ -1545,9 +2009,14 @@ class AgentAssignmentManager:
                 return {"error": f"Invalid role: {role}", "status": "failed"}
 
             # Validate agent IDs
-            invalid_agents = [aid for aid in agent_ids if aid not in self.available_agents]
+            invalid_agents = [
+                aid for aid in agent_ids if aid not in self.available_agents
+            ]
             if invalid_agents:
-                return {"error": f"Invalid agent IDs: {invalid_agents}", "status": "failed"}
+                return {
+                    "error": f"Invalid agent IDs: {invalid_agents}",
+                    "status": "failed",
+                }
 
             # Check agent suitability for role
             suitability_check = self._check_agent_suitability(agent_ids, role)
@@ -1559,7 +2028,9 @@ class AgentAssignmentManager:
             assignment_details = self._generate_assignment_details(role, priority_order)
 
             # Create coordination strategy
-            coordination_strategy = self._create_coordination_strategy(role, priority_order)
+            coordination_strategy = self._create_coordination_strategy(
+                role, priority_order
+            )
 
             logger.info(f"✅ Assigned {len(agent_ids)} agents to {role}")
 
@@ -1570,7 +2041,9 @@ class AgentAssignmentManager:
                 "assignment_details": assignment_details,
                 "suitability_analysis": suitability_check,
                 "coordination_strategy": coordination_strategy,
-                "expected_performance": self._predict_role_performance(role, priority_order),
+                "expected_performance": self._predict_role_performance(
+                    role, priority_order
+                ),
                 "automation_setup": self._setup_role_automation(role, priority_order),
                 "monitoring_config": self._configure_role_monitoring(role),
                 "assigned_at": datetime.now().isoformat(),
@@ -1592,7 +2065,9 @@ class AgentAssignmentManager:
                     "role": role,
                     "assigned_agents": assigned_agents,
                     "agent_details": [
-                        self.available_agents[aid] for aid in assigned_agents if aid in self.available_agents
+                        self.available_agents[aid]
+                        for aid in assigned_agents
+                        if aid in self.available_agents
                     ],
                     "coordination_status": self._get_coordination_status(role),
                     "performance_metrics": self._get_role_performance_metrics(role),
@@ -1620,29 +2095,41 @@ class AgentAssignmentManager:
             logger.error(f"❌ Get assignments failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_agent_workload(self, optimization_request: Dict[str, Any]) -> Dict[str, Any]:
+    async def optimize_agent_workload(
+        self, optimization_request: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Optimize agent workload distribution across roles."""
         try:
             target_efficiency = optimization_request.get("target_efficiency", 90)
             rebalance_method = optimization_request.get("method", "performance_based")
 
-            logger.info(f"⚖️ Optimizing agent workload with {rebalance_method} method...")
+            logger.info(
+                f"⚖️ Optimizing agent workload with {rebalance_method} method..."
+            )
 
             # Analyze current workload
             workload_analysis = self._analyze_current_workload()
 
             # Identify optimization opportunities
-            optimization_opportunities = self._identify_workload_opportunities(workload_analysis)
+            optimization_opportunities = self._identify_workload_opportunities(
+                workload_analysis
+            )
 
             # Generate rebalancing strategy
-            rebalancing_strategy = self._create_rebalancing_strategy(optimization_opportunities, rebalance_method)
+            rebalancing_strategy = self._create_rebalancing_strategy(
+                optimization_opportunities, rebalance_method
+            )
 
             # Simulate optimization results
-            optimization_results = self._simulate_optimization(rebalancing_strategy, target_efficiency)
+            optimization_results = self._simulate_optimization(
+                rebalancing_strategy, target_efficiency
+            )
 
             # Apply optimizations if beneficial
             if optimization_results["efficiency_gain"] > 10:
-                new_assignments = self._apply_workload_optimizations(rebalancing_strategy)
+                new_assignments = self._apply_workload_optimizations(
+                    rebalancing_strategy
+                )
                 self.agent_assignments.update(new_assignments)
 
                 return {
@@ -1676,7 +2163,9 @@ class AgentAssignmentManager:
             logger.error(f"❌ Workload optimization failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def _check_agent_suitability(self, agent_ids: List[str], role: str) -> Dict[str, Any]:
+    def _check_agent_suitability(
+        self, agent_ids: List[str], role: str
+    ) -> Dict[str, Any]:
         """Check how suitable agents are for the assigned role."""
         suitability_scores = {}
 
@@ -1693,27 +2182,51 @@ class AgentAssignmentManager:
                 # Specialty alignment bonus
                 specialty_bonus = 0
                 role_specialty_map = {
-                    "frontend_beauty": ["ui_design", "ux_optimization", "visual_systems"],
-                    "social_media": ["content_strategy", "engagement_optimization", "trend_analysis"],
-                    "email_sms": ["personalized_messaging", "automation_workflows", "customer_segmentation"],
-                    "design_automation": ["ui_design", "visual_systems", "frontend_development"],
+                    "frontend_beauty": [
+                        "ui_design",
+                        "ux_optimization",
+                        "visual_systems",
+                    ],
+                    "social_media": [
+                        "content_strategy",
+                        "engagement_optimization",
+                        "trend_analysis",
+                    ],
+                    "email_sms": [
+                        "personalized_messaging",
+                        "automation_workflows",
+                        "customer_segmentation",
+                    ],
+                    "design_automation": [
+                        "ui_design",
+                        "visual_systems",
+                        "frontend_development",
+                    ],
                 }
 
                 if role in role_specialty_map:
-                    matching_specialties = set(agent_info["specialties"]) & set(role_specialty_map[role])
+                    matching_specialties = set(agent_info["specialties"]) & set(
+                        role_specialty_map[role]
+                    )
                     specialty_bonus = len(matching_specialties) * 5
 
                 total_score = min(100, base_score + luxury_bonus + specialty_bonus)
                 suitability_scores[agent_id] = {
                     "score": round(total_score, 1),
-                    "rating": "excellent" if total_score > 90 else "good" if total_score > 70 else "fair",
+                    "rating": (
+                        "excellent"
+                        if total_score > 90
+                        else "good" if total_score > 70 else "fair"
+                    ),
                     "strengths": agent_info["specialties"],
                     "luxury_expertise": agent_info["luxury_expertise"],
                 }
 
         return suitability_scores
 
-    def _generate_assignment_details(self, role: str, agent_ids: List[str]) -> Dict[str, Any]:
+    def _generate_assignment_details(
+        self, role: str, agent_ids: List[str]
+    ) -> Dict[str, Any]:
         """Generate detailed assignment information."""
         primary_agent = agent_ids[0] if agent_ids else None
         backup_agents = agent_ids[1:] if len(agent_ids) > 1 else []
@@ -1745,8 +2258,14 @@ class AgentAssignmentManager:
         return {
             "primary_agent": {
                 "id": primary_agent,
-                "name": self.available_agents[primary_agent]["name"] if primary_agent else None,
-                "responsibilities": role_responsibilities.get(role, ["General management"]),
+                "name": (
+                    self.available_agents[primary_agent]["name"]
+                    if primary_agent
+                    else None
+                ),
+                "responsibilities": role_responsibilities.get(
+                    role, ["General management"]
+                ),
                 "workload_percentage": 70 if backup_agents else 100,
             },
             "backup_agents": [
@@ -1754,16 +2273,26 @@ class AgentAssignmentManager:
                     "id": agent_id,
                     "name": self.available_agents[agent_id]["name"],
                     "support_role": "overflow_and_specialization",
-                    "workload_percentage": 30 // len(backup_agents) if backup_agents else 0,
+                    "workload_percentage": (
+                        30 // len(backup_agents) if backup_agents else 0
+                    ),
                 }
                 for agent_id in backup_agents
                 if agent_id in self.available_agents
             ],
-            "coordination_model": "primary_with_specialist_support" if backup_agents else "single_agent_ownership",
-            "escalation_path": backup_agents + [primary_agent] if backup_agents else [primary_agent],
+            "coordination_model": (
+                "primary_with_specialist_support"
+                if backup_agents
+                else "single_agent_ownership"
+            ),
+            "escalation_path": (
+                backup_agents + [primary_agent] if backup_agents else [primary_agent]
+            ),
         }
 
-    def _create_coordination_strategy(self, role: str, agent_ids: List[str]) -> Dict[str, Any]:
+    def _create_coordination_strategy(
+        self, role: str, agent_ids: List[str]
+    ) -> Dict[str, Any]:
         """Create coordination strategy for multiple agents in same role."""
         if len(agent_ids) == 1:
             return {
@@ -1793,7 +2322,9 @@ class AgentAssignmentManager:
             },
         }
 
-    def _predict_role_performance(self, role: str, agent_ids: List[str]) -> Dict[str, Any]:
+    def _predict_role_performance(
+        self, role: str, agent_ids: List[str]
+    ) -> Dict[str, Any]:
         """Predict performance for the role assignment."""
         if not agent_ids:
             return {"predicted_performance": 0, "confidence": "low"}
@@ -1803,7 +2334,9 @@ class AgentAssignmentManager:
         for i, agent_id in enumerate(agent_ids):
             if agent_id in self.available_agents:
                 agent_expertise = self.available_agents[agent_id]["luxury_expertise"]
-                weight = 0.7 if i == 0 else 0.3 / max(1, len(agent_ids) - 1)  # Primary gets 70%, others split 30%
+                weight = (
+                    0.7 if i == 0 else 0.3 / max(1, len(agent_ids) - 1)
+                )  # Primary gets 70%, others split 30%
                 total_performance += agent_expertise * weight
 
         # Role complexity factor
@@ -1828,7 +2361,9 @@ class AgentAssignmentManager:
             },
             "expected_outcomes": {
                 "quality_score": (
-                    "premium" if final_performance > 90 else "high" if final_performance > 80 else "standard"
+                    "premium"
+                    if final_performance > 90
+                    else "high" if final_performance > 80 else "standard"
                 ),
                 "delivery_speed": "fast" if len(agent_ids) > 1 else "standard",
                 "innovation_level": "high" if final_performance > 85 else "medium",
@@ -1839,18 +2374,38 @@ class AgentAssignmentManager:
         """Setup automation for the assigned role."""
         automation_configs = {
             "frontend_beauty": {
-                "automated_tasks": ["design_consistency_checks", "responsive_testing", "accessibility_validation"],
+                "automated_tasks": [
+                    "design_consistency_checks",
+                    "responsive_testing",
+                    "accessibility_validation",
+                ],
                 "triggers": ["code_changes", "design_updates", "user_feedback"],
                 "frequency": "continuous_monitoring",
             },
             "social_media": {
-                "automated_tasks": ["content_scheduling", "engagement_tracking", "trend_monitoring"],
-                "triggers": ["content_calendar", "engagement_thresholds", "trending_topics"],
+                "automated_tasks": [
+                    "content_scheduling",
+                    "engagement_tracking",
+                    "trend_monitoring",
+                ],
+                "triggers": [
+                    "content_calendar",
+                    "engagement_thresholds",
+                    "trending_topics",
+                ],
                 "frequency": "daily_execution",
             },
             "email_sms": {
-                "automated_tasks": ["campaign_deployment", "segmentation_updates", "performance_analysis"],
-                "triggers": ["behavioral_triggers", "time_based_sequences", "conversion_events"],
+                "automated_tasks": [
+                    "campaign_deployment",
+                    "segmentation_updates",
+                    "performance_analysis",
+                ],
+                "triggers": [
+                    "behavioral_triggers",
+                    "time_based_sequences",
+                    "conversion_events",
+                ],
                 "frequency": "real_time_and_scheduled",
             },
         }
@@ -1874,11 +2429,17 @@ class AgentAssignmentManager:
 
         # Adjust for task complexity
         complex_keywords = ["optimization", "analysis", "implementation", "development"]
-        complexity_bonus = sum(1 for task in tasks if any(keyword in task.lower() for keyword in complex_keywords))
+        complexity_bonus = sum(
+            1
+            for task in tasks
+            if any(keyword in task.lower() for keyword in complex_keywords)
+        )
 
         return total_hours + (complexity_bonus * 2)
 
-    def _identify_task_dependencies(self, agent_id: str, template: Dict[str, List[str]]) -> List[str]:
+    def _identify_task_dependencies(
+        self, agent_id: str, template: Dict[str, List[str]]
+    ) -> List[str]:
         """Identify task dependencies for an agent."""
         # Define common dependencies between agents
         dependency_map = {
@@ -1893,15 +2454,36 @@ class AgentAssignmentManager:
     def _define_task_deliverables(self, agent_id: str, tasks: List[str]) -> List[str]:
         """Define deliverables for agent tasks."""
         deliverable_templates = {
-            "design_automation": ["UI mockups", "Component library", "Style guide", "Responsive layouts"],
-            "performance": ["Performance report", "Optimization recommendations", "Code improvements"],
-            "wordpress": ["Custom components", "Theme modifications", "Plugin configurations"],
-            "brand_intelligence": ["Brand guidelines", "Consistency report", "Strategic recommendations"],
+            "design_automation": [
+                "UI mockups",
+                "Component library",
+                "Style guide",
+                "Responsive layouts",
+            ],
+            "performance": [
+                "Performance report",
+                "Optimization recommendations",
+                "Code improvements",
+            ],
+            "wordpress": [
+                "Custom components",
+                "Theme modifications",
+                "Plugin configurations",
+            ],
+            "brand_intelligence": [
+                "Brand guidelines",
+                "Consistency report",
+                "Strategic recommendations",
+            ],
         }
 
-        return deliverable_templates.get(agent_id, ["Task completion report", "Quality assurance checklist"])
+        return deliverable_templates.get(
+            agent_id, ["Task completion report", "Quality assurance checklist"]
+        )
 
-    def _define_quality_criteria(self, agent_id: str, procedure_type: str) -> Dict[str, Any]:
+    def _define_quality_criteria(
+        self, agent_id: str, procedure_type: str
+    ) -> Dict[str, Any]:
         """Define quality criteria for agent work."""
         return {
             "performance_standards": {
@@ -1924,7 +2506,9 @@ class AgentAssignmentManager:
             ],
         }
 
-    def _create_coordination_schedule(self, task_breakdown: Dict[str, Any]) -> Dict[str, Any]:
+    def _create_coordination_schedule(
+        self, task_breakdown: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create coordination schedule for tasks."""
         return {
             "daily_standups": "09:00_UTC",
@@ -1932,18 +2516,44 @@ class AgentAssignmentManager:
             "milestone_reviews": "bi_weekly",
             "coordination_meetings": {
                 "frequency": "as_needed",
-                "triggers": ["dependency_conflicts", "priority_changes", "quality_issues"],
+                "triggers": [
+                    "dependency_conflicts",
+                    "priority_changes",
+                    "quality_issues",
+                ],
             },
         }
 
-    def _define_milestone_checkpoints(self, procedure_type: str) -> List[Dict[str, Any]]:
+    def _define_milestone_checkpoints(
+        self, procedure_type: str
+    ) -> List[Dict[str, Any]]:
         """Define milestone checkpoints for procedures."""
         return [
-            {"milestone": "requirements_analysis", "timeline": "day_1", "deliverables": ["requirements_doc"]},
-            {"milestone": "design_approval", "timeline": "day_3", "deliverables": ["design_mockups"]},
-            {"milestone": "development_complete", "timeline": "day_7", "deliverables": ["working_implementation"]},
-            {"milestone": "quality_assurance", "timeline": "day_9", "deliverables": ["qa_report"]},
-            {"milestone": "deployment_ready", "timeline": "day_10", "deliverables": ["production_ready_code"]},
+            {
+                "milestone": "requirements_analysis",
+                "timeline": "day_1",
+                "deliverables": ["requirements_doc"],
+            },
+            {
+                "milestone": "design_approval",
+                "timeline": "day_3",
+                "deliverables": ["design_mockups"],
+            },
+            {
+                "milestone": "development_complete",
+                "timeline": "day_7",
+                "deliverables": ["working_implementation"],
+            },
+            {
+                "milestone": "quality_assurance",
+                "timeline": "day_9",
+                "deliverables": ["qa_report"],
+            },
+            {
+                "milestone": "deployment_ready",
+                "timeline": "day_10",
+                "deliverables": ["production_ready_code"],
+            },
         ]
 
     def _setup_quality_gates(self, task_breakdown: Dict[str, Any]) -> Dict[str, Any]:
@@ -2067,7 +2677,12 @@ class AgentAssignmentManager:
         }
 
         return impact_metrics.get(
-            agent_id, {"general_user_impact": "positive", "satisfaction_score": "85%", "efficiency_improvement": "+10%"}
+            agent_id,
+            {
+                "general_user_impact": "positive",
+                "satisfaction_score": "85%",
+                "efficiency_improvement": "+10%",
+            },
         )
 
     async def _get_next_scheduled_task(self, agent_id: str) -> Dict[str, Any]:
@@ -2116,7 +2731,9 @@ class AgentAssignmentManager:
 
         # Factors that affect coordination
         active_agents = len(self.frontend_agent_assignments)
-        communication_overhead = max(0, (active_agents - 2) * 2)  # Penalty for too many agents
+        communication_overhead = max(
+            0, (active_agents - 2) * 2
+        )  # Penalty for too many agents
 
         final_efficiency = base_efficiency - communication_overhead
         return round(max(80.0, final_efficiency), 1)
@@ -2160,7 +2777,10 @@ class AgentAssignmentManager:
                 "brand_intelligence": "88%",
             },
             "bottlenecks": ["performance_optimization_queue"],
-            "optimization_opportunities": ["task_redistribution", "priority_rebalancing"],
+            "optimization_opportunities": [
+                "task_redistribution",
+                "priority_rebalancing",
+            ],
             "efficiency_score": 87.5,
         }
 
@@ -2213,7 +2833,13 @@ class AgentAssignmentManager:
         }
 
         return agent_metrics.get(
-            agent_id, ["task_completion_rate", "quality_score", "response_time", "user_satisfaction"]
+            agent_id,
+            [
+                "task_completion_rate",
+                "quality_score",
+                "response_time",
+                "user_satisfaction",
+            ],
         )
 
     def _get_agent_alert_thresholds(self, agent_id: str) -> Dict[str, Any]:
@@ -2249,7 +2875,11 @@ class AgentAssignmentManager:
                 "clear_performance_caches",
                 "apply_emergency_performance_fixes",
             ],
-            "wordpress": ["restart_wordpress_services", "clear_plugin_caches", "revert_problematic_updates"],
+            "wordpress": [
+                "restart_wordpress_services",
+                "clear_plugin_caches",
+                "revert_problematic_updates",
+            ],
             "brand_intelligence": [
                 "reapply_brand_guidelines",
                 "escalate_to_human_review",
@@ -2263,11 +2893,20 @@ class AgentAssignmentManager:
         return {
             "critical_alerts": {
                 "site_down": {"threshold": "immediate", "escalation": "emergency"},
-                "performance_degradation": {"threshold": "30_seconds", "escalation": "high"},
-                "security_breach": {"threshold": "immediate", "escalation": "emergency"},
+                "performance_degradation": {
+                    "threshold": "30_seconds",
+                    "escalation": "high",
+                },
+                "security_breach": {
+                    "threshold": "immediate",
+                    "escalation": "emergency",
+                },
             },
             "warning_alerts": {
-                "slow_response_time": {"threshold": "5_minutes", "escalation": "medium"},
+                "slow_response_time": {
+                    "threshold": "5_minutes",
+                    "escalation": "medium",
+                },
                 "high_error_rate": {"threshold": "2_minutes", "escalation": "medium"},
                 "brand_inconsistency": {"threshold": "10_minutes", "escalation": "low"},
             },
@@ -2284,9 +2923,21 @@ class AgentAssignmentManager:
         return {
             "dashboard_layout": {
                 "overview_section": ["system_health", "active_agents", "current_tasks"],
-                "performance_section": ["response_times", "error_rates", "uptime_stats"],
-                "agent_section": ["agent_status", "workload_distribution", "efficiency_metrics"],
-                "brand_section": ["consistency_scores", "luxury_metrics", "customer_satisfaction"],
+                "performance_section": [
+                    "response_times",
+                    "error_rates",
+                    "uptime_stats",
+                ],
+                "agent_section": [
+                    "agent_status",
+                    "workload_distribution",
+                    "efficiency_metrics",
+                ],
+                "brand_section": [
+                    "consistency_scores",
+                    "luxury_metrics",
+                    "customer_satisfaction",
+                ],
             },
             "refresh_intervals": {
                 "real_time_metrics": "5_seconds",
@@ -2308,12 +2959,20 @@ class AgentAssignmentManager:
             "daily_reports": {
                 "time": "09:00_UTC",
                 "recipients": ["frontend_team", "management"],
-                "content": ["performance_summary", "agent_efficiency", "issues_resolved"],
+                "content": [
+                    "performance_summary",
+                    "agent_efficiency",
+                    "issues_resolved",
+                ],
             },
             "weekly_reports": {
                 "time": "monday_10:00_UTC",
                 "recipients": ["executive_team", "stakeholders"],
-                "content": ["strategic_overview", "trend_analysis", "optimization_recommendations"],
+                "content": [
+                    "strategic_overview",
+                    "trend_analysis",
+                    "optimization_recommendations",
+                ],
             },
             "monthly_reports": {
                 "time": "first_monday_10:00_UTC",
@@ -2322,22 +2981,58 @@ class AgentAssignmentManager:
             },
         }
 
-    def _calculate_frontend_delivery_time(self, procedure_type: str, priority_level: str) -> str:
+    def _calculate_frontend_delivery_time(
+        self, procedure_type: str, priority_level: str
+    ) -> str:
         """Calculate estimated delivery time for frontend procedures."""
         base_times = {
-            "luxury_ui_design": {"high": "3-5 days", "medium": "5-7 days", "low": "7-10 days"},
-            "collection_page_creation": {"high": "5-7 days", "medium": "7-10 days", "low": "10-14 days"},
-            "frontend_performance_optimization": {"high": "2-3 days", "medium": "3-5 days", "low": "5-7 days"},
-            "responsive_design_implementation": {"high": "4-6 days", "medium": "6-8 days", "low": "8-12 days"},
-            "component_development": {"high": "3-4 days", "medium": "4-6 days", "low": "6-8 days"},
-            "brand_consistency_enforcement": {"high": "2-3 days", "medium": "3-4 days", "low": "4-6 days"},
-            "user_experience_optimization": {"high": "4-5 days", "medium": "5-7 days", "low": "7-10 days"},
-            "frontend_testing_and_qa": {"high": "2-3 days", "medium": "3-4 days", "low": "4-5 days"},
+            "luxury_ui_design": {
+                "high": "3-5 days",
+                "medium": "5-7 days",
+                "low": "7-10 days",
+            },
+            "collection_page_creation": {
+                "high": "5-7 days",
+                "medium": "7-10 days",
+                "low": "10-14 days",
+            },
+            "frontend_performance_optimization": {
+                "high": "2-3 days",
+                "medium": "3-5 days",
+                "low": "5-7 days",
+            },
+            "responsive_design_implementation": {
+                "high": "4-6 days",
+                "medium": "6-8 days",
+                "low": "8-12 days",
+            },
+            "component_development": {
+                "high": "3-4 days",
+                "medium": "4-6 days",
+                "low": "6-8 days",
+            },
+            "brand_consistency_enforcement": {
+                "high": "2-3 days",
+                "medium": "3-4 days",
+                "low": "4-6 days",
+            },
+            "user_experience_optimization": {
+                "high": "4-5 days",
+                "medium": "5-7 days",
+                "low": "7-10 days",
+            },
+            "frontend_testing_and_qa": {
+                "high": "2-3 days",
+                "medium": "3-4 days",
+                "low": "4-5 days",
+            },
         }
 
         return base_times.get(procedure_type, {}).get(priority_level, "5-7 days")
 
-    def _setup_frontend_qa_process(self, frontend_assignments: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _setup_frontend_qa_process(
+        self, frontend_assignments: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Setup quality assurance process for frontend assignments."""
         return {
             "qa_stages": [
@@ -2349,20 +3044,36 @@ class AgentAssignmentManager:
                 },
                 {
                     "stage": "manual_testing",
-                    "focus_areas": ["user_experience", "visual_consistency", "responsive_design"],
+                    "focus_areas": [
+                        "user_experience",
+                        "visual_consistency",
+                        "responsive_design",
+                    ],
                     "testing_devices": ["desktop", "tablet", "mobile"],
                     "browser_coverage": ["chrome", "firefox", "safari", "edge"],
                 },
                 {
                     "stage": "brand_compliance_review",
                     "reviewers": ["brand_manager", "design_lead"],
-                    "criteria": ["visual_guidelines", "tone_of_voice", "luxury_standards"],
+                    "criteria": [
+                        "visual_guidelines",
+                        "tone_of_voice",
+                        "luxury_standards",
+                    ],
                     "approval_required": True,
                 },
                 {
                     "stage": "performance_validation",
-                    "metrics": ["core_web_vitals", "loading_speed", "accessibility_score"],
-                    "minimum_scores": {"performance": 90, "accessibility": 95, "seo": 90},
+                    "metrics": [
+                        "core_web_vitals",
+                        "loading_speed",
+                        "accessibility_score",
+                    ],
+                    "minimum_scores": {
+                        "performance": 90,
+                        "accessibility": 95,
+                        "seo": 90,
+                    },
                     "tools": ["lighthouse", "webpagetest", "gtmetrix"],
                 },
             ],

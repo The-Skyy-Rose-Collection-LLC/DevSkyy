@@ -187,7 +187,10 @@ class ModelRegistry:
 
         # Update index
         if model_name not in self.index["models"]:
-            self.index["models"][model_name] = {"versions": [], "latest_production": None}
+            self.index["models"][model_name] = {
+                "versions": [],
+                "latest_production": None,
+            }
 
         version_entry = {
             "version": version,
@@ -209,7 +212,12 @@ class ModelRegistry:
 
         return metadata
 
-    def load_model(self, model_name: str, version: Optional[str] = None, stage: Optional[ModelStage] = None) -> Any:
+    def load_model(
+        self,
+        model_name: str,
+        version: Optional[str] = None,
+        stage: Optional[ModelStage] = None,
+    ) -> Any:
         """
         Load a model from registry
 
@@ -225,7 +233,9 @@ class ModelRegistry:
             if stage:
                 version = self._get_latest_version_by_stage(model_name, stage)
             else:
-                version = self.index["models"].get(model_name, {}).get("latest_production")
+                version = (
+                    self.index["models"].get(model_name, {}).get("latest_production")
+                )
 
             if not version:
                 raise ValueError(f"No production version found for {model_name}")
@@ -299,7 +309,9 @@ class ModelRegistry:
         """Archive a model version"""
         self.promote_model(model_name, version, ModelStage.ARCHIVED)
 
-    def compare_models(self, model_name: str, version1: str, version2: str) -> Dict[str, Any]:
+    def compare_models(
+        self, model_name: str, version1: str, version2: str
+    ) -> Dict[str, Any]:
         """
         Compare two model versions
 
@@ -330,7 +342,9 @@ class ModelRegistry:
             "stage2": meta2.stage,
         }
 
-    def _get_latest_version_by_stage(self, model_name: str, stage: ModelStage) -> Optional[str]:
+    def _get_latest_version_by_stage(
+        self, model_name: str, stage: ModelStage
+    ) -> Optional[str]:
         """Get latest version in a specific stage"""
         if model_name not in self.index["models"]:
             return None

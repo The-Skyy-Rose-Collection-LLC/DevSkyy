@@ -48,9 +48,24 @@ class ElementorThemeBuilder:
                 "animations": "subtle",
                 "color_mood": "sophisticated",
             },
-            "streetwear": {"style": "bold", "layout": "grid", "animations": "dynamic", "color_mood": "vibrant"},
-            "minimalist": {"style": "clean", "layout": "centered", "animations": "minimal", "color_mood": "neutral"},
-            "vintage": {"style": "classic", "layout": "magazine", "animations": "fade", "color_mood": "warm"},
+            "streetwear": {
+                "style": "bold",
+                "layout": "grid",
+                "animations": "dynamic",
+                "color_mood": "vibrant",
+            },
+            "minimalist": {
+                "style": "clean",
+                "layout": "centered",
+                "animations": "minimal",
+                "color_mood": "neutral",
+            },
+            "vintage": {
+                "style": "classic",
+                "layout": "magazine",
+                "animations": "fade",
+                "color_mood": "warm",
+            },
             "sustainable": {
                 "style": "organic",
                 "layout": "storytelling",
@@ -62,15 +77,38 @@ class ElementorThemeBuilder:
     def _initialize_widget_library(self) -> Dict[str, Dict]:
         """Initialize Elementor widget configurations"""
         return {
-            "hero": {"type": "section", "widgets": ["heading", "text", "button", "image"], "responsive": True},
-            "product_grid": {"type": "container", "widgets": ["posts", "woocommerce"], "layout": "grid"},
-            "testimonials": {"type": "carousel", "widgets": ["testimonial", "image", "rating"], "autoplay": True},
-            "gallery": {"type": "masonry", "widgets": ["image", "lightbox"], "lazy_load": True},
-            "cta": {"type": "section", "widgets": ["heading", "button", "form"], "conversion_optimized": True},
+            "hero": {
+                "type": "section",
+                "widgets": ["heading", "text", "button", "image"],
+                "responsive": True,
+            },
+            "product_grid": {
+                "type": "container",
+                "widgets": ["posts", "woocommerce"],
+                "layout": "grid",
+            },
+            "testimonials": {
+                "type": "carousel",
+                "widgets": ["testimonial", "image", "rating"],
+                "autoplay": True,
+            },
+            "gallery": {
+                "type": "masonry",
+                "widgets": ["image", "lightbox"],
+                "lazy_load": True,
+            },
+            "cta": {
+                "type": "section",
+                "widgets": ["heading", "button", "form"],
+                "conversion_optimized": True,
+            },
         }
 
     async def generate_theme(
-        self, brand_info: Dict[str, Any], theme_type: str = "luxury_fashion", pages: Optional[List[str]] = None
+        self,
+        brand_info: Dict[str, Any],
+        theme_type: str = "luxury_fashion",
+        pages: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Generate complete WordPress/Elementor theme
@@ -84,7 +122,9 @@ class ElementorThemeBuilder:
             Complete theme configuration
         """
         try:
-            logger.info(f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}")
+            logger.info(
+                f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}"
+            )
 
             # Default pages for fashion ecommerce
             if pages is None:
@@ -100,12 +140,18 @@ class ElementorThemeBuilder:
             page_layouts = {}
             for page in pages:
                 layout = await self._generate_page_layout(
-                    page_type=page, brand_info=brand_info, theme_type=theme_type, colors=colors, typography=typography
+                    page_type=page,
+                    brand_info=brand_info,
+                    theme_type=theme_type,
+                    colors=colors,
+                    typography=typography,
                 )
                 page_layouts[page] = layout
 
             # Generate global settings
-            global_settings = await self._generate_global_settings(brand_info, theme_type, colors, typography)
+            global_settings = await self._generate_global_settings(
+                brand_info, theme_type, colors, typography
+            )
 
             # Create theme package
             theme = {
@@ -122,7 +168,9 @@ class ElementorThemeBuilder:
                 "typography": typography,
                 "pages": page_layouts,
                 "widgets": self._get_required_widgets(page_layouts),
-                "woocommerce_settings": await self._generate_woocommerce_config(brand_info),
+                "woocommerce_settings": await self._generate_woocommerce_config(
+                    brand_info
+                ),
                 "seo_settings": await self._generate_seo_config(brand_info),
                 "performance_optimizations": self._get_performance_config(),
             }
@@ -143,7 +191,9 @@ class ElementorThemeBuilder:
             logger.error(f"Theme generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_color_palette(self, brand_info: Dict[str, Any], theme_type: str) -> Dict[str, str]:
+    async def _generate_color_palette(
+        self, brand_info: Dict[str, Any], theme_type: str
+    ) -> Dict[str, str]:
         """Generate ML-optimized color palette"""
         try:
             # Base colors from brand or theme template
@@ -215,7 +265,9 @@ class ElementorThemeBuilder:
             logger.error(f"Color palette generation failed: {e}")
             return {}
 
-    async def _generate_typography(self, brand_info: Dict[str, Any], theme_type: str) -> Dict[str, Any]:
+    async def _generate_typography(
+        self, brand_info: Dict[str, Any], theme_type: str
+    ) -> Dict[str, Any]:
         """Generate optimized typography settings"""
         template = self.theme_templates.get(theme_type, {})
         style = template.get("style", "modern")
@@ -237,7 +289,12 @@ class ElementorThemeBuilder:
                 "heading_font": "Inter",
                 "body_font": "Inter",
                 "accent_font": "Inter",
-                "font_weights": {"light": 300, "regular": 400, "semibold": 600, "bold": 700},
+                "font_weights": {
+                    "light": 300,
+                    "regular": 400,
+                    "semibold": 600,
+                    "bold": 700,
+                },
             },
             "classic": {
                 "heading_font": "Merriweather",
@@ -261,7 +318,11 @@ class ElementorThemeBuilder:
                 "small": {"desktop": "14px", "tablet": "14px", "mobile": "12px"},
             },
             "line_heights": {"headings": 1.2, "body": 1.6, "buttons": 1.4},
-            "letter_spacing": {"headings": "-0.02em", "body": "0em", "buttons": "0.05em"},
+            "letter_spacing": {
+                "headings": "-0.02em",
+                "body": "0em",
+                "buttons": "0.05em",
+            },
         }
 
     async def _generate_page_layout(
@@ -275,7 +336,9 @@ class ElementorThemeBuilder:
         """Generate page layout with Elementor sections"""
         try:
             if page_type == "home":
-                return await self._generate_homepage(brand_info, theme_type, colors, typography)
+                return await self._generate_homepage(
+                    brand_info, theme_type, colors, typography
+                )
             elif page_type == "shop":
                 return await self._generate_shop_page(brand_info, colors, typography)
             elif page_type == "product":
@@ -294,7 +357,11 @@ class ElementorThemeBuilder:
             return {"sections": [], "error": str(e)}
 
     async def _generate_homepage(
-        self, brand_info: Dict[str, Any], theme_type: str, colors: Dict, typography: Dict
+        self,
+        brand_info: Dict[str, Any],
+        theme_type: str,
+        colors: Dict,
+        typography: Dict,
     ) -> Dict[str, Any]:
         """Generate homepage layout"""
         return {
@@ -305,8 +372,14 @@ class ElementorThemeBuilder:
                     "background_type": "image",
                     "content": {
                         "heading": f"Welcome to {brand_info.get('name', 'Our Store')}",
-                        "subheading": brand_info.get("tagline", "Discover Luxury Fashion"),
-                        "cta_button": {"text": "Shop Now", "link": "/shop", "style": "primary"},
+                        "subheading": brand_info.get(
+                            "tagline", "Discover Luxury Fashion"
+                        ),
+                        "cta_button": {
+                            "text": "Shop Now",
+                            "link": "/shop",
+                            "style": "primary",
+                        },
                     },
                     "styling": {
                         "height": "100vh",
@@ -320,29 +393,48 @@ class ElementorThemeBuilder:
                     "type": "featured_products",
                     "layout": "grid",
                     "columns": {"desktop": 4, "tablet": 2, "mobile": 1},
-                    "content": {"heading": "Featured Collection", "products_count": 8, "filter": "featured"},
-                    "styling": {"padding": {"top": "80px", "bottom": "80px"}, "background": colors.get("background")},
+                    "content": {
+                        "heading": "Featured Collection",
+                        "products_count": 8,
+                        "filter": "featured",
+                    },
+                    "styling": {
+                        "padding": {"top": "80px", "bottom": "80px"},
+                        "background": colors.get("background"),
+                    },
                 },
                 {
                     "type": "brand_story",
                     "layout": "two-column",
                     "content": {
                         "heading": "Our Story",
-                        "text": brand_info.get("description", "Crafting excellence since inception"),
+                        "text": brand_info.get(
+                            "description", "Crafting excellence since inception"
+                        ),
                         "image_position": "right",
                     },
-                    "styling": {"padding": {"top": "80px", "bottom": "80px"}, "background": "#f9f9f9"},
+                    "styling": {
+                        "padding": {"top": "80px", "bottom": "80px"},
+                        "background": "#f9f9f9",
+                    },
                 },
                 {
                     "type": "testimonials",
                     "layout": "carousel",
-                    "content": {"heading": "What Our Customers Say", "autoplay": True, "slides_to_show": 3},
+                    "content": {
+                        "heading": "What Our Customers Say",
+                        "autoplay": True,
+                        "slides_to_show": 3,
+                    },
                 },
                 {
                     "type": "instagram_feed",
                     "layout": "grid",
                     "columns": 6,
-                    "content": {"heading": "Follow Us @" + brand_info.get("instagram", "brand"), "posts_count": 12},
+                    "content": {
+                        "heading": "Follow Us @" + brand_info.get("instagram", "brand"),
+                        "posts_count": 12,
+                    },
                 },
                 {
                     "type": "newsletter",
@@ -360,14 +452,24 @@ class ElementorThemeBuilder:
                     },
                 },
             ],
-            "metadata": {"template": "homepage", "responsive": True, "lazy_load": True, "seo_optimized": True},
+            "metadata": {
+                "template": "homepage",
+                "responsive": True,
+                "lazy_load": True,
+                "seo_optimized": True,
+            },
         }
 
-    async def _generate_shop_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
+    async def _generate_shop_page(
+        self, brand_info: Dict, colors: Dict, typography: Dict
+    ) -> Dict[str, Any]:
         """Generate shop page layout"""
         return {
             "sections": [
-                {"type": "page_header", "content": {"heading": "Shop", "breadcrumbs": True}},
+                {
+                    "type": "page_header",
+                    "content": {"heading": "Shop", "breadcrumbs": True},
+                },
                 {
                     "type": "product_filters",
                     "layout": "sidebar",
@@ -394,14 +496,21 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_product_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
+    async def _generate_product_page(
+        self, brand_info: Dict, colors: Dict, typography: Dict
+    ) -> Dict[str, Any]:
         """Generate product detail page layout"""
         return {
             "sections": [
                 {
                     "type": "product_details",
                     "layout": "split",
-                    "gallery": {"type": "slider", "thumbnails": True, "zoom": True, "video_support": True},
+                    "gallery": {
+                        "type": "slider",
+                        "thumbnails": True,
+                        "zoom": True,
+                        "video_support": True,
+                    },
                     "info": {
                         "elements": [
                             "title",
@@ -436,7 +545,9 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_about_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
+    async def _generate_about_page(
+        self, brand_info: Dict, colors: Dict, typography: Dict
+    ) -> Dict[str, Any]:
         """Generate about page layout"""
         return {
             "sections": [
@@ -456,11 +567,18 @@ class ElementorThemeBuilder:
                         {"heading": "Our Process", "content": "..."},
                     ],
                 },
-                {"type": "team", "heading": "Meet Our Team", "layout": "grid", "columns": 3},
+                {
+                    "type": "team",
+                    "heading": "Meet Our Team",
+                    "layout": "grid",
+                    "columns": 3,
+                },
             ]
         }
 
-    async def _generate_contact_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
+    async def _generate_contact_page(
+        self, brand_info: Dict, colors: Dict, typography: Dict
+    ) -> Dict[str, Any]:
         """Generate contact page layout"""
         return {
             "sections": [
@@ -484,7 +602,9 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_blog_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
+    async def _generate_blog_page(
+        self, brand_info: Dict, colors: Dict, typography: Dict
+    ) -> Dict[str, Any]:
         """Generate blog page layout"""
         return {
             "sections": [
@@ -492,7 +612,10 @@ class ElementorThemeBuilder:
                     "type": "blog_grid",
                     "layout": "masonry",
                     "columns": {"desktop": 3, "tablet": 2, "mobile": 1},
-                    "sidebar": {"position": "right", "widgets": ["search", "categories", "recent_posts", "tags"]},
+                    "sidebar": {
+                        "position": "right",
+                        "widgets": ["search", "categories", "recent_posts", "tags"],
+                    },
                     "features": {
                         "featured_image": True,
                         "excerpt": True,
@@ -542,7 +665,10 @@ class ElementorThemeBuilder:
                     "text_color": "#ffffff",
                     "border_radius": "4px",
                     "padding": "12px 32px",
-                    "hover": {"background": colors["hover_primary"], "transform": "translateY(-2px)"},
+                    "hover": {
+                        "background": colors["hover_primary"],
+                        "transform": "translateY(-2px)",
+                    },
                 },
                 "secondary": {
                     "background": colors["secondary"],
@@ -551,8 +677,16 @@ class ElementorThemeBuilder:
                     "padding": "12px 32px",
                 },
             },
-            "animations": {"enabled": True, "duration": "0.3s", "easing": "ease-in-out"},
-            "responsive_breakpoints": {"mobile": "768px", "tablet": "1024px", "desktop": "1200px"},
+            "animations": {
+                "enabled": True,
+                "duration": "0.3s",
+                "easing": "ease-in-out",
+            },
+            "responsive_breakpoints": {
+                "mobile": "768px",
+                "tablet": "1024px",
+                "desktop": "1200px",
+            },
         }
 
     async def _generate_woocommerce_config(self, brand_info: Dict) -> Dict[str, Any]:
@@ -565,7 +699,11 @@ class ElementorThemeBuilder:
                 "gallery_thumbnail_size": "woocommerce_gallery_thumbnail",
             },
             "cart": {"cross_sells": True, "ajax_add_to_cart": True, "mini_cart": True},
-            "checkout": {"guest_checkout": True, "coupon_codes": True, "order_notes": True},
+            "checkout": {
+                "guest_checkout": True,
+                "coupon_codes": True,
+                "order_notes": True,
+            },
             "product_options": {
                 "enable_reviews": True,
                 "enable_variations": True,
@@ -580,8 +718,16 @@ class ElementorThemeBuilder:
             "meta_description": brand_info.get("description", ""),
             "keywords": brand_info.get("keywords", []),
             "og_image": brand_info.get("og_image", ""),
-            "structured_data": {"organization": True, "website": True, "breadcrumbs": True, "products": True},
-            "sitemap": {"enabled": True, "include": ["pages", "posts", "products", "categories"]},
+            "structured_data": {
+                "organization": True,
+                "website": True,
+                "breadcrumbs": True,
+                "products": True,
+            },
+            "sitemap": {
+                "enabled": True,
+                "include": ["pages", "posts", "products", "categories"],
+            },
         }
 
     def _get_performance_config(self) -> Dict[str, Any]:
@@ -589,8 +735,16 @@ class ElementorThemeBuilder:
         return {
             "lazy_loading": {"images": True, "videos": True, "iframes": True},
             "minification": {"css": True, "js": True, "html": True},
-            "caching": {"browser_caching": True, "page_caching": True, "object_caching": True},
-            "image_optimization": {"webp_conversion": True, "responsive_images": True, "compression": 85},
+            "caching": {
+                "browser_caching": True,
+                "page_caching": True,
+                "object_caching": True,
+            },
+            "image_optimization": {
+                "webp_conversion": True,
+                "responsive_images": True,
+                "compression": 85,
+            },
             "cdn": {"enabled": False, "provider": ""},
         }
 
@@ -625,13 +779,17 @@ class ElementorThemeBuilder:
             hex_color = hex_color.lstrip("#")
             rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
-            adjusted = tuple(max(0, min(255, int(c + (c * percent / 100)))) for c in rgb)
+            adjusted = tuple(
+                max(0, min(255, int(c + (c * percent / 100)))) for c in rgb
+            )
 
             return "#{:02x}{:02x}{:02x}".format(*adjusted)
         except Exception:
             return hex_color
 
-    async def export_theme(self, theme: Dict[str, Any], format: str = "json") -> Dict[str, Any]:
+    async def export_theme(
+        self, theme: Dict[str, Any], format: str = "json"
+    ) -> Dict[str, Any]:
         """
         Export theme in various formats
 
@@ -678,4 +836,9 @@ class ElementorThemeBuilder:
         """Convert theme to Elementor-compatible JSON format"""
         # This would convert our theme structure to Elementor's JSON format
         # Simplified version for now
-        return {"version": "3.0", "title": theme["metadata"]["name"], "type": "page", "content": theme["pages"]}
+        return {
+            "version": "3.0",
+            "title": theme["metadata"]["name"],
+            "type": "page",
+            "content": theme["pages"],
+        }

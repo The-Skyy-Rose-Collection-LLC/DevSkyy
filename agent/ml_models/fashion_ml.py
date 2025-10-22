@@ -34,7 +34,9 @@ class FashionMLEngine(BaseMLEngine):
         super().__init__("Fashion ML Engine")
 
         # Multiple specialized models
-        self.trend_predictor = GradientBoostingRegressor(n_estimators=200, learning_rate=0.1)
+        self.trend_predictor = GradientBoostingRegressor(
+            n_estimators=200, learning_rate=0.1
+        )
         self.style_classifier = RandomForestClassifier(n_estimators=100, max_depth=10)
         self.customer_segmenter = KMeans(n_clusters=5, random_state=42)
         self.price_optimizer = GradientBoostingRegressor(n_estimators=150)
@@ -54,7 +56,9 @@ class FashionMLEngine(BaseMLEngine):
         self.color_palettes = {}
         self.seasonal_patterns = {}
 
-    async def train(self, X: np.ndarray, y: np.ndarray, task: str = "style") -> Dict[str, Any]:
+    async def train(
+        self, X: np.ndarray, y: np.ndarray, task: str = "style"
+    ) -> Dict[str, Any]:
         """
         Train fashion ML models
 
@@ -100,7 +104,9 @@ class FashionMLEngine(BaseMLEngine):
             self.is_trained = True
 
             # Evaluate
-            metrics = await self.evaluate_model(X_test, y_test) if task != "segment" else {}
+            metrics = (
+                await self.evaluate_model(X_test, y_test) if task != "segment" else {}
+            )
 
             # Record training history
             training_record = {
@@ -112,9 +118,16 @@ class FashionMLEngine(BaseMLEngine):
             }
             self.training_history.append(training_record)
 
-            logger.info(f"✅ {task_name} model trained - F1: {metrics.get('f1_score', 'N/A')}")
+            logger.info(
+                f"✅ {task_name} model trained - F1: {metrics.get('f1_score', 'N/A')}"
+            )
 
-            return {"success": True, "task": task_name, "samples_trained": len(X_train), **metrics}
+            return {
+                "success": True,
+                "task": task_name,
+                "samples_trained": len(X_train),
+                **metrics,
+            }
 
         except Exception as e:
             logger.error(f"Fashion ML training failed: {e}")
@@ -159,7 +172,15 @@ class FashionMLEngine(BaseMLEngine):
             for category, values in historical_data.items():
                 # Create time-based features
                 X = np.array(
-                    [[i, i**2, np.sin(i / 12 * 2 * np.pi), np.cos(i / 12 * 2 * np.pi)] for i in range(len(values))]
+                    [
+                        [
+                            i,
+                            i**2,
+                            np.sin(i / 12 * 2 * np.pi),
+                            np.cos(i / 12 * 2 * np.pi),
+                        ]
+                        for i in range(len(values))
+                    ]
                 )
                 y = np.array(values)
 
@@ -169,7 +190,12 @@ class FashionMLEngine(BaseMLEngine):
                 # Forecast
                 future_X = np.array(
                     [
-                        [i, i**2, np.sin(i / 12 * 2 * np.pi), np.cos(i / 12 * 2 * np.pi)]
+                        [
+                            i,
+                            i**2,
+                            np.sin(i / 12 * 2 * np.pi),
+                            np.cos(i / 12 * 2 * np.pi),
+                        ]
                         for i in range(len(values), len(values) + forecast_periods)
                     ]
                 )
@@ -178,19 +204,29 @@ class FashionMLEngine(BaseMLEngine):
 
                 results[category] = {
                     "historical_avg": float(np.mean(values)),
-                    "historical_trend": "increasing" if values[-1] > values[0] else "decreasing",
+                    "historical_trend": (
+                        "increasing" if values[-1] > values[0] else "decreasing"
+                    ),
                     "forecast": forecast.tolist(),
                     "confidence": confidence.tolist(),
-                    "seasonality_detected": bool(np.std(values) > np.mean(values) * 0.2),
+                    "seasonality_detected": bool(
+                        np.std(values) > np.mean(values) * 0.2
+                    ),
                 }
 
-            return {"success": True, "trends": results, "forecast_periods": forecast_periods}
+            return {
+                "success": True,
+                "trends": results,
+                "forecast_periods": forecast_periods,
+            }
 
         except Exception as e:
             logger.error(f"Trend analysis failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def optimize_pricing(self, product_features: Dict[str, Any], market_data: Dict[str, float]) -> Dict[str, Any]:
+    async def optimize_pricing(
+        self, product_features: Dict[str, Any], market_data: Dict[str, float]
+    ) -> Dict[str, Any]:
         """
         Optimize product pricing using ML
 
@@ -222,7 +258,10 @@ class FashionMLEngine(BaseMLEngine):
             return {
                 "success": True,
                 "recommended_price": round(base_price, 2),
-                "price_range": {"min": round(base_price - margin, 2), "max": round(base_price + margin, 2)},
+                "price_range": {
+                    "min": round(base_price - margin, 2),
+                    "max": round(base_price + margin, 2),
+                },
                 "confidence": float(confidence[0]),
                 "factors": {
                     "quality_impact": features[0] * 0.3,
@@ -237,7 +276,9 @@ class FashionMLEngine(BaseMLEngine):
             logger.error(f"Price optimization failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def segment_customers(self, customer_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def segment_customers(
+        self, customer_data: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """
         Segment customers based on behavior and preferences
 
@@ -292,7 +333,9 @@ class FashionMLEngine(BaseMLEngine):
             logger.error(f"Customer segmentation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def recommend_size(self, measurements: Dict[str, float], brand_sizing: str = "standard") -> Dict[str, Any]:
+    async def recommend_size(
+        self, measurements: Dict[str, float], brand_sizing: str = "standard"
+    ) -> Dict[str, Any]:
         """
         Recommend optimal size based on measurements
 

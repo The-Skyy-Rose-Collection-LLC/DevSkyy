@@ -9,7 +9,16 @@ import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import (
+    Boolean,
+    Column,
+    create_engine,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import func
@@ -78,7 +87,9 @@ class AuthManager:
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
         self.database_url = os.getenv("DATABASE_URL")
         if not self.database_url:
-            raise ValueError("DATABASE_URL environment variable must be set for security")
+            raise ValueError(
+                "DATABASE_URL environment variable must be set for security"
+            )
         self.security = HTTPBearer()
         self.engine = None
         self.SessionLocal = None
@@ -86,7 +97,9 @@ class AuthManager:
         try:
             self.init_database()
         except Exception as e:
-            logger.warning(f"Database initialization failed, will retry when needed: {str(e)}")
+            logger.warning(
+                f"Database initialization failed, will retry when needed: {str(e)}"
+            )
             self._db_initialized = False
 
     def init_database(self):
@@ -94,7 +107,9 @@ class AuthManager:
         try:
             if not self.engine:
                 self.engine = create_engine(self.database_url)
-                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+                self.SessionLocal = sessionmaker(
+                    autocommit=False, autoflush=False, bind=self.engine
+                )
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
             self._db_initialized = True
@@ -149,7 +164,12 @@ class AuthManager:
         return {"valid": len(errors) == 0, "errors": errors}
 
     def create_user(
-        self, email: str, username: str, password: str, first_name: str = "", last_name: str = ""
+        self,
+        email: str,
+        username: str,
+        password: str,
+        first_name: str = "",
+        last_name: str = "",
     ) -> Dict[str, Any]:
         """Create new user account with validation."""
 
@@ -165,10 +185,17 @@ class AuthManager:
 
         try:
             # Check if user already exists
-            existing_user = db.query(User).filter((User.email == email) | (User.username == username)).first()
+            existing_user = (
+                db.query(User)
+                .filter((User.email == email) | (User.username == username))
+                .first()
+            )
 
             if existing_user:
-                return {"success": False, "error": "User with this email or username already exists"}
+                return {
+                    "success": False,
+                    "error": "User with this email or username already exists",
+                }
 
             # Hash password and create user
             password_hash = self.hash_password(password)
@@ -222,7 +249,10 @@ class AuthManager:
 
             # Check if account is locked
             if user.locked_until and user.locked_until > datetime.now():
-                return {"success": False, "error": "Account temporarily locked due to failed login attempts"}
+                return {
+                    "success": False,
+                    "error": "Account temporarily locked due to failed login attempts",
+                }
 
             # Check if account is active
             if not user.is_active:
@@ -321,7 +351,9 @@ class AuthManager:
         except jwt.InvalidTokenError:
             return None
 
-    def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
+    def get_current_user(
+        self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
+    ):
         """Dependency to get current authenticated user."""
         token = credentials.credentials
         payload = self.verify_token(token)
@@ -401,9 +433,9 @@ class AuthManager:
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(UserSession.user_id == payload["user_id"], UserSession.is_active).update(
-                {"is_active": False}
-            )
+            db.query(UserSession).filter(
+                UserSession.user_id == payload["user_id"], UserSession.is_active
+            ).update({"is_active": False})
 
             db.commit()
             return {"success": True, "message": "Logged out successfully"}

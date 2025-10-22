@@ -13,7 +13,9 @@ except Exception:
 logger = logging.getLogger(__name__)
 
 
-def _build_session(total_retries: int = 3, backoff_factor: float = 0.5, timeout: float = 5.0) -> requests.Session:
+def _build_session(
+    total_retries: int = 3, backoff_factor: float = 0.5, timeout: float = 5.0
+) -> requests.Session:
     session = requests.Session()
     retry = Retry(
         total=total_retries,
@@ -66,7 +68,9 @@ async def async_get(url: str, **kwargs) -> Any:
             if attempt == retries:
                 raise
             sleep_time = backoff * (2 ** (attempt - 1))
-            logger.warning(f"async_get failed (attempt {attempt}/{retries}) for {url}: {e}. Retrying in {sleep_time}s")
+            logger.warning(
+                f"async_get failed (attempt {attempt}/{retries}) for {url}: {e}. Retrying in {sleep_time}s"
+            )
             await _async_sleep(sleep_time)
 
 

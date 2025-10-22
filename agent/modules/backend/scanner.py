@@ -73,7 +73,11 @@ def scan_site() -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"❌ Site scan failed: {str(e)}")
-        return {"status": "failed", "error": str(e), "timestamp": datetime.now().isoformat()}
+        return {
+            "status": "failed",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat(),
+        }
 
 
 def _scan_project_files() -> List[str]:
@@ -87,7 +91,10 @@ def _scan_project_files() -> List[str]:
     for root, dirs, filenames in os.walk("."):
         # Skip common directories to ignore
         dirs[:] = [
-            d for d in dirs if not d.startswith(".") and d not in {"node_modules", "__pycache__", "venv", ".git"}
+            d
+            for d in dirs
+            if not d.startswith(".")
+            and d not in {"node_modules", "__pycache__", "venv", ".git"}
         ]
 
         for filename in filenames:
@@ -151,7 +158,9 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
 
             # Check for print statements (should use logging)
             if line.strip().startswith("print(") and "logger" not in content:
-                optimizations.append(f"Line {i}: Consider using logging instead of print")
+                optimizations.append(
+                    f"Line {i}: Consider using logging instead of print"
+                )
 
         # Check for missing docstrings
         if "def " in content and '"""' not in content:
@@ -179,7 +188,9 @@ def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
 
         # Check for var usage
         if line.strip().startswith("var "):
-            optimizations.append(f"Line {i}: Consider using 'let' or 'const' instead of 'var'")
+            optimizations.append(
+                f"Line {i}: Consider using 'let' or 'const' instead of 'var'"
+            )
 
         # Check for missing semicolons
         if line.strip() and not line.strip().endswith((";", "{", "}")) and "=" in line:
@@ -249,7 +260,11 @@ def _check_site_health() -> Dict[str, Any]:
 
     try:
         # Try to check local development server
-        test_urls = ["http://localhost:8000", "http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+        test_urls = [
+            "http://localhost:8000",
+            "http://0.0.0.0:8000",
+            "http://127.0.0.1:8000",
+        ]
 
         for url in test_urls:
             try:
@@ -411,16 +426,29 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
 
         # Check for performance issues
         if "while True:" in content and "time.sleep" not in content:
-            performance_issues.append({"agent": agent_name, "issue": "Potential infinite loop detected"})
+            performance_issues.append(
+                {"agent": agent_name, "issue": "Potential infinite loop detected"}
+            )
 
         if "requests.get" in content and "timeout" not in content:
-            performance_issues.append({"agent": agent_name, "issue": "HTTP requests without timeout"})
+            performance_issues.append(
+                {"agent": agent_name, "issue": "HTTP requests without timeout"}
+            )
 
         # Check for security concerns
         credential_patterns = [
-            (r'password\s*=\s*["\'][^"\']{8,}["\']', "Potential hardcoded password detected"),
-            (r'api_key\s*=\s*["\'][^"\']{20,}["\']', "Potential hardcoded API key detected"),
-            (r'secret\s*=\s*["\'][^"\']{16,}["\']', "Potential hardcoded secret detected"),
+            (
+                r'password\s*=\s*["\'][^"\']{8,}["\']',
+                "Potential hardcoded password detected",
+            ),
+            (
+                r'api_key\s*=\s*["\'][^"\']{20,}["\']',
+                "Potential hardcoded API key detected",
+            ),
+            (
+                r'secret\s*=\s*["\'][^"\']{16,}["\']',
+                "Potential hardcoded secret detected",
+            ),
         ]
 
         for pattern, message in credential_patterns:
@@ -428,12 +456,17 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
                 security_concerns.append({"agent": agent_name, "concern": message})
 
         if "eval(" in content:
-            security_concerns.append({"agent": agent_name, "concern": "Unsafe eval() usage detected"})
+            security_concerns.append(
+                {"agent": agent_name, "concern": "Unsafe eval() usage detected"}
+            )
 
     except Exception as e:
         logger.warning(f"Could not analyze {agent_file}: {e}")
 
-    return {"performance_issues": performance_issues, "security_concerns": security_concerns}
+    return {
+        "performance_issues": performance_issues,
+        "security_concerns": security_concerns,
+    }
 
 
 def _security_scan() -> List[str]:
@@ -464,14 +497,25 @@ def _security_scan() -> List[str]:
                             # Additional check to avoid false positives
                             if not any(
                                 exclude in content.lower()
-                                for exclude in ["example", "placeholder", "your_", "replace_", "TODO", "FIXME"]
+                                for exclude in [
+                                    "example",
+                                    "placeholder",
+                                    "your_",
+                                    "replace_",
+                                    "TODO",
+                                    "FIXME",
+                                ]
                             ):
-                                security_issues.append(f"{file_path}: Possible hardcoded credentials detected")
+                                security_issues.append(
+                                    f"{file_path}: Possible hardcoded credentials detected"
+                                )
                                 break
 
                     # Check for SQL injection risks
                     if "execute(" in content and "%" in content:
-                        security_issues.append(f"{file_path}: Possible SQL injection risk")
+                        security_issues.append(
+                            f"{file_path}: Possible SQL injection risk"
+                        )
 
                 except Exception:
                     continue

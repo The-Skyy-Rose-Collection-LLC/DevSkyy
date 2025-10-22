@@ -46,7 +46,9 @@ class AdvancedCodeGenerationAgent:
             "brand_values": ["exclusivity", "quality", "sophistication", "innovation"],
         }
 
-    async def generate_fullstack_website(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_fullstack_website(
+        self, requirements: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate a complete full-stack website based on requirements.
 
@@ -59,27 +61,45 @@ class AdvancedCodeGenerationAgent:
         logger.info("🚀 Generating full-stack website...")
 
         try:
-            website_structure = {"frontend": {}, "backend": {}, "database": {}, "documentation": {}, "deployment": {}}
+            website_structure = {
+                "frontend": {},
+                "backend": {},
+                "database": {},
+                "documentation": {},
+                "deployment": {},
+            }
 
             # Generate frontend components
-            website_structure["frontend"] = await self._generate_frontend_structure(requirements)
+            website_structure["frontend"] = await self._generate_frontend_structure(
+                requirements
+            )
 
             # Generate backend API
-            website_structure["backend"] = await self._generate_backend_api(requirements)
+            website_structure["backend"] = await self._generate_backend_api(
+                requirements
+            )
 
             # Generate database schema
-            website_structure["database"] = await self._generate_database_schema(requirements)
+            website_structure["database"] = await self._generate_database_schema(
+                requirements
+            )
 
             # Generate documentation
-            website_structure["documentation"] = await self._generate_project_documentation(requirements)
+            website_structure["documentation"] = (
+                await self._generate_project_documentation(requirements)
+            )
 
             # Generate deployment configuration
-            website_structure["deployment"] = await self._generate_deployment_config(requirements)
+            website_structure["deployment"] = await self._generate_deployment_config(
+                requirements
+            )
 
             return {
                 "status": "success",
                 "website_structure": website_structure,
-                "estimated_development_time": self._estimate_development_time(requirements),
+                "estimated_development_time": self._estimate_development_time(
+                    requirements
+                ),
                 "technology_stack": self._get_recommended_tech_stack(requirements),
                 "deployment_instructions": self._generate_deployment_instructions(),
                 "maintenance_guide": self._generate_maintenance_guide(),
@@ -89,7 +109,9 @@ class AdvancedCodeGenerationAgent:
             logger.error(f"Full-stack generation failed: {str(e)}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_luxury_react_component(self, component_spec: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_luxury_react_component(
+        self, component_spec: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate luxury-styled React components with Framer Motion animations.
 
@@ -107,7 +129,9 @@ class AdvancedCodeGenerationAgent:
             features = component_spec.get("features", [])
 
             # Generate component code
-            component_code = await self._generate_react_component_code(component_name, component_type, features)
+            component_code = await self._generate_react_component_code(
+                component_name, component_type, features
+            )
 
             # Generate luxury styling
             luxury_styles = await self._generate_luxury_component_styles(component_spec)
@@ -119,7 +143,9 @@ class AdvancedCodeGenerationAgent:
             test_code = await self._generate_component_tests(component_name, features)
 
             # Generate documentation
-            component_docs = await self._generate_component_documentation(component_spec)
+            component_docs = await self._generate_component_documentation(
+                component_spec
+            )
 
             return {
                 "status": "success",
@@ -132,14 +158,18 @@ class AdvancedCodeGenerationAgent:
                     "documentation": component_docs,
                 },
                 "usage_examples": await self._generate_usage_examples(component_name),
-                "performance_optimizations": await self._generate_performance_tips(component_spec),
+                "performance_optimizations": await self._generate_performance_tips(
+                    component_spec
+                ),
             }
 
         except Exception as e:
             logger.error(f"React component generation failed: {str(e)}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_fastapi_microservice(self, service_spec: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_fastapi_microservice(
+        self, service_spec: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate a complete FastAPI microservice with all endpoints and features.
 
@@ -189,15 +219,21 @@ class AdvancedCodeGenerationAgent:
                     "tests": test_suite,
                     "docker": docker_config,
                 },
-                "api_documentation": await self._generate_api_documentation(service_spec),
-                "deployment_guide": await self._generate_microservice_deployment_guide(service_name),
+                "api_documentation": await self._generate_api_documentation(
+                    service_spec
+                ),
+                "deployment_guide": await self._generate_microservice_deployment_guide(
+                    service_name
+                ),
             }
 
         except Exception as e:
             logger.error(f"FastAPI microservice generation failed: {str(e)}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_wordpress_theme(self, theme_spec: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_wordpress_theme(
+        self, theme_spec: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate a complete WordPress theme with Divi compatibility.
 
@@ -216,7 +252,9 @@ class AdvancedCodeGenerationAgent:
             # Generate theme files
             theme_files = {
                 "style.css": await self._generate_wordpress_style_css(theme_name),
-                "functions.php": await self._generate_wordpress_functions(theme_features),
+                "functions.php": await self._generate_wordpress_functions(
+                    theme_features
+                ),
                 "index.php": await self._generate_wordpress_index(),
                 "header.php": await self._generate_wordpress_header(),
                 "footer.php": await self._generate_wordpress_footer(),
@@ -234,7 +272,9 @@ class AdvancedCodeGenerationAgent:
             customizer_code = await self._generate_theme_customizer(theme_spec)
 
             # Generate theme documentation
-            theme_docs = await self._generate_theme_documentation(theme_name, theme_features)
+            theme_docs = await self._generate_theme_documentation(
+                theme_name, theme_features
+            )
 
             return {
                 "status": "success",
@@ -246,14 +286,18 @@ class AdvancedCodeGenerationAgent:
                     "documentation": theme_docs,
                 },
                 "installation_guide": await self._generate_theme_installation_guide(),
-                "customization_options": await self._generate_customization_guide(theme_spec),
+                "customization_options": await self._generate_customization_guide(
+                    theme_spec
+                ),
             }
 
         except Exception as e:
             logger.error(f"WordPress theme generation failed: {str(e)}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_marketing_content(self, campaign_spec: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_marketing_content(
+        self, campaign_spec: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate comprehensive marketing content and campaigns.
 
@@ -273,21 +317,31 @@ class AdvancedCodeGenerationAgent:
 
             # Generate social media content
             if "social" in channels:
-                marketing_content["social_media"] = await self._generate_social_media_content(campaign_spec)
+                marketing_content["social_media"] = (
+                    await self._generate_social_media_content(campaign_spec)
+                )
 
             # Generate email campaigns
             if "email" in channels:
-                marketing_content["email_campaigns"] = await self._generate_email_campaign_content(campaign_spec)
+                marketing_content["email_campaigns"] = (
+                    await self._generate_email_campaign_content(campaign_spec)
+                )
 
             # Generate web content
             if "web" in channels:
-                marketing_content["web_content"] = await self._generate_web_marketing_content(campaign_spec)
+                marketing_content["web_content"] = (
+                    await self._generate_web_marketing_content(campaign_spec)
+                )
 
             # Generate advertising copy
-            marketing_content["advertising"] = await self._generate_advertising_copy(campaign_spec)
+            marketing_content["advertising"] = await self._generate_advertising_copy(
+                campaign_spec
+            )
 
             # Generate brand messaging
-            marketing_content["brand_messaging"] = await self._generate_brand_messaging(campaign_spec)
+            marketing_content["brand_messaging"] = await self._generate_brand_messaging(
+                campaign_spec
+            )
 
             # Generate content calendar
             content_calendar = await self._generate_content_calendar(campaign_spec)
@@ -334,13 +388,21 @@ class AdvancedCodeGenerationAgent:
             optimizations = {}
 
             if optimization_type == "performance":
-                optimizations = await self._generate_performance_optimizations(analysis_results)
+                optimizations = await self._generate_performance_optimizations(
+                    analysis_results
+                )
             elif optimization_type == "security":
-                optimizations = await self._generate_security_optimizations(analysis_results)
+                optimizations = await self._generate_security_optimizations(
+                    analysis_results
+                )
             elif optimization_type == "maintainability":
-                optimizations = await self._generate_maintainability_optimizations(analysis_results)
+                optimizations = await self._generate_maintainability_optimizations(
+                    analysis_results
+                )
             else:
-                optimizations = await self._generate_comprehensive_optimizations(analysis_results)
+                optimizations = await self._generate_comprehensive_optimizations(
+                    analysis_results
+                )
 
             # Generate improvement plan
             improvement_plan = await self._generate_improvement_plan(optimizations)
@@ -355,7 +417,9 @@ class AdvancedCodeGenerationAgent:
                 "optimizations": optimizations,
                 "improvement_plan": improvement_plan,
                 "code_examples": code_examples,
-                "estimated_impact": await self._estimate_optimization_impact(optimizations),
+                "estimated_impact": await self._estimate_optimization_impact(
+                    optimizations
+                ),
             }
 
         except Exception as e:
@@ -479,19 +543,27 @@ new {class_name}();
     # Implementation methods would be added here
     # For brevity, I'm including key method signatures
 
-    async def _generate_frontend_structure(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_frontend_structure(
+        self, requirements: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate frontend application structure."""
         # Implementation for frontend generation
 
-    async def _generate_backend_api(self, requirements: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_backend_api(
+        self, requirements: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate backend API structure."""
         # Implementation for backend generation
 
-    async def _generate_react_component_code(self, name: str, type: str, features: List[str]) -> str:
+    async def _generate_react_component_code(
+        self, name: str, type: str, features: List[str]
+    ) -> str:
         """Generate React component code."""
         # Implementation for React component generation
 
-    async def _generate_social_media_content(self, campaign_spec: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_social_media_content(
+        self, campaign_spec: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate social media marketing content."""
         # Implementation for social media content generation
 
@@ -511,10 +583,18 @@ new {class_name}();
         else:
             return "3-6 months"
 
-    def _get_recommended_tech_stack(self, requirements: Dict[str, Any]) -> Dict[str, List[str]]:
+    def _get_recommended_tech_stack(
+        self, requirements: Dict[str, Any]
+    ) -> Dict[str, List[str]]:
         """Get recommended technology stack."""
         return {
-            "frontend": ["React", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion"],
+            "frontend": [
+                "React",
+                "TypeScript",
+                "Vite",
+                "Tailwind CSS",
+                "Framer Motion",
+            ],
             "backend": ["FastAPI", "Python", "PostgreSQL", "Redis", "Docker"],
             "deployment": ["AWS", "Docker", "GitHub Actions", "Nginx"],
             "monitoring": ["Sentry", "DataDog", "Prometheus"],
@@ -529,7 +609,12 @@ async def main():
     # Generate a luxury e-commerce website
     website_requirements = {
         "type": "ecommerce",
-        "features": ["product_catalog", "shopping_cart", "user_authentication", "payment_processing"],
+        "features": [
+            "product_catalog",
+            "shopping_cart",
+            "user_authentication",
+            "payment_processing",
+        ],
         "complexity": "medium",
         "brand_style": "luxury",
         "target_audience": "luxury_consumers",

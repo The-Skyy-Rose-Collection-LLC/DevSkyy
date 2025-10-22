@@ -18,14 +18,18 @@ class WooCommerceIntegrationService:
 
         self.auth = HTTPBasicAuth(self.consumer_key, self.consumer_secret)
 
-        logger.info("🛒 WooCommerce Integration Service initialized for luxury e-commerce")
+        logger.info(
+            "🛒 WooCommerce Integration Service initialized for luxury e-commerce"
+        )
 
     def set_site_url(self, site_url: str):
         """Set the WooCommerce site URL for API calls."""
         self.base_url = f"{site_url.rstrip('/')}/wp-json/wc/v3"
         logger.info(f"🌐 WooCommerce API base URL set: {self.base_url}")
 
-    async def get_products(self, per_page: int = 20, category: str = None, status: str = "publish") -> Dict[str, Any]:
+    async def get_products(
+        self, per_page: int = 20, category: str = None, status: str = "publish"
+    ) -> Dict[str, Any]:
         """Get WooCommerce products for agent analysis."""
         try:
             if not self.base_url:
@@ -36,7 +40,9 @@ class WooCommerceIntegrationService:
             if category:
                 params["category"] = category
 
-            response = requests.get(f"{self.base_url}/products", auth=self.auth, params=params)
+            response = requests.get(
+                f"{self.base_url}/products", auth=self.auth, params=params
+            )
             response.raise_for_status()
 
             products = response.json()
@@ -45,14 +51,18 @@ class WooCommerceIntegrationService:
                 "products": products,
                 "total_products": len(products),
                 "luxury_analysis": await self._analyze_luxury_products(products),
-                "optimization_opportunities": await self._identify_product_optimizations(products),
+                "optimization_opportunities": await self._identify_product_optimizations(
+                    products
+                ),
             }
 
         except Exception as e:
             logger.error(f"Failed to get products: {str(e)}")
             return {"error": str(e)}
 
-    async def get_orders(self, per_page: int = 20, status: str = None) -> Dict[str, Any]:
+    async def get_orders(
+        self, per_page: int = 20, status: str = None
+    ) -> Dict[str, Any]:
         """Get WooCommerce orders for revenue analysis."""
         try:
             if not self.base_url:
@@ -62,7 +72,9 @@ class WooCommerceIntegrationService:
             if status:
                 params["status"] = status
 
-            response = requests.get(f"{self.base_url}/orders", auth=self.auth, params=params)
+            response = requests.get(
+                f"{self.base_url}/orders", auth=self.auth, params=params
+            )
             response.raise_for_status()
 
             orders = response.json()
@@ -78,7 +90,9 @@ class WooCommerceIntegrationService:
             logger.error(f"Failed to get orders: {str(e)}")
             return {"error": str(e)}
 
-    async def create_luxury_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_luxury_product(
+        self, product_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create a luxury product with optimized settings."""
         try:
             if not self.base_url:
@@ -87,12 +101,16 @@ class WooCommerceIntegrationService:
             # Enhance product data with luxury features
             enhanced_product = await self._enhance_product_for_luxury(product_data)
 
-            response = requests.post(f"{self.base_url}/products", auth=self.auth, json=enhanced_product)
+            response = requests.post(
+                f"{self.base_url}/products", auth=self.auth, json=enhanced_product
+            )
             response.raise_for_status()
 
             created_product = response.json()
 
-            logger.info(f"🎨 Luxury product created: {created_product.get('name')} (ID: {created_product.get('id')})")
+            logger.info(
+                f"🎨 Luxury product created: {created_product.get('name')} (ID: {created_product.get('id')})"
+            )
 
             return {
                 "product": created_product,
@@ -106,7 +124,9 @@ class WooCommerceIntegrationService:
             logger.error(f"Failed to create product: {str(e)}")
             return {"error": str(e)}
 
-    async def update_product_for_luxury(self, product_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
+    async def update_product_for_luxury(
+        self, product_id: int, updates: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Update product with luxury optimizations."""
         try:
             if not self.base_url:
@@ -115,7 +135,11 @@ class WooCommerceIntegrationService:
             # Apply luxury enhancements to updates
             luxury_updates = await self._apply_luxury_enhancements(updates)
 
-            response = requests.put(f"{self.base_url}/products/{product_id}", auth=self.auth, json=luxury_updates)
+            response = requests.put(
+                f"{self.base_url}/products/{product_id}",
+                auth=self.auth,
+                json=luxury_updates,
+            )
             response.raise_for_status()
 
             updated_product = response.json()
@@ -139,22 +163,32 @@ class WooCommerceIntegrationService:
             if not self.base_url:
                 return {"error": "WooCommerce site URL not configured"}
 
-            response = requests.get(f"{self.base_url}/products/categories", auth=self.auth, params={"per_page": 100})
+            response = requests.get(
+                f"{self.base_url}/products/categories",
+                auth=self.auth,
+                params={"per_page": 100},
+            )
             response.raise_for_status()
 
             categories = response.json()
 
             return {
                 "categories": categories,
-                "luxury_categorization": await self._analyze_luxury_categories(categories),
-                "organization_recommendations": await self._recommend_category_structure(categories),
+                "luxury_categorization": await self._analyze_luxury_categories(
+                    categories
+                ),
+                "organization_recommendations": await self._recommend_category_structure(
+                    categories
+                ),
             }
 
         except Exception as e:
             logger.error(f"Failed to get categories: {str(e)}")
             return {"error": str(e)}
 
-    async def create_luxury_collection_category(self, collection_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_luxury_collection_category(
+        self, collection_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create a luxury collection category."""
         try:
             if not self.base_url:
@@ -162,18 +196,26 @@ class WooCommerceIntegrationService:
 
             category_data = {
                 "name": collection_data.get("name", "Luxury Collection"),
-                "description": collection_data.get("description", "Exclusive luxury items"),
+                "description": collection_data.get(
+                    "description", "Exclusive luxury items"
+                ),
                 "display": "products",
                 "image": {"src": collection_data.get("image_url", "")},
                 "menu_order": collection_data.get("menu_order", 0),
             }
 
-            response = requests.post(f"{self.base_url}/products/categories", auth=self.auth, json=category_data)
+            response = requests.post(
+                f"{self.base_url}/products/categories",
+                auth=self.auth,
+                json=category_data,
+            )
             response.raise_for_status()
 
             created_category = response.json()
 
-            logger.info(f"💎 Luxury collection category created: {created_category.get('name')}")
+            logger.info(
+                f"💎 Luxury collection category created: {created_category.get('name')}"
+            )
 
             return {
                 "category": created_category,
@@ -218,7 +260,11 @@ class WooCommerceIntegrationService:
                 return {"error": "WooCommerce site URL not configured"}
 
             # Get sales reports
-            reports_response = requests.get(f"{self.base_url}/reports/sales", auth=self.auth, params={"period": period})
+            reports_response = requests.get(
+                f"{self.base_url}/reports/sales",
+                auth=self.auth,
+                params={"period": period},
+            )
 
             sales_data = {}
             if reports_response.status_code == 200:
@@ -227,9 +273,15 @@ class WooCommerceIntegrationService:
             # Analyze for luxury insights
             analytics = {
                 "sales_data": sales_data,
-                "luxury_performance_insights": await self._analyze_luxury_performance(sales_data),
-                "agent_recommendations": await self._generate_sales_recommendations(sales_data),
-                "revenue_optimization_opportunities": await self._identify_revenue_opportunities(sales_data),
+                "luxury_performance_insights": await self._analyze_luxury_performance(
+                    sales_data
+                ),
+                "agent_recommendations": await self._generate_sales_recommendations(
+                    sales_data
+                ),
+                "revenue_optimization_opportunities": await self._identify_revenue_opportunities(
+                    sales_data
+                ),
             }
 
             return analytics
@@ -240,7 +292,9 @@ class WooCommerceIntegrationService:
 
     # Helper methods for luxury e-commerce optimization
 
-    async def _analyze_luxury_products(self, products: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _analyze_luxury_products(
+        self, products: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Analyze products for luxury positioning."""
         luxury_indicators = []
         optimization_needed = []
@@ -251,8 +305,17 @@ class WooCommerceIntegrationService:
             price = float(product.get("price", 0))
 
             # Check luxury indicators
-            luxury_keywords = ["luxury", "premium", "exclusive", "limited", "designer", "couture"]
-            has_luxury_keywords = any(keyword in name or keyword in description for keyword in luxury_keywords)
+            luxury_keywords = [
+                "luxury",
+                "premium",
+                "exclusive",
+                "limited",
+                "designer",
+                "couture",
+            ]
+            has_luxury_keywords = any(
+                keyword in name or keyword in description for keyword in luxury_keywords
+            )
 
             if has_luxury_keywords or price > 500:
                 luxury_indicators.append(product.get("id"))
@@ -262,7 +325,9 @@ class WooCommerceIntegrationService:
         return {
             "luxury_products_identified": len(luxury_indicators),
             "products_needing_luxury_optimization": len(optimization_needed),
-            "luxury_positioning_score": (len(luxury_indicators) / len(products)) * 100 if products else 0,
+            "luxury_positioning_score": (
+                (len(luxury_indicators) / len(products)) * 100 if products else 0
+            ),
             "optimization_recommendations": [
                 "enhance_product_descriptions_with_luxury_language",
                 "implement_premium_pricing_strategy",
@@ -271,7 +336,9 @@ class WooCommerceIntegrationService:
             ],
         }
 
-    async def _identify_product_optimizations(self, products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def _identify_product_optimizations(
+        self, products: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Identify specific optimization opportunities."""
         optimizations = []
 
@@ -300,13 +367,17 @@ class WooCommerceIntegrationService:
                         "product_id": product.get("id"),
                         "product_name": product.get("name"),
                         "optimizations_needed": product_optimizations,
-                        "priority": "high" if len(product_optimizations) > 2 else "medium",
+                        "priority": (
+                            "high" if len(product_optimizations) > 2 else "medium"
+                        ),
                     }
                 )
 
         return optimizations[:10]  # Return top 10 optimization opportunities
 
-    async def _enhance_product_for_luxury(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _enhance_product_for_luxury(
+        self, product_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Enhance product data with luxury features."""
         enhanced = product_data.copy()
 
@@ -315,7 +386,10 @@ class WooCommerceIntegrationService:
 
         # Enhance name
         if "name" in enhanced:
-            if not any(word in enhanced["name"].lower() for word in ["luxury", "premium", "exclusive"]):
+            if not any(
+                word in enhanced["name"].lower()
+                for word in ["luxury", "premium", "exclusive"]
+            ):
                 enhanced["name"] = f"Premium {enhanced['name']}"
                 luxury_features.append("premium_naming")
 
@@ -352,7 +426,9 @@ class WooCommerceIntegrationService:
         enhanced["luxury_features"] = luxury_features
         return enhanced
 
-    async def _apply_luxury_enhancements(self, updates: Dict[str, Any]) -> Dict[str, Any]:
+    async def _apply_luxury_enhancements(
+        self, updates: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Apply luxury enhancements to product updates."""
         enhanced_updates = updates.copy()
         enhancements = []
@@ -377,25 +453,39 @@ class WooCommerceIntegrationService:
         enhanced_updates["luxury_enhancements"] = enhancements
         return enhanced_updates
 
-    async def _analyze_revenue_patterns(self, orders: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _analyze_revenue_patterns(
+        self, orders: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Analyze revenue patterns for luxury insights."""
         total_revenue = sum(float(order.get("total", 0)) for order in orders)
         average_order_value = total_revenue / len(orders) if orders else 0
 
-        high_value_orders = [order for order in orders if float(order.get("total", 0)) > 200]
-        luxury_conversion_rate = (len(high_value_orders) / len(orders)) * 100 if orders else 0
+        high_value_orders = [
+            order for order in orders if float(order.get("total", 0)) > 200
+        ]
+        luxury_conversion_rate = (
+            (len(high_value_orders) / len(orders)) * 100 if orders else 0
+        )
 
         return {
             "total_revenue": total_revenue,
             "average_order_value": average_order_value,
             "high_value_orders": len(high_value_orders),
             "luxury_conversion_rate": luxury_conversion_rate,
-            "revenue_trend": "positive" if average_order_value > 150 else "needs_optimization",
+            "revenue_trend": (
+                "positive" if average_order_value > 150 else "needs_optimization"
+            ),
         }
 
-    async def _analyze_customer_behavior(self, orders: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _analyze_customer_behavior(
+        self, orders: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Analyze customer behavior for luxury targeting."""
-        customer_segments = {"luxury_customers": 0, "premium_customers": 0, "standard_customers": 0}
+        customer_segments = {
+            "luxury_customers": 0,
+            "premium_customers": 0,
+            "standard_customers": 0,
+        }
 
         for order in orders:
             total = float(order.get("total", 0))
@@ -408,7 +498,11 @@ class WooCommerceIntegrationService:
 
         return {
             "customer_segments": customer_segments,
-            "luxury_customer_percentage": (customer_segments["luxury_customers"] / len(orders)) * 100 if orders else 0,
+            "luxury_customer_percentage": (
+                (customer_segments["luxury_customers"] / len(orders)) * 100
+                if orders
+                else 0
+            ),
             "targeting_recommendations": [
                 "focus_on_luxury_customer_retention",
                 "upsell_premium_customers_to_luxury",

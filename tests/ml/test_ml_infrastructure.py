@@ -65,7 +65,11 @@ class TestModelRegistry:
         """Test model loading"""
         model = MockModel()
         temp_registry.register_model(
-            model=model, model_name="test_model", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
+            model=model,
+            model_name="test_model",
+            version="1.0.0",
+            model_type="classifier",
+            metrics={"accuracy": 0.95},
         )
 
         loaded_model = temp_registry.load_model("test_model", version="1.0.0")
@@ -80,7 +84,11 @@ class TestModelRegistry:
         """Test model promotion"""
         model = MockModel()
         temp_registry.register_model(
-            model=model, model_name="test_model", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
+            model=model,
+            model_name="test_model",
+            version="1.0.0",
+            model_type="classifier",
+            metrics={"accuracy": 0.95},
         )
 
         # Promote to staging
@@ -146,11 +154,19 @@ class TestModelRegistry:
         model = MockModel()
 
         temp_registry.register_model(
-            model=model, model_name="model1", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
+            model=model,
+            model_name="model1",
+            version="1.0.0",
+            model_type="classifier",
+            metrics={"accuracy": 0.95},
         )
 
         temp_registry.register_model(
-            model=model, model_name="model2", version="1.0.0", model_type="regressor", metrics={"mse": 0.05}
+            model=model,
+            model_name="model2",
+            version="1.0.0",
+            model_type="regressor",
+            metrics={"mse": 0.05},
         )
 
         stats = temp_registry.get_registry_stats()

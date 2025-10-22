@@ -79,7 +79,9 @@ class DatabaseConfig:
         # URL encode password to handle special characters
         encoded_password = quote_plus(password)
 
-        return f"postgresql+asyncpg://{user}:{encoded_password}@{host}:{port}/{database}"
+        return (
+            f"postgresql+asyncpg://{user}:{encoded_password}@{host}:{port}/{database}"
+        )
 
     @staticmethod
     def get_connection_args() -> dict:

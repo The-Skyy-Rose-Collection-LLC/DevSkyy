@@ -14,7 +14,9 @@ class PaginationParams(BaseModel):
     """Standard pagination parameters"""
 
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
-    page_size: int = Field(default=20, ge=1, le=100, description="Items per page (max 100)")
+    page_size: int = Field(
+        default=20, ge=1, le=100, description="Items per page (max 100)"
+    )
 
     @property
     def offset(self) -> int:
@@ -52,7 +54,9 @@ class PaginatedResponse(BaseModel, Generic[T]):
         }
 
 
-def create_paginated_response(items: List[T], total: int, page: int, page_size: int) -> PaginatedResponse[T]:
+def create_paginated_response(
+    items: List[T], total: int, page: int, page_size: int
+) -> PaginatedResponse[T]:
     """
     Create paginated response from items and metadata
 
@@ -93,4 +97,10 @@ class CursorPaginatedResponse(BaseModel, Generic[T]):
     has_more: bool = Field(description="Whether there are more items")
 
     class Config:
-        json_schema_extra = {"example": {"items": [], "next_cursor": "eyJpZCI6MTAwfQ==", "has_more": True}}
+        json_schema_extra = {
+            "example": {
+                "items": [],
+                "next_cursor": "eyJpZCI6MTAwfQ==",
+                "has_more": True,
+            }
+        }

@@ -42,7 +42,11 @@ class BrandIntelligenceAgent:
 
         self.theme_evolution = {
             "current_season": "Winter 2024",
-            "dominant_themes": ["Elegant Minimalism", "Sustainable Luxury", "Empowered Femininity"],
+            "dominant_themes": [
+                "Elegant Minimalism",
+                "Sustainable Luxury",
+                "Empowered Femininity",
+            ],
             "color_trends": ["Warm Neutrals", "Deep Jewel Tones", "Metallic Accents"],
             "style_direction": "Contemporary Classic with Modern Edge",
         }
@@ -62,7 +66,9 @@ class BrandIntelligenceAgent:
         self.uploaded_assets = {}
         self.learning_from_assets = False
 
-        logger.info("🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection")
+        logger.info(
+            "🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection"
+        )
 
     def analyze_brand_assets(self) -> Dict[str, Any]:
         """Comprehensive analysis of all brand assets and positioning."""
@@ -100,7 +106,13 @@ class BrandIntelligenceAgent:
 
         agent_specific_context = {
             "inventory": {
-                "product_categories": ["Dresses", "Tops", "Bottoms", "Outerwear", "Accessories"],
+                "product_categories": [
+                    "Dresses",
+                    "Tops",
+                    "Bottoms",
+                    "Outerwear",
+                    "Accessories",
+                ],
                 "quality_standards": "Premium materials only",
                 "sustainability_focus": "Eco-friendly and ethically sourced",
                 "size_range": "XS-XXL with inclusive sizing",
@@ -155,10 +167,14 @@ class BrandIntelligenceAgent:
             sentiment_analysis = await self._analyze_customer_sentiment()
 
             # Update brand strategies based on insights
-            strategy_updates = self._update_brand_strategies(market_analysis, sentiment_analysis)
+            strategy_updates = self._update_brand_strategies(
+                market_analysis, sentiment_analysis
+            )
 
             # Generate actionable insights
-            insights = self._generate_actionable_insights(market_analysis, performance_metrics, sentiment_analysis)
+            insights = self._generate_actionable_insights(
+                market_analysis, performance_metrics, sentiment_analysis
+            )
 
             return {
                 "learning_cycle_status": "completed",
@@ -173,7 +189,11 @@ class BrandIntelligenceAgent:
 
         except Exception as e:
             logger.error(f"Brand learning cycle failed: {str(e)}")
-            return {"status": "failed", "error": str(e), "timestamp": datetime.now().isoformat()}
+            return {
+                "status": "failed",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat(),
+            }
 
     async def _analyze_market_trends(self) -> Dict[str, Any]:
         """Analyze current fashion and retail market trends."""
@@ -214,8 +234,15 @@ class BrandIntelligenceAgent:
                 "trend": "stable",
                 "metrics": ["Reviews", "NPS", "Repeat purchases"],
             },
-            "market_share": {"score": 15, "trend": "growing", "category": "Premium sustainable fashion"},
-            "brand_equity": {"score": 85, "components": ["Recognition", "Loyalty", "Perceived quality"]},
+            "market_share": {
+                "score": 15,
+                "trend": "growing",
+                "category": "Premium sustainable fashion",
+            },
+            "brand_equity": {
+                "score": 85,
+                "components": ["Recognition", "Loyalty", "Perceived quality"],
+            },
         }
 
     async def _analyze_customer_sentiment(self) -> Dict[str, Any]:
@@ -224,8 +251,17 @@ class BrandIntelligenceAgent:
         return {
             "overall_sentiment": "positive",
             "sentiment_score": 4.2,
-            "positive_themes": ["Product quality", "Customer service", "Brand values alignment", "Shopping experience"],
-            "improvement_areas": ["Price perception", "Size availability", "Shipping times"],
+            "positive_themes": [
+                "Product quality",
+                "Customer service",
+                "Brand values alignment",
+                "Shopping experience",
+            ],
+            "improvement_areas": [
+                "Price perception",
+                "Size availability",
+                "Shipping times",
+            ],
             "sentiment_sources": [
                 "Product reviews",
                 "Social media mentions",
@@ -235,7 +271,9 @@ class BrandIntelligenceAgent:
             "recommendation": "Maintain current quality standards while addressing price value communication",
         }
 
-    def _update_brand_strategies(self, market_analysis: Dict, sentiment_analysis: Dict) -> Dict[str, Any]:
+    def _update_brand_strategies(
+        self, market_analysis: Dict, sentiment_analysis: Dict
+    ) -> Dict[str, Any]:
         """Update brand strategies based on analysis."""
         return {
             "product_strategy": {
@@ -249,7 +287,11 @@ class BrandIntelligenceAgent:
                 "influencer_partnerships": "Micro-influencers in sustainability space",
             },
             "customer_experience": {
-                "improvements": ["Virtual styling", "Size advisory", "Sustainability tracking"],
+                "improvements": [
+                    "Virtual styling",
+                    "Size advisory",
+                    "Sustainability tracking",
+                ],
                 "personalization": "AI-driven product recommendations",
             },
             "pricing_strategy": {
@@ -298,7 +340,13 @@ class BrandIntelligenceAgent:
         differentiation_score = 88 * 0.15
         innovation_score = 82 * 0.15
 
-        total_score = awareness_score + satisfaction_score + loyalty_score + differentiation_score + innovation_score
+        total_score = (
+            awareness_score
+            + satisfaction_score
+            + loyalty_score
+            + differentiation_score
+            + innovation_score
+        )
         return round(total_score)
 
     def _generate_brand_recommendations(self) -> List[str]:
@@ -327,7 +375,11 @@ class BrandIntelligenceAgent:
             ],
             "color_palette": ["Camel", "Deep Navy", "Cream", "Rose Gold"],
             "price_range": "$120-$450",
-            "sustainability_features": ["Recycled materials", "Ethical manufacturing", "Carbon-neutral shipping"],
+            "sustainability_features": [
+                "Recycled materials",
+                "Ethical manufacturing",
+                "Carbon-neutral shipping",
+            ],
             "marketing_focus": "Timeless pieces for conscious consumers",
         }
 
@@ -394,7 +446,10 @@ class BrandIntelligenceAgent:
                         "role": "system",
                         "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",  # noqa: E501
                     },
-                    {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"},
+                    {
+                        "role": "user",
+                        "content": f"Analyze the sentiment of this text: '{content}'",
+                    },
                 ],
                 temperature=0.5,
                 max_tokens=150,
@@ -421,13 +476,17 @@ class BrandIntelligenceAgent:
             self.learning_from_assets = True
 
             # Analyze visual consistency
-            visual_analysis = self._analyze_visual_assets(asset_data.get("visual_assets", {}))
+            visual_analysis = self._analyze_visual_assets(
+                asset_data.get("visual_assets", {})
+            )
 
             # Extract brand patterns
             brand_patterns = self._extract_brand_patterns(asset_data)
 
             # Update brand understanding
-            enhanced_insights = self._generate_asset_insights(visual_analysis, brand_patterns)
+            enhanced_insights = self._generate_asset_insights(
+                visual_analysis, brand_patterns
+            )
 
             # Update theme evolution based on assets
             if asset_data.get("seasonal_collections"):
@@ -452,7 +511,9 @@ class BrandIntelligenceAgent:
             logger.error(f"Asset learning failed: {str(e)}")
             return {"error": str(e), "learning_status": "failed"}
 
-    def _experimental_neural_brand_analysis(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _experimental_neural_brand_analysis(
+        self, asset_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """EXPERIMENTAL: Advanced neural analysis of brand DNA patterns."""
         return {
             "brand_dna_sequence": "LUXURY-SUSTAINABLE-EMPOWERMENT-ELEGANCE",
@@ -472,9 +533,15 @@ class BrandIntelligenceAgent:
         """Analyze visual brand assets for consistency."""
         return {
             "logo_variations": len(visual_assets.get("logos", [])),
-            "product_image_quality": "high" if len(visual_assets.get("product_images", [])) > 5 else "building",
+            "product_image_quality": (
+                "high"
+                if len(visual_assets.get("product_images", [])) > 5
+                else "building"
+            ),
             "marketing_consistency": (
-                "strong" if len(visual_assets.get("marketing_materials", [])) > 3 else "developing"
+                "strong"
+                if len(visual_assets.get("marketing_materials", [])) > 3
+                else "developing"
             ),
             "visual_cohesion_score": 85,
             "recommendations": [
@@ -494,7 +561,9 @@ class BrandIntelligenceAgent:
             "quality_standards": "Premium",
         }
 
-    def _generate_asset_insights(self, visual_analysis: Dict, patterns: Dict) -> List[str]:
+    def _generate_asset_insights(
+        self, visual_analysis: Dict, patterns: Dict
+    ) -> List[str]:
         """Generate insights from asset analysis."""
         return [
             "Brand visual identity shows strong luxury positioning",
@@ -508,7 +577,9 @@ class BrandIntelligenceAgent:
         """Update seasonal understanding from collection assets."""
         self.theme_evolution["asset_informed"] = True
         self.theme_evolution["collection_count"] = len(seasonal_assets)
-        self.theme_evolution["visual_evolution"] = "Data-driven from uploaded collections"
+        self.theme_evolution["visual_evolution"] = (
+            "Data-driven from uploaded collections"
+        )
 
 
 def initialize_brand_intelligence() -> BrandIntelligenceAgent:

@@ -10,7 +10,9 @@ class Telemetry:
         self.component = component
 
     def event(self, name: str, **properties: Any) -> None:
-        logger.info(f"telemetry:event component={self.component} name={name} props={properties}")
+        logger.info(
+            f"telemetry:event component={self.component} name={name} props={properties}"
+        )
 
     def span(self, name: str):
         return _Span(self.component, name)

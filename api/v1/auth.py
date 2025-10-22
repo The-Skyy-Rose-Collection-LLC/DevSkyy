@@ -4,24 +4,23 @@ JWT/OAuth2 authentication with user management
 """
 
 import logging
+
 # datetime not needed in this module
 from typing import Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
+from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
+    create_user_tokens,
+    get_current_active_user,
     TokenData,
     TokenResponse,
     User,
-    UserRole,
-    create_user_tokens,
-    get_current_active_user,
     user_manager,
+    UserRole,
     verify_token,
-)
-from api.validation_models import (
-    EnhancedRegisterRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,18 +45,23 @@ async def register(request: EnhancedRegisterRequest):
         # Check if user already exists
         existing_user = user_manager.get_user_by_email(request.email)
         if existing_user:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
 
         # Create user with enhanced validation
         user = user_manager.create_user(
             email=request.email,
             username=request.username,
             password=request.password,
-            role=request.role
+            role=request.role,
         )
 
         # Log security event
-        logger.info(f"✅ New user registered: {user.email} (username: {user.username}, role: {user.role})")
+        logger.info(
+            f"✅ New user registered: {user.email} (username: {user.username}, role: {user.role})"
+        )
 
         logger.info(f"New user registered: {user.email}")
 
@@ -67,7 +71,10 @@ async def register(request: EnhancedRegisterRequest):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Registration failed: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Registration failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed",
+        )
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -128,7 +135,9 @@ async def refresh_token(refresh_token: str):
         user = user_manager.get_user_by_id(token_data.user_id)
 
         if not user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+            )
 
         # Create new tokens
         tokens = create_user_tokens(user)
@@ -139,11 +148,15 @@ async def refresh_token(refresh_token: str):
         raise
     except Exception as e:
         logger.error(f"Token refresh failed: {e}")
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
 
 
 @router.get("/me", response_model=User)
-async def get_current_user_info(current_user: TokenData = Depends(get_current_active_user)):
+async def get_current_user_info(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Get current user information
 
@@ -152,7 +165,9 @@ async def get_current_user_info(current_user: TokenData = Depends(get_current_ac
     user = user_manager.get_user_by_id(current_user.user_id)
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     return user
 
@@ -184,7 +199,9 @@ async def list_users(current_user: TokenData = Depends(get_current_active_user))
     """
     # In production, check if user is admin
     if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
+        )
 
     users = list(user_manager.users.values())
 

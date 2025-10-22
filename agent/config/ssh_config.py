@@ -41,9 +41,17 @@ Host *
             logger.info("✅ SSH config created")
 
         # Add GitHub to known hosts if not present
-        if not known_hosts_path.exists() or "github.com" not in known_hosts_path.read_text():
+        if (
+            not known_hosts_path.exists()
+            or "github.com" not in known_hosts_path.read_text()
+        ):
             try:
-                result = subprocess.run(["ssh-keyscan", "-H", "github.com"], capture_output=True, text=True, timeout=10)
+                result = subprocess.run(
+                    ["ssh-keyscan", "-H", "github.com"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
 
                 if result.returncode == 0:
                     with open(known_hosts_path, "a") as f:
@@ -60,7 +68,8 @@ Host *
         key_path = ssh_dir / "id_rsa"
         if not key_path.exists():
             logger.info(
-                "ℹ️ SSH key not found. Generate one with: " "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
+                "ℹ️ SSH key not found. Generate one with: "
+                "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
             )
 
         return {

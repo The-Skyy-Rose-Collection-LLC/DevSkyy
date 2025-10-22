@@ -48,21 +48,35 @@ class IntegrationManager:
                     "icon": "🌐",
                     "auth_type": "api_key",
                     "required_fields": ["site_url", "api_key", "username"],
-                    "capabilities": ["content_management", "plugin_management", "theme_customization", "analytics"],
+                    "capabilities": [
+                        "content_management",
+                        "plugin_management",
+                        "theme_customization",
+                        "analytics",
+                    ],
                 },
                 "shopify": {
                     "name": "Shopify",
                     "icon": "🛍️",
                     "auth_type": "oauth",
                     "required_fields": ["shop_domain", "access_token"],
-                    "capabilities": ["product_management", "order_processing", "inventory_sync", "analytics"],
+                    "capabilities": [
+                        "product_management",
+                        "order_processing",
+                        "inventory_sync",
+                        "analytics",
+                    ],
                 },
                 "custom_site": {
                     "name": "Custom Website",
                     "icon": "⚡",
                     "auth_type": "api_key",
                     "required_fields": ["domain", "api_endpoint", "api_key"],
-                    "capabilities": ["data_sync", "performance_monitoring", "analytics_integration"],
+                    "capabilities": [
+                        "data_sync",
+                        "performance_monitoring",
+                        "analytics_integration",
+                    ],
                 },
             },
             "social_media": {
@@ -71,42 +85,77 @@ class IntegrationManager:
                     "icon": "📘",
                     "auth_type": "oauth",
                     "required_fields": ["page_id", "access_token"],
-                    "capabilities": ["post_management", "ad_management", "analytics", "customer_insights"],
+                    "capabilities": [
+                        "post_management",
+                        "ad_management",
+                        "analytics",
+                        "customer_insights",
+                    ],
                 },
                 "instagram": {
                     "name": "Instagram",
                     "icon": "📸",
                     "auth_type": "oauth",
                     "required_fields": ["account_id", "access_token"],
-                    "capabilities": ["content_publishing", "story_management", "analytics", "influencer_tracking"],
+                    "capabilities": [
+                        "content_publishing",
+                        "story_management",
+                        "analytics",
+                        "influencer_tracking",
+                    ],
                 },
                 "twitter": {
                     "name": "Twitter/X",
                     "icon": "🐦",
                     "auth_type": "oauth",
-                    "required_fields": ["api_key", "api_secret", "access_token", "access_token_secret"],
-                    "capabilities": ["tweet_management", "analytics", "trend_monitoring", "engagement_tracking"],
+                    "required_fields": [
+                        "api_key",
+                        "api_secret",
+                        "access_token",
+                        "access_token_secret",
+                    ],
+                    "capabilities": [
+                        "tweet_management",
+                        "analytics",
+                        "trend_monitoring",
+                        "engagement_tracking",
+                    ],
                 },
                 "linkedin": {
                     "name": "LinkedIn",
                     "icon": "💼",
                     "auth_type": "oauth",
                     "required_fields": ["company_id", "access_token"],
-                    "capabilities": ["business_posts", "professional_networking", "lead_generation", "analytics"],
+                    "capabilities": [
+                        "business_posts",
+                        "professional_networking",
+                        "lead_generation",
+                        "analytics",
+                    ],
                 },
                 "tiktok": {
                     "name": "TikTok",
                     "icon": "📱",
                     "auth_type": "oauth",
                     "required_fields": ["account_id", "access_token"],
-                    "capabilities": ["video_publishing", "trend_analysis", "audience_insights", "ad_management"],
+                    "capabilities": [
+                        "video_publishing",
+                        "trend_analysis",
+                        "audience_insights",
+                        "ad_management",
+                    ],
                 },
                 "youtube": {
                     "name": "YouTube",
                     "icon": "📺",
                     "auth_type": "oauth",
                     "required_fields": ["channel_id", "access_token"],
-                    "capabilities": ["video_management", "analytics", "monetization", "audience_insights"],
+                    "capabilities": [
+                        "video_management",
+                        "analytics",
+                        "monetization",
+                        "audience_insights",
+                    ],
                 },
             },
             "banking": {
@@ -114,7 +163,11 @@ class IntegrationManager:
                     "name": "Chase Bank",
                     "icon": "🏦",
                     "auth_type": "secure_oauth",
-                    "required_fields": ["account_number", "routing_number", "access_token"],
+                    "required_fields": [
+                        "account_number",
+                        "routing_number",
+                        "access_token",
+                    ],
                     "capabilities": [
                         "account_monitoring",
                         "transaction_analysis",
@@ -139,7 +192,12 @@ class IntegrationManager:
                     "icon": "🏪",
                     "auth_type": "secure_oauth",
                     "required_fields": ["account_number", "access_token"],
-                    "capabilities": ["business_banking", "merchant_services", "loan_management", "investment_tracking"],
+                    "capabilities": [
+                        "business_banking",
+                        "merchant_services",
+                        "loan_management",
+                        "investment_tracking",
+                    ],
                 },
             },
             "payment_processors": {
@@ -148,21 +206,36 @@ class IntegrationManager:
                     "icon": "💳",
                     "auth_type": "api_key",
                     "required_fields": ["publishable_key", "secret_key"],
-                    "capabilities": ["payment_processing", "subscription_management", "analytics", "fraud_detection"],
+                    "capabilities": [
+                        "payment_processing",
+                        "subscription_management",
+                        "analytics",
+                        "fraud_detection",
+                    ],
                 },
                 "paypal": {
                     "name": "PayPal",
                     "icon": "💰",
                     "auth_type": "oauth",
                     "required_fields": ["client_id", "client_secret"],
-                    "capabilities": ["payment_processing", "invoice_management", "dispute_resolution", "analytics"],
+                    "capabilities": [
+                        "payment_processing",
+                        "invoice_management",
+                        "dispute_resolution",
+                        "analytics",
+                    ],
                 },
                 "square": {
                     "name": "Square",
                     "icon": "⬜",
                     "auth_type": "oauth",
                     "required_fields": ["application_id", "access_token"],
-                    "capabilities": ["payment_processing", "inventory_management", "pos_integration", "analytics"],
+                    "capabilities": [
+                        "payment_processing",
+                        "inventory_management",
+                        "pos_integration",
+                        "analytics",
+                    ],
                 },
             },
             "accounting_software": {
@@ -197,13 +270,22 @@ class IntegrationManager:
                     "icon": "📊",
                     "auth_type": "oauth",
                     "required_fields": ["property_id", "access_token"],
-                    "capabilities": ["web_analytics", "conversion_tracking", "audience_insights", "goal_monitoring"],
+                    "capabilities": [
+                        "web_analytics",
+                        "conversion_tracking",
+                        "audience_insights",
+                        "goal_monitoring",
+                    ],
                 }
             },
         }
 
     async def create_integration(
-        self, agent_type: str, service_type: str, service_name: str, credentials: Dict[str, Any]
+        self,
+        agent_type: str,
+        service_type: str,
+        service_name: str,
+        credentials: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Create a new integration between an agent and external service."""
         try:
@@ -211,12 +293,20 @@ class IntegrationManager:
 
             # Validate service support
             if not self._validate_service_support(service_type, service_name):
-                return {"error": f"Service {service_name} not supported", "status": "failed"}
+                return {
+                    "error": f"Service {service_name} not supported",
+                    "status": "failed",
+                }
 
             # Validate credentials
-            validation_result = await self._validate_credentials(service_type, service_name, credentials)
+            validation_result = await self._validate_credentials(
+                service_type, service_name, credentials
+            )
             if not validation_result["valid"]:
-                return {"error": validation_result["error"], "status": "validation_failed"}
+                return {
+                    "error": validation_result["error"],
+                    "status": "validation_failed",
+                }
 
             # Encrypt and store credentials
             encrypted_credentials = self._encrypt_credentials(credentials)
@@ -229,11 +319,15 @@ class IntegrationManager:
                 "service_name": service_name,
                 "credentials": encrypted_credentials,
                 "status": IntegrationStatus.PENDING.value,
-                "capabilities": self.supported_services[service_type][service_name]["capabilities"],
+                "capabilities": self.supported_services[service_type][service_name][
+                    "capabilities"
+                ],
                 "created_at": datetime.now().isoformat(),
                 "last_sync": None,
                 "sync_frequency": "hourly",
-                "data_mapping": self._create_data_mapping(agent_type, service_type, service_name),
+                "data_mapping": self._create_data_mapping(
+                    agent_type, service_type, service_name
+                ),
                 "webhook_url": f"/webhooks/{integration_id}",
                 "error_count": 0,
                 "success_count": 0,
@@ -286,10 +380,16 @@ class IntegrationManager:
             return {
                 "agent_type": agent_type,
                 "total_integrations": len(integrations_data),
-                "active_integrations": len([i for i in integrations_data if i["status"] == "active"]),
+                "active_integrations": len(
+                    [i for i in integrations_data if i["status"] == "active"]
+                ),
                 "integrations": integrations_data,
-                "available_services": self._get_available_services_for_agent(agent_type),
-                "integration_health": self._calculate_integration_health(integrations_data),
+                "available_services": self._get_available_services_for_agent(
+                    agent_type
+                ),
+                "integration_health": self._calculate_integration_health(
+                    integrations_data
+                ),
             }
 
         except Exception as e:
@@ -331,7 +431,10 @@ class IntegrationManager:
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
         """Validate if service is supported."""
-        return service_type in self.supported_services and service_name in self.supported_services[service_type]
+        return (
+            service_type in self.supported_services
+            and service_name in self.supported_services[service_type]
+        )
 
     async def _validate_credentials(
         self, service_type: str, service_name: str, credentials: Dict[str, Any]
@@ -361,17 +464,33 @@ class IntegrationManager:
         decoded = base64.b64decode(encrypted_credentials.encode()).decode()
         return json.loads(decoded)
 
-    def _create_data_mapping(self, agent_type: str, service_type: str, service_name: str) -> Dict[str, Any]:
+    def _create_data_mapping(
+        self, agent_type: str, service_type: str, service_name: str
+    ) -> Dict[str, Any]:
         """Create data mapping configuration for integration."""
         mappings = {
             "financial": {
                 "banking": {
-                    "transaction_mapping": {"amount": "amount", "date": "transaction_date", "description": "memo"},
-                    "account_mapping": {"balance": "current_balance", "account_type": "account_category"},
+                    "transaction_mapping": {
+                        "amount": "amount",
+                        "date": "transaction_date",
+                        "description": "memo",
+                    },
+                    "account_mapping": {
+                        "balance": "current_balance",
+                        "account_type": "account_category",
+                    },
                 },
                 "payment_processors": {
-                    "payment_mapping": {"amount": "gross_amount", "fee": "stripe_fee", "net": "net_amount"},
-                    "customer_mapping": {"email": "customer_email", "name": "customer_name"},
+                    "payment_mapping": {
+                        "amount": "gross_amount",
+                        "fee": "stripe_fee",
+                        "net": "net_amount",
+                    },
+                    "customer_mapping": {
+                        "email": "customer_email",
+                        "name": "customer_name",
+                    },
                 },
             }
         }
@@ -392,7 +511,9 @@ class IntegrationManager:
             "data_retention": "90 days",
         }
 
-    def _get_available_services_for_agent(self, agent_type: str) -> Dict[str, List[str]]:
+    def _get_available_services_for_agent(
+        self, agent_type: str
+    ) -> Dict[str, List[str]]:
         """Get available services for specific agent type."""
         agent_service_compatibility = {
             "financial": ["banking", "payment_processors", "accounting_software"],
@@ -407,11 +528,15 @@ class IntegrationManager:
 
         for service_type in compatible_services:
             if service_type in self.supported_services:
-                available[service_type] = list(self.supported_services[service_type].keys())
+                available[service_type] = list(
+                    self.supported_services[service_type].keys()
+                )
 
         return available
 
-    def _calculate_integration_health(self, integrations: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _calculate_integration_health(
+        self, integrations: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Calculate overall health of agent integrations."""
         if not integrations:
             return {"status": "no_integrations", "score": 0}
@@ -422,14 +547,20 @@ class IntegrationManager:
         health_score = (active_count / len(integrations)) * 100
 
         return {
-            "status": "healthy" if health_score > 80 else "needs_attention" if health_score > 50 else "critical",
+            "status": (
+                "healthy"
+                if health_score > 80
+                else "needs_attention" if health_score > 50 else "critical"
+            ),
             "score": round(health_score, 1),
             "active_integrations": active_count,
             "error_integrations": error_count,
             "recommendations": self._generate_health_recommendations(integrations),
         }
 
-    def _generate_health_recommendations(self, integrations: List[Dict[str, Any]]) -> List[str]:
+    def _generate_health_recommendations(
+        self, integrations: List[Dict[str, Any]]
+    ) -> List[str]:
         """Generate recommendations for improving integration health."""
         recommendations = []
 
@@ -440,14 +571,19 @@ class IntegrationManager:
         old_syncs = [
             i
             for i in integrations
-            if i["last_sync"] and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
+            if i["last_sync"]
+            and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
         ]
         if old_syncs:
-            recommendations.append(f"Update {len(old_syncs)} integrations with stale data")
+            recommendations.append(
+                f"Update {len(old_syncs)} integrations with stale data"
+            )
 
         return recommendations
 
-    async def _perform_data_sync(self, integration: Dict[str, Any], credentials: Dict[str, Any]) -> Dict[str, Any]:
+    async def _perform_data_sync(
+        self, integration: Dict[str, Any], credentials: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Perform actual data synchronization."""
         # Simulate data sync - in production, this would make actual API calls
         return {

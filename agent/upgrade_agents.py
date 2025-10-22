@@ -200,7 +200,11 @@ def main():
         analysis = analyze_agent_structure(agent_file)
         results.append(analysis)
 
-        status = "✅ Uses BaseAgent" if analysis.get("uses_base_agent") else "⚠️  Needs Upgrade"
+        status = (
+            "✅ Uses BaseAgent"
+            if analysis.get("uses_base_agent")
+            else "⚠️  Needs Upgrade"
+        )
         print(f"{status}: {analysis['file']}")
         print(f"   Classes: {', '.join(analysis.get('classes', []))}")
         print(f"   Lines: {analysis.get('lines', 0)}")

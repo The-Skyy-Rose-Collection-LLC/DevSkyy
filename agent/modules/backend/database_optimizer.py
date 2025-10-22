@@ -26,7 +26,9 @@ class QueryOptimizer:
         self.query_cache = {}
         self.index_recommendations = []
 
-    def analyze_query(self, query: str, execution_time: float, params: Dict = None) -> Dict[str, Any]:
+    def analyze_query(
+        self, query: str, execution_time: float, params: Dict = None
+    ) -> Dict[str, Any]:
         """Analyze query performance and provide optimization suggestions."""
         analysis = {
             "query_hash": hashlib.md5(query.encode()).hexdigest()[:8],
@@ -126,8 +128,12 @@ class QueryOptimizer:
     def get_query_stats(self) -> Dict[str, Any]:
         """Get query performance statistics."""
         if self.query_stats["total_queries"] > 0:
-            slow_query_rate = (self.query_stats["slow_queries"] / self.query_stats["total_queries"]) * 100
-            cache_hit_rate = (self.query_stats["cached_queries"] / self.query_stats["total_queries"]) * 100
+            slow_query_rate = (
+                self.query_stats["slow_queries"] / self.query_stats["total_queries"]
+            ) * 100
+            cache_hit_rate = (
+                self.query_stats["cached_queries"] / self.query_stats["total_queries"]
+            ) * 100
         else:
             slow_query_rate = 0
             cache_hit_rate = 0
@@ -148,10 +154,18 @@ class DatabaseConnectionPool:
         self.connection_timeout = connection_timeout
         self.connections = asyncio.Queue(maxsize=max_connections)
         self.active_connections = 0
-        self.connection_stats = {"created": 0, "reused": 0, "closed": 0, "timeouts": 0, "errors": 0}
+        self.connection_stats = {
+            "created": 0,
+            "reused": 0,
+            "closed": 0,
+            "timeouts": 0,
+            "errors": 0,
+        }
         self.query_optimizer = QueryOptimizer()
 
-    async def execute_query(self, query: str, params: Dict = None, use_cache: bool = True) -> Any:
+    async def execute_query(
+        self, query: str, params: Dict = None, use_cache: bool = True
+    ) -> Any:
         """Execute query with optimization and caching."""
         start_time = time.time()
 
@@ -179,7 +193,9 @@ class DatabaseConnectionPool:
             analysis = self.query_optimizer.analyze_query(query, execution_time, params)
 
             if analysis["is_slow"]:
-                logger.warning(f"Slow query detected: {execution_time:.2f}s - {query[:100]}...")
+                logger.warning(
+                    f"Slow query detected: {execution_time:.2f}s - {query[:100]}..."
+                )
 
             return result
 
@@ -194,7 +210,9 @@ class DatabaseConnectionPool:
         key_string = json.dumps(key_data, sort_keys=True)
         return hashlib.md5(key_string.encode()).hexdigest()
 
-    async def _execute_with_connection(self, connection, query: str, params: Dict = None) -> Any:
+    async def _execute_with_connection(
+        self, connection, query: str, params: Dict = None
+    ) -> Any:
         """Execute query with specific connection."""
         # This would be implemented based on your database driver
         # For now, return mock data
@@ -204,7 +222,9 @@ class DatabaseConnectionPool:
         """Get connection from pool."""
         try:
             if not self.connections.empty():
-                connection = await asyncio.wait_for(self.connections.get(), timeout=self.connection_timeout)
+                connection = await asyncio.wait_for(
+                    self.connections.get(), timeout=self.connection_timeout
+                )
                 self.connection_stats["reused"] += 1
                 return connection
             elif self.active_connections < self.max_connections:
@@ -213,7 +233,9 @@ class DatabaseConnectionPool:
                 self.connection_stats["created"] += 1
                 return connection
             else:
-                connection = await asyncio.wait_for(self.connections.get(), timeout=self.connection_timeout)
+                connection = await asyncio.wait_for(
+                    self.connections.get(), timeout=self.connection_timeout
+                )
                 self.connection_stats["reused"] += 1
                 return connection
         except asyncio.TimeoutError:
@@ -266,7 +288,9 @@ class IndexOptimizer:
         self.index_recommendations = []
         self.existing_indexes = set()
 
-    def analyze_table(self, table_name: str, query_patterns: List[str]) -> List[Dict[str, Any]]:
+    def analyze_table(
+        self, table_name: str, query_patterns: List[str]
+    ) -> List[Dict[str, Any]]:
         """Analyze table and recommend indexes."""
         recommendations = []
 
@@ -384,7 +408,9 @@ def optimize_query(func):
         # Log performance
         execution_time = time.time() - start_time
         if execution_time > 1.0:  # Log slow operations
-            logger.warning(f"Slow operation: {func.__name__} took {execution_time:.2f}s")
+            logger.warning(
+                f"Slow operation: {func.__name__} took {execution_time:.2f}s"
+            )
 
         return result
 

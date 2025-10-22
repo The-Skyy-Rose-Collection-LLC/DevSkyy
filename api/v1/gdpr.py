@@ -15,7 +15,12 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from security.jwt_auth import TokenData, get_current_active_user, require_admin, user_manager
+from security.jwt_auth import (
+    get_current_active_user,
+    require_admin,
+    TokenData,
+    user_manager,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +87,8 @@ class DataRetentionPolicyResponse(BaseModel):
 
 @router.get("/export", response_model=GDPRExportResponse)
 async def export_user_data(
-    request: GDPRExportRequest = Depends(), current_user: TokenData = Depends(get_current_active_user)
+    request: GDPRExportRequest = Depends(),
+    current_user: TokenData = Depends(get_current_active_user),
 ):
     """
     Export all user data (GDPR Article 15 - Right of Access)
@@ -107,7 +113,9 @@ async def export_user_data(
         # Get user details
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
 
         # Collect all user data
         user_data = {
@@ -122,7 +130,9 @@ async def export_user_data(
                 "permissions": user.permissions,
             },
             "account_data": {
-                "registration_date": user.created_at.isoformat() if user.created_at else None,
+                "registration_date": (
+                    user.created_at.isoformat() if user.created_at else None
+                ),
                 "account_status": "active" if user.is_active else "inactive",
             },
         }
@@ -134,7 +144,9 @@ async def export_user_data(
                 "api_calls": [],
                 "data_access_logs": [],
             }
-            logger.info(f"   ✓ Including audit logs in export")  # noqa: F541 - Consistent logging format
+            logger.info(
+                f"   ✓ Including audit logs in export"
+            )  # noqa: F541 - Consistent logging format
 
         # Include activity history if requested
         if request.include_activity_history:
@@ -143,7 +155,9 @@ async def export_user_data(
                 "webhook_subscriptions": [],
                 "api_usage_statistics": {},
             }
-            logger.info(f"   ✓ Including activity history in export")  # noqa: F541 - Consistent logging format
+            logger.info(
+                f"   ✓ Including activity history in export"
+            )  # noqa: F541 - Consistent logging format
 
         # Generate export metadata
         import uuid
@@ -185,7 +199,10 @@ async def export_user_data(
 
 
 @router.delete("/delete", response_model=GDPRDeleteResponse)
-async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def delete_user_data(
+    request: GDPRDeleteRequest,
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     Delete all user data (GDPR Article 17 - Right to Erasure)
 
@@ -217,7 +234,9 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
         # Get user details before deletion
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
 
         import uuid
 
@@ -229,7 +248,9 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
 
         if request.anonymize_instead_of_delete:
             # Anonymization approach - retain data for legal/audit purposes
-            logger.info(f"   → Anonymizing user data instead of deletion")  # noqa: F541 - Consistent logging format
+            logger.info(
+                f"   → Anonymizing user data instead of deletion"
+            )  # noqa: F541 - Consistent logging format
 
             # Anonymize personal information
             anonymized_user_data = {
@@ -264,13 +285,17 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
 
             # Note: In production, this would actually delete records from the database
             # For now, we're documenting what would be deleted
-            logger.warning(f"   ⚠️  User account marked for deletion: {current_user.email}")
+            logger.warning(
+                f"   ⚠️  User account marked for deletion: {current_user.email}"
+            )
 
         logger.info("   ✓ Data deletion/anonymization completed")
         logger.info(f"   ✓ Request ID: {request_id}")
         logger.info(f"   ✓ Records deleted: {sum(deleted_records.values())}")
         if retained_records:
-            logger.info(f"   ℹ️  Records retained for legal compliance: {sum(retained_records.values())}")
+            logger.info(
+                f"   ℹ️  Records retained for legal compliance: {sum(retained_records.values())}"
+            )
 
         return GDPRDeleteResponse(
             request_id=request_id,
@@ -331,7 +356,9 @@ async def get_retention_policy():
 
 
 @router.get("/requests", dependencies=[Depends(require_admin)])
-async def list_data_subject_requests(current_user: TokenData = Depends(get_current_active_user)):
+async def list_data_subject_requests(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """
     List all GDPR data subject requests (Admin only)
 

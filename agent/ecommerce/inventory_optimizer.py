@@ -48,7 +48,10 @@ class InventoryOptimizer:
         """
         try:
             if len(historical_sales) < 14:
-                return {"success": False, "error": "Insufficient historical data (minimum 14 days required)"}
+                return {
+                    "success": False,
+                    "error": "Insufficient historical data (minimum 14 days required)",
+                }
 
             # Prepare time series features
             X = np.array([[i, i % 7, i % 30] for i in range(len(historical_sales))])
@@ -60,7 +63,11 @@ class InventoryOptimizer:
             # Generate forecast
             future_X = np.array(
                 [
-                    [len(historical_sales) + i, (len(historical_sales) + i) % 7, (len(historical_sales) + i) % 30]
+                    [
+                        len(historical_sales) + i,
+                        (len(historical_sales) + i) % 7,
+                        (len(historical_sales) + i) % 30,
+                    ]
                     for i in range(forecast_periods)
                 ]
             )
@@ -90,7 +97,9 @@ class InventoryOptimizer:
                     "trend": trend,
                     "average_daily_sales": round(float(np.mean(historical_sales)), 2),
                     "peak_demand_day": int(np.argmax(forecast)),
-                    "volatility": round(float(np.std(historical_sales) / np.mean(historical_sales)), 3),
+                    "volatility": round(
+                        float(np.std(historical_sales) / np.mean(historical_sales)), 3
+                    ),
                 },
                 "forecast_period_days": forecast_periods,
             }
@@ -99,7 +108,9 @@ class InventoryOptimizer:
             logger.error(f"Demand forecasting failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def calculate_reorder_point(self, product_data: Dict[str, Any], sales_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def calculate_reorder_point(
+        self, product_data: Dict[str, Any], sales_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Calculate optimal reorder point and quantity
 
@@ -148,7 +159,11 @@ class InventoryOptimizer:
                 "reorder_point": int(reorder_point),
                 "recommended_order_quantity": int(eoq),
                 "should_reorder": should_reorder,
-                "urgency": "high" if days_until_stockout < 7 else "medium" if days_until_stockout < 14 else "low",
+                "urgency": (
+                    "high"
+                    if days_until_stockout < 7
+                    else "medium" if days_until_stockout < 14 else "low"
+                ),
                 "days_until_stockout": round(days_until_stockout, 1),
                 "safety_stock": int(safety_stock),
                 "lead_time_days": lead_time_days,
@@ -158,7 +173,9 @@ class InventoryOptimizer:
             logger.error(f"Reorder point calculation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def identify_dead_stock(self, inventory: List[Dict[str, Any]], threshold_days: int = 90) -> Dict[str, Any]:
+    async def identify_dead_stock(
+        self, inventory: List[Dict[str, Any]], threshold_days: int = 90
+    ) -> Dict[str, Any]:
         """
         Identify slow-moving and dead stock
 
@@ -190,7 +207,9 @@ class InventoryOptimizer:
                             "days_since_sale": days_since_sale,
                             "value_locked": value_locked,
                             "recommendation": (
-                                "Aggressive clearance" if days_since_sale > 180 else "Promotional pricing"
+                                "Aggressive clearance"
+                                if days_since_sale > 180
+                                else "Promotional pricing"
                             ),
                         }
                     )
@@ -256,7 +275,9 @@ class InventoryOptimizer:
                 z_score = 1.65  # For 95% service level
                 std_dev = product.get("sales_std_dev", avg_sales * 0.3)
 
-                optimal_stock = (avg_sales * lead_time) + (z_score * std_dev * np.sqrt(lead_time))
+                optimal_stock = (avg_sales * lead_time) + (
+                    z_score * std_dev * np.sqrt(lead_time)
+                )
 
                 difference = optimal_stock - current_stock
                 value_change = difference * cost
@@ -269,7 +290,11 @@ class InventoryOptimizer:
                         "optimal_stock": int(optimal_stock),
                         "adjustment_needed": int(difference),
                         "value_change": round(value_change, 2),
-                        "action": "increase" if difference > 0 else "decrease" if difference < 0 else "maintain",
+                        "action": (
+                            "increase"
+                            if difference > 0
+                            else "decrease" if difference < 0 else "maintain"
+                        ),
                     }
                 )
 
@@ -286,7 +311,9 @@ class InventoryOptimizer:
                 "financial_impact": {
                     "investment_needed": round(total_investment_needed, 2),
                     "capital_release_possible": round(total_reduction_possible, 2),
-                    "net_change": round(total_investment_needed - total_reduction_possible, 2),
+                    "net_change": round(
+                        total_investment_needed - total_reduction_possible, 2
+                    ),
                 },
             }
 

@@ -37,4 +37,8 @@ class VisionEngine:
 
     async def analyze_style(self, image_path: str) -> Dict[str, Any]:
         """Analyze fashion style"""
-        return {"style": "elegant", "attributes": ["formal", "luxury", "modern"], "confidence": 0.87}
+        return {
+            "style": "elegant",
+            "attributes": ["formal", "luxury", "modern"],
+            "confidence": 0.87,
+        }

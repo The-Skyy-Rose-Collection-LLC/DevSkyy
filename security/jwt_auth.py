@@ -10,14 +10,20 @@ from typing import Any, Dict, List, Optional
 
 import jwt
 from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+    OAuth2PasswordBearer,
+)
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
 
 logger = logging.getLogger(__name__)
 
 # JWT Configuration - Enhanced Security
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME"))
+JWT_SECRET_KEY = os.getenv(
+    "JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME")
+)
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -29,7 +35,7 @@ TOKEN_BLACKLIST_EXPIRE_HOURS = 24  # How long to keep blacklisted tokens
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
-    bcrypt__rounds=12  # Increased rounds for better security
+    bcrypt__rounds=12,  # Increased rounds for better security
 )
 
 # Security schemes
@@ -129,6 +135,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # ENHANCED SECURITY FUNCTIONS
 # ============================================================================
 
+
 def is_account_locked(email: str) -> bool:
     """Check if account is locked due to failed login attempts"""
     if email in locked_accounts:
@@ -150,8 +157,7 @@ def record_failed_login(email: str) -> bool:
     # Clean old attempts (older than 1 hour)
     hour_ago = now - timedelta(hours=1)
     failed_login_attempts[email] = [
-        attempt for attempt in failed_login_attempts[email]
-        if attempt > hour_ago
+        attempt for attempt in failed_login_attempts[email] if attempt > hour_ago
     ]
 
     # Add current failed attempt
@@ -193,7 +199,9 @@ def validate_token_security(token: str, token_data: TokenData) -> bool:
         return False
 
     # Check token age (additional security check)
-    token_age = datetime.now() - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    token_age = (
+        datetime.now() - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     if token_age > timedelta(hours=TOKEN_BLACKLIST_EXPIRE_HOURS):
         logger.warning(f"⚠️ Suspiciously old token used: {token_data.email}")
         return False
@@ -206,7 +214,9 @@ def validate_token_security(token: str, token_data: TokenData) -> bool:
 # ============================================================================
 
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(
+    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
+) -> str:
     """
     Create a new access token
 
@@ -222,7 +232,9 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
 
     to_encode.update(
         {
@@ -363,7 +375,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     return verify_token(token, token_type="access")
 
 
-async def get_current_active_user(current_user: TokenData = Depends(get_current_user)) -> TokenData:
+async def get_current_active_user(
+    current_user: TokenData = Depends(get_current_user),
+) -> TokenData:
     """
     Get current active user (additional checks can be added)
 
@@ -391,9 +405,12 @@ class RoleChecker:
 
     def __call__(self, user: TokenData = Depends(get_current_active_user)) -> TokenData:
         if user.role not in self.allowed_roles:
-            logger.warning(f"User {user.email} with role {user.role} denied access. Required: {self.allowed_roles}")
+            logger.warning(
+                f"User {user.email} with role {user.role} denied access. Required: {self.allowed_roles}"
+            )
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail=f"Access forbidden. Required role: {self.allowed_roles}"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access forbidden. Required role: {self.allowed_roles}",
             )
         return user
 
@@ -401,9 +418,17 @@ class RoleChecker:
 # Predefined role checkers
 require_super_admin = RoleChecker([UserRole.SUPER_ADMIN])
 require_admin = RoleChecker([UserRole.SUPER_ADMIN, UserRole.ADMIN])
-require_developer = RoleChecker([UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DEVELOPER])
+require_developer = RoleChecker(
+    [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DEVELOPER]
+)
 require_authenticated = RoleChecker(
-    [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DEVELOPER, UserRole.API_USER, UserRole.READ_ONLY]
+    [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.DEVELOPER,
+        UserRole.API_USER,
+        UserRole.READ_ONLY,
+    ]
 )
 
 
@@ -416,7 +441,9 @@ class APIKeyAuth:
     """API Key authentication for service-to-service communication"""
 
     @staticmethod
-    def validate_api_key(credentials: HTTPAuthorizationCredentials = Security(security_bearer)) -> Dict[str, Any]:
+    def validate_api_key(
+        credentials: HTTPAuthorizationCredentials = Security(security_bearer),
+    ) -> Dict[str, Any]:
         """
         Validate API key from Authorization header
 
@@ -479,7 +506,9 @@ def create_user_tokens(user: User) -> TokenResponse:
     refresh_token = create_refresh_token(token_data)
 
     return TokenResponse(
-        access_token=access_token, refresh_token=refresh_token, expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
 
@@ -507,7 +536,9 @@ class UserManager:
         """Verify a password against its hash"""
         return pwd_context.verify(plain_password, hashed_password)
 
-    def authenticate_user(self, username_or_email: str, password: str) -> Optional[User]:
+    def authenticate_user(
+        self, username_or_email: str, password: str
+    ) -> Optional[User]:
         """Authenticate a user by username/email and password"""
         # Try to find user by email first
         user = self.get_user_by_email(username_or_email)
@@ -571,7 +602,9 @@ class UserManager:
             return self.users.get(user_id)
         return None
 
-    def create_user(self, email: str, username: str, password: str, role: str = UserRole.API_USER) -> User:
+    def create_user(
+        self, email: str, username: str, password: str, role: str = UserRole.API_USER
+    ) -> User:
         """Create a new user with hashed password"""
         # Check if email already exists
         if email in self.email_index:
@@ -588,14 +621,22 @@ class UserManager:
         password_hash = self.hash_password(password)
 
         # Create user
-        user = User(user_id=user_id, email=email, username=username, password_hash=password_hash, role=role)
+        user = User(
+            user_id=user_id,
+            email=email,
+            username=username,
+            password_hash=password_hash,
+            role=role,
+        )
 
         # Store user
         self.users[user_id] = user
         self.email_index[email] = user_id
         self.username_index[username] = user_id
 
-        logger.info(f"Created new user: {email} (username: {username}) with role {role}")
+        logger.info(
+            f"Created new user: {email} (username: {username}) with role {role}"
+        )
 
         return user
 

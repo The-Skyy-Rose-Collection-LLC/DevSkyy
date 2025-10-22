@@ -42,8 +42,16 @@ class SecurityAgent:
                     "last_scan": datetime.now().isoformat(),
                 },
                 "compliance_status": {
-                    "pci_dss": {"status": "compliant", "score": 98, "expiry": "2025-12-31"},
-                    "gdpr": {"status": "compliant", "score": 96, "last_audit": "2024-11-15"},
+                    "pci_dss": {
+                        "status": "compliant",
+                        "score": 98,
+                        "expiry": "2025-12-31",
+                    },
+                    "gdpr": {
+                        "status": "compliant",
+                        "score": 96,
+                        "last_audit": "2024-11-15",
+                    },
                 },
                 "threat_landscape": {
                     "active_threats": 2,
@@ -52,9 +60,18 @@ class SecurityAgent:
                     "brand_impersonation_sites": 4,
                 },
                 "luxury_specific_risks": {
-                    "high_value_transactions": {"risk_score": 25, "mitigation": "enhanced_verification"},
-                    "vip_customer_data": {"risk_score": 15, "mitigation": "additional_encryption"},
-                    "brand_reputation": {"risk_score": 30, "mitigation": "continuous_monitoring"},
+                    "high_value_transactions": {
+                        "risk_score": 25,
+                        "mitigation": "enhanced_verification",
+                    },
+                    "vip_customer_data": {
+                        "risk_score": 15,
+                        "mitigation": "additional_encryption",
+                    },
+                    "brand_reputation": {
+                        "risk_score": 30,
+                        "mitigation": "continuous_monitoring",
+                    },
                 },
             }
 
@@ -70,7 +87,9 @@ class SecurityAgent:
             logger.error(f"❌ Security assessment failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_security_recommendations(self, assessment: Dict) -> List[Dict[str, Any]]:
+    def _generate_security_recommendations(
+        self, assessment: Dict
+    ) -> List[Dict[str, Any]]:
         """Generate prioritized security recommendations."""
         recommendations = [
             {

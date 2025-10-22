@@ -122,7 +122,9 @@ class EventStore:
             all_events.extend(events)
         return sorted(all_events, key=lambda e: e.timestamp)
 
-    async def save_snapshot(self, aggregate_id: str, state: Dict[str, Any], version: int):
+    async def save_snapshot(
+        self, aggregate_id: str, state: Dict[str, Any], version: int
+    ):
         """
         Save snapshot of aggregate state for faster reconstruction
 
@@ -131,7 +133,11 @@ class EventStore:
             state: Current state of the aggregate
             version: Version number of the snapshot
         """
-        self._snapshots[aggregate_id] = {"state": state, "version": version, "timestamp": datetime.now(timezone.utc)}
+        self._snapshots[aggregate_id] = {
+            "state": state,
+            "version": version,
+            "timestamp": datetime.now(timezone.utc),
+        }
 
     async def get_snapshot(self, aggregate_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -272,7 +278,10 @@ class AgentAggregate(AggregateRoot):
     def update(self, **updates):
         """Update agent properties"""
         event = AgentUpdatedEvent(
-            aggregate_id=self.aggregate_id, aggregate_type="Agent", version=self.version + 1, data=updates
+            aggregate_id=self.aggregate_id,
+            aggregate_type="Agent",
+            version=self.version + 1,
+            data=updates,
         )
         self.raise_event(event)
 

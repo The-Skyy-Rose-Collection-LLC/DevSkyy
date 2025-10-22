@@ -7,13 +7,17 @@ import logging
 from typing import Any, Dict, List
 
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException
 import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
-from prometheus_client import Counter, Histogram  # noqa: F401 - Reserved for Phase 5 monitoring
+from fastapi import APIRouter, Depends, HTTPException
+from prometheus_client import (  # noqa: F401 - Reserved for Phase 5 monitoring
+    Counter,
+    Histogram,
+)
 from pydantic import BaseModel, Field
 
-from ml import ModelStage, explainer, model_registry, redis_cache
-from security.jwt_auth import TokenData, get_current_active_user, require_developer
+from ml import explainer, model_registry, ModelStage, redis_cache
+from security.jwt_auth import get_current_active_user, require_developer, TokenData
+
 # MLModelRequest imported when needed
 
 logger = logging.getLogger(__name__)
@@ -70,42 +74,62 @@ async def list_models(current_user: TokenData = Depends(get_current_active_user)
 
 
 @router.get("/registry/models/{model_name}/versions")
-async def list_model_versions(model_name: str, current_user: TokenData = Depends(get_current_active_user)):
+async def list_model_versions(
+    model_name: str, current_user: TokenData = Depends(get_current_active_user)
+):
     """List all versions of a model"""
     try:
         versions = model_registry.list_versions(model_name)
         return {"model_name": model_name, "versions": versions}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Model not found: {model_name}. Error: {str(e)}")
+        raise HTTPException(
+            status_code=404, detail=f"Model not found: {model_name}. Error: {str(e)}"
+        )
 
 
 @router.get("/registry/models/{model_name}/{version}")
-async def get_model_metadata(model_name: str, version: str, current_user: TokenData = Depends(get_current_active_user)):
+async def get_model_metadata(
+    model_name: str,
+    version: str,
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """Get model metadata"""
     try:
         metadata = model_registry.get_metadata(model_name, version)
         return metadata.to_dict()
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail=f"Metadata not found for {model_name} v{version}")
+        raise HTTPException(
+            status_code=404, detail=f"Metadata not found for {model_name} v{version}"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/registry/models/{model_name}/{version}/promote")
 async def promote_model(
-    model_name: str, version: str, request: ModelPromotionRequest, current_user: TokenData = Depends(require_developer)
+    model_name: str,
+    version: str,
+    request: ModelPromotionRequest,
+    current_user: TokenData = Depends(require_developer),
 ):
     """Promote model to different stage"""
     try:
         model_registry.promote_model(model_name, version, request.target_stage)
-        return {"status": "success", "model_name": model_name, "version": version, "new_stage": request.target_stage}
+        return {
+            "status": "success",
+            "model_name": model_name,
+            "version": version,
+            "new_stage": request.target_stage,
+        }
     except Exception as e:
         logger.error(f"Failed to promote model: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/registry/stats")
-async def get_registry_stats(current_user: TokenData = Depends(get_current_active_user)):
+async def get_registry_stats(
+    current_user: TokenData = Depends(get_current_active_user),
+):
     """Get model registry statistics"""
     try:
         stats = model_registry.get_registry_stats()
@@ -116,7 +140,10 @@ async def get_registry_stats(current_user: TokenData = Depends(get_current_activ
 
 @router.post("/registry/models/{model_name}/compare")
 async def compare_models(
-    model_name: str, version1: str, version2: str, current_user: TokenData = Depends(get_current_active_user)
+    model_name: str,
+    version1: str,
+    version2: str,
+    current_user: TokenData = Depends(get_current_active_user),
 ):
     """Compare two model versions"""
     try:
@@ -157,7 +184,9 @@ async def clear_cache(current_user: TokenData = Depends(require_developer)):
 
 
 @router.post("/explain/prediction")
-async def explain_prediction(request: ExplainRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def explain_prediction(
+    request: ExplainRequest, current_user: TokenData = Depends(get_current_active_user)
+):
     """
     Explain model prediction using SHAP values
 
@@ -166,11 +195,15 @@ async def explain_prediction(request: ExplainRequest, current_user: TokenData = 
     try:
         X = np.array(request.input_data)
         explanation = explainer.explain_prediction(
-            request.model_name, X, feature_names=request.feature_names if request.feature_names else None
+            request.model_name,
+            X,
+            feature_names=request.feature_names if request.feature_names else None,
         )
         return explanation
     except ImportError:
-        raise HTTPException(status_code=501, detail="SHAP not installed. Install with: pip install shap")
+        raise HTTPException(
+            status_code=501, detail="SHAP not installed. Install with: pip install shap"
+        )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

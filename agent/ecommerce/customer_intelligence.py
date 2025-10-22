@@ -15,10 +15,14 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-import numpy as np
-from sklearn.cluster import KMeans  # noqa: F401 - Reserved for future ML clustering features
-from sklearn.preprocessing import StandardScaler  # noqa: F401 - Reserved for Phase 3 data preprocessing
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
+import numpy as np
+from sklearn.cluster import (  # noqa: F401 - Reserved for future ML clustering features
+    KMeans,
+)
+from sklearn.preprocessing import (  # noqa: F401 - Reserved for Phase 3 data preprocessing
+    StandardScaler,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +144,9 @@ class CustomerIntelligence:
 
         return segments
 
-    async def predict_customer_ltv(self, customer_id: str, time_horizon_months: int = 12) -> Dict[str, Any]:
+    async def predict_customer_ltv(
+        self, customer_id: str, time_horizon_months: int = 12
+    ) -> Dict[str, Any]:
         """
         Predict customer lifetime value
 
@@ -151,7 +157,9 @@ class CustomerIntelligence:
         Returns:
             LTV prediction with confidence intervals
         """
-        logger.info(f"Predicting LTV for customer {customer_id} over {time_horizon_months} months")
+        logger.info(
+            f"Predicting LTV for customer {customer_id} over {time_horizon_months} months"
+        )
 
         # Simulate LTV prediction
         base_ltv = np.random.uniform(200, 5000)
@@ -181,7 +189,9 @@ class CustomerIntelligence:
 
         return prediction
 
-    async def predict_churn_risk(self, customer_id: str, prediction_window_days: int = 90) -> Dict[str, Any]:
+    async def predict_churn_risk(
+        self, customer_id: str, prediction_window_days: int = 90
+    ) -> Dict[str, Any]:
         """
         Predict customer churn risk
 
@@ -258,7 +268,9 @@ class CustomerIntelligence:
 
         return assessment
 
-    async def analyze_purchase_behavior(self, customer_id: str, lookback_days: int = 180) -> Dict[str, Any]:
+    async def analyze_purchase_behavior(
+        self, customer_id: str, lookback_days: int = 180
+    ) -> Dict[str, Any]:
         """
         Analyze customer purchase behavior patterns
 
@@ -288,10 +300,18 @@ class CustomerIntelligence:
                 "outerwear": np.random.uniform(0.1, 0.6),
             },
             "shopping_preferences": {
-                "preferred_day": ["Monday", "Wednesday", "Saturday"][int(np.random.uniform(0, 3))],
-                "preferred_time": ["morning", "afternoon", "evening"][int(np.random.uniform(0, 3))],
-                "device_preference": ["mobile", "desktop", "tablet"][int(np.random.uniform(0, 3))],
-                "price_sensitivity": ["low", "medium", "high"][int(np.random.uniform(0, 3))],
+                "preferred_day": ["Monday", "Wednesday", "Saturday"][
+                    int(np.random.uniform(0, 3))
+                ],
+                "preferred_time": ["morning", "afternoon", "evening"][
+                    int(np.random.uniform(0, 3))
+                ],
+                "device_preference": ["mobile", "desktop", "tablet"][
+                    int(np.random.uniform(0, 3))
+                ],
+                "price_sensitivity": ["low", "medium", "high"][
+                    int(np.random.uniform(0, 3))
+                ],
             },
             "next_purchase_prediction": {
                 "days_until_next_purchase": int(np.random.uniform(7, 60)),
@@ -301,14 +321,17 @@ class CustomerIntelligence:
         }
 
         # Calculate average order value
-        behavior["purchase_patterns"]["avg_order_value"] = behavior["purchase_patterns"]["total_spent"] / max(
-            behavior["purchase_patterns"]["total_orders"], 1
-        )
+        behavior["purchase_patterns"]["avg_order_value"] = behavior[
+            "purchase_patterns"
+        ]["total_spent"] / max(behavior["purchase_patterns"]["total_orders"], 1)
 
         return behavior
 
     async def generate_personalized_recommendations(
-        self, customer_id: str, n_recommendations: int = 10, context: Optional[Dict] = None
+        self,
+        customer_id: str,
+        n_recommendations: int = 10,
+        context: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """
         Generate personalized product recommendations
@@ -321,7 +344,9 @@ class CustomerIntelligence:
         Returns:
             Personalized product recommendations
         """
-        logger.info(f"Generating {n_recommendations} recommendations for customer {customer_id}")
+        logger.info(
+            f"Generating {n_recommendations} recommendations for customer {customer_id}"
+        )
 
         recommendations = {
             "customer_id": customer_id,
@@ -353,11 +378,15 @@ class CustomerIntelligence:
         }
 
         # Sort by relevance score
-        recommendations["products"].sort(key=lambda x: x["relevance_score"], reverse=True)
+        recommendations["products"].sort(
+            key=lambda x: x["relevance_score"], reverse=True
+        )
 
         return recommendations
 
-    async def map_customer_journey(self, customer_id: str, session_id: Optional[str] = None) -> Dict[str, Any]:
+    async def map_customer_journey(
+        self, customer_id: str, session_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
         Map customer journey and touchpoints
 
@@ -382,7 +411,11 @@ class CustomerIntelligence:
                 },
                 {
                     "stage": "consideration",
-                    "touchpoints": ["product_browse", "category_filter", "reviews_read"],
+                    "touchpoints": [
+                        "product_browse",
+                        "category_filter",
+                        "reviews_read",
+                    ],
                     "duration_seconds": int(np.random.uniform(180, 600)),
                     "engagement_score": np.random.uniform(0.5, 0.8),
                 },
@@ -394,7 +427,11 @@ class CustomerIntelligence:
                 },
                 {
                     "stage": "post_purchase",
-                    "touchpoints": ["order_confirmation", "shipping_updates", "review_request"],
+                    "touchpoints": [
+                        "order_confirmation",
+                        "shipping_updates",
+                        "review_request",
+                    ],
                     "duration_seconds": int(np.random.uniform(60, 180)),
                     "engagement_score": np.random.uniform(0.6, 0.9),
                 },

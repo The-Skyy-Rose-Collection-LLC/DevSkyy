@@ -31,7 +31,9 @@ class WordPressServerAccess:
 
         # Validate that either password or key is provided
         if not self.sftp_password and not self.ssh_key_path:
-            logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
+            logger.warning(
+                "Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail."
+            )
 
         # Connection objects
         self.sftp_client = None
@@ -110,11 +112,19 @@ class WordPressServerAccess:
                     "message": "🔥 GOD MODE LEVEL 2 activated! Agents now have full server access to skyyrose.co",
                 }
             else:
-                return {"status": "failed", "error": "SFTP connection failed", "details": sftp_test}
+                return {
+                    "status": "failed",
+                    "error": "SFTP connection failed",
+                    "details": sftp_test,
+                }
 
         except Exception as e:
             logger.error(f"❌ Server access failed: {str(e)}")
-            return {"status": "error", "error": str(e), "fallback": "Will continue with REST API access"}
+            return {
+                "status": "error",
+                "error": str(e),
+                "fallback": "Will continue with REST API access",
+            }
 
     async def _test_sftp_access(self) -> Dict[str, Any]:
         """Test SFTP access and permissions."""
@@ -172,8 +182,12 @@ class WordPressServerAccess:
                 "brand_learning_active": True,
                 "analysis_complete": True,
                 "confidence_score": 95,
-                "insights_discovered": len(file_analysis) + len(content_analysis) + len(brand_assets),
-                "performance_baseline": performance_analysis.get("overall_score", "analyzing"),
+                "insights_discovered": len(file_analysis)
+                + len(content_analysis)
+                + len(brand_assets),
+                "performance_baseline": performance_analysis.get(
+                    "overall_score", "analyzing"
+                ),
                 "next_learning_cycle": "1 hour",
             }
 
@@ -192,7 +206,14 @@ class WordPressServerAccess:
             }
 
             # Check for common WordPress directories
-            wp_directories = ["wp-content", "wp-admin", "wp-includes", "themes", "plugins", "uploads"]
+            wp_directories = [
+                "wp-content",
+                "wp-admin",
+                "wp-includes",
+                "themes",
+                "plugins",
+                "uploads",
+            ]
 
             for directory in wp_directories:
                 try:
@@ -203,7 +224,10 @@ class WordPressServerAccess:
                     brand_files = [
                         f
                         for f in files
-                        if any(brand in f.lower() for brand in ["skyy", "rose", "love", "hurts", "signature"])
+                        if any(
+                            brand in f.lower()
+                            for brand in ["skyy", "rose", "love", "hurts", "signature"]
+                        )
                     ]
                     if brand_files:
                         structure_analysis["brand_directories"].append(
@@ -238,26 +262,52 @@ class WordPressServerAccess:
                     with tempfile.NamedTemporaryFile(mode="w+") as temp_file:
                         self.sftp_client.get(file_name, temp_file.name)
 
-                        with open(temp_file.name, "r", encoding="utf-8", errors="ignore") as f:
+                        with open(
+                            temp_file.name, "r", encoding="utf-8", errors="ignore"
+                        ) as f:
                             content = f.read()
 
                         # Analyze for luxury and streetwear terms
-                        luxury_terms = ["luxury", "premium", "exclusive", "elegant", "sophisticated", "prestige"]
-                        streetwear_terms = ["streetwear", "urban", "street", "hype", "drop", "collection"]
+                        luxury_terms = [
+                            "luxury",
+                            "premium",
+                            "exclusive",
+                            "elegant",
+                            "sophisticated",
+                            "prestige",
+                        ]
+                        streetwear_terms = [
+                            "streetwear",
+                            "urban",
+                            "street",
+                            "hype",
+                            "drop",
+                            "collection",
+                        ]
 
                         for term in luxury_terms:
-                            content_patterns["luxury_keywords"] += content.lower().count(term)
+                            content_patterns[
+                                "luxury_keywords"
+                            ] += content.lower().count(term)
 
                         for term in streetwear_terms:
-                            content_patterns["streetwear_terms"] += content.lower().count(term)
+                            content_patterns[
+                                "streetwear_terms"
+                            ] += content.lower().count(term)
 
                 except Exception:
                     continue
 
             # Determine brand theme based on analysis
-            if content_patterns["luxury_keywords"] > content_patterns["streetwear_terms"]:
+            if (
+                content_patterns["luxury_keywords"]
+                > content_patterns["streetwear_terms"]
+            ):
                 content_patterns["primary_theme"] = "luxury-focused"
-            elif content_patterns["streetwear_terms"] > content_patterns["luxury_keywords"]:
+            elif (
+                content_patterns["streetwear_terms"]
+                > content_patterns["luxury_keywords"]
+            ):
                 content_patterns["primary_theme"] = "streetwear-focused"
             else:
                 content_patterns["primary_theme"] = "luxury-streetwear-fusion"
@@ -271,7 +321,12 @@ class WordPressServerAccess:
     async def _analyze_brand_assets(self) -> Dict[str, Any]:
         """Analyze brand assets (images, logos, etc.) on server."""
         try:
-            brand_assets = {"logos_found": [], "brand_images": [], "color_schemes": [], "asset_quality": "high"}
+            brand_assets = {
+                "logos_found": [],
+                "brand_images": [],
+                "color_schemes": [],
+                "asset_quality": "high",
+            }
 
             # Check uploads directory for brand assets
             try:
@@ -279,12 +334,22 @@ class WordPressServerAccess:
                 uploads_files = self.sftp_client.listdir(uploads_path)
 
                 # Look for logo and brand image files
-                brand_keywords = ["logo", "brand", "skyy", "rose", "signature", "love", "hurts"]
+                brand_keywords = [
+                    "logo",
+                    "brand",
+                    "skyy",
+                    "rose",
+                    "signature",
+                    "love",
+                    "hurts",
+                ]
                 image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"]
 
                 for file_name in uploads_files:
                     if any(file_name.lower().endswith(ext) for ext in image_extensions):
-                        if any(keyword in file_name.lower() for keyword in brand_keywords):
+                        if any(
+                            keyword in file_name.lower() for keyword in brand_keywords
+                        ):
                             brand_assets["logos_found"].append(file_name)
                         else:
                             brand_assets["brand_images"].append(file_name)
@@ -319,13 +384,20 @@ class WordPressServerAccess:
                     try:
                         attrs = self.sftp_client.lstat(file_name)
                         if attrs.st_size > 5 * 1024 * 1024:  # Files larger than 5MB
-                            large_files.append({"file": file_name, "size_mb": round(attrs.st_size / (1024 * 1024), 2)})
+                            large_files.append(
+                                {
+                                    "file": file_name,
+                                    "size_mb": round(attrs.st_size / (1024 * 1024), 2),
+                                }
+                            )
                     except Exception:
                         continue
 
                 if large_files:
                     performance_metrics["large_files"] = large_files
-                    performance_metrics["optimization_opportunities"].append("optimize_large_files")
+                    performance_metrics["optimization_opportunities"].append(
+                        "optimize_large_files"
+                    )
 
             except Exception:
                 performance_metrics["file_scan"] = "limited"
@@ -441,7 +513,9 @@ class WordPressServerAccess:
                 except (OSError, IOError, FileNotFoundError):
                     continue
 
-            logger.info(f"✅ Checked permissions on {permissions_checked} security files")
+            logger.info(
+                f"✅ Checked permissions on {permissions_checked} security files"
+            )
             return permissions_checked > 0
 
         except Exception as e:

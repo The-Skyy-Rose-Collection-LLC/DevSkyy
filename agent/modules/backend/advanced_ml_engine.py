@@ -20,7 +20,11 @@ from typing import Any, Dict, List
 import joblib
 import numpy as np
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.ensemble import GradientBoostingClassifier, IsolationForest, RandomForestRegressor
+from sklearn.ensemble import (
+    GradientBoostingClassifier,
+    IsolationForest,
+    RandomForestRegressor,
+)
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -52,9 +56,15 @@ class AdvancedMLEngine:
         """Initialize core machine learning models."""
         self.models = {
             "anomaly_detector": IsolationForest(contamination=0.1, random_state=42),
-            "performance_predictor": RandomForestRegressor(n_estimators=100, random_state=42),
-            "user_behavior_classifier": GradientBoostingClassifier(n_estimators=100, random_state=42),
-            "resource_optimizer": MLPRegressor(hidden_layer_sizes=(100, 50), random_state=42),
+            "performance_predictor": RandomForestRegressor(
+                n_estimators=100, random_state=42
+            ),
+            "user_behavior_classifier": GradientBoostingClassifier(
+                n_estimators=100, random_state=42
+            ),
+            "resource_optimizer": MLPRegressor(
+                hidden_layer_sizes=(100, 50), random_state=42
+            ),
             "demand_forecaster": LinearRegression(),
             "risk_assessor": LogisticRegression(random_state=42),
             "trend_analyzer": KMeans(n_clusters=5, random_state=42),
@@ -77,22 +87,30 @@ class AdvancedMLEngine:
 
             # Performance prediction
             if "performance_metrics" in processed_data:
-                perf_prediction = await self._predict_performance(processed_data["performance_metrics"])
+                perf_prediction = await self._predict_performance(
+                    processed_data["performance_metrics"]
+                )
                 predictions["performance"] = perf_prediction
 
             # User behavior prediction
             if "user_data" in processed_data:
-                behavior_prediction = await self._predict_user_behavior(processed_data["user_data"])
+                behavior_prediction = await self._predict_user_behavior(
+                    processed_data["user_data"]
+                )
                 predictions["user_behavior"] = behavior_prediction
 
             # Resource optimization prediction
             if "resource_data" in processed_data:
-                resource_prediction = await self._predict_resource_needs(processed_data["resource_data"])
+                resource_prediction = await self._predict_resource_needs(
+                    processed_data["resource_data"]
+                )
                 predictions["resource_optimization"] = resource_prediction
 
             # Business trend prediction
             if "business_data" in processed_data:
-                trend_prediction = await self._predict_business_trends(processed_data["business_data"])
+                trend_prediction = await self._predict_business_trends(
+                    processed_data["business_data"]
+                )
                 predictions["business_trends"] = trend_prediction
 
             # Anomaly detection
@@ -115,7 +133,9 @@ class AdvancedMLEngine:
             logger.error(f"❌ Predictive analytics failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def self_healing_automation(self, system_state: Dict[str, Any]) -> Dict[str, Any]:
+    async def self_healing_automation(
+        self, system_state: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Self-healing system that prevents and fixes issues automatically."""
         try:
             logger.info("🔧 Initiating self-healing automation...")
@@ -147,7 +167,8 @@ class AdvancedMLEngine:
                 "healing_status": "completed",
                 "issues_detected": len(potential_issues),
                 "actions_executed": len(healing_actions),
-                "health_improvement": post_healing_health["score"] - health_analysis["score"],
+                "health_improvement": post_healing_health["score"]
+                - health_analysis["score"],
                 "execution_results": execution_results,
                 "system_stability": "enhanced",
                 "preventive_measures_active": True,
@@ -158,10 +179,14 @@ class AdvancedMLEngine:
             logger.error(f"❌ Self-healing automation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def intelligent_optimization(self, optimization_target: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def intelligent_optimization(
+        self, optimization_target: str, data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Intelligent optimization using advanced ML algorithms."""
         try:
-            logger.info(f"⚡ Running intelligent optimization for {optimization_target}...")
+            logger.info(
+                f"⚡ Running intelligent optimization for {optimization_target}..."
+            )
 
             # Select optimization strategy based on target
             if optimization_target == "performance":
@@ -192,7 +217,9 @@ class AdvancedMLEngine:
             logger.error(f"❌ Intelligent optimization failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def pattern_recognition(self, data_stream: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def pattern_recognition(
+        self, data_stream: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Advanced pattern recognition with neural network analysis."""
         try:
             logger.info("🔍 Running advanced pattern recognition...")
@@ -235,7 +262,9 @@ class AdvancedMLEngine:
             logger.error(f"❌ Pattern recognition failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def continuous_learning(self, feedback_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def continuous_learning(
+        self, feedback_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Continuous learning system that improves models over time."""
         try:
             logger.info("📚 Executing continuous learning cycle...")
@@ -250,7 +279,9 @@ class AdvancedMLEngine:
             retrain_results = {}
             for model_name, model in self.models.items():
                 if self._should_retrain_model(model_name, learning_data):
-                    retrain_result = await self._retrain_model(model_name, learning_data)
+                    retrain_result = await self._retrain_model(
+                        model_name, learning_data
+                    )
                     retrain_results[model_name] = retrain_result
 
             # Update model weights and parameters
@@ -260,7 +291,9 @@ class AdvancedMLEngine:
             await self._save_models()
 
             # Generate learning report
-            learning_report = self._generate_learning_report(retrain_results, weight_updates)
+            learning_report = self._generate_learning_report(
+                retrain_results, weight_updates
+            )
 
             return {
                 "learning_status": "completed",
@@ -334,7 +367,9 @@ class AdvancedMLEngine:
             "confidence": 0.88,
         }
 
-    async def _predict_resource_needs(self, resource_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_resource_needs(
+        self, resource_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Predict future resource requirements."""
         return {
             "cpu_requirement": "increase_20_percent",
@@ -345,7 +380,9 @@ class AdvancedMLEngine:
             "confidence": 0.91,
         }
 
-    async def _predict_business_trends(self, business_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_business_trends(
+        self, business_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Predict business trends and opportunities."""
         return {
             "revenue_forecast": "growth_trajectory",
@@ -366,7 +403,9 @@ class AdvancedMLEngine:
             "confidence": 0.94,
         }
 
-    def _generate_executive_summary(self, predictions: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_executive_summary(
+        self, predictions: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate executive summary of predictions."""
         return {
             "overall_system_health": "excellent",
@@ -384,7 +423,9 @@ class AdvancedMLEngine:
             "risk_level": "low",
         }
 
-    def _calculate_confidence_scores(self, predictions: Dict[str, Any]) -> Dict[str, float]:
+    def _calculate_confidence_scores(
+        self, predictions: Dict[str, Any]
+    ) -> Dict[str, float]:
         """Calculate confidence scores for predictions."""
         return {
             "overall_confidence": 0.91,
@@ -394,7 +435,9 @@ class AdvancedMLEngine:
             "business_confidence": 0.87,
         }
 
-    async def _generate_recommendations(self, predictions: Dict[str, Any]) -> List[Dict[str, Any]]:
+    async def _generate_recommendations(
+        self, predictions: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Generate actionable recommendations based on predictions."""
         return [
             {
@@ -417,15 +460,24 @@ class AdvancedMLEngine:
             },
         ]
 
-    async def _analyze_system_health(self, system_state: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_system_health(
+        self, system_state: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Analyze overall system health."""
         return {
             "score": 0.89,
-            "components": {"cpu": 0.92, "memory": 0.85, "storage": 0.91, "network": 0.88},
+            "components": {
+                "cpu": 0.92,
+                "memory": 0.85,
+                "storage": 0.91,
+                "network": 0.88,
+            },
             "status": "healthy",
         }
 
-    async def _predict_potential_issues(self, system_state: Dict[str, Any]) -> List[Dict[str, Any]]:
+    async def _predict_potential_issues(
+        self, system_state: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Predict potential system issues."""
         return [
             {
@@ -471,7 +523,11 @@ class AdvancedMLEngine:
         """Optimize system performance."""
         return {
             "optimization_type": "performance",
-            "improvements": {"response_time": "-25%", "throughput": "+30%", "error_rate": "-40%"},
+            "improvements": {
+                "response_time": "-25%",
+                "throughput": "+30%",
+                "error_rate": "-40%",
+            },
             "implementation_steps": [
                 "Enable advanced caching",
                 "Optimize database queries",
@@ -485,7 +541,11 @@ class AdvancedMLEngine:
         """Optimize resource utilization."""
         return {
             "optimization_type": "resources",
-            "improvements": {"cpu_efficiency": "+20%", "memory_usage": "-15%", "cost_reduction": "12%"},
+            "improvements": {
+                "cpu_efficiency": "+20%",
+                "memory_usage": "-15%",
+                "cost_reduction": "12%",
+            },
             "implementation_steps": [
                 "Implement auto-scaling",
                 "Optimize memory allocation",
@@ -499,7 +559,11 @@ class AdvancedMLEngine:
         """Optimize user experience."""
         return {
             "optimization_type": "user_experience",
-            "improvements": {"page_load_time": "-40%", "user_satisfaction": "+25%", "conversion_rate": "+18%"},
+            "improvements": {
+                "page_load_time": "-40%",
+                "user_satisfaction": "+25%",
+                "conversion_rate": "+18%",
+            },
             "implementation_steps": [
                 "Optimize frontend assets",
                 "Implement progressive loading",
@@ -513,7 +577,11 @@ class AdvancedMLEngine:
         """Optimize business metrics."""
         return {
             "optimization_type": "business_metrics",
-            "improvements": {"revenue": "+22%", "customer_acquisition": "+35%", "retention_rate": "+28%"},
+            "improvements": {
+                "revenue": "+22%",
+                "customer_acquisition": "+35%",
+                "retention_rate": "+28%",
+            },
             "implementation_steps": [
                 "Implement AI-driven recommendations",
                 "Optimize pricing strategy",
@@ -531,20 +599,34 @@ class AdvancedMLEngine:
 
         logger.info("💾 Models saved successfully")
 
-    def _should_retrain_model(self, model_name: str, learning_data: Dict[str, Any]) -> bool:
+    def _should_retrain_model(
+        self, model_name: str, learning_data: Dict[str, Any]
+    ) -> bool:
         """Determine if model should be retrained."""
         # Simplified logic - retrain if performance drops or new data is available
         return True  # Always retrain for continuous improvement
 
-    async def _retrain_model(self, model_name: str, learning_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _retrain_model(
+        self, model_name: str, learning_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Retrain a specific model."""
         # Simplified retraining simulation
-        return {"model": model_name, "improvement": "5.2%", "training_time": "2.3s", "status": "completed"}
+        return {
+            "model": model_name,
+            "improvement": "5.2%",
+            "training_time": "2.3s",
+            "status": "completed",
+        }
 
-    def _generate_learning_report(self, retrain_results: Dict, weight_updates: Dict) -> Dict[str, Any]:
+    def _generate_learning_report(
+        self, retrain_results: Dict, weight_updates: Dict
+    ) -> Dict[str, Any]:
         """Generate learning cycle report."""
         return {
-            "improvements": {model: result["improvement"] for model, result in retrain_results.items()},
+            "improvements": {
+                model: result["improvement"]
+                for model, result in retrain_results.items()
+            },
             "efficiency": "high",
             "evolution": "continuous_adaptation_active",
         }
@@ -565,7 +647,9 @@ class AdvancedMLEngine:
             features.append(feature_vector)
         return np.array(features)
 
-    async def _identify_cluster_patterns(self, feature_matrix: np.ndarray) -> Dict[str, Any]:
+    async def _identify_cluster_patterns(
+        self, feature_matrix: np.ndarray
+    ) -> Dict[str, Any]:
         """Identify clustering patterns."""
         if feature_matrix.shape[0] < 5:
             return {"clusters": 0, "patterns": []}
@@ -579,15 +663,29 @@ class AdvancedMLEngine:
             "insights": "Clear user behavior segments identified",
         }
 
-    async def _identify_sequence_patterns(self, data_stream: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _identify_sequence_patterns(
+        self, data_stream: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Identify sequential patterns."""
-        return {"sequences": ["login_purchase", "browse_compare_buy"], "confidence": 0.85, "support": 0.12}
+        return {
+            "sequences": ["login_purchase", "browse_compare_buy"],
+            "confidence": 0.85,
+            "support": 0.12,
+        }
 
-    async def _identify_anomaly_patterns(self, feature_matrix: np.ndarray) -> Dict[str, Any]:
+    async def _identify_anomaly_patterns(
+        self, feature_matrix: np.ndarray
+    ) -> Dict[str, Any]:
         """Identify anomalous patterns."""
-        return {"anomalies": 3, "types": ["unusual_access_pattern", "spike_activity"], "severity": "medium"}
+        return {
+            "anomalies": 3,
+            "types": ["unusual_access_pattern", "spike_activity"],
+            "severity": "medium",
+        }
 
-    async def _identify_trend_patterns(self, data_stream: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _identify_trend_patterns(
+        self, data_stream: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """Identify trend patterns."""
         return {
             "trends": ["increasing_engagement", "seasonal_variation"],
@@ -595,7 +693,9 @@ class AdvancedMLEngine:
             "strength": "strong",
         }
 
-    def _calculate_pattern_significance(self, patterns: Dict[str, Any]) -> Dict[str, float]:
+    def _calculate_pattern_significance(
+        self, patterns: Dict[str, Any]
+    ) -> Dict[str, float]:
         """Calculate significance of detected patterns."""
         return {
             "cluster_significance": 0.89,
@@ -613,7 +713,9 @@ class AdvancedMLEngine:
             "Positive trends indicate successful optimization efforts",
         ]
 
-    async def _patterns_to_actions(self, patterns: Dict[str, Any]) -> List[Dict[str, Any]]:
+    async def _patterns_to_actions(
+        self, patterns: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Convert patterns to actionable recommendations."""
         return [
             {
@@ -630,7 +732,9 @@ class AdvancedMLEngine:
             },
         ]
 
-    def _calculate_pattern_confidence(self, patterns: Dict[str, Any]) -> Dict[str, float]:
+    def _calculate_pattern_confidence(
+        self, patterns: Dict[str, Any]
+    ) -> Dict[str, float]:
         """Calculate confidence levels for patterns."""
         return {
             "overall_confidence": 0.87,
@@ -640,7 +744,9 @@ class AdvancedMLEngine:
             "trend_confidence": 0.84,
         }
 
-    async def _collect_learning_data(self, feedback_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _collect_learning_data(
+        self, feedback_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Collect data for continuous learning."""
         return {
             "feedback_scores": feedback_data.get("scores", []),
@@ -660,15 +766,25 @@ class AdvancedMLEngine:
             }
         )
 
-    async def _update_model_weights(self, learning_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _update_model_weights(
+        self, learning_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Update model weights based on learning data."""
-        return {"weight_adjustments": "applied", "learning_rate": "adaptive", "convergence": "improving"}
+        return {
+            "weight_adjustments": "applied",
+            "learning_rate": "adaptive",
+            "convergence": "improving",
+        }
 
-    async def _update_optimization_models(self, target: str, data: Dict[str, Any], result: Dict[str, Any]):
+    async def _update_optimization_models(
+        self, target: str, data: Dict[str, Any], result: Dict[str, Any]
+    ):
         """Update optimization models with new data."""
         # Store optimization results for future learning
 
-    async def _generic_optimization(self, target: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generic_optimization(
+        self, target: str, data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generic optimization for custom targets."""
         return {
             "optimization_type": target,

@@ -92,7 +92,9 @@ class SelfLearningSystem:
         # Calculate learning metrics
         self.improvement_score = self._calculate_improvement()
 
-        logger.info(f"🧠 Learned from error: {error_data.get('type')} (Confidence: {solution['confidence']:.2%})")
+        logger.info(
+            f"🧠 Learned from error: {error_data.get('type')} (Confidence: {solution['confidence']:.2%})"
+        )
 
         return {
             "error_type": error_data.get("type"),
@@ -182,7 +184,9 @@ class SelfLearningSystem:
         failure_probability = self._predict_failure_probability(features)
 
         # Get preventive measures
-        preventive_measures = self._get_preventive_measures(operation_data, failure_probability)
+        preventive_measures = self._get_preventive_measures(
+            operation_data, failure_probability
+        )
 
         return {
             "will_likely_fail": failure_probability > 0.7,
@@ -234,7 +238,9 @@ class SelfLearningSystem:
 
         except Exception as e:
             logger.error(f"Auto-fix failed: {e}")
-            self.learn_from_error({"type": "auto_fix_failure", "error": str(e), "issue": issue})
+            self.learn_from_error(
+                {"type": "auto_fix_failure", "error": str(e), "issue": issue}
+            )
             return {
                 "fixed": False,
                 "error": str(e),
@@ -246,7 +252,15 @@ class SelfLearningSystem:
         features = []
 
         # Error type encoding
-        error_types = ["syntax", "runtime", "logic", "dependency", "network", "permission", "other"]
+        error_types = [
+            "syntax",
+            "runtime",
+            "logic",
+            "dependency",
+            "network",
+            "permission",
+            "other",
+        ]
         error_type = error_data.get("type", "other")
         type_encoding = [1 if t == error_type else 0 for t in error_types]
         features.extend(type_encoding)
@@ -257,7 +271,9 @@ class SelfLearningSystem:
         features.extend([hour / 24, day_of_week / 7])
 
         # Context features
-        features.append(len(error_data.get("message", "")) / 1000)  # Normalized message length
+        features.append(
+            len(error_data.get("message", "")) / 1000
+        )  # Normalized message length
         features.append(error_data.get("severity", 5) / 10)  # Normalized severity
 
         return np.array(features)
@@ -271,7 +287,8 @@ class SelfLearningSystem:
             if past_features is not None:
                 # Calculate similarity (cosine similarity)
                 similarity = np.dot(error_features, past_features) / (
-                    np.linalg.norm(error_features) * np.linalg.norm(past_features) + 1e-10
+                    np.linalg.norm(error_features) * np.linalg.norm(past_features)
+                    + 1e-10
                 )
 
                 if similarity > 0.8:
@@ -279,17 +296,25 @@ class SelfLearningSystem:
 
         return similar
 
-    def _generate_solution(self, error_data: Dict[str, Any], similar_errors: List[Dict]) -> Dict[str, Any]:
+    def _generate_solution(
+        self, error_data: Dict[str, Any], similar_errors: List[Dict]
+    ) -> Dict[str, Any]:
         """Generate solution based on error and similar cases."""
         # If we have similar cases, use their solutions
         if similar_errors:
-            successful_solutions = [e.get("solution") for e in similar_errors if e.get("solution", {}).get("success")]
+            successful_solutions = [
+                e.get("solution")
+                for e in similar_errors
+                if e.get("solution", {}).get("success")
+            ]
 
             if successful_solutions:
                 # Use most common successful solution
                 from collections import Counter
 
-                solution_texts = [s.get("text") for s in successful_solutions if s.get("text")]
+                solution_texts = [
+                    s.get("text") for s in successful_solutions if s.get("text")
+                ]
                 if solution_texts:
                     most_common = Counter(solution_texts).most_common(1)[0][0]
                     return {
@@ -341,7 +366,9 @@ class SelfLearningSystem:
             "source": "ml_generated",
         }
 
-    def _analyze_conflict_pattern(self, conflict_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_conflict_pattern(
+        self, conflict_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Analyze conflict to identify patterns."""
         pattern = {
             "type": conflict_data.get("type"),
@@ -357,7 +384,9 @@ class SelfLearningSystem:
 
         return pattern
 
-    def _predict_conflict_resolution(self, conflict_pattern: Dict[str, Any]) -> Dict[str, Any]:
+    def _predict_conflict_resolution(
+        self, conflict_pattern: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Predict best resolution for conflict."""
         conflict_type = conflict_pattern.get("type")
 
@@ -520,8 +549,20 @@ class SelfLearningSystem:
             return 0.0
 
         # Compare error rate over time
-        recent_errors = len([e for e in self.error_history[-50:] if not e.get("solution", {}).get("success")])
-        older_errors = len([e for e in self.error_history[-100:-50] if not e.get("solution", {}).get("success")])
+        recent_errors = len(
+            [
+                e
+                for e in self.error_history[-50:]
+                if not e.get("solution", {}).get("success")
+            ]
+        )
+        older_errors = len(
+            [
+                e
+                for e in self.error_history[-100:-50]
+                if not e.get("solution", {}).get("success")
+            ]
+        )
 
         if older_errors == 0:
             return 1.0
@@ -566,7 +607,9 @@ class SelfLearningSystem:
             with open(model_file, "rb") as f:
                 self.error_classifier = pickle.load(f)
 
-        logger.info(f"🧠 Loaded knowledge: {len(self.error_history)} errors, {len(self.conflict_history)} conflicts")
+        logger.info(
+            f"🧠 Loaded knowledge: {len(self.error_history)} errors, {len(self.conflict_history)} conflicts"
+        )
 
 
 # Global instance
@@ -590,7 +633,9 @@ async def predict_and_prevent(operation: Dict[str, Any]) -> Dict[str, Any]:
     prediction = self_learning_system.predict_failure(operation)
 
     if prediction["will_likely_fail"]:
-        logger.warning(f"⚠️ Operation likely to fail (probability: {prediction['failure_probability']:.2%})")
+        logger.warning(
+            f"⚠️ Operation likely to fail (probability: {prediction['failure_probability']:.2%})"
+        )
         logger.info(f"Preventive measures: {prediction['preventive_measures']}")
 
     return prediction

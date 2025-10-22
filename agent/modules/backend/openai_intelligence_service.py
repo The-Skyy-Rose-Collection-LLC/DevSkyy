@@ -4,8 +4,8 @@ import os
 from typing import Any, Dict
 
 import openai
-from selenium import webdriver  # noqa: F401 - Reserved for Phase 3 web automation
 import requests  # noqa: F401 - Reserved for Phase 3 API automation
+from selenium import webdriver  # noqa: F401 - Reserved for Phase 3 web automation
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +19,16 @@ class OpenAIIntelligenceService:
         if self.api_key:
             openai.api_key = self.api_key
             self.client = openai.OpenAI(api_key=self.api_key)
-            logger.info("🧠 OpenAI Intelligence Service initialized for luxury agent enhancement")
+            logger.info(
+                "🧠 OpenAI Intelligence Service initialized for luxury agent enhancement"
+            )
         else:
             self.client = None
             logger.warning("🧠 OpenAI Intelligence Service initialized without API key")
 
-    async def enhance_product_description(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def enhance_product_description(
+        self, product_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Use OpenAI to create luxury product descriptions."""
         try:
             prompt = """
@@ -76,7 +80,9 @@ class OpenAIIntelligenceService:
             logger.error(f"OpenAI product description enhancement failed: {str(e)}")
             return {"error": str(e)}
 
-    async def generate_luxury_content_strategy(self, site_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_luxury_content_strategy(
+        self, site_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate AI-powered luxury content strategy."""
         try:
             prompt = """
@@ -130,7 +136,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Content strategy generation failed: {str(e)}")
             return {"error": str(e)}
 
-    async def optimize_page_content_for_seo(self, page_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def optimize_page_content_for_seo(
+        self, page_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Use OpenAI to optimize page content for luxury SEO."""
         try:
             prompt = """
@@ -183,7 +191,9 @@ class OpenAIIntelligenceService:
             logger.error(f"SEO optimization failed: {str(e)}")
             return {"error": str(e)}
 
-    async def analyze_competitor_strategy(self, competitor_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_competitor_strategy(
+        self, competitor_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Analyze competitor strategies using OpenAI."""
         try:
             prompt = """
@@ -235,7 +245,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Competitive analysis failed: {str(e)}")
             return {"error": str(e)}
 
-    async def generate_luxury_email_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_luxury_email_campaign(
+        self, campaign_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate luxury email campaign content."""
         try:
             prompt = """
@@ -288,7 +300,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Email campaign generation failed: {str(e)}")
             return {"error": str(e)}
 
-    async def create_luxury_social_media_content(self, content_request: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_luxury_social_media_content(
+        self, content_request: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate luxury social media content."""
         try:
             prompt = """
@@ -341,7 +355,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Social media content generation failed: {str(e)}")
             return {"error": str(e)}
 
-    async def make_executive_business_decision(self, decision_context: Dict[str, Any]) -> Dict[str, Any]:
+    async def make_executive_business_decision(
+        self, decision_context: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Use OpenAI for executive-level business decision making."""
         try:
             prompt = """
@@ -395,7 +411,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Executive decision making failed: {str(e)}")
             return {"error": str(e)}
 
-    async def optimize_conversion_funnel(self, funnel_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def optimize_conversion_funnel(
+        self, funnel_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Use OpenAI to optimize luxury conversion funnels."""
         try:
             prompt = """

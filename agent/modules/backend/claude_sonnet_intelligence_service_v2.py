@@ -182,7 +182,9 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             # Track token usage and costs
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = self._calculate_cost(response.usage.input_tokens, response.usage.output_tokens)
+            cost = self._calculate_cost(
+                response.usage.input_tokens, response.usage.output_tokens
+            )
             self.total_api_cost += cost
 
             # Assess response quality
@@ -276,7 +278,9 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             # Track usage
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = self._calculate_cost(response.usage.input_tokens, response.usage.output_tokens)
+            cost = self._calculate_cost(
+                response.usage.input_tokens, response.usage.output_tokens
+            )
             self.total_api_cost += cost
 
             # Assess quality
@@ -311,7 +315,9 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-    def _check_cache(self, key: str, context: Optional[Dict] = None) -> Optional[Dict[str, Any]]:
+    def _check_cache(
+        self, key: str, context: Optional[Dict] = None
+    ) -> Optional[Dict[str, Any]]:
         """Check if we have a cached response"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -327,16 +333,24 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
         return None
 
-    def _cache_response(self, key: str, context: Optional[Dict], response: Dict[str, Any]):
+    def _cache_response(
+        self, key: str, context: Optional[Dict], response: Dict[str, Any]
+    ):
         """Cache a response for future use"""
         cache_key = self._generate_cache_key(key, context)
 
         # Implement LRU by removing oldest if at max size
         if len(self.response_cache) >= self.cache_max_size:
-            oldest_key = min(self.response_cache.keys(), key=lambda k: self.response_cache[k]["cached_at"])
+            oldest_key = min(
+                self.response_cache.keys(),
+                key=lambda k: self.response_cache[k]["cached_at"],
+            )
             del self.response_cache[oldest_key]
 
-        self.response_cache[cache_key] = {"response": response, "cached_at": datetime.now()}
+        self.response_cache[cache_key] = {
+            "response": response,
+            "cached_at": datetime.now(),
+        }
 
     def _generate_cache_key(self, key: str, context: Optional[Dict]) -> str:
         """Generate a unique cache key"""
@@ -397,8 +411,18 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
                 score -= 0.2
 
         # Check for quality indicators
-        quality_indicators = ["specifically", "furthermore", "additionally", "therefore", "consequently"]
-        quality_score = sum(1 for indicator in quality_indicators if indicator.lower() in response.lower())
+        quality_indicators = [
+            "specifically",
+            "furthermore",
+            "additionally",
+            "therefore",
+            "consequently",
+        ]
+        quality_score = sum(
+            1
+            for indicator in quality_indicators
+            if indicator.lower() in response.lower()
+        )
         score += min(0.2, quality_score * 0.05)
 
         # Ensure score is between 0 and 1
@@ -422,7 +446,11 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "total_tokens_used": self.total_tokens_used,
             "total_api_cost_usd": round(self.total_api_cost, 2),
             "average_quality_score": (
-                round(sum(self.response_quality_scores) / len(self.response_quality_scores), 2)
+                round(
+                    sum(self.response_quality_scores)
+                    / len(self.response_quality_scores),
+                    2,
+                )
                 if self.response_quality_scores
                 else 0.0
             ),
@@ -436,7 +464,9 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         """Override to clear caches"""
         logger.info("Optimizing Claude service resources...")
         self.response_cache.clear()
-        self.response_quality_scores = self.response_quality_scores[-100:]  # Keep recent scores
+        self.response_quality_scores = self.response_quality_scores[
+            -100:
+        ]  # Keep recent scores
 
 
 # Factory function

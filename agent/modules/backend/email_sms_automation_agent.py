@@ -25,13 +25,21 @@ class EmailSMSAutomationAgent:
             "klaviyo": {
                 "name": "Klaviyo",
                 "icon": "💌",
-                "features": ["ecommerce_integration", "behavioral_triggers", "personalization"],
+                "features": [
+                    "ecommerce_integration",
+                    "behavioral_triggers",
+                    "personalization",
+                ],
                 "deliverability_rate": 96.8,
             },
             "sendgrid": {
                 "name": "SendGrid",
                 "icon": "📮",
-                "features": ["transactional_emails", "api_integration", "email_validation"],
+                "features": [
+                    "transactional_emails",
+                    "api_integration",
+                    "email_validation",
+                ],
                 "deliverability_rate": 94.7,
             },
             "constant_contact": {
@@ -47,7 +55,12 @@ class EmailSMSAutomationAgent:
             "twilio": {
                 "name": "Twilio",
                 "icon": "📱",
-                "features": ["global_sms", "mms_support", "api_integration", "automation"],
+                "features": [
+                    "global_sms",
+                    "mms_support",
+                    "api_integration",
+                    "automation",
+                ],
                 "delivery_rate": 98.5,
             },
             "textmagic": {
@@ -76,29 +89,64 @@ class EmailSMSAutomationAgent:
                     "personal_styling",
                     "loyalty_program",
                 ],
-                "luxury_elements": ["premium_typography", "gold_accents", "high_res_imagery"],
+                "luxury_elements": [
+                    "premium_typography",
+                    "gold_accents",
+                    "high_res_imagery",
+                ],
             },
             "abandoned_cart": {
                 "sequence_length": 3,
                 "schedule": ["1_hour", "24_hours", "72_hours"],
-                "themes": ["gentle_reminder", "styling_suggestions", "limited_time_offer"],
+                "themes": [
+                    "gentle_reminder",
+                    "styling_suggestions",
+                    "limited_time_offer",
+                ],
                 "personalization": ["product_images", "customer_name", "cart_value"],
             },
             "post_purchase": {
                 "sequence_length": 4,
                 "schedule": ["immediate", "day_3", "day_14", "day_30"],
-                "themes": ["order_confirmation", "care_instructions", "styling_tips", "review_request"],
-                "luxury_touch": ["thank_you_note", "exclusive_previews", "vip_benefits"],
+                "themes": [
+                    "order_confirmation",
+                    "care_instructions",
+                    "styling_tips",
+                    "review_request",
+                ],
+                "luxury_touch": [
+                    "thank_you_note",
+                    "exclusive_previews",
+                    "vip_benefits",
+                ],
             },
             "seasonal_campaigns": {
                 "frequency": "monthly",
-                "themes": ["new_collections", "seasonal_trends", "exclusive_events", "limited_editions"],
-                "personalization": ["past_purchases", "style_preferences", "size_history"],
+                "themes": [
+                    "new_collections",
+                    "seasonal_trends",
+                    "exclusive_events",
+                    "limited_editions",
+                ],
+                "personalization": [
+                    "past_purchases",
+                    "style_preferences",
+                    "size_history",
+                ],
             },
             "vip_communications": {
                 "frequency": "weekly",
-                "themes": ["early_access", "private_sales", "personal_shopping", "exclusive_events"],
-                "luxury_elements": ["concierge_tone", "premium_offers", "personal_attention"],
+                "themes": [
+                    "early_access",
+                    "private_sales",
+                    "personal_shopping",
+                    "exclusive_events",
+                ],
+                "luxury_elements": [
+                    "concierge_tone",
+                    "premium_offers",
+                    "personal_attention",
+                ],
             },
         }
 
@@ -141,28 +189,44 @@ class EmailSMSAutomationAgent:
         self.personalization_engine = self._initialize_personalization_engine()
         self.optimization_system = self._initialize_optimization_system()
 
-        logger.info("💌 Email & SMS Automation Agent initialized with Luxury Messaging Intelligence")
+        logger.info(
+            "💌 Email & SMS Automation Agent initialized with Luxury Messaging Intelligence"
+        )
 
-    async def create_email_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_email_campaign(
+        self, campaign_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create comprehensive email marketing campaign for luxury fashion brand."""
         try:
             campaign_type = campaign_data.get("type", "promotional")
             target_audience = campaign_data.get("audience", "all_customers")
-            launch_date = campaign_data.get("launch_date", datetime.now().strftime("%Y-%m-%d"))
+            launch_date = campaign_data.get(
+                "launch_date", datetime.now().strftime("%Y-%m-%d")
+            )
 
-            logger.info(f"📧 Creating {campaign_type} email campaign for {target_audience}...")
+            logger.info(
+                f"📧 Creating {campaign_type} email campaign for {target_audience}..."
+            )
 
             # Generate campaign strategy
-            campaign_strategy = self._generate_email_strategy(campaign_type, target_audience)
+            campaign_strategy = self._generate_email_strategy(
+                campaign_type, target_audience
+            )
 
             # Create email sequence
-            email_sequence = self._create_email_sequence(campaign_type, campaign_strategy)
+            email_sequence = self._create_email_sequence(
+                campaign_type, campaign_strategy
+            )
 
             # Generate luxury content
-            email_content = self._generate_luxury_email_content(campaign_type, campaign_strategy)
+            email_content = self._generate_luxury_email_content(
+                campaign_type, campaign_strategy
+            )
 
             # Set up automation triggers
-            automation_setup = self._setup_email_automation(campaign_type, target_audience)
+            automation_setup = self._setup_email_automation(
+                campaign_type, target_audience
+            )
 
             # Configure A/B testing
             ab_testing = self._configure_email_ab_testing(campaign_type)
@@ -180,7 +244,9 @@ class EmailSMSAutomationAgent:
                 "personalization": self._setup_email_personalization(target_audience),
                 "luxury_elements": self._add_luxury_email_elements(),
                 "performance_tracking": self._setup_email_tracking(),
-                "estimated_metrics": self._predict_email_performance(campaign_type, target_audience),
+                "estimated_metrics": self._predict_email_performance(
+                    campaign_type, target_audience
+                ),
                 "created_at": datetime.now().isoformat(),
             }
 
@@ -188,14 +254,18 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ Email campaign creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def create_sms_campaign(self, campaign_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_sms_campaign(
+        self, campaign_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Create targeted SMS marketing campaign with luxury brand messaging."""
         try:
             campaign_type = campaign_data.get("type", "promotional")
             target_segments = campaign_data.get("segments", ["vip_customers"])
             send_time = campaign_data.get("send_time", "optimal")
 
-            logger.info(f"📱 Creating {campaign_type} SMS campaign for {len(target_segments)} segments...")
+            logger.info(
+                f"📱 Creating {campaign_type} SMS campaign for {len(target_segments)} segments..."
+            )
 
             # Generate SMS strategy
             sms_strategy = self._generate_sms_strategy(campaign_type, target_segments)
@@ -207,7 +277,9 @@ class EmailSMSAutomationAgent:
             personalization = self._setup_sms_personalization(target_segments)
 
             # Configure delivery optimization
-            delivery_optimization = self._optimize_sms_delivery(target_segments, send_time)
+            delivery_optimization = self._optimize_sms_delivery(
+                target_segments, send_time
+            )
 
             # Set up compliance
             compliance_setup = self._ensure_sms_compliance(target_segments)
@@ -233,25 +305,35 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ SMS campaign creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def setup_omnichannel_automation(self, automation_config: Dict[str, Any]) -> Dict[str, Any]:
+    async def setup_omnichannel_automation(
+        self, automation_config: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Set up comprehensive omnichannel email & SMS automation."""
         try:
             channels = automation_config.get("channels", ["email", "sms"])
             customer_journey_stage = automation_config.get("journey_stage", "all")
             automation_triggers = automation_config.get("triggers", [])
 
-            logger.info(f"🔄 Setting up omnichannel automation for {len(channels)} channels...")
+            logger.info(
+                f"🔄 Setting up omnichannel automation for {len(channels)} channels..."
+            )
 
             # Create customer journey mapping
-            journey_mapping = self._create_customer_journey_mapping(customer_journey_stage)
+            journey_mapping = self._create_customer_journey_mapping(
+                customer_journey_stage
+            )
 
             # Set up cross-channel workflows
             workflows = {}
             for channel in channels:
-                workflows[channel] = self._create_channel_workflow(channel, journey_mapping)
+                workflows[channel] = self._create_channel_workflow(
+                    channel, journey_mapping
+                )
 
             # Configure trigger-based automation
-            trigger_automation = self._setup_trigger_automation(automation_triggers, channels)
+            trigger_automation = self._setup_trigger_automation(
+                automation_triggers, channels
+            )
 
             # Set up personalization across channels
             cross_channel_personalization = self._setup_cross_channel_personalization()
@@ -282,24 +364,38 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ Omnichannel automation setup failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_email_strategy(self, campaign_type: str, audience: str) -> Dict[str, Any]:
+    def _generate_email_strategy(
+        self, campaign_type: str, audience: str
+    ) -> Dict[str, Any]:
         """Generate comprehensive email marketing strategy."""
         strategies = {
             "welcome_series": {
                 "objective": "introduce_luxury_brand_experience",
-                "sequence_goals": ["brand_education", "style_preference_discovery", "first_purchase"],
+                "sequence_goals": [
+                    "brand_education",
+                    "style_preference_discovery",
+                    "first_purchase",
+                ],
                 "luxury_positioning": "exclusive_access_to_premium_fashion",
                 "personalization_level": "high",
             },
             "seasonal_campaign": {
                 "objective": "drive_seasonal_collection_sales",
-                "content_themes": ["new_arrivals", "styling_guides", "limited_editions"],
+                "content_themes": [
+                    "new_arrivals",
+                    "styling_guides",
+                    "limited_editions",
+                ],
                 "luxury_positioning": "early_access_to_exclusive_pieces",
                 "personalization_level": "medium",
             },
             "vip_campaign": {
                 "objective": "enhance_vip_customer_experience",
-                "exclusive_benefits": ["private_sales", "personal_styling", "early_access"],
+                "exclusive_benefits": [
+                    "private_sales",
+                    "personal_styling",
+                    "early_access",
+                ],
                 "luxury_positioning": "ultra_exclusive_luxury_experience",
                 "personalization_level": "very_high",
             },
@@ -307,24 +403,38 @@ class EmailSMSAutomationAgent:
 
         return strategies.get(campaign_type, strategies["seasonal_campaign"])
 
-    def _generate_sms_strategy(self, campaign_type: str, target_segments: List[str]) -> Dict[str, Any]:
+    def _generate_sms_strategy(
+        self, campaign_type: str, target_segments: List[str]
+    ) -> Dict[str, Any]:
         """Generate comprehensive SMS marketing strategy."""
         strategies = {
             "promotional": {
                 "objective": "drive_immediate_sales_with_urgency",
-                "message_themes": ["flash_sales", "limited_time_offers", "exclusive_discounts"],
+                "message_themes": [
+                    "flash_sales",
+                    "limited_time_offers",
+                    "exclusive_discounts",
+                ],
                 "luxury_positioning": "vip_exclusive_access",
                 "personalization_level": "high",
             },
             "flash_sale": {
                 "objective": "create_urgency_for_luxury_purchases",
-                "message_themes": ["time_sensitive_offers", "limited_inventory", "exclusive_access"],
+                "message_themes": [
+                    "time_sensitive_offers",
+                    "limited_inventory",
+                    "exclusive_access",
+                ],
                 "luxury_positioning": "members_only_flash_access",
                 "personalization_level": "very_high",
             },
             "new_arrivals": {
                 "objective": "announce_luxury_collection_launches",
-                "message_themes": ["first_access", "preview_collections", "styling_alerts"],
+                "message_themes": [
+                    "first_access",
+                    "preview_collections",
+                    "styling_alerts",
+                ],
                 "luxury_positioning": "insider_fashion_intelligence",
                 "personalization_level": "medium",
             },
@@ -332,7 +442,9 @@ class EmailSMSAutomationAgent:
 
         return strategies.get(campaign_type, strategies["promotional"])
 
-    def _create_email_sequence(self, campaign_type: str, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _create_email_sequence(
+        self, campaign_type: str, strategy: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Create detailed email sequence for campaign."""
         if campaign_type == "welcome_series":
             return [
@@ -373,11 +485,18 @@ class EmailSMSAutomationAgent:
             }
         ]
 
-    def _generate_luxury_email_content(self, campaign_type: str, strategy: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_luxury_email_content(
+        self, campaign_type: str, strategy: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate luxury-focused email content."""
         return {
             "design_elements": {
-                "color_palette": ["rose_gold", "champagne", "deep_black", "pearl_white"],
+                "color_palette": [
+                    "rose_gold",
+                    "champagne",
+                    "deep_black",
+                    "pearl_white",
+                ],
                 "typography": "luxury_serif_fonts",
                 "layout": "editorial_magazine_style",
                 "imagery": "high_fashion_photography",
@@ -404,13 +523,29 @@ class EmailSMSAutomationAgent:
             ],
         }
 
-    def _setup_email_automation(self, campaign_type: str, audience: str) -> Dict[str, Any]:
+    def _setup_email_automation(
+        self, campaign_type: str, audience: str
+    ) -> Dict[str, Any]:
         """Set up email automation triggers and workflows."""
         return {
             "trigger_types": {
-                "behavioral": ["page_visit", "cart_abandonment", "product_view", "email_engagement"],
-                "temporal": ["birthday", "anniversary", "seasonal", "time_since_purchase"],
-                "transactional": ["purchase_confirmation", "shipping_update", "delivery_confirmation"],
+                "behavioral": [
+                    "page_visit",
+                    "cart_abandonment",
+                    "product_view",
+                    "email_engagement",
+                ],
+                "temporal": [
+                    "birthday",
+                    "anniversary",
+                    "seasonal",
+                    "time_since_purchase",
+                ],
+                "transactional": [
+                    "purchase_confirmation",
+                    "shipping_update",
+                    "delivery_confirmation",
+                ],
             },
             "workflow_rules": {
                 "frequency_capping": "max_3_emails_per_week",
@@ -425,7 +560,9 @@ class EmailSMSAutomationAgent:
             },
         }
 
-    def _create_sms_variants(self, campaign_type: str, strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _create_sms_variants(
+        self, campaign_type: str, strategy: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Create SMS message variants for testing."""
         if campaign_type == "flash_sale":
             return [
@@ -463,7 +600,9 @@ class EmailSMSAutomationAgent:
                 "variant": "A",
                 "message": f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]",
                 "tone": "professional",
-                "length": len(f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]"),
+                "length": len(
+                    f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]"
+                ),
             }
         ]
 

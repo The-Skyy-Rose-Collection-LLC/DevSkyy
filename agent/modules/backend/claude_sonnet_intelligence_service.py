@@ -36,7 +36,9 @@ class ClaudeSonnetIntelligenceService:
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.sync_client = Anthropic(api_key=self.api_key)
             self.model = "claude-sonnet-4-5-20250929"  # Latest Sonnet 4.5
-            logger.info("🧠 Claude Sonnet 4.5 Intelligence Service initialized with advanced reasoning")
+            logger.info(
+                "🧠 Claude Sonnet 4.5 Intelligence Service initialized with advanced reasoning"
+            )
         else:
             self.client = None
             self.sync_client = None
@@ -116,7 +118,9 @@ class ClaudeSonnetIntelligenceService:
             logger.error(f"❌ Claude reasoning failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def enhance_luxury_product_description(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def enhance_luxury_product_description(
+        self, product_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Create ultra-premium product descriptions using Claude's superior writing.
         """
@@ -171,7 +175,9 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             logger.error(f"❌ Claude product enhancement failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def generate_strategic_marketing_plan(self, business_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_strategic_marketing_plan(
+        self, business_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate comprehensive marketing strategy using Claude's strategic reasoning.
         """
@@ -224,7 +230,9 @@ Make it actionable, specific, and focused on luxury market best practices."""
             logger.error(f"❌ Claude strategy generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_competitor_intelligence(self, competitor_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_competitor_intelligence(
+        self, competitor_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Deep competitive analysis using Claude's analytical capabilities.
         """
@@ -274,7 +282,9 @@ Provide actionable insights for luxury market domination."""
             logger.error(f"❌ Claude competitive analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_conversion_funnel(self, funnel_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def optimize_conversion_funnel(
+        self, funnel_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Analyze and optimize conversion funnel using advanced reasoning.
         """
@@ -380,7 +390,9 @@ Provide complete, working code that can be deployed immediately."""
             logger.error(f"❌ Claude code generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_customer_sentiment(self, customer_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def analyze_customer_sentiment(
+        self, customer_data: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
         """
         Advanced sentiment analysis and customer insights using Claude.
         """
@@ -430,7 +442,9 @@ Focus on insights that drive business value for a luxury brand."""
             logger.error(f"❌ Claude sentiment analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def create_viral_social_content(self, campaign_brief: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_viral_social_content(
+        self, campaign_brief: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Generate viral-worthy social media content using Claude's creativity.
         """
@@ -498,7 +512,9 @@ claude_service = create_claude_service()
 
 
 # Convenience functions for easy access
-async def advanced_ai_reasoning(task: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+async def advanced_ai_reasoning(
+    task: str, context: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """Use Claude's advanced reasoning for complex tasks."""
     return await claude_service.advanced_reasoning(task, context)
 

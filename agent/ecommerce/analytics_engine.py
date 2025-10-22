@@ -49,7 +49,11 @@ class EcommerceAnalytics:
         logger.info(f"Calculating revenue analytics from {start_date} to {end_date}")
 
         analytics = {
-            "period": {"start": start_date.isoformat(), "end": end_date.isoformat(), "granularity": granularity},
+            "period": {
+                "start": start_date.isoformat(),
+                "end": end_date.isoformat(),
+                "granularity": granularity,
+            },
             "revenue": {
                 "total": 0.0,
                 "average_order_value": 0.0,
@@ -103,7 +107,11 @@ class EcommerceAnalytics:
             "popular_categories": [],
             "peak_shopping_hours": [],
             "device_breakdown": {"mobile": 0.0, "desktop": 0.0, "tablet": 0.0},
-            "journey_analysis": {"entry_points": [], "exit_points": [], "conversion_paths": []},
+            "journey_analysis": {
+                "entry_points": [],
+                "exit_points": [],
+                "conversion_paths": [],
+            },
         }
 
         # Simulate behavior metrics
@@ -167,7 +175,9 @@ class EcommerceAnalytics:
 
         return performance
 
-    async def analyze_conversion_funnel(self, funnel_stages: Optional[List[str]] = None) -> Dict[str, Any]:
+    async def analyze_conversion_funnel(
+        self, funnel_stages: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """
         Analyze conversion funnel and drop-off points
 
@@ -190,7 +200,12 @@ class EcommerceAnalytics:
         stages = funnel_stages or default_stages
         logger.info(f"Analyzing conversion funnel with {len(stages)} stages")
 
-        funnel = {"stages": [], "overall_conversion_rate": 0.0, "bottlenecks": [], "optimization_opportunities": []}
+        funnel = {
+            "stages": [],
+            "overall_conversion_rate": 0.0,
+            "bottlenecks": [],
+            "optimization_opportunities": [],
+        }
 
         # Simulate funnel data
         visitors = 10000
@@ -256,9 +271,15 @@ class EcommerceAnalytics:
 
         # Calculate metrics
         roi_data["revenue_attributed"] = roi_data["spend"] * np.random.uniform(2, 8)
-        roi_data["roi_percentage"] = (roi_data["revenue_attributed"] - roi_data["spend"]) / roi_data["spend"] * 100
+        roi_data["roi_percentage"] = (
+            (roi_data["revenue_attributed"] - roi_data["spend"])
+            / roi_data["spend"]
+            * 100
+        )
         roi_data["customers_acquired"] = int(np.random.uniform(50, 300))
-        roi_data["customer_acquisition_cost"] = roi_data["spend"] / roi_data["customers_acquired"]
+        roi_data["customer_acquisition_cost"] = (
+            roi_data["spend"] / roi_data["customers_acquired"]
+        )
 
         roi_data["channel_breakdown"] = {
             "social_media": np.random.uniform(0.3, 0.5),
@@ -285,7 +306,9 @@ class EcommerceAnalytics:
         default_metrics = ["revenue", "orders", "new_customers", "conversion_rate"]
         metrics_to_forecast = metrics or default_metrics
 
-        logger.info(f"Generating {forecast_days}-day forecast for {len(metrics_to_forecast)} metrics")
+        logger.info(
+            f"Generating {forecast_days}-day forecast for {len(metrics_to_forecast)} metrics"
+        )
 
         insights = {
             "forecast_period_days": forecast_days,
@@ -301,7 +324,9 @@ class EcommerceAnalytics:
             base_value = np.random.uniform(1000, 10000)
             trend = np.random.uniform(-0.02, 0.05)
 
-            forecast_values = [base_value * (1 + trend) ** day for day in range(forecast_days)]
+            forecast_values = [
+                base_value * (1 + trend) ** day for day in range(forecast_days)
+            ]
 
             insights["forecasts"][metric] = {
                 "current_value": base_value,
@@ -322,7 +347,9 @@ class EcommerceAnalytics:
 
         return insights
 
-    def export_analytics_report(self, analytics_data: Dict[str, Any], format: str = "json") -> str:
+    def export_analytics_report(
+        self, analytics_data: Dict[str, Any], format: str = "json"
+    ) -> str:
         """
         Export analytics data in various formats
 

@@ -7,7 +7,7 @@ import logging
 import os
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from database_config import CONNECTION_ARGS, DATABASE_URL
@@ -115,7 +115,9 @@ class DatabaseManager:
                     "status": "healthy",
                     "connected": True,
                     "type": "SQLAlchemy",
-                    "url": DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite",
+                    "url": (
+                        DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
+                    ),
                 }
         except Exception as e:
             return {"status": "unhealthy", "connected": False, "error": str(e)}

@@ -164,19 +164,31 @@ class PersonalizedWebsiteRenderer:
             "returning_visitor": {
                 "offer": "Welcome back! Your cart is waiting",
                 "messaging": "Continue where you left off",
-                "content_priority": ["recently_viewed", "recommendations", "new_arrivals"],
+                "content_priority": [
+                    "recently_viewed",
+                    "recommendations",
+                    "new_arrivals",
+                ],
                 "popup_delay": None,
             },
             "frequent_buyer": {
                 "offer": "VIP early access to new collections",
                 "messaging": "Your exclusive preview",
-                "content_priority": ["vip_collection", "personal_stylist", "loyalty_rewards"],
+                "content_priority": [
+                    "vip_collection",
+                    "personal_stylist",
+                    "loyalty_rewards",
+                ],
                 "perks": ["free_shipping", "priority_support", "exclusive_events"],
             },
             "cart_abandoner": {
                 "offer": "Complete your purchase - 10% off waiting",
                 "messaging": "Your style is still available",
-                "content_priority": ["cart_items", "urgency_messaging", "similar_items"],
+                "content_priority": [
+                    "cart_items",
+                    "urgency_messaging",
+                    "similar_items",
+                ],
                 "urgency": "high",
             },
         }
@@ -291,8 +303,16 @@ class PersonalizedWebsiteRenderer:
         """Load pricing strategies for different segments."""
         return {
             "luxury": {"display": "subtle", "discounts": "rare", "payment": "premium"},
-            "value": {"display": "prominent", "discounts": "frequent", "payment": "flexible"},
-            "sustainable": {"display": "transparent", "discounts": "moderate", "payment": "standard"},
+            "value": {
+                "display": "prominent",
+                "discounts": "frequent",
+                "payment": "flexible",
+            },
+            "sustainable": {
+                "display": "transparent",
+                "discounts": "moderate",
+                "payment": "standard",
+            },
         }
 
     def _load_copy_variations(self) -> Dict[str, Dict[str, str]]:
@@ -358,22 +378,32 @@ class PersonalizedWebsiteRenderer:
             segment = self._determine_segment(user_profile)
 
             # Get location-specific content
-            location_content = await self._get_location_content(user_profile.get("location"))
+            location_content = await self._get_location_content(
+                user_profile.get("location")
+            )
 
             # Generate personalized content
-            personalized_content = self._generate_personalized_content(segment, location_content, page_type)
+            personalized_content = self._generate_personalized_content(
+                segment, location_content, page_type
+            )
 
             # Apply behavioral targeting
-            behavioral_content = self._apply_behavioral_targeting(user_profile.get("behavior"), personalized_content)
+            behavioral_content = self._apply_behavioral_targeting(
+                user_profile.get("behavior"), personalized_content
+            )
 
             # Optimize for device
-            final_content = self._optimize_for_device(user_profile.get("device"), behavioral_content)
+            final_content = self._optimize_for_device(
+                user_profile.get("device"), behavioral_content
+            )
 
             return {
                 "status": "success",
                 "user_segment": segment,
                 "content": final_content,
-                "personalization_score": self._calculate_personalization_score(user_profile),
+                "personalization_score": self._calculate_personalization_score(
+                    user_profile
+                ),
                 "rendered_at": datetime.now().isoformat(),
             }
 
@@ -462,9 +492,21 @@ class PersonalizedWebsiteRenderer:
 
         return {
             "type": behavior_type,
-            "engagement_level": "high" if session_count > 5 else "medium" if session_count > 2 else "low",
-            "price_sensitivity": "low" if avg_order_value > 1000 else "medium" if avg_order_value > 500 else "high",
-            "loyalty_status": "vip" if purchase_count > 10 else "regular" if purchase_count > 3 else "new",
+            "engagement_level": (
+                "high"
+                if session_count > 5
+                else "medium" if session_count > 2 else "low"
+            ),
+            "price_sensitivity": (
+                "low"
+                if avg_order_value > 1000
+                else "medium" if avg_order_value > 500 else "high"
+            ),
+            "loyalty_status": (
+                "vip"
+                if purchase_count > 10
+                else "regular" if purchase_count > 3 else "new"
+            ),
         }
 
     def _infer_demographics(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -511,15 +553,35 @@ class PersonalizedWebsiteRenderer:
 
         if location.get("country") == "United States":
             if month in [12, 1, 2]:
-                return {"season": "winter", "temperature": "cold", "recommendations": ["coats", "boots"]}
+                return {
+                    "season": "winter",
+                    "temperature": "cold",
+                    "recommendations": ["coats", "boots"],
+                }
             elif month in [6, 7, 8]:
-                return {"season": "summer", "temperature": "hot", "recommendations": ["dresses", "sandals"]}
+                return {
+                    "season": "summer",
+                    "temperature": "hot",
+                    "recommendations": ["dresses", "sandals"],
+                }
             elif month in [3, 4, 5]:
-                return {"season": "spring", "temperature": "mild", "recommendations": ["light_jackets", "transitional"]}
+                return {
+                    "season": "spring",
+                    "temperature": "mild",
+                    "recommendations": ["light_jackets", "transitional"],
+                }
             else:
-                return {"season": "fall", "temperature": "cool", "recommendations": ["sweaters", "boots"]}
+                return {
+                    "season": "fall",
+                    "temperature": "cool",
+                    "recommendations": ["sweaters", "boots"],
+                }
 
-        return {"season": "all_season", "temperature": "moderate", "recommendations": ["bestsellers"]}
+        return {
+            "season": "all_season",
+            "temperature": "moderate",
+            "recommendations": ["bestsellers"],
+        }
 
     def _get_time_context(self) -> Dict[str, Any]:
         """Get time-based context for personalization."""
@@ -629,18 +691,24 @@ class PersonalizedWebsiteRenderer:
             "hero": {
                 "headline": self._get_personalized_headline(content_style),
                 "subheadline": self._get_personalized_subheadline(segment),
-                "cta_text": self.content_library["copy"]["cta_buttons"].get(content_style, "Shop Now"),
+                "cta_text": self.content_library["copy"]["cta_buttons"].get(
+                    content_style, "Shop Now"
+                ),
                 "background_style": self._get_hero_style(content_style),
             },
             "products": self._get_personalized_products(segment, location_content),
             "messaging": {
-                "value_prop": self.content_library["copy"]["value_props"].get(content_style),
+                "value_prop": self.content_library["copy"]["value_props"].get(
+                    content_style
+                ),
                 "urgency": self._get_urgency_messaging(segment),
                 "social_proof": self._get_social_proof(segment),
             },
             "pricing": {
                 "currency": location_content["currency"],
-                "display_style": self.content_library["pricing"][content_style]["display"],
+                "display_style": self.content_library["pricing"][content_style][
+                    "display"
+                ],
                 "shipping": location_content["shipping_message"],
                 "tax": location_content["tax_info"],
             },
@@ -652,7 +720,9 @@ class PersonalizedWebsiteRenderer:
 
     def _get_personalized_headline(self, content_style: str) -> str:
         """Get personalized headline based on style."""
-        headlines = self.content_library["headlines"].get(content_style, self.content_library["headlines"]["luxury"])
+        headlines = self.content_library["headlines"].get(
+            content_style, self.content_library["headlines"]["luxury"]
+        )
 
         # In production, would use AI to generate unique headlines
         # For demo, return from library
@@ -699,7 +769,9 @@ class PersonalizedWebsiteRenderer:
 
         return styles.get(content_style, styles["luxury"])
 
-    def _get_personalized_products(self, segment: str, location_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _get_personalized_products(
+        self, segment: str, location_content: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
         """Get personalized product recommendations."""
         products = self.content_library["products"]["products"]
 
@@ -713,7 +785,9 @@ class PersonalizedWebsiteRenderer:
             if price_key in ["usd", "gbp", "eur"]:
                 price_key = {"USD": "us", "GBP": "uk", "EUR": "eu"}.get(currency, "us")
 
-            product["display_price"] = product["price_tiers"].get(price_key, product["price_tiers"]["us"])
+            product["display_price"] = product["price_tiers"].get(
+                price_key, product["price_tiers"]["us"]
+            )
             product["currency"] = currency
 
         return relevant_products[:6]  # Return top 6 products
@@ -783,7 +857,9 @@ class PersonalizedWebsiteRenderer:
 
         return content
 
-    def _optimize_for_device(self, device: Optional[Dict[str, Any]], content: Dict[str, Any]) -> Dict[str, Any]:
+    def _optimize_for_device(
+        self, device: Optional[Dict[str, Any]], content: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Optimize content for specific device type."""
         if not device:
             return content
@@ -865,7 +941,9 @@ class PersonalizedWebsiteRenderer:
             "personalization_score": 0,
         }
 
-    async def track_engagement(self, user_id: str, content_version: str, engagement_data: Dict[str, Any]) -> bool:
+    async def track_engagement(
+        self, user_id: str, content_version: str, engagement_data: Dict[str, Any]
+    ) -> bool:
         """
         Track user engagement with personalized content.
 
@@ -942,7 +1020,9 @@ async def main():
         print(f"Personalizing for: {context['name']}")
         print("=" * 60)
 
-        result = await renderer.render_personalized_experience(user_data=context["data"], page_type="homepage")
+        result = await renderer.render_personalized_experience(
+            user_data=context["data"], page_type="homepage"
+        )
 
         if result["status"] == "success":
             content = result["content"]

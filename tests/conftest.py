@@ -56,7 +56,9 @@ def test_db_engine():
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine):
     """Create database session for testing"""
-    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
+    TestingSessionLocal = sessionmaker(
+        autocommit=False, autoflush=False, bind=test_db_engine
+    )
     session = TestingSessionLocal()
     try:
         yield session
@@ -106,7 +108,7 @@ def test_user_data():
 @pytest.fixture(scope="function")
 def setup_test_user(test_user_data):
     """Add test user to user manager for testing"""
-    from security.jwt_auth import User, UserRole, user_manager
+    from security.jwt_auth import User, user_manager, UserRole
 
     # Create test user
     test_user = User(

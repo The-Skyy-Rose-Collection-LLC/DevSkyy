@@ -167,10 +167,14 @@ class AutonomousLandingPageGenerator:
         test_id = str(uuid4())
         variants = []
 
-        logger.info(f"🎨 Generating {num_variants} landing page variants for {product_name}")
+        logger.info(
+            f"🎨 Generating {num_variants} landing page variants for {product_name}"
+        )
 
         for i in range(num_variants):
-            variant = await self._create_variant(product_name, target_audience, goal, chr(65 + i))  # A, B, C, D
+            variant = await self._create_variant(
+                product_name, target_audience, goal, chr(65 + i)
+            )  # A, B, C, D
             variants.append(variant)
 
         # Initialize A/B test
@@ -233,7 +237,9 @@ class AutonomousLandingPageGenerator:
 
     def _generate_hero_section(self, product_name: str, variant: str) -> str:
         """Generate hero section with variant-specific styling."""
-        hero_style = self.luxury_elements["hero_styles"][ord(variant) - 65 % len(self.luxury_elements["hero_styles"])]
+        hero_style = self.luxury_elements["hero_styles"][
+            ord(variant) - 65 % len(self.luxury_elements["hero_styles"])
+        ]
         cta_text = self.luxury_elements["cta_variations"][
             ord(variant) - 65 % len(self.luxury_elements["cta_variations"])
         ]
@@ -376,11 +382,15 @@ class AutonomousLandingPageGenerator:
         primary = self.luxury_elements["colors"]["primary"][
             color_index % len(self.luxury_elements["colors"]["primary"])
         ]
-        accent = self.luxury_elements["colors"]["accent"][color_index % len(self.luxury_elements["colors"]["accent"])]
+        accent = self.luxury_elements["colors"]["accent"][
+            color_index % len(self.luxury_elements["colors"]["accent"])
+        ]
         heading_font = self.luxury_elements["fonts"]["heading"][
             color_index % len(self.luxury_elements["fonts"]["heading"])
         ]
-        body_font = self.luxury_elements["fonts"]["body"][color_index % len(self.luxury_elements["fonts"]["body"])]
+        body_font = self.luxury_elements["fonts"]["body"][
+            color_index % len(self.luxury_elements["fonts"]["body"])
+        ]
 
         return f"""
         @import url('https://fonts.googleapis.com/css2?family={heading_font.replace(' ', '+')}:wght@400;700&family={body_font.replace(' ', '+')}:wght@300;400;700&display=swap');
@@ -532,17 +542,31 @@ class AutonomousLandingPageGenerator:
         index = ord(variant) - 65
 
         if element_type == "hero":
-            return self.luxury_elements["hero_styles"][index % len(self.luxury_elements["hero_styles"])]
+            return self.luxury_elements["hero_styles"][
+                index % len(self.luxury_elements["hero_styles"])
+            ]
         elif element_type == "cta":
-            return self.luxury_elements["cta_variations"][index % len(self.luxury_elements["cta_variations"])]
+            return self.luxury_elements["cta_variations"][
+                index % len(self.luxury_elements["cta_variations"])
+            ]
         elif element_type == "color":
-            primary = self.luxury_elements["colors"]["primary"][index % len(self.luxury_elements["colors"]["primary"])]
-            accent = self.luxury_elements["colors"]["accent"][index % len(self.luxury_elements["colors"]["accent"])]
+            primary = self.luxury_elements["colors"]["primary"][
+                index % len(self.luxury_elements["colors"]["primary"])
+            ]
+            accent = self.luxury_elements["colors"]["accent"][
+                index % len(self.luxury_elements["colors"]["accent"])
+            ]
             return f"{primary}/{accent}"
 
         return ""
 
-    async def track_event(self, test_id: str, variant_id: str, event_type: str, data: Optional[Dict] = None) -> bool:
+    async def track_event(
+        self,
+        test_id: str,
+        variant_id: str,
+        event_type: str,
+        data: Optional[Dict] = None,
+    ) -> bool:
         """
         Track user interaction event for A/B testing.
 
@@ -598,7 +622,9 @@ class AutonomousLandingPageGenerator:
             perf = test["performance"][variant_id]
 
             # Calculate conversion rate
-            conversion_rate = perf["conversions"] / perf["views"] if perf["views"] > 0 else 0
+            conversion_rate = (
+                perf["conversions"] / perf["views"] if perf["views"] > 0 else 0
+            )
 
             # Calculate confidence interval
             confidence = self._calculate_confidence(perf["conversions"], perf["views"])
@@ -636,7 +662,9 @@ class AutonomousLandingPageGenerator:
             "recommendation": self._get_recommendation(results, winner),
         }
 
-    def _calculate_confidence(self, conversions: int, views: int) -> Tuple[float, float]:
+    def _calculate_confidence(
+        self, conversions: int, views: int
+    ) -> Tuple[float, float]:
         """Calculate 95% confidence interval for conversion rate."""
         if views == 0:
             return (0, 0)
@@ -649,8 +677,12 @@ class AutonomousLandingPageGenerator:
         centre_adjusted_probability = p + z**2 / (2 * views)
         adjusted_standard_deviation = (p * (1 - p) + z**2 / (4 * views)) / views
 
-        lower = (centre_adjusted_probability - z * (adjusted_standard_deviation**0.5)) / denominator
-        upper = (centre_adjusted_probability + z * (adjusted_standard_deviation**0.5)) / denominator
+        lower = (
+            centre_adjusted_probability - z * (adjusted_standard_deviation**0.5)
+        ) / denominator
+        upper = (
+            centre_adjusted_probability + z * (adjusted_standard_deviation**0.5)
+        ) / denominator
 
         return (max(0, lower), min(1, upper))
 
@@ -727,7 +759,9 @@ class AutonomousLandingPageGenerator:
             "goal": test["goal"],
             "variants": new_variants,
             "start_time": datetime.now(),
-            "performance": {v["id"]: {"views": 0, "conversions": 0} for v in new_variants},
+            "performance": {
+                v["id"]: {"views": 0, "conversions": 0} for v in new_variants
+            },
             "parent_test": test_id,
             "optimization_round": test.get("optimization_round", 0) + 1,
         }
@@ -750,7 +784,9 @@ class AutonomousLandingPageGenerator:
     ) -> Dict[str, Any]:
         """Create optimized variant based on winning elements."""
         # Start with winning elements and make minor variations
-        variant = await self._create_variant(product_name, target_audience, goal, variant_label)
+        variant = await self._create_variant(
+            product_name, target_audience, goal, variant_label
+        )
 
         # Apply winning elements with slight modifications
         variant["elements"] = {
@@ -765,7 +801,11 @@ class AutonomousLandingPageGenerator:
         """Get similar CTA text to winning variant."""
         similar_ctas = {
             "Shop Now": ["Shop Collection", "Shop Today", "Start Shopping"],
-            "Discover Collection": ["Explore Collection", "View Collection", "See Collection"],
+            "Discover Collection": [
+                "Explore Collection",
+                "View Collection",
+                "See Collection",
+            ],
             "Experience Luxury": ["Discover Luxury", "Feel Luxury", "Live Luxury"],
         }
 
@@ -802,7 +842,9 @@ class AutonomousLandingPageGenerator:
         test = self.active_tests[test_id]
 
         # Find winning variant HTML
-        winning_variant = next((v for v in test["variants"] if v["id"] == winner["variant_id"]), None)
+        winning_variant = next(
+            (v for v in test["variants"] if v["id"] == winner["variant_id"]), None
+        )
 
         if not winning_variant:
             return {"error": "Winner variant not found", "status": "failed"}
@@ -842,7 +884,9 @@ class AutonomousLandingPageGenerator:
         import re
 
         # Remove A/B testing tracker script
-        html = re.sub(r"<!-- A/B Testing Tracker -->.*?</script>", "", html, flags=re.DOTALL)
+        html = re.sub(
+            r"<!-- A/B Testing Tracker -->.*?</script>", "", html, flags=re.DOTALL
+        )
 
         # Remove data attributes used for testing
         html = re.sub(r'data-variant="[^"]*"', "", html)
@@ -891,7 +935,9 @@ async def main():
 
     print("\n📊 Test Results:")
     for result in analysis["results"]:
-        print(f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)")
+        print(
+            f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)"
+        )
 
     if analysis.get("winner"):
         print(f"\n🏆 Winner: {analysis['winner']['variant']}")

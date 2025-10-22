@@ -42,7 +42,11 @@ class JSONFormatter(logging.Formatter):
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__ if record.exc_info[0] else None,
                 "message": str(record.exc_info[1]) if record.exc_info[1] else None,
-                "traceback": traceback.format_exception(*record.exc_info) if record.exc_info else None,
+                "traceback": (
+                    traceback.format_exception(*record.exc_info)
+                    if record.exc_info
+                    else None
+                ),
             }
 
         # Add extra fields
@@ -81,7 +85,9 @@ class StructuredLogger:
         file_handler.setFormatter(JSONFormatter())
         self.logger.addHandler(file_handler)
 
-    def _log(self, level: int, message: str, extra: Optional[Dict[str, Any]] = None, **kwargs):
+    def _log(
+        self, level: int, message: str, extra: Optional[Dict[str, Any]] = None, **kwargs
+    ):
         """
         Internal log method with extra fields
 

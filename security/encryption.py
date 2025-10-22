@@ -14,7 +14,7 @@ from typing import Any, Dict, Optional, Union
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,9 @@ class KeyManager:
         Args:
             master_key: Master encryption key (from environment or generated)
         """
-        self.master_key = master_key or os.getenv("ENCRYPTION_MASTER_KEY", self._generate_master_key())
+        self.master_key = master_key or os.getenv(
+            "ENCRYPTION_MASTER_KEY", self._generate_master_key()
+        )
         self.active_keys: Dict[str, bytes] = {}
         self.key_versions: Dict[str, int] = {}
 
@@ -47,7 +49,9 @@ class KeyManager:
         logger.warning(f"ENCRYPTION_MASTER_KEY={key.decode()}")
         return key.decode()
 
-    def derive_key(self, password: str, salt: Optional[bytes] = None, key_size: int = 32) -> tuple[bytes, bytes]:
+    def derive_key(
+        self, password: str, salt: Optional[bytes] = None, key_size: int = 32
+    ) -> tuple[bytes, bytes]:
         """
         Derive an encryption key from a password using PBKDF2
 
@@ -163,7 +167,9 @@ class AESEncryption:
             key = self.key_manager.get_key(key_id)
 
             # Create cipher
-            cipher = Cipher(algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend())
+            cipher = Cipher(
+                algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend()
+            )
             decryptor = cipher.decryptor()
 
             # Decrypt
@@ -173,7 +179,9 @@ class AESEncryption:
 
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
-            raise ValueError("Decryption failed - data may be corrupted or key is incorrect")
+            raise ValueError(
+                "Decryption failed - data may be corrupted or key is incorrect"
+            )
 
 
 # ============================================================================
@@ -248,7 +256,12 @@ class FieldEncryption:
         # Encrypt
         encrypted = self.engine.encrypt(str_value, key_id=f"field_{field_name}")
 
-        return {"encrypted": True, "value": encrypted, "field": field_name, "encrypted_at": str(hash(field_name))}
+        return {
+            "encrypted": True,
+            "value": encrypted,
+            "field": field_name,
+            "encrypted_at": str(hash(field_name)),
+        }
 
     def decrypt_field(self, encrypted_data: Dict[str, Any]) -> Any:
         """
@@ -296,7 +309,9 @@ class PasswordHasher:
         salt = secrets.token_bytes(32)
 
         # Hash password
-        key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000 + salt_rounds * 10000)
+        key = hashlib.pbkdf2_hmac(
+            "sha256", password.encode(), salt, 100000 + salt_rounds * 10000
+        )
 
         # Combine salt and hash
         storage = salt + key

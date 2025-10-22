@@ -9,7 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import app
-from security.jwt_auth import UserRole, create_access_token
+from security.jwt_auth import create_access_token, UserRole
 
 
 @pytest.fixture
@@ -67,7 +67,11 @@ class TestGDPRExportEndpoint:
         response = client.get(
             "/api/v1/gdpr/export",
             headers=auth_headers,
-            params={"format": "json", "include_audit_logs": True, "include_activity_history": True},
+            params={
+                "format": "json",
+                "include_audit_logs": True,
+                "include_activity_history": True,
+            },
         )
 
         assert response.status_code == 200
@@ -104,7 +108,11 @@ class TestGDPRExportEndpoint:
         response = client.get(
             "/api/v1/gdpr/export",
             headers=auth_headers,
-            params={"format": "json", "include_audit_logs": False, "include_activity_history": False},
+            params={
+                "format": "json",
+                "include_audit_logs": False,
+                "include_activity_history": False,
+            },
         )
 
         assert response.status_code == 200
@@ -123,7 +131,11 @@ class TestGDPRExportEndpoint:
     def test_export_different_formats(self, client, auth_headers):
         """Test export with different format options"""
         for format_type in ["json", "csv", "xml"]:
-            response = client.get("/api/v1/gdpr/export", headers=auth_headers, params={"format": format_type})
+            response = client.get(
+                "/api/v1/gdpr/export",
+                headers=auth_headers,
+                params={"format": format_type},
+            )
 
             assert response.status_code == 200
             data = response.json()
@@ -141,7 +153,9 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
+        response = client.request(
+            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -166,7 +180,9 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": True,
         }
 
-        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
+        response = client.request(
+            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -184,7 +200,9 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
+        response = client.request(
+            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
+        )
 
         assert response.status_code == 400  # Bad request
 
@@ -298,7 +316,9 @@ class TestGDPRCompliance:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
+        response = client.request(
+            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -330,7 +350,9 @@ class TestGDPRIntegration:
             "anonymize_instead_of_delete": False,
         }
 
-        delete_response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
+        delete_response = client.request(
+            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
+        )
         assert delete_response.status_code == 200
         delete_data = delete_response.json()
 

@@ -67,7 +67,9 @@ class WordPressDirectService:
             self._try_direct_login_simulation,
         ]
 
-        for method_name, method in zip(["REST API", "XML-RPC", "Direct Login"], connection_methods):
+        for method_name, method in zip(
+            ["REST API", "XML-RPC", "Direct Login"], connection_methods
+        ):
             try:
                 logger.info(f"🔄 Attempting {method_name} connection...")
                 result = await method()
@@ -86,21 +88,31 @@ class WordPressDirectService:
         # operating under a false sense of security and avoids misleading the
         # user about the connection status.
         logger.error("❌ All WordPress connection methods failed")
-        raise ConnectionError("Unable to connect to WordPress with the provided credentials")
+        raise ConnectionError(
+            "Unable to connect to WordPress with the provided credentials"
+        )
 
     async def _try_rest_api_connection(self) -> Dict[str, Any]:
         """Try REST API connection with user credentials."""
         try:
             # First, try to get user info with basic auth
             response = requests.get(
-                f"{self.api_base}/users/me", auth=self.auth, headers=self.headers, timeout=15, verify=True
+                f"{self.api_base}/users/me",
+                auth=self.auth,
+                headers=self.headers,
+                timeout=15,
+                verify=True,
             )
 
             if response.status_code == 200:
                 user_info = response.json()
 
                 # Get site information
-                site_response = requests.get(f"{self.site_url.rstrip('/')}/wp-json", headers=self.headers, timeout=10)
+                site_response = requests.get(
+                    f"{self.site_url.rstrip('/')}/wp-json",
+                    headers=self.headers,
+                    timeout=10,
+                )
 
                 site_info = {}
                 if site_response.status_code == 200:
@@ -120,7 +132,9 @@ class WordPressDirectService:
                 }
 
             elif response.status_code == 401:
-                logger.warning("🔑 REST API authentication failed - trying alternative methods")
+                logger.warning(
+                    "🔑 REST API authentication failed - trying alternative methods"
+                )
                 raise Exception("Authentication failed")
             else:
                 logger.warning(f"🌐 REST API returned {response.status_code}")
@@ -200,7 +214,9 @@ class WordPressDirectService:
         """Setup WooCommerce integration with the connected site."""
         try:
             # Import WooCommerce service
-            from agent.modules.woocommerce_integration_service import woocommerce_service
+            from agent.modules.woocommerce_integration_service import (
+                woocommerce_service,
+            )
 
             # Set the site URL for WooCommerce
             woocommerce_service.set_site_url(self.site_url)
@@ -217,7 +233,9 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             response = requests.get(
-                f"{self.api_base}/posts", auth=self.auth, params={"per_page": per_page, "_embed": True}
+                f"{self.api_base}/posts",
+                auth=self.auth,
+                params={"per_page": per_page, "_embed": True},
             )
             response.raise_for_status()
 
@@ -240,7 +258,9 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             response = requests.get(
-                f"{self.api_base}/pages", auth=self.auth, params={"per_page": per_page, "_embed": True}
+                f"{self.api_base}/pages",
+                auth=self.auth,
+                params={"per_page": per_page, "_embed": True},
             )
             response.raise_for_status()
 
@@ -249,7 +269,9 @@ class WordPressDirectService:
             return {
                 "pages": pages,
                 "total_pages": len(pages),
-                "optimization_opportunities": await self._analyze_pages_for_luxury_enhancement(pages),
+                "optimization_opportunities": await self._analyze_pages_for_luxury_enhancement(
+                    pages
+                ),
             }
 
         except Exception as e:
@@ -263,12 +285,16 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             # Create the page
-            response = requests.post(f"{self.api_base}/pages", auth=self.auth, json=page_data)
+            response = requests.post(
+                f"{self.api_base}/pages", auth=self.auth, json=page_data
+            )
             response.raise_for_status()
 
             created_page = response.json()
 
-            logger.info(f"🎨 Luxury page created: {created_page.get('title', {}).get('rendered', 'New Page')}")
+            logger.info(
+                f"🎨 Luxury page created: {created_page.get('title', {}).get('rendered', 'New Page')}"
+            )
 
             return {
                 "page": created_page,
@@ -281,20 +307,28 @@ class WordPressDirectService:
             logger.error(f"Failed to create page: {str(e)}")
             return {"error": str(e)}
 
-    async def update_site_content(self, post_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
+    async def update_site_content(
+        self, post_id: int, updates: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Update WordPress content with luxury enhancements."""
         try:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = requests.post(f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates)
+            response = requests.post(
+                f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates
+            )
             response.raise_for_status()
 
             updated_post = response.json()
 
             logger.info(f"✨ Content updated: Post {post_id}")
 
-            return {"post": updated_post, "status": "success", "luxury_enhancements_applied": True}
+            return {
+                "post": updated_post,
+                "status": "success",
+                "luxury_enhancements_applied": True,
+            }
 
         except Exception as e:
             logger.error(f"Failed to update content: {str(e)}")
@@ -328,7 +362,9 @@ class WordPressDirectService:
             logger.error(f"Site health check failed: {str(e)}")
             return {"error": str(e)}
 
-    async def _analyze_posts_for_luxury_optimization(self, posts: List[Dict]) -> Dict[str, Any]:
+    async def _analyze_posts_for_luxury_optimization(
+        self, posts: List[Dict]
+    ) -> Dict[str, Any]:
         """Analyze posts for luxury brand optimization opportunities."""
         opportunities = []
 
@@ -339,8 +375,17 @@ class WordPressDirectService:
             post_opportunities = []
 
             # Check for luxury keywords
-            luxury_keywords = ["luxury", "premium", "exclusive", "elegant", "sophisticated"]
-            if not any(keyword in title.lower() or keyword in content.lower() for keyword in luxury_keywords):
+            luxury_keywords = [
+                "luxury",
+                "premium",
+                "exclusive",
+                "elegant",
+                "sophisticated",
+            ]
+            if not any(
+                keyword in title.lower() or keyword in content.lower()
+                for keyword in luxury_keywords
+            ):
                 post_opportunities.append("add_luxury_positioning_language")
 
             # Check content length
@@ -352,7 +397,13 @@ class WordPressDirectService:
                 post_opportunities.append("add_high_quality_featured_image")
 
             if post_opportunities:
-                opportunities.append({"post_id": post.get("id"), "title": title, "opportunities": post_opportunities})
+                opportunities.append(
+                    {
+                        "post_id": post.get("id"),
+                        "title": title,
+                        "opportunities": post_opportunities,
+                    }
+                )
 
         return {
             "total_posts_analyzed": len(posts),
@@ -366,7 +417,9 @@ class WordPressDirectService:
             ],
         }
 
-    async def _analyze_pages_for_luxury_enhancement(self, pages: List[Dict]) -> List[Dict[str, Any]]:
+    async def _analyze_pages_for_luxury_enhancement(
+        self, pages: List[Dict]
+    ) -> List[Dict[str, Any]]:
         """Analyze pages for luxury enhancement opportunities."""
         enhancements = []
 

@@ -55,10 +55,28 @@ class FinancialAgent:
 
         # ENHANCED FINANCIAL SERVICES - Tax, Credit, Advisory
         self.tax_services = {
-            "preparation": ["Business Tax Returns", "Personal Tax Returns", "Quarterly Estimates", "Tax Planning"],
-            "compliance": ["IRS Compliance", "State Tax Requirements", "International Tax", "Sales Tax Management"],
-            "optimization": ["Deduction Maximization", "Tax Strategy Planning", "Entity Structure Optimization"],
-            "audit_support": ["IRS Audit Defense", "Documentation Management", "Representation Services"],
+            "preparation": [
+                "Business Tax Returns",
+                "Personal Tax Returns",
+                "Quarterly Estimates",
+                "Tax Planning",
+            ],
+            "compliance": [
+                "IRS Compliance",
+                "State Tax Requirements",
+                "International Tax",
+                "Sales Tax Management",
+            ],
+            "optimization": [
+                "Deduction Maximization",
+                "Tax Strategy Planning",
+                "Entity Structure Optimization",
+            ],
+            "audit_support": [
+                "IRS Audit Defense",
+                "Documentation Management",
+                "Representation Services",
+            ],
         }
 
         self.advisory_services = {
@@ -68,23 +86,72 @@ class FinancialAgent:
                 "Cash Flow Management",
                 "Investment Planning",
             ],
-            "risk_management": ["Insurance Analysis", "Risk Assessment", "Contingency Planning", "Asset Protection"],
-            "growth_strategies": ["Funding Options", "Expansion Planning", "Acquisition Analysis", "Exit Strategies"],
-            "performance_analysis": ["KPI Tracking", "Profitability Analysis", "Cost Optimization", "ROI Analysis"],
+            "risk_management": [
+                "Insurance Analysis",
+                "Risk Assessment",
+                "Contingency Planning",
+                "Asset Protection",
+            ],
+            "growth_strategies": [
+                "Funding Options",
+                "Expansion Planning",
+                "Acquisition Analysis",
+                "Exit Strategies",
+            ],
+            "performance_analysis": [
+                "KPI Tracking",
+                "Profitability Analysis",
+                "Cost Optimization",
+                "ROI Analysis",
+            ],
         }
 
         self.credit_services = {
-            "monitoring": ["Business Credit Score Tracking", "Credit Report Analysis", "Alert Systems"],
-            "building": ["Credit Building Strategies", "Tradeline Management", "Payment History Optimization"],
-            "repair": ["Dispute Management", "Credit Error Correction", "Negative Item Removal"],
-            "optimization": ["Credit Utilization Management", "Mix Optimization", "Length of Credit History"],
+            "monitoring": [
+                "Business Credit Score Tracking",
+                "Credit Report Analysis",
+                "Alert Systems",
+            ],
+            "building": [
+                "Credit Building Strategies",
+                "Tradeline Management",
+                "Payment History Optimization",
+            ],
+            "repair": [
+                "Dispute Management",
+                "Credit Error Correction",
+                "Negative Item Removal",
+            ],
+            "optimization": [
+                "Credit Utilization Management",
+                "Mix Optimization",
+                "Length of Credit History",
+            ],
         }
 
         # INTEGRATION CAPABILITIES
         self.banking_integrations = {
-            "supported_banks": ["Chase", "Bank of America", "Wells Fargo", "Citibank", "Capital One", "US Bank"],
-            "business_accounts": ["Checking", "Savings", "Credit Lines", "Merchant Services"],
-            "payment_processors": ["Stripe", "PayPal", "Square", "Authorize.net", "Braintree"],
+            "supported_banks": [
+                "Chase",
+                "Bank of America",
+                "Wells Fargo",
+                "Citibank",
+                "Capital One",
+                "US Bank",
+            ],
+            "business_accounts": [
+                "Checking",
+                "Savings",
+                "Credit Lines",
+                "Merchant Services",
+            ],
+            "payment_processors": [
+                "Stripe",
+                "PayPal",
+                "Square",
+                "Authorize.net",
+                "Braintree",
+            ],
             "accounting_software": ["QuickBooks", "Xero", "FreshBooks", "Wave", "Sage"],
         }
 
@@ -110,7 +177,9 @@ class FinancialAgent:
         self.blockchain_ledger = self._initialize_blockchain_ledger()
         self.defi_analytics = self._initialize_defi_analytics()
         self.neural_fraud_detector = self._initialize_neural_fraud_detector()
-        logger.info("💰 Production Financial Agent Initialized with Blockchain Intelligence")
+        logger.info(
+            "💰 Production Financial Agent Initialized with Blockchain Intelligence"
+        )
 
     def process_payment(
         self,
@@ -126,9 +195,14 @@ class FinancialAgent:
             transaction_id = str(uuid.uuid4())
 
             # Input validation
-            validation_result = self._validate_payment_inputs(amount, currency, customer_id, payment_method, gateway)
+            validation_result = self._validate_payment_inputs(
+                amount, currency, customer_id, payment_method, gateway
+            )
             if not validation_result["valid"]:
-                return {"error": validation_result["error"], "status": "validation_failed"}
+                return {
+                    "error": validation_result["error"],
+                    "status": "validation_failed",
+                }
 
             # Fraud detection
             fraud_check = self._comprehensive_fraud_check(
@@ -155,7 +229,9 @@ class FinancialAgent:
             fees = self._calculate_processing_fees(amount, gateway)
 
             # Process payment
-            processing_result = self._process_with_gateway(transaction_id, amount, currency, payment_method, gateway)
+            processing_result = self._process_with_gateway(
+                transaction_id, amount, currency, payment_method, gateway
+            )
 
             # Create transaction record
             transaction = {
@@ -202,7 +278,10 @@ class FinancialAgent:
             return {"error": str(e), "status": "processing_failed"}
 
     def create_chargeback(
-        self, transaction_id: str, reason: ChargebackReason, amount: Optional[float] = None
+        self,
+        transaction_id: str,
+        reason: ChargebackReason,
+        amount: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Handle chargeback creation with automated response system."""
         try:
@@ -224,7 +303,9 @@ class FinancialAgent:
                 "due_date": (datetime.now() + timedelta(days=7)).isoformat(),
                 "evidence_submitted": False,
                 "auto_response": self._generate_auto_response(reason, transaction),
-                "likelihood_of_winning": self._calculate_win_probability(reason, transaction),
+                "likelihood_of_winning": self._calculate_win_probability(
+                    reason, transaction
+                ),
             }
 
             self.chargebacks[chargeback_id] = chargeback
@@ -254,7 +335,9 @@ class FinancialAgent:
             logger.error(f"❌ Chargeback creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def submit_chargeback_evidence(self, chargeback_id: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
+    def submit_chargeback_evidence(
+        self, chargeback_id: str, evidence: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Submit comprehensive evidence for chargeback dispute."""
         try:
             if chargeback_id not in self.chargebacks:
@@ -263,13 +346,17 @@ class FinancialAgent:
             chargeback = self.chargebacks[chargeback_id]
 
             # Validate evidence completeness
-            evidence_validation = self._validate_evidence(evidence, chargeback["reason"])
+            evidence_validation = self._validate_evidence(
+                evidence, chargeback["reason"]
+            )
 
             # Enhance evidence with automated data
             enhanced_evidence = self._enhance_evidence(evidence, chargeback)
 
             # Submit to payment processor
-            submission_result = self._submit_to_processor(chargeback_id, enhanced_evidence)
+            submission_result = self._submit_to_processor(
+                chargeback_id, enhanced_evidence
+            )
 
             # Update chargeback record
             chargeback["evidence_submitted"] = True
@@ -278,7 +365,9 @@ class FinancialAgent:
             chargeback["tracking_id"] = submission_result["tracking_id"]
 
             # Calculate updated win probability
-            updated_probability = self._recalculate_win_probability(chargeback, enhanced_evidence)
+            updated_probability = self._recalculate_win_probability(
+                chargeback, enhanced_evidence
+            )
             chargeback["likelihood_of_winning"] = updated_probability
 
             return {
@@ -346,7 +435,12 @@ class FinancialAgent:
 
     # Advanced helper methods
     def _validate_payment_inputs(
-        self, amount: float, currency: str, customer_id: str, payment_method: str, gateway: str
+        self,
+        amount: float,
+        currency: str,
+        customer_id: str,
+        payment_method: str,
+        gateway: str,
     ) -> Dict[str, Any]:
         """Comprehensive input validation."""
         errors = []
@@ -362,7 +456,10 @@ class FinancialAgent:
         if gateway not in self.payment_gateways:
             errors.append("Unsupported payment gateway")
 
-        return {"valid": len(errors) == 0, "error": "; ".join(errors) if errors else None}
+        return {
+            "valid": len(errors) == 0,
+            "error": "; ".join(errors) if errors else None,
+        }
 
     def _comprehensive_fraud_check(self, transaction_data: Dict) -> Dict[str, Any]:
         """Advanced fraud detection using multiple algorithms."""
@@ -375,7 +472,9 @@ class FinancialAgent:
             indicators.append("high_amount")
 
         # Velocity checks
-        recent_transactions = self._get_recent_transactions(transaction_data["customer_id"])
+        recent_transactions = self._get_recent_transactions(
+            transaction_data["customer_id"]
+        )
         if len(recent_transactions) > self.risk_thresholds["velocity_limit"]:
             fraud_score += 25
             indicators.append("high_velocity")
@@ -407,7 +506,9 @@ class FinancialAgent:
             "ml_assessment": ml_score,
         }
 
-    def _calculate_processing_fees(self, amount: float, gateway: str) -> Dict[str, float]:
+    def _calculate_processing_fees(
+        self, amount: float, gateway: str
+    ) -> Dict[str, float]:
         """Calculate detailed processing fees."""
         gateway_config = self.payment_gateways[gateway]
 
@@ -423,7 +524,12 @@ class FinancialAgent:
         }
 
     def _process_with_gateway(
-        self, transaction_id: str, amount: float, currency: str, payment_method: str, gateway: str
+        self,
+        transaction_id: str,
+        amount: float,
+        currency: str,
+        payment_method: str,
+        gateway: str,
     ) -> Dict[str, Any]:
         """Simulate payment processing with gateway."""
         # Simulate processing with different success rates
@@ -447,7 +553,9 @@ class FinancialAgent:
         # PCI DSS compliance checks
         # AML (Anti-Money Laundering) checks
         # KYC (Know Your Customer) validation
-        logger.info(f"✅ Compliance monitoring completed for transaction {transaction['id']}")
+        logger.info(
+            f"✅ Compliance monitoring completed for transaction {transaction['id']}"
+        )
 
     def _update_financial_metrics(self, transaction: Dict) -> None:
         """Update real-time financial metrics."""
@@ -459,7 +567,9 @@ class FinancialAgent:
         """Calculate estimated settlement date."""
         return (datetime.now() + timedelta(days=2)).isoformat()
 
-    def _generate_auto_response(self, reason: ChargebackReason, transaction: Dict) -> str:
+    def _generate_auto_response(
+        self, reason: ChargebackReason, transaction: Dict
+    ) -> str:
         """Generate automated chargeback response."""
         responses = {
             ChargebackReason.FRAUDULENT: "Transaction verified with customer authentication",
@@ -468,7 +578,9 @@ class FinancialAgent:
         }
         return responses.get(reason, "Standard dispute response generated")
 
-    def _calculate_win_probability(self, reason: ChargebackReason, transaction: Dict) -> float:
+    def _calculate_win_probability(
+        self, reason: ChargebackReason, transaction: Dict
+    ) -> float:
         """Calculate probability of winning chargeback dispute."""
         base_probabilities = {
             ChargebackReason.FRAUDULENT: 0.45,
@@ -478,12 +590,16 @@ class FinancialAgent:
         }
         return base_probabilities.get(reason, 0.60)
 
-    def _auto_collect_evidence(self, transaction: Dict, reason: ChargebackReason) -> List[str]:
+    def _auto_collect_evidence(
+        self, transaction: Dict, reason: ChargebackReason
+    ) -> List[str]:
         """Automatically collect relevant evidence."""
         evidence = []
 
         # Always include
-        evidence.extend(["transaction_receipt", "customer_verification", "payment_authorization"])
+        evidence.extend(
+            ["transaction_receipt", "customer_verification", "payment_authorization"]
+        )
 
         # Reason-specific evidence
         if reason == ChargebackReason.PRODUCT_NOT_RECEIVED:
@@ -493,7 +609,9 @@ class FinancialAgent:
 
         return evidence
 
-    def _send_chargeback_notifications(self, chargeback: Dict, transaction: Dict) -> None:
+    def _send_chargeback_notifications(
+        self, chargeback: Dict, transaction: Dict
+    ) -> None:
         """Send notifications about chargeback."""
         logger.info(f"📧 Chargeback notifications sent for {chargeback['id']}")
 
@@ -521,7 +639,11 @@ class FinancialAgent:
                 missing_fields.append(field)
                 score -= 20
 
-        return {"score": max(score, 0), "missing_fields": missing_fields, "completeness": len(missing_fields) == 0}
+        return {
+            "score": max(score, 0),
+            "missing_fields": missing_fields,
+            "completeness": len(missing_fields) == 0,
+        }
 
     def _enhance_evidence(self, evidence: Dict, chargeback: Dict) -> Dict[str, Any]:
         """Enhance evidence with automated data collection."""
@@ -530,7 +652,9 @@ class FinancialAgent:
         # Add automated evidence
         enhanced.update(
             {
-                "transaction_metadata": self.transactions[chargeback["transaction_id"]]["metadata"],
+                "transaction_metadata": self.transactions[chargeback["transaction_id"]][
+                    "metadata"
+                ],
                 "fraud_analysis": {"score": 15, "indicators": []},
                 "customer_history": {"transactions": 25, "chargebacks": 0},
                 "device_fingerprint": "secure_device_verified",
@@ -539,7 +663,9 @@ class FinancialAgent:
 
         return enhanced
 
-    def _submit_to_processor(self, chargeback_id: str, evidence: Dict) -> Dict[str, Any]:
+    def _submit_to_processor(
+        self, chargeback_id: str, evidence: Dict
+    ) -> Dict[str, Any]:
         """Submit evidence to payment processor."""
         return {
             "tracking_id": f"CB_{uuid.uuid4().hex[:8].upper()}",
@@ -574,7 +700,11 @@ class FinancialAgent:
     # Financial calculation methods
     def _calculate_total_revenue(self) -> float:
         """Calculate total revenue from all transactions."""
-        successful_transactions = [t for t in self.transactions.values() if t["status"] == PaymentStatus.CAPTURED.value]
+        successful_transactions = [
+            t
+            for t in self.transactions.values()
+            if t["status"] == PaymentStatus.CAPTURED.value
+        ]
         return sum(float(t["amount"]) for t in successful_transactions)
 
     def _calculate_monthly_revenue(self) -> float:
@@ -583,7 +713,8 @@ class FinancialAgent:
         monthly_transactions = [
             t
             for t in self.transactions.values()
-            if datetime.fromisoformat(t["created_at"]) >= current_month and t["status"] == PaymentStatus.CAPTURED.value
+            if datetime.fromisoformat(t["created_at"]) >= current_month
+            and t["status"] == PaymentStatus.CAPTURED.value
         ]
         return sum(float(t["amount"]) for t in monthly_transactions)
 
@@ -603,14 +734,17 @@ class FinancialAgent:
 
     def _calculate_fraud_metrics(self) -> Dict[str, Any]:
         """Calculate fraud detection metrics."""
-        fraud_blocked = len([t for t in self.transactions.values() if t.get("risk_level") == "HIGH"])
+        fraud_blocked = len(
+            [t for t in self.transactions.values() if t.get("risk_level") == "HIGH"]
+        )
 
         return {
             "fraud_attempts_blocked": fraud_blocked,
             "fraud_prevention_rate": 0.98,
             "false_positive_rate": 0.02,
             "average_fraud_score": 25.5,
-            "fraud_savings": fraud_blocked * 150,  # Estimated savings per blocked transaction
+            "fraud_savings": fraud_blocked
+            * 150,  # Estimated savings per blocked transaction
         }
 
     def _calculate_chargeback_rate(self) -> float:
@@ -652,7 +786,8 @@ class FinancialAgent:
         return [
             t
             for t in self.transactions.values()
-            if t["customer_id"] == customer_id and datetime.fromisoformat(t["created_at"]) > cutoff_time
+            if t["customer_id"] == customer_id
+            and datetime.fromisoformat(t["created_at"]) > cutoff_time
         ]
 
     def _check_geographic_risk(self, transaction_data: Dict) -> bool:
@@ -680,7 +815,12 @@ class FinancialAgent:
 
     def _get_revenue_by_product(self) -> Dict[str, float]:
         """Get revenue breakdown by product."""
-        return {"necklaces": 15420.50, "rings": 12850.75, "earrings": 9675.25, "bracelets": 8920.00}
+        return {
+            "necklaces": 15420.50,
+            "rings": 12850.75,
+            "earrings": 9675.25,
+            "bracelets": 8920.00,
+        }
 
     def _get_revenue_by_gateway(self) -> Dict[str, float]:
         """Get revenue breakdown by payment gateway."""
@@ -688,14 +828,22 @@ class FinancialAgent:
 
     def _calculate_success_rate(self) -> float:
         """Calculate transaction success rate."""
-        successful = len([t for t in self.transactions.values() if t["status"] == PaymentStatus.CAPTURED.value])
+        successful = len(
+            [
+                t
+                for t in self.transactions.values()
+                if t["status"] == PaymentStatus.CAPTURED.value
+            ]
+        )
         return (successful / max(len(self.transactions), 1)) * 100
 
     def _calculate_average_transaction(self) -> float:
         """Calculate average transaction value."""
         if not self.transactions:
             return 0
-        return sum(float(t["amount"]) for t in self.transactions.values()) / len(self.transactions)
+        return sum(float(t["amount"]) for t in self.transactions.values()) / len(
+            self.transactions
+        )
 
     def _get_transactions_by_status(self) -> Dict[str, int]:
         """Get transaction count by status."""
@@ -707,7 +855,12 @@ class FinancialAgent:
 
     def _get_processing_time_metrics(self) -> Dict[str, float]:
         """Get processing time metrics."""
-        return {"average_ms": 450.5, "median_ms": 380.0, "p95_ms": 750.0, "p99_ms": 1200.0}
+        return {
+            "average_ms": 450.5,
+            "median_ms": 380.0,
+            "p95_ms": 750.0,
+            "p99_ms": 1200.0,
+        }
 
     def _analyze_processing_fees(self) -> Dict[str, Any]:
         """Analyze processing fees across gateways."""
@@ -729,7 +882,13 @@ class FinancialAgent:
 
     def _get_compliance_status(self) -> Dict[str, str]:
         """Get compliance status across regulations."""
-        return {"pci_dss": "compliant", "aml": "compliant", "kyc": "compliant", "gdpr": "compliant", "sox": "compliant"}
+        return {
+            "pci_dss": "compliant",
+            "aml": "compliant",
+            "kyc": "compliant",
+            "gdpr": "compliant",
+            "sox": "compliant",
+        }
 
     def _get_financial_alerts(self) -> List[str]:
         """Get current financial alerts."""
@@ -809,7 +968,8 @@ class FinancialAgent:
                 "audit_id": str(uuid.uuid4()),
                 "blockchain_verification": {
                     "transactions_verified": len(self.transactions),
-                    "merkle_root": "0x" + hashlib.sha256("audit_data".encode()).hexdigest(),
+                    "merkle_root": "0x"
+                    + hashlib.sha256("audit_data".encode()).hexdigest(),
                     "consensus_reached": True,
                     "validator_nodes": 21,
                     "finality_time": "3.2_seconds",
@@ -872,15 +1032,21 @@ class FinancialAgent:
 
             # Calculate net taxable income
             net_income = (
-                tax_analysis["business_income"] - tax_analysis["business_expenses"] - tax_analysis["depreciation"]
+                tax_analysis["business_income"]
+                - tax_analysis["business_expenses"]
+                - tax_analysis["depreciation"]
             )
             tax_analysis["net_taxable_income"] = max(0, net_income)
 
             # Estimate tax liability
-            tax_analysis["estimated_tax_liability"] = self._calculate_tax_liability(net_income, business_type)
+            tax_analysis["estimated_tax_liability"] = self._calculate_tax_liability(
+                net_income, business_type
+            )
 
             # Generate tax optimization recommendations
-            optimization_recommendations = self._generate_tax_optimization_strategies(tax_analysis, business_type)
+            optimization_recommendations = self._generate_tax_optimization_strategies(
+                tax_analysis, business_type
+            )
 
             return {
                 "tax_preparation_id": str(uuid.uuid4()),
@@ -899,7 +1065,9 @@ class FinancialAgent:
             logger.error(f"❌ Tax preparation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_business_credit(self, credit_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_business_credit(
+        self, credit_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Comprehensive business credit analysis and improvement planning."""
         try:
             business_ein = credit_data.get("ein", "")
@@ -939,7 +1107,9 @@ class FinancialAgent:
                 "recommended_actions": self._prioritize_credit_actions(credit_analysis),
                 "monitoring_setup": self._setup_credit_monitoring(),
                 "estimated_improvement_timeline": "3-6 months",
-                "potential_score_increase": self._calculate_potential_score_increase(credit_analysis),
+                "potential_score_increase": self._calculate_potential_score_increase(
+                    credit_analysis
+                ),
                 "timestamp": datetime.now().isoformat(),
             }
 
@@ -947,28 +1117,46 @@ class FinancialAgent:
             logger.error(f"❌ Credit analysis failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def provide_financial_advisory(self, advisory_request: Dict[str, Any]) -> Dict[str, Any]:
+    async def provide_financial_advisory(
+        self, advisory_request: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Comprehensive financial advisory services for business growth."""
         try:
             advisory_type = advisory_request.get("type", "general")
             business_stage = advisory_request.get("business_stage", "established")
 
-            logger.info(f"💡 Providing {advisory_type} financial advisory for {business_stage} business...")
+            logger.info(
+                f"💡 Providing {advisory_type} financial advisory for {business_stage} business..."
+            )
 
             advisory_analysis = {
-                "current_financial_health": self._assess_financial_health(advisory_request),
-                "cash_flow_analysis": self._analyze_cash_flow_patterns(advisory_request),
-                "profitability_metrics": self._calculate_profitability_metrics(advisory_request),
-                "growth_opportunities": self._identify_growth_opportunities(advisory_request),
+                "current_financial_health": self._assess_financial_health(
+                    advisory_request
+                ),
+                "cash_flow_analysis": self._analyze_cash_flow_patterns(
+                    advisory_request
+                ),
+                "profitability_metrics": self._calculate_profitability_metrics(
+                    advisory_request
+                ),
+                "growth_opportunities": self._identify_growth_opportunities(
+                    advisory_request
+                ),
                 "risk_factors": self._identify_financial_risks(advisory_request),
-                "benchmark_comparison": self._compare_to_industry_benchmarks(advisory_request),
+                "benchmark_comparison": self._compare_to_industry_benchmarks(
+                    advisory_request
+                ),
             }
 
             # Generate strategic recommendations
-            strategic_recommendations = self._generate_strategic_recommendations(advisory_analysis, advisory_type)
+            strategic_recommendations = self._generate_strategic_recommendations(
+                advisory_analysis, advisory_type
+            )
 
             # Create action plan
-            action_plan = self._create_financial_action_plan(advisory_analysis, strategic_recommendations)
+            action_plan = self._create_financial_action_plan(
+                advisory_analysis, strategic_recommendations
+            )
 
             return {
                 "advisory_id": str(uuid.uuid4()),
@@ -977,7 +1165,9 @@ class FinancialAgent:
                 "financial_analysis": advisory_analysis,
                 "strategic_recommendations": strategic_recommendations,
                 "action_plan": action_plan,
-                "investment_opportunities": self._identify_investment_opportunities(advisory_request),
+                "investment_opportunities": self._identify_investment_opportunities(
+                    advisory_request
+                ),
                 "funding_options": self._analyze_funding_options(advisory_request),
                 "roi_projections": self._calculate_roi_projections(advisory_analysis),
                 "follow_up_schedule": self._create_follow_up_schedule(),
@@ -988,7 +1178,9 @@ class FinancialAgent:
             logger.error(f"❌ Financial advisory failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    def _calculate_deductible_expenses(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _calculate_deductible_expenses(
+        self, tax_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Calculate deductible business expenses."""
         expenses = tax_data.get("expenses", {})
         return {
@@ -997,7 +1189,8 @@ class FinancialAgent:
             "professional_services": expenses.get("professional_fees", 0),
             "travel_meals": expenses.get("travel", 0) * 0.5,  # 50% deductible
             "home_office": expenses.get("home_office", 0),
-            "equipment_depreciation": expenses.get("equipment", 0) * 0.2,  # 20% per year
+            "equipment_depreciation": expenses.get("equipment", 0)
+            * 0.2,  # 20% per year
             "total_deductible": sum(expenses.values()) * 0.8,  # Estimate 80% deductible
         }
 
@@ -1015,7 +1208,9 @@ class FinancialAgent:
 
         return depreciation
 
-    def _calculate_quarterly_estimates(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _calculate_quarterly_estimates(
+        self, tax_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Calculate quarterly tax estimates."""
         annual_income = tax_data.get("projected_income", 0)
         estimated_tax = annual_income * 0.25  # Estimate 25% tax rate
@@ -1066,7 +1261,9 @@ class FinancialAgent:
         else:
             return net_income * 0.15  # Default rate
 
-    def _generate_tax_optimization_strategies(self, analysis: Dict, business_type: str) -> List[Dict[str, Any]]:
+    def _generate_tax_optimization_strategies(
+        self, analysis: Dict, business_type: str
+    ) -> List[Dict[str, Any]]:
         """Generate tax optimization strategies."""
         strategies = [
             {
@@ -1090,7 +1287,9 @@ class FinancialAgent:
         ]
         return strategies
 
-    def _get_filing_deadlines(self, tax_year: int, business_type: str) -> Dict[str, str]:
+    def _get_filing_deadlines(
+        self, tax_year: int, business_type: str
+    ) -> Dict[str, str]:
         """Get tax filing deadlines."""
         deadlines = {
             "LLC": f"{tax_year + 1}-03-15",
@@ -1131,7 +1330,9 @@ class FinancialAgent:
             risk_score += 15
 
         # High deductions relative to income
-        deduction_ratio = analysis["deductible_expenses"]["total_deductible"] / max(analysis["business_income"], 1)
+        deduction_ratio = analysis["deductible_expenses"]["total_deductible"] / max(
+            analysis["business_income"], 1
+        )
         if deduction_ratio > 0.6:
             risk_factors.append("High deduction ratio")
             risk_score += 20
@@ -1140,7 +1341,9 @@ class FinancialAgent:
         risk_factors.append("Cash-intensive business")
         risk_score += 10
 
-        risk_level = "LOW" if risk_score < 30 else "MEDIUM" if risk_score < 50 else "HIGH"
+        risk_level = (
+            "LOW" if risk_score < 30 else "MEDIUM" if risk_score < 50 else "HIGH"
+        )
 
         return {
             "risk_level": risk_level,

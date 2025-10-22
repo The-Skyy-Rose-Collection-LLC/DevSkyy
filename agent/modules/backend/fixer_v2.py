@@ -157,14 +157,24 @@ class FixerAgentV2(BaseAgent):
             return fix_results
 
     async def _auto_fix(
-        self, scan_results: Optional[Dict[str, Any]], target_files: Optional[List[str]], dry_run: bool
+        self,
+        scan_results: Optional[Dict[str, Any]],
+        target_files: Optional[List[str]],
+        dry_run: bool,
     ) -> Dict[str, Any]:
         """Automatically fix issues based on scan results"""
-        results = {"files_fixed": 0, "errors_fixed": 0, "warnings_fixed": 0, "fixes_applied": []}
+        results = {
+            "files_fixed": 0,
+            "errors_fixed": 0,
+            "warnings_fixed": 0,
+            "fixes_applied": [],
+        }
 
         # If no scan results provided, need to scan first
         if not scan_results:
-            logger.info("No scan results provided, fix operation requires scanner dependency")
+            logger.info(
+                "No scan results provided, fix operation requires scanner dependency"
+            )
             return {
                 "error": "Scanner dependency required. Run scanner first or provide scan_results.",
                 "_requires_agent": "scanner",
@@ -183,13 +193,21 @@ class FixerAgentV2(BaseAgent):
         results["fixes_applied"].extend(common_fixes)
 
         # Update counts
-        results["files_fixed"] = len(set(fix["file"] for fix in results["fixes_applied"]))
-        results["errors_fixed"] = sum(1 for fix in results["fixes_applied"] if fix.get("severity") == "error")
-        results["warnings_fixed"] = sum(1 for fix in results["fixes_applied"] if fix.get("severity") == "warning")
+        results["files_fixed"] = len(
+            set(fix["file"] for fix in results["fixes_applied"])
+        )
+        results["errors_fixed"] = sum(
+            1 for fix in results["fixes_applied"] if fix.get("severity") == "error"
+        )
+        results["warnings_fixed"] = sum(
+            1 for fix in results["fixes_applied"] if fix.get("severity") == "warning"
+        )
 
         return results
 
-    async def _security_fix(self, scan_results: Optional[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
+    async def _security_fix(
+        self, scan_results: Optional[Dict[str, Any]], dry_run: bool
+    ) -> Dict[str, Any]:
         """Fix security vulnerabilities"""
         results = {"fixes_applied": [], "vulnerabilities_fixed": 0}
 
@@ -215,7 +233,9 @@ class FixerAgentV2(BaseAgent):
         results["vulnerabilities_fixed"] = len(results["fixes_applied"])
         return results
 
-    async def _performance_fix(self, scan_results: Optional[Dict[str, Any]], dry_run: bool) -> Dict[str, Any]:
+    async def _performance_fix(
+        self, scan_results: Optional[Dict[str, Any]], dry_run: bool
+    ) -> Dict[str, Any]:
         """Apply performance optimizations"""
         results = {"fixes_applied": [], "optimizations": 0}
 
@@ -230,7 +250,9 @@ class FixerAgentV2(BaseAgent):
         results["optimizations"] = len(results["fixes_applied"])
         return results
 
-    async def _format_fix(self, target_files: Optional[List[str]], dry_run: bool) -> Dict[str, Any]:
+    async def _format_fix(
+        self, target_files: Optional[List[str]], dry_run: bool
+    ) -> Dict[str, Any]:
         """Format code according to standards"""
         results = {"fixes_applied": [], "files_formatted": 0}
 
@@ -245,11 +267,15 @@ class FixerAgentV2(BaseAgent):
         results["files_formatted"] = len(results["fixes_applied"])
         return results
 
-    async def _fix_python_files(self, target_files: Optional[List[str]], dry_run: bool) -> List[Dict[str, Any]]:
+    async def _fix_python_files(
+        self, target_files: Optional[List[str]], dry_run: bool
+    ) -> List[Dict[str, Any]]:
         """Fix Python-specific issues"""
         fixes = []
 
-        python_files = [f for f in (target_files or self._get_all_code_files()) if f.endswith(".py")]
+        python_files = [
+            f for f in (target_files or self._get_all_code_files()) if f.endswith(".py")
+        ]
 
         for file_path in python_files:
             try:
@@ -264,7 +290,9 @@ class FixerAgentV2(BaseAgent):
                 # Apply custom fixes
                 for pattern_name, (pattern, replacement) in self.fix_patterns.items():
                     if pattern_name.startswith("python_"):
-                        modified_content = re.sub(pattern, replacement, modified_content)
+                        modified_content = re.sub(
+                            pattern, replacement, modified_content
+                        )
 
                 # Write changes if not dry run
                 if modified_content != original_content:
@@ -286,11 +314,17 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_javascript_files(self, target_files: Optional[List[str]], dry_run: bool) -> List[Dict[str, Any]]:
+    async def _fix_javascript_files(
+        self, target_files: Optional[List[str]], dry_run: bool
+    ) -> List[Dict[str, Any]]:
         """Fix JavaScript/TypeScript issues"""
         fixes = []
 
-        js_files = [f for f in (target_files or self._get_all_code_files()) if f.endswith((".js", ".ts", ".tsx"))]
+        js_files = [
+            f
+            for f in (target_files or self._get_all_code_files())
+            if f.endswith((".js", ".ts", ".tsx"))
+        ]
 
         for file_path in js_files:
             try:
@@ -302,7 +336,9 @@ class FixerAgentV2(BaseAgent):
                 # Apply custom fixes
                 for pattern_name, (pattern, replacement) in self.fix_patterns.items():
                     if pattern_name.startswith("js_"):
-                        modified_content = re.sub(pattern, replacement, modified_content)
+                        modified_content = re.sub(
+                            pattern, replacement, modified_content
+                        )
 
                 if modified_content != original_content:
                     if not dry_run:
@@ -323,7 +359,9 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_common_issues(self, target_files: Optional[List[str]], dry_run: bool) -> List[Dict[str, Any]]:
+    async def _fix_common_issues(
+        self, target_files: Optional[List[str]], dry_run: bool
+    ) -> List[Dict[str, Any]]:
         """Fix common issues across all file types"""
         fixes = []
 
@@ -364,7 +402,9 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_hardcoded_secret(self, file_path: str, dry_run: bool) -> Optional[Dict[str, Any]]:
+    async def _fix_hardcoded_secret(
+        self, file_path: str, dry_run: bool
+    ) -> Optional[Dict[str, Any]]:
         """Fix hardcoded secrets by replacing with environment variables"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -392,7 +432,9 @@ class FixerAgentV2(BaseAgent):
 
         return None
 
-    async def _fix_sql_injection(self, file_path: str, dry_run: bool) -> Optional[Dict[str, Any]]:
+    async def _fix_sql_injection(
+        self, file_path: str, dry_run: bool
+    ) -> Optional[Dict[str, Any]]:
         """Add SQL injection prevention"""
         # Placeholder - would need more sophisticated SQL parsing
         return {
@@ -414,7 +456,9 @@ class FixerAgentV2(BaseAgent):
         # For now, return placeholder
         return []
 
-    async def _format_python_file(self, file_path: str, dry_run: bool) -> Optional[Dict[str, Any]]:
+    async def _format_python_file(
+        self, file_path: str, dry_run: bool
+    ) -> Optional[Dict[str, Any]]:
         """Format a Python file"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -447,7 +491,9 @@ class FixerAgentV2(BaseAgent):
         # Copy important files
         for pattern in ["*.py", "*.js", "*.ts", "*.tsx", "*.json"]:
             for file_path in Path(".").rglob(pattern):
-                if ".git" not in str(file_path) and "node_modules" not in str(file_path):
+                if ".git" not in str(file_path) and "node_modules" not in str(
+                    file_path
+                ):
                     dest = backup_path / file_path
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(file_path, dest)
@@ -497,7 +543,11 @@ class FixerAgentV2(BaseAgent):
             files.extend([str(f) for f in Path(".").rglob(f"*{ext}")])
 
         # Filter out ignored directories
-        files = [f for f in files if "node_modules" not in f and ".git" not in f and "__pycache__" not in f]
+        files = [
+            f
+            for f in files
+            if "node_modules" not in f and ".git" not in f and "__pycache__" not in f
+        ]
 
         return files
 

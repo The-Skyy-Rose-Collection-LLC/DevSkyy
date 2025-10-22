@@ -16,7 +16,9 @@ class RateLimiter:
     """
 
     def __init__(self):
-        self._buckets: Dict[str, Dict] = defaultdict(lambda: {"tokens": 0, "last_update": 0})
+        self._buckets: Dict[str, Dict] = defaultdict(
+            lambda: {"tokens": 0, "last_update": 0}
+        )
         self._lock = threading.Lock()
 
     def is_allowed(
@@ -66,7 +68,9 @@ class RateLimiter:
     def reset(self, client_identifier: str):
         """Reset rate limit for a client"""
         with self._lock:
-            keys_to_remove = [k for k in self._buckets.keys() if k.startswith(client_identifier)]
+            keys_to_remove = [
+                k for k in self._buckets.keys() if k.startswith(client_identifier)
+            ]
             for key in keys_to_remove:
                 del self._buckets[key]
 

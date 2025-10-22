@@ -88,7 +88,11 @@ class TestAgentEndpoints:
         response = test_client.get("/api/v1/agents", headers=auth_headers)
 
         # Endpoint might not exist yet or require auth
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_401_UNAUTHORIZED, status.HTTP_404_NOT_FOUND]
+        assert response.status_code in [
+            status.HTTP_200_OK,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_404_NOT_FOUND,
+        ]
 
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
@@ -97,7 +101,9 @@ class TestAgentEndpoints:
     @pytest.mark.api
     def test_create_agent(self, test_client, auth_headers, mock_agent_data):
         """Test creating a new agent"""
-        response = test_client.post("/api/v1/agents", json=mock_agent_data, headers=auth_headers)
+        response = test_client.post(
+            "/api/v1/agents", json=mock_agent_data, headers=auth_headers
+        )
 
         # Endpoint might not exist yet
         assert response.status_code in [
@@ -114,7 +120,11 @@ class TestAgentEndpoints:
         response = test_client.get(f"/api/v1/agents/{agent_id}", headers=auth_headers)
 
         # Endpoint might not exist or agent might not be found
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND, status.HTTP_401_UNAUTHORIZED]
+        assert response.status_code in [
+            status.HTTP_200_OK,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_401_UNAUTHORIZED,
+        ]
 
 
 class TestProjectEndpoints:
@@ -125,12 +135,18 @@ class TestProjectEndpoints:
         """Test listing all projects"""
         response = test_client.get("/api/v1/projects", headers=auth_headers)
 
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND, status.HTTP_401_UNAUTHORIZED]
+        assert response.status_code in [
+            status.HTTP_200_OK,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_401_UNAUTHORIZED,
+        ]
 
     @pytest.mark.api
     def test_create_project(self, test_client, auth_headers, mock_project_data):
         """Test creating a new project"""
-        response = test_client.post("/api/v1/projects", json=mock_project_data, headers=auth_headers)
+        response = test_client.post(
+            "/api/v1/projects", json=mock_project_data, headers=auth_headers
+        )
 
         assert response.status_code in [
             status.HTTP_201_CREATED,
@@ -147,9 +163,14 @@ class TestAIEndpoints:
     @pytest.mark.external
     def test_chat_completion(self, test_client, auth_headers):
         """Test AI chat completion endpoint"""
-        chat_data = {"message": "Hello, test message", "model": "claude-3-5-sonnet-20241022"}
+        chat_data = {
+            "message": "Hello, test message",
+            "model": "claude-3-5-sonnet-20241022",
+        }
 
-        response = test_client.post("/api/v1/ai/chat", json=chat_data, headers=auth_headers)
+        response = test_client.post(
+            "/api/v1/ai/chat", json=chat_data, headers=auth_headers
+        )
 
         # Endpoint might not exist or require external API
         assert response.status_code in [
@@ -176,7 +197,10 @@ class TestErrorHandling:
         response = test_client.patch("/api/v1/monitoring/health")
 
         # Should return 405 Method Not Allowed or 404
-        assert response.status_code in [status.HTTP_405_METHOD_NOT_ALLOWED, status.HTTP_404_NOT_FOUND]
+        assert response.status_code in [
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+            status.HTTP_404_NOT_FOUND,
+        ]
 
     @pytest.mark.api
     def test_malformed_json(self, test_client, auth_headers):
