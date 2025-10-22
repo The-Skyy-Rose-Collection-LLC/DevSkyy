@@ -3,10 +3,10 @@
 Deployment Verification Script
 Verifies all imports, endpoints, configurations, and system health
 """
-import sys
-import os
 import importlib
 import logging
+import os
+import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -77,9 +77,9 @@ class DeploymentVerifier:
         for module_name, description in critical_modules:
             try:
                 # Suppress warnings and stderr during import
-                import warnings
-                import sys
                 import io
+                import sys
+                import warnings
 
                 # Capture stderr to suppress NumPy warnings
                 old_stderr = sys.stderr
@@ -99,7 +99,9 @@ class DeploymentVerifier:
                 sys.stderr = old_stderr
                 # Handle runtime errors during import (e.g., NumPy compatibility issues)
                 if "NumPy" in str(e) or "_ARRAY_API" in str(e):
-                    self.warn(f"{description} ({module_name})", f"Version compatibility issue (non-critical): {str(e)[:80]}")
+                    self.warn(
+                        f"{description} ({module_name})", f"Version compatibility issue (non-critical): {str(e)[:80]}"
+                    )
                 else:
                     self.check(f"{description} ({module_name})", False, str(e))
 
@@ -131,6 +133,7 @@ class DeploymentVerifier:
         self.section("Verifying Environment Variables")
 
         from dotenv import load_dotenv
+
         load_dotenv()
 
         required_vars = [
@@ -168,6 +171,7 @@ class DeploymentVerifier:
 
         try:
             from dotenv import load_dotenv
+
             load_dotenv()
 
             db_url = os.getenv("DATABASE_URL")
@@ -199,6 +203,7 @@ class DeploymentVerifier:
 
             # Check tables
             from sqlalchemy import inspect
+
             inspector = inspect(engine)
             tables = inspector.get_table_names()
 
@@ -226,9 +231,11 @@ class DeploymentVerifier:
 
         try:
             from ml.model_registry import model_registry
+
             self.check("Model registry import", True)
 
             from ml.redis_cache import redis_cache
+
             self.check("Redis cache import", True)
 
             # Test cache
@@ -245,9 +252,11 @@ class DeploymentVerifier:
             self.info(f"Cache mode: {stats['mode']}")
 
             from ml.explainability import explainer
+
             self.check("Explainability import", True)
 
             from ml.auto_retrain import auto_retrainer
+
             self.check("Auto-retrainer import", True)
 
             return True
@@ -298,6 +307,7 @@ class DeploymentVerifier:
 
         try:
             from security.jwt_auth import create_access_token, verify_token
+
             self.check("JWT authentication import", True)
 
             # Test JWT - Handle both success and expected auth errors
@@ -326,6 +336,7 @@ class DeploymentVerifier:
                 self.check("JWT token generation", False, str(jwt_error))
 
             from security.encryption import aes_encryption
+
             self.check("Encryption import", True)
 
             # Test encryption

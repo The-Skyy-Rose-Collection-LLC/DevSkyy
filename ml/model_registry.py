@@ -8,21 +8,22 @@ References:
 - Versioning: Semantic Versioning 2.0.0 (https://semver.org/)
 """
 
+import json
 import logging
 import os
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from enum import Enum
 
 import joblib
-import json
 
 logger = logging.getLogger(__name__)
 
 
 class ModelStage(str, Enum):
     """Model lifecycle stages following MLflow convention"""
+
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"

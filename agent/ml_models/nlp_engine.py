@@ -5,8 +5,8 @@ Reference: AGENTS.md Line 1559-1563
 """
 
 import logging
-from typing import List, Dict, Any
 import re
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +17,8 @@ class NLPEngine:
     async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
         """Analyze sentiment of text"""
         # Simplified sentiment analysis
-        positive_words = ['good', 'great', 'excellent', 'love', 'amazing', 'perfect']
-        negative_words = ['bad', 'terrible', 'hate', 'awful', 'poor', 'worst']
+        positive_words = ["good", "great", "excellent", "love", "amazing", "perfect"]
+        negative_words = ["bad", "terrible", "hate", "awful", "poor", "worst"]
 
         text_lower = text.lower()
         pos_count = sum(1 for word in positive_words if word in text_lower)
@@ -38,8 +38,8 @@ class NLPEngine:
 
     async def extract_keywords(self, text: str, top_n: int = 10) -> List[str]:
         """Extract keywords from text"""
-        words = re.findall(r'\b[a-zA-Z]{4,}\b', text.lower())
-        stop_words = {'this', 'that', 'with', 'from', 'have', 'will'}
+        words = re.findall(r"\b[a-zA-Z]{4,}\b", text.lower())
+        stop_words = {"this", "that", "with", "from", "have", "will"}
         filtered = [w for w in words if w not in stop_words]
         return list(set(filtered))[:top_n]
 

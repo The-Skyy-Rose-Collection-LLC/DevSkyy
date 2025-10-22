@@ -11,10 +11,10 @@ Features:
 Reference: Based on AGENTS.md Line 921-961
 """
 
-import logging
-from typing import Any, Dict, List, Optional
-from datetime import datetime
 import json
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -40,15 +40,10 @@ class WordPressSEOOptimizer:
             "content_length": {"min": 300, "weight": 8},
             "keyword_density": {"min": 1.0, "max": 3.0, "weight": 7},
             "https": {"required": True, "weight": 10},
-            "mobile_friendly": {"required": True, "weight": 10}
+            "mobile_friendly": {"required": True, "weight": 10},
         }
 
-    async def optimize_page(
-        self,
-        url: str,
-        target_keywords: List[str],
-        content_type: str = "page"
-    ) -> Dict[str, Any]:
+    async def optimize_page(self, url: str, target_keywords: List[str], content_type: str = "page") -> Dict[str, Any]:
         """
         Perform comprehensive SEO optimization on a page
 
@@ -83,16 +78,12 @@ class WordPressSEOOptimizer:
             "optimized_meta": {
                 "title": analysis.get("optimized_title", ""),
                 "description": analysis.get("optimized_description", ""),
-                "keywords": target_keywords
+                "keywords": target_keywords,
             },
-            "analyzed_at": datetime.now().isoformat()
+            "analyzed_at": datetime.now().isoformat(),
         }
 
-    async def analyze_page(
-        self,
-        url: str,
-        keywords: List[str]
-    ) -> Dict[str, Any]:
+    async def analyze_page(self, url: str, keywords: List[str]) -> Dict[str, Any]:
         """
         Analyze page for SEO issues
 
@@ -106,51 +97,19 @@ class WordPressSEOOptimizer:
         # Simulate page analysis
         analysis = {
             "url": url,
-            "title": {
-                "text": "Example Page Title",
-                "length": 18,
-                "has_keyword": False
-            },
-            "meta_description": {
-                "text": "This is a meta description",
-                "length": 27,
-                "has_keyword": False
-            },
-            "headings": {
-                "h1": ["Main Heading"],
-                "h2": ["Subheading 1", "Subheading 2"],
-                "h3": []
-            },
-            "images": {
-                "total": 5,
-                "with_alt": 3,
-                "without_alt": 2
-            },
-            "links": {
-                "internal": 4,
-                "external": 2,
-                "broken": 0
-            },
-            "content": {
-                "word_count": 450,
-                "paragraph_count": 6,
-                "keyword_density": {}
-            },
-            "technical": {
-                "https": True,
-                "mobile_friendly": True,
-                "page_speed_score": 75,
-                "has_schema": False
-            },
-            "keywords": keywords
+            "title": {"text": "Example Page Title", "length": 18, "has_keyword": False},
+            "meta_description": {"text": "This is a meta description", "length": 27, "has_keyword": False},
+            "headings": {"h1": ["Main Heading"], "h2": ["Subheading 1", "Subheading 2"], "h3": []},
+            "images": {"total": 5, "with_alt": 3, "without_alt": 2},
+            "links": {"internal": 4, "external": 2, "broken": 0},
+            "content": {"word_count": 450, "paragraph_count": 6, "keyword_density": {}},
+            "technical": {"https": True, "mobile_friendly": True, "page_speed_score": 75, "has_schema": False},
+            "keywords": keywords,
         }
 
         # Calculate keyword density
         for keyword in keywords:
-            analysis["content"]["keyword_density"][keyword] = {
-                "count": 3,
-                "density": 0.67  # percentage
-            }
+            analysis["content"]["keyword_density"][keyword] = {"count": 3, "density": 0.67}  # percentage
 
         return analysis
 
@@ -161,105 +120,125 @@ class WordPressSEOOptimizer:
         # Title recommendations
         title_len = analysis["title"]["length"]
         if title_len < self.seo_best_practices["title_length"]["min"]:
-            recommendations.append({
-                "type": "title",
-                "priority": "high",
-                "issue": f"Title too short ({title_len} chars)",
-                "recommendation": f"Increase title length to at least {self.seo_best_practices['title_length']['min']} characters",
-                "impact": "High impact on SEO"
-            })
+            recommendations.append(
+                {
+                    "type": "title",
+                    "priority": "high",
+                    "issue": f"Title too short ({title_len} chars)",
+                    "recommendation": f"Increase title length to at least {self.seo_best_practices['title_length']['min']} characters",
+                    "impact": "High impact on SEO",
+                }
+            )
         elif title_len > self.seo_best_practices["title_length"]["max"]:
-            recommendations.append({
-                "type": "title",
-                "priority": "medium",
-                "issue": f"Title too long ({title_len} chars)",
-                "recommendation": f"Reduce title length to under {self.seo_best_practices['title_length']['max']} characters",
-                "impact": "Medium impact on SEO"
-            })
+            recommendations.append(
+                {
+                    "type": "title",
+                    "priority": "medium",
+                    "issue": f"Title too long ({title_len} chars)",
+                    "recommendation": f"Reduce title length to under {self.seo_best_practices['title_length']['max']} characters",
+                    "impact": "Medium impact on SEO",
+                }
+            )
 
         # Meta description recommendations
         meta_len = analysis["meta_description"]["length"]
         if meta_len < self.seo_best_practices["meta_description_length"]["min"]:
-            recommendations.append({
-                "type": "meta_description",
-                "priority": "high",
-                "issue": f"Meta description too short ({meta_len} chars)",
-                "recommendation": f"Expand meta description to {self.seo_best_practices['meta_description_length']['min']}-{self.seo_best_practices['meta_description_length']['max']} characters",
-                "impact": "High impact on click-through rate"
-            })
+            recommendations.append(
+                {
+                    "type": "meta_description",
+                    "priority": "high",
+                    "issue": f"Meta description too short ({meta_len} chars)",
+                    "recommendation": f"Expand meta description to {self.seo_best_practices['meta_description_length']['min']}-{self.seo_best_practices['meta_description_length']['max']} characters",
+                    "impact": "High impact on click-through rate",
+                }
+            )
 
         # Heading recommendations
         h1_count = len(analysis["headings"]["h1"])
         if h1_count == 0:
-            recommendations.append({
-                "type": "headings",
-                "priority": "critical",
-                "issue": "Missing H1 heading",
-                "recommendation": "Add exactly one H1 heading to the page",
-                "impact": "Critical for SEO structure"
-            })
+            recommendations.append(
+                {
+                    "type": "headings",
+                    "priority": "critical",
+                    "issue": "Missing H1 heading",
+                    "recommendation": "Add exactly one H1 heading to the page",
+                    "impact": "Critical for SEO structure",
+                }
+            )
         elif h1_count > 1:
-            recommendations.append({
-                "type": "headings",
-                "priority": "high",
-                "issue": f"Multiple H1 headings ({h1_count})",
-                "recommendation": "Use only one H1 heading per page",
-                "impact": "High impact on SEO"
-            })
+            recommendations.append(
+                {
+                    "type": "headings",
+                    "priority": "high",
+                    "issue": f"Multiple H1 headings ({h1_count})",
+                    "recommendation": "Use only one H1 heading per page",
+                    "impact": "High impact on SEO",
+                }
+            )
 
         # Image alt text recommendations
         images_without_alt = analysis["images"]["without_alt"]
         if images_without_alt > 0:
-            recommendations.append({
-                "type": "images",
-                "priority": "medium",
-                "issue": f"{images_without_alt} images missing alt text",
-                "recommendation": "Add descriptive alt text to all images",
-                "impact": "Medium impact on accessibility and image SEO"
-            })
+            recommendations.append(
+                {
+                    "type": "images",
+                    "priority": "medium",
+                    "issue": f"{images_without_alt} images missing alt text",
+                    "recommendation": "Add descriptive alt text to all images",
+                    "impact": "Medium impact on accessibility and image SEO",
+                }
+            )
 
         # Content length recommendations
         word_count = analysis["content"]["word_count"]
         if word_count < self.seo_best_practices["content_length"]["min"]:
-            recommendations.append({
-                "type": "content",
-                "priority": "high",
-                "issue": f"Content too short ({word_count} words)",
-                "recommendation": f"Expand content to at least {self.seo_best_practices['content_length']['min']} words",
-                "impact": "High impact on ranking potential"
-            })
+            recommendations.append(
+                {
+                    "type": "content",
+                    "priority": "high",
+                    "issue": f"Content too short ({word_count} words)",
+                    "recommendation": f"Expand content to at least {self.seo_best_practices['content_length']['min']} words",
+                    "impact": "High impact on ranking potential",
+                }
+            )
 
         # Internal linking recommendations
         internal_links = analysis["links"]["internal"]
         if internal_links < self.seo_best_practices["internal_links"]["min"]:
-            recommendations.append({
-                "type": "links",
-                "priority": "medium",
-                "issue": f"Insufficient internal links ({internal_links})",
-                "recommendation": f"Add at least {self.seo_best_practices['internal_links']['min']} internal links to related content",
-                "impact": "Medium impact on site structure and SEO"
-            })
+            recommendations.append(
+                {
+                    "type": "links",
+                    "priority": "medium",
+                    "issue": f"Insufficient internal links ({internal_links})",
+                    "recommendation": f"Add at least {self.seo_best_practices['internal_links']['min']} internal links to related content",
+                    "impact": "Medium impact on site structure and SEO",
+                }
+            )
 
         # Schema markup recommendation
         if not analysis["technical"].get("has_schema", False):
-            recommendations.append({
-                "type": "schema",
-                "priority": "high",
-                "issue": "Missing schema markup",
-                "recommendation": "Add appropriate schema markup (Article, Product, etc.)",
-                "impact": "High impact on rich snippets"
-            })
+            recommendations.append(
+                {
+                    "type": "schema",
+                    "priority": "high",
+                    "issue": "Missing schema markup",
+                    "recommendation": "Add appropriate schema markup (Article, Product, etc.)",
+                    "impact": "High impact on rich snippets",
+                }
+            )
 
         # Page speed recommendation
         speed_score = analysis["technical"].get("page_speed_score", 0)
         if speed_score < 80:
-            recommendations.append({
-                "type": "performance",
-                "priority": "high",
-                "issue": f"Page speed score low ({speed_score}/100)",
-                "recommendation": "Optimize images, minify CSS/JS, enable caching",
-                "impact": "High impact on user experience and rankings"
-            })
+            recommendations.append(
+                {
+                    "type": "performance",
+                    "priority": "high",
+                    "issue": f"Page speed score low ({speed_score}/100)",
+                    "recommendation": "Optimize images, minify CSS/JS, enable caching",
+                    "impact": "High impact on user experience and rankings",
+                }
+            )
 
         return recommendations
 
@@ -270,12 +249,20 @@ class WordPressSEOOptimizer:
 
         # Title score
         title_len = analysis["title"]["length"]
-        if self.seo_best_practices["title_length"]["min"] <= title_len <= self.seo_best_practices["title_length"]["max"]:
+        if (
+            self.seo_best_practices["title_length"]["min"]
+            <= title_len
+            <= self.seo_best_practices["title_length"]["max"]
+        ):
             score += self.seo_best_practices["title_length"]["weight"]
 
         # Meta description score
         meta_len = analysis["meta_description"]["length"]
-        if self.seo_best_practices["meta_description_length"]["min"] <= meta_len <= self.seo_best_practices["meta_description_length"]["max"]:
+        if (
+            self.seo_best_practices["meta_description_length"]["min"]
+            <= meta_len
+            <= self.seo_best_practices["meta_description_length"]["max"]
+        ):
             score += self.seo_best_practices["meta_description_length"]["weight"]
 
         # H1 score
@@ -308,11 +295,7 @@ class WordPressSEOOptimizer:
 
         return int((score / max_score) * 100)
 
-    def generate_schema_markup(
-        self,
-        content_type: str,
-        page_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def generate_schema_markup(self, content_type: str, page_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate schema.org markup
 
@@ -327,7 +310,7 @@ class WordPressSEOOptimizer:
             "article": self._generate_article_schema,
             "product": self._generate_product_schema,
             "organization": self._generate_organization_schema,
-            "breadcrumb": self._generate_breadcrumb_schema
+            "breadcrumb": self._generate_breadcrumb_schema,
         }
 
         generator = schemas.get(content_type, self._generate_article_schema)
@@ -339,22 +322,16 @@ class WordPressSEOOptimizer:
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": data.get("title", "Article Title"),
-            "author": {
-                "@type": "Person",
-                "name": data.get("author", "Staff Writer")
-            },
+            "author": {"@type": "Person", "name": data.get("author", "Staff Writer")},
             "datePublished": data.get("published_date", datetime.now().isoformat()),
             "dateModified": data.get("modified_date", datetime.now().isoformat()),
             "image": data.get("featured_image", ""),
             "publisher": {
                 "@type": "Organization",
                 "name": data.get("publisher_name", "Publisher"),
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": data.get("publisher_logo", "")
-                }
+                "logo": {"@type": "ImageObject", "url": data.get("publisher_logo", "")},
             },
-            "description": data.get("description", "")
+            "description": data.get("description", ""),
         }
 
     def _generate_product_schema(self, data: Dict) -> Dict:
@@ -365,22 +342,19 @@ class WordPressSEOOptimizer:
             "name": data.get("name", "Product Name"),
             "image": data.get("images", []),
             "description": data.get("description", ""),
-            "brand": {
-                "@type": "Brand",
-                "name": data.get("brand", "")
-            },
+            "brand": {"@type": "Brand", "name": data.get("brand", "")},
             "offers": {
                 "@type": "Offer",
                 "price": data.get("price", 0),
                 "priceCurrency": data.get("currency", "USD"),
                 "availability": "https://schema.org/InStock",
-                "url": data.get("url", "")
+                "url": data.get("url", ""),
             },
             "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": data.get("rating", 0),
-                "reviewCount": data.get("review_count", 0)
-            }
+                "reviewCount": data.get("review_count", 0),
+            },
         }
 
     def _generate_organization_schema(self, data: Dict) -> Dict:
@@ -395,8 +369,8 @@ class WordPressSEOOptimizer:
             "contactPoint": {
                 "@type": "ContactPoint",
                 "telephone": data.get("phone", ""),
-                "contactType": "customer service"
-            }
+                "contactType": "customer service",
+            },
         }
 
     def _generate_breadcrumb_schema(self, data: Dict) -> Dict:
@@ -407,21 +381,12 @@ class WordPressSEOOptimizer:
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-                {
-                    "@type": "ListItem",
-                    "position": i + 1,
-                    "name": item.get("name", ""),
-                    "item": item.get("url", "")
-                }
+                {"@type": "ListItem", "position": i + 1, "name": item.get("name", ""), "item": item.get("url", "")}
                 for i, item in enumerate(items)
-            ]
+            ],
         }
 
-    async def generate_sitemap(
-        self,
-        pages: List[Dict[str, Any]],
-        base_url: str
-    ) -> str:
+    async def generate_sitemap(self, pages: List[Dict[str, Any]], base_url: str) -> str:
         """
         Generate XML sitemap
 
@@ -457,11 +422,7 @@ class WordPressSEOOptimizer:
 
         return sitemap
 
-    def analyze_keywords(
-        self,
-        content: str,
-        target_keywords: List[str]
-    ) -> Dict[str, Any]:
+    def analyze_keywords(self, content: str, target_keywords: List[str]) -> Dict[str, Any]:
         """
         Analyze keyword usage in content
 
@@ -483,20 +444,21 @@ class WordPressSEOOptimizer:
             analysis[keyword] = {
                 "count": count,
                 "density": round(density, 2),
-                "status": "optimal" if 1.0 <= density <= 3.0 else "low" if density < 1.0 else "high"
+                "status": "optimal" if 1.0 <= density <= 3.0 else "low" if density < 1.0 else "high",
             }
 
         return {
             "keywords": analysis,
             "total_words": word_count,
-            "overall_score": sum(1 for k in analysis.values() if k["status"] == "optimal") / len(target_keywords) * 100 if target_keywords else 0
+            "overall_score": (
+                sum(1 for k in analysis.values() if k["status"] == "optimal") / len(target_keywords) * 100
+                if target_keywords
+                else 0
+            ),
         }
 
     def generate_robots_txt(
-        self,
-        allow_all: bool = True,
-        disallow_paths: Optional[List[str]] = None,
-        sitemap_url: Optional[str] = None
+        self, allow_all: bool = True, disallow_paths: Optional[List[str]] = None, sitemap_url: Optional[str] = None
     ) -> str:
         """
         Generate robots.txt file

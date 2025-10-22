@@ -14,8 +14,9 @@ Features:
 
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class OrderStatus(str, Enum):
     """Order status enumeration"""
+
     PENDING = "pending"
     PROCESSING = "processing"
     CONFIRMED = "confirmed"
@@ -50,7 +52,7 @@ class OrderAutomation:
             "manual_review_threshold": 2000.0,  # Orders over $2000 need review
             "high_risk_countries": ["XX", "YY"],  # Country codes needing review
             "vip_priority_processing": True,
-            "fraud_check_enabled": True
+            "fraud_check_enabled": True,
         }
 
     def _initialize_fraud_detection(self) -> Dict[str, Any]:
@@ -62,16 +64,12 @@ class OrderAutomation:
                 "shipping_billing_mismatch",
                 "new_customer_high_value",
                 "multiple_failed_payments",
-                "suspicious_ip"
+                "suspicious_ip",
             ],
-            "risk_threshold": 0.7
+            "risk_threshold": 0.7,
         }
 
-    async def process_order(
-        self,
-        order_data: Dict[str, Any],
-        auto_process: bool = True
-    ) -> Dict[str, Any]:
+    async def process_order(self, order_data: Dict[str, Any], auto_process: bool = True) -> Dict[str, Any]:
         """
         Process incoming order with automation
 
@@ -92,7 +90,7 @@ class OrderAutomation:
                 "order_id": order_id,
                 "status": OrderStatus.CANCELLED,
                 "validation_result": validation,
-                "message": "Order validation failed"
+                "message": "Order validation failed",
             }
 
         # Fraud check
@@ -103,7 +101,7 @@ class OrderAutomation:
                 "status": OrderStatus.PENDING,
                 "fraud_check": fraud_check,
                 "message": "Order flagged for manual review",
-                "requires_action": "fraud_review"
+                "requires_action": "fraud_review",
             }
 
         # Inventory allocation
@@ -114,7 +112,7 @@ class OrderAutomation:
                 "status": OrderStatus.PENDING,
                 "inventory_result": inventory_result,
                 "message": "Inventory allocation failed",
-                "requires_action": "inventory_check"
+                "requires_action": "inventory_check",
             }
 
         # Payment processing
@@ -124,7 +122,7 @@ class OrderAutomation:
                 "order_id": order_id,
                 "status": OrderStatus.CANCELLED,
                 "payment_result": payment_result,
-                "message": "Payment processing failed"
+                "message": "Payment processing failed",
             }
 
         # Route to fulfillment
@@ -140,7 +138,7 @@ class OrderAutomation:
             "routing": routing,
             "estimated_ship_date": (datetime.now() + timedelta(days=1)).isoformat(),
             "estimated_delivery_date": (datetime.now() + timedelta(days=5)).isoformat(),
-            "message": "Order processed successfully"
+            "message": "Order processed successfully",
         }
 
         logger.info(f"Order {order_id} confirmed and routed to {routing['warehouse']}")
@@ -156,11 +154,7 @@ class OrderAutomation:
         Returns:
             Validation result
         """
-        validation = {
-            "valid": True,
-            "errors": [],
-            "warnings": []
-        }
+        validation = {"valid": True, "errors": [], "warnings": []}
 
         # Check required fields
         required_fields = ["customer_id", "items", "shipping_address", "payment_method"]
@@ -236,7 +230,7 @@ class OrderAutomation:
             "risk_score": min(risk_score, 1.0),
             "risk_level": risk_level,
             "risk_factors": risk_factors,
-            "recommended_action": "manual_review" if risk_level == "high" else "proceed"
+            "recommended_action": "manual_review" if risk_level == "high" else "proceed",
         }
 
     async def allocate_inventory(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -261,27 +255,31 @@ class OrderAutomation:
             available_quantity = np.random.randint(0, 100)
 
             if available_quantity >= quantity:
-                allocations.append({
-                    "product_id": product_id,
-                    "requested": quantity,
-                    "allocated": quantity,
-                    "warehouse": f"WH-{np.random.randint(1, 5)}"
-                })
+                allocations.append(
+                    {
+                        "product_id": product_id,
+                        "requested": quantity,
+                        "allocated": quantity,
+                        "warehouse": f"WH-{np.random.randint(1, 5)}",
+                    }
+                )
             else:
                 all_available = False
-                allocations.append({
-                    "product_id": product_id,
-                    "requested": quantity,
-                    "allocated": available_quantity,
-                    "backorder": quantity - available_quantity,
-                    "estimated_restock": (datetime.now() + timedelta(days=7)).isoformat()
-                })
+                allocations.append(
+                    {
+                        "product_id": product_id,
+                        "requested": quantity,
+                        "allocated": available_quantity,
+                        "backorder": quantity - available_quantity,
+                        "estimated_restock": (datetime.now() + timedelta(days=7)).isoformat(),
+                    }
+                )
 
         return {
             "success": all_available,
             "allocations": allocations,
             "fully_allocated": all_available,
-            "partial_shipment_available": len([a for a in allocations if a.get("allocated", 0) > 0]) > 0
+            "partial_shipment_available": len([a for a in allocations if a.get("allocated", 0) > 0]) > 0,
         }
 
     async def process_payment(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -309,7 +307,7 @@ class OrderAutomation:
                 "amount": amount,
                 "currency": "USD",
                 "processed_at": datetime.now().isoformat(),
-                "status": "completed"
+                "status": "completed",
             }
         else:
             return {
@@ -318,7 +316,7 @@ class OrderAutomation:
                 "amount": amount,
                 "error_code": "payment_declined",
                 "message": "Payment was declined by processor",
-                "retry_allowed": True
+                "retry_allowed": True,
             }
 
     async def route_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -338,7 +336,7 @@ class OrderAutomation:
         warehouses = [
             {"id": "WH-EAST", "location": "East Coast", "distance_score": np.random.random()},
             {"id": "WH-WEST", "location": "West Coast", "distance_score": np.random.random()},
-            {"id": "WH-CENTRAL", "location": "Central", "distance_score": np.random.random()}
+            {"id": "WH-CENTRAL", "location": "Central", "distance_score": np.random.random()},
         ]
 
         # Sort by distance score
@@ -356,7 +354,7 @@ class OrderAutomation:
             "priority": priority,
             "estimated_processing_hours": 24 if priority == "express" else 48,
             "shipping_method": "express" if priority == "express" else "standard",
-            "carrier": "FedEx" if priority == "express" else "USPS"
+            "carrier": "FedEx" if priority == "express" else "USPS",
         }
 
     async def track_order(self, order_id: str) -> Dict[str, Any]:
@@ -380,39 +378,32 @@ class OrderAutomation:
                 {
                     "status": OrderStatus.PENDING,
                     "timestamp": (datetime.now() - timedelta(days=3)).isoformat(),
-                    "location": "System"
+                    "location": "System",
                 },
                 {
                     "status": OrderStatus.CONFIRMED,
                     "timestamp": (datetime.now() - timedelta(days=2)).isoformat(),
-                    "location": "Processing Center"
+                    "location": "Processing Center",
                 },
                 {
                     "status": OrderStatus.PREPARING,
                     "timestamp": (datetime.now() - timedelta(days=1)).isoformat(),
-                    "location": "Warehouse WH-EAST"
-                }
+                    "location": "Warehouse WH-EAST",
+                },
             ],
             "estimated_delivery": (datetime.now() + timedelta(days=2)).isoformat(),
             "carrier": "FedEx",
-            "tracking_number": f"FDX{np.random.randint(100000000, 999999999)}"
+            "tracking_number": f"FDX{np.random.randint(100000000, 999999999)}",
         }
 
         if current_status == OrderStatus.SHIPPED:
-            tracking["status_history"].append({
-                "status": OrderStatus.SHIPPED,
-                "timestamp": datetime.now().isoformat(),
-                "location": "In Transit"
-            })
+            tracking["status_history"].append(
+                {"status": OrderStatus.SHIPPED, "timestamp": datetime.now().isoformat(), "location": "In Transit"}
+            )
 
         return tracking
 
-    async def process_return(
-        self,
-        order_id: str,
-        return_items: List[Dict[str, Any]],
-        reason: str
-    ) -> Dict[str, Any]:
+    async def process_return(self, order_id: str, return_items: List[Dict[str, Any]], reason: str) -> Dict[str, Any]:
         """
         Process order return request
 
@@ -446,8 +437,8 @@ class OrderAutomation:
                     "Print the return label",
                     "Package items securely",
                     "Drop off at any FedEx location",
-                    "Refund will be processed upon receipt"
-                ]
+                    "Refund will be processed upon receipt",
+                ],
             }
         else:
             return {
@@ -455,15 +446,10 @@ class OrderAutomation:
                 "order_id": order_id,
                 "status": "rejected",
                 "reason": f"Return window of {return_window_days} days has expired",
-                "alternative": "Contact customer service for exceptions"
+                "alternative": "Contact customer service for exceptions",
             }
 
-    async def process_refund(
-        self,
-        order_id: str,
-        refund_amount: float,
-        reason: str
-    ) -> Dict[str, Any]:
+    async def process_refund(self, order_id: str, refund_amount: float, reason: str) -> Dict[str, Any]:
         """
         Process refund for order
 
@@ -488,14 +474,10 @@ class OrderAutomation:
             "reason": reason,
             "method": "original_payment",
             "estimated_completion": (datetime.now() + timedelta(days=5)).isoformat(),
-            "transaction_id": f"TXN-{np.random.randint(100000, 999999)}"
+            "transaction_id": f"TXN-{np.random.randint(100000, 999999)}",
         }
 
-    def get_order_statistics(
-        self,
-        start_date: datetime,
-        end_date: datetime
-    ) -> Dict[str, Any]:
+    def get_order_statistics(self, start_date: datetime, end_date: datetime) -> Dict[str, Any]:
         """
         Get order processing statistics
 
@@ -509,30 +491,26 @@ class OrderAutomation:
         days = (end_date - start_date).days
 
         stats = {
-            "period": {
-                "start": start_date.isoformat(),
-                "end": end_date.isoformat(),
-                "days": days
-            },
+            "period": {"start": start_date.isoformat(), "end": end_date.isoformat(), "days": days},
             "orders": {
                 "total": int(np.random.uniform(100, 1000) * days),
                 "confirmed": 0,
                 "shipped": 0,
                 "delivered": 0,
                 "cancelled": 0,
-                "refunded": 0
+                "refunded": 0,
             },
             "processing": {
                 "avg_processing_time_hours": np.random.uniform(12, 48),
                 "avg_fulfillment_time_hours": np.random.uniform(24, 72),
                 "automation_rate": np.random.uniform(0.85, 0.98),
-                "manual_review_rate": np.random.uniform(0.02, 0.15)
+                "manual_review_rate": np.random.uniform(0.02, 0.15),
             },
             "fraud": {
                 "flagged_orders": int(np.random.uniform(1, 20)),
                 "confirmed_fraud": int(np.random.uniform(0, 5)),
-                "false_positive_rate": np.random.uniform(0.1, 0.3)
-            }
+                "false_positive_rate": np.random.uniform(0.1, 0.3),
+            },
         }
 
         # Calculate order statuses

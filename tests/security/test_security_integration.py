@@ -8,22 +8,23 @@ References:
 - OWASP Top 10: Security best practices
 """
 
-import pytest
 from datetime import datetime, timedelta, timezone
+
+import pytest
 from fastapi.testclient import TestClient
 
 from main import app
-from security.jwt_auth import (
-    create_access_token,
-    create_refresh_token,
-    verify_token,
-    hash_password,
-    verify_password,
-    UserRole,
-    user_manager,
-)
 from security.encryption import AESEncryption, KeyManager
 from security.input_validation import InputSanitizer
+from security.jwt_auth import (
+    UserRole,
+    create_access_token,
+    create_refresh_token,
+    hash_password,
+    user_manager,
+    verify_password,
+    verify_token,
+)
 
 
 @pytest.fixture

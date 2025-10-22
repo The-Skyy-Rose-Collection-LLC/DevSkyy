@@ -14,9 +14,10 @@ Reference: AGENTS.md Line 1571-1575
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 
 logger = logging.getLogger(__name__)
 
@@ -32,10 +33,7 @@ class ForecastingEngine:
         self.seasonal_patterns = {}
 
     async def forecast_demand(
-        self,
-        historical_data: List[float],
-        periods: int = 30,
-        method: str = "auto"
+        self, historical_data: List[float], periods: int = 30, method: str = "auto"
     ) -> Dict[str, Any]:
         """
         Forecast future demand based on historical data
@@ -56,7 +54,7 @@ class ForecastingEngine:
                 "confidence_interval_lower": [historical_data[-1] * 0.8] * periods,
                 "confidence_interval_upper": [historical_data[-1] * 1.2] * periods,
                 "method": "naive",
-                "warning": "Insufficient data for advanced forecasting"
+                "warning": "Insufficient data for advanced forecasting",
             }
 
         # Detect seasonality
@@ -86,15 +84,11 @@ class ForecastingEngine:
             "accuracy_metrics": {
                 "mae": np.random.uniform(5, 15),  # Simulated
                 "rmse": np.random.uniform(10, 25),
-                "mape": np.random.uniform(5, 20)
-            }
+                "mape": np.random.uniform(5, 20),
+            },
         }
 
-    def _linear_forecast(
-        self,
-        data: List[float],
-        periods: int
-    ) -> Tuple[List[float], List[float], List[float]]:
+    def _linear_forecast(self, data: List[float], periods: int) -> Tuple[List[float], List[float], List[float]]:
         """Linear regression forecast"""
         X = np.array(range(len(data))).reshape(-1, 1)
         y = np.array(data)
@@ -115,11 +109,7 @@ class ForecastingEngine:
 
         return forecast, lower, upper
 
-    def _random_forest_forecast(
-        self,
-        data: List[float],
-        periods: int
-    ) -> Tuple[List[float], List[float], List[float]]:
+    def _random_forest_forecast(self, data: List[float], periods: int) -> Tuple[List[float], List[float], List[float]]:
         """Random Forest forecast with feature engineering"""
         # Create features: lag features, rolling stats, etc.
         features = []
@@ -129,11 +119,11 @@ class ForecastingEngine:
 
         for i in range(window_size, len(data)):
             feature = [
-                data[i-1],  # lag 1
-                data[i-window_size],  # lag window
-                np.mean(data[i-window_size:i]),  # rolling mean
-                np.std(data[i-window_size:i]),  # rolling std
-                i  # time index
+                data[i - 1],  # lag 1
+                data[i - window_size],  # lag window
+                np.mean(data[i - window_size : i]),  # rolling mean
+                np.std(data[i - window_size : i]),  # rolling std
+                i,  # time index
             ]
             features.append(feature)
             targets.append(data[i])
@@ -151,13 +141,7 @@ class ForecastingEngine:
 
         for _ in range(periods):
             last_values = current_data[-window_size:]
-            feature = [
-                current_data[-1],
-                last_values[0],
-                np.mean(last_values),
-                np.std(last_values),
-                len(current_data)
-            ]
+            feature = [current_data[-1], last_values[0], np.mean(last_values), np.std(last_values), len(current_data)]
 
             prediction = model.predict([feature])[0]
             forecast.append(prediction)
@@ -171,10 +155,7 @@ class ForecastingEngine:
         return forecast, lower, upper
 
     def _seasonal_forecast(
-        self,
-        data: List[float],
-        periods: int,
-        seasonality: Dict
+        self, data: List[float], periods: int, seasonality: Dict
     ) -> Tuple[List[float], List[float], List[float]]:
         """Seasonal forecast using detected patterns"""
         seasonal_period = seasonality.get("period", 7)
@@ -245,7 +226,7 @@ class ForecastingEngine:
             "has_seasonality": has_seasonality,
             "period": best_period,
             "component": seasonal_component,
-            "strength": best_score
+            "strength": best_score,
         }
 
     def _analyze_trend(self, data: List[float]) -> Dict[str, Any]:
@@ -275,14 +256,11 @@ class ForecastingEngine:
             "direction": direction,
             "slope": float(slope),
             "strength": float(r_squared),
-            "percentage_change": (data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0
+            "percentage_change": (data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0,
         }
 
     async def forecast_revenue(
-        self,
-        historical_revenue: List[float],
-        historical_orders: List[int],
-        periods: int = 30
+        self, historical_revenue: List[float], historical_orders: List[int], periods: int = 30
     ) -> Dict[str, Any]:
         """
         Forecast revenue considering order volume and AOV
@@ -303,9 +281,7 @@ class ForecastingEngine:
         aov_forecast = await self.forecast_demand(aov, periods, "linear")
 
         # Calculate revenue forecast
-        revenue_forecast = [
-            o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"])
-        ]
+        revenue_forecast = [o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"])]
 
         return {
             "revenue_forecast": revenue_forecast,
@@ -314,22 +290,22 @@ class ForecastingEngine:
             "total_forecasted_revenue": sum(revenue_forecast),
             "avg_daily_revenue": np.mean(revenue_forecast),
             "confidence_interval": {
-                "lower": [o * a for o, a in zip(
-                    order_forecast["confidence_interval_lower"],
-                    aov_forecast["confidence_interval_lower"]
-                )],
-                "upper": [o * a for o, a in zip(
-                    order_forecast["confidence_interval_upper"],
-                    aov_forecast["confidence_interval_upper"]
-                )]
-            }
+                "lower": [
+                    o * a
+                    for o, a in zip(
+                        order_forecast["confidence_interval_lower"], aov_forecast["confidence_interval_lower"]
+                    )
+                ],
+                "upper": [
+                    o * a
+                    for o, a in zip(
+                        order_forecast["confidence_interval_upper"], aov_forecast["confidence_interval_upper"]
+                    )
+                ],
+            },
         }
 
-    async def detect_anomalies(
-        self,
-        data: List[float],
-        sensitivity: float = 2.0
-    ) -> Dict[str, Any]:
+    async def detect_anomalies(self, data: List[float], sensitivity: float = 2.0) -> Dict[str, Any]:
         """
         Detect anomalies in time series data
 
@@ -348,7 +324,7 @@ class ForecastingEngine:
         anomalies = []
 
         for i in range(window, len(data)):
-            window_data = data[i-window:i]
+            window_data = data[i - window : i]
             mean = np.mean(window_data)
             std = np.std(window_data)
 
@@ -356,26 +332,24 @@ class ForecastingEngine:
             threshold_lower = mean - sensitivity * std
 
             if data[i] > threshold_upper or data[i] < threshold_lower:
-                anomalies.append({
-                    "index": i,
-                    "value": data[i],
-                    "expected_range": (threshold_lower, threshold_upper),
-                    "deviation": abs(data[i] - mean) / std if std > 0 else 0,
-                    "type": "spike" if data[i] > threshold_upper else "drop"
-                })
+                anomalies.append(
+                    {
+                        "index": i,
+                        "value": data[i],
+                        "expected_range": (threshold_lower, threshold_upper),
+                        "deviation": abs(data[i] - mean) / std if std > 0 else 0,
+                        "type": "spike" if data[i] > threshold_upper else "drop",
+                    }
+                )
 
         return {
             "anomalies": anomalies,
             "count": len(anomalies),
             "anomaly_rate": len(anomalies) / len(data) * 100,
-            "sensitivity": sensitivity
+            "sensitivity": sensitivity,
         }
 
-    def calculate_forecast_accuracy(
-        self,
-        actual: List[float],
-        forecast: List[float]
-    ) -> Dict[str, float]:
+    def calculate_forecast_accuracy(self, actual: List[float], forecast: List[float]) -> Dict[str, float]:
         """
         Calculate forecast accuracy metrics
 
@@ -403,9 +377,4 @@ class ForecastingEngine:
         ss_tot = np.sum((actual - np.mean(actual)) ** 2)
         r_squared = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
 
-        return {
-            "mae": float(mae),
-            "rmse": float(rmse),
-            "mape": float(mape),
-            "r_squared": float(r_squared)
-        }
+        return {"mae": float(mae), "rmse": float(rmse), "mape": float(mape), "r_squared": float(r_squared)}

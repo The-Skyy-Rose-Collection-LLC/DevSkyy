@@ -107,9 +107,7 @@ async def export_user_data(
         # Get user details
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # Collect all user data
         user_data = {
@@ -149,6 +147,7 @@ async def export_user_data(
 
         # Generate export metadata
         import uuid
+
         request_id = str(uuid.uuid4())
         export_timestamp = datetime.now()
 
@@ -186,9 +185,7 @@ async def export_user_data(
 
 
 @router.delete("/delete", response_model=GDPRDeleteResponse)
-async def delete_user_data(
-    request: GDPRDeleteRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData = Depends(get_current_active_user)):
     """
     Delete all user data (GDPR Article 17 - Right to Erasure)
 
@@ -220,11 +217,10 @@ async def delete_user_data(
         # Get user details before deletion
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         import uuid
+
         request_id = str(uuid.uuid4())
         deletion_timestamp = datetime.now()
 

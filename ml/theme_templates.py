@@ -8,26 +8,26 @@ THEME_TEMPLATES = {
         "name": "Luxury Minimalist",
         "colors": {"primary": "#000000", "secondary": "#FFFFFF", "accent": "#C9A962"},
         "fonts": {"heading": "Cormorant Garamond", "body": "Montserrat"},
-        "style": "clean modern with gold accents"
+        "style": "clean modern with gold accents",
     },
     "vintage_elegance": {
         "name": "Vintage Elegance",
         "colors": {"primary": "#8B4513", "secondary": "#F5E6D3", "accent": "#D4AF37"},
         "fonts": {"heading": "Playfair Display", "body": "Crimson Text"},
-        "style": "classic vintage with serif typography"
+        "style": "classic vintage with serif typography",
     },
     "modern_bold": {
         "name": "Modern Bold",
         "colors": {"primary": "#FF6B6B", "secondary": "#4ECDC4", "accent": "#FFE66D"},
         "fonts": {"heading": "Poppins", "body": "Inter"},
-        "style": "vibrant modern with bold colors"
+        "style": "vibrant modern with bold colors",
     },
     "sustainable_earth": {
         "name": "Sustainable Earth",
         "colors": {"primary": "#2D5016", "secondary": "#F4F1DE", "accent": "#E07A5F"},
         "fonts": {"heading": "Raleway", "body": "Lato"},
-        "style": "eco-friendly earth tones"
-    }
+        "style": "eco-friendly earth tones",
+    },
 }
 
 

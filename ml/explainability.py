@@ -2,14 +2,17 @@
 ML Model Explainability using SHAP
 References: SHAP (https://github.com/slundberg/shap), Lundberg & Lee, NIPS 2017
 """
+
 import logging
-import numpy as np
 from typing import Any, Dict, List, Optional
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
 try:
     import shap
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -31,7 +34,7 @@ class ModelExplainer:
 
         try:
             # Use TreeExplainer for tree-based models, KernelExplainer for others
-            if hasattr(model, 'tree_'):
+            if hasattr(model, "tree_"):
                 explainer = shap.TreeExplainer(model)
             else:
                 explainer = shap.KernelExplainer(model.predict, X_background)
@@ -44,10 +47,7 @@ class ModelExplainer:
             return None
 
     def explain_prediction(
-        self,
-        model_name: str,
-        X: np.ndarray,
-        feature_names: Optional[List[str]] = None
+        self, model_name: str, X: np.ndarray, feature_names: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Explain single prediction using SHAP values
@@ -70,9 +70,9 @@ class ModelExplainer:
         sorted_importance = dict(sorted(importance.items(), key=lambda x: x[1], reverse=True))
 
         return {
-            "shap_values": shap_values.tolist() if hasattr(shap_values, 'tolist') else shap_values,
+            "shap_values": shap_values.tolist() if hasattr(shap_values, "tolist") else shap_values,
             "feature_importance": sorted_importance,
-            "top_features": list(sorted_importance.keys())[:5]
+            "top_features": list(sorted_importance.keys())[:5],
         }
 
     def explain_dataset(self, model_name: str, X: np.ndarray) -> Dict[str, Any]:
@@ -88,7 +88,7 @@ class ModelExplainer:
 
         return {
             "global_importance": mean_abs_shap.tolist(),
-            "summary": "SHAP-based feature importance for entire dataset"
+            "summary": "SHAP-based feature importance for entire dataset",
         }
 
 

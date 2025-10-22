@@ -106,7 +106,7 @@ def test_user_data():
 @pytest.fixture(scope="function")
 def setup_test_user(test_user_data):
     """Add test user to user manager for testing"""
-    from security.jwt_auth import user_manager, User, UserRole
+    from security.jwt_auth import User, UserRole, user_manager
 
     # Create test user
     test_user = User(

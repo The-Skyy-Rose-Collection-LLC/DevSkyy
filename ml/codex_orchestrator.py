@@ -18,8 +18,8 @@ Architecture:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from ml.codex_integration import codex
 
@@ -190,7 +190,9 @@ class CodexOrchestrator:
 
         try:
             # Build strategy prompt
-            issues_summary = "\n".join([f"- {i.get('type', 'issue')}: {i.get('description', 'Unknown')}" for i in issues])
+            issues_summary = "\n".join(
+                [f"- {i.get('type', 'issue')}: {i.get('description', 'Unknown')}" for i in issues]
+            )
 
             prompt = f"""Analyze the following code issues and create an optimal healing strategy:
 
@@ -396,9 +398,7 @@ Respond with validation analysis."""
                 elif "bug" in line_lower or "error" in line_lower:
                     issue_type = "bug"
 
-                issues.append(
-                    {"type": issue_type, "severity": severity, "description": line.strip(), "line": None}
-                )
+                issues.append({"type": issue_type, "severity": severity, "description": line.strip(), "line": None})
 
         return issues
 

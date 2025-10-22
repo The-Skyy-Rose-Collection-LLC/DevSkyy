@@ -2,15 +2,16 @@
 ML Infrastructure API Endpoints
 Model registry, caching, and explainability services
 """
+
 import logging
 from typing import Any, Dict, List
-import numpy as np
 
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from ml import ModelStage, explainer, model_registry, redis_cache
 from security.jwt_auth import TokenData, get_current_active_user, require_developer
-from ml import model_registry, redis_cache, explainer, ModelStage
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,10 @@ router = APIRouter(prefix="/ml", tags=["ml-infrastructure"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class ModelRegistrationRequest(BaseModel):
     """Request to register a model"""
+
     model_name: str
     version: str
     model_type: str
@@ -35,11 +38,13 @@ class ModelRegistrationRequest(BaseModel):
 
 class ModelPromotionRequest(BaseModel):
     """Request to promote a model"""
+
     target_stage: str
 
 
 class ExplainRequest(BaseModel):
     """Request for model explanation"""
+
     model_name: str
     input_data: List[List[float]]
     feature_names: List[str] = Field(default_factory=list)
@@ -48,6 +53,7 @@ class ExplainRequest(BaseModel):
 # ============================================================================
 # MODEL REGISTRY ENDPOINTS
 # ============================================================================
+
 
 @router.get("/registry/models")
 async def list_models(current_user: TokenData = Depends(get_current_active_user)):
@@ -61,10 +67,7 @@ async def list_models(current_user: TokenData = Depends(get_current_active_user)
 
 
 @router.get("/registry/models/{model_name}/versions")
-async def list_model_versions(
-    model_name: str,
-    current_user: TokenData = Depends(get_current_active_user)
-):
+async def list_model_versions(model_name: str, current_user: TokenData = Depends(get_current_active_user)):
     """List all versions of a model"""
     try:
         versions = model_registry.list_versions(model_name)
@@ -74,11 +77,7 @@ async def list_model_versions(
 
 
 @router.get("/registry/models/{model_name}/{version}")
-async def get_model_metadata(
-    model_name: str,
-    version: str,
-    current_user: TokenData = Depends(get_current_active_user)
-):
+async def get_model_metadata(model_name: str, version: str, current_user: TokenData = Depends(get_current_active_user)):
     """Get model metadata"""
     try:
         metadata = model_registry.get_metadata(model_name, version)
@@ -91,10 +90,7 @@ async def get_model_metadata(
 
 @router.post("/registry/models/{model_name}/{version}/promote")
 async def promote_model(
-    model_name: str,
-    version: str,
-    request: ModelPromotionRequest,
-    current_user: TokenData = Depends(require_developer)
+    model_name: str, version: str, request: ModelPromotionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Promote model to different stage"""
     try:
@@ -117,10 +113,7 @@ async def get_registry_stats(current_user: TokenData = Depends(get_current_activ
 
 @router.post("/registry/models/{model_name}/compare")
 async def compare_models(
-    model_name: str,
-    version1: str,
-    version2: str,
-    current_user: TokenData = Depends(get_current_active_user)
+    model_name: str, version1: str, version2: str, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Compare two model versions"""
     try:
@@ -133,6 +126,7 @@ async def compare_models(
 # ============================================================================
 # CACHE ENDPOINTS
 # ============================================================================
+
 
 @router.get("/cache/stats")
 async def get_cache_stats(current_user: TokenData = Depends(require_developer)):
@@ -158,11 +152,9 @@ async def clear_cache(current_user: TokenData = Depends(require_developer)):
 # EXPLAINABILITY ENDPOINTS
 # ============================================================================
 
+
 @router.post("/explain/prediction")
-async def explain_prediction(
-    request: ExplainRequest,
-    current_user: TokenData = Depends(get_current_active_user)
-):
+async def explain_prediction(request: ExplainRequest, current_user: TokenData = Depends(get_current_active_user)):
     """
     Explain model prediction using SHAP values
 
@@ -171,16 +163,11 @@ async def explain_prediction(
     try:
         X = np.array(request.input_data)
         explanation = explainer.explain_prediction(
-            request.model_name,
-            X,
-            feature_names=request.feature_names if request.feature_names else None
+            request.model_name, X, feature_names=request.feature_names if request.feature_names else None
         )
         return explanation
     except ImportError:
-        raise HTTPException(
-            status_code=501,
-            detail="SHAP not installed. Install with: pip install shap"
-        )
+        raise HTTPException(status_code=501, detail="SHAP not installed. Install with: pip install shap")
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -194,6 +181,6 @@ async def ml_health_check():
     health = {
         "registry": "healthy",
         "cache_mode": redis_cache.mode,
-        "explainability": "available" if explainer else "unavailable"
+        "explainability": "available" if explainer else "unavailable",
     }
     return health

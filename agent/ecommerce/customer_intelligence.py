@@ -14,6 +14,7 @@ Features:
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+
 import numpy as np
 from sklearn.cluster import KMeans
 
@@ -32,9 +33,7 @@ class CustomerIntelligence:
         self.ltv_model = None
 
     async def segment_customers(
-        self,
-        customer_data: Optional[List[Dict]] = None,
-        n_segments: int = 5
+        self, customer_data: Optional[List[Dict]] = None, n_segments: int = 5
     ) -> Dict[str, Any]:
         """
         Segment customers using ML clustering
@@ -61,13 +60,13 @@ class CustomerIntelligence:
                         "avg_order_value": 850.0,
                         "purchase_frequency": 8.5,
                         "lifetime_value": 7200.0,
-                        "churn_risk": 0.12
+                        "churn_risk": 0.12,
                     },
                     "recommended_actions": [
                         "Exclusive VIP events and early access",
                         "Personal shopping assistant",
-                        "Premium loyalty rewards"
-                    ]
+                        "Premium loyalty rewards",
+                    ],
                 },
                 {
                     "id": "High_Value",
@@ -77,13 +76,13 @@ class CustomerIntelligence:
                         "avg_order_value": 450.0,
                         "purchase_frequency": 5.2,
                         "lifetime_value": 2340.0,
-                        "churn_risk": 0.18
+                        "churn_risk": 0.18,
                     },
                     "recommended_actions": [
                         "Upgrade to VIP program",
                         "Targeted premium product campaigns",
-                        "Enhanced customer service"
-                    ]
+                        "Enhanced customer service",
+                    ],
                 },
                 {
                     "id": "Regular",
@@ -93,13 +92,13 @@ class CustomerIntelligence:
                         "avg_order_value": 180.0,
                         "purchase_frequency": 3.1,
                         "lifetime_value": 558.0,
-                        "churn_risk": 0.25
+                        "churn_risk": 0.25,
                     },
                     "recommended_actions": [
                         "Re-engagement campaigns",
                         "Cross-sell recommendations",
-                        "Seasonal promotions"
-                    ]
+                        "Seasonal promotions",
+                    ],
                 },
                 {
                     "id": "Occasional",
@@ -109,13 +108,13 @@ class CustomerIntelligence:
                         "avg_order_value": 120.0,
                         "purchase_frequency": 1.5,
                         "lifetime_value": 180.0,
-                        "churn_risk": 0.45
+                        "churn_risk": 0.45,
                     },
                     "recommended_actions": [
                         "Win-back campaigns",
                         "Special offers and discounts",
-                        "Email nurture sequences"
-                    ]
+                        "Email nurture sequences",
+                    ],
                 },
                 {
                     "id": "At_Risk",
@@ -125,28 +124,21 @@ class CustomerIntelligence:
                         "avg_order_value": 95.0,
                         "purchase_frequency": 0.8,
                         "lifetime_value": 76.0,
-                        "churn_risk": 0.75
+                        "churn_risk": 0.75,
                     },
                     "recommended_actions": [
                         "Urgent retention campaigns",
                         "Feedback surveys",
-                        "Personalized incentives"
-                    ]
-                }
+                        "Personalized incentives",
+                    ],
+                },
             ],
-            "model_metrics": {
-                "silhouette_score": 0.65,
-                "inertia": 1250.5
-            }
+            "model_metrics": {"silhouette_score": 0.65, "inertia": 1250.5},
         }
 
         return segments
 
-    async def predict_customer_ltv(
-        self,
-        customer_id: str,
-        time_horizon_months: int = 12
-    ) -> Dict[str, Any]:
+    async def predict_customer_ltv(self, customer_id: str, time_horizon_months: int = 12) -> Dict[str, Any]:
         """
         Predict customer lifetime value
 
@@ -170,28 +162,24 @@ class CustomerIntelligence:
             "predicted_ltv": base_ltv * (1 + growth_rate),
             "confidence_interval": {
                 "lower": base_ltv * (1 + growth_rate) * 0.8,
-                "upper": base_ltv * (1 + growth_rate) * 1.2
+                "upper": base_ltv * (1 + growth_rate) * 1.2,
             },
             "contributing_factors": {
                 "purchase_frequency": np.random.uniform(0.7, 1.0),
                 "average_order_value": np.random.uniform(0.7, 1.0),
                 "engagement_level": np.random.uniform(0.6, 1.0),
-                "product_affinity": np.random.uniform(0.6, 0.9)
+                "product_affinity": np.random.uniform(0.6, 0.9),
             },
             "recommendations": [
                 "Increase engagement through personalized content",
                 "Recommend premium products",
-                "Enroll in loyalty program"
-            ]
+                "Enroll in loyalty program",
+            ],
         }
 
         return prediction
 
-    async def predict_churn_risk(
-        self,
-        customer_id: str,
-        prediction_window_days: int = 90
-    ) -> Dict[str, Any]:
+    async def predict_churn_risk(self, customer_id: str, prediction_window_days: int = 90) -> Dict[str, Any]:
         """
         Predict customer churn risk
 
@@ -223,24 +211,24 @@ class CustomerIntelligence:
                 {
                     "factor": "Days since last purchase",
                     "value": int(np.random.uniform(30, 180)),
-                    "impact": np.random.uniform(0.5, 1.0)
+                    "impact": np.random.uniform(0.5, 1.0),
                 },
                 {
                     "factor": "Email engagement decline",
                     "value": f"{np.random.uniform(20, 80):.1f}%",
-                    "impact": np.random.uniform(0.4, 0.8)
+                    "impact": np.random.uniform(0.4, 0.8),
                 },
                 {
                     "factor": "Customer service interactions",
                     "value": int(np.random.uniform(0, 5)),
-                    "impact": np.random.uniform(0.3, 0.7)
-                }
+                    "impact": np.random.uniform(0.3, 0.7),
+                },
             ],
             "prevention_strategies": [],
             "estimated_impact": {
                 "revenue_at_risk": np.random.uniform(500, 3000),
-                "retention_probability_increase": 0.0
-            }
+                "retention_probability_increase": 0.0,
+            },
         }
 
         # Recommend prevention strategies based on risk level
@@ -249,30 +237,26 @@ class CustomerIntelligence:
                 {"action": "Immediate personal outreach", "priority": "urgent"},
                 {"action": "Exclusive discount offer (20%)", "priority": "high"},
                 {"action": "VIP upgrade trial", "priority": "high"},
-                {"action": "Request feedback survey", "priority": "medium"}
+                {"action": "Request feedback survey", "priority": "medium"},
             ]
             assessment["estimated_impact"]["retention_probability_increase"] = 0.35
         elif risk_level == "medium":
             assessment["prevention_strategies"] = [
                 {"action": "Personalized product recommendations", "priority": "high"},
                 {"action": "Re-engagement email sequence", "priority": "medium"},
-                {"action": "Limited-time offer", "priority": "medium"}
+                {"action": "Limited-time offer", "priority": "medium"},
             ]
             assessment["estimated_impact"]["retention_probability_increase"] = 0.25
         else:
             assessment["prevention_strategies"] = [
                 {"action": "Maintain regular engagement", "priority": "low"},
-                {"action": "Cross-sell complementary products", "priority": "low"}
+                {"action": "Cross-sell complementary products", "priority": "low"},
             ]
             assessment["estimated_impact"]["retention_probability_increase"] = 0.10
 
         return assessment
 
-    async def analyze_purchase_behavior(
-        self,
-        customer_id: str,
-        lookback_days: int = 180
-    ) -> Dict[str, Any]:
+    async def analyze_purchase_behavior(self, customer_id: str, lookback_days: int = 180) -> Dict[str, Any]:
         """
         Analyze customer purchase behavior patterns
 
@@ -293,40 +277,36 @@ class CustomerIntelligence:
                 "total_spent": np.random.uniform(100, 5000),
                 "avg_order_value": 0.0,
                 "avg_items_per_order": np.random.uniform(1.5, 4.5),
-                "purchase_frequency_days": np.random.uniform(30, 90)
+                "purchase_frequency_days": np.random.uniform(30, 90),
             },
             "category_affinity": {
                 "dresses": np.random.uniform(0.5, 1.0),
                 "accessories": np.random.uniform(0.3, 0.8),
                 "shoes": np.random.uniform(0.2, 0.7),
-                "outerwear": np.random.uniform(0.1, 0.6)
+                "outerwear": np.random.uniform(0.1, 0.6),
             },
             "shopping_preferences": {
                 "preferred_day": ["Monday", "Wednesday", "Saturday"][int(np.random.uniform(0, 3))],
                 "preferred_time": ["morning", "afternoon", "evening"][int(np.random.uniform(0, 3))],
                 "device_preference": ["mobile", "desktop", "tablet"][int(np.random.uniform(0, 3))],
-                "price_sensitivity": ["low", "medium", "high"][int(np.random.uniform(0, 3))]
+                "price_sensitivity": ["low", "medium", "high"][int(np.random.uniform(0, 3))],
             },
             "next_purchase_prediction": {
                 "days_until_next_purchase": int(np.random.uniform(7, 60)),
                 "predicted_category": "dresses",
-                "predicted_value": np.random.uniform(100, 500)
-            }
+                "predicted_value": np.random.uniform(100, 500),
+            },
         }
 
         # Calculate average order value
-        behavior["purchase_patterns"]["avg_order_value"] = (
-            behavior["purchase_patterns"]["total_spent"] /
-            max(behavior["purchase_patterns"]["total_orders"], 1)
+        behavior["purchase_patterns"]["avg_order_value"] = behavior["purchase_patterns"]["total_spent"] / max(
+            behavior["purchase_patterns"]["total_orders"], 1
         )
 
         return behavior
 
     async def generate_personalized_recommendations(
-        self,
-        customer_id: str,
-        n_recommendations: int = 10,
-        context: Optional[Dict] = None
+        self, customer_id: str, n_recommendations: int = 10, context: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """
         Generate personalized product recommendations
@@ -357,8 +337,8 @@ class CustomerIntelligence:
                         "Based on your purchase history",
                         "Customers like you also bought",
                         "Trending in your favorite category",
-                        "Complements items in your cart"
-                    ][i % 4]
+                        "Complements items in your cart",
+                    ][i % 4],
                 }
                 for i in range(n_recommendations)
             ],
@@ -366,8 +346,8 @@ class CustomerIntelligence:
                 "purchase_history": 0.4,
                 "browsing_behavior": 0.3,
                 "similar_customers": 0.2,
-                "trending_items": 0.1
-            }
+                "trending_items": 0.1,
+            },
         }
 
         # Sort by relevance score
@@ -375,11 +355,7 @@ class CustomerIntelligence:
 
         return recommendations
 
-    async def map_customer_journey(
-        self,
-        customer_id: str,
-        session_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def map_customer_journey(self, customer_id: str, session_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Map customer journey and touchpoints
 
@@ -400,42 +376,39 @@ class CustomerIntelligence:
                     "stage": "awareness",
                     "touchpoints": ["social_media_ad", "google_search"],
                     "duration_seconds": int(np.random.uniform(30, 120)),
-                    "engagement_score": np.random.uniform(0.3, 0.7)
+                    "engagement_score": np.random.uniform(0.3, 0.7),
                 },
                 {
                     "stage": "consideration",
                     "touchpoints": ["product_browse", "category_filter", "reviews_read"],
                     "duration_seconds": int(np.random.uniform(180, 600)),
-                    "engagement_score": np.random.uniform(0.5, 0.8)
+                    "engagement_score": np.random.uniform(0.5, 0.8),
                 },
                 {
                     "stage": "purchase",
                     "touchpoints": ["add_to_cart", "checkout", "payment"],
                     "duration_seconds": int(np.random.uniform(120, 300)),
-                    "engagement_score": np.random.uniform(0.7, 1.0)
+                    "engagement_score": np.random.uniform(0.7, 1.0),
                 },
                 {
                     "stage": "post_purchase",
                     "touchpoints": ["order_confirmation", "shipping_updates", "review_request"],
                     "duration_seconds": int(np.random.uniform(60, 180)),
-                    "engagement_score": np.random.uniform(0.6, 0.9)
-                }
+                    "engagement_score": np.random.uniform(0.6, 0.9),
+                },
             ],
             "conversion_points": [],
             "drop_off_points": [],
             "optimization_opportunities": [
                 "Reduce steps in checkout process",
                 "Add product comparison feature",
-                "Improve mobile browsing experience"
-            ]
+                "Improve mobile browsing experience",
+            ],
         }
 
         return journey
 
-    def get_customer_profile(
-        self,
-        customer_id: str
-    ) -> Dict[str, Any]:
+    def get_customer_profile(self, customer_id: str) -> Dict[str, Any]:
         """
         Get comprehensive customer profile
 
@@ -457,15 +430,15 @@ class CustomerIntelligence:
                 "favorite_categories": ["dresses", "accessories"],
                 "price_range": {"min": 100, "max": 800},
                 "brand_affinity": ["Designer A", "Designer B"],
-                "style_profile": ["elegant", "modern", "luxury"]
+                "style_profile": ["elegant", "modern", "luxury"],
             },
             "communication_preferences": {
                 "email_frequency": "weekly",
                 "sms_enabled": True,
-                "preferred_time": "evening"
+                "preferred_time": "evening",
             },
             "created_date": (datetime.now() - timedelta(days=365)).isoformat(),
-            "last_purchase_date": (datetime.now() - timedelta(days=15)).isoformat()
+            "last_purchase_date": (datetime.now() - timedelta(days=15)).isoformat(),
         }
 
         return profile

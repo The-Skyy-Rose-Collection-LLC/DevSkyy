@@ -9,6 +9,7 @@ from pathlib import Path
 
 # Load environment variables FIRST before any other imports
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Configure logging

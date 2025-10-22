@@ -14,6 +14,7 @@ Reference: Based on AGENTS.md specifications
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+
 import anthropic
 
 logger = logging.getLogger(__name__)
@@ -34,11 +35,7 @@ class ContentGenerator:
             self.client = None
 
     async def generate_blog_post(
-        self,
-        topic: str,
-        keywords: Optional[List[str]] = None,
-        tone: str = "professional",
-        length: int = 800
+        self, topic: str, keywords: Optional[List[str]] = None, tone: str = "professional", length: int = 800
     ) -> Dict[str, Any]:
         """
         Generate complete blog post
@@ -71,15 +68,13 @@ Meta Description: [150 chars]
 [Content with HTML formatting]"""
 
             message = self.client.messages.create(
-                model="claude-sonnet-4-5-20250929",
-                max_tokens=2000,
-                messages=[{"role": "user", "content": prompt}]
+                model="claude-sonnet-4-5-20250929", max_tokens=2000, messages=[{"role": "user", "content": prompt}]
             )
 
             content = message.content[0].text
 
             # Parse response
-            lines = content.split('\n')
+            lines = content.split("\n")
             title = ""
             meta_desc = ""
             post_content = []
@@ -97,8 +92,8 @@ Meta Description: [150 chars]
                 "content": "\n".join(post_content),
                 "meta_description": meta_desc or f"Learn about {topic}",
                 "keywords": keywords or [],
-                "word_count": len(' '.join(post_content).split()),
-                "generated_at": datetime.now().isoformat()
+                "word_count": len(" ".join(post_content).split()),
+                "generated_at": datetime.now().isoformat(),
             }
         else:
             # Mock response
@@ -115,14 +110,11 @@ Meta Description: [150 chars]
                 "meta_description": f"Comprehensive guide to {topic} with actionable insights and expert tips.",
                 "keywords": keywords or [topic],
                 "word_count": length,
-                "generated_at": datetime.now().isoformat()
+                "generated_at": datetime.now().isoformat(),
             }
 
     async def generate_page_content(
-        self,
-        page_type: str,
-        brand_info: Dict[str, Any],
-        additional_context: Optional[Dict] = None
+        self, page_type: str, brand_info: Dict[str, Any], additional_context: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """
         Generate WordPress page content
@@ -142,17 +134,13 @@ Meta Description: [150 chars]
             "contact": self._generate_contact_page,
             "services": self._generate_services_page,
             "faq": self._generate_faq_page,
-            "privacy": self._generate_privacy_page
+            "privacy": self._generate_privacy_page,
         }
 
         generator = page_templates.get(page_type, self._generate_generic_page)
         return await generator(brand_info, additional_context or {})
 
-    async def _generate_about_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_about_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate About Us page"""
         brand_name = brand_info.get("name", "Our Brand")
         tagline = brand_info.get("tagline", "Excellence in Fashion")
@@ -188,14 +176,10 @@ work together to bring you the best shopping experience.</p>
             "title": f"About {brand_name}",
             "content": content,
             "meta_description": f"Learn about {brand_name} - {tagline}. Our story, values, and commitment to excellence.",
-            "page_type": "about"
+            "page_type": "about",
         }
 
-    async def _generate_contact_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_contact_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate Contact page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -225,14 +209,10 @@ work together to bring you the best shopping experience.</p>
             "title": f"Contact {brand_name}",
             "content": content,
             "meta_description": f"Contact {brand_name}. Our team is here to help with any questions or concerns.",
-            "page_type": "contact"
+            "page_type": "contact",
         }
 
-    async def _generate_services_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_services_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate Services page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -263,14 +243,10 @@ work together to bring you the best shopping experience.</p>
             "title": "Our Services",
             "content": content,
             "meta_description": "Explore our premium services: free shipping, personal styling, easy returns, and VIP program.",
-            "page_type": "services"
+            "page_type": "services",
         }
 
-    async def _generate_faq_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_faq_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate FAQ page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -305,14 +281,10 @@ work together to bring you the best shopping experience.</p>
             "title": "FAQ - Frequently Asked Questions",
             "content": content,
             "meta_description": "Find answers to common questions about shipping, returns, orders, and customer service.",
-            "page_type": "faq"
+            "page_type": "faq",
         }
 
-    async def _generate_privacy_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_privacy_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate Privacy Policy page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -355,14 +327,10 @@ work together to bring you the best shopping experience.</p>
             "title": "Privacy Policy",
             "content": content,
             "meta_description": f"{brand_name} Privacy Policy. Learn how we collect, use, and protect your personal information.",
-            "page_type": "privacy"
+            "page_type": "privacy",
         }
 
-    async def _generate_generic_page(
-        self,
-        brand_info: Dict[str, Any],
-        context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_generic_page(self, brand_info: Dict[str, Any], context: Dict) -> Dict[str, Any]:
         """Generate generic page"""
         page_type = context.get("page_type", "Page")
 
@@ -370,14 +338,10 @@ work together to bring you the best shopping experience.</p>
             "title": page_type.title(),
             "content": f"<h1>{page_type.title()}</h1>\n<p>Content for {page_type} page.</p>",
             "meta_description": f"{page_type.title()} page.",
-            "page_type": page_type
+            "page_type": page_type,
         }
 
-    async def optimize_content(
-        self,
-        content: str,
-        target_keywords: List[str]
-    ) -> Dict[str, Any]:
+    async def optimize_content(self, content: str, target_keywords: List[str]) -> Dict[str, Any]:
         """
         Optimize existing content for SEO
 
@@ -396,10 +360,7 @@ work together to bring you the best shopping experience.</p>
 
         for keyword in target_keywords:
             count = content_lower.count(keyword.lower())
-            keyword_density[keyword] = {
-                "count": count,
-                "density": count / len(content.split()) * 100 if content else 0
-            }
+            keyword_density[keyword] = {"count": count, "density": count / len(content.split()) * 100 if content else 0}
 
         suggestions = []
         for keyword, stats in keyword_density.items():
@@ -414,14 +375,19 @@ work together to bring you the best shopping experience.</p>
             "original_content": content,
             "keyword_density": keyword_density,
             "suggestions": suggestions,
-            "seo_score": min(100, len([s for s in keyword_density.values() if s["density"] >= 1.0 and s["density"] <= 3.0]) / len(target_keywords) * 100) if target_keywords else 0
+            "seo_score": (
+                min(
+                    100,
+                    len([s for s in keyword_density.values() if s["density"] >= 1.0 and s["density"] <= 3.0])
+                    / len(target_keywords)
+                    * 100,
+                )
+                if target_keywords
+                else 0
+            ),
         }
 
-    async def rewrite_content(
-        self,
-        content: str,
-        style: str = "professional"
-    ) -> str:
+    async def rewrite_content(self, content: str, style: str = "professional") -> str:
         """
         Rewrite content in different style
 
@@ -442,9 +408,7 @@ work together to bring you the best shopping experience.</p>
 Provide only the rewritten content."""
 
             message = self.client.messages.create(
-                model="claude-sonnet-4-5-20250929",
-                max_tokens=2000,
-                messages=[{"role": "user", "content": prompt}]
+                model="claude-sonnet-4-5-20250929", max_tokens=2000, messages=[{"role": "user", "content": prompt}]
             )
 
             return message.content[0].text
@@ -452,11 +416,7 @@ Provide only the rewritten content."""
             # Mock response
             return content
 
-    def generate_meta_description(
-        self,
-        content: str,
-        max_length: int = 155
-    ) -> str:
+    def generate_meta_description(self, content: str, max_length: int = 155) -> str:
         """
         Generate meta description from content
 
@@ -469,13 +429,14 @@ Provide only the rewritten content."""
         """
         # Remove HTML tags
         import re
-        text = re.sub('<[^<]+?>', '', content)
+
+        text = re.sub("<[^<]+?>", "", content)
 
         # Get first sentence or 155 chars
-        sentences = text.split('. ')
+        sentences = text.split(". ")
         description = sentences[0] if sentences else text[:max_length]
 
         if len(description) > max_length:
-            description = description[:max_length - 3] + "..."
+            description = description[: max_length - 3] + "..."
 
         return description

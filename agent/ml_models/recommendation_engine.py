@@ -5,7 +5,8 @@ Reference: AGENTS.md Line 1577-1581
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -15,10 +16,7 @@ class RecommendationEngine:
     """Product recommendation system"""
 
     async def get_recommendations(
-        self,
-        user_id: str,
-        n_recommendations: int = 10,
-        method: str = "hybrid"
+        self, user_id: str, n_recommendations: int = 10, method: str = "hybrid"
     ) -> List[Dict[str, Any]]:
         """Get personalized product recommendations"""
         return [
@@ -26,7 +24,7 @@ class RecommendationEngine:
                 "product_id": f"PROD-{i:04d}",
                 "name": f"Recommended Product {i}",
                 "score": np.random.uniform(0.7, 1.0),
-                "reason": ["Popular", "Based on your history", "Trending"][i % 3]
+                "reason": ["Popular", "Based on your history", "Trending"][i % 3],
             }
             for i in range(n_recommendations)
         ]

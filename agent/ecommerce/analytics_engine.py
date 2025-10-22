@@ -12,10 +12,11 @@ Features:
 """
 
 import logging
+from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
+
 import numpy as np
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +32,7 @@ class EcommerceAnalytics:
         self.time_series_data = defaultdict(list)
 
     async def get_revenue_analytics(
-        self,
-        start_date: datetime,
-        end_date: datetime,
-        granularity: str = "daily"
+        self, start_date: datetime, end_date: datetime, granularity: str = "daily"
     ) -> Dict[str, Any]:
         """
         Calculate comprehensive revenue analytics
@@ -50,25 +48,17 @@ class EcommerceAnalytics:
         logger.info(f"Calculating revenue analytics from {start_date} to {end_date}")
 
         analytics = {
-            "period": {
-                "start": start_date.isoformat(),
-                "end": end_date.isoformat(),
-                "granularity": granularity
-            },
+            "period": {"start": start_date.isoformat(), "end": end_date.isoformat(), "granularity": granularity},
             "revenue": {
                 "total": 0.0,
                 "average_order_value": 0.0,
                 "orders_count": 0,
                 "growth_rate": 0.0,
-                "trend": "stable"
+                "trend": "stable",
             },
             "time_series": [],
             "top_products": [],
-            "segments": {
-                "by_category": {},
-                "by_region": {},
-                "by_customer_type": {}
-            }
+            "segments": {"by_category": {}, "by_region": {}, "by_customer_type": {}},
         }
 
         # Simulate analytics calculation
@@ -84,9 +74,7 @@ class EcommerceAnalytics:
         return analytics
 
     async def analyze_customer_behavior(
-        self,
-        customer_segment: Optional[str] = None,
-        time_period: int = 30
+        self, customer_segment: Optional[str] = None, time_period: int = 30
     ) -> Dict[str, Any]:
         """
         Analyze customer behavior patterns
@@ -109,20 +97,12 @@ class EcommerceAnalytics:
                 "bounce_rate": 0.0,
                 "conversion_rate": 0.0,
                 "repeat_purchase_rate": 0.0,
-                "customer_lifetime_value": 0.0
+                "customer_lifetime_value": 0.0,
             },
             "popular_categories": [],
             "peak_shopping_hours": [],
-            "device_breakdown": {
-                "mobile": 0.0,
-                "desktop": 0.0,
-                "tablet": 0.0
-            },
-            "journey_analysis": {
-                "entry_points": [],
-                "exit_points": [],
-                "conversion_paths": []
-            }
+            "device_breakdown": {"mobile": 0.0, "desktop": 0.0, "tablet": 0.0},
+            "journey_analysis": {"entry_points": [], "exit_points": [], "conversion_paths": []},
         }
 
         # Simulate behavior metrics
@@ -136,15 +116,13 @@ class EcommerceAnalytics:
         behavior["device_breakdown"] = {
             "mobile": np.random.uniform(0.4, 0.6),
             "desktop": np.random.uniform(0.3, 0.4),
-            "tablet": np.random.uniform(0.05, 0.15)
+            "tablet": np.random.uniform(0.05, 0.15),
         }
 
         return behavior
 
     async def analyze_product_performance(
-        self,
-        product_ids: Optional[List[str]] = None,
-        metric: str = "revenue"
+        self, product_ids: Optional[List[str]] = None, metric: str = "revenue"
     ) -> Dict[str, Any]:
         """
         Analyze product performance metrics
@@ -164,12 +142,8 @@ class EcommerceAnalytics:
             "top_performers": [],
             "underperformers": [],
             "category_analysis": {},
-            "trends": {
-                "rising_stars": [],
-                "declining": [],
-                "seasonal": []
-            },
-            "recommendations": []
+            "trends": {"rising_stars": [], "declining": [], "seasonal": []},
+            "recommendations": [],
         }
 
         # Simulate top performers
@@ -178,7 +152,7 @@ class EcommerceAnalytics:
                 "product_id": f"PROD-{i:03d}",
                 "name": f"Luxury Item {i}",
                 "metric_value": np.random.uniform(5000, 20000),
-                "growth_rate": np.random.uniform(0.1, 0.5)
+                "growth_rate": np.random.uniform(0.1, 0.5),
             }
             for i in range(1, 11)
         ]
@@ -187,15 +161,12 @@ class EcommerceAnalytics:
             "Increase inventory for top 10 performers",
             "Consider discontinuing products with <1% conversion",
             "Optimize pricing for medium performers",
-            "Create bundles with complementary products"
+            "Create bundles with complementary products",
         ]
 
         return performance
 
-    async def analyze_conversion_funnel(
-        self,
-        funnel_stages: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+    async def analyze_conversion_funnel(self, funnel_stages: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Analyze conversion funnel and drop-off points
 
@@ -212,18 +183,13 @@ class EcommerceAnalytics:
             "add_to_cart",
             "checkout_start",
             "payment_info",
-            "order_complete"
+            "order_complete",
         ]
 
         stages = funnel_stages or default_stages
         logger.info(f"Analyzing conversion funnel with {len(stages)} stages")
 
-        funnel = {
-            "stages": [],
-            "overall_conversion_rate": 0.0,
-            "bottlenecks": [],
-            "optimization_opportunities": []
-        }
+        funnel = {"stages": [], "overall_conversion_rate": 0.0, "bottlenecks": [], "optimization_opportunities": []}
 
         # Simulate funnel data
         visitors = 10000
@@ -231,31 +197,32 @@ class EcommerceAnalytics:
             conversion_rate = np.random.uniform(0.5, 0.9)
             visitors = int(visitors * conversion_rate)
 
-            funnel["stages"].append({
-                "name": stage,
-                "visitors": visitors,
-                "conversion_rate": conversion_rate,
-                "drop_off": int(visitors * (1 - conversion_rate))
-            })
+            funnel["stages"].append(
+                {
+                    "name": stage,
+                    "visitors": visitors,
+                    "conversion_rate": conversion_rate,
+                    "drop_off": int(visitors * (1 - conversion_rate)),
+                }
+            )
 
         funnel["overall_conversion_rate"] = visitors / 10000
 
         # Identify bottlenecks
         for i, stage_data in enumerate(funnel["stages"]):
             if stage_data["conversion_rate"] < 0.6:
-                funnel["bottlenecks"].append({
-                    "stage": stage_data["name"],
-                    "issue": "High drop-off rate",
-                    "improvement_potential": f"{(0.75 - stage_data['conversion_rate']) * 100:.1f}%"
-                })
+                funnel["bottlenecks"].append(
+                    {
+                        "stage": stage_data["name"],
+                        "issue": "High drop-off rate",
+                        "improvement_potential": f"{(0.75 - stage_data['conversion_rate']) * 100:.1f}%",
+                    }
+                )
 
         return funnel
 
     async def calculate_marketing_roi(
-        self,
-        campaign_id: str,
-        start_date: datetime,
-        end_date: datetime
+        self, campaign_id: str, start_date: datetime, end_date: datetime
     ) -> Dict[str, Any]:
         """
         Calculate ROI for marketing campaigns
@@ -275,7 +242,7 @@ class EcommerceAnalytics:
             "period": {
                 "start": start_date.isoformat(),
                 "end": end_date.isoformat(),
-                "duration_days": (end_date - start_date).days
+                "duration_days": (end_date - start_date).days,
             },
             "spend": np.random.uniform(5000, 20000),
             "revenue_attributed": 0.0,
@@ -283,32 +250,26 @@ class EcommerceAnalytics:
             "customer_acquisition_cost": 0.0,
             "customers_acquired": 0,
             "channel_breakdown": {},
-            "attribution_model": "last_click"
+            "attribution_model": "last_click",
         }
 
         # Calculate metrics
         roi_data["revenue_attributed"] = roi_data["spend"] * np.random.uniform(2, 8)
-        roi_data["roi_percentage"] = (
-            (roi_data["revenue_attributed"] - roi_data["spend"]) / roi_data["spend"] * 100
-        )
+        roi_data["roi_percentage"] = (roi_data["revenue_attributed"] - roi_data["spend"]) / roi_data["spend"] * 100
         roi_data["customers_acquired"] = int(np.random.uniform(50, 300))
-        roi_data["customer_acquisition_cost"] = (
-            roi_data["spend"] / roi_data["customers_acquired"]
-        )
+        roi_data["customer_acquisition_cost"] = roi_data["spend"] / roi_data["customers_acquired"]
 
         roi_data["channel_breakdown"] = {
             "social_media": np.random.uniform(0.3, 0.5),
             "email": np.random.uniform(0.2, 0.3),
             "paid_search": np.random.uniform(0.15, 0.25),
-            "organic": np.random.uniform(0.1, 0.2)
+            "organic": np.random.uniform(0.1, 0.2),
         }
 
         return roi_data
 
     async def get_predictive_insights(
-        self,
-        forecast_days: int = 30,
-        metrics: Optional[List[str]] = None
+        self, forecast_days: int = 30, metrics: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Generate predictive insights and forecasts
@@ -331,7 +292,7 @@ class EcommerceAnalytics:
             "forecasts": {},
             "trends": [],
             "alerts": [],
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Generate forecasts
@@ -339,10 +300,7 @@ class EcommerceAnalytics:
             base_value = np.random.uniform(1000, 10000)
             trend = np.random.uniform(-0.02, 0.05)
 
-            forecast_values = [
-                base_value * (1 + trend) ** day
-                for day in range(forecast_days)
-            ]
+            forecast_values = [base_value * (1 + trend) ** day for day in range(forecast_days)]
 
             insights["forecasts"][metric] = {
                 "current_value": base_value,
@@ -350,24 +308,20 @@ class EcommerceAnalytics:
                 "trend": "increasing" if trend > 0 else "decreasing",
                 "confidence_interval": {
                     "lower": [v * 0.9 for v in forecast_values],
-                    "upper": [v * 1.1 for v in forecast_values]
-                }
+                    "upper": [v * 1.1 for v in forecast_values],
+                },
             }
 
         insights["recommendations"] = [
             "Stock up on trending products before peak season",
             "Increase marketing spend during high-conversion periods",
             "Optimize pricing for declining categories",
-            "Focus on customer retention programs"
+            "Focus on customer retention programs",
         ]
 
         return insights
 
-    def export_analytics_report(
-        self,
-        analytics_data: Dict[str, Any],
-        format: str = "json"
-    ) -> str:
+    def export_analytics_report(self, analytics_data: Dict[str, Any], format: str = "json") -> str:
         """
         Export analytics data in various formats
 
@@ -382,6 +336,7 @@ class EcommerceAnalytics:
 
         if format == "json":
             import json
+
             return json.dumps(analytics_data, indent=2, default=str)
         elif format == "csv":
             return "CSV export not yet implemented"

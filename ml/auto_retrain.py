@@ -2,8 +2,9 @@
 Automated Model Retraining System
 Continuous learning with scheduled retraining
 """
-import logging
+
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, Optional
 
@@ -18,11 +19,7 @@ class AutoRetrainer:
         self.running = False
 
     def schedule_retrain(
-        self,
-        model_name: str,
-        retrain_func: Callable,
-        interval_hours: int = 24,
-        min_samples: int = 1000
+        self, model_name: str, retrain_func: Callable, interval_hours: int = 24, min_samples: int = 1000
     ):
         """
         Schedule automated retraining
@@ -38,7 +35,7 @@ class AutoRetrainer:
             "interval": interval_hours,
             "min_samples": min_samples,
             "last_run": None,
-            "next_run": datetime.now() + timedelta(hours=interval_hours)
+            "next_run": datetime.now() + timedelta(hours=interval_hours),
         }
         logger.info(f"📅 Scheduled auto-retrain for {model_name} every {interval_hours}h")
 

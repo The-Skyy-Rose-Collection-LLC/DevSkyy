@@ -2,20 +2,24 @@
 Comprehensive ML Infrastructure Tests
 Tests for model registry, caching, explainability, and API endpoints
 """
-import pytest
-import numpy as np
-import tempfile
-import shutil
-from pathlib import Path
-from datetime import datetime
 
+import shutil
+import tempfile
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pytest
+
+from ml.explainability import ModelExplainer
 from ml.model_registry import ModelRegistry, ModelStage
 from ml.redis_cache import RedisCache
-from ml.explainability import ModelExplainer
+
 
 # Mock model for testing
 class MockModel:
     """Simple mock model for testing"""
+
     def predict(self, X):
         return np.sum(X, axis=1)
 
@@ -26,6 +30,7 @@ class MockModel:
 # ============================================================================
 # MODEL REGISTRY TESTS
 # ============================================================================
+
 
 class TestModelRegistry:
     """Test model registry operations"""
@@ -48,7 +53,7 @@ class TestModelRegistry:
             model_type="classifier",
             metrics={"accuracy": 0.95, "f1": 0.92},
             parameters={"n_estimators": 100},
-            dataset_info={"samples": 1000}
+            dataset_info={"samples": 1000},
         )
 
         assert metadata.model_name == "test_model"
@@ -60,11 +65,7 @@ class TestModelRegistry:
         """Test model loading"""
         model = MockModel()
         temp_registry.register_model(
-            model=model,
-            model_name="test_model",
-            version="1.0.0",
-            model_type="classifier",
-            metrics={"accuracy": 0.95}
+            model=model, model_name="test_model", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
         )
 
         loaded_model = temp_registry.load_model("test_model", version="1.0.0")
@@ -79,11 +80,7 @@ class TestModelRegistry:
         """Test model promotion"""
         model = MockModel()
         temp_registry.register_model(
-            model=model,
-            model_name="test_model",
-            version="1.0.0",
-            model_type="classifier",
-            metrics={"accuracy": 0.95}
+            model=model, model_name="test_model", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
         )
 
         # Promote to staging
@@ -107,7 +104,7 @@ class TestModelRegistry:
                 model_name="test_model",
                 version=version,
                 model_type="classifier",
-                metrics={"accuracy": 0.95}
+                metrics={"accuracy": 0.95},
             )
 
         versions = temp_registry.list_versions("test_model")
@@ -124,7 +121,7 @@ class TestModelRegistry:
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
-            metrics={"accuracy": 0.90, "f1": 0.88}
+            metrics={"accuracy": 0.90, "f1": 0.88},
         )
 
         temp_registry.register_model(
@@ -132,33 +129,28 @@ class TestModelRegistry:
             model_name="test_model",
             version="2.0.0",
             model_type="classifier",
-            metrics={"accuracy": 0.95, "f1": 0.93}
+            metrics={"accuracy": 0.95, "f1": 0.93},
         )
 
         comparison = temp_registry.compare_models("test_model", "1.0.0", "2.0.0")
 
         assert comparison["model_name"] == "test_model"
         assert "metrics_comparison" in comparison
-        assert comparison["metrics_comparison"]["accuracy"]["v2.0.0"] > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
+        assert (
+            comparison["metrics_comparison"]["accuracy"]["v2.0.0"]
+            > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
+        )
 
     def test_registry_stats(self, temp_registry):
         """Test registry statistics"""
         model = MockModel()
 
         temp_registry.register_model(
-            model=model,
-            model_name="model1",
-            version="1.0.0",
-            model_type="classifier",
-            metrics={"accuracy": 0.95}
+            model=model, model_name="model1", version="1.0.0", model_type="classifier", metrics={"accuracy": 0.95}
         )
 
         temp_registry.register_model(
-            model=model,
-            model_name="model2",
-            version="1.0.0",
-            model_type="regressor",
-            metrics={"mse": 0.05}
+            model=model, model_name="model2", version="1.0.0", model_type="regressor", metrics={"mse": 0.05}
         )
 
         stats = temp_registry.get_registry_stats()
@@ -171,6 +163,7 @@ class TestModelRegistry:
 # ============================================================================
 # REDIS CACHE TESTS
 # ============================================================================
+
 
 class TestRedisCache:
     """Test Redis cache with fallback"""
@@ -203,6 +196,7 @@ class TestRedisCache:
     def test_cache_ttl(self, cache):
         """Test TTL expiration"""
         import time
+
         cache.set("test_key", "value", ttl=1)
         assert cache.get("test_key") == "value"
         time.sleep(2)
@@ -223,6 +217,7 @@ class TestRedisCache:
 # ============================================================================
 # MODEL EXPLAINABILITY TESTS
 # ============================================================================
+
 
 class TestModelExplainer:
     """Test SHAP-based explainability"""
@@ -260,6 +255,7 @@ class TestModelExplainer:
 # INTEGRATION TESTS
 # ============================================================================
 
+
 class TestMLIntegration:
     """Integration tests for ML infrastructure"""
 
@@ -292,7 +288,7 @@ class TestMLIntegration:
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.95},
-            parameters={"trained": True}
+            parameters={"trained": True},
         )
 
         assert metadata.model_name == "workflow_model"
@@ -325,7 +321,7 @@ class TestMLIntegration:
             model_name="versioned_model",
             version="1.0.0",
             model_type="classifier",
-            metrics={"accuracy": 0.85, "f1": 0.82}
+            metrics={"accuracy": 0.85, "f1": 0.82},
         )
 
         # Register v2 with better metrics
@@ -334,13 +330,16 @@ class TestMLIntegration:
             model_name="versioned_model",
             version="2.0.0",
             model_type="classifier",
-            metrics={"accuracy": 0.92, "f1": 0.90}
+            metrics={"accuracy": 0.92, "f1": 0.90},
         )
 
         # Compare versions
         comparison = registry.compare_models("versioned_model", "1.0.0", "2.0.0")
 
-        assert comparison["metrics_comparison"]["accuracy"]["v2.0.0"] > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
+        assert (
+            comparison["metrics_comparison"]["accuracy"]["v2.0.0"]
+            > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
+        )
 
         # Promote better model to production
         registry.promote_model("versioned_model", "2.0.0", ModelStage.PRODUCTION)
@@ -354,6 +353,7 @@ class TestMLIntegration:
 # API ENDPOINT TESTS (if FastAPI is available)
 # ============================================================================
 
+
 class TestMLAPI:
     """Test ML API endpoints"""
 
@@ -361,7 +361,9 @@ class TestMLAPI:
     def client(self):
         """Create test client"""
         from fastapi.testclient import TestClient
+
         from main import app
+
         return TestClient(app)
 
     def test_ml_health_check(self, client):

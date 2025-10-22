@@ -488,13 +488,7 @@ class UserManager:
         password_hash = self.hash_password(password)
 
         # Create user
-        user = User(
-            user_id=user_id,
-            email=email,
-            username=username,
-            password_hash=password_hash,
-            role=role
-        )
+        user = User(user_id=user_id, email=email, username=username, password_hash=password_hash, role=role)
 
         # Store user
         self.users[user_id] = user

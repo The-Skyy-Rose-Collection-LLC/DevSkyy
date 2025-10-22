@@ -17,8 +17,8 @@ Features:
 
 import logging
 import os
-from typing import Any, Dict, List, Optional, Literal
 from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
 
 try:
     from openai import AsyncOpenAI
@@ -181,7 +181,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            system_message = (
+                f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            )
 
             user_message = f"```{language}\n{code_prefix}\n```\n\nComplete this code:"
 

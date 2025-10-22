@@ -2,16 +2,18 @@
 Redis Caching Layer - Distributed caching for scalability
 References: Redis Best Practices (redis.io/topics/lru-cache)
 """
+
+import hashlib
 import json
 import logging
 import os
 from typing import Any, Optional
-import hashlib
 
 logger = logging.getLogger(__name__)
 
 try:
     import redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False

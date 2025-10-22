@@ -5,7 +5,8 @@ Reference: AGENTS.md Line 1565-1569
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -20,14 +21,14 @@ class VisionEngine:
         return {
             "category": categories[0],
             "confidence": 0.92,
-            "all_predictions": {cat: np.random.uniform(0, 1) for cat in categories}
+            "all_predictions": {cat: np.random.uniform(0, 1) for cat in categories},
         }
 
     async def detect_objects(self, image_path: str) -> List[Dict[str, Any]]:
         """Detect objects in image"""
         return [
             {"object": "dress", "confidence": 0.95, "bbox": [100, 100, 300, 500]},
-            {"object": "shoes", "confidence": 0.88, "bbox": [50, 450, 150, 600]}
+            {"object": "shoes", "confidence": 0.88, "bbox": [50, 450, 150, 600]},
         ]
 
     async def extract_colors(self, image_path: str, n_colors: int = 5) -> List[str]:
@@ -36,8 +37,4 @@ class VisionEngine:
 
     async def analyze_style(self, image_path: str) -> Dict[str, Any]:
         """Analyze fashion style"""
-        return {
-            "style": "elegant",
-            "attributes": ["formal", "luxury", "modern"],
-            "confidence": 0.87
-        }
+        return {"style": "elegant", "attributes": ["formal", "luxury", "modern"], "confidence": 0.87}
