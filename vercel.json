@@ -1,12 +1,26 @@
 {
   "version": 2,
+  "name": "devskyy-enterprise-platform",
+  "framework": "other",
+  "buildCommand": "pip install -r requirements.txt",
+  "outputDirectory": ".",
+  "installCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "devCommand": "uvicorn main:app --host 0.0.0.0 --port $PORT --reload",
   "builds": [
     {
       "src": "main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.11"
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "main.py"
+    },
     {
       "src": "/(.*)",
       "dest": "main.py"
@@ -14,11 +28,21 @@
   ],
   "env": {
     "PYTHONPATH": ".",
-    "ENVIRONMENT": "production"
+    "ENVIRONMENT": "production",
+    "LOG_LEVEL": "INFO",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1"
   },
   "functions": {
     "main.py": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "python3.11"
     }
+  },
+  "regions": ["iad1"],
+  "github": {
+    "autoDeployment": true,
+    "autoJobCancelation": true
   }
 }
