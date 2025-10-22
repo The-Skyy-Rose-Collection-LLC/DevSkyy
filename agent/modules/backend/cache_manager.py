@@ -223,8 +223,30 @@ class ConnectionPool:
             logger.error(f"Error returning connection: {e}")
 
     async def _create_connection(self):
-        """Create a new connection (to be implemented by subclasses)."""
-        raise NotImplementedError("Subclasses must implement _create_connection")
+        """Create a new Redis connection with enterprise configuration."""
+        import redis.asyncio as redis
+
+        try:
+            connection = redis.Redis(
+                host=self.host,
+                port=self.port,
+                password=self.password,
+                db=self.db,
+                decode_responses=True,
+                socket_connect_timeout=5,
+                socket_timeout=5,
+                retry_on_timeout=True,
+                health_check_interval=30
+            )
+
+            # Test the connection
+            await connection.ping()
+            logger.info("✅ Redis connection created successfully")
+            return connection
+
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis connection: {e}")
+            raise
 
     def get_stats(self) -> Dict[str, Any]:
         """Get connection pool statistics."""

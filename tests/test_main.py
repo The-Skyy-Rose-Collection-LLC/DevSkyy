@@ -8,7 +8,12 @@ from fastapi.testclient import TestClient
 
 
 def test_run_endpoint_calls_functions_in_sequence():
-    """TODO: Add docstring for test_run_endpoint_calls_functions_in_sequence."""
+    """Test that the run endpoint calls functions in the correct sequence.
+
+    This test verifies that when the /run endpoint is called, it properly
+    orchestrates the execution of multiple agent functions in the expected
+    order and handles the response correctly.
+    """
     modules = {
         "agent": types.ModuleType("agent"),
         "agent.modules": types.ModuleType("agent.modules"),

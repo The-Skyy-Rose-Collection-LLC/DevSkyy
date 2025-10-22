@@ -262,7 +262,8 @@ class RedisManager:
                 # Try pickle deserialization
                 try:
                     return pickle.loads(value)
-                except:
+                except (pickle.PickleError, TypeError, ValueError) as e:
+                    logger.debug(f"Pickle deserialization failed for key {key}: {e}")
                     return value.decode('utf-8')
             
         except RedisError as e:

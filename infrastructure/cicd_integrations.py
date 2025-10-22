@@ -833,7 +833,8 @@ class CICDIntegrationManager:
                         # Simple connectivity test
                         response = await self.http_client.get(conn.base_url, timeout=5)
                         connection_health[name] = 'healthy' if response.status_code < 500 else 'degraded'
-                    except:
+                    except Exception as e:
+                        logger.warning(f"Health check failed for {name}: {e}")
                         connection_health[name] = 'unhealthy'
                 else:
                     connection_health[name] = 'disabled'

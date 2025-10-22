@@ -7,7 +7,12 @@ from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 class TestFinancialAgent:
 
     def test_chargeback_monitoring(self):
-        """TODO: Add docstring for test_chargeback_monitoring."""
+        """Test chargeback monitoring functionality.
+
+        This test verifies that the chargeback monitoring system properly
+        detects, tracks, and responds to chargeback events in the payment
+        processing pipeline.
+        """
         agent = FinancialAgent()
         result = agent.monitor_chargebacks()
 

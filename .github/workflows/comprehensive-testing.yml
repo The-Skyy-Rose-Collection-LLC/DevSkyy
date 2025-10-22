@@ -1,10 +1,11 @@
-name: 🧪 Comprehensive Testing Pipeline
+name: 🧪 Enterprise Testing Pipeline
 
 on:
   push:
-    branches: [ main, develop, 'feature/*', 'hotfix/*' ]
+    branches: [ main, develop, 'feature/*', 'hotfix/*', 'release/*' ]
   pull_request:
     branches: [ main, develop ]
+    types: [opened, synchronize, reopened, ready_for_review]
   schedule:
     - cron: '0 2 * * *'  # Daily at 2 AM UTC
   workflow_dispatch:
@@ -21,50 +22,117 @@ on:
           - e2e
           - performance
           - security
+          - fashion-specific
       coverage_threshold:
         description: 'Coverage threshold percentage'
         required: false
-        default: '80'
+        default: '90'
         type: string
+      environment:
+        description: 'Target environment'
+        required: false
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - staging
+          - production
 
 env:
   PYTHON_VERSION: '3.11'
   NODE_VERSION: '18'
-  COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || '80' }}
+  COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold || '90' }}
   TEST_DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_devskyy
   REDIS_URL: redis://localhost:6379/1
   ELASTICSEARCH_URL: http://localhost:9200
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'test' }}
+  PYTHONPATH: ${{ github.workspace }}
+  PYTHONDONTWRITEBYTECODE: 1
+  PYTHONUNBUFFERED: 1
 
 jobs:
   # ============================================================================
   # SETUP AND PREPARATION
   # ============================================================================
   
+  # ============================================================================
+  # ENTERPRISE SETUP AND VALIDATION
+  # ============================================================================
+
   setup:
-    name: 🔧 Setup Test Environment
+    name: 🔧 Enterprise Environment Setup
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     outputs:
       test-matrix: ${{ steps.test-matrix.outputs.matrix }}
       cache-key: ${{ steps.cache-key.outputs.key }}
-    
+      python-version: ${{ steps.python-setup.outputs.python-version }}
+      should-run-tests: ${{ steps.changes.outputs.should-run }}
+
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔍 Detect Changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            python:
+              - '**/*.py'
+              - '**/requirements*.txt'
+              - 'pyproject.toml'
+              - 'setup.py'
+              - 'setup.cfg'
+            config:
+              - '**/*.yaml'
+              - '**/*.yml'
+              - '**/*.json'
+              - '**/*.toml'
+            tests:
+              - 'tests/**'
+              - '**/test_*.py'
+              - '**/*_test.py'
+            docs:
+              - '**/*.md'
+              - 'docs/**'
+            workflows:
+              - '.github/workflows/**'
+
+      - name: 🐍 Setup Python
+        id: python-setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements*.txt
+            pyproject.toml
+
       - name: 🔑 Generate Cache Key
         id: cache-key
         run: |
-          echo "key=test-deps-${{ runner.os }}-${{ hashFiles('**/requirements*.txt', '**/package*.json', '**/poetry.lock') }}" >> $GITHUB_OUTPUT
-      
+          echo "key=enterprise-deps-${{ runner.os }}-py${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+
       - name: 📋 Generate Test Matrix
         id: test-matrix
         run: |
           if [[ "${{ github.event.inputs.test_type }}" == "all" || "${{ github.event.inputs.test_type }}" == "" ]]; then
-            echo 'matrix=["unit", "integration", "e2e", "performance", "security"]' >> $GITHUB_OUTPUT
+            echo 'matrix=["unit", "integration", "e2e", "performance", "security", "fashion-specific"]' >> $GITHUB_OUTPUT
           else
             echo 'matrix=["${{ github.event.inputs.test_type }}"]' >> $GITHUB_OUTPUT
+          fi
+
+      - name: ✅ Set Should Run Tests
+        id: should-run
+        run: |
+          if [[ "${{ steps.changes.outputs.python }}" == "true" || "${{ steps.changes.outputs.tests }}" == "true" || "${{ steps.changes.outputs.config }}" == "true" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should-run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-run=false" >> $GITHUB_OUTPUT
           fi
 
   # ============================================================================
