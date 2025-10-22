@@ -33,12 +33,12 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Create a luxury, premium product description for the following product:
-            
+
             Product Name: {product_data.get('name', 'Luxury Item')}
             Current Description: {product_data.get('description', 'Premium product')}
             Price: ${product_data.get('price', '0')}
             Category: {product_data.get('category', 'Luxury')}
-            
+
             Requirements:
             1. Use sophisticated, luxury language
             2. Emphasize exclusivity and premium quality
@@ -47,7 +47,7 @@ class OpenAIIntelligenceService:
             5. Create desire and urgency
             6. Keep it between 150-300 words
             7. Use luxury brand tone of voice
-            
+
             Format as HTML with proper styling for e-commerce.
             """
 
@@ -87,13 +87,13 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Analyze this luxury brand website and create a comprehensive content strategy:
-            
+
             Site Name: {site_data.get('site_name', 'Luxury Brand')}
             Site URL: {site_data.get('site_url', '')}
             Description: {site_data.get('description', '')}
             Current Products: {len(site_data.get('products', []))} products
             Target Market: Luxury consumers
-            
+
             Create a strategic content plan that includes:
             1. Content pillars for luxury brand positioning
             2. Content calendar suggestions (monthly themes)
@@ -103,7 +103,7 @@ class OpenAIIntelligenceService:
             6. Blog post topics that establish luxury authority
             7. Conversion optimization recommendations
             8. Brand storytelling elements
-            
+
             Focus on premium positioning and high-value customer acquisition.
             """
 
@@ -143,12 +143,12 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Optimize this webpage content for luxury brand SEO:
-            
+
             Page Title: {page_data.get('title', 'Luxury Page')}
             Current Content: {page_data.get('content', '')[:1000]}...
             Target Keywords: luxury, premium, exclusive, high-end, designer
             Brand Focus: Luxury fashion/lifestyle
-            
+
             Provide:
             1. Optimized meta title (60 chars max)
             2. Meta description (160 chars max, compelling)
@@ -158,7 +158,7 @@ class OpenAIIntelligenceService:
             6. Internal linking opportunities
             7. Schema markup recommendations
             8. Luxury-focused call-to-action improvements
-            
+
             Maintain luxury brand voice while optimizing for search engines.
             """
 
@@ -198,11 +198,11 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Analyze these luxury brand competitors and provide strategic insights:
-            
+
             Our Brand: {competitor_data.get('our_brand', 'Luxury Brand')}
             Competitors: {', '.join(competitor_data.get('competitors', []))}
             Market Segment: Luxury/Premium
-            
+
             Provide analysis on:
             1. Competitive positioning gaps we can exploit
             2. Pricing strategy recommendations
@@ -212,7 +212,7 @@ class OpenAIIntelligenceService:
             6. Customer acquisition tactics
             7. Brand messaging opportunities
             8. Luxury market trends to leverage
-            
+
             Focus on actionable strategies that can be implemented immediately.
             """
 
@@ -252,12 +252,12 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Create a luxury email marketing campaign:
-            
+
             Campaign Type: {campaign_data.get('type', 'product_launch')}
             Target Audience: {campaign_data.get('audience', 'luxury_customers')}
             Product/Service: {campaign_data.get('product', 'luxury_items')}
             Brand Voice: Sophisticated, exclusive, premium
-            
+
             Create:
             1. Subject line (compelling, open-worthy)
             2. Preview text (complementary to subject)
@@ -266,7 +266,7 @@ class OpenAIIntelligenceService:
             5. Personalization elements
             6. Mobile-optimized structure
             7. A/B testing variations (2 subject lines)
-            
+
             Focus on exclusivity, scarcity, and luxury lifestyle aspiration.
             Include luxury design elements and premium positioning.
             """
@@ -307,12 +307,12 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Create luxury social media content:
-            
+
             Platform: {content_request.get('platform', 'instagram')}
             Content Type: {content_request.get('type', 'product_showcase')}
             Product/Theme: {content_request.get('theme', 'luxury_lifestyle')}
             Brand Personality: Sophisticated, aspirational, exclusive
-            
+
             Create:
             1. Engaging caption (platform-optimized length)
             2. Relevant luxury hashtags (mix of popular and niche)
@@ -321,7 +321,7 @@ class OpenAIIntelligenceService:
             5. User-generated content ideas
             6. Influencer collaboration suggestions
             7. Community engagement tactics
-            
+
             Focus on luxury lifestyle, exclusivity, and brand prestige.
             Encourage high-quality engagement from affluent audience.
             """
@@ -362,13 +362,13 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             As a luxury brand CEO, analyze this business situation and make a strategic decision:
-            
+
             Situation: {decision_context.get('situation', 'business_decision_needed')}
             Data Available: {json.dumps(decision_context.get('data', {}), indent=2)}
             Stakeholders: {', '.join(decision_context.get('stakeholders', []))}
             Timeline: {decision_context.get('timeline', 'immediate')}
             Budget Considerations: {decision_context.get('budget', 'flexible')}
-            
+
             Provide:
             1. Executive summary of the situation
             2. Strategic recommendation with rationale
@@ -378,7 +378,7 @@ class OpenAIIntelligenceService:
             6. Resource requirements
             7. Alternative options considered
             8. Expected ROI and timeline
-            
+
             Make decisions that prioritize long-term brand value and premium positioning.
             """
 
@@ -418,13 +418,13 @@ class OpenAIIntelligenceService:
         try:
             prompt = """
             Optimize this luxury brand conversion funnel:
-            
+
             Current Funnel Stages: {', '.join(funnel_data.get('stages', []))}
             Conversion Rates: {json.dumps(funnel_data.get('conversion_rates', {}), indent=2)}
             Target Audience: Affluent consumers, luxury shoppers
             Average Order Value: ${funnel_data.get('aov', 300)}
             Main Drop-off Points: {', '.join(funnel_data.get('drop_offs', []))}
-            
+
             Provide optimization strategy:
             1. Identify conversion bottlenecks
             2. Luxury-specific optimization tactics
@@ -434,7 +434,7 @@ class OpenAIIntelligenceService:
             6. Payment and checkout optimization
             7. Follow-up sequence improvements
             8. A/B testing recommendations
-            
+
             Focus on luxury customer psychology and premium buying behavior.
             """
 

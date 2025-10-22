@@ -5,6 +5,7 @@ Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 
 import logging
 import os
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
@@ -43,7 +44,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 security_bearer = HTTPBearer()
 
 # Security tracking
-from collections import defaultdict
 
 # Track failed login attempts
 failed_login_attempts = defaultdict(list)

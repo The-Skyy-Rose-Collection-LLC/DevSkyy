@@ -46,13 +46,13 @@ class WordPressAgent:
         try:
             prompt = f"""
             WORDPRESS OPTIMIZATION - GOD MODE INTELLIGENCE
-            
+
             Site URL: {site_data.get('site_url', 'Luxury WordPress Site')}
             Current Performance: {site_data.get('performance_score', 0)}/100
             Theme: {site_data.get('theme', 'Divi')}
             Plugins: {len(site_data.get('plugins', []))} installed
             Monthly Traffic: {site_data.get('traffic', 0)} visitors
-            
+
             ADVANCED WORDPRESS OPTIMIZATION:
             1. Core Web Vitals Maximization (95+ scores)
             2. Database Optimization (50%+ speed improvement)
@@ -64,7 +64,7 @@ class WordPressAgent:
             8. SEO Technical Foundation
             9. Conversion Rate Optimization
             10. Backup & Recovery Strategy
-            
+
             Provide specific WordPress optimizations that achieve:
             - 95+ Performance Score
             - 2 second load times
@@ -111,12 +111,12 @@ class WordPressAgent:
         try:
             prompt = f"""
             DIVI LUXURY COMPONENT CREATION - GOD MODE MASTERY
-            
+
             Component Type: {component_request.get('type', 'luxury_hero')}
             Brand Colors: {component_request.get('colors', ['#D4AF37', '#C0C0C0'])}
             Purpose: {component_request.get('purpose', 'conversion_optimization')}
             Target Conversion: {component_request.get('target_conversion', '15%+')}
-            
+
             CREATE LUXURY DIVI COMPONENTS:
             1. Custom Divi Module Code (PHP/CSS/JS)
             2. Luxury Design Implementation
@@ -128,7 +128,7 @@ class WordPressAgent:
             8. Performance Optimization
             9. Accessibility Compliance
             10. Installation Instructions
-            
+
             Provide complete Divi module code that creates luxury experiences
             and drives 15%+ conversion rates for premium brands.
             Include custom CSS, PHP functions, and JavaScript interactions.
@@ -169,12 +169,12 @@ class WordPressAgent:
         try:
             prompt = f"""
             WORDPRESS SECURITY - MILITARY-GRADE PROTECTION GOD MODE
-            
+
             Current Security Issues: {json.dumps(security_audit.get('issues', []), indent=2)}
             Site Value: ${security_audit.get('site_value', 1000000)}
             Security Level Required: Military-Grade
             Threat Level: High (luxury brand target)
-            
+
             ADVANCED SECURITY IMPLEMENTATION:
             1. Multi-Layer Firewall Configuration
             2. Advanced Brute Force Protection
@@ -186,7 +186,7 @@ class WordPressAgent:
             8. Real-Time Threat Monitoring
             9. Backup & Recovery Strategy
             10. Incident Response Plan
-            
+
             Provide military-grade WordPress security implementation that protects
             high-value luxury brand websites from all known attack vectors.
             Include specific security plugins, code snippets, and configurations.

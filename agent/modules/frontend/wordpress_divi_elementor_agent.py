@@ -743,7 +743,7 @@ class WordPressDiviElementorAgent:
         padding: 14px 28px;
         font-size: 14px;
     }
-    
+
     .luxury-card {
         margin-bottom: 20px;
     }

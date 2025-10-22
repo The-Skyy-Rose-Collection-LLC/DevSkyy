@@ -487,16 +487,16 @@ if (!defined('ABSPATH')) {{
 }}
 
 class {class_name} {{
-    
+
     public function __construct() {{
         add_action('init', [$this, 'init']);
         {additional_hooks}
     }}
-    
+
     public function init() {{
         {initialization_code}
     }}
-    
+
     {additional_methods}
 }}
 

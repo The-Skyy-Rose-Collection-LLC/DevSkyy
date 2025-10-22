@@ -436,7 +436,7 @@ Provide specific, actionable feedback."""
             )
 
         if context:
-            message += f"\n\nAdditional context:\n" + "\n".join(context)
+            message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 
