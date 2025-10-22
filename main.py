@@ -138,35 +138,56 @@ def setup_logging() -> None:
 # ENTERPRISE METRICS AND MONITORING
 # ============================================================================
 
-# Prometheus Metrics
-REQUEST_COUNT = Counter(
-    'devskyy_requests_total',
-    'Total number of requests',
-    ['method', 'endpoint', 'status_code']
-)
+# Prometheus Metrics - with collision protection
+try:
+    REQUEST_COUNT = Counter(
+        'devskyy_requests_total',
+        'Total number of requests',
+        ['method', 'endpoint', 'status_code']
+    )
+except ValueError:
+    # Metric already exists, get existing one
+    from prometheus_client import REGISTRY
+    REQUEST_COUNT = None
+    for collector in REGISTRY._collector_to_names:
+        if hasattr(collector, '_name') and collector._name == 'devskyy_requests_total':
+            REQUEST_COUNT = collector
+            break
 
-REQUEST_DURATION = Histogram(
-    'devskyy_request_duration_seconds',
-    'Request duration in seconds',
-    ['method', 'endpoint']
-)
+try:
+    REQUEST_DURATION = Histogram(
+        'devskyy_request_duration_seconds',
+        'Request duration in seconds',
+        ['method', 'endpoint']
+    )
+except ValueError:
+    REQUEST_DURATION = None
 
-ACTIVE_CONNECTIONS = Counter(
-    'devskyy_active_connections',
-    'Number of active connections'
-)
+try:
+    ACTIVE_CONNECTIONS = Counter(
+        'devskyy_active_connections',
+        'Number of active connections'
+    )
+except ValueError:
+    ACTIVE_CONNECTIONS = None
 
-FASHION_OPERATIONS = Counter(
-    'devskyy_fashion_operations_total',
-    'Total fashion-related operations',
-    ['operation_type', 'status']
-)
+try:
+    FASHION_OPERATIONS = Counter(
+        'devskyy_fashion_operations_total',
+        'Total fashion-related operations',
+        ['operation_type', 'status']
+    )
+except ValueError:
+    FASHION_OPERATIONS = None
 
-AI_PREDICTIONS = Counter(
-    'devskyy_ai_predictions_total',
-    'Total AI predictions made',
-    ['model_type', 'accuracy_tier']
-)
+try:
+    AI_PREDICTIONS = Counter(
+        'devskyy_ai_predictions_total',
+        'Total AI predictions made',
+        ['model_type', 'accuracy_tier']
+    )
+except ValueError:
+    AI_PREDICTIONS = None
 
 # ============================================================================
 # ENTERPRISE APPLICATION LIFECYCLE MANAGEMENT

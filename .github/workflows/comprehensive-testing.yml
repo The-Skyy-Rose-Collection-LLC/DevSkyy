@@ -181,19 +181,19 @@ jobs:
         run: |
           case "${{ matrix.test-group }}" in
             "core")
-              pytest tests/unit/test_core/ -v --cov=core --cov-report=xml:coverage-core.xml --junitxml=junit-core.xml -n auto
+              pytest tests/test_main.py tests/test_basic_functionality.py -v --cov=. --cov-report=xml:coverage-core.xml --junitxml=junit-core.xml --cov-fail-under=50
               ;;
             "agents")
-              pytest tests/unit/test_agents/ -v --cov=agents --cov-report=xml:coverage-agents.xml --junitxml=junit-agents.xml -n auto
+              pytest tests/test_agents.py -v --cov=agent --cov-report=xml:coverage-agents.xml --junitxml=junit-agents.xml --cov-fail-under=50
               ;;
             "api")
-              pytest tests/unit/test_api/ -v --cov=api --cov-report=xml:coverage-api.xml --junitxml=junit-api.xml -n auto
+              pytest tests/api/ -v --cov=api --cov-report=xml:coverage-api.xml --junitxml=junit-api.xml --cov-fail-under=50
               ;;
             "ml")
-              pytest tests/unit/test_ml/ -v --cov=ml --cov-report=xml:coverage-ml.xml --junitxml=junit-ml.xml -n auto
+              pytest tests/ml/ -v --cov=ml --cov-report=xml:coverage-ml.xml --junitxml=junit-ml.xml --cov-fail-under=50
               ;;
             "fashion")
-              pytest tests/unit/test_fashion/ -v --cov=fashion --cov-report=xml:coverage-fashion.xml --junitxml=junit-fashion.xml -n auto
+              pytest tests/unit/ tests/integration/ -v --cov=fashion --cov-report=xml:coverage-fashion.xml --junitxml=junit-fashion.xml --cov-fail-under=50
               ;;
           esac
       
