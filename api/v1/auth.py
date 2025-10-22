@@ -21,6 +21,13 @@ from security.jwt_auth import (
     user_manager,
     verify_token,
 )
+from api.validation_models import (
+    EnhancedRegisterRequest,
+    EnhancedLoginRequest,
+    ValidationErrorResponse,
+    SecurityViolationResponse,
+    EnhancedSuccessResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +40,7 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest):
+async def register(request: EnhancedRegisterRequest):
     """
     Register a new user
 
@@ -46,10 +53,16 @@ async def register(request: RegisterRequest):
         if existing_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
-        # Create user
+        # Create user with enhanced validation
         user = user_manager.create_user(
-            email=request.email, username=request.username, password=request.password, role=request.role
+            email=request.email,
+            username=request.username,
+            password=request.password,
+            role=request.role
         )
+
+        # Log security event
+        logger.info(f"✅ New user registered: {user.email} (username: {user.username}, role: {user.role})")
 
         logger.info(f"New user registered: {user.email}")
 

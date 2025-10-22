@@ -10,6 +10,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from security.jwt_auth import TokenData, get_current_active_user, require_developer
+from api.validation_models import (
+    AgentExecutionRequest,
+    ValidationErrorResponse,
+    SecurityViolationResponse,
+    EnhancedSuccessResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +27,10 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 # ============================================================================
 
 
-class AgentExecuteRequest(BaseModel):
-    """Generic agent execution request"""
+# Using enhanced AgentExecutionRequest from validation_models
+# Legacy model kept for backward compatibility
+class LegacyAgentExecuteRequest(BaseModel):
+    """Legacy agent execution request - use AgentExecutionRequest instead"""
 
     parameters: Dict[str, Any] = Field(default_factory=dict)
     timeout: Optional[int] = Field(default=300, description="Execution timeout in seconds")

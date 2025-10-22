@@ -16,18 +16,34 @@ from pydantic import BaseModel, EmailStr, Field
 
 logger = logging.getLogger(__name__)
 
-# JWT Configuration
+# JWT Configuration - Enhanced Security
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME"))
 JWT_ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+MAX_LOGIN_ATTEMPTS = 5  # Maximum failed login attempts
+LOCKOUT_DURATION_MINUTES = 15  # Account lockout duration
+TOKEN_BLACKLIST_EXPIRE_HOURS = 24  # How long to keep blacklisted tokens
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing - Enhanced
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=12  # Increased rounds for better security
+)
 
 # Security schemes
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 security_bearer = HTTPBearer()
+
+# Security tracking
+from collections import defaultdict
+from datetime import datetime, timedelta
+
+# Track failed login attempts
+failed_login_attempts = defaultdict(list)
+locked_accounts = {}
+blacklisted_tokens = set()  # In production, use Redis or database
 
 
 # ============================================================================
@@ -108,6 +124,82 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
     return pwd_context.verify(plain_password, hashed_password)
+
+
+# ============================================================================
+# ENHANCED SECURITY FUNCTIONS
+# ============================================================================
+
+def is_account_locked(email: str) -> bool:
+    """Check if account is locked due to failed login attempts"""
+    if email in locked_accounts:
+        lock_time = locked_accounts[email]
+        if datetime.now() < lock_time:
+            return True
+        else:
+            # Lock expired, remove from locked accounts
+            del locked_accounts[email]
+            if email in failed_login_attempts:
+                del failed_login_attempts[email]
+    return False
+
+
+def record_failed_login(email: str) -> bool:
+    """Record failed login attempt and lock account if necessary"""
+    now = datetime.now()
+
+    # Clean old attempts (older than 1 hour)
+    hour_ago = now - timedelta(hours=1)
+    failed_login_attempts[email] = [
+        attempt for attempt in failed_login_attempts[email]
+        if attempt > hour_ago
+    ]
+
+    # Add current failed attempt
+    failed_login_attempts[email].append(now)
+
+    # Check if account should be locked
+    if len(failed_login_attempts[email]) >= MAX_LOGIN_ATTEMPTS:
+        locked_accounts[email] = now + timedelta(minutes=LOCKOUT_DURATION_MINUTES)
+        logger.warning(f"🔒 Account locked due to failed login attempts: {email}")
+        return True
+
+    return False
+
+
+def clear_failed_login_attempts(email: str):
+    """Clear failed login attempts for successful login"""
+    if email in failed_login_attempts:
+        del failed_login_attempts[email]
+    if email in locked_accounts:
+        del locked_accounts[email]
+
+
+def blacklist_token(token: str):
+    """Add token to blacklist (logout/security breach)"""
+    blacklisted_tokens.add(token)
+    logger.info(f"🚫 Token blacklisted for security")
+
+
+def is_token_blacklisted(token: str) -> bool:
+    """Check if token is blacklisted"""
+    return token in blacklisted_tokens
+
+
+def validate_token_security(token: str, token_data: TokenData) -> bool:
+    """Enhanced token security validation"""
+    # Check if token is blacklisted
+    if is_token_blacklisted(token):
+        logger.warning(f"⚠️ Blacklisted token used: {token_data.email}")
+        return False
+
+    # Check token age (additional security check)
+    token_age = datetime.now() - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    if token_age > timedelta(hours=TOKEN_BLACKLIST_EXPIRE_HOURS):
+        logger.warning(f"⚠️ Suspiciously old token used: {token_data.email}")
+        return False
+
+    return True
 
 
 # ============================================================================
@@ -231,6 +323,15 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             token_type=token_type,
             exp=datetime.fromtimestamp(payload.get("exp")),
         )
+
+        # Enhanced security validation
+        if not validate_token_security(token, token_data):
+            logger.warning(f"🚨 Security validation failed for token: {email}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token security validation failed",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         return token_data
 
