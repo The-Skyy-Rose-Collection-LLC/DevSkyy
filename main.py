@@ -580,9 +580,22 @@ app = FastAPI(
 )
 
 # Configure enhanced structured logging (Phase 2) - with fallback
-if STRUCTURED_LOGGING_AVAILABLE:
-    setup_logging()
-    logger = structured_logger
+if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
+    try:
+        setup_enterprise_logging(
+            level=LOG_LEVEL,
+            environment=ENVIRONMENT,
+            service_name="devskyy-platform",
+            version=VERSION
+        )
+        logger = structlog.get_logger(__name__)
+    except Exception as e:
+        print(f"Warning: Failed to setup enterprise logging: {e}")
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        )
+        logger = logging.getLogger(__name__)
 else:
     # Fallback to basic logging
     logging.basicConfig(
@@ -615,9 +628,12 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(BaseHTTPMiddleware, dispatch=validation_middleware)
 
 # Add Phase 2 Security Middleware (comprehensive security enforcement)
-if SECURITY_MIDDLEWARE_AVAILABLE:
-    app.add_middleware(SecurityMiddleware)
-    logger.info("✅ Security middleware enabled")
+if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
+    try:
+        app.add_middleware(SecurityMiddleware)
+        logger.info("✅ Security middleware enabled")
+    except Exception as e:
+        logger.warning(f"⚠️ Security middleware failed to load: {e}")
 else:
     logger.warning("⚠️ Security middleware not available - using basic security")
 
