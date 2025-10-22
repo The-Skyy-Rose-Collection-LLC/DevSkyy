@@ -25,14 +25,14 @@ except ImportError:
     print("Warning: Security middleware not available")
 
 try:
-    from logging_config import setup_logging, security_logger, error_logger, structured_logger
+    from logging_config import setup_logging, structured_logger
     STRUCTURED_LOGGING_AVAILABLE = True
 except ImportError:
     STRUCTURED_LOGGING_AVAILABLE = False
     print("Warning: Structured logging not available")
 
 try:
-    from error_handling import error_handler, DevSkyError, ErrorCode, ErrorSeverity
+    from error_handling import DevSkyError, ErrorCode, ErrorSeverity
     ERROR_HANDLING_AVAILABLE = True
 except ImportError:
     ERROR_HANDLING_AVAILABLE = False
@@ -265,7 +265,7 @@ async def lifespan(app: FastAPI):
     # Run initial health checks
     logger.info("🏥 Running initial health checks...")
     try:
-        health_results = await health_monitor.run_all_checks()
+        await health_monitor.run_all_checks()
         overall_status, message = health_monitor.get_overall_status()
         logger.info(f"   {message}")
     except Exception as e:

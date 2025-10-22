@@ -1,0 +1,239 @@
+name: 🔄 Reusable Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      scan_type:
+        description: 'Type of security scan to perform'
+        required: false
+        default: 'full'
+        type: string
+      python_version:
+        description: 'Python version to use'
+        required: false
+        default: '3.11'
+        type: string
+      upload_sarif:
+        description: 'Whether to upload SARIF results'
+        required: false
+        default: true
+        type: boolean
+      fail_on_critical:
+        description: 'Fail workflow on critical vulnerabilities'
+        required: false
+        default: true
+        type: boolean
+    outputs:
+      security_score:
+        description: 'Overall security score (0-100)'
+        value: ${{ jobs.security-scan.outputs.security_score }}
+      critical_count:
+        description: 'Number of critical vulnerabilities found'
+        value: ${{ jobs.security-scan.outputs.critical_count }}
+      scan_status:
+        description: 'Security scan status'
+        value: ${{ jobs.security-scan.outputs.scan_status }}
+    secrets:
+      SNYK_TOKEN:
+        description: 'Snyk authentication token'
+        required: false
+      SONAR_TOKEN:
+        description: 'SonarQube authentication token'
+        required: false
+
+jobs:
+  security-scan:
+    name: 🛡️ Security Analysis
+    runs-on: ubuntu-latest
+    outputs:
+      security_score: ${{ steps.calculate-score.outputs.security_score }}
+      critical_count: ${{ steps.vulnerability-summary.outputs.critical_count }}
+      scan_status: ${{ steps.final-status.outputs.scan_status }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python_version }}
+          cache: 'pip'
+
+      - name: 📦 Install Security Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit[toml] safety pip-audit semgrep
+
+      # SAST Analysis
+      - name: 🔍 Static Analysis (Bandit)
+        if: inputs.scan_type == 'full' || inputs.scan_type == 'sast'
+        run: |
+          bandit -r . -f json -o bandit-results.json || true
+          if [ "${{ inputs.upload_sarif }}" == "true" ]; then
+            bandit -r . -f sarif -o bandit-results.sarif || true
+          fi
+
+      - name: 🔍 Semantic Analysis (Semgrep)
+        if: inputs.scan_type == 'full' || inputs.scan_type == 'sast'
+        run: |
+          semgrep --config=auto --json --output=semgrep-results.json . || true
+          if [ "${{ inputs.upload_sarif }}" == "true" ]; then
+            semgrep --config=auto --sarif --output=semgrep-results.sarif . || true
+          fi
+
+      # SCA Analysis
+      - name: 🔍 Dependency Scan (Safety)
+        if: inputs.scan_type == 'full' || inputs.scan_type == 'sca'
+        run: |
+          if [ -f requirements.txt ]; then
+            safety check --requirements requirements.txt --json --output safety-results.json || true
+          fi
+
+      - name: 🔍 Vulnerability Audit (Pip-Audit)
+        if: inputs.scan_type == 'full' || inputs.scan_type == 'sca'
+        run: |
+          if [ -f requirements.txt ]; then
+            pip-audit --requirements requirements.txt --format=json --output=pip-audit-results.json || true
+          fi
+
+      # Secrets Detection
+      - name: 🔐 Secrets Scan (TruffleHog)
+        if: inputs.scan_type == 'full' || inputs.scan_type == 'secrets'
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      # Upload SARIF Results
+      - name: 📤 Upload Bandit SARIF
+        if: inputs.upload_sarif && (inputs.scan_type == 'full' || inputs.scan_type == 'sast')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+
+      - name: 📤 Upload Semgrep SARIF
+        if: inputs.upload_sarif && (inputs.scan_type == 'full' || inputs.scan_type == 'sast')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+      # Vulnerability Summary
+      - name: 📊 Vulnerability Summary
+        id: vulnerability-summary
+        run: |
+          echo "📊 Analyzing vulnerability results..."
+          
+          # Count vulnerabilities from different tools
+          BANDIT_CRITICAL=0
+          SEMGREP_CRITICAL=0
+          SAFETY_CRITICAL=0
+          
+          if [ -f bandit-results.json ]; then
+            BANDIT_CRITICAL=$(jq '[.results[] | select(.issue_severity == "HIGH")] | length' bandit-results.json 2>/dev/null || echo "0")
+          fi
+          
+          if [ -f semgrep-results.json ]; then
+            SEMGREP_CRITICAL=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' semgrep-results.json 2>/dev/null || echo "0")
+          fi
+          
+          if [ -f safety-results.json ]; then
+            SAFETY_CRITICAL=$(jq '[.[] | select(.vulnerability_id != null)] | length' safety-results.json 2>/dev/null || echo "0")
+          fi
+          
+          TOTAL_CRITICAL=$((BANDIT_CRITICAL + SEMGREP_CRITICAL + SAFETY_CRITICAL))
+          
+          echo "critical_count=$TOTAL_CRITICAL" >> $GITHUB_OUTPUT
+          echo "bandit_critical=$BANDIT_CRITICAL" >> $GITHUB_OUTPUT
+          echo "semgrep_critical=$SEMGREP_CRITICAL" >> $GITHUB_OUTPUT
+          echo "safety_critical=$SAFETY_CRITICAL" >> $GITHUB_OUTPUT
+          
+          echo "✅ Critical vulnerabilities found: $TOTAL_CRITICAL"
+
+      # Calculate Security Score
+      - name: 📊 Calculate Security Score
+        id: calculate-score
+        run: |
+          CRITICAL_COUNT=${{ steps.vulnerability-summary.outputs.critical_count }}
+          
+          # Calculate security score (100 - penalties)
+          SCORE=100
+          
+          # Deduct points for critical vulnerabilities
+          CRITICAL_PENALTY=$((CRITICAL_COUNT * 10))
+          SCORE=$((SCORE - CRITICAL_PENALTY))
+          
+          # Ensure score doesn't go below 0
+          if [ $SCORE -lt 0 ]; then
+            SCORE=0
+          fi
+          
+          echo "security_score=$SCORE" >> $GITHUB_OUTPUT
+          echo "✅ Security score calculated: $SCORE/100"
+
+      # Security Gate Check
+      - name: 🚨 Security Gate Check
+        id: security-gate
+        run: |
+          CRITICAL_COUNT=${{ steps.vulnerability-summary.outputs.critical_count }}
+          SECURITY_SCORE=${{ steps.calculate-score.outputs.security_score }}
+          
+          echo "🚨 Security Gate Analysis:"
+          echo "  Critical vulnerabilities: $CRITICAL_COUNT"
+          echo "  Security score: $SECURITY_SCORE/100"
+          
+          if [ "${{ inputs.fail_on_critical }}" == "true" ] && [ $CRITICAL_COUNT -gt 0 ]; then
+            echo "❌ Security gate FAILED: Critical vulnerabilities found"
+            echo "gate_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          elif [ $SECURITY_SCORE -lt 70 ]; then
+            echo "⚠️ Security gate WARNING: Low security score"
+            echo "gate_status=warning" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Security gate PASSED"
+            echo "gate_status=passed" >> $GITHUB_OUTPUT
+          fi
+
+      # Final Status
+      - name: 📊 Final Security Status
+        id: final-status
+        if: always()
+        run: |
+          if [ "${{ steps.security-gate.outputs.gate_status }}" == "failed" ]; then
+            echo "scan_status=failed" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.security-gate.outputs.gate_status }}" == "warning" ]; then
+            echo "scan_status=warning" >> $GITHUB_OUTPUT
+          else
+            echo "scan_status=passed" >> $GITHUB_OUTPUT
+          fi
+
+      # Upload Artifacts
+      - name: 📤 Upload Security Reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-scan-results
+          path: |
+            *-results.json
+            *-results.sarif
+
+      # Security Summary
+      - name: 📊 Security Scan Summary
+        if: always()
+        run: |
+          echo "## 🛡️ Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Scan Type: ${{ inputs.scan_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 📊 Security Score: ${{ steps.calculate-score.outputs.security_score }}/100" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚨 Critical Issues: ${{ steps.vulnerability-summary.outputs.critical_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎯 Gate Status: ${{ steps.security-gate.outputs.gate_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Tool Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- Bandit (SAST): ${{ steps.vulnerability-summary.outputs.bandit_critical }} critical" >> $GITHUB_STEP_SUMMARY
+          echo "- Semgrep (SAST): ${{ steps.vulnerability-summary.outputs.semgrep_critical }} critical" >> $GITHUB_STEP_SUMMARY
+          echo "- Safety (SCA): ${{ steps.vulnerability-summary.outputs.safety_critical }} critical" >> $GITHUB_STEP_SUMMARY

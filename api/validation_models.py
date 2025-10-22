@@ -5,10 +5,10 @@ Comprehensive input validation, sanitization, and security enforcement
 
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from enum import Enum
 
-from pydantic import BaseModel, EmailStr, Field, validator, root_validator
+from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic.types import constr, conint, confloat
 
 
@@ -95,11 +95,9 @@ class EnhancedRegisterRequest(BaseModel):
     """Enhanced registration request with comprehensive validation"""
     
     email: EmailStr = Field(..., description="Valid email address")
-    username: constr(
-        min_length=3, 
-        max_length=50, 
-        regex=r"^[a-zA-Z0-9_-]+$"
-    ) = Field(..., description="Username (3-50 chars, alphanumeric, _, -)")
+    username: constr(min_length=3, max_length=50) = Field(
+        ..., description="Username (3-50 chars, alphanumeric, _, -)"
+    )
     password: constr(min_length=8, max_length=128) = Field(
         ..., description="Password (8-128 chars)"
     )
@@ -169,11 +167,9 @@ class EnhancedLoginRequest(BaseModel):
 class AgentExecutionRequest(BaseModel):
     """Enhanced agent execution request"""
     
-    agent_type: constr(
-        min_length=1, 
-        max_length=50,
-        regex=r"^[a-zA-Z0-9_-]+$"
-    ) = Field(..., description="Agent type identifier")
+    agent_type: constr(min_length=1, max_length=50) = Field(
+        ..., description="Agent type identifier"
+    )
     
     task_description: constr(
         min_length=1, 
@@ -200,6 +196,13 @@ class AgentExecutionRequest(BaseModel):
         description="Security level for task execution"
     )
     
+    @validator('agent_type')
+    def validate_agent_type(cls, v):
+        """Validate agent type format"""
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('Agent type can only contain letters, numbers, underscores, and hyphens')
+        return v
+
     @validator('task_description')
     def validate_task_description(cls, v):
         """Validate task description for security"""
@@ -226,17 +229,13 @@ class AgentExecutionRequest(BaseModel):
 class MLModelRequest(BaseModel):
     """Enhanced ML model request"""
     
-    model_name: constr(
-        min_length=1,
-        max_length=100,
-        regex=r"^[a-zA-Z0-9_-]+$"
-    ) = Field(..., description="Model name")
-    
-    version: constr(
-        min_length=1,
-        max_length=20,
-        regex=r"^[a-zA-Z0-9._-]+$"
-    ) = Field(default="latest", description="Model version")
+    model_name: constr(min_length=1, max_length=100) = Field(
+        ..., description="Model name"
+    )
+
+    version: constr(min_length=1, max_length=20) = Field(
+        default="latest", description="Model version"
+    )
     
     input_data: Dict[str, Any] = Field(
         ..., description="Input data for model"
@@ -251,7 +250,21 @@ class MLModelRequest(BaseModel):
         default=10,
         description="Maximum results to return (1-100)"
     )
-    
+
+    @validator('model_name')
+    def validate_model_name(cls, v):
+        """Validate model name format"""
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('Model name can only contain letters, numbers, underscores, and hyphens')
+        return v
+
+    @validator('version')
+    def validate_version(cls, v):
+        """Validate version format"""
+        if not re.match(r'^[a-zA-Z0-9._-]+$', v):
+            raise ValueError('Version can only contain letters, numbers, dots, underscores, and hyphens')
+        return v
+
     @validator('input_data')
     def validate_input_data(cls, v):
         """Validate input data for security"""
@@ -270,11 +283,9 @@ class MLModelRequest(BaseModel):
 class ContentGenerationRequest(BaseModel):
     """Enhanced content generation request"""
     
-    content_type: constr(
-        min_length=1,
-        max_length=50,
-        regex=r"^[a-zA-Z0-9_-]+$"
-    ) = Field(..., description="Content type")
+    content_type: constr(min_length=1, max_length=50) = Field(
+        ..., description="Content type"
+    )
     
     prompt: constr(
         min_length=1,
@@ -298,7 +309,14 @@ class ContentGenerationRequest(BaseModel):
         default=True,
         description="Include generation metadata"
     )
-    
+
+    @validator('content_type')
+    def validate_content_type(cls, v):
+        """Validate content type format"""
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('Content type can only contain letters, numbers, underscores, and hyphens')
+        return v
+
     @validator('prompt', 'target_audience', 'tone')
     def validate_text_content(cls, v):
         """Validate text content for security"""
@@ -351,7 +369,7 @@ class EnhancedSuccessResponse(BaseModel):
 class GDPRDataRequest(BaseModel):
     """Enhanced GDPR data request"""
     
-    request_type: constr(regex=r"^(export|delete|anonymize)$") = Field(
+    request_type: str = Field(
         ..., description="Request type: export, delete, or anonymize"
     )
     
@@ -375,7 +393,15 @@ class GDPRDataRequest(BaseModel):
     reason: Optional[constr(max_length=500)] = Field(
         None, description="Reason for request (max 500 chars)"
     )
-    
+
+    @validator('request_type')
+    def validate_request_type(cls, v):
+        """Validate GDPR request type"""
+        valid_types = ['export', 'delete', 'anonymize']
+        if v not in valid_types:
+            raise ValueError(f'Request type must be one of: {", ".join(valid_types)}')
+        return v
+
     @validator('reason')
     def validate_reason(cls, v):
         """Validate reason field"""

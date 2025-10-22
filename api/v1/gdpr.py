@@ -247,7 +247,7 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
 
         else:
             # Full deletion approach
-            logger.info(f"   → Performing full data deletion")
+            logger.info("   → Performing full data deletion")
 
             # Delete user account
             deleted_records["user_account"] = 1
@@ -256,17 +256,17 @@ async def delete_user_data(request: GDPRDeleteRequest, current_user: TokenData =
             if request.delete_activity_logs:
                 deleted_records["activity_logs"] = 1
                 deleted_records["api_calls"] = 1
-                logger.info(f"   ✓ Deleted activity logs")
+                logger.info("   ✓ Deleted activity logs")
 
             # Retain minimal audit trail for legal compliance
             retained_records["deletion_audit_log"] = 1
-            logger.info(f"   ✓ Retained deletion audit log for compliance")
+            logger.info("   ✓ Retained deletion audit log for compliance")
 
             # Note: In production, this would actually delete records from the database
             # For now, we're documenting what would be deleted
             logger.warning(f"   ⚠️  User account marked for deletion: {current_user.email}")
 
-        logger.info(f"   ✓ Data deletion/anonymization completed")
+        logger.info("   ✓ Data deletion/anonymization completed")
         logger.info(f"   ✓ Request ID: {request_id}")
         logger.info(f"   ✓ Records deleted: {sum(deleted_records.values())}")
         if retained_records:

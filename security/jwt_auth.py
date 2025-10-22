@@ -38,7 +38,6 @@ security_bearer = HTTPBearer()
 
 # Security tracking
 from collections import defaultdict
-from datetime import datetime, timedelta
 
 # Track failed login attempts
 failed_login_attempts = defaultdict(list)
@@ -178,7 +177,7 @@ def clear_failed_login_attempts(email: str):
 def blacklist_token(token: str):
     """Add token to blacklist (logout/security breach)"""
     blacklisted_tokens.add(token)
-    logger.info(f"🚫 Token blacklisted for security")
+    logger.info("🚫 Token blacklisted for security")
 
 
 def is_token_blacklisted(token: str) -> bool:

@@ -8,12 +8,11 @@ import os
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import AsyncGenerator, Dict, List, Optional
+from typing import AsyncGenerator, Dict, Optional
 from collections import defaultdict, deque
 
 from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
-from sqlalchemy.pool import QueuePool
 from cryptography.fernet import Fernet
 
 logger = logging.getLogger(__name__)

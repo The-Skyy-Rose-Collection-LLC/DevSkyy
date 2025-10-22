@@ -7,10 +7,10 @@ import logging
 import time
 import uuid
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 from collections import defaultdict, deque
 
-from fastapi import Request, Response, HTTPException, status
+from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import ValidationError

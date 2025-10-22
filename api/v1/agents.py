@@ -12,9 +12,6 @@ from pydantic import BaseModel, Field
 from security.jwt_auth import TokenData, get_current_active_user, require_developer
 from api.validation_models import (
     AgentExecutionRequest,
-    ValidationErrorResponse,
-    SecurityViolationResponse,
-    EnhancedSuccessResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -29,7 +26,7 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 
 # Using enhanced AgentExecutionRequest from validation_models
 # Legacy model kept for backward compatibility
-class LegacyAgentExecuteRequest(BaseModel):
+class LegacyAgentExecutionRequest(BaseModel):
     """Legacy agent execution request - use AgentExecutionRequest instead"""
 
     parameters: Dict[str, Any] = Field(default_factory=dict)
@@ -60,7 +57,7 @@ class BatchRequest(BaseModel):
 
 
 @router.post("/scanner/execute", response_model=AgentExecuteResponse)
-async def execute_scanner(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_scanner(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Scanner Agent - Code and site analysis"""
     try:
         from agent.modules.backend.scanner import scanner_agent
@@ -80,7 +77,7 @@ async def execute_scanner(request: AgentExecuteRequest, current_user: TokenData 
 
 
 @router.post("/scanner-v2/execute", response_model=AgentExecuteResponse)
-async def execute_scanner_v2(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_scanner_v2(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Scanner Agent V2 - Enhanced scanner with security scanning"""
     try:
         from agent.modules.backend.scanner_v2 import scanner_agent
@@ -105,7 +102,7 @@ async def execute_scanner_v2(request: AgentExecuteRequest, current_user: TokenDa
 
 
 @router.post("/fixer/execute", response_model=AgentExecuteResponse)
-async def execute_fixer(request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)):
+async def execute_fixer(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Fixer Agent - Automated code fixing"""
     try:
         from agent.modules.backend.fixer import fixer_agent
@@ -125,7 +122,7 @@ async def execute_fixer(request: AgentExecuteRequest, current_user: TokenData = 
 
 
 @router.post("/fixer-v2/execute", response_model=AgentExecuteResponse)
-async def execute_fixer_v2(request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)):
+async def execute_fixer_v2(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Fixer Agent V2 - Enhanced auto-fixing with AI"""
     try:
         from agent.modules.backend.fixer_v2 import fixer_agent
@@ -151,7 +148,7 @@ async def execute_fixer_v2(request: AgentExecuteRequest, current_user: TokenData
 
 @router.post("/claude-sonnet/execute", response_model=AgentExecuteResponse)
 async def execute_claude_sonnet(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Claude Sonnet Intelligence Service"""
     try:
@@ -172,7 +169,7 @@ async def execute_claude_sonnet(
 
 
 @router.post("/openai/execute", response_model=AgentExecuteResponse)
-async def execute_openai(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_openai(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute OpenAI Intelligence Service"""
     try:
         from agent.modules.backend.openai_intelligence_service import agent as openai_agent
@@ -193,7 +190,7 @@ async def execute_openai(request: AgentExecuteRequest, current_user: TokenData =
 
 @router.post("/multi-model-ai/execute", response_model=AgentExecuteResponse)
 async def execute_multi_model_ai(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Multi-Model AI Orchestrator - Routes to best model"""
     try:
@@ -219,7 +216,7 @@ async def execute_multi_model_ai(
 
 
 @router.post("/ecommerce/execute", response_model=AgentExecuteResponse)
-async def execute_ecommerce(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_ecommerce(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute E-commerce Agent - General e-commerce operations"""
     try:
         from agent.modules.backend.ecommerce_agent import agent as ecom_agent
@@ -239,7 +236,7 @@ async def execute_ecommerce(request: AgentExecuteRequest, current_user: TokenDat
 
 
 @router.post("/inventory/execute", response_model=AgentExecuteResponse)
-async def execute_inventory(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_inventory(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Inventory Agent - Inventory management and forecasting"""
     try:
         from agent.modules.backend.inventory_agent import agent as inventory_agent
@@ -259,7 +256,7 @@ async def execute_inventory(request: AgentExecuteRequest, current_user: TokenDat
 
 
 @router.post("/financial/execute", response_model=AgentExecuteResponse)
-async def execute_financial(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_financial(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Financial Agent - Payment processing and analytics"""
     try:
         from agent.modules.backend.financial_agent import agent as financial_agent
@@ -285,7 +282,7 @@ async def execute_financial(request: AgentExecuteRequest, current_user: TokenDat
 
 @router.post("/brand-intelligence/execute", response_model=AgentExecuteResponse)
 async def execute_brand_intelligence(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Brand Intelligence Agent - Brand insights and analysis"""
     try:
@@ -307,7 +304,7 @@ async def execute_brand_intelligence(
 
 @router.post("/seo-marketing/execute", response_model=AgentExecuteResponse)
 async def execute_seo_marketing(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute SEO Marketing Agent - SEO optimization and strategy"""
     try:
@@ -329,7 +326,7 @@ async def execute_seo_marketing(
 
 @router.post("/social-media/execute", response_model=AgentExecuteResponse)
 async def execute_social_media(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Social Media Automation Agent"""
     try:
@@ -350,7 +347,7 @@ async def execute_social_media(
 
 
 @router.post("/email-sms/execute", response_model=AgentExecuteResponse)
-async def execute_email_sms(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_email_sms(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Email/SMS Automation Agent"""
     try:
         from agent.modules.backend.email_sms_automation_agent import agent as email_agent
@@ -371,7 +368,7 @@ async def execute_email_sms(request: AgentExecuteRequest, current_user: TokenDat
 
 @router.post("/marketing-content/execute", response_model=AgentExecuteResponse)
 async def execute_marketing_content(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Marketing Content Generation Agent"""
     try:
@@ -397,7 +394,7 @@ async def execute_marketing_content(
 
 
 @router.post("/wordpress/execute", response_model=AgentExecuteResponse)
-async def execute_wordpress(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_wordpress(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute WordPress Agent - WordPress integration"""
     try:
         from agent.modules.backend.wordpress_agent import agent as wp_agent
@@ -418,7 +415,7 @@ async def execute_wordpress(request: AgentExecuteRequest, current_user: TokenDat
 
 @router.post("/wordpress-theme-builder/execute", response_model=AgentExecuteResponse)
 async def execute_wordpress_theme_builder(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute WordPress Theme Builder - Generate complete themes"""
     try:
@@ -445,7 +442,7 @@ async def execute_wordpress_theme_builder(
 
 @router.post("/customer-service/execute", response_model=AgentExecuteResponse)
 async def execute_customer_service(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Customer Service Agent - AI customer support"""
     try:
@@ -466,7 +463,7 @@ async def execute_customer_service(
 
 
 @router.post("/voice-audio/execute", response_model=AgentExecuteResponse)
-async def execute_voice_audio(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_voice_audio(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Voice/Audio Content Agent - Voice synthesis and processing"""
     try:
         from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
@@ -492,7 +489,7 @@ async def execute_voice_audio(request: AgentExecuteRequest, current_user: TokenD
 
 @router.post("/blockchain-nft/execute", response_model=AgentExecuteResponse)
 async def execute_blockchain_nft(
-    request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)
+    request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Execute Blockchain/NFT Agent - NFT and blockchain operations"""
     try:
@@ -513,7 +510,7 @@ async def execute_blockchain_nft(
 
 
 @router.post("/code-generation/execute", response_model=AgentExecuteResponse)
-async def execute_code_generation(request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)):
+async def execute_code_generation(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Advanced Code Generation Agent - AI code generation"""
     try:
         from agent.modules.backend.advanced_code_generation_agent import agent as codegen_agent
@@ -533,7 +530,7 @@ async def execute_code_generation(request: AgentExecuteRequest, current_user: To
 
 
 @router.post("/security/execute", response_model=AgentExecuteResponse)
-async def execute_security(request: AgentExecuteRequest, current_user: TokenData = Depends(require_developer)):
+async def execute_security(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Security Agent - Security scanning and threat detection"""
     try:
         from agent.modules.backend.security_agent import agent as security_agent
@@ -553,7 +550,7 @@ async def execute_security(request: AgentExecuteRequest, current_user: TokenData
 
 
 @router.post("/performance/execute", response_model=AgentExecuteResponse)
-async def execute_performance(request: AgentExecuteRequest, current_user: TokenData = Depends(get_current_active_user)):
+async def execute_performance(request: AgentExecutionRequest, current_user: TokenData = Depends(get_current_active_user)):
     """Execute Performance Agent - Performance analysis and optimization"""
     try:
         from agent.modules.backend.performance_agent import agent as perf_agent

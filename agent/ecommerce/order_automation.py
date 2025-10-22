@@ -15,7 +15,7 @@ Features:
 import logging
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -334,6 +334,7 @@ class OrderAutomation:
 
         # Use shipping address for intelligent routing
         customer_region = shipping_address.get("region", "unknown")
+        logger.debug(f"Routing order for customer in region: {customer_region}")
 
         # Simulate intelligent routing based on customer location
         warehouses = [

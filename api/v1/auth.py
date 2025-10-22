@@ -4,14 +4,13 @@ JWT/OAuth2 authentication with user management
 """
 
 import logging
-from datetime import datetime
+# datetime not needed in this module
 from typing import Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from security.jwt_auth import (
-    RegisterRequest,
     TokenData,
     TokenResponse,
     User,
@@ -23,10 +22,6 @@ from security.jwt_auth import (
 )
 from api.validation_models import (
     EnhancedRegisterRequest,
-    EnhancedLoginRequest,
-    ValidationErrorResponse,
-    SecurityViolationResponse,
-    EnhancedSuccessResponse,
 )
 
 logger = logging.getLogger(__name__)
