@@ -20,13 +20,27 @@ def client():
 @pytest.fixture
 def auth_headers():
     """Create authentication headers with valid JWT token"""
+    from security.jwt_auth import user_manager, User
+
     # Create a test user token
     token_data = {
         "user_id": "test_user_123",
-        "email": "test@example.com",
+        "email": "test@devskyy.com",
         "username": "testuser",
         "role": UserRole.API_USER,
     }
+
+    # Add user to user manager
+    test_user = User(
+        user_id=token_data["user_id"],
+        email=token_data["email"],
+        username=token_data["username"],
+        role=token_data["role"],
+        permissions=["read", "write"],
+    )
+    user_manager.users[test_user.user_id] = test_user
+    user_manager.email_index[test_user.email] = test_user.user_id
+
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
 
@@ -47,7 +61,7 @@ def admin_headers():
 class TestGDPRExportEndpoint:
     """Test GDPR data export endpoint (Article 15)"""
 
-    def test_export_user_data_success(self, client, auth_headers):
+    def test_export_user_data_success(self, client, auth_headers, setup_test_user):
         """Test successful user data export"""
         response = client.get(
             "/api/v1/gdpr/export",

@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 import time
+from contextlib import asynccontextmanager
 from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException, Request, status
@@ -199,6 +200,90 @@ from models_sqlalchemy import PaymentRequest, ProductRequest
 load_dotenv()
 
 # ============================================================================
+# LIFESPAN HANDLER
+# ============================================================================
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan handler"""
+    # Startup
+    logger.info("=" * 80)
+    logger.info(" 🚀 DevSkyy Enterprise v5.1 - Starting Up")
+    logger.info("=" * 80)
+
+    try:
+        # Initialize database
+        from startup_sqlalchemy import on_startup
+
+        await on_startup()
+        logger.info("✅ Database initialized")
+    except Exception as e:
+        logger.warning(f"⚠️  Database initialization issue: {str(e)}")
+
+    # Initialize security
+    logger.info("🔐 Initializing enterprise security...")
+    from security.jwt_auth import user_manager
+
+    logger.info(f"   ✅ {len(user_manager.users)} users loaded")
+    logger.info("   ✅ JWT/OAuth2 authentication enabled")
+    logger.info("   ✅ AES-256-GCM encryption enabled")
+
+    # Initialize monitoring
+    logger.info("📊 Initializing monitoring...")
+    metrics_collector.increment_counter("app_startups")
+    logger.info("   ✅ Metrics collection active")
+    logger.info("   ✅ Performance tracking active")
+
+    # Initialize webhooks
+    logger.info("🔔 Initializing webhook system...")
+    logger.info(f"   ✅ {len(webhook_manager.subscriptions)} subscriptions active")
+
+    # Run initial health checks
+    logger.info("🏥 Running initial health checks...")
+    try:
+        health_results = await health_monitor.run_all_checks()
+        overall_status, message = health_monitor.get_overall_status()
+        logger.info(f"   {message}")
+    except Exception as e:
+        logger.warning(f"   ⚠️  Health check issue: {str(e)}")
+
+    # Initialize agents
+    logger.info("🤖 Initializing agent systems...")
+    try:
+        from agent.registry import registry
+
+        # Discover and register agents
+        discovery_results = await registry.discover_and_register_all_agents()
+        logger.info(f"   ✅ {discovery_results.get('registered', 0)} agents registered")
+    except Exception as e:
+        logger.warning(f"   ⚠️  Agent discovery issue: {str(e)}")
+
+    logger.info("=" * 80)
+    logger.info(" ✅ DevSkyy Enterprise v5.1 - Ready for Production!")
+    logger.info("=" * 80)
+    logger.info("")
+    logger.info(" 🌐 API Documentation:    http://localhost:8000/docs")
+    logger.info(" 🔐 Authentication:       JWT/OAuth2 enabled")
+    logger.info(" 🔔 Webhooks:             Active")
+    logger.info(" 📊 Monitoring:           Active")
+    logger.info(" 🤖 Agents:               54 available via API")
+    logger.info(" 🔒 Security:             AES-256-GCM encryption")
+    logger.info(" ✅ API Version:          v1")
+    logger.info("")
+    logger.info("=" * 80)
+
+    yield
+
+    # Shutdown
+    try:
+        from startup_sqlalchemy import on_shutdown
+
+        await on_shutdown()
+        logger.info("👋 Platform shutdown complete")
+    except Exception as e:
+        logger.warning(f"⚠️  Shutdown issue: {str(e)}")
+
+
+# ============================================================================
 # FASTAPI APPLICATION
 # ============================================================================
 app = FastAPI(
@@ -207,6 +292,7 @@ app = FastAPI(
     description="Enterprise-grade platform with JWT auth, AES-256 encryption, webhooks, and monitoring. 54 AI agents with comprehensive REST API. Zero MongoDB - Pure SQLAlchemy.",  # noqa: E501
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configure logging
@@ -392,87 +478,8 @@ health_monitor.register_check("security", security_manager_health_check)
 
 
 # ============================================================================
-# STARTUP & SHUTDOWN
+# STARTUP & SHUTDOWN - Now handled by lifespan handler above
 # ============================================================================
-@app.on_event("startup")
-async def startup_event():
-    """Enhanced startup with all enterprise features"""
-    logger.info("=" * 80)
-    logger.info(" 🚀 DevSkyy Enterprise v5.1 - Starting Up")
-    logger.info("=" * 80)
-
-    try:
-        # Initialize database
-        from startup_sqlalchemy import on_startup
-
-        await on_startup()
-        logger.info("✅ Database initialized")
-    except Exception as e:
-        logger.warning(f"⚠️  Database initialization issue: {str(e)}")
-
-    # Initialize security
-    logger.info("🔐 Initializing enterprise security...")
-    from security.jwt_auth import user_manager
-
-    logger.info(f"   ✅ {len(user_manager.users)} users loaded")
-    logger.info("   ✅ JWT/OAuth2 authentication enabled")
-    logger.info("   ✅ AES-256-GCM encryption enabled")
-
-    # Initialize monitoring
-    logger.info("📊 Initializing monitoring...")
-    metrics_collector.increment_counter("app_startups")
-    logger.info("   ✅ Metrics collection active")
-    logger.info("   ✅ Performance tracking active")
-
-    # Initialize webhooks
-    logger.info("🔔 Initializing webhook system...")
-    logger.info(f"   ✅ {len(webhook_manager.subscriptions)} subscriptions active")
-
-    # Run initial health checks
-    logger.info("🏥 Running initial health checks...")
-    try:
-        health_results = await health_monitor.run_all_checks()
-        overall_status, message = health_monitor.get_overall_status()
-        logger.info(f"   {message}")
-    except Exception as e:
-        logger.warning(f"   ⚠️  Health check issue: {str(e)}")
-
-    # Initialize agents
-    logger.info("🤖 Initializing agent systems...")
-    try:
-        from agent.registry import registry
-
-        # Discover and register agents
-        discovery_results = await registry.discover_and_register_all_agents()
-        logger.info(f"   ✅ {discovery_results.get('registered', 0)} agents registered")
-    except Exception as e:
-        logger.warning(f"   ⚠️  Agent discovery issue: {str(e)}")
-
-    logger.info("=" * 80)
-    logger.info(" ✅ DevSkyy Enterprise v5.1 - Ready for Production!")
-    logger.info("=" * 80)
-    logger.info("")
-    logger.info(" 🌐 API Documentation:    http://localhost:8000/docs")
-    logger.info(" 🔐 Authentication:       JWT/OAuth2 enabled")
-    logger.info(" 🔔 Webhooks:             Active")
-    logger.info(" 📊 Monitoring:           Active")
-    logger.info(" 🤖 Agents:               54 available via API")
-    logger.info(" 🔒 Security:             AES-256-GCM encryption")
-    logger.info(" ✅ API Version:          v1")
-    logger.info("")
-    logger.info("=" * 80)
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
-    try:
-        from startup_sqlalchemy import on_shutdown
-
-        await on_shutdown()
-        logger.info("👋 Platform shutdown complete")
-    except Exception as e:
-        logger.warning(f"⚠️  Shutdown issue: {str(e)}")
 
 
 # ============================================================================

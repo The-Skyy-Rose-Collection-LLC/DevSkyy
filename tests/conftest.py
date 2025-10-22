@@ -104,6 +104,33 @@ def test_user_data():
 
 
 @pytest.fixture(scope="function")
+def setup_test_user(test_user_data):
+    """Add test user to user manager for testing"""
+    from security.jwt_auth import user_manager, User, UserRole
+
+    # Create test user
+    test_user = User(
+        user_id=test_user_data["user_id"],
+        email=test_user_data["email"],
+        username=test_user_data["username"],
+        role=UserRole.SUPER_ADMIN,
+        permissions=test_user_data["permissions"],
+    )
+
+    # Add to user manager
+    user_manager.users[test_user.user_id] = test_user
+    user_manager.email_index[test_user.email] = test_user.user_id
+
+    yield test_user
+
+    # Cleanup
+    if test_user.user_id in user_manager.users:
+        del user_manager.users[test_user.user_id]
+    if test_user.email in user_manager.email_index:
+        del user_manager.email_index[test_user.email]
+
+
+@pytest.fixture(scope="function")
 def test_access_token(test_user_data):
     """Generate test JWT access token"""
     return create_access_token(data=test_user_data)

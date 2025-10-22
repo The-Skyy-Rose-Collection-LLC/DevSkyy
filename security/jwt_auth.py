@@ -51,6 +51,7 @@ class User(BaseModel):
     user_id: str
     email: EmailStr
     username: str
+    password_hash: Optional[str] = None  # Hashed password
     role: str = UserRole.API_USER
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.now)
@@ -167,6 +168,23 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
 
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
     return encoded_jwt
+
+
+def get_token_payload(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Get token payload without validation (for testing purposes)
+
+    Args:
+        token: JWT token to decode
+
+    Returns:
+        Token payload or None if invalid
+    """
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        return payload
+    except Exception:
+        return None
 
 
 def verify_token(token: str, token_type: str = "access") -> TokenData:
@@ -376,9 +394,36 @@ class UserManager:
     def __init__(self):
         self.users: Dict[str, User] = {}
         self.email_index: Dict[str, str] = {}  # email -> user_id
+        self.username_index: Dict[str, str] = {}  # username -> user_id
 
         # Create default admin user
         self._create_default_users()
+
+    def hash_password(self, password: str) -> str:
+        """Hash a password using bcrypt"""
+        return pwd_context.hash(password)
+
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """Verify a password against its hash"""
+        return pwd_context.verify(plain_password, hashed_password)
+
+    def authenticate_user(self, username_or_email: str, password: str) -> Optional[User]:
+        """Authenticate a user by username/email and password"""
+        # Try to find user by email first
+        user = self.get_user_by_email(username_or_email)
+        if not user:
+            # Try to find by username
+            user = self.get_user_by_username(username_or_email)
+
+        if not user or not user.password_hash:
+            return None
+
+        if not self.verify_password(password, user.password_hash):
+            return None
+
+        # Update last login
+        user.last_login = datetime.now()
+        return user
 
     def _create_default_users(self):
         """Create default users for development"""
@@ -392,6 +437,7 @@ class UserManager:
         )
         self.users[admin_user.user_id] = admin_user
         self.email_index[admin_user.email] = admin_user.user_id
+        self.username_index[admin_user.username] = admin_user.user_id
 
         # API user
         api_user = User(
@@ -403,6 +449,7 @@ class UserManager:
         )
         self.users[api_user.user_id] = api_user
         self.email_index[api_user.email] = api_user.user_id
+        self.username_index[api_user.username] = api_user.user_id
 
         logger.info(f"Created {len(self.users)} default users")
 
@@ -417,24 +464,44 @@ class UserManager:
             return self.users.get(user_id)
         return None
 
+    def get_user_by_username(self, username: str) -> Optional[User]:
+        """Get user by username"""
+        user_id = self.username_index.get(username)
+        if user_id:
+            return self.users.get(user_id)
+        return None
+
     def create_user(self, email: str, username: str, password: str, role: str = UserRole.API_USER) -> User:
-        """Create a new user"""
+        """Create a new user with hashed password"""
         # Check if email already exists
         if email in self.email_index:
             raise ValueError(f"User with email {email} already exists")
 
+        # Check if username already exists
+        if username in self.username_index:
+            raise ValueError(f"User with username {username} already exists")
+
         # Generate user ID
         user_id = f"user_{len(self.users) + 1:06d}"
 
+        # Hash password
+        password_hash = self.hash_password(password)
+
         # Create user
-        user = User(user_id=user_id, email=email, username=username, role=role)
+        user = User(
+            user_id=user_id,
+            email=email,
+            username=username,
+            password_hash=password_hash,
+            role=role
+        )
 
         # Store user
         self.users[user_id] = user
         self.email_index[email] = user_id
+        self.username_index[username] = user_id
 
-        # In production, hash and store password in database
-        logger.info(f"Created new user: {email} with role {role}")
+        logger.info(f"Created new user: {email} (username: {username}) with role {role}")
 
         return user
 

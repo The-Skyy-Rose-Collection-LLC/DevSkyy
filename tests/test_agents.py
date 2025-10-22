@@ -1,7 +1,7 @@
-from agent.modules.customer_service import CustomerServiceAgent, handle_customer_service
-from agent.modules.financial import FinancialAgent, monitor_financial_health
-from agent.modules.inventory import InventoryAgent, manage_inventory
-from agent.modules.marketing import MarketingAgent, optimize_marketing
+from agent.modules.backend.customer_service_agent import CustomerServiceAgent
+from agent.modules.backend.financial_agent import FinancialAgent
+from agent.modules.backend.inventory_agent import InventoryAgent
+from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 
 
 class TestFinancialAgent:

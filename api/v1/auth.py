@@ -67,26 +67,28 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Login and get access token
 
-    Uses OAuth2 password flow. Provide username (email) and password.
+    Uses OAuth2 password flow. Provide username/email and password.
     Returns access token and refresh token.
     """
     try:
-        # Get user by email (username field contains email)
-        user = user_manager.get_user_by_email(form_data.username)
+        # Authenticate user with username/email and password
+        user = user_manager.authenticate_user(form_data.username, form_data.password)
 
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password",
+                detail="Incorrect username/email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        # In production, verify password against hash
-        # For now, accept any password for development
-        logger.info(f"User logged in: {user.email}")
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User account is disabled",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
-        # Update last login
-        user.last_login = datetime.now()
+        logger.info(f"User logged in: {user.email} (username: {user.username})")
 
         # Create tokens
         tokens = create_user_tokens(user)

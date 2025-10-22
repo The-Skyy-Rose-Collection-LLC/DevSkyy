@@ -9,8 +9,8 @@ import pytest
 from jose import jwt
 
 from security.jwt_auth import (
-    ALGORITHM,
-    SECRET_KEY,
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
     create_access_token,
     create_refresh_token,
     get_token_payload,
@@ -30,7 +30,7 @@ class TestJWTTokenCreation:
         assert len(token) > 50  # JWT tokens are reasonably long
 
         # Verify token can be decoded
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         assert payload["user_id"] == test_user_data["user_id"]
         assert payload["email"] == test_user_data["email"]
         assert payload["token_type"] == "access"
@@ -40,7 +40,7 @@ class TestJWTTokenCreation:
         expires_delta = timedelta(minutes=30)
         token = create_access_token(data=test_user_data, expires_delta=expires_delta)
 
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         exp_timestamp = payload["exp"]
         iat_timestamp = payload["iat"]
 
@@ -54,14 +54,14 @@ class TestJWTTokenCreation:
         assert token is not None
         assert isinstance(token, str)
 
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         assert payload["user_id"] == test_user_data["user_id"]
         assert payload["token_type"] == "refresh"
 
     def test_create_token_contains_all_user_data(self, test_user_data):
         """Test that token contains all provided user data"""
         token = create_access_token(data=test_user_data)
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
         for key, value in test_user_data.items():
             assert payload[key] == value
@@ -72,7 +72,7 @@ class TestJWTTokenCreation:
         token = create_access_token(data=test_user_data)
         after_time = datetime.now(timezone.utc)
 
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         iat_time = datetime.fromtimestamp(payload["iat"], tz=timezone.utc)
 
         # Issued time should be between before and after
@@ -131,7 +131,7 @@ class TestJWTTokenVerification:
     def test_verify_token_with_wrong_secret(self, test_user_data):
         """Test that token signed with different secret is rejected"""
         # Create token with different secret
-        wrong_secret_token = jwt.encode(test_user_data, "wrong_secret_key", algorithm=ALGORITHM)
+        wrong_secret_token = jwt.encode(test_user_data, "wrong_secret_key", algorithm=JWT_ALGORITHM)
 
         result = verify_token(wrong_secret_token)
         assert result is None
