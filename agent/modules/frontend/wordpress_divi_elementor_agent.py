@@ -549,15 +549,22 @@ class WordPressDiviElementorAgent:
         secondary_color = brand_context.get("secondary_color", "#c9a96e")
         accent_color = brand_context.get("accent_color", "#ffffff")
 
-        css_template = f"""
+        css_template = (
+            """
 /* Luxury WordPress Theme - Custom CSS */
 
-:root {{
-    --primary-color: {primary_color};
-    --secondary-color: {secondary_color};
-    --accent-color: {accent_color};
+:root {
+    --primary-color: """
+            + primary_color
+            + """;
+    --secondary-color: """
+            + secondary_color
+            + """;
+    --accent-color: """
+            + accent_color
+            + """;
     --luxury-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-}}"""
+}
 
 /* Typography */
 .luxury-heading {
@@ -631,6 +638,7 @@ class WordPressDiviElementorAgent:
     }
 }
         """
+        )
 
         return css_template
 
