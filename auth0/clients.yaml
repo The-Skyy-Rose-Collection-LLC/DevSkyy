@@ -1,0 +1,202 @@
+# DevSkyy Auth0 Applications Configuration
+# Enterprise applications for web, mobile, and API access
+
+clients:
+  # Web Application (React/Next.js Frontend)
+  - name: "DevSkyy Web Application"
+    description: "DevSkyy enterprise web application for fashion e-commerce"
+    app_type: "spa"
+    logo_uri: "https://devskyy.com/logo.png"
+    
+    # URLs
+    callbacks:
+      - "https://devskyy.vercel.app/callback"
+      - "https://devskyy.com/callback"
+      - "http://localhost:3000/callback"  # Development
+    
+    allowed_logout_urls:
+      - "https://devskyy.vercel.app"
+      - "https://devskyy.com"
+      - "http://localhost:3000"  # Development
+    
+    web_origins:
+      - "https://devskyy.vercel.app"
+      - "https://devskyy.com"
+      - "http://localhost:3000"  # Development
+    
+    allowed_origins:
+      - "https://devskyy.vercel.app"
+      - "https://devskyy.com"
+      - "http://localhost:3000"  # Development
+    
+    # Token Settings
+    token_endpoint_auth_method: "none"  # PKCE for SPA
+    grant_types:
+      - "authorization_code"
+      - "refresh_token"
+    
+    # JWT Configuration
+    jwt_configuration:
+      alg: "RS256"
+      lifetime_in_seconds: 36000  # 10 hours
+      secret_encoded: false
+    
+    # Refresh Token
+    refresh_token:
+      rotation_type: "rotating"
+      expiration_type: "expiring"
+      token_lifetime: 2592000  # 30 days
+      idle_token_lifetime: 1296000  # 15 days
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      leeway: 0
+    
+    # Client Metadata
+    client_metadata:
+      environment: "production"
+      version: "5.2.0"
+    
+    # Custom Login Page
+    custom_login_page_on: true
+    
+    # Cross-Origin Authentication
+    cross_origin_auth: false
+    
+    # SSO
+    sso: true
+    sso_disabled: false
+    
+    # Organization Usage
+    organization_usage: "allow"
+    organization_require_behavior: "no_prompt"
+
+  # Mobile Application (React Native)
+  - name: "DevSkyy Mobile Application"
+    description: "DevSkyy mobile application for iOS and Android"
+    app_type: "native"
+    logo_uri: "https://devskyy.com/logo.png"
+    
+    # URLs
+    callbacks:
+      - "com.devskyy.app://callback"
+      - "devskyy://callback"
+    
+    allowed_logout_urls:
+      - "com.devskyy.app://logout"
+      - "devskyy://logout"
+    
+    # Token Settings
+    token_endpoint_auth_method: "none"  # PKCE for native
+    grant_types:
+      - "authorization_code"
+      - "refresh_token"
+    
+    # JWT Configuration
+    jwt_configuration:
+      alg: "RS256"
+      lifetime_in_seconds: 36000  # 10 hours
+      secret_encoded: false
+    
+    # Refresh Token
+    refresh_token:
+      rotation_type: "rotating"
+      expiration_type: "expiring"
+      token_lifetime: 7776000  # 90 days for mobile
+      idle_token_lifetime: 2592000  # 30 days
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      leeway: 0
+    
+    # Native App Settings
+    native_social_login:
+      apple:
+        enabled: true
+      facebook:
+        enabled: true
+      google:
+        enabled: true
+    
+    # Client Metadata
+    client_metadata:
+      environment: "production"
+      platform: "mobile"
+      version: "5.2.0"
+
+  # API Machine-to-Machine Application
+  - name: "DevSkyy API Service"
+    description: "DevSkyy backend API service for machine-to-machine authentication"
+    app_type: "non_interactive"
+    
+    # Token Settings
+    token_endpoint_auth_method: "client_secret_post"
+    grant_types:
+      - "client_credentials"
+    
+    # JWT Configuration
+    jwt_configuration:
+      alg: "RS256"
+      lifetime_in_seconds: 86400  # 24 hours
+      secret_encoded: false
+    
+    # Client Metadata
+    client_metadata:
+      environment: "production"
+      service: "api"
+      version: "5.2.0"
+
+  # Admin Dashboard Application
+  - name: "DevSkyy Admin Dashboard"
+    description: "DevSkyy administrative dashboard for enterprise management"
+    app_type: "regular_web"
+    logo_uri: "https://devskyy.com/admin-logo.png"
+    
+    # URLs
+    callbacks:
+      - "https://admin.devskyy.com/callback"
+      - "https://devskyy-admin.vercel.app/callback"
+      - "http://localhost:3001/callback"  # Development
+    
+    allowed_logout_urls:
+      - "https://admin.devskyy.com"
+      - "https://devskyy-admin.vercel.app"
+      - "http://localhost:3001"  # Development
+    
+    web_origins:
+      - "https://admin.devskyy.com"
+      - "https://devskyy-admin.vercel.app"
+      - "http://localhost:3001"  # Development
+    
+    # Token Settings
+    token_endpoint_auth_method: "client_secret_post"
+    grant_types:
+      - "authorization_code"
+      - "refresh_token"
+    
+    # JWT Configuration
+    jwt_configuration:
+      alg: "RS256"
+      lifetime_in_seconds: 28800  # 8 hours (shorter for admin)
+      secret_encoded: false
+    
+    # Refresh Token
+    refresh_token:
+      rotation_type: "rotating"
+      expiration_type: "expiring"
+      token_lifetime: 86400  # 24 hours (shorter for admin)
+      idle_token_lifetime: 28800  # 8 hours
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      leeway: 0
+    
+    # Client Metadata
+    client_metadata:
+      environment: "production"
+      role: "admin"
+      version: "5.2.0"
+      
+    # Enhanced Security for Admin
+    require_auth_time: true
+    
+    # Organization Usage
+    organization_usage: "require"
+    organization_require_behavior: "pre_login_prompt"
