@@ -58,14 +58,35 @@ except ImportError as e:
 
 # Core Application Modules
 try:
-    from agent.core.agent_manager import AgentManager
-    # Core routers would be imported here when available
+    # BaseAgent Framework and V2 Agents
+    from agent.modules.base_agent import BaseAgent, AgentStatus, SeverityLevel
+    from agent.orchestrator import AgentOrchestrator, ExecutionPriority, TaskStatus
+    from agent.registry import AgentRegistry
+    from agent.enhanced_agent_manager import EnhancedAgentManager
+
+    # V2 Backend Agents
+    from agent.modules.backend.fixer_v2 import FixerAgentV2
+    from agent.modules.backend.scanner_v2 import ScannerAgentV2
+    from agent.modules.backend.security_agent import SecurityAgent
+    from agent.modules.backend.performance_agent import PerformanceAgent
+    from agent.modules.backend.cache_manager import CacheManager
+
+    # V2 Frontend Agents
+    from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
+    from agent.modules.frontend.design_automation_agent import DesignAutomationAgent
+    from agent.modules.frontend.fashion_computer_vision_agent import FashionComputerVisionAgent
+
+    # Core Intelligence Engines
     from fashion.intelligence_engine import FashionIntelligenceEngine
     from ml.recommendation_engine import RecommendationEngine
+    from ml.model_registry import ModelRegistry
+    from ml.redis_cache import RedisCache
 
     CORE_MODULES_AVAILABLE = True
+    logger.info("✅ Core agent modules loaded successfully")
 except ImportError as e:
     CORE_MODULES_AVAILABLE = False
+    logger.warning(f"⚠️ Core modules not fully available: {e}")
     print(f"Warning: Core modules not fully available: {e}")
 
 # ============================================================================
@@ -235,10 +256,22 @@ async def lifespan(app: FastAPI):
         if CORE_MODULES_AVAILABLE:
             logger.info("🤖 Initializing AI and agent systems...")
 
-            # Agent Manager
-            agent_manager = AgentManager()
-            await agent_manager.initialize()
-            app.state.agent_manager = agent_manager
+            # Initialize Enterprise Agent Ecosystem (V2 with BaseAgent)
+            await initialize_agent_ecosystem()
+            app.state.agent_orchestrator = agent_orchestrator
+            app.state.agent_registry = agent_registry
+            app.state.enhanced_agent_manager = enhanced_agent_manager
+            app.state.ml_cache = ml_cache
+            app.state.model_registry = model_registry
+
+            # Legacy Agent Manager (for backward compatibility)
+            try:
+                from agent.core.agent_manager import AgentManager
+                agent_manager = AgentManager()
+                await agent_manager.initialize()
+                app.state.agent_manager = agent_manager
+            except ImportError:
+                logger.info("Legacy AgentManager not available - using V2 system only")
 
             # Fashion Intelligence Engine
             if FASHION_AI_ENABLED:
@@ -247,9 +280,12 @@ async def lifespan(app: FastAPI):
                 app.state.fashion_engine = fashion_engine
 
             # ML Recommendation Engine
-            recommendation_engine = RecommendationEngine()
-            await recommendation_engine.initialize()
-            app.state.recommendation_engine = recommendation_engine
+            try:
+                recommendation_engine = RecommendationEngine()
+                await recommendation_engine.initialize()
+                app.state.recommendation_engine = recommendation_engine
+            except ImportError:
+                logger.info("RecommendationEngine not available - using agent-based recommendations")
 
             logger.info("✅ AI and agent systems initialized")
 
@@ -277,7 +313,19 @@ async def lifespan(app: FastAPI):
     logger.info("🛑 Shutting down DevSkyy Platform...")
 
     try:
+        # Shutdown Enterprise Agent Ecosystem first
+        await shutdown_agent_ecosystem()
+
         # Graceful shutdown of components
+        if hasattr(app.state, "enhanced_agent_manager"):
+            await app.state.enhanced_agent_manager.shutdown()
+
+        if hasattr(app.state, "agent_orchestrator"):
+            await app.state.agent_orchestrator.shutdown()
+
+        if hasattr(app.state, "ml_cache"):
+            await app.state.ml_cache.close()
+
         if hasattr(app.state, "agent_manager"):
             await app.state.agent_manager.shutdown()
 
@@ -498,6 +546,210 @@ def get_agent(agent_name: str, agent_type: str = "backend"):
 
 
 # ============================================================================
+# ENTERPRISE AGENT MANAGEMENT SYSTEM
+# ============================================================================
+
+# Global agent instances
+agent_orchestrator: Optional[AgentOrchestrator] = None
+agent_registry: Optional[AgentRegistry] = None
+enhanced_agent_manager: Optional[EnhancedAgentManager] = None
+ml_cache: Optional[RedisCache] = None
+model_registry: Optional[ModelRegistry] = None
+
+# Agent initialization status
+_agents_initialized = False
+_agent_initialization_lock = asyncio.Lock()
+
+
+async def initialize_agent_ecosystem():
+    """
+    Initialize the comprehensive agent ecosystem with BaseAgent framework.
+
+    This function sets up the enterprise agent management system including:
+    - Agent orchestrator for coordination
+    - Agent registry for discovery
+    - Enhanced agent manager for lifecycle management
+    - ML model registry and caching
+    - V2 agents with self-healing capabilities
+    """
+    global agent_orchestrator, agent_registry, enhanced_agent_manager
+    global ml_cache, model_registry, _agents_initialized
+
+    async with _agent_initialization_lock:
+        if _agents_initialized:
+            return
+
+        try:
+            logger.info("🚀 Initializing DevSkyy Enterprise Agent Ecosystem...")
+
+            # 1. Initialize core infrastructure
+            if CORE_MODULES_AVAILABLE:
+                # Initialize ML cache and model registry
+                ml_cache = RedisCache(
+                    redis_url=REDIS_URL,
+                    default_ttl=3600,
+                    mode="hybrid"  # Redis + memory fallback
+                )
+
+                model_registry = ModelRegistry()
+                await model_registry.initialize()
+
+                # Initialize agent registry
+                agent_registry = AgentRegistry()
+
+                # Initialize agent orchestrator
+                agent_orchestrator = AgentOrchestrator(
+                    max_concurrent_agents=10,
+                    enable_circuit_breaker=True,
+                    health_check_interval=30
+                )
+
+                # Initialize enhanced agent manager
+                enhanced_agent_manager = EnhancedAgentManager(
+                    orchestrator=agent_orchestrator,
+                    registry=agent_registry,
+                    cache=ml_cache
+                )
+
+                logger.info("✅ Core agent infrastructure initialized")
+
+                # 2. Register and initialize V2 agents
+                await register_v2_agents()
+
+                # 3. Start agent orchestrator
+                await agent_orchestrator.start()
+
+                # 4. Perform initial health checks
+                await perform_agent_health_checks()
+
+                _agents_initialized = True
+                logger.info("🎉 DevSkyy Agent Ecosystem fully initialized!")
+
+            else:
+                logger.warning("⚠️ Core modules not available - running in limited mode")
+
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize agent ecosystem: {e}")
+            raise
+
+
+async def register_v2_agents():
+    """Register all V2 agents with the orchestrator and registry."""
+    try:
+        if not (agent_orchestrator and agent_registry):
+            return
+
+        logger.info("📋 Registering V2 agents...")
+
+        # Backend V2 Agents
+        backend_agents = [
+            ("fixer_v2", FixerAgentV2, ExecutionPriority.HIGH),
+            ("scanner_v2", ScannerAgentV2, ExecutionPriority.HIGH),
+            ("security", SecurityAgent, ExecutionPriority.CRITICAL),
+            ("performance", PerformanceAgent, ExecutionPriority.MEDIUM),
+        ]
+
+        # Frontend V2 Agents
+        frontend_agents = [
+            ("web_development", WebDevelopmentAgent, ExecutionPriority.MEDIUM),
+            ("design_automation", DesignAutomationAgent, ExecutionPriority.MEDIUM),
+            ("fashion_cv", FashionComputerVisionAgent, ExecutionPriority.LOW),
+        ]
+
+        # Register backend agents
+        for agent_name, agent_class, priority in backend_agents:
+            try:
+                agent_instance = agent_class()
+                await agent_instance.initialize()
+
+                agent_registry.register_agent(
+                    agent_name=agent_name,
+                    agent_instance=agent_instance,
+                    capabilities=agent_instance.get_capabilities(),
+                    priority=priority
+                )
+
+                agent_orchestrator.add_agent(agent_instance, priority)
+                logger.debug(f"✅ Registered backend agent: {agent_name}")
+
+            except Exception as e:
+                logger.error(f"❌ Failed to register {agent_name}: {e}")
+
+        # Register frontend agents
+        for agent_name, agent_class, priority in frontend_agents:
+            try:
+                agent_instance = agent_class()
+                await agent_instance.initialize()
+
+                agent_registry.register_agent(
+                    agent_name=agent_name,
+                    agent_instance=agent_instance,
+                    capabilities=agent_instance.get_capabilities(),
+                    priority=priority
+                )
+
+                agent_orchestrator.add_agent(agent_instance, priority)
+                logger.debug(f"✅ Registered frontend agent: {agent_name}")
+
+            except Exception as e:
+                logger.error(f"❌ Failed to register {agent_name}: {e}")
+
+        logger.info(f"📊 Agent registration complete: {len(backend_agents + frontend_agents)} agents")
+
+    except Exception as e:
+        logger.error(f"❌ Agent registration failed: {e}")
+
+
+async def perform_agent_health_checks():
+    """Perform initial health checks on all registered agents."""
+    try:
+        if not agent_orchestrator:
+            return
+
+        logger.info("🏥 Performing agent health checks...")
+
+        health_results = await agent_orchestrator.health_check_all()
+
+        healthy_count = sum(1 for status in health_results.values()
+                          if status == AgentStatus.HEALTHY)
+        total_count = len(health_results)
+
+        logger.info(f"📊 Health check results: {healthy_count}/{total_count} agents healthy")
+
+        # Log any unhealthy agents
+        for agent_name, status in health_results.items():
+            if status != AgentStatus.HEALTHY:
+                logger.warning(f"⚠️ Agent {agent_name} status: {status.value}")
+
+    except Exception as e:
+        logger.error(f"❌ Health check failed: {e}")
+
+
+async def shutdown_agent_ecosystem():
+    """Gracefully shutdown the agent ecosystem."""
+    global agent_orchestrator, agent_registry, enhanced_agent_manager
+    global ml_cache, model_registry, _agents_initialized
+
+    try:
+        logger.info("🛑 Shutting down agent ecosystem...")
+
+        if agent_orchestrator:
+            await agent_orchestrator.shutdown()
+
+        if enhanced_agent_manager:
+            await enhanced_agent_manager.shutdown()
+
+        if ml_cache:
+            await ml_cache.close()
+
+        _agents_initialized = False
+        logger.info("✅ Agent ecosystem shutdown complete")
+
+    except Exception as e:
+        logger.error(f"❌ Agent shutdown error: {e}")
+
+
+# ============================================================================
 # DATABASE & CONFIGURATION (Zero MongoDB)
 # ============================================================================
 from datetime import datetime
@@ -507,9 +759,6 @@ from dotenv import load_dotenv
 from models_sqlalchemy import PaymentRequest, ProductRequest
 
 load_dotenv()
-
-
-# Duplicate lifespan function removed - using the comprehensive one above
 
 
 # ============================================================================
@@ -1983,6 +2232,191 @@ async def export_wordpress_theme(request: Dict[str, Any]):
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Theme export failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# ENTERPRISE AGENT MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.get("/api/agents/status")
+async def get_agent_ecosystem_status():
+    """Get comprehensive status of the agent ecosystem."""
+    try:
+        if not agent_orchestrator:
+            return {"status": "error", "message": "Agent ecosystem not initialized"}
+
+        # Get orchestrator status
+        orchestrator_status = await agent_orchestrator.get_status()
+
+        # Get individual agent health
+        agent_health = await agent_orchestrator.health_check_all()
+
+        # Get registry information
+        registry_info = {}
+        if agent_registry:
+            registry_info = {
+                "total_agents": len(agent_registry.agents),
+                "agent_types": list(agent_registry.agents.keys()),
+                "capabilities": {
+                    name: agent.get_capabilities()
+                    for name, agent in agent_registry.agents.items()
+                }
+            }
+
+        return {
+            "status": "success",
+            "timestamp": datetime.now().isoformat(),
+            "orchestrator": orchestrator_status,
+            "agent_health": {name: status.value for name, status in agent_health.items()},
+            "registry": registry_info,
+            "cache_status": {
+                "ml_cache_connected": ml_cache.is_connected() if ml_cache else False,
+                "model_registry_initialized": model_registry is not None
+            }
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get agent status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/agents/{agent_name}/execute")
+async def execute_agent_task(agent_name: str, task_data: Dict[str, Any]):
+    """Execute a task using a specific agent."""
+    try:
+        if not agent_registry:
+            raise HTTPException(status_code=503, detail="Agent registry not available")
+
+        # Get agent from registry
+        agent = agent_registry.get_agent(agent_name)
+        if not agent:
+            raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
+
+        # Execute task through orchestrator
+        if agent_orchestrator:
+            task_id = await agent_orchestrator.execute_task(
+                agent_name=agent_name,
+                task_data=task_data,
+                priority=ExecutionPriority.MEDIUM
+            )
+
+            return {
+                "status": "success",
+                "task_id": task_id,
+                "agent": agent_name,
+                "message": "Task submitted for execution"
+            }
+        else:
+            # Direct execution fallback
+            result = await agent.execute_task(task_data)
+            return {
+                "status": "success",
+                "agent": agent_name,
+                "result": result
+            }
+
+    except Exception as e:
+        logger.error(f"Agent task execution failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/agents/{agent_name}/health")
+async def get_agent_health(agent_name: str):
+    """Get health status of a specific agent."""
+    try:
+        if not agent_registry:
+            raise HTTPException(status_code=503, detail="Agent registry not available")
+
+        agent = agent_registry.get_agent(agent_name)
+        if not agent:
+            raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
+
+        # Perform health check
+        health_status = await agent.health_check()
+
+        return {
+            "status": "success",
+            "agent": agent_name,
+            "health": health_status[0].value,
+            "message": health_status[1],
+            "metrics": health_status[2],
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Agent health check failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/agents/orchestrator/coordinate")
+async def coordinate_multi_agent_task(task_request: Dict[str, Any]):
+    """Coordinate a multi-agent task execution."""
+    try:
+        if not agent_orchestrator:
+            raise HTTPException(status_code=503, detail="Agent orchestrator not available")
+
+        # Extract task parameters
+        agents_required = task_request.get("agents", [])
+        task_data = task_request.get("task_data", {})
+        priority = ExecutionPriority(task_request.get("priority", "medium"))
+
+        # Coordinate multi-agent execution
+        coordination_id = await agent_orchestrator.coordinate_agents(
+            agent_names=agents_required,
+            shared_context=task_data,
+            priority=priority
+        )
+
+        return {
+            "status": "success",
+            "coordination_id": coordination_id,
+            "agents": agents_required,
+            "message": "Multi-agent coordination initiated"
+        }
+
+    except Exception as e:
+        logger.error(f"Multi-agent coordination failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/agents/metrics")
+async def get_agent_metrics():
+    """Get comprehensive agent performance metrics."""
+    try:
+        metrics = {
+            "timestamp": datetime.now().isoformat(),
+            "orchestrator_metrics": {},
+            "agent_metrics": {},
+            "cache_metrics": {},
+            "system_metrics": {}
+        }
+
+        # Orchestrator metrics
+        if agent_orchestrator:
+            metrics["orchestrator_metrics"] = await agent_orchestrator.get_metrics()
+
+        # Individual agent metrics
+        if agent_registry:
+            for agent_name, agent in agent_registry.agents.items():
+                if hasattr(agent, 'get_metrics'):
+                    metrics["agent_metrics"][agent_name] = await agent.get_metrics()
+
+        # Cache metrics
+        if ml_cache:
+            metrics["cache_metrics"] = ml_cache.stats()
+
+        # Model registry metrics
+        if model_registry:
+            metrics["system_metrics"]["model_registry"] = {
+                "models_loaded": len(model_registry.models),
+                "total_predictions": getattr(model_registry, 'total_predictions', 0)
+            }
+
+        return {"status": "success", "metrics": metrics}
+
+    except Exception as e:
+        logger.error(f"Failed to get agent metrics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
