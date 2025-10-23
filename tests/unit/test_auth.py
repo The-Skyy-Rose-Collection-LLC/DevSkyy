@@ -331,9 +331,11 @@ class TestSecurityLogging:
             # Simulate a failed login
             record_failed_login("test@example.com")
 
-            # Verify logging was called (in actual implementation)
-            # This would be tested with the actual security logger integration
-            assert True  # Placeholder for actual logging test
+            # Verify logging was called with proper security event
+            mock_log.warning.assert_called_once()
+            call_args = mock_log.warning.call_args[0][0]
+            assert "Failed login attempt" in call_args
+            assert "test@example.com" in call_args
 
 
 if __name__ == "__main__":

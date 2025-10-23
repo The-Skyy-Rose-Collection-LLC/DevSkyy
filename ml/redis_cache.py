@@ -79,26 +79,77 @@ class RedisCache:
         else:
             self.memory_cache[hashed_key] = value
 
-    def delete(self, key: str):
-        """Delete cached value"""
+    def delete(self, key: str) -> bool:
+        """
+        Delete cached value with comprehensive error handling.
+
+        Args:
+            key (str): Cache key to delete
+
+        Returns:
+            bool: True if deletion was successful, False otherwise
+        """
         hashed_key = self._hash_key(key)
+        deletion_success = True
 
         if self.mode == "redis" and self.client:
             try:
-                self.client.delete(hashed_key)
-            except Exception:
-                pass
+                result = self.client.delete(hashed_key)
+                logger.debug(f"🗑️ Redis delete result for key '{key}': {result}")
+            except redis.ConnectionError as e:
+                logger.warning(f"🔌 Redis connection error during delete of '{key}': {e}")
+                deletion_success = False
+            except redis.TimeoutError as e:
+                logger.warning(f"⏰ Redis timeout during delete of '{key}': {e}")
+                deletion_success = False
+            except Exception as e:
+                logger.error(f"❌ Unexpected Redis error during delete of '{key}': {e}")
+                deletion_success = False
+
+        # Always try to delete from memory cache as fallback
         if hashed_key in self.memory_cache:
-            del self.memory_cache[hashed_key]
+            try:
+                del self.memory_cache[hashed_key]
+                logger.debug(f"🧠 Deleted '{key}' from memory cache")
+            except Exception as e:
+                logger.error(f"❌ Failed to delete '{key}' from memory cache: {e}")
+                deletion_success = False
 
-    def clear(self):
-        """Clear all cache"""
+        return deletion_success
+
+    def clear(self) -> bool:
+        """
+        Clear all cache with comprehensive error handling.
+
+        Returns:
+            bool: True if clearing was successful, False otherwise
+        """
+        clear_success = True
+
         if self.mode == "redis" and self.client:
             try:
-                self.client.flushdb()
-            except Exception:
-                pass
-        self.memory_cache.clear()
+                result = self.client.flushdb()
+                logger.info(f"🧹 Redis cache cleared successfully: {result}")
+            except redis.ConnectionError as e:
+                logger.warning(f"🔌 Redis connection error during cache clear: {e}")
+                clear_success = False
+            except redis.TimeoutError as e:
+                logger.warning(f"⏰ Redis timeout during cache clear: {e}")
+                clear_success = False
+            except Exception as e:
+                logger.error(f"❌ Unexpected Redis error during cache clear: {e}")
+                clear_success = False
+
+        # Always clear memory cache
+        try:
+            cache_size = len(self.memory_cache)
+            self.memory_cache.clear()
+            logger.info(f"🧠 Memory cache cleared: {cache_size} items removed")
+        except Exception as e:
+            logger.error(f"❌ Failed to clear memory cache: {e}")
+            clear_success = False
+
+        return clear_success
 
     def stats(self) -> dict:
         """Get cache statistics"""

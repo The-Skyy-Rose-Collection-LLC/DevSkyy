@@ -11,14 +11,17 @@ Features:
 - Integration with orchestrator
 """
 
+import ast
 import logging
 import os
 import re
 import shutil
+import subprocess
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import autopep8
 
@@ -568,10 +571,205 @@ class FixerAgentV2(BaseAgent):
             return []
 
     async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """Remove unused imports"""
-        # This would typically use autoflake
-        # For now, return placeholder
-        return []
+        """
+        Remove unused imports from Python files using AST analysis.
+
+        This function analyzes Python files to identify and remove unused imports,
+        improving code quality and reducing potential security vulnerabilities.
+
+        Args:
+            dry_run (bool): If True, only analyze without making changes
+
+        Returns:
+            List[Dict[str, Any]]: List of files processed with unused imports removed
+
+        Raises:
+            Exception: If file processing fails
+        """
+        results = []
+
+        try:
+            # Find all Python files
+            python_files = list(Path('.').rglob('*.py'))
+
+            for file_path in python_files:
+                if (file_path.name.startswith('.') or
+                    'test' in str(file_path) or
+                    '__pycache__' in str(file_path) or
+                    'venv' in str(file_path) or
+                    '.git' in str(file_path)):
+                    continue
+
+                try:
+                    unused_imports = await self._analyze_unused_imports(file_path)
+
+                    if unused_imports:
+                        if not dry_run:
+                            removed_count = await self._remove_imports_from_file(
+                                file_path, unused_imports
+                            )
+                        else:
+                            removed_count = len(unused_imports)
+
+                        results.append({
+                            "file": str(file_path),
+                            "type": "code_quality",
+                            "action": "remove_unused_imports",
+                            "unused_imports": unused_imports,
+                            "removed_count": removed_count,
+                            "dry_run": dry_run,
+                            "timestamp": datetime.now().isoformat()
+                        })
+
+                        logger.info(f"📦 {'Would remove' if dry_run else 'Removed'} "
+                                  f"{removed_count} unused imports from {file_path}")
+
+                except Exception as e:
+                    logger.warning(f"Error analyzing imports in {file_path}: {e}")
+                    results.append({
+                        "file": str(file_path),
+                        "type": "error",
+                        "action": "remove_unused_imports",
+                        "error": str(e),
+                        "timestamp": datetime.now().isoformat()
+                    })
+
+            return results
+
+        except Exception as e:
+            logger.error(f"Error in unused imports removal: {e}")
+            return [{
+                "type": "error",
+                "action": "remove_unused_imports",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }]
+
+    async def _analyze_unused_imports(self, file_path: Path) -> List[str]:
+        """
+        Analyze a Python file to find unused imports using AST.
+
+        Args:
+            file_path (Path): Path to the Python file
+
+        Returns:
+            List[str]: List of unused import names
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Parse the AST
+            tree = ast.parse(content)
+
+            # Find all imports
+            imports = set()
+            import_lines = {}
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        import_name = alias.asname if alias.asname else alias.name
+                        imports.add(import_name)
+                        import_lines[import_name] = node.lineno
+
+                elif isinstance(node, ast.ImportFrom):
+                    for alias in node.names:
+                        import_name = alias.asname if alias.asname else alias.name
+                        imports.add(import_name)
+                        import_lines[import_name] = node.lineno
+
+            # Find all names used in the code
+            used_names = set()
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Name):
+                    used_names.add(node.id)
+                elif isinstance(node, ast.Attribute):
+                    # Handle module.attribute usage
+                    if isinstance(node.value, ast.Name):
+                        used_names.add(node.value.id)
+
+            # Find unused imports
+            unused_imports = []
+            for import_name in imports:
+                # Skip special imports that might be used implicitly
+                if import_name in ['__future__', '__all__', 'typing']:
+                    continue
+
+                # Check if the import is used
+                if import_name not in used_names:
+                    # Additional check for partial matches (e.g., os.path)
+                    base_name = import_name.split('.')[0]
+                    if base_name not in used_names:
+                        unused_imports.append(import_name)
+
+            return unused_imports
+
+        except Exception as e:
+            logger.warning(f"Error analyzing imports in {file_path}: {e}")
+            return []
+
+    async def _remove_imports_from_file(
+        self, file_path: Path, unused_imports: List[str]
+    ) -> int:
+        """
+        Remove unused imports from a Python file.
+
+        Args:
+            file_path (Path): Path to the Python file
+            unused_imports (List[str]): List of unused import names to remove
+
+        Returns:
+            int: Number of imports actually removed
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+
+            removed_count = 0
+            new_lines = []
+
+            for line in lines:
+                should_remove = False
+
+                # Check if this line contains an unused import
+                for unused_import in unused_imports:
+                    # Match various import patterns
+                    patterns = [
+                        rf'^import\s+{re.escape(unused_import)}\s*$',
+                        rf'^import\s+{re.escape(unused_import)}\s*,',
+                        rf',\s*{re.escape(unused_import)}\s*$',
+                        rf',\s*{re.escape(unused_import)}\s*,',
+                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*$',
+                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*,',
+                        rf',\s*{re.escape(unused_import)}\s*$',
+                    ]
+
+                    for pattern in patterns:
+                        if re.search(pattern, line.strip()):
+                            should_remove = True
+                            break
+
+                    if should_remove:
+                        break
+
+                if should_remove:
+                    removed_count += 1
+                    logger.debug(f"Removing unused import line: {line.strip()}")
+                else:
+                    new_lines.append(line)
+
+            # Write back the cleaned file
+            if removed_count > 0:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.writelines(new_lines)
+
+            return removed_count
+
+        except Exception as e:
+            logger.error(f"Error removing imports from {file_path}: {e}")
+            return 0
 
     async def _format_python_file(
         self, file_path: str, dry_run: bool

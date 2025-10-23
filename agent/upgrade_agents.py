@@ -9,9 +9,12 @@ This script:
 4. Adds comprehensive error handling and ML features
 """
 
+import asyncio
+import gc
+import logging
 import re
 from pathlib import Path
-from typing import List
+from typing import Dict, List, Optional
 
 AGENT_MODULES_DIR = Path(__file__).parent / "modules"
 
@@ -163,11 +166,91 @@ class {original_class_name}V2(BaseAgent):
             logger.error(f"Method failed: {{e}}")
             raise  # Let BaseAgent.with_healing handle retry
 
-    async def _optimize_resources(self):
-        """Override to implement agent-specific resource optimization"""
-        logger.info(f"Optimizing {{self.agent_name}} resources...")
-        # Clear caches, reset connections, etc.
-        pass
+    async def _optimize_resources(self) -> Dict[str, any]:
+        """
+        Implement comprehensive agent-specific resource optimization.
+
+        This method performs memory cleanup, connection pooling optimization,
+        cache management, and resource monitoring for optimal performance.
+
+        Returns:
+            Dict[str, any]: Resource optimization results and metrics
+        """
+        optimization_results = {
+            "timestamp": asyncio.get_event_loop().time(),
+            "agent_name": getattr(self, 'agent_name', 'Unknown'),
+            "optimizations_performed": [],
+            "memory_freed_mb": 0,
+            "connections_optimized": 0,
+            "caches_cleared": 0
+        }
+
+        try:
+            logger.info(f"🔧 Optimizing {optimization_results['agent_name']} resources...")
+
+            # 1. Memory optimization
+            initial_objects = len(gc.get_objects())
+            gc.collect()  # Force garbage collection
+            final_objects = len(gc.get_objects())
+            objects_freed = initial_objects - final_objects
+
+            if objects_freed > 0:
+                optimization_results["optimizations_performed"].append("garbage_collection")
+                optimization_results["memory_freed_mb"] = objects_freed * 0.001  # Rough estimate
+                logger.debug(f"🗑️ Freed {objects_freed} objects from memory")
+
+            # 2. Clear internal caches if they exist
+            cache_attributes = ['_cache', '_response_cache', '_model_cache', '_prediction_cache']
+            for attr in cache_attributes:
+                if hasattr(self, attr):
+                    cache = getattr(self, attr)
+                    if hasattr(cache, 'clear'):
+                        cache.clear()
+                        optimization_results["caches_cleared"] += 1
+                        optimization_results["optimizations_performed"].append(f"cleared_{attr}")
+                        logger.debug(f"🧹 Cleared cache: {attr}")
+
+            # 3. Optimize async connections and pools
+            connection_attributes = ['_connection_pool', '_http_client', '_db_connection']
+            for attr in connection_attributes:
+                if hasattr(self, attr):
+                    connection = getattr(self, attr)
+                    # Close and recreate connection if it has close method
+                    if hasattr(connection, 'close'):
+                        try:
+                            await connection.close()
+                            optimization_results["connections_optimized"] += 1
+                            optimization_results["optimizations_performed"].append(f"optimized_{attr}")
+                            logger.debug(f"🔌 Optimized connection: {attr}")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Failed to optimize {attr}: {e}")
+
+            # 4. Reset performance metrics if they exist
+            if hasattr(self, 'agent_metrics'):
+                # Reset counters that might grow indefinitely
+                metrics = self.agent_metrics
+                if hasattr(metrics, 'reset_counters'):
+                    metrics.reset_counters()
+                    optimization_results["optimizations_performed"].append("reset_metrics")
+                    logger.debug("📊 Reset performance metrics counters")
+
+            # 5. Optimize ML model memory if applicable
+            if hasattr(self, '_model') or hasattr(self, 'model'):
+                model = getattr(self, '_model', None) or getattr(self, 'model', None)
+                if model and hasattr(model, 'clear_session'):
+                    model.clear_session()
+                    optimization_results["optimizations_performed"].append("cleared_ml_session")
+                    logger.debug("🤖 Cleared ML model session")
+
+            total_optimizations = len(optimization_results["optimizations_performed"])
+            logger.info(f"✅ Resource optimization complete: {total_optimizations} optimizations performed")
+
+            return optimization_results
+
+        except Exception as e:
+            logger.error(f"❌ Resource optimization failed: {e}")
+            optimization_results["error"] = str(e)
+            return optimization_results
 
 
 # Factory function

@@ -765,13 +765,93 @@ async def agent_orchestrator_health_check():
 
 
 async def security_manager_health_check():
-    """Check security manager status"""
-    try:
-        pass
+    """
+    Comprehensive security manager health check.
 
-        return HealthStatus.HEALTHY, "Security manager operational", {}
+    Validates security components, authentication systems, and protection mechanisms.
+
+    Returns:
+        Tuple[HealthStatus, str, Dict]: Health status, message, and metrics
+    """
+    try:
+        security_metrics = {
+            "timestamp": datetime.now().isoformat(),
+            "checks_performed": [],
+            "security_level": "unknown",
+            "vulnerabilities_detected": 0
+        }
+
+        # 1. Check JWT authentication system
+        try:
+            from security.jwt_auth import JWTManager
+            jwt_manager = JWTManager()
+            # Test token generation and validation
+            test_payload = {"test": "health_check", "exp": time.time() + 60}
+            test_token = jwt_manager.create_token(test_payload)
+            decoded = jwt_manager.verify_token(test_token)
+
+            if decoded and decoded.get("test") == "health_check":
+                security_metrics["checks_performed"].append("jwt_auth_ok")
+            else:
+                security_metrics["vulnerabilities_detected"] += 1
+
+        except Exception as e:
+            logger.warning(f"JWT health check failed: {e}")
+            security_metrics["vulnerabilities_detected"] += 1
+
+        # 2. Check input validation system
+        try:
+            from security.input_validation import input_sanitizer
+            test_input = "<script>alert('test')</script>"
+            sanitized = input_sanitizer.sanitize_html(test_input)
+
+            if "<script>" not in sanitized:
+                security_metrics["checks_performed"].append("input_validation_ok")
+            else:
+                security_metrics["vulnerabilities_detected"] += 1
+
+        except Exception as e:
+            logger.warning(f"Input validation health check failed: {e}")
+            security_metrics["vulnerabilities_detected"] += 1
+
+        # 3. Check environment security
+        critical_env_vars = ["SECRET_KEY", "JWT_SECRET_KEY"]
+        missing_vars = []
+
+        for var in critical_env_vars:
+            if not os.getenv(var):
+                missing_vars.append(var)
+                security_metrics["vulnerabilities_detected"] += 1
+
+        if not missing_vars:
+            security_metrics["checks_performed"].append("env_vars_ok")
+
+        # 4. Determine overall security level
+        total_checks = 3  # JWT, input validation, env vars
+        passed_checks = len(security_metrics["checks_performed"])
+
+        if security_metrics["vulnerabilities_detected"] == 0:
+            security_metrics["security_level"] = "high"
+            status = HealthStatus.HEALTHY
+            message = f"Security manager operational - {passed_checks}/{total_checks} checks passed"
+        elif security_metrics["vulnerabilities_detected"] <= 2:
+            security_metrics["security_level"] = "medium"
+            status = HealthStatus.DEGRADED
+            message = f"Security manager degraded - {security_metrics['vulnerabilities_detected']} vulnerabilities detected"
+        else:
+            security_metrics["security_level"] = "low"
+            status = HealthStatus.UNHEALTHY
+            message = f"Security manager compromised - {security_metrics['vulnerabilities_detected']} critical issues"
+
+        logger.info(f"🛡️ Security health check: {message}")
+        return status, message, security_metrics
+
     except Exception as e:
-        return HealthStatus.UNHEALTHY, f"Security error: {str(e)}", {}
+        logger.error(f"Security health check failed: {e}")
+        return HealthStatus.UNHEALTHY, f"Security health check error: {str(e)}", {
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 
 # Register health checks
@@ -1049,8 +1129,11 @@ def _scan_performance():
                     size = os.path.getsize(module.__file__)
                     if size > 1024 * 1024:  # 1MB
                         large_modules.append((module_name, size))
-                except:
-                    pass
+                except (OSError, AttributeError, TypeError) as e:
+                    # Handle cases where module file doesn't exist, is not accessible,
+                    # or __file__ attribute is not a valid path
+                    logger.debug(f"Could not get size for module {module_name}: {e}")
+                    continue
 
         if large_modules:
             issues.append({
@@ -1087,16 +1170,127 @@ def _scan_seo():
 
 
 def _scan_accessibility():
-    """Scan for accessibility issues"""
+    """
+    Comprehensive accessibility scan for WCAG compliance.
+
+    Scans templates, static files, and configuration for accessibility issues
+    including missing alt text, color contrast, keyboard navigation, and ARIA labels.
+
+    Returns:
+        List[Dict]: List of accessibility issues found
+    """
     issues = []
 
     try:
-        # Basic accessibility checks would go here
-        # For now, return empty as this would require HTML content analysis
-        pass
+        # 1. Scan HTML templates for accessibility issues
+        template_dirs = [Path("templates"), Path("static")]
+
+        for template_dir in template_dirs:
+            if template_dir.exists():
+                for html_file in template_dir.rglob("*.html"):
+                    try:
+                        with open(html_file, 'r', encoding='utf-8') as f:
+                            content = f.read()
+
+                        # Check for images without alt attributes
+                        img_pattern = r'<img[^>]*(?<!alt=")[^>]*>'
+                        img_matches = re.findall(img_pattern, content, re.IGNORECASE)
+
+                        for match in img_matches:
+                            if 'alt=' not in match.lower():
+                                issues.append({
+                                    "type": "accessibility",
+                                    "severity": "medium",
+                                    "message": f"Image without alt attribute in {html_file}",
+                                    "recommendation": "Add descriptive alt attributes to all images",
+                                    "file": str(html_file),
+                                    "wcag_guideline": "1.1.1 Non-text Content"
+                                })
+
+                        # Check for form inputs without labels
+                        input_pattern = r'<input[^>]*(?<!aria-label=")[^>]*>'
+                        input_matches = re.findall(input_pattern, content, re.IGNORECASE)
+
+                        for match in input_matches:
+                            if 'aria-label=' not in match.lower() and 'id=' in match.lower():
+                                input_id = re.search(r'id=["\']([^"\']+)["\']', match, re.IGNORECASE)
+                                if input_id:
+                                    label_pattern = f'<label[^>]*for=["\']?{input_id.group(1)}["\']?[^>]*>'
+                                    if not re.search(label_pattern, content, re.IGNORECASE):
+                                        issues.append({
+                                            "type": "accessibility",
+                                            "severity": "high",
+                                            "message": f"Form input without label in {html_file}",
+                                            "recommendation": "Add proper labels or aria-label attributes to form inputs",
+                                            "file": str(html_file),
+                                            "wcag_guideline": "1.3.1 Info and Relationships"
+                                        })
+
+                        # Check for missing page title
+                        if '<title>' not in content.lower():
+                            issues.append({
+                                "type": "accessibility",
+                                "severity": "high",
+                                "message": f"Missing page title in {html_file}",
+                                "recommendation": "Add descriptive page titles",
+                                "file": str(html_file),
+                                "wcag_guideline": "2.4.2 Page Titled"
+                            })
+
+                        # Check for missing lang attribute
+                        if not re.search(r'<html[^>]*lang=', content, re.IGNORECASE):
+                            issues.append({
+                                "type": "accessibility",
+                                "severity": "medium",
+                                "message": f"Missing lang attribute in {html_file}",
+                                "recommendation": "Add lang attribute to html element",
+                                "file": str(html_file),
+                                "wcag_guideline": "3.1.1 Language of Page"
+                            })
+
+                    except Exception as e:
+                        logger.warning(f"Error scanning {html_file} for accessibility: {e}")
+
+        # 2. Check for accessibility configuration
+        if not os.getenv("ACCESSIBILITY_FEATURES_ENABLED"):
+            issues.append({
+                "type": "accessibility",
+                "severity": "low",
+                "message": "Accessibility features not explicitly enabled",
+                "recommendation": "Set ACCESSIBILITY_FEATURES_ENABLED=true in environment",
+                "wcag_guideline": "General Best Practice"
+            })
+
+        # 3. Check for color contrast configuration
+        css_files = list(Path("static").rglob("*.css")) if Path("static").exists() else []
+
+        for css_file in css_files:
+            try:
+                with open(css_file, 'r', encoding='utf-8') as f:
+                    css_content = f.read()
+
+                # Look for potential low contrast combinations (basic check)
+                if '#fff' in css_content and '#f0f0f0' in css_content:
+                    issues.append({
+                        "type": "accessibility",
+                        "severity": "medium",
+                        "message": f"Potential low contrast colors in {css_file}",
+                        "recommendation": "Verify color contrast ratios meet WCAG AA standards (4.5:1)",
+                        "file": str(css_file),
+                        "wcag_guideline": "1.4.3 Contrast (Minimum)"
+                    })
+
+            except Exception as e:
+                logger.warning(f"Error scanning {css_file} for accessibility: {e}")
 
     except Exception as e:
         logger.warning(f"Accessibility scan error: {e}")
+        issues.append({
+            "type": "accessibility",
+            "severity": "low",
+            "message": f"Accessibility scan encountered error: {str(e)}",
+            "recommendation": "Review accessibility scanning implementation"
+        })
 
     return issues
 

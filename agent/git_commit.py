@@ -308,7 +308,7 @@ def _git_commit(message: str) -> Dict[str, Any]:
                 "error": f"Commit failed: {result.stderr or result.stdout}",
             }
 
-        # Extract commit hash
+        # Extract commit hash with comprehensive error handling
         commit_hash = None
         try:
             hash_result = subprocess.run(
@@ -316,12 +316,17 @@ def _git_commit(message: str) -> Dict[str, Any]:
             )
             if hash_result.returncode == 0:
                 commit_hash = hash_result.stdout.strip()[:8]  # Short hash
-        except (
-            subprocess.TimeoutExpired,
-            subprocess.CalledProcessError,
-            FileNotFoundError,
-        ):
-            pass
+                logger.debug(f"📋 Extracted commit hash: {commit_hash}")
+            else:
+                logger.warning(f"⚠️ Failed to extract commit hash: {hash_result.stderr}")
+        except subprocess.TimeoutExpired:
+            logger.warning("⏰ Timeout while extracting commit hash")
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"🚫 Git command failed while extracting hash: {e}")
+        except FileNotFoundError:
+            logger.warning("🔍 Git command not found in PATH")
+        except Exception as e:
+            logger.warning(f"❌ Unexpected error extracting commit hash: {e}")
 
         return {"success": True, "commit_hash": commit_hash, "output": result.stdout}
 

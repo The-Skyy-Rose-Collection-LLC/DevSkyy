@@ -83,16 +83,44 @@ class DynamicPricingEngine:
             elif age_days > 180:
                 adjustment *= 0.60  # 40% off for items older than 180 days
 
-            # Competitive adjustments
+            # Competitive adjustments with sophisticated pricing strategy
+            competitive_ratio = base_price / competitor_avg if competitor_avg > 0 else 1.0
+
             if competitor_avg * 0.95 < base_price < competitor_avg * 1.05:
-                # Price competitive
-                pass
+                # Price competitive - maintain position with slight optimization
+                if demand_score > 0.6:
+                    # High demand allows for premium positioning
+                    adjustment *= 1.02
+                elif inventory_level > 80:
+                    # High inventory - be more aggressive
+                    adjustment *= 0.98
+                else:
+                    # Maintain competitive position
+                    adjustment *= 1.0
+
+                logger.debug(f"💰 Competitive pricing maintained: ratio={competitive_ratio:.3f}")
+
             elif base_price > competitor_avg * 1.1:
-                # Price too high
-                adjustment *= 0.95
+                # Price too high - reduce more aggressively
+                if demand_score > 0.8:
+                    # High demand can support premium
+                    adjustment *= 0.98
+                else:
+                    # Standard reduction
+                    adjustment *= 0.95
+
+                logger.info(f"📉 Reducing high price: was {competitive_ratio:.1f}x competitor avg")
+
             elif base_price < competitor_avg * 0.9:
-                # Price too low
-                adjustment *= 1.05
+                # Price too low - increase strategically
+                if inventory_level < 30:
+                    # Low inventory - increase more
+                    adjustment *= 1.08
+                else:
+                    # Standard increase
+                    adjustment *= 1.05
+
+                logger.info(f"📈 Increasing low price: was {competitive_ratio:.1f}x competitor avg")
 
             # Seasonal adjustments
             adjustment *= season_factor
