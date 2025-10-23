@@ -131,7 +131,21 @@ class WebDevelopmentAgent:
         img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
 
         def add_alt(match):
-            """TODO: Add docstring for add_alt."""
+            """
+            Add alt attribute to img tags that don't have one.
+
+            This function ensures accessibility compliance by adding alt attributes
+            to images that are missing them, improving SEO and screen reader support.
+
+            Args:
+                match (re.Match): Regex match object containing the img tag
+
+            Returns:
+                str: The img tag with alt attribute added if it was missing
+
+            Example:
+                '<img src="photo.jpg">' -> '<img src="photo.jpg" alt="Image">'
+            """
             img_tag = match.group(0)
             if "alt=" not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'

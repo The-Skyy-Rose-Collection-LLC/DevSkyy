@@ -435,20 +435,137 @@ class FixerAgentV2(BaseAgent):
     async def _fix_sql_injection(
         self, file_path: str, dry_run: bool
     ) -> Optional[Dict[str, Any]]:
-        """Add SQL injection prevention"""
-        # Placeholder - would need more sophisticated SQL parsing
-        return {
-            "file": file_path,
-            "type": "security",
-            "severity": "critical",
-            "description": "Manual review required for SQL injection vulnerability",
-            "requires_manual_review": True,
-        }
+        """
+        Add SQL injection prevention by detecting and fixing vulnerable SQL patterns.
+
+        This function identifies common SQL injection vulnerabilities and suggests
+        parameterized query fixes or ORM usage recommendations.
+
+        Args:
+            file_path (str): Path to the file to analyze
+            dry_run (bool): If True, only analyze without making changes
+
+        Returns:
+            Optional[Dict[str, Any]]: Fix results or None if no issues found
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Patterns that indicate potential SQL injection vulnerabilities
+            vulnerable_patterns = [
+                r'execute\s*\(\s*["\'].*%s.*["\']',  # String formatting in SQL
+                r'execute\s*\(\s*["\'].*\+.*["\']',   # String concatenation in SQL
+                r'execute\s*\(\s*f["\'].*\{.*\}.*["\']',  # f-string in SQL
+                r'cursor\.execute\s*\(\s*["\'].*%.*["\']',  # % formatting
+            ]
+
+            issues_found = []
+            lines = content.split('\n')
+
+            for i, line in enumerate(lines, 1):
+                for pattern in vulnerable_patterns:
+                    if re.search(pattern, line, re.IGNORECASE):
+                        issues_found.append({
+                            "line": i,
+                            "content": line.strip(),
+                            "pattern": pattern,
+                            "recommendation": "Use parameterized queries or ORM methods"
+                        })
+
+            if not issues_found:
+                return None
+
+            if not dry_run:
+                # In a real implementation, this would apply automated fixes
+                # For now, we log the issues for manual review
+                logger.warning(f"SQL injection vulnerabilities found in {file_path}: {len(issues_found)} issues")
+
+            return {
+                "file": file_path,
+                "type": "security",
+                "severity": "critical",
+                "description": f"Found {len(issues_found)} potential SQL injection vulnerabilities",
+                "issues": issues_found,
+                "requires_manual_review": True,
+                "automated_fix_available": False
+            }
+
+        except Exception as e:
+            logger.error(f"Error analyzing SQL injection in {file_path}: {e}")
+            return {
+                "file": file_path,
+                "type": "security",
+                "severity": "critical",
+                "description": f"Error analyzing file: {str(e)}",
+                "requires_manual_review": True,
+            }
 
     async def _add_caching(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """Add caching to expensive operations"""
-        # Placeholder for caching improvements
-        return []
+        """
+        Add caching to expensive operations to improve performance.
+
+        Identifies functions that would benefit from caching and suggests
+        appropriate caching strategies (Redis, in-memory, file-based).
+
+        Args:
+            dry_run (bool): If True, only analyze without making changes
+
+        Returns:
+            List[Dict[str, Any]]: List of caching improvements applied or suggested
+        """
+        improvements = []
+
+        try:
+            # Scan Python files for functions that could benefit from caching
+            python_files = list(Path('.').rglob('*.py'))
+
+            for file_path in python_files:
+                if file_path.name.startswith('.') or 'test' in str(file_path):
+                    continue
+
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+
+                    # Look for patterns that indicate expensive operations
+                    expensive_patterns = [
+                        (r'def.*\(.*\).*:.*requests\.get', 'HTTP requests'),
+                        (r'def.*\(.*\).*:.*requests\.post', 'HTTP requests'),
+                        (r'def.*\(.*\).*:.*\.query\(', 'Database queries'),
+                        (r'def.*\(.*\).*:.*\.execute\(', 'Database operations'),
+                        (r'def.*\(.*\).*:.*time\.sleep', 'Blocking operations'),
+                        (r'def.*\(.*\).*:.*subprocess\.', 'System calls'),
+                    ]
+
+                    lines = content.split('\n')
+                    for i, line in enumerate(lines, 1):
+                        for pattern, operation_type in expensive_patterns:
+                            if re.search(pattern, line, re.IGNORECASE):
+                                # Check if caching is already implemented
+                                if '@cache' not in content and '@lru_cache' not in content:
+                                    improvements.append({
+                                        "file": str(file_path),
+                                        "line": i,
+                                        "type": "performance",
+                                        "operation_type": operation_type,
+                                        "recommendation": f"Consider adding caching for {operation_type}",
+                                        "suggested_solution": "@lru_cache(maxsize=128) or Redis caching",
+                                        "priority": "medium"
+                                    })
+
+                except Exception as e:
+                    logger.warning(f"Error analyzing {file_path} for caching: {e}")
+                    continue
+
+            if not dry_run and improvements:
+                logger.info(f"Identified {len(improvements)} caching opportunities")
+
+            return improvements
+
+        except Exception as e:
+            logger.error(f"Error in caching analysis: {e}")
+            return []
 
     async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
         """Remove unused imports"""

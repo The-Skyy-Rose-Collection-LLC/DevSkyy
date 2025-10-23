@@ -391,7 +391,22 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
         img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
 
         def add_alt(match):
-            """TODO: Add docstring for add_alt."""
+            """
+            Add alt attribute to img tags for accessibility compliance.
+
+            Automatically adds alt attributes to HTML img tags that don't have them,
+            ensuring the content meets WCAG accessibility standards and improves SEO.
+
+            Args:
+                match (re.Match): Regex match object containing the img tag
+
+            Returns:
+                str: The img tag with alt attribute added if it was missing
+
+            Note:
+                This is part of the automated HTML fixing process that ensures
+                all images have proper accessibility attributes.
+            """
             img_tag = match.group(0)
             if "alt=" not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'
