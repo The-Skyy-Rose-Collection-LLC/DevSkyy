@@ -56,7 +56,14 @@ except ImportError as e:
     ENTERPRISE_INFRASTRUCTURE_AVAILABLE = False
     print(f"Warning: Enterprise infrastructure not fully available: {e}")
 
-# Core Application Modules
+# Core Application Modules - Load with graceful degradation
+CORE_MODULES_AVAILABLE = False
+BaseAgent = AgentStatus = SeverityLevel = None
+AgentOrchestrator = ExecutionPriority = TaskStatus = None
+AgentRegistry = EnhancedAgentManager = None
+FashionIntelligenceEngine = RecommendationEngine = None
+ModelRegistry = RedisCache = None
+
 try:
     # BaseAgent Framework and V2 Agents
     from agent.modules.base_agent import BaseAgent, AgentStatus, SeverityLevel
@@ -266,12 +273,16 @@ async def lifespan(app: FastAPI):
 
             # Legacy Agent Manager (for backward compatibility)
             try:
-                from agent.core.agent_manager import AgentManager
-                agent_manager = AgentManager()
-                await agent_manager.initialize()
-                app.state.agent_manager = agent_manager
-            except ImportError:
-                logger.info("Legacy AgentManager not available - using V2 system only")
+                from agent.enhanced_agent_manager import EnhancedAgentManager as LegacyAgentManager
+                legacy_agent_manager = LegacyAgentManager(
+                    orchestrator=agent_orchestrator,
+                    registry=agent_registry,
+                    cache=ml_cache
+                )
+                await legacy_agent_manager.initialize()
+                app.state.agent_manager = legacy_agent_manager
+            except ImportError as e:
+                logger.info(f"Legacy AgentManager not available - using V2 system only: {e}")
 
             # Fashion Intelligence Engine
             if FASHION_AI_ENABLED:
@@ -360,13 +371,23 @@ from api.rate_limiting import get_client_identifier, rate_limiter
 # ============================================================================
 # API V1 ROUTERS
 # ============================================================================
-from api.v1 import agents as agents_router
-from api.v1 import auth as auth_router
-from api.v1 import codex as codex_router
-from api.v1 import gdpr as gdpr_router
-from api.v1 import ml as ml_router
-from api.v1 import monitoring as monitoring_router
-from api.v1 import webhooks as webhooks_router
+# API Routers - Import with error handling for missing dependencies
+try:
+    from api.v1 import agents as agents_router
+    from api.v1 import auth as auth_router
+    from api.v1 import codex as codex_router
+    from api.v1 import gdpr as gdpr_router
+    from api.v1 import ml as ml_router
+    from api.v1 import monitoring as monitoring_router
+    from api.v1 import webhooks as webhooks_router
+    API_ROUTERS_AVAILABLE = True
+    logger.info("✅ All API routers loaded successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ Some API routers not available due to missing dependencies: {e}")
+    API_ROUTERS_AVAILABLE = False
+    # Create minimal routers for basic functionality
+    agents_router = auth_router = codex_router = None
+    gdpr_router = ml_router = monitoring_router = webhooks_router = None
 
 # ============================================================================
 # ARCHITECTURE - GRADE A+
@@ -1118,26 +1139,39 @@ health_monitor.register_check("security", security_manager_health_check)
 # API V1 ROUTERS - Enterprise API
 # ============================================================================
 
-# Authentication & Authorization
-app.include_router(auth_router.router, prefix="/api/v1", tags=["v1-auth"])
+# Conditional Router Registration - Only register available routers
+if API_ROUTERS_AVAILABLE:
+    # Authentication & Authorization
+    if auth_router:
+        app.include_router(auth_router.router, prefix="/api/v1", tags=["v1-auth"])
 
-# Agents (all 54 agents with comprehensive endpoints)
-app.include_router(agents_router.router, prefix="/api/v1", tags=["v1-agents"])
+    # Agents (all 54 agents with comprehensive endpoints)
+    if agents_router:
+        app.include_router(agents_router.router, prefix="/api/v1", tags=["v1-agents"])
 
-# Webhooks
-app.include_router(webhooks_router.router, prefix="/api/v1", tags=["v1-webhooks"])
+    # Webhooks
+    if webhooks_router:
+        app.include_router(webhooks_router.router, prefix="/api/v1", tags=["v1-webhooks"])
 
-# Monitoring & Observability
-app.include_router(monitoring_router.router, prefix="/api/v1", tags=["v1-monitoring"])
+    # Monitoring & Observability
+    if monitoring_router:
+        app.include_router(monitoring_router.router, prefix="/api/v1", tags=["v1-monitoring"])
 
-# GDPR Compliance
-app.include_router(gdpr_router.router, prefix="/api/v1", tags=["v1-gdpr"])
+    # GDPR Compliance
+    if gdpr_router:
+        app.include_router(gdpr_router.router, prefix="/api/v1", tags=["v1-gdpr"])
 
-# ML Infrastructure
-app.include_router(ml_router.router, prefix="/api/v1", tags=["v1-ml"])
+    # ML Infrastructure
+    if ml_router:
+        app.include_router(ml_router.router, prefix="/api/v1", tags=["v1-ml"])
 
-# Codex Integration (OpenAI GPT-4/GPT-3.5 Code Generation)
-app.include_router(codex_router.router, prefix="/api/v1", tags=["v1-codex"])
+    # Codex Integration (OpenAI GPT-4/GPT-3.5 Code Generation)
+    if codex_router:
+        app.include_router(codex_router.router, prefix="/api/v1", tags=["v1-codex"])
+
+    logger.info("✅ All available API routers registered")
+else:
+    logger.warning("⚠️ API routers not registered due to missing dependencies")
 
 
 # ============================================================================
@@ -1180,32 +1214,56 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Comprehensive health check"""
-    health_status = {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "platform": "operational",
-        "agents": {
-            "backend_loaded": len([k for k in _agent_cache if k.startswith("backend")]),
-            "frontend_loaded": len(
-                [k for k in _agent_cache if k.startswith("frontend")]
-            ),
-            "total_loaded": len(_agent_cache),
-        },
-        "database": "SQLAlchemy",
-        "mongodb": False,
-    }
-
-    # Check database
+    """Basic health check that works without dependencies"""
     try:
-        from database import db_manager
+        health_status = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "platform": "operational",
+            "version": "5.2.0",
+            "environment": os.getenv("ENVIRONMENT", "development"),
+            "deployment_platform": "vercel",
+            "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        }
 
-        db_health = await db_manager.health_check()
-        health_status["database_status"] = db_health.get("status", "unknown")
+        # Add agent information if available
+        if CORE_MODULES_AVAILABLE and '_agent_cache' in globals():
+            health_status["agents"] = {
+                "backend_loaded": len([k for k in _agent_cache if k.startswith("backend")]),
+                "frontend_loaded": len([k for k in _agent_cache if k.startswith("frontend")]),
+                "total_loaded": len(_agent_cache),
+            }
+        else:
+            health_status["agents"] = {
+                "status": "modules_not_available",
+                "message": "Agent modules not loaded due to missing dependencies"
+            }
+
+        # Add API router status
+        health_status["api_routers"] = {
+            "available": API_ROUTERS_AVAILABLE if 'API_ROUTERS_AVAILABLE' in globals() else False,
+            "message": "All routers loaded" if globals().get('API_ROUTERS_AVAILABLE', False) else "Some routers unavailable due to dependencies"
+        }
+
+        # Check database if available
+        try:
+            from database import db_manager
+            db_health = await db_manager.health_check()
+            health_status["database_status"] = db_health.get("status", "unknown")
+        except Exception as e:
+            health_status["database_status"] = f"unavailable: {str(e)}"
+
+        return health_status
+
     except Exception as e:
-        health_status["database_status"] = f"unavailable: {str(e)}"
-
-    return health_status
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "version": "5.2.0",
+            "environment": os.getenv("ENVIRONMENT", "development")
+        }
 
 
 @app.get("/agents")

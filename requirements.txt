@@ -6,8 +6,9 @@
 # Core Framework (Latest Secure Versions)
 fastapi==0.119.0
 uvicorn[standard]==0.34.0
-pydantic==2.7.4  # Min version for langchain compatibility (requires >=2.7.4)
+pydantic[email]==2.7.4  # Min version for langchain compatibility (requires >=2.7.4)
 python-dotenv==1.0.1
+email-validator==2.1.0  # Required for Pydantic email validation
 starlette==0.48.0  # FastAPI dependency, security updated (GHSA-2c2j-9gv5-cj73 fixed)
 
 # Database (Enterprise-Grade)

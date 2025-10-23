@@ -2,9 +2,9 @@
   "version": 2,
   "name": "devskyy-enterprise-platform",
   "framework": "other",
-  "buildCommand": "pip install -r requirements.txt",
+  "buildCommand": "pip install -r requirements.vercel.txt",
   "outputDirectory": ".",
-  "installCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "installCommand": "pip install --upgrade pip && pip install -r requirements.vercel.txt",
   "devCommand": "uvicorn main:app --host 0.0.0.0 --port $PORT --reload",
   "builds": [
     {
