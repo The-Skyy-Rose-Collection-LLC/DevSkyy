@@ -20,6 +20,7 @@ Version: 5.2.0
 Python: >=3.11
 """
 
+import asyncio
 import logging
 import os
 import sys
@@ -27,7 +28,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import structlog
 from fastapi import FastAPI, HTTPException, Request, status
@@ -93,8 +94,8 @@ try:
     logger.info("✅ Core agent modules loaded successfully")
 except ImportError as e:
     CORE_MODULES_AVAILABLE = False
-    logger.warning(f"⚠️ Core modules not fully available: {e}")
     print(f"Warning: Core modules not fully available: {e}")
+    # Logger will be initialized later
 
 # ============================================================================
 # ENTERPRISE APPLICATION CONFIGURATION
@@ -228,11 +229,7 @@ except ValueError:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Enterprise application lifecycle management with comprehensive startup and shutdown."""
-    logger.info(
-        "🚀 Starting DevSkyy Enterprise Platform",
-        version=VERSION,
-        environment=ENVIRONMENT,
-    )
+    logger.info(f"🚀 Starting DevSkyy Enterprise Platform v{VERSION} ({ENVIRONMENT})")
 
     # Startup Phase
     startup_start = time.time()
@@ -307,17 +304,12 @@ async def lifespan(app: FastAPI):
             logger.info("✅ Monitoring setup complete")
 
         startup_time = time.time() - startup_start
-        logger.info(
-            "🌟 DevSkyy Platform startup complete",
-            startup_time_seconds=startup_time,
-            environment=ENVIRONMENT,
-            version=VERSION,
-        )
+        logger.info(f"🌟 DevSkyy Platform startup complete in {startup_time:.2f}s (v{VERSION}, {ENVIRONMENT})")
 
         yield
 
     except Exception as e:
-        logger.error("❌ Failed to start DevSkyy Platform", error=str(e), exc_info=True)
+        logger.error(f"❌ Failed to start DevSkyy Platform: {str(e)}", exc_info=True)
         raise
 
     # Shutdown Phase
@@ -358,7 +350,7 @@ async def lifespan(app: FastAPI):
         logger.info("✅ DevSkyy Platform shutdown complete")
 
     except Exception as e:
-        logger.error("❌ Error during shutdown", error=str(e), exc_info=True)
+        logger.error(f"❌ Error during shutdown: {str(e)}", exc_info=True)
 
 
 from agent.modules.backend.scanner import scan_site
@@ -383,7 +375,7 @@ try:
     API_ROUTERS_AVAILABLE = True
     logger.info("✅ All API routers loaded successfully")
 except ImportError as e:
-    logger.warning(f"⚠️ Some API routers not available due to missing dependencies: {e}")
+    print(f"Warning: Some API routers not available due to missing dependencies: {e}")
     API_ROUTERS_AVAILABLE = False
     # Create minimal routers for basic functionality
     agents_router = auth_router = codex_router = None

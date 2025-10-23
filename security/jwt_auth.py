@@ -558,11 +558,12 @@ class UserManager:
 
     def _create_default_users(self):
         """Create default users for development"""
-        # Super admin
+        # Super admin with default password
         admin_user = User(
             user_id="admin_001",
             email="admin@devskyy.com",
             username="admin",
+            password_hash=self.hash_password("admin123"),  # Default password: admin123
             role=UserRole.SUPER_ADMIN,
             permissions=["*"],
         )
@@ -570,11 +571,12 @@ class UserManager:
         self.email_index[admin_user.email] = admin_user.user_id
         self.username_index[admin_user.username] = admin_user.user_id
 
-        # API user
+        # API user with default password
         api_user = User(
             user_id="api_001",
             email="api@devskyy.com",
             username="api_user",
+            password_hash=self.hash_password("api123"),  # Default password: api123
             role=UserRole.API_USER,
             permissions=["read", "write", "execute"],
         )
