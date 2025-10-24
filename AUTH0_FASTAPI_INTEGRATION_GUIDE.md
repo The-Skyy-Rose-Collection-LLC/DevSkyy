@@ -235,9 +235,9 @@ async def get_user_profile(current_user = Depends(get_current_auth0_user)):
 ### **Environment Variables**
 ```bash
 # Auth0 Configuration (Required)
-AUTH0_DOMAIN=devskyy.auth0.com
-AUTH0_CLIENT_ID=your-auth0-client-id
-AUTH0_CLIENT_SECRET=your-auth0-client-secret
+AUTH0_DOMAIN=devskyy.us.auth0.com
+AUTH0_CLIENT_ID=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv
+AUTH0_CLIENT_SECRET=ltEkfUE1jZhlZqwzivRfmZnmKXe1zQDNRsoz60b_tG1C_VqXGxHXzxttYouFkMMe
 AUTH0_AUDIENCE=https://api.devskyy.com
 
 # DevSkyy JWT Configuration (Already configured)

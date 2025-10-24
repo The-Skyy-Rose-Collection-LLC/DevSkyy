@@ -5,7 +5,7 @@
 ### **🔐 Real Auth0 Credentials Configured**
 - **Client ID**: `DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv`
 - **Client Secret**: `ltEkfUE1jZhlZqwzivRfmZnmKXe1zQDNRsoz60b_tG1C_VqXGxHXzxttYouFkMMe`
-- **Domain**: `devskyy.auth0.com`
+- **Domain**: `devskyy.us.auth0.com`
 - **Audience**: `https://api.devskyy.com`
 
 ---
@@ -68,8 +68,8 @@ GET /api/v1/auth/auth0/demo            # Testing interface
 # Auth0 Login Endpoint
 curl http://localhost:8000/api/v1/auth/auth0/login
 Response: {
-  "authorization_url": "https://devskyy.auth0.com/authorize?...client_id=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv...",
-  "state": "LVBpMwF7IGRRt90fucXGWEijLzfGZMEe"
+  "authorization_url": "https://devskyy.us.auth0.com/authorize?...client_id=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv...",
+  "state": "HRk5qtbQKGgoBObuKRgTs5FteeN5aDpG"
 }
 
 # JWT Token Creation/Verification
@@ -118,7 +118,7 @@ const makeAuthenticatedRequest = async (endpoint) => {
 ### **Environment Configuration**
 ```bash
 # Production Environment Variables
-AUTH0_DOMAIN=devskyy.auth0.com
+AUTH0_DOMAIN=devskyy.us.auth0.com
 AUTH0_CLIENT_ID=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv
 AUTH0_CLIENT_SECRET=ltEkfUE1jZhlZqwzivRfmZnmKXe1zQDNRsoz60b_tG1C_VqXGxHXzxttYouFkMMe
 AUTH0_AUDIENCE=https://api.devskyy.com
@@ -172,7 +172,7 @@ npm install @auth0/auth0-react
 
 # Configure Auth0Provider
 <Auth0Provider
-  domain="devskyy.auth0.com"
+  domain="devskyy.us.auth0.com"
   clientId="DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv"
   authorizationParams={{
     audience: "https://api.devskyy.com",
@@ -186,7 +186,7 @@ npm install @auth0/auth0-react
 ### **3. Production Deployment**
 ```bash
 # Vercel Environment Variables
-AUTH0_DOMAIN=devskyy.auth0.com
+AUTH0_DOMAIN=devskyy.us.auth0.com
 AUTH0_CLIENT_ID=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv
 AUTH0_CLIENT_SECRET=@auth0-client-secret  # Secure environment variable
 SECRET_KEY=@secret-key-production         # Secure environment variable
