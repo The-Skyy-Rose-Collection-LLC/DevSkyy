@@ -1,6 +1,7 @@
 """
 Authentication API Endpoints
 JWT/OAuth2 authentication with user management
+Includes Auth0 integration for enterprise authentication
 """
 
 import logging
@@ -26,6 +27,16 @@ from security.jwt_auth import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
+
+# Import and include Auth0 endpoints
+try:
+    from api.v1.auth0_endpoints import router as auth0_router
+    router.include_router(auth0_router)
+    logger.info("✅ Auth0 authentication endpoints loaded")
+except ImportError as e:
+    logger.warning(f"⚠️ Auth0 endpoints not available: {e}")
+except Exception as e:
+    logger.error(f"❌ Failed to load Auth0 endpoints: {e}")
 
 
 # ============================================================================

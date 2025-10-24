@@ -1,6 +1,7 @@
 """
 Auth0 Integration for DevSkyy Enterprise Platform
 Enterprise-grade authentication with Auth0 for unicorn-ready scaling
+Adapted from Flask to FastAPI with JWT token integration
 """
 
 import os
@@ -10,11 +11,19 @@ from typing import Dict, List, Optional, Any
 from functools import lru_cache
 from datetime import datetime, timedelta
 import logging
+from urllib.parse import quote_plus, urlencode
 
-from fastapi import HTTPException, status, Depends, Request
+from fastapi import HTTPException, status, Depends, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import RedirectResponse
 from jose import jwt, JWTError
 from pydantic import BaseModel
+from authlib.integrations.httpx_client import AsyncOAuth2Client
+from authlib.common.security import generate_token
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -25,6 +34,16 @@ AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE", "https://api.devskyy.com")
 AUTH0_ALGORITHMS = ["RS256"]
 AUTH0_CLIENT_ID = os.getenv("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.getenv("AUTH0_CLIENT_SECRET")
+
+# DevSkyy JWT Configuration (for hybrid authentication)
+DEVSKYY_SECRET_KEY = os.getenv("SECRET_KEY")
+DEVSKYY_JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+
+# OAuth2 Configuration
+AUTH0_AUTHORIZATION_URL = f"https://{AUTH0_DOMAIN}/authorize"
+AUTH0_TOKEN_URL = f"https://{AUTH0_DOMAIN}/oauth/token"
+AUTH0_USERINFO_URL = f"https://{AUTH0_DOMAIN}/userinfo"
+AUTH0_LOGOUT_URL = f"https://{AUTH0_DOMAIN}/v2/logout"
 
 # Security scheme
 security = HTTPBearer()
@@ -70,7 +89,95 @@ class TokenPayload(BaseModel):
     organization: Optional[str] = None
 
 # ============================================================================
-# AUTH0 CLIENT
+# OAUTH2 CLIENT & SESSION MANAGEMENT
+# ============================================================================
+
+class Auth0OAuth2Client:
+    """Auth0 OAuth2 client for FastAPI integration."""
+
+    def __init__(self):
+        self.client_id = AUTH0_CLIENT_ID
+        self.client_secret = AUTH0_CLIENT_SECRET
+        self.domain = AUTH0_DOMAIN
+
+        # OAuth2 client configuration
+        self.oauth_client = AsyncOAuth2Client(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_endpoint=AUTH0_TOKEN_URL,
+            authorization_endpoint=AUTH0_AUTHORIZATION_URL
+        )
+
+    def get_authorization_url(self, redirect_uri: str, state: str = None) -> str:
+        """Generate Auth0 authorization URL."""
+        params = {
+            "response_type": "code",
+            "client_id": self.client_id,
+            "redirect_uri": redirect_uri,
+            "scope": "openid profile email",
+            "audience": AUTH0_AUDIENCE
+        }
+
+        if state:
+            params["state"] = state
+
+        query_string = urlencode(params, quote_via=quote_plus)
+        return f"{AUTH0_AUTHORIZATION_URL}?{query_string}"
+
+    async def exchange_code_for_token(self, code: str, redirect_uri: str) -> Dict[str, Any]:
+        """Exchange authorization code for access token."""
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                AUTH0_TOKEN_URL,
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "code": code,
+                    "redirect_uri": redirect_uri
+                },
+                headers={"Content-Type": "application/x-www-form-urlencoded"}
+            )
+
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Failed to exchange code for token: {response.text}"
+                )
+
+            return response.json()
+
+    async def get_user_info(self, access_token: str) -> Dict[str, Any]:
+        """Get user information from Auth0."""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                AUTH0_USERINFO_URL,
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Failed to get user info from Auth0"
+                )
+
+            return response.json()
+
+    def get_logout_url(self, return_to: str) -> str:
+        """Generate Auth0 logout URL."""
+        params = {
+            "returnTo": return_to,
+            "client_id": self.client_id
+        }
+
+        query_string = urlencode(params, quote_via=quote_plus)
+        return f"{AUTH0_LOGOUT_URL}?{query_string}"
+
+# Global OAuth2 client instance
+auth0_oauth_client = Auth0OAuth2Client()
+
+# ============================================================================
+# AUTH0 MANAGEMENT CLIENT
 # ============================================================================
 
 class Auth0Client:
@@ -331,6 +438,87 @@ def require_scope(required_scope: str):
         return token_payload
     
     return scope_checker
+
+# ============================================================================
+# JWT TOKEN INTEGRATION (DevSkyy + Auth0 Hybrid)
+# ============================================================================
+
+def create_devskyy_jwt_token(user_data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    """Create DevSkyy JWT token with Auth0 user data."""
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=30)
+
+    # Create payload with Auth0 user data
+    payload = {
+        "sub": user_data.get("sub"),  # Auth0 user ID
+        "email": user_data.get("email"),
+        "name": user_data.get("name"),
+        "picture": user_data.get("picture"),
+        "email_verified": user_data.get("email_verified", False),
+        "exp": int(expire.timestamp()),
+        "iat": int(datetime.utcnow().timestamp()),
+        "iss": "devskyy-platform",
+        "aud": "devskyy-api",
+        "token_type": "access",
+        "auth_provider": "auth0"
+    }
+
+    # Ensure secret key is properly formatted
+    secret_key = DEVSKYY_SECRET_KEY
+    if not secret_key:
+        raise ValueError("DEVSKYY_SECRET_KEY is not configured")
+
+    # Sign with DevSkyy secret key for compatibility
+    encoded_jwt = jwt.encode(payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
+    return encoded_jwt
+
+def create_devskyy_refresh_token(user_data: Dict[str, Any]) -> str:
+    """Create DevSkyy refresh token."""
+    expire = datetime.utcnow() + timedelta(days=30)
+
+    payload = {
+        "sub": user_data.get("sub"),
+        "exp": int(expire.timestamp()),
+        "iat": int(datetime.utcnow().timestamp()),
+        "iss": "devskyy-platform",
+        "aud": "devskyy-api",
+        "token_type": "refresh",
+        "auth_provider": "auth0"
+    }
+
+    # Ensure secret key is properly formatted
+    secret_key = DEVSKYY_SECRET_KEY
+    if not secret_key:
+        raise ValueError("DEVSKYY_SECRET_KEY is not configured")
+
+    encoded_jwt = jwt.encode(payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
+    return encoded_jwt
+
+def verify_devskyy_jwt_token(token: str) -> Dict[str, Any]:
+    """Verify DevSkyy JWT token (compatible with existing system)."""
+    try:
+        # Ensure secret key is properly formatted
+        secret_key = DEVSKYY_SECRET_KEY
+        if not secret_key:
+            raise ValueError("DEVSKYY_SECRET_KEY is not configured")
+
+        payload = jwt.decode(
+            token,
+            secret_key,
+            algorithms=[DEVSKYY_JWT_ALGORITHM],
+            audience="devskyy-api",
+            issuer="devskyy-platform"
+        )
+        return payload
+    except JWTError as e:
+        logger.warning(f"DevSkyy JWT verification failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 # ============================================================================
 # UTILITY FUNCTIONS
