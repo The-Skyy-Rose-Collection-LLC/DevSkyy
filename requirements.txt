@@ -50,7 +50,7 @@ torchvision==0.17.2  # Compatible with torch 2.2.2
 diffusers==0.31.0
 sentence-transformers==3.3.1
 scikit-learn==1.5.2
-numpy==1.26.4  # Compatible version
+numpy==2.3.3  # Compatible version
 pandas==2.2.3
 # tensorflow==2.16.2  # Disabled due to system compatibility issues - will re-enable in Phase 3
 xgboost==2.1.3
