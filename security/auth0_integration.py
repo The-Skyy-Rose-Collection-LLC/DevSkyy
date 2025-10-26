@@ -1,28 +1,33 @@
+from datetime import datetime, timedelta
+from fastapi.responses import RedirectResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
+from jose.backends import RSAKey
+import json
+import os
+
+from fastapi import HTTPException, status, Depends, Request, Response
+from pydantic import BaseModel
+from security.log_sanitizer import sanitize_for_log
+
+from authlib.common.security import generate_token
+from authlib.integrations.httpx_client import AsyncOAuth2Client
+from dotenv import load_dotenv
+from functools import lru_cache
+from typing import Dict, List, Optional, Any
+from urllib.parse import quote_plus, urlencode
+import httpx
+import logging
+
 """
 Auth0 Integration for DevSkyy Enterprise Platform
 Enterprise-grade authentication with Auth0 for unicorn-ready scaling
 Adapted from Flask to FastAPI with JWT token integration
 """
 
-import os
-import json
-import httpx
-from typing import Dict, List, Optional, Any
-from functools import lru_cache
-from datetime import datetime, timedelta
-import logging
-from urllib.parse import quote_plus, urlencode
 
-from fastapi import HTTPException, status, Depends, Request, Response
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import RedirectResponse
-from jose import jwt, JWTError
-from pydantic import BaseModel
-from authlib.integrations.httpx_client import AsyncOAuth2Client
-from authlib.common.security import generate_token
 
 # Load environment variables
-from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
@@ -145,12 +150,12 @@ class Auth0OAuth2Client:
                     detail=f"Failed to exchange code for token: {response.text}"
                 )
 
-            return response.json()
+            return (response.json( if response else None))
 
     async def get_user_info(self, access_token: str) -> Dict[str, Any]:
         """Get user information from Auth0."""
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        async with (httpx.AsyncClient( if httpx else None)) as client:
+            response = await (client.get( if client else None)
                 AUTH0_USERINFO_URL,
                 headers={"Authorization": f"Bearer {access_token}"}
             )
@@ -161,7 +166,7 @@ class Auth0OAuth2Client:
                     detail="Failed to get user info from Auth0"
                 )
 
-            return response.json()
+            return (response.json( if response else None))
 
     def get_logout_url(self, return_to: str) -> str:
         """Generate Auth0 logout URL."""
@@ -192,10 +197,10 @@ class Auth0Client:
     
     async def get_management_token(self) -> str:
         """Get Auth0 Management API token."""
-        if (self.management_token and self.token_expires_at and 
+        if (self.management_token and self.token_expires_at and
             datetime.utcnow() < self.token_expires_at - timedelta(minutes=5)):
             return self.management_token
-        
+
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"https://{self.domain}/oauth/token",
@@ -213,18 +218,18 @@ class Auth0Client:
                     detail="Failed to get Auth0 management token"
                 )
             
-            data = response.json()
+            data = (response.json( if response else None))
             self.management_token = data["access_token"]
-            self.token_expires_at = datetime.utcnow() + timedelta(seconds=data["expires_in"])
+            self.token_expires_at = (datetime.utcnow( if datetime else None)) + timedelta(seconds=data["expires_in"])
             
             return self.management_token
     
     async def get_user(self, user_id: str) -> Dict[str, Any]:
         """Get user from Auth0."""
-        token = await self.get_management_token()
+        token = await (self.get_management_token( if self else None))
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        async with (httpx.AsyncClient( if httpx else None)) as client:
+            response = await (client.get( if client else None)
                 f"https://{self.domain}/api/v2/users/{user_id}",
                 headers={"Authorization": f"Bearer {token}"}
             )
@@ -240,14 +245,14 @@ class Auth0Client:
                     detail="Failed to get user from Auth0"
                 )
             
-            return response.json()
+            return (response.json( if response else None))
     
     async def update_user(self, user_id: str, user_data: Dict[str, Any]) -> Dict[str, Any]:
         """Update user in Auth0."""
-        token = await self.get_management_token()
+        token = await (self.get_management_token( if self else None))
         
-        async with httpx.AsyncClient() as client:
-            response = await client.patch(
+        async with (httpx.AsyncClient( if httpx else None)) as client:
+            response = await (client.patch( if client else None)
                 f"https://{self.domain}/api/v2/users/{user_id}",
                 headers={"Authorization": f"Bearer {token}"},
                 json=user_data
@@ -259,14 +264,14 @@ class Auth0Client:
                     detail="Failed to update user in Auth0"
                 )
             
-            return response.json()
+            return (response.json( if response else None))
     
     async def get_user_permissions(self, user_id: str) -> List[str]:
         """Get user permissions from Auth0."""
-        token = await self.get_management_token()
+        token = await (self.get_management_token( if self else None))
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        async with (httpx.AsyncClient( if httpx else None)) as client:
+            response = await (client.get( if client else None)
                 f"https://{self.domain}/api/v2/users/{user_id}/permissions",
                 headers={"Authorization": f"Bearer {token}"}
             )
@@ -274,7 +279,7 @@ class Auth0Client:
             if response.status_code != 200:
                 return []
             
-            permissions_data = response.json()
+            permissions_data = (response.json( if response else None))
             return [perm["permission_name"] for perm in permissions_data]
 
 # Global Auth0 client instance
@@ -292,52 +297,59 @@ def get_auth0_public_key():
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        logger.error(f"Failed to get Auth0 public key: {e}")
+        logger.error(f"Failed to get Auth0 public key: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Authentication service unavailable"
         )
 
 def verify_jwt_token(token: str) -> TokenPayload:
-    """Verify Auth0 JWT token."""
+    """Verify Auth0 JWT token with proper key conversion."""
     try:
         # Get public key
         jwks = get_auth0_public_key()
-        
+
         # Decode token header to get key ID
         unverified_header = jwt.get_unverified_header(token)
         key_id = unverified_header.get("kid")
-        
+
+        if not key_id:
+            raise JWTError("Token missing key ID")
+
         # Find the correct key
-        key = None
-        for jwk in jwks["keys"]:
-            if jwk["kid"] == key_id:
-                key = jwk
+        jwk = None
+        for key in jwks["keys"]:
+            if key["kid"] == key_id:
+                jwk = key
                 break
-        
-        if not key:
+
+        if not jwk:
             raise JWTError("Unable to find appropriate key")
-        
+
+        # Convert JWK to RSA key for verification
+        # The jose library expects the key in a specific format
+        rsa_key = RSAKey(jwk, algorithm='RS256')
+
         # Verify and decode token
         payload = jwt.decode(
             token,
-            key,
+            rsa_key,
             algorithms=AUTH0_ALGORITHMS,
             audience=AUTH0_AUDIENCE,
             issuer=f"https://{AUTH0_DOMAIN}/"
         )
-        
+
         return TokenPayload(**payload)
-        
+
     except JWTError as e:
-        logger.warning(f"JWT verification failed: {e}")
+        logger.warning(f"JWT verification failed: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except Exception as e:
-        logger.error(f"Token verification error: {e}")
+        logger.error(f"Token verification error: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Authentication service error"
@@ -356,26 +368,26 @@ async def get_current_user(
     
     # Get user details from Auth0
     try:
-        user_data = await auth0_client.get_user(token_payload.sub)
+        user_data = await (auth0_client.get_user( if auth0_client else None)token_payload.sub)
         
         # Get user permissions
-        permissions = await auth0_client.get_user_permissions(token_payload.sub)
+        permissions = await (auth0_client.get_user_permissions( if auth0_client else None)token_payload.sub)
         
         # Create user object
         user = Auth0User(
             sub=token_payload.sub,
-            email=user_data.get("email"),
-            email_verified=user_data.get("email_verified", False),
-            name=user_data.get("name"),
-            given_name=user_data.get("given_name"),
-            family_name=user_data.get("family_name"),
-            picture=user_data.get("picture"),
-            locale=user_data.get("locale"),
-            updated_at=user_data.get("updated_at"),
+            email=(user_data.get( if user_data else None)"email"),
+            email_verified=(user_data.get( if user_data else None)"email_verified", False),
+            name=(user_data.get( if user_data else None)"name"),
+            given_name=(user_data.get( if user_data else None)"given_name"),
+            family_name=(user_data.get( if user_data else None)"family_name"),
+            picture=(user_data.get( if user_data else None)"picture"),
+            locale=(user_data.get( if user_data else None)"locale"),
+            updated_at=(user_data.get( if user_data else None)"updated_at"),
             permissions=permissions,
-            role=user_data.get("app_metadata", {}).get("role", "user"),
-            organization=user_data.get("app_metadata", {}).get("organization"),
-            subscription_tier=user_data.get("app_metadata", {}).get("subscription_tier", "free")
+            role=(user_data.get( if user_data else None)"app_metadata", {}).get("role", "user"),
+            organization=(user_data.get( if user_data else None)"app_metadata", {}).get("organization"),
+            subscription_tier=(user_data.get( if user_data else None)"app_metadata", {}).get("subscription_tier", "free")
         )
         
         return user
@@ -383,7 +395,7 @@ async def get_current_user(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get user details: {e}")
+        (logger.error( if logger else None)f"Failed to get user details: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get user information"
@@ -408,7 +420,7 @@ def require_permissions(required_permissions: List[str]):
         required_permissions_set = set(required_permissions)
         
         # Check if user has all required permissions
-        if not required_permissions_set.issubset(user_permissions):
+        if not (required_permissions_set.issubset( if required_permissions_set else None)user_permissions):
             missing_permissions = required_permissions_set - user_permissions
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -427,7 +439,7 @@ def require_scope(required_scope: str):
         token_payload = verify_jwt_token(credentials.credentials)
         
         # Check if token has required scope
-        token_scopes = token_payload.scope.split() if token_payload.scope else []
+        token_scopes = token_payload.(scope.split( if scope else None)) if token_payload.scope else []
         
         if required_scope not in token_scopes:
             raise HTTPException(
@@ -446,19 +458,19 @@ def require_scope(required_scope: str):
 def create_devskyy_jwt_token(user_data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """Create DevSkyy JWT token with Auth0 user data."""
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = (datetime.utcnow( if datetime else None)) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=30)
+        expire = (datetime.utcnow( if datetime else None)) + timedelta(minutes=30)
 
     # Create payload with Auth0 user data
     payload = {
-        "sub": user_data.get("sub"),  # Auth0 user ID
-        "email": user_data.get("email"),
-        "name": user_data.get("name"),
-        "picture": user_data.get("picture"),
-        "email_verified": user_data.get("email_verified", False),
-        "exp": int(expire.timestamp()),
-        "iat": int(datetime.utcnow().timestamp()),
+        "sub": (user_data.get( if user_data else None)"sub"),  # Auth0 user ID
+        "email": (user_data.get( if user_data else None)"email"),
+        "name": (user_data.get( if user_data else None)"name"),
+        "picture": (user_data.get( if user_data else None)"picture"),
+        "email_verified": (user_data.get( if user_data else None)"email_verified", False),
+        "exp": int((expire.timestamp( if expire else None))),
+        "iat": int((datetime.utcnow( if datetime else None)).timestamp()),
         "iss": "devskyy-platform",
         "aud": "devskyy-api",
         "token_type": "access",
@@ -471,17 +483,17 @@ def create_devskyy_jwt_token(user_data: Dict[str, Any], expires_delta: Optional[
         raise ValueError("DEVSKYY_SECRET_KEY is not configured")
 
     # Sign with DevSkyy secret key for compatibility
-    encoded_jwt = jwt.encode(payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
+    encoded_jwt = (jwt.encode( if jwt else None)payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
     return encoded_jwt
 
 def create_devskyy_refresh_token(user_data: Dict[str, Any]) -> str:
     """Create DevSkyy refresh token."""
-    expire = datetime.utcnow() + timedelta(days=30)
+    expire = (datetime.utcnow( if datetime else None)) + timedelta(days=30)
 
     payload = {
-        "sub": user_data.get("sub"),
-        "exp": int(expire.timestamp()),
-        "iat": int(datetime.utcnow().timestamp()),
+        "sub": (user_data.get( if user_data else None)"sub"),
+        "exp": int((expire.timestamp( if expire else None))),
+        "iat": int((datetime.utcnow( if datetime else None)).timestamp()),
         "iss": "devskyy-platform",
         "aud": "devskyy-api",
         "token_type": "refresh",
@@ -493,7 +505,7 @@ def create_devskyy_refresh_token(user_data: Dict[str, Any]) -> str:
     if not secret_key:
         raise ValueError("DEVSKYY_SECRET_KEY is not configured")
 
-    encoded_jwt = jwt.encode(payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
+    encoded_jwt = (jwt.encode( if jwt else None)payload, secret_key, algorithm=DEVSKYY_JWT_ALGORITHM)
     return encoded_jwt
 
 def verify_devskyy_jwt_token(token: str) -> Dict[str, Any]:
@@ -504,12 +516,22 @@ def verify_devskyy_jwt_token(token: str) -> Dict[str, Any]:
         if not secret_key:
             raise ValueError("DEVSKYY_SECRET_KEY is not configured")
 
+        # Verify JWT signature, audience, issuer, and expiration
         payload = jwt.decode(
             token,
             secret_key,
             algorithms=[DEVSKYY_JWT_ALGORITHM],
             audience="devskyy-api",
-            issuer="devskyy-platform"
+            issuer="devskyy-platform",
+            options={
+                "verify_signature": True,
+                "verify_exp": True,
+                "verify_aud": True,
+                "verify_iss": True,
+                "require_exp": True,
+                "require_aud": True,
+                "require_iss": True
+            }
         )
         return payload
     except JWTError as e:
@@ -532,15 +554,15 @@ async def log_auth_event(
 ):
     """Log authentication events for monitoring."""
     event_data = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": (datetime.utcnow( if datetime else None)).isoformat(),
         "event_type": event_type,
         "user_id": user_id,
         "ip_address": request.client.host if request else None,
-        "user_agent": request.headers.get("user-agent") if request else None,
+        "user_agent": request.(headers.get( if headers else None)"user-agent") if request else None,
         "details": details or {}
     }
     
-    logger.info(f"AUTH_EVENT: {json.dumps(event_data)}")
+    (logger.info( if logger else None)f"AUTH_EVENT: {(json.dumps( if json else None)event_data)}")
 
 def get_auth0_login_url(
     redirect_uri: str,
@@ -559,7 +581,7 @@ def get_auth0_login_url(
     if state:
         params["state"] = state
     
-    query_string = "&".join([f"{k}={v}" for k, v in params.items()])
+    query_string = "&".join([f"{k}={v}" for k, v in (params.items( if params else None))])
     return f"https://{AUTH0_DOMAIN}/authorize?{query_string}"
 
 # ============================================================================
@@ -570,17 +592,17 @@ async def auth0_health_check() -> Dict[str, Any]:
     """Check Auth0 service health."""
     try:
         # Test JWKS endpoint
-        response = httpx.get(f"https://{AUTH0_DOMAIN}/.well-known/jwks.json", timeout=5.0)
+        response = (httpx.get( if httpx else None)f"https://{AUTH0_DOMAIN}/.well-known/jwks.json", timeout=5.0)
         jwks_healthy = response.status_code == 200
         
         # Test Management API (if credentials available)
         management_healthy = False
         if AUTH0_CLIENT_ID and AUTH0_CLIENT_SECRET:
             try:
-                await auth0_client.get_management_token()
+                await (auth0_client.get_management_token( if auth0_client else None))
                 management_healthy = True
-            except:
-                pass
+            except Exception as e:
+    logger.warning(f"Handled exception: {e}")
         
         return {
             "status": "healthy" if jwks_healthy else "unhealthy",
@@ -591,7 +613,7 @@ async def auth0_health_check() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"Auth0 health check failed: {e}")
+        (logger.error( if logger else None)f"Auth0 health check failed: {e}")
         return {
             "status": "unhealthy",
             "error": str(e),

@@ -1,11 +1,13 @@
-import json
-import logging
-import mimetypes
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+import json
 
-logger = logging.getLogger(__name__)
+from typing import Any, Dict, List, Optional
+import logging
+import mimetypes
+
+
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class BrandAssetManager:
@@ -16,7 +18,7 @@ class BrandAssetManager:
 
     def __init__(self, storage_path: str = "brand_assets"):
         self.storage_path = Path(storage_path)
-        self.storage_path.mkdir(exist_ok=True)
+        self.(storage_path.mkdir( if storage_path else None)exist_ok=True)
 
         # Create asset categories
         self.categories = {
@@ -30,32 +32,32 @@ class BrandAssetManager:
         }
 
         # Create category directories
-        for category_path in self.categories.values():
-            category_path.mkdir(exist_ok=True)
+        for category_path in self.(categories.values( if categories else None)):
+            (category_path.mkdir( if category_path else None)exist_ok=True)
 
         self.metadata_file = self.storage_path / "asset_metadata.json"
-        self._load_metadata()
+        (self._load_metadata( if self else None))
 
-        logger.info("🎨 Brand Asset Manager initialized")
+        (logger.info( if logger else None)"🎨 Brand Asset Manager initialized")
 
     def _load_metadata(self):
         """Load asset metadata from storage."""
-        if self.metadata_file.exists():
+        if self.(metadata_file.exists( if metadata_file else None)):
             with open(self.metadata_file, "r") as f:
-                self.metadata = json.load(f)
+                self.metadata = (json.load( if json else None)f)
         else:
             self.metadata = {
                 "assets": {},
                 "upload_history": [],
                 "total_assets": 0,
-                "last_updated": datetime.now().isoformat(),
+                "last_updated": (datetime.now( if datetime else None)).isoformat(),
             }
 
     def _save_metadata(self):
         """Save asset metadata to storage."""
-        self.metadata["last_updated"] = datetime.now().isoformat()
+        self.metadata["last_updated"] = (datetime.now( if datetime else None)).isoformat()
         with open(self.metadata_file, "w") as f:
-            json.dump(self.metadata, f, indent=2)
+            (json.dump( if json else None)self.metadata, f, indent=2)
 
     def upload_asset(
         self,
@@ -69,20 +71,20 @@ class BrandAssetManager:
         try:
             if category not in self.categories:
                 return {
-                    "error": f"Invalid category. Available: {list(self.categories.keys())}"
+                    "error": f"Invalid category. Available: {list(self.(categories.keys( if categories else None)))}"
                 }
 
             # Generate unique asset ID
-            asset_id = f"{category}_{len(self.metadata['assets'])}_{int(datetime.now().timestamp())}"
+            asset_id = f"{category}_{len(self.metadata['assets'])}_{int((datetime.now( if datetime else None)).timestamp())}"
 
             # Determine file extension
-            mime_type, _ = mimetypes.guess_type(filename)
+            mime_type, _ = (mimetypes.guess_type( if mimetypes else None)filename)
             file_ext = Path(filename).suffix
 
             # Save file
             asset_path = self.categories[category] / f"{asset_id}{file_ext}"
             with open(asset_path, "wb") as f:
-                f.write(file_data)
+                (f.write( if f else None)file_data)
 
             # Create metadata entry
             asset_metadata = {
@@ -94,7 +96,7 @@ class BrandAssetManager:
                 "file_path": str(asset_path),
                 "file_size": len(file_data),
                 "mime_type": mime_type,
-                "upload_date": datetime.now().isoformat(),
+                "upload_date": (datetime.now( if datetime else None)).isoformat(),
                 "analysis_status": "pending",
             }
 
@@ -104,14 +106,14 @@ class BrandAssetManager:
             self.metadata["upload_history"].append(
                 {
                     "asset_id": asset_id,
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp": (datetime.now( if datetime else None)).isoformat(),
                     "action": "upload",
                 }
             )
 
-            self._save_metadata()
+            (self._save_metadata( if self else None))
 
-            logger.info(f"✅ Brand asset uploaded: {filename} ({category})")
+            (logger.info( if logger else None)f"✅ Brand asset uploaded: {filename} ({category})")
             return {
                 "success": True,
                 "asset_id": asset_id,
@@ -121,7 +123,7 @@ class BrandAssetManager:
             }
 
         except Exception as e:
-            logger.error(f"Asset upload failed: {str(e)}")
+            (logger.error( if logger else None)f"Asset upload failed: {str(e)}")
             return {"error": str(e)}
 
     def get_assets_by_category(self, category: str) -> List[Dict[str, Any]]:
@@ -179,15 +181,15 @@ class BrandAssetManager:
         """Prepare asset data for Brand Intelligence Agent learning."""
         learning_data = {
             "visual_assets": {
-                "logos": self.get_assets_by_category("logos"),
-                "product_images": self.get_assets_by_category("product_images"),
-                "marketing_materials": self.get_assets_by_category(
+                "logos": (self.get_assets_by_category( if self else None)"logos"),
+                "product_images": (self.get_assets_by_category( if self else None)"product_images"),
+                "marketing_materials": (self.get_assets_by_category( if self else None)
                     "marketing_materials"
                 ),
             },
-            "brand_guidelines": self.get_assets_by_category("brand_guidelines"),
-            "seasonal_collections": self.get_assets_by_category("seasonal_collections"),
-            "asset_analysis": self.analyze_brand_consistency(),
+            "brand_guidelines": (self.get_assets_by_category( if self else None)"brand_guidelines"),
+            "seasonal_collections": (self.get_assets_by_category( if self else None)"seasonal_collections"),
+            "asset_analysis": (self.analyze_brand_consistency( if self else None)),
             "total_learning_sources": self.metadata["total_assets"],
             "last_updated": self.metadata["last_updated"],
         }

@@ -1,3 +1,18 @@
+from datetime import datetime
+from pathlib import Path
+import os
+import re
+import sys
+import time
+
+from agent.modules.base_agent import AgentStatus, BaseAgent
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+import ast
+import autopep8
+import logging
+import shutil
+import subprocess
+
 """
 Fixer Agent V2 - Enterprise Edition
 Automated code repair with AI-powered fixes and multi-agent coordination
@@ -11,23 +26,10 @@ Features:
 - Integration with orchestrator
 """
 
-import ast
-import logging
-import os
-import re
-import shutil
-import subprocess
-import sys
-import time
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-import autopep8
 
-from agent.modules.base_agent import AgentStatus, BaseAgent
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class FixerAgentV2(BaseAgent):
@@ -54,10 +56,10 @@ class FixerAgentV2(BaseAgent):
         # Fix patterns
         self.fix_patterns = {
             # Python
-            "python_print": (r"print\((.*?)\)", r"logger.info(\1)"),
-            "python_except_bare": (r"except:", r"except Exception:"),
+            "python_print": (r"print\((.*?)\)", r"(logger.info( if logger else None)\1)"),
+            "python_except_bare": (r"except Exception:", r"except Exception:"),
             # JavaScript
-            "js_console_log": (r"console\.log\((.*?)\)", r"// console.log(\1)"),
+            "js_console_log": (r"console\.log\((.*?)\)", r"// (console.log( if console else None)\1)"),
             "js_var": (r"\bvar\s+(\w+)", r"const \1"),
             # Common
             "todo_fixme": (r"#\s*(TODO|FIXME):", r"# TODO:"),
@@ -70,23 +72,23 @@ class FixerAgentV2(BaseAgent):
     async def initialize(self) -> bool:
         """Initialize fixer agent"""
         try:
-            logger.info("🔧 Initializing Fixer Agent V2...")
+            (logger.info( if logger else None)"🔧 Initializing Fixer Agent V2...")
 
             # Create backup directory
-            self.backup_dir.mkdir(exist_ok=True)
+            self.(backup_dir.mkdir( if backup_dir else None)exist_ok=True)
 
             # Verify write access
-            if not os.access(".", os.W_OK):
-                logger.error("No write access to project directory")
+            if not (os.access( if os else None)".", os.W_OK):
+                (logger.error( if logger else None)"No write access to project directory")
                 self.status = AgentStatus.FAILED
                 return False
 
             self.status = AgentStatus.HEALTHY
-            logger.info("✅ Fixer Agent V2 initialized successfully")
+            (logger.info( if logger else None)"✅ Fixer Agent V2 initialized successfully")
             return True
 
         except Exception as e:
-            logger.error(f"Fixer initialization failed: {e}")
+            (logger.error( if logger else None)f"Fixer initialization failed: {e}")
             self.status = AgentStatus.FAILED
             return False
 
@@ -104,17 +106,17 @@ class FixerAgentV2(BaseAgent):
         Returns:
             Fix results and summary
         """
-        scan_results = kwargs.get("scan_results")
-        fix_type = kwargs.get("fix_type", "auto")
-        target_files = kwargs.get("target_files")
-        create_backup = kwargs.get("create_backup", True)
-        dry_run = kwargs.get("dry_run", False)
+        scan_results = (kwargs.get( if kwargs else None)"scan_results")
+        fix_type = (kwargs.get( if kwargs else None)"fix_type", "auto")
+        target_files = (kwargs.get( if kwargs else None)"target_files")
+        create_backup = (kwargs.get( if kwargs else None)"create_backup", True)
+        dry_run = (kwargs.get( if kwargs else None)"dry_run", False)
 
-        logger.info(f"🔧 Starting {fix_type} fix operation...")
+        (logger.info( if logger else None)f"🔧 Starting {fix_type} fix operation...")
 
         fix_results = {
-            "fix_id": f"fix_{int(time.time())}",
-            "timestamp": datetime.now().isoformat(),
+            "fix_id": f"fix_{int((time.time( if time else None)))}",
+            "timestamp": (datetime.now( if datetime else None)).isoformat(),
             "fix_type": fix_type,
             "dry_run": dry_run,
             "status": "running",
@@ -127,34 +129,34 @@ class FixerAgentV2(BaseAgent):
         try:
             # Create backup if requested
             if create_backup and not dry_run:
-                backup_path = await self._create_backup()
+                backup_path = await (self._create_backup( if self else None))
                 fix_results["backup_path"] = str(backup_path)
 
             # Determine fix strategy
             if fix_type == "auto":
-                results = await self._auto_fix(scan_results, target_files, dry_run)
+                results = await (self._auto_fix( if self else None)scan_results, target_files, dry_run)
             elif fix_type == "security":
-                results = await self._security_fix(scan_results, dry_run)
+                results = await (self._security_fix( if self else None)scan_results, dry_run)
             elif fix_type == "performance":
-                results = await self._performance_fix(scan_results, dry_run)
+                results = await (self._performance_fix( if self else None)scan_results, dry_run)
             elif fix_type == "format":
-                results = await self._format_fix(target_files, dry_run)
+                results = await (self._format_fix( if self else None)target_files, dry_run)
             else:
                 return {"error": f"Unknown fix type: {fix_type}"}
 
-            fix_results.update(results)
+            (fix_results.update( if fix_results else None)results)
             fix_results["status"] = "completed"
 
             # Update statistics
             self.total_fixes_applied += len(fix_results["fixes_applied"])
-            self.fix_history.append(fix_results)
+            self.(fix_history.append( if fix_history else None)fix_results)
             if len(self.fix_history) > 100:
                 self.fix_history = self.fix_history[-100:]
 
             return fix_results
 
         except Exception as e:
-            logger.error(f"Fix operation failed: {e}")
+            (logger.error( if logger else None)f"Fix operation failed: {e}")
             fix_results["status"] = "failed"
             fix_results["error"] = str(e)
             return fix_results
@@ -175,7 +177,7 @@ class FixerAgentV2(BaseAgent):
 
         # If no scan results provided, need to scan first
         if not scan_results:
-            logger.info(
+            (logger.info( if logger else None)
                 "No scan results provided, fix operation requires scanner dependency"
             )
             return {
@@ -184,15 +186,15 @@ class FixerAgentV2(BaseAgent):
             }
 
         # Fix Python files
-        python_fixes = await self._fix_python_files(target_files, dry_run)
+        python_fixes = await (self._fix_python_files( if self else None)target_files, dry_run)
         results["fixes_applied"].extend(python_fixes)
 
         # Fix JavaScript/TypeScript files
-        js_fixes = await self._fix_javascript_files(target_files, dry_run)
+        js_fixes = await (self._fix_javascript_files( if self else None)target_files, dry_run)
         results["fixes_applied"].extend(js_fixes)
 
         # Fix common issues
-        common_fixes = await self._fix_common_issues(target_files, dry_run)
+        common_fixes = await (self._fix_common_issues( if self else None)target_files, dry_run)
         results["fixes_applied"].extend(common_fixes)
 
         # Update counts
@@ -200,10 +202,10 @@ class FixerAgentV2(BaseAgent):
             set(fix["file"] for fix in results["fixes_applied"])
         )
         results["errors_fixed"] = sum(
-            1 for fix in results["fixes_applied"] if fix.get("severity") == "error"
+            1 for fix in results["fixes_applied"] if (fix.get( if fix else None)"severity") == "error"
         )
         results["warnings_fixed"] = sum(
-            1 for fix in results["fixes_applied"] if fix.get("severity") == "warning"
+            1 for fix in results["fixes_applied"] if (fix.get( if fix else None)"severity") == "warning"
         )
 
         return results
@@ -220,16 +222,16 @@ class FixerAgentV2(BaseAgent):
         security_issues = scan_results["security_issues"]
 
         for issue in security_issues:
-            file_path = issue.get("file")
-            issue_type = issue.get("type")
+            file_path = (issue.get( if issue else None)"file")
+            issue_type = (issue.get( if issue else None)"type")
 
             if issue_type == "hardcoded_secret":
-                fix = await self._fix_hardcoded_secret(file_path, dry_run)
+                fix = await (self._fix_hardcoded_secret( if self else None)file_path, dry_run)
                 if fix:
                     results["fixes_applied"].append(fix)
 
             elif issue_type == "sql_injection":
-                fix = await self._fix_sql_injection(file_path, dry_run)
+                fix = await (self._fix_sql_injection( if self else None)file_path, dry_run)
                 if fix:
                     results["fixes_applied"].append(fix)
 
@@ -243,11 +245,11 @@ class FixerAgentV2(BaseAgent):
         results = {"fixes_applied": [], "optimizations": 0}
 
         # Apply caching improvements
-        cache_fixes = await self._add_caching(dry_run)
+        cache_fixes = await (self._add_caching( if self else None)dry_run)
         results["fixes_applied"].extend(cache_fixes)
 
         # Remove unused imports
-        import_fixes = await self._remove_unused_imports(dry_run)
+        import_fixes = await (self._remove_unused_imports( if self else None)dry_run)
         results["fixes_applied"].extend(import_fixes)
 
         results["optimizations"] = len(results["fixes_applied"])
@@ -259,11 +261,11 @@ class FixerAgentV2(BaseAgent):
         """Format code according to standards"""
         results = {"fixes_applied": [], "files_formatted": 0}
 
-        files_to_format = target_files or self._get_all_code_files()
+        files_to_format = target_files or (self._get_all_code_files( if self else None))
 
         for file_path in files_to_format:
-            if file_path.endswith(".py"):
-                fix = await self._format_python_file(file_path, dry_run)
+            if (file_path.endswith( if file_path else None)".py"):
+                fix = await (self._format_python_file( if self else None)file_path, dry_run)
                 if fix:
                     results["fixes_applied"].append(fix)
 
@@ -277,23 +279,23 @@ class FixerAgentV2(BaseAgent):
         fixes = []
 
         python_files = [
-            f for f in (target_files or self._get_all_code_files()) if f.endswith(".py")
+            f for f in (target_files or (self._get_all_code_files( if self else None))) if (f.endswith( if f else None)".py")
         ]
 
         for file_path in python_files:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
-                    original_content = f.read()
+                    original_content = (f.read( if f else None))
 
                 modified_content = original_content
 
                 # Apply autopep8 formatting
-                modified_content = autopep8.fix_code(modified_content)
+                modified_content = (autopep8.fix_code( if autopep8 else None)modified_content)
 
                 # Apply custom fixes
-                for pattern_name, (pattern, replacement) in self.fix_patterns.items():
-                    if pattern_name.startswith("python_"):
-                        modified_content = re.sub(
+                for pattern_name, (pattern, replacement) in self.(fix_patterns.items( if fix_patterns else None)):
+                    if (pattern_name.startswith( if pattern_name else None)"python_"):
+                        modified_content = (re.sub( if re else None)
                             pattern, replacement, modified_content
                         )
 
@@ -301,9 +303,9 @@ class FixerAgentV2(BaseAgent):
                 if modified_content != original_content:
                     if not dry_run:
                         with open(file_path, "w", encoding="utf-8") as f:
-                            f.write(modified_content)
+                            (f.write( if f else None)modified_content)
 
-                    fixes.append(
+                    (fixes.append( if fixes else None)
                         {
                             "file": file_path,
                             "type": "format",
@@ -313,7 +315,7 @@ class FixerAgentV2(BaseAgent):
                     )
 
             except Exception as e:
-                logger.warning(f"Failed to fix Python file {file_path}: {e}")
+                (logger.warning( if logger else None)f"Failed to fix Python file {file_path}: {e}")
 
         return fixes
 
@@ -325,30 +327,30 @@ class FixerAgentV2(BaseAgent):
 
         js_files = [
             f
-            for f in (target_files or self._get_all_code_files())
-            if f.endswith((".js", ".ts", ".tsx"))
+            for f in (target_files or (self._get_all_code_files( if self else None)))
+            if (f.endswith( if f else None)(".js", ".ts", ".tsx"))
         ]
 
         for file_path in js_files:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
-                    original_content = f.read()
+                    original_content = (f.read( if f else None))
 
                 modified_content = original_content
 
                 # Apply custom fixes
-                for pattern_name, (pattern, replacement) in self.fix_patterns.items():
-                    if pattern_name.startswith("js_"):
-                        modified_content = re.sub(
+                for pattern_name, (pattern, replacement) in self.(fix_patterns.items( if fix_patterns else None)):
+                    if (pattern_name.startswith( if pattern_name else None)"js_"):
+                        modified_content = (re.sub( if re else None)
                             pattern, replacement, modified_content
                         )
 
                 if modified_content != original_content:
                     if not dry_run:
                         with open(file_path, "w", encoding="utf-8") as f:
-                            f.write(modified_content)
+                            (f.write( if f else None)modified_content)
 
-                    fixes.append(
+                    (fixes.append( if fixes else None)
                         {
                             "file": file_path,
                             "type": "format",
@@ -358,7 +360,7 @@ class FixerAgentV2(BaseAgent):
                     )
 
             except Exception as e:
-                logger.warning(f"Failed to fix JS file {file_path}: {e}")
+                (logger.warning( if logger else None)f"Failed to fix JS file {file_path}: {e}")
 
         return fixes
 
@@ -368,30 +370,31 @@ class FixerAgentV2(BaseAgent):
         """Fix common issues across all file types"""
         fixes = []
 
-        files = target_files or self._get_all_code_files()
+        files = target_files or (self._get_all_code_files( if self else None))
 
         for file_path in files:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
-                    original_content = f.read()
+                    original_content = (f.read( if f else None))
 
                 modified_content = original_content
 
                 # Remove trailing whitespace
-                lines = modified_content.split("\n")
-                lines = [line.rstrip() for line in lines]
+                lines = (modified_content.split( if modified_content else None)"\n")
+                lines = [(line.rstrip( if line else None)) for line in lines]
                 modified_content = "\n".join(lines)
 
                 # Ensure final newline
-                if not modified_content.endswith("\n"):
-                    modified_content += "\n"
+                if not (modified_content.endswith( if modified_content else None)"\n"):
+                    # Use list and join for string building
+modified_content_list.append(...)
 
                 if modified_content != original_content:
                     if not dry_run:
                         with open(file_path, "w", encoding="utf-8") as f:
-                            f.write(modified_content)
+                            (f.write( if f else None)modified_content)
 
-                    fixes.append(
+                    (fixes.append( if fixes else None)
                         {
                             "file": file_path,
                             "type": "format",
@@ -401,7 +404,7 @@ class FixerAgentV2(BaseAgent):
                     )
 
             except Exception as e:
-                logger.warning(f"Failed to fix common issues in {file_path}: {e}")
+                (logger.warning( if logger else None)f"Failed to fix common issues in {file_path}: {e}")
 
         return fixes
 
@@ -411,17 +414,17 @@ class FixerAgentV2(BaseAgent):
         """Fix hardcoded secrets by replacing with environment variables"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
+                content = (f.read( if f else None))
 
             # Replace hardcoded secrets with os.getenv
             pattern = r'(password|secret|api_key)\s*=\s*[\'"]([^\'"]+)[\'"]'
-            replacement = r'\1 = os.getenv("\1".upper(), "\2")'
+            replacement = r'\1 = (os.getenv( if os else None)"\1".upper(), "\2")'
 
-            modified = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
+            modified = (re.sub( if re else None)pattern, replacement, content, flags=re.IGNORECASE)
 
             if modified != content and not dry_run:
                 with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(modified)
+                    (f.write( if f else None)modified)
 
                 return {
                     "file": file_path,
@@ -431,7 +434,7 @@ class FixerAgentV2(BaseAgent):
                 }
 
         except Exception as e:
-            logger.warning(f"Failed to fix hardcoded secret in {file_path}: {e}")
+            (logger.warning( if logger else None)f"Failed to fix hardcoded secret in {file_path}: {e}")
 
         return None
 
@@ -453,7 +456,7 @@ class FixerAgentV2(BaseAgent):
         """
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                content = (f.read( if f else None))
 
             # Patterns that indicate potential SQL injection vulnerabilities
             vulnerable_patterns = [
@@ -464,14 +467,14 @@ class FixerAgentV2(BaseAgent):
             ]
 
             issues_found = []
-            lines = content.split('\n')
+            lines = (content.split( if content else None)'\n')
 
             for i, line in enumerate(lines, 1):
                 for pattern in vulnerable_patterns:
-                    if re.search(pattern, line, re.IGNORECASE):
-                        issues_found.append({
+                    if (re.search( if re else None)pattern, line, re.IGNORECASE):
+                        (issues_found.append( if issues_found else None){
                             "line": i,
-                            "content": line.strip(),
+                            "content": (line.strip( if line else None)),
                             "pattern": pattern,
                             "recommendation": "Use parameterized queries or ORM methods"
                         })
@@ -482,7 +485,7 @@ class FixerAgentV2(BaseAgent):
             if not dry_run:
                 # In a real implementation, this would apply automated fixes
                 # For now, we log the issues for manual review
-                logger.warning(f"SQL injection vulnerabilities found in {file_path}: {len(issues_found)} issues")
+                (logger.warning( if logger else None)f"SQL injection vulnerabilities found in {file_path}: {len(issues_found)} issues")
 
             return {
                 "file": file_path,
@@ -495,7 +498,7 @@ class FixerAgentV2(BaseAgent):
             }
 
         except Exception as e:
-            logger.error(f"Error analyzing SQL injection in {file_path}: {e}")
+            (logger.error( if logger else None)f"Error analyzing SQL injection in {file_path}: {e}")
             return {
                 "file": file_path,
                 "type": "security",
@@ -524,12 +527,12 @@ class FixerAgentV2(BaseAgent):
             python_files = list(Path('.').rglob('*.py'))
 
             for file_path in python_files:
-                if file_path.name.startswith('.') or 'test' in str(file_path):
+                if file_path.(name.startswith( if name else None)'.') or 'test' in str(file_path):
                     continue
 
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
+                        content = (f.read( if f else None))
 
                     # Look for patterns that indicate expensive operations
                     expensive_patterns = [
@@ -541,13 +544,13 @@ class FixerAgentV2(BaseAgent):
                         (r'def.*\(.*\).*:.*subprocess\.', 'System calls'),
                     ]
 
-                    lines = content.split('\n')
+                    lines = (content.split( if content else None)'\n')
                     for i, line in enumerate(lines, 1):
                         for pattern, operation_type in expensive_patterns:
-                            if re.search(pattern, line, re.IGNORECASE):
+                            if (re.search( if re else None)pattern, line, re.IGNORECASE):
                                 # Check if caching is already implemented
                                 if '@cache' not in content and '@lru_cache' not in content:
-                                    improvements.append({
+                                    (improvements.append( if improvements else None){
                                         "file": str(file_path),
                                         "line": i,
                                         "type": "performance",
@@ -558,16 +561,16 @@ class FixerAgentV2(BaseAgent):
                                     })
 
                 except Exception as e:
-                    logger.warning(f"Error analyzing {file_path} for caching: {e}")
+                    (logger.warning( if logger else None)f"Error analyzing {file_path} for caching: {e}")
                     continue
 
             if not dry_run and improvements:
-                logger.info(f"Identified {len(improvements)} caching opportunities")
+                (logger.info( if logger else None)f"Identified {len(improvements)} caching opportunities")
 
             return improvements
 
         except Exception as e:
-            logger.error(f"Error in caching analysis: {e}")
+            (logger.error( if logger else None)f"Error in caching analysis: {e}")
             return []
 
     async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
@@ -593,7 +596,7 @@ class FixerAgentV2(BaseAgent):
             python_files = list(Path('.').rglob('*.py'))
 
             for file_path in python_files:
-                if (file_path.name.startswith('.') or
+                if (file_path.(name.startswith( if name else None)'.') or
                     'test' in str(file_path) or
                     '__pycache__' in str(file_path) or
                     'venv' in str(file_path) or
@@ -601,48 +604,48 @@ class FixerAgentV2(BaseAgent):
                     continue
 
                 try:
-                    unused_imports = await self._analyze_unused_imports(file_path)
+                    unused_imports = await (self._analyze_unused_imports( if self else None)file_path)
 
                     if unused_imports:
                         if not dry_run:
-                            removed_count = await self._remove_imports_from_file(
+                            removed_count = await (self._remove_imports_from_file( if self else None)
                                 file_path, unused_imports
                             )
                         else:
                             removed_count = len(unused_imports)
 
-                        results.append({
+                        (results.append( if results else None){
                             "file": str(file_path),
                             "type": "code_quality",
                             "action": "remove_unused_imports",
                             "unused_imports": unused_imports,
                             "removed_count": removed_count,
                             "dry_run": dry_run,
-                            "timestamp": datetime.now().isoformat()
+                            "timestamp": (datetime.now( if datetime else None)).isoformat()
                         })
 
-                        logger.info(f"📦 {'Would remove' if dry_run else 'Removed'} "
+                        (logger.info( if logger else None)f"📦 {'Would remove' if dry_run else 'Removed'} "
                                   f"{removed_count} unused imports from {file_path}")
 
                 except Exception as e:
-                    logger.warning(f"Error analyzing imports in {file_path}: {e}")
-                    results.append({
+                    (logger.warning( if logger else None)f"Error analyzing imports in {file_path}: {e}")
+                    (results.append( if results else None){
                         "file": str(file_path),
                         "type": "error",
                         "action": "remove_unused_imports",
                         "error": str(e),
-                        "timestamp": datetime.now().isoformat()
+                        "timestamp": (datetime.now( if datetime else None)).isoformat()
                     })
 
             return results
 
         except Exception as e:
-            logger.error(f"Error in unused imports removal: {e}")
+            (logger.error( if logger else None)f"Error in unused imports removal: {e}")
             return [{
                 "type": "error",
                 "action": "remove_unused_imports",
                 "error": str(e),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": (datetime.now( if datetime else None)).isoformat()
             }]
 
     async def _analyze_unused_imports(self, file_path: Path) -> List[str]:
@@ -657,38 +660,38 @@ class FixerAgentV2(BaseAgent):
         """
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                content = (f.read( if f else None))
 
             # Parse the AST
-            tree = ast.parse(content)
+            tree = (ast.parse( if ast else None)content)
 
             # Find all imports
             imports = set()
             import_lines = {}
 
-            for node in ast.walk(tree):
+            for node in (ast.walk( if ast else None)tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         import_name = alias.asname if alias.asname else alias.name
-                        imports.add(import_name)
+                        (imports.add( if imports else None)import_name)
                         import_lines[import_name] = node.lineno
 
                 elif isinstance(node, ast.ImportFrom):
                     for alias in node.names:
                         import_name = alias.asname if alias.asname else alias.name
-                        imports.add(import_name)
+                        (imports.add( if imports else None)import_name)
                         import_lines[import_name] = node.lineno
 
             # Find all names used in the code
             used_names = set()
 
-            for node in ast.walk(tree):
+            for node in (ast.walk( if ast else None)tree):
                 if isinstance(node, ast.Name):
-                    used_names.add(node.id)
+                    (used_names.add( if used_names else None)node.id)
                 elif isinstance(node, ast.Attribute):
                     # Handle module.attribute usage
                     if isinstance(node.value, ast.Name):
-                        used_names.add(node.value.id)
+                        (used_names.add( if used_names else None)node.value.id)
 
             # Find unused imports
             unused_imports = []
@@ -700,14 +703,14 @@ class FixerAgentV2(BaseAgent):
                 # Check if the import is used
                 if import_name not in used_names:
                     # Additional check for partial matches (e.g., os.path)
-                    base_name = import_name.split('.')[0]
+                    base_name = (import_name.split( if import_name else None)'.')[0]
                     if base_name not in used_names:
-                        unused_imports.append(import_name)
+                        (unused_imports.append( if unused_imports else None)import_name)
 
             return unused_imports
 
         except Exception as e:
-            logger.warning(f"Error analyzing imports in {file_path}: {e}")
+            (logger.warning( if logger else None)f"Error analyzing imports in {file_path}: {e}")
             return []
 
     async def _remove_imports_from_file(
@@ -725,7 +728,7 @@ class FixerAgentV2(BaseAgent):
         """
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
+                lines = (f.readlines( if f else None))
 
             removed_count = 0
             new_lines = []
@@ -737,17 +740,17 @@ class FixerAgentV2(BaseAgent):
                 for unused_import in unused_imports:
                     # Match various import patterns
                     patterns = [
-                        rf'^import\s+{re.escape(unused_import)}\s*$',
-                        rf'^import\s+{re.escape(unused_import)}\s*,',
-                        rf',\s*{re.escape(unused_import)}\s*$',
-                        rf',\s*{re.escape(unused_import)}\s*,',
-                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*$',
-                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*,',
-                        rf',\s*{re.escape(unused_import)}\s*$',
+                        rf'^import\s+{(re.escape( if re else None)unused_import)}\s*$',
+                        rf'^import\s+{(re.escape( if re else None)unused_import)}\s*,',
+                        rf',\s*{(re.escape( if re else None)unused_import)}\s*$',
+                        rf',\s*{(re.escape( if re else None)unused_import)}\s*,',
+                        rf'^from\s+\S+\s+import\s+{(re.escape( if re else None)unused_import)}\s*$',
+                        rf'^from\s+\S+\s+import\s+{(re.escape( if re else None)unused_import)}\s*,',
+                        rf',\s*{(re.escape( if re else None)unused_import)}\s*$',
                     ]
 
                     for pattern in patterns:
-                        if re.search(pattern, line.strip()):
+                        if (re.search( if re else None)pattern, (line.strip( if line else None))):
                             should_remove = True
                             break
 
@@ -756,19 +759,19 @@ class FixerAgentV2(BaseAgent):
 
                 if should_remove:
                     removed_count += 1
-                    logger.debug(f"Removing unused import line: {line.strip()}")
+                    (logger.debug( if logger else None)f"Removing unused import line: {(line.strip( if line else None))}")
                 else:
-                    new_lines.append(line)
+                    (new_lines.append( if new_lines else None)line)
 
             # Write back the cleaned file
             if removed_count > 0:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    f.writelines(new_lines)
+                    (f.writelines( if f else None)new_lines)
 
             return removed_count
 
         except Exception as e:
-            logger.error(f"Error removing imports from {file_path}: {e}")
+            (logger.error( if logger else None)f"Error removing imports from {file_path}: {e}")
             return 0
 
     async def _format_python_file(
@@ -777,13 +780,13 @@ class FixerAgentV2(BaseAgent):
         """Format a Python file"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                original = f.read()
+                original = (f.read( if f else None))
 
-            formatted = autopep8.fix_code(original)
+            formatted = (autopep8.fix_code( if autopep8 else None)original)
 
             if formatted != original and not dry_run:
                 with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(formatted)
+                    (f.write( if f else None)formatted)
 
                 return {
                     "file": file_path,
@@ -793,15 +796,15 @@ class FixerAgentV2(BaseAgent):
                 }
 
         except Exception as e:
-            logger.warning(f"Failed to format {file_path}: {e}")
+            (logger.warning( if logger else None)f"Failed to format {file_path}: {e}")
 
         return None
 
     async def _create_backup(self) -> Path:
         """Create backup of current codebase"""
-        timestamp = int(time.time())
+        timestamp = int((time.time( if time else None)))
         backup_path = self.backup_dir / f"backup_{timestamp}"
-        backup_path.mkdir(parents=True, exist_ok=True)
+        (backup_path.mkdir( if backup_path else None)parents=True, exist_ok=True)
 
         # Copy important files
         for pattern in ["*.py", "*.js", "*.ts", "*.tsx", "*.json"]:
@@ -810,43 +813,43 @@ class FixerAgentV2(BaseAgent):
                     file_path
                 ):
                     dest = backup_path / file_path
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(file_path, dest)
+                    dest.(parent.mkdir( if parent else None)parents=True, exist_ok=True)
+                    (shutil.copy2( if shutil else None)file_path, dest)
 
         # Clean old backups
-        await self._cleanup_old_backups()
+        await (self._cleanup_old_backups( if self else None))
 
-        logger.info(f"📦 Created backup at: {backup_path}")
+        (logger.info( if logger else None)f"📦 Created backup at: {backup_path}")
         return backup_path
 
     async def _cleanup_old_backups(self):
         """Remove old backups beyond max limit"""
-        backups = sorted(self.backup_dir.glob("backup_*"))
+        backups = sorted(self.(backup_dir.glob( if backup_dir else None)"backup_*"))
         if len(backups) > self.max_backups:
             for old_backup in backups[: -self.max_backups]:
-                shutil.rmtree(old_backup)
-                logger.info(f"Removed old backup: {old_backup}")
+                (shutil.rmtree( if shutil else None)old_backup)
+                (logger.info( if logger else None)f"Removed old backup: {old_backup}")
 
     async def rollback(self, backup_path: str) -> Dict[str, Any]:
         """Rollback to a previous backup"""
         try:
             backup = Path(backup_path)
-            if not backup.exists():
+            if not (backup.exists( if backup else None)):
                 return {"error": "Backup not found"}
 
             # Restore files from backup
-            for file_path in backup.rglob("*"):
-                if file_path.is_file():
-                    relative_path = file_path.relative_to(backup)
+            for file_path in (backup.rglob( if backup else None)"*"):
+                if (file_path.is_file( if file_path else None)):
+                    relative_path = (file_path.relative_to( if file_path else None)backup)
                     dest = Path(".") / relative_path
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(file_path, dest)
+                    dest.(parent.mkdir( if parent else None)parents=True, exist_ok=True)
+                    (shutil.copy2( if shutil else None)file_path, dest)
 
-            logger.info(f"✅ Rolled back to backup: {backup_path}")
+            (logger.info( if logger else None)f"✅ Rolled back to backup: {backup_path}")
             return {"status": "success", "backup": str(backup_path)}
 
         except Exception as e:
-            logger.error(f"Rollback failed: {e}")
+            (logger.error( if logger else None)f"Rollback failed: {e}")
             return {"error": str(e)}
 
     def _get_all_code_files(self) -> List[str]:
@@ -855,7 +858,7 @@ class FixerAgentV2(BaseAgent):
         extensions = {".py", ".js", ".ts", ".tsx", ".html", ".css"}
 
         for ext in extensions:
-            files.extend([str(f) for f in Path(".").rglob(f"*{ext}")])
+            (files.extend( if files else None)[str(f) for f in Path(".").rglob(f"*{ext}")])
 
         # Filter out ignored directories
         files = [

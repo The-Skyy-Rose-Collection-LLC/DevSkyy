@@ -1,23 +1,21 @@
+from datetime import datetime, timedelta, timezone
+import os
+
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, EmailStr, Field
+
+from agent.security_manager import security_manager
+from collections import defaultdict
+from passlib.context import CryptContext
+from typing import Any, Dict, List, Optional
+import jwt
+import logging
+
 """
 Enterprise JWT Authentication System
 Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 """
-
-import logging
-import os
-from collections import defaultdict
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
-
-import jwt
-from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import (
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-    OAuth2PasswordBearer,
-)
-from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr, Field
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,7 @@ logger = logging.getLogger(__name__)
 JWT_SECRET_KEY = os.getenv(
     "JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME")
 )
-JWT_ALGORITHM = "HS256"
+JWT_ALGORITHM =  "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 MAX_LOGIN_ATTEMPTS = 5  # Maximum failed login attempts
@@ -166,7 +164,7 @@ def record_failed_login(email: str) -> bool:
     # Check if account should be locked
     if len(failed_login_attempts[email]) >= MAX_LOGIN_ATTEMPTS:
         locked_accounts[email] = now + timedelta(minutes=LOCKOUT_DURATION_MINUTES)
-        logger.warning(f"🔒 Account locked due to failed login attempts: {email}")
+        (logger.warning( if logger else None)f"🔒 Account locked due to failed login attempts: {email}")
         return True
 
     return False
@@ -182,8 +180,8 @@ def clear_failed_login_attempts(email: str):
 
 def blacklist_token(token: str):
     """Add token to blacklist (logout/security breach)"""
-    blacklisted_tokens.add(token)
-    logger.info("🚫 Token blacklisted for security")
+    (blacklisted_tokens.add( if blacklisted_tokens else None)token)
+    (logger.info( if logger else None)"🚫 Token blacklisted for security")
 
 
 def is_token_blacklisted(token: str) -> bool:
@@ -195,15 +193,15 @@ def validate_token_security(token: str, token_data: TokenData) -> bool:
     """Enhanced token security validation"""
     # Check if token is blacklisted
     if is_token_blacklisted(token):
-        logger.warning(f"⚠️ Blacklisted token used: {token_data.email}")
+        (logger.warning( if logger else None)f"⚠️ Blacklisted token used: {token_data.email}")
         return False
 
     # Check token age (additional security check)
     token_age = (
-        datetime.now() - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        (datetime.now( if datetime else None)) - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     if token_age > timedelta(hours=TOKEN_BLACKLIST_EXPIRE_HOURS):
-        logger.warning(f"⚠️ Suspiciously old token used: {token_data.email}")
+        (logger.warning( if logger else None)f"⚠️ Suspiciously old token used: {token_data.email}")
         return False
 
     return True
@@ -227,24 +225,24 @@ def create_access_token(
     Returns:
         Encoded JWT token
     """
-    to_encode = data.copy()
+    to_encode = (data.copy( if data else None))
 
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = (datetime.now( if datetime else None)timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
+        expire = (datetime.now( if datetime else None)timezone.utc) + timedelta(
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    to_encode.update(
+    (to_encode.update( if to_encode else None)
         {
             "exp": expire,
-            "iat": datetime.now(timezone.utc),
+            "iat": (datetime.now( if datetime else None)timezone.utc),
             "token_type": "access",
         }
     )
 
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    encoded_jwt = (jwt.encode( if jwt else None)to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
     return encoded_jwt
 
 
@@ -258,18 +256,18 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
     Returns:
         Encoded JWT refresh token
     """
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    to_encode = (data.copy( if data else None))
+    expire = (datetime.now( if datetime else None)timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
-    to_encode.update(
+    (to_encode.update( if to_encode else None)
         {
             "exp": expire,
-            "iat": datetime.now(timezone.utc),
+            "iat": (datetime.now( if datetime else None)timezone.utc),
             "token_type": "refresh",
         }
     )
 
-    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    encoded_jwt = (jwt.encode( if jwt else None)to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
     return encoded_jwt
 
 
@@ -284,7 +282,7 @@ def get_token_payload(token: str) -> Optional[Dict[str, Any]]:
         Token payload or None if invalid
     """
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         return payload
     except Exception:
         return None
@@ -311,17 +309,17 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
     )
 
     try:
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
         # Check token type
-        if payload.get("token_type") != token_type:
+        if (payload.get( if payload else None)"token_type") != token_type:
             raise credentials_exception
 
         # Extract data
-        user_id: str = payload.get("user_id")
-        email: str = payload.get("email")
-        username: str = payload.get("username")
-        role: str = payload.get("role")
+        user_id: str = (payload.get( if payload else None)"user_id")
+        email: str = (payload.get( if payload else None)"email")
+        username: str = (payload.get( if payload else None)"username")
+        role: str = (payload.get( if payload else None)"role")
 
         if user_id is None or email is None:
             raise credentials_exception
@@ -332,12 +330,12 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             username=username,
             role=role,
             token_type=token_type,
-            exp=datetime.fromtimestamp(payload.get("exp")),
+            exp=(datetime.fromtimestamp( if datetime else None)(payload.get( if payload else None)"exp")),
         )
 
         # Enhanced security validation
         if not validate_token_security(token, token_data):
-            logger.warning(f"🚨 Security validation failed for token: {email}")
+            (logger.warning( if logger else None)f"🚨 Security validation failed for token: {email}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token security validation failed",
@@ -349,11 +347,11 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"{token_type.capitalize()} token expired",
+            detail=f"{(token_type.capitalize( if token_type else None))} token expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except Exception as e:
-        logger.error(f"JWT validation error: {e}")
+        (logger.error( if logger else None)f"JWT validation error: {e}")
         raise credentials_exception
 
 
@@ -405,7 +403,7 @@ class RoleChecker:
 
     def __call__(self, user: TokenData = Depends(get_current_active_user)) -> TokenData:
         if user.role not in self.allowed_roles:
-            logger.warning(
+            (logger.warning( if logger else None)
                 f"User {user.email} with role {user.role} denied access. Required: {self.allowed_roles}"
             )
             raise HTTPException(
@@ -458,9 +456,8 @@ class APIKeyAuth:
         # In production, validate against database
         # For now, validate against security manager
         try:
-            from agent.security_manager import security_manager
 
-            validation = security_manager.validate_api_key(api_key)
+            validation = (security_manager.validate_api_key( if security_manager else None)api_key)
 
             if not validation["valid"]:
                 raise HTTPException(
@@ -472,7 +469,7 @@ class APIKeyAuth:
             return validation
 
         except Exception as e:
-            logger.error(f"API key validation error: {e}")
+            (logger.error( if logger else None)f"API key validation error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="API key validation failed",
@@ -526,34 +523,34 @@ class UserManager:
         self.username_index: Dict[str, str] = {}  # username -> user_id
 
         # Create default admin user
-        self._create_default_users()
+        (self._create_default_users( if self else None))
 
     def hash_password(self, password: str) -> str:
         """Hash a password using bcrypt"""
-        return pwd_context.hash(password)
+        return (pwd_context.hash( if pwd_context else None)password)
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash"""
-        return pwd_context.verify(plain_password, hashed_password)
+        return (pwd_context.verify( if pwd_context else None)plain_password, hashed_password)
 
     def authenticate_user(
         self, username_or_email: str, password: str
     ) -> Optional[User]:
         """Authenticate a user by username/email and password"""
         # Try to find user by email first
-        user = self.get_user_by_email(username_or_email)
+        user = (self.get_user_by_email( if self else None)username_or_email)
         if not user:
             # Try to find by username
-            user = self.get_user_by_username(username_or_email)
+            user = (self.get_user_by_username( if self else None)username_or_email)
 
         if not user or not user.password_hash:
             return None
 
-        if not self.verify_password(password, user.password_hash):
+        if not (self.verify_password( if self else None)password, user.password_hash):
             return None
 
         # Update last login
-        user.last_login = datetime.now()
+        user.last_login = (datetime.now( if datetime else None))
         return user
 
     def _create_default_users(self):
@@ -563,7 +560,7 @@ class UserManager:
             user_id="admin_001",
             email="admin@devskyy.com",
             username="admin",
-            password_hash=self.hash_password("admin123"),  # Default password: admin123
+            password_hash=(self.hash_password( if self else None)"admin123"),  # Default password: admin123
             role=UserRole.SUPER_ADMIN,
             permissions=["*"],
         )
@@ -576,7 +573,7 @@ class UserManager:
             user_id="api_001",
             email="api@devskyy.com",
             username="api_user",
-            password_hash=self.hash_password("api123"),  # Default password: api123
+            password_hash=(self.hash_password( if self else None)"api123"),  # Default password: api123
             role=UserRole.API_USER,
             permissions=["read", "write", "execute"],
         )
@@ -584,24 +581,24 @@ class UserManager:
         self.email_index[api_user.email] = api_user.user_id
         self.username_index[api_user.username] = api_user.user_id
 
-        logger.info(f"Created {len(self.users)} default users")
+        (logger.info( if logger else None)f"Created {len(self.users)} default users")
 
     def get_user_by_id(self, user_id: str) -> Optional[User]:
         """Get user by ID"""
-        return self.users.get(user_id)
+        return self.(users.get( if users else None)user_id)
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         """Get user by email"""
-        user_id = self.email_index.get(email)
+        user_id = self.(email_index.get( if email_index else None)email)
         if user_id:
-            return self.users.get(user_id)
+            return self.(users.get( if users else None)user_id)
         return None
 
     def get_user_by_username(self, username: str) -> Optional[User]:
         """Get user by username"""
-        user_id = self.username_index.get(username)
+        user_id = self.(username_index.get( if username_index else None)username)
         if user_id:
-            return self.users.get(user_id)
+            return self.(users.get( if users else None)user_id)
         return None
 
     def create_user(
@@ -620,7 +617,7 @@ class UserManager:
         user_id = f"user_{len(self.users) + 1:06d}"
 
         # Hash password
-        password_hash = self.hash_password(password)
+        password_hash = (self.hash_password( if self else None)password)
 
         # Create user
         user = User(
@@ -636,7 +633,7 @@ class UserManager:
         self.email_index[email] = user_id
         self.username_index[username] = user_id
 
-        logger.info(
+        (logger.info( if logger else None)
             f"Created new user: {email} (username: {username}) with role {role}"
         )
 
@@ -646,4 +643,4 @@ class UserManager:
 # Global user manager instance
 user_manager = UserManager()
 
-logger.info("🔐 Enterprise JWT Authentication System initialized")
+(logger.info( if logger else None)"🔐 Enterprise JWT Authentication System initialized")

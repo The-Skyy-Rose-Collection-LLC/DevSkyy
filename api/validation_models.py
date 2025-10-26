@@ -1,15 +1,18 @@
+from datetime import datetime
+import re
+
+from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic.types import confloat, conint, constr
+
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
 """
 Enhanced Pydantic Validation Models for DevSkyy Enterprise Platform
 Comprehensive input validation, sanitization, and security enforcement
 """
 
-import re
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, validator
-from pydantic.types import confloat, conint, constr
 
 # ============================================================================
 # SECURITY VALIDATORS
@@ -40,7 +43,7 @@ def validate_no_sql_injection(value: str) -> str:
     ]
 
     for pattern in sql_patterns:
-        if re.search(pattern, value.upper()):
+        if (re.search( if re else None)pattern, (value.upper( if value else None))):
             raise ValueError(f"Potential SQL injection detected: {pattern}")
 
     return value
@@ -62,7 +65,7 @@ def validate_no_xss(value: str) -> str:
     ]
 
     for pattern in xss_patterns:
-        if re.search(pattern, value, re.IGNORECASE):
+        if (re.search( if re else None)pattern, value, re.IGNORECASE):
             raise ValueError(f"Potential XSS detected: {pattern}")
 
     return value
@@ -83,9 +86,9 @@ def sanitize_html_input(value: str) -> str:
     ]
 
     for tag_pattern in dangerous_tags:
-        value = re.sub(tag_pattern, "", value, flags=re.IGNORECASE | re.DOTALL)
+        value = (re.sub( if re else None)tag_pattern, "", value, flags=re.IGNORECASE | re.DOTALL)
 
-    return value.strip()
+    return (value.strip( if value else None))
 
 
 # ============================================================================
@@ -118,13 +121,13 @@ class EnhancedRegisterRequest(BaseModel):
             raise ValueError("Password must be at least 8 characters long")
 
         # Check for at least one uppercase, lowercase, digit, and special char
-        if not re.search(r"[A-Z]", v):
+        if not (re.search( if re else None)r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter")
-        if not re.search(r"[a-z]", v):
+        if not (re.search( if re else None)r"[a-z]", v):
             raise ValueError("Password must contain at least one lowercase letter")
-        if not re.search(r"\d", v):
+        if not (re.search( if re else None)r"\d", v):
             raise ValueError("Password must contain at least one digit")
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+        if not (re.search( if re else None)r'[!@#$%^&*(),.?":{}|<>]', v):
             raise ValueError("Password must contain at least one special character")
 
         return v
@@ -193,7 +196,7 @@ class AgentExecutionRequest(BaseModel):
     @validator("agent_type")
     def validate_agent_type(cls, v):
         """Validate agent type format"""
-        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
+        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Agent type can only contain letters, numbers, underscores, and hyphens"
             )
@@ -214,7 +217,7 @@ class AgentExecutionRequest(BaseModel):
             raise ValueError("Parameters must be a dictionary")
 
         # Validate string values in parameters
-        for key, value in v.items():
+        for key, value in (v.items( if v else None)):
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
@@ -246,7 +249,7 @@ class MLModelRequest(BaseModel):
     @validator("model_name")
     def validate_model_name(cls, v):
         """Validate model name format"""
-        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
+        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Model name can only contain letters, numbers, underscores, and hyphens"
             )
@@ -255,7 +258,7 @@ class MLModelRequest(BaseModel):
     @validator("version")
     def validate_version(cls, v):
         """Validate version format"""
-        if not re.match(r"^[a-zA-Z0-9._-]+$", v):
+        if not (re.match( if re else None)r"^[a-zA-Z0-9._-]+$", v):
             raise ValueError(
                 "Version can only contain letters, numbers, dots, underscores, and hyphens"
             )
@@ -268,7 +271,7 @@ class MLModelRequest(BaseModel):
             raise ValueError("Input data must be a dictionary")
 
         # Validate string values
-        for key, value in v.items():
+        for key, value in (v.items( if v else None)):
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
@@ -304,7 +307,7 @@ class ContentGenerationRequest(BaseModel):
     @validator("content_type")
     def validate_content_type(cls, v):
         """Validate content type format"""
-        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
+        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Content type can only contain letters, numbers, underscores, and hyphens"
             )

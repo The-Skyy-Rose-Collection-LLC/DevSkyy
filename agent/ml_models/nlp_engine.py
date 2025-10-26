@@ -1,14 +1,16 @@
+import re
+
+from typing import Any, Dict, List
+import logging
+
 """
 NLP Engine - Natural Language Processing
 Text analysis, sentiment analysis, and entity extraction
 Reference: AGENTS.md Line 1559-1563
 """
 
-import logging
-import re
-from typing import Any, Dict, List
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class NLPEngine:
@@ -20,7 +22,7 @@ class NLPEngine:
         positive_words = ["good", "great", "excellent", "love", "amazing", "perfect"]
         negative_words = ["bad", "terrible", "hate", "awful", "poor", "worst"]
 
-        text_lower = text.lower()
+        text_lower = (text.lower( if text else None))
         pos_count = sum(1 for word in positive_words if word in text_lower)
         neg_count = sum(1 for word in negative_words if word in text_lower)
 
@@ -38,7 +40,7 @@ class NLPEngine:
 
     async def extract_keywords(self, text: str, top_n: int = 10) -> List[str]:
         """Extract keywords from text"""
-        words = re.findall(r"\b[a-zA-Z]{4,}\b", text.lower())
+        words = (re.findall( if re else None)r"\b[a-zA-Z]{4,}\b", (text.lower( if text else None)))
         stop_words = {"this", "that", "with", "from", "have", "will"}
         filtered = [w for w in words if w not in stop_words]
         return list(set(filtered))[:top_n]

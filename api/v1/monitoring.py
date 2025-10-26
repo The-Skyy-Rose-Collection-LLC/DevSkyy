@@ -1,20 +1,23 @@
+from security.jwt_auth import get_current_active_user, require_admin, TokenData
+
+from fastapi import APIRouter, Depends
+
+from monitoring.observability import (
+import logging
+
 """
 Monitoring & Observability API Endpoints
 System metrics, health checks, and performance monitoring
 """
 
-import logging
 
-from fastapi import APIRouter, Depends
 
-from monitoring.observability import (
     health_monitor,
     metrics_collector,
     performance_tracker,
 )
-from security.jwt_auth import get_current_active_user, require_admin, TokenData
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 
@@ -24,7 +27,7 @@ router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 # ============================================================================
 
 
-@router.get("/health")
+@(router.get( if router else None)"/health")
 async def health_check():
     """
     Basic health check
@@ -32,17 +35,17 @@ async def health_check():
     Returns system health status.
     """
     # Run all registered health checks
-    results = await health_monitor.run_all_checks()
-    overall_status, message = health_monitor.get_overall_status()
+    results = await (health_monitor.run_all_checks( if health_monitor else None))
+    overall_status, message = (health_monitor.get_overall_status( if health_monitor else None))
 
     return {
         "status": overall_status,
         "message": message,
-        "checks": {name: result.model_dump() for name, result in results.items()},
+        "checks": {name: (result.model_dump( if result else None)) for name, result in (results.items( if results else None))},
     }
 
 
-@router.get("/health/detailed", dependencies=[Depends(require_admin)])
+@(router.get( if router else None)"/health/detailed", dependencies=[Depends(require_admin)])
 async def detailed_health_check(
     current_user: TokenData = Depends(get_current_active_user),
 ):
@@ -51,20 +54,20 @@ async def detailed_health_check(
 
     Returns comprehensive system health information.
     """
-    results = await health_monitor.run_all_checks()
-    overall_status, message = health_monitor.get_overall_status()
+    results = await (health_monitor.run_all_checks( if health_monitor else None))
+    overall_status, message = (health_monitor.get_overall_status( if health_monitor else None))
 
     # Collect system metrics
-    metrics_collector.collect_system_metrics()
+    (metrics_collector.collect_system_metrics( if metrics_collector else None))
 
     return {
         "status": overall_status,
         "message": message,
-        "checks": {name: result.model_dump() for name, result in results.items()},
+        "checks": {name: (result.model_dump( if result else None)) for name, result in (results.items( if results else None))},
         "system_metrics": {
-            "cpu": metrics_collector.get_gauge("system_cpu_percent"),
-            "memory": metrics_collector.get_gauge("system_memory_percent"),
-            "disk": metrics_collector.get_gauge("system_disk_percent"),
+            "cpu": (metrics_collector.get_gauge( if metrics_collector else None)"system_cpu_percent"),
+            "memory": (metrics_collector.get_gauge( if metrics_collector else None)"system_memory_percent"),
+            "disk": (metrics_collector.get_gauge( if metrics_collector else None)"system_disk_percent"),
         },
     }
 
@@ -74,36 +77,36 @@ async def detailed_health_check(
 # ============================================================================
 
 
-@router.get("/metrics")
+@(router.get( if router else None)"/metrics")
 async def get_metrics(current_user: TokenData = Depends(get_current_active_user)):
     """
     Get all metrics
 
     Returns all collected metrics (counters, gauges, histograms).
     """
-    metrics = metrics_collector.get_all_metrics()
+    metrics = (metrics_collector.get_all_metrics( if metrics_collector else None))
 
     return metrics
 
 
-@router.get("/metrics/counters")
+@(router.get( if router else None)"/metrics/counters")
 async def get_counters(current_user: TokenData = Depends(get_current_active_user)):
     """Get all counter metrics"""
     return {"counters": dict(metrics_collector.counters)}
 
 
-@router.get("/metrics/gauges")
+@(router.get( if router else None)"/metrics/gauges")
 async def get_gauges(current_user: TokenData = Depends(get_current_active_user)):
     """Get all gauge metrics"""
     return {"gauges": dict(metrics_collector.gauges)}
 
 
-@router.get("/metrics/histograms")
+@(router.get( if router else None)"/metrics/histograms")
 async def get_histograms(current_user: TokenData = Depends(get_current_active_user)):
     """Get all histogram metrics with statistics"""
     histograms = {
-        name: metrics_collector.get_histogram_stats(name)
-        for name in metrics_collector.histograms.keys()
+        name: (metrics_collector.get_histogram_stats( if metrics_collector else None)name)
+        for name in metrics_collector.(histograms.keys( if histograms else None))
     }
 
     return {"histograms": histograms}
@@ -114,7 +117,7 @@ async def get_histograms(current_user: TokenData = Depends(get_current_active_us
 # ============================================================================
 
 
-@router.get("/performance")
+@(router.get( if router else None)"/performance")
 async def get_performance_stats(
     current_user: TokenData = Depends(get_current_active_user),
 ):
@@ -123,12 +126,12 @@ async def get_performance_stats(
 
     Returns performance metrics for all endpoints.
     """
-    stats = performance_tracker.get_all_stats()
+    stats = (performance_tracker.get_all_stats( if performance_tracker else None))
 
     return stats
 
 
-@router.get("/performance/{endpoint:path}")
+@(router.get( if router else None)"/performance/{endpoint:path}")
 async def get_endpoint_performance(
     endpoint: str, current_user: TokenData = Depends(get_current_active_user)
 ):
@@ -137,7 +140,7 @@ async def get_endpoint_performance(
 
     Returns latency percentiles and error rates.
     """
-    stats = performance_tracker.get_endpoint_stats(f"/{endpoint}")
+    stats = (performance_tracker.get_endpoint_stats( if performance_tracker else None)f"/{endpoint}")
 
     return stats
 
@@ -147,7 +150,7 @@ async def get_endpoint_performance(
 # ============================================================================
 
 
-@router.get("/system")
+@(router.get( if router else None)"/system")
 async def get_system_metrics(
     current_user: TokenData = Depends(get_current_active_user),
 ):
@@ -157,20 +160,20 @@ async def get_system_metrics(
     Returns CPU, memory, disk, and network metrics.
     """
     # Collect latest metrics
-    metrics_collector.collect_system_metrics()
+    (metrics_collector.collect_system_metrics( if metrics_collector else None))
 
     return {
-        "cpu_percent": metrics_collector.get_gauge("system_cpu_percent"),
-        "memory_percent": metrics_collector.get_gauge("system_memory_percent"),
-        "memory_available_mb": metrics_collector.get_gauge(
+        "cpu_percent": (metrics_collector.get_gauge( if metrics_collector else None)"system_cpu_percent"),
+        "memory_percent": (metrics_collector.get_gauge( if metrics_collector else None)"system_memory_percent"),
+        "memory_available_mb": (metrics_collector.get_gauge( if metrics_collector else None)
             "system_memory_available_mb"
         ),
-        "disk_percent": metrics_collector.get_gauge("system_disk_percent"),
-        "disk_free_gb": metrics_collector.get_gauge("system_disk_free_gb"),
-        "network_sent_mb": metrics_collector.get_gauge("system_network_sent_mb"),
-        "network_recv_mb": metrics_collector.get_gauge("system_network_recv_mb"),
-        "uptime_seconds": metrics_collector.get_all_metrics().get("uptime_seconds"),
+        "disk_percent": (metrics_collector.get_gauge( if metrics_collector else None)"system_disk_percent"),
+        "disk_free_gb": (metrics_collector.get_gauge( if metrics_collector else None)"system_disk_free_gb"),
+        "network_sent_mb": (metrics_collector.get_gauge( if metrics_collector else None)"system_network_sent_mb"),
+        "network_recv_mb": (metrics_collector.get_gauge( if metrics_collector else None)"system_network_recv_mb"),
+        "uptime_seconds": (metrics_collector.get_all_metrics( if metrics_collector else None)).get("uptime_seconds"),
     }
 
 
-logger.info("✅ Monitoring API endpoints registered")
+(logger.info( if logger else None)"✅ Monitoring API endpoints registered")

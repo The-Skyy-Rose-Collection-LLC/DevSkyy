@@ -1,20 +1,22 @@
+from datetime import datetime, timedelta
+from infrastructure.redis_manager import redis_manager
+import json
+
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set
+import asyncio
+import logging
+
 """
 Enterprise Cache Invalidation Strategies
 Implements intelligent cache invalidation for real-time data consistency
 Fashion industry specific caching patterns and strategies
 """
 
-import asyncio
-import json
-import logging
-from dataclasses import dataclass
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
 
-from infrastructure.redis_manager import redis_manager
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class InvalidationStrategy(Enum):
@@ -60,14 +62,14 @@ class CacheInvalidationManager:
             "product_catalog": ["recommendations", "search_index", "analytics"],
         }
 
-        self._setup_default_rules()
-        logger.info("Cache invalidation manager initialized")
+        (self._setup_default_rules( if self else None))
+        (logger.info( if logger else None)"Cache invalidation manager initialized")
 
     def _setup_default_rules(self):
         """Setup default invalidation rules for fashion e-commerce"""
 
         # Fashion trends - immediate invalidation for real-time updates
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="fashion_trends_update",
                 strategy=InvalidationStrategy.IMMEDIATE,
@@ -77,7 +79,7 @@ class CacheInvalidationManager:
         )
 
         # Inventory updates - delayed invalidation to batch updates
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="inventory_update",
                 strategy=InvalidationStrategy.DELAYED,
@@ -88,7 +90,7 @@ class CacheInvalidationManager:
         )
 
         # User preferences - immediate for personalization
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="user_preferences_update",
                 strategy=InvalidationStrategy.IMMEDIATE,
@@ -98,12 +100,12 @@ class CacheInvalidationManager:
         )
 
         # Seasonal data - scheduled invalidation
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="seasonal_data_refresh",
                 strategy=InvalidationStrategy.SCHEDULED,
                 patterns=["trends:seasonal:*", "analytics:seasonal:*"],
-                schedule_time=datetime.now().replace(
+                schedule_time=(datetime.now( if datetime else None)).replace(
                     hour=2, minute=0, second=0
                 ),  # 2 AM daily
                 fashion_context=True,
@@ -111,7 +113,7 @@ class CacheInvalidationManager:
         )
 
         # API responses - TTL refresh for frequently accessed data
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="api_response_refresh",
                 strategy=InvalidationStrategy.TTL_REFRESH,
@@ -121,7 +123,7 @@ class CacheInvalidationManager:
         )
 
         # ML model results - dependency-based invalidation
-        self.add_rule(
+        (self.add_rule( if self else None)
             InvalidationRule(
                 name="ml_model_update",
                 strategy=InvalidationStrategy.DEPENDENCY,
@@ -141,7 +143,7 @@ class CacheInvalidationManager:
                     self.dependency_graph[dep] = set()
                 self.dependency_graph[dep].add(rule.name)
 
-        logger.debug(f"Added invalidation rule: {rule.name}")
+        (logger.debug( if logger else None)f"Added invalidation rule: {rule.name}")
 
     def remove_rule(self, rule_name: str):
         """Remove invalidation rule"""
@@ -149,10 +151,10 @@ class CacheInvalidationManager:
             del self.invalidation_rules[rule_name]
 
             # Clean up dependency graph
-            for deps in self.dependency_graph.values():
-                deps.discard(rule_name)
+            for deps in self.(dependency_graph.values( if dependency_graph else None)):
+                (deps.discard( if deps else None)rule_name)
 
-            logger.debug(f"Removed invalidation rule: {rule_name}")
+            (logger.debug( if logger else None)f"Removed invalidation rule: {rule_name}")
 
     async def invalidate(
         self,
@@ -164,7 +166,7 @@ class CacheInvalidationManager:
         context = context or {}
         invalidation_results = {
             "trigger": trigger,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": (datetime.now( if datetime else None)).isoformat(),
             "rules_executed": [],
             "keys_invalidated": 0,
             "errors": [],
@@ -172,39 +174,39 @@ class CacheInvalidationManager:
 
         # Find matching rules
         matching_rules = []
-        for rule_name, rule in self.invalidation_rules.items():
-            if self._rule_matches_trigger(rule, trigger, context):
-                matching_rules.append(rule)
+        for rule_name, rule in self.(invalidation_rules.items( if invalidation_rules else None)):
+            if (self._rule_matches_trigger( if self else None)rule, trigger, context):
+                (matching_rules.append( if matching_rules else None)rule)
 
         # Execute invalidation for each matching rule
         for rule in matching_rules:
             try:
-                result = await self._execute_rule(rule, context, force_immediate)
+                result = await (self._execute_rule( if self else None)rule, context, force_immediate)
                 invalidation_results["rules_executed"].append(
                     {
                         "rule_name": rule.name,
                         "strategy": rule.strategy.value,
-                        "keys_invalidated": result.get("keys_invalidated", 0),
-                        "execution_time_ms": result.get("execution_time_ms", 0),
+                        "keys_invalidated": (result.get( if result else None)"keys_invalidated", 0),
+                        "execution_time_ms": (result.get( if result else None)"execution_time_ms", 0),
                     }
                 )
-                invalidation_results["keys_invalidated"] += result.get(
+                invalidation_results["keys_invalidated"] += (result.get( if result else None)
                     "keys_invalidated", 0
                 )
 
             except Exception as e:
                 error_msg = f"Error executing rule {rule.name}: {str(e)}"
-                logger.error(error_msg)
+                (logger.error( if logger else None)error_msg)
                 invalidation_results["errors"].append(error_msg)
 
         # Record invalidation history
-        self.invalidation_history.append(invalidation_results)
+        self.(invalidation_history.append( if invalidation_history else None)invalidation_results)
 
         # Keep only last 1000 invalidation records
         if len(self.invalidation_history) > 1000:
             self.invalidation_history = self.invalidation_history[-1000:]
 
-        logger.info(
+        (logger.info( if logger else None)
             f"Cache invalidation completed: {trigger} - {invalidation_results['keys_invalidated']} keys"
         )
         return invalidation_results
@@ -215,9 +217,9 @@ class CacheInvalidationManager:
         """Check if rule matches the trigger"""
         # Check if trigger matches any pattern
         for pattern in rule.patterns:
-            if self._pattern_matches(pattern, trigger):
+            if (self._pattern_matches( if self else None)pattern, trigger):
                 # Check condition if specified
-                if rule.condition and not rule.condition(trigger, context):
+                if rule.condition and not (rule.condition( if rule else None)trigger, context):
                     continue
                 return True
 
@@ -233,13 +235,13 @@ class CacheInvalidationManager:
             return pattern == trigger
 
         # Simple wildcard matching
-        if pattern.endswith("*"):
-            return trigger.startswith(pattern[:-1])
-        elif pattern.startswith("*"):
-            return trigger.endswith(pattern[1:])
+        if (pattern.endswith( if pattern else None)"*"):
+            return (trigger.startswith( if trigger else None)pattern[:-1])
+        elif (pattern.startswith( if pattern else None)"*"):
+            return (trigger.endswith( if trigger else None)pattern[1:])
         elif "*" in pattern:
-            parts = pattern.split("*")
-            return trigger.startswith(parts[0]) and trigger.endswith(parts[-1])
+            parts = (pattern.split( if pattern else None)"*")
+            return (trigger.startswith( if trigger else None)parts[0]) and (trigger.endswith( if trigger else None)parts[-1])
 
         return False
 
@@ -250,30 +252,30 @@ class CacheInvalidationManager:
         force_immediate: bool = False,
     ) -> Dict[str, Any]:
         """Execute specific invalidation rule"""
-        start_time = datetime.now()
+        start_time = (datetime.now( if datetime else None))
         keys_invalidated = 0
 
         if rule.strategy == InvalidationStrategy.IMMEDIATE or force_immediate:
-            keys_invalidated = await self._immediate_invalidation(rule.patterns)
+            keys_invalidated = await (self._immediate_invalidation( if self else None)rule.patterns)
 
         elif rule.strategy == InvalidationStrategy.DELAYED:
-            await self._delayed_invalidation(rule.patterns, rule.delay_seconds)
+            await (self._delayed_invalidation( if self else None)rule.patterns, rule.delay_seconds)
 
         elif rule.strategy == InvalidationStrategy.SCHEDULED:
-            await self._scheduled_invalidation(rule)
+            await (self._scheduled_invalidation( if self else None)rule)
 
         elif rule.strategy == InvalidationStrategy.PATTERN:
-            keys_invalidated = await self._pattern_invalidation(rule.patterns)
+            keys_invalidated = await (self._pattern_invalidation( if self else None)rule.patterns)
 
         elif rule.strategy == InvalidationStrategy.DEPENDENCY:
-            keys_invalidated = await self._dependency_invalidation(rule.dependencies)
+            keys_invalidated = await (self._dependency_invalidation( if self else None)rule.dependencies)
 
         elif rule.strategy == InvalidationStrategy.TTL_REFRESH:
-            keys_invalidated = await self._ttl_refresh(
+            keys_invalidated = await (self._ttl_refresh( if self else None)
                 rule.patterns, rule.delay_seconds
             )
 
-        execution_time = (datetime.now() - start_time).total_seconds() * 1000
+        execution_time = ((datetime.now( if datetime else None)) - start_time).total_seconds() * 1000
 
         return {
             "keys_invalidated": keys_invalidated,
@@ -287,13 +289,13 @@ class CacheInvalidationManager:
         for pattern in patterns:
             # Extract prefix and pattern
             if ":" in pattern:
-                prefix_part = pattern.split(":")[0]
-                pattern_part = ":".join(pattern.split(":")[1:])
+                prefix_part = (pattern.split( if pattern else None)":")[0]
+                pattern_part = ":".join((pattern.split( if pattern else None)":")[1:])
             else:
                 prefix_part = "api_cache"
                 pattern_part = pattern
 
-            invalidated = await redis_manager.invalidate_pattern(
+            invalidated = await (redis_manager.invalidate_pattern( if redis_manager else None)
                 pattern_part, prefix_part
             )
             total_invalidated += invalidated
@@ -304,25 +306,25 @@ class CacheInvalidationManager:
         """Delayed cache invalidation"""
 
         async def delayed_task():
-            await asyncio.sleep(delay_seconds)
-            await self._immediate_invalidation(patterns)
+            await (asyncio.sleep( if asyncio else None)delay_seconds)
+            await (self._immediate_invalidation( if self else None)patterns)
 
         # Schedule delayed invalidation
-        asyncio.create_task(delayed_task())
+        (asyncio.create_task( if asyncio else None)delayed_task())
 
     async def _scheduled_invalidation(self, rule: InvalidationRule):
         """Scheduled cache invalidation"""
         if rule.schedule_time:
-            now = datetime.now()
+            now = (datetime.now( if datetime else None))
             if rule.schedule_time > now:
                 delay = (rule.schedule_time - now).total_seconds()
-                await asyncio.sleep(delay)
+                await (asyncio.sleep( if asyncio else None)delay)
 
-            await self._immediate_invalidation(rule.patterns)
+            await (self._immediate_invalidation( if self else None)rule.patterns)
 
     async def _pattern_invalidation(self, patterns: List[str]) -> int:
         """Pattern-based cache invalidation"""
-        return await self._immediate_invalidation(patterns)
+        return await (self._immediate_invalidation( if self else None)patterns)
 
     async def _dependency_invalidation(self, dependencies: List[str]) -> int:
         """Dependency-based cache invalidation"""
@@ -332,7 +334,7 @@ class CacheInvalidationManager:
             if dependency in self.fashion_dependencies:
                 dependent_patterns = self.fashion_dependencies[dependency]
                 for pattern in dependent_patterns:
-                    invalidated = await redis_manager.invalidate_pattern(
+                    invalidated = await (redis_manager.invalidate_pattern( if redis_manager else None)
                         f"{pattern}:*", pattern
                     )
                     total_invalidated += invalidated
@@ -347,15 +349,15 @@ class CacheInvalidationManager:
             # This would require getting all keys matching pattern and refreshing their TTL
             # For now, we'll implement a simplified version
             if ":" in pattern:
-                prefix_part = pattern.split(":")[0]
-                pattern_part = ":".join(pattern.split(":")[1:])
+                prefix_part = (pattern.split( if pattern else None)":")[0]
+                pattern_part = ":".join((pattern.split( if pattern else None)":")[1:])
             else:
                 prefix_part = "api_cache"
                 pattern_part = pattern
 
             # In a real implementation, we'd get all matching keys and refresh their TTL
             # For now, we'll just log the refresh operation
-            logger.debug(
+            (logger.debug( if logger else None)
                 f"TTL refresh scheduled for pattern {pattern} (+{refresh_seconds}s)"
             )
             total_refreshed += 1
@@ -365,30 +367,30 @@ class CacheInvalidationManager:
     async def invalidate_fashion_trends(self, trend_categories: List[str] = None):
         """Invalidate fashion trend related caches"""
         context = {"categories": trend_categories or []}
-        return await self.invalidate("fashion_trends_update", context)
+        return await (self.invalidate( if self else None)"fashion_trends_update", context)
 
     async def invalidate_inventory(self, product_ids: List[str] = None):
         """Invalidate inventory related caches"""
         context = {"product_ids": product_ids or []}
-        return await self.invalidate("inventory_update", context)
+        return await (self.invalidate( if self else None)"inventory_update", context)
 
     async def invalidate_user_data(self, user_id: str):
         """Invalidate user-specific caches"""
         context = {"user_id": user_id}
-        return await self.invalidate("user_preferences_update", context)
+        return await (self.invalidate( if self else None)"user_preferences_update", context)
 
     async def invalidate_ml_models(self, model_names: List[str] = None):
         """Invalidate ML model related caches"""
         context = {"model_names": model_names or []}
-        return await self.invalidate("ml_model_update", context)
+        return await (self.invalidate( if self else None)"ml_model_update", context)
 
     async def get_invalidation_stats(self) -> Dict[str, Any]:
         """Get cache invalidation statistics"""
         recent_invalidations = [
             inv
             for inv in self.invalidation_history
-            if datetime.fromisoformat(inv["timestamp"])
-            > datetime.now() - timedelta(hours=24)
+            if (datetime.fromisoformat( if datetime else None)inv["timestamp"])
+            > (datetime.now( if datetime else None)) - timedelta(hours=24)
         ]
 
         total_keys_invalidated = sum(
@@ -404,7 +406,7 @@ class CacheInvalidationManager:
             "total_keys_invalidated_24h": total_keys_invalidated,
             "total_rules_executed_24h": total_rules_executed,
             "fashion_specific_rules": len(
-                [r for r in self.invalidation_rules.values() if r.fashion_context]
+                [r for r in self.(invalidation_rules.values( if invalidation_rules else None)) if r.fashion_context]
             ),
             "dependency_graph_size": len(self.dependency_graph),
             "scheduled_invalidations": len(self.scheduled_invalidations),
@@ -413,8 +415,8 @@ class CacheInvalidationManager:
     async def health_check(self) -> Dict[str, Any]:
         """Health check for cache invalidation system"""
         try:
-            stats = await self.get_invalidation_stats()
-            redis_health = await redis_manager.health_check()
+            stats = await (self.get_invalidation_stats( if self else None))
+            redis_health = await (redis_manager.health_check( if redis_manager else None))
 
             return {
                 "status": (

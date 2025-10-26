@@ -1,3 +1,9 @@
+from datetime import datetime
+import json  # noqa: F401 - Reserved for future JSON schema processing
+
+from typing import Any, Dict, List, Optional
+import logging
+
 """
 WordPress SEO Optimizer
 Comprehensive SEO optimization for WordPress sites
@@ -11,12 +17,8 @@ Features:
 Reference: Based on AGENTS.md Line 921-961
 """
 
-import json  # noqa: F401 - Reserved for future JSON schema processing
-import logging
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class WordPressSEOOptimizer:
@@ -26,7 +28,7 @@ class WordPressSEOOptimizer:
     """
 
     def __init__(self):
-        self.seo_best_practices = self._load_best_practices()
+        self.seo_best_practices = (self._load_best_practices( if self else None))
 
     def _load_best_practices(self) -> Dict[str, Any]:
         """Load SEO best practices and scoring criteria"""
@@ -57,21 +59,21 @@ class WordPressSEOOptimizer:
         Returns:
             Optimization results and recommendations
         """
-        logger.info(f"Optimizing SEO for: {url}")
+        (logger.info( if logger else None)f"Optimizing SEO for: {url}")
 
         # Simulate page analysis
-        analysis = await self.analyze_page(url, target_keywords)
+        analysis = await (self.analyze_page( if self else None)url, target_keywords)
 
         # Generate recommendations
-        recommendations = self._generate_recommendations(analysis)
+        recommendations = (self._generate_recommendations( if self else None)analysis)
 
         # Generate schema markup
-        schema = self.generate_schema_markup(
-            content_type, analysis.get("page_data", {})
+        schema = (self.generate_schema_markup( if self else None)
+            content_type, (analysis.get( if analysis else None)"page_data", {})
         )
 
         # Calculate SEO score
-        seo_score = self._calculate_seo_score(analysis)
+        seo_score = (self._calculate_seo_score( if self else None)analysis)
 
         return {
             "url": url,
@@ -80,11 +82,11 @@ class WordPressSEOOptimizer:
             "recommendations": recommendations,
             "schema_markup": schema,
             "optimized_meta": {
-                "title": analysis.get("optimized_title", ""),
-                "description": analysis.get("optimized_description", ""),
+                "title": (analysis.get( if analysis else None)"optimized_title", ""),
+                "description": (analysis.get( if analysis else None)"optimized_description", ""),
                 "keywords": target_keywords,
             },
-            "analyzed_at": datetime.now().isoformat(),
+            "analyzed_at": (datetime.now( if datetime else None)).isoformat(),
         }
 
     async def analyze_page(self, url: str, keywords: List[str]) -> Dict[str, Any]:
@@ -142,7 +144,7 @@ class WordPressSEOOptimizer:
         # Title recommendations
         title_len = analysis["title"]["length"]
         if title_len < self.seo_best_practices["title_length"]["min"]:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "title",
                     "priority": "high",
@@ -152,7 +154,7 @@ class WordPressSEOOptimizer:
                 }
             )
         elif title_len > self.seo_best_practices["title_length"]["max"]:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "title",
                     "priority": "medium",
@@ -165,7 +167,7 @@ class WordPressSEOOptimizer:
         # Meta description recommendations
         meta_len = analysis["meta_description"]["length"]
         if meta_len < self.seo_best_practices["meta_description_length"]["min"]:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "meta_description",
                     "priority": "high",
@@ -178,7 +180,7 @@ class WordPressSEOOptimizer:
         # Heading recommendations
         h1_count = len(analysis["headings"]["h1"])
         if h1_count == 0:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "headings",
                     "priority": "critical",
@@ -188,7 +190,7 @@ class WordPressSEOOptimizer:
                 }
             )
         elif h1_count > 1:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "headings",
                     "priority": "high",
@@ -201,7 +203,7 @@ class WordPressSEOOptimizer:
         # Image alt text recommendations
         images_without_alt = analysis["images"]["without_alt"]
         if images_without_alt > 0:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "images",
                     "priority": "medium",
@@ -214,7 +216,7 @@ class WordPressSEOOptimizer:
         # Content length recommendations
         word_count = analysis["content"]["word_count"]
         if word_count < self.seo_best_practices["content_length"]["min"]:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "content",
                     "priority": "high",
@@ -227,7 +229,7 @@ class WordPressSEOOptimizer:
         # Internal linking recommendations
         internal_links = analysis["links"]["internal"]
         if internal_links < self.seo_best_practices["internal_links"]["min"]:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "links",
                     "priority": "medium",
@@ -239,7 +241,7 @@ class WordPressSEOOptimizer:
 
         # Schema markup recommendation
         if not analysis["technical"].get("has_schema", False):
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "schema",
                     "priority": "high",
@@ -252,7 +254,7 @@ class WordPressSEOOptimizer:
         # Page speed recommendation
         speed_score = analysis["technical"].get("page_speed_score", 0)
         if speed_score < 80:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 {
                     "type": "performance",
                     "priority": "high",
@@ -268,7 +270,7 @@ class WordPressSEOOptimizer:
         """Calculate overall SEO score (0-100)"""
         score = 0
         max_score = sum(
-            bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp
+            bp["weight"] for bp in self.(seo_best_practices.values( if seo_best_practices else None)) if "weight" in bp
         )
 
         # Title score
@@ -348,7 +350,7 @@ class WordPressSEOOptimizer:
             "breadcrumb": self._generate_breadcrumb_schema,
         }
 
-        generator = schemas.get(content_type, self._generate_article_schema)
+        generator = (schemas.get( if schemas else None)content_type, self._generate_article_schema)
         return generator(page_data)
 
     def _generate_article_schema(self, data: Dict) -> Dict:
@@ -356,17 +358,17 @@ class WordPressSEOOptimizer:
         return {
             "@context": "https://schema.org",
             "@type": "Article",
-            "headline": data.get("title", "Article Title"),
-            "author": {"@type": "Person", "name": data.get("author", "Staff Writer")},
-            "datePublished": data.get("published_date", datetime.now().isoformat()),
-            "dateModified": data.get("modified_date", datetime.now().isoformat()),
-            "image": data.get("featured_image", ""),
+            "headline": (data.get( if data else None)"title", "Article Title"),
+            "author": {"@type": "Person", "name": (data.get( if data else None)"author", "Staff Writer")},
+            "datePublished": (data.get( if data else None)"published_date", (datetime.now( if datetime else None)).isoformat()),
+            "dateModified": (data.get( if data else None)"modified_date", (datetime.now( if datetime else None)).isoformat()),
+            "image": (data.get( if data else None)"featured_image", ""),
             "publisher": {
                 "@type": "Organization",
-                "name": data.get("publisher_name", "Publisher"),
-                "logo": {"@type": "ImageObject", "url": data.get("publisher_logo", "")},
+                "name": (data.get( if data else None)"publisher_name", "Publisher"),
+                "logo": {"@type": "ImageObject", "url": (data.get( if data else None)"publisher_logo", "")},
             },
-            "description": data.get("description", ""),
+            "description": (data.get( if data else None)"description", ""),
         }
 
     def _generate_product_schema(self, data: Dict) -> Dict:
@@ -374,21 +376,21 @@ class WordPressSEOOptimizer:
         return {
             "@context": "https://schema.org",
             "@type": "Product",
-            "name": data.get("name", "Product Name"),
-            "image": data.get("images", []),
-            "description": data.get("description", ""),
-            "brand": {"@type": "Brand", "name": data.get("brand", "")},
+            "name": (data.get( if data else None)"name", "Product Name"),
+            "image": (data.get( if data else None)"images", []),
+            "description": (data.get( if data else None)"description", ""),
+            "brand": {"@type": "Brand", "name": (data.get( if data else None)"brand", "")},
             "offers": {
                 "@type": "Offer",
-                "price": data.get("price", 0),
-                "priceCurrency": data.get("currency", "USD"),
+                "price": (data.get( if data else None)"price", 0),
+                "priceCurrency": (data.get( if data else None)"currency", "USD"),
                 "availability": "https://schema.org/InStock",
-                "url": data.get("url", ""),
+                "url": (data.get( if data else None)"url", ""),
             },
             "aggregateRating": {
                 "@type": "AggregateRating",
-                "ratingValue": data.get("rating", 0),
-                "reviewCount": data.get("review_count", 0),
+                "ratingValue": (data.get( if data else None)"rating", 0),
+                "reviewCount": (data.get( if data else None)"review_count", 0),
             },
         }
 
@@ -397,20 +399,20 @@ class WordPressSEOOptimizer:
         return {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": data.get("name", "Organization"),
-            "url": data.get("url", ""),
-            "logo": data.get("logo", ""),
-            "sameAs": data.get("social_profiles", []),
+            "name": (data.get( if data else None)"name", "Organization"),
+            "url": (data.get( if data else None)"url", ""),
+            "logo": (data.get( if data else None)"logo", ""),
+            "sameAs": (data.get( if data else None)"social_profiles", []),
             "contactPoint": {
                 "@type": "ContactPoint",
-                "telephone": data.get("phone", ""),
+                "telephone": (data.get( if data else None)"phone", ""),
                 "contactType": "customer service",
             },
         }
 
     def _generate_breadcrumb_schema(self, data: Dict) -> Dict:
         """Generate BreadcrumbList schema"""
-        items = data.get("breadcrumbs", [])
+        items = (data.get( if data else None)"breadcrumbs", [])
 
         return {
             "@context": "https://schema.org",
@@ -419,8 +421,8 @@ class WordPressSEOOptimizer:
                 {
                     "@type": "ListItem",
                     "position": i + 1,
-                    "name": item.get("name", ""),
-                    "item": item.get("url", ""),
+                    "name": (item.get( if item else None)"name", ""),
+                    "item": (item.get( if item else None)"url", ""),
                 }
                 for i, item in enumerate(items)
             ],
@@ -437,19 +439,20 @@ class WordPressSEOOptimizer:
         Returns:
             XML sitemap string
         """
-        logger.info(f"Generating sitemap for {len(pages)} pages")
+        (logger.info( if logger else None)f"Generating sitemap for {len(pages)} pages")
 
         sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        # Use list and join for string building
+sitemap_list.append(...)
 
         for page in pages:
-            url = page.get("url", "")
-            if not url.startswith("http"):
-                url = f"{base_url.rstrip('/')}/{url.lstrip('/')}"
+            url = (page.get( if page else None)"url", "")
+            if not (url.startswith( if url else None)"http"):
+                url = f"{(base_url.rstrip( if base_url else None)'/')}/{(url.lstrip( if url else None)'/')}"
 
-            priority = page.get("priority", 0.5)
-            changefreq = page.get("changefreq", "weekly")
-            lastmod = page.get("lastmod", datetime.now().strftime("%Y-%m-%d"))
+            priority = (page.get( if page else None)"priority", 0.5)
+            changefreq = (page.get( if page else None)"changefreq", "weekly")
+            lastmod = (page.get( if page else None)"lastmod", (datetime.now( if datetime else None)).strftime("%Y-%m-%d"))
 
             sitemap += f"  <url>\n"
             sitemap += f"    <loc>{url}</loc>\n"
@@ -458,7 +461,8 @@ class WordPressSEOOptimizer:
             sitemap += f"    <priority>{priority}</priority>\n"
             sitemap += f"  </url>\n"
 
-        sitemap += "</urlset>"
+        # Use list and join for string building
+sitemap_list.append(...)
 
         return sitemap
 
@@ -475,12 +479,12 @@ class WordPressSEOOptimizer:
         Returns:
             Keyword analysis
         """
-        content_lower = content.lower()
-        word_count = len(content.split())
+        content_lower = (content.lower( if content else None))
+        word_count = len((content.split( if content else None)))
 
         analysis = {}
         for keyword in target_keywords:
-            count = content_lower.count(keyword.lower())
+            count = (content_lower.count( if content_lower else None)(keyword.lower( if keyword else None)))
             density = (count / word_count * 100) if word_count > 0 else 0
 
             analysis[keyword] = {
@@ -497,7 +501,7 @@ class WordPressSEOOptimizer:
             "keywords": analysis,
             "total_words": word_count,
             "overall_score": (
-                sum(1 for k in analysis.values() if k["status"] == "optimal")
+                sum(1 for k in (analysis.values( if analysis else None)) if k["status"] == "optimal")
                 / len(target_keywords)
                 * 100
                 if target_keywords
@@ -525,9 +529,11 @@ class WordPressSEOOptimizer:
         robots = "User-agent: *\n"
 
         if allow_all:
-            robots += "Allow: /\n"
+            # Use list and join for string building
+robots_list.append(...)
         else:
-            robots += "Disallow: /\n"
+            # Use list and join for string building
+robots_list.append(...)
 
         if disallow_paths:
             for path in disallow_paths:

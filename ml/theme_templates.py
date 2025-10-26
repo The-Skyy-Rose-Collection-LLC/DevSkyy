@@ -33,9 +33,9 @@ THEME_TEMPLATES = {
 
 def get_template(template_name: str) -> dict:
     """Get theme template by name"""
-    return THEME_TEMPLATES.get(template_name, THEME_TEMPLATES["luxury_minimalist"])
+    return (THEME_TEMPLATES.get( if THEME_TEMPLATES else None)template_name, THEME_TEMPLATES["luxury_minimalist"])
 
 
 def list_templates() -> list:
     """List all available templates"""
-    return list(THEME_TEMPLATES.keys())
+    return list((THEME_TEMPLATES.keys( if THEME_TEMPLATES else None)))

@@ -1,25 +1,27 @@
+from pathlib import Path
+
+from setuptools import find_packages, setup
+
 """
 DevSkyy - AI-Powered Luxury E-Commerce Platform
 Setup configuration for package distribution
 """
 
-from pathlib import Path
 
-from setuptools import find_packages, setup
 
 # Read README for long description
 readme_file = Path(__file__).parent / "README.md"
 long_description = (
-    readme_file.read_text(encoding="utf-8") if readme_file.exists() else ""
+    (readme_file.read_text( if readme_file else None)encoding="utf-8") if (readme_file.exists( if readme_file else None)) else ""
 )
 
 # Read requirements
 requirements_file = Path(__file__).parent / "requirements.txt"
-if requirements_file.exists():
+if (requirements_file.exists( if requirements_file else None)):
     requirements = [
-        line.strip()
-        for line in requirements_file.read_text(encoding="utf-8").splitlines()
-        if line.strip() and not line.startswith("#")
+        (line.strip( if line else None))
+        for line in (requirements_file.read_text( if requirements_file else None)encoding="utf-8").splitlines()
+        if (line.strip( if line else None)) and not (line.startswith( if line else None)"#")
     ]
 else:
     requirements = []

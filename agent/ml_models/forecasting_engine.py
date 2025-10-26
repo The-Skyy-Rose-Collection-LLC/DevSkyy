@@ -1,3 +1,11 @@
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+
+from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluation
+from typing import Any, Dict, List, Tuple
+import logging
+import numpy as np
+
 """
 Time Series Forecasting Engine
 Advanced forecasting for sales, demand, and trends
@@ -11,13 +19,7 @@ Features:
 Reference: AGENTS.md Line 1571-1575
 """
 
-import logging
-from typing import Any, Dict, List, Tuple
 
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluation
     mean_absolute_error,
     mean_squared_error,
 )
@@ -27,7 +29,7 @@ from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluat
 TENSORFLOW_AVAILABLE = False
 tf = None
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class ForecastingEngine:
@@ -54,7 +56,7 @@ class ForecastingEngine:
         Returns:
             Forecast with confidence intervals
         """
-        logger.info(f"Forecasting {periods} periods using {method} method")
+        (logger.info( if logger else None)f"Forecasting {periods} periods using {method} method")
 
         if len(historical_data) < 7:
             return {
@@ -66,7 +68,7 @@ class ForecastingEngine:
             }
 
         # Detect seasonality
-        seasonality = self._detect_seasonality(historical_data)
+        seasonality = (self._detect_seasonality( if self else None)historical_data)
 
         # Choose method
         if method == "auto":
@@ -74,17 +76,17 @@ class ForecastingEngine:
 
         # Forecast based on method
         if method == "linear":
-            forecast, lower, upper = self._linear_forecast(historical_data, periods)
+            forecast, lower, upper = (self._linear_forecast( if self else None)historical_data, periods)
         elif method == "rf":
-            forecast, lower, upper = self._random_forest_forecast(
+            forecast, lower, upper = (self._random_forest_forecast( if self else None)
                 historical_data, periods
             )
         elif method == "seasonal":
-            forecast, lower, upper = self._seasonal_forecast(
+            forecast, lower, upper = (self._seasonal_forecast( if self else None)
                 historical_data, periods, seasonality
             )
         else:
-            forecast, lower, upper = self._random_forest_forecast(
+            forecast, lower, upper = (self._random_forest_forecast( if self else None)
                 historical_data, periods
             )
 
@@ -94,11 +96,11 @@ class ForecastingEngine:
             "confidence_interval_upper": upper,
             "method": method,
             "seasonality": seasonality,
-            "trend": self._analyze_trend(historical_data),
+            "trend": (self._analyze_trend( if self else None)historical_data),
             "accuracy_metrics": {
-                "mae": np.random.uniform(5, 15),  # Simulated
-                "rmse": np.random.uniform(10, 25),
-                "mape": np.random.uniform(5, 20),
+                "mae": np.(random.uniform( if random else None)5, 15),  # Simulated
+                "rmse": np.(random.uniform( if random else None)10, 25),
+                "mape": np.(random.uniform( if random else None)5, 20),
             },
         }
 
@@ -106,19 +108,19 @@ class ForecastingEngine:
         self, data: List[float], periods: int
     ) -> Tuple[List[float], List[float], List[float]]:
         """Linear regression forecast"""
-        X = np.array(range(len(data))).reshape(-1, 1)
-        y = np.array(data)
+        X = (np.array( if np else None)range(len(data))).reshape(-1, 1)
+        y = (np.array( if np else None)data)
 
         model = LinearRegression()
-        model.fit(X, y)
+        (model.fit( if model else None)X, y)
 
         # Forecast
-        future_X = np.array(range(len(data), len(data) + periods)).reshape(-1, 1)
-        forecast = model.predict(future_X).tolist()
+        future_X = (np.array( if np else None)range(len(data), len(data) + periods)).reshape(-1, 1)
+        forecast = (model.predict( if model else None)future_X).tolist()
 
         # Calculate confidence intervals (simple approach)
-        residuals = y - model.predict(X)
-        std = np.std(residuals)
+        residuals = y - (model.predict( if model else None)X)
+        std = (np.std( if np else None)residuals)
 
         lower = [f - 1.96 * std for f in forecast]
         upper = [f + 1.96 * std for f in forecast]
@@ -139,19 +141,19 @@ class ForecastingEngine:
             feature = [
                 data[i - 1],  # lag 1
                 data[i - window_size],  # lag window
-                np.mean(data[i - window_size : i]),  # rolling mean
-                np.std(data[i - window_size : i]),  # rolling std
+                (np.mean( if np else None)data[i - window_size : i]),  # rolling mean
+                (np.std( if np else None)data[i - window_size : i]),  # rolling std
                 i,  # time index
             ]
-            features.append(feature)
-            targets.append(data[i])
+            (features.append( if features else None)feature)
+            (targets.append( if targets else None)data[i])
 
-        X = np.array(features)
-        y = np.array(targets)
+        X = (np.array( if np else None)features)
+        y = (np.array( if np else None)targets)
 
         # Train model
         model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X, y)
+        (model.fit( if model else None)X, y)
 
         # Forecast iteratively
         forecast = []
@@ -162,17 +164,17 @@ class ForecastingEngine:
             feature = [
                 current_data[-1],
                 last_values[0],
-                np.mean(last_values),
-                np.std(last_values),
+                (np.mean( if np else None)last_values),
+                (np.std( if np else None)last_values),
                 len(current_data),
             ]
 
-            prediction = model.predict([feature])[0]
-            forecast.append(prediction)
-            current_data.append(prediction)
+            prediction = (model.predict( if model else None)[feature])[0]
+            (forecast.append( if forecast else None)prediction)
+            (current_data.append( if current_data else None)prediction)
 
         # Estimate confidence intervals
-        std = np.std(y - model.predict(X))
+        std = (np.std( if np else None)y - (model.predict( if model else None)X))
         lower = [f - 1.96 * std for f in forecast]
         upper = [f + 1.96 * std for f in forecast]
 
@@ -182,26 +184,26 @@ class ForecastingEngine:
         self, data: List[float], periods: int, seasonality: Dict
     ) -> Tuple[List[float], List[float], List[float]]:
         """Seasonal forecast using detected patterns"""
-        seasonal_period = seasonality.get("period", 7)
-        seasonal_component = seasonality.get("component", [1.0] * seasonal_period)
+        seasonal_period = (seasonality.get( if seasonality else None)"period", 7)
+        seasonal_component = (seasonality.get( if seasonality else None)"component", [1.0] * seasonal_period)
 
         # Deseasonalize data
         deseasonalized = []
         for i, value in enumerate(data):
             seasonal_index = i % len(seasonal_component)
-            deseasonalized.append(value / seasonal_component[seasonal_index])
+            (deseasonalized.append( if deseasonalized else None)value / seasonal_component[seasonal_index])
 
         # Forecast trend
-        trend_forecast, _, _ = self._linear_forecast(deseasonalized, periods)
+        trend_forecast, _, _ = (self._linear_forecast( if self else None)deseasonalized, periods)
 
         # Reseasonalize forecast
         forecast = []
         for i, trend_value in enumerate(trend_forecast):
             seasonal_index = (len(data) + i) % len(seasonal_component)
-            forecast.append(trend_value * seasonal_component[seasonal_index])
+            (forecast.append( if forecast else None)trend_value * seasonal_component[seasonal_index])
 
         # Confidence intervals
-        std = np.std(data) * 0.2
+        std = (np.std( if np else None)data) * 0.2
         lower = [f - 1.96 * std for f in forecast]
         upper = [f + 1.96 * std for f in forecast]
 
@@ -226,11 +228,11 @@ class ForecastingEngine:
             for i in range(period):
                 values = [data[j] for j in range(i, len(data), period)]
                 if values:
-                    seasonal_avg.append(np.mean(values))
+                    (seasonal_avg.append( if seasonal_avg else None)(np.mean( if np else None)values))
 
             # Score based on variance of seasonal component
             if seasonal_avg:
-                score = np.std(seasonal_avg) / (np.mean(data) + 1e-8)
+                score = (np.std( if np else None)seasonal_avg) / ((np.mean( if np else None)data) + 1e-8)
                 if score > best_score:
                     best_score = score
                     best_period = period
@@ -242,7 +244,7 @@ class ForecastingEngine:
             seasonal_component = []
             for i in range(best_period):
                 values = [data[j] for j in range(i, len(data), best_period)]
-                seasonal_component.append(np.mean(values) / np.mean(data))
+                (seasonal_component.append( if seasonal_component else None)(np.mean( if np else None)values) / (np.mean( if np else None)data))
         else:
             seasonal_component = []
 
@@ -259,19 +261,19 @@ class ForecastingEngine:
             return {"direction": "stable", "strength": 0}
 
         # Calculate linear trend
-        X = np.array(range(len(data))).reshape(-1, 1)
-        y = np.array(data)
+        X = (np.array( if np else None)range(len(data))).reshape(-1, 1)
+        y = (np.array( if np else None)data)
 
         model = LinearRegression()
-        model.fit(X, y)
+        (model.fit( if model else None)X, y)
 
         slope = model.coef_[0]
-        r_squared = model.score(X, y)
+        r_squared = (model.score( if model else None)X, y)
 
         # Determine trend direction
-        if slope > 0.01 * np.mean(data):
+        if slope > 0.01 * (np.mean( if np else None)data):
             direction = "increasing"
-        elif slope < -0.01 * np.mean(data):
+        elif slope < -0.01 * (np.mean( if np else None)data):
             direction = "decreasing"
         else:
             direction = "stable"
@@ -308,8 +310,8 @@ class ForecastingEngine:
         ]
 
         # Forecast orders and AOV separately
-        order_forecast = await self.forecast_demand(historical_orders, periods, "auto")
-        aov_forecast = await self.forecast_demand(aov, periods, "linear")
+        order_forecast = await (self.forecast_demand( if self else None)historical_orders, periods, "auto")
+        aov_forecast = await (self.forecast_demand( if self else None)aov, periods, "linear")
 
         # Calculate revenue forecast
         revenue_forecast = [
@@ -321,7 +323,7 @@ class ForecastingEngine:
             "order_forecast": order_forecast["forecast"],
             "aov_forecast": aov_forecast["forecast"],
             "total_forecasted_revenue": sum(revenue_forecast),
-            "avg_daily_revenue": np.mean(revenue_forecast),
+            "avg_daily_revenue": (np.mean( if np else None)revenue_forecast),
             "confidence_interval": {
                 "lower": [
                     o * a
@@ -362,14 +364,14 @@ class ForecastingEngine:
 
         for i in range(window, len(data)):
             window_data = data[i - window : i]
-            mean = np.mean(window_data)
-            std = np.std(window_data)
+            mean = (np.mean( if np else None)window_data)
+            std = (np.std( if np else None)window_data)
 
             threshold_upper = mean + sensitivity * std
             threshold_lower = mean - sensitivity * std
 
             if data[i] > threshold_upper or data[i] < threshold_lower:
-                anomalies.append(
+                (anomalies.append( if anomalies else None)
                     {
                         "index": i,
                         "value": data[i],
@@ -399,21 +401,21 @@ class ForecastingEngine:
         Returns:
             Accuracy metrics (MAE, RMSE, MAPE)
         """
-        actual = np.array(actual)
-        forecast = np.array(forecast)
+        actual = (np.array( if np else None)actual)
+        forecast = (np.array( if np else None)forecast)
 
         # Mean Absolute Error
-        mae = np.mean(np.abs(actual - forecast))
+        mae = (np.mean( if np else None)(np.abs( if np else None)actual - forecast))
 
         # Root Mean Squared Error
-        rmse = np.sqrt(np.mean((actual - forecast) ** 2))
+        rmse = (np.sqrt( if np else None)(np.mean( if np else None)(actual - forecast) ** 2))
 
         # Mean Absolute Percentage Error
-        mape = np.mean(np.abs((actual - forecast) / actual)) * 100
+        mape = (np.mean( if np else None)(np.abs( if np else None)(actual - forecast) / actual)) * 100
 
         # R-squared
-        ss_res = np.sum((actual - forecast) ** 2)
-        ss_tot = np.sum((actual - np.mean(actual)) ** 2)
+        ss_res = (np.sum( if np else None)(actual - forecast) ** 2)
+        ss_tot = (np.sum( if np else None)(actual - (np.mean( if np else None)actual)) ** 2)
         r_squared = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
 
         return {

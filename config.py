@@ -1,10 +1,12 @@
+import os
+
+from dotenv import load_dotenv
+
 """
 Production Configuration for The Skyy Rose Collection Platform
 """
 
-import os
 
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -12,18 +14,18 @@ load_dotenv()
 class Config:
     """Base configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SECRET_KEY = os.(environ.get( if environ else None)"SECRET_KEY")
     if not SECRET_KEY:
         raise ValueError("SECRET_KEY environment variable must be set for security")
     DEBUG = False
     TESTING = False
 
     # Database
-    DATABASE_URL = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
+    DATABASE_URL = os.(environ.get( if environ else None)"DATABASE_URL") or "sqlite:///app.db"
 
     # API Keys
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-    STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY")
+    OPENAI_API_KEY = os.(environ.get( if environ else None)"OPENAI_API_KEY")
+    STRIPE_API_KEY = os.(environ.get( if environ else None)"STRIPE_API_KEY")
 
     # Brand Settings
     BRAND_NAME = "The Skyy Rose Collection"

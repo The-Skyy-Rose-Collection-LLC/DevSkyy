@@ -72,8 +72,21 @@ spec:
         fashion-platform: "true"
     spec:
       containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
       - name: api-gateway
-        image: devskyy/api-gateway:latest
+        image: devskyy/api-gateway:v1.0.0
         ports:
         - containerPort: 8000
           name: http
@@ -156,8 +169,21 @@ spec:
         fashion-platform: "true"
     spec:
       containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
       - name: workflow-engine
-        image: devskyy/workflow-engine:latest
+        image: devskyy/workflow-engine:v1.0.0
         ports:
         - containerPort: 8001
           name: http
@@ -230,8 +256,21 @@ spec:
         fashion-platform: "true"
     spec:
       containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
       - name: fashion-api-integrator
-        image: devskyy/fashion-api-integrator:latest
+        image: devskyy/fashion-api-integrator:v1.0.0
         ports:
         - containerPort: 8002
           name: http
@@ -304,8 +343,21 @@ spec:
         fashion-platform: "true"
     spec:
       containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
       - name: fashion-intelligence
-        image: devskyy/fashion-intelligence:latest
+        image: devskyy/fashion-intelligence:v1.0.0
         ports:
         - containerPort: 8003
           name: http

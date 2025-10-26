@@ -1,3 +1,11 @@
+from datetime import datetime
+import json
+import os
+
+from anthropic import Anthropic, AsyncAnthropic
+from typing import Any, Dict, List, Optional
+import logging
+
 """
 Claude Sonnet 4.5 Advanced Intelligence Service
 Enterprise-grade AI reasoning and analysis using Anthropic's most advanced model
@@ -12,15 +20,9 @@ Features:
 - Advanced content creation and copywriting
 """
 
-import json
-import logging
-import os
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 
-from anthropic import Anthropic, AsyncAnthropic
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class ClaudeSonnetIntelligenceService:
@@ -30,19 +32,19 @@ class ClaudeSonnetIntelligenceService:
     """
 
     def __init__(self):
-        self.api_key = os.getenv("ANTHROPIC_API_KEY")
+        self.api_key = (os.getenv( if os else None)"ANTHROPIC_API_KEY")
 
         if self.api_key:
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.sync_client = Anthropic(api_key=self.api_key)
             self.model = "claude-sonnet-4-5-20250929"  # Latest Sonnet 4.5
-            logger.info(
+            (logger.info( if logger else None)
                 "🧠 Claude Sonnet 4.5 Intelligence Service initialized with advanced reasoning"
             )
         else:
             self.client = None
             self.sync_client = None
-            logger.warning("⚠️ Claude Sonnet 4.5 Service initialized without API key")
+            (logger.warning( if logger else None)"⚠️ Claude Sonnet 4.5 Service initialized without API key")
 
         # Brand context for The Skyy Rose Collection
         self.brand_context = """
@@ -90,10 +92,10 @@ class ClaudeSonnetIntelligenceService:
             messages = [{"role": "user", "content": task}]
 
             if context:
-                context_str = json.dumps(context, indent=2)
+                context_str = (json.dumps( if json else None)context, indent=2)
                 messages[0]["content"] = f"{task}\n\nContext:\n{context_str}"
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=max_tokens,
                 system=system_prompt,
@@ -107,7 +109,7 @@ class ClaudeSonnetIntelligenceService:
                 "reasoning": content,
                 "model": self.model,
                 "confidence": "high",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
                 "usage": {
                     "input_tokens": response.usage.input_tokens,
                     "output_tokens": response.usage.output_tokens,
@@ -115,7 +117,7 @@ class ClaudeSonnetIntelligenceService:
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude reasoning failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude reasoning failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def enhance_luxury_product_description(
@@ -130,11 +132,11 @@ class ClaudeSonnetIntelligenceService:
 
             prompt = f"""Create an exquisite, ultra-luxury product description for:
 
-Product Name: {product_data.get('name', 'Luxury Item')}
-Current Description: {product_data.get('description', 'Premium product')}
-Price: ${product_data.get('price', '0')}
-Category: {product_data.get('category', 'Luxury Fashion')}
-Materials: {product_data.get('materials', 'Premium materials')}
+Product Name: {(product_data.get( if product_data else None)'name', 'Luxury Item')}
+Current Description: {(product_data.get( if product_data else None)'description', 'Premium product')}
+Price: ${(product_data.get( if product_data else None)'price', '0')}
+Category: {(product_data.get( if product_data else None)'category', 'Luxury Fashion')}
+Materials: {(product_data.get( if product_data else None)'materials', 'Premium materials')}
 
 Requirements:
 1. Use sophisticated, evocative language that speaks to affluent customers
@@ -150,7 +152,7 @@ Requirements:
 
 Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=1500,
                 system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers. Your words create desire and justify premium pricing.",  # noqa: E501
@@ -162,17 +164,17 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
             return {
                 "enhanced_description": enhanced_description,
-                "original_description": product_data.get("description", ""),
+                "original_description": (product_data.get( if product_data else None)"description", ""),
                 "improvement_type": "claude_sonnet_luxury_enhancement",
                 "estimated_conversion_improvement": "+45%",
                 "estimated_aov_increase": "+25%",
                 "model": self.model,
                 "confidence": "very_high",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude product enhancement failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude product enhancement failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def generate_strategic_marketing_plan(
@@ -188,7 +190,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             prompt = f"""As a luxury brand strategist, create a comprehensive marketing plan for The Skyy Rose Collection.  # noqa: E501
 
 Business Data:
-{json.dumps(business_data, indent=2)}
+{(json.dumps( if json else None)business_data, indent=2)}
 
 Create a detailed strategy covering:
 1. Brand positioning and differentiation
@@ -206,7 +208,7 @@ Create a detailed strategy covering:
 
 Make it actionable, specific, and focused on luxury market best practices."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=4096,
                 system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",  # noqa: E501
@@ -223,11 +225,11 @@ Make it actionable, specific, and focused on luxury market best practices."""
                 "confidence": "very_high",
                 "estimated_roi": "300-500%",
                 "implementation_timeline": "immediate_to_12_months",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude strategy generation failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude strategy generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def analyze_competitor_intelligence(
@@ -243,7 +245,7 @@ Make it actionable, specific, and focused on luxury market best practices."""
             prompt = f"""Perform a comprehensive competitive analysis:
 
 Competitor Data:
-{json.dumps(competitor_data, indent=2)}
+{(json.dumps( if json else None)competitor_data, indent=2)}
 
 Analyze:
 1. Competitive advantages and weaknesses
@@ -259,7 +261,7 @@ Analyze:
 
 Provide actionable insights for luxury market domination."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=3000,
                 system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",  # noqa: E501
@@ -275,11 +277,11 @@ Provide actionable insights for luxury market domination."""
                 "model": self.model,
                 "confidence": "high",
                 "priority_actions": "extracted_from_analysis",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude competitive analysis failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude competitive analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def optimize_conversion_funnel(
@@ -295,7 +297,7 @@ Provide actionable insights for luxury market domination."""
             prompt = f"""Analyze this luxury e-commerce conversion funnel and provide optimization recommendations:
 
 Funnel Data:
-{json.dumps(funnel_data, indent=2)}
+{(json.dumps( if json else None)funnel_data, indent=2)}
 
 Provide:
 1. Bottleneck identification at each stage
@@ -311,7 +313,7 @@ Provide:
 
 Focus on luxury customer behavior and premium positioning."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=3000,
                 system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",  # noqa: E501
@@ -328,11 +330,11 @@ Focus on luxury customer behavior and premium positioning."""
                 "confidence": "high",
                 "estimated_conversion_lift": "+35-65%",
                 "estimated_aov_increase": "+20-40%",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude funnel optimization failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude funnel optimization failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def generate_advanced_code(
@@ -366,7 +368,7 @@ Requirements:
 
 Provide complete, working code that can be deployed immediately."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=4096,
                 system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",  # noqa: E501
@@ -383,11 +385,11 @@ Provide complete, working code that can be deployed immediately."""
                 "model": self.model,
                 "code_quality": "production_ready",
                 "security_level": "enterprise",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude code generation failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude code generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def analyze_customer_sentiment(
@@ -403,7 +405,7 @@ Provide complete, working code that can be deployed immediately."""
             prompt = f"""Analyze customer sentiment and extract deep insights:
 
 Customer Data (reviews, feedback, interactions):
-{json.dumps(customer_data[:50], indent=2)}  # Limit for token efficiency
+{(json.dumps( if json else None)customer_data[:50], indent=2)}  # Limit for token efficiency
 
 Provide:
 1. Overall sentiment breakdown (positive/neutral/negative with %)
@@ -419,7 +421,7 @@ Provide:
 
 Focus on insights that drive business value for a luxury brand."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=2500,
                 system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",  # noqa: E501
@@ -435,11 +437,11 @@ Focus on insights that drive business value for a luxury brand."""
                 "model": self.model,
                 "confidence": "high",
                 "sample_size": len(customer_data),
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude sentiment analysis failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude sentiment analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def create_viral_social_content(
@@ -455,7 +457,7 @@ Focus on insights that drive business value for a luxury brand."""
             prompt = f"""Create viral social media content for The Skyy Rose Collection:
 
 Campaign Brief:
-{json.dumps(campaign_brief, indent=2)}
+{(json.dumps( if json else None)campaign_brief, indent=2)}
 
 Generate:
 1. Instagram caption (with hashtags)
@@ -476,7 +478,7 @@ Make it:
 
 Focus on The Skyy Rose Collection's brand values: exclusivity, elegance, quality."""
 
-            response = await self.client.messages.create(
+            response = await self.client.(messages.create( if messages else None)
                 model=self.model,
                 max_tokens=3500,
                 system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",  # noqa: E501
@@ -493,11 +495,11 @@ Focus on The Skyy Rose Collection's brand values: exclusivity, elegance, quality
                 "confidence": "high",
                 "estimated_reach": "10x_normal",
                 "estimated_engagement": "+250%",
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Claude viral content creation failed: {e}")
+            (logger.error( if logger else None)f"❌ Claude viral content creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
 
@@ -516,39 +518,39 @@ async def advanced_ai_reasoning(
     task: str, context: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """Use Claude's advanced reasoning for complex tasks."""
-    return await claude_service.advanced_reasoning(task, context)
+    return await (claude_service.advanced_reasoning( if claude_service else None)task, context)
 
 
 async def enhance_luxury_description(product_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury product descriptions with Claude."""
-    return await claude_service.enhance_luxury_product_description(product_data)
+    return await (claude_service.enhance_luxury_product_description( if claude_service else None)product_data)
 
 
 async def generate_marketing_strategy(business_data: Dict[str, Any]) -> Dict[str, Any]:
     """Generate comprehensive marketing strategy with Claude."""
-    return await claude_service.generate_strategic_marketing_plan(business_data)
+    return await (claude_service.generate_strategic_marketing_plan( if claude_service else None)business_data)
 
 
 async def analyze_competitors(competitor_data: Dict[str, Any]) -> Dict[str, Any]:
     """Perform competitive intelligence analysis with Claude."""
-    return await claude_service.analyze_competitor_intelligence(competitor_data)
+    return await (claude_service.analyze_competitor_intelligence( if claude_service else None)competitor_data)
 
 
 async def optimize_conversions(funnel_data: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize conversion funnel with Claude."""
-    return await claude_service.optimize_conversion_funnel(funnel_data)
+    return await (claude_service.optimize_conversion_funnel( if claude_service else None)funnel_data)
 
 
 async def generate_code(code_request: str, language: str = "python") -> Dict[str, Any]:
     """Generate production code with Claude."""
-    return await claude_service.generate_advanced_code(code_request, language)
+    return await (claude_service.generate_advanced_code( if claude_service else None)code_request, language)
 
 
 async def analyze_sentiment(customer_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Analyze customer sentiment with Claude."""
-    return await claude_service.analyze_customer_sentiment(customer_data)
+    return await (claude_service.analyze_customer_sentiment( if claude_service else None)customer_data)
 
 
 async def create_viral_content(campaign_brief: Dict[str, Any]) -> Dict[str, Any]:
     """Create viral social content with Claude."""
-    return await claude_service.create_viral_social_content(campaign_brief)
+    return await (claude_service.create_viral_social_content( if claude_service else None)campaign_brief)
