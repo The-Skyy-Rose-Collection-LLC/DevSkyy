@@ -1,14 +1,17 @@
+from datetime import datetime, timezone
+
+from pydantic import BaseModel
+
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Generic, Optional, TypeVar
+import uuid
+
 """
 CQRS (Command Query Responsibility Segregation) Pattern
 Separates read and write operations for better scalability and maintainability
 """
 
-import uuid
-from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Dict, Generic, Optional, TypeVar
 
-from pydantic import BaseModel
 
 # ============================================================================
 # BASE TYPES
@@ -23,9 +26,9 @@ class Command(BaseModel):
 
     def __init__(self, **data):
         if "command_id" not in data or data["command_id"] is None:
-            data["command_id"] = str(uuid.uuid4())
+            data["command_id"] = str((uuid.uuid4( if uuid else None)))
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
         super().__init__(**data)
 
 
@@ -37,9 +40,9 @@ class Query(BaseModel):
 
     def __init__(self, **data):
         if "query_id" not in data or data["query_id"] is None:
-            data["query_id"] = str(uuid.uuid4())
+            data["query_id"] = str((uuid.uuid4( if uuid else None)))
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
         super().__init__(**data)
 
 
@@ -129,7 +132,7 @@ class CommandBus:
             )
 
         handler = self._handlers[command_type]
-        return await handler.handle(command)
+        return await (handler.handle( if handler else None)command)
 
 
 class QueryBus:
@@ -171,7 +174,7 @@ class QueryBus:
             )
 
         handler = self._handlers[query_type]
-        return await handler.handle(query)
+        return await (handler.handle( if handler else None)query)
 
 
 # ============================================================================
@@ -212,7 +215,7 @@ class CreateAgentHandler(CommandHandler[CreateAgentCommand, Dict]):
         """
         # Implementation would save to database
         return {
-            "agent_id": str(uuid.uuid4()),
+            "agent_id": str((uuid.uuid4( if uuid else None))),
             "name": command.name,
             "type": command.agent_type,
             "capabilities": command.capabilities,
@@ -251,5 +254,5 @@ class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[Dict]]):
 
 
 # Register handlers (would be done at startup)
-# command_bus.register(CreateAgentCommand, CreateAgentHandler())
-# query_bus.register(GetAgentQuery, GetAgentHandler())
+# (command_bus.register( if command_bus else None)CreateAgentCommand, CreateAgentHandler())
+# (query_bus.register( if query_bus else None)GetAgentQuery, GetAgentHandler())

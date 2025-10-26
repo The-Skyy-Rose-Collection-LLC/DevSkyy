@@ -1,23 +1,27 @@
+        import re
+from datetime import datetime, timedelta
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+import time
+
+from fastapi import Request, Response, status
+from pydantic import ValidationError
+
+from api.validation_models import SecurityViolationResponse, ValidationErrorResponse
+from collections import defaultdict, deque
+from typing import Dict, List, Optional
+import logging
+import uuid
+
 """
 Security Middleware for DevSkyy Enterprise Platform
 Comprehensive security enforcement, rate limiting, and threat detection
 """
 
-import logging
-import time
-import uuid
-from collections import defaultdict, deque
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
 
-from fastapi import Request, Response, status
-from fastapi.responses import JSONResponse
-from pydantic import ValidationError
-from starlette.middleware.base import BaseHTTPMiddleware
 
-from api.validation_models import SecurityViolationResponse, ValidationErrorResponse
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 # ============================================================================
@@ -55,7 +59,7 @@ class RateLimiter:
         self, client_ip: str, endpoint_category: str = "default"
     ) -> tuple[bool, Optional[str]]:
         """Check if request is allowed based on rate limits"""
-        now = datetime.now()
+        now = (datetime.now( if datetime else None))
 
         # Check if IP is temporarily blocked
         if client_ip in self.blocked_ips:
@@ -72,7 +76,7 @@ class RateLimiter:
 
         # Remove old requests
         while client_requests and client_requests[0] < minute_ago:
-            client_requests.popleft()
+            (client_requests.popleft( if client_requests else None))
 
         # Check rate limits
         requests_per_minute = len(client_requests)
@@ -80,21 +84,21 @@ class RateLimiter:
             1 for req_time in client_requests if req_time > second_ago
         )
 
-        minute_limit = self.limits.get(endpoint_category, self.limits["default"])
-        burst_limit = self.burst_limits.get(
+        minute_limit = self.(limits.get( if limits else None)endpoint_category, self.limits["default"])
+        burst_limit = self.(burst_limits.get( if burst_limits else None)
             endpoint_category, self.burst_limits["default"]
         )
 
         if requests_per_minute >= minute_limit:
-            self._record_violation(client_ip, "rate_limit_exceeded")
+            (self._record_violation( if self else None)client_ip, "rate_limit_exceeded")
             return False, f"Rate limit exceeded: {minute_limit} requests per minute"
 
         if requests_per_second >= burst_limit:
-            self._record_violation(client_ip, "burst_limit_exceeded")
+            (self._record_violation( if self else None)client_ip, "burst_limit_exceeded")
             return False, f"Burst limit exceeded: {burst_limit} requests per second"
 
         # Record this request
-        client_requests.append(now)
+        (client_requests.append( if client_requests else None)now)
         return True, None
 
     def _record_violation(self, client_ip: str, violation_type: str):
@@ -103,8 +107,8 @@ class RateLimiter:
 
         # Block IP if too many violations
         if self.suspicious_patterns[client_ip] >= 5:
-            self.blocked_ips[client_ip] = datetime.now() + timedelta(minutes=15)
-            logger.warning(
+            self.blocked_ips[client_ip] = (datetime.now( if datetime else None)) + timedelta(minutes=15)
+            (logger.warning( if logger else None)
                 f"🚨 IP {client_ip} blocked for 15 minutes due to {violation_type}"
             )
 
@@ -149,7 +153,7 @@ class ThreatDetector:
         """Analyze request for security threats"""
 
         # Check User-Agent
-        user_agent = request.headers.get("user-agent", "").lower()
+        user_agent = request.(headers.get( if headers else None)"user-agent", "").lower()
         for blocked_agent in self.blocked_user_agents:
             if blocked_agent in user_agent:
                 return (
@@ -162,10 +166,9 @@ class ThreatDetector:
         url_path = str(request.url.path)
         query_params = str(request.url.query) if request.url.query else ""
 
-        import re
 
         for pattern in self.suspicious_patterns:
-            if re.search(pattern, url_path + query_params, re.IGNORECASE):
+            if (re.search( if re else None)pattern, url_path + query_params, re.IGNORECASE):
                 return (
                     False,
                     "suspicious_pattern",
@@ -173,7 +176,7 @@ class ThreatDetector:
                 )
 
         # Check for excessive header size (potential DoS)
-        total_header_size = sum(len(k) + len(v) for k, v in request.headers.items())
+        total_header_size = sum(len(k) + len(v) for k, v in request.(headers.items( if headers else None)))
         if total_header_size > 8192:  # 8KB limit
             return False, "excessive_headers", "Request headers too large"
 
@@ -196,30 +199,30 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         """Process request through security pipeline"""
-        start_time = time.time()
-        request_id = str(uuid.uuid4())
-        client_ip = self._get_client_ip(request)
+        start_time = (time.time( if time else None))
+        request_id = str((uuid.uuid4( if uuid else None)))
+        client_ip = (self._get_client_ip( if self else None)request)
 
         # Add request ID to request state
         request.state.request_id = request_id
 
         try:
             # 1. Threat Detection
-            is_safe, threat_type, threat_message = self.threat_detector.analyze_request(
+            is_safe, threat_type, threat_message = self.(threat_detector.analyze_request( if threat_detector else None)
                 request
             )
             if not is_safe:
-                return await self._security_violation_response(
+                return await (self._security_violation_response( if self else None)
                     request_id, client_ip, threat_type, threat_message
                 )
 
             # 2. Rate Limiting
-            endpoint_category = self._get_endpoint_category(request.url.path)
-            is_allowed, rate_message = self.rate_limiter.is_allowed(
+            endpoint_category = (self._get_endpoint_category( if self else None)request.url.path)
+            is_allowed, rate_message = self.(rate_limiter.is_allowed( if rate_limiter else None)
                 client_ip, endpoint_category
             )
             if not is_allowed:
-                return await self._rate_limit_response(
+                return await (self._rate_limit_response( if self else None)
                     request_id, client_ip, rate_message
                 )
 
@@ -227,30 +230,30 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
 
             # 4. Log successful request
-            processing_time = time.time() - start_time
-            await self._log_request(
+            processing_time = (time.time( if time else None)) - start_time
+            await (self._log_request( if self else None)
                 request, response, request_id, client_ip, processing_time
             )
 
             # 5. Add security headers
-            response = self._add_security_headers(response, request_id)
+            response = (self._add_security_headers( if self else None)response, request_id)
 
             return response
 
         except ValidationError as e:
-            return await self._validation_error_response(request_id, e)
+            return await (self._validation_error_response( if self else None)request_id, e)
         except Exception as e:
-            logger.error(f"Security middleware error: {e}")
-            return await self._internal_error_response(request_id)
+            (logger.error( if logger else None)f"Security middleware error: {e}")
+            return await (self._internal_error_response( if self else None)request_id)
 
     def _get_client_ip(self, request: Request) -> str:
         """Extract client IP address"""
         # Check for forwarded headers (behind proxy/load balancer)
-        forwarded_for = request.headers.get("x-forwarded-for")
+        forwarded_for = request.(headers.get( if headers else None)"x-forwarded-for")
         if forwarded_for:
-            return forwarded_for.split(",")[0].strip()
+            return (forwarded_for.split( if forwarded_for else None)",")[0].strip()
 
-        real_ip = request.headers.get("x-real-ip")
+        real_ip = request.(headers.get( if headers else None)"x-real-ip")
         if real_ip:
             return real_ip
 
@@ -287,7 +290,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         self, request_id: str, client_ip: str, threat_type: str, message: str
     ) -> JSONResponse:
         """Return security violation response"""
-        logger.warning(
+        (logger.warning( if logger else None)
             f"🚨 Security violation: {threat_type} from {client_ip} - {message}"
         )
 
@@ -296,14 +299,14 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         )
 
         return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN, content=response_data.dict()
+            status_code=status.HTTP_403_FORBIDDEN, content=(response_data.dict( if response_data else None))
         )
 
     async def _rate_limit_response(
         self, request_id: str, client_ip: str, message: str
     ) -> JSONResponse:
         """Return rate limit response"""
-        logger.warning(f"⚠️ Rate limit exceeded: {client_ip} - {message}")
+        (logger.warning( if logger else None)f"⚠️ Rate limit exceeded: {client_ip} - {message}")
 
         return JSONResponse(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -311,7 +314,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 "error": "rate_limit_exceeded",
                 "message": message,
                 "request_id": request_id,
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             },
         )
 
@@ -322,14 +325,14 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response_data = ValidationErrorResponse(
             message="Request validation failed",
             details=[
-                {"field": err["loc"], "message": err["msg"]} for err in error.errors()
+                {"field": err["loc"], "message": err["msg"]} for err in (error.errors( if error else None))
             ],
             request_id=request_id,
         )
 
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=response_data.dict(),
+            content=(response_data.dict( if response_data else None)),
         )
 
     async def _internal_error_response(self, request_id: str) -> JSONResponse:
@@ -340,7 +343,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 "error": "internal_server_error",
                 "message": "An internal error occurred",
                 "request_id": request_id,
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
             },
         )
 
@@ -355,19 +358,19 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         """Log request for monitoring and analysis"""
         log_entry = {
             "request_id": request_id,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": (datetime.now( if datetime else None)).isoformat(),
             "client_ip": client_ip,
             "method": request.method,
             "path": request.url.path,
             "status_code": response.status_code,
             "processing_time_ms": round(processing_time * 1000, 2),
-            "user_agent": request.headers.get("user-agent", ""),
+            "user_agent": request.(headers.get( if headers else None)"user-agent", ""),
         }
 
-        self.request_log.append(log_entry)
+        self.(request_log.append( if request_log else None)log_entry)
 
         # Log to structured logger
-        logger.info(
+        (logger.info( if logger else None)
             f"🌐 {request.method} {request.url.path} - "
             f"{response.status_code} - {log_entry['processing_time_ms']}ms - "
             f"{client_ip} - {request_id}"

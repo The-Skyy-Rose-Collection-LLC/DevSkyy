@@ -1,3 +1,12 @@
+from datetime import datetime
+from pathlib import Path
+import json
+
+from enum import Enum
+from typing import Any, Dict, List, Optional
+import joblib
+import logging
+
 """
 ML Model Registry using MLflow
 Manages model versioning, metadata, and lifecycle
@@ -8,16 +17,9 @@ References:
 - Versioning: Semantic Versioning 2.0.0 (https://semver.org/)
 """
 
-import json
-import logging
-from datetime import datetime
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
-import joblib
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class ModelStage(str, Enum):
@@ -62,8 +64,8 @@ class ModelMetadata:
             "version": self.version,
             "model_type": self.model_type,
             "framework": self.framework,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "created_at": self.(created_at.isoformat( if created_at else None)),
+            "updated_at": self.(updated_at.isoformat( if updated_at else None)),
             "metrics": self.metrics,
             "parameters": self.parameters,
             "dataset_info": self.dataset_info,
@@ -78,11 +80,11 @@ class ModelMetadata:
             version=data["version"],
             model_type=data["model_type"],
             framework=data["framework"],
-            created_at=datetime.fromisoformat(data["created_at"]),
+            created_at=(datetime.fromisoformat( if datetime else None)data["created_at"]),
             metrics=data["metrics"],
             parameters=data["parameters"],
             dataset_info=data["dataset_info"],
-            stage=data.get("stage", ModelStage.DEVELOPMENT),
+            stage=(data.get( if data else None)"stage", ModelStage.DEVELOPMENT),
         )
 
 
@@ -104,32 +106,32 @@ class ModelRegistry:
             registry_path: Base path for model storage
         """
         self.registry_path = Path(registry_path)
-        self.registry_path.mkdir(parents=True, exist_ok=True)
+        self.(registry_path.mkdir( if registry_path else None)parents=True, exist_ok=True)
 
         self.models_dir = self.registry_path / "models"
-        self.models_dir.mkdir(exist_ok=True)
+        self.(models_dir.mkdir( if models_dir else None)exist_ok=True)
 
         self.metadata_dir = self.registry_path / "metadata"
-        self.metadata_dir.mkdir(exist_ok=True)
+        self.(metadata_dir.mkdir( if metadata_dir else None)exist_ok=True)
 
         self.index_file = self.registry_path / "index.json"
-        self._load_index()
+        (self._load_index( if self else None))
 
-        logger.info(f"📦 Model Registry initialized at {self.registry_path}")
+        (logger.info( if logger else None)f"📦 Model Registry initialized at {self.registry_path}")
 
     def _load_index(self):
         """Load registry index"""
-        if self.index_file.exists():
+        if self.(index_file.exists( if index_file else None)):
             with open(self.index_file, "r") as f:
-                self.index = json.load(f)
+                self.index = (json.load( if json else None)f)
         else:
             self.index = {"models": {}, "version": "1.0.0"}
-            self._save_index()
+            (self._save_index( if self else None))
 
     def _save_index(self):
         """Save registry index"""
         with open(self.index_file, "w") as f:
-            json.dump(self.index, f, indent=2)
+            (json.dump( if json else None)self.index, f, indent=2)
 
     def register_model(
         self,
@@ -166,7 +168,7 @@ class ModelRegistry:
             version=version,
             model_type=model_type,
             framework=framework,
-            created_at=datetime.now(),
+            created_at=(datetime.now( if datetime else None)),
             metrics=metrics,
             parameters=parameters,
             dataset_info=dataset_info,
@@ -175,15 +177,15 @@ class ModelRegistry:
 
         # Save model
         model_dir = self.models_dir / model_name / version
-        model_dir.mkdir(parents=True, exist_ok=True)
+        (model_dir.mkdir( if model_dir else None)parents=True, exist_ok=True)
 
         model_file = model_dir / "model.pkl"
-        joblib.dump(model, model_file)
+        (joblib.dump( if joblib else None)model, model_file)
 
         # Save metadata
         metadata_file = self.metadata_dir / f"{model_name}_{version}.json"
         with open(metadata_file, "w") as f:
-            json.dump(metadata.to_dict(), f, indent=2)
+            (json.dump( if json else None)(metadata.to_dict( if metadata else None)), f, indent=2)
 
         # Update index
         if model_name not in self.index["models"]:
@@ -195,7 +197,7 @@ class ModelRegistry:
         version_entry = {
             "version": version,
             "stage": stage,
-            "created_at": metadata.created_at.isoformat(),
+            "created_at": metadata.(created_at.isoformat( if created_at else None)),
             "metrics": metrics,
         }
 
@@ -205,10 +207,10 @@ class ModelRegistry:
         if stage == ModelStage.PRODUCTION:
             self.index["models"][model_name]["latest_production"] = version
 
-        self._save_index()
+        (self._save_index( if self else None))
 
-        logger.info(f"✅ Registered {model_name} v{version} ({stage})")
-        logger.info(f"   Metrics: {metrics}")
+        (logger.info( if logger else None)f"✅ Registered {model_name} v{version} ({stage})")
+        (logger.info( if logger else None)f"   Metrics: {metrics}")
 
         return metadata
 
@@ -231,7 +233,7 @@ class ModelRegistry:
         """
         if version is None:
             if stage:
-                version = self._get_latest_version_by_stage(model_name, stage)
+                version = (self._get_latest_version_by_stage( if self else None)model_name, stage)
             else:
                 version = (
                     self.index["models"].get(model_name, {}).get("latest_production")
@@ -242,12 +244,12 @@ class ModelRegistry:
 
         model_file = self.models_dir / model_name / version / "model.pkl"
 
-        if not model_file.exists():
+        if not (model_file.exists( if model_file else None)):
             raise FileNotFoundError(f"Model file not found: {model_file}")
 
-        model = joblib.load(model_file)
+        model = (joblib.load( if joblib else None)model_file)
 
-        logger.info(f"📥 Loaded {model_name} v{version}")
+        (logger.info( if logger else None)f"📥 Loaded {model_name} v{version}")
 
         return model
 
@@ -255,13 +257,13 @@ class ModelRegistry:
         """Get model metadata"""
         metadata_file = self.metadata_dir / f"{model_name}_{version}.json"
 
-        if not metadata_file.exists():
+        if not (metadata_file.exists( if metadata_file else None)):
             raise FileNotFoundError(f"Metadata not found for {model_name} v{version}")
 
         with open(metadata_file, "r") as f:
-            data = json.load(f)
+            data = (json.load( if json else None)f)
 
-        return ModelMetadata.from_dict(data)
+        return (ModelMetadata.from_dict( if ModelMetadata else None)data)
 
     def list_models(self) -> List[str]:
         """List all registered model names"""
@@ -284,13 +286,13 @@ class ModelRegistry:
             target_stage: Target lifecycle stage
         """
         # Update metadata
-        metadata = self.get_metadata(model_name, version)
+        metadata = (self.get_metadata( if self else None)model_name, version)
         metadata.stage = target_stage
-        metadata.updated_at = datetime.now()
+        metadata.updated_at = (datetime.now( if datetime else None))
 
         metadata_file = self.metadata_dir / f"{model_name}_{version}.json"
         with open(metadata_file, "w") as f:
-            json.dump(metadata.to_dict(), f, indent=2)
+            (json.dump( if json else None)(metadata.to_dict( if metadata else None)), f, indent=2)
 
         # Update index
         for version_entry in self.index["models"][model_name]["versions"]:
@@ -301,13 +303,13 @@ class ModelRegistry:
         if target_stage == ModelStage.PRODUCTION:
             self.index["models"][model_name]["latest_production"] = version
 
-        self._save_index()
+        (self._save_index( if self else None))
 
-        logger.info(f"🚀 Promoted {model_name} v{version} to {target_stage}")
+        (logger.info( if logger else None)f"🚀 Promoted {model_name} v{version} to {target_stage}")
 
     def archive_model(self, model_name: str, version: str):
         """Archive a model version"""
-        self.promote_model(model_name, version, ModelStage.ARCHIVED)
+        (self.promote_model( if self else None)model_name, version, ModelStage.ARCHIVED)
 
     def compare_models(
         self, model_name: str, version1: str, version2: str
@@ -318,14 +320,14 @@ class ModelRegistry:
         Returns:
             Comparison dictionary with metrics diff
         """
-        meta1 = self.get_metadata(model_name, version1)
-        meta2 = self.get_metadata(model_name, version2)
+        meta1 = (self.get_metadata( if self else None)model_name, version1)
+        meta2 = (self.get_metadata( if self else None)model_name, version2)
 
         # Calculate metric differences
         metric_diff = {}
-        for metric_name in set(meta1.metrics.keys()) | set(meta2.metrics.keys()):
-            val1 = meta1.metrics.get(metric_name, 0)
-            val2 = meta2.metrics.get(metric_name, 0)
+        for metric_name in set(meta1.(metrics.keys( if metrics else None))) | set(meta2.(metrics.keys( if metrics else None))):
+            val1 = meta1.(metrics.get( if metrics else None)metric_name, 0)
+            val2 = meta2.(metrics.get( if metrics else None)metric_name, 0)
             metric_diff[metric_name] = {
                 "v1": val1,
                 "v2": val2,

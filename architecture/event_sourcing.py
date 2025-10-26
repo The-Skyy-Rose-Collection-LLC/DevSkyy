@@ -1,14 +1,17 @@
+from datetime import datetime, timezone
+
+from pydantic import BaseModel
+
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
+import uuid
+
 """
 Event Sourcing Pattern for Grade A+ Architecture
 Stores state changes as a sequence of events for audit and replay
 """
 
-import uuid
-from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
 
 # ============================================================================
 # EVENT BASE CLASSES
@@ -29,9 +32,9 @@ class DomainEvent(BaseModel):
 
     def __init__(self, **data):
         if "event_id" not in data:
-            data["event_id"] = str(uuid.uuid4())
+            data["event_id"] = str((uuid.uuid4( if uuid else None)))
         if "timestamp" not in data:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
         if "event_type" not in data:
             data["event_type"] = self.__class__.__name__
         super().__init__(**data)
@@ -81,7 +84,7 @@ class EventStore:
             True if all saved successfully
         """
         for event in events:
-            await self.save_event(event)
+            await (self.save_event( if self else None)event)
         return True
 
     async def get_events(
@@ -118,8 +121,8 @@ class EventStore:
             List of all domain events
         """
         all_events = []
-        for events in self._events.values():
-            all_events.extend(events)
+        for events in self.(_events.values( if _events else None)):
+            (all_events.extend( if all_events else None)events)
         return sorted(all_events, key=lambda e: e.timestamp)
 
     async def save_snapshot(
@@ -136,7 +139,7 @@ class EventStore:
         self._snapshots[aggregate_id] = {
             "state": state,
             "version": version,
-            "timestamp": datetime.now(timezone.utc),
+            "timestamp": (datetime.now( if datetime else None)timezone.utc),
         }
 
     async def get_snapshot(self, aggregate_id: str) -> Optional[Dict[str, Any]]:
@@ -149,7 +152,7 @@ class EventStore:
         Returns:
             Snapshot data or None if no snapshot exists
         """
-        return self._snapshots.get(aggregate_id)
+        return self.(_snapshots.get( if _snapshots else None)aggregate_id)
 
 
 # ============================================================================
@@ -185,8 +188,8 @@ class AggregateRoot(ABC):
             event: Domain event to raise
         """
         event.version = self.version + 1
-        self.apply_event(event)
-        self.uncommitted_events.append(event)
+        (self.apply_event( if self else None)event)
+        self.(uncommitted_events.append( if uncommitted_events else None)event)
         self.version = event.version
 
     async def load_from_history(self, events: List[DomainEvent]):
@@ -197,7 +200,7 @@ class AggregateRoot(ABC):
             events: List of historical events
         """
         for event in events:
-            self.apply_event(event)
+            (self.apply_event( if self else None)event)
             self.version = event.version
 
     def get_uncommitted_events(self) -> List[DomainEvent]:
@@ -207,11 +210,11 @@ class AggregateRoot(ABC):
         Returns:
             List of uncommitted events
         """
-        return self.uncommitted_events.copy()
+        return self.(uncommitted_events.copy( if uncommitted_events else None))
 
     def mark_events_as_committed(self):
         """Mark all uncommitted events as committed"""
-        self.uncommitted_events.clear()
+        self.(uncommitted_events.clear( if uncommitted_events else None))
 
 
 # ============================================================================
@@ -251,16 +254,16 @@ class AgentAggregate(AggregateRoot):
     def apply_event(self, event: DomainEvent):
         """Apply event to update agent state"""
         if isinstance(event, AgentCreatedEvent):
-            self.name = event.data.get("name")
-            self.agent_type = event.data.get("type")
+            self.name = event.(data.get( if data else None)"name")
+            self.agent_type = event.(data.get( if data else None)"type")
             self.status = "active"
-            self.capabilities = event.data.get("capabilities", {})
+            self.capabilities = event.(data.get( if data else None)"capabilities", {})
 
         elif isinstance(event, AgentUpdatedEvent):
             if "name" in event.data:
                 self.name = event.data["name"]
             if "capabilities" in event.data:
-                self.capabilities.update(event.data["capabilities"])
+                self.(capabilities.update( if capabilities else None)event.data["capabilities"])
 
         elif isinstance(event, AgentDeletedEvent):
             self.status = "deleted"
@@ -273,7 +276,7 @@ class AgentAggregate(AggregateRoot):
             version=self.version + 1,
             data={"name": name, "type": agent_type, "capabilities": capabilities},
         )
-        self.raise_event(event)
+        (self.raise_event( if self else None)event)
 
     def update(self, **updates):
         """Update agent properties"""
@@ -283,7 +286,7 @@ class AgentAggregate(AggregateRoot):
             version=self.version + 1,
             data=updates,
         )
-        self.raise_event(event)
+        (self.raise_event( if self else None)event)
 
     def delete(self):
         """Mark agent as deleted"""
@@ -291,9 +294,9 @@ class AgentAggregate(AggregateRoot):
             aggregate_id=self.aggregate_id,
             aggregate_type="Agent",
             version=self.version + 1,
-            data={"deleted_at": datetime.now(timezone.utc).isoformat()},
+            data={"deleted_at": (datetime.now( if datetime else None)timezone.utc).isoformat()},
         )
-        self.raise_event(event)
+        (self.raise_event( if self else None)event)
 
 
 # ============================================================================

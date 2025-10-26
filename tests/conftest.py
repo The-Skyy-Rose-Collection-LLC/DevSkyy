@@ -1,37 +1,44 @@
+import requests
+import time
+from security.jwt_auth import create_access_token, create_refresh_token
+from sqlalchemy import create_engine
+
+from fastapi.testclient import TestClient
+from models_sqlalchemy import Base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
+    from httpx import AsyncClient
+    from security.jwt_auth import User, user_manager, UserRole
+from main import app
+from typing import AsyncGenerator, Generator
+import asyncio
+import pytest
+
 """
 DevSkyy Enterprise - Test Fixtures and Configuration
 Provides reusable fixtures for unit, integration, and API tests
 """
 
-import asyncio
-from typing import AsyncGenerator, Generator
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 # Import main app
-from main import app
 
 # Import database models
-from models_sqlalchemy import Base
 
 # Import security modules
-from security.jwt_auth import create_access_token, create_refresh_token
 
 # ============================================================================
 # Pytest Configuration
 # ============================================================================
 
 
-@pytest.fixture(scope="session")
+@(pytest.fixture( if pytest else None)scope="session")
 def event_loop():
     """Create event loop for async tests"""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
+    loop = (asyncio.get_event_loop_policy( if asyncio else None)).new_event_loop()
     yield loop
-    loop.close()
+    (loop.close( if loop else None))
 
 
 # ============================================================================
@@ -39,7 +46,7 @@ def event_loop():
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_db_engine():
     """Create in-memory SQLite database for testing"""
     engine = create_engine(
@@ -47,13 +54,13 @@ def test_db_engine():
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-    Base.metadata.create_all(bind=engine)
+    Base.(metadata.create_all( if metadata else None)bind=engine)
     yield engine
-    Base.metadata.drop_all(bind=engine)
-    engine.dispose()
+    Base.(metadata.drop_all( if metadata else None)bind=engine)
+    (engine.dispose( if engine else None))
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_db_session(test_db_engine):
     """Create database session for testing"""
     TestingSessionLocal = sessionmaker(
@@ -63,7 +70,7 @@ def test_db_session(test_db_engine):
     try:
         yield session
     finally:
-        session.close()
+        (session.close( if session else None))
 
 
 # ============================================================================
@@ -71,17 +78,16 @@ def test_db_session(test_db_engine):
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_client() -> Generator[TestClient, None, None]:
     """Create FastAPI test client"""
     with TestClient(app) as client:
         yield client
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 async def async_test_client() -> AsyncGenerator:
     """Create async FastAPI test client"""
-    from httpx import AsyncClient
 
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
@@ -92,7 +98,7 @@ async def async_test_client() -> AsyncGenerator:
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_user_data():
     """Sample test user data"""
     return {
@@ -105,10 +111,9 @@ def test_user_data():
     }
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def setup_test_user(test_user_data):
     """Add test user to user manager for testing"""
-    from security.jwt_auth import User, user_manager, UserRole
 
     # Create test user
     test_user = User(
@@ -132,19 +137,19 @@ def setup_test_user(test_user_data):
         del user_manager.email_index[test_user.email]
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_access_token(test_user_data):
     """Generate test JWT access token"""
     return create_access_token(data=test_user_data)
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_refresh_token(test_user_data):
     """Generate test JWT refresh token"""
     return create_refresh_token(data=test_user_data)
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def auth_headers(test_access_token):
     """Generate authorization headers with test token"""
     return {"Authorization": f"Bearer {test_access_token}"}
@@ -155,7 +160,7 @@ def auth_headers(test_access_token):
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def mock_ai_response():
     """Mock AI API response"""
     return {
@@ -165,7 +170,7 @@ def mock_ai_response():
     }
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def mock_project_data():
     """Sample project data"""
     return {
@@ -177,7 +182,7 @@ def mock_project_data():
     }
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def mock_agent_data():
     """Sample agent data"""
     return {
@@ -194,15 +199,15 @@ def mock_agent_data():
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def test_env_vars(monkeypatch):
     """Set test environment variables"""
-    monkeypatch.setenv("ENVIRONMENT", "test")
-    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
-    monkeypatch.setenv("JWT_SECRET_KEY", "test_secret_key_for_testing_only")
-    monkeypatch.setenv("ENCRYPTION_MASTER_KEY", "test_encryption_key_32_bytes_!!")
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "test_anthropic_key")
-    monkeypatch.setenv("OPENAI_API_KEY", "test_openai_key")
+    (monkeypatch.setenv( if monkeypatch else None)"ENVIRONMENT", "test")
+    (monkeypatch.setenv( if monkeypatch else None)"DATABASE_URL", "sqlite:///:memory:")
+    (monkeypatch.setenv( if monkeypatch else None)"JWT_SECRET_KEY", "test_secret_key_for_testing_only")
+    (monkeypatch.setenv( if monkeypatch else None)"ENCRYPTION_MASTER_KEY", "test_encryption_key_32_bytes_!!")
+    (monkeypatch.setenv( if monkeypatch else None)"ANTHROPIC_API_KEY", "test_anthropic_key")
+    (monkeypatch.setenv( if monkeypatch else None)"OPENAI_API_KEY", "test_openai_key")
 
 
 # ============================================================================
@@ -210,7 +215,7 @@ def test_env_vars(monkeypatch):
 # ============================================================================
 
 
-@pytest.fixture(autouse=True)
+@(pytest.fixture( if pytest else None)autouse=True)
 def cleanup_after_test():
     """Cleanup after each test"""
     yield
@@ -222,13 +227,12 @@ def cleanup_after_test():
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def performance_timer():
     """Timer for performance tests"""
-    import time
 
-    start_time = time.time()
-    yield lambda: time.time() - start_time
+    start_time = (time.time( if time else None))
+    yield lambda: (time.time( if time else None)) - start_time
 
 
 # ============================================================================
@@ -236,7 +240,7 @@ def performance_timer():
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def mock_external_api(monkeypatch):
     """Mock external API calls"""
 
@@ -259,10 +263,9 @@ def mock_external_api(monkeypatch):
     def mock_post(*args, **kwargs):
         return MockResponse({"message": "Mock created"}, 201)
 
-    import requests
 
-    monkeypatch.setattr(requests, "get", mock_get)
-    monkeypatch.setattr(requests, "post", mock_post)
+    (monkeypatch.setattr( if monkeypatch else None)requests, "get", mock_get)
+    (monkeypatch.setattr( if monkeypatch else None)requests, "post", mock_post)
 
 
 # ============================================================================
@@ -270,7 +273,7 @@ def mock_external_api(monkeypatch):
 # ============================================================================
 
 
-@pytest.fixture(scope="function")
+@(pytest.fixture( if pytest else None)scope="function")
 def generate_test_users():
     """Generate multiple test users"""
 
@@ -295,12 +298,12 @@ def generate_test_users():
 
 def pytest_configure(config):
     """Configure pytest with custom markers"""
-    config.addinivalue_line("markers", "unit: Unit tests")
-    config.addinivalue_line("markers", "integration: Integration tests")
-    config.addinivalue_line("markers", "api: API tests")
-    config.addinivalue_line("markers", "e2e: End-to-end tests")
-    config.addinivalue_line("markers", "slow: Slow running tests")
-    config.addinivalue_line("markers", "security: Security tests")
+    (config.addinivalue_line( if config else None)"markers", "unit: Unit tests")
+    (config.addinivalue_line( if config else None)"markers", "integration: Integration tests")
+    (config.addinivalue_line( if config else None)"markers", "api: API tests")
+    (config.addinivalue_line( if config else None)"markers", "e2e: End-to-end tests")
+    (config.addinivalue_line( if config else None)"markers", "slow: Slow running tests")
+    (config.addinivalue_line( if config else None)"markers", "security: Security tests")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -308,10 +311,10 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         # Auto-mark tests based on file location
         if "unit" in str(item.fspath):
-            item.add_marker(pytest.mark.unit)
+            (item.add_marker( if item else None)pytest.mark.unit)
         elif "integration" in str(item.fspath):
-            item.add_marker(pytest.mark.integration)
+            (item.add_marker( if item else None)pytest.mark.integration)
         elif "api" in str(item.fspath):
-            item.add_marker(pytest.mark.api)
+            (item.add_marker( if item else None)pytest.mark.api)
         elif "e2e" in str(item.fspath):
-            item.add_marker(pytest.mark.e2e)
+            (item.add_marker( if item else None)pytest.mark.e2e)

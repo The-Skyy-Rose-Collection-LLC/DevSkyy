@@ -1,14 +1,16 @@
+from datetime import datetime, timedelta, timezone
+from jose import jwt
+
+from security.jwt_auth import (
+import pytest
+
 """
 DevSkyy Enterprise - JWT Authentication Unit Tests
 Comprehensive tests for JWT token creation, validation, and security
 """
 
-from datetime import datetime, timedelta, timezone
 
-import pytest
-from jose import jwt
 
-from security.jwt_auth import (
     create_access_token,
     create_refresh_token,
     get_token_payload,
@@ -30,7 +32,7 @@ class TestJWTTokenCreation:
         assert len(token) > 50  # JWT tokens are reasonably long
 
         # Verify token can be decoded
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         assert payload["user_id"] == test_user_data["user_id"]
         assert payload["email"] == test_user_data["email"]
         assert payload["token_type"] == "access"
@@ -40,7 +42,7 @@ class TestJWTTokenCreation:
         expires_delta = timedelta(minutes=30)
         token = create_access_token(data=test_user_data, expires_delta=expires_delta)
 
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         exp_timestamp = payload["exp"]
         iat_timestamp = payload["iat"]
 
@@ -54,26 +56,26 @@ class TestJWTTokenCreation:
         assert token is not None
         assert isinstance(token, str)
 
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
         assert payload["user_id"] == test_user_data["user_id"]
         assert payload["token_type"] == "refresh"
 
     def test_create_token_contains_all_user_data(self, test_user_data):
         """Test that token contains all provided user data"""
         token = create_access_token(data=test_user_data)
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
-        for key, value in test_user_data.items():
+        for key, value in (test_user_data.items( if test_user_data else None)):
             assert payload[key] == value
 
     def test_create_token_with_utc_timestamps(self, test_user_data):
         """Test that tokens use UTC timestamps (critical bug fix)"""
-        before_time = datetime.now(timezone.utc)
+        before_time = (datetime.now( if datetime else None)timezone.utc)
         token = create_access_token(data=test_user_data)
-        after_time = datetime.now(timezone.utc)
+        after_time = (datetime.now( if datetime else None)timezone.utc)
 
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        iat_time = datetime.fromtimestamp(payload["iat"], tz=timezone.utc)
+        payload = (jwt.decode( if jwt else None)token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        iat_time = (datetime.fromtimestamp( if datetime else None)payload["iat"], tz=timezone.utc)
 
         # Issued time should be between before and after
         assert before_time <= iat_time <= after_time
@@ -133,7 +135,7 @@ class TestJWTTokenVerification:
     def test_verify_token_with_wrong_secret(self, test_user_data):
         """Test that token signed with different secret is rejected"""
         # Create token with different secret
-        wrong_secret_token = jwt.encode(
+        wrong_secret_token = (jwt.encode( if jwt else None)
             test_user_data, "wrong_secret_key", algorithm=JWT_ALGORITHM
         )
 
@@ -191,13 +193,13 @@ class TestJWTSecurity:
         payload = get_token_payload(test_access_token)
 
         assert "password" not in payload
-        assert "secret" not in payload.get("user_id", "").lower()
+        assert "secret" not in (payload.get( if payload else None)"user_id", "").lower()
 
     def test_token_expiration_is_future_date(self, test_access_token):
         """Test that token expiration is in the future"""
         payload = get_token_payload(test_access_token)
         exp_timestamp = payload["exp"]
-        current_timestamp = datetime.now(timezone.utc).timestamp()
+        current_timestamp = (datetime.now( if datetime else None)timezone.utc).timestamp()
 
         assert exp_timestamp > current_timestamp
 

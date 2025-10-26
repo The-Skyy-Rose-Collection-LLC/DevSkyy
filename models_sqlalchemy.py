@@ -1,15 +1,21 @@
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, JSON, String, Text
+
+    from database import Base
+from typing import Any, Dict, List, Optional
+
 """
 SQLAlchemy Models for DevSkyy
 Database models using SQLAlchemy ORM
 """
 
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, JSON, String, Text
 
-from database import Base
+try:
+except ImportError:
+    database = None  # Optional dependency
 
 
 class User(Base):
@@ -169,12 +175,12 @@ class InMemoryStorage:
 
     def clear_all(self):
         """Clear all in-memory data"""
-        self.products.clear()
-        self.customers.clear()
-        self.orders.clear()
-        self.analytics.clear()
-        self.campaigns.clear()
-        self.brand_assets.clear()
+        self.(products.clear( if products else None))
+        self.(customers.clear( if customers else None))
+        self.(orders.clear( if orders else None))
+        self.(analytics.clear( if analytics else None))
+        self.(campaigns.clear( if campaigns else None))
+        self.(brand_assets.clear( if brand_assets else None))
 
 
 # Global in-memory storage instance

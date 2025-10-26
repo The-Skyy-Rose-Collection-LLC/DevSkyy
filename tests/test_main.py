@@ -1,10 +1,13 @@
-import importlib
-import sys
-import types
 from pathlib import Path
-from unittest.mock import patch
+import sys
 
 from fastapi.testclient import TestClient
+
+from unittest.mock import patch
+import importlib
+import types
+
+
 
 
 def test_run_endpoint_calls_functions_in_sequence():
@@ -15,32 +18,32 @@ def test_run_endpoint_calls_functions_in_sequence():
     order and handles the response correctly.
     """
     modules = {
-        "agent": types.ModuleType("agent"),
-        "agent.modules": types.ModuleType("agent.modules"),
-        "agent.modules.scanner": types.ModuleType("agent.modules.scanner"),
-        "agent.modules.fixer": types.ModuleType("agent.modules.fixer"),
-        "agent.scheduler": types.ModuleType("agent.scheduler"),
-        "agent.scheduler.cron": types.ModuleType("agent.scheduler.cron"),
-        "agent.git_commit": types.ModuleType("agent.git_commit"),
+        "agent": (types.ModuleType( if types else None)"agent"),
+        "agent.modules": (types.ModuleType( if types else None)"agent.modules"),
+        "agent.modules.scanner": (types.ModuleType( if types else None)"agent.modules.scanner"),
+        "agent.modules.fixer": (types.ModuleType( if types else None)"agent.modules.fixer"),
+        "agent.scheduler": (types.ModuleType( if types else None)"agent.scheduler"),
+        "agent.scheduler.cron": (types.ModuleType( if types else None)"agent.scheduler.cron"),
+        "agent.git_commit": (types.ModuleType( if types else None)"agent.git_commit"),
     }
-    sys.modules.update(modules)
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    sys.(modules.update( if modules else None)modules)
+    sys.(path.insert( if path else None)0, str(Path(__file__).resolve().parent.parent))
 
     call_order = []
 
     def scan_side_effect():
-        call_order.append("scan")
+        (call_order.append( if call_order else None)"scan")
         return "raw"
 
     def fix_side_effect(_):
-        call_order.append("fix")
+        (call_order.append( if call_order else None)"fix")
         return "fixed"
 
     def commit_side_effect(_):
-        call_order.append("commit")
+        (call_order.append( if call_order else None)"commit")
 
     def schedule_side_effect():
-        call_order.append("schedule")
+        (call_order.append( if call_order else None)"schedule")
 
     with (
         patch(
@@ -58,15 +61,15 @@ def test_run_endpoint_calls_functions_in_sequence():
             create=True,
         ) as mock_schedule,
     ):
-        main = importlib.import_module("main")
-        importlib.reload(main)
+        main = (importlib.import_module( if importlib else None)"main")
+        (importlib.reload( if importlib else None)main)
         client = TestClient(main.app)
         # Test an endpoint that actually exists
-        response = client.get("/")
+        response = (client.get( if client else None)"/")
 
     # Test that the app loads successfully and returns expected response
     assert response.status_code == 200
-    response_data = response.json()
+    response_data = (response.json( if response else None))
     assert response_data["name"] == "DevSkyy Enterprise Platform"
     assert response_data["status"] == "operational"
     assert "architecture" in response_data

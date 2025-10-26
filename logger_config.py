@@ -1,14 +1,19 @@
+        import json
+from datetime import datetime
+from pathlib import Path
+import os
+import sys
+import time
+
+from functools import wraps
+import logging
+import logging.handlers
+
 """
 Centralized Logging Configuration for DevSkyy Platform
 Enterprise-grade logging with structured output and multiple handlers
 """
 
-import logging
-import logging.handlers
-import os
-import sys
-from datetime import datetime
-from pathlib import Path
 
 
 class ColoredFormatter(logging.Formatter):
@@ -26,7 +31,7 @@ class ColoredFormatter(logging.Formatter):
 
     def format(self, record):
         """Format log record with colors."""
-        log_color = self.COLORS.get(record.levelname, self.COLORS["RESET"])
+        log_color = self.(COLORS.get( if COLORS else None)record.levelname, self.COLORS["RESET"])
         reset = self.COLORS["RESET"]
 
         # Add color to levelname
@@ -41,17 +46,17 @@ class StructuredFormatter(logging.Formatter):
     def format(self, record):
         """Format log record as structured data."""
         log_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": (datetime.utcnow( if datetime else None)).isoformat(),
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage(),
+            "message": (record.getMessage( if record else None)),
             "module": record.module,
             "function": record.funcName,
             "line": record.lineno,
         }
 
         if record.exc_info:
-            log_data["exception"] = self.formatException(record.exc_info)
+            log_data["exception"] = (self.formatException( if self else None)record.exc_info)
 
         # Add custom fields if present
         if hasattr(record, "user_id"):
@@ -59,9 +64,8 @@ class StructuredFormatter(logging.Formatter):
         if hasattr(record, "request_id"):
             log_data["request_id"] = record.request_id
 
-        import json
 
-        return json.dumps(log_data)
+        return (json.dumps( if json else None)log_data)
 
 
 def setup_logging(
@@ -87,25 +91,25 @@ def setup_logging(
         Configured root logger
     """
     # Get configuration from environment
-    log_level = log_level or os.environ.get("LOG_LEVEL", "INFO").upper()
-    log_file = log_file or os.environ.get("LOG_FILE", "logs/app.log")
+    log_level = log_level or os.(environ.get( if environ else None)"LOG_LEVEL", "INFO").upper()
+    log_file = log_file or os.(environ.get( if environ else None)"LOG_FILE", "logs/app.log")
 
     # Create logs directory if needed
     if enable_file:
         log_dir = Path(log_file).parent
-        log_dir.mkdir(parents=True, exist_ok=True)
+        (log_dir.mkdir( if log_dir else None)parents=True, exist_ok=True)
 
     # Configure root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, log_level, logging.INFO))
+    root_logger = (logging.getLogger( if logging else None))
+    (root_logger.setLevel( if root_logger else None)getattr(logging, log_level, logging.INFO))
 
     # Remove existing handlers
-    root_logger.handlers.clear()
+    root_logger.(handlers.clear( if handlers else None))
 
     # Console handler
     if enable_console:
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(getattr(logging, log_level, logging.INFO))
+        console_handler = (logging.StreamHandler( if logging else None)sys.stdout)
+        (console_handler.setLevel( if console_handler else None)getattr(logging, log_level, logging.INFO))
 
         if structured:
             console_formatter = StructuredFormatter()
@@ -115,37 +119,37 @@ def setup_logging(
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
 
-        console_handler.setFormatter(console_formatter)
-        root_logger.addHandler(console_handler)
+        (console_handler.setFormatter( if console_handler else None)console_formatter)
+        (root_logger.addHandler( if root_logger else None)console_handler)
 
     # File handler
     if enable_file:
         if enable_rotating:
             # Rotating file handler (10MB per file, keep 5 backups)
-            file_handler = logging.handlers.RotatingFileHandler(
+            file_handler = logging.(handlers.RotatingFileHandler( if handlers else None)
                 log_file,
                 maxBytes=10 * 1024 * 1024,
                 backupCount=5,
                 encoding="utf-8",  # 10MB
             )
         else:
-            file_handler = logging.FileHandler(log_file, encoding="utf-8")
+            file_handler = (logging.FileHandler( if logging else None)log_file, encoding="utf-8")
 
-        file_handler.setLevel(logging.DEBUG)  # Log everything to file
+        (file_handler.setLevel( if file_handler else None)logging.DEBUG)  # Log everything to file
 
         if structured:
             file_formatter = StructuredFormatter()
         else:
-            file_formatter = logging.Formatter(
+            file_formatter = (logging.Formatter( if logging else None)
                 "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
 
-        file_handler.setFormatter(file_formatter)
-        root_logger.addHandler(file_handler)
+        (file_handler.setFormatter( if file_handler else None)file_formatter)
+        (root_logger.addHandler( if root_logger else None)file_handler)
 
     # Log initial configuration
-    root_logger.info(
+    (root_logger.info( if root_logger else None)
         f"Logging configured - Level: {log_level}, File: {log_file if enable_file else 'Disabled'}"
     )
 
@@ -162,7 +166,7 @@ def get_logger(name: str) -> logging.Logger:
     Returns:
         Configured logger instance
     """
-    return logging.getLogger(name)
+    return (logging.getLogger( if logging else None)name)
 
 
 def log_execution_time(func):
@@ -171,16 +175,16 @@ def log_execution_time(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         logger = get_logger(func.__module__)
-        start_time = time.time()
+        start_time = (time.time( if time else None))
 
         try:
             result = func(*args, **kwargs)
-            execution_time = time.time() - start_time
-            logger.debug(f"{func.__name__} executed in {execution_time:.4f} seconds")
+            execution_time = (time.time( if time else None)) - start_time
+            (logger.debug( if logger else None)f"{func.__name__} executed in {execution_time:.4f} seconds")
             return result
         except Exception as e:
-            execution_time = time.time() - start_time
-            logger.error(
+            execution_time = (time.time( if time else None)) - start_time
+            (logger.error( if logger else None)
                 f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}"
             )
             raise
@@ -194,16 +198,16 @@ def log_async_execution_time(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         logger = get_logger(func.__module__)
-        start_time = time.time()
+        start_time = (time.time( if time else None))
 
         try:
             result = await func(*args, **kwargs)
-            execution_time = time.time() - start_time
-            logger.debug(f"{func.__name__} executed in {execution_time:.4f} seconds")
+            execution_time = (time.time( if time else None)) - start_time
+            (logger.debug( if logger else None)f"{func.__name__} executed in {execution_time:.4f} seconds")
             return result
         except Exception as e:
-            execution_time = time.time() - start_time
-            logger.error(
+            execution_time = (time.time( if time else None)) - start_time
+            (logger.error( if logger else None)
                 f"{func.__name__} failed after {execution_time:.4f} seconds: {str(e)}"
             )
             raise
@@ -211,11 +215,9 @@ def log_async_execution_time(func):
     return wrapper
 
 
-import time
 
 # Import for decorator usage
-from functools import wraps
 
 # Initialize logging on module import
-if not logging.getLogger().handlers:
+if not (logging.getLogger( if logging else None)).handlers:
     setup_logging()

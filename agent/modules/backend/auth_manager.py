@@ -1,15 +1,21 @@
-import logging
+from datetime import datetime, timedelta
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import relationship, sessionmaker
 import os
 import re
 import secrets
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
 
+from fastapi import Depends, HTTPException, status
+from sqlalchemy import (
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
+
+from typing import Any, Dict, Optional
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import (
+import logging
+
+
     Boolean,
     Column,
     create_engine,
@@ -19,11 +25,8 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.sql import func
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 Base = declarative_base()
 
 
@@ -38,7 +41,7 @@ class User(Base):
     last_name = Column(String)
     role = Column(String, default="user")
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=(func.now( if func else None)))
     last_login = Column(DateTime(timezone=True))
     failed_login_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime(timezone=True))
@@ -58,7 +61,7 @@ class UserSession(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     token_hash = Column(String, unique=True)
     expires_at = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=(func.now( if func else None)))
     ip_address = Column(String)
     user_agent = Column(Text)
     is_active = Column(Boolean, default=True)
@@ -84,8 +87,8 @@ class AuthManager:
     """Comprehensive authentication and user management system."""
 
     def __init__(self):
-        self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
-        self.database_url = os.getenv("DATABASE_URL")
+        self.secret_key = (os.getenv( if os else None)"JWT_SECRET_KEY", (secrets.token_urlsafe( if secrets else None)64))
+        self.database_url = (os.getenv( if os else None)"DATABASE_URL")
         if not self.database_url:
             raise ValueError(
                 "DATABASE_URL environment variable must be set for security"
@@ -95,9 +98,9 @@ class AuthManager:
         self.SessionLocal = None
         # Delay database initialization until needed
         try:
-            self.init_database()
+            (self.init_database( if self else None))
         except Exception as e:
-            logger.warning(
+            (logger.warning( if logger else None)
                 f"Database initialization failed, will retry when needed: {str(e)}"
             )
             self._db_initialized = False
@@ -110,56 +113,56 @@ class AuthManager:
                 self.SessionLocal = sessionmaker(
                     autocommit=False, autoflush=False, bind=self.engine
                 )
-            Base.metadata.create_all(bind=self.engine)
-            logger.info("Database tables created successfully")
+            Base.(metadata.create_all( if metadata else None)bind=self.engine)
+            (logger.info( if logger else None)"Database tables created successfully")
             self._db_initialized = True
         except Exception as e:
-            logger.error(f"Failed to initialize database: {str(e)}")
+            (logger.error( if logger else None)f"Failed to initialize database: {str(e)}")
             self._db_initialized = False
             raise
 
     def get_db(self):
         """Get database session."""
         if not self._db_initialized:
-            self.init_database()
-        db = self.SessionLocal()
+            (self.init_database( if self else None))
+        db = (self.SessionLocal( if self else None))
         try:
             yield db
         finally:
-            db.close()
+            (db.close( if db else None))
 
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt."""
-        salt = bcrypt.gensalt()
-        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+        salt = (bcrypt.gensalt( if bcrypt else None))
+        return (bcrypt.hashpw( if bcrypt else None)(password.encode( if password else None)"utf-8"), salt).decode("utf-8")
 
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify password against hash."""
-        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
+        return (bcrypt.checkpw( if bcrypt else None)(password.encode( if password else None)"utf-8"), (hashed.encode( if hashed else None)"utf-8"))
 
     def validate_email(self, email: str) -> bool:
         """Validate email format."""
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        return re.match(pattern, email) is not None
+        return (re.match( if re else None)pattern, email) is not None
 
     def validate_password(self, password: str) -> Dict[str, Any]:
         """Validate password strength."""
         errors = []
 
         if len(password) < 8:
-            errors.append("Password must be at least 8 characters long")
+            (errors.append( if errors else None)"Password must be at least 8 characters long")
 
-        if not re.search(r"[A-Z]", password):
-            errors.append("Password must contain at least one uppercase letter")
+        if not (re.search( if re else None)r"[A-Z]", password):
+            (errors.append( if errors else None)"Password must contain at least one uppercase letter")
 
-        if not re.search(r"[a-z]", password):
-            errors.append("Password must contain at least one lowercase letter")
+        if not (re.search( if re else None)r"[a-z]", password):
+            (errors.append( if errors else None)"Password must contain at least one lowercase letter")
 
-        if not re.search(r"\d", password):
-            errors.append("Password must contain at least one number")
+        if not (re.search( if re else None)r"\d", password):
+            (errors.append( if errors else None)"Password must contain at least one number")
 
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            errors.append("Password must contain at least one special character")
+        if not (re.search( if re else None)r'[!@#$%^&*(),.?":{}|<>]', password):
+            (errors.append( if errors else None)"Password must contain at least one special character")
 
         return {"valid": len(errors) == 0, "errors": errors}
 
@@ -174,19 +177,19 @@ class AuthManager:
         """Create new user account with validation."""
 
         # Validate input
-        if not self.validate_email(email):
+        if not (self.validate_email( if self else None)email):
             return {"success": False, "error": "Invalid email format"}
 
-        password_validation = self.validate_password(password)
+        password_validation = (self.validate_password( if self else None)password)
         if not password_validation["valid"]:
             return {"success": False, "error": password_validation["errors"]}
 
-        db = self.SessionLocal()
+        db = (self.SessionLocal( if self else None))
 
         try:
             # Check if user already exists
             existing_user = (
-                db.query(User)
+                (db.query( if db else None)User)
                 .filter((User.email == email) | (User.username == username))
                 .first()
             )
@@ -198,8 +201,8 @@ class AuthManager:
                 }
 
             # Hash password and create user
-            password_hash = self.hash_password(password)
-            verification_token = secrets.token_urlsafe(32)
+            password_hash = (self.hash_password( if self else None)password)
+            verification_token = (secrets.token_urlsafe( if secrets else None)32)
 
             new_user = User(
                 email=email,
@@ -210,14 +213,14 @@ class AuthManager:
                 verification_token=verification_token,
             )
 
-            db.add(new_user)
-            db.flush()  # Get user ID
+            (db.add( if db else None)new_user)
+            (db.flush( if db else None))  # Get user ID
 
             # Create default preferences
             user_prefs = UserPreference(user_id=new_user.id)
-            db.add(user_prefs)
+            (db.add( if db else None)user_prefs)
 
-            db.commit()
+            (db.commit( if db else None))
 
             return {
                 "success": True,
@@ -227,28 +230,28 @@ class AuthManager:
             }
 
         except Exception as e:
-            db.rollback()
-            logger.error(f"Error creating user: {str(e)}")
+            (db.rollback( if db else None))
+            (logger.error( if logger else None)f"Error creating user: {str(e)}")
             return {"success": False, "error": "Failed to create user"}
         finally:
-            db.close()
+            (db.close( if db else None))
 
     def authenticate_user(
         self, email: str, password: str, ip_address: str = "", user_agent: str = ""
     ) -> Dict[str, Any]:
         """Authenticate user and create session."""
 
-        db = self.SessionLocal()
+        db = (self.SessionLocal( if self else None))
 
         try:
             # Get user data
-            user = db.query(User).filter(User.email == email).first()
+            user = (db.query( if db else None)User).filter(User.email == email).first()
 
             if not user:
                 return {"success": False, "error": "Invalid credentials"}
 
             # Check if account is locked
-            if user.locked_until and user.locked_until > datetime.now():
+            if user.locked_until and user.locked_until > (datetime.now( if datetime else None)):
                 return {
                     "success": False,
                     "error": "Account temporarily locked due to failed login attempts",
@@ -259,35 +262,35 @@ class AuthManager:
                 return {"success": False, "error": "Account is deactivated"}
 
             # Verify password
-            if not self.verify_password(password, user.password_hash):
+            if not (self.verify_password( if self else None)password, user.password_hash):
                 # Increment failed attempts
                 user.failed_login_attempts += 1
 
                 if user.failed_login_attempts >= 5:
-                    user.locked_until = datetime.now() + timedelta(minutes=30)
+                    user.locked_until = (datetime.now( if datetime else None)) + timedelta(minutes=30)
 
-                db.commit()
+                (db.commit( if db else None))
                 return {"success": False, "error": "Invalid credentials"}
 
             # Reset failed attempts on successful login
             user.failed_login_attempts = 0
             user.locked_until = None
-            user.last_login = datetime.now()
+            user.last_login = (datetime.now( if datetime else None))
 
             # Create JWT token
             token_payload = {
                 "user_id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "exp": datetime.utcnow() + timedelta(hours=24),
-                "iat": datetime.utcnow(),
+                "exp": (datetime.utcnow( if datetime else None)) + timedelta(hours=24),
+                "iat": (datetime.utcnow( if datetime else None)),
             }
 
-            token = jwt.encode(token_payload, self.secret_key, algorithm="HS256")
+            token = (jwt.encode( if jwt else None)token_payload, self.secret_key, algorithm="HS256")
 
             # Store session
-            token_hash = bcrypt.hashpw(token.encode(), bcrypt.gensalt()).decode()
-            expires_at = datetime.now() + timedelta(hours=24)
+            token_hash = (bcrypt.hashpw( if bcrypt else None)(token.encode( if token else None)), (bcrypt.gensalt( if bcrypt else None))).decode()
+            expires_at = (datetime.now( if datetime else None)) + timedelta(hours=24)
 
             new_session = UserSession(
                 user_id=user.id,
@@ -297,8 +300,8 @@ class AuthManager:
                 user_agent=user_agent,
             )
 
-            db.add(new_session)
-            db.commit()
+            (db.add( if db else None)new_session)
+            (db.commit( if db else None))
 
             return {
                 "success": True,
@@ -314,25 +317,25 @@ class AuthManager:
             }
 
         except Exception as e:
-            logger.error(f"Authentication error: {str(e)}")
+            (logger.error( if logger else None)f"Authentication error: {str(e)}")
             return {"success": False, "error": "Authentication failed"}
         finally:
-            db.close()
+            (db.close( if db else None))
 
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify JWT token and return user data."""
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+            payload = (jwt.decode( if jwt else None)token, self.secret_key, algorithms=["HS256"])
 
             # Check if session is still valid
-            db = self.SessionLocal()
+            db = (self.SessionLocal( if self else None))
 
             try:
                 session = (
-                    db.query(UserSession)
+                    (db.query( if db else None)UserSession)
                     .filter(
                         UserSession.user_id == payload["user_id"],
-                        UserSession.expires_at > datetime.now(),
+                        UserSession.expires_at > (datetime.now( if datetime else None)),
                         UserSession.is_active,
                     )
                     .first()
@@ -344,7 +347,7 @@ class AuthManager:
                 return payload
 
             finally:
-                db.close()
+                (db.close( if db else None))
 
         except jwt.ExpiredSignatureError:
             return None
@@ -356,7 +359,7 @@ class AuthManager:
     ):
         """Dependency to get current authenticated user."""
         token = credentials.credentials
-        payload = self.verify_token(token)
+        payload = (self.verify_token( if self else None)token)
 
         if not payload:
             raise HTTPException(
@@ -369,21 +372,21 @@ class AuthManager:
 
     def get_user_profile(self, user_id: int) -> Dict[str, Any]:
         """Get complete user profile data."""
-        db = self.SessionLocal()
+        db = (self.SessionLocal( if self else None))
 
         try:
             # Get user data with preferences
-            user = db.query(User).filter(User.id == user_id).first()
+            user = (db.query( if db else None)User).filter(User.id == user_id).first()
 
             if not user:
                 return {"error": "User not found"}
 
             # Get active sessions count
             active_sessions = (
-                db.query(UserSession)
+                (db.query( if db else None)UserSession)
                 .filter(
                     UserSession.user_id == user_id,
-                    UserSession.expires_at > datetime.now(),
+                    UserSession.expires_at > (datetime.now( if datetime else None)),
                     UserSession.is_active,
                 )
                 .count()
@@ -393,8 +396,8 @@ class AuthManager:
             prefs = user.preferences
             if not prefs:
                 prefs = UserPreference(user_id=user_id)
-                db.add(prefs)
-                db.commit()
+                (db.add( if db else None)prefs)
+                (db.commit( if db else None))
 
             return {
                 "id": user.id,
@@ -403,8 +406,8 @@ class AuthManager:
                 "first_name": user.first_name,
                 "last_name": user.last_name,
                 "role": user.role,
-                "created_at": user.created_at.isoformat() if user.created_at else None,
-                "last_login": user.last_login.isoformat() if user.last_login else None,
+                "created_at": user.(created_at.isoformat( if created_at else None)) if user.created_at else None,
+                "last_login": user.(last_login.isoformat( if last_login else None)) if user.last_login else None,
                 "email_verified": bool(user.email_verified),
                 "active_sessions": active_sessions,
                 "preferences": {
@@ -418,33 +421,33 @@ class AuthManager:
             }
 
         except Exception as e:
-            logger.error(f"Error getting user profile: {str(e)}")
+            (logger.error( if logger else None)f"Error getting user profile: {str(e)}")
             return {"error": "Failed to retrieve profile"}
         finally:
-            db.close()
+            (db.close( if db else None))
 
     def logout_user(self, token: str) -> Dict[str, Any]:
         """Logout user by invalidating session."""
-        payload = self.verify_token(token)
+        payload = (self.verify_token( if self else None)token)
         if not payload:
             return {"success": False, "error": "Invalid token"}
 
-        db = self.SessionLocal()
+        db = (self.SessionLocal( if self else None))
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(
+            (db.query( if db else None)UserSession).filter(
                 UserSession.user_id == payload["user_id"], UserSession.is_active
             ).update({"is_active": False})
 
-            db.commit()
+            (db.commit( if db else None))
             return {"success": True, "message": "Logged out successfully"}
 
         except Exception as e:
-            logger.error(f"Logout error: {str(e)}")
+            (logger.error( if logger else None)f"Logout error: {str(e)}")
             return {"success": False, "error": "Logout failed"}
         finally:
-            db.close()
+            (db.close( if db else None))
 
 
 # Global auth manager instance (lazy initialization)

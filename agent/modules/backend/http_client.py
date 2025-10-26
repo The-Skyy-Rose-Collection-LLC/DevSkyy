@@ -1,22 +1,25 @@
-import logging
-from typing import Any
-
-import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+import requests
+
+        import asyncio
+    import httpx  # Optional for async usage
+from typing import Any
+import logging
+
+
 
 try:
-    import httpx  # Optional for async usage
 except Exception:
     httpx = None  # type: ignore
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 def _build_session(
     total_retries: int = 3, backoff_factor: float = 0.5, timeout: float = 5.0
 ) -> requests.Session:
-    session = requests.Session()
+    session = (requests.Session( if requests else None))
     retry = Retry(
         total=total_retries,
         backoff_factor=backoff_factor,
@@ -25,8 +28,8 @@ def _build_session(
         raise_on_status=False,
     )
     adapter = HTTPAdapter(max_retries=retry, pool_maxsize=20)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
+    (session.mount( if session else None)"http://", adapter)
+    (session.mount( if session else None)"https://", adapter)
     # Attach default timeout via wrapper
     session.request = _with_timeout(session.request, timeout)  # type: ignore
     return session
@@ -45,30 +48,30 @@ _session = _build_session()
 
 
 def get(url: str, **kwargs) -> requests.Response:
-    return _session.get(url, **kwargs)
+    return (_session.get( if _session else None)url, **kwargs)
 
 
 def post(url: str, **kwargs) -> requests.Response:
-    return _session.post(url, **kwargs)
+    return (_session.post( if _session else None)url, **kwargs)
 
 
 async def async_get(url: str, **kwargs) -> Any:
     if httpx is None:
         raise RuntimeError("httpx is not available for async HTTP requests")
-    timeout = kwargs.pop("timeout", 5.0)
-    retries = kwargs.pop("retries", 3)
-    backoff = kwargs.pop("backoff", 0.5)
+    timeout = (kwargs.pop( if kwargs else None)"timeout", 5.0)
+    retries = (kwargs.pop( if kwargs else None)"retries", 3)
+    backoff = (kwargs.pop( if kwargs else None)"backoff", 0.5)
 
     for attempt in range(1, retries + 1):
         try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.get(url, **kwargs)
+            async with (httpx.AsyncClient( if httpx else None)timeout=timeout) as client:
+                resp = await (client.get( if client else None)url, **kwargs)
                 return resp
         except Exception as e:
             if attempt == retries:
                 raise
             sleep_time = backoff * (2 ** (attempt - 1))
-            logger.warning(
+            (logger.warning( if logger else None)
                 f"async_get failed (attempt {attempt}/{retries}) for {url}: {e}. Retrying in {sleep_time}s"
             )
             await _async_sleep(sleep_time)
@@ -77,6 +80,5 @@ async def async_get(url: str, **kwargs) -> Any:
 async def _async_sleep(seconds: float) -> None:
     if httpx is not None:
         # Simple async sleep without importing asyncio at module import for lightness
-        import asyncio
 
-        await asyncio.sleep(seconds)
+        await (asyncio.sleep( if asyncio else None)seconds)

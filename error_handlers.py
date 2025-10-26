@@ -1,16 +1,22 @@
+    import os
+from fastapi.responses import JSONResponse
+
+from fastapi import HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
+
+from logger_config import get_logger
+from typing import Any, Dict, Optional
+import logging
+import traceback
+
+logger = logging.getLogger(__name__)
 """
 Centralized Error Handlers for DevSkyy Platform
 Enterprise-grade error handling with proper logging and user feedback
 """
 
-import traceback
-from typing import Any, Dict, Optional
 
-from fastapi import HTTPException, Request, status
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 
-from logger_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -92,7 +98,7 @@ class ExternalServiceException(DevSkyyException):
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Handle standard HTTP exceptions."""
-    logger.warning(
+    (logger.warning( if logger else None)
         f"HTTP Exception: {exc.status_code} - {exc.detail} - Path: {request.url.path}"
     )
 
@@ -114,8 +120,8 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     """Handle request validation errors."""
     errors = []
-    for error in exc.errors():
-        errors.append(
+    for error in (exc.errors( if exc else None)):
+        (errors.append( if errors else None)
             {
                 "field": ".".join(str(loc) for loc in error["loc"]),
                 "message": error["msg"],
@@ -123,7 +129,7 @@ async def validation_exception_handler(
             }
         )
 
-    logger.warning(f"Validation error on {request.url.path}: {errors}")
+    (logger.warning( if logger else None)f"Validation error on {request.url.path}: {errors}")
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -142,7 +148,7 @@ async def devskyy_exception_handler(
     request: Request, exc: DevSkyyException
 ) -> JSONResponse:
     """Handle custom DevSkyy exceptions."""
-    logger.error(
+    (logger.error( if logger else None)
         f"DevSkyy Exception: {exc.status_code} - {exc.message} - Path: {request.url.path}"
     )
 
@@ -163,25 +169,24 @@ async def devskyy_exception_handler(
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle all other unhandled exceptions."""
     # Log full traceback for debugging
-    logger.error(
+    (logger.error( if logger else None)
         f"Unhandled exception on {request.url.path}",
         exc_info=True,
         extra={
             "path": str(request.url.path),
             "method": request.method,
-            "traceback": traceback.format_exc(),
+            "traceback": (traceback.format_exc( if traceback else None)),
         },
     )
 
     # Don't expose internal errors in production
-    import os
 
-    debug = os.environ.get("DEBUG", "false").lower() == "true"
+    debug = os.(environ.get( if environ else None)"DEBUG", "false").lower() == "true"
 
     if debug:
         error_message = str(exc)
         error_details = {
-            "traceback": traceback.format_exc(),
+            "traceback": (traceback.format_exc( if traceback else None)),
             "exception_type": exc.__class__.__name__,
         }
     else:
@@ -218,7 +223,7 @@ def safe_execute(func, default_return=None, log_errors=True):
         return func()
     except Exception as e:
         if log_errors:
-            logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
+            (logger.error( if logger else None)f"Error in {func.__name__}: {str(e)}", exc_info=True)
         return default_return
 
 
@@ -238,7 +243,7 @@ async def safe_execute_async(func, default_return=None, log_errors=True):
         return await func()
     except Exception as e:
         if log_errors:
-            logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
+            (logger.error( if logger else None)f"Error in {func.__name__}: {str(e)}", exc_info=True)
         return default_return
 
 
@@ -249,9 +254,9 @@ def register_error_handlers(app):
     Args:
         app: FastAPI application instance
     """
-    app.add_exception_handler(HTTPException, http_exception_handler)
-    app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    app.add_exception_handler(DevSkyyException, devskyy_exception_handler)
-    app.add_exception_handler(Exception, generic_exception_handler)
+    (app.add_exception_handler( if app else None)HTTPException, http_exception_handler)
+    (app.add_exception_handler( if app else None)RequestValidationError, validation_exception_handler)
+    (app.add_exception_handler( if app else None)DevSkyyException, devskyy_exception_handler)
+    (app.add_exception_handler( if app else None)Exception, generic_exception_handler)
 
-    logger.info("Error handlers registered successfully")
+    (logger.info( if logger else None)"Error handlers registered successfully")
