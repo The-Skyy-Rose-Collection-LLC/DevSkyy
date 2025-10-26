@@ -58,7 +58,7 @@ lightgbm==4.5.0
 
 # Computer Vision & Image Processing
 opencv-python==4.11.0.86  # Updated
-Pillow==11.1.0  # Latest security fix
+Pillow==11.3.0  # Latest security fix
 imagehash==4.3.2
 
 # Web Scraping & Parsing
