@@ -1,30 +1,32 @@
+from datetime import datetime, timedelta
+from infrastructure.redis_manager import redis_manager
+import json
+import secrets
+import time
+
+from api_integration.discovery_engine import APIEndpoint, AuthenticationType
+from cryptography.fernet import Fernet
+from dataclasses import asdict, dataclass
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Union
+from urllib.parse import parse_qs, urlencode
+import aiohttp
+import asyncio
+import base64
+import hashlib
+import jwt
+import logging
+
 """
 API Authentication & Rate Limiting Manager
 Standardized authentication handling and intelligent rate limiting for fashion e-commerce APIs
 Supports OAuth2, API keys, JWT, and custom authentication methods
 """
 
-import asyncio
-import base64
-import hashlib
-import json
-import logging
-import secrets
-import time
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import parse_qs, urlencode
 
-import aiohttp
-import jwt
-from cryptography.fernet import Fernet
 
-from api_integration.discovery_engine import APIEndpoint, AuthenticationType
-from infrastructure.redis_manager import redis_manager
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class TokenStatus(Enum):
@@ -53,7 +55,7 @@ class AuthCredentials:
 
     def __post_init__(self):
         if self.created_at is None:
-            self.created_at = datetime.now()
+            self.created_at = (datetime.now( if datetime else None))
         if self.scopes is None:
             self.scopes = []
 
@@ -61,18 +63,18 @@ class AuthCredentials:
         """Check if credentials are expired"""
         if self.expires_at is None:
             return False
-        return datetime.now() > self.expires_at
+        return (datetime.now( if datetime else None)) > self.expires_at
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for storage"""
         data = asdict(self)
         data["auth_type"] = self.auth_type.value
         if self.expires_at:
-            data["expires_at"] = self.expires_at.isoformat()
+            data["expires_at"] = self.(expires_at.isoformat( if expires_at else None))
         if self.created_at:
-            data["created_at"] = self.created_at.isoformat()
+            data["created_at"] = self.(created_at.isoformat( if created_at else None))
         if self.last_used:
-            data["last_used"] = self.last_used.isoformat()
+            data["last_used"] = self.(last_used.isoformat( if last_used else None))
         return data
 
 
@@ -96,7 +98,7 @@ class RateLimitRule:
             "hour": self.requests_per_hour,
             "day": self.requests_per_day,
         }
-        return limits.get(window_type, self.requests_per_minute)
+        return (limits.get( if limits else None)window_type, self.requests_per_minute)
 
 
 class AuthenticationManager:
@@ -104,18 +106,18 @@ class AuthenticationManager:
 
     def __init__(self):
         self.credentials_store: Dict[str, AuthCredentials] = {}
-        self.encryption_key = self._generate_encryption_key()
+        self.encryption_key = (self._generate_encryption_key( if self else None))
         self.cipher_suite = Fernet(self.encryption_key)
 
         # OAuth2 flow storage
         self.oauth_states: Dict[str, Dict[str, Any]] = {}
 
-        logger.info("Authentication Manager initialized")
+        (logger.info( if logger else None)"Authentication Manager initialized")
 
     def _generate_encryption_key(self) -> bytes:
         """Generate encryption key for credential storage"""
         # In production, this should be stored securely (e.g., AWS KMS, Azure Key Vault)
-        return Fernet.generate_key()
+        return (Fernet.generate_key( if Fernet else None))
 
     async def store_credentials(
         self,
@@ -129,7 +131,7 @@ class AuthenticationManager:
 
         try:
             # Encrypt sensitive credentials
-            encrypted_credentials = self._encrypt_credentials(credentials)
+            encrypted_credentials = (self._encrypt_credentials( if self else None)credentials)
 
             auth_creds = AuthCredentials(
                 api_id=api_id,
@@ -144,18 +146,18 @@ class AuthenticationManager:
 
             # Cache in Redis
             cache_key = f"auth_credentials:{api_id}"
-            await redis_manager.set(
+            await (redis_manager.set( if redis_manager else None)
                 cache_key,
-                auth_creds.to_dict(),
+                (auth_creds.to_dict( if auth_creds else None)),
                 ttl=86400,  # 24 hours
                 prefix="api_auth",
             )
 
-            logger.info(f"Stored credentials for API: {api_id}")
+            (logger.info( if logger else None)f"Stored credentials for API: {api_id}")
             return True
 
         except Exception as e:
-            logger.error(f"Error storing credentials for {api_id}: {e}")
+            (logger.error( if logger else None)f"Error storing credentials for {api_id}: {e}")
             return False
 
     async def get_credentials(self, api_id: str) -> Optional[AuthCredentials]:
@@ -164,38 +166,38 @@ class AuthenticationManager:
         # Check memory first
         if api_id in self.credentials_store:
             creds = self.credentials_store[api_id]
-            if not creds.is_expired():
+            if not (creds.is_expired( if creds else None)):
                 return creds
 
         # Check Redis cache
         try:
             cache_key = f"auth_credentials:{api_id}"
-            cached_data = await redis_manager.get(cache_key, prefix="api_auth")
+            cached_data = await (redis_manager.get( if redis_manager else None)cache_key, prefix="api_auth")
 
             if cached_data:
                 # Reconstruct AuthCredentials object
                 cached_data["auth_type"] = AuthenticationType(cached_data["auth_type"])
-                if cached_data.get("expires_at"):
-                    cached_data["expires_at"] = datetime.fromisoformat(
+                if (cached_data.get( if cached_data else None)"expires_at"):
+                    cached_data["expires_at"] = (datetime.fromisoformat( if datetime else None)
                         cached_data["expires_at"]
                     )
-                if cached_data.get("created_at"):
-                    cached_data["created_at"] = datetime.fromisoformat(
+                if (cached_data.get( if cached_data else None)"created_at"):
+                    cached_data["created_at"] = (datetime.fromisoformat( if datetime else None)
                         cached_data["created_at"]
                     )
-                if cached_data.get("last_used"):
-                    cached_data["last_used"] = datetime.fromisoformat(
+                if (cached_data.get( if cached_data else None)"last_used"):
+                    cached_data["last_used"] = (datetime.fromisoformat( if datetime else None)
                         cached_data["last_used"]
                     )
 
                 creds = AuthCredentials(**cached_data)
 
-                if not creds.is_expired():
+                if not (creds.is_expired( if creds else None)):
                     self.credentials_store[api_id] = creds
                     return creds
 
         except Exception as e:
-            logger.error(f"Error retrieving credentials for {api_id}: {e}")
+            (logger.error( if logger else None)f"Error retrieving credentials for {api_id}: {e}")
 
         return None
 
@@ -211,10 +213,10 @@ class AuthenticationManager:
             "password",
         ]
 
-        for key, value in credentials.items():
+        for key, value in (credentials.items( if credentials else None)):
             if key in sensitive_fields and isinstance(value, str):
-                encrypted_creds[key] = self.cipher_suite.encrypt(
-                    value.encode()
+                encrypted_creds[key] = self.(cipher_suite.encrypt( if cipher_suite else None)
+                    (value.encode( if value else None))
                 ).decode()
             else:
                 encrypted_creds[key] = value
@@ -235,11 +237,11 @@ class AuthenticationManager:
             "password",
         ]
 
-        for key, value in encrypted_credentials.items():
+        for key, value in (encrypted_credentials.items( if encrypted_credentials else None)):
             if key in sensitive_fields and isinstance(value, str):
                 try:
-                    decrypted_creds[key] = self.cipher_suite.decrypt(
-                        value.encode()
+                    decrypted_creds[key] = self.(cipher_suite.decrypt( if cipher_suite else None)
+                        (value.encode( if value else None))
                     ).decode()
                 except Exception:
                     # If decryption fails, assume it's already decrypted
@@ -252,30 +254,30 @@ class AuthenticationManager:
     async def get_auth_headers(self, api_id: str) -> Dict[str, str]:
         """Get authentication headers for API request"""
 
-        credentials = await self.get_credentials(api_id)
+        credentials = await (self.get_credentials( if self else None)api_id)
         if not credentials:
             return {}
 
-        decrypted_creds = self._decrypt_credentials(credentials.credentials)
+        decrypted_creds = (self._decrypt_credentials( if self else None)credentials.credentials)
 
         if credentials.auth_type == AuthenticationType.API_KEY:
-            return await self._get_api_key_headers(decrypted_creds)
+            return await (self._get_api_key_headers( if self else None)decrypted_creds)
         elif credentials.auth_type == AuthenticationType.BEARER_TOKEN:
-            return await self._get_bearer_token_headers(decrypted_creds)
+            return await (self._get_bearer_token_headers( if self else None)decrypted_creds)
         elif credentials.auth_type == AuthenticationType.OAUTH2:
-            return await self._get_oauth2_headers(decrypted_creds)
+            return await (self._get_oauth2_headers( if self else None)decrypted_creds)
         elif credentials.auth_type == AuthenticationType.JWT:
-            return await self._get_jwt_headers(decrypted_creds)
+            return await (self._get_jwt_headers( if self else None)decrypted_creds)
         elif credentials.auth_type == AuthenticationType.BASIC_AUTH:
-            return await self._get_basic_auth_headers(decrypted_creds)
+            return await (self._get_basic_auth_headers( if self else None)decrypted_creds)
 
         return {}
 
     async def _get_api_key_headers(self, credentials: Dict[str, Any]) -> Dict[str, str]:
         """Get API key authentication headers"""
 
-        api_key = credentials.get("api_key")
-        header_name = credentials.get("header_name", "X-API-Key")
+        api_key = (credentials.get( if credentials else None)"api_key")
+        header_name = (credentials.get( if credentials else None)"header_name", "X-API-Key")
 
         if api_key:
             return {header_name: api_key}
@@ -287,7 +289,7 @@ class AuthenticationManager:
     ) -> Dict[str, str]:
         """Get Bearer token authentication headers"""
 
-        access_token = credentials.get("access_token")
+        access_token = (credentials.get( if credentials else None)"access_token")
 
         if access_token:
             return {"Authorization": f"Bearer {access_token}"}
@@ -297,7 +299,7 @@ class AuthenticationManager:
     async def _get_oauth2_headers(self, credentials: Dict[str, Any]) -> Dict[str, str]:
         """Get OAuth2 authentication headers"""
 
-        access_token = credentials.get("access_token")
+        access_token = (credentials.get( if credentials else None)"access_token")
 
         if access_token:
             return {"Authorization": f"Bearer {access_token}"}
@@ -307,7 +309,7 @@ class AuthenticationManager:
     async def _get_jwt_headers(self, credentials: Dict[str, Any]) -> Dict[str, str]:
         """Get JWT authentication headers"""
 
-        jwt_token = credentials.get("jwt_token")
+        jwt_token = (credentials.get( if credentials else None)"jwt_token")
 
         if jwt_token:
             return {"Authorization": f"Bearer {jwt_token}"}
@@ -319,11 +321,11 @@ class AuthenticationManager:
     ) -> Dict[str, str]:
         """Get Basic authentication headers"""
 
-        username = credentials.get("username")
-        password = credentials.get("password")
+        username = (credentials.get( if credentials else None)"username")
+        password = (credentials.get( if credentials else None)"password")
 
         if username and password:
-            auth_string = base64.b64encode(f"{username}:{password}".encode()).decode()
+            auth_string = (base64.b64encode( if base64 else None)f"{username}:{password}".encode()).decode()
             return {"Authorization": f"Basic {auth_string}"}
 
         return {}
@@ -339,7 +341,7 @@ class AuthenticationManager:
         """Initiate OAuth2 authorization flow"""
 
         # Generate state parameter for security
-        state = secrets.token_urlsafe(32)
+        state = (secrets.token_urlsafe( if secrets else None)32)
 
         # Store OAuth2 flow data
         self.oauth_states[state] = {
@@ -347,7 +349,7 @@ class AuthenticationManager:
             "client_id": client_id,
             "redirect_uri": redirect_uri,
             "scopes": scopes,
-            "created_at": datetime.now(),
+            "created_at": (datetime.now( if datetime else None)),
         }
 
         # Build authorization URL
@@ -361,7 +363,7 @@ class AuthenticationManager:
 
         auth_url = f"{authorization_url}?{urlencode(params)}"
 
-        logger.info(f"Initiated OAuth2 flow for API: {api_id}")
+        (logger.info( if logger else None)f"Initiated OAuth2 flow for API: {api_id}")
         return auth_url, state
 
     async def complete_oauth2_flow(
@@ -370,7 +372,7 @@ class AuthenticationManager:
         """Complete OAuth2 authorization flow"""
 
         if state not in self.oauth_states:
-            logger.error(f"Invalid OAuth2 state: {state}")
+            (logger.error( if logger else None)f"Invalid OAuth2 state: {state}")
             return False
 
         oauth_data = self.oauth_states[state]
@@ -385,25 +387,25 @@ class AuthenticationManager:
                 "client_secret": client_secret,
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(token_url, data=token_data) as response:
+            async with (aiohttp.ClientSession( if aiohttp else None)) as session:
+                async with (session.post( if session else None)token_url, data=token_data) as response:
                     if response.status == 200:
-                        token_response = await response.json()
+                        token_response = await (response.json( if response else None))
 
                         # Store credentials
                         expires_at = None
                         if "expires_in" in token_response:
-                            expires_at = datetime.now() + timedelta(
+                            expires_at = (datetime.now( if datetime else None)) + timedelta(
                                 seconds=token_response["expires_in"]
                             )
 
-                        await self.store_credentials(
+                        await (self.store_credentials( if self else None)
                             api_id=oauth_data["api_id"],
                             auth_type=AuthenticationType.OAUTH2,
                             credentials={
-                                "access_token": token_response.get("access_token"),
-                                "refresh_token": token_response.get("refresh_token"),
-                                "token_type": token_response.get(
+                                "access_token": (token_response.get( if token_response else None)"access_token"),
+                                "refresh_token": (token_response.get( if token_response else None)"refresh_token"),
+                                "token_type": (token_response.get( if token_response else None)
                                     "token_type", "Bearer"
                                 ),
                             },
@@ -414,16 +416,16 @@ class AuthenticationManager:
                         # Clean up OAuth state
                         del self.oauth_states[state]
 
-                        logger.info(
+                        (logger.info( if logger else None)
                             f"Completed OAuth2 flow for API: {oauth_data['api_id']}"
                         )
                         return True
                     else:
-                        logger.error(f"OAuth2 token exchange failed: {response.status}")
+                        (logger.error( if logger else None)f"OAuth2 token exchange failed: {response.status}")
                         return False
 
         except Exception as e:
-            logger.error(f"Error completing OAuth2 flow: {e}")
+            (logger.error( if logger else None)f"Error completing OAuth2 flow: {e}")
             return False
 
     async def refresh_oauth2_token(
@@ -431,12 +433,12 @@ class AuthenticationManager:
     ) -> bool:
         """Refresh OAuth2 access token"""
 
-        credentials = await self.get_credentials(api_id)
+        credentials = await (self.get_credentials( if self else None)api_id)
         if not credentials or credentials.auth_type != AuthenticationType.OAUTH2:
             return False
 
-        decrypted_creds = self._decrypt_credentials(credentials.credentials)
-        refresh_token = decrypted_creds.get("refresh_token")
+        decrypted_creds = (self._decrypt_credentials( if self else None)credentials.credentials)
+        refresh_token = (decrypted_creds.get( if decrypted_creds else None)"refresh_token")
 
         if not refresh_token:
             return False
@@ -449,27 +451,27 @@ class AuthenticationManager:
                 "client_secret": client_secret,
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(token_url, data=token_data) as response:
+            async with (aiohttp.ClientSession( if aiohttp else None)) as session:
+                async with (session.post( if session else None)token_url, data=token_data) as response:
                     if response.status == 200:
-                        token_response = await response.json()
+                        token_response = await (response.json( if response else None))
 
                         # Update credentials
                         expires_at = None
                         if "expires_in" in token_response:
-                            expires_at = datetime.now() + timedelta(
+                            expires_at = (datetime.now( if datetime else None)) + timedelta(
                                 seconds=token_response["expires_in"]
                             )
 
-                        await self.store_credentials(
+                        await (self.store_credentials( if self else None)
                             api_id=api_id,
                             auth_type=AuthenticationType.OAUTH2,
                             credentials={
-                                "access_token": token_response.get("access_token"),
-                                "refresh_token": token_response.get(
+                                "access_token": (token_response.get( if token_response else None)"access_token"),
+                                "refresh_token": (token_response.get( if token_response else None)
                                     "refresh_token", refresh_token
                                 ),
-                                "token_type": token_response.get(
+                                "token_type": (token_response.get( if token_response else None)
                                     "token_type", "Bearer"
                                 ),
                             },
@@ -477,14 +479,14 @@ class AuthenticationManager:
                             scopes=credentials.scopes,
                         )
 
-                        logger.info(f"Refreshed OAuth2 token for API: {api_id}")
+                        (logger.info( if logger else None)f"Refreshed OAuth2 token for API: {api_id}")
                         return True
                     else:
-                        logger.error(f"OAuth2 token refresh failed: {response.status}")
+                        (logger.error( if logger else None)f"OAuth2 token refresh failed: {response.status}")
                         return False
 
         except Exception as e:
-            logger.error(f"Error refreshing OAuth2 token: {e}")
+            (logger.error( if logger else None)f"Error refreshing OAuth2 token: {e}")
             return False
 
 
@@ -502,7 +504,7 @@ class RateLimitManager:
             "enterprise": RateLimitRule("default", 50, 3000, 50000, 500000, 100),
         }
 
-        logger.info("Rate Limit Manager initialized")
+        (logger.info( if logger else None)"Rate Limit Manager initialized")
 
     async def set_rate_limit(self, api_id: str, rate_limit: RateLimitRule):
         """Set rate limit for specific API"""
@@ -511,11 +513,11 @@ class RateLimitManager:
 
         # Cache in Redis
         cache_key = f"rate_limit:{api_id}"
-        await redis_manager.set(
+        await (redis_manager.set( if redis_manager else None)
             cache_key, asdict(rate_limit), ttl=86400, prefix="api_limits"  # 24 hours
         )
 
-        logger.info(f"Set rate limit for API: {api_id}")
+        (logger.info( if logger else None)f"Set rate limit for API: {api_id}")
 
     async def get_rate_limit(self, api_id: str) -> Optional[RateLimitRule]:
         """Get rate limit for API"""
@@ -527,7 +529,7 @@ class RateLimitManager:
         # Check Redis cache
         try:
             cache_key = f"rate_limit:{api_id}"
-            cached_data = await redis_manager.get(cache_key, prefix="api_limits")
+            cached_data = await (redis_manager.get( if redis_manager else None)cache_key, prefix="api_limits")
 
             if cached_data:
                 rate_limit = RateLimitRule(**cached_data)
@@ -535,7 +537,7 @@ class RateLimitManager:
                 return rate_limit
 
         except Exception as e:
-            logger.error(f"Error retrieving rate limit for {api_id}: {e}")
+            (logger.error( if logger else None)f"Error retrieving rate limit for {api_id}: {e}")
 
         # Return default limit
         return self.default_limits["free"]
@@ -543,11 +545,11 @@ class RateLimitManager:
     async def can_make_request(self, api_id: str) -> Tuple[bool, Dict[str, Any]]:
         """Check if request can be made within rate limits"""
 
-        rate_limit = await self.get_rate_limit(api_id)
+        rate_limit = await (self.get_rate_limit( if self else None)api_id)
         if not rate_limit:
             return True, {}
 
-        current_time = time.time()
+        current_time = (time.time( if time else None))
 
         # Get request history
         if api_id not in self.request_history:
@@ -564,11 +566,11 @@ class RateLimitManager:
 
         rate_limit_info = {}
 
-        for window_name, window_seconds in windows.items():
+        for window_name, window_seconds in (windows.items( if windows else None)):
             window_start = current_time - window_seconds
             requests_in_window = len([t for t in history if t > window_start])
 
-            limit = rate_limit.get_limit_for_window(window_name)
+            limit = (rate_limit.get_limit_for_window( if rate_limit else None)window_name)
             remaining = max(0, limit - requests_in_window)
 
             rate_limit_info[f"{window_name}_limit"] = limit
@@ -592,7 +594,7 @@ class RateLimitManager:
     async def record_request(self, api_id: str):
         """Record a successful API request"""
 
-        current_time = time.time()
+        current_time = (time.time( if time else None))
 
         if api_id not in self.request_history:
             self.request_history[api_id] = []
@@ -606,19 +608,19 @@ class RateLimitManager:
         # Update Redis cache
         try:
             cache_key = f"request_history:{api_id}"
-            await redis_manager.set(
+            await (redis_manager.set( if redis_manager else None)
                 cache_key,
                 self.request_history[api_id][-100:],  # Store last 100 requests
                 ttl=86400,
                 prefix="api_limits",
             )
         except Exception as e:
-            logger.error(f"Error caching request history for {api_id}: {e}")
+            (logger.error( if logger else None)f"Error caching request history for {api_id}: {e}")
 
     async def get_rate_limit_status(self, api_id: str) -> Dict[str, Any]:
         """Get current rate limit status for API"""
 
-        can_request, rate_info = await self.can_make_request(api_id)
+        can_request, rate_info = await (self.can_make_request( if self else None)api_id)
 
         return {
             "api_id": api_id,
@@ -627,8 +629,8 @@ class RateLimitManager:
             "total_requests_today": len(
                 [
                     t
-                    for t in self.request_history.get(api_id, [])
-                    if t > time.time() - 86400
+                    for t in self.(request_history.get( if request_history else None)api_id, [])
+                    if t > (time.time( if time else None)) - 86400
                 ]
             ),
         }
@@ -638,8 +640,8 @@ class RateLimitManager:
 
         status = {}
 
-        for api_id in self.rate_limits.keys():
-            status[api_id] = await self.get_rate_limit_status(api_id)
+        for api_id in self.(rate_limits.keys( if rate_limits else None)):
+            status[api_id] = await (self.get_rate_limit_status( if self else None)api_id)
 
         return status
 

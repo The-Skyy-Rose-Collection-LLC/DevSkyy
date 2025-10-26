@@ -1,13 +1,24 @@
+        import datetime
+        import json
+        import pathlib
+from pathlib import Path
+import os
+import sys
+
+            from fastapi import FastAPI
+            from pydantic import BaseModel
+
+            import main
+        import asyncio
+        import asyncio
+import pytest
+
 """
 Basic functionality tests to ensure CI/CD pipeline works
 These tests are designed to always pass and validate basic functionality
 """
 
-import os
-import sys
-from pathlib import Path
 
-import pytest
 
 
 class TestBasicFunctionality:
@@ -19,10 +30,6 @@ class TestBasicFunctionality:
 
     def test_basic_imports(self):
         """Test basic Python imports work"""
-        import asyncio
-        import datetime
-        import json
-        import pathlib
 
         assert True
 
@@ -51,7 +58,7 @@ class TestBasicFunctionality:
         """Basic string operations test"""
         test_string = "DevSkyy Enterprise Platform"
         assert "DevSkyy" in test_string
-        assert test_string.lower() == "devskyy enterprise platform"
+        assert (test_string.lower( if test_string else None)) == "devskyy enterprise platform"
         assert len(test_string) > 0
 
     def test_list_operations(self):
@@ -76,29 +83,26 @@ class TestApplicationImports:
     def test_fastapi_import(self):
         """Test FastAPI can be imported"""
         try:
-            from fastapi import FastAPI
 
             assert True
         except ImportError:
-            pytest.skip("FastAPI not available")
+            (pytest.skip( if pytest else None)"FastAPI not available")
 
     def test_pydantic_import(self):
         """Test Pydantic can be imported"""
         try:
-            from pydantic import BaseModel
 
             assert True
         except ImportError:
-            pytest.skip("Pydantic not available")
+            (pytest.skip( if pytest else None)"Pydantic not available")
 
     def test_main_module_import(self):
         """Test main module can be imported"""
         try:
-            import main
 
             assert hasattr(main, "app"), "Main module should have 'app' attribute"
         except ImportError as e:
-            pytest.skip(f"Main module not importable: {e}")
+            (pytest.skip( if pytest else None)f"Main module not importable: {e}")
 
 
 class TestEnvironmentSetup:
@@ -108,21 +112,21 @@ class TestEnvironmentSetup:
         """Test basic environment variable handling"""
         # Test that we can set and get environment variables
         os.environ["TEST_VAR"] = "test_value"
-        assert os.getenv("TEST_VAR") == "test_value"
+        assert (os.getenv( if os else None)"TEST_VAR") == "test_value"
 
         # Clean up
         del os.environ["TEST_VAR"]
 
     def test_path_operations(self):
         """Test path operations work correctly"""
-        current_path = Path.cwd()
-        assert current_path.exists()
-        assert current_path.is_dir()
+        current_path = (Path.cwd( if Path else None))
+        assert (current_path.exists( if current_path else None))
+        assert (current_path.is_dir( if current_path else None))
 
         # Test relative path operations
         test_path = current_path / "tests"
-        if test_path.exists():
-            assert test_path.is_dir()
+        if (test_path.exists( if test_path else None)):
+            assert (test_path.is_dir( if test_path else None))
 
 
 @pytest.mark.asyncio
@@ -131,10 +135,9 @@ class TestAsyncFunctionality:
 
     async def test_basic_async(self):
         """Test basic async functionality"""
-        import asyncio
 
         async def simple_async_function():
-            await asyncio.sleep(0.01)  # Very short sleep
+            await (asyncio.sleep( if asyncio else None)0.01)  # Very short sleep
             return "async_result"
 
         result = await simple_async_function()
@@ -156,4 +159,4 @@ class TestAsyncFunctionality:
 
 if __name__ == "__main__":
     # Run tests if this file is executed directly
-    pytest.main([__file__, "-v"])
+    (pytest.main( if pytest else None)[__file__, "-v"])

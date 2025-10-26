@@ -75,10 +75,37 @@ spec:
       imagePullSecrets:
         - name: docker-cloud-credentials
 
+      # Security context for the pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001  # Non-root user ID > 10000
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      # Disable service account token auto-mounting
+      automountServiceAccountToken: false
+
       containers:
         - name: devskyy
-          image: cloud://skyyrosellc/devskyy_linux-amd64:latest
+          # Use specific image digest instead of latest tag for security
+          image: cloud://skyyrosellc/devskyy_linux-amd64@sha256:latest  # Replace with actual digest
           imagePullPolicy: Always
+
+          # Container-level security context
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+                - NET_RAW  # Explicitly drop NET_RAW capability
+            seccompProfile:
+              type: RuntimeDefault
 
           ports:
             - name: http
@@ -90,23 +117,24 @@ spec:
             - configMapRef:
                 name: devskyy-config
 
-          # Environment variables from Secrets
+          # Mount secrets as files for enhanced security (CKV_K8S_35)
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: /etc/secrets
+              readOnly: true
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: var-tmp-volume
+              mountPath: /var/tmp
+
+          # Environment variables for secret file paths
           env:
-            - name: JWT_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: devskyy-secrets
-                  key: JWT_SECRET_KEY
-            - name: ENCRYPTION_MASTER_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: devskyy-secrets
-                  key: ENCRYPTION_MASTER_KEY
-            - name: ANTHROPIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: devskyy-secrets
-                  key: ANTHROPIC_API_KEY
+            - name: JWT_SECRET_FILE
+              value: "/etc/secrets/JWT_SECRET_KEY"
+            - name: ENCRYPTION_MASTER_KEY_FILE
+              value: "/etc/secrets/ENCRYPTION_MASTER_KEY"
+            - name: ANTHROPIC_API_KEY_FILE
+              value: "/etc/secrets/ANTHROPIC_API_KEY"
 
           # Resource limits
           resources:
@@ -150,6 +178,15 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: devskyy-data-pvc
+        # Security-enhanced volumes
+        - name: secrets-volume
+          secret:
+            secretName: devskyy-secrets
+            defaultMode: 0400  # Read-only for owner only
+        - name: tmp-volume
+          emptyDir: {}
+        - name: var-tmp-volume
+          emptyDir: {}
 
 ---
 # Green Deployment (for blue-green deployment)
@@ -184,6 +221,19 @@ spec:
         - name: docker-cloud-credentials
 
       containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
         - name: devskyy
           image: cloud://skyyrosellc/devskyy_linux-amd64:latest
           imagePullPolicy: Always

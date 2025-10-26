@@ -1,3 +1,20 @@
+from datetime import datetime, timedelta
+from web3.middleware import geth_poa_middleware
+import json
+import os
+
+from typing import Any, Dict, List
+from uuid import uuid4
+from web3 import Web3
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import asyncio
+import hashlib
+import logging
+
 """
 Blockchain & NFT Integration for Luxury Digital Assets
 Enables digital ownership, authenticity verification, and exclusive NFT collections
@@ -15,19 +32,9 @@ Features:
 - Secondary market integration
 """
 
-import asyncio
-import hashlib
-import json
-import logging
-import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
-from uuid import uuid4
 
-from web3 import Web3
-from web3.middleware import geth_poa_middleware
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class BlockchainNFTLuxuryAssets:
@@ -38,19 +45,19 @@ class BlockchainNFTLuxuryAssets:
 
     def __init__(self):
         # Initialize Web3 connections
-        self.networks = self._initialize_networks()
+        self.networks = (self._initialize_networks( if self else None))
 
         # Smart contract templates
         self.contract_templates = {
-            "luxury_nft": self._load_luxury_nft_contract(),
-            "authenticity": self._load_authenticity_contract(),
-            "membership": self._load_membership_contract(),
+            "luxury_nft": (self._load_luxury_nft_contract( if self else None)),
+            "authenticity": (self._load_authenticity_contract( if self else None)),
+            "membership": (self._load_membership_contract( if self else None)),
         }
 
         # NFT metadata standards
         self.metadata_standards = {
-            "erc721": self._get_erc721_metadata(),
-            "erc1155": self._get_erc1155_metadata(),
+            "erc721": (self._get_erc721_metadata( if self else None)),
+            "erc1155": (self._get_erc1155_metadata( if self else None)),
         }
 
         # Luxury collections configuration
@@ -78,18 +85,18 @@ class BlockchainNFTLuxuryAssets:
             },
         }
 
-        logger.info("🔗 Blockchain NFT Luxury Assets system initialized")
+        (logger.info( if logger else None)"🔗 Blockchain NFT Luxury Assets system initialized")
 
     def _initialize_networks(self) -> Dict[str, Any]:
         """Initialize connections to blockchain networks."""
         networks = {}
 
         # Ethereum Mainnet
-        eth_rpc = os.getenv("ETH_RPC_URL", "https://mainnet.infura.io/v3/YOUR_KEY")
+        eth_rpc = (os.getenv( if os else None)"ETH_RPC_URL", "https://mainnet.infura.io/v3/YOUR_KEY")
         if eth_rpc and "YOUR_KEY" not in eth_rpc:
             try:
-                w3_eth = Web3(Web3.HTTPProvider(eth_rpc))
-                if w3_eth.is_connected():
+                w3_eth = Web3((Web3.HTTPProvider( if Web3 else None)eth_rpc))
+                if (w3_eth.is_connected( if w3_eth else None)):
                     networks["ethereum"] = {
                         "web3": w3_eth,
                         "chain_id": 1,
@@ -97,14 +104,14 @@ class BlockchainNFTLuxuryAssets:
                         "explorer": "https://etherscan.io",
                     }
             except Exception as e:
-                logger.warning(f"Ethereum connection failed: {e}")
+                (logger.warning( if logger else None)f"Ethereum connection failed: {e}")
 
         # Polygon (Matic)
-        polygon_rpc = os.getenv("POLYGON_RPC_URL", "https://polygon-rpc.com")
+        polygon_rpc = (os.getenv( if os else None)"POLYGON_RPC_URL", "https://polygon-rpc.com")
         try:
-            w3_polygon = Web3(Web3.HTTPProvider(polygon_rpc))
-            w3_polygon.middleware_onion.inject(geth_poa_middleware, layer=0)
-            if w3_polygon.is_connected():
+            w3_polygon = Web3((Web3.HTTPProvider( if Web3 else None)polygon_rpc))
+            w3_polygon.(middleware_onion.inject( if middleware_onion else None)geth_poa_middleware, layer=0)
+            if (w3_polygon.is_connected( if w3_polygon else None)):
                 networks["polygon"] = {
                     "web3": w3_polygon,
                     "chain_id": 137,
@@ -112,20 +119,20 @@ class BlockchainNFTLuxuryAssets:
                     "explorer": "https://polygonscan.com",
                 }
         except Exception as e:
-            logger.warning(f"Polygon connection failed: {e}")
+            (logger.warning( if logger else None)f"Polygon connection failed: {e}")
 
         # Local development network
         try:
-            w3_local = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-            if w3_local.is_connected():
+            w3_local = Web3((Web3.HTTPProvider( if Web3 else None)"http://127.0.0.1:8545"))
+            if (w3_local.is_connected( if w3_local else None)):
                 networks["local"] = {
                     "web3": w3_local,
                     "chain_id": 1337,
                     "name": "Local Development",
                     "explorer": None,
                 }
-        except Exception:
-            pass
+        except Exception as e:
+    logger.warning(f"Handled exception: {e}")
 
         return networks
 
@@ -135,10 +142,6 @@ class BlockchainNFTLuxuryAssets:
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract SkyyRoseLuxuryNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -179,11 +182,11 @@ contract SkyyRoseLuxuryNFT is ERC721, ERC721URIStorage, Ownable {
         string memory collection,
         bool hasPhysicalItem
     ) public payable returns (uint256) {
-        require(_tokenIdCounter.current() < maxSupply, "Max supply reached");
+        require((_tokenIdCounter.current( if _tokenIdCounter else None)) < maxSupply, "Max supply reached");
         require(msg.value >= mintPrice, "Insufficient payment");
 
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        uint256 tokenId = (_tokenIdCounter.current( if _tokenIdCounter else None));
+        (_tokenIdCounter.increment( if _tokenIdCounter else None));
 
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
@@ -257,7 +260,7 @@ contract SkyyRoseAuthenticity {
         require(msg.sender == verifier, "Only verifier can create certificates");
 
         bytes32 fingerprint = keccak256(
-            abi.encodePacked(itemId, itemName, collection, block.timestamp)
+            (abi.encodePacked( if abi else None)itemId, itemName, collection, block.timestamp)
         );
 
         require(!fingerprints[fingerprint], "Duplicate fingerprint");
@@ -295,7 +298,6 @@ contract SkyyRoseAuthenticity {
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract SkyyRoseMembership {
     IERC721 public nftContract;
@@ -325,7 +327,7 @@ contract SkyyRoseMembership {
     }
 
     function registerMember(address member) public {
-        require(nftContract.balanceOf(member) > 0, "Must hold NFT");
+        require((nftContract.balanceOf( if nftContract else None)member) > 0, "Must hold NFT");
 
         if (memberships[member].joinDate == 0) {
             memberships[member] = Membership({
@@ -340,7 +342,7 @@ contract SkyyRoseMembership {
 
     function upgradeTier(address member) public {
         Membership storage membership = memberships[member];
-        uint256 nftBalance = nftContract.balanceOf(member);
+        uint256 nftBalance = (nftContract.balanceOf( if nftContract else None)member);
 
         if (nftBalance >= 5 && membership.totalSpent >= 10000) {
             membership.tier = 3;
@@ -413,7 +415,7 @@ contract SkyyRoseMembership {
             if network not in self.networks:
                 return {"error": f"Network {network} not available", "status": "failed"}
 
-            collection = self.collections.get(collection_type)
+            collection = self.(collections.get( if collections else None)collection_type)
             if not collection:
                 return {
                     "error": f"Collection {collection_type} not found",
@@ -421,16 +423,16 @@ contract SkyyRoseMembership {
                 }
 
             # Generate NFT metadata
-            metadata = await self._generate_nft_metadata(item_data, collection)
+            metadata = await (self._generate_nft_metadata( if self else None)item_data, collection)
 
             # Store metadata on IPFS (simulated)
-            ipfs_hash = await self._store_on_ipfs(metadata)
+            ipfs_hash = await (self._store_on_ipfs( if self else None)metadata)
 
             # Generate unique token ID
-            token_id = self._generate_token_id(collection_type, item_data)
+            token_id = (self._generate_token_id( if self else None)collection_type, item_data)
 
             # Simulate minting (in production, would deploy and call smart contract)
-            logger.info(f"🎨 Minting NFT: {collection['name']} #{token_id}")
+            (logger.info( if logger else None)f"🎨 Minting NFT: {collection['name']} #{token_id}")
 
             mint_result = {
                 "token_id": token_id,
@@ -438,13 +440,13 @@ contract SkyyRoseMembership {
                 "owner": owner_address,
                 "metadata_uri": f"ipfs://{ipfs_hash}",
                 "network": network,
-                "contract_address": self._get_contract_address(
+                "contract_address": (self._get_contract_address( if self else None)
                     collection_type, network
                 ),
-                "mint_date": datetime.now().isoformat(),
+                "mint_date": (datetime.now( if datetime else None)).isoformat(),
                 "benefits": collection["benefits"],
                 "transaction": {
-                    "hash": f"0x{hashlib.sha256(str(token_id).encode()).hexdigest()}",
+                    "hash": f"0x{(hashlib.sha256( if hashlib else None)str(token_id).encode()).hexdigest()}",
                     "status": "success",
                     "gas_used": 150000,
                     "block_number": 1234567,
@@ -452,19 +454,19 @@ contract SkyyRoseMembership {
             }
 
             # Store NFT record (in production, would be on blockchain)
-            await self._store_nft_record(mint_result)
+            await (self._store_nft_record( if self else None)mint_result)
 
             return {
                 "status": "success",
                 "nft": mint_result,
                 "message": f"Successfully minted {collection['name']} NFT #{token_id}",
-                "explorer_url": self._get_explorer_url(
+                "explorer_url": (self._get_explorer_url( if self else None)
                     mint_result["transaction"]["hash"], network
                 ),
             }
 
         except Exception as e:
-            logger.error(f"NFT minting failed: {e}")
+            (logger.error( if logger else None)f"NFT minting failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _generate_nft_metadata(
@@ -473,41 +475,41 @@ contract SkyyRoseMembership {
         """Generate NFT metadata for luxury item."""
         metadata = {
             "name": f"{collection['name']} - {item_data['name']}",
-            "description": item_data.get(
+            "description": (item_data.get( if item_data else None)
                 "description",
                 "Exclusive luxury fashion NFT from The Skyy Rose Collection",
             ),
-            "image": item_data.get("image", "https://skyyrose.com/nft/placeholder.jpg"),
+            "image": (item_data.get( if item_data else None)"image", "https://skyyrose.com/nft/placeholder.jpg"),
             "external_url": "https://skyyrose.com/nft",
             "attributes": [
                 {"trait_type": "Collection", "value": collection["name"]},
                 {
                     "trait_type": "Category",
-                    "value": item_data.get("category", "Fashion"),
+                    "value": (item_data.get( if item_data else None)"category", "Fashion"),
                 },
-                {"trait_type": "Rarity", "value": item_data.get("rarity", "Rare")},
-                {"trait_type": "Season", "value": item_data.get("season", "2024")},
+                {"trait_type": "Rarity", "value": (item_data.get( if item_data else None)"rarity", "Rare")},
+                {"trait_type": "Season", "value": (item_data.get( if item_data else None)"season", "2024")},
                 {"trait_type": "Designer", "value": "The Skyy Rose Collection"},
             ],
             "properties": {
                 "benefits": collection["benefits"],
-                "redeemable": item_data.get("has_physical", False),
+                "redeemable": (item_data.get( if item_data else None)"has_physical", False),
                 "transferable": True,
             },
         }
 
         # Add luxury-specific attributes
-        if item_data.get("material"):
+        if (item_data.get( if item_data else None)"material"):
             metadata["attributes"].append(
                 {"trait_type": "Material", "value": item_data["material"]}
             )
 
-        if item_data.get("craftsmanship"):
+        if (item_data.get( if item_data else None)"craftsmanship"):
             metadata["attributes"].append(
                 {"trait_type": "Craftsmanship", "value": item_data["craftsmanship"]}
             )
 
-        if item_data.get("limited_edition"):
+        if (item_data.get( if item_data else None)"limited_edition"):
             metadata["attributes"].append(
                 {
                     "trait_type": "Edition",
@@ -520,11 +522,11 @@ contract SkyyRoseMembership {
     async def _store_on_ipfs(self, metadata: Dict[str, Any]) -> str:
         """Store metadata on IPFS (simulated)."""
         # In production, would use actual IPFS service like Pinata or Infura
-        metadata_json = json.dumps(metadata)
-        ipfs_hash = hashlib.sha256(metadata_json.encode()).hexdigest()[:46]
+        metadata_json = (json.dumps( if json else None)metadata)
+        ipfs_hash = (hashlib.sha256( if hashlib else None)(metadata_json.encode( if metadata_json else None))).hexdigest()[:46]
         ipfs_hash = f"Qm{ipfs_hash}"  # Simulate IPFS hash format
 
-        logger.info(f"📦 Stored metadata on IPFS: {ipfs_hash}")
+        (logger.info( if logger else None)f"📦 Stored metadata on IPFS: {ipfs_hash}")
         return ipfs_hash
 
     def _generate_token_id(
@@ -539,7 +541,7 @@ contract SkyyRoseMembership {
         }.get(collection_type, 9000)
 
         # Add unique identifier based on timestamp and randomness
-        unique_part = int(datetime.now().timestamp()) % 1000
+        unique_part = int((datetime.now( if datetime else None)).timestamp()) % 1000
         return base_id + unique_part
 
     def _get_contract_address(self, collection_type: str, network: str) -> str:
@@ -558,14 +560,14 @@ contract SkyyRoseMembership {
             },
         }
 
-        return addresses.get(network, {}).get(
+        return (addresses.get( if addresses else None)network, {}).get(
             collection_type, "0x0000000000000000000000000000000000000000"
         )
 
     async def _store_nft_record(self, mint_result: Dict[str, Any]) -> None:
         """Store NFT record in database."""
         # In production, would store in database
-        logger.info(f"💾 Stored NFT record: Token #{mint_result['token_id']}")
+        (logger.info( if logger else None)f"💾 Stored NFT record: Token #{mint_result['token_id']}")
 
     def _get_explorer_url(self, tx_hash: str, network: str) -> str:
         """Get blockchain explorer URL for transaction."""
@@ -574,7 +576,7 @@ contract SkyyRoseMembership {
             "polygon": f"https://polygonscan.com/tx/{tx_hash}",
             "local": f"http://localhost:8545/tx/{tx_hash}",
         }
-        return explorers.get(network, "")
+        return (explorers.get( if explorers else None)network, "")
 
     async def create_authenticity_certificate(
         self,
@@ -595,41 +597,41 @@ contract SkyyRoseMembership {
         """
         try:
             # Generate certificate fingerprint
-            fingerprint = self._generate_fingerprint(item_id, item_details)
+            fingerprint = (self._generate_fingerprint( if self else None)item_id, item_details)
 
             # Create certificate data
             certificate = {
                 "item_id": item_id,
                 "item_name": item_details["name"],
-                "collection": item_details.get("collection", "Skyy Rose Collection"),
-                "manufacture_date": item_details.get(
-                    "manufacture_date", datetime.now().isoformat()
+                "collection": (item_details.get( if item_details else None)"collection", "Skyy Rose Collection"),
+                "manufacture_date": (item_details.get( if item_details else None)
+                    "manufacture_date", (datetime.now( if datetime else None)).isoformat()
                 ),
-                "materials": item_details.get("materials", []),
-                "craftsman": item_details.get("craftsman", "Skyy Rose Atelier"),
+                "materials": (item_details.get( if item_details else None)"materials", []),
+                "craftsman": (item_details.get( if item_details else None)"craftsman", "Skyy Rose Atelier"),
                 "fingerprint": fingerprint,
                 "verification_url": f"https://verify.skyyrose.com/{fingerprint}",
             }
 
             # Store on blockchain (simulated)
-            logger.info(f"📜 Creating authenticity certificate for {item_id}")
+            (logger.info( if logger else None)f"📜 Creating authenticity certificate for {item_id}")
 
             return {
                 "status": "success",
                 "certificate": certificate,
                 "blockchain": network,
-                "transaction_hash": f"0x{hashlib.sha256(fingerprint.encode()).hexdigest()}",
+                "transaction_hash": f"0x{(hashlib.sha256( if hashlib else None)(fingerprint.encode( if fingerprint else None))).hexdigest()}",
                 "message": "Authenticity certificate created successfully",
             }
 
         except Exception as e:
-            logger.error(f"Certificate creation failed: {e}")
+            (logger.error( if logger else None)f"Certificate creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_fingerprint(self, item_id: str, item_details: Dict[str, Any]) -> str:
         """Generate unique fingerprint for item."""
-        data = f"{item_id}{item_details.get('name')}{datetime.now().isoformat()}"
-        return hashlib.sha256(data.encode()).hexdigest()
+        data = f"{item_id}{(item_details.get( if item_details else None)'name')}{(datetime.now( if datetime else None)).isoformat()}"
+        return (hashlib.sha256( if hashlib else None)(data.encode( if data else None))).hexdigest()
 
     async def verify_authenticity(
         self, item_id: str, fingerprint: str
@@ -646,7 +648,7 @@ contract SkyyRoseMembership {
         """
         try:
             # In production, would query blockchain
-            logger.info(f"🔍 Verifying authenticity for {item_id}")
+            (logger.info( if logger else None)f"🔍 Verifying authenticity for {item_id}")
 
             # Simulate verification
             is_authentic = len(fingerprint) == 64  # SHA256 length
@@ -656,7 +658,7 @@ contract SkyyRoseMembership {
                 "item_id": item_id,
                 "is_authentic": is_authentic,
                 "fingerprint": fingerprint,
-                "verification_date": datetime.now().isoformat(),
+                "verification_date": (datetime.now( if datetime else None)).isoformat(),
                 "certificate_url": (
                     f"https://verify.skyyrose.com/{fingerprint}"
                     if is_authentic
@@ -665,7 +667,7 @@ contract SkyyRoseMembership {
             }
 
         except Exception as e:
-            logger.error(f"Verification failed: {e}")
+            (logger.error( if logger else None)f"Verification failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def create_membership_nft(
@@ -713,7 +715,7 @@ contract SkyyRoseMembership {
                 },
             }
 
-            tier_data = tiers.get(tier, tiers["silver"])
+            tier_data = (tiers.get( if tiers else None)tier, tiers["silver"])
 
             # Create membership NFT
             membership = {
@@ -722,8 +724,8 @@ contract SkyyRoseMembership {
                 "tier": tier,
                 "tier_name": tier_data["name"],
                 "benefits": tier_data["benefits"],
-                "join_date": datetime.now().isoformat(),
-                "expiry_date": (datetime.now() + timedelta(days=365)).isoformat(),
+                "join_date": (datetime.now( if datetime else None)).isoformat(),
+                "expiry_date": ((datetime.now( if datetime else None)) + timedelta(days=365)).isoformat(),
                 "points_balance": (
                     1000 if tier == "platinum" else 500 if tier == "gold" else 100
                 ),
@@ -732,14 +734,14 @@ contract SkyyRoseMembership {
                     "description": "Exclusive membership to The Skyy Rose Collection",
                     "image": f"https://skyyrose.com/membership/{tier}.jpg",
                     "attributes": [
-                        {"trait_type": "Tier", "value": tier.capitalize()},
+                        {"trait_type": "Tier", "value": (tier.capitalize( if tier else None))},
                         {"trait_type": "Benefits", "value": len(tier_data["benefits"])},
                         {"trait_type": "Status", "value": "Active"},
                     ],
                 },
             }
 
-            logger.info(f"👑 Created {tier} membership NFT for {member_data['name']}")
+            (logger.info( if logger else None)f"👑 Created {tier} membership NFT for {member_data['name']}")
 
             return {
                 "status": "success",
@@ -748,7 +750,7 @@ contract SkyyRoseMembership {
             }
 
         except Exception as e:
-            logger.error(f"Membership creation failed: {e}")
+            (logger.error( if logger else None)f"Membership creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def create_digital_wearable(
@@ -771,35 +773,35 @@ contract SkyyRoseMembership {
             wearable = {
                 "item_id": str(uuid4()),
                 "name": item_data["name"],
-                "category": item_data.get("category", "clothing"),
+                "category": (item_data.get( if item_data else None)"category", "clothing"),
                 "3d_model": {
                     "format": "gltf",
                     "url": f"https://assets.skyyrose.com/wearables/{item_data['model_id']}.gltf",
-                    "textures": item_data.get("textures", []),
-                    "animations": item_data.get("animations", []),
+                    "textures": (item_data.get( if item_data else None)"textures", []),
+                    "animations": (item_data.get( if item_data else None)"animations", []),
                 },
                 "platforms": {},
-                "rarity": item_data.get("rarity", "rare"),
-                "max_supply": item_data.get("max_supply", 100),
+                "rarity": (item_data.get( if item_data else None)"rarity", "rare"),
+                "max_supply": (item_data.get( if item_data else None)"max_supply", 100),
             }
 
             # Platform-specific configurations
             for platform in platforms:
                 if platform == "decentraland":
                     wearable["platforms"]["decentraland"] = {
-                        "category": self._map_to_dcl_category(item_data["category"]),
-                        "replaces": item_data.get("replaces", []),
-                        "hides": item_data.get("hides", []),
+                        "category": (self._map_to_dcl_category( if self else None)item_data["category"]),
+                        "replaces": (item_data.get( if item_data else None)"replaces", []),
+                        "hides": (item_data.get( if item_data else None)"hides", []),
                         "tags": ["fashion", "luxury", "skyy_rose"],
                     }
                 elif platform == "sandbox":
                     wearable["platforms"]["sandbox"] = {
                         "voxel_model": f"https://assets.skyyrose.com/voxels/{item_data['model_id']}.vox",
-                        "equipment_slot": item_data.get("slot", "outfit"),
-                        "attributes": item_data.get("attributes", {}),
+                        "equipment_slot": (item_data.get( if item_data else None)"slot", "outfit"),
+                        "attributes": (item_data.get( if item_data else None)"attributes", {}),
                     }
 
-            logger.info(f"🎮 Created digital wearable: {item_data['name']}")
+            (logger.info( if logger else None)f"🎮 Created digital wearable: {item_data['name']}")
 
             return {
                 "status": "success",
@@ -809,7 +811,7 @@ contract SkyyRoseMembership {
             }
 
         except Exception as e:
-            logger.error(f"Wearable creation failed: {e}")
+            (logger.error( if logger else None)f"Wearable creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     def _map_to_dcl_category(self, category: str) -> str:
@@ -821,7 +823,7 @@ contract SkyyRoseMembership {
             "accessory": "eyewear",
             "bag": "tiara",  # Using tiara slot for bags
         }
-        return mapping.get(category, "upper_body")
+        return (mapping.get( if mapping else None)category, "upper_body")
 
     async def get_nft_benefits(self, wallet_address: str) -> Dict[str, Any]:
         """
@@ -851,7 +853,7 @@ contract SkyyRoseMembership {
             ]
 
             for nft in owned_nfts:
-                collection = self.collections.get(nft["collection"])
+                collection = self.(collections.get( if collections else None)nft["collection"])
                 if collection:
                     for benefit in collection["benefits"]:
                         if "discount" in benefit:
@@ -876,7 +878,7 @@ contract SkyyRoseMembership {
             }
 
         except Exception as e:
-            logger.error(f"Failed to get benefits: {e}")
+            (logger.error( if logger else None)f"Failed to get benefits: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def enable_royalties(
@@ -895,7 +897,7 @@ contract SkyyRoseMembership {
             Royalty configuration
         """
         try:
-            collection = self.collections.get(collection_type)
+            collection = self.(collections.get( if collections else None)collection_type)
             if not collection:
                 return {
                     "error": f"Collection {collection_type} not found",
@@ -911,7 +913,7 @@ contract SkyyRoseMembership {
                 "platforms": ["opensea", "rarible", "looksrare"],
             }
 
-            logger.info(
+            (logger.info( if logger else None)
                 f"💰 Enabled {royalty_percentage}% royalties for {collection['name']}"
             )
 
@@ -922,7 +924,7 @@ contract SkyyRoseMembership {
             }
 
         except Exception as e:
-            logger.error(f"Royalty setup failed: {e}")
+            (logger.error( if logger else None)f"Royalty setup failed: {e}")
             return {"error": str(e), "status": "failed"}
 
 
@@ -938,8 +940,8 @@ async def main():
     blockchain = create_blockchain_nft_system()
 
     # Mint luxury fashion NFT
-    print("\n🎨 Minting Luxury NFT...")
-    nft_result = await blockchain.mint_luxury_nft(
+    (logger.info( if logger else None)"\n🎨 Minting Luxury NFT...")
+    nft_result = await (blockchain.mint_luxury_nft( if blockchain else None)
         collection_type="genesis",
         item_data={
             "name": "Rose Gold Evening Gown #001",
@@ -958,13 +960,13 @@ async def main():
     )
 
     if nft_result["status"] == "success":
-        print(f"✅ NFT Minted: Token #{nft_result['nft']['token_id']}")
-        print(f"📍 Contract: {nft_result['nft']['contract_address']}")
-        print(f"🎁 Benefits: {', '.join(nft_result['nft']['benefits'])}")
+        (logger.info( if logger else None)f"✅ NFT Minted: Token #{nft_result['nft']['token_id']}")
+        (logger.info( if logger else None)f"📍 Contract: {nft_result['nft']['contract_address']}")
+        (logger.info( if logger else None)f"🎁 Benefits: {', '.join(nft_result['nft']['benefits'])}")
 
     # Create authenticity certificate
-    print("\n📜 Creating Authenticity Certificate...")
-    cert_result = await blockchain.create_authenticity_certificate(
+    (logger.info( if logger else None)"\n📜 Creating Authenticity Certificate...")
+    cert_result = await (blockchain.create_authenticity_certificate( if blockchain else None)
         item_id="SRFW2024-001",
         item_details={
             "name": "Limited Edition Handbag",
@@ -976,13 +978,13 @@ async def main():
     )
 
     if cert_result["status"] == "success":
-        print("✅ Certificate Created")
-        print(f"🔐 Fingerprint: {cert_result['certificate']['fingerprint'][:16]}...")
-        print(f"🔗 Verify at: {cert_result['certificate']['verification_url']}")
+        (logger.info( if logger else None)"✅ Certificate Created")
+        (logger.info( if logger else None)f"🔐 Fingerprint: {cert_result['certificate']['fingerprint'][:16]}...")
+        (logger.info( if logger else None)f"🔗 Verify at: {cert_result['certificate']['verification_url']}")
 
     # Create membership NFT
-    print("\n👑 Creating Membership NFT...")
-    membership_result = await blockchain.create_membership_nft(
+    (logger.info( if logger else None)"\n👑 Creating Membership NFT...")
+    membership_result = await (blockchain.create_membership_nft( if blockchain else None)
         member_data={
             "name": "VIP Customer",
             "email": "vip@example.com",
@@ -992,13 +994,13 @@ async def main():
     )
 
     if membership_result["status"] == "success":
-        print(f"✅ {membership_result['membership']['tier_name']} Membership Created")
-        print(f"🎁 Benefits: {', '.join(membership_result['membership']['benefits'])}")
-        print(f"💎 Points Balance: {membership_result['membership']['points_balance']}")
+        (logger.info( if logger else None)f"✅ {membership_result['membership']['tier_name']} Membership Created")
+        (logger.info( if logger else None)f"🎁 Benefits: {', '.join(membership_result['membership']['benefits'])}")
+        (logger.info( if logger else None)f"💎 Points Balance: {membership_result['membership']['points_balance']}")
 
     # Create digital wearable
-    print("\n🎮 Creating Digital Wearable...")
-    wearable_result = await blockchain.create_digital_wearable(
+    (logger.info( if logger else None)"\n🎮 Creating Digital Wearable...")
+    wearable_result = await (blockchain.create_digital_wearable( if blockchain else None)
         item_data={
             "name": "Skyy Rose Metaverse Dress",
             "model_id": "dress_001",
@@ -1011,22 +1013,22 @@ async def main():
     )
 
     if wearable_result["status"] == "success":
-        print(f"✅ Digital Wearable Created: {wearable_result['wearable']['name']}")
-        print(f"🎮 Available on: {', '.join(wearable_result['platforms'])}")
-        print(f"💎 Rarity: {wearable_result['wearable']['rarity']}")
+        (logger.info( if logger else None)f"✅ Digital Wearable Created: {wearable_result['wearable']['name']}")
+        (logger.info( if logger else None)f"🎮 Available on: {', '.join(wearable_result['platforms'])}")
+        (logger.info( if logger else None)f"💎 Rarity: {wearable_result['wearable']['rarity']}")
 
     # Check NFT holder benefits
-    print("\n🎁 Checking NFT Holder Benefits...")
-    benefits = await blockchain.get_nft_benefits(
+    (logger.info( if logger else None)"\n🎁 Checking NFT Holder Benefits...")
+    benefits = await (blockchain.get_nft_benefits( if blockchain else None)
         "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7"
     )
 
     if benefits["status"] == "success":
-        print(f"✅ VIP Status: {benefits['vip_status']}")
-        print(f"💰 Total Discount: {benefits['total_discount']}")
+        (logger.info( if logger else None)f"✅ VIP Status: {benefits['vip_status']}")
+        (logger.info( if logger else None)f"💰 Total Discount: {benefits['total_discount']}")
         if benefits["benefits"]["access"]:
-            print(f"🔓 Access: {', '.join(benefits['benefits']['access'])}")
+            (logger.info( if logger else None)f"🔓 Access: {', '.join(benefits['benefits']['access'])}")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    (asyncio.run( if asyncio else None)main())

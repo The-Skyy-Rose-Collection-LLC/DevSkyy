@@ -1,3 +1,8 @@
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
 name: Vercel Integration Pipeline
 
 on:
@@ -43,7 +48,7 @@ jobs:
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: 'Notify Vercel - Preview Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: preview'
         if: always()
@@ -80,7 +85,7 @@ jobs:
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: 'Notify Vercel - Production Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: production'
         if: always()
@@ -93,7 +98,7 @@ jobs:
     
     steps:
       - name: 'Notify Vercel - Overall Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: complete'
         if: always()

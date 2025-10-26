@@ -1,3 +1,118 @@
+#!/usr/bin/env python3
+"""
+DevSkyy - Luxury Fashion AI Platform
+Main FastAPI application with multi-AI orchestration system
+
+Author: DevSkyy Team
+Version: 1.0.0
+Python: >=3.11
+"""
+
+import sys
+import os
+import asyncio
+import logging
+from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+# Core FastAPI imports
+from fastapi import FastAPI, HTTPException, Depends, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+
+# DevSkyy imports
+try:
+    from agent.registry import AgentRegistry
+    from api.security_middleware import SecurityMiddleware
+    from infrastructure.database_manager import DatabaseManager
+    from infrastructure.elasticsearch_manager import ElasticsearchManager
+    from infrastructure.logging_config import setup_enterprise_logging
+    from infrastructure.monitoring import setup_monitoring
+    from infrastructure.redis_manager import RedisManager
+    from ml.model_registry import ModelRegistry
+except ImportError as e:
+    print(f"Warning: Some imports not available: {e}")
+    AgentRegistry = SecurityMiddleware = DatabaseManager = None
+    ElasticsearchManager = RedisManager = ModelRegistry = None
+    from ml.recommendation_engine import RecommendationEngine
+    from ml.redis_cache import RedisCache
+from agent.registry import registry
+from datetime import datetime
+from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from pathlib import Path
+from security.input_validation import csp, validation_middleware
+from security.secure_headers import security_headers_manager
+from starlette.middleware.base import BaseHTTPMiddleware
+from webhooks.webhook_system import webhook_manager
+import os
+import sys
+import time
+
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
+from models_sqlalchemy import PaymentRequest, ProductRequest
+from pydantic import BaseModel
+
+from agent.enhanced_agent_manager import EnhancedAgentManager as LegacyAgentManager
+from agent.modules.backend.cache_manager import cache_manager
+from agent.modules.backend.ecommerce_agent import EcommerceAgent
+from agent.modules.backend.financial_agent import FinancialAgent
+from agent.modules.backend.inventory_agent import InventoryAgent
+from agent.modules.backend.performance_agent import PerformanceAgent
+from agent.modules.backend.security_agent import SecurityAgent
+from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
+from database import db_manager
+from security.input_validation import input_sanitizer
+from security.jwt_auth import JWTManager
+from agent.ecommerce.inventory_optimizer import InventoryOptimizer
+from agent.ecommerce.pricing_engine import DynamicPricingEngine
+from agent.ecommerce.product_manager import ProductManager
+from agent.ml_models.fashion_ml import FashionMLEngine
+from agent.modules.backend.fixer_v2 import fixer_agent
+from agent.modules.backend.scanner_v2 import scanner_agent
+from agent.orchestrator import orchestrator
+from database import async_session_maker
+from agent.enhanced_agent_manager import EnhancedAgentManager
+from agent.modules.backend.cache_manager import CacheManager
+from agent.modules.backend.fixer_v2 import FixerAgentV2
+from agent.modules.backend.scanner_v2 import ScannerAgentV2
+from agent.modules.base_agent import BaseAgent, AgentStatus, SeverityLevel
+from agent.modules.frontend.design_automation_agent import DesignAutomationAgent
+from agent.modules.frontend.fashion_computer_vision_agent import FashionComputerVisionAgent
+from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
+from agent.orchestrator import AgentOrchestrator, ExecutionPriority, TaskStatus
+from api.v1 import agents as agents_router
+from api.v1 import auth as auth_router
+from api.v1 import codex as codex_router
+from api.v1 import dashboard as dashboard_router
+from api.v1 import gdpr as gdpr_router
+from api.v1 import ml as ml_router
+from api.v1 import monitoring as monitoring_router
+from api.v1 import webhooks as webhooks_router
+from fashion.intelligence_engine import FashionIntelligenceEngine
+from prometheus_client import REGISTRY
+from vercel_startup import initialize_vercel_app, get_app_config
+import uvicorn
+from agent.modules.backend.scanner import scan_site
+from agent.orchestrator import ExecutionPriority, orchestrator
+from agent.security_manager import security_manager, SecurityRole
+from api.rate_limiting import get_client_identifier, rate_limiter
+from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+from monitoring.observability import setup_monitoring
+from prometheus_client import Counter, Histogram
+from typing import Any, Dict, Optional
+import asyncio
+import logging
+import structlog
+import sys
+
 """
 DevSkyy Enterprise Fashion E-commerce Automation Platform v5.2.0
 
@@ -20,42 +135,32 @@ Version: 5.2.0
 Python: >=3.11
 """
 
-import asyncio
-import logging
-import os
-import sys
-import time
-from contextlib import asynccontextmanager
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, Optional
-
-import structlog
-from fastapi import FastAPI, HTTPException, Request, status
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from prometheus_client import Counter, Histogram
-from starlette.middleware.base import BaseHTTPMiddleware
+# Initialize Vercel-specific startup handling
+try:
+    VERCEL_STARTUP_SUCCESS = initialize_vercel_app()
+    APP_CONFIG = get_app_config()
+    logger.info("✅ Vercel startup initialization completed")
+except ImportError:
+    VERCEL_STARTUP_SUCCESS = True  # Fallback for local development
+    APP_CONFIG = {
+        "title": "DevSkyy Enterprise Platform",
+        "version": "5.2.0",
+        "environment": "development",
+        "features": {"email_validation": True}
+    }
+    logger.info("ℹ️ Running in local development mode")
+except Exception as e:
+    VERCEL_STARTUP_SUCCESS = False
+    logger.info(f"⚠️ Vercel startup failed: {e}")
+    APP_CONFIG = {"title": "DevSkyy Enterprise Platform", "version": "5.2.0"}
 
 # Enterprise Infrastructure Imports
 try:
-    from api.security_middleware import SecurityMiddleware
-    from infrastructure.database_manager import DatabaseManager
-    from infrastructure.elasticsearch_manager import ElasticsearchManager
-    from infrastructure.error_handling import (
-        global_exception_handler,
-    )
-    from infrastructure.logging_config import setup_enterprise_logging
-    from infrastructure.monitoring import setup_monitoring
-    from infrastructure.redis_manager import RedisManager
-
+    from infrastructure.global_exception_handler import global_exception_handler
     ENTERPRISE_INFRASTRUCTURE_AVAILABLE = True
 except ImportError as e:
     ENTERPRISE_INFRASTRUCTURE_AVAILABLE = False
-    print(f"Warning: Enterprise infrastructure not fully available: {e}")
+    logger.info(f"Warning: Enterprise infrastructure not fully available: {e}")
 
 # Core Application Modules - Load with graceful degradation
 CORE_MODULES_AVAILABLE = False
@@ -66,42 +171,66 @@ FashionIntelligenceEngine = RecommendationEngine = None
 ModelRegistry = RedisCache = None
 
 try:
-    # BaseAgent Framework and V2 Agents
-    from agent.modules.base_agent import BaseAgent, AgentStatus, SeverityLevel
-    from agent.orchestrator import AgentOrchestrator, ExecutionPriority, TaskStatus
-    from agent.registry import AgentRegistry
-    from agent.enhanced_agent_manager import EnhancedAgentManager
+    # BaseAgent Framework and V2 Agents (Core)
 
-    # V2 Backend Agents
-    from agent.modules.backend.fixer_v2 import FixerAgentV2
-    from agent.modules.backend.scanner_v2 import ScannerAgentV2
-    from agent.modules.backend.security_agent import SecurityAgent
-    from agent.modules.backend.performance_agent import PerformanceAgent
-    from agent.modules.backend.cache_manager import CacheManager
-
-    # V2 Frontend Agents
-    from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
-    from agent.modules.frontend.design_automation_agent import DesignAutomationAgent
-    from agent.modules.frontend.fashion_computer_vision_agent import FashionComputerVisionAgent
-
-    # Core Intelligence Engines
-    from fashion.intelligence_engine import FashionIntelligenceEngine
-    from ml.recommendation_engine import RecommendationEngine
-    from ml.model_registry import ModelRegistry
-    from ml.redis_cache import RedisCache
+    # Core Intelligence Engines (Essential)
 
     CORE_MODULES_AVAILABLE = True
     logger.info("✅ Core agent modules loaded successfully")
 except ImportError as e:
     CORE_MODULES_AVAILABLE = False
-    print(f"Warning: Core modules not fully available: {e}")
-    # Logger will be initialized later
+    logger.info(f"Warning: Core modules not fully available: {e}")
+    # Create fallback classes for missing modules
+    class BaseAgent: pass
+    class AgentStatus: pass
+    class SeverityLevel: pass
+    class AgentOrchestrator: pass
+    class ExecutionPriority: pass
+    class TaskStatus: pass
+    class AgentRegistry: pass
+    class EnhancedAgentManager: pass
+    class RecommendationEngine: pass
+    class ModelRegistry: pass
+    class RedisCache: pass
+
+# Optional V2 Backend Agents (Load with individual error handling)
+try:
+    V2_BACKEND_AVAILABLE = True
+except ImportError as e:
+    V2_BACKEND_AVAILABLE = False
+    logger.info(f"Info: V2 Backend agents not available: {e}")
+    # Create fallback classes
+    class FixerAgentV2: pass
+    class ScannerAgentV2: pass
+    class SecurityAgent: pass
+    class PerformanceAgent: pass
+    class CacheManager: pass
+
+# Optional V2 Frontend Agents (Load with individual error handling)
+try:
+    V2_FRONTEND_AVAILABLE = True
+except ImportError as e:
+    V2_FRONTEND_AVAILABLE = False
+    logger.info(f"Info: V2 Frontend agents not available: {e}")
+    # Create fallback classes
+    class WebDevelopmentAgent: pass
+    class DesignAutomationAgent: pass
+    class FashionComputerVisionAgent: pass
+
+# Optional Fashion Intelligence Engine (Load with individual error handling)
+try:
+    FASHION_ENGINE_AVAILABLE = True
+except ImportError as e:
+    FASHION_ENGINE_AVAILABLE = False
+    logger.info(f"Info: Fashion intelligence engine not available: {e}")
+    class FashionIntelligenceEngine: pass
 
 # ============================================================================
 # ENTERPRISE APPLICATION CONFIGURATION
 # ============================================================================
 
 # Environment Configuration
+import os
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 VERSION = "5.2.0"
@@ -114,8 +243,8 @@ CORS_ORIGINS = os.getenv(
     "CORS_ORIGINS", "http://localhost:3000,http://localhost:8080"
 ).split(",")
 
-# Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/devskyy")
+# Database Configuration - Use SQLite by default for development and Vercel
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./devskyy.db")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
 
@@ -140,7 +269,6 @@ KEEPALIVE_TIMEOUT = int(os.getenv("KEEPALIVE_TIMEOUT", "5"))
 
 logger = structlog.get_logger(__name__)
 
-
 def setup_logging() -> None:
     """Setup enterprise-grade structured logging."""
     if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
@@ -148,7 +276,7 @@ def setup_logging() -> None:
             level=LOG_LEVEL,
             environment=ENVIRONMENT,
             service_name="devskyy-platform",
-            version=VERSION,
+            version=VERSION)
         )
     else:
         # Fallback logging configuration
@@ -163,8 +291,6 @@ def setup_logging() -> None:
                     else logging.StreamHandler()
                 ),
             ],
-        )
-
 
 # ============================================================================
 # ENTERPRISE METRICS AND MONITORING
@@ -175,11 +301,10 @@ try:
     REQUEST_COUNT = Counter(
         "devskyy_requests_total",
         "Total number of requests",
-        ["method", "endpoint", "status_code"],
+        ["method", "endpoint", "status_code"]
     )
 except ValueError:
     # Metric already exists, get existing one
-    from prometheus_client import REGISTRY
 
     REQUEST_COUNT = None
     for collector in REGISTRY._collector_to_names:
@@ -189,35 +314,33 @@ except ValueError:
 
 try:
     REQUEST_DURATION = Histogram(
-        "devskyy_request_duration_seconds",
-        "Request duration in seconds",
+        "devskyy_request_duration_seconds")
+        "Request duration in seconds",)
         ["method", "endpoint"],
-    )
+
 except ValueError:
     REQUEST_DURATION = None
 
 try:
     ACTIVE_CONNECTIONS = Counter(
         "devskyy_active_connections", "Number of active connections"
-    )
+
 except ValueError:
     ACTIVE_CONNECTIONS = None
 
 try:
     FASHION_OPERATIONS = Counter(
         "devskyy_fashion_operations_total",
-        "Total fashion-related operations",
-        ["operation_type", "status"],
-    )
+        "Total fashion-related operations")
+        ["operation_type", "status"],)
 except ValueError:
     FASHION_OPERATIONS = None
 
 try:
     AI_PREDICTIONS = Counter(
         "devskyy_ai_predictions_total",
-        "Total AI predictions made",
-        ["model_type", "accuracy_tier"],
-    )
+        "Total AI predictions made")
+        ["model_type", "accuracy_tier"],)
 except ValueError:
     AI_PREDICTIONS = None
 
@@ -225,12 +348,10 @@ except ValueError:
 # ENTERPRISE APPLICATION LIFECYCLE MANAGEMENT
 # ============================================================================
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Enterprise application lifecycle management with comprehensive startup and shutdown."""
     logger.info(f"🚀 Starting DevSkyy Enterprise Platform v{VERSION} ({ENVIRONMENT})")
-
     # Startup Phase
     startup_start = time.time()
 
@@ -238,7 +359,6 @@ async def lifespan(app: FastAPI):
         # Initialize Enterprise Infrastructure
         if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
             logger.info("🔧 Initializing enterprise infrastructure...")
-
             # Database Connections
             db_manager = DatabaseManager()
             await db_manager.initialize()
@@ -255,11 +375,9 @@ async def lifespan(app: FastAPI):
             app.state.es_manager = es_manager
 
             logger.info("✅ Enterprise infrastructure initialized")
-
         # Initialize Core Application Modules
         if CORE_MODULES_AVAILABLE:
             logger.info("🤖 Initializing AI and agent systems...")
-
             # Initialize Enterprise Agent Ecosystem (V2 with BaseAgent)
             await initialize_agent_ecosystem()
             app.state.agent_orchestrator = agent_orchestrator
@@ -270,17 +388,15 @@ async def lifespan(app: FastAPI):
 
             # Legacy Agent Manager (for backward compatibility)
             try:
-                from agent.enhanced_agent_manager import EnhancedAgentManager as LegacyAgentManager
                 legacy_agent_manager = LegacyAgentManager(
                     orchestrator=agent_orchestrator,
-                    registry=agent_registry,
+                    registry=agent_registry)
                     cache=ml_cache
-                )
+
                 await legacy_agent_manager.initialize()
                 app.state.agent_manager = legacy_agent_manager
             except ImportError as e:
                 logger.info(f"Legacy AgentManager not available - using V2 system only: {e}")
-
             # Fashion Intelligence Engine
             if FASHION_AI_ENABLED:
                 fashion_engine = FashionIntelligenceEngine()
@@ -294,18 +410,14 @@ async def lifespan(app: FastAPI):
                 app.state.recommendation_engine = recommendation_engine
             except ImportError:
                 logger.info("RecommendationEngine not available - using agent-based recommendations")
-
             logger.info("✅ AI and agent systems initialized")
-
         # Setup Monitoring
         if ENABLE_METRICS and ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
             logger.info("📊 Setting up monitoring and observability...")
             await setup_monitoring(app)
             logger.info("✅ Monitoring setup complete")
-
         startup_time = time.time() - startup_start
         logger.info(f"🌟 DevSkyy Platform startup complete in {startup_time:.2f}s (v{VERSION}, {ENVIRONMENT})")
-
         yield
 
     except Exception as e:
@@ -314,7 +426,6 @@ async def lifespan(app: FastAPI):
 
     # Shutdown Phase
     logger.info("🛑 Shutting down DevSkyy Platform...")
-
     try:
         # Shutdown Enterprise Agent Ecosystem first
         await shutdown_agent_ecosystem()
@@ -348,65 +459,61 @@ async def lifespan(app: FastAPI):
             await app.state.es_manager.close()
 
         logger.info("✅ DevSkyy Platform shutdown complete")
-
     except Exception as e:
         logger.error(f"❌ Error during shutdown: {str(e)}", exc_info=True)
-
-
-from agent.modules.backend.scanner import scan_site
 
 # ============================================================================
 # API ENHANCEMENTS - GRADE A+
 # ============================================================================
-from api.rate_limiting import get_client_identifier, rate_limiter
 
 # ============================================================================
 # API V1 ROUTERS
 # ============================================================================
 # API Routers - Import with error handling for missing dependencies
 try:
-    from api.v1 import agents as agents_router
-    from api.v1 import auth as auth_router
-    from api.v1 import codex as codex_router
-    from api.v1 import gdpr as gdpr_router
-    from api.v1 import ml as ml_router
-    from api.v1 import monitoring as monitoring_router
-    from api.v1 import webhooks as webhooks_router
+    from api.v1.agents import router as agents_router
+    from api.v1.auth import router as auth_router
+    from api.v1.webhooks import router as webhooks_router
+    from api.v1.monitoring import router as monitoring_router
+    from api.v1.gdpr import router as gdpr_router
+    from api.v1.ml import router as ml_router
+    from api.v1.codex import router as codex_router
+    from api.v1.dashboard import router as dashboard_router
+    from api.v1.orchestration import router as orchestration_router
     API_ROUTERS_AVAILABLE = True
     logger.info("✅ All API routers loaded successfully")
 except ImportError as e:
-    print(f"Warning: Some API routers not available due to missing dependencies: {e}")
+    logger.info(f"Warning: Some API routers not available due to missing dependencies: {e}")
     API_ROUTERS_AVAILABLE = False
     # Create minimal routers for basic functionality
-    agents_router = auth_router = codex_router = None
-    gdpr_router = ml_router = monitoring_router = webhooks_router = None
+    agents_router = auth_router = codex_router = dashboard_router = None
+    gdpr_router = ml_router = monitoring_router = webhooks_router = orchestration_router = None
 
 # ============================================================================
 # ARCHITECTURE - GRADE A+
 # ============================================================================
-from monitoring.observability import (
-    health_monitor,
-    HealthStatus,
-    metrics_collector,
-    performance_tracker,
-)
-from security.input_validation import csp, validation_middleware
+try:
+    from architecture.health_monitor import health_monitor, HealthStatus
+    from architecture.metrics_collector import metrics_collector
+    from architecture.performance_tracker import performance_tracker
+    ARCHITECTURE_AVAILABLE = True
+except ImportError as e:
+    logger.info(f"Warning: Architecture modules not available: {e}")
+    ARCHITECTURE_AVAILABLE = False
+    health_monitor = HealthStatus = metrics_collector = performance_tracker = None
 
 # ============================================================================
 # ENTERPRISE SECURITY & AUTHENTICATION
 # ============================================================================
-from security.secure_headers import security_headers_manager
 
 # ============================================================================
 # WEBHOOKS & MONITORING
 # ============================================================================
-from webhooks.webhook_system import webhook_manager
 
 # ============================================================================
 # LAZY AGENT LOADER - Import on demand for fast startup
 # ============================================================================
 _agent_cache = {}
-
 
 def get_agent(agent_name: str, agent_type: str = "backend"):
     """
@@ -428,89 +535,56 @@ def get_agent(agent_name: str, agent_type: str = "backend"):
         if agent_type == "backend":
             # Backend agent imports
             if agent_name == "inventory":
-                from agent.modules.backend.inventory_agent import InventoryAgent
 
                 _agent_cache[cache_key] = InventoryAgent()
             elif agent_name == "ecommerce":
-                from agent.modules.backend.ecommerce_agent import EcommerceAgent
 
                 _agent_cache[cache_key] = EcommerceAgent()
             elif agent_name == "financial":
-                from agent.modules.backend.financial_agent import FinancialAgent
 
                 _agent_cache[cache_key] = FinancialAgent()
             elif agent_name == "brand_intelligence":
-                from agent.modules.backend.brand_intelligence_agent import (
-                    BrandIntelligenceAgent,
-                )
-
                 _agent_cache[cache_key] = BrandIntelligenceAgent()
             elif agent_name == "enhanced_brand_intelligence":
-                from agent.modules.backend.enhanced_brand_intelligence_agent import (
-                    EnhancedBrandIntelligenceAgent,
-                )
-
                 _agent_cache[cache_key] = EnhancedBrandIntelligenceAgent()
             elif agent_name == "seo_marketing":
-                from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 
                 _agent_cache[cache_key] = SEOMarketingAgent()
             elif agent_name == "customer_service":
-                from agent.modules.backend.customer_service_agent import (
-                    CustomerServiceAgent,
-                )
 
                 _agent_cache[cache_key] = CustomerServiceAgent()
             elif agent_name == "security":
-                from agent.modules.backend.security_agent import SecurityAgent
 
                 _agent_cache[cache_key] = SecurityAgent()
             elif agent_name == "performance":
-                from agent.modules.backend.performance_agent import PerformanceAgent
 
                 _agent_cache[cache_key] = PerformanceAgent()
             elif agent_name == "claude_sonnet":
-                from agent.modules.backend.claude_sonnet_intelligence_service import (
                     ClaudeSonnetIntelligenceService,
-                )
 
                 _agent_cache[cache_key] = ClaudeSonnetIntelligenceService()
             elif agent_name == "claude_sonnet_v2":
-                from agent.modules.backend.claude_sonnet_intelligence_service_v2 import (
                     ClaudeSonnetIntelligenceServiceV2,
-                )
 
                 _agent_cache[cache_key] = ClaudeSonnetIntelligenceServiceV2()
             elif agent_name == "openai":
-                from agent.modules.backend.openai_intelligence_service import (
                     OpenAIIntelligenceService,
-                )
 
                 _agent_cache[cache_key] = OpenAIIntelligenceService()
             elif agent_name == "multi_model":
-                from agent.modules.backend.multi_model_ai_orchestrator import (
                     MultiModelOrchestrator,
-                )
 
                 _agent_cache[cache_key] = MultiModelOrchestrator()
             elif agent_name == "social_media":
-                from agent.modules.backend.social_media_automation_agent import (
-                    SocialMediaAutomationAgent,
-                )
 
                 _agent_cache[cache_key] = SocialMediaAutomationAgent()
             elif agent_name == "email_sms":
-                from agent.modules.backend.email_sms_automation_agent import (
-                    EmailSMSAutomationAgent,
-                )
 
                 _agent_cache[cache_key] = EmailSMSAutomationAgent()
             elif agent_name == "wordpress":
-                from agent.modules.backend.wordpress_agent import WordPressAgent
 
                 _agent_cache[cache_key] = WordPressAgent()
             elif agent_name == "cache_manager":
-                from agent.modules.backend.cache_manager import cache_manager
 
                 _agent_cache[cache_key] = cache_manager
             else:
@@ -519,33 +593,20 @@ def get_agent(agent_name: str, agent_type: str = "backend"):
         elif agent_type == "frontend":
             # Frontend agent imports
             if agent_name == "design":
-                from agent.modules.frontend.design_automation_agent import (
-                    DesignAutomationAgent,
-                )
 
                 _agent_cache[cache_key] = DesignAutomationAgent()
             elif agent_name == "landing_page":
-                from agent.modules.frontend.autonomous_landing_page_generator import (
                     LandingPageGenerator,
-                )
 
                 _agent_cache[cache_key] = LandingPageGenerator()
             elif agent_name == "web_development":
-                from agent.modules.frontend.web_development_agent import (
-                    WebDevelopmentAgent,
-                )
 
                 _agent_cache[cache_key] = WebDevelopmentAgent()
             elif agent_name == "personalized_renderer":
-                from agent.modules.frontend.personalized_website_renderer import (
                     PersonalizedRenderer,
-                )
 
                 _agent_cache[cache_key] = PersonalizedRenderer()
             elif agent_name == "fashion_cv":
-                from agent.modules.frontend.fashion_computer_vision_agent import (
-                    FashionComputerVisionAgent,
-                )
 
                 _agent_cache[cache_key] = FashionComputerVisionAgent()
             else:
@@ -556,7 +617,6 @@ def get_agent(agent_name: str, agent_type: str = "backend"):
     except Exception as e:
         logging.warning(f"Failed to load {agent_type} agent '{agent_name}': {str(e)}")
         return None
-
 
 # ============================================================================
 # ENTERPRISE AGENT MANAGEMENT SYSTEM
@@ -572,7 +632,6 @@ model_registry: Optional[ModelRegistry] = None
 # Agent initialization status
 _agents_initialized = False
 _agent_initialization_lock = asyncio.Lock()
-
 
 async def initialize_agent_ecosystem():
     """
@@ -594,15 +653,13 @@ async def initialize_agent_ecosystem():
 
         try:
             logger.info("🚀 Initializing DevSkyy Enterprise Agent Ecosystem...")
-
             # 1. Initialize core infrastructure
             if CORE_MODULES_AVAILABLE:
                 # Initialize ML cache and model registry
                 ml_cache = RedisCache(
                     redis_url=REDIS_URL,
-                    default_ttl=3600,
+                    default_ttl=3600)
                     mode="hybrid"  # Redis + memory fallback
-                )
 
                 model_registry = ModelRegistry()
                 await model_registry.initialize()
@@ -615,17 +672,14 @@ async def initialize_agent_ecosystem():
                     max_concurrent_agents=10,
                     enable_circuit_breaker=True,
                     health_check_interval=30
-                )
 
                 # Initialize enhanced agent manager
                 enhanced_agent_manager = EnhancedAgentManager(
                     orchestrator=agent_orchestrator,
-                    registry=agent_registry,
+                    registry=agent_registry)
                     cache=ml_cache
-                )
 
                 logger.info("✅ Core agent infrastructure initialized")
-
                 # 2. Register and initialize V2 agents
                 await register_v2_agents()
 
@@ -637,14 +691,12 @@ async def initialize_agent_ecosystem():
 
                 _agents_initialized = True
                 logger.info("🎉 DevSkyy Agent Ecosystem fully initialized!")
-
             else:
                 logger.warning("⚠️ Core modules not available - running in limited mode")
 
         except Exception as e:
             logger.error(f"❌ Failed to initialize agent ecosystem: {e}")
             raise
-
 
 async def register_v2_agents():
     """Register all V2 agents with the orchestrator and registry."""
@@ -653,7 +705,6 @@ async def register_v2_agents():
             return
 
         logger.info("📋 Registering V2 agents...")
-
         # Backend V2 Agents
         backend_agents = [
             ("fixer_v2", FixerAgentV2, ExecutionPriority.HIGH),
@@ -677,17 +728,14 @@ async def register_v2_agents():
 
                 agent_registry.register_agent(
                     agent_name=agent_name,
-                    agent_instance=agent_instance,
+                    agent_instance=agent_instance)
                     capabilities=agent_instance.get_capabilities(),
                     priority=priority
-                )
 
                 agent_orchestrator.add_agent(agent_instance, priority)
                 logger.debug(f"✅ Registered backend agent: {agent_name}")
-
             except Exception as e:
                 logger.error(f"❌ Failed to register {agent_name}: {e}")
-
         # Register frontend agents
         for agent_name, agent_class, priority in frontend_agents:
             try:
@@ -696,23 +744,17 @@ async def register_v2_agents():
 
                 agent_registry.register_agent(
                     agent_name=agent_name,
-                    agent_instance=agent_instance,
+                    agent_instance=agent_instance)
                     capabilities=agent_instance.get_capabilities(),
                     priority=priority
-                )
 
                 agent_orchestrator.add_agent(agent_instance, priority)
                 logger.debug(f"✅ Registered frontend agent: {agent_name}")
-
             except Exception as e:
                 logger.error(f"❌ Failed to register {agent_name}: {e}")
-
         logger.info(f"📊 Agent registration complete: {len(backend_agents + frontend_agents)} agents")
-
     except Exception as e:
         logger.error(f"❌ Agent registration failed: {e}")
-
-
 async def perform_agent_health_checks():
     """Perform initial health checks on all registered agents."""
     try:
@@ -720,7 +762,6 @@ async def perform_agent_health_checks():
             return
 
         logger.info("🏥 Performing agent health checks...")
-
         health_results = await agent_orchestrator.health_check_all()
 
         healthy_count = sum(1 for status in health_results.values()
@@ -728,16 +769,12 @@ async def perform_agent_health_checks():
         total_count = len(health_results)
 
         logger.info(f"📊 Health check results: {healthy_count}/{total_count} agents healthy")
-
         # Log any unhealthy agents
         for agent_name, status in health_results.items():
             if status != AgentStatus.HEALTHY:
                 logger.warning(f"⚠️ Agent {agent_name} status: {status.value}")
-
     except Exception as e:
         logger.error(f"❌ Health check failed: {e}")
-
-
 async def shutdown_agent_ecosystem():
     """Gracefully shutdown the agent ecosystem."""
     global agent_orchestrator, agent_registry, enhanced_agent_manager
@@ -745,7 +782,6 @@ async def shutdown_agent_ecosystem():
 
     try:
         logger.info("🛑 Shutting down agent ecosystem...")
-
         if agent_orchestrator:
             await agent_orchestrator.shutdown()
 
@@ -757,22 +793,13 @@ async def shutdown_agent_ecosystem():
 
         _agents_initialized = False
         logger.info("✅ Agent ecosystem shutdown complete")
-
     except Exception as e:
         logger.error(f"❌ Agent shutdown error: {e}")
-
-
 # ============================================================================
 # DATABASE & CONFIGURATION (Zero MongoDB)
 # ============================================================================
-from datetime import datetime
-
-from dotenv import load_dotenv
-
-from models_sqlalchemy import PaymentRequest, ProductRequest
 
 load_dotenv()
-
 
 # ============================================================================
 # FASTAPI APPLICATION
@@ -818,7 +845,7 @@ app = FastAPI(
     docs_url="/docs" if DEBUG else None,
     redoc_url="/redoc" if DEBUG else None,
     openapi_url="/openapi.json" if DEBUG else None,
-    lifespan=lifespan,
+    lifespan=lifespan)
 )
 
 # Configure enhanced structured logging (Phase 2) - with fallback
@@ -828,29 +855,28 @@ if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
             level=LOG_LEVEL,
             environment=ENVIRONMENT,
             service_name="devskyy-platform",
-            version=VERSION,
-        )
+            version=VERSION)
         logger = structlog.get_logger(__name__)
     except Exception as e:
-        print(f"Warning: Failed to setup enterprise logging: {e}")
+        logger.info(f"Warning: Failed to setup enterprise logging: {e}")
         logging.basicConfig(
-            level=logging.INFO,
+            level=logging.INFO)
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        )
+
         logger = logging.getLogger(__name__)
 else:
     # Fallback to basic logging
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.INFO)
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler(sys.stdout)],
-    )
+
     logger = logging.getLogger(__name__)
 
 # ============================================================================
 # MIDDLEWARE
 # ============================================================================
-cors_origins = os.getenv(
+cors_origins = os.getenv()
     "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173"
 ).split(",")
 trusted_hosts = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
@@ -860,7 +886,7 @@ app.add_middleware(
     allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"])
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
@@ -881,7 +907,6 @@ if ENTERPRISE_INFRASTRUCTURE_AVAILABLE:
 else:
     logger.warning("⚠️ Security middleware not available - using basic security")
 
-
 # Add rate limiting middleware (Grade A+ API)
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
@@ -896,7 +921,6 @@ async def rate_limit_middleware(request: Request, call_next):
     # Check rate limit (100 requests per minute)
     is_allowed, rate_limit_info = rate_limiter.is_allowed(
         client_id, max_requests=100, window_seconds=60
-    )
 
     if not is_allowed:
         return JSONResponse(
@@ -905,14 +929,13 @@ async def rate_limit_middleware(request: Request, call_next):
                 "error": True,
                 "message": "Rate limit exceeded. Please try again later.",
                 "rate_limit": rate_limit_info,
-            },
+            })
             headers={
                 "X-RateLimit-Limit": str(rate_limit_info["limit"]),
                 "X-RateLimit-Remaining": str(rate_limit_info["remaining"]),
                 "X-RateLimit-Reset": str(rate_limit_info["reset"]),
                 "Retry-After": "60",
             },
-        )
 
     # Process request
     response = await call_next(request)
@@ -923,7 +946,6 @@ async def rate_limit_middleware(request: Request, call_next):
     response.headers["X-RateLimit-Reset"] = str(rate_limit_info["reset"])
 
     return response
-
 
 # Add performance tracking middleware
 @app.middleware("http")
@@ -941,12 +963,11 @@ async def track_performance(request: Request, call_next):
     endpoint = f"{request.method} {request.url.path}"
     performance_tracker.record_request(endpoint, duration_ms, response.status_code)
     metrics_collector.increment_counter(
-        "http_requests_total",
+        "http_requests_total")
         labels={"method": request.method, "status": str(response.status_code)},
-    )
+
     metrics_collector.record_histogram(
         "http_request_duration_ms", duration_ms, labels={"endpoint": request.url.path}
-    )
 
     # Add comprehensive security headers (Grade A+ Security)
     security_headers = csp.get_csp_header()
@@ -961,7 +982,6 @@ async def track_performance(request: Request, call_next):
 
     return response
 
-
 # ============================================================================
 # EXCEPTION HANDLERS
 # ============================================================================
@@ -970,10 +990,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url}")
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": True, "message": exc.detail, "status_code": exc.status_code},
-    )
-
-
+        content={"error": True, "message": exc.detail, "status_code": exc.status_code})
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation error: {exc} - {request.url}")
@@ -981,30 +998,23 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "error": True,
-            "message": "Invalid request data",
+            "message": "Invalid request data")
             "details": exc.errors(),
         },
-    )
-
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"error": True, "message": "Internal server error"},
-    )
-
-
+        content={"error": True, "message": "Internal server error"})
 # ============================================================================
 # HEALTH CHECKS - Register system health checks
 # ============================================================================
 
-
 async def database_health_check():
     """Check database connectivity"""
     try:
-        from database import async_session_maker
 
         async with async_session_maker() as session:
             await session.execute("SELECT 1")
@@ -1012,11 +1022,9 @@ async def database_health_check():
     except Exception as e:
         return HealthStatus.UNHEALTHY, f"Database error: {str(e)}", {}
 
-
 async def agent_orchestrator_health_check():
     """Check agent orchestrator status"""
     try:
-        from agent.orchestrator import orchestrator
 
         health = await orchestrator.get_orchestrator_health()
         if health.get("status") == "healthy":
@@ -1024,7 +1032,6 @@ async def agent_orchestrator_health_check():
         return HealthStatus.DEGRADED, "Orchestrator degraded", health
     except Exception as e:
         return HealthStatus.UNHEALTHY, f"Orchestrator error: {str(e)}", {}
-
 
 async def security_manager_health_check():
     """
@@ -1045,7 +1052,6 @@ async def security_manager_health_check():
 
         # 1. Check JWT authentication system
         try:
-            from security.jwt_auth import JWTManager
             jwt_manager = JWTManager()
             # Test token generation and validation
             test_payload = {"test": "health_check", "exp": time.time() + 60}
@@ -1063,7 +1069,6 @@ async def security_manager_health_check():
 
         # 2. Check input validation system
         try:
-            from security.input_validation import input_sanitizer
             test_input = "<script>alert('test')</script>"
             sanitized = input_sanitizer.sanitize_html(test_input)
 
@@ -1115,17 +1120,14 @@ async def security_manager_health_check():
             "timestamp": datetime.now().isoformat()
         }
 
-
 # Register health checks
 health_monitor.register_check("database", database_health_check)
 health_monitor.register_check("orchestrator", agent_orchestrator_health_check)
 health_monitor.register_check("security", security_manager_health_check)
 
-
 # ============================================================================
 # STARTUP & SHUTDOWN - Now handled by lifespan handler above
 # ============================================================================
-
 
 # ============================================================================
 # API V1 ROUTERS - Enterprise API
@@ -1161,10 +1163,17 @@ if API_ROUTERS_AVAILABLE:
     if codex_router:
         app.include_router(codex_router.router, prefix="/api/v1", tags=["v1-codex"])
 
+    # Enterprise Dashboard
+    if dashboard_router:
+        app.include_router(dashboard_router.router, prefix="/api/v1", tags=["v1-dashboard"])
+
+    # Multi-AI Orchestration System
+    if orchestration_router:
+        app.include_router(orchestration_router, prefix="/api/v1/orchestration", tags=["v1-orchestration"])
+
     logger.info("✅ All available API routers registered")
 else:
     logger.warning("⚠️ API routers not registered due to missing dependencies")
-
 
 # ============================================================================
 # CORE ENDPOINTS
@@ -1203,7 +1212,6 @@ async def root():
         "timestamp": datetime.now().isoformat(),
     }
 
-
 @app.get("/health")
 async def health_check():
     """Basic health check that works without dependencies"""
@@ -1239,7 +1247,6 @@ async def health_check():
 
         # Check database if available
         try:
-            from database import db_manager
             db_health = await db_manager.health_check()
             health_status["database_status"] = db_health.get("status", "unknown")
         except Exception as e:
@@ -1256,7 +1263,6 @@ async def health_check():
             "version": "5.2.0",
             "environment": os.getenv("ENVIRONMENT", "development")
         }
-
 
 @app.get("/agents")
 async def list_agents():
@@ -1294,7 +1300,6 @@ async def list_agents():
         },
     }
 
-
 # ============================================================================
 # CORE AGENT ENDPOINTS
 # ============================================================================
@@ -1310,7 +1315,6 @@ async def scan_website():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 def scan_site():
     """
@@ -1383,7 +1387,6 @@ def scan_site():
             "scan_id": f"scan_failed_{int(time.time())}"
         }
 
-
 def _scan_security():
     """Scan for security vulnerabilities"""
     issues = []
@@ -1395,7 +1398,7 @@ def _scan_security():
             issues.append({
                 "type": "security",
                 "severity": "high",
-                "message": "SECRET_KEY environment variable not set",
+                "message": "SECRET_KEY environment variable not set")
                 "recommendation": "Set a strong SECRET_KEY in environment variables"
             })
 
@@ -1404,15 +1407,13 @@ def _scan_security():
             issues.append({
                 "type": "security",
                 "severity": "critical",
-                "message": "Debug mode enabled in production",
+                "message": "Debug mode enabled in production")
                 "recommendation": "Disable debug mode in production environment"
             })
 
     except Exception as e:
         logger.warning(f"Security scan error: {e}")
-
     return issues
-
 
 def _scan_performance():
     """Scan for performance issues"""
@@ -1420,7 +1421,6 @@ def _scan_performance():
 
     try:
         # Check for large dependencies
-        import sys
         large_modules = []
         for module_name, module in sys.modules.items():
             if hasattr(module, '__file__') and module.__file__:
@@ -1437,16 +1437,14 @@ def _scan_performance():
         if large_modules:
             issues.append({
                 "type": "performance",
-                "severity": "medium",
+                "severity": "medium")
                 "message": f"Large modules detected: {len(large_modules)} modules > 1MB",
                 "recommendation": "Consider lazy loading or optimizing large dependencies"
             })
 
     except Exception as e:
         logger.warning(f"Performance scan error: {e}")
-
     return issues
-
 
 def _scan_seo():
     """Scan for SEO issues"""
@@ -1458,15 +1456,13 @@ def _scan_seo():
             issues.append({
                 "type": "seo",
                 "severity": "medium",
-                "message": "Application title not set",
+                "message": "Application title not set")
                 "recommendation": "Set a descriptive title for better SEO"
             })
 
     except Exception as e:
         logger.warning(f"SEO scan error: {e}")
-
     return issues
-
 
 def _scan_accessibility():
     """
@@ -1501,7 +1497,7 @@ def _scan_accessibility():
                                     "type": "accessibility",
                                     "severity": "medium",
                                     "message": f"Image without alt attribute in {html_file}",
-                                    "recommendation": "Add descriptive alt attributes to all images",
+                                    "recommendation": "Add descriptive alt attributes to all images")
                                     "file": str(html_file),
                                     "wcag_guideline": "1.1.1 Non-text Content"
                                 })
@@ -1520,7 +1516,7 @@ def _scan_accessibility():
                                             "type": "accessibility",
                                             "severity": "high",
                                             "message": f"Form input without label in {html_file}",
-                                            "recommendation": "Add proper labels or aria-label attributes to form inputs",
+                                            "recommendation": "Add proper labels or aria-label attributes to form inputs")
                                             "file": str(html_file),
                                             "wcag_guideline": "1.3.1 Info and Relationships"
                                         })
@@ -1531,7 +1527,7 @@ def _scan_accessibility():
                                 "type": "accessibility",
                                 "severity": "high",
                                 "message": f"Missing page title in {html_file}",
-                                "recommendation": "Add descriptive page titles",
+                                "recommendation": "Add descriptive page titles")
                                 "file": str(html_file),
                                 "wcag_guideline": "2.4.2 Page Titled"
                             })
@@ -1542,21 +1538,20 @@ def _scan_accessibility():
                                 "type": "accessibility",
                                 "severity": "medium",
                                 "message": f"Missing lang attribute in {html_file}",
-                                "recommendation": "Add lang attribute to html element",
+                                "recommendation": "Add lang attribute to html element")
                                 "file": str(html_file),
                                 "wcag_guideline": "3.1.1 Language of Page"
                             })
 
                     except Exception as e:
                         logger.warning(f"Error scanning {html_file} for accessibility: {e}")
-
         # 2. Check for accessibility configuration
         if not os.getenv("ACCESSIBILITY_FEATURES_ENABLED"):
             issues.append({
                 "type": "accessibility",
                 "severity": "low",
                 "message": "Accessibility features not explicitly enabled",
-                "recommendation": "Set ACCESSIBILITY_FEATURES_ENABLED=true in environment",
+                "recommendation": "Set ACCESSIBILITY_FEATURES_ENABLED=true in environment")
                 "wcag_guideline": "General Best Practice"
             })
 
@@ -1573,7 +1568,7 @@ def _scan_accessibility():
                     issues.append({
                         "type": "accessibility",
                         "severity": "medium",
-                        "message": f"Potential low contrast colors in {css_file}",
+                        "message": f"Potential low contrast colors in {css_file}")
                         "recommendation": "Verify color contrast ratios meet WCAG AA standards (4.5:1)",
                         "file": str(css_file),
                         "wcag_guideline": "1.4.3 Contrast (Minimum)"
@@ -1581,18 +1576,16 @@ def _scan_accessibility():
 
             except Exception as e:
                 logger.warning(f"Error scanning {css_file} for accessibility: {e}")
-
     except Exception as e:
         logger.warning(f"Accessibility scan error: {e}")
         issues.append({
             "type": "accessibility",
-            "severity": "low",
+            "severity": "low")
             "message": f"Accessibility scan encountered error: {str(e)}",
             "recommendation": "Review accessibility scanning implementation"
         })
 
     return issues
-
 
 def _scan_code_quality():
     """Scan for code quality issues"""
@@ -1608,15 +1601,13 @@ def _scan_code_quality():
                     issues.append({
                         "type": "code_quality",
                         "severity": "low",
-                        "message": "TODO/FIXME comments found in main.py",
+                        "message": "TODO/FIXME comments found in main.py")
                         "recommendation": "Review and resolve pending TODO items"
                     })
 
     except Exception as e:
         logger.warning(f"Code quality scan error: {e}")
-
     return issues
-
 
 def fix_code(issues: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -1651,7 +1642,7 @@ def fix_code(issues: Dict[str, Any]) -> Dict[str, Any]:
             except Exception as e:
                 failed_fixes.append({
                     "issue": issue,
-                    "success": False,
+                    "success": False)
                     "error": str(e)
                 })
 
@@ -1680,7 +1671,6 @@ def fix_code(issues: Dict[str, Any]) -> Dict[str, Any]:
             "failed": len(issues.get("issues", [])),
             "fix_id": f"fix_failed_{int(time.time())}"
         }
-
 
 def _fix_single_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -1719,7 +1709,6 @@ def _fix_single_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
             "error": str(e)
         }
 
-
 def _fix_security_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """Fix security-related issues"""
     message = issue.get("message", "")
@@ -1737,7 +1726,6 @@ def _fix_security_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
         "message": "Security issue requires manual review"
     }
 
-
 def _fix_performance_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """Fix performance-related issues"""
     return {
@@ -1745,7 +1733,6 @@ def _fix_performance_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
         "success": True,
         "message": "Performance issue logged for optimization review"
     }
-
 
 def _fix_seo_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """Fix SEO-related issues"""
@@ -1755,7 +1742,6 @@ def _fix_seo_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
         "message": "SEO issue logged for content team review"
     }
 
-
 def _fix_accessibility_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """Fix accessibility-related issues"""
     return {
@@ -1764,7 +1750,6 @@ def _fix_accessibility_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
         "message": "Accessibility issue logged for UI/UX team review"
     }
 
-
 def _fix_code_quality_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
     """Fix code quality-related issues"""
     return {
@@ -1772,7 +1757,6 @@ def _fix_code_quality_issue(issue: Dict[str, Any]) -> Dict[str, Any]:
         "success": True,
         "message": "Code quality issue logged for development team review"
     }
-
 
 @app.post("/fix")
 async def fix_issues(issues: Dict[str, Any]):
@@ -1786,7 +1770,6 @@ async def fix_issues(issues: Dict[str, Any]):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # BACKEND AGENT ENDPOINTS
@@ -1804,7 +1787,6 @@ async def inventory_scan():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/products")
 async def create_product(product: ProductRequest):
     """Create new product"""
@@ -1817,7 +1799,6 @@ async def create_product(product: ProductRequest):
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/api/analytics/dashboard")
 async def analytics_dashboard():
@@ -1832,7 +1813,6 @@ async def analytics_dashboard():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/payments/process")
 async def process_payment(payment: PaymentRequest):
     """Process payment"""
@@ -1845,7 +1825,6 @@ async def process_payment(payment: PaymentRequest):
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # FRONTEND AGENT ENDPOINTS
@@ -1863,7 +1842,6 @@ async def generate_design(design_request: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/frontend/landing-page")
 async def generate_landing_page(page_request: Dict[str, Any]):
     """Generate landing page"""
@@ -1877,7 +1855,6 @@ async def generate_landing_page(page_request: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================================
 # DYNAMIC AGENT EXECUTION
 # ============================================================================
@@ -1887,13 +1864,11 @@ async def execute_agent(agent_type: str, agent_name: str, task: Dict[str, Any]):
     if agent_type not in ["backend", "frontend"]:
         raise HTTPException(
             status_code=400, detail="agent_type must be 'backend' or 'frontend'"
-        )
 
     agent = get_agent(agent_name, agent_type)
     if not agent:
         raise HTTPException(
             status_code=404, detail=f"{agent_type} agent '{agent_name}' not found"
-        )
 
     try:
         if hasattr(agent, "execute"):
@@ -1914,16 +1889,9 @@ async def execute_agent(agent_type: str, agent_name: str, task: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-from pydantic import BaseModel
-
 # ============================================================================
 # AGENT ORCHESTRATION SYSTEM
 # ============================================================================
-from agent.orchestrator import ExecutionPriority, orchestrator
-from agent.registry import registry
-from agent.security_manager import security_manager, SecurityRole
-
 
 class ExecuteTaskRequest(BaseModel):
     task_type: str
@@ -1931,22 +1899,18 @@ class ExecuteTaskRequest(BaseModel):
     required_capabilities: list[str]
     priority: str = "medium"
 
-
 class WorkflowRequest(BaseModel):
     workflow_name: str
     parameters: Dict[str, Any]
-
 
 class APIKeyRequest(BaseModel):
     agent_name: str
     role: str = "service"
 
-
 class PermissionCheckRequest(BaseModel):
     agent_name: str
     resource: str
     permission: str
-
 
 # Orchestrator Endpoints
 @app.get("/api/agents/orchestrator/health")
@@ -1958,7 +1922,6 @@ async def orchestrator_health():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/agents/orchestrator/metrics")
 async def orchestrator_metrics():
     """Get performance metrics for all agents"""
@@ -1968,7 +1931,6 @@ async def orchestrator_metrics():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/agents/orchestrator/dependencies")
 async def orchestrator_dependencies():
     """Get agent dependency graph"""
@@ -1977,7 +1939,6 @@ async def orchestrator_dependencies():
         return {"status": "success", "data": deps}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/agents/orchestrator/execute")
 async def orchestrator_execute(request: ExecuteTaskRequest):
@@ -1995,12 +1956,10 @@ async def orchestrator_execute(request: ExecuteTaskRequest):
             task_type=request.task_type,
             parameters=request.parameters,
             required_capabilities=request.required_capabilities,
-            priority=priority,
-        )
+            priority=priority)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Registry Endpoints
 @app.get("/api/agents/registry/list")
@@ -2012,7 +1971,6 @@ async def registry_list():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/agents/registry/info/{agent_name}")
 async def registry_info(agent_name: str):
     """Get detailed agent information"""
@@ -2021,13 +1979,12 @@ async def registry_info(agent_name: str):
         if not info:
             raise HTTPException(
                 status_code=404, detail=f"Agent '{agent_name}' not found"
-            )
+
         return {"status": "success", "data": info}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/agents/registry/discover")
 async def registry_discover():
@@ -2038,7 +1995,6 @@ async def registry_discover():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/agents/registry/health")
 async def registry_health():
     """Health check all registered agents"""
@@ -2048,18 +2004,16 @@ async def registry_health():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/agents/registry/workflow")
 async def registry_workflow(request: WorkflowRequest):
     """Execute a predefined workflow"""
     try:
         result = await registry.execute_workflow(
             workflow_name=request.workflow_name, parameters=request.parameters
-        )
+
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/agents/registry/reload/{agent_name}")
 async def registry_reload(agent_name: str):
@@ -2069,13 +2023,12 @@ async def registry_reload(agent_name: str):
         if not success:
             raise HTTPException(
                 status_code=404, detail=f"Failed to reload agent '{agent_name}'"
-            )
+
         return {"status": "success", "message": f"Agent '{agent_name}' reloaded"}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Security Endpoints
 @app.post("/api/security/api-key/generate")
@@ -2093,14 +2046,13 @@ async def security_generate_key(request: APIKeyRequest):
 
         api_key = security_manager.generate_api_key(
             agent_name=request.agent_name, role=role
-        )
+
         return {
             "status": "success",
-            "data": {"api_key": api_key, "agent": request.agent_name},
+            "data": {"api_key": api_key, "agent": request.agent_name})
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.delete("/api/security/api-key/{key_id}")
 async def security_revoke_key(key_id: str):
@@ -2115,7 +2067,6 @@ async def security_revoke_key(key_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/security/audit-log")
 async def security_audit_log(
     agent_name: str = None, event_type: str = None, limit: int = 100
@@ -2124,11 +2075,10 @@ async def security_audit_log(
     try:
         logs = security_manager.get_audit_log(
             agent_name=agent_name, event_type=event_type, limit=limit
-        )
+
         return {"status": "success", "data": {"logs": logs, "count": len(logs)}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/api/security/summary")
 async def security_summary():
@@ -2139,7 +2089,6 @@ async def security_summary():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/security/check-permission")
 async def security_check_permission(request: PermissionCheckRequest):
     """Check if agent has permission"""
@@ -2147,12 +2096,10 @@ async def security_check_permission(request: PermissionCheckRequest):
         has_permission = security_manager.check_permission(
             agent_name=request.agent_name,
             resource=request.resource,
-            permission=request.permission,
-        )
+            permission=request.permission)
         return {"status": "success", "data": {"has_permission": has_permission}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # V2 Agent Endpoints
 @app.post("/api/agents/scanner/scan")
@@ -2161,7 +2108,6 @@ async def scanner_v2_scan(
 ):
     """Execute Scanner Agent V2"""
     try:
-        from agent.modules.backend.scanner_v2 import scanner_agent
 
         if scanner_agent.status.value != "healthy":
             await scanner_agent.initialize()
@@ -2169,23 +2115,20 @@ async def scanner_v2_scan(
         result = await scanner_agent.execute_core_function(
             scan_type=scan_type,
             target_path=target_path,
-            include_live_check=include_live_check,
-        )
+            include_live_check=include_live_check)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/agents/fixer/fix")
 async def fixer_v2_fix(
     fix_type: str = "auto",
     scan_results: Dict[str, Any] = None,
     target_files: list[str] = None,
-    dry_run: bool = False,
+    dry_run: bool = False)
 ):
     """Execute Fixer Agent V2"""
     try:
-        from agent.modules.backend.fixer_v2 import fixer_agent
 
         if fixer_agent.status.value != "healthy":
             await fixer_agent.initialize()
@@ -2194,12 +2137,10 @@ async def fixer_v2_fix(
             fix_type=fix_type,
             scan_results=scan_results,
             target_files=target_files,
-            dry_run=dry_run,
-        )
+            dry_run=dry_run)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/api/agents/{agent_name}/health")
 async def agent_health(agent_name: str):
@@ -2209,7 +2150,6 @@ async def agent_health(agent_name: str):
         if not agent:
             raise HTTPException(
                 status_code=404, detail=f"Agent '{agent_name}' not found"
-            )
 
         health = await agent.health_check()
         return {"status": "success", "data": health}
@@ -2217,7 +2157,6 @@ async def agent_health(agent_name: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # PERFORMANCE METRICS
@@ -2243,7 +2182,6 @@ async def performance_metrics():
         "timestamp": datetime.now().isoformat(),
     }
 
-
 # ============================================================================
 # WORDPRESS THEME BUILDER ENDPOINTS
 # ============================================================================
@@ -2251,7 +2189,6 @@ async def performance_metrics():
 async def generate_wordpress_theme(request: Dict[str, Any]):
     """Generate WordPress/Elementor theme"""
     try:
-        from agent.wordpress.theme_builder import ElementorThemeBuilder
 
         builder = ElementorThemeBuilder(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
@@ -2259,31 +2196,26 @@ async def generate_wordpress_theme(request: Dict[str, Any]):
             brand_info=request.get("brand_info", {}),
             theme_type=request.get("theme_type", "luxury_fashion"),
             pages=request.get("pages"),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Theme generation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/wordpress/theme/export")
 async def export_wordpress_theme(request: Dict[str, Any]):
     """Export WordPress theme"""
     try:
-        from agent.wordpress.theme_builder import ElementorThemeBuilder
 
         builder = ElementorThemeBuilder(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
         result = await builder.export_theme(
             theme=request.get("theme", {}), format=request.get("format", "json")
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Theme export failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # ENTERPRISE AGENT MANAGEMENT ENDPOINTS
@@ -2330,7 +2262,6 @@ async def get_agent_ecosystem_status():
         logger.error(f"Failed to get agent status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/agents/{agent_name}/execute")
 async def execute_agent_task(agent_name: str, task_data: Dict[str, Any]):
     """Execute a task using a specific agent."""
@@ -2349,12 +2280,11 @@ async def execute_agent_task(agent_name: str, task_data: Dict[str, Any]):
                 agent_name=agent_name,
                 task_data=task_data,
                 priority=ExecutionPriority.MEDIUM
-            )
 
             return {
                 "status": "success",
                 "task_id": task_id,
-                "agent": agent_name,
+                "agent": agent_name)
                 "message": "Task submitted for execution"
             }
         else:
@@ -2369,7 +2299,6 @@ async def execute_agent_task(agent_name: str, task_data: Dict[str, Any]):
     except Exception as e:
         logger.error(f"Agent task execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/api/agents/{agent_name}/health")
 async def get_agent_health(agent_name: str):
@@ -2398,7 +2327,6 @@ async def get_agent_health(agent_name: str):
         logger.error(f"Agent health check failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/agents/orchestrator/coordinate")
 async def coordinate_multi_agent_task(task_request: Dict[str, Any]):
     """Coordinate a multi-agent task execution."""
@@ -2416,19 +2344,17 @@ async def coordinate_multi_agent_task(task_request: Dict[str, Any]):
             agent_names=agents_required,
             shared_context=task_data,
             priority=priority
-        )
 
         return {
             "status": "success",
             "coordination_id": coordination_id,
-            "agents": agents_required,
+            "agents": agents_required)
             "message": "Multi-agent coordination initiated"
         }
 
     except Exception as e:
         logger.error(f"Multi-agent coordination failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/api/agents/metrics")
 async def get_agent_metrics():
@@ -2469,7 +2395,6 @@ async def get_agent_metrics():
         logger.error(f"Failed to get agent metrics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================================
 # ECOMMERCE AUTOMATION ENDPOINTS
 # ============================================================================
@@ -2477,81 +2402,68 @@ async def get_agent_metrics():
 async def create_enhanced_product(request: Dict[str, Any]):
     """Create product with ML enhancements"""
     try:
-        from agent.ecommerce.product_manager import ProductManager
 
         manager = ProductManager()
 
         result = await manager.create_product(
             product_data=request, auto_generate=request.get("auto_generate", True)
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Product creation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/products/bulk")
 async def bulk_import_products(request: Dict[str, Any]):
     """Bulk import products"""
     try:
-        from agent.ecommerce.product_manager import ProductManager
 
         manager = ProductManager()
 
         result = await manager.bulk_import_products(
             products=request.get("products", [])
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Bulk import failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/pricing/optimize")
 async def optimize_pricing(request: Dict[str, Any]):
     """Optimize product pricing using ML"""
     try:
-        from agent.ecommerce.pricing_engine import DynamicPricingEngine
 
         pricing = DynamicPricingEngine()
 
         result = await pricing.optimize_price(
             product_data=request.get("product_data", {}),
             market_data=request.get("market_data", {}),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Price optimization failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/pricing/strategy")
 async def create_pricing_strategy(request: Dict[str, Any]):
     """Create pricing strategy"""
     try:
-        from agent.ecommerce.pricing_engine import DynamicPricingEngine
 
         pricing = DynamicPricingEngine()
 
         result = await pricing.create_pricing_strategy(
             strategy_type=request.get("strategy_type", "clearance"),
             products=request.get("products", []),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Pricing strategy creation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/pricing/ab-test")
 async def create_ab_test(request: Dict[str, Any]):
     """Create A/B price test"""
     try:
-        from agent.ecommerce.pricing_engine import DynamicPricingEngine
 
         pricing = DynamicPricingEngine()
 
@@ -2560,19 +2472,16 @@ async def create_ab_test(request: Dict[str, Any]):
             price_variant_a=request.get("price_variant_a"),
             price_variant_b=request.get("price_variant_b"),
             duration_days=request.get("duration_days", 14),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"A/B test creation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/inventory/forecast")
 async def forecast_inventory(request: Dict[str, Any]):
     """Forecast inventory demand"""
     try:
-        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
 
         inventory = InventoryOptimizer()
 
@@ -2580,76 +2489,64 @@ async def forecast_inventory(request: Dict[str, Any]):
             product_id=request.get("product_id"),
             historical_sales=request.get("historical_sales", []),
             forecast_periods=request.get("forecast_periods", 30),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Inventory forecast failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/inventory/reorder")
 async def calculate_reorder_point(request: Dict[str, Any]):
     """Calculate optimal reorder point"""
     try:
-        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
 
         inventory = InventoryOptimizer()
 
         result = await inventory.calculate_reorder_point(
             product_data=request.get("product_data", {}),
             sales_data=request.get("sales_data", {}),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Reorder calculation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/inventory/deadstock")
 async def identify_dead_stock(request: Dict[str, Any]):
     """Identify dead stock"""
     try:
-        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
 
         inventory = InventoryOptimizer()
 
         result = await inventory.identify_dead_stock(
             inventory=request.get("inventory", []),
             threshold_days=request.get("threshold_days", 90),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Dead stock identification failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ecommerce/inventory/optimize")
 async def optimize_stock_levels(request: Dict[str, Any]):
     """Optimize stock levels"""
     try:
-        from agent.ecommerce.inventory_optimizer import InventoryOptimizer
 
         inventory = InventoryOptimizer()
 
         result = await inventory.optimize_stock_levels(
             products=request.get("products", []),
             target_service_level=request.get("target_service_level", 0.95),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Stock optimization failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/api/ecommerce/products/{product_id}/analytics")
 async def get_product_analytics(product_id: str):
     """Get product analytics"""
     try:
-        from agent.ecommerce.product_manager import ProductManager
 
         manager = ProductManager()
 
@@ -2660,7 +2557,6 @@ async def get_product_analytics(product_id: str):
         logger.error(f"Analytics retrieval failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================================
 # MACHINE LEARNING ENDPOINTS
 # ============================================================================
@@ -2668,82 +2564,69 @@ async def get_product_analytics(product_id: str):
 async def analyze_fashion_trend(request: Dict[str, Any]):
     """Analyze fashion trends"""
     try:
-        from agent.ml_models.fashion_ml import FashionMLEngine
 
         ml = FashionMLEngine()
 
         result = await ml.analyze_trend(
             historical_data=request.get("historical_data", {}),
             forecast_periods=request.get("forecast_periods", 12),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Trend analysis failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ml/fashion/optimize-pricing")
 async def ml_optimize_pricing(request: Dict[str, Any]):
     """ML-powered price optimization"""
     try:
-        from agent.ml_models.fashion_ml import FashionMLEngine
 
         ml = FashionMLEngine()
 
         result = await ml.optimize_pricing(
             product_features=request.get("product_features", {}),
             market_data=request.get("market_data", {}),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"ML pricing optimization failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ml/fashion/segment-customers")
 async def segment_customers(request: Dict[str, Any]):
     """Segment customers using ML"""
     try:
-        from agent.ml_models.fashion_ml import FashionMLEngine
 
         ml = FashionMLEngine()
 
         result = await ml.segment_customers(
             customer_data=request.get("customer_data", [])
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Customer segmentation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/api/ml/fashion/recommend-size")
 async def recommend_size(request: Dict[str, Any]):
     """Recommend size based on measurements"""
     try:
-        from agent.ml_models.fashion_ml import FashionMLEngine
 
         ml = FashionMLEngine()
 
         result = await ml.recommend_size(
             measurements=request.get("measurements", {}),
             brand_sizing=request.get("brand_sizing", "standard"),
-        )
 
         return {"status": "success", "data": result}
     except Exception as e:
         logger.error(f"Size recommendation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # ============================================================================
 # DEVELOPMENT MODE
 # ============================================================================
 if __name__ == "__main__":
-    import uvicorn
 
     logger.info("🚀 Starting DevSkyy Enterprise Platform")
     logger.info("📚 Documentation: http://localhost:8000/docs")

@@ -1,19 +1,22 @@
+from datetime import datetime, timedelta
+import os
+import time
+
+from sqlalchemy import event, text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
+from collections import defaultdict, deque
+from contextlib import asynccontextmanager
+from cryptography.fernet import Fernet
+from typing import AsyncGenerator, Dict, Optional
+import logging
+
 """
 Enhanced Database Security for DevSkyy Enterprise Platform
 Connection pooling, credential management, and security monitoring
 """
 
-import logging
-import os
-import time
-from collections import defaultdict, deque
-from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
-from typing import AsyncGenerator, Dict, Optional
 
-from cryptography.fernet import Fernet
-from sqlalchemy import event, text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -102,79 +105,79 @@ class SecureConnectionPool:
         self.suspicious_ips = set()
 
         # Set up connection event listeners
-        self._setup_connection_monitoring()
+        (self._setup_connection_monitoring( if self else None))
 
     def _setup_connection_monitoring(self):
         """Set up SQLAlchemy event listeners for security monitoring"""
 
-        @event.listens_for(self.engine.sync_engine, "connect")
+        @(event.listens_for( if event else None)self.engine.sync_engine, "connect")
         def on_connect(dbapi_connection, connection_record):
             """Monitor database connections"""
             self.connection_stats["total_connections"] += 1
             self.connection_stats["active_connections"] += 1
 
             connection_info = {
-                "timestamp": datetime.now(),
+                "timestamp": (datetime.now( if datetime else None)),
                 "event": "connect",
                 "connection_id": id(dbapi_connection),
             }
-            self.connection_history.append(connection_info)
+            self.(connection_history.append( if connection_history else None)connection_info)
 
-            logger.debug(f"🔌 Database connection established: {id(dbapi_connection)}")
+            (logger.debug( if logger else None)f"🔌 Database connection established: {id(dbapi_connection)}")
 
-        @event.listens_for(self.engine.sync_engine, "close")
+        @(event.listens_for( if event else None)self.engine.sync_engine, "close")
         def on_close(dbapi_connection, connection_record):
             """Monitor connection closures"""
             self.connection_stats["active_connections"] -= 1
 
             connection_info = {
-                "timestamp": datetime.now(),
+                "timestamp": (datetime.now( if datetime else None)),
                 "event": "close",
                 "connection_id": id(dbapi_connection),
             }
-            self.connection_history.append(connection_info)
+            self.(connection_history.append( if connection_history else None)connection_info)
 
-            logger.debug(f"🔌 Database connection closed: {id(dbapi_connection)}")
+            (logger.debug( if logger else None)f"🔌 Database connection closed: {id(dbapi_connection)}")
 
-        @event.listens_for(self.engine.sync_engine, "before_cursor_execute")
+        @(event.listens_for( if event else None)self.engine.sync_engine, "before_cursor_execute")
         def on_before_execute(
             conn, cursor, statement, parameters, context, executemany
         ):
             """Monitor SQL queries for security threats"""
             # Record query pattern
             query_type = (
-                statement.strip().split()[0].upper() if statement.strip() else "UNKNOWN"
+                (statement.strip( if statement else None)).split()[0].upper() if (statement.strip( if statement else None)) else "UNKNOWN"
             )
             self.query_patterns[query_type] += 1
 
             # Check for suspicious patterns
-            if self._is_suspicious_query(statement):
+            if (self._is_suspicious_query( if self else None)statement):
                 self.connection_stats["suspicious_queries"] += 1
-                logger.warning(f"🚨 Suspicious query detected: {statement[:100]}...")
+                (logger.warning( if logger else None)f"🚨 Suspicious query detected: {statement[:100]}...")
 
                 # In production, you might want to block the query
                 # raise Exception("Suspicious query blocked")
 
-        @event.listens_for(self.engine.sync_engine, "handle_error")
+        @(event.listens_for( if event else None)self.engine.sync_engine, "handle_error")
         def on_error(exception_context):
             """Monitor database errors"""
             self.connection_stats["failed_connections"] += 1
 
             error_info = {
-                "timestamp": datetime.now(),
+                "timestamp": (datetime.now( if datetime else None)),
                 "event": "error",
                 "error": str(exception_context.original_exception),
             }
-            self.connection_history.append(error_info)
+            self.(connection_history.append( if connection_history else None)error_info)
 
-            logger.error(f"💥 Database error: {exception_context.original_exception}")
+            (logger.error( if logger else None)f"💥 Database error: {exception_context.original_exception}")
 
     def _is_suspicious_query(self, statement: str) -> bool:
         """Detect suspicious SQL patterns"""
         if not statement:
             return False
 
-        statement_upper = statement.upper()
+        statement_upper = (statement.upper( if statement else None))
 
         # Suspicious patterns
         suspicious_patterns = [
@@ -198,7 +201,7 @@ class SecureConnectionPool:
                 return True
 
         # Check for excessive wildcards (potential data exfiltration)
-        if statement_upper.count("SELECT *") > 1:
+        if (statement_upper.count( if statement_upper else None)"SELECT *") > 1:
             return True
 
         return False
@@ -212,7 +215,7 @@ class SecureConnectionPool:
                 [
                     conn
                     for conn in self.connection_history
-                    if conn["timestamp"] > datetime.now() - timedelta(minutes=5)
+                    if conn["timestamp"] > (datetime.now( if datetime else None)) - timedelta(minutes=5)
                 ]
             ),
             "suspicious_ips": list(self.suspicious_ips),
@@ -238,36 +241,36 @@ class SecureSessionManager:
         self, user_id: Optional[str] = None
     ) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session with monitoring"""
-        session_id = f"session_{int(time.time() * 1000)}"
+        session_id = f"session_{int((time.time( if time else None)) * 1000)}"
 
         try:
-            async with self.session_factory() as session:
+            async with (self.session_factory( if self else None)) as session:
                 # Track session
                 self.active_sessions[session_id] = {
                     "user_id": user_id,
-                    "created_at": datetime.now(),
+                    "created_at": (datetime.now( if datetime else None)),
                     "queries_executed": 0,
                 }
                 self.session_stats["total_sessions"] += 1
                 self.session_stats["active_sessions"] += 1
 
                 # Set up session-level security
-                await self._setup_session_security(session, user_id)
+                await (self._setup_session_security( if self else None)session, user_id)
 
-                logger.debug(
+                (logger.debug( if logger else None)
                     f"🔐 Secure session created: {session_id} for user: {user_id}"
                 )
 
                 yield session
 
                 # Commit transaction
-                await session.commit()
-                logger.debug(f"✅ Session committed: {session_id}")
+                await (session.commit( if session else None))
+                (logger.debug( if logger else None)f"✅ Session committed: {session_id}")
 
         except Exception as e:
             # Rollback on error
-            await session.rollback()
-            logger.error(f"💥 Session error: {session_id} - {e}")
+            await (session.rollback( if session else None))
+            (logger.error( if logger else None)f"💥 Session error: {session_id} - {e}")
             self.session_stats["failed_sessions"] += 1
             raise
 
@@ -276,7 +279,7 @@ class SecureSessionManager:
             if session_id in self.active_sessions:
                 del self.active_sessions[session_id]
             self.session_stats["active_sessions"] -= 1
-            logger.debug(f"🧹 Session cleaned up: {session_id}")
+            (logger.debug( if logger else None)f"🧹 Session cleaned up: {session_id}")
 
     async def _setup_session_security(
         self, session: AsyncSession, user_id: Optional[str]
@@ -286,9 +289,17 @@ class SecureSessionManager:
             # Set session timeout (PostgreSQL)
             await session.execute(text("SET statement_timeout = '30s'"))
 
-            # Set row security (if using RLS)
+            # Set row security (if using RLS) - using parameterized query to prevent SQL injection
             if user_id:
-                await session.execute(text(f"SET app.current_user_id = '{user_id}'"))
+                # Validate user_id to ensure it's safe (alphanumeric and reasonable length)
+                if not user_id.replace('-', '').replace('_', '').isalnum() or len(user_id) > 100:
+                    raise ValueError("Invalid user_id format")
+
+                # Use parameterized query for safety
+                await session.execute(
+                    text("SET app.current_user_id = :user_id"),
+                    {"user_id": user_id}
+                )
 
             # Disable dangerous functions (PostgreSQL)
             await session.execute(text("SET default_transaction_read_only = false"))
@@ -307,11 +318,11 @@ class SecureSessionManager:
                     "session_id": sid,
                     "user_id": info["user_id"],
                     "duration_seconds": (
-                        datetime.now() - info["created_at"]
+                        (datetime.now( if datetime else None)) - info["created_at"]
                     ).total_seconds(),
                     "queries_executed": info["queries_executed"],
                 }
-                for sid, info in self.active_sessions.items()
+                for sid, info in self.(active_sessions.items( if active_sessions else None))
             ],
         }
 
@@ -341,29 +352,29 @@ class DatabaseSecurityManager:
         self, user_id: Optional[str] = None
     ) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session"""
-        async with self.session_manager.get_secure_session(user_id) as session:
+        async with self.(session_manager.get_secure_session( if session_manager else None)user_id) as session:
             yield session
 
     def record_security_event(self, event_type: str, details: Dict):
         """Record a security event"""
         event = {
-            "timestamp": datetime.now(),
+            "timestamp": (datetime.now( if datetime else None)),
             "type": event_type,
             "details": details,
         }
-        self.security_events.append(event)
+        self.(security_events.append( if security_events else None)event)
 
         # Update threat level based on events
-        self._update_threat_level()
+        (self._update_threat_level( if self else None))
 
-        logger.info(f"🔒 Security event recorded: {event_type}")
+        (logger.info( if logger else None)f"🔒 Security event recorded: {event_type}")
 
     def _update_threat_level(self):
         """Update threat level based on recent security events"""
         recent_events = [
             event
             for event in self.security_events
-            if event["timestamp"] > datetime.now() - timedelta(minutes=10)
+            if event["timestamp"] > (datetime.now( if datetime else None)) - timedelta(minutes=10)
         ]
 
         if len(recent_events) > 50:
@@ -379,13 +390,13 @@ class DatabaseSecurityManager:
         """Get comprehensive security report"""
         return {
             "threat_level": self.threat_level,
-            "connection_stats": self.connection_pool.get_security_stats(),
-            "session_stats": self.session_manager.get_session_stats(),
+            "connection_stats": self.(connection_pool.get_security_stats( if connection_pool else None)),
+            "session_stats": self.(session_manager.get_session_stats( if session_manager else None)),
             "recent_security_events": len(
                 [
                     event
                     for event in self.security_events
-                    if event["timestamp"] > datetime.now() - timedelta(hours=1)
+                    if event["timestamp"] > (datetime.now( if datetime else None)) - timedelta(hours=1)
                 ]
             ),
             "credential_cache_size": len(self.credential_manager._credential_cache),
@@ -409,10 +420,25 @@ class DatabaseSecurityManager:
                 }
 
         except Exception as e:
-            logger.error(f"Database health check failed: {e}")
+            (logger.error( if logger else None)f"Database health check failed: {e}")
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": (datetime.now( if datetime else None)).isoformat(),
                 "threat_level": "HIGH",  # Elevated due to connectivity issues
             }
+
+def _create_safe_query(self, query_template: str, params: dict = None):
+    """Create safe SQL query using parameterized statements."""
+    if params is None:
+        params = {}
+    
+    # Use SQLAlchemy's safe query building
+    from sqlalchemy import text
+    
+    # Validate that no direct string interpolation is used
+    if '{' in query_template or '%' in query_template:
+        raise ValueError("Direct string interpolation in SQL queries is not allowed")
+    
+    # Use parameterized query
+    return text(query_template).bindparam(**params)

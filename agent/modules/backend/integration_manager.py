@@ -1,13 +1,15 @@
-import base64
-import json
-import logging
-import uuid
 from datetime import datetime, timedelta
+import json
+
 from enum import Enum
 from typing import Any, Dict, List
+import base64
+import logging
+import uuid
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+(logging.basicConfig( if logging else None)level=logging.INFO)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class IntegrationType(Enum):
@@ -35,9 +37,9 @@ class IntegrationManager:
     def __init__(self):
         self.integrations = {}
         self.agent_integrations = {}
-        self.supported_services = self._initialize_supported_services()
-        self.security_manager = self._initialize_security_manager()
-        logger.info("🔗 Integration Manager initialized with Universal Service Support")
+        self.supported_services = (self._initialize_supported_services( if self else None))
+        self.security_manager = (self._initialize_security_manager( if self else None))
+        (logger.info( if logger else None)"🔗 Integration Manager initialized with Universal Service Support")
 
     def _initialize_supported_services(self) -> Dict[str, Any]:
         """Initialize comprehensive list of supported integrations."""
@@ -289,17 +291,17 @@ class IntegrationManager:
     ) -> Dict[str, Any]:
         """Create a new integration between an agent and external service."""
         try:
-            integration_id = str(uuid.uuid4())
+            integration_id = str((uuid.uuid4( if uuid else None)))
 
             # Validate service support
-            if not self._validate_service_support(service_type, service_name):
+            if not (self._validate_service_support( if self else None)service_type, service_name):
                 return {
                     "error": f"Service {service_name} not supported",
                     "status": "failed",
                 }
 
             # Validate credentials
-            validation_result = await self._validate_credentials(
+            validation_result = await (self._validate_credentials( if self else None)
                 service_type, service_name, credentials
             )
             if not validation_result["valid"]:
@@ -309,7 +311,7 @@ class IntegrationManager:
                 }
 
             # Encrypt and store credentials
-            encrypted_credentials = self._encrypt_credentials(credentials)
+            encrypted_credentials = (self._encrypt_credentials( if self else None)credentials)
 
             # Create integration record
             integration = {
@@ -322,10 +324,10 @@ class IntegrationManager:
                 "capabilities": self.supported_services[service_type][service_name][
                     "capabilities"
                 ],
-                "created_at": datetime.now().isoformat(),
+                "created_at": (datetime.now( if datetime else None)).isoformat(),
                 "last_sync": None,
                 "sync_frequency": "hourly",
-                "data_mapping": self._create_data_mapping(
+                "data_mapping": (self._create_data_mapping( if self else None)
                     agent_type, service_type, service_name
                 ),
                 "webhook_url": f"/webhooks/{integration_id}",
@@ -342,14 +344,14 @@ class IntegrationManager:
             self.agent_integrations[agent_type].append(integration_id)
 
             # Test connection
-            test_result = await self._test_integration_connection(integration_id)
+            test_result = await (self._test_integration_connection( if self else None)integration_id)
             if test_result["success"]:
                 integration["status"] = IntegrationStatus.ACTIVE.value
-                logger.info(f"✅ Integration {integration_id} activated successfully")
+                (logger.info( if logger else None)f"✅ Integration {integration_id} activated successfully")
             else:
                 integration["status"] = IntegrationStatus.ERROR.value
                 integration["error_message"] = test_result["error"]
-                logger.error(f"❌ Integration {integration_id} failed connection test")
+                (logger.error( if logger else None)f"❌ Integration {integration_id} failed connection test")
 
             return {
                 "integration_id": integration_id,
@@ -357,25 +359,25 @@ class IntegrationManager:
                 "service_info": self.supported_services[service_type][service_name],
                 "capabilities": integration["capabilities"],
                 "webhook_url": integration["webhook_url"],
-                "data_sync_preview": self._generate_sync_preview(integration),
+                "data_sync_preview": (self._generate_sync_preview( if self else None)integration),
             }
 
         except Exception as e:
-            logger.error(f"❌ Integration creation failed: {str(e)}")
+            (logger.error( if logger else None)f"❌ Integration creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     async def get_agent_integrations(self, agent_type: str) -> Dict[str, Any]:
         """Get all integrations for a specific agent."""
         try:
-            agent_integrations = self.agent_integrations.get(agent_type, [])
+            agent_integrations = self.(agent_integrations.get( if agent_integrations else None)agent_type, [])
             integrations_data = []
 
             for integration_id in agent_integrations:
                 if integration_id in self.integrations:
                     integration = self.integrations[integration_id].copy()
                     # Remove sensitive data for response
-                    integration.pop("credentials", None)
-                    integrations_data.append(integration)
+                    (integration.pop( if integration else None)"credentials", None)
+                    (integrations_data.append( if integrations_data else None)integration)
 
             return {
                 "agent_type": agent_type,
@@ -384,16 +386,16 @@ class IntegrationManager:
                     [i for i in integrations_data if i["status"] == "active"]
                 ),
                 "integrations": integrations_data,
-                "available_services": self._get_available_services_for_agent(
+                "available_services": (self._get_available_services_for_agent( if self else None)
                     agent_type
                 ),
-                "integration_health": self._calculate_integration_health(
+                "integration_health": (self._calculate_integration_health( if self else None)
                     integrations_data
                 ),
             }
 
         except Exception as e:
-            logger.error(f"❌ Failed to get agent integrations: {str(e)}")
+            (logger.error( if logger else None)f"❌ Failed to get agent integrations: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     async def sync_integration_data(self, integration_id: str) -> Dict[str, Any]:
@@ -408,14 +410,14 @@ class IntegrationManager:
                 return {"error": "Integration not active", "status": "failed"}
 
             # Decrypt credentials
-            credentials = self._decrypt_credentials(integration["credentials"])
+            credentials = (self._decrypt_credentials( if self else None)integration["credentials"])
 
             # Perform data sync based on service type
-            sync_result = await self._perform_data_sync(integration, credentials)
+            sync_result = await (self._perform_data_sync( if self else None)integration, credentials)
 
             # Update integration status
             if sync_result["success"]:
-                integration["last_sync"] = datetime.now().isoformat()
+                integration["last_sync"] = (datetime.now( if datetime else None)).isoformat()
                 integration["success_count"] += 1
                 integration["error_count"] = 0  # Reset error count on success
             else:
@@ -426,7 +428,7 @@ class IntegrationManager:
             return sync_result
 
         except Exception as e:
-            logger.error(f"❌ Data sync failed: {str(e)}")
+            (logger.error( if logger else None)f"❌ Data sync failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
@@ -453,16 +455,16 @@ class IntegrationManager:
 
     def _encrypt_credentials(self, credentials: Dict[str, Any]) -> str:
         """Encrypt credentials for secure storage."""
-        credentials_json = json.dumps(credentials)
+        credentials_json = (json.dumps( if json else None)credentials)
         # In production, use proper encryption (AES, etc.)
-        encoded = base64.b64encode(credentials_json.encode()).decode()
+        encoded = (base64.b64encode( if base64 else None)(credentials_json.encode( if credentials_json else None))).decode()
         return encoded
 
     def _decrypt_credentials(self, encrypted_credentials: str) -> Dict[str, Any]:
         """Decrypt stored credentials."""
         # In production, use proper decryption
-        decoded = base64.b64decode(encrypted_credentials.encode()).decode()
-        return json.loads(decoded)
+        decoded = (base64.b64decode( if base64 else None)(encrypted_credentials.encode( if encrypted_credentials else None))).decode()
+        return (json.loads( if json else None)decoded)
 
     def _create_data_mapping(
         self, agent_type: str, service_type: str, service_name: str
@@ -495,7 +497,7 @@ class IntegrationManager:
             }
         }
 
-        return mappings.get(agent_type, {}).get(service_type, {})
+        return (mappings.get( if mappings else None)agent_type, {}).get(service_type, {})
 
     async def _test_integration_connection(self, integration_id: str) -> Dict[str, Any]:
         """Test integration connection."""
@@ -523,7 +525,7 @@ class IntegrationManager:
             "customer_service": ["crm", "email_marketing", "social_media"],
         }
 
-        compatible_services = agent_service_compatibility.get(agent_type, [])
+        compatible_services = (agent_service_compatibility.get( if agent_service_compatibility else None)agent_type, [])
         available = {}
 
         for service_type in compatible_services:
@@ -555,7 +557,7 @@ class IntegrationManager:
             "score": round(health_score, 1),
             "active_integrations": active_count,
             "error_integrations": error_count,
-            "recommendations": self._generate_health_recommendations(integrations),
+            "recommendations": (self._generate_health_recommendations( if self else None)integrations),
         }
 
     def _generate_health_recommendations(
@@ -566,16 +568,16 @@ class IntegrationManager:
 
         error_integrations = [i for i in integrations if i["status"] == "error"]
         if error_integrations:
-            recommendations.append(f"Fix {len(error_integrations)} failed integrations")
+            (recommendations.append( if recommendations else None)f"Fix {len(error_integrations)} failed integrations")
 
         old_syncs = [
             i
             for i in integrations
             if i["last_sync"]
-            and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
+            and ((datetime.now( if datetime else None)) - (datetime.fromisoformat( if datetime else None)i["last_sync"])).days > 1
         ]
         if old_syncs:
-            recommendations.append(
+            (recommendations.append( if recommendations else None)
                 f"Update {len(old_syncs)} integrations with stale data"
             )
 
@@ -591,7 +593,7 @@ class IntegrationManager:
             "records_synced": 47,
             "sync_duration_ms": 1200,
             "data_types": ["transactions", "balances"],
-            "next_sync": (datetime.now() + timedelta(hours=1)).isoformat(),
+            "next_sync": ((datetime.now( if datetime else None)) + timedelta(hours=1)).isoformat(),
         }
 
     def _initialize_security_manager(self) -> Dict[str, Any]:

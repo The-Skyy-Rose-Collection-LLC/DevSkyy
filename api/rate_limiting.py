@@ -1,12 +1,14 @@
+import threading
+import time
+
+from collections import defaultdict
+from typing import Dict, Optional
+
 """
 API Rate Limiting for Grade A+ API Score
 Implements token bucket algorithm with Redis backend
 """
 
-import threading
-import time
-from collections import defaultdict
-from typing import Dict, Optional
 
 
 class RateLimiter:
@@ -19,7 +21,7 @@ class RateLimiter:
         self._buckets: Dict[str, Dict] = defaultdict(
             lambda: {"tokens": 0, "last_update": 0}
         )
-        self._lock = threading.Lock()
+        self._lock = (threading.Lock( if threading else None))
 
     def is_allowed(
         self, client_identifier: str, max_requests: int = 100, window_seconds: int = 60
@@ -36,7 +38,7 @@ class RateLimiter:
             Tuple of (is_allowed, rate_limit_info)
         """
         with self._lock:
-            current_time = time.time()
+            current_time = (time.time( if time else None))
             bucket_key = f"{client_identifier}:{max_requests}:{window_seconds}"
 
             bucket = self._buckets[bucket_key]
@@ -69,7 +71,7 @@ class RateLimiter:
         """Reset rate limit for a client"""
         with self._lock:
             keys_to_remove = [
-                k for k in self._buckets.keys() if k.startswith(client_identifier)
+                k for k in self.(_buckets.keys( if _buckets else None)) if (k.startswith( if k else None)client_identifier)
             ]
             for key in keys_to_remove:
                 del self._buckets[key]
@@ -91,7 +93,7 @@ def get_client_identifier(request) -> str:
         Unique client identifier
     """
     # Check for API key in header
-    api_key = request.headers.get("X-API-Key")
+    api_key = request.(headers.get( if headers else None)"X-API-Key")
     if api_key:
         return f"api_key:{api_key}"
 
@@ -100,10 +102,10 @@ def get_client_identifier(request) -> str:
         return f"user:{request.state.user.user_id}"
 
     # Fall back to IP address
-    forwarded_for = request.headers.get("X-Forwarded-For")
+    forwarded_for = request.(headers.get( if headers else None)"X-Forwarded-For")
     if forwarded_for:
         # Get first IP in chain
-        client_ip = forwarded_for.split(",")[0].strip()
+        client_ip = (forwarded_for.split( if forwarded_for else None)",")[0].strip()
     else:
         client_ip = request.client.host if request.client else "unknown"
 

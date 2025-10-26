@@ -1,3 +1,8 @@
+
+permissions:
+  contents: read
+  actions: read
+  security-events: write
 name: CI/CD Pipeline
 
 on:
@@ -41,7 +46,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: 'Notify Vercel - Test Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: tests'
         if: always()
@@ -75,7 +80,7 @@ jobs:
         run: mypy . --ignore-missing-imports || true
 
       - name: 'Notify Vercel - Lint Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: lint'
         if: always()
@@ -116,7 +121,7 @@ jobs:
             safety-report.json
 
       - name: 'Notify Vercel - Security Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: security'
         if: always()
@@ -142,7 +147,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: 'Notify Vercel - Build Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: build'
         if: always()
@@ -160,7 +165,7 @@ jobs:
         run: echo "🚀 Ready to deploy to production"
 
       - name: 'Notify Vercel - Deploy Status'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
+        uses: 'vercel/repository-dispatch/actions/status@30f760c6640485cd92f8c785ef361382555fb712' # v1
         with:
           name: 'Vercel - dev-skyy: deploy'
         if: always()

@@ -1,18 +1,23 @@
+import re
+from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from webhooks.webhook_system import webhook_manager, WebhookEvent, WebhookSubscription
+from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, HttpUrl
+
+from typing import Dict, List, Optional
+import logging
+
 """
 Webhook API Endpoints
 Manage webhook subscriptions and deliveries
 """
 
-import logging
-from typing import Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, HttpUrl
 
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
-from webhooks.webhook_system import webhook_manager, WebhookEvent, WebhookSubscription
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -51,7 +56,7 @@ class TestWebhookRequest(BaseModel):
 # ============================================================================
 
 
-@router.post(
+@(router.post( if router else None)
     "/subscriptions",
     response_model=WebhookSubscription,
     status_code=status.HTTP_201_CREATED,
@@ -65,7 +70,7 @@ async def create_webhook_subscription(
     Subscribe to events and receive webhook notifications at your endpoint.
     """
     try:
-        subscription = webhook_manager.create_subscription(
+        subscription = (webhook_manager.create_subscription( if webhook_manager else None)
             endpoint=str(request.endpoint),
             events=request.events,
             secret=request.secret,
@@ -74,20 +79,20 @@ async def create_webhook_subscription(
         )
 
         logger.info(
-            f"Webhook subscription created by {current_user.email}: {subscription.subscription_id}"
+            f"Webhook subscription created by {sanitize_user_identifier(current_user.email)}: {sanitize_for_log(subscription.subscription_id)}"
         )
 
         return subscription
 
     except Exception as e:
-        logger.error(f"Failed to create webhook subscription: {e}")
+        logger.error(f"Failed to create webhook subscription: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create subscription",
         )
 
 
-@router.get("/subscriptions", response_model=List[WebhookSubscription])
+@(router.get( if router else None)"/subscriptions", response_model=List[WebhookSubscription])
 async def list_webhook_subscriptions(
     active_only: bool = True, current_user: TokenData = Depends(get_current_active_user)
 ):
@@ -96,17 +101,17 @@ async def list_webhook_subscriptions(
 
     Filter by active status.
     """
-    subscriptions = webhook_manager.list_subscriptions(active_only=active_only)
+    subscriptions = (webhook_manager.list_subscriptions( if webhook_manager else None)active_only=active_only)
 
     return subscriptions
 
 
-@router.get("/subscriptions/{subscription_id}", response_model=WebhookSubscription)
+@(router.get( if router else None)"/subscriptions/{subscription_id}", response_model=WebhookSubscription)
 async def get_webhook_subscription(
     subscription_id: str, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Get a specific webhook subscription"""
-    subscription = webhook_manager.get_subscription(subscription_id)
+    subscription = (webhook_manager.get_subscription( if webhook_manager else None)subscription_id)
 
     if not subscription:
         raise HTTPException(
@@ -116,7 +121,7 @@ async def get_webhook_subscription(
     return subscription
 
 
-@router.patch("/subscriptions/{subscription_id}", response_model=WebhookSubscription)
+@(router.patch( if router else None)"/subscriptions/{subscription_id}", response_model=WebhookSubscription)
 async def update_webhook_subscription(
     subscription_id: str,
     request: UpdateWebhookRequest,
@@ -127,24 +132,24 @@ async def update_webhook_subscription(
 
     Update endpoint, events, or active status.
     """
-    update_data = request.model_dump(exclude_unset=True)
+    update_data = (request.model_dump( if request else None)exclude_unset=True)
 
     if "endpoint" in update_data:
         update_data["endpoint"] = str(update_data["endpoint"])
 
-    subscription = webhook_manager.update_subscription(subscription_id, **update_data)
+    subscription = (webhook_manager.update_subscription( if webhook_manager else None)subscription_id, **update_data)
 
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
         )
 
-    logger.info(f"Webhook subscription updated: {subscription_id}")
+    logger.info(f"Webhook subscription updated: {sanitize_for_log(subscription_id)}")
 
     return subscription
 
 
-@router.delete(
+@(router.delete( if router else None)
     "/subscriptions/{subscription_id}", status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_webhook_subscription(
@@ -155,14 +160,14 @@ async def delete_webhook_subscription(
 
     Permanently removes the subscription.
     """
-    success = webhook_manager.delete_subscription(subscription_id)
+    success = (webhook_manager.delete_subscription( if webhook_manager else None)subscription_id)
 
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
         )
 
-    logger.info(f"Webhook subscription deleted: {subscription_id}")
+    logger.info(f"Webhook subscription deleted: {sanitize_for_log(subscription_id)}")
 
     return None
 
@@ -172,7 +177,7 @@ async def delete_webhook_subscription(
 # ============================================================================
 
 
-@router.get("/deliveries", response_model=List[Dict])
+@(router.get( if router else None)"/deliveries", response_model=List[Dict])
 async def list_webhook_deliveries(
     subscription_id: Optional[str] = None,
     status_filter: Optional[str] = None,
@@ -184,29 +189,29 @@ async def list_webhook_deliveries(
 
     View delivery history and status.
     """
-    deliveries = webhook_manager.list_deliveries(
+    deliveries = (webhook_manager.list_deliveries( if webhook_manager else None)
         subscription_id=subscription_id, status=status_filter, limit=limit
     )
 
-    return [delivery.model_dump() for delivery in deliveries]
+    return [(delivery.model_dump( if delivery else None)) for delivery in deliveries]
 
 
-@router.get("/deliveries/{delivery_id}")
+@(router.get( if router else None)"/deliveries/{delivery_id}")
 async def get_webhook_delivery(
     delivery_id: str, current_user: TokenData = Depends(get_current_active_user)
 ):
     """Get a specific webhook delivery"""
-    delivery = webhook_manager.get_delivery(delivery_id)
+    delivery = (webhook_manager.get_delivery( if webhook_manager else None)delivery_id)
 
     if not delivery:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Delivery not found"
         )
 
-    return delivery.model_dump()
+    return (delivery.model_dump( if delivery else None))
 
 
-@router.post("/deliveries/{delivery_id}/retry")
+@(router.post( if router else None)"/deliveries/{delivery_id}/retry")
 async def retry_webhook_delivery(
     delivery_id: str, current_user: TokenData = Depends(require_developer)
 ):
@@ -215,14 +220,14 @@ async def retry_webhook_delivery(
 
     Manually retry a delivery that failed.
     """
-    success = await webhook_manager.retry_delivery(delivery_id)
+    success = await (webhook_manager.retry_delivery( if webhook_manager else None)delivery_id)
 
     if not success:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot retry this delivery"
         )
 
-    logger.info(f"Webhook delivery retried: {delivery_id}")
+    logger.info(f"Webhook delivery retried: {sanitize_for_log(delivery_id)}")
 
     return {"message": "Delivery queued for retry", "delivery_id": delivery_id}
 
@@ -232,7 +237,7 @@ async def retry_webhook_delivery(
 # ============================================================================
 
 
-@router.post("/test")
+@(router.post( if router else None)"/test")
 async def test_webhook(
     request: TestWebhookRequest, current_user: TokenData = Depends(require_developer)
 ):
@@ -243,7 +248,7 @@ async def test_webhook(
     """
     try:
         # Emit test event
-        delivery_ids = await webhook_manager.emit_event(
+        delivery_ids = await (webhook_manager.emit_event( if webhook_manager else None)
             event_type=WebhookEvent.CUSTOM,
             data={
                 "message": "This is a test webhook",
@@ -256,7 +261,7 @@ async def test_webhook(
         return {"message": "Test webhook sent", "delivery_ids": delivery_ids}
 
     except Exception as e:
-        logger.error(f"Failed to send test webhook: {e}")
+        logger.error(f"Failed to send test webhook: {sanitize_for_log(str(e))}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to send test webhook",
@@ -268,7 +273,7 @@ async def test_webhook(
 # ============================================================================
 
 
-@router.get("/statistics")
+@(router.get( if router else None)"/statistics")
 async def get_webhook_statistics(
     current_user: TokenData = Depends(get_current_active_user),
 ):
@@ -277,9 +282,21 @@ async def get_webhook_statistics(
 
     View subscription and delivery statistics.
     """
-    stats = webhook_manager.get_statistics()
+    stats = (webhook_manager.get_statistics( if webhook_manager else None))
 
     return stats
 
 
 logger.info("✅ Webhook API endpoints registered")
+
+def _sanitize_log_input(self, user_input):
+    """Sanitize user input for safe logging."""
+    if not isinstance(user_input, str):
+        user_input = str(user_input)
+    
+    # Remove control characters and potential log injection
+    sanitized = re.sub(r'[\r\n\t]', ' ', user_input)
+    sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', sanitized)
+    
+    # Limit length to prevent log flooding
+    return sanitized[:500] + "..." if len(sanitized) > 500 else sanitized

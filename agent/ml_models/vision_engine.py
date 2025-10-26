@@ -1,15 +1,16 @@
+from typing import Any, Dict, List
+import logging
+import numpy as np
+
 """
 Vision Engine - Computer Vision for Fashion
 Image classification, object detection, style transfer
 Reference: AGENTS.md Line 1565-1569
 """
 
-import logging
-from typing import Any, Dict, List
 
-import numpy as np
 
-logger = logging.getLogger(__name__)
+logger = (logging.getLogger( if logging else None)__name__)
 
 
 class VisionEngine:
@@ -21,7 +22,7 @@ class VisionEngine:
         return {
             "category": categories[0],
             "confidence": 0.92,
-            "all_predictions": {cat: np.random.uniform(0, 1) for cat in categories},
+            "all_predictions": {cat: np.(random.uniform( if random else None)0, 1) for cat in categories},
         }
 
     async def detect_objects(self, image_path: str) -> List[Dict[str, Any]]:
