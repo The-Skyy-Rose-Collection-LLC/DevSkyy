@@ -227,6 +227,11 @@ class AssetPreprocessingPipeline:
     """
 
     def __init__(self):
+        """
+        Initialize the asset preprocessing pipeline, create on-disk storage directories, and set up in-memory runtime state.
+        
+        Creates the storage root and subdirectories for uploads, processed assets, thumbnails, 3D models, and textures on disk; initializes the asset registry and an asyncio processing queue; sets lazy placeholders for heavy models; initializes performance counters; registers supported input/output/3D formats; and emits startup log entries.
+        """
         self.pipeline_name = "Asset Preprocessing Pipeline"
         self.version = "1.0.0-production"
 
@@ -276,16 +281,15 @@ class AssetPreprocessingPipeline:
         self, request: ProcessingRequest
     ) -> ProcessingResult:
         """
-        Process a fashion asset through the complete pipeline.
-
-        Steps:
-        1. Load and validate
-        2. Upscale to target quality
-        3. Enhance with AI
-        4. Remove background
-        5. Generate 3D model
-        6. Extract textures
-        7. Optimize and save
+        Run the full preprocessing pipeline for a single fashion asset request.
+        
+        Performs sequential stages including loading/validation, optional upscaling, optional AI enhancement, optional background removal, saving the processed image, thumbnail generation, optional 3D model generation, optional texture extraction, and final quality/sharpness scoring. Records stage timing, stores asset metadata, and returns a ProcessingResult summarizing the outcome.
+        
+        Parameters:
+            request (ProcessingRequest): Processing options and asset location for this job (target quality, enhancement/background/3D/texture flags, asset type, and advanced options).
+        
+        Returns:
+            ProcessingResult: Result object containing the request and asset IDs, success flag, completed stages, current stage, file paths (original/processed/thumbnail/3D/texture files), quality and sharpness scores, mesh metrics if produced, processing timing, stored metadata, and any error message when processing fails.
         """
         start_time = datetime.now()
         stages_time = {}
@@ -430,7 +434,20 @@ class AssetPreprocessingPipeline:
     async def _load_and_validate(
         self, asset_path: str
     ) -> Tuple[Image.Image, Tuple[int, int]]:
-        """Load and validate image."""
+        """
+        Load an image file from disk, validate its existence and supported format, and return the image (converted to RGB or RGBA) with its original resolution.
+        
+        Parameters:
+            asset_path (str): Filesystem path to the image asset.
+        
+        Returns:
+            Tuple[Image.Image, Tuple[int, int]]: The opened PIL Image (in `RGB` or `RGBA` mode) and its original resolution as (width, height).
+        
+        Raises:
+            RuntimeError: If the Pillow (PIL) library is not available.
+            FileNotFoundError: If the asset file does not exist at the given path.
+            ValueError: If the file extension is not one of the pipeline's supported input formats.
+        """
         if not PIL_AVAILABLE:
             raise RuntimeError("PIL not available")
 
@@ -454,14 +471,21 @@ class AssetPreprocessingPipeline:
         self, image: Image.Image, target_quality: UpscaleQuality
     ) -> Tuple[Image.Image, float]:
         """
-        Upscale image using Real-ESRGAN or similar.
-
-        Target resolutions:
-        - HD: 1920x1080
-        - QHD: 2560x1440
-        - UHD_4K: 3840x2160
-        - UHD_8K: 7680x4320
-        - MAXIMUM: Best possible
+        Upscales an image to the specified quality level and returns the resulting image and the applied scale factor.
+        
+        Parameters:
+            image (PIL.Image.Image): Source image to be upscaled.
+            target_quality (UpscaleQuality): Desired target quality; mapped target widths:
+                - HD: 1920
+                - QHD: 2560
+                - UHD_4K: 3840
+                - UHD_8K: 7680
+                - MAXIMUM: 16384
+        
+        Returns:
+            Tuple[PIL.Image.Image, float]: A tuple containing the upscaled image and the upscale factor applied.
+                If the image's current width is already greater than or equal to the target width, the original
+                image is returned with an upscale factor of 1.0.
         """
         target_resolutions = {
             UpscaleQuality.HD: 1920,
@@ -504,13 +528,19 @@ class AssetPreprocessingPipeline:
         self, image: Image.Image, request: ProcessingRequest
     ) -> Image.Image:
         """
-        Enhance image with AI.
-
-        Enhancements:
-        - Denoise
-        - Sharpen
-        - Color correction
-        - Detail enhancement
+        Apply configurable image enhancements (denoise, sharpen, and color/contrast adjustments) based on the processing request.
+        
+        This uses simple PIL-based filters as a lightweight/default implementation and serves as a placeholder for integration with stronger AI-powered enhancers.
+        
+        Parameters:
+            image (PIL.Image.Image): Source image to be enhanced.
+            request (ProcessingRequest): Processing options that control which enhancements to apply. Relevant flags:
+                - denoise: apply a basic median filter for noise reduction.
+                - sharpen: apply a sharpen filter.
+                - color_correction: apply modest color and contrast adjustments.
+        
+        Returns:
+            PIL.Image.Image: The enhanced image with the requested adjustments applied.
         """
         enhanced = image
 
@@ -540,23 +570,12 @@ class AssetPreprocessingPipeline:
 
     async def _remove_background(self, image: Image.Image) -> Image.Image:
         """
-        Remove background and create alpha channel.
-
-        Current Implementation: Basic RGBA conversion (manual background removal required)
-
-        For AI-powered background removal, integrate one of:
-        - rembg (U2Net, recommended): pip install rembg
-        - remove.bg API: https://remove.bg/api
-        - BackgroundRemover: pip install backgroundremover
-
-        Example with rembg:
-        ```python
-        from rembg import remove
-        image_no_bg = remove(image)
-        ```
-
+        Ensure the image has an alpha channel (RGBA) without performing true background segmentation.
+        
+        This placeholder converts the image to RGBA mode if necessary; it does not remove or mask foreground/background content.
+        
         Returns:
-            Image with alpha channel (RGBA mode)
+            Image.Image: Image in RGBA mode with an alpha channel.
         """
         if image.mode != "RGBA":
             image = image.convert("RGBA")
@@ -571,31 +590,15 @@ class AssetPreprocessingPipeline:
         self, image: Image.Image, asset_id: str, request: ProcessingRequest
     ) -> Tuple[Path, Dict[str, Any]]:
         """
-        Generate 3D model from 2D image using AI.
-
-        Requires integration with 3D reconstruction models:
-        - TripoSR (stable-fast-3d): https://github.com/VAST-AI-Research/TripoSR
-        - Wonder3D: https://github.com/xxlong0/Wonder3D
-        - OpenLRM: https://github.com/3DTopia/OpenLRM
-
-        Example TripoSR integration:
-        ```python
-        from tsr.system import TSR
-        model = TSR.from_pretrained("stabilityai/TripoSR")
-        mesh = model.run(image)
-        mesh.export(model_path)
-        ```
-
-        Args:
-            image: Input 2D image
-            asset_id: Unique asset identifier
-            request: Processing configuration
-
-        Raises:
-            NotImplementedError: 3D model generation requires external model integration
-
+        Generate a 3D mesh and save it as an OBJ file from a single 2D image.
+        
+        This function is a placeholder and requires integration with external 3D reconstruction models (for example TripoSR, Wonder3D, or OpenLRM) to produce a mesh and export it to disk.
+        
         Returns:
-            Path to generated OBJ file and mesh statistics
+            Tuple[Path, Dict[str, Any]]: Path to the generated OBJ file and a dictionary of mesh statistics (for example `vertex_count`, `face_count`, and other metadata).
+        
+        Raises:
+            NotImplementedError: 3D model generation is not implemented and requires external model integration.
         """
         logger.error("3D model generation not implemented - requires TripoSR/Wonder3D integration")
         raise NotImplementedError(
@@ -608,14 +611,17 @@ class AssetPreprocessingPipeline:
         self, image: Image.Image, asset_id: str, request: ProcessingRequest
     ) -> Dict[str, str]:
         """
-        Extract PBR textures.
-
-        Textures:
-        - Albedo (base color)
-        - Normal map
-        - Roughness
-        - Metallic
-        - Ambient Occlusion
+        Generate PBR texture maps for an asset and save them to the pipeline's textures directory.
+        
+        Generates and saves an albedo (base color) texture from the provided image. Placeholder behavior: only the albedo map is produced by this implementation; normal, roughness, metallic, and ambient occlusion maps are not generated and require integration with external material/geometry estimation models or tools.
+        
+        Parameters:
+            image (Image.Image): Source image used to produce texture maps.
+            asset_id (str): Unique identifier for the asset; used to name saved texture files.
+            request (ProcessingRequest): Processing options that may affect texture extraction (e.g., requested texture sizes or PBR generation flags).
+        
+        Returns:
+            Dict[str, str]: Mapping of texture type to saved file path (e.g., {"albedo": "/path/to/asset_albedo.png"}). Only entries for actually generated textures are included.
         """
         texture_files = {}
 
@@ -650,7 +656,17 @@ class AssetPreprocessingPipeline:
     async def _generate_thumbnail(
         self, image: Image.Image, asset_id: str, size: Tuple[int, int] = (512, 512)
     ) -> Path:
-        """Generate thumbnail."""
+        """
+        Create and save a PNG thumbnail for an image using Lanczos resampling.
+        
+        Parameters:
+            image (PIL.Image.Image): Source image to generate the thumbnail from.
+            asset_id (str): Identifier used as a filename prefix for the saved thumbnail.
+            size (Tuple[int, int]): Maximum thumbnail dimensions as (width, height) in pixels.
+        
+        Returns:
+            pathlib.Path: Path to the saved thumbnail PNG file.
+        """
         thumbnail = image.copy()
         thumbnail.thumbnail(size, Image.Resampling.LANCZOS)
 
@@ -662,29 +678,15 @@ class AssetPreprocessingPipeline:
 
     async def _calculate_quality_score(self, image: Image.Image) -> float:
         """
-        Calculate overall quality score (0-100).
-
-        Current Implementation: Resolution-based heuristic
-        - 8K (7680x4320): 100 points
-        - 4K (3840x2160): 95 points
-        - QHD (2560x1440): 85 points
-        - HD (1920x1080): 75 points
-        - Lower: 60 points
-
-        For perception-based quality assessment, integrate:
-        - BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)
-        - NIQE (Natural Image Quality Evaluator)
-        - PIQE (Perception based Image Quality Evaluator)
-
-        Example with PyIQA library:
-        ```python
-        import pyiqa
-        iqa_metric = pyiqa.create_metric('brisque')
-        quality = iqa_metric(image)  # Returns 0-100 score
-        ```
-
-        Reference: Resolution-based scoring is acceptable for automated pipelines
-        where higher resolution generally indicates higher quality.
+        Estimate an image quality score using a resolution-based heuristic.
+        
+        Returns:
+            float: Quality score in the range 0–100 where higher values indicate higher estimated quality.
+                   - 100.0 for resolution >= 8K (7680x4320)
+                   - 95.0 for resolution >= 4K (3840x2160)
+                   - 85.0 for resolution >= QHD (2560x1440)
+                   - 75.0 for resolution >= HD (1920x1080)
+                   - 60.0 for lower resolutions
         """
         width, height = image.size
         pixels = width * height
@@ -701,7 +703,12 @@ class AssetPreprocessingPipeline:
             return 60.0
 
     async def _calculate_sharpness(self, image: Image.Image) -> float:
-        """Calculate sharpness score using Laplacian variance."""
+        """
+        Computes an image sharpness score between 0.0 and 100.0 using the variance of the Laplacian.
+        
+        Returns:
+        	Sharpness score (float) in the range 0.0–100.0; returns 0.0 if required image processing libraries are not available.
+        """
         if not PIL_AVAILABLE:
             return 0.0
 
@@ -722,7 +729,15 @@ class AssetPreprocessingPipeline:
     async def batch_process(
         self, requests: List[ProcessingRequest]
     ) -> List[ProcessingResult]:
-        """Process multiple assets concurrently."""
+        """
+        Process a batch of processing requests concurrently.
+        
+        Parameters:
+            requests (List[ProcessingRequest]): List of processing requests to run.
+        
+        Returns:
+            List[ProcessingResult]: A list of results corresponding to the input requests. If an individual request raises an exception, its entry will be a failed ProcessingResult with `error` set to the exception message.
+        """
         logger.info(f"🎨 Batch processing {len(requests)} assets")
 
         results = await asyncio.gather(
@@ -748,11 +763,27 @@ class AssetPreprocessingPipeline:
         return processed_results
 
     def get_asset(self, asset_id: str) -> Optional[AssetMetadata]:
-        """Get asset metadata by ID."""
+        """
+        Retrieve metadata for a stored asset.
+        
+        Returns:
+            AssetMetadata: The metadata for `asset_id` if present, or `None` if no asset with that ID exists.
+        """
         return self.assets.get(asset_id)
 
     def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """
+        Return the current pipeline status including performance metrics, storage paths, asset counts, and supported formats.
+        
+        Returns:
+            status (Dict[str, Any]): Dictionary with keys:
+                - pipeline_name (str): Pipeline name.
+                - version (str): Pipeline version.
+                - performance (dict): Contains `assets_processed` (int), `total_processing_time` (float), and `avg_processing_time` (float).
+                - storage (dict): Filesystem paths as strings for `root`, `uploads`, `processed`, `models_3d`, and `textures`.
+                - assets (dict): Contains `total_assets` (int) and `3d_models` (int) counts.
+                - supported_formats (dict): Supported input/output and 3D formats.
+        """
         return {
             "pipeline_name": self.pipeline_name,
             "version": self.version,

@@ -132,7 +132,11 @@ class TestCommandInjectionPrevention:
                 InputSanitizer.sanitize_command(malicious_input)
 
     def test_safe_command_input(self):
-        """Test that safe input passes."""
+        """
+        Verifies that a benign filename is unchanged by the command sanitizer.
+        
+        Uses a simple safe filename ("myfile.txt") and asserts sanitize_command returns the same string.
+        """
         safe_input = "myfile.txt"
         result = InputSanitizer.sanitize_command(safe_input)
 
