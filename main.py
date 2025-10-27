@@ -450,6 +450,18 @@ if API_ROUTERS_AVAILABLE:
         app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["v1-dashboard"])
         app.include_router(orchestration_router, prefix="/api/v1/orchestration", tags=["v1-orchestration"])
 
+        # Luxury Fashion Brand Automation Router
+        try:
+            from api.v1.luxury_fashion_automation import router as luxury_automation_router
+            app.include_router(
+                luxury_automation_router,
+                prefix="/api/v1/luxury-automation",
+                tags=["v1-luxury-automation"]
+            )
+            logger.info("✅ Luxury Fashion Automation router registered")
+        except ImportError as e:
+            logger.warning(f"⚠️ Luxury Fashion Automation router not available: {e}")
+
         # DevSkyy v5.1 Enterprise Security Routers
         try:
             app.include_router(enterprise_auth_router, prefix="/api/v1/enterprise/auth", tags=["v1-enterprise-auth"])

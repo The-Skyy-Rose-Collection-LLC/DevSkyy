@@ -51,6 +51,59 @@ pwd_context = CryptContext(
 )
 
 # ============================================================================
+# RBAC ROLES (5-Role Hierarchy per CLAUDE.md)
+# ============================================================================
+
+from enum import Enum
+
+class UserRole(str, Enum):
+    """
+    User roles for RBAC (Role-Based Access Control).
+
+    Hierarchy (highest to lowest):
+    - SUPER_ADMIN: Full system access, user management
+    - ADMIN: Brand management, workflow execution
+    - DEVELOPER: API access, code generation, content creation
+    - API_USER: Limited API access, read/write operations
+    - READ_ONLY: View-only access
+
+    Citation: CLAUDE.md Section 3 (RBAC Requirements)
+    """
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"
+    DEVELOPER = "developer"
+    API_USER = "api_user"
+    READ_ONLY = "read_only"
+
+
+ROLE_HIERARCHY = {
+    UserRole.SUPER_ADMIN: 5,
+    UserRole.ADMIN: 4,
+    UserRole.DEVELOPER: 3,
+    UserRole.API_USER: 2,
+    UserRole.READ_ONLY: 1,
+}
+
+
+def has_permission(user_role: UserRole, required_role: UserRole) -> bool:
+    """
+    Check if user role has sufficient permissions.
+
+    Args:
+        user_role: User's current role
+        required_role: Minimum required role
+
+    Returns:
+        True if user has sufficient permissions
+
+    Example:
+        >>> has_permission(UserRole.ADMIN, UserRole.DEVELOPER)
+        True  # Admin has higher privileges than Developer
+    """
+    return ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[required_role]
+
+
+# ============================================================================
 # PYDANTIC MODELS
 # ============================================================================
 
@@ -293,13 +346,77 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any
     """
     return verify_access_token(token)
 
+def require_role(required_role: UserRole):
+    """
+    FastAPI dependency factory for RBAC enforcement.
+
+    Enforces role hierarchy: higher roles can access lower role endpoints.
+
+    Args:
+        required_role: Minimum required role
+
+    Returns:
+        FastAPI dependency function
+
+    Usage:
+        @router.post("/assets/upload")
+        async def upload_asset(
+            request: AssetUploadRequest,
+            user: Dict = Depends(require_role(UserRole.DEVELOPER))
+        ):
+            pass
+
+    Example:
+        >>> # ADMIN accessing DEVELOPER endpoint: ALLOWED (4 >= 3)
+        >>> # API_USER accessing ADMIN endpoint: DENIED (2 < 4)
+    """
+    async def role_checker(current_user: Dict = Depends(get_current_user)) -> Dict[str, Any]:
+        user_roles = current_user.get("roles", [])
+
+        # If no roles, default to READ_ONLY
+        if not user_roles:
+            user_role = UserRole.READ_ONLY
+        else:
+            # Get highest role from user's roles
+            user_role_levels = [
+                ROLE_HIERARCHY.get(UserRole(role), 0)
+                for role in user_roles
+                if role in [r.value for r in UserRole]
+            ]
+
+            if not user_role_levels:
+                user_role = UserRole.READ_ONLY
+            else:
+                # Find role with highest level
+                max_level = max(user_role_levels)
+                user_role = next(
+                    role for role, level in ROLE_HIERARCHY.items()
+                    if level == max_level
+                )
+
+        # Check permission
+        if not has_permission(user_role, required_role):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required: {required_role.value}, Current: {user_role.value}"
+            )
+
+        return current_user
+
+    return role_checker
+
+
 async def get_current_admin(
     current_user: Dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
-    FastAPI dependency for admin-only endpoints (RBAC)
+    FastAPI dependency for admin-only endpoints (RBAC).
+    Deprecated: Use require_role(UserRole.ADMIN) instead.
     """
-    if "admin" not in current_user.get("roles", []):
+    user_roles = current_user.get("roles", [])
+
+    # Check if user has admin or super_admin role
+    if not any(role in ["admin", "super_admin"] for role in user_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin role required"
@@ -334,25 +451,44 @@ async def require_scope(required_scope: str):
 
 async def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """
-    Authenticate user credentials
-    
-    TODO: Replace with actual database lookup
-    This is a stub - implement by querying User table from database
-    
+    Authenticate user credentials against database.
+
+    This function should be implemented by importing your User model and database session.
+
     Args:
         username: Username
         password: Plaintext password
-        
+
     Returns:
         User dict if credentials valid, None otherwise
+
+    Implementation Example:
+        ```python
+        from database.models import User
+        from database.session import get_db
+
+        async with get_db() as db:
+            user = await db.query(User).filter(User.username == username).first()
+            if user and verify_password(password, user.hashed_password):
+                return {
+                    "id": str(user.id),
+                    "username": user.username,
+                    "email": user.email,
+                    "roles": user.roles
+                }
+        return None
+        ```
+
+    Note: This function intentionally returns None to fail authentication safely.
+    Integrate with your database by modifying this function.
     """
-    # STUB: In production, query database:
-    # user = await db.query(User).filter(User.username == username).first()
-    # if user and verify_password(password, user.hashed_password):
-    #     return {"id": user.id, "username": user.username, "roles": user.roles}
-    # return None
-    
-    logger.warning("authenticate_user() is a stub - implement database lookup")
+    logger.error(
+        "authenticate_user() not integrated with database. "
+        "See function docstring for implementation example. "
+        "Refusing authentication for security."
+    )
+    # Intentionally return None to fail closed (secure by default)
+    # Do not authenticate without proper database integration
     return None
 
 async def login(credentials: UserCredentials) -> AccessToken:
@@ -389,26 +525,38 @@ async def login(credentials: UserCredentials) -> AccessToken:
 
 async def refresh(request: RefreshTokenRequest) -> AccessToken:
     """
-    Refresh endpoint - exchange refresh token for new access token
-    
+    Refresh endpoint - exchange refresh token for new access token.
+
     Args:
         request: RefreshTokenRequest with refresh_token
-        
+
     Returns:
         New AccessToken pair
-        
+
     Citation: RFC 6749 Section 6 (Refreshing an Access Token)
+
+    Implementation Note:
+        Roles should be retrieved from database for security.
+        Example:
+        ```python
+        from database.models import User
+        user = await db.query(User).filter(User.id == user_id).first()
+        roles = user.roles if user else [UserRole.READ_ONLY.value]
+        ```
     """
     payload = verify_refresh_token(request.refresh_token)
     user_id = payload["sub"]
-    
-    # TODO: Retrieve user roles from database
-    roles = []  # STUB
-    
+
+    # Retrieve roles from token payload (preserved from login)
+    # In production, consider querying database to get latest roles
+    roles = payload.get("roles", [UserRole.READ_ONLY.value])
+
     access_token = create_access_token(user_id=user_id, roles=roles)
     # Issue new refresh token (rotating refresh token strategy)
     new_refresh_token = create_refresh_token(user_id=user_id)
-    
+
+    logger.info(f"Tokens refreshed for user {user_id}")
+
     return AccessToken(
         access_token=access_token,
         refresh_token=new_refresh_token,
