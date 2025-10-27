@@ -622,20 +622,31 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Enterprise monitoring not available: {e}")
 
-# Import and initialize enterprise monitoring
+# Import and initialize WordPress credentials
 try:
-    from monitoring.enterprise_logging import enterprise_logger
-    from monitoring.enterprise_metrics import metrics_collector
-    from monitoring.incident_response import incident_response_system
+    from config.wordpress_credentials import (
+        wordpress_credentials_manager,
+        get_skyy_rose_credentials,
+        validate_environment_setup
+    )
 
-    app.state.enterprise_logger = enterprise_logger
-    app.state.metrics_collector = metrics_collector
-    app.state.incident_response_system = incident_response_system
+    app.state.wordpress_credentials_manager = wordpress_credentials_manager
 
-    logger.info("✅ Enterprise monitoring initialized")
+    # Validate WordPress credentials on startup
+    env_validation = validate_environment_setup()
+    if env_validation['valid']:
+        credentials = get_skyy_rose_credentials()
+        if credentials:
+            logger.info(f"✅ WordPress credentials loaded for: {credentials.site_url}")
+        else:
+            logger.warning("⚠️ WordPress credentials configured but failed to load")
+    else:
+        logger.warning(f"⚠️ WordPress credentials not configured: {env_validation['missing_required']}")
+
+    logger.info("✅ WordPress credential system initialized")
 
 except ImportError as e:
-    logger.warning(f"⚠️ Enterprise monitoring not available: {e}")
+    logger.warning(f"⚠️ WordPress credential system not available: {e}")
 
 # ============================================================================
 # METRICS AND MONITORING ENDPOINTS
@@ -927,18 +938,33 @@ async def build_and_deploy_theme(theme_request: Dict[str, Any]):
             ThemeType,
             UploadMethod
         )
-        from agent.wordpress.automated_theme_uploader import WordPressCredentials
-
-        # Parse request
-        credentials = WordPressCredentials(
-            site_url=theme_request["site_url"],
-            username=theme_request["username"],
-            password=theme_request["password"],
-            application_password=theme_request.get("application_password"),
-            ftp_host=theme_request.get("ftp_host"),
-            ftp_username=theme_request.get("ftp_username"),
-            ftp_password=theme_request.get("ftp_password")
+        from config.wordpress_credentials import (
+            WordPressCredentials,
+            wordpress_credentials_manager
         )
+
+        # Get credentials - either from request or use configured credentials
+        site_key = theme_request.get("site_key", "skyy_rose")
+
+        if "site_url" in theme_request and "username" in theme_request and "password" in theme_request:
+            # Use provided credentials
+            credentials = WordPressCredentials(
+                site_url=theme_request["site_url"],
+                username=theme_request["username"],
+                password=theme_request["password"],
+                application_password=theme_request.get("application_password"),
+                ftp_host=theme_request.get("ftp_host"),
+                ftp_username=theme_request.get("ftp_username"),
+                ftp_password=theme_request.get("ftp_password")
+            )
+        else:
+            # Use configured credentials
+            credentials = wordpress_credentials_manager.get_credentials(site_key)
+            if not credentials:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No credentials configured for site: {site_key}. Available sites: {wordpress_credentials_manager.list_available_sites()}"
+                )
 
         build_request = ThemeBuildRequest(
             theme_name=theme_request["theme_name"],
@@ -1081,6 +1107,153 @@ async def get_theme_system_status():
 
     except Exception as e:
         logger.error(f"Theme system status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/themes/skyy-rose/build")
+async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
+    """Build and deploy a theme specifically for Skyy Rose Collection using configured credentials."""
+    try:
+        from agent.wordpress.theme_builder_orchestrator import (
+            theme_builder_orchestrator,
+            ThemeType
+        )
+
+        # Use the convenience method for Skyy Rose themes
+        result = await theme_builder_orchestrator.build_skyy_rose_theme(
+            theme_name=theme_request["theme_name"],
+            theme_type=ThemeType(theme_request.get("theme_type", "luxury_fashion")),
+            customizations=theme_request.get("customizations", {}),
+            auto_deploy=theme_request.get("auto_deploy", True),
+            activate_after_deploy=theme_request.get("activate_after_deploy", False),
+            site_key=theme_request.get("site_key", "skyy_rose")
+        )
+
+        if not result:
+            raise HTTPException(
+                status_code=400,
+                detail="Failed to create theme build request. Check credentials configuration."
+            )
+
+        return {
+            "build_id": result.build_id,
+            "status": result.status.value,
+            "theme_name": result.request.theme_name,
+            "theme_type": result.request.theme_type.value,
+            "target_site": result.request.target_site,
+            "auto_deploy": result.request.auto_deploy,
+            "theme_path": result.theme_path,
+            "deployment_success": result.deployment_result.success if result.deployment_result else None,
+            "deployment_id": result.deployment_result.deployment_id if result.deployment_result else None,
+            "build_log": result.build_log[-5:],  # Last 5 log entries
+            "created_at": result.created_at.isoformat(),
+            "completed_at": result.completed_at.isoformat() if result.completed_at else None,
+            "error_message": result.error_message
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Skyy Rose theme build error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/themes/credentials/status")
+async def get_credentials_status():
+    """Get status of configured WordPress credentials."""
+    try:
+        from config.wordpress_credentials import (
+            wordpress_credentials_manager,
+            validate_environment_setup,
+            list_configured_sites
+        )
+
+        # Validate environment setup
+        env_validation = validate_environment_setup()
+
+        # Get configured sites
+        sites = list_configured_sites()
+
+        # Validate each site's credentials
+        site_validations = {}
+        for site in sites:
+            site_validations[site] = wordpress_credentials_manager.validate_credentials(site)
+
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "environment_validation": env_validation,
+            "configured_sites": sites,
+            "site_validations": site_validations,
+            "default_site": "skyy_rose",
+            "has_default_credentials": "skyy_rose" in sites
+        }
+
+    except Exception as e:
+        logger.error(f"Credentials status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/themes/credentials/test")
+async def test_wordpress_connection(test_request: Dict[str, Any]):
+    """Test WordPress connection with configured or provided credentials."""
+    try:
+        from config.wordpress_credentials import wordpress_credentials_manager
+        import requests
+
+        site_key = test_request.get("site_key", "skyy_rose")
+        credentials = wordpress_credentials_manager.get_credentials(site_key)
+
+        if not credentials:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No credentials found for site: {site_key}"
+            )
+
+        # Test WordPress REST API connection
+        try:
+            # Test basic site connectivity
+            response = requests.get(f"{credentials.site_url}/wp-json/wp/v2", timeout=10)
+            api_accessible = response.status_code == 200
+
+            # Test authenticated endpoint if we have app password
+            auth_test = False
+            if credentials.application_password:
+                import base64
+                auth_header = base64.b64encode(
+                    f"{credentials.username}:{credentials.application_password}".encode()
+                ).decode()
+
+                auth_response = requests.get(
+                    f"{credentials.site_url}/wp-json/wp/v2/users/me",
+                    headers={"Authorization": f"Basic {auth_header}"},
+                    timeout=10
+                )
+                auth_test = auth_response.status_code == 200
+
+            return {
+                "site_key": site_key,
+                "site_url": credentials.site_url,
+                "api_accessible": api_accessible,
+                "authentication_test": auth_test,
+                "has_application_password": bool(credentials.application_password),
+                "has_ftp_credentials": credentials.has_ftp_credentials(),
+                "has_sftp_credentials": credentials.has_sftp_credentials(),
+                "test_timestamp": datetime.now().isoformat(),
+                "status": "success" if api_accessible else "failed"
+            }
+
+        except requests.RequestException as e:
+            return {
+                "site_key": site_key,
+                "site_url": credentials.site_url,
+                "api_accessible": False,
+                "authentication_test": False,
+                "error": str(e),
+                "test_timestamp": datetime.now().isoformat(),
+                "status": "connection_failed"
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"WordPress connection test error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

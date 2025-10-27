@@ -24,6 +24,21 @@ class Config:
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
     STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY")
 
+    # WordPress Credentials (Skyy Rose Collection)
+    SKYY_ROSE_SITE_URL = os.environ.get("SKYY_ROSE_SITE_URL")
+    SKYY_ROSE_USERNAME = os.environ.get("SKYY_ROSE_USERNAME")
+    SKYY_ROSE_PASSWORD = os.environ.get("SKYY_ROSE_PASSWORD")
+    SKYY_ROSE_APP_PASSWORD = os.environ.get("SKYY_ROSE_APP_PASSWORD")
+
+    # FTP/SFTP Credentials
+    SKYY_ROSE_FTP_HOST = os.environ.get("SKYY_ROSE_FTP_HOST")
+    SKYY_ROSE_FTP_USERNAME = os.environ.get("SKYY_ROSE_FTP_USERNAME")
+    SKYY_ROSE_FTP_PASSWORD = os.environ.get("SKYY_ROSE_FTP_PASSWORD")
+    SKYY_ROSE_SFTP_HOST = os.environ.get("SKYY_ROSE_SFTP_HOST")
+    SKYY_ROSE_SFTP_USERNAME = os.environ.get("SKYY_ROSE_SFTP_USERNAME")
+    SKYY_ROSE_SFTP_PASSWORD = os.environ.get("SKYY_ROSE_SFTP_PASSWORD")
+    SKYY_ROSE_SFTP_PRIVATE_KEY = os.environ.get("SKYY_ROSE_SFTP_PRIVATE_KEY")
+
     # Brand Settings
     BRAND_NAME = "The Skyy Rose Collection"
     BRAND_DOMAIN = "theskyy-rose-collection.com"

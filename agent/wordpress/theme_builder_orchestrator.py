@@ -18,10 +18,14 @@ import shutil
 from agent.wordpress.theme_builder import ElementorThemeBuilder
 from agent.modules.frontend.wordpress_fullstack_theme_builder_agent import WordPressFullStackThemeBuilderAgent
 from agent.wordpress.automated_theme_uploader import (
-    AutomatedThemeUploader, 
-    WordPressCredentials, 
+    AutomatedThemeUploader,
     UploadMethod,
     DeploymentResult
+)
+from config.wordpress_credentials import (
+    WordPressCredentials,
+    wordpress_credentials_manager,
+    get_skyy_rose_credentials
 )
 from monitoring.enterprise_logging import enterprise_logger, LogCategory
 
@@ -842,8 +846,85 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             "total_builds": len(self.build_history),
             "successful_builds": len([r for r in self.build_history if r.status == BuildStatus.COMPLETED]),
             "supported_theme_types": [t.value for t in ThemeType],
-            "uploader_status": self.theme_uploader.get_system_status()
+            "uploader_status": self.theme_uploader.get_system_status(),
+            "available_sites": wordpress_credentials_manager.list_available_sites()
         }
+
+    def create_skyy_rose_build_request(
+        self,
+        theme_name: str,
+        theme_type: ThemeType = ThemeType.LUXURY_FASHION,
+        customizations: Dict[str, Any] = None,
+        auto_deploy: bool = True,
+        activate_after_deploy: bool = False,
+        upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
+        site_key: str = "skyy_rose"
+    ) -> Optional[ThemeBuildRequest]:
+        """Create a theme build request for Skyy Rose Collection with default credentials."""
+        credentials = wordpress_credentials_manager.get_credentials(site_key)
+
+        if not credentials:
+            enterprise_logger.error(
+                f"No credentials found for site: {site_key}",
+                category=LogCategory.SYSTEM
+            )
+            return None
+
+        # Default Skyy Rose brand guidelines
+        default_brand_guidelines = {
+            "colors": {
+                "primary": "#1a1a1a",      # Sophisticated black
+                "secondary": "#d4af37",    # Luxury gold
+                "accent": "#8b7355",       # Warm bronze
+                "background": "#ffffff",   # Clean white
+                "text": "#333333"          # Dark gray
+            },
+            "typography": {
+                "headings": "Playfair Display",
+                "body": "Source Sans Pro",
+                "accent": "Dancing Script"
+            },
+            "brand_name": "Skyy Rose Collection",
+            "style_keywords": ["luxury", "elegant", "sophisticated", "modern", "fashion"],
+            "target_audience": "luxury fashion enthusiasts",
+            "brand_personality": "sophisticated, elegant, exclusive"
+        }
+
+        return ThemeBuildRequest(
+            theme_name=theme_name,
+            theme_type=theme_type,
+            brand_guidelines=default_brand_guidelines,
+            target_site=credentials.site_url,
+            deployment_credentials=credentials,
+            customizations=customizations or {},
+            auto_deploy=auto_deploy,
+            activate_after_deploy=activate_after_deploy,
+            upload_method=upload_method
+        )
+
+    async def build_skyy_rose_theme(
+        self,
+        theme_name: str,
+        theme_type: ThemeType = ThemeType.LUXURY_FASHION,
+        customizations: Dict[str, Any] = None,
+        auto_deploy: bool = True,
+        activate_after_deploy: bool = False,
+        site_key: str = "skyy_rose"
+    ) -> Optional[ThemeBuildResult]:
+        """Build and deploy a theme for Skyy Rose Collection with default settings."""
+        build_request = self.create_skyy_rose_build_request(
+            theme_name=theme_name,
+            theme_type=theme_type,
+            customizations=customizations,
+            auto_deploy=auto_deploy,
+            activate_after_deploy=activate_after_deploy,
+            site_key=site_key
+        )
+
+        if not build_request:
+            return None
+
+        return await self.build_and_deploy_theme(build_request)
 
 # Global theme builder orchestrator
 theme_builder_orchestrator = ThemeBuilderOrchestrator()
