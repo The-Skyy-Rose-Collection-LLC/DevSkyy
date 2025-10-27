@@ -73,45 +73,23 @@ if (!defined('ABSPATH')) {
 
 			<div class="header-main">
 				<div class="site-branding">
-					<?php if (has_custom_logo()) : ?>
-						<div class="custom-logo-container">
-							<?php the_custom_logo(); ?>
-						</div>
-					<?php else : ?>
-						<?php
-						// Display Skyy Rose Collection GIF Logo
-						if (function_exists('skyy_rose_get_logo_html')) {
-							echo skyy_rose_get_logo_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						} else {
-							// Fallback if function doesn't exist
-							?>
-							<div class="skyy-rose-logo-container">
-								<a href="<?php echo esc_url(home_url('/')); ?>" rel="home" class="skyy-rose-logo-link" aria-label="<?php echo esc_attr(get_bloginfo('name')); ?> - <?php esc_attr_e('Go to homepage', 'skyy-rose-collection'); ?>">
-									<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/TSRC-logo-60h.gif'); ?>"
-										 alt="<?php echo esc_attr(get_bloginfo('name')); ?>"
-										 class="skyy-rose-logo-gif"
-										 width="60"
-										 height="60"
-										 loading="eager">
-									<span class="skyy-rose-logo-text">
-										<?php if (is_front_page() && is_home()) : ?>
-											<span class="site-title-h1"><?php bloginfo('name'); ?></span>
-										<?php else : ?>
-											<span class="site-title"><?php bloginfo('name'); ?></span>
-										<?php endif; ?>
-									</span>
-								</a>
-							</div>
-							<?php
-						}
-						?>
-					<?php endif; ?>
-
 					<?php
-					$skyy_rose_description = get_bloginfo('description', 'display');
-					if ($skyy_rose_description || is_customize_preview()) :
+					the_custom_logo();
+					
+					if (is_front_page() && is_home()) :
 						?>
-						<p class="site-description"><?php echo esc_html($skyy_rose_description); ?></p>
+						<h1 class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></h1>
+						<?php
+					else :
+						?>
+						<p class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></p>
+						<?php
+					endif;
+					
+					$wp_mastery_woocommerce_luxury_description = get_bloginfo('description', 'display');
+					if ($wp_mastery_woocommerce_luxury_description || is_customize_preview()) :
+						?>
+						<p class="site-description"><?php echo $wp_mastery_woocommerce_luxury_description; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 					<?php endif; ?>
 				</div><!-- .site-branding -->
 

@@ -266,112 +266,6 @@ a:focus {
 }
 
 /* ==========================================================================
-   SKYY ROSE COLLECTION GIF LOGO STYLING
-   ========================================================================== */
-
-.skyy-rose-logo-container {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: var(--spacing-md);
-	margin-bottom: var(--spacing-sm);
-}
-
-.skyy-rose-logo-link {
-	display: flex;
-	align-items: center;
-	gap: var(--spacing-md);
-	text-decoration: none;
-	transition: all var(--transition-medium);
-	padding: var(--spacing-sm);
-	border-radius: var(--border-radius-lg);
-	position: relative;
-	overflow: hidden;
-}
-
-.skyy-rose-logo-link:hover {
-	transform: scale(1.02);
-	background: rgba(212, 175, 55, 0.05);
-}
-
-.skyy-rose-logo-link:focus {
-	outline: 2px solid var(--secondary-color);
-	outline-offset: 2px;
-}
-
-.skyy-rose-logo-picture {
-	display: block;
-	line-height: 0;
-}
-
-.skyy-rose-logo-gif {
-	width: 60px;
-	height: 60px;
-	object-fit: contain;
-	border-radius: var(--border-radius);
-	box-shadow: var(--shadow-sm);
-	transition: all var(--transition-medium);
-	background: var(--skyy-rose-white);
-	padding: 2px;
-	display: block;
-	max-width: 100%;
-	height: auto;
-}
-
-/* Ensure GIF animation plays smoothly */
-.skyy-rose-logo-gif {
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: crisp-edges;
-}
-
-.skyy-rose-logo-link:hover .skyy-rose-logo-gif {
-	transform: scale(1.05);
-	box-shadow: var(--shadow-md);
-}
-
-.skyy-rose-logo-text {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.site-title-h1,
-.site-title {
-	margin: 0;
-	font-family: var(--font-primary);
-	font-size: clamp(1.5rem, 2.5vw, 2rem);
-	font-weight: 400;
-	letter-spacing: 0.05em;
-	color: var(--primary-color);
-	transition: color var(--transition-medium);
-	line-height: 1.2;
-}
-
-.skyy-rose-logo-link:hover .site-title-h1,
-.skyy-rose-logo-link:hover .site-title {
-	color: var(--secondary-color);
-}
-
-/* Custom Logo Support */
-.custom-logo-container {
-	display: flex;
-	justify-content: center;
-	margin-bottom: var(--spacing-sm);
-}
-
-.custom-logo {
-	max-height: 60px;
-	width: auto;
-	transition: all var(--transition-medium);
-	border-radius: var(--border-radius);
-}
-
-.custom-logo:hover {
-	transform: scale(1.05);
-	box-shadow: var(--shadow-md);
-}
-
-/* ==========================================================================
    LUXURY NAVIGATION
    ========================================================================== */
 
@@ -523,27 +417,7 @@ a:focus {
 	.site-branding {
 		margin-bottom: var(--spacing-sm);
 	}
-
-	/* Mobile Logo Adjustments */
-	.skyy-rose-logo-container {
-		gap: var(--spacing-sm);
-	}
-
-	.skyy-rose-logo-gif {
-		width: 50px;
-		height: 50px;
-	}
-
-	.site-title-h1,
-	.site-title {
-		font-size: clamp(1.2rem, 4vw, 1.5rem);
-	}
-
-	.skyy-rose-logo-link {
-		gap: var(--spacing-sm);
-		padding: var(--spacing-xs);
-	}
-
+	
 	.main-navigation ul {
 		flex-direction: column;
 		gap: var(--spacing-md);
@@ -576,28 +450,6 @@ a:focus {
 	
 	.main-navigation ul {
 		gap: var(--spacing-sm);
-	}
-
-	/* Extra Small Mobile Logo Adjustments */
-	.skyy-rose-logo-gif {
-		width: 40px;
-		height: 40px;
-	}
-
-	.site-title-h1,
-	.site-title {
-		font-size: clamp(1rem, 5vw, 1.2rem);
-	}
-
-	.skyy-rose-logo-container {
-		flex-direction: column;
-		gap: var(--spacing-xs);
-		text-align: center;
-	}
-
-	.skyy-rose-logo-link {
-		flex-direction: column;
-		gap: var(--spacing-xs);
 	}
 }
 
