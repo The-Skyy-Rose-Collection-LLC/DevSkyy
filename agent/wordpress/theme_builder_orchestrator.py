@@ -22,11 +22,17 @@ from agent.wordpress.automated_theme_uploader import (
     UploadMethod,
     DeploymentResult
 )
-from config.wordpress_credentials import (
-    WordPressCredentials,
-    wordpress_credentials_manager,
-    get_skyy_rose_credentials
-)
+try:
+    from config.wordpress_credentials import (
+        WordPressCredentials,
+        wordpress_credentials_manager,
+        get_skyy_rose_credentials
+    )
+except ImportError:
+    # Fallback for testing
+    from agent.wordpress.automated_theme_uploader import WordPressCredentials
+    wordpress_credentials_manager = None
+    get_skyy_rose_credentials = None
 from monitoring.enterprise_logging import enterprise_logger, LogCategory
 
 class ThemeType(Enum):
@@ -847,7 +853,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             "successful_builds": len([r for r in self.build_history if r.status == BuildStatus.COMPLETED]),
             "supported_theme_types": [t.value for t in ThemeType],
             "uploader_status": self.theme_uploader.get_system_status(),
-            "available_sites": wordpress_credentials_manager.list_available_sites()
+            "available_sites": wordpress_credentials_manager.list_available_sites() if wordpress_credentials_manager else []
         }
 
     def create_skyy_rose_build_request(

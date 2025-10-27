@@ -2,12 +2,16 @@ import re
 from datetime import datetime
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 from anthropic import AsyncAnthropic
 from openai import AsyncOpenAI
 from typing import Any, Dict, List
 import logging
 import zipfile
+
+# Load environment variables
+load_dotenv()
 
 """
 WordPress Full-Stack Theme Builder Agent
