@@ -73,6 +73,32 @@ except ImportError:
     WORKFLOW_ENGINE_AVAILABLE = False
     logging.warning("Workflow Engine not available")
 
+try:
+    from agent.modules.content.asset_preprocessing_pipeline import (
+        asset_pipeline,
+        ProcessingRequest,
+        AssetType,
+        UpscaleQuality,
+    )
+    ASSET_PIPELINE_AVAILABLE = True
+except ImportError:
+    ASSET_PIPELINE_AVAILABLE = False
+    logging.warning("Asset Preprocessing Pipeline not available")
+
+try:
+    from agent.modules.content.virtual_tryon_huggingface_agent import (
+        virtual_tryon_agent,
+        TryOnRequest,
+        ModelSpecification,
+        PoseType,
+        ModelEthnicity,
+        BodyType,
+    )
+    VIRTUAL_TRYON_AVAILABLE = True
+except ImportError:
+    VIRTUAL_TRYON_AVAILABLE = False
+    logging.warning("Virtual Try-On Agent not available")
+
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +177,301 @@ class WorkflowExecutionRequest(BaseModel):
     """Request model for workflow execution."""
     workflow_type: str = Field(..., description="Type of workflow")
     workflow_data: Dict[str, Any] = Field(..., description="Workflow configuration")
+
+
+class AssetUploadRequest(BaseModel):
+    """Request model for asset upload and preprocessing."""
+    asset_path: str = Field(..., description="Path to uploaded asset")
+    asset_type: str = Field(default="clothing", description="Type of asset")
+    target_quality: str = Field(default="uhd_8k", description="Target quality")
+    enable_enhancement: bool = Field(default=True)
+    remove_background: bool = Field(default=True)
+    generate_3d: bool = Field(default=True)
+    extract_textures: bool = Field(default=True)
+    product_name: Optional[str] = None
+    brand: Optional[str] = None
+    collection: Optional[str] = None
+
+
+class VirtualTryOnRequestModel(BaseModel):
+    """Request model for virtual try-on generation."""
+    product_asset_id: str = Field(..., description="Preprocessed asset ID")
+    # Model specification
+    gender: str = Field(default="female")
+    ethnicity: str = Field(default="mixed")
+    age_range: str = Field(default="25-30")
+    body_type: str = Field(default="athletic")
+    pose: str = Field(default="fashion_shoot")
+    # Generation options
+    num_variations: int = Field(default=4, ge=1, le=10)
+    generate_video: bool = Field(default=False)
+    video_duration_seconds: int = Field(default=5, ge=3, le=30)
+    generate_multiple_angles: bool = Field(default=False)
+    generate_3d_preview: bool = Field(default=False)
+
+
+# ============================================================================
+# ASSET PREPROCESSING ENDPOINTS
+# ============================================================================
+
+@router.post("/assets/upload", tags=["Assets"])
+async def upload_and_process_asset(
+    request: AssetUploadRequest,
+    background_tasks: BackgroundTasks
+):
+    """
+    Upload and preprocess a fashion asset.
+
+    Automatic processing:
+    1. Upscale to target quality (up to 8K)
+    2. AI enhancement and restoration
+    3. Background removal with alpha channel
+    4. 3D model generation
+    5. Texture extraction (PBR materials)
+
+    Returns preprocessed asset ID for use in try-on generation.
+    """
+    if not ASSET_PIPELINE_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Asset preprocessing pipeline not available"
+        )
+
+    try:
+        # Create processing request
+        processing_request = ProcessingRequest(
+            asset_path=request.asset_path,
+            asset_type=AssetType(request.asset_type),
+            target_quality=UpscaleQuality(request.target_quality),
+            enable_enhancement=request.enable_enhancement,
+            remove_background=request.remove_background,
+            generate_3d=request.generate_3d,
+            extract_textures=request.extract_textures,
+        )
+
+        # Process asset
+        result = await asset_pipeline.process_asset(processing_request)
+
+        if not result.success:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Asset processing failed: {result.error}"
+            )
+
+        return {
+            "success": True,
+            "asset_id": result.asset_id,
+            "original_resolution": {
+                "width": result.original_resolution[0],
+                "height": result.original_resolution[1],
+            },
+            "final_resolution": {
+                "width": result.final_resolution[0],
+                "height": result.final_resolution[1],
+            },
+            "processed_file": result.processed_file,
+            "thumbnail_file": result.thumbnail_file,
+            "model_3d_file": result.model_3d_file,
+            "texture_files": result.texture_files,
+            "quality_score": result.quality_score,
+            "sharpness_score": result.sharpness_score,
+            "processing_time": result.processing_time,
+            "stages_completed": [s.value for s in result.stages_completed],
+        }
+
+    except Exception as e:
+        logger.error(f"Asset upload error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/assets/{asset_id}", tags=["Assets"])
+async def get_asset_info(asset_id: str):
+    """Get information about a preprocessed asset."""
+    if not ASSET_PIPELINE_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Asset preprocessing pipeline not available"
+        )
+
+    asset = asset_pipeline.get_asset(asset_id)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    return {
+        "asset_id": asset.asset_id,
+        "asset_type": asset.asset_type.value,
+        "product_name": asset.product_name,
+        "brand": asset.brand,
+        "collection": asset.collection,
+        "original_resolution": {
+            "width": asset.original_resolution[0],
+            "height": asset.original_resolution[1],
+        },
+        "final_resolution": {
+            "width": asset.final_resolution[0],
+            "height": asset.final_resolution[1],
+        },
+        "upscale_factor": asset.upscale_factor,
+        "has_3d_model": asset.has_3d_model,
+        "processed_path": asset.processed_path,
+        "thumbnail_path": asset.thumbnail_path,
+        "model_3d_path": asset.model_3d_path,
+        "uploaded_at": asset.uploaded_at.isoformat(),
+        "processed_at": asset.processed_at.isoformat() if asset.processed_at else None,
+    }
+
+
+@router.get("/assets", tags=["Assets"])
+async def list_assets():
+    """List all preprocessed assets."""
+    if not ASSET_PIPELINE_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Asset preprocessing pipeline not available"
+        )
+
+    status_info = asset_pipeline.get_system_status()
+
+    return {
+        "total_assets": status_info["assets"]["total_assets"],
+        "3d_models": status_info["assets"]["3d_models"],
+        "assets_processed": status_info["performance"]["assets_processed"],
+        "avg_processing_time": status_info["performance"]["avg_processing_time"],
+    }
+
+
+# ============================================================================
+# VIRTUAL TRY-ON & HUGGINGFACE ENDPOINTS
+# ============================================================================
+
+@router.post("/tryon/generate", tags=["Virtual Try-On"])
+async def generate_virtual_tryon(
+    request: VirtualTryOnRequestModel,
+    background_tasks: BackgroundTasks
+):
+    """
+    Generate AI models wearing your actual products.
+
+    LIMITLESS CAPABILITIES:
+    - 20+ HuggingFace models integrated
+    - Virtual try-on with real product placement
+    - AI model generation (any ethnicity, body type, pose)
+    - Video generation of models wearing products
+    - 3D preview generation
+    - Multiple angles and variations
+
+    Uses cutting-edge models:
+    - IDM-VTON for virtual try-on
+    - SDXL for high-quality generation
+    - ControlNet for pose control
+    - InstantID for face consistency
+    - AnimateDiff/SVD for video
+    - TripoSR for 3D generation
+    """
+    if not VIRTUAL_TRYON_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Virtual try-on agent not available"
+        )
+
+    try:
+        # Create model specification
+        model_spec = ModelSpecification(
+            gender=request.gender,
+            ethnicity=ModelEthnicity(request.ethnicity),
+            age_range=request.age_range,
+            body_type=BodyType(request.body_type),
+            pose=PoseType(request.pose),
+        )
+
+        # Create try-on request
+        tryon_request = TryOnRequest(
+            product_asset_id=request.product_asset_id,
+            model_spec=model_spec,
+            num_variations=request.num_variations,
+            generate_video=request.generate_video,
+            video_duration_seconds=request.video_duration_seconds,
+            generate_multiple_angles=request.generate_multiple_angles,
+            generate_3d_preview=request.generate_3d_preview,
+        )
+
+        # Generate try-on
+        result = await virtual_tryon_agent.generate_tryon(tryon_request)
+
+        if not result.success:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Try-on generation failed: {result.error}"
+            )
+
+        return {
+            "success": True,
+            "request_id": result.request_id,
+            "images": result.images,
+            "videos": result.videos,
+            "model_3d": result.model_3d,
+            "variations_generated": result.variations_generated,
+            "quality_score": result.quality_score,
+            "product_accuracy_score": result.product_accuracy_score,
+            "realism_score": result.realism_score,
+            "generation_time": result.generation_time,
+            "model_used": result.model_used,
+        }
+
+    except Exception as e:
+        logger.error(f"Virtual try-on error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/tryon/models", tags=["Virtual Try-On"])
+async def get_available_models():
+    """
+    Get list of all available HuggingFace models.
+
+    Returns information about 20+ integrated models including:
+    - Virtual try-on models
+    - Image generation models
+    - Video generation models
+    - 3D generation models
+    - Enhancement models
+    - Control models (pose, depth, segmentation)
+    """
+    if not VIRTUAL_TRYON_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Virtual try-on agent not available"
+        )
+
+    models = virtual_tryon_agent.get_available_models()
+
+    return {
+        "total_models": len(models),
+        "models": models,
+        "capabilities": [
+            "Virtual Try-On (IDM-VTON, OOTDiffusion)",
+            "Image Generation (SDXL, SDXL Turbo)",
+            "Video Generation (AnimateDiff, SVD, CogVideoX)",
+            "3D Generation (TripoSR, Wonder3D)",
+            "Face Models (InstantID, PhotoMaker, GFPGAN)",
+            "Control Models (ControlNet Pose/Depth)",
+            "Segmentation (SAM, CLIPSeg)",
+            "Detection (Grounding DINO, DWPose)",
+            "Enhancement (Real-ESRGAN)",
+            "Fashion-Specific (DeepFashion)"
+        ]
+    }
+
+
+@router.get("/tryon/status", tags=["Virtual Try-On"])
+async def get_tryon_status():
+    """Get virtual try-on system status."""
+    if not VIRTUAL_TRYON_AVAILABLE:
+        return {"available": False, "error": "Virtual try-on agent not available"}
+
+    return {
+        "available": True,
+        "status": virtual_tryon_agent.get_system_status(),
+    }
 
 
 # ============================================================================
