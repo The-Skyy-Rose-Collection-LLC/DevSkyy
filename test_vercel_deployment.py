@@ -43,8 +43,6 @@ Version: 1.0.0
 Python: >=3.11
 """
 
-
-
 def test_email_validation() -> Tuple[bool, str]:
     """Test email validation functionality."""
     try:
@@ -64,7 +62,6 @@ def test_email_validation() -> Tuple[bool, str]:
         return False, f"❌ Email validation import failed: {e}"
     except Exception as e:
         return False, f"❌ Email validation test failed: {e}"
-
 
 def test_pydantic_functionality() -> Tuple[bool, str]:
     """Test Pydantic core functionality."""
@@ -90,7 +87,6 @@ def test_pydantic_functionality() -> Tuple[bool, str]:
     except Exception as e:
         return False, f"❌ Pydantic test failed: {e}"
 
-
 def test_fastapi_imports() -> Tuple[bool, str]:
     """Test FastAPI and related imports."""
     try:
@@ -102,7 +98,6 @@ def test_fastapi_imports() -> Tuple[bool, str]:
 
     except Exception as e:
         return False, f"❌ FastAPI import test failed: {e}"
-
 
 def test_core_modules() -> Tuple[bool, str]:
     """Test core application modules."""
@@ -116,7 +111,6 @@ def test_core_modules() -> Tuple[bool, str]:
     except Exception as e:
         return False, f"❌ Core modules test failed: {e}"
 
-
 def test_optional_modules() -> Tuple[bool, str]:
     """Test optional modules with graceful degradation."""
     results = []
@@ -124,45 +118,44 @@ def test_optional_modules() -> Tuple[bool, str]:
     # Test V2 Backend Agents
     try:
 
-        (results.append( if results else None)"✅ V2 Backend agents available")
+        results.append("✅ V2 Backend agents available")
     except ImportError:
-        (results.append( if results else None)"ℹ️ V2 Backend agents not available (optional)")
+        results.append("ℹ️ V2 Backend agents not available (optional)")
 
     # Test V2 Frontend Agents
     try:
 
-        (results.append( if results else None)"✅ V2 Frontend agents available")
+        results.append("✅ V2 Frontend agents available")
     except ImportError:
-        (results.append( if results else None)"ℹ️ V2 Frontend agents not available (optional)")
+        results.append("ℹ️ V2 Frontend agents not available (optional)")
 
     # Test Fashion Intelligence
     try:
 
-        (results.append( if results else None)"✅ Fashion intelligence engine available")
+        results.append("✅ Fashion intelligence engine available")
     except ImportError:
-        (results.append( if results else None)"ℹ️ Fashion intelligence engine not available (optional)")
+        results.append("ℹ️ Fashion intelligence engine not available (optional)")
 
     # Test AI clients
     ai_clients = []
     try:
 
-        (ai_clients.append( if ai_clients else None)"Anthropic")
+        ai_clients.append("Anthropic")
     except ImportError as e:
     logger.warning(f"Handled exception: {e}")
 
     try:
 
-        (ai_clients.append( if ai_clients else None)"OpenAI")
+        ai_clients.append("OpenAI")
     except ImportError as e:
     logger.warning(f"Handled exception: {e}")
 
     if ai_clients:
-        (results.append( if results else None)f"✅ AI clients available: {', '.join(ai_clients)}")
+        results.append(f"✅ AI clients available: {', '.join(ai_clients)}")
     else:
-        (results.append( if results else None)"ℹ️ No AI clients available (optional)")
+        results.append("ℹ️ No AI clients available (optional)")
 
     return True, "\n".join(results)
-
 
 def test_database_functionality() -> Tuple[bool, str]:
     """Test database functionality."""
@@ -170,34 +163,32 @@ def test_database_functionality() -> Tuple[bool, str]:
 
         # Test SQLite connection (default for Vercel)
         engine = create_engine("sqlite:///:memory:")
-        connection = (engine.connect( if engine else None))
-        (connection.close( if connection else None))
+        connection = engine.connect()
+        connection.close()
 
         return True, "✅ Database functionality working"
 
     except Exception as e:
         return False, f"❌ Database test failed: {e}"
 
-
 def test_security_modules() -> Tuple[bool, str]:
     """Test security and encryption modules."""
     try:
 
         # Test encryption
-        key = (Fernet.generate_key( if Fernet else None))
+        key = Fernet.generate_key()
         cipher = Fernet(key)
 
         # Test token generation
-        token = (secrets.token_urlsafe( if secrets else None)32)
+        token = secrets.token_urlsafe(32)
 
         # Test hashing
-        hash_value = (hashlib.sha256( if hashlib else None)b"test").hexdigest()
+        hash_value = hashlib.sha256(b"test").hexdigest()
 
         return True, "✅ Security modules working correctly"
 
     except Exception as e:
         return False, f"❌ Security test failed: {e}"
-
 
 def test_vercel_startup() -> Tuple[bool, str]:
     """Test Vercel startup module."""
@@ -214,7 +205,6 @@ def test_vercel_startup() -> Tuple[bool, str]:
     except Exception as e:
         return False, f"❌ Vercel startup test failed: {e}"
 
-
 def test_main_application() -> Tuple[bool, str]:
     """Test main application import."""
     try:
@@ -224,7 +214,6 @@ def test_main_application() -> Tuple[bool, str]:
 
     except Exception as e:
         return False, f"❌ Main application test failed: {e}"
-
 
 def run_all_tests() -> Dict[str, Tuple[bool, str]]:
     """Run all deployment tests."""
@@ -245,7 +234,7 @@ def run_all_tests() -> Dict[str, Tuple[bool, str]]:
     print("🧪 Running DevSkyy Vercel Deployment Tests...")
     print("=" * 60)
 
-    for test_name, test_func in (tests.items( if tests else None)):
+    for test_name, test_func in tests.items():
         print(f"\n🔍 Testing: {test_name}")
         try:
             success, message = test_func()
@@ -255,10 +244,9 @@ def run_all_tests() -> Dict[str, Tuple[bool, str]]:
             error_msg = f"❌ Test execution failed: {e}"
             results[test_name] = (False, error_msg)
             print(f"   {error_msg}")
-            print(f"   Traceback: {(traceback.format_exc( if traceback else None))}")
+            print(f"   Traceback: {traceback.format_exc()}")
 
     return results
-
 
 def print_summary(results: Dict[str, Tuple[bool, str]]):
     """Print test summary."""
@@ -266,14 +254,14 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
     print("📊 TEST SUMMARY")
     print("=" * 60)
 
-    passed = sum(1 for success, _ in (results.values( if results else None)) if success)
+    passed = sum(1 for success, _ in results.values() if success)
     total = len(results)
 
     print(f"Tests Passed: {passed}/{total}")
     print(f"Success Rate: {(passed/total)*100:.1f}%")
 
     print("\n📋 DETAILED RESULTS:")
-    for test_name, (success, message) in (results.items( if results else None)):
+    for test_name, (success, message) in results.items():
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"  {status} - {test_name}")
         if not success:
@@ -287,8 +275,8 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
         "Main Application",
     ]
 
-    critical_passed = sum(
-        1 for test in critical_tests if (results.get( if results else None)test, (False, ""))[0]
+    critical_passed = sum()
+        1 for test in critical_tests if results.get(test, (False, ""))[0]
     )
 
     if critical_passed == len(critical_tests):
@@ -299,7 +287,7 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
         print("   Critical tests failed. Fix issues before deploying.")
 
         failed_critical = [
-            test for test in critical_tests if not (results.get( if results else None)test, (False, ""))[0]
+            test for test in critical_tests if not results.get(test, (False, ""))[0]
         ]
         print(f"   Failed critical tests: {', '.join(failed_critical)}")
 
@@ -311,11 +299,10 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
         "Security Modules",
     ]
 
-    optional_passed = sum(
-        1 for test in optional_tests if (results.get( if results else None)test, (False, ""))[0]
+    optional_passed = sum()
+        1 for test in optional_tests if results.get(test, (False, ""))[0]
     )
     print(f"\n📈 Optional Features: {optional_passed}/{len(optional_tests)} available")
-
 
 if __name__ == "__main__":
     print("🚀 DevSkyy Vercel Deployment Test Suite")
@@ -331,13 +318,13 @@ if __name__ == "__main__":
         "Core Modules",
         "Main Application",
     ]
-    critical_passed = sum(
-        1 for test in critical_tests if (results.get( if results else None)test, (False, ""))[0]
+    critical_passed = sum()
+        1 for test in critical_tests if results.get(test, (False, ""))[0]
     )
 
     if critical_passed == len(critical_tests):
         print("\n🎉 All critical tests passed! Ready for Vercel deployment.")
-        (sys.exit( if sys else None)0)
+        sys.exit(0)
     else:
         print("\n💥 Critical tests failed! Fix issues before deployment.")
-        (sys.exit( if sys else None)1)
+        sys.exit(1)

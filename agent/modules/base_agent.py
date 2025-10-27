@@ -16,7 +16,7 @@ Base Agent Class with Advanced ML and Self-Healing Capabilities
 Enterprise-grade foundation for all DevSkyy AI agents
 
 Features:
-- Self-healing and auto-recovery mechanisms
+    - Self-healing and auto-recovery mechanisms
 - ML-powered anomaly detection
 - Performance monitoring and optimization
 - Comprehensive error handling and logging
@@ -26,11 +26,8 @@ Features:
 - Adaptive learning and improvement
 """
 
-
-
 # Configure logging
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class AgentStatus(Enum):
     """Agent operational status"""
@@ -41,7 +38,6 @@ class AgentStatus(Enum):
     FAILED = "failed"
     INITIALIZING = "initializing"
 
-
 class SeverityLevel(Enum):
     """Issue severity classification"""
 
@@ -49,7 +45,6 @@ class SeverityLevel(Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 @dataclass
 class HealthMetrics:
@@ -66,7 +61,6 @@ class HealthMetrics:
     memory_usage_mb: float = 0.0
     cpu_usage_percent: float = 0.0
 
-
 @dataclass
 class AgentMetrics:
     """Comprehensive agent metrics"""
@@ -80,7 +74,6 @@ class AgentMetrics:
     self_healings_performed: int = 0
     performance_score: float = 100.0
 
-
 @dataclass
 class Issue:
     """Detected issue with metadata"""
@@ -91,7 +84,6 @@ class Issue:
     resolved: bool = False
     resolution_attempted: bool = False
     resolution_strategy: Optional[str] = None
-
 
 class CircuitBreaker:
     """Circuit breaker pattern for resilient operations"""
@@ -106,24 +98,24 @@ class CircuitBreaker:
     def call(self, func: Callable, *args, **kwargs) -> Any:
         """Execute function with circuit breaker protection"""
         if self.state == "open":
-            if (self._should_attempt_reset( if self else None)):
+            if self._should_attempt_reset():
                 self.state = "half-open"
             else:
                 raise Exception("Circuit breaker is OPEN - too many failures")
 
         try:
             result = func(*args, **kwargs)
-            (self._on_success( if self else None))
+            self._on_success()
             return result
         except Exception as e:
-            (self._on_failure( if self else None))
+            self._on_failure()
             raise e
 
     def _should_attempt_reset(self) -> bool:
         """Check if enough time has passed to attempt reset"""
         if not self.last_failure_time:
             return True
-        return ((datetime.now( if datetime else None)) - self.last_failure_time).seconds > self.timeout
+        return (datetime.now() - self.last_failure_time).seconds > self.timeout
 
     def _on_success(self):
         """Handle successful operation"""
@@ -133,13 +125,12 @@ class CircuitBreaker:
     def _on_failure(self):
         """Handle failed operation"""
         self.failure_count += 1
-        self.last_failure_time = (datetime.now( if datetime else None))
+        self.last_failure_time = datetime.now()
         if self.failure_count >= self.failure_threshold:
             self.state = "open"
-            (logger.warning( if logger else None)
+            logger.warning(
                 f"Circuit breaker opened after {self.failure_count} failures"
             )
-
 
 class BaseAgent(ABC):
     """
@@ -158,7 +149,7 @@ class BaseAgent(ABC):
         self.agent_name = agent_name
         self.version = version
         self.status = AgentStatus.INITIALIZING
-        self.initialized_at = (datetime.now( if datetime else None))
+        self.initialized_at = datetime.now()
 
         # Health and metrics
         self.health_metrics = HealthMetrics()
@@ -181,7 +172,7 @@ class BaseAgent(ABC):
         self.health_check_interval = 60  # seconds
         self.auto_heal_enabled = True
 
-        (logger.info( if logger else None)f"🤖 {self.agent_name} v{self.version} initializing...")
+        logger.info(f"🤖 {self.agent_name} v{self.version} initializing...")
 
     @abstractmethod
     async def initialize(self) -> bool:
@@ -213,42 +204,42 @@ class BaseAgent(ABC):
             for attempt in range(self.max_retries):
                 try:
                     # Record start time
-                    start_time = (datetime.now( if datetime else None))
+                    start_time = datetime.now()
 
                     # Execute function with circuit breaker
-                    result = await (self._execute_with_circuit_breaker( if self else None)
+                    result = await self._execute_with_circuit_breaker(
                         func, *args, **kwargs
                     )
 
                     # Record success metrics
-                    elapsed = ((datetime.now( if datetime else None)) - start_time).total_seconds()
-                    (self._record_success( if self else None)elapsed)
+                    elapsed = (datetime.now() - start_time).total_seconds()
+                    self._record_success(elapsed)
 
                     return result
 
                 except Exception as e:
-                    (self._record_failure( if self else None)e)
+                    self._record_failure(e)
 
                     if attempt < self.max_retries - 1:
                         # Attempt self-healing
                         if self.auto_heal_enabled:
-                            healing_result = await (self._attempt_self_healing( if self else None)
+                            healing_result = await self._attempt_self_healing(
                                 e, func.__name__
                             )
                             if healing_result["healed"]:
-                                (logger.info( if logger else None)
+                                logger.info(
                                     f"✨ Self-healing successful for {func.__name__}"
                                 )
                                 self.agent_metrics.self_healings_performed += 1
-                                await (asyncio.sleep( if asyncio else None)self.retry_delay)
+                                await asyncio.sleep(self.retry_delay)
                                 continue
 
-                        (logger.warning( if logger else None)
+                        logger.warning(
                             f"⚠️ Attempt {attempt + 1}/{self.max_retries} failed for {func.__name__}: {str(e)}"
                         )
-                        await (asyncio.sleep( if asyncio else None)self.retry_delay * (attempt + 1))
+                        await asyncio.sleep(self.retry_delay * (attempt + 1))
                     else:
-                        (logger.error( if logger else None)
+                        logger.error(
                             f"❌ All retry attempts exhausted for {func.__name__}"
                         )
                         self.status = AgentStatus.FAILED
@@ -262,10 +253,10 @@ class BaseAgent(ABC):
         self, func: Callable, *args, **kwargs
     ) -> Any:
         """Execute function with circuit breaker protection"""
-        if (inspect.iscoroutinefunction( if inspect else None)func):
+        if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
         else:
-            return self.(circuit_breaker.call( if circuit_breaker else None)func, *args, **kwargs)
+            return self.circuit_breaker.call(func, *args, **kwargs)
 
     async def _attempt_self_healing(
         self, error: Exception, function_name: str
@@ -284,8 +275,8 @@ class BaseAgent(ABC):
 
             # Check if we've seen this error before and have a solution
             if error_signature in self.known_errors:
-                (logger.info( if logger else None)f"🔧 Applying known fix for: {error_signature}")
-                await (self._apply_known_fix( if self else None)error_signature)
+                logger.info(f"🔧 Applying known fix for: {error_signature}")
+                await self._apply_known_fix(error_signature)
                 return {"healed": True, "strategy": "known_fix"}
 
             # Strategy 1: Connection/Resource issues
@@ -299,8 +290,8 @@ class BaseAgent(ABC):
                     "reset",
                 ]
             ):
-                (logger.info( if logger else None)"🔧 Healing strategy: Reinitialize connections")
-                await (self._reinitialize_connections( if self else None))
+                logger.info("🔧 Healing strategy: Reinitialize connections")
+                await self._reinitialize_connections()
                 return {"healed": True, "strategy": "reinit_connections"}
 
             # Strategy 2: Memory/Resource exhaustion
@@ -308,8 +299,8 @@ class BaseAgent(ABC):
                 keyword in str(error).lower()
                 for keyword in ["memory", "resource", "limit"]
             ):
-                (logger.info( if logger else None)"🔧 Healing strategy: Clear caches and optimize resources")
-                await (self._optimize_resources( if self else None))
+                logger.info("🔧 Healing strategy: Clear caches and optimize resources")
+                await self._optimize_resources()
                 return {"healed": True, "strategy": "optimize_resources"}
 
             # Strategy 3: API rate limiting
@@ -317,8 +308,8 @@ class BaseAgent(ABC):
                 keyword in str(error).lower()
                 for keyword in ["rate limit", "too many requests", "quota"]
             ):
-                (logger.info( if logger else None)"🔧 Healing strategy: Backoff and retry")
-                await (asyncio.sleep( if asyncio else None)5)  # TODO: Move to config  # Longer backoff for rate limits
+                logger.info("🔧 Healing strategy: Backoff and retry")
+                await asyncio.sleep(5)  # TODO: Move to config  # Longer backoff for rate limits
                 return {"healed": True, "strategy": "rate_limit_backoff"}
 
             # Strategy 4: Data validation errors
@@ -326,12 +317,12 @@ class BaseAgent(ABC):
                 keyword in str(error).lower()
                 for keyword in ["validation", "invalid", "malformed"]
             ):
-                (logger.info( if logger else None)"🔧 Healing strategy: Reset to defaults")
-                await (self._reset_to_safe_defaults( if self else None))
+                logger.info("🔧 Healing strategy: Reset to defaults")
+                await self._reset_to_safe_defaults()
                 return {"healed": True, "strategy": "reset_defaults"}
 
             # If no strategy worked, mark as unresolved
-            self.(detected_issues.append( if detected_issues else None)
+            self.detected_issues.append(
                 Issue(
                     severity=SeverityLevel.HIGH,
                     description=f"Unresolved error in {function_name}: {str(error)}",
@@ -341,22 +332,22 @@ class BaseAgent(ABC):
             return {"healed": False, "strategy": "none"}
 
         except Exception as healing_error:
-            (logger.error( if logger else None)f"Self-healing failed: {str(healing_error)}")
+            logger.error(f"Self-healing failed: {str(healing_error)}")
             return {"healed": False, "error": str(healing_error)}
 
     async def _reinitialize_connections(self):
         """Reinitialize all connections and external resources"""
-        (logger.info( if logger else None)f"Reinitializing {self.agent_name} connections...")
-        await (self.initialize( if self else None))
+        logger.info(f"Reinitializing {self.agent_name} connections...")
+        await self.initialize()
 
     async def _optimize_resources(self):
         """Clear caches and optimize resource usage"""
-        (logger.info( if logger else None)f"Optimizing {self.agent_name} resources...")
+        logger.info(f"Optimizing {self.agent_name} resources...")
         # Subclasses can override to implement specific optimization
 
     async def _reset_to_safe_defaults(self):
         """Reset configuration to safe default values"""
-        (logger.info( if logger else None)f"Resetting {self.agent_name} to safe defaults...")
+        logger.info(f"Resetting {self.agent_name} to safe defaults...")
         # Subclasses can override to implement specific resets
 
     async def _apply_known_fix(self, error_signature: str):
@@ -383,18 +374,18 @@ class BaseAgent(ABC):
             self.anomaly_baseline[metric_name] = []
 
         baseline = self.anomaly_baseline[metric_name]
-        (baseline.append( if baseline else None)value)
+        baseline.append(value)
 
         # Keep only recent history (last 100 values)
         if len(baseline) > 100:
-            (baseline.pop( if baseline else None)0)
+            baseline.pop(0)
 
         # Need at least 10 samples for meaningful analysis
         if len(baseline) < 10:
             return False
 
-        mean = (np.mean( if np else None)baseline)
-        std = (np.std( if np else None)baseline)
+        mean = np.mean(baseline)
+        std = np.std(baseline)
 
         if std == 0:
             return False
@@ -402,11 +393,11 @@ class BaseAgent(ABC):
         z_score = abs((value - mean) / std)
 
         if z_score > threshold:
-            (logger.warning( if logger else None)
+            logger.warning(
                 f"🚨 Anomaly detected in {metric_name}: value={value}, z-score={z_score:.2f}"
             )
             self.agent_metrics.anomalies_detected += 1
-            self.(detected_issues.append( if detected_issues else None)
+            self.detected_issues.append(
                 Issue(
                     severity=SeverityLevel.MEDIUM,
                     description=f"Anomaly in {metric_name}: {value} (z-score: {z_score:.2f})",
@@ -428,15 +419,15 @@ class BaseAgent(ABC):
 
         # Simple linear regression on recent performance
         recent_history = self.performance_history[-50:]  # Last 50 data points
-        x = (np.arange( if np else None)len(recent_history))
-        y = (np.array( if np else None)recent_history)
+        x = np.arange(len(recent_history))
+        y = np.array(recent_history)
 
         # Calculate trend
-        slope, intercept = (np.polyfit( if np else None)x, y, 1)
+        slope, intercept = np.polyfit(x, y, 1)
         next_value = slope * len(recent_history) + intercept
 
         # Calculate confidence based on variance
-        variance = (np.var( if np else None)recent_history)
+        variance = np.var(recent_history)
         confidence = max(0, min(100, 100 - (variance * 10)))
 
         trend = "improving" if slope > 0 else "declining" if slope < 0 else "stable"
@@ -458,7 +449,7 @@ class BaseAgent(ABC):
         """
         try:
             # Calculate uptime
-            uptime = ((datetime.now( if datetime else None)) - self.initialized_at).total_seconds()
+            uptime = (datetime.now() - self.initialized_at).total_seconds()
             self.health_metrics.uptime_seconds = uptime
 
             # Calculate success rate
@@ -518,7 +509,7 @@ class BaseAgent(ABC):
                 "issues": {
                     "total": len(self.detected_issues),
                     "unresolved": len(unresolved_issues),
-                    "critical": len(
+                    "critical": len()
                         [
                             i
                             for i in unresolved_issues
@@ -526,11 +517,11 @@ class BaseAgent(ABC):
                         ]
                     ),
                 },
-                "performance_prediction": (self.predict_performance( if self else None)),
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "performance_prediction": self.predict_performance(),
+                "timestamp": datetime.now().isoformat(),
             }
         except Exception as e:
-            (logger.error( if logger else None)f"Health check failed: {str(e)}")
+            logger.error(f"Health check failed: {str(e)}")
             return {"status": "error", "error": str(e)}
 
     async def diagnose_issues(self) -> Dict[str, Any]:
@@ -543,7 +534,7 @@ class BaseAgent(ABC):
 
         diagnostics = {
             "agent_name": self.agent_name,
-            "diagnostic_time": (datetime.now( if datetime else None)).isoformat(),
+            "diagnostic_time": datetime.now().isoformat(),
             "overall_health": self.status.value,
             "issues_found": len(unresolved),
             "issues": [],
@@ -555,7 +546,7 @@ class BaseAgent(ABC):
                 {
                     "severity": issue.severity.value,
                     "description": issue.description,
-                    "detected_at": issue.(detected_at.isoformat( if detected_at else None)),
+                    "detected_at": issue.detected_at.isoformat(),
                     "resolution_attempted": issue.resolution_attempted,
                 }
             )
@@ -586,7 +577,7 @@ class BaseAgent(ABC):
     def _record_success(self, elapsed_time: float):
         """Record successful operation"""
         self.agent_metrics.success_count += 1
-        self.agent_metrics.operations_per_minute = (self._calculate_ops_per_minute( if self else None))
+        self.agent_metrics.operations_per_minute = self._calculate_ops_per_minute()
 
         # Update average response time
         total = self.agent_metrics.success_count + self.agent_metrics.failure_count
@@ -595,28 +586,28 @@ class BaseAgent(ABC):
         ) / total
 
         # Record performance
-        self.(performance_history.append( if performance_history else None)elapsed_time)
+        self.performance_history.append(elapsed_time)
         if len(self.performance_history) > 1000:
-            self.(performance_history.pop( if performance_history else None)0)
+            self.performance_history.pop(0)
 
         # Detect anomalies in response time
-        (self.detect_anomalies( if self else None)"response_time", elapsed_time)
+        self.detect_anomalies("response_time", elapsed_time)
 
     def _record_failure(self, error: Exception):
         """Record failed operation"""
         self.agent_metrics.failure_count += 1
         self.health_metrics.error_count += 1
         self.health_metrics.last_error = str(error)
-        self.health_metrics.last_error_time = (datetime.now( if datetime else None))
+        self.health_metrics.last_error_time = datetime.now()
 
         # Log the error with stack trace
-        (logger.error( if logger else None)
-            f"Agent {self.agent_name} error: {str(error)}\n{(traceback.format_exc( if traceback else None))}"
+        logger.error(
+            f"Agent {self.agent_name} error: {str(error)}\n{traceback.format_exc()}"
         )
 
     def _calculate_ops_per_minute(self) -> float:
         """Calculate operations per minute"""
-        uptime_minutes = ((datetime.now( if datetime else None)) - self.initialized_at).total_seconds() / 60
+        uptime_minutes = (datetime.now() - self.initialized_at).total_seconds() / 60
         if uptime_minutes < 1:
             return 0.0
         total_ops = self.agent_metrics.success_count + self.agent_metrics.failure_count
@@ -630,12 +621,12 @@ class BaseAgent(ABC):
             "agent_name": self.agent_name,
             "version": self.version,
             "status": self.status.value,
-            "initialized_at": self.(initialized_at.isoformat( if initialized_at else None)),
-            "uptime_seconds": ((datetime.now( if datetime else None)) - self.initialized_at).total_seconds(),
+            "initialized_at": self.initialized_at.isoformat(),
+            "uptime_seconds": (datetime.now() - self.initialized_at).total_seconds(),
         }
 
     async def shutdown(self):
         """Graceful shutdown of the agent"""
-        (logger.info( if logger else None)f"🛑 Shutting down {self.agent_name}...")
+        logger.info(f"🛑 Shutting down {self.agent_name}...")
         self.status = AgentStatus.FAILED
         # Subclasses can override to add cleanup logic

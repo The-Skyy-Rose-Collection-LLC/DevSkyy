@@ -6,29 +6,26 @@ from typing import Any, Dict, List
 import httpx
 import logging
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class WooCommerceIntegrationService:
     """WooCommerce REST API integration service for luxury e-commerce automation."""
 
     def __init__(self):
-        self.consumer_key = (os.getenv( if os else None)"WOOCOMMERCE_KEY")
-        self.consumer_secret = (os.getenv( if os else None)"WOOCOMMERCE_SECRET")
+        self.consumer_key = os.getenv("WOOCOMMERCE_KEY")
+        self.consumer_secret = os.getenv("WOOCOMMERCE_SECRET")
         self.base_url = None  # Will be set when WordPress site is connected
 
         self.auth = HTTPBasicAuth(self.consumer_key, self.consumer_secret)
 
-        (logger.info( if logger else None)
+        logger.info(
             "🛒 WooCommerce Integration Service initialized for luxury e-commerce"
         )
 
     def set_site_url(self, site_url: str):
         """Set the WooCommerce site URL for API calls."""
-        self.base_url = f"{(site_url.rstrip( if site_url else None)'/')}/wp-json/wc/v3"
-        (logger.info( if logger else None)f"🌐 WooCommerce API base URL set: {self.base_url}")
+        self.base_url = f"{site_url.rstrip('/')}/wp-json/wc/v3"
+        logger.info(f"🌐 WooCommerce API base URL set: {self.base_url}")
 
     async def get_products(
         self, per_page: int = 20, category: str = None, status: str = "publish"
@@ -43,24 +40,24 @@ class WooCommerceIntegrationService:
             if category:
                 params["category"] = category
 
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.base_url}/products", auth=self.auth, params=params
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            products = (response.json( if response else None))
+            products = response.json()
 
             return {
                 "products": products,
                 "total_products": len(products),
-                "luxury_analysis": await (self._analyze_luxury_products( if self else None)products),
-                "optimization_opportunities": await (self._identify_product_optimizations( if self else None)
+                "luxury_analysis": await self._analyze_luxury_products(products),
+                "optimization_opportunities": await self._identify_product_optimizations(
                     products
                 ),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to get products: {str(e)}")
+            logger.error(f"Failed to get products: {str(e)}")
             return {"error": str(e)}
 
     async def get_orders(
@@ -75,22 +72,22 @@ class WooCommerceIntegrationService:
             if status:
                 params["status"] = status
 
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.base_url}/orders", auth=self.auth, params=params
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            orders = (response.json( if response else None))
+            orders = response.json()
 
             return {
                 "orders": orders,
                 "total_orders": len(orders),
-                "revenue_analysis": await (self._analyze_revenue_patterns( if self else None)orders),
-                "customer_insights": await (self._analyze_customer_behavior( if self else None)orders),
+                "revenue_analysis": await self._analyze_revenue_patterns(orders),
+                "customer_insights": await self._analyze_customer_behavior(orders),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to get orders: {str(e)}")
+            logger.error(f"Failed to get orders: {str(e)}")
             return {"error": str(e)}
 
     async def create_luxury_product(
@@ -102,29 +99,29 @@ class WooCommerceIntegrationService:
                 return {"error": "WooCommerce site URL not configured"}
 
             # Enhance product data with luxury features
-            enhanced_product = await (self._enhance_product_for_luxury( if self else None)product_data)
+            enhanced_product = await self._enhance_product_for_luxury(product_data)
 
-            response = (httpx.post( if httpx else None)
+            response = httpx.post(
                 f"{self.base_url}/products", auth=self.auth, json=enhanced_product
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            created_product = (response.json( if response else None))
+            created_product = response.json()
 
-            (logger.info( if logger else None)
-                f"🎨 Luxury product created: {(created_product.get( if created_product else None)'name')} (ID: {(created_product.get( if created_product else None)'id')})"
+            logger.info(
+                f"🎨 Luxury product created: {created_product.get('name')} (ID: {created_product.get('id')})"
             )
 
             return {
                 "product": created_product,
-                "luxury_features_added": (enhanced_product.get( if enhanced_product else None)"luxury_features", []),
+                "luxury_features_added": enhanced_product.get("luxury_features", []),
                 "seo_optimization": "applied",
                 "conversion_optimization": "enhanced",
                 "agent_responsible": "design_automation_agent",
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create product: {str(e)}")
+            logger.error(f"Failed to create product: {str(e)}")
             return {"error": str(e)}
 
     async def update_product_for_luxury(
@@ -136,28 +133,28 @@ class WooCommerceIntegrationService:
                 return {"error": "WooCommerce site URL not configured"}
 
             # Apply luxury enhancements to updates
-            luxury_updates = await (self._apply_luxury_enhancements( if self else None)updates)
+            luxury_updates = await self._apply_luxury_enhancements(updates)
 
-            response = (requests.put( if requests else None)
+            response = requests.put(
                 f"{self.base_url}/products/{product_id}",
                 auth=self.auth,
                 json=luxury_updates,
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            updated_product = (response.json( if response else None))
+            updated_product = response.json()
 
-            (logger.info( if logger else None)f"✨ Product optimized for luxury: {product_id}")
+            logger.info(f"✨ Product optimized for luxury: {product_id}")
 
             return {
                 "updated_product": updated_product,
-                "luxury_improvements": (luxury_updates.get( if luxury_updates else None)"luxury_enhancements", []),
+                "luxury_improvements": luxury_updates.get("luxury_enhancements", []),
                 "conversion_impact": "positive",
                 "seo_improvements": "applied",
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to update product: {str(e)}")
+            logger.error(f"Failed to update product: {str(e)}")
             return {"error": str(e)}
 
     async def get_product_categories(self) -> Dict[str, Any]:
@@ -166,27 +163,27 @@ class WooCommerceIntegrationService:
             if not self.base_url:
                 return {"error": "WooCommerce site URL not configured"}
 
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.base_url}/products/categories",
                 auth=self.auth,
                 params={"per_page": 100},
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            categories = (response.json( if response else None))
+            categories = response.json()
 
             return {
                 "categories": categories,
-                "luxury_categorization": await (self._analyze_luxury_categories( if self else None)
+                "luxury_categorization": await self._analyze_luxury_categories(
                     categories
                 ),
-                "organization_recommendations": await (self._recommend_category_structure( if self else None)
+                "organization_recommendations": await self._recommend_category_structure(
                     categories
                 ),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to get categories: {str(e)}")
+            logger.error(f"Failed to get categories: {str(e)}")
             return {"error": str(e)}
 
     async def create_luxury_collection_category(
@@ -198,26 +195,26 @@ class WooCommerceIntegrationService:
                 return {"error": "WooCommerce site URL not configured"}
 
             category_data = {
-                "name": (collection_data.get( if collection_data else None)"name", "Luxury Collection"),
-                "description": (collection_data.get( if collection_data else None)
+                "name": collection_data.get("name", "Luxury Collection"),
+                "description": collection_data.get(
                     "description", "Exclusive luxury items"
                 ),
                 "display": "products",
-                "image": {"src": (collection_data.get( if collection_data else None)"image_url", "")},
-                "menu_order": (collection_data.get( if collection_data else None)"menu_order", 0),
+                "image": {"src": collection_data.get("image_url", "")},
+                "menu_order": collection_data.get("menu_order", 0),
             }
 
-            response = (httpx.post( if httpx else None)
+            response = httpx.post(
                 f"{self.base_url}/products/categories",
                 auth=self.auth,
                 json=category_data,
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            created_category = (response.json( if response else None))
+            created_category = response.json()
 
-            (logger.info( if logger else None)
-                f"💎 Luxury collection category created: {(created_category.get( if created_category else None)'name')}"
+            logger.info(
+                f"💎 Luxury collection category created: {created_category.get('name')}"
             )
 
             return {
@@ -228,7 +225,7 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create category: {str(e)}")
+            logger.error(f"Failed to create category: {str(e)}")
             return {"error": str(e)}
 
     async def optimize_checkout_process(self) -> Dict[str, Any]:
@@ -248,12 +245,12 @@ class WooCommerceIntegrationService:
                 "agent_responsible": "performance_agent",
             }
 
-            (logger.info( if logger else None)"🛒 Checkout optimization recommendations prepared")
+            logger.info("🛒 Checkout optimization recommendations prepared")
 
             return optimizations
 
         except Exception as e:
-            (logger.error( if logger else None)f"Checkout optimization failed: {str(e)}")
+            logger.error(f"Checkout optimization failed: {str(e)}")
             return {"error": str(e)}
 
     async def get_sales_analytics(self, period: str = "7d") -> Dict[str, Any]:
@@ -263,7 +260,7 @@ class WooCommerceIntegrationService:
                 return {"error": "WooCommerce site URL not configured"}
 
             # Get sales reports
-            reports_response = (httpx.get( if httpx else None)
+            reports_response = httpx.get(
                 f"{self.base_url}/reports/sales",
                 auth=self.auth,
                 params={"period": period},
@@ -271,18 +268,18 @@ class WooCommerceIntegrationService:
 
             sales_data = {}
             if reports_response.status_code == 200:
-                sales_data = (reports_response.json( if reports_response else None))
+                sales_data = reports_response.json()
 
             # Analyze for luxury insights
             analytics = {
                 "sales_data": sales_data,
-                "luxury_performance_insights": await (self._analyze_luxury_performance( if self else None)
+                "luxury_performance_insights": await self._analyze_luxury_performance(
                     sales_data
                 ),
-                "agent_recommendations": await (self._generate_sales_recommendations( if self else None)
+                "agent_recommendations": await self._generate_sales_recommendations(
                     sales_data
                 ),
-                "revenue_optimization_opportunities": await (self._identify_revenue_opportunities( if self else None)
+                "revenue_optimization_opportunities": await self._identify_revenue_opportunities(
                     sales_data
                 ),
             }
@@ -290,7 +287,7 @@ class WooCommerceIntegrationService:
             return analytics
 
         except Exception as e:
-            (logger.error( if logger else None)f"Sales analytics failed: {str(e)}")
+            logger.error(f"Sales analytics failed: {str(e)}")
             return {"error": str(e)}
 
     # Helper methods for luxury e-commerce optimization
@@ -303,9 +300,9 @@ class WooCommerceIntegrationService:
         optimization_needed = []
 
         for product in products:
-            name = (product.get( if product else None)"name", "").lower()
-            description = (product.get( if product else None)"description", "").lower()
-            price = float((product.get( if product else None)"price", 0))
+            name = product.get("name", "").lower()
+            description = product.get("description", "").lower()
+            price = float(product.get("price", 0))
 
             # Check luxury indicators
             luxury_keywords = [
@@ -321,9 +318,9 @@ class WooCommerceIntegrationService:
             )
 
             if has_luxury_keywords or price > 500:
-                (luxury_indicators.append( if luxury_indicators else None)(product.get( if product else None)"id"))
+                luxury_indicators.append(product.get("id"))
             else:
-                (optimization_needed.append( if optimization_needed else None)(product.get( if product else None)"id"))
+                optimization_needed.append(product.get("id"))
 
         return {
             "luxury_products_identified": len(luxury_indicators),
@@ -349,26 +346,26 @@ class WooCommerceIntegrationService:
             product_optimizations = []
 
             # Check images
-            if not (product.get( if product else None)"images") or len((product.get( if product else None)"images", [])) < 3:
-                (product_optimizations.append( if product_optimizations else None)"add_more_high_quality_images")
+            if not product.get("images") or len(product.get("images", [])) < 3:
+                product_optimizations.append("add_more_high_quality_images")
 
             # Check description
-            if len((product.get( if product else None)"description", "")) < 200:
-                (product_optimizations.append( if product_optimizations else None)"enhance_product_description")
+            if len(product.get("description", "")) < 200:
+                product_optimizations.append("enhance_product_description")
 
             # Check SEO
-            if not (product.get( if product else None)"meta_data"):
-                (product_optimizations.append( if product_optimizations else None)"add_seo_metadata")
+            if not product.get("meta_data"):
+                product_optimizations.append("add_seo_metadata")
 
             # Check pricing
-            if float((product.get( if product else None)"price", 0)) < 50:
-                (product_optimizations.append( if product_optimizations else None)"consider_premium_pricing")
+            if float(product.get("price", 0)) < 50:
+                product_optimizations.append("consider_premium_pricing")
 
             if product_optimizations:
-                (optimizations.append( if optimizations else None)
+                optimizations.append(
                     {
-                        "product_id": (product.get( if product else None)"id"),
-                        "product_name": (product.get( if product else None)"name"),
+                        "product_id": product.get("id"),
+                        "product_name": product.get("name"),
                         "optimizations_needed": product_optimizations,
                         "priority": (
                             "high" if len(product_optimizations) > 2 else "medium"
@@ -382,7 +379,7 @@ class WooCommerceIntegrationService:
         self, product_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Enhance product data with luxury features."""
-        enhanced = (product_data.copy( if product_data else None))
+        enhanced = product_data.copy()
 
         # Add luxury enhancements
         luxury_features = []
@@ -394,7 +391,7 @@ class WooCommerceIntegrationService:
                 for word in ["luxury", "premium", "exclusive"]
             ):
                 enhanced["name"] = f"Premium {enhanced['name']}"
-                (luxury_features.append( if luxury_features else None)"premium_naming")
+                luxury_features.append("premium_naming")
 
         # Enhance description
         if "description" in enhanced:
@@ -406,10 +403,10 @@ class WooCommerceIntegrationService:
                 "• Backed by our luxury guarantee",
             ]
             enhanced["description"] += "\n".join(luxury_desc_additions)
-            (luxury_features.append( if luxury_features else None)"luxury_description_enhancement")
+            luxury_features.append("luxury_description_enhancement")
 
         # Add luxury metadata
-        enhanced["meta_data"] = (enhanced.get( if enhanced else None)"meta_data", [])
+        enhanced["meta_data"] = enhanced.get("meta_data", [])
         enhanced["meta_data"].extend(
             [
                 {"key": "luxury_item", "value": "true"},
@@ -417,14 +414,14 @@ class WooCommerceIntegrationService:
                 {"key": "exclusive_collection", "value": "true"},
             ]
         )
-        (luxury_features.append( if luxury_features else None)"luxury_metadata")
+        luxury_features.append("luxury_metadata")
 
         # Ensure premium pricing
         if "regular_price" in enhanced:
             price = float(enhanced["regular_price"])
             if price < 100:
                 enhanced["regular_price"] = str(price * 1.5)  # 50% premium markup
-                (luxury_features.append( if luxury_features else None)"premium_pricing_adjustment")
+                luxury_features.append("premium_pricing_adjustment")
 
         enhanced["luxury_features"] = luxury_features
         return enhanced
@@ -433,7 +430,7 @@ class WooCommerceIntegrationService:
         self, updates: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Apply luxury enhancements to product updates."""
-        enhanced_updates = (updates.copy( if updates else None))
+        enhanced_updates = updates.copy()
         enhancements = []
 
         # Enhance any text fields with luxury language
@@ -448,10 +445,10 @@ class WooCommerceIntegrationService:
         for field in ["name", "description", "short_description"]:
             if field in enhanced_updates:
                 text = enhanced_updates[field]
-                for basic, luxury in (luxury_terms.items( if luxury_terms else None)):
-                    text = (text.replace( if text else None)basic, luxury)
+                for basic, luxury in luxury_terms.items():
+                    text = text.replace(basic, luxury)
                 enhanced_updates[field] = text
-                (enhancements.append( if enhancements else None)f"{field}_luxury_enhancement")
+                enhancements.append(f"{field}_luxury_enhancement")
 
         enhanced_updates["luxury_enhancements"] = enhancements
         return enhanced_updates
@@ -460,11 +457,11 @@ class WooCommerceIntegrationService:
         self, orders: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """Analyze revenue patterns for luxury insights."""
-        total_revenue = sum(float((order.get( if order else None)"total", 0)) for order in orders)
+        total_revenue = sum(float(order.get("total", 0)) for order in orders)
         average_order_value = total_revenue / len(orders) if orders else 0
 
         high_value_orders = [
-            order for order in orders if float((order.get( if order else None)"total", 0)) > 200
+            order for order in orders if float(order.get("total", 0)) > 200
         ]
         luxury_conversion_rate = (
             (len(high_value_orders) / len(orders)) * 100 if orders else 0
@@ -491,7 +488,7 @@ class WooCommerceIntegrationService:
         }
 
         for order in orders:
-            total = float((order.get( if order else None)"total", 0))
+            total = float(order.get("total", 0))
             if total > 500:
                 customer_segments["luxury_customers"] += 1
             elif total > 200:
@@ -513,9 +510,7 @@ class WooCommerceIntegrationService:
             ],
         }
 
-
 # Factory function
-
 
 def create_woocommerce_integration_service() -> WooCommerceIntegrationService:
     """Create WooCommerce integration service instance."""

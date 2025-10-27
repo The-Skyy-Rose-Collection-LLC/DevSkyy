@@ -4,10 +4,8 @@ from typing import Any, Dict
 import logging
 import uuid
 
-
-(logging.basicConfig( if logging else None)level=logging.INFO)
-logger = (logging.getLogger( if logging else None)__name__)
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class DesignAutomationAgent:
     """Luxury Fashion Design Automation & Frontend Beauty Specialist."""
@@ -164,11 +162,11 @@ class DesignAutomationAgent:
         }
 
         # EXPERIMENTAL: AI-Powered Design Intelligence
-        self.design_ai = (self._initialize_design_ai( if self else None))
-        self.aesthetic_analyzer = (self._initialize_aesthetic_analyzer( if self else None))
-        self.trend_forecaster = (self._initialize_design_trend_forecaster( if self else None))
+        self.design_ai = self._initialize_design_ai()
+        self.aesthetic_analyzer = self._initialize_aesthetic_analyzer()
+        self.trend_forecaster = self._initialize_design_trend_forecaster()
 
-        (logger.info( if logger else None)
+        logger.info(
             "🎨 Design Automation Agent initialized with Luxury Fashion Intelligence"
         )
 
@@ -177,50 +175,50 @@ class DesignAutomationAgent:
     ) -> Dict[str, Any]:
         """Create comprehensive luxury frontend design with automated beauty optimization."""
         try:
-            page_type = (design_request.get( if design_request else None)"page_type", "product_showcase")
-            design_style = (design_request.get( if design_request else None)"style", "modern_luxury")
-            target_audience = (design_request.get( if design_request else None)"audience", "luxury_customers")
-            brand_personality = (design_request.get( if design_request else None)
+            page_type = design_request.get("page_type", "product_showcase")
+            design_style = design_request.get("style", "modern_luxury")
+            target_audience = design_request.get("audience", "luxury_customers")
+            brand_personality = design_request.get(
                 "brand_personality", "sophisticated_elegant"
             )
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"🎨 Creating luxury {page_type} design with {design_style} style..."
             )
 
             # Generate design system
-            design_system = (self._create_luxury_design_system( if self else None)
+            design_system = self._create_luxury_design_system(
                 design_style, brand_personality
             )
 
             # Create component library
-            component_library = (self._generate_luxury_components( if self else None)
+            component_library = self._generate_luxury_components(
                 page_type, design_system
             )
 
             # Generate layout structure
-            layout_structure = (self._create_responsive_layout( if self else None)
+            layout_structure = self._create_responsive_layout(
                 page_type, target_audience
             )
 
             # Add luxury animations and interactions
-            interaction_design = (self._design_luxury_interactions( if self else None)
+            interaction_design = self._design_luxury_interactions(
                 page_type, design_system
             )
 
             # Generate responsive breakpoints
-            responsive_design = (self._create_responsive_specifications( if self else None)layout_structure)
+            responsive_design = self._create_responsive_specifications(layout_structure)
 
             # Create accessibility features
-            accessibility_features = (self._ensure_luxury_accessibility( if self else None)design_system)
+            accessibility_features = self._ensure_luxury_accessibility(design_system)
 
             # Generate performance optimizations
-            performance_optimizations = (self._optimize_design_performance( if self else None)
+            performance_optimizations = self._optimize_design_performance(
                 component_library, layout_structure
             )
 
             return {
-                "design_id": str((uuid.uuid4( if uuid else None))),
+                "design_id": str(uuid.uuid4()),
                 "page_type": page_type,
                 "design_style": design_style,
                 "target_audience": target_audience,
@@ -231,19 +229,19 @@ class DesignAutomationAgent:
                 "responsive_design": responsive_design,
                 "accessibility_features": accessibility_features,
                 "performance_optimizations": performance_optimizations,
-                "brand_consistency": (self._ensure_brand_consistency( if self else None)design_system),
-                "conversion_optimization": (self._optimize_for_conversions( if self else None)page_type),
-                "generated_code": (self._generate_frontend_code( if self else None)
+                "brand_consistency": self._ensure_brand_consistency(design_system),
+                "conversion_optimization": self._optimize_for_conversions(page_type),
+                "generated_code": self._generate_frontend_code(
                     component_library, layout_structure
                 ),
-                "design_preview": (self._create_design_preview_url( if self else None)),
+                "design_preview": self._create_design_preview_url(),
                 "estimated_development_time": "2-3 days",
-                "luxury_score": (self._calculate_luxury_design_score( if self else None)design_system),
-                "created_at": (datetime.now( if datetime else None)).isoformat(),
+                "luxury_score": self._calculate_luxury_design_score(design_system),
+                "created_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Luxury frontend design creation failed: {str(e)}")
+            logger.error(f"❌ Luxury frontend design creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     async def automate_design_system_updates(
@@ -251,48 +249,48 @@ class DesignAutomationAgent:
     ) -> Dict[str, Any]:
         """Automate design system updates and component refresh."""
         try:
-            update_type = (update_request.get( if update_request else None)"type", "seasonal_refresh")
-            affected_components = (update_request.get( if update_request else None)"components", "all")
-            brand_evolution = (update_request.get( if update_request else None)"brand_evolution", {})
+            update_type = update_request.get("type", "seasonal_refresh")
+            affected_components = update_request.get("components", "all")
+            brand_evolution = update_request.get("brand_evolution", {})
 
-            (logger.info( if logger else None)f"🔄 Automating {update_type} design system updates...")
+            logger.info(f"🔄 Automating {update_type} design system updates...")
 
             # Analyze current design system
-            current_analysis = (self._analyze_current_design_system( if self else None))
+            current_analysis = self._analyze_current_design_system()
 
             # Generate update strategy
-            update_strategy = (self._create_update_strategy( if self else None)update_type, brand_evolution)
+            update_strategy = self._create_update_strategy(update_type, brand_evolution)
 
             # Update color palette if needed
-            updated_colors = (self._evolve_color_palette( if self else None)
+            updated_colors = self._evolve_color_palette(
                 update_strategy, current_analysis
             )
 
             # Refresh typography if specified
-            updated_typography = (self._refresh_typography_system( if self else None)update_strategy)
+            updated_typography = self._refresh_typography_system(update_strategy)
 
             # Update component library
-            updated_components = (self._update_component_library( if self else None)
+            updated_components = self._update_component_library(
                 affected_components, update_strategy
             )
 
             # Regenerate design tokens
-            design_tokens = (self._generate_design_tokens( if self else None)
+            design_tokens = self._generate_design_tokens(
                 updated_colors, updated_typography
             )
 
             # Create migration guide
-            migration_guide = (self._create_migration_guide( if self else None)
+            migration_guide = self._create_migration_guide(
                 current_analysis, update_strategy
             )
 
             # Generate updated CSS/SCSS
-            updated_styles = (self._generate_updated_styles( if self else None)
+            updated_styles = self._generate_updated_styles(
                 design_tokens, updated_components
             )
 
             return {
-                "update_id": str((uuid.uuid4( if uuid else None))),
+                "update_id": str(uuid.uuid4()),
                 "update_type": update_type,
                 "affected_components": affected_components,
                 "current_analysis": current_analysis,
@@ -303,16 +301,16 @@ class DesignAutomationAgent:
                 "design_tokens": design_tokens,
                 "migration_guide": migration_guide,
                 "updated_styles": updated_styles,
-                "rollback_plan": (self._create_rollback_plan( if self else None)current_analysis),
-                "testing_checklist": (self._generate_testing_checklist( if self else None)
+                "rollback_plan": self._create_rollback_plan(current_analysis),
+                "testing_checklist": self._generate_testing_checklist()
                     affected_components
                 ),
-                "estimated_impact": (self._assess_update_impact( if self else None)update_strategy),
-                "updated_at": (datetime.now( if datetime else None)).isoformat(),
+                "estimated_impact": self._assess_update_impact(update_strategy),
+                "updated_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Design system automation failed: {str(e)}")
+            logger.error(f"❌ Design system automation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     async def optimize_frontend_beauty(
@@ -320,50 +318,50 @@ class DesignAutomationAgent:
     ) -> Dict[str, Any]:
         """Optimize frontend beauty with AI-powered aesthetic enhancements."""
         try:
-            target_pages = (optimization_request.get( if optimization_request else None)
+            target_pages = optimization_request.get(
                 "pages", ["homepage", "product_pages"]
             )
-            optimization_goals = (optimization_request.get( if optimization_request else None)
+            optimization_goals = optimization_request.get(
                 "goals", ["visual_appeal", "conversion"]
             )
-            brand_guidelines = (optimization_request.get( if optimization_request else None)"brand_guidelines", {})
+            brand_guidelines = optimization_request.get("brand_guidelines", {})
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"✨ Optimizing frontend beauty for {len(target_pages)} pages..."
             )
 
             # Analyze current aesthetic
-            aesthetic_analysis = (self._analyze_current_aesthetics( if self else None)target_pages)
+            aesthetic_analysis = self._analyze_current_aesthetics(target_pages)
 
             # Generate beauty optimization strategy
-            beauty_strategy = (self._create_beauty_optimization_strategy( if self else None)
+            beauty_strategy = self._create_beauty_optimization_strategy(
                 aesthetic_analysis, optimization_goals
             )
 
             # Optimize visual hierarchy
-            visual_hierarchy = (self._optimize_visual_hierarchy( if self else None)
+            visual_hierarchy = self._optimize_visual_hierarchy(
                 target_pages, beauty_strategy
             )
 
             # Enhance color harmony
-            color_optimization = (self._optimize_color_harmony( if self else None)
+            color_optimization = self._optimize_color_harmony(
                 aesthetic_analysis, brand_guidelines
             )
 
             # Improve typography elegance
-            typography_enhancement = (self._enhance_typography_elegance( if self else None)target_pages)
+            typography_enhancement = self._enhance_typography_elegance(target_pages)
 
             # Add luxury micro-interactions
-            micro_interactions = (self._add_luxury_micro_interactions( if self else None)target_pages)
+            micro_interactions = self._add_luxury_micro_interactions(target_pages)
 
             # Optimize spacing and proportions
-            spacing_optimization = (self._optimize_luxury_spacing( if self else None)target_pages)
+            spacing_optimization = self._optimize_luxury_spacing(target_pages)
 
             # Enhance image presentation
-            image_optimization = (self._optimize_image_presentation( if self else None)target_pages)
+            image_optimization = self._optimize_image_presentation(target_pages)
 
             return {
-                "optimization_id": str((uuid.uuid4( if uuid else None))),
+                "optimization_id": str(uuid.uuid4()),
                 "target_pages": target_pages,
                 "optimization_goals": optimization_goals,
                 "aesthetic_analysis": aesthetic_analysis,
@@ -374,16 +372,16 @@ class DesignAutomationAgent:
                 "micro_interactions": micro_interactions,
                 "spacing_optimization": spacing_optimization,
                 "image_optimization": image_optimization,
-                "performance_impact": (self._assess_beauty_performance_impact( if self else None)),
-                "conversion_impact": (self._predict_beauty_conversion_impact( if self else None)),
-                "implementation_priority": (self._prioritize_beauty_optimizations( if self else None)),
-                "before_after_preview": (self._generate_before_after_preview( if self else None)),
-                "luxury_elegance_score": (self._calculate_elegance_score( if self else None)),
-                "optimized_at": (datetime.now( if datetime else None)).isoformat(),
+                "performance_impact": self._assess_beauty_performance_impact(),
+                "conversion_impact": self._predict_beauty_conversion_impact(),
+                "implementation_priority": self._prioritize_beauty_optimizations(),
+                "before_after_preview": self._generate_before_after_preview(),
+                "luxury_elegance_score": self._calculate_elegance_score(),
+                "optimized_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Frontend beauty optimization failed: {str(e)}")
+            logger.error(f"❌ Frontend beauty optimization failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _create_luxury_design_system(
@@ -565,7 +563,7 @@ class DesignAutomationAgent:
             },
         }
 
-        return (layout_templates.get( if layout_templates else None)page_type, layout_templates["product_showcase"])
+        return layout_templates.get(page_type, layout_templates["product_showcase"])
 
     def _design_luxury_interactions(
         self, page_type: str, design_system: Dict[str, Any]
@@ -689,46 +687,46 @@ class DesignAutomationAgent:
 // Luxury Frontend Interactions
 class LuxuryInteractions {
     constructor() {
-        (this.initScrollAnimations( if this else None));
-        (this.initHoverEffects( if this else None));
-        (this.initFormInteractions( if this else None));
+        this.initScrollAnimations();
+        this.initHoverEffects();
+        this.initFormInteractions();
     }
 
     initScrollAnimations() {
         const observer = new IntersectionObserver((entries) => {
-            (entries.forEach( if entries else None)entry => {
+            entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.(classList.add( if classList else None)'animate-in');
+                    entry.target.classList.add('animate-in');
                 }
             });
         }, { threshold: 0.1 });
 
-        (document.querySelectorAll( if document else None)'.animate-on-scroll').forEach(el => {
-            (observer.observe( if observer else None)el);
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
         });
     }
 
     initHoverEffects() {
-        (document.querySelectorAll( if document else None)'.luxury-card').forEach(card => {
-            (card.addEventListener( if card else None)'mouseenter', () => {
+        document.querySelectorAll('.luxury-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
                 card.style.transform = 'translateY(-8px) scale(1.02)';
             });
 
-            (card.addEventListener( if card else None)'mouseleave', () => {
+            card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0) scale(1)';
             });
         });
     }
 
     initFormInteractions() {
-        (document.querySelectorAll( if document else None)'.luxury-input').forEach(input => {
-            (input.addEventListener( if input else None)'focus', () => {
-                input.parentElement.(classList.add( if classList else None)'focused');
+        document.querySelectorAll('.luxury-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
             });
 
-            (input.addEventListener( if input else None)'blur', () => {
+            input.addEventListener('blur', () => {
                 if (!input.value) {
-                    input.parentElement.(classList.remove( if classList else None)'focused');
+                    input.parentElement.classList.remove('focused');
                 }
             });
         });
@@ -736,7 +734,7 @@ class LuxuryInteractions {
 }
 
 // Initialize luxury interactions when DOM is loaded
-(document.addEventListener( if document else None)'DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     new LuxuryInteractions();
 });
             """,
@@ -757,7 +755,7 @@ class LuxuryInteractions {
             "responsive_excellence": 87,
         }
 
-        overall_score = sum((score_factors.values( if score_factors else None))) / len(score_factors)
+        overall_score = sum(score_factors.values()) / len(score_factors)
 
         return {
             "overall_luxury_score": round(overall_score, 1),
@@ -767,7 +765,7 @@ class LuxuryInteractions {
                 if overall_score > 90
                 else "High-End" if overall_score > 80 else "Standard"
             ),
-            "improvement_areas": [k for k, v in (score_factors.items( if score_factors else None)) if v < 90],
+            "improvement_areas": [k for k, v in score_factors.items() if v < 90],
         }
 
     def _initialize_design_ai(self) -> Dict[str, Any]:
@@ -803,34 +801,34 @@ class LuxuryInteractions {
     async def deploy_luxury_theme(self, theme_data: Dict[str, Any]) -> Dict[str, Any]:
         """Deploy luxury WordPress theme with brand assets."""
         try:
-            layout_id = (theme_data.get( if theme_data else None)"layout", "luxury_streetwear_homepage")
-            brand_assets = (theme_data.get( if theme_data else None)"brand_assets", {})
-            style = (theme_data.get( if theme_data else None)"style", "luxury_streetwear_fusion")
-            wordpress_site = (theme_data.get( if theme_data else None)"wordpress_site", "skyyrose.co")
+            layout_id = theme_data.get("layout", "luxury_streetwear_homepage")
+            brand_assets = theme_data.get("brand_assets", {})
+            style = theme_data.get("style", "luxury_streetwear_fusion")
+            wordpress_site = theme_data.get("wordpress_site", "skyyrose.co")
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"🎨 Deploying luxury theme '{layout_id}' to {wordpress_site}..."
             )
 
             # Generate theme configuration
-            theme_config = (self._generate_theme_configuration( if self else None)
+            theme_config = self._generate_theme_configuration(
                 layout_id, style, brand_assets
             )
 
             # Create brand asset integration
-            asset_integration = (self._integrate_brand_assets( if self else None)brand_assets)
+            asset_integration = self._integrate_brand_assets(brand_assets)
 
             # Generate custom CSS for luxury styling
-            custom_css = (self._generate_luxury_css( if self else None)style, brand_assets)
+            custom_css = self._generate_luxury_css(style, brand_assets)
 
             # Set up responsive design
-            responsive_config = (self._configure_responsive_design( if self else None)layout_id)
+            responsive_config = self._configure_responsive_design(layout_id)
 
             # Create performance optimizations
-            performance_config = (self._optimize_theme_performance( if self else None))
+            performance_config = self._optimize_theme_performance()
 
             return {
-                "deployment_id": str((uuid.uuid4( if uuid else None))),
+                "deployment_id": str(uuid.uuid4()),
                 "layout_id": layout_id,
                 "style": style,
                 "wordpress_site": wordpress_site,
@@ -847,11 +845,11 @@ class LuxuryInteractions {
                 },
                 "deployment_status": "successful",
                 "live_preview_url": f"https://{wordpress_site}",
-                "deployed_at": (datetime.now( if datetime else None)).isoformat(),
+                "deployed_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Theme deployment failed: {str(e)}")
+            logger.error(f"❌ Theme deployment failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     async def create_custom_section(
@@ -859,36 +857,36 @@ class LuxuryInteractions {
     ) -> Dict[str, Any]:
         """Create custom WordPress section with luxury styling."""
         try:
-            section_type = (section_data.get( if section_data else None)"type", "hero_section")
-            brand_style = (section_data.get( if section_data else None)"brand_style", "luxury_streetwear")
-            content = (section_data.get( if section_data else None)"content", {})
-            (section_data.get( if section_data else None)"luxury_optimization", True)
+            section_type = section_data.get("type", "hero_section")
+            brand_style = section_data.get("brand_style", "luxury_streetwear")
+            content = section_data.get("content", {})
+            section_data.get("luxury_optimization", True)
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"🎨 Creating custom {section_type} with {brand_style} styling..."
             )
 
             # Generate section structure
-            section_structure = (self._generate_section_structure( if self else None)section_type, content)
+            section_structure = self._generate_section_structure(section_type, content)
 
             # Apply luxury styling
-            luxury_styling = (self._apply_luxury_section_styling( if self else None)
+            luxury_styling = self._apply_luxury_section_styling(
                 section_type, brand_style
             )
 
             # Create responsive design
-            responsive_design = (self._create_section_responsive_design( if self else None)section_type)
+            responsive_design = self._create_section_responsive_design(section_type)
 
             # Add interactive elements
-            interactive_elements = (self._add_section_interactions( if self else None)section_type)
+            interactive_elements = self._add_section_interactions(section_type)
 
             # Generate section code
-            section_code = (self._generate_section_code( if self else None)
+            section_code = self._generate_section_code(
                 section_structure, luxury_styling
             )
 
             return {
-                "section_id": str((uuid.uuid4( if uuid else None))),
+                "section_id": str(uuid.uuid4()),
                 "section_type": section_type,
                 "brand_style": brand_style,
                 "section_structure": section_structure,
@@ -904,11 +902,11 @@ class LuxuryInteractions {
                     "sophisticated_animations": True,
                     "brand_consistent_colors": True,
                 },
-                "created_at": (datetime.now( if datetime else None)).isoformat(),
+                "created_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Custom section creation failed: {str(e)}")
+            logger.error(f"❌ Custom section creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_theme_configuration(
@@ -916,30 +914,30 @@ class LuxuryInteractions {
     ) -> Dict[str, Any]:
         """Generate theme configuration."""
         return {
-            "theme_name": f"Luxury {(layout_id.replace( if layout_id else None)'_', ' ').title()}",
+            "theme_name": f"Luxury {layout_id.replace('_', ' ').title()}",
             "style_variant": style,
             "color_scheme": {
                 "primary": (
-                    (brand_assets.get( if brand_assets else None)"colors", ["#E8B4B8"])[0]
-                    if (brand_assets.get( if brand_assets else None)"colors")
+                    brand_assets.get("colors", ["#E8B4B8"])[0]
+                    if brand_assets.get("colors")
                     else "#E8B4B8"
                 ),
                 "secondary": (
-                    (brand_assets.get( if brand_assets else None)"colors", ["#FFD700", "#FFD700"])[1]
-                    if len((brand_assets.get( if brand_assets else None)"colors", [])) > 1
+                    brand_assets.get("colors", ["#FFD700", "#FFD700"])[1]
+                    if len(brand_assets.get("colors", [])) > 1
                     else "#FFD700"
                 ),
                 "accent": "#C0C0C0",
             },
             "typography": {
                 "headings": (
-                    (brand_assets.get( if brand_assets else None)"fonts", ["Playfair Display"])[0]
-                    if (brand_assets.get( if brand_assets else None)"fonts")
+                    brand_assets.get("fonts", ["Playfair Display"])[0]
+                    if brand_assets.get("fonts")
                     else "Playfair Display"
                 ),
                 "body": (
-                    (brand_assets.get( if brand_assets else None)"fonts", ["Montserrat", "Montserrat"])[1]
-                    if len((brand_assets.get( if brand_assets else None)"fonts", [])) > 1
+                    brand_assets.get("fonts", ["Montserrat", "Montserrat"])[1]
+                    if len(brand_assets.get("fonts", [])) > 1
                     else "Montserrat"
                 ),
             },
@@ -955,19 +953,19 @@ class LuxuryInteractions {
         """Integrate brand assets into theme."""
         return {
             "logo_integration": {
-                "logo_file": (brand_assets.get( if brand_assets else None)"logo", "skyy_rose_logo.png"),
+                "logo_file": brand_assets.get("logo", "skyy_rose_logo.png"),
                 "logo_placement": "header_center",
                 "logo_sizing": "responsive_optimal",
             },
             "color_integration": {
-                "primary_colors": (brand_assets.get( if brand_assets else None)
+                "primary_colors": brand_assets.get(
                     "colors", ["#E8B4B8", "#FFD700", "#C0C0C0"]
                 ),
                 "color_application": "throughout_theme",
                 "color_harmony": "luxury_palette_optimized",
             },
             "font_integration": {
-                "custom_fonts": (brand_assets.get( if brand_assets else None)
+                "custom_fonts": brand_assets.get(
                     "fonts", ["Playfair Display", "Montserrat"]
                 ),
                 "font_loading": "optimized_web_fonts",
@@ -977,8 +975,8 @@ class LuxuryInteractions {
 
     def _generate_luxury_css(self, style: str, brand_assets: Dict[str, Any]) -> str:
         """Generate custom CSS for luxury styling."""
-        colors = (brand_assets.get( if brand_assets else None)"colors", ["#E8B4B8", "#FFD700", "#C0C0C0"])
-        fonts = (brand_assets.get( if brand_assets else None)"fonts", ["Playfair Display", "Montserrat"])
+        colors = brand_assets.get("colors", ["#E8B4B8", "#FFD700", "#C0C0C0"])
+        fonts = brand_assets.get("fonts", ["Playfair Display", "Montserrat"])
 
         return f"""
 /* Luxury Theme Custom CSS */
@@ -1056,25 +1054,25 @@ h1, h2, h3, h4, h5, h6 {{
             "hero_section": {
                 "layout": "full_width_with_overlay",
                 "elements": ["background_image", "title", "subtitle", "cta_button"],
-                "title": (content.get( if content else None)"title", "Luxury Collection"),
-                "subtitle": (content.get( if content else None)"subtitle", "Exclusive Fashion"),
-                "cta": (content.get( if content else None)"cta", "Shop Now"),
+                "title": content.get("title", "Luxury Collection"),
+                "subtitle": content.get("subtitle", "Exclusive Fashion"),
+                "cta": content.get("cta", "Shop Now"),
             },
             "feature_section": {
                 "layout": "three_column_grid",
                 "elements": ["feature_cards", "icons", "descriptions"],
-                "features": (content.get( if content else None)
+                "features": content.get(
                     "features", ["Quality", "Style", "Exclusivity"]
                 ),
             },
             "testimonial_section": {
                 "layout": "carousel_with_quotes",
                 "elements": ["customer_quotes", "customer_images", "ratings"],
-                "testimonials": (content.get( if content else None)"testimonials", []),
+                "testimonials": content.get("testimonials", []),
             },
         }
 
-        return (structures.get( if structures else None)section_type, structures["hero_section"])
+        return structures.get(section_type, structures["hero_section"])
 
     def _apply_luxury_section_styling(
         self, section_type: str, brand_style: str
@@ -1112,11 +1110,11 @@ h1, h2, h3, h4, h5, h6 {{
         """Generate section code."""
         return {
             "html": f"""
-<section class="luxury-section {(structure.get( if structure else None)'layout', 'default')}">
+<section class="luxury-section {structure.get('layout', 'default')}">
     <div class="container">
         <div class="section-content">
-            <h2 class="section-title">{(structure.get( if structure else None)'title', 'Section Title')}</h2>
-            <p class="section-subtitle">{(structure.get( if structure else None)'subtitle', 'Section Description')}</p>
+            <h2 class="section-title">{structure.get('title', 'Section Title')}</h2>
+            <p class="section-subtitle">{structure.get('subtitle', 'Section Description')}</p>
             <div class="section-elements">
                 <!-- Section elements will be rendered here -->
             </div>
@@ -1147,7 +1145,6 @@ h1, h2, h3, h4, h5, h6 {{
             """,
         }
 
-
 def optimize_design_automation() -> Dict[str, Any]:
     """Main function to optimize design automation."""
     agent = DesignAutomationAgent()
@@ -1157,5 +1154,5 @@ def optimize_design_automation() -> Dict[str, Any]:
         "css_frameworks": len(agent.design_tools["css_frameworks"]),
         "luxury_design_ready": True,
         "automation_active": True,
-        "timestamp": (datetime.now( if datetime else None)).isoformat(),
+        "timestamp": datetime.now().isoformat(),
     }

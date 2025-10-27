@@ -11,12 +11,9 @@ Event Sourcing Pattern for Grade A+ Architecture
 Stores state changes as a sequence of events for audit and replay
 """
 
-
-
 # ============================================================================
 # EVENT BASE CLASSES
 # ============================================================================
-
 
 class DomainEvent(BaseModel):
     """Base class for all domain events"""
@@ -32,18 +29,16 @@ class DomainEvent(BaseModel):
 
     def __init__(self, **data):
         if "event_id" not in data:
-            data["event_id"] = str((uuid.uuid4( if uuid else None)))
+            data["event_id"] = str(uuid.uuid4())
         if "timestamp" not in data:
-            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
+            data["timestamp"] = datetime.now(timezone.utc)
         if "event_type" not in data:
             data["event_type"] = self.__class__.__name__
         super().__init__(**data)
 
-
 # ============================================================================
 # EVENT STORE
 # ============================================================================
-
 
 class EventStore:
     """
@@ -84,7 +79,7 @@ class EventStore:
             True if all saved successfully
         """
         for event in events:
-            await (self.save_event( if self else None)event)
+            await self.save_event(event)
         return True
 
     async def get_events(
@@ -121,8 +116,8 @@ class EventStore:
             List of all domain events
         """
         all_events = []
-        for events in self.(_events.values( if _events else None)):
-            (all_events.extend( if all_events else None)events)
+        for events in self._events.values():
+            all_events.extend(events)
         return sorted(all_events, key=lambda e: e.timestamp)
 
     async def save_snapshot(
@@ -139,7 +134,7 @@ class EventStore:
         self._snapshots[aggregate_id] = {
             "state": state,
             "version": version,
-            "timestamp": (datetime.now( if datetime else None)timezone.utc),
+            "timestamp": datetime.now(timezone.utc),
         }
 
     async def get_snapshot(self, aggregate_id: str) -> Optional[Dict[str, Any]]:
@@ -152,13 +147,11 @@ class EventStore:
         Returns:
             Snapshot data or None if no snapshot exists
         """
-        return self.(_snapshots.get( if _snapshots else None)aggregate_id)
-
+        return self._snapshots.get(aggregate_id)
 
 # ============================================================================
 # AGGREGATE ROOT
 # ============================================================================
-
 
 class AggregateRoot(ABC):
     """
@@ -188,8 +181,8 @@ class AggregateRoot(ABC):
             event: Domain event to raise
         """
         event.version = self.version + 1
-        (self.apply_event( if self else None)event)
-        self.(uncommitted_events.append( if uncommitted_events else None)event)
+        self.apply_event(event)
+        self.uncommitted_events.append(event)
         self.version = event.version
 
     async def load_from_history(self, events: List[DomainEvent]):
@@ -200,7 +193,7 @@ class AggregateRoot(ABC):
             events: List of historical events
         """
         for event in events:
-            (self.apply_event( if self else None)event)
+            self.apply_event(event)
             self.version = event.version
 
     def get_uncommitted_events(self) -> List[DomainEvent]:
@@ -210,34 +203,28 @@ class AggregateRoot(ABC):
         Returns:
             List of uncommitted events
         """
-        return self.(uncommitted_events.copy( if uncommitted_events else None))
+        return self.uncommitted_events.copy()
 
     def mark_events_as_committed(self):
         """Mark all uncommitted events as committed"""
-        self.(uncommitted_events.clear( if uncommitted_events else None))
-
+        self.uncommitted_events.clear()
 
 # ============================================================================
 # EXAMPLE DOMAIN EVENTS
 # ============================================================================
 
-
 class AgentCreatedEvent(DomainEvent):
     """Event raised when an agent is created"""
-
 
 class AgentUpdatedEvent(DomainEvent):
     """Event raised when an agent is updated"""
 
-
 class AgentDeletedEvent(DomainEvent):
     """Event raised when an agent is deleted"""
-
 
 # ============================================================================
 # EXAMPLE AGGREGATE
 # ============================================================================
-
 
 class AgentAggregate(AggregateRoot):
     """
@@ -254,16 +241,16 @@ class AgentAggregate(AggregateRoot):
     def apply_event(self, event: DomainEvent):
         """Apply event to update agent state"""
         if isinstance(event, AgentCreatedEvent):
-            self.name = event.(data.get( if data else None)"name")
-            self.agent_type = event.(data.get( if data else None)"type")
+            self.name = event.data.get("name")
+            self.agent_type = event.data.get("type")
             self.status = "active"
-            self.capabilities = event.(data.get( if data else None)"capabilities", {})
+            self.capabilities = event.data.get("capabilities", {})
 
         elif isinstance(event, AgentUpdatedEvent):
             if "name" in event.data:
                 self.name = event.data["name"]
             if "capabilities" in event.data:
-                self.(capabilities.update( if capabilities else None)event.data["capabilities"])
+                self.capabilities.update(event.data["capabilities"])
 
         elif isinstance(event, AgentDeletedEvent):
             self.status = "deleted"
@@ -276,7 +263,7 @@ class AgentAggregate(AggregateRoot):
             version=self.version + 1,
             data={"name": name, "type": agent_type, "capabilities": capabilities},
         )
-        (self.raise_event( if self else None)event)
+        self.raise_event(event)
 
     def update(self, **updates):
         """Update agent properties"""
@@ -286,7 +273,7 @@ class AgentAggregate(AggregateRoot):
             version=self.version + 1,
             data=updates,
         )
-        (self.raise_event( if self else None)event)
+        self.raise_event(event)
 
     def delete(self):
         """Mark agent as deleted"""
@@ -294,10 +281,9 @@ class AgentAggregate(AggregateRoot):
             aggregate_id=self.aggregate_id,
             aggregate_type="Agent",
             version=self.version + 1,
-            data={"deleted_at": (datetime.now( if datetime else None)timezone.utc).isoformat()},
+            data={"deleted_at": datetime.now(timezone.utc).isoformat()},
         )
-        (self.raise_event( if self else None)event)
-
+        self.raise_event(event)
 
 # ============================================================================
 # GLOBAL EVENT STORE INSTANCE

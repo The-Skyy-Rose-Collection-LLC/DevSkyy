@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from api.validation_models import EnhancedLoginRequest, EnhancedRegisterRequest
 from main import app
 from security.jwt_auth import (
-from unittest.mock import AsyncMock, Mock, patch
+    from unittest.mock import AsyncMock, Mock, patch
 import asyncio
 import pytest
 
@@ -16,8 +16,6 @@ import pytest
 Unit Tests for Authentication System
 Tests for enhanced JWT authentication, validation, and security features
 """
-
-
 
     blacklist_token,
     clear_failed_login_attempts,
@@ -29,7 +27,6 @@ Tests for enhanced JWT authentication, validation, and security features
     verify_password,
     verify_token,
 )
-
 
 class TestPasswordSecurity:
     """Test password hashing and verification"""
@@ -53,7 +50,6 @@ class TestPasswordSecurity:
         assert verify_password(password, hash1)
         assert verify_password(password, hash2)
 
-
 class TestAccountLockout:
     """Test account lockout functionality"""
 
@@ -62,8 +58,8 @@ class TestAccountLockout:
         self.test_email = "test@example.com"
         # Clear any existing lockout data
 
-        (failed_login_attempts.clear( if failed_login_attempts else None))
-        (locked_accounts.clear( if locked_accounts else None))
+        failed_login_attempts.clear()
+        locked_accounts.clear()
 
     def test_account_not_locked_initially(self):
         """Test that account is not locked initially"""
@@ -93,14 +89,13 @@ class TestAccountLockout:
         # Should not be locked
         assert not is_account_locked(self.test_email)
 
-
 class TestTokenBlacklist:
     """Test token blacklisting functionality"""
 
     def setup_method(self):
         """Setup test data"""
 
-        (blacklisted_tokens.clear( if blacklisted_tokens else None))
+        blacklisted_tokens.clear()
 
     def test_token_blacklisting(self):
         """Test token blacklisting"""
@@ -111,7 +106,6 @@ class TestTokenBlacklist:
         blacklist_token(token)
 
         assert is_token_blacklisted(token)
-
 
 class TestEnhancedValidation:
     """Test enhanced validation models"""
@@ -144,7 +138,7 @@ class TestEnhancedValidation:
         ]
 
         for weak_password in weak_passwords:
-            with (pytest.raises( if pytest else None)ValueError):
+            with pytest.raises(ValueError):
                 EnhancedRegisterRequest(
                     email="test@example.com",
                     username="testuser",
@@ -163,7 +157,7 @@ class TestEnhancedValidation:
         ]
 
         for invalid_username in invalid_usernames:
-            with (pytest.raises( if pytest else None)ValueError):
+            with pytest.raises(ValueError):
                 EnhancedRegisterRequest(
                     email="test@example.com",
                     username=invalid_username,
@@ -173,7 +167,7 @@ class TestEnhancedValidation:
 
     def test_xss_protection(self):
         """Test XSS protection in validation"""
-        with (pytest.raises( if pytest else None)ValueError):
+        with pytest.raises(ValueError):
             EnhancedRegisterRequest(
                 email="test@example.com",
                 username="testuser",
@@ -184,14 +178,13 @@ class TestEnhancedValidation:
 
     def test_sql_injection_protection(self):
         """Test SQL injection protection"""
-        with (pytest.raises( if pytest else None)ValueError):
+        with pytest.raises(ValueError):
             EnhancedRegisterRequest(
                 email="test@example.com",
                 username="testuser'; DROP TABLE users; --",
                 password="TestPassword123!",
                 role="api_user",
             )
-
 
 class TestJWTTokens:
     """Test JWT token creation and verification"""
@@ -225,7 +218,7 @@ class TestJWTTokens:
 
     def test_invalid_token_verification(self):
         """Test verification of invalid token"""
-        with (pytest.raises( if pytest else None)HTTPException):
+        with pytest.raises(HTTPException):
             verify_token("invalid_token")
 
     def test_expired_token_verification(self, mock_user):
@@ -235,9 +228,8 @@ class TestJWTTokens:
             tokens = create_user_tokens(mock_user)
             access_token = tokens["access_token"]
 
-        with (pytest.raises( if pytest else None)HTTPException):
+        with pytest.raises(HTTPException):
             verify_token(access_token)
-
 
 class TestAuthenticationAPI:
     """Test authentication API endpoints"""
@@ -265,7 +257,7 @@ class TestAuthenticationAPI:
             )
             mock_create.return_value = mock_user
 
-            response = self.(client.post( if client else None)"/api/v1/auth/register", json=valid_data)
+            response = self.client.post("/api/v1/auth/register", json=valid_data)
             assert response.status_code == 201
 
     def test_register_endpoint_weak_password(self):
@@ -277,7 +269,7 @@ class TestAuthenticationAPI:
             "role": "api_user",
         }
 
-        response = self.(client.post( if client else None)"/api/v1/auth/register", json=invalid_data)
+        response = self.client.post("/api/v1/auth/register", json=invalid_data)
         assert response.status_code == 422  # Validation error
 
     def test_login_endpoint_validation(self):
@@ -293,13 +285,12 @@ class TestAuthenticationAPI:
             )
             mock_auth.return_value = mock_user
 
-            response = self.(client.post( if client else None)"/api/v1/auth/login", json=login_data)
+            response = self.client.post("/api/v1/auth/login", json=login_data)
             assert response.status_code == 200
 
-            data = (response.json( if response else None))
+            data = response.json()
             assert "access_token" in data
             assert "refresh_token" in data
-
 
 @pytest.mark.asyncio
 class TestAsyncAuthentication:
@@ -322,7 +313,6 @@ class TestAsyncAuthentication:
         assert token_data.user_id == mock_user.id
         assert token_data.email == mock_user.email
 
-
 class TestSecurityLogging:
     """Test security event logging"""
 
@@ -335,11 +325,10 @@ class TestSecurityLogging:
             record_failed_login("test@example.com")
 
             # Verify logging was called with proper security event
-            mock_log.(warning.assert_called_once( if warning else None))
+            mock_log.warning.assert_called_once()
             call_args = mock_log.warning.call_args[0][0]
             assert "Failed login attempt" in call_args
             assert "test@example.com" in call_args
 
-
 if __name__ == "__main__":
-    (pytest.main( if pytest else None)[__file__, "-v"])
+    pytest.main([__file__, "-v"])

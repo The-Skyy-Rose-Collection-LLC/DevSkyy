@@ -8,11 +8,8 @@ import autopep8
 import logging
 import shutil
 
-
-
-(logging.basicConfig( if logging else None)level=logging.INFO)
-logger = (logging.getLogger( if logging else None)__name__)
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -20,11 +17,11 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
     Production-level implementation with automatic code repair.
     """
     try:
-        (logger.info( if logger else None)"🔧 Starting comprehensive code fixing...")
+        logger.info("🔧 Starting comprehensive code fixing...")
 
         fix_results = {
-            "fix_id": f"fix_{int((datetime.now( if datetime else None)).timestamp())}",
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "fix_id": f"fix_{int(datetime.now().timestamp())}",
+            "timestamp": datetime.now().isoformat(),
             "status": "completed",
             "files_fixed": 0,
             "errors_fixed": 0,
@@ -58,52 +55,51 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
         fix_results["fixes_applied"].extend(config_fixes)
 
         # Update count
-        fix_results["files_fixed"] = len(
+        fix_results["files_fixed"] = len()
             set(fix["file"] for fix in fix_results["fixes_applied"])
         )
-        fix_results["errors_fixed"] = sum(
+        fix_results["errors_fixed"] = sum()
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "error"
         )
-        fix_results["warnings_fixed"] = sum(
+        fix_results["warnings_fixed"] = sum()
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning"
         )
-        fix_results["optimizations_applied"] = sum(
+        fix_results["optimizations_applied"] = sum()
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization"
         )
 
-        (logger.info( if logger else None)
+        logger.info(
             f"✅ Code fixing completed: {fix_results['files_fixed']} files fixed"
         )
 
         return fix_results
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Code fixing failed: {str(e)}")
+        logger.error(f"❌ Code fixing failed: {str(e)}")
         return {
             "status": "failed",
             "error": str(e),
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
         }
-
 
 def _create_backup():
     """Create backup of current codebase."""
     try:
-        backup_dir = f"backup_{int((time.time( if time else None)))}"
-        (os.makedirs( if os else None)backup_dir, exist_ok=True)
-        (logger.info( if logger else None)f"📦 Created backup directory: {backup_dir}")
+        backup_dir = f"backup_{int(time.time())}"
+        os.makedirs(backup_dir, exist_ok=True)
+        logger.info(f"📦 Created backup directory: {backup_dir}")
 
         # Copy important files
         files_to_backup = []
-        for root, dirs, files in (os.walk( if os else None)"."):
+        for root, dirs, files in os.walk("."):
             dirs[:] = [
                 d
                 for d in dirs
-                if not (d.startswith( if d else None)".")
+                if not d.startswith(".")
                 and d not in {"__pycache__", "node_modules", "backup_*"}
             ]
             for file in files:
-                if (file.endswith( if file else None)
+                if file.endswith(
                     (
                         ".py",
                         ".js",
@@ -116,40 +112,38 @@ def _create_backup():
                         ".yaml",
                     )
                 ):
-                    (files_to_backup.append( if files_to_backup else None)os.(path.join( if path else None)root, file))
+                    files_to_backup.append(os.path.join(root, file))
 
         for file_path in files_to_backup:
-            backup_path = os.(path.join( if path else None)backup_dir, (file_path.lstrip( if file_path else None)"./"))
-            (os.makedirs( if os else None)os.(path.dirname( if path else None)backup_path), exist_ok=True)
-            (shutil.copy2( if shutil else None)file_path, backup_path)
+            backup_path = os.path.join(backup_dir, file_path.lstrip("./"))
+            os.makedirs(os.path.dirname(backup_path), exist_ok=True)
+            shutil.copy2(file_path, backup_path)
 
-        (logger.info( if logger else None)
+        logger.info(
             f"📦 Backup of {len(files_to_backup)} files created in {backup_dir}"
         )
 
     except Exception as e:
-        (logger.warning( if logger else None)f"⚠️ Backup creation failed: {str(e)}")
-
+        logger.warning(f"⚠️ Backup creation failed: {str(e)}")
 
 def _fix_python_files() -> List[Dict[str, Any]]:
     """Fix Python files with comprehensive improvements."""
     fixes = []
 
-    for root, dirs, files in (os.walk( if os else None)"."):
+    for root, dirs, files in os.walk("."):
         dirs[:] = [
             d
             for d in dirs
-            if not (d.startswith( if d else None)".") and d not in {"__pycache__", "backup_*"}
+            if not d.startswith(".") and d not in {"__pycache__", "backup_*"}
         ]
 
         for file in files:
-            if (file.endswith( if file else None)".py"):
-                file_path = os.(path.join( if path else None)root, file)
+            if file.endswith(".py"):
+                file_path = os.path.join(root, file)
                 file_fixes = _fix_python_file(file_path)
-                (fixes.extend( if fixes else None)file_fixes)
+                fixes.extend(file_fixes)
 
     return fixes
-
 
 def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual Python file."""
@@ -157,7 +151,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            original_content = (f.read( if f else None))
+            original_content = f.read()
 
         modified_content = original_content
 
@@ -166,10 +160,10 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # 1. Fix import errors
         if (
             "from datetime import datetime" not in modified_content
-            and "(datetime.now( if datetime else None))" in modified_content
+            and "datetime.now()" in modified_content
         ):
             modified_content = "from datetime import datetime\n" + modified_content
-            (fixes.append( if fixes else None)
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "error",
@@ -181,7 +175,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # 2. Fix logging setup
         if "logger." in modified_content and "import logging" not in modified_content:
             modified_content = "import logging\n" + modified_content
-            (fixes.append( if fixes else None)
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "error",
@@ -192,13 +186,13 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
         # 3. Replace print statements with logging
         print_pattern = r"^(\s*)print\((.*)\)$"
-        lines = (modified_content.split( if modified_content else None)"\n")
+        lines = modified_content.split("\n")
         for i, line in enumerate(lines):
-            match = (re.match( if re else None)print_pattern, line)
+            match = re.match(print_pattern, line)
             if match and "logger" in modified_content:
-                indent, content = (match.groups( if match else None))
-                lines[i] = f"{indent}(logger.info( if logger else None){content})"
-                (fixes.append( if fixes else None)
+                indent, content = match.groups()
+                lines[i] = f"{indent}logger.info({content})"
+                fixes.append(
                     {
                         "file": file_path,
                         "type": "optimization",
@@ -210,10 +204,10 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
         # 4. Add proper exception handling
         if "except Exception as e:" in modified_content:
-            modified_content = (modified_content.replace( if modified_content else None)
+            modified_content = modified_content.replace(
                 "except Exception as e:", "except Exception as e:"
             )
-            (fixes.append( if fixes else None)
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "warning",
@@ -225,12 +219,12 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # 5. Use autopep8 for formatting
         if autopep8:
             try:
-                formatted_content = (autopep8.fix_code( if autopep8 else None)
+                formatted_content = autopep8.fix_code(
                     modified_content, options={"max_line_length": 120}
                 )
                 if formatted_content != modified_content:
                     modified_content = formatted_content
-                    (fixes.append( if fixes else None)
+                    fixes.append(
                         {
                             "file": file_path,
                             "type": "optimization",
@@ -244,10 +238,10 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # Write changes if any fixes were made
         if modified_content != original_content:
             with open(file_path, "w", encoding="utf-8") as f:
-                (f.write( if f else None)modified_content)
+                f.write(modified_content)
 
     except Exception as e:
-        (fixes.append( if fixes else None)
+        fixes.append(
             {
                 "file": file_path,
                 "type": "error",
@@ -258,26 +252,24 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
-
 def _fix_javascript_files() -> List[Dict[str, Any]]:
     """Fix JavaScript files."""
     fixes = []
 
-    for root, dirs, files in (os.walk( if os else None)"."):
+    for root, dirs, files in os.walk("."):
         dirs[:] = [
             d
             for d in dirs
-            if not (d.startswith( if d else None)".") and d not in {"node_modules", "backup_*"}
+            if not d.startswith(".") and d not in {"node_modules", "backup_*"}
         ]
 
         for file in files:
-            if (file.endswith( if file else None)".js"):
-                file_path = os.(path.join( if path else None)root, file)
+            if file.endswith(".js"):
+                file_path = os.path.join(root, file)
                 file_fixes = _fix_javascript_file(file_path)
-                (fixes.extend( if fixes else None)file_fixes)
+                fixes.extend(file_fixes)
 
     return fixes
-
 
 def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual JavaScript file."""
@@ -285,20 +277,20 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
 
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            content = (f.read( if f else None))
+            content = f.read()
 
         original_content = content
 
         # Fix common JavaScript issues
-        lines = (content.split( if content else None)"\n")
+        lines = content.split("\n")
         for i, line in enumerate(lines):
             # Replace var with let/const
-            if (line.strip( if line else None)).startswith("var "):
-                if "=" in line and not (line.strip( if line else None)).endswith(";"):
-                    lines[i] = (line.replace( if line else None)"var ", "const ")
+            if line.strip().startswith("var "):
+                if "=" in line and not line.strip().endswith(";"):
+                    lines[i] = line.replace("var ", "const ")
                 else:
-                    lines[i] = (line.replace( if line else None)"var ", "let ")
-                (fixes.append( if fixes else None)
+                    lines[i] = line.replace("var ", "let ")
+                fixes.append(
                     {
                         "file": file_path,
                         "type": "optimization",
@@ -308,9 +300,9 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
                 )
 
             # Remove console.log in production
-            if "console.log" in line and "debug" not in (file_path.lower( if file_path else None)):
+            if "console.log" in line and "debug" not in file_path.lower():
                 lines[i] = ""  # Remove the line
-                (fixes.append( if fixes else None)
+                fixes.append(
                     {
                         "file": file_path,
                         "type": "optimization",
@@ -324,10 +316,10 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
         # Write changes if any fixes were made
         if content != original_content:
             with open(file_path, "w", encoding="utf-8") as f:
-                (f.write( if f else None)content)
+                f.write(content)
 
     except Exception as e:
-        (fixes.append( if fixes else None)
+        fixes.append(
             {
                 "file": file_path,
                 "type": "error",
@@ -338,22 +330,20 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
-
 def _fix_html_files() -> List[Dict[str, Any]]:
     """Fix HTML files for SEO and accessibility."""
     fixes = []
 
-    for root, dirs, files in (os.walk( if os else None)"."):
-        dirs[:] = [d for d in dirs if not (d.startswith( if d else None)".") and d not in {"backup_*"}]
+    for root, dirs, files in os.walk("."):
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"backup_*"}]
 
         for file in files:
-            if (file.endswith( if file else None)".html"):
-                file_path = os.(path.join( if path else None)root, file)
+            if file.endswith(".html"):
+                file_path = os.path.join(root, file)
                 file_fixes = _fix_html_file(file_path)
-                (fixes.extend( if fixes else None)file_fixes)
+                fixes.extend(file_fixes)
 
     return fixes
-
 
 def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual HTML file."""
@@ -361,14 +351,14 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            content = (f.read( if f else None))
+            content = f.read()
 
         original_content = content
 
         # Add missing meta tags
         if "<meta charset=" not in content and "<head>" in content:
-            content = (content.replace( if content else None)"<head>", '<head>\n    <meta charset="UTF-8">')
-            (fixes.append( if fixes else None)
+            content = content.replace("<head>", '<head>\n    <meta charset="UTF-8">')
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "warning",
@@ -379,8 +369,8 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
         if '<meta name="viewport"' not in content and "<head>" in content:
             viewport_tag = '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            content = (content.replace( if content else None)"</head>", f"    {viewport_tag}\n</head>")
-            (fixes.append( if fixes else None)
+            content = content.replace("</head>", f"    {viewport_tag}\n</head>")
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "warning",
@@ -409,15 +399,15 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
                 This is part of the automated HTML fixing process that ensures
                 all images have proper accessibility attributes.
             """
-            img_tag = (match.group( if match else None)0)
+            img_tag = match.group(0)
             if "alt=" not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'
             return img_tag
 
-        new_content = (re.sub( if re else None)img_pattern, add_alt, content)
+        new_content = re.sub(img_pattern, add_alt, content)
         if new_content != content:
             content = new_content
-            (fixes.append( if fixes else None)
+            fixes.append(
                 {
                     "file": file_path,
                     "type": "warning",
@@ -429,10 +419,10 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
         # Write changes if any fixes were made
         if content != original_content:
             with open(file_path, "w", encoding="utf-8") as f:
-                (f.write( if f else None)content)
+                f.write(content)
 
     except Exception as e:
-        (fixes.append( if fixes else None)
+        fixes.append(
             {
                 "file": file_path,
                 "type": "error",
@@ -443,22 +433,20 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
-
 def _fix_css_files() -> List[Dict[str, Any]]:
     """Fix CSS files for better performance."""
     fixes = []
 
-    for root, dirs, files in (os.walk( if os else None)"."):
-        dirs[:] = [d for d in dirs if not (d.startswith( if d else None)".") and d not in {"backup_*"}]
+    for root, dirs, files in os.walk("."):
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"backup_*"}]
 
         for file in files:
-            if (file.endswith( if file else None)".css"):
-                file_path = os.(path.join( if path else None)root, file)
+            if file.endswith(".css"):
+                file_path = os.path.join(root, file)
                 file_fixes = _fix_css_file(file_path)
-                (fixes.extend( if fixes else None)file_fixes)
+                fixes.extend(file_fixes)
 
     return fixes
-
 
 def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual CSS file."""
@@ -466,20 +454,20 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            content = (f.read( if f else None))
+            content = f.read()
 
         original_content = content
 
         # Remove duplicate properties (improved implementation)
-        lines = (content.split( if content else None)"\n")
+        lines = content.split("\n")
         in_rule = False
         current_rule_props = {}  # Use dict to track line numbers
 
         for i, line in enumerate(lines):
-            stripped_line = (line.strip( if line else None))
+            stripped_line = line.strip()
 
             # Check for rule start
-            if "{" in stripped_line and not (stripped_line.startswith( if stripped_line else None)"/*"):
+            if "{" in stripped_line and not stripped_line.startswith("/*"):
                 in_rule = True
                 current_rule_props = {}
             # Check for rule end
@@ -488,21 +476,21 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
                 current_rule_props = {}
             # Process property within rule
             elif (
-                in_rule and ":" in stripped_line and not (stripped_line.startswith( if stripped_line else None)"/*")
+                in_rule and ":" in stripped_line and not stripped_line.startswith("/*")
             ):
                 # Extract property name (before colon)
-                prop_part = (stripped_line.split( if stripped_line else None)":")[0].strip()
+                prop_part = stripped_line.split(":")[0].strip()
                 # Only consider it a property if it's not a comment and has valid CSS property format
                 if (
                     prop_part
-                    and not (prop_part.startswith( if prop_part else None)"/*")
-                    and not (prop_part.startswith( if prop_part else None)"*")
+                    and not prop_part.startswith("/*")
+                    and not prop_part.startswith("*")
                 ):
                     # Check if this property already exists in current rule
                     if prop_part in current_rule_props:
                         # Remove the duplicate line
                         lines[i] = ""
-                        (fixes.append( if fixes else None)
+                        fixes.append(
                             {
                                 "file": file_path,
                                 "type": "warning",
@@ -519,10 +507,10 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
         # Write changes if any fixes were made
         if content != original_content:
             with open(file_path, "w", encoding="utf-8") as f:
-                (f.write( if f else None)content)
+                f.write(content)
 
     except Exception as e:
-        (fixes.append( if fixes else None)
+        fixes.append(
             {
                 "file": file_path,
                 "type": "error",
@@ -533,26 +521,25 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
-
 def _fix_configuration_files() -> List[Dict[str, Any]]:
     """Fix configuration files."""
     fixes = []
 
     # Fix missing __init__.py files
-    for root, dirs, files in (os.walk( if os else None)"."):
+    for root, dirs, files in os.walk("."):
         dirs[:] = [
             d
             for d in dirs
-            if not (d.startswith( if d else None)".") and d not in {"__pycache__", "backup_*"}
+            if not d.startswith(".") and d not in {"__pycache__", "backup_*"}
         ]
 
         # Check if directory needs __init__.py
-        if any((f.endswith( if f else None)".py") for f in files) and "__init__.py" not in files:
-            init_path = os.(path.join( if path else None)root, "__init__.py")
+        if any(f.endswith(".py") for f in files) and "__init__.py" not in files:
+            init_path = os.path.join(root, "__init__.py")
             try:
                 with open(init_path, "w") as f:
-                    (f.write( if f else None)'"""Package initialization."""\n')
-                (fixes.append( if fixes else None)
+                    f.write('"""Package initialization."""\n')
+                fixes.append(
                     {
                         "file": init_path,
                         "type": "optimization",
@@ -561,7 +548,7 @@ def _fix_configuration_files() -> List[Dict[str, Any]]:
                     }
                 )
             except Exception as e:
-                (fixes.append( if fixes else None)
+                fixes.append(
                     {
                         "file": init_path,
                         "type": "error",

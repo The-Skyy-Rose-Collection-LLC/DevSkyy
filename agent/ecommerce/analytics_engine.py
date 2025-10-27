@@ -12,7 +12,7 @@ E-commerce Analytics Engine
 Real-time analytics, reporting, and business intelligence for fashion e-commerce
 
 Features:
-- Revenue and sales analytics
+    - Revenue and sales analytics
 - Customer behavior tracking
 - Product performance metrics
 - Conversion funnel analysis
@@ -20,10 +20,7 @@ Features:
 - Predictive analytics
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class EcommerceAnalytics:
     """
@@ -49,12 +46,12 @@ class EcommerceAnalytics:
         Returns:
             Revenue metrics including total, average, growth rates
         """
-        (logger.info( if logger else None)f"Calculating revenue analytics from {start_date} to {end_date}")
+        logger.info(f"Calculating revenue analytics from {start_date} to {end_date}")
 
         analytics = {
             "period": {
-                "start": (start_date.isoformat( if start_date else None)),
-                "end": (end_date.isoformat( if end_date else None)),
+                "start": start_date.isoformat(),
+                "end": end_date.isoformat(),
                 "granularity": granularity,
             },
             "revenue": {
@@ -72,12 +69,12 @@ class EcommerceAnalytics:
         # Simulate analytics calculation
         # In production, this would query actual database
         days = (end_date - start_date).days
-        analytics["revenue"]["total"] = np.(random.uniform( if random else None)10000, 50000) * days
-        analytics["revenue"]["orders_count"] = int(np.(random.uniform( if random else None)100, 500) * days)
+        analytics["revenue"]["total"] = np.random.uniform(10000, 50000) * days
+        analytics["revenue"]["orders_count"] = int(np.random.uniform(100, 500) * days)
         analytics["revenue"]["average_order_value"] = (
             analytics["revenue"]["total"] / analytics["revenue"]["orders_count"]
         )
-        analytics["revenue"]["growth_rate"] = np.(random.uniform( if random else None)-0.1, 0.3)
+        analytics["revenue"]["growth_rate"] = np.random.uniform(-0.1, 0.3)
 
         return analytics
 
@@ -94,7 +91,7 @@ class EcommerceAnalytics:
         Returns:
             Customer behavior insights and metrics
         """
-        (logger.info( if logger else None)f"Analyzing customer behavior for segment: {customer_segment}")
+        logger.info(f"Analyzing customer behavior for segment: {customer_segment}")
 
         behavior = {
             "segment": customer_segment or "all",
@@ -118,17 +115,17 @@ class EcommerceAnalytics:
         }
 
         # Simulate behavior metrics
-        behavior["metrics"]["average_session_duration"] = np.(random.uniform( if random else None)180, 600)
-        behavior["metrics"]["pages_per_session"] = np.(random.uniform( if random else None)3, 12)
-        behavior["metrics"]["bounce_rate"] = np.(random.uniform( if random else None)0.2, 0.5)
-        behavior["metrics"]["conversion_rate"] = np.(random.uniform( if random else None)0.02, 0.08)
-        behavior["metrics"]["repeat_purchase_rate"] = np.(random.uniform( if random else None)0.15, 0.35)
-        behavior["metrics"]["customer_lifetime_value"] = np.(random.uniform( if random else None)500, 2000)
+        behavior["metrics"]["average_session_duration"] = np.random.uniform(180, 600)
+        behavior["metrics"]["pages_per_session"] = np.random.uniform(3, 12)
+        behavior["metrics"]["bounce_rate"] = np.random.uniform(0.2, 0.5)
+        behavior["metrics"]["conversion_rate"] = np.random.uniform(0.02, 0.08)
+        behavior["metrics"]["repeat_purchase_rate"] = np.random.uniform(0.15, 0.35)
+        behavior["metrics"]["customer_lifetime_value"] = np.random.uniform(500, 2000)
 
         behavior["device_breakdown"] = {
-            "mobile": np.(random.uniform( if random else None)0.4, 0.6),
-            "desktop": np.(random.uniform( if random else None)0.3, 0.4),
-            "tablet": np.(random.uniform( if random else None)0.05, 0.15),
+            "mobile": np.random.uniform(0.4, 0.6),
+            "desktop": np.random.uniform(0.3, 0.4),
+            "tablet": np.random.uniform(0.05, 0.15),
         }
 
         return behavior
@@ -146,7 +143,7 @@ class EcommerceAnalytics:
         Returns:
             Product performance analysis
         """
-        (logger.info( if logger else None)f"Analyzing product performance by {metric}")
+        logger.info(f"Analyzing product performance by {metric}")
 
         performance = {
             "metric": metric,
@@ -163,8 +160,8 @@ class EcommerceAnalytics:
             {
                 "product_id": f"PROD-{i:03d}",
                 "name": f"Luxury Item {i}",
-                "metric_value": np.(random.uniform( if random else None)5000, 20000),
-                "growth_rate": np.(random.uniform( if random else None)0.1, 0.5),
+                "metric_value": np.random.uniform(5000, 20000),
+                "growth_rate": np.random.uniform(0.1, 0.5),
             }
             for i in range(1, 11)
         ]
@@ -201,7 +198,7 @@ class EcommerceAnalytics:
         ]
 
         stages = funnel_stages or default_stages
-        (logger.info( if logger else None)f"Analyzing conversion funnel with {len(stages)} stages")
+        logger.info(f"Analyzing conversion funnel with {len(stages)} stages")
 
         funnel = {
             "stages": [],
@@ -213,7 +210,7 @@ class EcommerceAnalytics:
         # Simulate funnel data
         visitors = 10000
         for i, stage in enumerate(stages):
-            conversion_rate = np.(random.uniform( if random else None)0.5, 0.9)
+            conversion_rate = np.random.uniform(0.5, 0.9)
             visitors = int(visitors * conversion_rate)
 
             funnel["stages"].append(
@@ -254,16 +251,16 @@ class EcommerceAnalytics:
         Returns:
             Marketing ROI metrics and attribution
         """
-        (logger.info( if logger else None)f"Calculating ROI for campaign: {campaign_id}")
+        logger.info(f"Calculating ROI for campaign: {campaign_id}")
 
         roi_data = {
             "campaign_id": campaign_id,
             "period": {
-                "start": (start_date.isoformat( if start_date else None)),
-                "end": (end_date.isoformat( if end_date else None)),
+                "start": start_date.isoformat(),
+                "end": end_date.isoformat(),
                 "duration_days": (end_date - start_date).days,
             },
-            "spend": np.(random.uniform( if random else None)5000, 20000),
+            "spend": np.random.uniform(5000, 20000),
             "revenue_attributed": 0.0,
             "roi_percentage": 0.0,
             "customer_acquisition_cost": 0.0,
@@ -273,22 +270,22 @@ class EcommerceAnalytics:
         }
 
         # Calculate metrics
-        roi_data["revenue_attributed"] = roi_data["spend"] * np.(random.uniform( if random else None)2, 8)
+        roi_data["revenue_attributed"] = roi_data["spend"] * np.random.uniform(2, 8)
         roi_data["roi_percentage"] = (
             (roi_data["revenue_attributed"] - roi_data["spend"])
             / roi_data["spend"]
             * 100
         )
-        roi_data["customers_acquired"] = int(np.(random.uniform( if random else None)50, 300))
+        roi_data["customers_acquired"] = int(np.random.uniform(50, 300))
         roi_data["customer_acquisition_cost"] = (
             roi_data["spend"] / roi_data["customers_acquired"]
         )
 
         roi_data["channel_breakdown"] = {
-            "social_media": np.(random.uniform( if random else None)0.3, 0.5),
-            "email": np.(random.uniform( if random else None)0.2, 0.3),
-            "paid_search": np.(random.uniform( if random else None)0.15, 0.25),
-            "organic": np.(random.uniform( if random else None)0.1, 0.2),
+            "social_media": np.random.uniform(0.3, 0.5),
+            "email": np.random.uniform(0.2, 0.3),
+            "paid_search": np.random.uniform(0.15, 0.25),
+            "organic": np.random.uniform(0.1, 0.2),
         }
 
         return roi_data
@@ -309,7 +306,7 @@ class EcommerceAnalytics:
         default_metrics = ["revenue", "orders", "new_customers", "conversion_rate"]
         metrics_to_forecast = metrics or default_metrics
 
-        (logger.info( if logger else None)
+        logger.info(
             f"Generating {forecast_days}-day forecast for {len(metrics_to_forecast)} metrics"
         )
 
@@ -324,8 +321,8 @@ class EcommerceAnalytics:
 
         # Generate forecasts
         for metric in metrics_to_forecast:
-            base_value = np.(random.uniform( if random else None)1000, 10000)
-            trend = np.(random.uniform( if random else None)-0.02, 0.05)
+            base_value = np.random.uniform(1000, 10000)
+            trend = np.random.uniform(-0.02, 0.05)
 
             forecast_values = [
                 base_value * (1 + trend) ** day for day in range(forecast_days)
@@ -363,11 +360,11 @@ class EcommerceAnalytics:
         Returns:
             Exported data as string or file path
         """
-        (logger.info( if logger else None)f"Exporting analytics report in {format} format")
+        logger.info(f"Exporting analytics report in {format} format")
 
         if format == "json":
 
-            return (json.dumps( if json else None)analytics_data, indent=2, default=str)
+            return json.dumps(analytics_data, indent=2, default=str)
         elif format == "csv":
             return "CSV export not yet implemented"
         elif format == "pdf":

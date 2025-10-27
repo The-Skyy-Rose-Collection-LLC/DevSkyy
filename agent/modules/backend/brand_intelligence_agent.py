@@ -7,11 +7,8 @@ from typing import Any, Dict, List
 import logging
 import openai
 
-
-
 load_dotenv()
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class BrandIntelligenceAgent:
     """
@@ -60,7 +57,7 @@ class BrandIntelligenceAgent:
         }
 
         # Initialize OpenAI client
-        self.api_key = (os.getenv( if os else None)"OPENAI_API_KEY")
+        self.api_key = os.getenv("OPENAI_API_KEY")
         self.openai_available = openai is not None and self.api_key is not None
         if self.openai_available:
             openai.api_key = self.api_key
@@ -68,7 +65,7 @@ class BrandIntelligenceAgent:
         self.uploaded_assets = {}
         self.learning_from_assets = False
 
-        (logger.info( if logger else None)
+        logger.info(
             "🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection"
         )
 
@@ -89,12 +86,12 @@ class BrandIntelligenceAgent:
                     "competitive_advantage": "Sustainable luxury with personalized shopping experience",
                 },
                 "current_trends": self.theme_evolution,
-                "brand_health_score": (self._calculate_brand_health( if self else None)),
-                "recommendations": (self._generate_brand_recommendations( if self else None)),
-                "analysis_timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "brand_health_score": self._calculate_brand_health(),
+                "recommendations": self._generate_brand_recommendations(),
+                "analysis_timestamp": datetime.now().isoformat(),
             }
         except Exception as e:
-            (logger.error( if logger else None)f"Brand analysis failed: {str(e)}")
+            logger.error(f"Brand analysis failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def get_brand_context_for_agent(self, agent_type: str) -> Dict[str, Any]:
@@ -102,7 +99,7 @@ class BrandIntelligenceAgent:
         base_context = {
             "brand_name": self.brand_name,
             "brand_voice": "Sophisticated, warm, and empowering",
-            "key_values": list(self.(brand_values.keys( if brand_values else None))),
+            "key_values": list(self.brand_values.keys()),
             "target_audience": self.target_demographics["primary"],
         }
 
@@ -151,30 +148,30 @@ class BrandIntelligenceAgent:
             },
         }
 
-        context = {**base_context, **(agent_specific_context.get( if agent_specific_context else None)agent_type, {})}
+        context = {**base_context, **agent_specific_context.get(agent_type, {})}
 
-        (logger.info( if logger else None)f"🎯 Generated brand context for {agent_type} agent")
+        logger.info(f"🎯 Generated brand context for {agent_type} agent")
         return context
 
     async def continuous_learning_cycle(self) -> Dict[str, Any]:
         """Execute continuous brand learning and adaptation."""
         try:
             # Analyze current market trends
-            market_analysis = await (self._analyze_market_trends( if self else None))
+            market_analysis = await self._analyze_market_trends()
 
             # Track brand performance metrics
-            performance_metrics = (self._track_brand_performance( if self else None))
+            performance_metrics = self._track_brand_performance()
 
             # Analyze customer feedback and sentiment
-            sentiment_analysis = await (self._analyze_customer_sentiment( if self else None))
+            sentiment_analysis = await self._analyze_customer_sentiment()
 
             # Update brand strategies based on insights
-            strategy_updates = (self._update_brand_strategies( if self else None)
+            strategy_updates = self._update_brand_strategies(
                 market_analysis, sentiment_analysis
             )
 
             # Generate actionable insights
-            insights = (self._generate_actionable_insights( if self else None)
+            insights = self._generate_actionable_insights(
                 market_analysis, performance_metrics, sentiment_analysis
             )
 
@@ -185,16 +182,16 @@ class BrandIntelligenceAgent:
                 "sentiment_analysis": sentiment_analysis,
                 "strategy_updates": strategy_updates,
                 "actionable_insights": insights,
-                "next_cycle_scheduled": ((datetime.now( if datetime else None)).timestamp() + 3600),  # 1 hour
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "next_cycle_scheduled": (datetime.now().timestamp() + 3600),  # 1 hour
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Brand learning cycle failed: {str(e)}")
+            logger.error(f"Brand learning cycle failed: {str(e)}")
             return {
                 "status": "failed",
                 "error": str(e),
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
     async def _analyze_market_trends(self) -> Dict[str, Any]:
@@ -437,11 +434,11 @@ class BrandIntelligenceAgent:
                 "confidence": 0.5,
                 "keywords": ["analysis", "unavailable"],
                 "summary": "OpenAI analysis unavailable - using fallback",
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         try:
-            response = openai.(ChatCompletion.create( if ChatCompletion else None)
+            response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
@@ -457,18 +454,18 @@ class BrandIntelligenceAgent:
                 max_tokens=150,
             )
 
-            sentiment_data = (json.loads( if json else None)response.choices[0].message.content)
-            sentiment_data["timestamp"] = (datetime.now( if datetime else None)).isoformat()
-            (logger.info( if logger else None)"✅ Brand sentiment analyzed successfully using OpenAI")
+            sentiment_data = json.loads(response.choices[0].message.content)
+            sentiment_data["timestamp"] = datetime.now().isoformat()
+            logger.info("✅ Brand sentiment analyzed successfully using OpenAI")
             return sentiment_data
         except Exception as e:
-            (logger.error( if logger else None)f"Brand sentiment analysis failed: {str(e)}")
+            logger.error(f"Brand sentiment analysis failed: {str(e)}")
             return {
                 "sentiment": "error",
                 "confidence": 0.0,
                 "keywords": ["analysis", "error"],
                 "summary": f"Error during OpenAI sentiment analysis: {str(e)}",
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
     def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -478,39 +475,39 @@ class BrandIntelligenceAgent:
             self.learning_from_assets = True
 
             # Analyze visual consistency
-            visual_analysis = (self._analyze_visual_assets( if self else None)
-                (asset_data.get( if asset_data else None)"visual_assets", {})
+            visual_analysis = self._analyze_visual_assets(
+                asset_data.get("visual_assets", {})
             )
 
             # Extract brand patterns
-            brand_patterns = (self._extract_brand_patterns( if self else None)asset_data)
+            brand_patterns = self._extract_brand_patterns(asset_data)
 
             # Update brand understanding
-            enhanced_insights = (self._generate_asset_insights( if self else None)
+            enhanced_insights = self._generate_asset_insights(
                 visual_analysis, brand_patterns
             )
 
             # Update theme evolution based on assets
-            if (asset_data.get( if asset_data else None)"seasonal_collections"):
-                (self._update_seasonal_understanding( if self else None)asset_data["seasonal_collections"])
+            if asset_data.get("seasonal_collections"):
+                self._update_seasonal_understanding(asset_data["seasonal_collections"])
 
             # EXPERIMENTAL: Neural Brand DNA Analysis
-            neural_brand_dna = (self._experimental_neural_brand_analysis( if self else None)asset_data)
+            neural_brand_dna = self._experimental_neural_brand_analysis(asset_data)
 
             return {
                 "learning_status": "completed",
-                "assets_processed": (asset_data.get( if asset_data else None)"total_learning_sources", 0),
+                "assets_processed": asset_data.get("total_learning_sources", 0),
                 "visual_analysis": visual_analysis,
                 "brand_patterns": brand_patterns,
                 "enhanced_insights": enhanced_insights,
                 "neural_brand_dna": neural_brand_dna,
                 "confidence_boost": "+35%",
                 "experimental_features_active": True,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Asset learning failed: {str(e)}")
+            logger.error(f"Asset learning failed: {str(e)}")
             return {"error": str(e), "learning_status": "failed"}
 
     def _experimental_neural_brand_analysis(
@@ -534,15 +531,15 @@ class BrandIntelligenceAgent:
     def _analyze_visual_assets(self, visual_assets: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze visual brand assets for consistency."""
         return {
-            "logo_variations": len((visual_assets.get( if visual_assets else None)"logos", [])),
+            "logo_variations": len(visual_assets.get("logos", [])),
             "product_image_quality": (
                 "high"
-                if len((visual_assets.get( if visual_assets else None)"product_images", [])) > 5
+                if len(visual_assets.get("product_images", [])) > 5
                 else "building"
             ),
             "marketing_consistency": (
                 "strong"
-                if len((visual_assets.get( if visual_assets else None)"marketing_materials", [])) > 3
+                if len(visual_assets.get("marketing_materials", [])) > 3
                 else "developing"
             ),
             "visual_cohesion_score": 85,
@@ -582,7 +579,6 @@ class BrandIntelligenceAgent:
         self.theme_evolution["visual_evolution"] = (
             "Data-driven from uploaded collections"
         )
-
 
 def initialize_brand_intelligence() -> BrandIntelligenceAgent:
     """Initialize the brand intelligence system."""

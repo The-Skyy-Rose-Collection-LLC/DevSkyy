@@ -9,10 +9,7 @@ Dynamic Pricing Engine
 ML-powered dynamic pricing optimization for fashion ecommerce
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class DynamicPricingEngine:
     """
@@ -34,7 +31,7 @@ class DynamicPricingEngine:
         self.competitor_prices = {}
         self.is_trained = False
 
-        (logger.info( if logger else None)"💰 Dynamic Pricing Engine initialized")
+        logger.info("💰 Dynamic Pricing Engine initialized")
 
     async def optimize_price(
         self, product_data: Dict[str, Any], market_data: Dict[str, Any]
@@ -51,16 +48,16 @@ class DynamicPricingEngine:
         """
         try:
             # Extract features
-            base_price = (product_data.get( if product_data else None)"base_price", 100)
-            cost = (product_data.get( if product_data else None)"cost", 50)
-            inventory_level = (product_data.get( if product_data else None)"inventory", 100)
-            age_days = (product_data.get( if product_data else None)"age_days", 0)
-            demand_score = (market_data.get( if market_data else None)"demand_score", 0.5)
-            competitor_avg = (market_data.get( if market_data else None)"competitor_avg_price", base_price)
-            season_factor = (market_data.get( if market_data else None)"season_factor", 1.0)
+            base_price = product_data.get("base_price", 100)
+            cost = product_data.get("cost", 50)
+            inventory_level = product_data.get("inventory", 100)
+            age_days = product_data.get("age_days", 0)
+            demand_score = market_data.get("demand_score", 0.5)
+            competitor_avg = market_data.get("competitor_avg_price", base_price)
+            season_factor = market_data.get("season_factor", 1.0)
 
             # Calculate demand elasticity
-            elasticity = await (self._calculate_elasticity( if self else None)product_data, market_data)
+            elasticity = await self._calculate_elasticity(product_data, market_data)
 
             # Base optimization
             if demand_score > 0.7:
@@ -102,7 +99,7 @@ class DynamicPricingEngine:
                     # Maintain competitive position
                     adjustment *= 1.0
 
-                (logger.debug( if logger else None)
+                logger.debug(
                     f"💰 Competitive pricing maintained: ratio={competitive_ratio:.3f}"
                 )
 
@@ -115,7 +112,7 @@ class DynamicPricingEngine:
                     # Standard reduction
                     adjustment *= 0.95
 
-                (logger.info( if logger else None)
+                logger.info(
                     f"📉 Reducing high price: was {competitive_ratio:.1f}x competitor avg"
                 )
 
@@ -128,7 +125,7 @@ class DynamicPricingEngine:
                     # Standard increase
                     adjustment *= 1.05
 
-                (logger.info( if logger else None)
+                logger.info(
                     f"📈 Increasing low price: was {competitive_ratio:.1f}x competitor avg"
                 )
 
@@ -150,7 +147,7 @@ class DynamicPricingEngine:
             }
 
             # Calculate expected impact
-            expected_revenue = await (self._calculate_expected_revenue( if self else None)
+            expected_revenue = await self._calculate_expected_revenue(
                 optimal_price, demand_score, elasticity
             )
 
@@ -169,13 +166,13 @@ class DynamicPricingEngine:
                     "competitor_avg": competitor_avg,
                     "elasticity": elasticity,
                 },
-                "recommendations": await (self._get_pricing_recommendations( if self else None)
+                "recommendations": await self._get_pricing_recommendations(
                     product_data, optimal_price, base_price
                 ),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Price optimization failed: {e}")
+            logger.error(f"Price optimization failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def _calculate_elasticity(
@@ -185,12 +182,12 @@ class DynamicPricingEngine:
         # Simplified elasticity calculation
         # In production, this would use historical price/demand data
 
-        category = (product_data.get( if product_data else None)"category", "")
+        category = product_data.get("category", "")
 
         # Category-based elasticity estimates
-        if "luxury" in (category.lower( if category else None)):
+        if "luxury" in category.lower():
             return -0.5  # Inelastic (luxury goods)
-        elif "basic" in (category.lower( if category else None)):
+        elif "basic" in category.lower():
             return -1.5  # Elastic (basic items)
         else:
             return -1.0  # Unit elastic
@@ -215,17 +212,17 @@ class DynamicPricingEngine:
         price_change = ((optimal_price / current_price) - 1) * 100
 
         if abs(price_change) > 10:
-            (recommendations.append( if recommendations else None)
+            recommendations.append(
                 f"Consider gradual price adjustment of {price_change:.1f}% over 2-3 weeks"
             )
 
-        if (product_data.get( if product_data else None)"inventory", 0) > 100:
-            (recommendations.append( if recommendations else None)
+        if product_data.get("inventory", 0) > 100:
+            recommendations.append(
                 "High inventory detected - consider promotional pricing"
             )
 
-        if (product_data.get( if product_data else None)"age_days", 0) > 90:
-            (recommendations.append( if recommendations else None)"Product aging - implement clearance strategy")
+        if product_data.get("age_days", 0) > 90:
+            recommendations.append("Product aging - implement clearance strategy")
 
         return recommendations
 
@@ -271,20 +268,20 @@ class DynamicPricingEngine:
                 },
             }
 
-            strategy = (strategies.get( if strategies else None)strategy_type, {})
+            strategy = strategies.get(strategy_type, {})
 
             # Apply strategy to products
             pricing_updates = []
             for product in products:
                 update = {
-                    "product_id": (product.get( if product else None)"id"),
-                    "current_price": (product.get( if product else None)"price"),
+                    "product_id": product.get("id"),
+                    "current_price": product.get("price"),
                     "strategy": strategy_type,
                 }
 
                 if strategy_type == "clearance":
-                    age = (product.get( if product else None)"age_days", 0)
-                    inventory = (product.get( if product else None)"inventory", 0)
+                    age = product.get("age_days", 0)
+                    inventory = product.get("inventory", 0)
 
                     discount = 0
                     for tier in strategy["discount_tiers"]:
@@ -294,11 +291,11 @@ class DynamicPricingEngine:
                     if inventory > 100:
                         discount += strategy["additional_inventory_discount"]
 
-                    new_price = (product.get( if product else None)"price") * (1 - discount)
+                    new_price = product.get("price") * (1 - discount)
                     update["new_price"] = round(new_price, 2)
                     update["discount"] = f"{discount * 100:.0f}%"
 
-                (pricing_updates.append( if pricing_updates else None)update)
+                pricing_updates.append(update)
 
             return {
                 "success": True,
@@ -308,7 +305,7 @@ class DynamicPricingEngine:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Pricing strategy creation failed: {e}")
+            logger.error(f"Pricing strategy creation failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def ab_test_pricing(
@@ -331,7 +328,7 @@ class DynamicPricingEngine:
             A/B test configuration
         """
         try:
-            test_id = f"AB-{product_id}-{int((datetime.utcnow( if datetime else None)).timestamp())}"
+            test_id = f"AB-{product_id}-{int(datetime.utcnow().timestamp())}"
 
             test_config = {
                 "test_id": test_id,
@@ -340,9 +337,9 @@ class DynamicPricingEngine:
                     "A": {"price": price_variant_a, "traffic_split": 0.5},
                     "B": {"price": price_variant_b, "traffic_split": 0.5},
                 },
-                "start_date": (datetime.utcnow( if datetime else None)).isoformat(),
+                "start_date": datetime.utcnow().isoformat(),
                 "end_date": (
-                    (datetime.utcnow( if datetime else None)) + timedelta(days=duration_days)
+                    datetime.utcnow() + timedelta(days=duration_days)
                 ).isoformat(),
                 "metrics_tracked": [
                     "conversion_rate",
@@ -354,7 +351,7 @@ class DynamicPricingEngine:
                 "confidence_level": 0.95,
             }
 
-            (logger.info( if logger else None)f"🧪 A/B test created: {test_id}")
+            logger.info(f"🧪 A/B test created: {test_id}")
 
             return {
                 "success": True,
@@ -363,5 +360,5 @@ class DynamicPricingEngine:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"A/B test creation failed: {e}")
+            logger.error(f"A/B test creation failed: {e}")
             return {"success": False, "error": str(e)}

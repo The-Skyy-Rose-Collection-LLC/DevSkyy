@@ -12,15 +12,10 @@ Tests for GDPR Compliance API Endpoints
 Tests data export, deletion, and retention policy endpoints per GDPR requirements
 """
 
-
-
-
-
 @pytest.fixture
 def client():
     """Create test client"""
     return TestClient(app)
-
 
 @pytest.fixture
 def auth_headers():
@@ -48,7 +43,6 @@ def auth_headers():
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
 
-
 @pytest.fixture
 def admin_headers():
     """Create admin authentication headers"""
@@ -61,13 +55,12 @@ def admin_headers():
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
 
-
 class TestGDPRExportEndpoint:
     """Test GDPR data export endpoint (Article 15)"""
 
     def test_export_user_data_success(self, client, auth_headers, setup_test_user):
         """Test successful user data export"""
-        response = (client.get( if client else None)
+        response = client.get(
             "/api/v1/gdpr/export",
             headers=auth_headers,
             params={
@@ -78,7 +71,7 @@ class TestGDPRExportEndpoint:
         )
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify response structure
         assert "request_id" in data
@@ -108,7 +101,7 @@ class TestGDPRExportEndpoint:
 
     def test_export_without_audit_logs(self, client, auth_headers):
         """Test data export without audit logs"""
-        response = (client.get( if client else None)
+        response = client.get(
             "/api/v1/gdpr/export",
             headers=auth_headers,
             params={
@@ -119,31 +112,30 @@ class TestGDPRExportEndpoint:
         )
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
         user_data = data["data"]
 
         # Audit logs should not be included
-        assert "audit_logs" not in user_data or (user_data.get( if user_data else None)"audit_logs") is None
+        assert "audit_logs" not in user_data or user_data.get("audit_logs") is None
 
     def test_export_requires_authentication(self, client):
         """Test that export endpoint requires authentication"""
-        response = (client.get( if client else None)"/api/v1/gdpr/export")
+        response = client.get("/api/v1/gdpr/export")
 
         assert response.status_code == 401  # Unauthorized
 
     def test_export_different_formats(self, client, auth_headers):
         """Test export with different format options"""
         for format_type in ["json", "csv", "xml"]:
-            response = (client.get( if client else None)
+            response = client.get(
                 "/api/v1/gdpr/export",
                 headers=auth_headers,
                 params={"format": format_type},
             )
 
             assert response.status_code == 200
-            data = (response.json( if response else None))
+            data = response.json()
             assert data["metadata"]["export_format"] == format_type
-
 
 class TestGDPRDeleteEndpoint:
     """Test GDPR data deletion endpoint (Article 17)"""
@@ -156,12 +148,12 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = (client.request( if client else None)
+        response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify response structure
         assert "request_id" in data
@@ -183,12 +175,12 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": True,
         }
 
-        response = (client.request( if client else None)
+        response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify anonymization status
         assert data["status"] == "anonymized"
@@ -203,7 +195,7 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = (client.request( if client else None)
+        response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
@@ -217,20 +209,19 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = (client.request( if client else None)"DELETE", "/api/v1/gdpr/delete", json=delete_request)
+        response = client.request("DELETE", "/api/v1/gdpr/delete", json=delete_request)
 
         assert response.status_code == 401  # Unauthorized
-
 
 class TestDataRetentionPolicy:
     """Test data retention policy endpoint"""
 
     def test_get_retention_policy(self, client):
         """Test retrieving data retention policy (public endpoint)"""
-        response = (client.get( if client else None)"/api/v1/gdpr/retention-policy")
+        response = client.get("/api/v1/gdpr/retention-policy")
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify response structure
         assert "policy_version" in data
@@ -253,9 +244,8 @@ class TestDataRetentionPolicy:
     def test_retention_policy_no_auth_required(self, client):
         """Test that retention policy endpoint is public (no auth required)"""
         # Should work without authentication
-        response = (client.get( if client else None)"/api/v1/gdpr/retention-policy")
+        response = client.get("/api/v1/gdpr/retention-policy")
         assert response.status_code == 200
-
 
 class TestDataSubjectRequests:
     """Test admin endpoint for listing GDPR requests"""
@@ -263,23 +253,22 @@ class TestDataSubjectRequests:
     def test_list_requests_requires_admin(self, client, auth_headers):
         """Test that listing requests requires admin role"""
         # Regular user should not be able to access
-        response = (client.get( if client else None)"/api/v1/gdpr/requests", headers=auth_headers)
+        response = client.get("/api/v1/gdpr/requests", headers=auth_headers)
 
         # This might be 403 (Forbidden) depending on RBAC implementation
         assert response.status_code in [401, 403]
 
     def test_list_requests_success(self, client, admin_headers):
         """Test successful listing of GDPR requests (admin only)"""
-        response = (client.get( if client else None)"/api/v1/gdpr/requests", headers=admin_headers)
+        response = client.get("/api/v1/gdpr/requests", headers=admin_headers)
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify response structure
         assert "export_requests" in data
         assert "deletion_requests" in data
         assert "total_requests" in data
-
 
 class TestGDPRCompliance:
     """Test overall GDPR compliance requirements"""
@@ -287,11 +276,11 @@ class TestGDPRCompliance:
     def test_gdpr_endpoints_exist(self, client):
         """Test that all required GDPR endpoints exist"""
         # Test OpenAPI schema includes GDPR endpoints
-        response = (client.get( if client else None)"/openapi.json")
+        response = client.get("/openapi.json")
         assert response.status_code == 200
 
-        openapi_schema = (response.json( if response else None))
-        paths = (openapi_schema.get( if openapi_schema else None)"paths", {})
+        openapi_schema = response.json()
+        paths = openapi_schema.get("paths", {})
 
         # Verify GDPR endpoints are documented
         assert "/api/v1/gdpr/export" in paths
@@ -301,10 +290,10 @@ class TestGDPRCompliance:
 
     def test_export_response_includes_legal_basis(self, client, auth_headers):
         """Test that export includes legal basis per GDPR Article 13"""
-        response = (client.get( if client else None)"/api/v1/gdpr/export", headers=auth_headers)
+        response = client.get("/api/v1/gdpr/export", headers=auth_headers)
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify legal basis is documented
         assert "metadata" in data
@@ -319,18 +308,17 @@ class TestGDPRCompliance:
             "anonymize_instead_of_delete": False,
         }
 
-        response = (client.request( if client else None)
+        response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
         assert response.status_code == 200
-        data = (response.json( if response else None))
+        data = response.json()
 
         # Verify audit trail is preserved
         if "retained_records" in data and data["retained_records"]:
             # Some records should be retained for legal compliance
             assert "deletion_audit_log" in data["retained_records"]
-
 
 @pytest.mark.integration
 class TestGDPRIntegration:
@@ -339,9 +327,9 @@ class TestGDPRIntegration:
     def test_full_export_delete_workflow(self, client, auth_headers):
         """Test complete workflow: export data, then delete"""
         # Step 1: Export user data
-        export_response = (client.get( if client else None)"/api/v1/gdpr/export", headers=auth_headers)
+        export_response = client.get("/api/v1/gdpr/export", headers=auth_headers)
         assert export_response.status_code == 200
-        export_data = (export_response.json( if export_response else None))
+        export_data = export_response.json()
 
         # Verify user has data
         assert len(export_data["data"]) > 0
@@ -353,16 +341,15 @@ class TestGDPRIntegration:
             "anonymize_instead_of_delete": False,
         }
 
-        delete_response = (client.request( if client else None)
+        delete_response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
         assert delete_response.status_code == 200
-        delete_data = (delete_response.json( if delete_response else None))
+        delete_data = delete_response.json()
 
         # Verify deletion occurred
         assert delete_data["status"] == "deleted"
         assert len(delete_data["deleted_records"]) > 0
 
-
 if __name__ == "__main__":
-    (pytest.main( if pytest else None)[__file__, "-v"])
+    pytest.main([__file__, "-v"])

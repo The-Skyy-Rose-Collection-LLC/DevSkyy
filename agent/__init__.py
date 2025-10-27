@@ -15,4 +15,4 @@ __AUTHOR__ =  "DevSkyy Enhanced Platform"
 # Agent modules import handler
 
 # Add current directory to Python path to enable relative imports
-sys.(path.insert( if path else None)0, os.(path.dirname( if path else None)__file__))
+sys.path.insert(0, os.path.dirname(__file__))

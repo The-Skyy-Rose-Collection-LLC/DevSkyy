@@ -26,13 +26,12 @@ Version: 1.0.0
 Python: >=3.11
 """
 
-
 # Configure logging
-(logging.basicConfig( if logging else None)
+logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -74,7 +73,7 @@ class SQLiteTestSuite:
             except Exception as e:
                 self.test_results[test_name] = False
                 print(f"   ❌ FAIL - {e}")
-                (logger.error( if logger else None)f"Test {test_name} failed: {e}")
+                logger.error(f"Test {test_name} failed: {e}")
         
         return self.test_results
     
@@ -93,7 +92,7 @@ class SQLiteTestSuite:
             # Check if database file exists or can be created
             if "sqlite" in DATABASE_URL:
                 db_path = Path("./devskyy.db")
-                if not (db_path.exists( if db_path else None)):
+                if not db_path.exists():
                     print(f"   ℹ️  Database file will be created: {db_path}")
             
             print(f"   ✓ Database Provider: {DB_PROVIDER}")
@@ -108,20 +107,20 @@ class SQLiteTestSuite:
         """Test database connection."""
         try:
             # Test connection through db_manager
-            health = await (db_manager.health_check( if db_manager else None))
+            health = await db_manager.health_check()
             
-            if (health.get( if health else None)"status") != "healthy":
+            if health.get("status") != "healthy":
                 print(f"   ❌ Health check failed: {health}")
                 return False
             
             # Test direct connection
             async with AsyncSessionLocal() as session:
-                result = await (session.execute( if session else None)text("SELECT 1"))
-                value = (result.scalar( if result else None))
+                result = await session.execute(text("SELECT 1"))
+                value = result.scalar()
                 if value != 1:
                     return False
             
-            print(f"   ✓ Connection healthy: {(health.get( if health else None)'type')}")
+            print(f"   ✓ Connection healthy: {health.get('type')}")
             return True
             
         except Exception as e:
@@ -137,15 +136,15 @@ class SQLiteTestSuite:
             # Verify tables exist
             async with AsyncSessionLocal() as session:
                 if "sqlite" in DATABASE_URL:
-                    result = await (session.execute( if session else None)
+                    result = await session.execute(
                         text("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
                     )
-                    tables = [row[0] for row in (result.fetchall( if result else None))]
+                    tables = [row[0] for row in result.fetchall()]
                 else:
-                    result = await (session.execute( if session else None)
+                    result = await session.execute(
                         text("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
                     )
-                    tables = [row[0] for row in (result.fetchall( if result else None))]
+                    tables = [row[0] for row in result.fetchall()]
             
             expected_tables = ["users", "products", "customers", "orders", "agent_logs", "brand_assets", "campaigns"]
             missing_tables = [t for t in expected_tables if t not in tables]
@@ -172,9 +171,9 @@ class SQLiteTestSuite:
                     full_name="Test User",
                     hashed_password="hashed_password"
                 )
-                (session.add( if session else None)user)
-                await (session.commit( if session else None))
-                await (session.refresh( if session else None)user)
+                session.add(user)
+                await session.commit()
+                await session.refresh(user)
                 
                 if not user.id:
                     return False
@@ -192,9 +191,9 @@ class SQLiteTestSuite:
                     tags=["test", "product"],
                     colors=["red", "blue"]
                 )
-                (session.add( if session else None)product)
-                await (session.commit( if session else None))
-                await (session.refresh( if session else None)product)
+                session.add(product)
+                await session.commit()
+                await session.refresh(product)
                 
                 if not product.id:
                     return False
@@ -213,27 +212,27 @@ class SQLiteTestSuite:
         try:
             async with AsyncSessionLocal() as session:
                 # CREATE - Already done in previous test
-                user_id = self.(test_data_ids.get( if test_data_ids else None)"user_id")
+                user_id = self.test_data_ids.get("user_id")
                 if not user_id:
                     return False
                 
                 # READ
-                result = await (session.execute( if session else None)select(User).where(User.id == user_id))
-                user = (result.scalar_one_or_none( if result else None))
+                result = await session.execute(select(User).where(User.id == user_id))
+                user = result.scalar_one_or_none()
                 if not user or user.email != "test@example.com":
                     return False
                 
                 # UPDATE
                 user.full_name = "Updated Test User"
-                await (session.commit( if session else None))
-                await (session.refresh( if session else None)user)
+                await session.commit()
+                await session.refresh(user)
                 
                 if user.full_name != "Updated Test User":
                     return False
                 
                 # DELETE (we'll keep the data for other tests)
-                # await (session.delete( if session else None)user)
-                # await (session.commit( if session else None))
+                # await session.delete(user)
+                # await session.commit()
                 
                 print(f"   ✓ CRUD operations successful")
                 return True
@@ -257,19 +256,19 @@ class SQLiteTestSuite:
                         price=float(i + 1),
                         stock_quantity=i
                     )
-                    (products.append( if products else None)product)
+                    products.append(product)
                 
-                (session.add_all( if session else None)products)
-                await (session.commit( if session else None))
+                session.add_all(products)
+                await session.commit()
                 
                 # Test query performance
-                start_time = (time.time( if time else None))
+                start_time = time.time()
                 
                 # Query all products
-                result = await (session.execute( if session else None)select(Product).where(Product.category == "Performance"))
-                perf_products = (result.scalars( if result else None)).all()
+                result = await session.execute(select(Product).where(Product.category == "Performance"))
+                perf_products = result.scalars().all()
                 
-                query_time = (time.time( if time else None)) - start_time
+                query_time = time.time() - start_time
                 
                 if len(perf_products) != 100:
                     return False
@@ -297,10 +296,10 @@ class SQLiteTestSuite:
                         full_name="Transaction Test",
                         hashed_password="password"
                     )
-                    (session.add( if session else None)user)
+                    session.add(user)
                     
                     # This should succeed
-                    await (session.flush( if session else None))
+                    await session.flush()
                     
                     # Now try to add a duplicate email (should fail)
                     duplicate_user = User(
@@ -309,23 +308,23 @@ class SQLiteTestSuite:
                         full_name="Duplicate",
                         hashed_password="password"
                     )
-                    (session.add( if session else None)duplicate_user)
+                    session.add(duplicate_user)
                     
                     # This should fail due to unique constraint
-                    await (session.commit( if session else None))
+                    await session.commit()
                     
                     # If we get here, the test failed (should have raised an exception)
                     return False
                     
                 except Exception:
                     # Expected to fail - rollback should work
-                    await (session.rollback( if session else None))
+                    await session.rollback()
                     
                     # Verify the first user was not committed
-                    result = await (session.execute( if session else None)
+                    result = await session.execute(
                         select(User).where(User.email == "transaction@test.com")
                     )
-                    user = (result.scalar_one_or_none( if result else None))
+                    user = result.scalar_one_or_none()
                     
                     # User should not exist due to rollback
                     if user is not None:
@@ -342,7 +341,7 @@ class SQLiteTestSuite:
         """Test health check functionality."""
         try:
             # Test db_manager health check
-            health = await (db_manager.health_check( if db_manager else None))
+            health = await db_manager.health_check()
             
             required_fields = ["status", "connected", "type"]
             for field in required_fields:
@@ -373,8 +372,8 @@ class SQLiteTestSuite:
                         status="success",
                         execution_time_ms=100.0
                     )
-                    (session.add( if session else None)log)
-                    await (session.commit( if session else None))
+                    session.add(log)
+                    await session.commit()
                     return log.id
             
             # Run multiple concurrent operations
@@ -383,7 +382,7 @@ class SQLiteTestSuite:
                 for i in range(10)
             ]
             
-            results = await (asyncio.gather( if asyncio else None)*tasks, return_exceptions=True)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # Check that all operations succeeded
             successful_ops = [r for r in results if isinstance(r, int)]
@@ -416,9 +415,9 @@ class SQLiteTestSuite:
                         "version": "1.0"
                     }
                 )
-                (session.add( if session else None)brand_asset)
-                await (session.commit( if session else None))
-                await (session.refresh( if session else None)brand_asset)
+                session.add(brand_asset)
+                await session.commit()
+                await session.refresh(brand_asset)
                 
                 # Verify JSON data integrity
                 if brand_asset.data["primary"] != "#FF6B6B":
@@ -444,14 +443,14 @@ class SQLiteTestSuite:
         print("📊 SQLite Test Summary")
         print("=" * 60)
         
-        passed = sum(1 for result in self.(test_results.values( if test_results else None)) if result)
+        passed = sum(1 for result in self.test_results.values() if result)
         total = len(self.test_results)
         
         print(f"Tests Passed: {passed}/{total}")
         print(f"Success Rate: {(passed/total)*100:.1f}%")
         
         print("\n📋 Detailed Results:")
-        for test_name, result in self.(test_results.items( if test_results else None)):
+        for test_name, result in self.test_results.items():
             status = "✅ PASS" if result else "❌ FAIL"
             print(f"  {status} - {test_name}")
         
@@ -463,7 +462,7 @@ class SQLiteTestSuite:
             print("❌ SQLITE SETUP ISSUES")
             print("   Some tests failed. Review errors before deployment.")
             
-            failed_tests = [name for name, result in self.(test_results.items( if test_results else None)) if not result]
+            failed_tests = [name for name, result in self.test_results.items() if not result]
             print(f"   Failed tests: {', '.join(failed_tests)}")
 
 async def main():
@@ -472,19 +471,19 @@ async def main():
     print("Testing database configuration and operations...")
     
     test_suite = SQLiteTestSuite()
-    results = await (test_suite.run_all_tests( if test_suite else None))
-    (test_suite.print_summary( if test_suite else None))
+    results = await test_suite.run_all_tests()
+    test_suite.print_summary()
     
     # Exit with appropriate code
-    passed = sum(1 for result in (results.values( if results else None)) if result)
+    passed = sum(1 for result in results.values() if result)
     total = len(results)
     
     if passed == total:
         print("\n🎉 All SQLite tests passed! Database setup is complete.")
-        (sys.exit( if sys else None)0)
+        sys.exit(0)
     else:
         print("\n💥 Some SQLite tests failed! Review errors before proceeding.")
-        (sys.exit( if sys else None)1)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    (asyncio.run( if asyncio else None)main())
+    asyncio.run(main())

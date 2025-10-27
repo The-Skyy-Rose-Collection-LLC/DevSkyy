@@ -22,10 +22,7 @@ Trigger-based automation with multi-step workflow orchestration, conditional log
 error handling with automatic retry, rollback mechanisms, and audit logging
 """
 
-
-
 logger = logging.getLogger(__name__)
-
 
 class TriggerType(Enum):
     """Workflow trigger types"""
@@ -36,7 +33,6 @@ class TriggerType(Enum):
     API_RESPONSE = "api_response"
     THRESHOLD = "threshold"
     MANUAL = "manual"
-
 
 class WorkflowStatus(Enum):
     """Workflow execution status"""
@@ -49,7 +45,6 @@ class WorkflowStatus(Enum):
     PAUSED = "paused"
     ROLLED_BACK = "rolled_back"
 
-
 class StepStatus(Enum):
     """Workflow step status"""
 
@@ -59,7 +54,6 @@ class StepStatus(Enum):
     FAILED = "failed"
     SKIPPED = "skipped"
     ROLLED_BACK = "rolled_back"
-
 
 class ActionType(Enum):
     """Workflow action types"""
@@ -73,7 +67,9 @@ class ActionType(Enum):
     FASHION_ANALYSIS = "fashion_analysis"
     CACHE_OPERATION = "cache_operation"
     DATABASE_OPERATION = "database_operation"
-
+    VIDEO_GENERATION = "video_generation"
+    BRAND_MODEL_TRAINING = "brand_model_training"
+    IMAGE_GENERATION = "image_generation"
 
 @dataclass
 class WorkflowTrigger:
@@ -93,7 +89,6 @@ class WorkflowTrigger:
         data["trigger_type"] = self.trigger_type.value
         data["created_at"] = self.created_at.isoformat()
         return data
-
 
 @dataclass
 class WorkflowStep:
@@ -120,11 +115,10 @@ class WorkflowStep:
         data["action_type"] = self.action_type.value
         data["status"] = self.status.value
         if self.started_at:
-            data["started_at"] = self.(started_at.isoformat( if started_at else None))
+            data["started_at"] = self.started_at.isoformat()
         if self.completed_at:
-            data["completed_at"] = self.(completed_at.isoformat( if completed_at else None))
+            data["completed_at"] = self.completed_at.isoformat()
         return data
-
 
 @dataclass
 class Workflow:
@@ -146,16 +140,15 @@ class Workflow:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
-        data["trigger"] = self.(trigger.to_dict( if trigger else None))
-        data["steps"] = [(step.to_dict( if step else None)) for step in self.steps]
+        data["trigger"] = self.trigger.to_dict()
+        data["steps"] = [step.to_dict() for step in self.steps]
         data["status"] = self.status.value
-        data["created_at"] = self.(created_at.isoformat( if created_at else None))
+        data["created_at"] = self.created_at.isoformat()
         if self.started_at:
-            data["started_at"] = self.(started_at.isoformat( if started_at else None))
+            data["started_at"] = self.started_at.isoformat()
         if self.completed_at:
-            data["completed_at"] = self.(completed_at.isoformat( if completed_at else None))
+            data["completed_at"] = self.completed_at.isoformat()
         return data
-
 
 class WorkflowAction(ABC):
     """Abstract base class for workflow actions"""
@@ -172,7 +165,6 @@ class WorkflowAction(ABC):
         """Rollback the workflow action"""
         pass
 
-
 class APICallAction(WorkflowAction):
     """API call workflow action"""
 
@@ -184,16 +176,16 @@ class APICallAction(WorkflowAction):
         config = step.config
 
         # Resolve variables in config
-        resolved_config = (self._resolve_variables( if self else None)config, context)
+        resolved_config = self._resolve_variables(config, context)
 
         # Make API call
-        result = await (api_gateway.make_request( if api_gateway else None)
+        result = await api_gateway.make_request(
             api_id=resolved_config["api_id"],
             endpoint=resolved_config["endpoint"],
-            method=(resolved_config.get( if resolved_config else None)"method", "GET"),
-            params=(resolved_config.get( if resolved_config else None)"params"),
-            data=(resolved_config.get( if resolved_config else None)"data"),
-            headers=(resolved_config.get( if resolved_config else None)"headers"),
+            method=resolved_config.get("method", "GET"),
+            params=resolved_config.get("params"),
+            data=resolved_config.get("data"),
+            headers=resolved_config.get("headers"),
             timeout=step.timeout,
         )
 
@@ -206,19 +198,19 @@ class APICallAction(WorkflowAction):
             return True
 
         try:
-            rollback_result = await (api_gateway.make_request( if api_gateway else None)
+            rollback_result = await api_gateway.make_request(
                 api_id=step.rollback_config["api_id"],
                 endpoint=step.rollback_config["endpoint"],
-                method=step.(rollback_config.get( if rollback_config else None)"method", "POST"),
-                params=step.(rollback_config.get( if rollback_config else None)"params"),
-                data=step.(rollback_config.get( if rollback_config else None)"data"),
-                headers=step.(rollback_config.get( if rollback_config else None)"headers"),
+                method=step.rollback_config.get("method", "POST"),
+                params=step.rollback_config.get("params"),
+                data=step.rollback_config.get("data"),
+                headers=step.rollback_config.get("headers"),
             )
 
-            return (rollback_result.get( if rollback_result else None)"success", False)
+            return rollback_result.get("success", False)
 
         except Exception as e:
-            (logger.error( if logger else None)f"Rollback failed for step {step.step_id}: {e}")
+            logger.error(f"Rollback failed for step {step.step_id}: {e}")
             return False
 
     def _resolve_variables(
@@ -228,21 +220,20 @@ class APICallAction(WorkflowAction):
 
         resolved = {}
 
-        for key, value in (config.items( if config else None)):
+        for key, value in config.items():
             if (
                 isinstance(value, str)
-                and (value.startswith( if value else None)"${")
-                and (value.endswith( if value else None)"}")
+                and value.startswith("${")
+                and value.endswith("}")
             ):
                 var_name = value[2:-1]
-                resolved[key] = (context.get( if context else None)var_name, value)
+                resolved[key] = context.get(var_name, value)
             elif isinstance(value, dict):
-                resolved[key] = (self._resolve_variables( if self else None)value, context)
+                resolved[key] = self._resolve_variables(value, context)
             else:
                 resolved[key] = value
 
         return resolved
-
 
 class NotificationAction(WorkflowAction):
     """Notification workflow action"""
@@ -254,11 +245,11 @@ class NotificationAction(WorkflowAction):
 
         config = step.config
 
-        message_id = await (notification_manager.send_from_template( if notification_manager else None)
+        message_id = await notification_manager.send_from_template(
             template_name=config["template_name"],
             webhook_url=config["webhook_url"],
             context=context,
-            priority=(config.get( if config else None)"priority", "normal"),
+            priority=config.get("priority", "normal"),
         )
 
         return {"success": True, "message_id": message_id, "notification_sent": True}
@@ -266,7 +257,6 @@ class NotificationAction(WorkflowAction):
     async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
         """Rollback notification (no-op for notifications)"""
         return True
-
 
 class FashionAnalysisAction(WorkflowAction):
     """Fashion analysis workflow action"""
@@ -277,23 +267,23 @@ class FashionAnalysisAction(WorkflowAction):
         """Perform fashion analysis"""
 
         config = step.config
-        analysis_type = (config.get( if config else None)"analysis_type", "context")
+        analysis_type = config.get("analysis_type", "context")
 
         if analysis_type == "context":
-            text = (config.get( if config else None)"text") or (context.get( if context else None)"text", "")
-            result = await (fashion_intelligence.analyze_fashion_context( if fashion_intelligence else None)text)
+            text = config.get("text") or context.get("text", "")
+            result = await fashion_intelligence.analyze_fashion_context(text)
 
         elif analysis_type == "trends":
-            result = await (fashion_intelligence.get_trend_recommendations( if fashion_intelligence else None)
-                category=(config.get( if config else None)"category"),
-                season=(config.get( if config else None)"season"),
-                target_demographic=(config.get( if config else None)"target_demographic"),
-                sustainability_focus=(config.get( if config else None)"sustainability_focus", False),
+            result = await fashion_intelligence.get_trend_recommendations(
+                category=config.get("category"),
+                season=config.get("season"),
+                target_demographic=config.get("target_demographic"),
+                sustainability_focus=config.get("sustainability_focus", False),
             )
 
         elif analysis_type == "market_intelligence":
-            result = await (fashion_intelligence.get_market_intelligence( if fashion_intelligence else None)
-                region=(config.get( if config else None)"region", "global"), segment=(config.get( if config else None)"segment")
+            result = await fashion_intelligence.get_market_intelligence(
+                region=config.get("region", "global"), segment=config.get("segment")
             )
 
         else:
@@ -308,7 +298,6 @@ class FashionAnalysisAction(WorkflowAction):
     async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
         """Rollback fashion analysis (no-op for analysis)"""
         return True
-
 
 class ConditionAction(WorkflowAction):
     """Conditional logic workflow action"""
@@ -440,7 +429,6 @@ class ConditionAction(WorkflowAction):
         else:
             raise ValueError(f"Node type {type(node)} not allowed")
 
-
 class WorkflowEngine:
     """Main workflow automation engine"""
 
@@ -464,17 +452,17 @@ class WorkflowEngine:
             "failed_workflows": 0,
             "average_execution_time": 0.0,
             "workflows_by_trigger": {},
-            "last_updated": (datetime.now( if datetime else None)),
+            "last_updated": datetime.now(),
         }
 
-        (logger.info( if logger else None)"Workflow Engine initialized")
+        logger.info("Workflow Engine initialized")
 
     async def register_workflow(self, workflow: Workflow) -> bool:
         """Register a new workflow"""
 
         try:
             # Validate workflow
-            if not (self._validate_workflow( if self else None)workflow):
+            if not self._validate_workflow(workflow):
                 return False
 
             # Store workflow
@@ -485,23 +473,23 @@ class WorkflowEngine:
 
             # Cache in Redis
             cache_key = f"workflow:{workflow.workflow_id}"
-            await (redis_manager.set( if redis_manager else None)
-                cache_key, (workflow.to_dict( if workflow else None)), ttl=86400, prefix="workflows"  # 24 hours
+            await redis_manager.set(
+                cache_key, workflow.to_dict(), ttl=86400, prefix="workflows"  # 24 hours
             )
 
-            (logger.info( if logger else None)f"Registered workflow: {workflow.name}")
+            logger.info(f"Registered workflow: {workflow.name}")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Error registering workflow {workflow.workflow_id}: {e}")
+            logger.error(f"Error registering workflow {workflow.workflow_id}: {e}")
             return False
 
     def _validate_workflow(self, workflow: Workflow) -> bool:
         """Validate workflow configuration"""
 
         # Check for circular dependencies
-        if (self._has_circular_dependencies( if self else None)workflow.steps):
-            (logger.error( if logger else None)
+        if self._has_circular_dependencies(workflow.steps):
+            logger.error(
                 f"Circular dependencies detected in workflow {workflow.workflow_id}"
             )
             return False
@@ -509,7 +497,7 @@ class WorkflowEngine:
         # Validate step configurations
         for step in workflow.steps:
             if step.action_type not in self.actions:
-                (logger.error( if logger else None)f"Unknown action type: {step.action_type}")
+                logger.error(f"Unknown action type: {step.action_type}")
                 return False
 
         return True
@@ -527,8 +515,8 @@ class WorkflowEngine:
             if step_id in visited:
                 return False
 
-            (visited.add( if visited else None)step_id)
-            (rec_stack.add( if rec_stack else None)step_id)
+            visited.add(step_id)
+            rec_stack.add(step_id)
 
             # Find step by ID
             step = next((s for s in steps if s.step_id == step_id), None)
@@ -537,7 +525,7 @@ class WorkflowEngine:
                     if has_cycle(dep):
                         return True
 
-            (rec_stack.remove( if rec_stack else None)step_id)
+            rec_stack.remove(step_id)
             return False
 
         for step in steps:
@@ -556,23 +544,23 @@ class WorkflowEngine:
             raise ValueError(f"Workflow not found: {workflow_id}")
 
         workflow = self.workflows[workflow_id]
-        execution_id = str((uuid.uuid4( if uuid else None)))
+        execution_id = str(uuid.uuid4())
 
         # Create execution context
         context = {
             "execution_id": execution_id,
             "workflow_id": workflow_id,
             "trigger_data": trigger_data or {},
-            "variables": workflow.(variables.copy( if variables else None)),
-            "start_time": (datetime.now( if datetime else None)),
+            "variables": workflow.variables.copy(),
+            "start_time": datetime.now(),
         }
 
         # Start workflow execution
-        task = (asyncio.create_task( if asyncio else None)(self._execute_workflow( if self else None)workflow, context))
+        task = asyncio.create_task(self._execute_workflow(workflow, context))
 
         self.running_workflows[execution_id] = task
 
-        (logger.info( if logger else None)
+        logger.info(
             f"Triggered workflow {workflow.name} with execution ID: {execution_id}"
         )
         return execution_id
@@ -583,14 +571,14 @@ class WorkflowEngine:
         """Execute workflow with all steps"""
 
         execution_id = context["execution_id"]
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             workflow.status = WorkflowStatus.RUNNING
-            workflow.started_at = (datetime.now( if datetime else None))
+            workflow.started_at = datetime.now()
 
             # Log workflow start
-            await (self._log_workflow_event( if self else None)workflow, "started", context)
+            await self._log_workflow_event(workflow, "started", context)
 
             # Execute steps in dependency order
             executed_steps = set()
@@ -615,28 +603,28 @@ class WorkflowEngine:
                 # Execute ready steps (can be parallel)
                 step_tasks = []
                 for step in ready_steps:
-                    task = (asyncio.create_task( if asyncio else None)
-                        (self._execute_step( if self else None)step, context, step_results)
+                    task = asyncio.create_task(
+                        self._execute_step(step, context, step_results)
                     )
-                    (step_tasks.append( if step_tasks else None)(step, task))
+                    step_tasks.append((step, task))
 
                 # Wait for all steps to complete
                 for step, task in step_tasks:
                     try:
                         result = await task
                         step_results[step.step_id] = result
-                        (executed_steps.add( if executed_steps else None)step.step_id)
+                        executed_steps.add(step.step_id)
 
                         # Update context with step result
                         context[f"step_{step.step_id}_result"] = result
 
                     except Exception as e:
-                        (logger.error( if logger else None)f"Step {step.step_id} failed: {e}")
+                        logger.error(f"Step {step.step_id} failed: {e}")
 
                         # Handle step failure
                         if step.retry_count < step.max_retries:
                             step.retry_count += 1
-                            (logger.info( if logger else None)
+                            logger.info(
                                 f"Retrying step {step.step_id} (attempt {step.retry_count})"
                             )
                             # Remove from executed_steps to retry
@@ -647,7 +635,7 @@ class WorkflowEngine:
                             step.error_message = str(e)
 
                             # Rollback workflow
-                            await (self._rollback_workflow( if self else None)
+                            await self._rollback_workflow(
                                 workflow, executed_steps, context
                             )
 
@@ -656,16 +644,16 @@ class WorkflowEngine:
 
             # All steps completed successfully
             workflow.status = WorkflowStatus.SUCCESS
-            workflow.completed_at = (datetime.now( if datetime else None))
-            workflow.execution_time = (time.time( if time else None)) - start_time
+            workflow.completed_at = datetime.now()
+            workflow.execution_time = time.time() - start_time
 
             # Update metrics
-            await (self._update_metrics( if self else None)workflow, True)
+            await self._update_metrics(workflow, True)
 
             # Log workflow completion
-            await (self._log_workflow_event( if self else None)workflow, "completed", context)
+            await self._log_workflow_event(workflow, "completed", context)
 
-            (logger.info( if logger else None)f"Workflow {workflow.name} completed successfully")
+            logger.info(f"Workflow {workflow.name} completed successfully")
 
             return {
                 "success": True,
@@ -676,16 +664,16 @@ class WorkflowEngine:
 
         except Exception as e:
             workflow.status = WorkflowStatus.FAILED
-            workflow.completed_at = (datetime.now( if datetime else None))
-            workflow.execution_time = (time.time( if time else None)) - start_time
+            workflow.completed_at = datetime.now()
+            workflow.execution_time = time.time() - start_time
 
             # Update metrics
-            await (self._update_metrics( if self else None)workflow, False)
+            await self._update_metrics(workflow, False)
 
             # Log workflow failure
-            await (self._log_workflow_event( if self else None)workflow, "failed", context, str(e))
+            await self._log_workflow_event(workflow, "failed", context, str(e))
 
-            (logger.error( if logger else None)f"Workflow {workflow.name} failed: {e}")
+            logger.error(f"Workflow {workflow.name} failed: {e}")
 
             return {
                 "success": False,
@@ -705,36 +693,36 @@ class WorkflowEngine:
         """Execute individual workflow step"""
 
         step.status = StepStatus.RUNNING
-        step.started_at = (datetime.now( if datetime else None))
+        step.started_at = datetime.now()
 
         try:
             # Get action handler
-            action = self.(actions.get( if actions else None)step.action_type)
+            action = self.actions.get(step.action_type)
             if not action:
                 raise Exception(f"No action handler for type: {step.action_type}")
 
             # Execute action with timeout
-            result = await (asyncio.wait_for( if asyncio else None)
-                (action.execute( if action else None)step, context), timeout=step.timeout
+            result = await asyncio.wait_for(
+                action.execute(step, context), timeout=step.timeout
             )
 
             step.status = StepStatus.SUCCESS
-            step.completed_at = (datetime.now( if datetime else None))
+            step.completed_at = datetime.now()
             step.result = result
 
-            (logger.info( if logger else None)f"Step {step.name} completed successfully")
+            logger.info(f"Step {step.name} completed successfully")
             return result
 
         except asyncio.TimeoutError:
             step.status = StepStatus.FAILED
             step.error_message = f"Step timed out after {step.timeout} seconds"
-            step.completed_at = (datetime.now( if datetime else None))
+            step.completed_at = datetime.now()
             raise Exception(step.error_message)
 
         except Exception as e:
             step.status = StepStatus.FAILED
             step.error_message = str(e)
-            step.completed_at = (datetime.now( if datetime else None))
+            step.completed_at = datetime.now()
             raise e
 
     async def _rollback_workflow(
@@ -742,7 +730,7 @@ class WorkflowEngine:
     ):
         """Rollback executed workflow steps"""
 
-        (logger.info( if logger else None)f"Rolling back workflow {workflow.name}")
+        logger.info(f"Rolling back workflow {workflow.name}")
 
         # Rollback steps in reverse order
         rollback_steps = [
@@ -753,17 +741,17 @@ class WorkflowEngine:
 
         for step in rollback_steps:
             try:
-                action = self.(actions.get( if actions else None)step.action_type)
+                action = self.actions.get(step.action_type)
                 if action:
-                    success = await (action.rollback( if action else None)step, context)
+                    success = await action.rollback(step, context)
                     if success:
                         step.status = StepStatus.ROLLED_BACK
-                        (logger.info( if logger else None)f"Rolled back step {step.name}")
+                        logger.info(f"Rolled back step {step.name}")
                     else:
-                        (logger.error( if logger else None)f"Failed to rollback step {step.name}")
+                        logger.error(f"Failed to rollback step {step.name}")
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error rolling back step {step.name}: {e}")
+                logger.error(f"Error rolling back step {step.name}: {e}")
 
         workflow.status = WorkflowStatus.ROLLED_BACK
 
@@ -783,7 +771,7 @@ class WorkflowEngine:
                 "execution_id": context["execution_id"],
                 "event_type": event_type,
                 "status": workflow.status.value,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "execution_time": workflow.execution_time,
                 "fashion_context": workflow.fashion_context,
                 "trigger_type": workflow.trigger.trigger_type.value,
@@ -791,10 +779,10 @@ class WorkflowEngine:
                 "error_message": error_message,
             }
 
-            await (elasticsearch_manager.index_document( if elasticsearch_manager else None)"analytics", log_data)
+            await elasticsearch_manager.index_document("analytics", log_data)
 
         except Exception as e:
-            (logger.error( if logger else None)f"Error logging workflow event: {e}")
+            logger.error(f"Error logging workflow event: {e}")
 
     async def _update_metrics(self, workflow: Workflow, success: bool):
         """Update workflow execution metrics"""
@@ -822,7 +810,7 @@ class WorkflowEngine:
             self.metrics["workflows_by_trigger"][trigger_type] = 0
         self.metrics["workflows_by_trigger"][trigger_type] += 1
 
-        self.metrics["last_updated"] = (datetime.now( if datetime else None))
+        self.metrics["last_updated"] = datetime.now()
 
     async def get_workflow_status(self, execution_id: str) -> Dict[str, Any]:
         """Get workflow execution status"""
@@ -832,7 +820,7 @@ class WorkflowEngine:
             return {
                 "execution_id": execution_id,
                 "status": "running",
-                "done": (task.done( if task else None)),
+                "done": task.done(),
             }
 
         # Check completed workflows in cache/database
@@ -847,14 +835,14 @@ class WorkflowEngine:
             "registered_workflows": len(self.workflows),
             "registered_triggers": len(self.triggers),
             "running_workflows": len(self.running_workflows),
-            "available_actions": list(self.(actions.keys( if actions else None))),
+            "available_actions": list(self.actions.keys()),
         }
 
     async def health_check(self) -> Dict[str, Any]:
         """Health check for workflow engine"""
 
         try:
-            metrics = await (self.get_metrics( if self else None))
+            metrics = await self.get_metrics()
 
             # Calculate success rate
             total = self.metrics["total_workflows"]
@@ -868,8 +856,8 @@ class WorkflowEngine:
                 "running_workflows": len(self.running_workflows),
                 "success_rate": success_rate,
                 "average_execution_time": self.metrics["average_execution_time"],
-                "fashion_workflows": len(
-                    [w for w in self.(workflows.values( if workflows else None)) if w.fashion_context]
+                "fashion_workflows": len()
+                    [w for w in self.workflows.values() if w.fashion_context]
                 ),
                 "metrics": metrics,
             }
@@ -877,6 +865,277 @@ class WorkflowEngine:
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
 
+class VideoGenerationWorkflowEngine(WorkflowEngine):
+    """
+    Extended workflow engine with video generation capabilities.
+    Integrates with FashionComputerVisionAgent and SkyRoseBrandTrainer.
+    """
 
-# Global workflow engine instance
-workflow_engine = WorkflowEngine()
+    def __init__(self):
+        super().__init__()
+
+        # Import video generation modules
+        try:
+            from agent.modules.frontend.fashion_computer_vision_agent import fashion_vision_agent
+            from agent.modules.backend.brand_model_trainer import brand_trainer
+
+            self.fashion_vision_agent = fashion_vision_agent
+            self.brand_trainer = brand_trainer
+
+            # Register video generation actions
+            self._register_video_actions()
+
+            logger.info("✅ Video Generation Workflow Engine initialized")
+
+        except ImportError as e:
+            logger.warning(f"⚠️ Video generation modules not available: {e}")
+            self.fashion_vision_agent = None
+            self.brand_trainer = None
+
+    def _register_video_actions(self):
+        """Register video generation workflow actions."""
+
+        # Fashion runway video generation
+        self.register_action(
+            ActionType.VIDEO_GENERATION,
+            "generate_runway_video",
+            self._generate_runway_video_action
+        )
+
+        # Product 360° video generation
+        self.register_action(
+            ActionType.VIDEO_GENERATION,
+            "generate_product_360",
+            self._generate_product_360_action
+        )
+
+        # Brand model training
+        self.register_action(
+            ActionType.BRAND_MODEL_TRAINING,
+            "train_brand_model",
+            self._train_brand_model_action
+        )
+
+        # Brand-specific image generation
+        self.register_action(
+            ActionType.IMAGE_GENERATION,
+            "generate_brand_image",
+            self._generate_brand_image_action
+        )
+
+        # Video upscaling
+        self.register_action(
+            ActionType.VIDEO_GENERATION,
+            "upscale_video",
+            self._upscale_video_action
+        )
+
+    async def _generate_runway_video_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Workflow action for generating fashion runway videos."""
+        try:
+            if not self.fashion_vision_agent:
+                return {"error": "Fashion vision agent not available", "status": "failed"}
+
+            prompt = context.get("prompt", "luxury fashion runway")
+            duration = context.get("duration", 4)
+            fps = context.get("fps", 8)
+            width = context.get("width", 1024)
+            height = context.get("height", 576)
+            style = context.get("style", "luxury fashion runway")
+            upscale = context.get("upscale", True)
+
+            logger.info(f"🎬 Workflow: Generating runway video - {prompt}")
+
+            result = await self.fashion_vision_agent.generate_fashion_runway_video(
+                prompt=prompt,
+                duration=duration,
+                fps=fps,
+                width=width,
+                height=height,
+                style=style,
+                upscale=upscale
+            )
+
+            if result.get("success"):
+                # Log successful generation
+                await self._log_video_generation(
+                    "runway_video",
+                    result.get("video_path"),
+                    context
+                )
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Runway video generation workflow failed: {e}")
+            return {"error": str(e), "status": "failed"}
+
+    async def _generate_product_360_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Workflow action for generating product 360° videos."""
+        try:
+            if not self.fashion_vision_agent:
+                return {"error": "Fashion vision agent not available", "status": "failed"}
+
+            product_image_path = context.get("product_image_path")
+            if not product_image_path:
+                return {"error": "Product image path required", "status": "failed"}
+
+            rotation_steps = context.get("rotation_steps", 24)
+            duration = context.get("duration", 3)
+            upscale = context.get("upscale", True)
+
+            logger.info(f"🔄 Workflow: Generating 360° video - {product_image_path}")
+
+            result = await self.fashion_vision_agent.generate_product_360_video(
+                product_image_path=product_image_path,
+                rotation_steps=rotation_steps,
+                duration=duration,
+                upscale=upscale
+            )
+
+            if result.get("success"):
+                await self._log_video_generation(
+                    "product_360",
+                    result.get("video_path"),
+                    context
+                )
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Product 360° video generation workflow failed: {e}")
+            return {"error": str(e), "status": "failed"}
+
+    async def _train_brand_model_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Workflow action for training brand models."""
+        try:
+            if not self.brand_trainer:
+                return {"error": "Brand trainer not available", "status": "failed"}
+
+            dataset_path = context.get("dataset_path")
+            model_name = context.get("model_name", "skyy_rose_v1")
+
+            if not dataset_path:
+                return {"error": "Dataset path required", "status": "failed"}
+
+            logger.info(f"🚀 Workflow: Training brand model - {model_name}")
+
+            result = await self.brand_trainer.train_lora_model(
+                dataset_path=dataset_path,
+                model_name=model_name
+            )
+
+            if result.get("success"):
+                await self._log_model_training(model_name, result, context)
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Brand model training workflow failed: {e}")
+            return {"error": str(e), "status": "failed"}
+
+    async def _generate_brand_image_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Workflow action for generating brand-specific images."""
+        try:
+            if not self.brand_trainer:
+                return {"error": "Brand trainer not available", "status": "failed"}
+
+            prompt = context.get("prompt", "luxury fashion item")
+            model_name = context.get("model_name", "skyy_rose_v1")
+            trigger_word = context.get("trigger_word", "skyrose_collection")
+            width = context.get("width", 1024)
+            height = context.get("height", 1024)
+
+            logger.info(f"🎨 Workflow: Generating brand image - {model_name}")
+
+            result = await self.brand_trainer.generate_with_brand_model(
+                prompt=prompt,
+                model_name=model_name,
+                trigger_word=trigger_word,
+                width=width,
+                height=height
+            )
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Brand image generation workflow failed: {e}")
+            return {"error": str(e), "status": "failed"}
+
+    async def _upscale_video_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Workflow action for upscaling videos."""
+        try:
+            if not self.fashion_vision_agent:
+                return {"error": "Fashion vision agent not available", "status": "failed"}
+
+            video_path = context.get("video_path")
+            if not video_path:
+                return {"error": "Video path required", "status": "failed"}
+
+            target_resolution = context.get("target_resolution", (2048, 1152))
+
+            logger.info(f"⬆️ Workflow: Upscaling video - {video_path}")
+
+            result = await self.fashion_vision_agent.upscale_video(
+                video_path=video_path,
+                target_resolution=target_resolution
+            )
+
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ Video upscaling workflow failed: {e}")
+            return {"error": str(e), "status": "failed"}
+
+    async def _log_video_generation(self, video_type: str, video_path: str, context: Dict[str, Any]):
+        """Log video generation for monitoring and analytics."""
+        try:
+            log_data = {
+                "event_type": "video_generation",
+                "video_type": video_type,
+                "video_path": video_path,
+                "context": context,
+                "timestamp": datetime.now().isoformat(),
+                "workflow_id": context.get("workflow_id"),
+                "execution_id": context.get("execution_id")
+            }
+
+            # Log to Elasticsearch if available
+            if hasattr(self, 'elasticsearch_manager') and self.elasticsearch_manager:
+                await self.elasticsearch_manager.index_document(
+                    index="video_generation_logs",
+                    document=log_data
+                )
+
+            logger.info(f"📊 Video generation logged: {video_type} - {video_path}")
+
+        except Exception as e:
+            logger.warning(f"Failed to log video generation: {e}")
+
+    async def _log_model_training(self, model_name: str, result: Dict[str, Any], context: Dict[str, Any]):
+        """Log model training for monitoring and analytics."""
+        try:
+            log_data = {
+                "event_type": "model_training",
+                "model_name": model_name,
+                "training_result": result,
+                "context": context,
+                "timestamp": datetime.now().isoformat(),
+                "workflow_id": context.get("workflow_id"),
+                "execution_id": context.get("execution_id")
+            }
+
+            # Log to Elasticsearch if available
+            if hasattr(self, 'elasticsearch_manager') and self.elasticsearch_manager:
+                await self.elasticsearch_manager.index_document(
+                    index="model_training_logs",
+                    document=log_data
+                )
+
+            logger.info(f"📊 Model training logged: {model_name}")
+
+        except Exception as e:
+            logger.warning(f"Failed to log model training: {e}")
+
+# Global workflow engine instance with video generation capabilities
+workflow_engine = VideoGenerationWorkflowEngine()

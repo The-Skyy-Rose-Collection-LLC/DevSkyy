@@ -5,20 +5,17 @@ from datetime import datetime
 from typing import Any, Dict, List
 import logging
 
-
 # Import the server access module
 try:
-except ImportError:
+    except ImportError:
     try:
     except ImportError:
         # Fallback if module not available
         def create_wordpress_server_access():
-            (logger.warning( if logger else None)"WordPress server access not available")
+            logger.warning("WordPress server access not available")
             return None
 
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class EnhancedBrandIntelligenceAgent:
     """
@@ -47,7 +44,7 @@ class EnhancedBrandIntelligenceAgent:
         self.insights_discovered = 0
         self.last_learning_cycle = None
 
-        (logger.info( if logger else None)
+        logger.info(
             "🧠 Enhanced Brand Intelligence Agent initialized - GOD MODE Level 2"
         )
 
@@ -57,15 +54,15 @@ class EnhancedBrandIntelligenceAgent:
             self.server_access = create_wordpress_server_access()
 
             # Connect to server
-            connection_result = await self.(server_access.connect_server_access( if server_access else None))
+            connection_result = await self.server_access.connect_server_access()
 
-            if (connection_result.get( if connection_result else None)"status") == "connected":
+            if connection_result.get("status") == "connected":
                 # Start comprehensive brand analysis
-                brand_analysis = await (self._comprehensive_brand_analysis( if self else None))
+                brand_analysis = await self._comprehensive_brand_analysis()
 
                 self.learning_confidence = 95
-                self.insights_discovered = len((brand_analysis.get( if brand_analysis else None)"insights", []))
-                self.last_learning_cycle = (datetime.now( if datetime else None))
+                self.insights_discovered = len(brand_analysis.get("insights", []))
+                self.last_learning_cycle = datetime.now()
 
                 return {
                     "server_access_established": True,
@@ -88,11 +85,11 @@ class EnhancedBrandIntelligenceAgent:
                 return {
                     "server_access_established": False,
                     "fallback_mode": "REST_API_analysis",
-                    "error": (connection_result.get( if connection_result else None)"error", "Unknown"),
+                    "error": connection_result.get("error", "Unknown"),
                 }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Server learning initialization failed: {str(e)}")
+            logger.error(f"Server learning initialization failed: {str(e)}")
             return {"server_access_established": False, "error": str(e)}
 
     async def _comprehensive_brand_analysis(self) -> Dict[str, Any]:
@@ -111,34 +108,34 @@ class EnhancedBrandIntelligenceAgent:
                 brand_intel = self.server_access.brand_intelligence
 
                 # Analyze brand DNA
-                analysis_results["brand_dna"] = await (self._analyze_brand_dna( if self else None)
+                analysis_results["brand_dna"] = await self._analyze_brand_dna(
                     brand_intel
                 )
 
                 # Analyze visual identity
                 analysis_results["visual_identity"] = (
-                    await (self._analyze_visual_identity( if self else None)brand_intel)
+                    await self._analyze_visual_identity(brand_intel)
                 )
 
                 # Analyze content strategy
                 analysis_results["content_strategy"] = (
-                    await (self._analyze_content_strategy( if self else None)brand_intel)
+                    await self._analyze_content_strategy(brand_intel)
                 )
 
                 # Analyze technical excellence
                 analysis_results["technical_excellence"] = (
-                    await (self._analyze_technical_excellence( if self else None)brand_intel)
+                    await self._analyze_technical_excellence(brand_intel)
                 )
 
                 # Generate insights
-                analysis_results["insights"] = await (self._generate_brand_insights( if self else None)
+                analysis_results["insights"] = await self._generate_brand_insights(
                     analysis_results
                 )
 
             return analysis_results
 
         except Exception as e:
-            (logger.error( if logger else None)f"Comprehensive brand analysis failed: {str(e)}")
+            logger.error(f"Comprehensive brand analysis failed: {str(e)}")
             return {"error": str(e)}
 
     async def _analyze_brand_dna(self, brand_intel: Dict[str, Any]) -> Dict[str, Any]:
@@ -153,11 +150,11 @@ class EnhancedBrandIntelligenceAgent:
             }
 
             # Extract insights from content patterns
-            content_patterns = (brand_intel.get( if brand_intel else None)"content_patterns", {})
+            content_patterns = brand_intel.get("content_patterns", {})
 
             if content_patterns:
-                luxury_keywords = (content_patterns.get( if content_patterns else None)"luxury_keywords", 0)
-                streetwear_terms = (content_patterns.get( if content_patterns else None)"streetwear_terms", 0)
+                luxury_keywords = content_patterns.get("luxury_keywords", 0)
+                streetwear_terms = content_patterns.get("streetwear_terms", 0)
 
                 if luxury_keywords > streetwear_terms:
                     brand_dna["primary_theme"] = "luxury_dominant"
@@ -191,7 +188,7 @@ class EnhancedBrandIntelligenceAgent:
             return brand_dna
 
         except Exception as e:
-            (logger.error( if logger else None)f"Brand DNA analysis failed: {str(e)}")
+            logger.error(f"Brand DNA analysis failed: {str(e)}")
             return {"error": str(e)}
 
     async def _analyze_visual_identity(
@@ -208,11 +205,11 @@ class EnhancedBrandIntelligenceAgent:
             }
 
             # Analyze brand assets
-            brand_assets = (brand_intel.get( if brand_intel else None)"brand_assets", {})
+            brand_assets = brand_intel.get("brand_assets", {})
 
             if brand_assets:
-                logos_found = (brand_assets.get( if brand_assets else None)"logos_found", [])
-                brand_images = (brand_assets.get( if brand_assets else None)"brand_images", [])
+                logos_found = brand_assets.get("logos_found", [])
+                brand_images = brand_assets.get("brand_images", [])
 
                 if len(logos_found) > 0:
                     visual_identity["logo_variants"] = len(logos_found)
@@ -223,10 +220,10 @@ class EnhancedBrandIntelligenceAgent:
                     visual_identity["brand_consistency"] = "excellent"
 
                 # Determine design style based on file analysis
-                if any("signature" in (logo.lower( if logo else None)) for logo in logos_found):
+                if any("signature" in logo.lower() for logo in logos_found):
                     visual_identity["design_style"] = "luxury_signature"
                 if any(
-                    "love" in (logo.lower( if logo else None)) or "hurts" in (logo.lower( if logo else None))
+                    "love" in logo.lower() or "hurts" in logo.lower()
                     for logo in logos_found
                 ):
                     visual_identity["collections"] = [
@@ -237,7 +234,7 @@ class EnhancedBrandIntelligenceAgent:
             return visual_identity
 
         except Exception as e:
-            (logger.error( if logger else None)f"Visual identity analysis failed: {str(e)}")
+            logger.error(f"Visual identity analysis failed: {str(e)}")
             return {"error": str(e)}
 
     async def _analyze_content_strategy(
@@ -254,7 +251,7 @@ class EnhancedBrandIntelligenceAgent:
             }
 
             # Analyze file structure for content insights
-            file_structure = (brand_intel.get( if brand_intel else None)"file_structure", {})
+            file_structure = brand_intel.get("file_structure", {})
 
             if file_structure:
                 # Check for content organization
@@ -263,15 +260,15 @@ class EnhancedBrandIntelligenceAgent:
                     content_themes = []
 
                     for directory in brand_dirs:
-                        dir_name = (directory.get( if directory else None)"directory", "")
-                        brand_files = (directory.get( if directory else None)"brand_files", [])
+                        dir_name = directory.get("directory", "")
+                        brand_files = directory.get("brand_files", [])
 
                         if "uploads" in dir_name and brand_files:
-                            (content_themes.append( if content_themes else None)"visual_storytelling")
-                        if any("blog" in (f.lower( if f else None)) for f in brand_files):
-                            (content_themes.append( if content_themes else None)"editorial_content")
-                        if any("product" in (f.lower( if f else None)) for f in brand_files):
-                            (content_themes.append( if content_themes else None)"product_showcase")
+                            content_themes.append("visual_storytelling")
+                        if any("blog" in f.lower() for f in brand_files):
+                            content_themes.append("editorial_content")
+                        if any("product" in f.lower() for f in brand_files):
+                            content_themes.append("product_showcase")
 
                     content_strategy["content_themes"] = content_themes
 
@@ -282,7 +279,7 @@ class EnhancedBrandIntelligenceAgent:
             return content_strategy
 
         except Exception as e:
-            (logger.error( if logger else None)f"Content strategy analysis failed: {str(e)}")
+            logger.error(f"Content strategy analysis failed: {str(e)}")
             return {"error": str(e)}
 
     async def _analyze_technical_excellence(
@@ -299,10 +296,10 @@ class EnhancedBrandIntelligenceAgent:
             }
 
             # Analyze performance metrics
-            performance_metrics = (brand_intel.get( if brand_intel else None)"performance_metrics", {})
+            performance_metrics = brand_intel.get("performance_metrics", {})
 
             if performance_metrics:
-                overall_score = (performance_metrics.get( if performance_metrics else None)"overall_score", 0)
+                overall_score = performance_metrics.get("overall_score", 0)
 
                 if overall_score >= 90:
                     technical_excellence["site_performance"] = "exceptional"
@@ -314,7 +311,7 @@ class EnhancedBrandIntelligenceAgent:
                     technical_excellence["site_performance"] = "needs_improvement"
 
                 # Check for optimization opportunities
-                optimization_ops = (performance_metrics.get( if performance_metrics else None)
+                optimization_ops = performance_metrics.get(
                     "optimization_opportunities", []
                 )
                 if len(optimization_ops) == 0:
@@ -327,7 +324,7 @@ class EnhancedBrandIntelligenceAgent:
             return technical_excellence
 
         except Exception as e:
-            (logger.error( if logger else None)f"Technical excellence analysis failed: {str(e)}")
+            logger.error(f"Technical excellence analysis failed: {str(e)}")
             return {"error": str(e)}
 
     async def _generate_brand_insights(
@@ -338,9 +335,9 @@ class EnhancedBrandIntelligenceAgent:
             insights = []
 
             # Brand DNA insights
-            brand_dna = (analysis_results.get( if analysis_results else None)"brand_dna", {})
-            if (brand_dna.get( if brand_dna else None)"primary_theme") == "luxury_streetwear_fusion":
-                (insights.append( if insights else None)
+            brand_dna = analysis_results.get("brand_dna", {})
+            if brand_dna.get("primary_theme") == "luxury_streetwear_fusion":
+                insights.append(
                     {
                         "category": "brand_positioning",
                         "insight": "Skyy Rose perfectly balances luxury sophistication with streetwear edge",
@@ -351,9 +348,9 @@ class EnhancedBrandIntelligenceAgent:
                 )
 
             # Visual identity insights
-            visual_identity = (analysis_results.get( if analysis_results else None)"visual_identity", {})
-            if (visual_identity.get( if visual_identity else None)"logo_presence") == "excellent":
-                (insights.append( if insights else None)
+            visual_identity = analysis_results.get("visual_identity", {})
+            if visual_identity.get("logo_presence") == "excellent":
+                insights.append(
                     {
                         "category": "visual_branding",
                         "insight": "Strong logo presence across multiple variants detected",
@@ -364,9 +361,9 @@ class EnhancedBrandIntelligenceAgent:
                 )
 
             # Content strategy insights
-            content_strategy = (analysis_results.get( if analysis_results else None)"content_strategy", {})
-            if "visual_storytelling" in (content_strategy.get( if content_strategy else None)"content_themes", []):
-                (insights.append( if insights else None)
+            content_strategy = analysis_results.get("content_strategy", {})
+            if "visual_storytelling" in content_strategy.get("content_themes", []):
+                insights.append(
                     {
                         "category": "content_excellence",
                         "insight": "Visual storytelling is a core strength of the brand",
@@ -377,9 +374,9 @@ class EnhancedBrandIntelligenceAgent:
                 )
 
             # Technical excellence insights
-            technical_excellence = (analysis_results.get( if analysis_results else None)"technical_excellence", {})
-            if (technical_excellence.get( if technical_excellence else None)"site_performance") == "exceptional":
-                (insights.append( if insights else None)
+            technical_excellence = analysis_results.get("technical_excellence", {})
+            if technical_excellence.get("site_performance") == "exceptional":
+                insights.append(
                     {
                         "category": "technical_leadership",
                         "insight": "Website performance exceeds industry standards",
@@ -392,7 +389,7 @@ class EnhancedBrandIntelligenceAgent:
             return insights
 
         except Exception as e:
-            (logger.error( if logger else None)f"Insight generation failed: {str(e)}")
+            logger.error(f"Insight generation failed: {str(e)}")
             return []
 
     async def continuous_brand_monitoring(self) -> Dict[str, Any]:
@@ -405,11 +402,11 @@ class EnhancedBrandIntelligenceAgent:
                 }
 
             # Perform continuous learning
-            learning_results = await self.(server_access.continuous_brand_learning( if server_access else None))
+            learning_results = await self.server_access.continuous_brand_learning()
 
             # Update brand knowledge
-            if (learning_results.get( if learning_results else None)"continuous_learning"):
-                self.last_learning_cycle = (datetime.now( if datetime else None))
+            if learning_results.get("continuous_learning"):
+                self.last_learning_cycle = datetime.now()
                 self.learning_confidence = min(self.learning_confidence + 1, 100)
 
             return {
@@ -417,16 +414,16 @@ class EnhancedBrandIntelligenceAgent:
                 "intelligence_level": "GOD_MODE_LEVEL_2",
                 "learning_confidence": self.learning_confidence,
                 "last_update": (
-                    self.(last_learning_cycle.isoformat( if last_learning_cycle else None))
+                    self.last_learning_cycle.isoformat()
                     if self.last_learning_cycle
                     else None
                 ),
-                "brand_evolution": (learning_results.get( if learning_results else None)"brand_evolution", {}),
+                "brand_evolution": learning_results.get("brand_evolution", {}),
                 "next_learning_cycle": "in_1_hour",
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Continuous monitoring failed: {str(e)}")
+            logger.error(f"Continuous monitoring failed: {str(e)}")
             return {"error": str(e)}
 
     async def generate_brand_strategy_recommendations(self) -> Dict[str, Any]:
@@ -475,12 +472,10 @@ class EnhancedBrandIntelligenceAgent:
             return recommendations
 
         except Exception as e:
-            (logger.error( if logger else None)f"Strategy recommendations failed: {str(e)}")
+            logger.error(f"Strategy recommendations failed: {str(e)}")
             return {"error": str(e)}
 
-
 # Factory function
-
 
 def create_enhanced_brand_intelligence_agent() -> EnhancedBrandIntelligenceAgent:
     """Create Enhanced Brand Intelligence Agent instance."""

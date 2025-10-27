@@ -16,8 +16,6 @@ Enterprise Structured Logging Configuration for DevSkyy Platform
 Correlation IDs, centralized error handling, and security event logging
 """
 
-
-
 # ============================================================================
 # CORRELATION ID MANAGEMENT
 # ============================================================================
@@ -25,55 +23,47 @@ Correlation IDs, centralized error handling, and security event logging
 # Context variable for correlation ID (thread-safe)
 correlation_id: ContextVar[Optional[str]] = ContextVar("correlation_id", default=None)
 
-
 def get_correlation_id() -> str:
     """Get current correlation ID or generate new one"""
-    current_id = (correlation_id.get( if correlation_id else None))
+    current_id = correlation_id.get()
     if not current_id:
-        current_id = str((uuid.uuid4( if uuid else None)))
-        (correlation_id.set( if correlation_id else None)current_id)
+        current_id = str(uuid.uuid4())
+        correlation_id.set(current_id)
     return current_id
-
 
 def set_correlation_id(request_id: str):
     """Set correlation ID for current context"""
-    (correlation_id.set( if correlation_id else None)request_id)
-
+    correlation_id.set(request_id)
 
 def clear_correlation_id():
     """Clear correlation ID from current context"""
-    (correlation_id.set( if correlation_id else None)None)
-
+    correlation_id.set(None)
 
 # ============================================================================
 # CUSTOM PROCESSORS
 # ============================================================================
-
 
 def add_correlation_id(logger, method_name, event_dict):
     """Add correlation ID to log entries"""
     event_dict["correlation_id"] = get_correlation_id()
     return event_dict
 
-
 def add_timestamp(logger, method_name, event_dict):
     """Add ISO timestamp to log entries"""
-    event_dict["timestamp"] = (datetime.utcnow( if datetime else None)).isoformat() + "Z"
+    event_dict["timestamp"] = datetime.utcnow().isoformat() + "Z"
     return event_dict
-
 
 def add_service_info(logger, method_name, event_dict):
     """Add service information to log entries"""
     event_dict["service"] = "devskyy-enterprise"
-    event_dict["version"] = (os.getenv( if os else None)"APP_VERSION", "5.1.0")
-    event_dict["environment"] = (os.getenv( if os else None)"ENVIRONMENT", "development")
+    event_dict["version"] = os.getenv("APP_VERSION", "5.1.0")
+    event_dict["environment"] = os.getenv("ENVIRONMENT", "development")
     return event_dict
-
 
 def add_security_context(logger, method_name, event_dict):
     """Add security context to log entries"""
     # Add security-related fields if available
-    if hasattr((event_dict.get( if event_dict else None)"request"), "state"):
+    if hasattr(event_dict.get("request"), "state"):
         request = event_dict["request"]
         if hasattr(request.state, "user_id"):
             event_dict["user_id"] = request.state.user_id
@@ -81,7 +71,6 @@ def add_security_context(logger, method_name, event_dict):
             event_dict["client_ip"] = request.state.client_ip
 
     return event_dict
-
 
 def sanitize_sensitive_data(logger, method_name, event_dict):
     """Sanitize sensitive data from log entries"""
@@ -92,31 +81,29 @@ def sanitize_sensitive_data(logger, method_name, event_dict):
             return {
                 k: (
                     "***REDACTED***"
-                    if any(field in (k.lower( if k else None)) for field in sensitive_fields)
+                    if any(field in k.lower() for field in sensitive_fields)
                     else sanitize_dict(v) if isinstance(v, (dict, list)) else v
                 )
-                for k, v in (data.items( if data else None))
+                for k, v in data.items()
             }
         elif isinstance(data, list):
             return [sanitize_dict(item) for item in data]
         return data
 
     # Sanitize the entire event dict
-    for key, value in (event_dict.items( if event_dict else None)):
+    for key, value in event_dict.items():
         if isinstance(value, (dict, list)):
             event_dict[key] = sanitize_dict(value)
         elif isinstance(value, str) and any(
-            field in (key.lower( if key else None)) for field in sensitive_fields
+            field in key.lower() for field in sensitive_fields
         ):
             event_dict[key] = "***REDACTED***"
 
     return event_dict
 
-
 # ============================================================================
 # CUSTOM FORMATTERS
 # ============================================================================
-
 
 class JSONFormatter(logging.Formatter):
     """Custom JSON formatter for structured logging"""
@@ -124,22 +111,22 @@ class JSONFormatter(logging.Formatter):
     def format(self, record):
         """Format log record as JSON"""
         log_entry = {
-            "timestamp": (datetime.utcnow( if datetime else None)).isoformat() + "Z",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": record.levelname,
             "logger": record.name,
-            "message": (record.getMessage( if record else None)),
+            "message": record.getMessage(),
             "correlation_id": get_correlation_id(),
             "service": "devskyy-enterprise",
-            "version": (os.getenv( if os else None)"APP_VERSION", "5.1.0"),
-            "environment": (os.getenv( if os else None)"ENVIRONMENT", "development"),
+            "version": os.getenv("APP_VERSION", "5.1.0"),
+            "environment": os.getenv("ENVIRONMENT", "development"),
         }
 
         # Add exception info if present
         if record.exc_info:
-            log_entry["exception"] = (self.formatException( if self else None)record.exc_info)
+            log_entry["exception"] = self.formatException(record.exc_info)
 
         # Add extra fields from record
-        for key, value in record.(__dict__.items( if __dict__ else None)):
+        for key, value in record.__dict__.items():
             if key not in [
                 "name",
                 "msg",
@@ -165,8 +152,7 @@ class JSONFormatter(logging.Formatter):
             ]:
                 log_entry[key] = value
 
-        return (json.dumps( if json else None)log_entry, default=str)
-
+        return json.dumps(log_entry, default=str)
 
 class SecurityFormatter(logging.Formatter):
     """Special formatter for security events"""
@@ -174,10 +160,10 @@ class SecurityFormatter(logging.Formatter):
     def format(self, record):
         """Format security log record"""
         log_entry = {
-            "timestamp": (datetime.utcnow( if datetime else None)).isoformat() + "Z",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
             "event_type": "security",
             "level": record.levelname,
-            "message": (record.getMessage( if record else None)),
+            "message": record.getMessage(),
             "correlation_id": get_correlation_id(),
             "service": "devskyy-enterprise",
             "security_category": getattr(record, "security_category", "general"),
@@ -189,38 +175,36 @@ class SecurityFormatter(logging.Formatter):
 
         # Add exception info if present
         if record.exc_info:
-            log_entry["exception"] = (self.formatException( if self else None)record.exc_info)
+            log_entry["exception"] = self.formatException(record.exc_info)
 
-        return (json.dumps( if json else None)log_entry, default=str)
-
+        return json.dumps(log_entry, default=str)
 
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
 
-
 def setup_logging():
     """Setup enterprise structured logging"""
 
     # Determine log level
-    log_level = (os.getenv( if os else None)"LOG_LEVEL", "INFO").upper()
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
     # Configure structlog
-    (structlog.configure( if structlog else None)
+    structlog.configure(
         processors=[
             structlog.stdlib.filter_by_level,
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
-            structlog.(stdlib.PositionalArgumentsFormatter( if stdlib else None)),
+            structlog.stdlib.PositionalArgumentsFormatter(),
             add_correlation_id,
             add_timestamp,
             add_service_info,
             add_security_context,
             sanitize_sensitive_data,
-            structlog.(processors.StackInfoRenderer( if processors else None)),
+            structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
-            structlog.(processors.UnicodeDecoder( if processors else None)),
-            structlog.(processors.JSONRenderer( if processors else None)),
+            structlog.processors.UnicodeDecoder(),
+            structlog.processors.JSONRenderer(),
         ],
         context_class=dict,
         logger_factory=LoggerFactory(),
@@ -247,7 +231,7 @@ def setup_logging():
             "console": {
                 "class": "logging.StreamHandler",
                 "formatter": (
-                    "console" if (os.getenv( if os else None)"ENVIRONMENT") == "development" else "json"
+                    "console" if os.getenv("ENVIRONMENT") == "development" else "json"
                 ),
                 "stream": sys.stdout,
             },
@@ -309,36 +293,34 @@ def setup_logging():
     }
 
     # Create logs directory if it doesn't exist
-    (os.makedirs( if os else None)"logs", exist_ok=True)
+    os.makedirs("logs", exist_ok=True)
 
     # Apply configuration
-    logging.(config.dictConfig( if config else None)logging_config)
+    logging.config.dictConfig(logging_config)
 
     # Get structured logger
-    logger = (structlog.get_logger( if structlog else None))
-    (logger.info( if logger else None)
+    logger = structlog.get_logger()
+    logger.info(
         "🚀 Structured logging initialized",
         log_level=log_level,
-        environment=(os.getenv( if os else None)"ENVIRONMENT", "development"),
+        environment=os.getenv("ENVIRONMENT", "development"),
     )
-
 
 # ============================================================================
 # SPECIALIZED LOGGERS
 # ============================================================================
 
-
 class SecurityLogger:
     """Specialized logger for security events"""
 
     def __init__(self):
-        self.logger = (logging.getLogger( if logging else None)"devskyy.security")
+        self.logger = logging.getLogger("devskyy.security")
 
     def log_authentication_event(
         self, event_type: str, user_id: str, client_ip: str, success: bool, **kwargs
     ):
         """Log authentication events"""
-        self.(logger.info( if logger else None)
+        self.logger.info(
             f"Authentication {event_type}: {'SUCCESS' if success else 'FAILED'}",
             extra={
                 "security_category": "authentication",
@@ -355,7 +337,7 @@ class SecurityLogger:
         self, user_id: str, resource: str, action: str, allowed: bool, **kwargs
     ):
         """Log authorization events"""
-        self.(logger.info( if logger else None)
+        self.logger.info(
             f"Authorization: {action} on {resource} {'ALLOWED' if allowed else 'DENIED'}",
             extra={
                 "security_category": "authorization",
@@ -377,7 +359,7 @@ class SecurityLogger:
         **kwargs,
     ):
         """Log security violations"""
-        self.(logger.warning( if logger else None)
+        self.logger.warning(
             f"Security violation: {violation_type}",
             extra={
                 "security_category": "violation",
@@ -398,7 +380,7 @@ class SecurityLogger:
         **kwargs,
     ):
         """Log data access events"""
-        self.(logger.info( if logger else None)
+        self.logger.info(
             f"Data access: {operation} on {table}",
             extra={
                 "security_category": "data_access",
@@ -411,16 +393,15 @@ class SecurityLogger:
             },
         )
 
-
 class ErrorLogger:
     """Specialized logger for error tracking"""
 
     def __init__(self):
-        self.logger = (logging.getLogger( if logging else None)"devskyy.error")
+        self.logger = logging.getLogger("devskyy.error")
 
     def log_application_error(self, error: Exception, context: Dict[str, Any] = None):
         """Log application errors with context"""
-        self.(logger.error( if logger else None)
+        self.logger.error(
             f"Application error: {str(error)}",
             exc_info=error,
             extra={
@@ -440,7 +421,7 @@ class ErrorLogger:
         user_id: str = None,
     ):
         """Log API errors"""
-        self.(logger.error( if logger else None)
+        self.logger.error(
             f"API error: {method} {endpoint} - {status_code}",
             exc_info=error,
             extra={
@@ -457,7 +438,7 @@ class ErrorLogger:
         self, operation: str, error: Exception, query: str = None, user_id: str = None
     ):
         """Log database errors"""
-        self.(logger.error( if logger else None)
+        self.logger.error(
             f"Database error: {operation}",
             exc_info=error,
             extra={
@@ -469,7 +450,6 @@ class ErrorLogger:
             },
         )
 
-
 # ============================================================================
 # GLOBAL LOGGER INSTANCES
 # ============================================================================
@@ -479,4 +459,4 @@ security_logger = SecurityLogger()
 error_logger = ErrorLogger()
 
 # Get structured logger
-structured_logger = (structlog.get_logger( if structlog else None))
+structured_logger = structlog.get_logger()

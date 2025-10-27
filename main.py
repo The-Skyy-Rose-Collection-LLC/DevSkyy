@@ -594,6 +594,49 @@ try:
 except ImportError as e:
     logger.warning(f"⚠️ Training data interface not available: {e}")
 
+# Import and initialize advanced features
+try:
+    from intelligence.multi_agent_orchestrator import multi_agent_orchestrator
+    from fashion.skyy_rose_3d_pipeline import skyy_rose_3d_pipeline
+
+    app.state.multi_agent_orchestrator = multi_agent_orchestrator
+    app.state.skyy_rose_3d_pipeline = skyy_rose_3d_pipeline
+
+    logger.info("✅ Advanced features initialized")
+
+except ImportError as e:
+    logger.warning(f"⚠️ Advanced features not available: {e}")
+
+# Import and initialize enterprise monitoring
+try:
+    from monitoring.enterprise_logging import enterprise_logger
+    from monitoring.enterprise_metrics import metrics_collector
+    from monitoring.incident_response import incident_response_system
+
+    app.state.enterprise_logger = enterprise_logger
+    app.state.metrics_collector = metrics_collector
+    app.state.incident_response_system = incident_response_system
+
+    logger.info("✅ Enterprise monitoring initialized")
+
+except ImportError as e:
+    logger.warning(f"⚠️ Enterprise monitoring not available: {e}")
+
+# Import and initialize enterprise monitoring
+try:
+    from monitoring.enterprise_logging import enterprise_logger
+    from monitoring.enterprise_metrics import metrics_collector
+    from monitoring.incident_response import incident_response_system
+
+    app.state.enterprise_logger = enterprise_logger
+    app.state.metrics_collector = metrics_collector
+    app.state.incident_response_system = incident_response_system
+
+    logger.info("✅ Enterprise monitoring initialized")
+
+except ImportError as e:
+    logger.warning(f"⚠️ Enterprise monitoring not available: {e}")
+
 # ============================================================================
 # METRICS AND MONITORING ENDPOINTS
 # ============================================================================
@@ -657,6 +700,218 @@ async def execute_agent_task(agent_type: str, agent_name: str, task_data: Dict[s
     except Exception as e:
         logger.error(f"Agent execution error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+# ============================================================================
+# ADVANCED FEATURE ENDPOINTS
+# ============================================================================
+
+@app.post("/api/v1/orchestration/multi-agent")
+async def execute_multi_agent_task(task_data: Dict[str, Any]):
+    """Execute task using multi-agent orchestration."""
+    try:
+        if not hasattr(app.state, 'multi_agent_orchestrator'):
+            raise HTTPException(status_code=503, detail="Multi-agent orchestrator not available")
+
+        from intelligence.multi_agent_orchestrator import TaskRequest, TaskType
+
+        # Create task request
+        task = TaskRequest(
+            task_id=f"multi_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            task_type=TaskType(task_data.get("task_type", "security_analysis")),
+            content=task_data.get("content", ""),
+            metadata=task_data.get("metadata", {}),
+            priority=task_data.get("priority", 1)
+        )
+
+        # Process task
+        result = await app.state.multi_agent_orchestrator.process_task(task)
+
+        return {
+            "task_id": result.task_id,
+            "provider": result.provider.value,
+            "result": result.result,
+            "processing_time": result.processing_time,
+            "success": result.success,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Multi-agent orchestration error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/3d/models/upload")
+async def upload_3d_model(
+    file_path: str,
+    model_format: str,
+    brand_context: Optional[str] = None
+):
+    """Upload and process a 3D model."""
+    try:
+        if not hasattr(app.state, 'skyy_rose_3d_pipeline'):
+            raise HTTPException(status_code=503, detail="3D pipeline not available")
+
+        from fashion.skyy_rose_3d_pipeline import ModelFormat
+
+        # Load and process model
+        model = await app.state.skyy_rose_3d_pipeline.load_3d_model(
+            file_path=file_path,
+            model_format=ModelFormat(model_format),
+            brand_context=brand_context
+        )
+
+        return {
+            "model_id": model.id,
+            "name": model.name,
+            "format": model.format.value,
+            "file_size": model.file_size,
+            "materials_count": len(model.materials),
+            "brand_tags": model.brand_tags,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"3D model upload error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/avatars/create")
+async def create_avatar(avatar_data: Dict[str, Any]):
+    """Create a new avatar."""
+    try:
+        if not hasattr(app.state, 'skyy_rose_3d_pipeline'):
+            raise HTTPException(status_code=503, detail="3D pipeline not available")
+
+        from fashion.skyy_rose_3d_pipeline import AvatarType
+
+        # Create avatar
+        avatar = await app.state.skyy_rose_3d_pipeline.create_avatar(
+            avatar_type=AvatarType(avatar_data.get("avatar_type", "ready_player_me")),
+            customization_options=avatar_data.get("customization_options", {}),
+            voice_settings=avatar_data.get("voice_settings")
+        )
+
+        return {
+            "avatar_id": avatar.id,
+            "name": avatar.name,
+            "avatar_type": avatar.avatar_type.value,
+            "model_path": avatar.model_path,
+            "animations": avatar.animations,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Avatar creation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/system/advanced-status")
+async def get_advanced_system_status():
+    """Get advanced system status including all new features."""
+    try:
+        status = {
+            "timestamp": datetime.now().isoformat(),
+            "multi_agent_orchestrator": None,
+            "3d_pipeline": None,
+            "advanced_features_available": False
+        }
+
+        # Multi-agent orchestrator status
+        if hasattr(app.state, 'multi_agent_orchestrator'):
+            status["multi_agent_orchestrator"] = app.state.multi_agent_orchestrator.get_system_status()
+            status["advanced_features_available"] = True
+
+        # 3D pipeline status
+        if hasattr(app.state, 'skyy_rose_3d_pipeline'):
+            status["3d_pipeline"] = app.state.skyy_rose_3d_pipeline.get_pipeline_status()
+            status["advanced_features_available"] = True
+
+        return status
+
+    except Exception as e:
+        logger.error(f"Advanced status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================================================
+# ENTERPRISE MONITORING ENDPOINTS
+# ============================================================================
+
+@app.get("/metrics")
+async def get_prometheus_metrics():
+    """Get Prometheus metrics."""
+    try:
+        if hasattr(app.state, 'metrics_collector'):
+            metrics_data = app.state.metrics_collector.get_prometheus_metrics()
+            return Response(content=metrics_data, media_type="text/plain")
+        else:
+            return Response(content="# Metrics collector not available\n", media_type="text/plain")
+    except Exception as e:
+        logger.error(f"Metrics endpoint error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/monitoring/status")
+async def get_monitoring_status():
+    """Get comprehensive monitoring system status."""
+    try:
+        status = {
+            "timestamp": datetime.now().isoformat(),
+            "monitoring_available": False,
+            "metrics": None,
+            "incidents": None,
+            "logging": None
+        }
+
+        # Metrics collector status
+        if hasattr(app.state, 'metrics_collector'):
+            status["metrics"] = app.state.metrics_collector.get_metrics_summary()
+            status["monitoring_available"] = True
+
+        # Incident response status
+        if hasattr(app.state, 'incident_response_system'):
+            status["incidents"] = app.state.incident_response_system.get_system_status()
+
+        # Logging status
+        if hasattr(app.state, 'enterprise_logger'):
+            status["logging"] = {
+                "enterprise_logging_available": True,
+                "log_level": "INFO"  # Could be dynamic
+            }
+
+        return status
+
+    except Exception as e:
+        logger.error(f"Monitoring status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/monitoring/incidents")
+async def get_active_incidents():
+    """Get active incidents."""
+    try:
+        if not hasattr(app.state, 'incident_response_system'):
+            raise HTTPException(status_code=503, detail="Incident response system not available")
+
+        incidents = app.state.incident_response_system.incidents
+        active_incidents = [
+            {
+                "id": incident.id,
+                "title": incident.title,
+                "severity": incident.severity.value,
+                "status": incident.status.value,
+                "created_at": incident.created_at.isoformat(),
+                "updated_at": incident.updated_at.isoformat(),
+                "alerts_count": len(incident.alerts),
+                "responses_executed": len(incident.responses_executed)
+            }
+            for incident in incidents.values()
+            if incident.status.value != "resolved"
+        ]
+
+        return {
+            "active_incidents": active_incidents,
+            "total_active": len(active_incidents),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Incidents endpoint error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ============================================================================

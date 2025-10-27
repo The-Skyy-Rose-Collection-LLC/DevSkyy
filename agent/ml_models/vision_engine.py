@@ -8,10 +8,7 @@ Image classification, object detection, style transfer
 Reference: AGENTS.md Line 1565-1569
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class VisionEngine:
     """Computer vision capabilities for fashion images"""
@@ -22,7 +19,7 @@ class VisionEngine:
         return {
             "category": categories[0],
             "confidence": 0.92,
-            "all_predictions": {cat: np.(random.uniform( if random else None)0, 1) for cat in categories},
+            "all_predictions": {cat: np.random.uniform(0, 1) for cat in categories},
         }
 
     async def detect_objects(self, image_path: str) -> List[Dict[str, Any]]:

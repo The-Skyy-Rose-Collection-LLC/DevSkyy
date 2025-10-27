@@ -15,7 +15,7 @@ WordPress Full-Stack Theme Builder Agent
 Advanced autonomous theme builder for WordPress, Divi 5, and Elementor Pro
 
 Features:
-- Complete theme generation from scratch
+    - Complete theme generation from scratch
 - Divi 5 advanced module creation
 - Elementor Pro widget development
 - WooCommerce integration
@@ -32,10 +32,7 @@ Features:
 - Theme options panel generation
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class WordPressFullStackThemeBuilderAgent:
     """
@@ -44,8 +41,8 @@ class WordPressFullStackThemeBuilderAgent:
 
     def __init__(self):
         # AI Services
-        self.claude = AsyncAnthropic(api_key=(os.getenv( if os else None)"ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=(os.getenv( if os else None)"OPENAI_API_KEY"))
+        self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         # Theme templates
         self.theme_structure = {
@@ -108,7 +105,7 @@ class WordPressFullStackThemeBuilderAgent:
             "spacing": {"base": "16px", "large": "32px", "xlarge": "64px"},
         }
 
-        (logger.info( if logger else None)"🎨 WordPress Full-Stack Theme Builder initialized")
+        logger.info("🎨 WordPress Full-Stack Theme Builder initialized")
 
     async def generate_complete_theme(
         self,
@@ -121,56 +118,56 @@ class WordPressFullStackThemeBuilderAgent:
         Generate a complete WordPress theme with all files and features.
         """
         try:
-            (logger.info( if logger else None)f"🏗️ Building complete WordPress theme: {theme_name}")
+            logger.info(f"🏗️ Building complete WordPress theme: {theme_name}")
 
-            theme_slug = (theme_name.lower( if theme_name else None)).replace(" ", "-")
+            theme_slug = theme_name.lower().replace(" ", "-")
             theme_path = Path("generated_themes") / theme_slug
-            (theme_path.mkdir( if theme_path else None)parents=True, exist_ok=True)
+            theme_path.mkdir(parents=True, exist_ok=True)
 
             # 1. Generate theme foundation
-            (logger.info( if logger else None)"1️⃣ Generating theme foundation...")
-            foundation = await (self._generate_theme_foundation( if self else None)
+            logger.info("1️⃣ Generating theme foundation...")
+            foundation = await self._generate_theme_foundation(
                 theme_name, theme_slug, theme_description, target_audience
             )
 
             # 2. Create style.css
-            (logger.info( if logger else None)"2️⃣ Creating style.css...")
-            await (self._create_style_css( if self else None)theme_path, foundation)
+            logger.info("2️⃣ Creating style.css...")
+            await self._create_style_css(theme_path, foundation)
 
             # 3. Generate functions.php
-            (logger.info( if logger else None)"3️⃣ Generating functions.php...")
-            await (self._generate_functions_php( if self else None)theme_path, features)
+            logger.info("3️⃣ Generating functions.php...")
+            await self._generate_functions_php(theme_path, features)
 
             # 4. Create template files
-            (logger.info( if logger else None)"4️⃣ Creating template files...")
-            await (self._create_template_files( if self else None)theme_path, foundation)
+            logger.info("4️⃣ Creating template files...")
+            await self._create_template_files(theme_path, foundation)
 
             # 5. Generate Divi 5 modules
             if "divi" in features:
-                (logger.info( if logger else None)"5️⃣ Generating Divi 5 modules...")
-                await (self._generate_divi_modules( if self else None)theme_path)
+                logger.info("5️⃣ Generating Divi 5 modules...")
+                await self._generate_divi_modules(theme_path)
 
             # 6. Generate Elementor widgets
             if "elementor" in features:
-                (logger.info( if logger else None)"6️⃣ Generating Elementor Pro widgets...")
-                await (self._generate_elementor_widgets( if self else None)theme_path)
+                logger.info("6️⃣ Generating Elementor Pro widgets...")
+                await self._generate_elementor_widgets(theme_path)
 
             # 7. Create WooCommerce templates
             if "woocommerce" in features:
-                (logger.info( if logger else None)"7️⃣ Creating WooCommerce templates...")
-                await (self._create_woocommerce_templates( if self else None)theme_path)
+                logger.info("7️⃣ Creating WooCommerce templates...")
+                await self._create_woocommerce_templates(theme_path)
 
             # 8. Generate assets (CSS, JS)
-            (logger.info( if logger else None)"8️⃣ Generating assets...")
-            await (self._generate_theme_assets( if self else None)theme_path)
+            logger.info("8️⃣ Generating assets...")
+            await self._generate_theme_assets(theme_path)
 
             # 9. Create theme options
-            (logger.info( if logger else None)"9️⃣ Creating theme options panel...")
-            await (self._create_theme_options( if self else None)theme_path)
+            logger.info("9️⃣ Creating theme options panel...")
+            await self._create_theme_options(theme_path)
 
             # 10. Package theme
-            (logger.info( if logger else None)"🔟 Packaging theme...")
-            zip_path = await (self._package_theme( if self else None)theme_path, theme_slug)
+            logger.info("🔟 Packaging theme...")
+            zip_path = await self._package_theme(theme_path, theme_slug)
 
             return {
                 "success": True,
@@ -179,11 +176,11 @@ class WordPressFullStackThemeBuilderAgent:
                 "theme_path": str(theme_path),
                 "zip_path": str(zip_path),
                 "features_included": features,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Theme generation failed: {e}")
+            logger.error(f"❌ Theme generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _generate_theme_foundation(
@@ -200,7 +197,7 @@ Description: {description}
 Target Audience: {audience}
 
 Generate:
-1. Theme architecture and file structure
+    1. Theme architecture and file structure
 2. Core features and functionality
 3. Design system (colors, typography, spacing)
 4. Template hierarchy
@@ -213,7 +210,7 @@ Generate:
 
 Provide detailed, production-ready specifications."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=3000,
                 messages=[{"role": "user", "content": prompt}],
@@ -230,7 +227,7 @@ Provide detailed, production-ready specifications."""
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Foundation generation failed: {e}")
+            logger.error(f"Foundation generation failed: {e}")
             return {}
 
     async def _create_style_css(
@@ -240,18 +237,18 @@ Provide detailed, production-ready specifications."""
         Create style.css with theme header.
         """
         style_content = f"""/*
-Theme Name: {(foundation.get( if foundation else None)'theme_name', 'Custom Theme')}
+Theme Name: {foundation.get('theme_name', 'Custom Theme')}
 Theme URI: https://theskyy-rose-collection.com
 Author: The Skyy Rose Collection
 Author URI: https://theskyy-rose-collection.com
-Description: {(foundation.get( if foundation else None)'description', 'A luxury WordPress theme')}
+Description: {foundation.get('description', 'A luxury WordPress theme')}
 Version: 1.0.0
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: {(foundation.get( if foundation else None)'theme_slug', 'custom-theme')}
+Text Domain: {foundation.get('theme_slug', 'custom-theme')}
 Tags: luxury, fashion, e-commerce, woocommerce, divi, elementor
 
 This theme is built for luxury fashion e-commerce with advanced features.
@@ -382,8 +379,8 @@ h1, h2, h3, h4, h5, h6 {{
 """
 
         style_file = theme_path / "style.css"
-        (style_file.write_text( if style_file else None)style_content)
-        (logger.info( if logger else None)"✅ style.css created")
+        style_file.write_text(style_content)
+        logger.info("✅ style.css created")
 
     async def _generate_functions_php(
         self, theme_path: Path, features: List[str]
@@ -397,7 +394,7 @@ h1, h2, h3, h4, h5, h6 {{
 Features to include: {', '.join(features)}
 
 Requirements:
-1. Theme setup and support
+    1. Theme setup and support
 2. Enqueue scripts and styles
 3. Widget areas registration
 4. Menu locations
@@ -412,7 +409,7 @@ Requirements:
 
 Generate complete, production-ready PHP code."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=4096,
                 messages=[{"role": "user", "content": prompt}],
@@ -423,18 +420,18 @@ Generate complete, production-ready PHP code."""
 
             # Extract PHP code
 
-            php_match = (re.search( if re else None)r"```php\n(.*?)```", functions_code, re.DOTALL)
+            php_match = re.search(r"```php\n(.*?)```", functions_code, re.DOTALL)
             if php_match:
-                functions_code = (php_match.group( if php_match else None)1)
+                functions_code = php_match.group(1)
             elif "<?php" not in functions_code:
                 functions_code = f"<?php\n{functions_code}"
 
             functions_file = theme_path / "functions.php"
-            (functions_file.write_text( if functions_file else None)functions_code)
-            (logger.info( if logger else None)"✅ functions.php created")
+            functions_file.write_text(functions_code)
+            logger.info("✅ functions.php created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"functions.php generation failed: {e}")
+            logger.error(f"functions.php generation failed: {e}")
 
     async def _create_template_files(
         self, theme_path: Path, foundation: Dict[str, Any]
@@ -443,23 +440,23 @@ Generate complete, production-ready PHP code."""
         Create all WordPress template files.
         """
         templates = {
-            "index.php": await (self._generate_template( if self else None)"index", foundation),
-            "header.php": await (self._generate_template( if self else None)"header", foundation),
-            "footer.php": await (self._generate_template( if self else None)"footer", foundation),
-            "sidebar.php": await (self._generate_template( if self else None)"sidebar", foundation),
-            "single.php": await (self._generate_template( if self else None)"single", foundation),
-            "page.php": await (self._generate_template( if self else None)"page", foundation),
-            "archive.php": await (self._generate_template( if self else None)"archive", foundation),
-            "search.php": await (self._generate_template( if self else None)"search", foundation),
-            "404.php": await (self._generate_template( if self else None)"404", foundation),
+            "index.php": await self._generate_template("index", foundation),
+            "header.php": await self._generate_template("header", foundation),
+            "footer.php": await self._generate_template("footer", foundation),
+            "sidebar.php": await self._generate_template("sidebar", foundation),
+            "single.php": await self._generate_template("single", foundation),
+            "page.php": await self._generate_template("page", foundation),
+            "archive.php": await self._generate_template("archive", foundation),
+            "search.php": await self._generate_template("search", foundation),
+            "404.php": await self._generate_template("404", foundation),
         }
 
-        for filename, content in (templates.items( if templates else None)):
+        for filename, content in templates.items():
             if content:
                 template_file = theme_path / filename
-                (template_file.write_text( if template_file else None)content)
+                template_file.write_text(content)
 
-        (logger.info( if logger else None)f"✅ Created {len(templates)} template files")
+        logger.info(f"✅ Created {len(templates)} template files")
 
     async def _generate_template(
         self, template_type: str, foundation: Dict[str, Any]
@@ -470,10 +467,10 @@ Generate complete, production-ready PHP code."""
         try:
             prompt = f"""Generate a production-ready WordPress {template_type}.php template for a luxury fashion e-commerce theme.
 
-Theme: {(foundation.get( if foundation else None)'theme_name')}
+Theme: {foundation.get('theme_name')}
 
 Requirements:
-1. Follow WordPress template hierarchy
+    1. Follow WordPress template hierarchy
 2. Proper WordPress functions and hooks
 3. Accessibility (WCAG 2.1 AA)
 4. SEO optimization
@@ -484,7 +481,7 @@ Requirements:
 
 Generate complete PHP template code."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}],
@@ -495,16 +492,16 @@ Generate complete PHP template code."""
 
             # Extract PHP code
 
-            php_match = (re.search( if re else None)r"```php\n(.*?)```", template_code, re.DOTALL)
+            php_match = re.search(r"```php\n(.*?)```", template_code, re.DOTALL)
             if php_match:
-                return (php_match.group( if php_match else None)1)
+                return php_match.group(1)
             elif "<?php" in template_code:
                 return template_code
             else:
                 return f"<?php\n{template_code}"
 
         except Exception as e:
-            (logger.error( if logger else None)f"Template {template_type} generation failed: {e}")
+            logger.error(f"Template {template_type} generation failed: {e}")
             return ""
 
     async def _generate_divi_modules(self, theme_path: Path) -> None:
@@ -513,20 +510,20 @@ Generate complete PHP template code."""
         """
         try:
             divi_path = theme_path / "includes" / "divi"
-            (divi_path.mkdir( if divi_path else None)parents=True, exist_ok=True)
+            divi_path.mkdir(parents=True, exist_ok=True)
 
             # Generate luxury product showcase module
-            module_code = await (self._generate_divi_module( if self else None)
+            module_code = await self._generate_divi_module(
                 "LuxuryProductShowcase", "Display luxury products with premium styling"
             )
 
             module_file = divi_path / "LuxuryProductShowcase.php"
-            (module_file.write_text( if module_file else None)module_code)
+            module_file.write_text(module_code)
 
-            (logger.info( if logger else None)"✅ Divi 5 modules created")
+            logger.info("✅ Divi 5 modules created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Divi module generation failed: {e}")
+            logger.error(f"Divi module generation failed: {e}")
 
     async def _generate_divi_module(self, module_name: str, description: str) -> str:
         """
@@ -539,7 +536,7 @@ Module Name: {module_name}
 Description: {description}
 
 Requirements:
-1. Extend ET_Builder_Module
+    1. Extend ET_Builder_Module
 2. Complete module configuration
 3. Advanced fields and controls
 4. Responsive design options
@@ -552,7 +549,7 @@ Requirements:
 
 Generate complete PHP class code."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=3000,
                 messages=[{"role": "user", "content": prompt}],
@@ -562,7 +559,7 @@ Generate complete PHP class code."""
             return response.content[0].text
 
         except Exception as e:
-            (logger.error( if logger else None)f"Divi module {module_name} generation failed: {e}")
+            logger.error(f"Divi module {module_name} generation failed: {e}")
             return ""
 
     async def _generate_elementor_widgets(self, theme_path: Path) -> None:
@@ -571,20 +568,20 @@ Generate complete PHP class code."""
         """
         try:
             elementor_path = theme_path / "includes" / "elementor"
-            (elementor_path.mkdir( if elementor_path else None)parents=True, exist_ok=True)
+            elementor_path.mkdir(parents=True, exist_ok=True)
 
             # Generate luxury collection widget
-            widget_code = await (self._generate_elementor_widget( if self else None)
+            widget_code = await self._generate_elementor_widget(
                 "Luxury_Collection_Widget", "Display luxury product collections"
             )
 
             widget_file = elementor_path / "luxury-collection-widget.php"
-            (widget_file.write_text( if widget_file else None)widget_code)
+            widget_file.write_text(widget_code)
 
-            (logger.info( if logger else None)"✅ Elementor Pro widgets created")
+            logger.info("✅ Elementor Pro widgets created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Elementor widget generation failed: {e}")
+            logger.error(f"Elementor widget generation failed: {e}")
 
     async def _generate_elementor_widget(
         self, widget_name: str, description: str
@@ -599,7 +596,7 @@ Widget Name: {widget_name}
 Description: {description}
 
 Requirements:
-1. Extend \\Elementor\\Widget_Base
+    1. Extend \\Elementor\\Widget_Base
 2. Complete widget configuration
 3. Register controls
 4. Responsive options
@@ -612,7 +609,7 @@ Requirements:
 
 Generate complete PHP class code."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=3000,
                 messages=[{"role": "user", "content": prompt}],
@@ -622,7 +619,7 @@ Generate complete PHP class code."""
             return response.content[0].text
 
         except Exception as e:
-            (logger.error( if logger else None)f"Elementor widget {widget_name} generation failed: {e}")
+            logger.error(f"Elementor widget {widget_name} generation failed: {e}")
             return ""
 
     async def _create_woocommerce_templates(self, theme_path: Path) -> None:
@@ -631,19 +628,19 @@ Generate complete PHP class code."""
         """
         try:
             woo_path = theme_path / "woocommerce"
-            (woo_path.mkdir( if woo_path else None)parents=True, exist_ok=True)
+            woo_path.mkdir(parents=True, exist_ok=True)
 
             # Create product templates
             templates = ["single-product.php", "archive-product.php", "cart.php"]
 
             for template in templates:
                 template_file = woo_path / template
-                (template_file.write_text( if template_file else None)f"<?php\n// WooCommerce {template} override\n")
+                template_file.write_text(f"<?php\n// WooCommerce {template} override\n")
 
-            (logger.info( if logger else None)"✅ WooCommerce templates created")
+            logger.info("✅ WooCommerce templates created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"WooCommerce template creation failed: {e}")
+            logger.error(f"WooCommerce template creation failed: {e}")
 
     async def _generate_theme_assets(self, theme_path: Path) -> None:
         """
@@ -654,8 +651,8 @@ Generate complete PHP class code."""
             css_path = assets_path / "css"
             js_path = assets_path / "js"
 
-            (css_path.mkdir( if css_path else None)parents=True, exist_ok=True)
-            (js_path.mkdir( if js_path else None)parents=True, exist_ok=True)
+            css_path.mkdir(parents=True, exist_ok=True)
+            js_path.mkdir(parents=True, exist_ok=True)
 
             # Generate custom CSS
             custom_css = """/* Custom Theme Styles */
@@ -686,12 +683,12 @@ Generate complete PHP class code."""
 
     // Smooth scroll
     $('a[href*="#"]:not([href="#"])').on('click', function() {
-        if (location.(pathname.replace( if pathname else None)/^\\//, '') == this.(pathname.replace( if pathname else None)/^\\//, '') && location.hostname == this.hostname) {
+        if (location.pathname.replace(/^\\//, '') == this.pathname.replace(/^\\//, '') && location.hostname == this.hostname) {
             var target = $(this.hash);
-            target = target.length ? target : $('[name=' + this.(hash.slice( if hash else None)1) + ']');
+            target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
             if (target.length) {
                 $('html, body').animate({
-                    scrollTop: (target.offset( if target else None)).top - 100
+                    scrollTop: target.offset().top - 100
                 }, 1000);
                 return false;
             }
@@ -702,10 +699,10 @@ Generate complete PHP class code."""
 """
             (js_path / "custom.js").write_text(custom_js)
 
-            (logger.info( if logger else None)"✅ Theme assets created")
+            logger.info("✅ Theme assets created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Asset generation failed: {e}")
+            logger.error(f"Asset generation failed: {e}")
 
     async def _create_theme_options(self, theme_path: Path) -> None:
         """
@@ -713,7 +710,7 @@ Generate complete PHP class code."""
         """
         try:
             inc_path = theme_path / "inc"
-            (inc_path.mkdir( if inc_path else None)parents=True, exist_ok=True)
+            inc_path.mkdir(parents=True, exist_ok=True)
 
             customizer_code = """<?php
 /**
@@ -744,10 +741,10 @@ add_action( 'customize_register', 'luxury_theme_customize_register' );
 
             (inc_path / "customizer.php").write_text(customizer_code)
 
-            (logger.info( if logger else None)"✅ Theme options created")
+            logger.info("✅ Theme options created")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Theme options creation failed: {e}")
+            logger.error(f"Theme options creation failed: {e}")
 
     async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
         """
@@ -756,33 +753,29 @@ add_action( 'customize_register', 'luxury_theme_customize_register' );
         try:
             zip_path = theme_path.parent / f"{theme_slug}.zip"
 
-            with (zipfile.ZipFile( if zipfile else None)zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for file_path in (theme_path.rglob( if theme_path else None)"*"):
-                    if (file_path.is_file( if file_path else None)):
-                        arcname = (file_path.relative_to( if file_path else None)theme_path.parent)
-                        (zipf.write( if zipf else None)file_path, arcname)
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in theme_path.rglob("*"):
+                    if file_path.is_file():
+                        arcname = file_path.relative_to(theme_path.parent)
+                        zipf.write(file_path, arcname)
 
-            (logger.info( if logger else None)f"✅ Theme packaged: {zip_path}")
+            logger.info(f"✅ Theme packaged: {zip_path}")
             return zip_path
 
         except Exception as e:
-            (logger.error( if logger else None)f"Theme packaging failed: {e}")
+            logger.error(f"Theme packaging failed: {e}")
             return theme_path
-
 
 # Factory function
 def create_theme_builder() -> WordPressFullStackThemeBuilderAgent:
     """Create WordPress Theme Builder Agent."""
     return WordPressFullStackThemeBuilderAgent()
 
-
 # Global instance
-theme_builder = create_theme_builder()
-
-
-# Convenience function
+theme_builder = create_theme_builder(
+    # Convenience function
 async def build_wordpress_theme(
     name: str, description: str, features: List[str]
 ) -> Dict[str, Any]:
     """Build complete WordPress theme."""
-    return await (theme_builder.generate_complete_theme( if theme_builder else None)name, description, features)
+    return await theme_builder.generate_complete_theme(name, description, features)

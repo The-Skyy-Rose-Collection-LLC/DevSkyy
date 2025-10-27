@@ -21,9 +21,7 @@ Features:
 - Security scanning and threat detection
 """
 
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class SecurityRole(Enum):
     """Security roles for agents"""
@@ -34,7 +32,6 @@ class SecurityRole(Enum):
     SERVICE = "service"  # Service-to-service communication
     GUEST = "guest"  # Limited access
 
-
 class PermissionLevel(Enum):
     """Permission levels"""
 
@@ -42,7 +39,6 @@ class PermissionLevel(Enum):
     WRITE = "write"
     EXECUTE = "execute"
     ADMIN = "admin"
-
 
 class SecurityManager:
     """
@@ -88,7 +84,7 @@ class SecurityManager:
         self.suspicious_activity: Dict[str, int] = {}
         self.blocked_agents: Set[str] = set()
 
-        (logger.info( if logger else None)"🔒 Enterprise Security Manager initialized")
+        logger.info("🔒 Enterprise Security Manager initialized")
 
     # ============================================================================
     # AUTHENTICATION
@@ -109,19 +105,19 @@ class SecurityManager:
             API key string
         """
         # Generate secure random key
-        key_id = (secrets.token_urlsafe( if secrets else None)16)
-        api_key = (secrets.token_urlsafe( if secrets else None)32)
+        key_id = secrets.token_urlsafe(16)
+        api_key = secrets.token_urlsafe(32)
 
         # Hash the key for storage
-        key_hash = (hashlib.sha256( if hashlib else None)(api_key.encode( if api_key else None))).hexdigest()
+        key_hash = hashlib.sha256(api_key.encode()).hexdigest()
 
         # Store key information
         self.api_keys[key_id] = {
             "key_hash": key_hash,
             "agent_name": agent_name,
             "role": role,
-            "created_at": (datetime.now( if datetime else None)),
-            "expires_at": (datetime.now( if datetime else None)) + timedelta(days=expires_days),
+            "created_at": datetime.now(),
+            "expires_at": datetime.now() + timedelta(days=expires_days),
             "last_used": None,
             "usage_count": 0,
         }
@@ -130,7 +126,7 @@ class SecurityManager:
         self.agent_credentials[agent_name] = key_id
         self.agent_roles[agent_name] = role
 
-        (self._audit_log( if self else None)
+        self._audit_log(
             "api_key_created", agent_name, {"key_id": key_id, "role": role.value}
         )
 
@@ -145,7 +141,7 @@ class SecurityManager:
         """
         try:
             # Parse key
-            parts = (api_key.split( if api_key else None)".")
+            parts = api_key.split(".")
             if len(parts) != 2:
                 return None
 
@@ -158,26 +154,26 @@ class SecurityManager:
             key_info = self.api_keys[key_id]
 
             # Verify hash
-            key_hash = (hashlib.sha256( if hashlib else None)(key_secret.encode( if key_secret else None))).hexdigest()
+            key_hash = hashlib.sha256(key_secret.encode()).hexdigest()
             if key_hash != key_info["key_hash"]:
-                (self._audit_log( if self else None)"invalid_api_key", "unknown", {"key_id": key_id})
+                self._audit_log("invalid_api_key", "unknown", {"key_id": key_id})
                 return None
 
             # Check expiration
-            if (datetime.now( if datetime else None)) > key_info["expires_at"]:
-                (self._audit_log( if self else None)
+            if datetime.now() > key_info["expires_at"]:
+                self._audit_log(
                     "expired_api_key", key_info["agent_name"], {"key_id": key_id}
                 )
                 return None
 
             # Update usage
-            key_info["last_used"] = (datetime.now( if datetime else None))
+            key_info["last_used"] = datetime.now()
             key_info["usage_count"] += 1
 
             return key_info
 
         except Exception as e:
-            (logger.error( if logger else None)f"API key validation error: {e}")
+            logger.error(f"API key validation error: {e}")
             return None
 
     def revoke_api_key(self, key_id: str) -> bool:
@@ -185,7 +181,7 @@ class SecurityManager:
         if key_id in self.api_keys:
             agent_name = self.api_keys[key_id]["agent_name"]
             del self.api_keys[key_id]
-            (self._audit_log( if self else None)"api_key_revoked", agent_name, {"key_id": key_id})
+            self._audit_log("api_key_revoked", agent_name, {"key_id": key_id})
             return True
         return False
 
@@ -197,11 +193,11 @@ class SecurityManager:
         # Revoke old key
         old_key_id = self.agent_credentials[agent_name]
         role = self.api_keys[old_key_id]["role"]
-        (self.revoke_api_key( if self else None)old_key_id)
+        self.revoke_api_key(old_key_id)
 
         # Generate new key
-        new_key = (self.generate_api_key( if self else None)agent_name, role)
-        (self._audit_log( if self else None)"api_key_rotated", agent_name, {})
+        new_key = self.generate_api_key(agent_name, role)
+        self._audit_log("api_key_rotated", agent_name, {})
 
         return new_key
 
@@ -223,15 +219,15 @@ class SecurityManager:
         """
         # Check if agent is blocked
         if agent_name in self.blocked_agents:
-            (self._audit_log( if self else None)
+            self._audit_log(
                 "blocked_agent_access_attempt", agent_name, {"resource": resource}
             )
             return False
 
         # Get agent role
-        role = self.(agent_roles.get( if agent_roles else None)agent_name)
+        role = self.agent_roles.get(agent_name)
         if not role:
-            (self._audit_log( if self else None)
+            self._audit_log(
                 "unauthorized_access",
                 agent_name,
                 {"resource": resource, "reason": "no_role"},
@@ -240,7 +236,7 @@ class SecurityManager:
 
         # Check role permissions
         if permission not in self.role_permissions[role]:
-            (self._audit_log( if self else None)
+            self._audit_log(
                 "unauthorized_access",
                 agent_name,
                 {"resource": resource, "permission": permission, "role": role.value},
@@ -250,14 +246,14 @@ class SecurityManager:
         # Check resource ACL
         if resource in self.resource_acl:
             if agent_name not in self.resource_acl[resource]:
-                (self._audit_log( if self else None)
+                self._audit_log(
                     "unauthorized_access",
                     agent_name,
                     {"resource": resource, "reason": "not_in_acl"},
                 )
                 return False
 
-        (self._audit_log( if self else None)
+        self._audit_log(
             "authorized_access",
             agent_name,
             {"resource": resource, "permission": permission},
@@ -269,13 +265,13 @@ class SecurityManager:
         if resource not in self.resource_acl:
             self.resource_acl[resource] = set()
         self.resource_acl[resource].add(agent_name)
-        (self._audit_log( if self else None)"access_granted", agent_name, {"resource": resource})
+        self._audit_log("access_granted", agent_name, {"resource": resource})
 
     def revoke_resource_access(self, resource: str, agent_name: str):
         """Revoke an agent's access to a resource"""
         if resource in self.resource_acl and agent_name in self.resource_acl[resource]:
             self.resource_acl[resource].remove(agent_name)
-            (self._audit_log( if self else None)"access_revoked", agent_name, {"resource": resource})
+            self._audit_log("access_revoked", agent_name, {"resource": resource})
 
     # ============================================================================
     # ENCRYPTION & SECRETS
@@ -293,41 +289,41 @@ class SecurityManager:
             Encrypted data as hex string
         """
         if not key:
-            key = (secrets.token_bytes( if secrets else None)32)
+            key = secrets.token_bytes(32)
 
         # Simple XOR encryption (in production, use proper encryption like AES)
         encrypted = bytearray()
-        data_bytes = (data.encode( if data else None))
+        data_bytes = data.encode()
 
         for i, byte in enumerate(data_bytes):
-            (encrypted.append( if encrypted else None)byte ^ key[i % len(key)])
+            encrypted.append(byte ^ key[i % len(key)])
 
-        return (encrypted.hex( if encrypted else None))
+        return encrypted.hex()
 
     def decrypt_data(self, encrypted_hex: str, key: str) -> str:
         """Decrypt data"""
-        encrypted = (bytes.fromhex( if bytes else None)encrypted_hex)
+        encrypted = bytes.fromhex(encrypted_hex)
         decrypted = bytearray()
 
         for i, byte in enumerate(encrypted):
-            (decrypted.append( if decrypted else None)byte ^ key[i % len(key)])
+            decrypted.append(byte ^ key[i % len(key)])
 
-        return (decrypted.decode( if decrypted else None))
+        return decrypted.decode()
 
     def store_secret(self, secret_name: str, secret_value: str):
         """Store a secret securely"""
         # In production, use a proper secrets manager like HashiCorp Vault
-        secret_hash = (hashlib.sha256( if hashlib else None)(secret_value.encode( if secret_value else None))).hexdigest()
+        secret_hash = hashlib.sha256(secret_value.encode()).hexdigest()
         self.secrets[secret_name] = secret_hash
-        (self._audit_log( if self else None)"secret_stored", "system", {"secret_name": secret_name})
+        self._audit_log("secret_stored", "system", {"secret_name": secret_name})
 
     def verify_secret(self, secret_name: str, secret_value: str) -> bool:
         """Verify a secret"""
         if secret_name not in self.secrets:
             return False
 
-        secret_hash = (hashlib.sha256( if hashlib else None)(secret_value.encode( if secret_value else None))).hexdigest()
-        return (hmac.compare_digest( if hmac else None)secret_hash, self.secrets[secret_name])
+        secret_hash = hashlib.sha256(secret_value.encode()).hexdigest()
+        return hmac.compare_digest(secret_hash, self.secrets[secret_name])
 
     # ============================================================================
     # RATE LIMITING
@@ -347,7 +343,7 @@ class SecurityManager:
         Returns:
             bool: True if under limit, False if exceeded
         """
-        now = (datetime.now( if datetime else None))
+        now = datetime.now()
         window_start = now - timedelta(seconds=window_seconds)
 
         # Initialize if not exists
@@ -361,12 +357,12 @@ class SecurityManager:
 
         # Check limit
         if len(self.rate_limits[agent_name]) >= limit:
-            (self._audit_log( if self else None)
+            self._audit_log(
                 "rate_limit_exceeded",
                 agent_name,
                 {"limit": limit, "window": window_seconds},
             )
-            (self._flag_suspicious_activity( if self else None)agent_name)
+            self._flag_suspicious_activity(agent_name)
             return False
 
         # Add current request
@@ -385,20 +381,20 @@ class SecurityManager:
         self.suspicious_activity[agent_name] += 1
 
         if self.suspicious_activity[agent_name] >= threshold:
-            (self.block_agent( if self else None)agent_name)
-            (logger.warning( if logger else None)f"🚨 Agent blocked due to suspicious activity: {agent_name}")
+            self.block_agent(agent_name)
+            logger.warning(f"🚨 Agent blocked due to suspicious activity: {agent_name}")
 
     def block_agent(self, agent_name: str):
         """Block an agent from making requests"""
-        self.(blocked_agents.add( if blocked_agents else None)agent_name)
-        (self._audit_log( if self else None)"agent_blocked", agent_name, {})
+        self.blocked_agents.add(agent_name)
+        self._audit_log("agent_blocked", agent_name, {})
 
     def unblock_agent(self, agent_name: str):
         """Unblock an agent"""
         if agent_name in self.blocked_agents:
-            self.(blocked_agents.remove( if blocked_agents else None)agent_name)
+            self.blocked_agents.remove(agent_name)
             self.suspicious_activity[agent_name] = 0
-            (self._audit_log( if self else None)"agent_unblocked", agent_name, {})
+            self._audit_log("agent_unblocked", agent_name, {})
 
     # ============================================================================
     # AUDIT LOGGING
@@ -407,13 +403,13 @@ class SecurityManager:
     def _audit_log(self, event_type: str, agent_name: str, details: Dict[str, Any]):
         """Log security events for audit trail"""
         log_entry = {
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
             "event_type": event_type,
             "agent_name": agent_name,
             "details": details,
         }
 
-        self.(audit_log.append( if audit_log else None)log_entry)
+        self.audit_log.append(log_entry)
 
         # Keep only last 10000 entries
         if len(self.audit_log) > 10000:
@@ -425,7 +421,7 @@ class SecurityManager:
             "agent_blocked",
             "rate_limit_exceeded",
         ]:
-            (logger.warning( if logger else None)f"🔐 Security event: {event_type} - {agent_name}")
+            logger.warning(f"🔐 Security event: {event_type} - {agent_name}")
 
     def get_audit_log(
         self,
@@ -464,11 +460,10 @@ class SecurityManager:
             "total_api_keys": len(self.api_keys),
             "active_agents": len(self.agent_roles),
             "blocked_agents": len(self.blocked_agents),
-            "suspicious_activity_count": sum(self.(suspicious_activity.values( if suspicious_activity else None))),
+            "suspicious_activity_count": sum(self.suspicious_activity.values()),
             "audit_log_entries": len(self.audit_log),
             "resources_protected": len(self.resource_acl),
         }
-
 
 # Global security manager instance
 security_manager = SecurityManager()

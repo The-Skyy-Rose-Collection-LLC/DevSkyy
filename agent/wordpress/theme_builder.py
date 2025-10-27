@@ -10,10 +10,7 @@ Elementor Theme Builder
 Industry-leading automated WordPress/Elementor theme generation with ML
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class ElementorThemeBuilder:
     """
@@ -34,12 +31,12 @@ class ElementorThemeBuilder:
 
     def __init__(self, api_key: Optional[str] = None):
         self.anthropic = Anthropic(api_key=api_key) if api_key else None
-        self.theme_templates = (self._load_theme_templates( if self else None))
-        self.widget_library = (self._initialize_widget_library( if self else None))
+        self.theme_templates = self._load_theme_templates()
+        self.widget_library = self._initialize_widget_library()
         self.color_schemes = {}
         self.generated_themes = []
 
-        (logger.info( if logger else None)"🎨 Elementor Theme Builder initialized")
+        logger.info("🎨 Elementor Theme Builder initialized")
 
     def _load_theme_templates(self) -> Dict[str, Any]:
         """Load predefined theme templates"""
@@ -124,8 +121,8 @@ class ElementorThemeBuilder:
             Complete theme configuration
         """
         try:
-            (logger.info( if logger else None)
-                f"🎨 Generating {theme_type} theme for {(brand_info.get( if brand_info else None)'name', 'Brand')}"
+            logger.info(
+                f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}"
             )
 
             # Default pages for fashion ecommerce
@@ -133,15 +130,15 @@ class ElementorThemeBuilder:
                 pages = ["home", "shop", "product", "about", "contact", "blog"]
 
             # Generate color palette
-            colors = await (self._generate_color_palette( if self else None)brand_info, theme_type)
+            colors = await self._generate_color_palette(brand_info, theme_type)
 
             # Generate typography
-            typography = await (self._generate_typography( if self else None)brand_info, theme_type)
+            typography = await self._generate_typography(brand_info, theme_type)
 
             # Generate page layouts
             page_layouts = {}
             for page in pages:
-                layout = await (self._generate_page_layout( if self else None)
+                layout = await self._generate_page_layout(
                     page_type=page,
                     brand_info=brand_info,
                     theme_type=theme_type,
@@ -151,46 +148,46 @@ class ElementorThemeBuilder:
                 page_layouts[page] = layout
 
             # Generate global settings
-            global_settings = await (self._generate_global_settings( if self else None)
+            global_settings = await self._generate_global_settings(
                 brand_info, theme_type, colors, typography
             )
 
             # Create theme package
             theme = {
                 "metadata": {
-                    "name": f"{(brand_info.get( if brand_info else None)'name', 'Brand')} Theme",
+                    "name": f"{brand_info.get('name', 'Brand')} Theme",
                     "version": "1.0.0",
                     "author": "DevSkyy AI",
-                    "description": f"Custom {theme_type} theme for {(brand_info.get( if brand_info else None)'name')}",
-                    "created_at": (datetime.utcnow( if datetime else None)).isoformat(),
+                    "description": f"Custom {theme_type} theme for {brand_info.get('name')}",
+                    "created_at": datetime.utcnow().isoformat(),
                     "theme_type": theme_type,
                 },
                 "global_settings": global_settings,
                 "color_palette": colors,
                 "typography": typography,
                 "pages": page_layouts,
-                "widgets": (self._get_required_widgets( if self else None)page_layouts),
-                "woocommerce_settings": await (self._generate_woocommerce_config( if self else None)
+                "widgets": self._get_required_widgets(page_layouts),
+                "woocommerce_settings": await self._generate_woocommerce_config(
                     brand_info
                 ),
-                "seo_settings": await (self._generate_seo_config( if self else None)brand_info),
-                "performance_optimizations": (self._get_performance_config( if self else None)),
+                "seo_settings": await self._generate_seo_config(brand_info),
+                "performance_optimizations": self._get_performance_config(),
             }
 
             # Store generated theme
-            self.(generated_themes.append( if generated_themes else None)theme)
+            self.generated_themes.append(theme)
 
-            (logger.info( if logger else None)f"✅ Theme generated with {len(pages)} pages")
+            logger.info(f"✅ Theme generated with {len(pages)} pages")
 
             return {
                 "success": True,
                 "theme": theme,
                 "export_formats": ["json", "elementor_json", "zip"],
-                "installation_instructions": (self._get_installation_instructions( if self else None)),
+                "installation_instructions": self._get_installation_instructions(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Theme generation failed: {e}")
+            logger.error(f"Theme generation failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def _generate_color_palette(
@@ -199,8 +196,8 @@ class ElementorThemeBuilder:
         """Generate ML-optimized color palette"""
         try:
             # Base colors from brand or theme template
-            template = self.(theme_templates.get( if theme_templates else None)theme_type, {})
-            mood = (template.get( if template else None)"color_mood", "neutral")
+            template = self.theme_templates.get(theme_type, {})
+            mood = template.get("color_mood", "neutral")
 
             # Predefined palettes based on mood
             palettes = {
@@ -246,7 +243,7 @@ class ElementorThemeBuilder:
                 },
             }
 
-            palette = (palettes.get( if palettes else None)mood, palettes["neutral"])
+            palette = palettes.get(mood, palettes["neutral"])
 
             # Override with brand colors if provided
             if "primary_color" in brand_info:
@@ -255,8 +252,8 @@ class ElementorThemeBuilder:
                 palette["secondary"] = brand_info["secondary_color"]
 
             # Generate complementary colors
-            palette["hover_primary"] = (self._adjust_color( if self else None)palette["primary"], -10)
-            palette["hover_secondary"] = (self._adjust_color( if self else None)palette["secondary"], -10)
+            palette["hover_primary"] = self._adjust_color(palette["primary"], -10)
+            palette["hover_secondary"] = self._adjust_color(palette["secondary"], -10)
             palette["success"] = "#4CAF50"
             palette["warning"] = "#FFC107"
             palette["error"] = "#F44336"
@@ -264,15 +261,15 @@ class ElementorThemeBuilder:
             return palette
 
         except Exception as e:
-            (logger.error( if logger else None)f"Color palette generation failed: {e}")
+            logger.error(f"Color palette generation failed: {e}")
             return {}
 
     async def _generate_typography(
         self, brand_info: Dict[str, Any], theme_type: str
     ) -> Dict[str, Any]:
         """Generate optimized typography settings"""
-        template = self.(theme_templates.get( if theme_templates else None)theme_type, {})
-        style = (template.get( if template else None)"style", "modern")
+        template = self.theme_templates.get(theme_type, {})
+        style = template.get("style", "modern")
 
         typography_systems = {
             "elegant": {
@@ -306,7 +303,7 @@ class ElementorThemeBuilder:
             },
         }
 
-        typo = (typography_systems.get( if typography_systems else None)style, typography_systems["clean"])
+        typo = typography_systems.get(style, typography_systems["clean"])
 
         return {
             "fonts": typo,
@@ -338,24 +335,24 @@ class ElementorThemeBuilder:
         """Generate page layout with Elementor sections"""
         try:
             if page_type == "home":
-                return await (self._generate_homepage( if self else None)
+                return await self._generate_homepage(
                     brand_info, theme_type, colors, typography
                 )
             elif page_type == "shop":
-                return await (self._generate_shop_page( if self else None)brand_info, colors, typography)
+                return await self._generate_shop_page(brand_info, colors, typography)
             elif page_type == "product":
-                return await (self._generate_product_page( if self else None)brand_info, colors, typography)
+                return await self._generate_product_page(brand_info, colors, typography)
             elif page_type == "about":
-                return await (self._generate_about_page( if self else None)brand_info, colors, typography)
+                return await self._generate_about_page(brand_info, colors, typography)
             elif page_type == "contact":
-                return await (self._generate_contact_page( if self else None)brand_info, colors, typography)
+                return await self._generate_contact_page(brand_info, colors, typography)
             elif page_type == "blog":
-                return await (self._generate_blog_page( if self else None)brand_info, colors, typography)
+                return await self._generate_blog_page(brand_info, colors, typography)
             else:
                 return {"sections": [], "error": f"Unknown page type: {page_type}"}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Page layout generation failed for {page_type}: {e}")
+            logger.error(f"Page layout generation failed for {page_type}: {e}")
             return {"sections": [], "error": str(e)}
 
     async def _generate_homepage(
@@ -373,8 +370,8 @@ class ElementorThemeBuilder:
                     "layout": "full-width",
                     "background_type": "image",
                     "content": {
-                        "heading": f"Welcome to {(brand_info.get( if brand_info else None)'name', 'Our Store')}",
-                        "subheading": (brand_info.get( if brand_info else None)
+                        "heading": f"Welcome to {brand_info.get('name', 'Our Store')}",
+                        "subheading": brand_info.get(
                             "tagline", "Discover Luxury Fashion"
                         ),
                         "cta_button": {
@@ -385,7 +382,7 @@ class ElementorThemeBuilder:
                     },
                     "styling": {
                         "height": "100vh",
-                        "overlay_color": (colors.get( if colors else None)"primary"),
+                        "overlay_color": colors.get("primary"),
                         "overlay_opacity": 0.3,
                         "text_color": "#ffffff",
                         "animation": "fade-in",
@@ -402,7 +399,7 @@ class ElementorThemeBuilder:
                     },
                     "styling": {
                         "padding": {"top": "80px", "bottom": "80px"},
-                        "background": (colors.get( if colors else None)"background"),
+                        "background": colors.get("background"),
                     },
                 },
                 {
@@ -410,7 +407,7 @@ class ElementorThemeBuilder:
                     "layout": "two-column",
                     "content": {
                         "heading": "Our Story",
-                        "text": (brand_info.get( if brand_info else None)
+                        "text": brand_info.get(
                             "description", "Crafting excellence since inception"
                         ),
                         "image_position": "right",
@@ -434,7 +431,7 @@ class ElementorThemeBuilder:
                     "layout": "grid",
                     "columns": 6,
                     "content": {
-                        "heading": "Follow Us @" + (brand_info.get( if brand_info else None)"instagram", "brand"),
+                        "heading": "Follow Us @" + brand_info.get("instagram", "brand"),
                         "posts_count": 12,
                     },
                 },
@@ -448,7 +445,7 @@ class ElementorThemeBuilder:
                         "button_text": "Subscribe",
                     },
                     "styling": {
-                        "background": (colors.get( if colors else None)"primary"),
+                        "background": colors.get("primary"),
                         "text_color": "#ffffff",
                         "padding": {"top": "60px", "bottom": "60px"},
                     },
@@ -556,8 +553,8 @@ class ElementorThemeBuilder:
                 {
                     "type": "hero",
                     "content": {
-                        "heading": "About " + (brand_info.get( if brand_info else None)"name", "Us"),
-                        "subheading": (brand_info.get( if brand_info else None)"tagline", ""),
+                        "heading": "About " + brand_info.get("name", "Us"),
+                        "subheading": brand_info.get("tagline", ""),
                     },
                 },
                 {
@@ -594,10 +591,10 @@ class ElementorThemeBuilder:
                         {"type": "textarea", "name": "message", "required": True},
                     ],
                     "contact_info": {
-                        "address": (brand_info.get( if brand_info else None)"address", ""),
-                        "phone": (brand_info.get( if brand_info else None)"phone", ""),
-                        "email": (brand_info.get( if brand_info else None)"email", ""),
-                        "hours": (brand_info.get( if brand_info else None)"hours", ""),
+                        "address": brand_info.get("address", ""),
+                        "phone": brand_info.get("phone", ""),
+                        "email": brand_info.get("email", ""),
+                        "hours": brand_info.get("hours", ""),
                     },
                     "map": True,
                 }
@@ -636,10 +633,10 @@ class ElementorThemeBuilder:
         """Generate global theme settings"""
         return {
             "site_identity": {
-                "site_name": (brand_info.get( if brand_info else None)"name", ""),
-                "tagline": (brand_info.get( if brand_info else None)"tagline", ""),
-                "logo_url": (brand_info.get( if brand_info else None)"logo_url", ""),
-                "favicon_url": (brand_info.get( if brand_info else None)"favicon_url", ""),
+                "site_name": brand_info.get("name", ""),
+                "tagline": brand_info.get("tagline", ""),
+                "logo_url": brand_info.get("logo_url", ""),
+                "favicon_url": brand_info.get("favicon_url", ""),
             },
             "header": {
                 "layout": "default",
@@ -658,8 +655,8 @@ class ElementorThemeBuilder:
                     {"type": "customer_service", "title": "Customer Service"},
                     {"type": "newsletter", "title": "Stay Connected"},
                 ],
-                "social_links": (brand_info.get( if brand_info else None)"social_media", {}),
-                "copyright": f"© {(datetime.now( if datetime else None)).year} {(brand_info.get( if brand_info else None)'name', '')}. All rights reserved.",
+                "social_links": brand_info.get("social_media", {}),
+                "copyright": f"© {datetime.now().year} {brand_info.get('name', '')}. All rights reserved.",
             },
             "buttons": {
                 "primary": {
@@ -717,9 +714,9 @@ class ElementorThemeBuilder:
     async def _generate_seo_config(self, brand_info: Dict) -> Dict[str, Any]:
         """Generate SEO settings"""
         return {
-            "meta_description": (brand_info.get( if brand_info else None)"description", ""),
-            "keywords": (brand_info.get( if brand_info else None)"keywords", []),
-            "og_image": (brand_info.get( if brand_info else None)"og_image", ""),
+            "meta_description": brand_info.get("description", ""),
+            "keywords": brand_info.get("keywords", []),
+            "og_image": brand_info.get("og_image", ""),
             "structured_data": {
                 "organization": True,
                 "website": True,
@@ -753,9 +750,9 @@ class ElementorThemeBuilder:
     def _get_required_widgets(self, page_layouts: Dict) -> List[str]:
         """Extract required widgets from page layouts"""
         widgets = set()
-        for page, layout in (page_layouts.items( if page_layouts else None)):
-            for section in (layout.get( if layout else None)"sections", []):
-                (widgets.add( if widgets else None)(section.get( if section else None)"type", ""))
+        for page, layout in page_layouts.items():
+            for section in layout.get("sections", []):
+                widgets.add(section.get("type", ""))
         return list(widgets)
 
     def _get_installation_instructions(self) -> str:
@@ -778,7 +775,7 @@ class ElementorThemeBuilder:
     def _adjust_color(self, hex_color: str, percent: int) -> str:
         """Adjust color brightness by percentage"""
         try:
-            hex_color = (hex_color.lstrip( if hex_color else None)"#")
+            hex_color = hex_color.lstrip("#")
             rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
             adjusted = tuple(
@@ -806,16 +803,16 @@ class ElementorThemeBuilder:
             if format == "json":
                 return {
                     "success": True,
-                    "data": (json.dumps( if json else None)theme, indent=2),
+                    "data": json.dumps(theme, indent=2),
                     "filename": f"{theme['metadata']['name'].replace(' ', '_')}.json",
                 }
 
             elif format == "elementor_json":
                 # Convert to Elementor-compatible format
-                elementor_data = (self._convert_to_elementor_format( if self else None)theme)
+                elementor_data = self._convert_to_elementor_format(theme)
                 return {
                     "success": True,
-                    "data": (json.dumps( if json else None)elementor_data, indent=2),
+                    "data": json.dumps(elementor_data, indent=2),
                     "filename": f"{theme['metadata']['name'].replace(' ', '_')}_elementor.json",
                 }
 
@@ -831,7 +828,7 @@ class ElementorThemeBuilder:
                 return {"success": False, "error": f"Unknown format: {format}"}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Theme export failed: {e}")
+            logger.error(f"Theme export failed: {e}")
             return {"success": False, "error": str(e)}
 
     def _convert_to_elementor_format(self, theme: Dict) -> Dict:

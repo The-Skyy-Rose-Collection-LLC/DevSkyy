@@ -18,10 +18,7 @@ Comprehensive database management for PostgreSQL, MongoDB, ClickHouse
 with connection pooling, indexing, migration tools, and backup automation
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class DatabaseType(Enum):
     """Database types supported"""
@@ -30,7 +27,6 @@ class DatabaseType(Enum):
     MONGODB = "mongodb"
     CLICKHOUSE = "clickhouse"
     REDIS = "redis"
-
 
 @dataclass
 class DatabaseConfig:
@@ -54,7 +50,6 @@ class DatabaseConfig:
         data["db_type"] = self.db_type.value
         return data
 
-
 @dataclass
 class ConnectionMetrics:
     """Database connection metrics"""
@@ -73,9 +68,8 @@ class ConnectionMetrics:
         """Convert to dictionary"""
         data = asdict(self)
         if self.last_updated:
-            data["last_updated"] = self.(last_updated.isoformat( if last_updated else None))
+            data["last_updated"] = self.last_updated.isoformat()
         return data
-
 
 class PostgreSQLManager:
     """PostgreSQL database manager with connection pooling"""
@@ -83,19 +77,19 @@ class PostgreSQLManager:
     def __init__(self, config: DatabaseConfig):
         self.config = config
         self.pool = None
-        self.metrics = ConnectionMetrics()
-        self.is_connected = False
+        self.metrics = ConnectionMetrics(
+            self.is_connected = False
 
-        (logger.info( if logger else None)
+        logger.info(
             f"PostgreSQL manager initialized - Host: {config.host}:{config.port}"
-        )
+)
 
     async def connect(self) -> bool:
         """Establish connection pool"""
         try:
             dsn = f"postgresql://{self.config.username}:{self.config.password}@{self.config.host}:{self.config.port}/{self.config.database}"
 
-            self.pool = await (asyncpg.create_pool( if asyncpg else None)
+            self.pool = await asyncpg.create_pool(
                 dsn,
                 min_size=1,
                 max_size=self.config.pool_size,
@@ -107,16 +101,16 @@ class PostgreSQLManager:
             )
 
             # Test connection
-            async with self.(pool.acquire( if pool else None)) as conn:
-                await (conn.execute( if conn else None)"SELECT 1")
+            async with self.pool.acquire() as conn:
+                await conn.execute("SELECT 1")
 
             self.is_connected = True
             self.metrics.total_connections += 1
-            (logger.info( if logger else None)"PostgreSQL connection pool established")
+            logger.info("PostgreSQL connection pool established")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to connect to PostgreSQL: {e}")
+            logger.error(f"Failed to connect to PostgreSQL: {e}")
             self.metrics.failed_connections += 1
             return False
 
@@ -127,29 +121,29 @@ class PostgreSQLManager:
         if not self.pool:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            async with self.(pool.acquire( if pool else None)) as conn:
+            async with self.pool.acquire() as conn:
                 if params:
-                    result = await (conn.fetch( if conn else None)query, *params)
+                    result = await conn.fetch(query, *params)
                 else:
-                    result = await (conn.fetch( if conn else None)query)
+                    result = await conn.fetch(query)
 
                 # Convert to list of dictionaries
                 rows = [dict(row) for row in result]
 
                 # Update metrics
-                response_time = (time.time( if time else None)) - start_time
+                response_time = time.time() - start_time
                 self.metrics.total_queries += 1
                 self.metrics.successful_queries += 1
-                (self._update_response_time( if self else None)response_time)
+                self._update_response_time(response_time)
 
                 return rows
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"PostgreSQL query failed: {e}")
+            logger.error(f"PostgreSQL query failed: {e}")
             raise e
 
     async def execute_command(self, command: str, params: tuple = None) -> str:
@@ -157,26 +151,26 @@ class PostgreSQLManager:
         if not self.pool:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            async with self.(pool.acquire( if pool else None)) as conn:
+            async with self.pool.acquire() as conn:
                 if params:
-                    result = await (conn.execute( if conn else None)command, *params)
+                    result = await conn.execute(command, *params)
                 else:
-                    result = await (conn.execute( if conn else None)command)
+                    result = await conn.execute(command)
 
                 # Update metrics
-                response_time = (time.time( if time else None)) - start_time
+                response_time = time.time() - start_time
                 self.metrics.total_queries += 1
                 self.metrics.successful_queries += 1
-                (self._update_response_time( if self else None)response_time)
+                self._update_response_time(response_time)
 
                 return result
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"PostgreSQL command failed: {e}")
+            logger.error(f"PostgreSQL command failed: {e}")
             raise e
 
     async def create_indexes(self) -> bool:
@@ -207,15 +201,15 @@ class PostgreSQLManager:
 
         try:
             for index_sql in indexes:
-                await (self.execute_command( if self else None)index_sql)
-                (logger.info( if logger else None)
-                    f"Created index: {(index_sql.split( if index_sql else None)'idx_')[1].split(' ')[0] if 'idx_' in index_sql else 'unknown'}"
+                await self.execute_command(index_sql)
+                logger.info(
+                    f"Created index: {index_sql.split('idx_')[1].split(' ')[0] if 'idx_' in index_sql else 'unknown'}"
                 )
 
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create indexes: {e}")
+            logger.error(f"Failed to create indexes: {e}")
             return False
 
     def _update_response_time(self, response_time: float):
@@ -229,7 +223,7 @@ class PostgreSQLManager:
                 alpha * response_time + (1 - alpha) * self.metrics.average_response_time
             )
 
-        self.metrics.last_updated = (datetime.now( if datetime else None))
+        self.metrics.last_updated = datetime.now()
 
     async def get_pool_status(self) -> Dict[str, Any]:
         """Get connection pool status"""
@@ -237,9 +231,9 @@ class PostgreSQLManager:
             return {"status": "disconnected"}
 
         return {
-            "size": self.(pool.get_size( if pool else None)),
-            "checked_in": self.(pool.get_size( if pool else None)) - self.(pool.get_idle_size( if pool else None)),
-            "checked_out": self.(pool.get_idle_size( if pool else None)),
+            "size": self.pool.get_size(),
+            "checked_in": self.pool.get_size() - self.pool.get_idle_size(),
+            "checked_out": self.pool.get_idle_size(),
             "overflow": 0,  # asyncpg doesn't have overflow concept
             "invalid": 0,
         }
@@ -247,10 +241,9 @@ class PostgreSQLManager:
     async def close(self):
         """Close connection pool"""
         if self.pool:
-            await self.(pool.close( if pool else None))
+            await self.pool.close()
             self.is_connected = False
-            (logger.info( if logger else None)"PostgreSQL connection pool closed")
-
+            logger.info("PostgreSQL connection pool closed")
 
 class MongoDBManager:
     """MongoDB database manager with connection pooling"""
@@ -262,14 +255,14 @@ class MongoDBManager:
         self.metrics = ConnectionMetrics()
         self.is_connected = False
 
-        (logger.info( if logger else None)f"MongoDB manager initialized - Host: {config.host}:{config.port}")
+        logger.info(f"MongoDB manager initialized - Host: {config.host}:{config.port}")
 
     async def connect(self) -> bool:
         """Establish MongoDB connection"""
         try:
             connection_string = f"mongodb://{self.config.username}:{self.config.password}@{self.config.host}:{self.config.port}/{self.config.database}"
 
-            self.client = motor.(motor_asyncio.AsyncIOMotorClient( if motor_asyncio else None)
+            self.client = motor.motor_asyncio.AsyncIOMotorClient(
                 connection_string,
                 maxPoolSize=self.config.pool_size,
                 minPoolSize=1,
@@ -281,15 +274,15 @@ class MongoDBManager:
             self.database = self.client[self.config.database]
 
             # Test connection
-            await self.client.(admin.command( if admin else None)"ping")
+            await self.client.admin.command("ping")
 
             self.is_connected = True
             self.metrics.total_connections += 1
-            (logger.info( if logger else None)"MongoDB connection established")
+            logger.info("MongoDB connection established")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to connect to MongoDB: {e}")
+            logger.error(f"Failed to connect to MongoDB: {e}")
             self.metrics.failed_connections += 1
             return False
 
@@ -300,12 +293,12 @@ class MongoDBManager:
         if not self.database:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             coll = self.database[collection]
-            cursor = (coll.find( if coll else None)query or {}).limit(limit)
-            documents = await (cursor.to_list( if cursor else None)length=limit)
+            cursor = coll.find(query or {}).limit(limit)
+            documents = await cursor.to_list(length=limit)
 
             # Convert ObjectId to string
             for doc in documents:
@@ -313,16 +306,16 @@ class MongoDBManager:
                     doc["_id"] = str(doc["_id"])
 
             # Update metrics
-            response_time = (time.time( if time else None)) - start_time
+            response_time = time.time() - start_time
             self.metrics.total_queries += 1
             self.metrics.successful_queries += 1
-            (self._update_response_time( if self else None)response_time)
+            self._update_response_time(response_time)
 
             return documents
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"MongoDB find failed: {e}")
+            logger.error(f"MongoDB find failed: {e}")
             raise e
 
     async def insert_document(self, collection: str, document: Dict[str, Any]) -> str:
@@ -330,23 +323,23 @@ class MongoDBManager:
         if not self.database:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             coll = self.database[collection]
-            result = await (coll.insert_one( if coll else None)document)
+            result = await coll.insert_one(document)
 
             # Update metrics
-            response_time = (time.time( if time else None)) - start_time
+            response_time = time.time() - start_time
             self.metrics.total_queries += 1
             self.metrics.successful_queries += 1
-            (self._update_response_time( if self else None)response_time)
+            self._update_response_time(response_time)
 
             return str(result.inserted_id)
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"MongoDB insert failed: {e}")
+            logger.error(f"MongoDB insert failed: {e}")
             raise e
 
     async def update_document(
@@ -356,23 +349,23 @@ class MongoDBManager:
         if not self.database:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             coll = self.database[collection]
-            result = await (coll.update_many( if coll else None)query, {"$set": update})
+            result = await coll.update_many(query, {"$set": update})
 
             # Update metrics
-            response_time = (time.time( if time else None)) - start_time
+            response_time = time.time() - start_time
             self.metrics.total_queries += 1
             self.metrics.successful_queries += 1
-            (self._update_response_time( if self else None)response_time)
+            self._update_response_time(response_time)
 
             return result.modified_count
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"MongoDB update failed: {e}")
+            logger.error(f"MongoDB update failed: {e}")
             raise e
 
     async def create_indexes(self) -> bool:
@@ -415,19 +408,19 @@ class MongoDBManager:
         }
 
         try:
-            for collection_name, collection_indexes in (indexes.items( if indexes else None)):
+            for collection_name, collection_indexes in indexes.items():
                 collection = self.database[collection_name]
 
                 for index_spec in collection_indexes:
-                    await (collection.create_index( if collection else None)index_spec)
-                    (logger.info( if logger else None)
+                    await collection.create_index(index_spec)
+                    logger.info(
                         f"Created MongoDB index on {collection_name}: {index_spec}"
                     )
 
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create MongoDB indexes: {e}")
+            logger.error(f"Failed to create MongoDB indexes: {e}")
             return False
 
     def _update_response_time(self, response_time: float):
@@ -441,15 +434,14 @@ class MongoDBManager:
                 alpha * response_time + (1 - alpha) * self.metrics.average_response_time
             )
 
-        self.metrics.last_updated = (datetime.now( if datetime else None))
+        self.metrics.last_updated = datetime.now()
 
     async def close(self):
         """Close MongoDB connection"""
         if self.client:
-            self.(client.close( if client else None))
+            self.client.close()
             self.is_connected = False
-            (logger.info( if logger else None)"MongoDB connection closed")
-
+            logger.info("MongoDB connection closed")
 
 class ClickHouseManager:
     """ClickHouse database manager for analytics"""
@@ -457,12 +449,12 @@ class ClickHouseManager:
     def __init__(self, config: DatabaseConfig):
         self.config = config
         self.client = None
-        self.metrics = ConnectionMetrics()
-        self.is_connected = False
+        self.metrics = ConnectionMetrics(
+            self.is_connected = False
 
-        (logger.info( if logger else None)
+        logger.info(
             f"ClickHouse manager initialized - Host: {config.host}:{config.port}"
-        )
+)
 
     async def connect(self) -> bool:
         """Establish ClickHouse connection"""
@@ -480,15 +472,15 @@ class ClickHouseManager:
             )
 
             # Test connection
-            result = self.(client.execute( if client else None)"SELECT 1")
+            result = self.client.execute("SELECT 1")
 
             self.is_connected = True
             self.metrics.total_connections += 1
-            (logger.info( if logger else None)"ClickHouse connection established")
+            logger.info("ClickHouse connection established")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to connect to ClickHouse: {e}")
+            logger.error(f"Failed to connect to ClickHouse: {e}")
             self.metrics.failed_connections += 1
             return False
 
@@ -499,13 +491,13 @@ class ClickHouseManager:
         if not self.client:
             raise Exception("Database not connected")
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             if params:
-                result = self.(client.execute( if client else None)query, params)
+                result = self.client.execute(query, params)
             else:
-                result = self.(client.execute( if client else None)query)
+                result = self.client.execute(query)
 
             # Convert to list of dictionaries
             if result and len(result) > 0:
@@ -516,16 +508,16 @@ class ClickHouseManager:
                 rows = []
 
             # Update metrics
-            response_time = (time.time( if time else None)) - start_time
+            response_time = time.time() - start_time
             self.metrics.total_queries += 1
             self.metrics.successful_queries += 1
-            (self._update_response_time( if self else None)response_time)
+            self._update_response_time(response_time)
 
             return rows
 
         except Exception as e:
             self.metrics.failed_queries += 1
-            (logger.error( if logger else None)f"ClickHouse query failed: {e}")
+            logger.error(f"ClickHouse query failed: {e}")
             raise e
 
     async def create_tables(self) -> bool:
@@ -584,14 +576,14 @@ class ClickHouseManager:
 
         try:
             for table_sql in tables:
-                self.(client.execute( if client else None)table_sql)
-                table_name = (table_sql.split( if table_sql else None)"TABLE IF NOT EXISTS ")[1].split(" (")[0]
-                (logger.info( if logger else None)f"Created ClickHouse table: {table_name}")
+                self.client.execute(table_sql)
+                table_name = table_sql.split("TABLE IF NOT EXISTS ")[1].split(" (")[0]
+                logger.info(f"Created ClickHouse table: {table_name}")
 
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create ClickHouse tables: {e}")
+            logger.error(f"Failed to create ClickHouse tables: {e}")
             return False
 
     def _update_response_time(self, response_time: float):
@@ -605,15 +597,14 @@ class ClickHouseManager:
                 alpha * response_time + (1 - alpha) * self.metrics.average_response_time
             )
 
-        self.metrics.last_updated = (datetime.now( if datetime else None))
+        self.metrics.last_updated = datetime.now()
 
     def close(self):
         """Close ClickHouse connection"""
         if self.client:
-            self.(client.disconnect( if client else None))
+            self.client.disconnect()
             self.is_connected = False
-            (logger.info( if logger else None)"ClickHouse connection closed")
-
+            logger.info("ClickHouse connection closed")
 
 class DatabaseEcosystem:
     """Unified database ecosystem manager"""
@@ -623,7 +614,7 @@ class DatabaseEcosystem:
         self.configs = {}
         self.backup_configs = {}
 
-        (logger.info( if logger else None)"Database Ecosystem initialized")
+        logger.info("Database Ecosystem initialized")
 
     async def add_database(self, name: str, config: DatabaseConfig) -> bool:
         """Add database to ecosystem"""
@@ -638,19 +629,19 @@ class DatabaseEcosystem:
                 raise ValueError(f"Unsupported database type: {config.db_type}")
 
             # Connect to database
-            success = await (manager.connect( if manager else None))
+            success = await manager.connect()
 
             if success:
                 self.databases[name] = manager
                 self.configs[name] = config
-                (logger.info( if logger else None)f"Added {config.db_type.value} database: {name}")
+                logger.info(f"Added {config.db_type.value} database: {name}")
                 return True
             else:
-                (logger.error( if logger else None)f"Failed to connect to database: {name}")
+                logger.error(f"Failed to connect to database: {name}")
                 return False
 
         except Exception as e:
-            (logger.error( if logger else None)f"Error adding database {name}: {e}")
+            logger.error(f"Error adding database {name}: {e}")
             return False
 
     def get_database(
@@ -666,19 +657,19 @@ class DatabaseEcosystem:
         """Initialize indexes for all databases"""
         results = {}
 
-        for name, manager in self.(databases.items( if databases else None)):
+        for name, manager in self.databases.items():
             try:
                 if hasattr(manager, "create_indexes"):
-                    success = await (manager.create_indexes( if manager else None))
+                    success = await manager.create_indexes()
                     results[name] = success
                 elif hasattr(manager, "create_tables"):
-                    success = await (manager.create_tables( if manager else None))
+                    success = await manager.create_tables()
                     results[name] = success
                 else:
                     results[name] = True  # No indexes to create
 
             except Exception as e:
-                (logger.error( if logger else None)f"Failed to initialize indexes for {name}: {e}")
+                logger.error(f"Failed to initialize indexes for {name}: {e}")
                 results[name] = False
 
         return results
@@ -687,22 +678,22 @@ class DatabaseEcosystem:
         """Get metrics for all databases"""
         metrics = {}
 
-        for name, manager in self.(databases.items( if databases else None)):
+        for name, manager in self.databases.items():
             try:
                 db_metrics = {
                     "type": self.configs[name].db_type.value,
                     "is_connected": manager.is_connected,
-                    "connection_metrics": manager.(metrics.to_dict( if metrics else None)),
+                    "connection_metrics": manager.metrics.to_dict(),
                 }
 
                 # Add pool status if available
                 if hasattr(manager, "get_pool_status"):
-                    db_metrics["pool_status"] = await (manager.get_pool_status( if manager else None))
+                    db_metrics["pool_status"] = await manager.get_pool_status()
 
                 metrics[name] = db_metrics
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error getting metrics for {name}: {e}")
+                logger.error(f"Error getting metrics for {name}: {e}")
                 metrics[name] = {"error": str(e)}
 
         return metrics
@@ -712,28 +703,28 @@ class DatabaseEcosystem:
         health_status = {}
         overall_healthy = True
 
-        for name, manager in self.(databases.items( if databases else None)):
+        for name, manager in self.databases.items():
             try:
-                start_time = (time.time( if time else None))
+                start_time = time.time()
 
                 # Test basic connectivity
                 if hasattr(manager, "execute_query"):
                     if isinstance(manager, PostgreSQLManager):
-                        await (manager.execute_query( if manager else None)"SELECT 1")
+                        await manager.execute_query("SELECT 1")
                     elif isinstance(manager, ClickHouseManager):
-                        await (manager.execute_query( if manager else None)"SELECT 1")
+                        await manager.execute_query("SELECT 1")
                 elif hasattr(manager, "find_documents"):
                     # MongoDB test
-                    await (manager.find_documents( if manager else None)"test", {}, limit=1)
+                    await manager.find_documents("test", {}, limit=1)
 
-                response_time = ((time.time( if time else None)) - start_time) * 1000
+                response_time = (time.time() - start_time) * 1000
 
                 health_status[name] = {
                     "status": "healthy",
                     "response_time_ms": response_time,
                     "type": self.configs[name].db_type.value,
                     "is_connected": manager.is_connected,
-                    "metrics": manager.(metrics.to_dict( if metrics else None)),
+                    "metrics": manager.metrics.to_dict(),
                 }
 
             except Exception as e:
@@ -749,23 +740,22 @@ class DatabaseEcosystem:
             "overall_status": "healthy" if overall_healthy else "degraded",
             "databases": health_status,
             "total_databases": len(self.databases),
-            "healthy_databases": sum(
-                1 for db in (health_status.values( if health_status else None)) if (db.get( if db else None)"status") == "healthy"
+            "healthy_databases": sum()
+                1 for db in health_status.values() if db.get("status") == "healthy"
             ),
         }
 
     async def close_all(self):
         """Close all database connections"""
-        for name, manager in self.(databases.items( if databases else None)):
+        for name, manager in self.databases.items():
             try:
                 if hasattr(manager, "close"):
-                    await (manager.close( if manager else None))
+                    await manager.close()
                 else:
-                    (manager.close( if manager else None))
-                (logger.info( if logger else None)f"Closed database connection: {name}")
+                    manager.close()
+                logger.info(f"Closed database connection: {name}")
             except Exception as e:
-                (logger.error( if logger else None)f"Error closing database {name}: {e}")
-
+                logger.error(f"Error closing database {name}: {e}")
 
 # Global database ecosystem instance
 database_ecosystem = DatabaseEcosystem()

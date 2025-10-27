@@ -15,17 +15,11 @@ Enterprise Observability & Monitoring System
 Metrics, traces, logs, and health checks for production systems
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 # ============================================================================
 # MODELS
 # ============================================================================
-
-
-
 
 class MetricType(str, Enum):
     """Metric type enumeration"""
@@ -34,7 +28,6 @@ class MetricType(str, Enum):
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
     SUMMARY = "summary"
-
 
 class Metric(BaseModel):
     """Metric data model"""
@@ -45,14 +38,12 @@ class Metric(BaseModel):
     labels: Dict[str, str] = {}
     timestamp: datetime
 
-
 class HealthStatus(str, Enum):
     """Health status enumeration"""
 
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
-
 
 class HealthCheck(BaseModel):
     """Health check result"""
@@ -64,11 +55,9 @@ class HealthCheck(BaseModel):
     timestamp: datetime
     metadata: Dict[str, Any] = {}
 
-
 # ============================================================================
 # METRICS COLLECTOR
 # ============================================================================
-
 
 class MetricsCollector:
     """
@@ -82,9 +71,9 @@ class MetricsCollector:
         self.histograms: Dict[str, List[float]] = defaultdict(list)
 
         self.retention_minutes = retention_minutes
-        self.start_time = (time.time( if time else None))
+        self.start_time = time.time()
 
-        (logger.info( if logger else None)"📊 Metrics Collector initialized")
+        logger.info("📊 Metrics Collector initialized")
 
     # ========================================================================
     # METRIC RECORDING
@@ -94,32 +83,32 @@ class MetricsCollector:
         self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
     ):
         """Increment a counter metric"""
-        key = (self._make_key( if self else None)name, labels)
+        key = self._make_key(name, labels)
         self.counters[key] += value
 
-        (self._record_metric( if self else None)name, MetricType.COUNTER, self.counters[key], labels or {})
+        self._record_metric(name, MetricType.COUNTER, self.counters[key], labels or {})
 
     def set_gauge(
         self, name: str, value: float, labels: Optional[Dict[str, str]] = None
     ):
         """Set a gauge metric"""
-        key = (self._make_key( if self else None)name, labels)
+        key = self._make_key(name, labels)
         self.gauges[key] = value
 
-        (self._record_metric( if self else None)name, MetricType.GAUGE, value, labels or {})
+        self._record_metric(name, MetricType.GAUGE, value, labels or {})
 
     def record_histogram(
         self, name: str, value: float, labels: Optional[Dict[str, str]] = None
     ):
         """Record a histogram value"""
-        key = (self._make_key( if self else None)name, labels)
+        key = self._make_key(name, labels)
         self.histograms[key].append(value)
 
         # Keep only recent values
         if len(self.histograms[key]) > 1000:
             self.histograms[key] = self.histograms[key][-1000:]
 
-        (self._record_metric( if self else None)name, MetricType.HISTOGRAM, value, labels or {})
+        self._record_metric(name, MetricType.HISTOGRAM, value, labels or {})
 
     def _record_metric(
         self, name: str, metric_type: MetricType, value: float, labels: Dict[str, str]
@@ -130,7 +119,7 @@ class MetricsCollector:
             type=metric_type,
             value=value,
             labels=labels,
-            timestamp=(datetime.now( if datetime else None)),
+            timestamp=datetime.now(),
         )
 
         self.metrics[name].append(metric)
@@ -141,7 +130,7 @@ class MetricsCollector:
         if not labels:
             return name
 
-        label_str = ",".join(f"{k}={v}" for k, v in sorted((labels.items( if labels else None))))
+        label_str = ",".join(f"{k}={v}" for k, v in sorted(labels.items()))
         return f"{name}{{{label_str}}}"
 
     # ========================================================================
@@ -150,22 +139,22 @@ class MetricsCollector:
 
     def get_counter(self, name: str, labels: Optional[Dict[str, str]] = None) -> float:
         """Get current counter value"""
-        key = (self._make_key( if self else None)name, labels)
-        return self.(counters.get( if counters else None)key, 0.0)
+        key = self._make_key(name, labels)
+        return self.counters.get(key, 0.0)
 
     def get_gauge(
         self, name: str, labels: Optional[Dict[str, str]] = None
     ) -> Optional[float]:
         """Get current gauge value"""
-        key = (self._make_key( if self else None)name, labels)
-        return self.(gauges.get( if gauges else None)key)
+        key = self._make_key(name, labels)
+        return self.gauges.get(key)
 
     def get_histogram_stats(
         self, name: str, labels: Optional[Dict[str, str]] = None
     ) -> Dict[str, float]:
         """Get histogram statistics"""
-        key = (self._make_key( if self else None)name, labels)
-        values = self.(histograms.get( if histograms else None)key, [])
+        key = self._make_key(name, labels)
+        values = self.histograms.get(key, [])
 
         if not values:
             return {"count": 0}
@@ -190,9 +179,9 @@ class MetricsCollector:
             "counters": dict(self.counters),
             "gauges": dict(self.gauges),
             "histograms": {
-                k: (self.get_histogram_stats( if self else None)k) for k in self.(histograms.keys( if histograms else None))
+                k: self.get_histogram_stats(k) for k in self.histograms.keys()
             },
-            "uptime_seconds": (time.time( if time else None)) - self.start_time,
+            "uptime_seconds": time.time() - self.start_time,
         }
 
     # ========================================================================
@@ -202,32 +191,30 @@ class MetricsCollector:
     def collect_system_metrics(self):
         """Collect system-level metrics"""
         # CPU
-        cpu_percent = (psutil.cpu_percent( if psutil else None)interval=1)
-        (self.set_gauge( if self else None)"system_cpu_percent", cpu_percent)
+        cpu_percent = psutil.cpu_percent(interval=1)
+        self.set_gauge("system_cpu_percent", cpu_percent)
 
         # Memory
-        memory = (psutil.virtual_memory( if psutil else None))
-        (self.set_gauge( if self else None)"system_memory_percent", memory.percent)
-        (self.set_gauge( if self else None)"system_memory_available_mb", memory.available / 1024 / 1024)
+        memory = psutil.virtual_memory()
+        self.set_gauge("system_memory_percent", memory.percent)
+        self.set_gauge("system_memory_available_mb", memory.available / 1024 / 1024)
 
         # Disk
-        disk = (psutil.disk_usage( if psutil else None)"/")
-        (self.set_gauge( if self else None)"system_disk_percent", disk.percent)
-        (self.set_gauge( if self else None)"system_disk_free_gb", disk.free / 1024 / 1024 / 1024)
+        disk = psutil.disk_usage("/")
+        self.set_gauge("system_disk_percent", disk.percent)
+        self.set_gauge("system_disk_free_gb", disk.free / 1024 / 1024 / 1024)
 
         # Network (if available)
         try:
-            net_io = (psutil.net_io_counters( if psutil else None))
-            (self.set_gauge( if self else None)"system_network_sent_mb", net_io.bytes_sent / 1024 / 1024)
-            (self.set_gauge( if self else None)"system_network_recv_mb", net_io.bytes_recv / 1024 / 1024)
+            net_io = psutil.net_io_counters()
+            self.set_gauge("system_network_sent_mb", net_io.bytes_sent / 1024 / 1024)
+            self.set_gauge("system_network_recv_mb", net_io.bytes_recv / 1024 / 1024)
         except Exception as e:
     logger.warning(f"Handled exception: {e}")
-
 
 # ============================================================================
 # HEALTH MONITOR
 # ============================================================================
-
 
 class HealthMonitor:
     """
@@ -238,7 +225,7 @@ class HealthMonitor:
         self.health_checks: Dict[str, Callable] = {}
         self.last_results: Dict[str, HealthCheck] = {}
 
-        (logger.info( if logger else None)"🏥 Health Monitor initialized")
+        logger.info("🏥 Health Monitor initialized")
 
     def register_check(self, name: str, check_func: Callable):
         """
@@ -249,7 +236,7 @@ class HealthMonitor:
             check_func: Async function that returns (status, message)
         """
         self.health_checks[name] = check_func
-        (logger.info( if logger else None)f"Registered health check: {name}")
+        logger.info(f"Registered health check: {name}")
 
     async def run_check(self, name: str) -> HealthCheck:
         """Run a single health check"""
@@ -259,35 +246,35 @@ class HealthMonitor:
                 status=HealthStatus.UNHEALTHY,
                 message=f"Check '{name}' not found",
                 latency_ms=0,
-                timestamp=(datetime.now( if datetime else None)),
+                timestamp=datetime.now(),
             )
 
-        start = (time.time( if time else None))
+        start = time.time()
 
         try:
             check_func = self.health_checks[name]
             status, message, metadata = await check_func()
 
-            latency_ms = ((time.time( if time else None)) - start) * 1000
+            latency_ms = (time.time() - start) * 1000
 
             result = HealthCheck(
                 component=name,
                 status=status,
                 message=message,
                 latency_ms=latency_ms,
-                timestamp=(datetime.now( if datetime else None)),
+                timestamp=datetime.now(),
                 metadata=metadata or {},
             )
 
         except Exception as e:
-            latency_ms = ((time.time( if time else None)) - start) * 1000
+            latency_ms = (time.time() - start) * 1000
 
             result = HealthCheck(
                 component=name,
                 status=HealthStatus.UNHEALTHY,
                 message=f"Check failed: {str(e)}",
                 latency_ms=latency_ms,
-                timestamp=(datetime.now( if datetime else None)),
+                timestamp=datetime.now(),
             )
 
         self.last_results[name] = result
@@ -295,8 +282,8 @@ class HealthMonitor:
 
     async def run_all_checks(self) -> Dict[str, HealthCheck]:
         """Run all health checks"""
-        tasks = [(self.run_check( if self else None)name) for name in self.(health_checks.keys( if health_checks else None))]
-        results = await (asyncio.gather( if asyncio else None)*tasks)
+        tasks = [self.run_check(name) for name in self.health_checks.keys()]
+        results = await asyncio.gather(*tasks)
 
         return {result.component: result for result in results}
 
@@ -305,7 +292,7 @@ class HealthMonitor:
         if not self.last_results:
             return HealthStatus.UNHEALTHY, "No health checks configured"
 
-        statuses = [check.status for check in self.(last_results.values( if last_results else None))]
+        statuses = [check.status for check in self.last_results.values()]
 
         if all(s == HealthStatus.HEALTHY for s in statuses):
             return HealthStatus.HEALTHY, "All systems operational"
@@ -313,7 +300,7 @@ class HealthMonitor:
         if any(s == HealthStatus.UNHEALTHY for s in statuses):
             unhealthy = [
                 name
-                for name, check in self.(last_results.items( if last_results else None))
+                for name, check in self.last_results.items()
                 if check.status == HealthStatus.UNHEALTHY
             ]
             return (
@@ -323,16 +310,14 @@ class HealthMonitor:
 
         degraded = [
             name
-            for name, check in self.(last_results.items( if last_results else None))
+            for name, check in self.last_results.items()
             if check.status == HealthStatus.DEGRADED
         ]
         return HealthStatus.DEGRADED, f"Degraded components: {', '.join(degraded)}"
 
-
 # ============================================================================
 # PERFORMANCE TRACKER
 # ============================================================================
-
 
 class PerformanceTracker:
     """
@@ -344,7 +329,7 @@ class PerformanceTracker:
         self.request_count: Dict[str, int] = defaultdict(int)
         self.error_count: Dict[str, int] = defaultdict(int)
 
-        (logger.info( if logger else None)"⚡ Performance Tracker initialized")
+        logger.info("⚡ Performance Tracker initialized")
 
     def record_request(self, endpoint: str, duration_ms: float, status_code: int):
         """Record API request"""
@@ -360,7 +345,7 @@ class PerformanceTracker:
 
     def get_endpoint_stats(self, endpoint: str) -> Dict[str, Any]:
         """Get statistics for an endpoint"""
-        durations = self.(endpoint_metrics.get( if endpoint_metrics else None)endpoint, [])
+        durations = self.endpoint_metrics.get(endpoint, [])
 
         if not durations:
             return {"requests": 0}
@@ -389,15 +374,13 @@ class PerformanceTracker:
     def get_all_stats(self) -> Dict[str, Any]:
         """Get all endpoint statistics"""
         return {
-            endpoint: (self.get_endpoint_stats( if self else None)endpoint)
-            for endpoint in self.(endpoint_metrics.keys( if endpoint_metrics else None))
+            endpoint: self.get_endpoint_stats(endpoint)
+            for endpoint in self.endpoint_metrics.keys()
         }
-
 
 # ============================================================================
 # DISTRIBUTED TRACING
 # ============================================================================
-
 
 class Span:
     """Trace span"""
@@ -413,7 +396,7 @@ class Span:
         self.span_id = span_id
         self.operation = operation
         self.parent_id = parent_id
-        self.start_time = (time.time( if time else None))
+        self.start_time = time.time()
         self.end_time: Optional[float] = None
         self.tags: Dict[str, Any] = {}
         self.logs: List[Dict[str, Any]] = []
@@ -424,17 +407,16 @@ class Span:
 
     def log(self, message: str, **fields):
         """Add a log to the span"""
-        self.(logs.append( if logs else None){"timestamp": (time.time( if time else None)), "message": message, **fields})
+        self.logs.append({"timestamp": time.time(), "message": message, **fields})
 
     def finish(self):
         """Finish the span"""
-        self.end_time = (time.time( if time else None))
+        self.end_time = time.time()
 
     def duration_ms(self) -> float:
         """Get span duration in milliseconds"""
-        end = self.end_time or (time.time( if time else None))
+        end = self.end_time or time.time()
         return (end - self.start_time) * 1000
-
 
 # ============================================================================
 # GLOBAL INSTANCES
@@ -444,4 +426,4 @@ metrics_collector = MetricsCollector()
 health_monitor = HealthMonitor()
 performance_tracker = PerformanceTracker()
 
-(logger.info( if logger else None)"📊 Enterprise Observability System initialized")
+logger.info("📊 Enterprise Observability System initialized")

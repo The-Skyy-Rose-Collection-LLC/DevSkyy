@@ -32,10 +32,7 @@ Features:
 - Auto-routing to best model
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class MultiModelAIOrchestrator:
     """
@@ -48,7 +45,7 @@ class MultiModelAIOrchestrator:
         self.models = {}
 
         # Anthropic (Claude)
-        anthropic_key = (os.getenv( if os else None)"ANTHROPIC_API_KEY")
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY")
         if anthropic_key:
             self.models["claude"] = {
                 "client": AsyncAnthropic(api_key=anthropic_key),
@@ -62,7 +59,7 @@ class MultiModelAIOrchestrator:
             }
 
         # OpenAI
-        openai_key = (os.getenv( if os else None)"OPENAI_API_KEY")
+        openai_key = os.getenv("OPENAI_API_KEY")
         if openai_key:
             self.models["openai"] = {
                 "client": AsyncOpenAI(api_key=openai_key),
@@ -76,7 +73,7 @@ class MultiModelAIOrchestrator:
             }
 
         # Google Gemini
-        gemini_key = (os.getenv( if os else None)"GOOGLE_API_KEY")
+        gemini_key = os.getenv("GOOGLE_API_KEY")
         if gemini_key:
             self.models["gemini"] = {
                 "api_key": gemini_key,
@@ -86,7 +83,7 @@ class MultiModelAIOrchestrator:
             }
 
         # Mistral
-        mistral_key = (os.getenv( if os else None)"MISTRAL_API_KEY")
+        mistral_key = os.getenv("MISTRAL_API_KEY")
         if mistral_key:
             self.models["mistral"] = {
                 "api_key": mistral_key,
@@ -99,7 +96,7 @@ class MultiModelAIOrchestrator:
             }
 
         # Together AI (for Llama and other open models)
-        together_key = (os.getenv( if os else None)"TOGETHER_API_KEY")
+        together_key = os.getenv("TOGETHER_API_KEY")
         if together_key:
             self.models["together"] = {
                 "api_key": together_key,
@@ -112,7 +109,7 @@ class MultiModelAIOrchestrator:
             }
 
         # Cohere
-        cohere_key = (os.getenv( if os else None)"COHERE_API_KEY")
+        cohere_key = os.getenv("COHERE_API_KEY")
         if cohere_key:
             self.models["cohere"] = {
                 "api_key": cohere_key,
@@ -137,7 +134,7 @@ class MultiModelAIOrchestrator:
             "general": "claude_sonnet",
         }
 
-        (logger.info( if logger else None)
+        logger.info(
             f"🤖 Multi-Model Orchestrator initialized with {len(self.models)} AI platforms"
         )
 
@@ -164,16 +161,16 @@ class MultiModelAIOrchestrator:
         """
         try:
             if use_ensemble:
-                return await (self._ensemble_generate( if self else None)
+                return await self._ensemble_generate(
                     prompt, task_type, max_tokens, temperature
                 )
             else:
-                return await (self._single_model_generate( if self else None)
+                return await self._single_model_generate(
                     prompt, task_type, max_tokens, temperature
                 )
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Multi-model generation failed: {e}")
+            logger.error(f"❌ Multi-model generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _single_model_generate(
@@ -183,35 +180,35 @@ class MultiModelAIOrchestrator:
         Generate response using single optimal model.
         """
         # Get optimal model for task
-        model_id = self.(task_routing.get( if task_routing else None)task_type, "claude_sonnet")
-        platform, model_name = (model_id.split( if model_id else None)"_", 1)
+        model_id = self.task_routing.get(task_type, "claude_sonnet")
+        platform, model_name = model_id.split("_", 1)
 
-        (logger.info( if logger else None)f"🎯 Routing {task_type} task to {platform} {model_name}")
+        logger.info(f"🎯 Routing {task_type} task to {platform} {model_name}")
 
         # Generate with selected model
         if platform == "claude":
-            response = await (self._call_claude( if self else None)
+            response = await self._call_claude(
                 model_name, prompt, max_tokens, temperature
             )
         elif platform == "openai":
-            response = await (self._call_openai( if self else None)
+            response = await self._call_openai(
                 model_name, prompt, max_tokens, temperature
             )
         elif platform == "gemini":
-            response = await (self._call_gemini( if self else None)
+            response = await self._call_gemini(
                 model_name, prompt, max_tokens, temperature
             )
         elif platform == "mistral":
-            response = await (self._call_mistral( if self else None)
+            response = await self._call_mistral(
                 model_name, prompt, max_tokens, temperature
             )
         elif platform == "together":
-            response = await (self._call_together( if self else None)
+            response = await self._call_together(
                 model_name, prompt, max_tokens, temperature
             )
         else:
             # Fallback to Claude Sonnet
-            response = await (self._call_claude( if self else None)
+            response = await self._call_claude(
                 "sonnet", prompt, max_tokens, temperature
             )
 
@@ -219,7 +216,7 @@ class MultiModelAIOrchestrator:
             "response": response,
             "model_used": model_id,
             "task_type": task_type,
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def _ensemble_generate(
@@ -228,7 +225,7 @@ class MultiModelAIOrchestrator:
         """
         Generate responses from multiple models and combine them.
         """
-        (logger.info( if logger else None)f"🎭 Using ensemble approach for {task_type}")
+        logger.info(f"🎭 Using ensemble approach for {task_type}")
 
         # Select top 3 models for this task
         models_to_use = [
@@ -240,21 +237,21 @@ class MultiModelAIOrchestrator:
         # Generate responses in parallel
         tasks = []
         for model_id in models_to_use:
-            platform, model_name = (model_id.split( if model_id else None)"_", 1)
+            platform, model_name = model_id.split("_", 1)
             if platform == "claude" and "claude" in self.models:
-                (tasks.append( if tasks else None)
-                    (self._call_claude( if self else None)model_name, prompt, max_tokens, temperature)
+                tasks.append(
+                    self._call_claude(model_name, prompt, max_tokens, temperature)
                 )
             elif platform == "openai" and "openai" in self.models:
-                (tasks.append( if tasks else None)
-                    (self._call_openai( if self else None)model_name, prompt, max_tokens, temperature)
+                tasks.append(
+                    self._call_openai(model_name, prompt, max_tokens, temperature)
                 )
             elif platform == "gemini" and "gemini" in self.models:
-                (tasks.append( if tasks else None)
-                    (self._call_gemini( if self else None)model_name, prompt, max_tokens, temperature)
+                tasks.append(
+                    self._call_gemini(model_name, prompt, max_tokens, temperature)
                 )
 
-        responses = await (asyncio.gather( if asyncio else None)*tasks, return_exceptions=True)
+        responses = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Filter out errors
         valid_responses = [r for r in responses if not isinstance(r, Exception)]
@@ -272,7 +269,7 @@ Responses:
 
 Create the optimal combined response that leverages the strengths of each."""
 
-        final_response = await (self._call_claude( if self else None)
+        final_response = await self._call_claude(
             "sonnet", synthesis_prompt, max_tokens, 0.3
         )
 
@@ -281,7 +278,7 @@ Create the optimal combined response that leverages the strengths of each."""
             "ensemble_used": models_to_use,
             "individual_responses": valid_responses,
             "task_type": task_type,
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def _call_claude(
@@ -294,7 +291,7 @@ Create the optimal combined response that leverages the strengths of each."""
                 model_name, self.models["claude"]["models"]["sonnet"]
             )
 
-            response = await client.(messages.create( if messages else None)
+            response = await client.messages.create(
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -304,7 +301,7 @@ Create the optimal combined response that leverages the strengths of each."""
             return response.content[0].text
 
         except Exception as e:
-            (logger.error( if logger else None)f"Claude call failed: {e}")
+            logger.error(f"Claude call failed: {e}")
             raise
 
     async def _call_openai(
@@ -317,7 +314,7 @@ Create the optimal combined response that leverages the strengths of each."""
                 model_name, self.models["openai"]["models"]["gpt4"]
             )
 
-            response = await client.chat.(completions.create( if completions else None)
+            response = await client.chat.completions.create(
                 model=model,
                 max_tokens=max_tokens,
                 temperature=temperature,
@@ -327,7 +324,7 @@ Create the optimal combined response that leverages the strengths of each."""
             return response.choices[0].message.content
 
         except Exception as e:
-            (logger.error( if logger else None)f"OpenAI call failed: {e}")
+            logger.error(f"OpenAI call failed: {e}")
             raise
 
     async def _call_gemini(
@@ -340,8 +337,8 @@ Create the optimal combined response that leverages the strengths of each."""
 
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=60.0) as client:
-                response = await (client.post( if client else None)
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
                     url,
                     json={
                         "contents": [{"parts": [{"text": prompt}]}],
@@ -353,13 +350,13 @@ Create the optimal combined response that leverages the strengths of each."""
                 )
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
+                    data = response.json()
                     return data["candidates"][0]["content"]["parts"][0]["text"]
                 else:
                     raise Exception(f"Gemini API error: {response.status_code}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Gemini call failed: {e}")
+            logger.error(f"Gemini call failed: {e}")
             raise
 
     async def _call_mistral(
@@ -374,8 +371,8 @@ Create the optimal combined response that leverages the strengths of each."""
 
             url = "https://api.mistral.ai/v1/chat/completions"
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=60.0) as client:
-                response = await (client.post( if client else None)
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
                     url,
                     headers={"Authorization": f"Bearer {api_key}"},
                     json={
@@ -387,13 +384,13 @@ Create the optimal combined response that leverages the strengths of each."""
                 )
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
+                    data = response.json()
                     return data["choices"][0]["message"]["content"]
                 else:
                     raise Exception(f"Mistral API error: {response.status_code}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Mistral call failed: {e}")
+            logger.error(f"Mistral call failed: {e}")
             raise
 
     async def _call_together(
@@ -408,8 +405,8 @@ Create the optimal combined response that leverages the strengths of each."""
 
             url = "https://api.together.xyz/v1/chat/completions"
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=60.0) as client:
-                response = await (client.post( if client else None)
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(
                     url,
                     headers={"Authorization": f"Bearer {api_key}"},
                     json={
@@ -421,20 +418,20 @@ Create the optimal combined response that leverages the strengths of each."""
                 )
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
+                    data = response.json()
                     return data["choices"][0]["message"]["content"]
                 else:
                     raise Exception(f"Together AI error: {response.status_code}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Together AI call failed: {e}")
+            logger.error(f"Together AI call failed: {e}")
             raise
 
     async def get_best_model_for_task(self, task_type: str) -> str:
         """
         Get the best model for a specific task type based on performance history.
         """
-        return self.(task_routing.get( if task_routing else None)task_type, "claude_sonnet")
+        return self.task_routing.get(task_type, "claude_sonnet")
 
     async def benchmark_models(self, test_prompts: List[str]) -> Dict[str, Any]:
         """
@@ -442,23 +439,23 @@ Create the optimal combined response that leverages the strengths of each."""
         """
         results = {}
 
-        for platform, config in self.(models.items( if models else None)):
+        for platform, config in self.models.items():
             if "client" in config or "api_key" in config:
                 platform_results = []
                 for prompt in test_prompts:
                     try:
-                        start_time = (datetime.now( if datetime else None))
+                        start_time = datetime.now()
 
                         if platform == "claude":
-                            await (self._call_claude( if self else None)"sonnet", prompt, 500, 0.7)
+                            await self._call_claude("sonnet", prompt, 500, 0.7)
                         elif platform == "openai":
-                            await (self._call_openai( if self else None)"gpt4", prompt, 500, 0.7)
+                            await self._call_openai("gpt4", prompt, 500, 0.7)
                         elif platform == "gemini":
-                            await (self._call_gemini( if self else None)"pro", prompt, 500, 0.7)
+                            await self._call_gemini("pro", prompt, 500, 0.7)
 
-                        duration = ((datetime.now( if datetime else None)) - start_time).total_seconds()
+                        duration = (datetime.now() - start_time).total_seconds()
 
-                        (platform_results.append( if platform_results else None)
+                        platform_results.append(
                             {
                                 "prompt": prompt,
                                 "response_time": duration,
@@ -467,7 +464,7 @@ Create the optimal combined response that leverages the strengths of each."""
                         )
 
                     except Exception as e:
-                        (platform_results.append( if platform_results else None)
+                        platform_results.append(
                             {"prompt": prompt, "error": str(e), "success": False}
                         )
 
@@ -475,28 +472,24 @@ Create the optimal combined response that leverages the strengths of each."""
 
         return results
 
-
 # Factory function
 def create_multi_model_orchestrator() -> MultiModelAIOrchestrator:
     """Create Multi-Model AI Orchestrator."""
     return MultiModelAIOrchestrator()
 
-
 # Global instance
 ai_orchestrator = create_multi_model_orchestrator()
-
 
 # Convenience functions
 async def ai_generate(
     prompt: str, task_type: str = "general", use_best: bool = True
 ) -> str:
     """Generate using optimal AI model."""
-    result = await (ai_orchestrator.generate( if ai_orchestrator else None)
+    result = await ai_orchestrator.generate(
         prompt, task_type, use_ensemble=not use_best
     )
-    return (result.get( if result else None)"response", "")
-
+    return result.get("response", "")
 
 async def ai_ensemble(prompt: str, task_type: str = "general") -> Dict[str, Any]:
     """Generate using ensemble of top models."""
-    return await (ai_orchestrator.generate( if ai_orchestrator else None)prompt, task_type, use_ensemble=True)
+    return await ai_orchestrator.generate(prompt, task_type, use_ensemble=True)

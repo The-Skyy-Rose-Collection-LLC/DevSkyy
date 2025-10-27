@@ -9,10 +9,7 @@ Inventory Optimizer
 ML-powered inventory management and forecasting
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class InventoryOptimizer:
     """
@@ -32,7 +29,7 @@ class InventoryOptimizer:
         self.inventory_data = {}
         self.reorder_rules = {}
 
-        (logger.info( if logger else None)"📊 Inventory Optimizer initialized")
+        logger.info("📊 Inventory Optimizer initialized")
 
     async def forecast_demand(
         self, product_id: str, historical_sales: List[int], forecast_periods: int = 30
@@ -56,14 +53,14 @@ class InventoryOptimizer:
                 }
 
             # Prepare time series features
-            X = (np.array( if np else None)[[i, i % 7, i % 30] for i in range(len(historical_sales))])
-            y = (np.array( if np else None)historical_sales)
+            X = np.array([[i, i % 7, i % 30] for i in range(len(historical_sales))])
+            y = np.array(historical_sales)
 
             # Train model
-            self.(forecast_model.fit( if forecast_model else None)X, y)
+            self.forecast_model.fit(X, y)
 
             # Generate forecast
-            future_X = (np.array( if np else None)
+            future_X = np.array(
                 [
                     [
                         len(historical_sales) + i,
@@ -74,40 +71,40 @@ class InventoryOptimizer:
                 ]
             )
 
-            forecast = self.(forecast_model.predict( if forecast_model else None)future_X)
+            forecast = self.forecast_model.predict(future_X)
 
             # Calculate confidence intervals (simplified)
-            std = (np.std( if np else None)historical_sales)
+            std = np.std(historical_sales)
             confidence_lower = forecast - (1.96 * std)
             confidence_upper = forecast + (1.96 * std)
 
             # Calculate trends
-            recent_avg = (np.mean( if np else None)historical_sales[-7:])
-            historical_avg = (np.mean( if np else None)historical_sales)
+            recent_avg = np.mean(historical_sales[-7:])
+            historical_avg = np.mean(historical_sales)
             trend = "increasing" if recent_avg > historical_avg else "decreasing"
 
             return {
                 "success": True,
                 "product_id": product_id,
                 "forecast": {
-                    "predicted_demand": (forecast.tolist( if forecast else None)),
-                    "confidence_lower": (np.maximum( if np else None)0, confidence_lower).tolist(),
-                    "confidence_upper": (confidence_upper.tolist( if confidence_upper else None)),
-                    "total_forecasted_units": int((np.sum( if np else None)forecast)),
+                    "predicted_demand": forecast.tolist(),
+                    "confidence_lower": np.maximum(0, confidence_lower).tolist(),
+                    "confidence_upper": confidence_upper.tolist(),
+                    "total_forecasted_units": int(np.sum(forecast)),
                 },
                 "analysis": {
                     "trend": trend,
-                    "average_daily_sales": round(float((np.mean( if np else None)historical_sales)), 2),
-                    "peak_demand_day": int((np.argmax( if np else None)forecast)),
+                    "average_daily_sales": round(float(np.mean(historical_sales)), 2),
+                    "peak_demand_day": int(np.argmax(forecast)),
                     "volatility": round(
-                        float((np.std( if np else None)historical_sales) / (np.mean( if np else None)historical_sales)), 3
+                        float(np.std(historical_sales) / np.mean(historical_sales)), 3
                     ),
                 },
                 "forecast_period_days": forecast_periods,
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Demand forecasting failed: {e}")
+            logger.error(f"Demand forecasting failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def calculate_reorder_point(
@@ -125,10 +122,10 @@ class InventoryOptimizer:
         """
         try:
             # Extract data
-            avg_daily_sales = (sales_data.get( if sales_data else None)"avg_daily_sales", 10)
-            lead_time_days = (product_data.get( if product_data else None)"supplier_lead_time_days", 14)
-            safety_stock_days = (product_data.get( if product_data else None)"safety_stock_days", 7)
-            current_stock = (product_data.get( if product_data else None)"current_stock", 0)
+            avg_daily_sales = sales_data.get("avg_daily_sales", 10)
+            lead_time_days = product_data.get("supplier_lead_time_days", 14)
+            safety_stock_days = product_data.get("safety_stock_days", 7)
+            current_stock = product_data.get("current_stock", 0)
 
             # Calculate reorder point
             lead_time_demand = avg_daily_sales * lead_time_days
@@ -137,11 +134,11 @@ class InventoryOptimizer:
 
             # Calculate economic order quantity (EOQ)
             annual_demand = avg_daily_sales * 365
-            ordering_cost = (product_data.get( if product_data else None)"ordering_cost", 50)
-            holding_cost = (product_data.get( if product_data else None)"holding_cost_per_unit", 5)
+            ordering_cost = product_data.get("ordering_cost", 50)
+            holding_cost = product_data.get("holding_cost_per_unit", 5)
 
             if holding_cost > 0:
-                eoq = (np.sqrt( if np else None)(2 * annual_demand * ordering_cost) / holding_cost)
+                eoq = np.sqrt((2 * annual_demand * ordering_cost) / holding_cost)
             else:
                 eoq = avg_daily_sales * 30  # Default to 30 days supply
 
@@ -156,7 +153,7 @@ class InventoryOptimizer:
 
             return {
                 "success": True,
-                "product_id": (product_data.get( if product_data else None)"id"),
+                "product_id": product_data.get("id"),
                 "current_stock": current_stock,
                 "reorder_point": int(reorder_point),
                 "recommended_order_quantity": int(eoq),
@@ -172,7 +169,7 @@ class InventoryOptimizer:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Reorder point calculation failed: {e}")
+            logger.error(f"Reorder point calculation failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def identify_dead_stock(
@@ -194,17 +191,17 @@ class InventoryOptimizer:
             total_value_locked = 0
 
             for item in inventory:
-                days_since_sale = (item.get( if item else None)"days_since_last_sale", 0)
-                quantity = (item.get( if item else None)"quantity", 0)
-                cost = (item.get( if item else None)"cost", 0)
+                days_since_sale = item.get("days_since_last_sale", 0)
+                quantity = item.get("quantity", 0)
+                cost = item.get("cost", 0)
 
                 value_locked = quantity * cost
 
                 if days_since_sale >= threshold_days:
-                    (dead_stock.append( if dead_stock else None)
+                    dead_stock.append(
                         {
-                            "product_id": (item.get( if item else None)"id"),
-                            "product_name": (item.get( if item else None)"name"),
+                            "product_id": item.get("id"),
+                            "product_name": item.get("name"),
                             "quantity": quantity,
                             "days_since_sale": days_since_sale,
                             "value_locked": value_locked,
@@ -218,10 +215,10 @@ class InventoryOptimizer:
                     total_value_locked += value_locked
 
                 elif days_since_sale >= threshold_days / 2:
-                    (slow_moving.append( if slow_moving else None)
+                    slow_moving.append(
                         {
-                            "product_id": (item.get( if item else None)"id"),
-                            "product_name": (item.get( if item else None)"name"),
+                            "product_id": item.get("id"),
+                            "product_name": item.get("name"),
                             "quantity": quantity,
                             "days_since_sale": days_since_sale,
                             "value_locked": value_locked,
@@ -245,7 +242,7 @@ class InventoryOptimizer:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Dead stock identification failed: {e}")
+            logger.error(f"Dead stock identification failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def optimize_stock_levels(
@@ -267,27 +264,27 @@ class InventoryOptimizer:
             total_reduction_possible = 0
 
             for product in products:
-                avg_sales = (product.get( if product else None)"avg_daily_sales", 0)
-                current_stock = (product.get( if product else None)"current_stock", 0)
-                cost = (product.get( if product else None)"cost", 0)
-                lead_time = (product.get( if product else None)"lead_time_days", 14)
+                avg_sales = product.get("avg_daily_sales", 0)
+                current_stock = product.get("current_stock", 0)
+                cost = product.get("cost", 0)
+                lead_time = product.get("lead_time_days", 14)
 
                 # Calculate optimal stock level
                 # Using normal distribution assumption for demand
                 z_score = 1.65  # For 95% service level
-                std_dev = (product.get( if product else None)"sales_std_dev", avg_sales * 0.3)
+                std_dev = product.get("sales_std_dev", avg_sales * 0.3)
 
                 optimal_stock = (avg_sales * lead_time) + (
-                    z_score * std_dev * (np.sqrt( if np else None)lead_time)
+                    z_score * std_dev * np.sqrt(lead_time)
                 )
 
                 difference = optimal_stock - current_stock
                 value_change = difference * cost
 
-                (recommendations.append( if recommendations else None)
+                recommendations.append(
                     {
-                        "product_id": (product.get( if product else None)"id"),
-                        "product_name": (product.get( if product else None)"name"),
+                        "product_id": product.get("id"),
+                        "product_name": product.get("name"),
                         "current_stock": current_stock,
                         "optimal_stock": int(optimal_stock),
                         "adjustment_needed": int(difference),
@@ -320,5 +317,5 @@ class InventoryOptimizer:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Stock level optimization failed: {e}")
+            logger.error(f"Stock level optimization failed: {e}")
             return {"success": False, "error": str(e)}

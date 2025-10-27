@@ -21,7 +21,7 @@ Continuous Learning Background Agent
 Autonomous 24/7 agent that learns new frontend/backend practices and auto-implements improvements
 
 Features:
-- Monitors latest framework releases (React, FastAPI, Next.js, etc.)
+    - Monitors latest framework releases (React, FastAPI, Next.js, etc.)
 - Tracks new best practices and patterns
 - Learns from official documentation updates
 - Analyzes GitHub trending repositories
@@ -36,10 +36,7 @@ Features:
 - Auto-generates migration guides
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class ContinuousLearningBackgroundAgent:
     """
@@ -49,8 +46,8 @@ class ContinuousLearningBackgroundAgent:
 
     def __init__(self):
         # AI Services for learning and reasoning
-        self.claude = AsyncAnthropic(api_key=(os.getenv( if os else None)"ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=(os.getenv( if os else None)"OPENAI_API_KEY"))
+        self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         # Knowledge base
         self.learned_practices: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
@@ -166,92 +163,92 @@ class ContinuousLearningBackgroundAgent:
 
         # Storage
         self.storage_path = Path("agent_learning_data")
-        self.(storage_path.mkdir( if storage_path else None)exist_ok=True)
+        self.storage_path.mkdir(exist_ok=True)
 
-        (logger.info( if logger else None)"🧠 Continuous Learning Background Agent initialized")
+        logger.info("🧠 Continuous Learning Background Agent initialized")
 
     async def start_learning_daemon(self) -> None:
         """
         Start the continuous learning daemon that runs 24/7.
         """
-        (logger.info( if logger else None)"🚀 Starting continuous learning daemon...")
+        logger.info("🚀 Starting continuous learning daemon...")
 
         iteration = 0
         while self.config["run_as_daemon"]:
             try:
                 iteration += 1
-                (logger.info( if logger else None)
-                    f"📚 Learning iteration #{iteration} started at {(datetime.now( if datetime else None))}"
+                logger.info(
+                    f"📚 Learning iteration #{iteration} started at {datetime.now()}"
                 )
 
                 # Run learning cycle
-                await (self._learning_cycle( if self else None))
+                await self._learning_cycle()
 
                 # Wait for next iteration
-                (logger.info( if logger else None)
+                logger.info(
                     f"⏰ Next learning cycle in {self.config['learning_interval']} seconds"
                 )
-                await (asyncio.sleep( if asyncio else None)self.config["learning_interval"])
+                await asyncio.sleep(self.config["learning_interval"])
 
             except Exception as e:
-                (logger.error( if logger else None)f"❌ Learning daemon error: {e}")
+                logger.error(f"❌ Learning daemon error: {e}")
                 # Continue running despite errors
-                await (asyncio.sleep( if asyncio else None)60)  # TODO: Move to config
+                await asyncio.sleep(60)  # TODO: Move to config
 
     async def _learning_cycle(self) -> Dict[str, Any]:
         """
         Execute one complete learning cycle.
         """
         try:
-            cycle_start = (datetime.now( if datetime else None))
+            cycle_start = datetime.now()
             improvements_applied = 0
 
             # 1. Check for framework updates
-            (logger.info( if logger else None)"1️⃣ Checking framework updates...")
-            framework_updates = await (self._check_framework_updates( if self else None))
+            logger.info("1️⃣ Checking framework updates...")
+            framework_updates = await self._check_framework_updates()
 
             # 2. Learn from documentation updates
-            (logger.info( if logger else None)"2️⃣ Learning from documentation...")
-            doc_learnings = await (self._learn_from_documentation( if self else None))
+            logger.info("2️⃣ Learning from documentation...")
+            doc_learnings = await self._learn_from_documentation()
 
             # 3. Analyze trending repositories
-            (logger.info( if logger else None)"3️⃣ Analyzing trending repositories...")
-            repo_insights = await (self._analyze_trending_repos( if self else None))
+            logger.info("3️⃣ Analyzing trending repositories...")
+            repo_insights = await self._analyze_trending_repos()
 
             # 4. Monitor tech blogs and news
-            (logger.info( if logger else None)"4️⃣ Monitoring tech news...")
-            news_insights = await (self._monitor_tech_news( if self else None))
+            logger.info("4️⃣ Monitoring tech news...")
+            news_insights = await self._monitor_tech_news()
 
             # 5. Identify new best practices
-            (logger.info( if logger else None)"5️⃣ Identifying new best practices...")
-            new_practices = await (self._identify_new_practices( if self else None)
+            logger.info("5️⃣ Identifying new best practices...")
+            new_practices = await self._identify_new_practices(
                 framework_updates, doc_learnings, repo_insights, news_insights
             )
 
             # 6. Analyze current codebase
-            (logger.info( if logger else None)"6️⃣ Analyzing current codebase...")
-            codebase_analysis = await (self._analyze_codebase( if self else None))
+            logger.info("6️⃣ Analyzing current codebase...")
+            codebase_analysis = await self._analyze_codebase()
 
             # 7. Generate improvement recommendations
-            (logger.info( if logger else None)"7️⃣ Generating improvements...")
-            recommendations = await (self._generate_improvements( if self else None)
+            logger.info("7️⃣ Generating improvements...")
+            recommendations = await self._generate_improvements(
                 new_practices, codebase_analysis
             )
 
             # 8. Apply high-confidence improvements
             if self.config["apply_improvements"]:
-                (logger.info( if logger else None)"8️⃣ Applying improvements...")
-                improvements_applied = await (self._apply_improvements( if self else None)recommendations)
+                logger.info("8️⃣ Applying improvements...")
+                improvements_applied = await self._apply_improvements(recommendations)
 
             # 9. Update knowledge base
-            await (self._update_knowledge_base( if self else None)new_practices, recommendations)
+            await self._update_knowledge_base(new_practices, recommendations)
 
             # 10. Generate learning report
-            cycle_duration = ((datetime.now( if datetime else None)) - cycle_start).total_seconds()
+            cycle_duration = (datetime.now() - cycle_start).total_seconds()
 
             report = {
                 "cycle_complete": True,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "duration_seconds": cycle_duration,
                 "framework_updates_found": len(framework_updates),
                 "new_practices_learned": len(new_practices),
@@ -259,21 +256,21 @@ class ContinuousLearningBackgroundAgent:
                 "improvements_applied": improvements_applied,
                 "total_knowledge_base_size": len(self.learned_practices),
                 "next_cycle": (
-                    (datetime.now( if datetime else None)) + timedelta(seconds=self.config["learning_interval"])
+                    datetime.now() + timedelta(seconds=self.config["learning_interval"])
                 ).isoformat(),
             }
 
             # Save report
-            await (self._save_learning_report( if self else None)report)
+            await self._save_learning_report(report)
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"✅ Learning cycle complete: {improvements_applied} improvements applied"
             )
 
             return report
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Learning cycle failed: {e}")
+            logger.error(f"❌ Learning cycle failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _check_framework_updates(self) -> List[Dict[str, Any]]:
@@ -282,16 +279,16 @@ class ContinuousLearningBackgroundAgent:
         """
         updates = []
 
-        async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-            for tech_name, tech_info in self.(monitored_technologies.items( if monitored_technologies else None)):
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            for tech_name, tech_info in self.monitored_technologies.items():
                 try:
                     # Check npm packages
                     if "npm_package" in tech_info:
-                        npm_update = await (self._check_npm_update( if self else None)
+                        npm_update = await self._check_npm_update(
                             tech_info["npm_package"], client
                         )
                         if npm_update:
-                            (updates.append( if updates else None)
+                            updates.append(
                                 {
                                     "technology": tech_name,
                                     "type": "npm",
@@ -302,11 +299,11 @@ class ContinuousLearningBackgroundAgent:
 
                     # Check pip packages
                     if "pip_package" in tech_info:
-                        pip_update = await (self._check_pip_update( if self else None)
+                        pip_update = await self._check_pip_update(
                             tech_info["pip_package"], client
                         )
                         if pip_update:
-                            (updates.append( if updates else None)
+                            updates.append(
                                 {
                                     "technology": tech_name,
                                     "type": "pip",
@@ -317,11 +314,11 @@ class ContinuousLearningBackgroundAgent:
 
                     # Check GitHub releases
                     if "github" in tech_info:
-                        github_update = await (self._check_github_releases( if self else None)
+                        github_update = await self._check_github_releases(
                             tech_info["github"], client
                         )
                         if github_update:
-                            (updates.append( if updates else None)
+                            updates.append(
                                 {
                                     "technology": tech_name,
                                     "type": "github",
@@ -331,9 +328,9 @@ class ContinuousLearningBackgroundAgent:
                             )
 
                 except Exception as e:
-                    (logger.error( if logger else None)f"Error checking {tech_name}: {e}")
+                    logger.error(f"Error checking {tech_name}: {e}")
 
-        (logger.info( if logger else None)f"Found {len(updates)} framework updates")
+        logger.info(f"Found {len(updates)} framework updates")
         return updates
 
     async def _check_npm_update(
@@ -343,11 +340,11 @@ class ContinuousLearningBackgroundAgent:
         Check for npm package updates.
         """
         try:
-            response = await (client.get( if client else None)f"https://registry.npmjs.org/{package_name}")
+            response = await client.get(f"https://registry.npmjs.org/{package_name}")
             if response.status_code == 200:
-                data = (response.json( if response else None))
-                latest_version = (data.get( if data else None)"dist-tags", {}).get("latest")
-                current_version = self.(framework_versions.get( if framework_versions else None)package_name)
+                data = response.json()
+                latest_version = data.get("dist-tags", {}).get("latest")
+                current_version = self.framework_versions.get(package_name)
 
                 if latest_version and latest_version != current_version:
                     return {
@@ -357,7 +354,7 @@ class ContinuousLearningBackgroundAgent:
                         "changelog_url": f"https://github.com/{package_name}/releases",
                     }
         except Exception as e:
-            (logger.debug( if logger else None)f"NPM check failed for {package_name}: {e}")
+            logger.debug(f"NPM check failed for {package_name}: {e}")
 
         return None
 
@@ -368,21 +365,21 @@ class ContinuousLearningBackgroundAgent:
         Check for pip package updates.
         """
         try:
-            response = await (client.get( if client else None)f"https://pypi.org/pypi/{package_name}/json")
+            response = await client.get(f"https://pypi.org/pypi/{package_name}/json")
             if response.status_code == 200:
-                data = (response.json( if response else None))
-                latest_version = (data.get( if data else None)"info", {}).get("version")
-                current_version = self.(framework_versions.get( if framework_versions else None)package_name)
+                data = response.json()
+                latest_version = data.get("info", {}).get("version")
+                current_version = self.framework_versions.get(package_name)
 
                 if latest_version and latest_version != current_version:
                     return {
                         "package": package_name,
                         "current_version": current_version,
                         "latest_version": latest_version,
-                        "release_notes": (data.get( if data else None)"info", {}).get("release_url"),
+                        "release_notes": data.get("info", {}).get("release_url"),
                     }
         except Exception as e:
-            (logger.debug( if logger else None)f"PyPI check failed for {package_name}: {e}")
+            logger.debug(f"PyPI check failed for {package_name}: {e}")
 
         return None
 
@@ -393,22 +390,22 @@ class ContinuousLearningBackgroundAgent:
         Check for new GitHub releases.
         """
         try:
-            response = await (client.get( if client else None)
+            response = await client.get(
                 f"https://api.github.com/repos/{repo}/releases/latest",
                 headers={"Accept": "application/vnd.github.v3+json"},
             )
             if response.status_code == 200:
-                data = (response.json( if response else None))
+                data = response.json()
                 return {
                     "repo": repo,
-                    "version": (data.get( if data else None)"tag_name"),
-                    "name": (data.get( if data else None)"name"),
-                    "published_at": (data.get( if data else None)"published_at"),
-                    "body": (data.get( if data else None)"body", "")[:500],  # First 500 chars
-                    "url": (data.get( if data else None)"html_url"),
+                    "version": data.get("tag_name"),
+                    "name": data.get("name"),
+                    "published_at": data.get("published_at"),
+                    "body": data.get("body", "")[:500],  # First 500 chars
+                    "url": data.get("html_url"),
                 }
         except Exception as e:
-            (logger.debug( if logger else None)f"GitHub check failed for {repo}: {e}")
+            logger.debug(f"GitHub check failed for {repo}: {e}")
 
         return None
 
@@ -418,22 +415,22 @@ class ContinuousLearningBackgroundAgent:
         """
         learnings = []
 
-        async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-            for tech_name, tech_info in self.(monitored_technologies.items( if monitored_technologies else None)):
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            for tech_name, tech_info in self.monitored_technologies.items():
                 if "docs_url" in tech_info:
                     try:
                         # Fetch documentation
-                        response = await (client.get( if client else None)tech_info["docs_url"])
+                        response = await client.get(tech_info["docs_url"])
                         if response.status_code == 200:
                             # Use AI to extract key learnings
-                            doc_learning = await (self._extract_doc_insights( if self else None)
+                            doc_learning = await self._extract_doc_insights(
                                 tech_name, response.text[:10000]  # First 10k chars
                             )
                             if doc_learning:
-                                (learnings.append( if learnings else None)doc_learning)
+                                learnings.append(doc_learning)
 
                     except Exception as e:
-                        (logger.debug( if logger else None)f"Doc learning failed for {tech_name}: {e}")
+                        logger.debug(f"Doc learning failed for {tech_name}: {e}")
 
         return learnings
 
@@ -454,11 +451,11 @@ class ContinuousLearningBackgroundAgent:
 6. Breaking changes
 
 Documentation:
-{doc_content[:3000]}
+    {doc_content[:3000]}
 
 Provide JSON with: new_features, deprecated, best_practices, performance_tips, security_tips"""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
@@ -469,15 +466,15 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
             # Try to extract JSON
 
-            json_match = (re.search( if re else None)r"\{.*\}", content, re.DOTALL)
+            json_match = re.search(r"\{.*\}", content, re.DOTALL)
             if json_match:
-                insights = (json.loads( if json else None)(json_match.group( if json_match else None)))
+                insights = json.loads(json_match.group())
                 insights["technology"] = technology
-                insights["learned_at"] = (datetime.now( if datetime else None)).isoformat()
+                insights["learned_at"] = datetime.now().isoformat()
                 return insights
 
         except Exception as e:
-            (logger.error( if logger else None)f"Doc insight extraction failed: {e}")
+            logger.error(f"Doc insight extraction failed: {e}")
 
         return None
 
@@ -488,45 +485,45 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
         insights = []
 
         try:
-            async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=30.0) as client:
                 # Fetch trending
-                response = await (client.get( if client else None)"https://github.com/trending")
+                response = await client.get("https://github.com/trending")
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, "html.parser")
 
                     # Extract repo info
-                    repos = (soup.find_all( if soup else None)"article", class_="Box-row")[:5]  # Top 5
+                    repos = soup.find_all("article", class_="Box-row")[:5]  # Top 5
 
                     for repo in repos:
                         try:
-                            h2 = (repo.find( if repo else None)"h2")
+                            h2 = repo.find("h2")
                             if h2:
                                 repo_name = (
-                                    (h2.get_text( if h2 else None)strip=True)
+                                    h2.get_text(strip=True)
                                     .replace(" ", "")
                                     .replace("\n", "")
                                 )
-                                description = (repo.find( if repo else None)"p")
+                                description = repo.find("p")
                                 desc_text = (
-                                    (description.get_text( if description else None)strip=True)
+                                    description.get_text(strip=True)
                                     if description
                                     else ""
                                 )
 
-                                (insights.append( if insights else None)
+                                insights.append(
                                     {
                                         "repo": repo_name,
                                         "description": desc_text,
-                                        "trending_date": (datetime.now( if datetime else None))
+                                        "trending_date": datetime.now()
                                         .date()
                                         .isoformat(),
                                     }
                                 )
                         except Exception as e:
-                            (logger.debug( if logger else None)f"Repo parsing error: {e}")
+                            logger.debug(f"Repo parsing error: {e}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Trending analysis failed: {e}")
+            logger.error(f"Trending analysis failed: {e}")
 
         return insights
 
@@ -536,39 +533,39 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
         """
         news_items = []
 
-        async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             # Check HackerNews
             try:
-                response = await (client.get( if client else None)
+                response = await client.get(
                     "https://hacker-news.firebaseio.com/v0/topstories.json"
                 )
                 if response.status_code == 200:
-                    story_ids = (response.json( if response else None))[:10]  # Top 10
+                    story_ids = response.json()[:10]  # Top 10
 
                     for story_id in story_ids:
                         try:
-                            story_response = await (client.get( if client else None)
+                            story_response = await client.get(
                                 f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
                             )
                             if story_response.status_code == 200:
-                                story = (story_response.json( if story_response else None))
+                                story = story_response.json()
                                 if (
-                                    "react" in (story.get( if story else None)"title", "").lower()
-                                    or "javascript" in (story.get( if story else None)"title", "").lower()
-                                    or "python" in (story.get( if story else None)"title", "").lower()
+                                    "react" in story.get("title", "").lower()
+                                    or "javascript" in story.get("title", "").lower()
+                                    or "python" in story.get("title", "").lower()
                                 ):
-                                    (news_items.append( if news_items else None)
+                                    news_items.append(
                                         {
-                                            "title": (story.get( if story else None)"title"),
-                                            "url": (story.get( if story else None)"url"),
+                                            "title": story.get("title"),
+                                            "url": story.get("url"),
                                             "source": "hackernews",
                                         }
                                     )
                         except Exception as e:
-                            (logger.debug( if logger else None)f"Story fetch error: {e}")
+                            logger.debug(f"Story fetch error: {e}")
 
             except Exception as e:
-                (logger.error( if logger else None)f"News monitoring failed: {e}")
+                logger.error(f"News monitoring failed: {e}")
 
         return news_items
 
@@ -593,15 +590,15 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
             prompt = f"""Based on these recent developments, identify new best practices for our codebase:
 
-{(json.dumps( if json else None)all_learnings, indent=2)}
+{json.dumps(all_learnings, indent=2)}
 
 Our stack:
-- Frontend: React, Vite, TailwindCSS
+    - Frontend: React, Vite, TailwindCSS
 - Backend: FastAPI, Python, SQLAlchemy
 - WordPress: Divi 5, Elementor Pro, WooCommerce
 
 Identify:
-1. New patterns we should adopt
+    1. New patterns we should adopt
 2. Deprecated patterns we should remove
 3. Performance optimizations
 4. Security improvements
@@ -609,7 +606,7 @@ Identify:
 
 Return JSON array of practices with: category, description, priority, implementation_steps"""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=2500,
                 messages=[{"role": "user", "content": prompt}],
@@ -620,13 +617,13 @@ Return JSON array of practices with: category, description, priority, implementa
 
             # Extract JSON
 
-            json_match = (re.search( if re else None)r"\[.*\]", content, re.DOTALL)
+            json_match = re.search(r"\[.*\]", content, re.DOTALL)
             if json_match:
-                practices = (json.loads( if json else None)(json_match.group( if json_match else None)))
+                practices = json.loads(json_match.group())
                 return practices
 
         except Exception as e:
-            (logger.error( if logger else None)f"Practice identification failed: {e}")
+            logger.error(f"Practice identification failed: {e}")
 
         return []
 
@@ -643,37 +640,37 @@ Return JSON array of practices with: category, description, priority, implementa
 
             # Check frontend
             frontend_path = Path("frontend")
-            if (frontend_path.exists( if frontend_path else None)):
+            if frontend_path.exists():
                 package_json = frontend_path / "package.json"
-                if (package_json.exists( if package_json else None)):
-                    async with (aiofiles.open( if aiofiles else None)package_json, "r") as f:
-                        content = await (f.read( if f else None))
-                        data = (json.loads( if json else None)content)
-                        analysis["frontend"]["dependencies"] = (data.get( if data else None)
+                if package_json.exists():
+                    async with aiofiles.open(package_json, "r") as f:
+                        content = await f.read()
+                        data = json.loads(content)
+                        analysis["frontend"]["dependencies"] = data.get(
                             "dependencies", {}
                         )
-                        analysis["frontend"]["devDependencies"] = (data.get( if data else None)
+                        analysis["frontend"]["devDependencies"] = data.get(
                             "devDependencies", {}
                         )
 
             # Check backend
             backend_path = Path("backend")
-            if (backend_path.exists( if backend_path else None)):
+            if backend_path.exists():
                 # Count Python files
-                py_files = list((backend_path.rglob( if backend_path else None)"*.py"))
+                py_files = list(backend_path.rglob("*.py"))
                 analysis["backend"]["python_files"] = len(py_files)
 
             # Check requirements.txt
             req_file = Path("requirements.txt")
-            if (req_file.exists( if req_file else None)):
-                async with (aiofiles.open( if aiofiles else None)req_file, "r") as f:
-                    content = await (f.read( if f else None))
-                    analysis["backend"]["requirements"] = (content.split( if content else None)"\n")[:20]
+            if req_file.exists():
+                async with aiofiles.open(req_file, "r") as f:
+                    content = await f.read()
+                    analysis["backend"]["requirements"] = content.split("\n")[:20]
 
             return analysis
 
         except Exception as e:
-            (logger.error( if logger else None)f"Codebase analysis failed: {e}")
+            logger.error(f"Codebase analysis failed: {e}")
             return {}
 
     async def _generate_improvements(
@@ -686,13 +683,13 @@ Return JSON array of practices with: category, description, priority, implementa
             prompt = f"""Generate specific code improvements based on:
 
 New Practices:
-{(json.dumps( if json else None)new_practices[:5], indent=2)}
+    {json.dumps(new_practices[:5], indent=2)}
 
 Current Codebase:
-{(json.dumps( if json else None)codebase_analysis, indent=2)}
+    {json.dumps(codebase_analysis, indent=2)}
 
 Generate actionable improvements with:
-1. Specific file/location to change
+    1. Specific file/location to change
 2. Before/after code examples
 3. Confidence score (0-1)
 4. Priority (low/medium/high/critical)
@@ -701,7 +698,7 @@ Generate actionable improvements with:
 
 Return JSON array of improvements."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=3000,
                 messages=[{"role": "user", "content": prompt}],
@@ -712,13 +709,13 @@ Return JSON array of improvements."""
 
             # Extract JSON
 
-            json_match = (re.search( if re else None)r"\[.*\]", content, re.DOTALL)
+            json_match = re.search(r"\[.*\]", content, re.DOTALL)
             if json_match:
-                improvements = (json.loads( if json else None)(json_match.group( if json_match else None)))
+                improvements = json.loads(json_match.group())
                 return improvements
 
         except Exception as e:
-            (logger.error( if logger else None)f"Improvement generation failed: {e}")
+            logger.error(f"Improvement generation failed: {e}")
 
         return []
 
@@ -732,32 +729,32 @@ Return JSON array of improvements."""
         high_confidence = [
             r
             for r in recommendations
-            if (r.get( if r else None)"confidence", 0) >= self.config["confidence_threshold"]
-            and (r.get( if r else None)"risk", "high") == "low"
+            if r.get("confidence", 0) >= self.config["confidence_threshold"]
+            and r.get("risk", "high") == "low"
         ]
 
         # Sort by priority
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-        (high_confidence.sort( if high_confidence else None)
-            key=lambda x: (priority_order.get( if priority_order else None)(x.get( if x else None)"priority", "low"), 3)
+        high_confidence.sort(
+            key=lambda x: priority_order.get(x.get("priority", "low"), 3)
         )
 
         # Apply improvements
         for improvement in high_confidence[: self.config["max_daily_improvements"]]:
             try:
                 # Apply the improvement
-                success = await (self._apply_single_improvement( if self else None)improvement)
+                success = await self._apply_single_improvement(improvement)
                 if success:
                     applied_count += 1
-                    self.(applied_improvements.append( if applied_improvements else None)
+                    self.applied_improvements.append(
                         {
                             "improvement": improvement,
-                            "applied_at": (datetime.now( if datetime else None)).isoformat(),
+                            "applied_at": datetime.now().isoformat(),
                         }
                     )
 
             except Exception as e:
-                (logger.error( if logger else None)f"Failed to apply improvement: {e}")
+                logger.error(f"Failed to apply improvement: {e}")
 
         return applied_count
 
@@ -767,8 +764,8 @@ Return JSON array of improvements."""
         """
         # This would integrate with the self-healing agent
         # For now, just log what would be done
-        (logger.info( if logger else None)
-            f"Would apply: {(improvement.get( if improvement else None)'description', 'Unknown improvement')}"
+        logger.info(
+            f"Would apply: {improvement.get('description', 'Unknown improvement')}"
         )
 
         # In production, this would:
@@ -788,23 +785,23 @@ Return JSON array of improvements."""
         try:
             # Store new practices
             for practice in new_practices:
-                category = (practice.get( if practice else None)"category", "general")
+                category = practice.get("category", "general")
                 self.learned_practices[category].append(
                     {
                         "practice": practice,
-                        "learned_at": (datetime.now( if datetime else None)).isoformat(),
+                        "learned_at": datetime.now().isoformat(),
                     }
                 )
 
             # Save to disk
             kb_file = self.storage_path / "knowledge_base.json"
-            async with (aiofiles.open( if aiofiles else None)kb_file, "w") as f:
-                await (f.write( if f else None)(json.dumps( if json else None)dict(self.learned_practices), indent=2))
+            async with aiofiles.open(kb_file, "w") as f:
+                await f.write(json.dumps(dict(self.learned_practices), indent=2))
 
-            (logger.info( if logger else None)f"Knowledge base updated: {len(new_practices)} new practices")
+            logger.info(f"Knowledge base updated: {len(new_practices)} new practices")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Knowledge base update failed: {e}")
+            logger.error(f"Knowledge base update failed: {e}")
 
     async def _save_learning_report(self, report: Dict[str, Any]) -> None:
         """
@@ -813,48 +810,44 @@ Return JSON array of improvements."""
         try:
             report_file = (
                 self.storage_path
-                / f"learning_report_{(datetime.now( if datetime else None)).strftime('%Y%m%d_%H%M%S')}.json"
+                / f"learning_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             )
-            async with (aiofiles.open( if aiofiles else None)report_file, "w") as f:
-                await (f.write( if f else None)(json.dumps( if json else None)report, indent=2))
+            async with aiofiles.open(report_file, "w") as f:
+                await f.write(json.dumps(report, indent=2))
 
-            (logger.info( if logger else None)f"Learning report saved: {report_file}")
+            logger.info(f"Learning report saved: {report_file}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Report save failed: {e}")
+            logger.error(f"Report save failed: {e}")
 
     async def get_learning_stats(self) -> Dict[str, Any]:
         """
         Get statistics about what the agent has learned.
         """
         return {
-            "total_practices_learned": sum(
-                len(practices) for practices in self.(learned_practices.values( if learned_practices else None))
+            "total_practices_learned": sum()
+                len(practices) for practices in self.learned_practices.values()
             ),
             "improvements_applied": len(self.applied_improvements),
-            "categories": list(self.(learned_practices.keys( if learned_practices else None))),
+            "categories": list(self.learned_practices.keys()),
             "learning_history_size": len(self.learning_history),
             "monitored_technologies": len(self.monitored_technologies),
-            "last_update": (datetime.now( if datetime else None)).isoformat(),
+            "last_update": datetime.now().isoformat(),
         }
-
 
 # Factory function
 def create_learning_agent() -> ContinuousLearningBackgroundAgent:
     """Create Continuous Learning Background Agent."""
     return ContinuousLearningBackgroundAgent()
 
-
 # Global instance
 learning_agent = create_learning_agent()
-
 
 # Convenience functions
 async def start_background_learning() -> None:
     """Start the background learning daemon."""
-    await (learning_agent.start_learning_daemon( if learning_agent else None))
-
+    await learning_agent.start_learning_daemon()
 
 async def get_learning_stats() -> Dict[str, Any]:
     """Get learning statistics."""
-    return await (learning_agent.get_learning_stats( if learning_agent else None))
+    return await learning_agent.get_learning_stats()

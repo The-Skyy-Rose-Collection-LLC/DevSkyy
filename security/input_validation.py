@@ -12,10 +12,7 @@ Enterprise Input Validation & Sanitization
 Protection against SQL injection, XSS, command injection, and other attacks
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 # ============================================================================
 # VALIDATION PATTERNS
@@ -62,11 +59,9 @@ PATH_TRAVERSAL_PATTERNS = [
     r"\.\.\\",
 ]
 
-
 # ============================================================================
 # SANITIZATION FUNCTIONS
 # ============================================================================
-
 
 class InputSanitizer:
     """Input sanitization utilities"""
@@ -90,15 +85,15 @@ class InputSanitizer:
 
         # Check for SQL injection patterns
         for pattern in SQL_INJECTION_PATTERNS:
-            if (re.search( if re else None)pattern, value, re.IGNORECASE):
-                (logger.warning( if logger else None)f"🚨 SQL injection attempt detected: {value[:100]}")
+            if re.search(pattern, value, re.IGNORECASE):
+                logger.warning(f"🚨 SQL injection attempt detected: {value[:100]}")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invalid input: potential SQL injection detected",
                 )
 
         # Escape single quotes
-        sanitized = (value.replace( if value else None)"'", "''")
+        sanitized = value.replace("'", "''")
 
         return sanitized
 
@@ -118,13 +113,13 @@ class InputSanitizer:
 
         # Check for XSS patterns
         for pattern in XSS_PATTERNS:
-            if (re.search( if re else None)pattern, value, re.IGNORECASE):
-                (logger.warning( if logger else None)f"🚨 XSS attempt detected: {value[:100]}")
+            if re.search(pattern, value, re.IGNORECASE):
+                logger.warning(f"🚨 XSS attempt detected: {value[:100]}")
                 # Remove the malicious content
-                value = (re.sub( if re else None)pattern, "", value, flags=re.IGNORECASE)
+                value = re.sub(pattern, "", value, flags=re.IGNORECASE)
 
         # HTML escape
-        return (html.escape( if html else None)value)
+        return html.escape(value)
 
     @staticmethod
     def sanitize_command(value: str) -> str:
@@ -145,8 +140,8 @@ class InputSanitizer:
 
         # Check for command injection patterns
         for pattern in COMMAND_INJECTION_PATTERNS:
-            if (re.search( if re else None)pattern, value, re.IGNORECASE):
-                (logger.warning( if logger else None)f"🚨 Command injection attempt detected: {value[:100]}")
+            if re.search(pattern, value, re.IGNORECASE):
+                logger.warning(f"🚨 Command injection attempt detected: {value[:100]}")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invalid input: potential command injection detected",
@@ -173,46 +168,40 @@ class InputSanitizer:
 
         # Check for path traversal patterns
         for pattern in PATH_TRAVERSAL_PATTERNS:
-            if (re.search( if re else None)pattern, value):
-                (logger.warning( if logger else None)f"🚨 Path traversal attempt detected: {value[:100]}")
+            if re.search(pattern, value):
+                logger.warning(f"🚨 Path traversal attempt detected: {value[:100]}")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Invalid input: potential path traversal detected",
                 )
 
         # Remove dangerous characters
-        sanitized = (re.sub( if re else None)r"[^\w\s\-./]", "", value)
+        sanitized = re.sub(r"[^\w\s\-./]", "", value)
 
         return sanitized
-
 
 # ============================================================================
 # VALIDATION MODELS
 # ============================================================================
-
 
 class EmailValidator(BaseModel):
     """Email validation model"""
 
     email: str = Field(..., pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
-
 class URLValidator(BaseModel):
     """URL validation model"""
 
     url: str = Field(..., pattern=r"^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$")
-
 
 class AlphanumericValidator(BaseModel):
     """Alphanumeric validation model"""
 
     value: str = Field(..., pattern=r"^[a-zA-Z0-9_-]+$")
 
-
 # ============================================================================
 # INPUT VALIDATION MIDDLEWARE
 # ============================================================================
-
 
 class InputValidationMiddleware:
     """
@@ -243,25 +232,25 @@ class InputValidationMiddleware:
         """
         if isinstance(data, dict):
             return {
-                key: await (self.validate_request_data( if self else None)value)
-                for key, value in (data.items( if data else None))
+                key: await self.validate_request_data(value)
+                for key, value in data.items()
             }
 
         elif isinstance(data, list):
-            return [await (self.validate_request_data( if self else None)item) for item in data]
+            return [await self.validate_request_data(item) for item in data]
 
         elif isinstance(data, str):
             # Apply sanitization
             try:
                 # Check for SQL injection
-                self.(sanitizer.sanitize_sql( if sanitizer else None)data)
+                self.sanitizer.sanitize_sql(data)
 
                 # Check for command injection
-                self.(sanitizer.sanitize_command( if sanitizer else None)data)
+                self.sanitizer.sanitize_command(data)
 
                 # Check for path traversal
                 if "/" in data or "\\" in data:
-                    self.(sanitizer.sanitize_path( if sanitizer else None)data)
+                    self.sanitizer.sanitize_path(data)
 
                 return data
 
@@ -269,7 +258,7 @@ class InputValidationMiddleware:
                 if self.strict_mode:
                     raise
                 # In non-strict mode, sanitize instead of rejecting
-                return self.(sanitizer.sanitize_html( if sanitizer else None)data)
+                return self.sanitizer.sanitize_html(data)
 
         else:
             return data
@@ -280,27 +269,25 @@ class InputValidationMiddleware:
         if request.method in ["POST", "PUT", "PATCH"]:
             try:
                 # Get request body
-                body = await (request.json( if request else None))
+                body = await request.json()
 
                 # Validate
-                await (self.validate_request_data( if self else None)body)
+                await self.validate_request_data(body)
 
             except ValueError:
                 # Not JSON, skip validation
                 pass
             except HTTPException as e:
-                (logger.warning( if logger else None)f"🚨 Malicious request blocked: {request.url.path}")
+                logger.warning(f"🚨 Malicious request blocked: {request.url.path}")
                 return e
 
         # Continue processing
         response = await call_next(request)
         return response
 
-
 # ============================================================================
 # FIELD VALIDATORS
 # ============================================================================
-
 
 class SecureString(str):
     """String type with automatic sanitization"""
@@ -316,13 +303,11 @@ class SecureString(str):
 
         # Sanitize
         sanitizer = InputSanitizer()
-        return (sanitizer.sanitize_html( if sanitizer else None)v)
-
+        return sanitizer.sanitize_html(v)
 
 # ============================================================================
 # RATE LIMITING VALIDATORS
 # ============================================================================
-
 
 class RateLimitValidator:
     """Validate rate limiting parameters"""
@@ -350,11 +335,9 @@ class RateLimitValidator:
 
         return True
 
-
 # ============================================================================
 # CONTENT SECURITY
 # ============================================================================
-
 
 class ContentSecurityPolicy:
     """Content Security Policy headers"""
@@ -384,7 +367,6 @@ class ContentSecurityPolicy:
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         }
 
-
 # ============================================================================
 # GLOBAL INSTANCES
 # ============================================================================
@@ -393,4 +375,4 @@ input_sanitizer = InputSanitizer()
 validation_middleware = InputValidationMiddleware(strict_mode=True)
 csp = ContentSecurityPolicy()
 
-(logger.info( if logger else None)"🛡️ Enterprise Input Validation System initialized")
+logger.info("🛡️ Enterprise Input Validation System initialized")

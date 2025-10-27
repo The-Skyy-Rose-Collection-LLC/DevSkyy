@@ -18,10 +18,7 @@ Implements connection pooling, session management, and cache invalidation strate
 Target: <50ms response times, 99.9% cache hit ratio
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class CacheMetrics:
@@ -49,10 +46,9 @@ class CacheMetrics:
             "hit_ratio": self.hit_ratio,
             "avg_response_time": self.avg_response_time,
             "last_updated": (
-                self.(last_updated.isoformat( if last_updated else None)) if self.last_updated else None
+                self.last_updated.isoformat() if self.last_updated else None
             ),
         }
-
 
 @dataclass
 class SessionData:
@@ -72,17 +68,16 @@ class SessionData:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for Redis storage"""
         data = asdict(self)
-        data["created_at"] = self.(created_at.isoformat( if created_at else None))
-        data["last_accessed"] = self.(last_accessed.isoformat( if last_accessed else None))
+        data["created_at"] = self.created_at.isoformat()
+        data["last_accessed"] = self.last_accessed.isoformat()
         return data
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "SessionData":
         """Create from dictionary"""
-        data["created_at"] = (datetime.fromisoformat( if datetime else None)data["created_at"])
-        data["last_accessed"] = (datetime.fromisoformat( if datetime else None)data["last_accessed"])
+        data["created_at"] = datetime.fromisoformat(data["created_at"])
+        data["last_accessed"] = datetime.fromisoformat(data["last_accessed"])
         return cls(**data)
-
 
 class RedisManager:
     """Enterprise Redis Manager with connection pooling and advanced features"""
@@ -120,7 +115,7 @@ class RedisManager:
             health_check_interval=health_check_interval,
         )
 
-        self.redis_client = (redis.Redis( if redis else None)connection_pool=self.pool)
+        self.redis_client = redis.Redis(connection_pool=self.pool)
         self.metrics = CacheMetrics()
         self.is_connected = False
 
@@ -142,44 +137,44 @@ class RedisManager:
             "notifications": "notif:",
         }
 
-        (logger.info( if logger else None)
+        logger.info(
             f"Redis Manager initialized - Pool: {min_connections}-{max_connections} connections"
         )
 
     async def connect(self) -> bool:
         """Establish Redis connection and verify connectivity"""
         try:
-            await self.(redis_client.ping( if redis_client else None))
+            await self.redis_client.ping()
             self.is_connected = True
 
             # Initialize metrics
-            self.metrics.last_updated = (datetime.now( if datetime else None))
+            self.metrics.last_updated = datetime.now()
 
-            (logger.info( if logger else None)f"✅ Redis connected: {self.host}:{self.port} (DB: {self.db})")
+            logger.info(f"✅ Redis connected: {self.host}:{self.port} (DB: {self.db})")
             return True
 
         except (ConnectionError, TimeoutError) as e:
-            (logger.error( if logger else None)f"❌ Redis connection failed: {e}")
+            logger.error(f"❌ Redis connection failed: {e}")
             self.is_connected = False
             return False
 
     async def disconnect(self):
         """Close Redis connection and cleanup"""
         try:
-            await self.(redis_client.close( if redis_client else None))
+            await self.redis_client.close()
             self.is_connected = False
-            (logger.info( if logger else None)"Redis connection closed")
+            logger.info("Redis connection closed")
         except Exception as e:
-            (logger.error( if logger else None)f"Error closing Redis connection: {e}")
+            logger.error(f"Error closing Redis connection: {e}")
 
     def _generate_key(self, prefix: str, identifier: str) -> str:
         """Generate standardized cache key"""
-        key = f"{self.(cache_prefixes.get( if cache_prefixes else None)prefix, prefix)}{identifier}"
+        key = f"{self.cache_prefixes.get(prefix, prefix)}{identifier}"
 
         # Ensure key length doesn't exceed Redis limits
         if len(key) > self.max_key_length:
             # Use hash for long keys
-            hash_suffix = (hashlib.sha256( if hashlib else None)(key.encode( if key else None))).hexdigest()[:8]
+            hash_suffix = hashlib.sha256(key.encode()).hexdigest()[:8]
             key = key[: self.max_key_length - 9] + f":{hash_suffix}"
 
         return key
@@ -202,116 +197,116 @@ class RedisManager:
                 + operation_time
             ) / self.metrics.total_requests
 
-        self.metrics.last_updated = (datetime.now( if datetime else None))
+        self.metrics.last_updated = datetime.now()
 
     async def set(
         self, key: str, value: Any, ttl: Optional[int] = None, prefix: str = "api_cache"
     ) -> bool:
         """Set cache value with optional TTL"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            cache_key = (self._generate_key( if self else None)prefix, key)
+            cache_key = self._generate_key(prefix, key)
             ttl = ttl or self.default_ttl
 
             # Serialize value
             if isinstance(value, (dict, list)):
-                serialized_value = (json.dumps( if json else None)value)
+                serialized_value = json.dumps(value)
             elif isinstance(value, str):
                 serialized_value = value
             else:
-                serialized_value = (pickle.dumps( if pickle else None)value)
+                serialized_value = pickle.dumps(value)
 
-            await self.(redis_client.setex( if redis_client else None)cache_key, ttl, serialized_value)
+            await self.redis_client.setex(cache_key, ttl, serialized_value)
 
-            operation_time = ((time.time( if time else None)) - start_time) * 1000  # Convert to ms
-            await (self._record_metrics( if self else None)operation_time, False)  # Set is not a hit
+            operation_time = (time.time() - start_time) * 1000  # Convert to ms
+            await self._record_metrics(operation_time, False)  # Set is not a hit
 
-            (logger.debug( if logger else None)
+            logger.debug(
                 f"Cache SET: {cache_key} (TTL: {ttl}s, Time: {operation_time:.2f}ms)"
             )
             return True
 
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis SET error for key {key}: {e}")
+            logger.error(f"Redis SET error for key {key}: {e}")
             return False
 
     async def get(
         self, key: str, prefix: str = "api_cache", deserialize_json: bool = True
     ) -> Optional[Any]:
         """Get cache value"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            cache_key = (self._generate_key( if self else None)prefix, key)
-            value = await self.(redis_client.get( if redis_client else None)cache_key)
+            cache_key = self._generate_key(prefix, key)
+            value = await self.redis_client.get(cache_key)
 
-            operation_time = ((time.time( if time else None)) - start_time) * 1000  # Convert to ms
+            operation_time = (time.time() - start_time) * 1000  # Convert to ms
 
             if value is None:
-                await (self._record_metrics( if self else None)operation_time, False)  # Cache miss
-                (logger.debug( if logger else None)f"Cache MISS: {cache_key} (Time: {operation_time:.2f}ms)")
+                await self._record_metrics(operation_time, False)  # Cache miss
+                logger.debug(f"Cache MISS: {cache_key} (Time: {operation_time:.2f}ms)")
                 return None
 
-            await (self._record_metrics( if self else None)operation_time, True)  # Cache hit
+            await self._record_metrics(operation_time, True)  # Cache hit
 
             # Deserialize value
             try:
                 if deserialize_json:
-                    return (json.loads( if json else None)value)
+                    return json.loads(value)
                 else:
-                    return (value.decode( if value else None)"utf-8")
+                    return value.decode("utf-8")
             except (json.JSONDecodeError, UnicodeDecodeError):
                 # Try pickle deserialization
                 try:
-                    return (pickle.loads( if pickle else None)value)
+                    return pickle.loads(value)
                 except (pickle.PickleError, TypeError, ValueError) as e:
-                    (logger.debug( if logger else None)f"Pickle deserialization failed for key {key}: {e}")
-                    return (value.decode( if value else None)"utf-8")
+                    logger.debug(f"Pickle deserialization failed for key {key}: {e}")
+                    return value.decode("utf-8")
 
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis GET error for key {key}: {e}")
-            await (self._record_metrics( if self else None)((time.time( if time else None)) - start_time) * 1000, False)
+            logger.error(f"Redis GET error for key {key}: {e}")
+            await self._record_metrics((time.time() - start_time) * 1000, False)
             return None
 
     async def delete(self, key: str, prefix: str = "api_cache") -> bool:
         """Delete cache key"""
         try:
-            cache_key = (self._generate_key( if self else None)prefix, key)
-            result = await self.(redis_client.delete( if redis_client else None)cache_key)
-            (logger.debug( if logger else None)f"Cache DELETE: {cache_key} (Result: {result})")
+            cache_key = self._generate_key(prefix, key)
+            result = await self.redis_client.delete(cache_key)
+            logger.debug(f"Cache DELETE: {cache_key} (Result: {result})")
             return result > 0
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis DELETE error for key {key}: {e}")
+            logger.error(f"Redis DELETE error for key {key}: {e}")
             return False
 
     async def exists(self, key: str, prefix: str = "api_cache") -> bool:
         """Check if key exists"""
         try:
-            cache_key = (self._generate_key( if self else None)prefix, key)
-            return await self.(redis_client.exists( if redis_client else None)cache_key) > 0
+            cache_key = self._generate_key(prefix, key)
+            return await self.redis_client.exists(cache_key) > 0
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis EXISTS error for key {key}: {e}")
+            logger.error(f"Redis EXISTS error for key {key}: {e}")
             return False
 
     async def expire(self, key: str, ttl: int, prefix: str = "api_cache") -> bool:
         """Set expiration for existing key"""
         try:
-            cache_key = (self._generate_key( if self else None)prefix, key)
-            return await self.(redis_client.expire( if redis_client else None)cache_key, ttl)
+            cache_key = self._generate_key(prefix, key)
+            return await self.redis_client.expire(cache_key, ttl)
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis EXPIRE error for key {key}: {e}")
+            logger.error(f"Redis EXPIRE error for key {key}: {e}")
             return False
 
     async def invalidate_pattern(self, pattern: str, prefix: str = "api_cache") -> int:
         """Invalidate keys matching pattern"""
         try:
-            cache_pattern = (self._generate_key( if self else None)prefix, pattern)
-            keys = await self.(redis_client.keys( if redis_client else None)cache_pattern)
+            cache_pattern = self._generate_key(prefix, pattern)
+            keys = await self.redis_client.keys(cache_pattern)
 
             if keys:
-                deleted = await self.(redis_client.delete( if redis_client else None)*keys)
-                (logger.info( if logger else None)
+                deleted = await self.redis_client.delete(*keys)
+                logger.info(
                     f"Cache invalidation: {deleted} keys deleted for pattern {cache_pattern}"
                 )
                 return deleted
@@ -319,93 +314,93 @@ class RedisManager:
             return 0
 
         except RedisError as e:
-            (logger.error( if logger else None)f"Redis pattern invalidation error for {pattern}: {e}")
+            logger.error(f"Redis pattern invalidation error for {pattern}: {e}")
             return 0
 
     # Session Management Methods
     async def create_session(self, session_id: str, session_data: SessionData) -> bool:
         """Create user session with 24-hour TTL"""
         try:
-            session_key = (self._generate_key( if self else None)"session", session_id)
-            session_json = (json.dumps( if json else None)(session_data.to_dict( if session_data else None)))
+            session_key = self._generate_key("session", session_id)
+            session_json = json.dumps(session_data.to_dict())
 
-            await self.(redis_client.setex( if redis_client else None)session_key, self.session_ttl, session_json)
+            await self.redis_client.setex(session_key, self.session_ttl, session_json)
 
             # Also store user-to-session mapping
-            user_session_key = (self._generate_key( if self else None)
+            user_session_key = self._generate_key(
                 "user", f"{session_data.user_id}:session"
             )
-            await self.(redis_client.setex( if redis_client else None)
+            await self.redis_client.setex(
                 user_session_key, self.session_ttl, session_id
             )
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"Session created: {session_id} for user {session_data.user_id}"
             )
             return True
 
         except RedisError as e:
-            (logger.error( if logger else None)f"Session creation error: {e}")
+            logger.error(f"Session creation error: {e}")
             return False
 
     async def get_session(self, session_id: str) -> Optional[SessionData]:
         """Get session data"""
         try:
-            session_key = (self._generate_key( if self else None)"session", session_id)
-            session_json = await self.(redis_client.get( if redis_client else None)session_key)
+            session_key = self._generate_key("session", session_id)
+            session_json = await self.redis_client.get(session_key)
 
             if session_json:
-                session_dict = (json.loads( if json else None)session_json)
-                return (SessionData.from_dict( if SessionData else None)session_dict)
+                session_dict = json.loads(session_json)
+                return SessionData.from_dict(session_dict)
 
             return None
 
         except (RedisError, json.JSONDecodeError, ValueError) as e:
-            (logger.error( if logger else None)f"Session retrieval error: {e}")
+            logger.error(f"Session retrieval error: {e}")
             return None
 
     async def update_session_access(self, session_id: str) -> bool:
         """Update session last accessed time"""
-        session = await (self.get_session( if self else None)session_id)
+        session = await self.get_session(session_id)
         if session:
-            session.last_accessed = (datetime.now( if datetime else None))
-            return await (self.create_session( if self else None)session_id, session)
+            session.last_accessed = datetime.now()
+            return await self.create_session(session_id, session)
         return False
 
     async def delete_session(self, session_id: str) -> bool:
         """Delete session"""
         try:
-            session = await (self.get_session( if self else None)session_id)
+            session = await self.get_session(session_id)
             if session:
                 # Delete session
-                session_key = (self._generate_key( if self else None)"session", session_id)
-                await self.(redis_client.delete( if redis_client else None)session_key)
+                session_key = self._generate_key("session", session_id)
+                await self.redis_client.delete(session_key)
 
                 # Delete user-to-session mapping
-                user_session_key = (self._generate_key( if self else None)
+                user_session_key = self._generate_key(
                     "user", f"{session.user_id}:session"
                 )
-                await self.(redis_client.delete( if redis_client else None)user_session_key)
+                await self.redis_client.delete(user_session_key)
 
-                (logger.info( if logger else None)f"Session deleted: {session_id}")
+                logger.info(f"Session deleted: {session_id}")
                 return True
 
             return False
 
         except RedisError as e:
-            (logger.error( if logger else None)f"Session deletion error: {e}")
+            logger.error(f"Session deletion error: {e}")
             return False
 
     async def cleanup_expired_sessions(self) -> int:
         """Clean up expired sessions (automatic with Redis TTL)"""
         # Redis automatically handles TTL cleanup, but we can get stats
         try:
-            session_pattern = (self._generate_key( if self else None)"session", "*")
-            active_sessions = await self.(redis_client.keys( if redis_client else None)session_pattern)
-            (logger.info( if logger else None)f"Active sessions: {len(active_sessions)}")
+            session_pattern = self._generate_key("session", "*")
+            active_sessions = await self.redis_client.keys(session_pattern)
+            logger.info(f"Active sessions: {len(active_sessions)}")
             return len(active_sessions)
         except RedisError as e:
-            (logger.error( if logger else None)f"Session cleanup error: {e}")
+            logger.error(f"Session cleanup error: {e}")
             return 0
 
     async def get_metrics(self) -> Dict[str, Any]:
@@ -418,7 +413,7 @@ class RedisManager:
         }
 
         return {
-            "cache_metrics": self.(metrics.to_dict( if metrics else None)),
+            "cache_metrics": self.metrics.to_dict(),
             "connection_pool": pool_stats,
             "is_connected": self.is_connected,
             "redis_info": {"host": self.host, "port": self.port, "db": self.db},
@@ -426,21 +421,21 @@ class RedisManager:
 
     async def health_check(self) -> Dict[str, Any]:
         """Comprehensive health check"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             # Test basic connectivity
-            await self.(redis_client.ping( if redis_client else None))
+            await self.redis_client.ping()
 
             # Test set/get operation
             test_key = "health_check_test"
-            test_value = {"timestamp": (datetime.now( if datetime else None)).isoformat(), "test": True}
+            test_value = {"timestamp": datetime.now().isoformat(), "test": True}
 
-            await (self.set( if self else None)test_key, test_value, ttl=60)
-            retrieved_value = await (self.get( if self else None)test_key)
-            await (self.delete( if self else None)test_key)
+            await self.set(test_key, test_value, ttl=60)
+            retrieved_value = await self.get(test_key)
+            await self.delete(test_key)
 
-            response_time = ((time.time( if time else None)) - start_time) * 1000
+            response_time = (time.time() - start_time) * 1000
 
             return {
                 "status": "healthy",
@@ -449,7 +444,7 @@ class RedisManager:
                 "operations": "working",
                 "target_response_time": "<50ms",
                 "meets_target": response_time < 50,
-                "metrics": await (self.get_metrics( if self else None)),
+                "metrics": await self.get_metrics(),
             }
 
         except Exception as e:
@@ -457,9 +452,8 @@ class RedisManager:
                 "status": "unhealthy",
                 "error": str(e),
                 "connectivity": False,
-                "response_time_ms": ((time.time( if time else None)) - start_time) * 1000,
+                "response_time_ms": (time.time() - start_time) * 1000,
             }
-
 
 # Global Redis manager instance
 redis_manager = RedisManager()

@@ -5,7 +5,7 @@ from datetime import datetime
                 from agent.modules.backend.fixer_v2 import CodeFixer
                 from agent.modules.backend.scanner_v2 import CodeScanner
                 from agent.modules.backend.universal_self_healing_agent import (
-from ml.codex_integration import codex
+                    from ml.codex_integration import codex
 from typing import Any, Dict, List, Optional
 import logging
 
@@ -14,24 +14,21 @@ Codex-Powered Code Healing Orchestrator
 Uses GPT-4 to intelligently coordinate code analysis, fixing, and healing
 
 This orchestrator:
-- Analyzes code issues using the scanner
+    - Analyzes code issues using the scanner
 - Uses GPT-4 to understand context and generate optimal fixes
 - Coordinates multiple healing agents (fixer, self-healing, auto-fix)
 - Validates fixes before applying
 - Learns from successful fixes to improve future healing
 
 Architecture:
-1. Scanner → Detect issues
+    1. Scanner → Detect issues
 2. Codex → Analyze and generate fix strategy
 3. Healing Agents → Apply fixes
 4. Validation → Test fixes
 5. Learning → Store successful patterns
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class CodexOrchestrator:
     """
@@ -49,7 +46,7 @@ class CodexOrchestrator:
         self._fixer = None
         self._self_healing = None
 
-        (logger.info( if logger else None)"🎯 Codex Orchestrator initialized")
+        logger.info("🎯 Codex Orchestrator initialized")
 
     @property
     def scanner(self):
@@ -63,7 +60,7 @@ class CodexOrchestrator:
 
                     self._scanner = lambda path: {"issues": scan_site(path)}
                 except ImportError:
-                    (logger.warning( if logger else None)"Scanner not available")
+                    logger.warning("Scanner not available")
                     self._scanner = None
         return self._scanner
 
@@ -79,7 +76,7 @@ class CodexOrchestrator:
 
                     self._fixer = lambda code, issue: fix_code(code, issue)
                 except ImportError:
-                    (logger.warning( if logger else None)"Fixer not available")
+                    logger.warning("Fixer not available")
                     self._fixer = None
         return self._fixer
 
@@ -93,7 +90,7 @@ class CodexOrchestrator:
 
                 self._self_healing = UniversalSelfHealingAgent()
             except ImportError:
-                (logger.warning( if logger else None)"Self-healing agent not available")
+                logger.warning("Self-healing agent not available")
                 self._self_healing = None
         return self._self_healing
 
@@ -116,13 +113,13 @@ class CodexOrchestrator:
         Returns:
             Dict containing healing results and fixes
         """
-        (logger.info( if logger else None)f"🎯 Starting AI-powered code healing for {language}")
+        logger.info(f"🎯 Starting AI-powered code healing for {language}")
 
         try:
             # Phase 1: Scan for issues
-            scan_result = await (self._scan_code( if self else None)code, language, context)
+            scan_result = await self._scan_code(code, language, context)
 
-            if not (scan_result.get( if scan_result else None)"issues"):
+            if not scan_result.get("issues"):
                 return {
                     "status": "success",
                     "message": "No issues detected",
@@ -131,24 +128,24 @@ class CodexOrchestrator:
                 }
 
             # Phase 2: AI Analysis - Use GPT-4 to analyze issues and generate strategy
-            strategy = await (self._generate_healing_strategy( if self else None)
+            strategy = await self._generate_healing_strategy(
                 code, scan_result["issues"], language, context
             )
 
             # Phase 3: Generate fixes using Codex
-            fixes = await (self._generate_fixes( if self else None)code, strategy, language)
+            fixes = await self._generate_fixes(code, strategy, language)
 
             # Phase 4: Validate fixes
-            validation = await (self._validate_fixes( if self else None)code, fixes, language)
+            validation = await self._validate_fixes(code, fixes, language)
 
             # Phase 5: Apply fixes (if validated and auto_apply=True)
             healed_code = code
             if validation["safe"] and auto_apply:
-                healed_code = await (self._apply_fixes( if self else None)code, fixes, language)
+                healed_code = await self._apply_fixes(code, fixes, language)
 
             # Phase 6: Learn from successful healing
             if validation["safe"]:
-                await (self._learn_from_healing( if self else None)strategy, fixes, validation)
+                await self._learn_from_healing(strategy, fixes, validation)
 
             return {
                 "status": "success",
@@ -160,34 +157,34 @@ class CodexOrchestrator:
                 "fixes": fixes,
                 "validation": validation,
                 "applied": auto_apply and validation["safe"],
-                "timestamp": (datetime.utcnow( if datetime else None)).isoformat(),
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code healing failed: {e}")
+            logger.error(f"Code healing failed: {e}")
             return {"status": "error", "error": str(e), "original_code": code}
 
     async def _scan_code(
         self, code: str, language: str, context: Optional[Dict] = None
     ) -> Dict[str, Any]:
         """Scan code for issues using scanner agent"""
-        (logger.info( if logger else None)"📊 Scanning code for issues...")
+        logger.info("📊 Scanning code for issues...")
 
         try:
             # Use Codex to analyze code for issues
-            analysis = await self.(codex.review_code( if codex else None)code=code, language=language)
+            analysis = await self.codex.review_code(code=code, language=language)
 
             if analysis["status"] == "error":
                 return {"issues": []}
 
             # Parse review into structured issues
-            review_text = (analysis.get( if analysis else None)"review", "")
-            issues = (self._parse_review_into_issues( if self else None)review_text)
+            review_text = analysis.get("review", "")
+            issues = self._parse_review_into_issues(review_text)
 
             return {"issues": issues, "raw_review": review_text}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code scanning failed: {e}")
+            logger.error(f"Code scanning failed: {e}")
             return {"issues": []}
 
     async def _generate_healing_strategy(
@@ -198,13 +195,13 @@ class CodexOrchestrator:
         context: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """Use GPT-4 to analyze issues and generate optimal healing strategy"""
-        (logger.info( if logger else None)"🧠 Generating AI-powered healing strategy...")
+        logger.info("🧠 Generating AI-powered healing strategy...")
 
         try:
             # Build strategy prompt
             issues_summary = "\n".join(
                 [
-                    f"- {(i.get( if i else None)'type', 'issue')}: {(i.get( if i else None)'description', 'Unknown')}"
+                    f"- {i.get('type', 'issue')}: {i.get('description', 'Unknown')}"
                     for i in issues
                 ]
             )
@@ -212,12 +209,12 @@ class CodexOrchestrator:
             prompt = f"""Analyze the following code issues and create an optimal healing strategy:
 
 ISSUES DETECTED:
-{issues_summary}
+    {issues_summary}
 
 LANGUAGE: {language}
 
 Create a healing strategy that:
-1. Prioritizes critical security and correctness issues
+    1. Prioritizes critical security and correctness issues
 2. Groups related issues for efficient fixing
 3. Identifies dependencies between fixes
 4. Suggests the optimal order of fixes
@@ -226,7 +223,7 @@ Create a healing strategy that:
 Respond with a structured healing strategy."""
 
             # Use Codex to generate strategy
-            strategy_response = await self.codex.client.chat.(completions.create( if completions else None)
+            strategy_response = await self.codex.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {
@@ -244,14 +241,14 @@ Respond with a structured healing strategy."""
             return {
                 "strategy": strategy_text,
                 "priority_issues": [
-                    i for i in issues if (i.get( if i else None)"severity") in ["high", "critical"]
+                    i for i in issues if i.get("severity") in ["high", "critical"]
                 ],
-                "issue_groups": (self._group_related_issues( if self else None)issues),
+                "issue_groups": self._group_related_issues(issues),
                 "estimated_fix_time": len(issues) * 30,  # seconds
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Strategy generation failed: {e}")
+            logger.error(f"Strategy generation failed: {e}")
             return {
                 "strategy": "Apply fixes sequentially",
                 "priority_issues": issues,
@@ -262,41 +259,41 @@ Respond with a structured healing strategy."""
         self, code: str, strategy: Dict, language: str
     ) -> List[Dict[str, Any]]:
         """Generate fixes for each issue using Codex"""
-        (logger.info( if logger else None)"🔧 Generating AI-powered fixes...")
+        logger.info("🔧 Generating AI-powered fixes...")
 
         fixes = []
 
         try:
             # Get priority issues from strategy
-            priority_issues = (strategy.get( if strategy else None)"priority_issues", [])
+            priority_issues = strategy.get("priority_issues", [])
 
             for issue in priority_issues:
                 # Use Codex to generate fix
                 fix_prompt = f"""Fix this {language} code issue:
 
-ISSUE: {(issue.get( if issue else None)'description', 'Unknown issue')}
-TYPE: {(issue.get( if issue else None)'type', 'general')}
+ISSUE: {issue.get('description', 'Unknown issue')}
+TYPE: {issue.get('type', 'general')}
 
 CODE:
-```{language}
+    ```{language}
 {code}
 ```
 
 Generate a corrected version that fixes this specific issue while maintaining functionality."""
 
-                fix_response = await self.(codex.generate_code( if codex else None)
+                fix_response = await self.codex.generate_code(
                     prompt=fix_prompt, language=language, model="gpt-4", temperature=0.1
                 )
 
                 if fix_response["status"] == "success":
-                    (fixes.append( if fixes else None)
+                    fixes.append(
                         {
                             "issue": issue,
                             "fixed_code": fix_response["code"],
-                            "explanation": (fix_response.get( if fix_response else None)"raw_response", ""),
+                            "explanation": fix_response.get("raw_response", ""),
                             "confidence": (
                                 "high"
-                                if (fix_response.get( if fix_response else None)"finish_reason") == "stop"
+                                if fix_response.get("finish_reason") == "stop"
                                 else "medium"
                             ),
                         }
@@ -305,14 +302,14 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             return fixes
 
         except Exception as e:
-            (logger.error( if logger else None)f"Fix generation failed: {e}")
+            logger.error(f"Fix generation failed: {e}")
             return []
 
     async def _validate_fixes(
         self, original_code: str, fixes: List[Dict], language: str
     ) -> Dict[str, Any]:
         """Validate fixes before applying"""
-        (logger.info( if logger else None)"✅ Validating fixes...")
+        logger.info("✅ Validating fixes...")
 
         try:
             if not fixes:
@@ -322,14 +319,14 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             validation_prompt = f"""Validate these code fixes for safety and correctness:
 
 ORIGINAL CODE:
-```{language}
+    ```{language}
 {original_code}
 ```
 
 NUMBER OF FIXES: {len(fixes)}
 
 Analyze:
-1. Do fixes solve the stated issues?
+    1. Do fixes solve the stated issues?
 2. Are there any new issues introduced?
 3. Is functionality preserved?
 4. Are there breaking changes?
@@ -337,7 +334,7 @@ Analyze:
 
 Respond with validation analysis."""
 
-            validation_response = await self.codex.client.chat.(completions.create( if completions else None)
+            validation_response = await self.codex.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {"role": "system", "content": "You are an expert code validator."},
@@ -351,8 +348,8 @@ Respond with validation analysis."""
 
             # Simple heuristic: safe if no breaking changes mentioned
             is_safe = (
-                "breaking" not in (validation_text.lower( if validation_text else None))
-                and "unsafe" not in (validation_text.lower( if validation_text else None))
+                "breaking" not in validation_text.lower()
+                and "unsafe" not in validation_text.lower()
             )
 
             return {
@@ -363,50 +360,50 @@ Respond with validation analysis."""
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Validation failed: {e}")
+            logger.error(f"Validation failed: {e}")
             return {"safe": False, "reason": str(e)}
 
     async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
         """Apply validated fixes to code"""
-        (logger.info( if logger else None)"🚀 Applying fixes...")
+        logger.info("🚀 Applying fixes...")
 
         if not fixes:
             return code
 
         # Apply highest confidence fix
-        best_fix = max(fixes, key=lambda f: 1 if (f.get( if f else None)"confidence") == "high" else 0)
+        best_fix = max(fixes, key=lambda f: 1 if f.get("confidence") == "high" else 0)
 
-        return (best_fix.get( if best_fix else None)"fixed_code", code)
+        return best_fix.get("fixed_code", code)
 
     async def _learn_from_healing(
         self, strategy: Dict, fixes: List[Dict], validation: Dict
     ):
         """Learn from successful healing to improve future operations"""
-        if (validation.get( if validation else None)"safe"):
+        if validation.get("safe"):
             pattern = {
-                "strategy": (strategy.get( if strategy else None)"strategy", "")[:200],  # First 200 chars
+                "strategy": strategy.get("strategy", "")[:200],  # First 200 chars
                 "num_fixes": len(fixes),
                 "success": True,
-                "timestamp": (datetime.utcnow( if datetime else None)).isoformat(),
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
-            self.(healing_history.append( if healing_history else None)pattern)
+            self.healing_history.append(pattern)
 
             # Limit history size
             if len(self.healing_history) > 100:
                 self.healing_history = self.healing_history[-100:]
 
-            (logger.info( if logger else None)"📚 Learned from successful healing")
+            logger.info("📚 Learned from successful healing")
 
     def _parse_review_into_issues(self, review_text: str) -> List[Dict[str, Any]]:
         """Parse code review text into structured issues"""
         issues = []
 
         # Simple parsing - look for common issue indicators
-        lines = (review_text.split( if review_text else None)"\n")
+        lines = review_text.split("\n")
 
         for line in lines:
-            line_lower = (line.lower( if line else None))
+            line_lower = line.lower()
 
             if any(
                 keyword in line_lower
@@ -435,11 +432,11 @@ Respond with validation analysis."""
                 elif "bug" in line_lower or "error" in line_lower:
                     issue_type = "bug"
 
-                (issues.append( if issues else None)
+                issues.append(
                     {
                         "type": issue_type,
                         "severity": severity,
-                        "description": (line.strip( if line else None)),
+                        "description": line.strip(),
                         "line": None,
                     }
                 )
@@ -454,17 +451,17 @@ Respond with validation analysis."""
         # Simple grouping by type
         groups = {}
         for issue in issues:
-            issue_type = (issue.get( if issue else None)"type", "general")
+            issue_type = issue.get("type", "general")
             if issue_type not in groups:
                 groups[issue_type] = []
             groups[issue_type].append(issue)
 
-        return list((groups.values( if groups else None)))
+        return list(groups.values())
 
     def get_healing_stats(self) -> Dict[str, Any]:
         """Get statistics about healing operations"""
         total_healings = len(self.healing_history)
-        successful = sum(1 for h in self.healing_history if (h.get( if h else None)"success"))
+        successful = sum(1 for h in self.healing_history if h.get("success"))
 
         return {
             "total_healings": total_healings,
@@ -477,8 +474,7 @@ Respond with validation analysis."""
             ),
         }
 
-
 # Global instance
 codex_orchestrator = CodexOrchestrator()
 
-(logger.info( if logger else None)"🎯 Codex Orchestrator module loaded")
+logger.info("🎯 Codex Orchestrator module loaded")

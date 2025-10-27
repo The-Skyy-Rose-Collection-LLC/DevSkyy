@@ -29,13 +29,11 @@ Version: 1.0.0
 Python: >=3.11
 """
 
-
 # Configure logging for Vercel
-(logging.basicConfig( if logging else None)
+logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 def validate_email_dependencies() -> bool:
     """
@@ -46,14 +44,14 @@ def validate_email_dependencies() -> bool:
     """
     try:
 
-        (logger.info( if logger else None)"✅ Email validation dependencies available")
+        logger.info("✅ Email validation dependencies available")
         return True
     except ImportError:
-        (logger.warning( if logger else None)"⚠️ Email validation not available - installing fallback")
+        logger.warning("⚠️ Email validation not available - installing fallback")
         try:
             # Try to install email-validator at runtime (Vercel allows this)
 
-            (subprocess.check_call( if subprocess else None)
+            subprocess.check_call(
                 [
                     sys.executable,
                     "-m",
@@ -65,31 +63,29 @@ def validate_email_dependencies() -> bool:
                 ]
             )
 
-            (logger.info( if logger else None)"✅ Email validation installed successfully")
+            logger.info("✅ Email validation installed successfully")
             return True
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Failed to install email validation: {e}")
+            logger.error(f"❌ Failed to install email validation: {e}")
             return False
-
 
 def setup_pydantic_config():
     """Configure Pydantic for Vercel environment."""
     try:
         # Set Pydantic configuration for serverless
-        os.(environ.setdefault( if environ else None)"PYDANTIC_V2", "1")
+        os.environ.setdefault("PYDANTIC_V2", "1")
 
         # Disable email validation if not available
         if not validate_email_dependencies():
-            (logger.warning( if logger else None)"🔧 Configuring Pydantic without email validation")
+            logger.warning("🔧 Configuring Pydantic without email validation")
             # This will be handled in the application code
 
-        (logger.info( if logger else None)"✅ Pydantic configuration completed")
+        logger.info("✅ Pydantic configuration completed")
         return True
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Pydantic configuration failed: {e}")
+        logger.error(f"❌ Pydantic configuration failed: {e}")
         return False
-
 
 def validate_core_dependencies() -> dict:
     """
@@ -111,17 +107,17 @@ def validate_core_dependencies() -> dict:
     try:
 
         status["fastapi"] = True
-        (logger.info( if logger else None)"✅ FastAPI available")
+        logger.info("✅ FastAPI available")
     except ImportError:
-        (logger.error( if logger else None)"❌ FastAPI not available")
+        logger.error("❌ FastAPI not available")
 
     # Check Pydantic
     try:
 
         status["pydantic"] = True
-        (logger.info( if logger else None)"✅ Pydantic available")
+        logger.info("✅ Pydantic available")
     except ImportError:
-        (logger.error( if logger else None)"❌ Pydantic not available")
+        logger.error("❌ Pydantic not available")
 
     # Check email validation
     status["email_validation"] = validate_email_dependencies()
@@ -130,62 +126,60 @@ def validate_core_dependencies() -> dict:
     try:
 
         status["database"] = True
-        (logger.info( if logger else None)"✅ Database dependencies available")
+        logger.info("✅ Database dependencies available")
     except ImportError:
-        (logger.warning( if logger else None)"⚠️ Database dependencies not available")
+        logger.warning("⚠️ Database dependencies not available")
 
     # Check Redis
     try:
 
         status["redis"] = True
-        (logger.info( if logger else None)"✅ Redis client available")
+        logger.info("✅ Redis client available")
     except ImportError:
-        (logger.warning( if logger else None)"⚠️ Redis client not available")
+        logger.warning("⚠️ Redis client not available")
 
     # Check AI clients
     ai_available = 0
     try:
 
         ai_available += 1
-        (logger.info( if logger else None)"✅ Anthropic client available")
+        logger.info("✅ Anthropic client available")
     except ImportError:
-        (logger.warning( if logger else None)"⚠️ Anthropic client not available")
+        logger.warning("⚠️ Anthropic client not available")
 
     try:
 
         ai_available += 1
-        (logger.info( if logger else None)"✅ OpenAI client available")
+        logger.info("✅ OpenAI client available")
     except ImportError:
-        (logger.warning( if logger else None)"⚠️ OpenAI client not available")
+        logger.warning("⚠️ OpenAI client not available")
 
     status["ai_clients"] = ai_available > 0
 
     return status
 
-
 def setup_environment_variables():
     """Setup environment variables for Vercel deployment."""
     try:
         # Set default environment variables
-        os.(environ.setdefault( if environ else None)"ENVIRONMENT", "production")
-        os.(environ.setdefault( if environ else None)"LOG_LEVEL", "INFO")
-        os.(environ.setdefault( if environ else None)"PYTHONPATH", "/var/task")
+        os.environ.setdefault("ENVIRONMENT", "production")
+        os.environ.setdefault("LOG_LEVEL", "INFO")
+        os.environ.setdefault("PYTHONPATH", "/var/task")
 
         # Vercel-specific settings
-        os.(environ.setdefault( if environ else None)"VERCEL_ENV", "production")
-        os.(environ.setdefault( if environ else None)"PYTHONUNBUFFERED", "1")
+        os.environ.setdefault("VERCEL_ENV", "production")
+        os.environ.setdefault("PYTHONUNBUFFERED", "1")
 
         # Database settings (use SQLite for serverless)
-        if not os.(environ.get( if environ else None)"DATABASE_URL"):
+        if not os.environ.get("DATABASE_URL"):
             os.environ["DATABASE_URL"] = "sqlite:///./devskyy.db"
 
-        (logger.info( if logger else None)"✅ Environment variables configured")
+        logger.info("✅ Environment variables configured")
         return True
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Environment setup failed: {e}")
+        logger.error(f"❌ Environment setup failed: {e}")
         return False
-
 
 def create_fallback_models():
     """Create fallback Pydantic models when email validation is not available."""
@@ -209,13 +203,12 @@ def create_fallback_models():
         if not hasattr(pydantic.networks, "validate_email"):
             pydantic.networks.validate_email = fallback_email_validator
 
-        (logger.info( if logger else None)"✅ Fallback email models created")
+        logger.info("✅ Fallback email models created")
         return True
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Fallback model creation failed: {e}")
+        logger.error(f"❌ Fallback model creation failed: {e}")
         return False
-
 
 def initialize_vercel_app():
     """
@@ -224,17 +217,17 @@ def initialize_vercel_app():
     Returns:
         bool: True if initialization successful, False otherwise
     """
-    (logger.info( if logger else None)"🚀 Starting DevSkyy Vercel initialization...")
+    logger.info("🚀 Starting DevSkyy Vercel initialization...")
 
     try:
         # Setup environment
         if not setup_environment_variables():
-            (logger.error( if logger else None)"❌ Environment setup failed")
+            logger.error("❌ Environment setup failed")
             return False
 
         # Setup Pydantic
         if not setup_pydantic_config():
-            (logger.error( if logger else None)"❌ Pydantic setup failed")
+            logger.error("❌ Pydantic setup failed")
             return False
 
         # Validate dependencies
@@ -245,7 +238,7 @@ def initialize_vercel_app():
         missing_critical = [dep for dep in critical_deps if not status[dep]]
 
         if missing_critical:
-            (logger.error( if logger else None)f"❌ Critical dependencies missing: {missing_critical}")
+            logger.error(f"❌ Critical dependencies missing: {missing_critical}")
             return False
 
         # Create fallbacks for optional features
@@ -253,22 +246,21 @@ def initialize_vercel_app():
             create_fallback_models()
 
         # Log status summary
-        available_features = [dep for dep, available in (status.items( if status else None)) if available]
+        available_features = [dep for dep, available in status.items() if available]
         unavailable_features = [
-            dep for dep, available in (status.items( if status else None)) if not available
+            dep for dep, available in status.items() if not available
         ]
 
-        (logger.info( if logger else None)f"✅ Available features: {', '.join(available_features)}")
+        logger.info(f"✅ Available features: {', '.join(available_features)}")
         if unavailable_features:
-            (logger.warning( if logger else None)f"⚠️ Unavailable features: {', '.join(unavailable_features)}")
+            logger.warning(f"⚠️ Unavailable features: {', '.join(unavailable_features)}")
 
-        (logger.info( if logger else None)"✅ DevSkyy Vercel initialization completed successfully")
+        logger.info("✅ DevSkyy Vercel initialization completed successfully")
         return True
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Vercel initialization failed: {e}")
+        logger.error(f"❌ Vercel initialization failed: {e}")
         return False
-
 
 def get_app_config() -> dict:
     """
@@ -281,8 +273,8 @@ def get_app_config() -> dict:
         "title": "DevSkyy Enterprise Platform",
         "description": "AI-Powered Enterprise Platform for E-commerce and Fashion Intelligence",
         "version": "2.0.0",
-        "environment": os.(environ.get( if environ else None)"ENVIRONMENT", "production"),
-        "debug": os.(environ.get( if environ else None)"DEBUG", "false").lower() == "true",
+        "environment": os.environ.get("ENVIRONMENT", "production"),
+        "debug": os.environ.get("DEBUG", "false").lower() == "true",
         "cors_origins": [
             "https://*.vercel.app",
             "https://devskyy.com",
@@ -297,12 +289,11 @@ def get_app_config() -> dict:
         },
     }
 
-
 # Auto-initialize when imported
 if __name__ == "__main__":
     success = initialize_vercel_app()
     if not success:
-        (sys.exit( if sys else None)1)
+        sys.exit(1)
 else:
     # Initialize when imported
     initialize_vercel_app()

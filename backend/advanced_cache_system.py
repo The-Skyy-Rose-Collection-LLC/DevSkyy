@@ -24,10 +24,7 @@ Features:
 - Cache warming and invalidation strategies
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class CacheConfig:
@@ -39,7 +36,6 @@ class CacheConfig:
     enable_compression: bool = True
     enable_encryption: bool = False
     cache_prefix: str = "devskyy:"
-
 
 class AdvancedCacheManager:
     """
@@ -59,12 +55,12 @@ class AdvancedCacheManager:
             "errors": 0,
         }
         self.memory_cache_order = []  # For LRU implementation
-        (self._initialize_redis( if self else None))
+        self._initialize_redis()
 
     def _initialize_redis(self):
         """Initialize Redis connections."""
         try:
-            self.redis_client = (redis.from_url( if redis else None)
+            self.redis_client = redis.from_url(
                 self.config.redis_url,
                 decode_responses=True,
                 socket_connect_timeout=5,
@@ -72,27 +68,27 @@ class AdvancedCacheManager:
                 retry_on_timeout=True,
             )
             # Test connection
-            self.(redis_client.ping( if redis_client else None))
-            (logger.info( if logger else None)"✅ Redis connection established")
+            self.redis_client.ping()
+            logger.info("✅ Redis connection established")
         except Exception as e:
-            (logger.warning( if logger else None)f"⚠️ Redis connection failed: {e}. Using memory cache only.")
+            logger.warning(f"⚠️ Redis connection failed: {e}. Using memory cache only.")
             self.redis_client = None
 
     async def _initialize_async_redis(self):
         """Initialize async Redis connection."""
         if not self.async_redis_client:
             try:
-                self.async_redis_client = await (aioredis.from_url( if aioredis else None)
+                self.async_redis_client = await aioredis.from_url(
                     self.config.redis_url,
                     decode_responses=True,
                     socket_connect_timeout=5,
                     socket_timeout=5,
                     retry_on_timeout=True,
                 )
-                await self.(async_redis_client.ping( if async_redis_client else None))
-                (logger.info( if logger else None)"✅ Async Redis connection established")
+                await self.async_redis_client.ping()
+                logger.info("✅ Async Redis connection established")
             except Exception as e:
-                (logger.warning( if logger else None)f"⚠️ Async Redis connection failed: {e}")
+                logger.warning(f"⚠️ Async Redis connection failed: {e}")
                 self.async_redis_client = None
 
     def _generate_cache_key(self, key: str, namespace: str = "default") -> str:
@@ -105,27 +101,27 @@ class AdvancedCacheManager:
             if self.config.enable_compression:
                 # Only serialize JSON-compatible types for security
                 if isinstance(value, (dict, list, str, int, float, bool, type(None))):
-                    return (json.dumps( if json else None)value)
+                    return json.dumps(value)
                 else:
                     # Convert non-JSON types to string representation for security
-                    (logger.warning( if logger else None)
+                    logger.warning(
                         f"Converting non-JSON type {type(value)} to string for security"
                     )
-                    return (json.dumps( if json else None)str(value))
+                    return json.dumps(str(value))
             else:
-                return (json.dumps( if json else None)value)
+                return json.dumps(value)
         except Exception as e:
-            (logger.error( if logger else None)f"Serialization error: {e}")
-            return (json.dumps( if json else None)str(value))
+            logger.error(f"Serialization error: {e}")
+            return json.dumps(str(value))
 
     def _deserialize_value(self, value: str) -> Any:
         """Deserialize value from storage."""
         try:
             # Try JSON first
-            return (json.loads( if json else None)value)
+            return json.loads(value)
         except json.JSONDecodeError:
             # Log warning about unsupported pickle data
-            (logger.warning( if logger else None)
+            logger.warning(
                 "Pickle deserialization is disabled for security reasons. Data may be lost."
             )
             return None
@@ -133,12 +129,12 @@ class AdvancedCacheManager:
     def _update_memory_cache_lru(self, key: str):
         """Update LRU order for memory cache."""
         if key in self.memory_cache_order:
-            self.(memory_cache_order.remove( if memory_cache_order else None)key)
-        self.(memory_cache_order.append( if memory_cache_order else None)key)
+            self.memory_cache_order.remove(key)
+        self.memory_cache_order.append(key)
 
         # Evict oldest entries if cache is full
         while len(self.memory_cache) > self.config.max_memory_cache_size:
-            oldest_key = self.(memory_cache_order.pop( if memory_cache_order else None)0)
+            oldest_key = self.memory_cache_order.pop(0)
             if oldest_key in self.memory_cache:
                 del self.memory_cache[oldest_key]
 
@@ -148,39 +144,39 @@ class AdvancedCacheManager:
         Checks memory cache first, then Redis.
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
 
             # Check memory cache first
             if cache_key in self.memory_cache:
-                (self._update_memory_cache_lru( if self else None)cache_key)
+                self._update_memory_cache_lru(cache_key)
                 self.cache_stats["hits"] += 1
                 return self.memory_cache[cache_key]["value"]
 
             # Check Redis cache
             if self.redis_client:
                 try:
-                    redis_value = self.(redis_client.get( if redis_client else None)cache_key)
+                    redis_value = self.redis_client.get(cache_key)
                     if redis_value is not None:
-                        value = (self._deserialize_value( if self else None)redis_value)
+                        value = self._deserialize_value(redis_value)
 
                         # Store in memory cache for faster access
                         self.memory_cache[cache_key] = {
                             "value": value,
-                            "timestamp": (time.time( if time else None)),
+                            "timestamp": time.time(),
                         }
-                        (self._update_memory_cache_lru( if self else None)cache_key)
+                        self._update_memory_cache_lru(cache_key)
 
                         self.cache_stats["hits"] += 1
                         return value
                 except Exception as e:
-                    (logger.error( if logger else None)f"Redis get error: {e}")
+                    logger.error(f"Redis get error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["misses"] += 1
             return default
 
         except Exception as e:
-            (logger.error( if logger else None)f"Cache get error: {e}")
+            logger.error(f"Cache get error: {e}")
             self.cache_stats["errors"] += 1
             return default
 
@@ -191,42 +187,42 @@ class AdvancedCacheManager:
         Get value from cache (asynchronous).
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
 
             # Check memory cache first
             if cache_key in self.memory_cache:
-                (self._update_memory_cache_lru( if self else None)cache_key)
+                self._update_memory_cache_lru(cache_key)
                 self.cache_stats["hits"] += 1
                 return self.memory_cache[cache_key]["value"]
 
             # Check Redis cache
             if not self.async_redis_client:
-                await (self._initialize_async_redis( if self else None))
+                await self._initialize_async_redis()
 
             if self.async_redis_client:
                 try:
-                    redis_value = await self.(async_redis_client.get( if async_redis_client else None)cache_key)
+                    redis_value = await self.async_redis_client.get(cache_key)
                     if redis_value is not None:
-                        value = (self._deserialize_value( if self else None)redis_value)
+                        value = self._deserialize_value(redis_value)
 
                         # Store in memory cache
                         self.memory_cache[cache_key] = {
                             "value": value,
-                            "timestamp": (time.time( if time else None)),
+                            "timestamp": time.time(),
                         }
-                        (self._update_memory_cache_lru( if self else None)cache_key)
+                        self._update_memory_cache_lru(cache_key)
 
                         self.cache_stats["hits"] += 1
                         return value
                 except Exception as e:
-                    (logger.error( if logger else None)f"Async Redis get error: {e}")
+                    logger.error(f"Async Redis get error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["misses"] += 1
             return default
 
         except Exception as e:
-            (logger.error( if logger else None)f"Async cache get error: {e}")
+            logger.error(f"Async cache get error: {e}")
             self.cache_stats["errors"] += 1
             return default
 
@@ -238,31 +234,31 @@ class AdvancedCacheManager:
         Stores in both memory and Redis cache.
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
             ttl = ttl or self.config.default_ttl
 
             # Store in memory cache
             self.memory_cache[cache_key] = {
                 "value": value,
-                "timestamp": (time.time( if time else None)),
+                "timestamp": time.time(),
                 "ttl": ttl,
             }
-            (self._update_memory_cache_lru( if self else None)cache_key)
+            self._update_memory_cache_lru(cache_key)
 
             # Store in Redis cache
             if self.redis_client:
                 try:
-                    serialized_value = (self._serialize_value( if self else None)value)
-                    self.(redis_client.setex( if redis_client else None)cache_key, ttl, serialized_value)
+                    serialized_value = self._serialize_value(value)
+                    self.redis_client.setex(cache_key, ttl, serialized_value)
                 except Exception as e:
-                    (logger.error( if logger else None)f"Redis set error: {e}")
+                    logger.error(f"Redis set error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["sets"] += 1
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Cache set error: {e}")
+            logger.error(f"Cache set error: {e}")
             self.cache_stats["errors"] += 1
             return False
 
@@ -273,36 +269,36 @@ class AdvancedCacheManager:
         Set value in cache (asynchronous).
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
             ttl = ttl or self.config.default_ttl
 
             # Store in memory cache
             self.memory_cache[cache_key] = {
                 "value": value,
-                "timestamp": (time.time( if time else None)),
+                "timestamp": time.time(),
                 "ttl": ttl,
             }
-            (self._update_memory_cache_lru( if self else None)cache_key)
+            self._update_memory_cache_lru(cache_key)
 
             # Store in Redis cache
             if not self.async_redis_client:
-                await (self._initialize_async_redis( if self else None))
+                await self._initialize_async_redis()
 
             if self.async_redis_client:
                 try:
-                    serialized_value = (self._serialize_value( if self else None)value)
-                    await self.(async_redis_client.setex( if async_redis_client else None)
+                    serialized_value = self._serialize_value(value)
+                    await self.async_redis_client.setex(
                         cache_key, ttl, serialized_value
                     )
                 except Exception as e:
-                    (logger.error( if logger else None)f"Async Redis set error: {e}")
+                    logger.error(f"Async Redis set error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["sets"] += 1
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Async cache set error: {e}")
+            logger.error(f"Async cache set error: {e}")
             self.cache_stats["errors"] += 1
             return False
 
@@ -311,27 +307,27 @@ class AdvancedCacheManager:
         Delete value from cache.
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
 
             # Remove from memory cache
             if cache_key in self.memory_cache:
                 del self.memory_cache[cache_key]
                 if cache_key in self.memory_cache_order:
-                    self.(memory_cache_order.remove( if memory_cache_order else None)cache_key)
+                    self.memory_cache_order.remove(cache_key)
 
             # Remove from Redis cache
             if self.redis_client:
                 try:
-                    self.(redis_client.delete( if redis_client else None)cache_key)
+                    self.redis_client.delete(cache_key)
                 except Exception as e:
-                    (logger.error( if logger else None)f"Redis delete error: {e}")
+                    logger.error(f"Redis delete error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["deletes"] += 1
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Cache delete error: {e}")
+            logger.error(f"Cache delete error: {e}")
             self.cache_stats["errors"] += 1
             return False
 
@@ -340,30 +336,30 @@ class AdvancedCacheManager:
         Delete value from cache (asynchronous).
         """
         try:
-            cache_key = (self._generate_cache_key( if self else None)key, namespace)
+            cache_key = self._generate_cache_key(key, namespace)
 
             # Remove from memory cache
             if cache_key in self.memory_cache:
                 del self.memory_cache[cache_key]
                 if cache_key in self.memory_cache_order:
-                    self.(memory_cache_order.remove( if memory_cache_order else None)cache_key)
+                    self.memory_cache_order.remove(cache_key)
 
             # Remove from Redis cache
             if not self.async_redis_client:
-                await (self._initialize_async_redis( if self else None))
+                await self._initialize_async_redis()
 
             if self.async_redis_client:
                 try:
-                    await self.(async_redis_client.delete( if async_redis_client else None)cache_key)
+                    await self.async_redis_client.delete(cache_key)
                 except Exception as e:
-                    (logger.error( if logger else None)f"Async Redis delete error: {e}")
+                    logger.error(f"Async Redis delete error: {e}")
                     self.cache_stats["errors"] += 1
 
             self.cache_stats["deletes"] += 1
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Async cache delete error: {e}")
+            logger.error(f"Async cache delete error: {e}")
             self.cache_stats["errors"] += 1
             return False
 
@@ -372,33 +368,33 @@ class AdvancedCacheManager:
         Clear all entries in a specific namespace.
         """
         try:
-            pattern = (self._generate_cache_key( if self else None)"*", namespace)
+            pattern = self._generate_cache_key("*", namespace)
 
             # Clear from memory cache
             keys_to_delete = [
                 key
-                for key in self.(memory_cache.keys( if memory_cache else None))
-                if (key.startswith( if key else None)f"{self.config.cache_prefix}{namespace}:")
+                for key in self.memory_cache.keys()
+                if key.startswith(f"{self.config.cache_prefix}{namespace}:")
             ]
             for key in keys_to_delete:
                 del self.memory_cache[key]
                 if key in self.memory_cache_order:
-                    self.(memory_cache_order.remove( if memory_cache_order else None)key)
+                    self.memory_cache_order.remove(key)
 
             # Clear from Redis cache
             if self.redis_client:
                 try:
-                    keys = self.(redis_client.keys( if redis_client else None)pattern)
+                    keys = self.redis_client.keys(pattern)
                     if keys:
-                        self.(redis_client.delete( if redis_client else None)*keys)
+                        self.redis_client.delete(*keys)
                 except Exception as e:
-                    (logger.error( if logger else None)f"Redis clear namespace error: {e}")
+                    logger.error(f"Redis clear namespace error: {e}")
                     self.cache_stats["errors"] += 1
 
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Clear namespace error: {e}")
+            logger.error(f"Clear namespace error: {e}")
             self.cache_stats["errors"] += 1
             return False
 
@@ -419,7 +415,7 @@ class AdvancedCacheManager:
             "memory_cache_size": len(self.memory_cache),
             "memory_cache_max_size": self.config.max_memory_cache_size,
             "redis_connected": self.redis_client is not None
-            and self.(redis_client.ping( if redis_client else None)),
+            and self.redis_client.ping(),
             "async_redis_connected": self.async_redis_client is not None,
         }
 
@@ -430,16 +426,15 @@ class AdvancedCacheManager:
         Warm the cache with frequently accessed data.
         """
         try:
-            for key, value in (warmup_data.items( if warmup_data else None)):
-                (self.set( if self else None)key, value, namespace=namespace)
+            for key, value in warmup_data.items():
+                self.set(key, value, namespace=namespace)
 
-            (logger.info( if logger else None)f"✅ Cache warmed with {len(warmup_data)} entries")
+            logger.info(f"✅ Cache warmed with {len(warmup_data)} entries")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Cache warming error: {e}")
+            logger.error(f"Cache warming error: {e}")
             return False
-
 
 # Cache decorators for easy integration
 def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = None):
@@ -461,27 +456,26 @@ def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = Non
             else:
                 # Default key generation
                 key_parts = [func.__name__]
-                (key_parts.extend( if key_parts else None)str(arg) for arg in args)
-                (key_parts.extend( if key_parts else None)f"{k}={v}" for k, v in sorted((kwargs.items( if kwargs else None))))
-                cache_key = (hashlib.sha256( if hashlib else None)":".join(key_parts).encode()).hexdigest()
+                key_parts.extend(str(arg) for arg in args)
+                key_parts.extend(f"{k}={v}" for k, v in sorted(kwargs.items()))
+                cache_key = hashlib.sha256(":".join(key_parts).encode()).hexdigest()
 
             # Try to get from cache
             cache_manager = get_cache_manager()
-            cached_result = (cache_manager.get( if cache_manager else None)cache_key, namespace)
+            cached_result = cache_manager.get(cache_key, namespace)
 
             if cached_result is not None:
                 return cached_result
 
             # Execute function and cache result
             result = func(*args, **kwargs)
-            (cache_manager.set( if cache_manager else None)cache_key, result, ttl, namespace)
+            cache_manager.set(cache_key, result, ttl, namespace)
 
             return result
 
         return wrapper
 
     return decorator
-
 
 def async_cached(
     ttl: int = 3600, namespace: str = "default", key_func: Callable = None
@@ -498,27 +492,26 @@ def async_cached(
                 cache_key = key_func(*args, **kwargs)
             else:
                 key_parts = [func.__name__]
-                (key_parts.extend( if key_parts else None)str(arg) for arg in args)
-                (key_parts.extend( if key_parts else None)f"{k}={v}" for k, v in sorted((kwargs.items( if kwargs else None))))
-                cache_key = (hashlib.sha256( if hashlib else None)":".join(key_parts).encode()).hexdigest()
+                key_parts.extend(str(arg) for arg in args)
+                key_parts.extend(f"{k}={v}" for k, v in sorted(kwargs.items()))
+                cache_key = hashlib.sha256(":".join(key_parts).encode()).hexdigest()
 
             # Try to get from cache
             cache_manager = get_cache_manager()
-            cached_result = await (cache_manager.aget( if cache_manager else None)cache_key, namespace)
+            cached_result = await cache_manager.aget(cache_key, namespace)
 
             if cached_result is not None:
                 return cached_result
 
             # Execute function and cache result
             result = await func(*args, **kwargs)
-            await (cache_manager.aset( if cache_manager else None)cache_key, result, ttl, namespace)
+            await cache_manager.aset(cache_key, result, ttl, namespace)
 
             return result
 
         return wrapper
 
     return decorator
-
 
 # Database query caching
 class DatabaseCacheManager:
@@ -536,15 +529,15 @@ class DatabaseCacheManager:
         """
         Cache database query result.
         """
-        query_hash = (hashlib.sha256( if hashlib else None)f"{query}:{str(params)}".encode()).hexdigest()
-        self.(cache_manager.set( if cache_manager else None)query_hash, result, ttl, self.namespace)
+        query_hash = hashlib.sha256(f"{query}:{str(params)}".encode()).hexdigest()
+        self.cache_manager.set(query_hash, result, ttl, self.namespace)
 
     def get_cached_query_result(self, query: str, params: tuple) -> Any:
         """
         Get cached database query result.
         """
-        query_hash = (hashlib.sha256( if hashlib else None)f"{query}:{str(params)}".encode()).hexdigest()
-        return self.(cache_manager.get( if cache_manager else None)query_hash, self.namespace)
+        query_hash = hashlib.sha256(f"{query}:{str(params)}".encode()).hexdigest()
+        return self.cache_manager.get(query_hash, self.namespace)
 
     def invalidate_table_cache(self, table_name: str):
         """
@@ -552,8 +545,7 @@ class DatabaseCacheManager:
         """
         # This would require tracking which queries affect which tables
         # For simplicity, we'll clear the entire database namespace
-        self.(cache_manager.clear_namespace( if cache_manager else None)self.namespace)
-
+        self.cache_manager.clear_namespace(self.namespace)
 
 # API response caching
 class APICacheManager:
@@ -571,20 +563,18 @@ class APICacheManager:
         """
         Cache API response.
         """
-        cache_key = f"{endpoint}:{(hashlib.sha256( if hashlib else None)(json.dumps( if json else None)params, sort_keys=True).encode()).hexdigest()}"
-        self.(cache_manager.set( if cache_manager else None)cache_key, response, ttl, self.namespace)
+        cache_key = f"{endpoint}:{hashlib.sha256(json.dumps(params, sort_keys=True).encode()).hexdigest()}"
+        self.cache_manager.set(cache_key, response, ttl, self.namespace)
 
     def get_cached_api_response(self, endpoint: str, params: Dict[str, Any]) -> Any:
         """
         Get cached API response.
         """
-        cache_key = f"{endpoint}:{(hashlib.sha256( if hashlib else None)(json.dumps( if json else None)params, sort_keys=True).encode()).hexdigest()}"
-        return self.(cache_manager.get( if cache_manager else None)cache_key, self.namespace)
-
+        cache_key = f"{endpoint}:{hashlib.sha256(json.dumps(params, sort_keys=True).encode()).hexdigest()}"
+        return self.cache_manager.get(cache_key, self.namespace)
 
 # Global cache manager instance
 _cache_manager = None
-
 
 def get_cache_manager() -> AdvancedCacheManager:
     """
@@ -593,14 +583,13 @@ def get_cache_manager() -> AdvancedCacheManager:
     global _cache_manager
     if _cache_manager is None:
         config = CacheConfig(
-            redis_url=(os.getenv( if os else None)"REDIS_URL", "redis://localhost:6379"),
-            default_ttl=int((os.getenv( if os else None)"CACHE_DEFAULT_TTL", "3600")),
-            max_memory_cache_size=int((os.getenv( if os else None)"CACHE_MEMORY_SIZE", "1000")),
+            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
+            default_ttl=int(os.getenv("CACHE_DEFAULT_TTL", "3600")),
+            max_memory_cache_size=int(os.getenv("CACHE_MEMORY_SIZE", "1000")),
         )
         _cache_manager = AdvancedCacheManager(config)
 
     return _cache_manager
-
 
 def initialize_cache_system():
     """
@@ -619,9 +608,8 @@ def initialize_cache_system():
         ],
     }
 
-    (cache_manager.warm_cache( if cache_manager else None)warmup_data, "system")
-    (logger.info( if logger else None)"✅ Cache system initialized and warmed up")
-
+    cache_manager.warm_cache(warmup_data, "system")
+    logger.info("✅ Cache system initialized and warmed up")
 
 # Example usage
 async def example_usage():
@@ -632,31 +620,30 @@ async def example_usage():
     cache_manager = get_cache_manager()
 
     # Basic cache operations
-    await (cache_manager.aset( if cache_manager else None)
+    await cache_manager.aset(
         "user:123", {"name": "John", "email": "john@example.com"}, ttl=1800
     )
-    user_data = await (cache_manager.aget( if cache_manager else None)"user:123")
-    (logger.info( if logger else None)f"Cached user data: {user_data}")
+    user_data = await cache_manager.aget("user:123")
+    logger.info(f"Cached user data: {user_data}")
 
     # Using decorators
     @async_cached(ttl=600, namespace="api")
     async def get_user_profile(user_id: int):
         # Simulate API call
-        await (asyncio.sleep( if asyncio else None)0.1)
+        await asyncio.sleep(0.1)
         return {"id": user_id, "name": f"User {user_id}", "premium": True}
 
     # First call - will execute function and cache result
     profile1 = await get_user_profile(123)
-    (logger.info( if logger else None)f"First call result: {profile1}")
+    logger.info(f"First call result: {profile1}")
 
     # Second call - will return cached result
     profile2 = await get_user_profile(123)
-    (logger.info( if logger else None)f"Second call result (cached): {profile2}")
+    logger.info(f"Second call result (cached): {profile2}")
 
     # Get cache statistics
-    stats = (cache_manager.get_stats( if cache_manager else None))
-    (logger.info( if logger else None)f"Cache statistics: {stats}")
-
+    stats = cache_manager.get_stats()
+    logger.info(f"Cache statistics: {stats}")
 
 if __name__ == "__main__":
-    (asyncio.run( if asyncio else None)example_usage())
+    asyncio.run(example_usage())

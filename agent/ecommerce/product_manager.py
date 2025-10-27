@@ -11,10 +11,7 @@ Product Manager
 ML-powered product management for fashion ecommerce
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class ProductManager:
     """
@@ -34,10 +31,10 @@ class ProductManager:
     def __init__(self, api_key: Optional[str] = None):
         self.anthropic = Anthropic(api_key=api_key) if api_key else None
         self.products_database = []
-        self.categories = (self._initialize_categories( if self else None))
-        self.attributes = (self._initialize_attributes( if self else None))
+        self.categories = self._initialize_categories()
+        self.attributes = self._initialize_attributes()
 
-        (logger.info( if logger else None)"📦 Product Manager initialized")
+        logger.info("📦 Product Manager initialized")
 
     def _initialize_categories(self) -> Dict[str, List[str]]:
         """Initialize fashion product categories"""
@@ -132,76 +129,76 @@ class ProductManager:
             Complete product configuration
         """
         try:
-            (logger.info( if logger else None)f"📦 Creating product: {(product_data.get( if product_data else None)'name', 'Unnamed')}")
+            logger.info(f"📦 Creating product: {product_data.get('name', 'Unnamed')}")
 
             # Generate product ID
             product_id = f"PROD-{len(self.products_database) + 1:06d}"
 
             # Auto-generate description if not provided
-            if auto_generate and not (product_data.get( if product_data else None)"description"):
-                product_data["description"] = await (self._generate_description( if self else None)
+            if auto_generate and not product_data.get("description"):
+                product_data["description"] = await self._generate_description(
                     product_data
                 )
 
             # Generate SEO metadata
             if auto_generate:
-                product_data["seo"] = await (self._generate_seo_metadata( if self else None)product_data)
+                product_data["seo"] = await self._generate_seo_metadata(product_data)
 
             # Auto-categorize product
-            if not (product_data.get( if product_data else None)"category"):
-                product_data["category"] = await (self._auto_categorize( if self else None)product_data)
+            if not product_data.get("category"):
+                product_data["category"] = await self._auto_categorize(product_data)
 
             # Generate variants if not provided
-            if auto_generate and not (product_data.get( if product_data else None)"variants"):
-                product_data["variants"] = await (self._generate_variants( if self else None)product_data)
+            if auto_generate and not product_data.get("variants"):
+                product_data["variants"] = await self._generate_variants(product_data)
 
             # Recommend pricing
-            if not (product_data.get( if product_data else None)"price"):
-                product_data["price"] = await (self._recommend_price( if self else None)product_data)
+            if not product_data.get("price"):
+                product_data["price"] = await self._recommend_price(product_data)
 
             # Complete product object
             product = {
                 "id": product_id,
-                "name": (product_data.get( if product_data else None)"name"),
-                "slug": (self._generate_slug( if self else None)(product_data.get( if product_data else None)"name")),
-                "description": (product_data.get( if product_data else None)"description"),
-                "short_description": (product_data.get( if product_data else None)"short_description", ""),
-                "category": (product_data.get( if product_data else None)"category"),
-                "subcategory": (product_data.get( if product_data else None)"subcategory"),
-                "price": (product_data.get( if product_data else None)"price"),
-                "compare_at_price": (product_data.get( if product_data else None)"compare_at_price"),
-                "cost": (product_data.get( if product_data else None)"cost"),
-                "sku": (product_data.get( if product_data else None)"sku", product_id),
-                "barcode": (product_data.get( if product_data else None)"barcode"),
-                "variants": (product_data.get( if product_data else None)"variants", []),
-                "images": (product_data.get( if product_data else None)"images", []),
-                "tags": await (self._generate_tags( if self else None)product_data),
-                "seo": (product_data.get( if product_data else None)"seo"),
+                "name": product_data.get("name"),
+                "slug": self._generate_slug(product_data.get("name")),
+                "description": product_data.get("description"),
+                "short_description": product_data.get("short_description", ""),
+                "category": product_data.get("category"),
+                "subcategory": product_data.get("subcategory"),
+                "price": product_data.get("price"),
+                "compare_at_price": product_data.get("compare_at_price"),
+                "cost": product_data.get("cost"),
+                "sku": product_data.get("sku", product_id),
+                "barcode": product_data.get("barcode"),
+                "variants": product_data.get("variants", []),
+                "images": product_data.get("images", []),
+                "tags": await self._generate_tags(product_data),
+                "seo": product_data.get("seo"),
                 "inventory": {
                     "track_quantity": True,
-                    "quantity": (product_data.get( if product_data else None)"quantity", 0),
-                    "allow_backorders": (product_data.get( if product_data else None)"allow_backorders", False),
+                    "quantity": product_data.get("quantity", 0),
+                    "allow_backorders": product_data.get("allow_backorders", False),
                     "low_stock_threshold": 5,
                 },
                 "shipping": {
-                    "weight": (product_data.get( if product_data else None)"weight"),
-                    "dimensions": (product_data.get( if product_data else None)"dimensions"),
-                    "fragile": (product_data.get( if product_data else None)"fragile", False),
+                    "weight": product_data.get("weight"),
+                    "dimensions": product_data.get("dimensions"),
+                    "fragile": product_data.get("fragile", False),
                 },
                 "status": "draft",
-                "created_at": (datetime.utcnow( if datetime else None)).isoformat(),
-                "updated_at": (datetime.utcnow( if datetime else None)).isoformat(),
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat(),
             }
 
             # Store product
-            self.(products_database.append( if products_database else None)product)
+            self.products_database.append(product)
 
-            (logger.info( if logger else None)f"✅ Product created: {product_id}")
+            logger.info(f"✅ Product created: {product_id}")
 
             return {"success": True, "product": product, "product_id": product_id}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Product creation failed: {e}")
+            logger.error(f"Product creation failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def _generate_description(self, product_data: Dict) -> str:
@@ -210,51 +207,51 @@ class ProductManager:
             if self.anthropic:
                 prompt = f"""Generate a compelling product description for:
 
-                Product Name: {(product_data.get( if product_data else None)'name')}
-                Category: {(product_data.get( if product_data else None)'category', 'fashion item')}
-                Material: {(product_data.get( if product_data else None)'material', 'premium fabric')}
-                Style: {(product_data.get( if product_data else None)'style', 'modern')}
+                Product Name: {product_data.get('name')}
+                Category: {product_data.get('category', 'fashion item')}
+                Material: {product_data.get('material', 'premium fabric')}
+                Style: {product_data.get('style', 'modern')}
 
                 Write a 2-3 sentence description that highlights quality, style, and appeal.
                 Make it persuasive for luxury fashion shoppers."""
 
-                message = self.anthropic.(messages.create( if messages else None)
+                message = self.anthropic.messages.create(
                     model="claude-sonnet-4-20250514",
                     max_tokens=200,
                     messages=[{"role": "user", "content": prompt}],
                 )
 
-                return message.content[0].(text.strip( if text else None))
+                return message.content[0].text.strip()
             else:
-                return f"Premium {(product_data.get( if product_data else None)'name')} crafted with attention to detail and quality."
+                return f"Premium {product_data.get('name')} crafted with attention to detail and quality."
 
         except Exception as e:
-            (logger.error( if logger else None)f"Description generation failed: {e}")
-            return f"High-quality {(product_data.get( if product_data else None)'name')}"
+            logger.error(f"Description generation failed: {e}")
+            return f"High-quality {product_data.get('name')}"
 
     async def _generate_seo_metadata(self, product_data: Dict) -> Dict[str, str]:
         """Generate SEO-optimized metadata"""
-        name = (product_data.get( if product_data else None)"name", "")
-        category = (product_data.get( if product_data else None)"category", "fashion")
+        name = product_data.get("name", "")
+        category = product_data.get("category", "fashion")
 
         return {
-            "meta_title": f"{name} | Premium {(category.title( if category else None))}",
-            "meta_description": f"Shop {name}. {(product_data.get( if product_data else None)'description', '')[:150]}",
+            "meta_title": f"{name} | Premium {category.title()}",
+            "meta_description": f"Shop {name}. {product_data.get('description', '')[:150]}",
             "keywords": ", ".join(
                 [
-                    (name.lower( if name else None)),
+                    name.lower(),
                     category,
-                    (product_data.get( if product_data else None)"material", ""),
-                    (product_data.get( if product_data else None)"style", ""),
+                    product_data.get("material", ""),
+                    product_data.get("style", ""),
                     "luxury fashion",
                     "designer",
                 ]
             ),
             "og_title": name,
-            "og_description": (product_data.get( if product_data else None)"description", "")[:200],
+            "og_description": product_data.get("description", "")[:200],
             "og_image": (
-                (product_data.get( if product_data else None)"images", [None])[0]
-                if (product_data.get( if product_data else None)"images")
+                product_data.get("images", [None])[0]
+                if product_data.get("images")
                 else None
             ),
         }
@@ -263,7 +260,7 @@ class ProductManager:
         """Auto-categorize product using ML"""
         # Simple keyword-based categorization
         # In production, this would use actual ML classification
-        name_lower = (product_data.get( if product_data else None)"name", "").lower()
+        name_lower = product_data.get("name", "").lower()
 
         if any(word in name_lower for word in ["dress", "gown", "frock"]):
             return "clothing/women/dresses"
@@ -285,15 +282,15 @@ class ProductManager:
         variants = []
 
         # Get available sizes and colors
-        sizes = (product_data.get( if product_data else None)
+        sizes = product_data.get(
             "sizes", self.attributes["sizes"][:5]
         )  # Default to first 5 sizes
-        colors = (product_data.get( if product_data else None)
+        colors = product_data.get(
             "colors", ["black", "white", "navy"]
         )  # Default colors
 
-        base_price = (product_data.get( if product_data else None)"price", 100)
-        base_sku = (product_data.get( if product_data else None)"sku", "ITEM")
+        base_price = product_data.get("price", 100)
+        base_sku = product_data.get("sku", "ITEM")
 
         for color in colors:
             for size in sizes:
@@ -302,11 +299,11 @@ class ProductManager:
                     "size": size,
                     "color": color,
                     "price": base_price,
-                    "quantity": (product_data.get( if product_data else None)"quantity_per_variant", 10),
+                    "quantity": product_data.get("quantity_per_variant", 10),
                     "image": None,  # Would link to color-specific image
                     "barcode": None,
                 }
-                (variants.append( if variants else None)variant)
+                variants.append(variant)
 
         return variants
 
@@ -315,7 +312,7 @@ class ProductManager:
         # Simplified pricing algorithm
         # In production, this would use the DynamicPricingEngine
 
-        base_cost = (product_data.get( if product_data else None)"cost", 50)
+        base_cost = product_data.get("cost", 50)
         material_multiplier = {
             "silk": 3.0,
             "cashmere": 4.0,
@@ -325,8 +322,8 @@ class ProductManager:
             "polyester": 1.8,
         }
 
-        material = (product_data.get( if product_data else None)"material", "cotton")
-        multiplier = (material_multiplier.get( if material_multiplier else None)(material.lower( if material else None)), 2.0)
+        material = product_data.get("material", "cotton")
+        multiplier = material_multiplier.get(material.lower(), 2.0)
 
         recommended_price = base_cost * multiplier
 
@@ -337,37 +334,37 @@ class ProductManager:
         tags = []
 
         # Add category tags
-        if (product_data.get( if product_data else None)"category"):
-            (tags.append( if tags else None)product_data["category"].split("/")[-1])
+        if product_data.get("category"):
+            tags.append(product_data["category"].split("/")[-1])
 
         # Add material tags
-        if (product_data.get( if product_data else None)"material"):
-            (tags.append( if tags else None)product_data["material"])
+        if product_data.get("material"):
+            tags.append(product_data["material"])
 
         # Add style tags
-        if (product_data.get( if product_data else None)"style"):
-            (tags.append( if tags else None)product_data["style"])
+        if product_data.get("style"):
+            tags.append(product_data["style"])
 
         # Add seasonal tags
-        (tags.append( if tags else None)"new-arrival")
+        tags.append("new-arrival")
 
         # Add price range tags
-        price = (product_data.get( if product_data else None)"price", 0)
+        price = product_data.get("price", 0)
         if price < 100:
-            (tags.append( if tags else None)"affordable")
+            tags.append("affordable")
         elif price < 300:
-            (tags.append( if tags else None)"mid-range")
+            tags.append("mid-range")
         else:
-            (tags.append( if tags else None)"luxury")
+            tags.append("luxury")
 
         return tags
 
     def _generate_slug(self, name: str) -> str:
         """Generate URL-friendly slug"""
 
-        slug = (name.lower( if name else None))
-        slug = (re.sub( if re else None)r"[^a-z0-9]+", "-", slug)
-        slug = (slug.strip( if slug else None)"-")
+        slug = name.lower()
+        slug = re.sub(r"[^a-z0-9]+", "-", slug)
+        slug = slug.strip("-")
         return slug
 
     async def bulk_import_products(
@@ -383,24 +380,24 @@ class ProductManager:
             Import results
         """
         try:
-            (logger.info( if logger else None)f"📦 Bulk importing {len(products)} products")
+            logger.info(f"📦 Bulk importing {len(products)} products")
 
             results = {"success": [], "failed": [], "total": len(products)}
 
             for product_data in products:
-                result = await (self.create_product( if self else None)product_data, auto_generate=True)
+                result = await self.create_product(product_data, auto_generate=True)
 
-                if (result.get( if result else None)"success"):
+                if result.get("success"):
                     results["success"].append(result["product_id"])
                 else:
                     results["failed"].append(
                         {
-                            "product": (product_data.get( if product_data else None)"name"),
-                            "error": (result.get( if result else None)"error"),
+                            "product": product_data.get("name"),
+                            "error": result.get("error"),
                         }
                     )
 
-            (logger.info( if logger else None)
+            logger.info(
                 f"✅ Imported {len(results['success'])}/{len(products)} products"
             )
 
@@ -412,7 +409,7 @@ class ProductManager:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Bulk import failed: {e}")
+            logger.error(f"Bulk import failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def optimize_product_images(
@@ -432,13 +429,13 @@ class ProductManager:
             optimizations = []
 
             for image_url in images:
-                (optimizations.append( if optimizations else None)
+                optimizations.append(
                     {
                         "original": image_url,
                         "optimized": image_url,  # Would process through image optimization service
                         "size_reduction": "35%",
                         "format": "webp",
-                        "alt_text": await (self._generate_image_alt_text( if self else None)
+                        "alt_text": await self._generate_image_alt_text(
                             product_id, image_url
                         ),
                     }
@@ -452,7 +449,7 @@ class ProductManager:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Image optimization failed: {e}")
+            logger.error(f"Image optimization failed: {e}")
             return {"success": False, "error": str(e)}
 
     async def _generate_image_alt_text(self, product_id: str, image_url: str) -> str:
@@ -463,7 +460,7 @@ class ProductManager:
         )
 
         if product:
-            return f"{product['name']} - {(product.get( if product else None)'category', 'fashion item')}"
+            return f"{product['name']} - {product.get('category', 'fashion item')}"
         else:
             return "Product image"
 
@@ -484,10 +481,10 @@ class ProductManager:
                 "success": True,
                 "product_id": product_id,
                 "performance": {
-                    "views": np.(random.randint( if random else None)100, 10000),
-                    "add_to_cart_rate": round(np.(random.uniform( if random else None)0.05, 0.25), 3),
-                    "conversion_rate": round(np.(random.uniform( if random else None)0.01, 0.08), 3),
-                    "average_time_on_page": round(np.(random.uniform( if random else None)30, 180), 1),
+                    "views": np.random.randint(100, 10000),
+                    "add_to_cart_rate": round(np.random.uniform(0.05, 0.25), 3),
+                    "conversion_rate": round(np.random.uniform(0.01, 0.08), 3),
+                    "average_time_on_page": round(np.random.uniform(30, 180), 1),
                 },
                 "recommendations": [
                     "Consider adding more product images",
@@ -497,5 +494,5 @@ class ProductManager:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Analytics retrieval failed: {e}")
+            logger.error(f"Analytics retrieval failed: {e}")
             return {"success": False, "error": str(e)}

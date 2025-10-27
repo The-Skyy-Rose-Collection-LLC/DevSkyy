@@ -18,7 +18,7 @@ Scanner Agent V2 - Enterprise Edition
 Comprehensive site scanning with self-healing, orchestration, and advanced security
 
 Features:
-- Inherits from BaseAgent for enterprise capabilities
+    - Inherits from BaseAgent for enterprise capabilities
 - Multi-threaded scanning for performance
 - Integration with orchestrator for multi-agent workflows
 - Security and compliance scanning
@@ -26,11 +26,7 @@ Features:
 - Automated remediation suggestions
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class ScannerAgentV2(BaseAgent):
     """
@@ -73,11 +69,11 @@ class ScannerAgentV2(BaseAgent):
 
         # Security patterns
         self.security_patterns = {
-            "hardcoded_secret": (re.compile( if re else None)
+            "hardcoded_secret": re.compile(
                 r"(password|secret|api_key)\s*=\s*['\"][^'\"]+['\"]", re.IGNORECASE
             ),
-            "sql_injection": (re.compile( if re else None)r"execute\([\"'].*\%s.*[\"']\)", re.IGNORECASE),
-            "xss_vulnerability": (re.compile( if re else None)
+            "sql_injection": re.compile(r"execute\([\"'].*\%s.*[\"']\)", re.IGNORECASE),
+            "xss_vulnerability": re.compile(
                 r"innerHTML\s*=|dangerouslySetInnerHTML", re.IGNORECASE
             ),
         }
@@ -89,20 +85,20 @@ class ScannerAgentV2(BaseAgent):
     async def initialize(self) -> bool:
         """Initialize scanner agent"""
         try:
-            (logger.info( if logger else None)"🔍 Initializing Scanner Agent V2...")
+            logger.info("🔍 Initializing Scanner Agent V2...")
 
             # Verify we have read access to project directory
-            if not (os.access( if os else None)".", os.R_OK):
-                (logger.error( if logger else None)"No read access to project directory")
+            if not os.access(".", os.R_OK):
+                logger.error("No read access to project directory")
                 self.status = AgentStatus.FAILED
                 return False
 
             self.status = AgentStatus.HEALTHY
-            (logger.info( if logger else None)"✅ Scanner Agent V2 initialized successfully")
+            logger.info("✅ Scanner Agent V2 initialized successfully")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Scanner initialization failed: {e}")
+            logger.error(f"Scanner initialization failed: {e}")
             self.status = AgentStatus.FAILED
             return False
 
@@ -118,15 +114,15 @@ class ScannerAgentV2(BaseAgent):
         Returns:
             Comprehensive scan results
         """
-        scan_type = (kwargs.get( if kwargs else None)"scan_type", "full")
-        target_path = (kwargs.get( if kwargs else None)"target_path", ".")
-        include_live_check = (kwargs.get( if kwargs else None)"include_live_check", True)
+        scan_type = kwargs.get("scan_type", "full")
+        target_path = kwargs.get("target_path", ".")
+        include_live_check = kwargs.get("include_live_check", True)
 
-        (logger.info( if logger else None)f"🔍 Starting {scan_type} scan...")
+        logger.info(f"🔍 Starting {scan_type} scan...")
 
         scan_results = {
-            "scan_id": f"scan_{int((time.time( if time else None)))}",
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "scan_id": f"scan_{int(time.time())}",
+            "timestamp": datetime.now().isoformat(),
             "scan_type": scan_type,
             "status": "running",
         }
@@ -134,28 +130,28 @@ class ScannerAgentV2(BaseAgent):
         try:
             # Perform appropriate scan type
             if scan_type == "full":
-                results = await (self._full_scan( if self else None)target_path, include_live_check)
+                results = await self._full_scan(target_path, include_live_check)
             elif scan_type == "security":
-                results = await (self._security_scan( if self else None)target_path)
+                results = await self._security_scan(target_path)
             elif scan_type == "performance":
-                results = await (self._performance_scan( if self else None)target_path)
+                results = await self._performance_scan(target_path)
             elif scan_type == "quick":
-                results = await (self._quick_scan( if self else None)target_path)
+                results = await self._quick_scan(target_path)
             else:
                 return {"error": f"Unknown scan type: {scan_type}"}
 
-            (scan_results.update( if scan_results else None)results)
+            scan_results.update(results)
             scan_results["status"] = "completed"
 
             # Store in history
-            self.(scan_history.append( if scan_history else None)scan_results)
+            self.scan_history.append(scan_results)
             if len(self.scan_history) > 100:
                 self.scan_history = self.scan_history[-100:]
 
             return scan_results
 
         except Exception as e:
-            (logger.error( if logger else None)f"Scan failed: {e}")
+            logger.error(f"Scan failed: {e}")
             scan_results["status"] = "failed"
             scan_results["error"] = str(e)
             return scan_results
@@ -175,39 +171,39 @@ class ScannerAgentV2(BaseAgent):
         }
 
         # Scan project files
-        files = await (self._scan_project_files( if self else None)target_path)
+        files = await self._scan_project_files(target_path)
         results["files_scanned"] = len(files)
 
         # Analyze files concurrently
-        file_results = await (asyncio.gather( if asyncio else None)
-            *[(self._analyze_file( if self else None)f) for f in files], return_exceptions=True
+        file_results = await asyncio.gather(
+            *[self._analyze_file(f) for f in files], return_exceptions=True
         )
 
         for file_result in file_results:
             if isinstance(file_result, Exception):
-                (logger.warning( if logger else None)f"File analysis error: {file_result}")
+                logger.warning(f"File analysis error: {file_result}")
                 continue
 
             if file_result:
-                results["errors_found"].extend((file_result.get( if file_result else None)"errors", []))
-                results["warnings"].extend((file_result.get( if file_result else None)"warnings", []))
-                results["optimizations"].extend((file_result.get( if file_result else None)"optimizations", []))
+                results["errors_found"].extend(file_result.get("errors", []))
+                results["warnings"].extend(file_result.get("warnings", []))
+                results["optimizations"].extend(file_result.get("optimizations", []))
 
         # Security scan
-        security_issues = await (self._detect_security_issues( if self else None)files)
+        security_issues = await self._detect_security_issues(files)
         results["security_issues"] = security_issues
 
         # Performance analysis
         if include_live_check:
-            performance = await (self._analyze_site_performance( if self else None))
+            performance = await self._analyze_site_performance()
             results["performance_metrics"] = performance
 
         # Dependency analysis
-        dependencies = await (self._analyze_dependencies( if self else None))
+        dependencies = await self._analyze_dependencies()
         results["dependencies"] = dependencies
 
         # Generate summary
-        results["summary"] = (self._generate_summary( if self else None)results)
+        results["summary"] = self._generate_summary(results)
 
         return results
 
@@ -215,15 +211,15 @@ class ScannerAgentV2(BaseAgent):
         """Focused security vulnerability scan"""
         results = {"security_issues": [], "vulnerabilities": [], "risk_level": "low"}
 
-        files = await (self._scan_project_files( if self else None)target_path)
-        security_issues = await (self._detect_security_issues( if self else None)files)
+        files = await self._scan_project_files(target_path)
+        security_issues = await self._detect_security_issues(files)
 
         results["security_issues"] = security_issues
 
         # Categorize by severity
-        critical = [i for i in security_issues if (i.get( if i else None)"severity") == "critical"]
-        high = [i for i in security_issues if (i.get( if i else None)"severity") == "high"]
-        medium = [i for i in security_issues if (i.get( if i else None)"severity") == "medium"]
+        critical = [i for i in security_issues if i.get("severity") == "critical"]
+        high = [i for i in security_issues if i.get("severity") == "high"]
+        medium = [i for i in security_issues if i.get("severity") == "medium"]
 
         if critical:
             results["risk_level"] = "critical"
@@ -244,20 +240,20 @@ class ScannerAgentV2(BaseAgent):
     async def _performance_scan(self, target_path: str) -> Dict[str, Any]:
         """Focused performance analysis"""
         return {
-            "performance_metrics": await (self._analyze_site_performance( if self else None)),
-            "optimization_suggestions": await (self._generate_optimization_suggestions( if self else None)
+            "performance_metrics": await self._analyze_site_performance(),
+            "optimization_suggestions": await self._generate_optimization_suggestions(
                 target_path
             ),
         }
 
     async def _quick_scan(self, target_path: str) -> Dict[str, Any]:
         """Quick health check scan"""
-        files = await (self._scan_project_files( if self else None)target_path)
+        files = await self._scan_project_files(target_path)
 
         return {
             "files_count": len(files),
             "health_status": "healthy" if len(files) > 0 else "unhealthy",
-            "last_modified": (self._get_last_modified_time( if self else None)files),
+            "last_modified": self._get_last_modified_time(files),
         }
 
     async def _scan_project_files(self, target_path: str) -> List[str]:
@@ -265,21 +261,21 @@ class ScannerAgentV2(BaseAgent):
         files = []
 
         def scan_directory():
-            for root, dirs, filenames in (os.walk( if os else None)target_path):
+            for root, dirs, filenames in os.walk(target_path):
                 # Filter ignored directories
                 dirs[:] = [
                     d
                     for d in dirs
-                    if not (d.startswith( if d else None)".") and d not in self.ignore_dirs
+                    if not d.startswith(".") and d not in self.ignore_dirs
                 ]
 
                 for filename in filenames:
-                    if any((filename.endswith( if filename else None)ext) for ext in self.scan_extensions):
-                        file_path = os.(path.join( if path else None)root, filename)
-                        (files.append( if files else None)file_path)
+                    if any(filename.endswith(ext) for ext in self.scan_extensions):
+                        file_path = os.path.join(root, filename)
+                        files.append(file_path)
 
         # Run in thread pool to avoid blocking
-        await (asyncio.get_event_loop( if asyncio else None)).run_in_executor(self.thread_pool, scan_directory)
+        await asyncio.get_event_loop().run_in_executor(self.thread_pool, scan_directory)
 
         return files
 
@@ -289,8 +285,8 @@ class ScannerAgentV2(BaseAgent):
 
         try:
             with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = (f.read( if f else None))
-                lines = (content.split( if content else None)"\n")
+                content = f.read()
+                lines = content.split("\n")
 
             # Check file size
             if len(content) > 100000:  # 100KB
@@ -309,12 +305,12 @@ class ScannerAgentV2(BaseAgent):
                     )
 
             # Python-specific checks
-            if (file_path.endswith( if file_path else None)".py"):
-                (result.update( if result else None)await (self._analyze_python_file( if self else None)content, file_path))
+            if file_path.endswith(".py"):
+                result.update(await self._analyze_python_file(content, file_path))
 
             # JavaScript/TypeScript checks
-            if (file_path.endswith( if file_path else None)(".js", ".ts", ".tsx")):
-                (result.update( if result else None)await (self._analyze_javascript_file( if self else None)content, file_path))
+            if file_path.endswith((".js", ".ts", ".tsx")):
+                result.update(await self._analyze_javascript_file(content, file_path))
 
         except Exception as e:
             result["errors"].append({"type": "read_error", "message": str(e)})
@@ -328,11 +324,11 @@ class ScannerAgentV2(BaseAgent):
         result = {"errors": [], "warnings": [], "optimizations": []}
 
         # Check for common issues
-        if "(logger.info( if logger else None)" in content and "DEBUG" not in content:
+        if "logger.info(" in content and "DEBUG" not in content:
             result["warnings"].append(
                 {
                     "type": "debug_print",
-                    "message": "Found (logger.info( if logger else None)) statement in production code",
+                    "message": "Found logger.info() statement in production code",
                 }
             )
 
@@ -359,7 +355,7 @@ class ScannerAgentV2(BaseAgent):
             )
 
         # Check for var usage (should use let/const)
-        if (re.search( if re else None)r"\bvar\s+", content):
+        if re.search(r"\bvar\s+", content):
             result["optimizations"].append(
                 {"type": "var_usage", "message": "Use let/const instead of var"}
             )
@@ -373,13 +369,13 @@ class ScannerAgentV2(BaseAgent):
         for file_path in files:
             try:
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                    content = (f.read( if f else None))
+                    content = f.read()
 
                 # Check each security pattern
-                for pattern_name, pattern in self.(security_patterns.items( if security_patterns else None)):
-                    matches = (pattern.findall( if pattern else None)content)
+                for pattern_name, pattern in self.security_patterns.items():
+                    matches = pattern.findall(content)
                     if matches:
-                        (issues.append( if issues else None)
+                        issues.append(
                             {
                                 "file": file_path,
                                 "type": pattern_name,
@@ -391,7 +387,7 @@ class ScannerAgentV2(BaseAgent):
                         )
 
             except Exception as e:
-                (logger.warning( if logger else None)f"Security scan error for {file_path}: {e}")
+                logger.warning(f"Security scan error for {file_path}: {e}")
 
         return issues
 
@@ -399,13 +395,13 @@ class ScannerAgentV2(BaseAgent):
         """Analyze live site performance"""
         try:
             # Try to check localhost backend
-            url = (os.getenv( if os else None)"SITE_URL", "http://localhost:8000")
+            url = os.getenv("SITE_URL", "http://localhost:8000")
 
-            start_time = (time.time( if time else None))
-            response = await (asyncio.get_event_loop( if asyncio else None)).run_in_executor(
-                self.thread_pool, lambda: (httpx.get( if httpx else None)url, timeout=10)
+            start_time = time.time()
+            response = await asyncio.get_event_loop().run_in_executor(
+                self.thread_pool, lambda: httpx.get(url, timeout=10)
             )
-            response_time = ((time.time( if time else None)) - start_time) * 1000  # ms
+            response_time = (time.time() - start_time) * 1000  # ms
 
             return {
                 "url": url,
@@ -422,20 +418,20 @@ class ScannerAgentV2(BaseAgent):
         dependencies = {"python": [], "nodejs": [], "status": "unknown"}
 
         # Check requirements.txt
-        if os.(path.exists( if path else None)"requirements.txt"):
+        if os.path.exists("requirements.txt"):
             with open("requirements.txt", "r") as f:
                 dependencies["python"] = [
-                    (line.strip( if line else None))
+                    line.strip()
                     for line in f
-                    if (line.strip( if line else None)) and not (line.startswith( if line else None)"#")
+                    if line.strip() and not line.startswith("#")
                 ]
 
         # Check package.json
-        if os.(path.exists( if path else None)"package.json"):
+        if os.path.exists("package.json"):
 
             with open("package.json", "r") as f:
-                pkg_data = (json.load( if json else None)f)
-                dependencies["nodejs"] = list((pkg_data.get( if pkg_data else None)"dependencies", {}).keys())
+                pkg_data = json.load(f)
+                dependencies["nodejs"] = list(pkg_data.get("dependencies", {}).keys())
 
         dependencies["status"] = "analyzed"
         return dependencies
@@ -445,19 +441,19 @@ class ScannerAgentV2(BaseAgent):
         suggestions = []
 
         # Check for large node_modules
-        if os.(path.exists( if path else None)"node_modules"):
-            size = sum(
-                (f.stat( if f else None)).st_size for f in Path("node_modules").rglob("*") if (f.is_file( if f else None))
+        if os.path.exists("node_modules"):
+            size = sum()
+                f.stat().st_size for f in Path("node_modules").rglob("*") if f.is_file()
             )
             if size > 500_000_000:  # 500MB
-                (suggestions.append( if suggestions else None)
+                suggestions.append(
                     "node_modules is large (>500MB). Consider using yarn PnP or pnpm"
                 )
 
         # Check for Python cache
         pycache_dirs = list(Path(target_path).rglob("__pycache__"))
         if len(pycache_dirs) > 100:
-            (suggestions.append( if suggestions else None)
+            suggestions.append(
                 f"Found {len(pycache_dirs)} __pycache__ directories. Consider cleanup"
             )
 
@@ -465,9 +461,9 @@ class ScannerAgentV2(BaseAgent):
 
     def _generate_summary(self, results: Dict[str, Any]) -> str:
         """Generate human-readable summary"""
-        errors = len((results.get( if results else None)"errors_found", []))
-        warnings = len((results.get( if results else None)"warnings", []))
-        security = len((results.get( if results else None)"security_issues", []))
+        errors = len(results.get("errors_found", []))
+        warnings = len(results.get("warnings", []))
+        security = len(results.get("security_issues", []))
 
         if errors == 0 and warnings == 0 and security == 0:
             return "✅ Scan completed successfully. No issues found."
@@ -482,15 +478,14 @@ class ScannerAgentV2(BaseAgent):
             return None
 
         try:
-            latest = max(files, key=lambda f: os.(path.getmtime( if path else None)f))
-            return (datetime.fromtimestamp( if datetime else None)os.(path.getmtime( if path else None)latest)).isoformat()
+            latest = max(files, key=lambda f: os.path.getmtime(f))
+            return datetime.fromtimestamp(os.path.getmtime(latest)).isoformat()
         except Exception:
             return None
 
     async def get_scan_history(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get recent scan history"""
         return self.scan_history[-limit:]
-
 
 # Create instance for export
 scanner_agent = ScannerAgentV2()

@@ -18,9 +18,6 @@ Basic functionality tests to ensure CI/CD pipeline works
 These tests are designed to always pass and validate basic functionality
 """
 
-
-
-
 class TestBasicFunctionality:
     """Basic functionality tests that should always pass"""
 
@@ -58,7 +55,7 @@ class TestBasicFunctionality:
         """Basic string operations test"""
         test_string = "DevSkyy Enterprise Platform"
         assert "DevSkyy" in test_string
-        assert (test_string.lower( if test_string else None)) == "devskyy enterprise platform"
+        assert test_string.lower() == "devskyy enterprise platform"
         assert len(test_string) > 0
 
     def test_list_operations(self):
@@ -76,7 +73,6 @@ class TestBasicFunctionality:
         assert "type" in test_dict
         assert len(test_dict) == 2
 
-
 class TestApplicationImports:
     """Test application imports work (with error handling)"""
 
@@ -86,7 +82,7 @@ class TestApplicationImports:
 
             assert True
         except ImportError:
-            (pytest.skip( if pytest else None)"FastAPI not available")
+            pytest.skip("FastAPI not available")
 
     def test_pydantic_import(self):
         """Test Pydantic can be imported"""
@@ -94,7 +90,7 @@ class TestApplicationImports:
 
             assert True
         except ImportError:
-            (pytest.skip( if pytest else None)"Pydantic not available")
+            pytest.skip("Pydantic not available")
 
     def test_main_module_import(self):
         """Test main module can be imported"""
@@ -102,8 +98,7 @@ class TestApplicationImports:
 
             assert hasattr(main, "app"), "Main module should have 'app' attribute"
         except ImportError as e:
-            (pytest.skip( if pytest else None)f"Main module not importable: {e}")
-
+            pytest.skip(f"Main module not importable: {e}")
 
 class TestEnvironmentSetup:
     """Test environment setup and configuration"""
@@ -112,22 +107,21 @@ class TestEnvironmentSetup:
         """Test basic environment variable handling"""
         # Test that we can set and get environment variables
         os.environ["TEST_VAR"] = "test_value"
-        assert (os.getenv( if os else None)"TEST_VAR") == "test_value"
+        assert os.getenv("TEST_VAR") == "test_value"
 
         # Clean up
         del os.environ["TEST_VAR"]
 
     def test_path_operations(self):
         """Test path operations work correctly"""
-        current_path = (Path.cwd( if Path else None))
-        assert (current_path.exists( if current_path else None))
-        assert (current_path.is_dir( if current_path else None))
+        current_path = Path.cwd()
+        assert current_path.exists()
+        assert current_path.is_dir()
 
         # Test relative path operations
         test_path = current_path / "tests"
-        if (test_path.exists( if test_path else None)):
-            assert (test_path.is_dir( if test_path else None))
-
+        if test_path.exists():
+            assert test_path.is_dir()
 
 @pytest.mark.asyncio
 class TestAsyncFunctionality:
@@ -137,7 +131,7 @@ class TestAsyncFunctionality:
         """Test basic async functionality"""
 
         async def simple_async_function():
-            await (asyncio.sleep( if asyncio else None)0.01)  # Very short sleep
+            await asyncio.sleep(0.01)  # Very short sleep
             return "async_result"
 
         result = await simple_async_function()
@@ -156,7 +150,6 @@ class TestAsyncFunctionality:
         async with AsyncContextManager() as value:
             assert value == "context_value"
 
-
 if __name__ == "__main__":
     # Run tests if this file is executed directly
-    (pytest.main( if pytest else None)[__file__, "-v"])
+    pytest.main([__file__, "-v"])

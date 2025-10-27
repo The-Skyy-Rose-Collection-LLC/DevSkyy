@@ -15,7 +15,7 @@ import logging
 DevSkyy Enhanced AI Orchestrator v2.0.0
 
 Advanced AI orchestration system with 2024 enterprise features including:
-- Multi-model routing and load balancing
+    - Multi-model routing and load balancing
 - Advanced caching and performance optimization
 - Real-time model health monitoring
 - Intelligent fallback mechanisms
@@ -25,8 +25,6 @@ Author: DevSkyy Team
 Version: 2.0.0
 Python: >=3.11
 """
-
-
 
 # Import AI providers with graceful degradation
 try:
@@ -39,7 +37,7 @@ try:
 except ImportError:
     OPENAI_AVAILABLE = False
 
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 # ============================================================================
 # ENUMS AND MODELS
@@ -84,7 +82,7 @@ class ModelConfig(BaseModel):
 
 class AIRequest(BaseModel):
     """AI processing request."""
-    request_id: str = Field(default_factory=lambda: f"req_{int((time.time( if time else None)))}")
+    request_id: str = Field(default_factory=lambda: f"req_{int(time.time())}")
     prompt: str
     system_prompt: Optional[str] = None
     model_preference: Optional[str] = None
@@ -145,7 +143,7 @@ class EnhancedAIOrchestrator:
         }
         
         # Initialize default models
-        (self._initialize_default_models( if self else None))
+        self._initialize_default_models()
         
     def _initialize_default_models(self):
         """Initialize default AI model configurations."""
@@ -217,25 +215,25 @@ class EnhancedAIOrchestrator:
         try:
             # Initialize Anthropic client
             if ANTHROPIC_AVAILABLE and anthropic_api_key:
-                self.clients[ModelProvider.ANTHROPIC] = (anthropic.AsyncAnthropic( if anthropic else None)
+                self.clients[ModelProvider.ANTHROPIC] = anthropic.AsyncAnthropic(
                     api_key=anthropic_api_key
                 )
-                (logger.info( if logger else None)"✅ Anthropic client initialized")
+                logger.info("✅ Anthropic client initialized")
             
             # Initialize OpenAI client
             if OPENAI_AVAILABLE and openai_api_key:
-                self.clients[ModelProvider.OPENAI] = (openai.AsyncOpenAI( if openai else None)
+                self.clients[ModelProvider.OPENAI] = openai.AsyncOpenAI(
                     api_key=openai_api_key
                 )
-                (logger.info( if logger else None)"✅ OpenAI client initialized")
+                logger.info("✅ OpenAI client initialized")
             
             # Start health monitoring
-            (asyncio.create_task( if asyncio else None)(self._health_monitor_loop( if self else None)))
+            asyncio.create_task(self._health_monitor_loop())
             
-            (logger.info( if logger else None)f"🚀 Enhanced AI Orchestrator initialized with {len(self.models)} models")
+            logger.info(f"🚀 Enhanced AI Orchestrator initialized with {len(self.models)} models")
             
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Failed to initialize AI Orchestrator: {e}")
+            logger.error(f"❌ Failed to initialize AI Orchestrator: {e}")
             raise
     
     async def process_request(self, request: AIRequest) -> AIResponse:
@@ -248,49 +246,49 @@ class EnhancedAIOrchestrator:
         Returns:
             AI response with metadata
         """
-        start_time = (time.time( if time else None))
+        start_time = time.time()
         
         try:
             # Check cache first
             if request.cache_key and self.redis_client:
-                cached_response = await (self._get_cached_response( if self else None)request.cache_key)
+                cached_response = await self._get_cached_response(request.cache_key)
                 if cached_response:
                     cached_response.request_id = request.request_id
                     return cached_response
             
             # Select optimal model
-            selected_model = await (self._select_model( if self else None)request)
+            selected_model = await self._select_model(request)
             if not selected_model:
                 raise Exception("No suitable model available")
             
             # Process request
-            response = await (self._process_with_model( if self else None)request, selected_model)
+            response = await self._process_with_model(request, selected_model)
             
             # Cache response
             if request.cache_key and self.redis_client:
-                await (self._cache_response( if self else None)request.cache_key, response, request.cache_ttl)
+                await self._cache_response(request.cache_key, response, request.cache_ttl)
             
             # Update metrics
-            (self._update_metrics( if self else None)response)
+            self._update_metrics(response)
             
             # Store in history
-            self.(request_history.append( if request_history else None)response)
+            self.request_history.append(response)
             if len(self.request_history) > 1000:  # Keep last 1000 requests
                 self.request_history = self.request_history[-1000:]
             
             return response
             
         except Exception as e:
-            (logger.error( if logger else None)f"❌ AI request failed: {e}")
+            logger.error(f"❌ AI request failed: {e}")
             # Try fallback if available
-            return await (self._handle_fallback( if self else None)request, str(e))
+            return await self._handle_fallback(request, str(e))
     
     async def _select_model(self, request: AIRequest) -> Optional[str]:
         """Select the optimal model for the request."""
         # Filter models by capability if specified
         available_models = []
         
-        for model_name, config in self.(models.items( if models else None)):
+        for model_name, config in self.models.items():
             if not config.enabled:
                 continue
                 
@@ -304,11 +302,11 @@ class EnhancedAIOrchestrator:
                 continue
                 
             # Check health status
-            health = self.(health_status.get( if health_status else None)model_name, {})
-            if (health.get( if health else None)"status") == "unhealthy":
+            health = self.health_status.get(model_name, {})
+            if health.get("status") == "unhealthy":
                 continue
                 
-            (available_models.append( if available_models else None)(model_name, config))
+            available_models.append((model_name, config))
         
         if not available_models:
             return None
@@ -328,7 +326,7 @@ class EnhancedAIOrchestrator:
             return min(available_models, key=lambda x: x[1].cost_per_token)[0]
         else:
             # Balanced selection based on performance and cost
-            return (self._balanced_model_selection( if self else None)available_models)
+            return self._balanced_model_selection(available_models)
     
     def _balanced_model_selection(self, available_models: List) -> str:
         """Select model based on balanced performance and cost criteria."""
@@ -339,7 +337,7 @@ class EnhancedAIOrchestrator:
         for model_name, config in available_models:
             capability_score = len(config.capabilities) * 10
             cost_score = 1 / (config.cost_per_token + 0.000001)  # Avoid division by zero
-            health_score = self.(health_status.get( if health_status else None)model_name, {}).get("score", 0.5) * 100
+            health_score = self.health_status.get(model_name, {}).get("score", 0.5) * 100
             
             total_score = capability_score + cost_score + health_score
             
@@ -354,17 +352,17 @@ class EnhancedAIOrchestrator:
         config = self.models[model_name]
         client = self.clients[config.provider]
         
-        start_time = (time.time( if time else None))
+        start_time = time.time()
         
         try:
             if config.provider == ModelProvider.ANTHROPIC:
-                response = await (self._process_anthropic( if self else None)client, request, config)
+                response = await self._process_anthropic(client, request, config)
             elif config.provider == ModelProvider.OPENAI:
-                response = await (self._process_openai( if self else None)client, request, config)
+                response = await self._process_openai(client, request, config)
             else:
                 raise Exception(f"Unsupported provider: {config.provider}")
             
-            response_time = (time.time( if time else None)) - start_time
+            response_time = time.time() - start_time
             
             return AIResponse(
                 request_id=request.request_id,
@@ -374,11 +372,11 @@ class EnhancedAIOrchestrator:
                 tokens_used=response["tokens_used"],
                 cost=response["tokens_used"] * config.cost_per_token,
                 response_time=response_time,
-                metadata=(response.get( if response else None)"metadata", {})
+                metadata=response.get("metadata", {})
             )
             
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Model {model_name} failed: {e}")
+            logger.error(f"❌ Model {model_name} failed: {e}")
             raise
     
     async def _process_anthropic(self, client, request: AIRequest, config: ModelConfig) -> Dict:
@@ -386,11 +384,11 @@ class EnhancedAIOrchestrator:
         messages = []
         
         if request.system_prompt:
-            (messages.append( if messages else None){"role": "system", "content": request.system_prompt})
+            messages.append({"role": "system", "content": request.system_prompt})
         
-        (messages.append( if messages else None){"role": "user", "content": request.prompt})
+        messages.append({"role": "user", "content": request.prompt})
         
-        response = await client.(messages.create( if messages else None)
+        response = await client.messages.create(
             model=config.model_name,
             max_tokens=request.max_tokens or config.max_tokens,
             temperature=request.temperature or config.temperature,
@@ -411,11 +409,11 @@ class EnhancedAIOrchestrator:
         messages = []
         
         if request.system_prompt:
-            (messages.append( if messages else None){"role": "system", "content": request.system_prompt})
+            messages.append({"role": "system", "content": request.system_prompt})
         
-        (messages.append( if messages else None){"role": "user", "content": request.prompt})
+        messages.append({"role": "user", "content": request.prompt})
         
-        response = await client.chat.(completions.create( if completions else None)
+        response = await client.chat.completions.create(
             model=config.model_name,
             max_tokens=request.max_tokens or config.max_tokens,
             temperature=request.temperature or config.temperature,
@@ -437,15 +435,15 @@ class EnhancedAIOrchestrator:
             if not self.redis_client:
                 return None
                 
-            cached_data = await self.(redis_client.get( if redis_client else None)f"ai_cache:{cache_key}")
+            cached_data = await self.redis_client.get(f"ai_cache:{cache_key}")
             if cached_data:
-                response_data = (json.loads( if json else None)cached_data)
+                response_data = json.loads(cached_data)
                 response = AIResponse(**response_data)
                 response.cached = True
                 return response
                 
         except Exception as e:
-            (logger.warning( if logger else None)f"Cache retrieval failed: {e}")
+            logger.warning(f"Cache retrieval failed: {e}")
             
         return None
     
@@ -455,17 +453,17 @@ class EnhancedAIOrchestrator:
             if not self.redis_client:
                 return
                 
-            cache_data = (response.dict( if response else None))
+            cache_data = response.dict()
             cache_data["timestamp"] = cache_data["timestamp"].isoformat()
             
-            await self.(redis_client.setex( if redis_client else None)
+            await self.redis_client.setex(
                 f"ai_cache:{cache_key}",
                 ttl,
-                (json.dumps( if json else None)cache_data)
+                json.dumps(cache_data)
             )
             
         except Exception as e:
-            (logger.warning( if logger else None)f"Cache storage failed: {e}")
+            logger.warning(f"Cache storage failed: {e}")
     
     def _update_metrics(self, response: AIResponse):
         """Update performance metrics."""
@@ -502,15 +500,15 @@ class EnhancedAIOrchestrator:
         """Background health monitoring for all models."""
         while True:
             try:
-                await (self._check_model_health( if self else None))
-                await (asyncio.sleep( if asyncio else None)60)  # TODO: Move to config  # Check every minute
+                await self._check_model_health()
+                await asyncio.sleep(60)  # TODO: Move to config  # Check every minute
             except Exception as e:
-                (logger.error( if logger else None)f"Health monitor error: {e}")
-                await (asyncio.sleep( if asyncio else None)60)  # TODO: Move to config
+                logger.error(f"Health monitor error: {e}")
+                await asyncio.sleep(60)  # TODO: Move to config
     
     async def _check_model_health(self):
         """Check health status of all models."""
-        for model_name, config in self.(models.items( if models else None)):
+        for model_name, config in self.models.items():
             if config.provider not in self.clients:
                 continue
                 
@@ -522,13 +520,13 @@ class EnhancedAIOrchestrator:
                     temperature=0.1
                 )
                 
-                start_time = (time.time( if time else None))
-                await (self._process_with_model( if self else None)test_request, model_name)
-                response_time = (time.time( if time else None)) - start_time
+                start_time = time.time()
+                await self._process_with_model(test_request, model_name)
+                response_time = time.time() - start_time
                 
                 self.health_status[model_name] = {
                     "status": "healthy",
-                    "last_check": (datetime.now( if datetime else None)).isoformat(),
+                    "last_check": datetime.now().isoformat(),
                     "response_time": response_time,
                     "score": min(1.0, 2.0 / (response_time + 1.0))  # Score based on response time
                 }
@@ -536,7 +534,7 @@ class EnhancedAIOrchestrator:
             except Exception as e:
                 self.health_status[model_name] = {
                     "status": "unhealthy",
-                    "last_check": (datetime.now( if datetime else None)).isoformat(),
+                    "last_check": datetime.now().isoformat(),
                     "error": str(e),
                     "score": 0.0
                 }
@@ -545,8 +543,8 @@ class EnhancedAIOrchestrator:
         """Get current performance metrics."""
         return {
             **self.metrics,
-            "models_available": len([m for m in self.(models.values( if models else None)) if m.enabled]),
-            "models_healthy": len([h for h in self.(health_status.values( if health_status else None)) if (h.get( if h else None)"status") == "healthy"]),
+            "models_available": len([m for m in self.models.values() if m.enabled]),
+            "models_healthy": len([h for h in self.health_status.values() if h.get("status") == "healthy"]),
             "recent_requests": len(self.request_history),
             "cost_by_model": self.cost_tracking
         }
@@ -555,8 +553,8 @@ class EnhancedAIOrchestrator:
         """Get status of all models."""
         return {
             model_name: {
-                "config": (config.dict( if config else None)),
-                "health": self.(health_status.get( if health_status else None)model_name, {"status": "unknown"})
+                "config": config.dict(),
+                "health": self.health_status.get(model_name, {"status": "unknown"})
             }
-            for model_name, config in self.(models.items( if models else None))
+            for model_name, config in self.models.items()
         }

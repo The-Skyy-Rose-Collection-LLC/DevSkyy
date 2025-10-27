@@ -9,9 +9,7 @@ Text analysis, sentiment analysis, and entity extraction
 Reference: AGENTS.md Line 1559-1563
 """
 
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class NLPEngine:
     """NLP capabilities for text processing and analysis"""
@@ -22,7 +20,7 @@ class NLPEngine:
         positive_words = ["good", "great", "excellent", "love", "amazing", "perfect"]
         negative_words = ["bad", "terrible", "hate", "awful", "poor", "worst"]
 
-        text_lower = (text.lower( if text else None))
+        text_lower = text.lower()
         pos_count = sum(1 for word in positive_words if word in text_lower)
         neg_count = sum(1 for word in negative_words if word in text_lower)
 
@@ -40,7 +38,7 @@ class NLPEngine:
 
     async def extract_keywords(self, text: str, top_n: int = 10) -> List[str]:
         """Extract keywords from text"""
-        words = (re.findall( if re else None)r"\b[a-zA-Z]{4,}\b", (text.lower( if text else None)))
+        words = re.findall(r"\b[a-zA-Z]{4,}\b", text.lower())
         stop_words = {"this", "that", "with", "from", "have", "will"}
         filtered = [w for w in words if w not in stop_words]
         return list(set(filtered))[:top_n]

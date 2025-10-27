@@ -20,90 +20,86 @@ Initialize DevSkyy Database
 Sets up database with all required tables using SQLAlchemy models
 """
 
-
 # Load environment variables FIRST before any other imports
 
 load_dotenv()
 
 # Configure logging
-(logging.basicConfig( if logging else None)
+logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
 
-        (logger.info( if logger else None)f"🗄️  Database Provider: {DB_PROVIDER}")
-        (logger.info( if logger else None)f"📍 Database URL: {DATABASE_URL}")
+        logger.info(f"🗄️  Database Provider: {DB_PROVIDER}")
+        logger.info(f"📍 Database URL: {DATABASE_URL}")
 
         # Create database file if it doesn't exist
         if "sqlite" in DATABASE_URL:
             db_path = Path("./devskyy.db")
-            if not (db_path.exists( if db_path else None)):
-                (logger.info( if logger else None)"📁 Creating new SQLite database file...")
-                (db_path.touch( if db_path else None))
+            if not db_path.exists():
+                logger.info("📁 Creating new SQLite database file...")
+                db_path.touch()
 
         # Initialize database (create all tables)
-        (logger.info( if logger else None)"🔨 Creating database tables...")
+        logger.info("🔨 Creating database tables...")
         await init_db()
 
         # Verify tables were created
-        (logger.info( if logger else None)"✅ Database tables created successfully!")
+        logger.info("✅ Database tables created successfully!")
 
         # Test connection
-        (logger.info( if logger else None)"🔍 Testing database connection...")
-        health = await (db_manager.health_check( if db_manager else None))
+        logger.info("🔍 Testing database connection...")
+        health = await db_manager.health_check()
 
-        if (health.get( if health else None)"status") == "healthy":
-            (logger.info( if logger else None)"✅ Database connection healthy!")
-            (logger.info( if logger else None)f"📊 Database info: {health}")
+        if health.get("status") == "healthy":
+            logger.info("✅ Database connection healthy!")
+            logger.info(f"📊 Database info: {health}")
         else:
-            (logger.error( if logger else None)f"❌ Database health check failed: {health}")
+            logger.error(f"❌ Database health check failed: {health}")
             return False
 
         # List created tables using async query
 
-
         async with AsyncSessionLocal() as session:
             if "sqlite" in DATABASE_URL:
                 # Query SQLite system table
-                result = await (session.execute( if session else None)
+                result = await session.execute(
                     text(
                         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
                     )
                 )
-                tables = [row[0] for row in (result.fetchall( if result else None))]
+                tables = [row[0] for row in result.fetchall()]
             else:
                 # For PostgreSQL/MySQL, use information_schema
-                result = await (session.execute( if session else None)
+                result = await session.execute(
                     text(
                         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
                     )
                 )
-                tables = [row[0] for row in (result.fetchall( if result else None))]
+                tables = [row[0] for row in result.fetchall()]
 
-        (logger.info( if logger else None)f"\n📋 Created {len(tables)} tables:")
+        logger.info(f"\n📋 Created {len(tables)} tables:")
         for table in sorted(tables):
-            (logger.info( if logger else None)f"  ✓ {table}")
+            logger.info(f"  ✓ {table}")
 
-        (logger.info( if logger else None)"\n🎉 Database initialization complete!")
+        logger.info("\n🎉 Database initialization complete!")
         return True
 
     except Exception as e:
-        (logger.error( if logger else None)f"❌ Database initialization failed: {e}")
+        logger.error(f"❌ Database initialization failed: {e}")
 
-        (logger.error( if logger else None)(traceback.format_exc( if traceback else None)))
+        logger.error(traceback.format_exc())
         return False
-
 
 async def verify_models():
     """Verify all models are properly registered"""
 
-    (logger.info( if logger else None)"\n🔍 Verifying SQLAlchemy models...")
+    logger.info("\n🔍 Verifying SQLAlchemy models...")
 
     model_classes = [
         models_sqlalchemy.User,
@@ -117,17 +113,15 @@ async def verify_models():
 
     for model in model_classes:
         table_name = model.__tablename__
-        (logger.info( if logger else None)f"  ✓ {model.__name__} → {table_name}")
+        logger.info(f"  ✓ {model.__name__} → {table_name}")
 
-    (logger.info( if logger else None)f"\n✅ {len(model_classes)} models registered")
+    logger.info(f"\n✅ {len(model_classes)} models registered")
     return True
-
 
 async def create_sample_data():
     """Create sample data for testing (optional)"""
 
-
-    (logger.info( if logger else None)"\n📝 Creating sample data...")
+    logger.info("\n📝 Creating sample data...")
 
     async with AsyncSessionLocal() as session:
         try:
@@ -139,7 +133,7 @@ async def create_sample_data():
                 hashed_password="<replace with hashed password>",
                 is_superuser=True,
             )
-            (session.add( if session else None)sample_user)
+            session.add(sample_user)
 
             # Create sample product
             sample_product = Product(
@@ -154,7 +148,7 @@ async def create_sample_data():
                 colors=["Rose Gold"],
                 tags=["luxury", "watches", "rose-gold"],
             )
-            (session.add( if session else None)sample_product)
+            session.add(sample_product)
 
             # Create sample agent log
             sample_log = AgentLog(
@@ -164,38 +158,37 @@ async def create_sample_data():
                 input_data={"event": "database_init"},
                 output_data={"tables_created": 7},
                 execution_time_ms=125.5,
-                created_at=(datetime.utcnow( if datetime else None)),
+                created_at=datetime.utcnow(),
             )
-            (session.add( if session else None)sample_log)
+            session.add(sample_log)
 
-            await (session.commit( if session else None))
-            (logger.info( if logger else None)"✅ Sample data created successfully!")
-            (logger.info( if logger else None)"  - Admin user: admin@devskyy.com")
-            (logger.info( if logger else None)"  - Sample product: Luxury Rose Gold Watch")
-            (logger.info( if logger else None)"  - Agent log entry")
+            await session.commit()
+            logger.info("✅ Sample data created successfully!")
+            logger.info("  - Admin user: admin@devskyy.com")
+            logger.info("  - Sample product: Luxury Rose Gold Watch")
+            logger.info("  - Agent log entry")
 
             return True
 
         except Exception as e:
-            await (session.rollback( if session else None))
-            (logger.error( if logger else None)f"❌ Failed to create sample data: {e}")
+            await session.rollback()
+            logger.error(f"❌ Failed to create sample data: {e}")
             return False
-
 
 async def main():
     """Main initialization function"""
-    (logger.info( if logger else None)"=" * 60)
-    (logger.info( if logger else None)"DevSkyy Database Initialization")
-    (logger.info( if logger else None)"=" * 60)
+    logger.info("=" * 60)
+    logger.info("DevSkyy Database Initialization")
+    logger.info("=" * 60)
 
     # Step 1: Verify models
     if not await verify_models():
-        (logger.error( if logger else None)"❌ Model verification failed")
+        logger.error("❌ Model verification failed")
         return False
 
     # Step 2: Initialize database
     if not await init_database():
-        (logger.error( if logger else None)"❌ Database initialization failed")
+        logger.error("❌ Database initialization failed")
         return False
 
     # Step 3: Create sample data (optional)
@@ -203,12 +196,11 @@ async def main():
     if create_samples:
         await create_sample_data()
 
-    (logger.info( if logger else None)"\n" + "=" * 60)
-    (logger.info( if logger else None)"✅ Database setup complete!")
-    (logger.info( if logger else None)"=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("✅ Database setup complete!")
+    logger.info("=" * 60)
 
     return True
 
-
 if __name__ == "__main__":
-    (asyncio.run( if asyncio else None)main())
+    asyncio.run(main())

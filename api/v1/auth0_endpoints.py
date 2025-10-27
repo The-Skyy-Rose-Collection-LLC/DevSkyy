@@ -8,15 +8,13 @@ from pydantic import BaseModel
 
 from authlib.common.security import generate_token
 from security.auth0_integration import (
-from typing import Optional, Dict, Any
+    from typing import Optional, Dict, Any
 import logging
 
 """
 Auth0 Authentication Endpoints for DevSkyy FastAPI Platform
 Converted from Flask to FastAPI with JWT token integration
 """
-
-
 
     auth0_oauth_client,
     create_devskyy_jwt_token,
@@ -26,14 +24,14 @@ Converted from Flask to FastAPI with JWT token integration
 )
 
 # Configure logging
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 # Create router
 router = APIRouter(prefix="/auth0", tags=["auth0-authentication"])
 
 # Configuration
-FRONTEND_URL = (os.getenv( if os else None)"FRONTEND_URL", "http://localhost:3000")
-API_BASE_URL = (os.getenv( if os else None)"API_BASE_URL", "http://localhost:8000")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 # ============================================================================
 # REQUEST/RESPONSE MODELS
@@ -61,7 +59,7 @@ class Auth0LogoutResponse(BaseModel):
 # AUTH0 AUTHENTICATION ENDPOINTS
 # ============================================================================
 
-@(router.get( if router else None)"/login", response_model=Auth0LoginResponse)
+@router.get("/login", response_model=Auth0LoginResponse)
 async def auth0_login(
     request: Request,
     redirect_uri: Optional[str] = Query(None, description="Custom redirect URI after login")
@@ -81,7 +79,7 @@ async def auth0_login(
             redirect_uri = f"{API_BASE_URL}/api/v1/auth0/callback"
         
         # Generate authorization URL
-        authorization_url = (auth0_oauth_client.get_authorization_url( if auth0_oauth_client else None)
+        authorization_url = auth0_oauth_client.get_authorization_url(
             redirect_uri=redirect_uri,
             state=state
         )
@@ -94,7 +92,7 @@ async def auth0_login(
         )
         
         # For API usage, return the URL
-        if request.(headers.get( if headers else None)"accept") == "application/json":
+        if request.headers.get("accept") == "application/json":
             return Auth0LoginResponse(
                 authorization_url=authorization_url,
                 state=state
@@ -104,14 +102,14 @@ async def auth0_login(
         return RedirectResponse(url=authorization_url, status_code=302)
         
     except Exception as e:
-        (logger.error( if logger else None)f"Auth0 login initiation failed: {e}")
+        logger.error(f"Auth0 login initiation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to initiate Auth0 login"
         )
 
-@(router.get( if router else None)"/callback", response_model=Auth0TokenResponse)
-@(router.post( if router else None)"/callback", response_model=Auth0TokenResponse)
+@router.get("/callback", response_model=Auth0TokenResponse)
+@router.post("/callback", response_model=Auth0TokenResponse)
 async def auth0_callback(
     request: Request,
     code: Optional[str] = Query(None, description="Authorization code from Auth0"),
@@ -147,13 +145,13 @@ async def auth0_callback(
         
         # Exchange code for tokens
         redirect_uri = f"{API_BASE_URL}/api/v1/auth0/callback"
-        token_data = await (auth0_oauth_client.exchange_code_for_token( if auth0_oauth_client else None)
+        token_data = await auth0_oauth_client.exchange_code_for_token(
             code=code,
             redirect_uri=redirect_uri
         )
         
         # Get user information from Auth0
-        user_info = await (auth0_oauth_client.get_user_info( if auth0_oauth_client else None)token_data["access_token"])
+        user_info = await auth0_oauth_client.get_user_info(token_data["access_token"])
         
         # Create DevSkyy JWT tokens for compatibility
         access_token = create_devskyy_jwt_token(
@@ -166,9 +164,9 @@ async def auth0_callback(
         # Log successful authentication
         await log_auth_event(
             event_type="auth0_login_success",
-            user_id=(user_info.get( if user_info else None)"sub"),
+            user_id=user_info.get("sub"),
             request=request,
-            details={"email": (user_info.get( if user_info else None)"email"), "name": (user_info.get( if user_info else None)"name")}
+            details={"email": user_info.get("email"), "name": user_info.get("name")}
         )
         
         # Prepare response
@@ -180,7 +178,7 @@ async def auth0_callback(
         )
         
         # For browser usage, redirect to frontend with tokens
-        if request.(headers.get( if headers else None)"accept") != "application/json":
+        if request.headers.get("accept") != "application/json":
             frontend_redirect = f"{FRONTEND_URL}/auth/callback?token={access_token}&refresh={refresh_token}"
             return RedirectResponse(url=frontend_redirect, status_code=302)
         
@@ -190,7 +188,7 @@ async def auth0_callback(
     except HTTPException:
         raise
     except Exception as e:
-        (logger.error( if logger else None)f"Auth0 callback processing failed: {e}")
+        logger.error(f"Auth0 callback processing failed: {e}")
         await log_auth_event(
             event_type="auth0_callback_error",
             request=request,
@@ -201,8 +199,8 @@ async def auth0_callback(
             detail="Failed to process Auth0 callback"
         )
 
-@(router.post( if router else None)"/logout", response_model=Auth0LogoutResponse)
-@(router.get( if router else None)"/logout", response_model=Auth0LogoutResponse)
+@router.post("/logout", response_model=Auth0LogoutResponse)
+@router.get("/logout", response_model=Auth0LogoutResponse)
 async def auth0_logout(
     request: Request,
     return_to: Optional[str] = Query(None, description="URL to return to after logout")
@@ -219,7 +217,7 @@ async def auth0_logout(
             return_to = FRONTEND_URL
         
         # Generate Auth0 logout URL
-        logout_url = (auth0_oauth_client.get_logout_url( if auth0_oauth_client else None)return_to=return_to)
+        logout_url = auth0_oauth_client.get_logout_url(return_to=return_to)
         
         # Log logout event
         await log_auth_event(
@@ -229,7 +227,7 @@ async def auth0_logout(
         )
         
         # For API usage, return the logout URL
-        if request.(headers.get( if headers else None)"accept") == "application/json":
+        if request.headers.get("accept") == "application/json":
             return Auth0LogoutResponse(
                 logout_url=logout_url,
                 message="Logout successful. Please visit the logout_url to complete Auth0 logout."
@@ -239,7 +237,7 @@ async def auth0_logout(
         return RedirectResponse(url=logout_url, status_code=302)
         
     except Exception as e:
-        (logger.error( if logger else None)f"Auth0 logout failed: {e}")
+        logger.error(f"Auth0 logout failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to process logout"
@@ -249,7 +247,7 @@ async def auth0_logout(
 # USER INFO ENDPOINT
 # ============================================================================
 
-@(router.get( if router else None)"/me")
+@router.get("/me")
 async def get_current_auth0_user(request: Request):
     """
     Get current user information from DevSkyy JWT token.
@@ -259,33 +257,33 @@ async def get_current_auth0_user(request: Request):
     """
     try:
         # Extract token from Authorization header
-        auth_header = request.(headers.get( if headers else None)"authorization", "")
-        if not (auth_header.startswith( if auth_header else None)"Bearer "):
+        auth_header = request.headers.get("authorization", "")
+        if not auth_header.startswith("Bearer "):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Authentication token required"
             )
 
-        token = (auth_header.replace( if auth_header else None)"Bearer ", "")
+        token = auth_header.replace("Bearer ", "")
         
         # Verify DevSkyy JWT token
         payload = verify_devskyy_jwt_token(token)
         
         # Return user information
         return {
-            "user_id": (payload.get( if payload else None)"sub"),
-            "email": (payload.get( if payload else None)"email"),
-            "name": (payload.get( if payload else None)"name"),
-            "picture": (payload.get( if payload else None)"picture"),
-            "email_verified": (payload.get( if payload else None)"email_verified"),
-            "auth_provider": (payload.get( if payload else None)"auth_provider"),
-            "token_type": (payload.get( if payload else None)"token_type")
+            "user_id": payload.get("sub"),
+            "email": payload.get("email"),
+            "name": payload.get("name"),
+            "picture": payload.get("picture"),
+            "email_verified": payload.get("email_verified"),
+            "auth_provider": payload.get("auth_provider"),
+            "token_type": payload.get("token_type")
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        (logger.error( if logger else None)f"Failed to get user info: {e}")
+        logger.error(f"Failed to get user info: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get user information"
@@ -295,24 +293,24 @@ async def get_current_auth0_user(request: Request):
 # DEMO HOME PAGE (Optional - for testing)
 # ============================================================================
 
-@(router.get( if router else None)"/demo", response_class=HTMLResponse)
+@router.get("/demo", response_class=HTMLResponse)
 async def auth0_demo_home(request: Request):
     """
     Demo home page for testing Auth0 integration.
     Adapted from the original Flask HTML template.
     """
     # Check if user is authenticated
-    auth_header = request.(headers.get( if headers else None)"authorization", "")
-    token = (auth_header.replace( if auth_header else None)"Bearer ", "") if (auth_header.startswith( if auth_header else None)"Bearer ") else None
+    auth_header = request.headers.get("authorization", "")
+    token = auth_header.replace("Bearer ", "") if auth_header.startswith("Bearer ") else None
     
     user_info = None
     if token:
         try:
             payload = verify_devskyy_jwt_token(token)
             user_info = {
-                "name": (payload.get( if payload else None)"name", "Unknown User"),
-                "email": (payload.get( if payload else None)"email"),
-                "picture": (payload.get( if payload else None)"picture"),
+                "name": payload.get("name", "Unknown User"),
+                "email": payload.get("email"),
+                "picture": payload.get("picture"),
                 "userinfo": payload  # For compatibility with original template
             }
         except Exception as e:
@@ -340,10 +338,10 @@ async def auth0_demo_home(request: Request):
             {f'''
             <div class="user-info">
                 <h2>Welcome {user_info["name"]}!</h2>
-                <p><strong>Email:</strong> {(user_info.get( if user_info else None)"email", "N/A")}</p>
+                <p><strong>Email:</strong> {user_info.get("email", "N/A")}</p>
                 <p><a href="/api/v1/auth0/logout" class="button logout-button">Logout</a></p>
                 <h3>User Information:</h3>
-                <pre>{(json.dumps( if json else None)user_info["userinfo"], indent=2)}</pre>
+                <pre>{json.dumps(user_info["userinfo"], indent=2)}</pre>
             </div>
             ''' if user_info else '''
             <div class="user-info">

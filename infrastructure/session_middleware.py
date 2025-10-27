@@ -16,11 +16,7 @@ Enterprise Session Middleware - FastAPI Integration
 Implements secure session management with Redis backend and fashion industry features
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class SessionMiddleware(BaseHTTPMiddleware):
     """Enterprise session middleware with Redis backend"""
@@ -51,23 +47,23 @@ class SessionMiddleware(BaseHTTPMiddleware):
         # Fashion industry specific session tracking
         self.fashion_tracking_enabled = True
 
-        (logger.info( if logger else None)"Session middleware initialized with Redis backend")
+        logger.info("Session middleware initialized with Redis backend")
 
     async def dispatch(self, request: Request, call_next):
         """Process request with session management"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         # Get session ID from cookie
-        session_id = request.(cookies.get( if cookies else None)self.session_cookie_name)
+        session_id = request.cookies.get(self.session_cookie_name)
         session_data = None
 
         # Load existing session
         if session_id:
-            session_data = await (redis_manager.get_session( if redis_manager else None)session_id)
+            session_data = await redis_manager.get_session(session_id)
 
             if session_data:
                 # Update last accessed time
-                await (redis_manager.update_session_access( if redis_manager else None)session_id)
+                await redis_manager.update_session_access(session_id)
 
                 # Add session data to request state
                 request.state.session_id = session_id
@@ -80,12 +76,12 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 if self.fashion_tracking_enabled and session_data.fashion_preferences:
                     request.state.fashion_preferences = session_data.fashion_preferences
 
-                (logger.debug( if logger else None)
+                logger.debug(
                     f"Session loaded: {session_id} for user {session_data.user_id}"
                 )
             else:
                 # Invalid session ID
-                (logger.warning( if logger else None)f"Invalid session ID: {session_id}")
+                logger.warning(f"Invalid session ID: {session_id}")
                 request.state.session_id = None
                 request.state.session_data = None
         else:
@@ -96,7 +92,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         # Check if session is required for this path
         path = request.url.path
         requires_session = any(
-            (path.startswith( if path else None)protected_path)
+            path.startswith(protected_path)
             for protected_path in self.require_session_for_paths
         )
 
@@ -107,7 +103,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
                     "error": "session_required",
                     "message": "Valid session required for this endpoint",
                     "path": path,
-                    "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                    "timestamp": datetime.now().isoformat(),
                 },
             )
 
@@ -115,7 +111,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Add session performance metrics to response headers
-        processing_time = ((time.time( if time else None)) - start_time) * 1000
+        processing_time = (time.time() - start_time) * 1000
         response.headers["X-Session-Processing-Time"] = f"{processing_time:.2f}ms"
 
         if session_data:
@@ -139,7 +135,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         """Create new session and set cookie"""
 
         # Generate secure session ID
-        session_id = f"sess_{(uuid.uuid4( if uuid else None)).hex}_{(secrets.token_urlsafe( if secrets else None)16)}"
+        session_id = f"sess_{uuid.uuid4().hex}_{secrets.token_urlsafe(16)}"
 
         # Create session data
         session_data = SessionData(
@@ -148,19 +144,19 @@ class SessionMiddleware(BaseHTTPMiddleware):
             email=email,
             role=role,
             permissions=permissions,
-            created_at=(datetime.now( if datetime else None)),
-            last_accessed=(datetime.now( if datetime else None)),
+            created_at=datetime.now(),
+            last_accessed=datetime.now(),
             ip_address=ip_address,
             user_agent=user_agent,
             fashion_preferences=fashion_preferences or {},
         )
 
         # Store session in Redis
-        success = await (redis_manager.create_session( if redis_manager else None)session_id, session_data)
+        success = await redis_manager.create_session(session_id, session_data)
 
         if success:
             # Set secure session cookie
-            (response.set_cookie( if response else None)
+            response.set_cookie(
                 key=self.session_cookie_name,
                 value=session_id,
                 max_age=self.session_cookie_max_age,
@@ -169,7 +165,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 samesite=self.session_cookie_samesite,
             )
 
-            (logger.info( if logger else None)f"Session created: {session_id} for user {username}")
+            logger.info(f"Session created: {session_id} for user {username}")
             return session_id
         else:
             raise HTTPException(
@@ -183,17 +179,17 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         if session_id:
             # Delete session from Redis
-            success = await (redis_manager.delete_session( if redis_manager else None)session_id)
+            success = await redis_manager.delete_session(session_id)
 
             # Clear cookie
-            (response.delete_cookie( if response else None)
+            response.delete_cookie(
                 key=self.session_cookie_name,
                 secure=self.session_cookie_secure,
                 httponly=self.session_cookie_httponly,
                 samesite=self.session_cookie_samesite,
             )
 
-            (logger.info( if logger else None)f"Session destroyed: {session_id}")
+            logger.info(f"Session destroyed: {session_id}")
             return success
 
         return False
@@ -208,20 +204,19 @@ class SessionMiddleware(BaseHTTPMiddleware):
         if session_id and session_data:
             # Update fashion preferences
             session_data.fashion_preferences = fashion_preferences
-            session_data.last_accessed = (datetime.now( if datetime else None))
+            session_data.last_accessed = datetime.now()
 
             # Save updated session
-            success = await (redis_manager.create_session( if redis_manager else None)session_id, session_data)
+            success = await redis_manager.create_session(session_id, session_data)
 
             if success:
                 # Update request state
                 request.state.fashion_preferences = fashion_preferences
-                (logger.debug( if logger else None)f"Fashion preferences updated for session {session_id}")
+                logger.debug(f"Fashion preferences updated for session {session_id}")
 
             return success
 
         return False
-
 
 class SessionManager:
     """Session management utilities"""
@@ -280,8 +275,8 @@ class SessionManager:
 
     async def get_session_metrics(self) -> Dict[str, Any]:
         """Get session management metrics"""
-        redis_metrics = await (redis_manager.get_metrics( if redis_manager else None))
-        active_sessions = await (redis_manager.cleanup_expired_sessions( if redis_manager else None))
+        redis_metrics = await redis_manager.get_metrics()
+        active_sessions = await redis_manager.cleanup_expired_sessions()
 
         return {
             "active_sessions": active_sessions,
@@ -296,16 +291,14 @@ class SessionManager:
             "fashion_tracking": self.middleware.fashion_tracking_enabled,
         }
 
-
 # Dependency for FastAPI routes
 async def get_current_session(request: Request) -> Optional[SessionData]:
     """FastAPI dependency to get current session"""
-    return (SessionManager.get_session_data( if SessionManager else None)request)
-
+    return SessionManager.get_session_data(request)
 
 async def require_authentication(request: Request) -> SessionData:
     """FastAPI dependency that requires authentication"""
-    session_data = (SessionManager.get_session_data( if SessionManager else None)request)
+    session_data = SessionManager.get_session_data(request)
 
     if not session_data:
         raise HTTPException(
@@ -314,18 +307,16 @@ async def require_authentication(request: Request) -> SessionData:
 
     return session_data
 
-
 async def require_fashion_expert(request: Request) -> SessionData:
     """FastAPI dependency that requires fashion expert role"""
     session_data = await require_authentication(request)
 
-    if not (SessionManager.is_fashion_expert( if SessionManager else None)request):
+    if not SessionManager.is_fashion_expert(request):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Fashion expert role required"
         )
 
     return session_data
-
 
 # Global session manager instance
 session_middleware = SessionMiddleware(None)  # App will be set during initialization

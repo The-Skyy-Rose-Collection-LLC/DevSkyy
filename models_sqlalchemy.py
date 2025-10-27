@@ -11,12 +11,9 @@ SQLAlchemy Models for DevSkyy
 Database models using SQLAlchemy ORM
 """
 
-
-
 try:
-except ImportError:
+    except ImportError:
     database = None  # Optional dependency
-
 
 class User(Base):
     """User model"""
@@ -32,7 +29,6 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
 
 class Product(Base):
     """Product model"""
@@ -57,7 +53,6 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
 class Customer(Base):
     """Customer model"""
 
@@ -74,7 +69,6 @@ class Customer(Base):
     total_orders = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
 
 class Order(Base):
     """Order model"""
@@ -100,7 +94,6 @@ class Order(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
 class AgentLog(Base):
     """Agent activity log"""
 
@@ -116,7 +109,6 @@ class AgentLog(Base):
     execution_time_ms = Column(Float)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
-
 class BrandAsset(Base):
     """Brand assets and intelligence data"""
 
@@ -131,7 +123,6 @@ class BrandAsset(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
 
 class Campaign(Base):
     """Marketing campaign"""
@@ -156,7 +147,6 @@ class Campaign(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
 # In-memory cache for backward compatibility with existing code
 # Agents can still use dictionaries; we'll persist to DB when needed
 class InMemoryStorage:
@@ -175,22 +165,19 @@ class InMemoryStorage:
 
     def clear_all(self):
         """Clear all in-memory data"""
-        self.(products.clear( if products else None))
-        self.(customers.clear( if customers else None))
-        self.(orders.clear( if orders else None))
-        self.(analytics.clear( if analytics else None))
-        self.(campaigns.clear( if campaigns else None))
-        self.(brand_assets.clear( if brand_assets else None))
-
+        self.products.clear()
+        self.customers.clear()
+        self.orders.clear()
+        self.analytics.clear()
+        self.campaigns.clear()
+        self.brand_assets.clear()
 
 # Global in-memory storage instance
 memory_storage = InMemoryStorage()
 
-
 # ============================================================================
 # PYDANTIC REQUEST/RESPONSE MODELS (for FastAPI validation)
 # ============================================================================
-
 
 class ProductRequest(BaseModel):
     """Request model for creating/updating products"""
@@ -204,7 +191,6 @@ class ProductRequest(BaseModel):
     stock_quantity: Optional[int] = 0
     tags: Optional[List[str]] = []
     images: Optional[List[str]] = []
-
 
 class PaymentRequest(BaseModel):
     """Request model for processing payments"""

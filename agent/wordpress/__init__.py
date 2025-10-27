@@ -9,7 +9,6 @@ WordPress Automation Module
 Industry-leading WordPress/Elementor theme builder and automation
 """
 
-
 if TYPE_CHECKING:
 
 __all__ = [

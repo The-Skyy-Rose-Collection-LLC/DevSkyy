@@ -13,15 +13,12 @@ Enterprise Database Configuration - SQLAlchemy Support
 Production-ready with Neon, Supabase, PlanetScale support
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 # Create async engine with production-ready configuration
 engine = create_async_engine(
     DATABASE_URL,
-    echo=(os.getenv( if os else None)"DEBUG", "False") == "True",
+    echo=os.getenv("DEBUG", "False") == "True",
     future=True,
     **CONNECTION_ARGS,
 )
@@ -36,43 +33,39 @@ AsyncSessionLocal = async_sessionmaker(
 # Create base class for models
 Base = declarative_base()
 
-
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency function to get database session.
 
     Usage in FastAPI:
-        @(app.get( if app else None)"/items")
+        @app.get("/items")
         async def get_items(db: AsyncSession = Depends(get_db)):
             # Use db here
     """
     async with AsyncSessionLocal() as session:
         try:
             yield session
-            await (session.commit( if session else None))
+            await session.commit()
         except Exception:
-            await (session.rollback( if session else None))
+            await session.rollback()
             raise
         finally:
-            await (session.close( if session else None))
-
+            await session.close()
 
 async def init_db():
     """
     Initialize database - create all tables.
     Call this on application startup.
     """
-    async with (engine.begin( if engine else None)) as conn:
-        await (conn.run_sync( if conn else None)Base.metadata.create_all)
-
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 async def close_db():
     """
     Close database connections.
     Call this on application shutdown.
     """
-    await (engine.dispose( if engine else None))
-
+    await engine.dispose()
 
 # For backward compatibility with MongoDB code
 class DatabaseManager:
@@ -113,18 +106,17 @@ class DatabaseManager:
         try:
 
             async with AsyncSessionLocal() as session:
-                await (session.execute( if session else None)text("SELECT 1"))
+                await session.execute(text("SELECT 1"))
                 return {
                     "status": "healthy",
                     "connected": True,
                     "type": "SQLAlchemy",
                     "url": (
-                        (DATABASE_URL.split( if DATABASE_URL else None)"@")[-1] if "@" in DATABASE_URL else "sqlite"
+                        DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
                     ),
                 }
         except Exception as e:
             return {"status": "unhealthy", "connected": False, "error": str(e)}
-
 
 # Global database instance
 db_manager = DatabaseManager()

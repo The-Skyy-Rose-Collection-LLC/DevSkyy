@@ -12,10 +12,7 @@ Advanced System Monitoring - Enterprise Grade
 Comprehensive system health monitoring with metrics collection and alerting
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class SystemMetrics:
@@ -33,7 +30,6 @@ class SystemMetrics:
     process_count: int
     load_average: List[float]
 
-
 @dataclass
 class AlertRule:
     """Alert rule configuration"""
@@ -45,7 +41,6 @@ class AlertRule:
     duration: int  # seconds
     severity: str  # 'critical', 'warning', 'info'
     enabled: bool = True
-
 
 class MetricsCollector:
     """System metrics collector"""
@@ -62,81 +57,81 @@ class MetricsCollector:
             return
 
         self.is_collecting = True
-        self._collection_task = (asyncio.create_task( if asyncio else None)(self._collect_metrics( if self else None)))
-        (logger.info( if logger else None)"Started system metrics collection")
+        self._collection_task = asyncio.create_task(self._collect_metrics())
+        logger.info("Started system metrics collection")
 
     async def stop_collection(self):
         """Stop metrics collection"""
         self.is_collecting = False
         if self._collection_task:
-            self.(_collection_task.cancel( if _collection_task else None))
+            self._collection_task.cancel()
             try:
                 await self._collection_task
             except asyncio.CancelledError:
                 pass
-        (logger.info( if logger else None)"Stopped system metrics collection")
+        logger.info("Stopped system metrics collection")
 
     async def _collect_metrics(self):
         """Collect system metrics periodically"""
         while self.is_collecting:
             try:
-                metrics = (self._get_current_metrics( if self else None))
-                self.(metrics_history.append( if metrics_history else None)metrics)
+                metrics = self._get_current_metrics()
+                self.metrics_history.append(metrics)
 
                 # Log critical metrics
                 if metrics.cpu_percent > 90:
-                    (logger.warning( if logger else None)f"High CPU usage: {metrics.cpu_percent:.1f}%")
+                    logger.warning(f"High CPU usage: {metrics.cpu_percent:.1f}%")
 
                 if metrics.memory_percent > 90:
-                    (logger.warning( if logger else None)f"High memory usage: {metrics.memory_percent:.1f}%")
+                    logger.warning(f"High memory usage: {metrics.memory_percent:.1f}%")
 
                 if metrics.disk_usage_percent > 90:
-                    (logger.warning( if logger else None)
+                    logger.warning(
                         f"High disk usage: {metrics.disk_usage_percent:.1f}%"
                     )
 
-                await (asyncio.sleep( if asyncio else None)self.collection_interval)
+                await asyncio.sleep(self.collection_interval)
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error collecting metrics: {e}")
-                await (asyncio.sleep( if asyncio else None)self.collection_interval)
+                logger.error(f"Error collecting metrics: {e}")
+                await asyncio.sleep(self.collection_interval)
 
     def _get_current_metrics(self) -> SystemMetrics:
         """Get current system metrics"""
         # CPU metrics
-        cpu_percent = (psutil.cpu_percent( if psutil else None)interval=1)
+        cpu_percent = psutil.cpu_percent(interval=1)
 
         # Memory metrics
-        memory = (psutil.virtual_memory( if psutil else None))
+        memory = psutil.virtual_memory()
         memory_percent = memory.percent
         memory_available_gb = memory.available / (1024**3)
 
         # Disk metrics
-        disk = (psutil.disk_usage( if psutil else None)"/")
+        disk = psutil.disk_usage("/")
         disk_usage_percent = (disk.used / disk.total) * 100
         disk_free_gb = disk.free / (1024**3)
 
         # Network metrics
-        network = (psutil.net_io_counters( if psutil else None))
+        network = psutil.net_io_counters()
         network_bytes_sent = network.bytes_sent
         network_bytes_recv = network.bytes_recv
 
         # Connection metrics
-        connections = (psutil.net_connections( if psutil else None))
+        connections = psutil.net_connections()
         active_connections = len([c for c in connections if c.status == "ESTABLISHED"])
 
         # Process metrics
-        process_count = len((psutil.pids( if psutil else None)))
+        process_count = len(psutil.pids())
 
         # Load average (Unix-like systems)
         try:
-            load_average = list((psutil.getloadavg( if psutil else None)))
+            load_average = list(psutil.getloadavg())
         except AttributeError:
             # Windows doesn't have load average
             load_average = [0.0, 0.0, 0.0]
 
         return SystemMetrics(
-            timestamp=(datetime.now( if datetime else None)),
+            timestamp=datetime.now(),
             cpu_percent=cpu_percent,
             memory_percent=memory_percent,
             memory_available_gb=memory_available_gb,
@@ -155,12 +150,12 @@ class MetricsCollector:
 
     def get_metrics_history(self, minutes: int = 60) -> List[SystemMetrics]:
         """Get metrics history for specified minutes"""
-        cutoff_time = (datetime.now( if datetime else None)) - timedelta(minutes=minutes)
+        cutoff_time = datetime.now() - timedelta(minutes=minutes)
         return [m for m in self.metrics_history if m.timestamp >= cutoff_time]
 
     def get_average_metrics(self, minutes: int = 60) -> Dict[str, float]:
         """Get average metrics over specified time period"""
-        history = (self.get_metrics_history( if self else None)minutes)
+        history = self.get_metrics_history(minutes)
 
         if not history:
             return {}
@@ -176,7 +171,6 @@ class MetricsCollector:
             "load_average_1m": sum(m.load_average[0] for m in history) / len(history),
         }
 
-
 class AlertManager:
     """System alert manager"""
 
@@ -186,7 +180,7 @@ class AlertManager:
         self.alert_history: deque = deque(maxlen=1000)
 
         # Default alert rules
-        (self._setup_default_rules( if self else None))
+        self._setup_default_rules()
 
     def _setup_default_rules(self):
         """Setup default alert rules"""
@@ -205,17 +199,17 @@ class AlertManager:
             AlertRule("Too Many Processes", "process_count", 500, ">=", 300, "warning"),
         ]
 
-        self.(alert_rules.extend( if alert_rules else None)default_rules)
-        (logger.info( if logger else None)f"Setup {len(default_rules)} default alert rules")
+        self.alert_rules.extend(default_rules)
+        logger.info(f"Setup {len(default_rules)} default alert rules")
 
     def add_alert_rule(self, rule: AlertRule):
         """Add custom alert rule"""
-        self.(alert_rules.append( if alert_rules else None)rule)
-        (logger.info( if logger else None)f"Added alert rule: {rule.name}")
+        self.alert_rules.append(rule)
+        logger.info(f"Added alert rule: {rule.name}")
 
     def check_alerts(self, metrics: SystemMetrics):
         """Check metrics against alert rules"""
-        current_time = (datetime.now( if datetime else None))
+        current_time = datetime.now()
 
         for rule in self.alert_rules:
             if not rule.enabled:
@@ -231,7 +225,7 @@ class AlertManager:
                 metric_value = metrics.load_average[0]
 
             # Check threshold
-            triggered = (self._evaluate_condition( if self else None)
+            triggered = self._evaluate_condition(
                 metric_value, rule.operator, rule.threshold
             )
 
@@ -257,11 +251,11 @@ class AlertManager:
                     # Check if alert should fire (duration exceeded)
                     duration = (current_time - alert["first_triggered"]).total_seconds()
                     if duration >= rule.duration:
-                        (self._fire_alert( if self else None)alert_key, alert)
+                        self._fire_alert(alert_key, alert)
             else:
                 # Clear alert if it exists
                 if alert_key in self.active_alerts:
-                    (self._clear_alert( if self else None)alert_key)
+                    self._clear_alert(alert_key)
 
     def _evaluate_condition(
         self, value: float, operator: str, threshold: float
@@ -284,7 +278,7 @@ class AlertManager:
         rule = alert_data["rule"]
 
         alert_event = {
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
             "alert_key": alert_key,
             "rule_name": rule.name,
             "severity": rule.severity,
@@ -296,9 +290,9 @@ class AlertManager:
             "status": "fired",
         }
 
-        self.(alert_history.append( if alert_history else None)alert_event)
+        self.alert_history.append(alert_event)
 
-        (logger.error( if logger else None)
+        logger.error(
             f"ALERT FIRED: {rule.name} - {rule.metric}={alert_data['current_value']:.2f} "
             f"{rule.operator} {rule.threshold} (severity: {rule.severity})"
         )
@@ -310,7 +304,7 @@ class AlertManager:
             rule = alert_data["rule"]
 
             alert_event = {
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "alert_key": alert_key,
                 "rule_name": rule.name,
                 "severity": rule.severity,
@@ -318,10 +312,10 @@ class AlertManager:
                 "status": "cleared",
             }
 
-            self.(alert_history.append( if alert_history else None)alert_event)
+            self.alert_history.append(alert_event)
             del self.active_alerts[alert_key]
 
-            (logger.info( if logger else None)f"ALERT CLEARED: {rule.name}")
+            logger.info(f"ALERT CLEARED: {rule.name}")
 
     def get_active_alerts(self) -> List[Dict]:
         """Get all active alerts"""
@@ -337,18 +331,17 @@ class AlertManager:
                 "last_triggered": data["last_triggered"].isoformat(),
                 "trigger_count": data["trigger_count"],
             }
-            for key, data in self.(active_alerts.items( if active_alerts else None))
+            for key, data in self.active_alerts.items()
         ]
 
     def get_alert_history(self, hours: int = 24) -> List[Dict]:
         """Get alert history"""
-        cutoff_time = (datetime.now( if datetime else None)) - timedelta(hours=hours)
+        cutoff_time = datetime.now() - timedelta(hours=hours)
         return [
             alert
             for alert in self.alert_history
-            if (datetime.fromisoformat( if datetime else None)alert["timestamp"]) >= cutoff_time
+            if datetime.fromisoformat(alert["timestamp"]) >= cutoff_time
         ]
-
 
 class SystemMonitor:
     """Main system monitor class"""
@@ -365,43 +358,43 @@ class SystemMonitor:
             return
 
         self.is_monitoring = True
-        await self.(metrics_collector.start_collection( if metrics_collector else None))
-        self._monitoring_task = (asyncio.create_task( if asyncio else None)(self._monitor_loop( if self else None)))
+        await self.metrics_collector.start_collection()
+        self._monitoring_task = asyncio.create_task(self._monitor_loop())
 
-        (logger.info( if logger else None)"System monitoring started")
+        logger.info("System monitoring started")
 
     async def stop_monitoring(self):
         """Stop system monitoring"""
         self.is_monitoring = False
-        await self.(metrics_collector.stop_collection( if metrics_collector else None))
+        await self.metrics_collector.stop_collection()
 
         if self._monitoring_task:
-            self.(_monitoring_task.cancel( if _monitoring_task else None))
+            self._monitoring_task.cancel()
             try:
                 await self._monitoring_task
             except asyncio.CancelledError:
                 pass
 
-        (logger.info( if logger else None)"System monitoring stopped")
+        logger.info("System monitoring stopped")
 
     async def _monitor_loop(self):
         """Main monitoring loop"""
         while self.is_monitoring:
             try:
-                latest_metrics = self.(metrics_collector.get_latest_metrics( if metrics_collector else None))
+                latest_metrics = self.metrics_collector.get_latest_metrics()
                 if latest_metrics:
-                    self.(alert_manager.check_alerts( if alert_manager else None)latest_metrics)
+                    self.alert_manager.check_alerts(latest_metrics)
 
-                await (asyncio.sleep( if asyncio else None)10)  # TODO: Move to config  # Check alerts every 10 seconds
+                await asyncio.sleep(10)  # TODO: Move to config  # Check alerts every 10 seconds
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error in monitoring loop: {e}")
-                await (asyncio.sleep( if asyncio else None)10)  # TODO: Move to config
+                logger.error(f"Error in monitoring loop: {e}")
+                await asyncio.sleep(10)  # TODO: Move to config
 
     def get_system_status(self) -> Dict[str, Any]:
         """Get comprehensive system status"""
-        latest_metrics = self.(metrics_collector.get_latest_metrics( if metrics_collector else None))
-        active_alerts = self.(alert_manager.get_active_alerts( if alert_manager else None))
+        latest_metrics = self.metrics_collector.get_latest_metrics()
+        active_alerts = self.alert_manager.get_active_alerts()
 
         if not latest_metrics:
             return {"status": "no_data", "message": "No metrics available"}
@@ -419,7 +412,7 @@ class SystemMonitor:
 
         return {
             "status": overall_status,
-            "timestamp": latest_metrics.(timestamp.isoformat( if timestamp else None)),
+            "timestamp": latest_metrics.timestamp.isoformat(),
             "metrics": {
                 "cpu_percent": latest_metrics.cpu_percent,
                 "memory_percent": latest_metrics.memory_percent,
@@ -436,9 +429,8 @@ class SystemMonitor:
                 "warning_count": len(warning_alerts),
                 "active_alerts": active_alerts,
             },
-            "averages_1h": self.(metrics_collector.get_average_metrics( if metrics_collector else None)60),
+            "averages_1h": self.metrics_collector.get_average_metrics(60),
         }
-
 
 # Global instance
 system_monitor = SystemMonitor()

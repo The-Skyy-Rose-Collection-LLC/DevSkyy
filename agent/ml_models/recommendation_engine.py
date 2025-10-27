@@ -8,10 +8,7 @@ Collaborative filtering and content-based recommendations
 Reference: AGENTS.md Line 1577-1581
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class RecommendationEngine:
     """Product recommendation system"""
@@ -24,7 +21,7 @@ class RecommendationEngine:
             {
                 "product_id": f"PROD-{i:04d}",
                 "name": f"Recommended Product {i}",
-                "score": np.(random.uniform( if random else None)0.7, 1.0),
+                "score": np.random.uniform(0.7, 1.0),
                 "reason": ["Popular", "Based on your history", "Trending"][i % 3],
             }
             for i in range(n_recommendations)
@@ -36,4 +33,4 @@ class RecommendationEngine:
 
     async def collaborative_filtering(self, user_id: str) -> List[Dict]:
         """Collaborative filtering recommendations"""
-        return await (self.get_recommendations( if self else None)user_id, method="collaborative")
+        return await self.get_recommendations(user_id, method="collaborative")

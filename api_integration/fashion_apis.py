@@ -5,10 +5,10 @@ from infrastructure.redis_manager import redis_manager
 import json
 
 from api_integration.workflow_engine import (
-from dataclasses import asdict, dataclass
+    from dataclasses import asdict, dataclass
 from enum import Enum
 from fashion.intelligence_engine import (
-from typing import Any, Dict, List, Optional, Union
+    from typing import Any, Dict, List, Optional, Union
 import asyncio
 import logging
 
@@ -17,7 +17,6 @@ Fashion Domain API Integrations
 Specialized integrations for fashion trends, inventory management, product catalog,
 customer analytics, and personalization APIs with fashion industry intelligence
 """
-
 
     ActionType,
     TriggerType,
@@ -31,8 +30,7 @@ customer analytics, and personalization APIs with fashion industry intelligence
     FashionSeason,
 )
 
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class FashionAPIType(Enum):
     """Fashion-specific API types"""
@@ -45,7 +43,6 @@ class FashionAPIType(Enum):
     SUSTAINABILITY = "sustainability"
     SOCIAL_MEDIA = "social_media"
     PRICING_OPTIMIZATION = "pricing_optimization"
-
 
 @dataclass
 class FashionTrendData:
@@ -70,9 +67,8 @@ class FashionTrendData:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
-        data["created_at"] = self.(created_at.isoformat( if created_at else None))
+        data["created_at"] = self.created_at.isoformat()
         return data
-
 
 @dataclass
 class ProductData:
@@ -99,10 +95,9 @@ class ProductData:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
-        data["created_at"] = self.(created_at.isoformat( if created_at else None))
-        data["updated_at"] = self.(updated_at.isoformat( if updated_at else None))
+        data["created_at"] = self.created_at.isoformat()
+        data["updated_at"] = self.updated_at.isoformat()
         return data
-
 
 class FashionAPIIntegrator:
     """Main fashion API integration manager"""
@@ -117,12 +112,12 @@ class FashionAPIIntegrator:
         self.fashion_workflows = {}
 
         # Initialize fashion API configurations
-        (self._initialize_fashion_apis( if self else None))
+        self._initialize_fashion_apis()
 
         # Setup automated workflows
-        (asyncio.create_task( if asyncio else None)(self._setup_fashion_workflows( if self else None)))
+        asyncio.create_task(self._setup_fashion_workflows())
 
-        (logger.info( if logger else None)"Fashion API Integrator initialized")
+        logger.info("Fashion API Integrator initialized")
 
     def _initialize_fashion_apis(self):
         """Initialize fashion-specific API configurations"""
@@ -176,22 +171,22 @@ class FashionAPIIntegrator:
         """Setup automated fashion workflows"""
 
         # Trend Analysis Workflow
-        trend_workflow = await (self._create_trend_analysis_workflow( if self else None))
-        await (workflow_engine.register_workflow( if workflow_engine else None)trend_workflow)
+        trend_workflow = await self._create_trend_analysis_workflow()
+        await workflow_engine.register_workflow(trend_workflow)
 
         # Inventory Sync Workflow
-        inventory_workflow = await (self._create_inventory_sync_workflow( if self else None))
-        await (workflow_engine.register_workflow( if workflow_engine else None)inventory_workflow)
+        inventory_workflow = await self._create_inventory_sync_workflow()
+        await workflow_engine.register_workflow(inventory_workflow)
 
         # Product Catalog Update Workflow
-        catalog_workflow = await (self._create_catalog_update_workflow( if self else None))
-        await (workflow_engine.register_workflow( if workflow_engine else None)catalog_workflow)
+        catalog_workflow = await self._create_catalog_update_workflow()
+        await workflow_engine.register_workflow(catalog_workflow)
 
         # Customer Analytics Workflow
-        analytics_workflow = await (self._create_customer_analytics_workflow( if self else None))
-        await (workflow_engine.register_workflow( if workflow_engine else None)analytics_workflow)
+        analytics_workflow = await self._create_customer_analytics_workflow()
+        await workflow_engine.register_workflow(analytics_workflow)
 
-        (logger.info( if logger else None)"Fashion workflows setup completed")
+        logger.info("Fashion workflows setup completed")
 
     async def _create_trend_analysis_workflow(self) -> Workflow:
         """Create automated trend analysis workflow"""
@@ -272,7 +267,7 @@ class FashionAPIIntegrator:
             steps=steps,
             fashion_context=True,
             variables={
-                "analysis_date": (datetime.now( if datetime else None)).isoformat(),
+                "analysis_date": datetime.now().isoformat(),
                 "target_demographics": ["gen_z", "millennial"],
                 "focus_categories": ["womens_wear", "accessories"],
             },
@@ -574,71 +569,71 @@ class FashionAPIIntegrator:
         for source in sources:
             try:
                 if source == "pinterest":
-                    trends = await (self._fetch_pinterest_trends( if self else None)categories)
-                    (trend_data.extend( if trend_data else None)trends)
+                    trends = await self._fetch_pinterest_trends(categories)
+                    trend_data.extend(trends)
 
                 elif source == "instagram":
-                    trends = await (self._fetch_instagram_trends( if self else None)categories)
-                    (trend_data.extend( if trend_data else None)trends)
+                    trends = await self._fetch_instagram_trends(categories)
+                    trend_data.extend(trends)
 
                 elif source == "fashion_blogs":
-                    trends = await (self._fetch_fashion_blog_trends( if self else None)categories)
-                    (trend_data.extend( if trend_data else None)trends)
+                    trends = await self._fetch_fashion_blog_trends(categories)
+                    trend_data.extend(trends)
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error fetching trends from {source}: {e}")
+                logger.error(f"Error fetching trends from {source}: {e}")
 
         # Analyze and enrich trend data
         enriched_trends = []
         for trend in trend_data:
             try:
                 # Use fashion intelligence for analysis
-                context_analysis = await (fashion_intelligence.analyze_fashion_context( if fashion_intelligence else None)
-                    f"{(trend.get( if trend else None)'name', '')} {(trend.get( if trend else None)'description', '')}"
+                context_analysis = await fashion_intelligence.analyze_fashion_context(
+                    f"{trend.get('name', '')} {trend.get('description', '')}"
                 )
 
                 # Create enriched trend object
                 enriched_trend = FashionTrendData(
-                    trend_id=(trend.get( if trend else None)"id", f"trend_{len(enriched_trends)}"),
-                    name=(trend.get( if trend else None)"name", ""),
-                    description=(trend.get( if trend else None)"description", ""),
-                    category=(trend.get( if trend else None)"category", ""),
-                    season=(trend.get( if trend else None)"season", ""),
-                    popularity_score=(context_analysis.get( if context_analysis else None)
+                    trend_id=trend.get("id", f"trend_{len(enriched_trends)}"),
+                    name=trend.get("name", ""),
+                    description=trend.get("description", ""),
+                    category=trend.get("category", ""),
+                    season=trend.get("season", ""),
+                    popularity_score=context_analysis.get(
                         "fashion_relevance_score", 0.0
                     ),
-                    color_palette=(trend.get( if trend else None)"colors", []),
-                    materials=(trend.get( if trend else None)"materials", []),
-                    target_demographics=(trend.get( if trend else None)"demographics", []),
-                    geographic_regions=(trend.get( if trend else None)"regions", []),
-                    social_mentions=(trend.get( if trend else None)"social_mentions", 0),
-                    runway_appearances=(trend.get( if trend else None)"runway_appearances", 0),
-                    retail_adoption=(trend.get( if trend else None)"retail_adoption", 0.0),
-                    sustainability_score=(trend.get( if trend else None)"sustainability_score", 0.0),
-                    created_at=(datetime.now( if datetime else None)),
+                    color_palette=trend.get("colors", []),
+                    materials=trend.get("materials", []),
+                    target_demographics=trend.get("demographics", []),
+                    geographic_regions=trend.get("regions", []),
+                    social_mentions=trend.get("social_mentions", 0),
+                    runway_appearances=trend.get("runway_appearances", 0),
+                    retail_adoption=trend.get("retail_adoption", 0.0),
+                    sustainability_score=trend.get("sustainability_score", 0.0),
+                    created_at=datetime.now(),
                 )
 
-                (enriched_trends.append( if enriched_trends else None)enriched_trend)
+                enriched_trends.append(enriched_trend)
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error enriching trend data: {e}")
+                logger.error(f"Error enriching trend data: {e}")
 
         # Cache trends
-        cache_key = f"fashion_trends:{(datetime.now( if datetime else None)).strftime('%Y-%m-%d')}"
-        await (redis_manager.set( if redis_manager else None)
+        cache_key = f"fashion_trends:{datetime.now().strftime('%Y-%m-%d')}"
+        await redis_manager.set(
             cache_key,
-            [(trend.to_dict( if trend else None)) for trend in enriched_trends],
+            [trend.to_dict() for trend in enriched_trends],
             ttl=86400,  # 24 hours
             prefix="fashion_cache",
         )
 
         # Index in Elasticsearch
         for trend in enriched_trends:
-            await (elasticsearch_manager.index_document( if elasticsearch_manager else None)
-                "fashion_trends", (trend.to_dict( if trend else None)), doc_id=trend.trend_id
+            await elasticsearch_manager.index_document(
+                "fashion_trends", trend.to_dict(), doc_id=trend.trend_id
             )
 
-        (logger.info( if logger else None)
+        logger.info(
             f"Synced {len(enriched_trends)} fashion trends from {len(sources)} sources"
         )
 
@@ -660,32 +655,32 @@ class FashionAPIIntegrator:
         for category in categories:
             try:
                 # Search for trending pins in fashion category
-                result = await (api_gateway.make_request( if api_gateway else None)
+                result = await api_gateway.make_request(
                     api_id="pinterest_api",
                     endpoint="/v5/search/pins",
                     method="GET",
                     params={"query": f"{category.value} trends 2024", "limit": 20},
                 )
 
-                if (result.get( if result else None)"success") and (result.get( if result else None)"data"):
+                if result.get("success") and result.get("data"):
                     pins_data = result["data"].get("data", [])
 
                     for pin in pins_data:
                         trend = {
-                            "id": (pin.get( if pin else None)"id"),
-                            "name": (pin.get( if pin else None)"title", ""),
-                            "description": (pin.get( if pin else None)"description", ""),
+                            "id": pin.get("id"),
+                            "name": pin.get("title", ""),
+                            "description": pin.get("description", ""),
                             "category": category.value,
                             "source": "pinterest",
-                            "social_mentions": (pin.get( if pin else None)"pin_metrics", {}).get(
+                            "social_mentions": pin.get("pin_metrics", {}).get(
                                 "save", 0
                             ),
-                            "created_at": (pin.get( if pin else None)"created_at"),
+                            "created_at": pin.get("created_at"),
                         }
-                        (trends.append( if trends else None)trend)
+                        trends.append(trend)
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error fetching Pinterest trends for {category}: {e}")
+                logger.error(f"Error fetching Pinterest trends for {category}: {e}")
 
         return trends
 
@@ -705,34 +700,34 @@ class FashionAPIIntegrator:
         }
 
         for category in categories:
-            hashtags = (hashtag_mapping.get( if hashtag_mapping else None)category, [f"#{category.value}"])
+            hashtags = hashtag_mapping.get(category, [f"#{category.value}"])
 
             for hashtag in hashtags:
                 try:
-                    result = await (api_gateway.make_request( if api_gateway else None)
+                    result = await api_gateway.make_request(
                         api_id="instagram_api",
                         endpoint="/ig_hashtag_search",
                         method="GET",
-                        params={"q": (hashtag.replace( if hashtag else None)"#", ""), "limit": 10},
+                        params={"q": hashtag.replace("#", ""), "limit": 10},
                     )
 
-                    if (result.get( if result else None)"success") and (result.get( if result else None)"data"):
+                    if result.get("success") and result.get("data"):
                         hashtag_data = result["data"].get("data", [])
 
                         for item in hashtag_data:
                             trend = {
-                                "id": (item.get( if item else None)"id"),
+                                "id": item.get("id"),
                                 "name": hashtag,
-                                "description": (item.get( if item else None)"caption", ""),
+                                "description": item.get("caption", ""),
                                 "category": category.value,
                                 "source": "instagram",
-                                "social_mentions": (item.get( if item else None)"like_count", 0),
-                                "created_at": (item.get( if item else None)"timestamp"),
+                                "social_mentions": item.get("like_count", 0),
+                                "created_at": item.get("timestamp"),
                             }
-                            (trends.append( if trends else None)trend)
+                            trends.append(trend)
 
                 except Exception as e:
-                    (logger.error( if logger else None)f"Error fetching Instagram trends for {hashtag}: {e}")
+                    logger.error(f"Error fetching Instagram trends for {hashtag}: {e}")
 
         return trends
 
@@ -748,14 +743,14 @@ class FashionAPIIntegrator:
         for category in categories:
             trend = {
                 "id": f"blog_trend_{category.value}",
-                "name": f'{category.(value.replace( if value else None)"_", " ").title()} Trend',
+                "name": f'{category.value.replace("_", " ").title()} Trend',
                 "description": f"Latest {category.value} trend from fashion blogs",
                 "category": category.value,
                 "source": "fashion_blogs",
                 "social_mentions": 100,
-                "created_at": (datetime.now( if datetime else None)).isoformat(),
+                "created_at": datetime.now().isoformat(),
             }
-            (trends.append( if trends else None)trend)
+            trends.append(trend)
 
         return trends
 
@@ -768,10 +763,10 @@ class FashionAPIIntegrator:
             "cached_products": len(self.product_cache),
             "customer_profiles": len(self.customer_profiles),
             "fashion_workflows": len(self.fashion_workflows),
-            "last_trend_sync": await (redis_manager.get( if redis_manager else None)
+            "last_trend_sync": await redis_manager.get(
                 "last_trend_sync", prefix="fashion_cache"
             ),
-            "api_health": await (self._check_fashion_api_health( if self else None)),
+            "api_health": await self._check_fashion_api_health(),
         }
 
     async def _check_fashion_api_health(self) -> Dict[str, str]:
@@ -779,10 +774,10 @@ class FashionAPIIntegrator:
 
         health_status = {}
 
-        for api_name, api_config in self.(fashion_apis.items( if fashion_apis else None)):
+        for api_name, api_config in self.fashion_apis.items():
             try:
                 # Simple health check
-                result = await (api_gateway.make_request( if api_gateway else None)
+                result = await api_gateway.make_request(
                     api_id=api_config["api_id"],
                     endpoint="/",  # Root endpoint
                     method="GET",
@@ -790,7 +785,7 @@ class FashionAPIIntegrator:
                 )
 
                 health_status[api_name] = (
-                    "healthy" if (result.get( if result else None)"success") else "unhealthy"
+                    "healthy" if result.get("success") else "unhealthy"
                 )
 
             except Exception:
@@ -802,11 +797,11 @@ class FashionAPIIntegrator:
         """Health check for fashion API integrator"""
 
         try:
-            metrics = await (self.get_fashion_metrics( if self else None))
-            api_health = await (self._check_fashion_api_health( if self else None))
+            metrics = await self.get_fashion_metrics()
+            api_health = await self._check_fashion_api_health()
 
-            healthy_apis = sum(
-                1 for status in (api_health.values( if api_health else None)) if status == "healthy"
+            healthy_apis = sum()
+                1 for status in api_health.values() if status == "healthy"
             )
             total_apis = len(api_health)
 
@@ -823,7 +818,6 @@ class FashionAPIIntegrator:
 
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
-
 
 # Global fashion API integrator instance
 fashion_api_integrator = FashionAPIIntegrator()

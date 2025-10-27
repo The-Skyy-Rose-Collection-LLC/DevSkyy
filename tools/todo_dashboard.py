@@ -20,27 +20,23 @@ A web-based dashboard for managing TODO items, technical debt,
 and development tasks across the DevSkyy platform.
 """
 
-
-
-
-
 class TodoDashboard:
     """Web dashboard for TODO management"""
     
     def __init__(self):
         self.app = FastAPI(title="DevSkyy TODO Dashboard", version="1.0.0")
         self.tracker = TodoTracker()
-        (self.setup_routes( if self else None))
+        self.setup_routes()
     
     def setup_routes(self):
         """Setup FastAPI routes for the dashboard"""
         
-        @self.(app.get( if app else None)"/", response_class=HTMLResponse)
+        @self.app.get("/", response_class=HTMLResponse)
         async def dashboard_home(request: Request):
             """Main dashboard page"""
-            return (self.render_dashboard( if self else None))
+            return self.render_dashboard()
         
-        @self.(app.get( if app else None)"/api/todos")
+        @self.app.get("/api/todos")
         async def get_todos(
             status: Optional[str] = None,
             priority: Optional[str] = None,
@@ -48,7 +44,7 @@ class TodoDashboard:
             file_path: Optional[str] = None
         ):
             """Get TODO items with optional filters"""
-            todos = list(self.tracker.(todos.values( if todos else None)))
+            todos = list(self.tracker.todos.values())
             
             # Apply filters
             if status:
@@ -61,19 +57,19 @@ class TodoDashboard:
                 todos = [t for t in todos if file_path in t.file_path]
             
             return {
-                "todos": [(self.todo_to_dict( if self else None)todo) for todo in todos],
+                "todos": [self.todo_to_dict(todo) for todo in todos],
                 "total": len(todos)
             }
         
-        @self.(app.get( if app else None)"/api/todos/{todo_id}")
+        @self.app.get("/api/todos/{todo_id}")
         async def get_todo(todo_id: str):
             """Get a specific TODO item"""
             if todo_id not in self.tracker.todos:
                 raise HTTPException(status_code=404, detail="TODO not found")
             
-            return (self.todo_to_dict( if self else None)self.tracker.todos[todo_id])
+            return self.todo_to_dict(self.tracker.todos[todo_id])
         
-        @self.(app.put( if app else None)"/api/todos/{todo_id}")
+        @self.app.put("/api/todos/{todo_id}")
         async def update_todo(todo_id: str, update_data: dict):
             """Update a TODO item"""
             if todo_id not in self.tracker.todos:
@@ -87,36 +83,36 @@ class TodoDashboard:
             if 'category' in update_data:
                 update_data['category'] = Category(update_data['category'])
             
-            success = self.(tracker.update_todo( if tracker else None)todo_id, **update_data)
+            success = self.tracker.update_todo(todo_id, **update_data)
             if not success:
                 raise HTTPException(status_code=400, detail="Failed to update TODO")
             
-            return (self.todo_to_dict( if self else None)self.tracker.todos[todo_id])
+            return self.todo_to_dict(self.tracker.todos[todo_id])
         
-        @self.(app.delete( if app else None)"/api/todos/{todo_id}")
+        @self.app.delete("/api/todos/{todo_id}")
         async def delete_todo(todo_id: str):
             """Delete a TODO item"""
-            success = self.(tracker.delete_todo( if tracker else None)todo_id)
+            success = self.tracker.delete_todo(todo_id)
             if not success:
                 raise HTTPException(status_code=404, detail="TODO not found")
             
             return {"message": "TODO deleted successfully"}
         
-        @self.(app.post( if app else None)"/api/sync")
+        @self.app.post("/api/sync")
         async def sync_todos():
             """Synchronize TODOs with codebase"""
-            stats = self.(tracker.sync_with_codebase( if tracker else None))
+            stats = self.tracker.sync_with_codebase()
             return stats
         
-        @self.(app.get( if app else None)"/api/report")
+        @self.app.get("/api/report")
         async def get_report():
             """Get comprehensive TODO report"""
-            return self.(tracker.generate_report( if tracker else None))
+            return self.tracker.generate_report()
         
-        @self.(app.get( if app else None)"/api/stats")
+        @self.app.get("/api/stats")
         async def get_stats():
             """Get dashboard statistics"""
-            return (self.get_dashboard_stats( if self else None))
+            return self.get_dashboard_stats()
     
     def todo_to_dict(self, todo: TodoItem) -> Dict:
         """Convert TodoItem to dictionary for JSON serialization"""
@@ -152,11 +148,11 @@ class TodoDashboard:
                 "completion_rate": 0
             }
         
-        open_todos = len(self.(tracker.get_todos_by_status( if tracker else None)Status.OPEN))
-        in_progress = len(self.(tracker.get_todos_by_status( if tracker else None)Status.IN_PROGRESS))
-        completed = len(self.(tracker.get_todos_by_status( if tracker else None)Status.COMPLETED))
-        critical = len(self.(tracker.get_todos_by_priority( if tracker else None)Priority.CRITICAL))
-        high = len(self.(tracker.get_todos_by_priority( if tracker else None)Priority.HIGH))
+        open_todos = len(self.tracker.get_todos_by_status(Status.OPEN))
+        in_progress = len(self.tracker.get_todos_by_status(Status.IN_PROGRESS))
+        completed = len(self.tracker.get_todos_by_status(Status.COMPLETED))
+        critical = len(self.tracker.get_todos_by_priority(Priority.CRITICAL))
+        high = len(self.tracker.get_todos_by_priority(Priority.HIGH))
         
         completion_rate = (completed / total_todos) * 100 if total_todos > 0 else 0
         
@@ -172,7 +168,7 @@ class TodoDashboard:
     
     def render_dashboard(self) -> str:
         """Render the main dashboard HTML"""
-        stats = (self.get_dashboard_stats( if self else None))
+        stats = self.get_dashboard_stats()
         
         html = f"""
         <!DOCTYPE html>
@@ -335,18 +331,18 @@ class TodoDashboard:
                 async function loadTodos() {{
                     try {{
                         const response = await fetch('/api/todos?status=open');
-                        const data = await (response.json( if response else None));
+                        const data = await response.json();
                         
-                        const todosContainer = (document.getElementById( if document else None)'todos');
+                        const todosContainer = document.getElementById('todos');
                         if (data.todos.length === 0) {{
                             todosContainer.innerHTML = '<p>No open TODOs found. Great job! 🎉</p>';
                             return;
                         }}
                         
-                        todosContainer.innerHTML = data.(todos.slice( if todos else None)0, 10).map(todo => `
+                        todosContainer.innerHTML = data.todos.slice(0, 10).map(todo => `
                             <div class="todo-item">
                                 <div class="todo-title">
-                                    <span class="priority-badge priority-${{todo.priority}}">${{todo.(priority.toUpperCase( if priority else None))}}</span>
+                                    <span class="priority-badge priority-${{todo.priority}}">${{todo.priority.toUpperCase()}}</span>
                                     ${{todo.title}}
                                 </div>
                                 <div class="todo-meta">
@@ -357,16 +353,16 @@ class TodoDashboard:
                             </div>
                         `).join('');
                     }} catch (error) {{
-                        (document.getElementById( if document else None)'todos').innerHTML = '<p>Error loading TODOs</p>';
+                        document.getElementById('todos').innerHTML = '<p>Error loading TODOs</p>';
                     }}
                 }}
                 
                 async function syncTodos() {{
                     try {{
                         const response = await fetch('/api/sync', {{ method: 'POST' }});
-                        const stats = await (response.json( if response else None));
+                        const stats = await response.json();
                         alert(`Sync complete! New: ${{stats.new_todos}}, Completed: ${{stats.completed_todos}}`);
-                        (location.reload( if location else None));
+                        location.reload();
                     }} catch (error) {{
                         alert('Sync failed: ' + error.message);
                     }}
@@ -375,15 +371,15 @@ class TodoDashboard:
                 async function generateReport() {{
                     try {{
                         const response = await fetch('/api/report');
-                        const report = await (response.json( if response else None));
+                        const report = await response.json();
                         
-                        const reportWindow = (window.open( if window else None)'', '_blank');
-                        reportWindow.(document.write( if document else None)`
+                        const reportWindow = window.open('', '_blank');
+                        reportWindow.document.write(`
                             <html>
                                 <head><title>DevSkyy TODO Report</title></head>
                                 <body>
                                     <h1>DevSkyy TODO Report</h1>
-                                    <pre>${{(JSON.stringify( if JSON else None)report, null, 2)}}</pre>
+                                    <pre>${{JSON.stringify(report, null, 2)}}</pre>
                                 </body>
                             </html>
                         `);
@@ -393,7 +389,7 @@ class TodoDashboard:
                 }}
                 
                 function refreshDashboard() {{
-                    (location.reload( if location else None));
+                    location.reload();
                 }}
                 
                 // Load TODOs on page load
@@ -408,21 +404,19 @@ class TodoDashboard:
         
         return html
 
-
 def main():
     """Run the TODO dashboard server"""
     
     dashboard = TodoDashboard()
     
-    (logger.info( if logger else None)"🚀 Starting DevSkyy TODO Dashboard...")
-    (logger.info( if logger else None)"📊 Dashboard will be available at: http://localhost:8001")
-    (logger.info( if logger else None)"🔄 Auto-syncing with codebase...")
+    logger.info("🚀 Starting DevSkyy TODO Dashboard...")
+    logger.info("📊 Dashboard will be available at: http://localhost:8001")
+    logger.info("🔄 Auto-syncing with codebase...")
     
     # Initial sync
-    dashboard.(tracker.sync_with_codebase( if tracker else None))
+    dashboard.tracker.sync_with_codebase()
     
-    (uvicorn.run( if uvicorn else None)dashboard.app, host="0.0.0.0", port=8001)
-
+    uvicorn.run(dashboard.app, host="0.0.0.0", port=8001)
 
 if __name__ == "__main__":
     main()

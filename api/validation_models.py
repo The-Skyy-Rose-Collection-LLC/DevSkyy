@@ -12,12 +12,9 @@ Enhanced Pydantic Validation Models for DevSkyy Enterprise Platform
 Comprehensive input validation, sanitization, and security enforcement
 """
 
-
-
 # ============================================================================
 # SECURITY VALIDATORS
 # ============================================================================
-
 
 class SecurityLevel(str, Enum):
     """Security level enumeration"""
@@ -26,7 +23,6 @@ class SecurityLevel(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
-
 
 def validate_no_sql_injection(value: str) -> str:
     """Validate against SQL injection patterns"""
@@ -43,11 +39,10 @@ def validate_no_sql_injection(value: str) -> str:
     ]
 
     for pattern in sql_patterns:
-        if (re.search( if re else None)pattern, (value.upper( if value else None))):
+        if re.search(pattern, value.upper()):
             raise ValueError(f"Potential SQL injection detected: {pattern}")
 
     return value
-
 
 def validate_no_xss(value: str) -> str:
     """Validate against XSS patterns"""
@@ -65,11 +60,10 @@ def validate_no_xss(value: str) -> str:
     ]
 
     for pattern in xss_patterns:
-        if (re.search( if re else None)pattern, value, re.IGNORECASE):
+        if re.search(pattern, value, re.IGNORECASE):
             raise ValueError(f"Potential XSS detected: {pattern}")
 
     return value
-
 
 def sanitize_html_input(value: str) -> str:
     """Sanitize HTML input by removing dangerous tags"""
@@ -86,15 +80,13 @@ def sanitize_html_input(value: str) -> str:
     ]
 
     for tag_pattern in dangerous_tags:
-        value = (re.sub( if re else None)tag_pattern, "", value, flags=re.IGNORECASE | re.DOTALL)
+        value = re.sub(tag_pattern, "", value, flags=re.IGNORECASE | re.DOTALL)
 
-    return (value.strip( if value else None))
-
+    return value.strip()
 
 # ============================================================================
 # ENHANCED USER MODELS
 # ============================================================================
-
 
 class EnhancedRegisterRequest(BaseModel):
     """Enhanced registration request with comprehensive validation"""
@@ -121,13 +113,13 @@ class EnhancedRegisterRequest(BaseModel):
             raise ValueError("Password must be at least 8 characters long")
 
         # Check for at least one uppercase, lowercase, digit, and special char
-        if not (re.search( if re else None)r"[A-Z]", v):
+        if not re.search(r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter")
-        if not (re.search( if re else None)r"[a-z]", v):
+        if not re.search(r"[a-z]", v):
             raise ValueError("Password must contain at least one lowercase letter")
-        if not (re.search( if re else None)r"\d", v):
+        if not re.search(r"\d", v):
             raise ValueError("Password must contain at least one digit")
-        if not (re.search( if re else None)r'[!@#$%^&*(),.?":{}|<>]', v):
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
             raise ValueError("Password must contain at least one special character")
 
         return v
@@ -148,7 +140,6 @@ class EnhancedRegisterRequest(BaseModel):
             v = sanitize_html_input(v)
         return v
 
-
 class EnhancedLoginRequest(BaseModel):
     """Enhanced login request with validation"""
 
@@ -162,11 +153,9 @@ class EnhancedLoginRequest(BaseModel):
         v = validate_no_sql_injection(v)
         return v
 
-
 # ============================================================================
 # API REQUEST MODELS
 # ============================================================================
-
 
 class AgentExecutionRequest(BaseModel):
     """Enhanced agent execution request"""
@@ -196,7 +185,7 @@ class AgentExecutionRequest(BaseModel):
     @validator("agent_type")
     def validate_agent_type(cls, v):
         """Validate agent type format"""
-        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
+        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Agent type can only contain letters, numbers, underscores, and hyphens"
             )
@@ -217,13 +206,12 @@ class AgentExecutionRequest(BaseModel):
             raise ValueError("Parameters must be a dictionary")
 
         # Validate string values in parameters
-        for key, value in (v.items( if v else None)):
+        for key, value in v.items():
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
 
         return v
-
 
 class MLModelRequest(BaseModel):
     """Enhanced ML model request"""
@@ -249,7 +237,7 @@ class MLModelRequest(BaseModel):
     @validator("model_name")
     def validate_model_name(cls, v):
         """Validate model name format"""
-        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
+        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Model name can only contain letters, numbers, underscores, and hyphens"
             )
@@ -258,7 +246,7 @@ class MLModelRequest(BaseModel):
     @validator("version")
     def validate_version(cls, v):
         """Validate version format"""
-        if not (re.match( if re else None)r"^[a-zA-Z0-9._-]+$", v):
+        if not re.match(r"^[a-zA-Z0-9._-]+$", v):
             raise ValueError(
                 "Version can only contain letters, numbers, dots, underscores, and hyphens"
             )
@@ -271,13 +259,12 @@ class MLModelRequest(BaseModel):
             raise ValueError("Input data must be a dictionary")
 
         # Validate string values
-        for key, value in (v.items( if v else None)):
+        for key, value in v.items():
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
 
         return v
-
 
 class ContentGenerationRequest(BaseModel):
     """Enhanced content generation request"""
@@ -307,7 +294,7 @@ class ContentGenerationRequest(BaseModel):
     @validator("content_type")
     def validate_content_type(cls, v):
         """Validate content type format"""
-        if not (re.match( if re else None)r"^[a-zA-Z0-9_-]+$", v):
+        if not re.match(r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError(
                 "Content type can only contain letters, numbers, underscores, and hyphens"
             )
@@ -322,11 +309,9 @@ class ContentGenerationRequest(BaseModel):
             v = sanitize_html_input(v)
         return v
 
-
 # ============================================================================
 # RESPONSE MODELS
 # ============================================================================
-
 
 class ValidationErrorResponse(BaseModel):
     """Validation error response"""
@@ -337,7 +322,6 @@ class ValidationErrorResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: Optional[str] = None
 
-
 class SecurityViolationResponse(BaseModel):
     """Security violation response"""
 
@@ -346,7 +330,6 @@ class SecurityViolationResponse(BaseModel):
     violation_type: str
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: Optional[str] = None
-
 
 class EnhancedSuccessResponse(BaseModel):
     """Enhanced success response"""
@@ -358,11 +341,9 @@ class EnhancedSuccessResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: Optional[str] = None
 
-
 # ============================================================================
 # GDPR COMPLIANCE MODELS
 # ============================================================================
-
 
 class GDPRDataRequest(BaseModel):
     """Enhanced GDPR data request"""

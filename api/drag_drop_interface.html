@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyy Rose Collection - Drag & Drop Processor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .drop-zone {
+            border: 3px dashed #ddd;
+            border-radius: 20px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: #e8f4fd;
+            transform: scale(1.02);
+        }
+        
+        .drop-zone-content {
+            pointer-events: none;
+        }
+        
+        .drop-zone h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .drop-zone p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .browse-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .processing-area {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .file-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+        
+        .file-item:hover {
+            background: #e9ecef;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .file-details h4 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .file-details p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .file-status {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .category-selector {
+            margin-bottom: 20px;
+        }
+        
+        .category-selector label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .category-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .process-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .process-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .results {
+            background: #e8f5e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .results h3 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌹 Skyy Rose Collection</h1>
+            <p>Drag & Drop Image Processor</p>
+        </div>
+        
+        <div class="content">
+            <!-- Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-content">
+                    <div class="upload-icon">📁</div>
+                    <h2>Drag & Drop Your Images Here</h2>
+                    <p>Or click to browse and select files</p>
+                    <p style="font-size: 14px; color: #999;">Supports: JPG, PNG, WEBP, HEIC, BMP, TIFF</p>
+                    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                        Browse Files
+                    </button>
+                </div>
+                <input type="file" id="fileInput" class="file-input" multiple accept=".jpg,.jpeg,.png,.webp,.heic,.bmp,.tiff">
+            </div>
+            
+            <!-- Processing Area -->
+            <div class="processing-area" id="processingArea">
+                <!-- Category Selector -->
+                <div class="category-selector">
+                    <label for="categorySelect">Default Category (auto-detection will override):</label>
+                    <select id="categorySelect">
+                        <option value="auto">Auto-Detect from Filename</option>
+                        <option value="dresses">Dresses</option>
+                        <option value="tops">Tops</option>
+                        <option value="bottoms">Bottoms</option>
+                        <option value="accessories">Accessories</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="outerwear">Outerwear</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                
+                <!-- File List -->
+                <div class="file-list" id="fileList"></div>
+                
+                <!-- Process Button -->
+                <button class="process-btn" id="processBtn" onclick="processFiles()">
+                    🚀 Process & Upload Images
+                </button>
+                
+                <!-- Progress -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Processing...</div>
+                </div>
+                
+                <!-- Results -->
+                <div class="results" id="results">
+                    <h3>✅ Processing Complete!</h3>
+                    <div id="resultsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        const API_BASE = 'http://localhost:8001';
+        
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const processingArea = document.getElementById('processingArea');
+        const fileList = document.getElementById('fileList');
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        // Handle dropped files
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        // Handle file input change
+        fileInput.addEventListener('change', handleFileSelect, false);
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight(e) {
+            dropZone.classList.add('dragover');
+        }
+        
+        function unhighlight(e) {
+            dropZone.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            displayFiles();
+            processingArea.style.display = 'block';
+        }
+        
+        function displayFiles() {
+            fileList.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const category = detectCategory(file.name);
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">📸</div>
+                        <div class="file-details">
+                            <h4>${file.name}</h4>
+                            <p>${fileSize} MB • Detected: ${category}</p>
+                        </div>
+                    </div>
+                    <div class="file-status status-pending" id="status-${index}">Pending</div>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+        
+        function detectCategory(filename) {
+            const name = filename.toLowerCase();
+            
+            const patterns = {
+                'dresses': ['dress', 'gown', 'evening', 'cocktail', 'maxi', 'midi', 'mini'],
+                'tops': ['top', 'blouse', 'shirt', 'tee', 'tank', 'camisole', 'crop'],
+                'bottoms': ['pants', 'jeans', 'trousers', 'leggings', 'shorts', 'skirt'],
+                'accessories': ['bag', 'purse', 'clutch', 'belt', 'scarf', 'hat', 'jewelry'],
+                'shoes': ['shoes', 'heels', 'boots', 'sandals', 'flats', 'sneakers'],
+                'outerwear': ['coat', 'jacket', 'blazer', 'cardigan', 'vest', 'poncho']
+            };
+            
+            for (const [category, keywords] of Object.entries(patterns)) {
+                if (keywords.some(keyword => name.includes(keyword))) {
+                    return category;
+                }
+            }
+            
+            return 'general';
+        }
+        
+        async function processFiles() {
+            if (selectedFiles.length === 0) return;
+            
+            const processBtn = document.getElementById('processBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const results = document.getElementById('results');
+            
+            processBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            results.style.display = 'none';
+            
+            let processed = 0;
+            let successful = 0;
+            let failed = 0;
+            const categoryStats = {};
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const statusElement = document.getElementById(`status-${i}`);
+                
+                try {
+                    statusElement.textContent = 'Processing';
+                    statusElement.className = 'file-status status-processing';
+                    
+                    // Determine category
+                    const defaultCategory = document.getElementById('categorySelect').value;
+                    const category = defaultCategory === 'auto' ? detectCategory(file.name) : defaultCategory;
+                    
+                    // Upload file
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('category', category);
+                    formData.append('auto_process', 'true');
+                    
+                    const response = await fetch(`${API_BASE}/upload/single-image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        statusElement.textContent = 'Success';
+                        statusElement.className = 'file-status status-success';
+                        successful++;
+                        
+                        // Update category stats
+                        if (!categoryStats[category]) {
+                            categoryStats[category] = 0;
+                        }
+                        categoryStats[category]++;
+                    } else {
+                        throw new Error(`Upload failed: ${response.statusText}`);
+                    }
+                    
+                } catch (error) {
+                    statusElement.textContent = 'Error';
+                    statusElement.className = 'file-status status-error';
+                    failed++;
+                    console.error(`Failed to process ${file.name}:`, error);
+                }
+                
+                processed++;
+                const progress = (processed / selectedFiles.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `Processing ${processed}/${selectedFiles.length} files...`;
+            }
+            
+            // Show results
+            progressText.textContent = 'Complete!';
+            processBtn.disabled = false;
+            
+            displayResults(successful, failed, categoryStats);
+        }
+        
+        function displayResults(successful, failed, categoryStats) {
+            const results = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            let statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${successful}</div>
+                        <div class="stat-label">Successful</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${failed}</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${Object.keys(categoryStats).length}</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-top: 20px;">Category Breakdown:</h4>
+                <div class="stats-grid">
+            `;
+            
+            for (const [category, count] of Object.entries(categoryStats)) {
+                statsHtml += `
+                    <div class="stat-card">
+                        <div class="stat-number">${count}</div>
+                        <div class="stat-label">${category.charAt(0).toUpperCase() + category.slice(1)}</div>
+                    </div>
+                `;
+            }
+            
+            statsHtml += '</div>';
+            
+            if (successful > 0) {
+                statsHtml += `
+                    <div style="margin-top: 20px; padding: 15px; background: #d1ecf1; border-radius: 8px;">
+                        <h4 style="color: #0c5460;">🚀 Ready for Training!</h4>
+                        <p style="color: #0c5460; margin: 5px 0;">Your Skyy Rose Collection images have been processed and are ready for AI model training.</p>
+                        <p style="color: #0c5460; margin: 5px 0;">Next step: Train your custom brand model with these images.</p>
+                    </div>
+                `;
+            }
+            
+            resultsContent.innerHTML = statsHtml;
+            results.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

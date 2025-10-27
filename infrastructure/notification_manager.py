@@ -18,10 +18,7 @@ Implements Slack/Discord webhooks with rate limiting, templates, and delivery co
 Target: Max 1 message/second rate limiting with rich formatting support
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class NotificationChannel(Enum):
     """Notification channel types"""
@@ -32,7 +29,6 @@ class NotificationChannel(Enum):
     SMS = "sms"
     WEBHOOK = "webhook"
 
-
 class NotificationPriority(Enum):
     """Notification priority levels"""
 
@@ -41,7 +37,6 @@ class NotificationPriority(Enum):
     HIGH = "high"
     CRITICAL = "critical"
     URGENT = "urgent"
-
 
 class NotificationStatus(Enum):
     """Notification delivery status"""
@@ -52,7 +47,6 @@ class NotificationStatus(Enum):
     FAILED = "failed"
     RATE_LIMITED = "rate_limited"
     RETRYING = "retrying"
-
 
 @dataclass
 class NotificationTemplate:
@@ -71,8 +65,8 @@ class NotificationTemplate:
     def render(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """Render template with context data"""
         try:
-            title = self.(title_template.format( if title_template else None)**context)
-            message = self.(message_template.format( if message_template else None)**context)
+            title = self.title_template.format(**context)
+            message = self.message_template.format(**context)
 
             rendered = {
                 "title": title,
@@ -89,20 +83,19 @@ class NotificationTemplate:
                         {
                             "name": field["name"].format(**context),
                             "value": field["value"].format(**context),
-                            "inline": (field.get( if field else None)"inline", False),
+                            "inline": field.get("inline", False),
                         }
                     )
 
             return rendered
 
         except KeyError as e:
-            (logger.error( if logger else None)f"Template rendering error - missing context key: {e}")
+            logger.error(f"Template rendering error - missing context key: {e}")
             return {
                 "title": "Template Error",
                 "message": f"Failed to render template: {self.name}",
                 "color": "#ff0000",
             }
-
 
 @dataclass
 class NotificationMessage:
@@ -130,12 +123,11 @@ class NotificationMessage:
 
     def __post_init__(self):
         if self.created_at is None:
-            self.created_at = (datetime.now( if datetime else None))
+            self.created_at = datetime.now()
         if self.context is None:
             self.context = {}
         if self.fashion_context is None:
             self.fashion_context = {}
-
 
 class RateLimiter:
     """Rate limiter for notification channels"""
@@ -148,16 +140,16 @@ class RateLimiter:
 
     async def acquire(self, channel: str = "default") -> bool:
         """Acquire rate limit permission"""
-        now = (time.time( if time else None))
+        now = time.time()
         channel_requests = self.channel_limits[channel]
 
         # Remove old requests outside time window
         while channel_requests and channel_requests[0] <= now - self.time_window:
-            (channel_requests.popleft( if channel_requests else None))
+            channel_requests.popleft()
 
         # Check if we can make a request
         if len(channel_requests) < self.max_requests:
-            (channel_requests.append( if channel_requests else None)now)
+            channel_requests.append(now)
             return True
 
         return False
@@ -171,13 +163,12 @@ class RateLimiter:
 
         # Calculate wait time until oldest request expires
         oldest_request = channel_requests[0]
-        wait_time = max(0, self.time_window - ((time.time( if time else None)) - oldest_request))
+        wait_time = max(0, self.time_window - (time.time() - oldest_request))
 
         if wait_time > 0:
-            await (asyncio.sleep( if asyncio else None)wait_time)
+            await asyncio.sleep(wait_time)
 
         return wait_time
-
 
 class NotificationManager:
     """Enterprise notification manager with multi-channel support"""
@@ -214,19 +205,19 @@ class NotificationManager:
             "total_failed": 0,
             "total_rate_limited": 0,
             "avg_delivery_time": 0.0,
-            "last_updated": (datetime.now( if datetime else None)),
+            "last_updated": datetime.now(),
         }
 
         # Setup default templates
-        (self._setup_default_templates( if self else None))
+        self._setup_default_templates()
 
-        (logger.info( if logger else None)"Notification manager initialized with rate limiting")
+        logger.info("Notification manager initialized with rate limiting")
 
     def _setup_default_templates(self):
         """Setup default notification templates for fashion e-commerce"""
 
         # System alerts
-        (self.add_template( if self else None)
+        self.add_template(
             NotificationTemplate(
                 name="system_alert",
                 channel=NotificationChannel.SLACK,
@@ -247,7 +238,7 @@ class NotificationManager:
         )
 
         # Deployment notifications
-        (self.add_template( if self else None)
+        self.add_template(
             NotificationTemplate(
                 name="deployment_success",
                 channel=NotificationChannel.SLACK,
@@ -264,7 +255,7 @@ class NotificationManager:
         )
 
         # Fashion trend alerts
-        (self.add_template( if self else None)
+        self.add_template(
             NotificationTemplate(
                 name="fashion_trend_alert",
                 channel=NotificationChannel.SLACK,
@@ -290,7 +281,7 @@ class NotificationManager:
         )
 
         # Inventory alerts
-        (self.add_template( if self else None)
+        self.add_template(
             NotificationTemplate(
                 name="inventory_low_stock",
                 channel=NotificationChannel.SLACK,
@@ -308,7 +299,7 @@ class NotificationManager:
         )
 
         # Performance alerts
-        (self.add_template( if self else None)
+        self.add_template(
             NotificationTemplate(
                 name="performance_degradation",
                 channel=NotificationChannel.SLACK,
@@ -327,13 +318,13 @@ class NotificationManager:
     def add_template(self, template: NotificationTemplate):
         """Add notification template"""
         self.templates[template.name] = template
-        (logger.debug( if logger else None)f"Added notification template: {template.name}")
+        logger.debug(f"Added notification template: {template.name}")
 
     def remove_template(self, template_name: str):
         """Remove notification template"""
         if template_name in self.templates:
             del self.templates[template_name]
-            (logger.debug( if logger else None)f"Removed notification template: {template_name}")
+            logger.debug(f"Removed notification template: {template_name}")
 
     async def send_notification(
         self,
@@ -349,8 +340,8 @@ class NotificationManager:
         """Send notification message"""
 
         # Generate unique message ID
-        message_id = (hashlib.sha256( if hashlib else None)
-            f"{channel.value}_{webhook_url}_{title}_{(time.time( if time else None))}".encode()
+        message_id = hashlib.sha256(
+            f"{channel.value}_{webhook_url}_{title}_{time.time()}".encode()
         ).hexdigest()
 
         # Create notification message
@@ -370,9 +361,9 @@ class NotificationManager:
         self.pending_messages[message_id] = notification
 
         # Schedule delivery
-        (asyncio.create_task( if asyncio else None)(self._deliver_message( if self else None)notification))
+        asyncio.create_task(self._deliver_message(notification))
 
-        (logger.info( if logger else None)f"Notification queued: {message_id} ({channel.value})")
+        logger.info(f"Notification queued: {message_id} ({channel.value})")
         return message_id
 
     async def send_from_template(
@@ -388,9 +379,9 @@ class NotificationManager:
             raise ValueError(f"Template not found: {template_name}")
 
         template = self.templates[template_name]
-        rendered = (template.render( if template else None)context)
+        rendered = template.render(context)
 
-        return await (self.send_notification( if self else None)
+        return await self.send_notification(
             channel=template.channel,
             webhook_url=webhook_url,
             title=rendered["title"],
@@ -398,49 +389,49 @@ class NotificationManager:
             priority=priority,
             template_name=template_name,
             context=context,
-            color=(rendered.get( if rendered else None)"color"),
-            emoji=(rendered.get( if rendered else None)"emoji"),
-            fields=(rendered.get( if rendered else None)"fields"),
+            color=rendered.get("color"),
+            emoji=rendered.get("emoji"),
+            fields=rendered.get("fields"),
             fashion_context=context if template.fashion_context else None,
         )
 
     async def _deliver_message(self, notification: NotificationMessage):
         """Deliver notification message with rate limiting and retries"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             # Wait for rate limit slot
             channel_key = f"{notification.channel.value}_{notification.webhook_url}"
 
-            if not await self.(rate_limiter.acquire( if rate_limiter else None)channel_key):
+            if not await self.rate_limiter.acquire(channel_key):
                 # Rate limited - wait for slot
-                wait_time = await self.(rate_limiter.wait_for_slot( if rate_limiter else None)channel_key)
+                wait_time = await self.rate_limiter.wait_for_slot(channel_key)
                 notification.status = NotificationStatus.RATE_LIMITED
                 self.metrics["total_rate_limited"] += 1
 
-                (logger.debug( if logger else None)
+                logger.debug(
                     f"Rate limited notification {notification.id}, waited {wait_time:.2f}s"
                 )
 
                 # Try to acquire again after waiting
-                if not await self.(rate_limiter.acquire( if rate_limiter else None)channel_key):
+                if not await self.rate_limiter.acquire(channel_key):
                     raise Exception("Failed to acquire rate limit slot after waiting")
 
             # Prepare webhook payload
-            payload = await (self._prepare_payload( if self else None)notification)
+            payload = await self._prepare_payload(notification)
 
             # Send webhook request
-            response = await self.(http_client.post( if http_client else None)
+            response = await self.http_client.post(
                 notification.webhook_url,
                 json=payload,
                 headers={"Content-Type": "application/json"},
             )
 
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
             # Mark as sent
             notification.status = NotificationStatus.SENT
-            notification.sent_at = (datetime.now( if datetime else None))
+            notification.sent_at = datetime.now()
 
             # Move to sent messages
             if notification.id in self.pending_messages:
@@ -448,25 +439,25 @@ class NotificationManager:
             self.sent_messages[notification.id] = notification
 
             # Update metrics
-            delivery_time = (time.time( if time else None)) - start_time
+            delivery_time = time.time() - start_time
             self.metrics["total_sent"] += 1
-            (self._update_avg_delivery_time( if self else None)delivery_time)
+            self._update_avg_delivery_time(delivery_time)
 
             # Record delivery history
-            self.(delivery_history.append( if delivery_history else None)
+            self.delivery_history.append(
                 {
                     "message_id": notification.id,
                     "channel": notification.channel.value,
                     "status": "sent",
                     "delivery_time": delivery_time,
-                    "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                    "timestamp": datetime.now().isoformat(),
                 }
             )
 
-            (logger.info( if logger else None)f"Notification sent: {notification.id} ({delivery_time:.2f}s)")
+            logger.info(f"Notification sent: {notification.id} ({delivery_time:.2f}s)")
 
         except Exception as e:
-            await (self._handle_delivery_error( if self else None)notification, str(e))
+            await self._handle_delivery_error(notification, str(e))
 
     async def _prepare_payload(
         self, notification: NotificationMessage
@@ -474,16 +465,16 @@ class NotificationManager:
         """Prepare webhook payload based on channel type"""
 
         if notification.channel == NotificationChannel.SLACK:
-            return await (self._prepare_slack_payload( if self else None)notification)
+            return await self._prepare_slack_payload(notification)
         elif notification.channel == NotificationChannel.DISCORD:
-            return await (self._prepare_discord_payload( if self else None)notification)
+            return await self._prepare_discord_payload(notification)
         else:
             # Generic webhook payload
             return {
                 "title": notification.title,
                 "message": notification.message,
                 "priority": notification.priority.value,
-                "timestamp": notification.(created_at.isoformat( if created_at else None)),
+                "timestamp": notification.created_at.isoformat(),
                 "context": notification.context,
             }
 
@@ -499,7 +490,7 @@ class NotificationManager:
                     "color": notification.color or "#36a64f",
                     "title": notification.title,
                     "text": notification.message,
-                    "ts": int(notification.(created_at.timestamp( if created_at else None))),
+                    "ts": int(notification.created_at.timestamp()),
                 }
             ],
         }
@@ -530,11 +521,11 @@ class NotificationManager:
             "title": notification.title,
             "description": notification.message,
             "color": (
-                int(notification.(color.replace( if color else None)"#", ""), 16)
+                int(notification.color.replace("#", ""), 16)
                 if notification.color
                 else 3447003
             ),
-            "timestamp": notification.(created_at.isoformat( if created_at else None)),
+            "timestamp": notification.created_at.isoformat(),
         }
 
         # Add fields if present
@@ -572,12 +563,12 @@ class NotificationManager:
                 2 ** (notification.retry_count - 1)
             )  # Exponential backoff
 
-            (logger.warning( if logger else None)
+            logger.warning(
                 f"Notification {notification.id} failed, retrying in {retry_delay}s (attempt {notification.retry_count}/{notification.max_retries})"
             )
 
-            await (asyncio.sleep( if asyncio else None)retry_delay)
-            await (self._deliver_message( if self else None)notification)
+            await asyncio.sleep(retry_delay)
+            await self._deliver_message(notification)
 
         else:
             # Max retries exceeded
@@ -591,18 +582,18 @@ class NotificationManager:
             self.metrics["total_failed"] += 1
 
             # Record failure in history
-            self.(delivery_history.append( if delivery_history else None)
+            self.delivery_history.append(
                 {
                     "message_id": notification.id,
                     "channel": notification.channel.value,
                     "status": "failed",
                     "error": error,
                     "retry_count": notification.retry_count,
-                    "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                    "timestamp": datetime.now().isoformat(),
                 }
             )
 
-            (logger.error( if logger else None)f"Notification {notification.id} failed permanently: {error}")
+            logger.error(f"Notification {notification.id} failed permanently: {error}")
 
     def _update_avg_delivery_time(self, delivery_time: float):
         """Update average delivery time metric"""
@@ -615,7 +606,7 @@ class NotificationManager:
                 alpha * delivery_time + (1 - alpha) * self.metrics["avg_delivery_time"]
             )
 
-        self.metrics["last_updated"] = (datetime.now( if datetime else None))
+        self.metrics["last_updated"] = datetime.now()
 
     async def get_message_status(self, message_id: str) -> Optional[Dict[str, Any]]:
         """Get notification message status"""
@@ -634,8 +625,8 @@ class NotificationManager:
                     "channel": message.channel.value,
                     "title": message.title,
                     "priority": message.priority.value,
-                    "created_at": message.(created_at.isoformat( if created_at else None)),
-                    "sent_at": message.(sent_at.isoformat( if sent_at else None)) if message.sent_at else None,
+                    "created_at": message.created_at.isoformat(),
+                    "sent_at": message.sent_at.isoformat() if message.sent_at else None,
                     "retry_count": message.retry_count,
                     "error_message": message.error_message,
                     "store": store_name,
@@ -653,7 +644,7 @@ class NotificationManager:
                 "sent": len(self.sent_messages),
                 "failed": len(self.failed_messages),
             },
-            "templates": list(self.(templates.keys( if templates else None))),
+            "templates": list(self.templates.keys()),
             "rate_limiting": {
                 "max_per_second": self.rate_limiter.max_requests,
                 "time_window": self.rate_limiter.time_window,
@@ -668,12 +659,12 @@ class NotificationManager:
 
         try:
             # Test HTTP client
-            test_response = await self.(http_client.get( if http_client else None)
+            test_response = await self.http_client.get(
                 "https://httpbin.org/status/200", timeout=5
             )
             http_client_healthy = test_response.status_code == 200
 
-            metrics = await (self.get_metrics( if self else None))
+            metrics = await self.get_metrics()
 
             return {
                 "status": "healthy" if http_client_healthy else "degraded",
@@ -692,9 +683,8 @@ class NotificationManager:
 
     async def close(self):
         """Close HTTP client and cleanup"""
-        await self.(http_client.aclose( if http_client else None))
-        (logger.info( if logger else None)"Notification manager closed")
-
+        await self.http_client.aclose()
+        logger.info("Notification manager closed")
 
 # Global notification manager instance
 notification_manager = NotificationManager()

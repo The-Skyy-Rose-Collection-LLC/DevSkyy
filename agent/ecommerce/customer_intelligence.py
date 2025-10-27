@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-from sklearn.cluster import (  # noqa: F401 - Reserved for future ML clustering features
-from sklearn.preprocessing import (  # noqa: F401 - Reserved for Phase 3 data preprocessing
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
 
 from typing import Any, Dict, List, Optional
@@ -12,7 +10,7 @@ Customer Intelligence Module
 Advanced customer segmentation, behavior prediction, and personalization
 
 Features:
-- ML-powered customer segmentation
+    - ML-powered customer segmentation
 - Lifetime value prediction
 - Churn prediction and prevention
 - Purchase behavior analysis
@@ -20,14 +18,12 @@ Features:
 - Customer journey mapping
 """
 
-
     KMeans,
 )
     StandardScaler,
 )
 
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class CustomerIntelligence:
     """
@@ -53,7 +49,7 @@ class CustomerIntelligence:
         Returns:
             Customer segments with characteristics
         """
-        (logger.info( if logger else None)f"Segmenting customers into {n_segments} groups")
+        logger.info(f"Segmenting customers into {n_segments} groups")
 
         # Simulate customer segmentation
         segments = {
@@ -159,13 +155,13 @@ class CustomerIntelligence:
         Returns:
             LTV prediction with confidence intervals
         """
-        (logger.info( if logger else None)
+        logger.info(
             f"Predicting LTV for customer {customer_id} over {time_horizon_months} months"
         )
 
         # Simulate LTV prediction
-        base_ltv = np.(random.uniform( if random else None)200, 5000)
-        growth_rate = np.(random.uniform( if random else None)-0.1, 0.3)
+        base_ltv = np.random.uniform(200, 5000)
+        growth_rate = np.random.uniform(-0.1, 0.3)
 
         prediction = {
             "customer_id": customer_id,
@@ -177,10 +173,10 @@ class CustomerIntelligence:
                 "upper": base_ltv * (1 + growth_rate) * 1.2,
             },
             "contributing_factors": {
-                "purchase_frequency": np.(random.uniform( if random else None)0.7, 1.0),
-                "average_order_value": np.(random.uniform( if random else None)0.7, 1.0),
-                "engagement_level": np.(random.uniform( if random else None)0.6, 1.0),
-                "product_affinity": np.(random.uniform( if random else None)0.6, 0.9),
+                "purchase_frequency": np.random.uniform(0.7, 1.0),
+                "average_order_value": np.random.uniform(0.7, 1.0),
+                "engagement_level": np.random.uniform(0.6, 1.0),
+                "product_affinity": np.random.uniform(0.6, 0.9),
             },
             "recommendations": [
                 "Increase engagement through personalized content",
@@ -204,9 +200,9 @@ class CustomerIntelligence:
         Returns:
             Churn risk assessment with prevention strategies
         """
-        (logger.info( if logger else None)f"Predicting churn risk for customer {customer_id}")
+        logger.info(f"Predicting churn risk for customer {customer_id}")
 
-        churn_probability = np.(random.uniform( if random else None)0, 1)
+        churn_probability = np.random.uniform(0, 1)
 
         # Determine risk level
         if churn_probability < 0.2:
@@ -224,23 +220,23 @@ class CustomerIntelligence:
             "risk_factors": [
                 {
                     "factor": "Days since last purchase",
-                    "value": int(np.(random.uniform( if random else None)30, 180)),
-                    "impact": np.(random.uniform( if random else None)0.5, 1.0),
+                    "value": int(np.random.uniform(30, 180)),
+                    "impact": np.random.uniform(0.5, 1.0),
                 },
                 {
                     "factor": "Email engagement decline",
-                    "value": f"{np.(random.uniform( if random else None)20, 80):.1f}%",
-                    "impact": np.(random.uniform( if random else None)0.4, 0.8),
+                    "value": f"{np.random.uniform(20, 80):.1f}%",
+                    "impact": np.random.uniform(0.4, 0.8),
                 },
                 {
                     "factor": "Customer service interactions",
-                    "value": int(np.(random.uniform( if random else None)0, 5)),
-                    "impact": np.(random.uniform( if random else None)0.3, 0.7),
+                    "value": int(np.random.uniform(0, 5)),
+                    "impact": np.random.uniform(0.3, 0.7),
                 },
             ],
             "prevention_strategies": [],
             "estimated_impact": {
-                "revenue_at_risk": np.(random.uniform( if random else None)500, 3000),
+                "revenue_at_risk": np.random.uniform(500, 3000),
                 "retention_probability_increase": 0.0,
             },
         }
@@ -283,42 +279,42 @@ class CustomerIntelligence:
         Returns:
             Purchase behavior insights
         """
-        (logger.info( if logger else None)f"Analyzing purchase behavior for customer {customer_id}")
+        logger.info(f"Analyzing purchase behavior for customer {customer_id}")
 
         behavior = {
             "customer_id": customer_id,
             "analysis_period_days": lookback_days,
             "purchase_patterns": {
-                "total_orders": int(np.(random.uniform( if random else None)1, 20)),
-                "total_spent": np.(random.uniform( if random else None)100, 5000),
+                "total_orders": int(np.random.uniform(1, 20)),
+                "total_spent": np.random.uniform(100, 5000),
                 "avg_order_value": 0.0,
-                "avg_items_per_order": np.(random.uniform( if random else None)1.5, 4.5),
-                "purchase_frequency_days": np.(random.uniform( if random else None)30, 90),
+                "avg_items_per_order": np.random.uniform(1.5, 4.5),
+                "purchase_frequency_days": np.random.uniform(30, 90),
             },
             "category_affinity": {
-                "dresses": np.(random.uniform( if random else None)0.5, 1.0),
-                "accessories": np.(random.uniform( if random else None)0.3, 0.8),
-                "shoes": np.(random.uniform( if random else None)0.2, 0.7),
-                "outerwear": np.(random.uniform( if random else None)0.1, 0.6),
+                "dresses": np.random.uniform(0.5, 1.0),
+                "accessories": np.random.uniform(0.3, 0.8),
+                "shoes": np.random.uniform(0.2, 0.7),
+                "outerwear": np.random.uniform(0.1, 0.6),
             },
             "shopping_preferences": {
                 "preferred_day": ["Monday", "Wednesday", "Saturday"][
-                    int(np.(random.uniform( if random else None)0, 3))
+                    int(np.random.uniform(0, 3))
                 ],
                 "preferred_time": ["morning", "afternoon", "evening"][
-                    int(np.(random.uniform( if random else None)0, 3))
+                    int(np.random.uniform(0, 3))
                 ],
                 "device_preference": ["mobile", "desktop", "tablet"][
-                    int(np.(random.uniform( if random else None)0, 3))
+                    int(np.random.uniform(0, 3))
                 ],
                 "price_sensitivity": ["low", "medium", "high"][
-                    int(np.(random.uniform( if random else None)0, 3))
+                    int(np.random.uniform(0, 3))
                 ],
             },
             "next_purchase_prediction": {
-                "days_until_next_purchase": int(np.(random.uniform( if random else None)7, 60)),
+                "days_until_next_purchase": int(np.random.uniform(7, 60)),
                 "predicted_category": "dresses",
-                "predicted_value": np.(random.uniform( if random else None)100, 500),
+                "predicted_value": np.random.uniform(100, 500),
             },
         }
 
@@ -346,7 +342,7 @@ class CustomerIntelligence:
         Returns:
             Personalized product recommendations
         """
-        (logger.info( if logger else None)
+        logger.info(
             f"Generating {n_recommendations} recommendations for customer {customer_id}"
         )
 
@@ -360,8 +356,8 @@ class CustomerIntelligence:
                     "product_id": f"PROD-{i:04d}",
                     "name": f"Recommended Product {i}",
                     "category": ["dresses", "accessories", "shoes", "bags"][i % 4],
-                    "price": np.(random.uniform( if random else None)50, 500),
-                    "relevance_score": np.(random.uniform( if random else None)0.7, 1.0),
+                    "price": np.random.uniform(50, 500),
+                    "relevance_score": np.random.uniform(0.7, 1.0),
                     "reason": [
                         "Based on your purchase history",
                         "Customers like you also bought",
@@ -399,7 +395,7 @@ class CustomerIntelligence:
         Returns:
             Customer journey map with touchpoints
         """
-        (logger.info( if logger else None)f"Mapping customer journey for {customer_id}")
+        logger.info(f"Mapping customer journey for {customer_id}")
 
         journey = {
             "customer_id": customer_id,
@@ -408,8 +404,8 @@ class CustomerIntelligence:
                 {
                     "stage": "awareness",
                     "touchpoints": ["social_media_ad", "google_search"],
-                    "duration_seconds": int(np.(random.uniform( if random else None)30, 120)),
-                    "engagement_score": np.(random.uniform( if random else None)0.3, 0.7),
+                    "duration_seconds": int(np.random.uniform(30, 120)),
+                    "engagement_score": np.random.uniform(0.3, 0.7),
                 },
                 {
                     "stage": "consideration",
@@ -418,14 +414,14 @@ class CustomerIntelligence:
                         "category_filter",
                         "reviews_read",
                     ],
-                    "duration_seconds": int(np.(random.uniform( if random else None)180, 600)),
-                    "engagement_score": np.(random.uniform( if random else None)0.5, 0.8),
+                    "duration_seconds": int(np.random.uniform(180, 600)),
+                    "engagement_score": np.random.uniform(0.5, 0.8),
                 },
                 {
                     "stage": "purchase",
                     "touchpoints": ["add_to_cart", "checkout", "payment"],
-                    "duration_seconds": int(np.(random.uniform( if random else None)120, 300)),
-                    "engagement_score": np.(random.uniform( if random else None)0.7, 1.0),
+                    "duration_seconds": int(np.random.uniform(120, 300)),
+                    "engagement_score": np.random.uniform(0.7, 1.0),
                 },
                 {
                     "stage": "post_purchase",
@@ -434,8 +430,8 @@ class CustomerIntelligence:
                         "shipping_updates",
                         "review_request",
                     ],
-                    "duration_seconds": int(np.(random.uniform( if random else None)60, 180)),
-                    "engagement_score": np.(random.uniform( if random else None)0.6, 0.9),
+                    "duration_seconds": int(np.random.uniform(60, 180)),
+                    "engagement_score": np.random.uniform(0.6, 0.9),
                 },
             ],
             "conversion_points": [],
@@ -459,14 +455,14 @@ class CustomerIntelligence:
         Returns:
             Complete customer profile with all intelligence
         """
-        (logger.info( if logger else None)f"Retrieving profile for customer {customer_id}")
+        logger.info(f"Retrieving profile for customer {customer_id}")
 
         profile = {
             "customer_id": customer_id,
             "segment": "VIP",
-            "lifetime_value": np.(random.uniform( if random else None)1000, 10000),
-            "churn_risk": np.(random.uniform( if random else None)0, 0.3),
-            "engagement_score": np.(random.uniform( if random else None)0.7, 1.0),
+            "lifetime_value": np.random.uniform(1000, 10000),
+            "churn_risk": np.random.uniform(0, 0.3),
+            "engagement_score": np.random.uniform(0.7, 1.0),
             "preferences": {
                 "favorite_categories": ["dresses", "accessories"],
                 "price_range": {"min": 100, "max": 800},
@@ -478,8 +474,8 @@ class CustomerIntelligence:
                 "sms_enabled": True,
                 "preferred_time": "evening",
             },
-            "created_date": ((datetime.now( if datetime else None)) - timedelta(days=365)).isoformat(),
-            "last_purchase_date": ((datetime.now( if datetime else None)) - timedelta(days=15)).isoformat(),
+            "created_date": (datetime.now() - timedelta(days=365)).isoformat(),
+            "last_purchase_date": (datetime.now() - timedelta(days=15)).isoformat(),
         }
 
         return profile

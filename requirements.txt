@@ -61,6 +61,12 @@ opencv-python==4.11.0.86  # Updated
 Pillow==11.1.0  # Latest security fix
 imagehash==4.3.2
 
+# Video Processing & Generation
+moviepy==1.0.3  # Video editing and processing
+imageio==2.36.1  # Image I/O for video frames
+imageio-ffmpeg==0.5.1  # FFmpeg wrapper for video encoding
+peft==0.14.0  # Parameter-Efficient Fine-Tuning for LoRA
+
 # Web Scraping & Parsing
 beautifulsoup4==4.12.3
 lxml==5.3.0  # Security update

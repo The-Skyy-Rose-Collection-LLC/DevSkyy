@@ -11,7 +11,6 @@ E-commerce Automation Module
 Full-stack fashion ecommerce with ML-powered automation
 """
 
-
 if TYPE_CHECKING:
 
 __all__ = [

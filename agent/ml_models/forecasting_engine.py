@@ -11,7 +11,7 @@ Time Series Forecasting Engine
 Advanced forecasting for sales, demand, and trends
 
 Features:
-- Time series prediction
+    - Time series prediction
 - Demand forecasting
 - Trend analysis
 - Seasonality detection

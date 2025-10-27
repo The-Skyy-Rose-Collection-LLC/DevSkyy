@@ -14,7 +14,7 @@ Claude Sonnet 4.5 Advanced Intelligence Service V2
 Enterprise-grade AI reasoning with ML and self-healing capabilities
 
 UPGRADED FEATURES:
-- Inherits from BaseAgent for self-healing and ML capabilities
+    - Inherits from BaseAgent for self-healing and ML capabilities
 - Automatic error recovery and retry logic
 - Performance monitoring and anomaly detection
 - Circuit breaker protection for API calls
@@ -25,11 +25,7 @@ UPGRADED FEATURES:
 - Response quality scoring and improvement
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     """
@@ -40,18 +36,18 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     def __init__(self):
         super().__init__(agent_name="Claude Sonnet 4.5 Intelligence", version="2.0.0")
 
-        self.api_key = (os.getenv( if os else None)"ANTHROPIC_API_KEY")
+        self.api_key = os.getenv("ANTHROPIC_API_KEY")
 
         # Anthropic clients
         if self.api_key:
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.sync_client = Anthropic(api_key=self.api_key)
             self.model = "claude-sonnet-4-20250514"  # Latest Sonnet 4.5
-            (logger.info( if logger else None)"🧠 Claude Sonnet 4.5 Intelligence Service V2 initialized")
+            logger.info("🧠 Claude Sonnet 4.5 Intelligence Service V2 initialized")
         else:
             self.client = None
             self.sync_client = None
-            (logger.warning( if logger else None)"⚠️ Claude Service V2 initialized without API key")
+            logger.warning("⚠️ Claude Service V2 initialized without API key")
 
         # Brand context for The Skyy Rose Collection
         self.brand_context = """
@@ -83,30 +79,30 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
 
         # Rate limiting
         self.requests_this_minute = 0
-        self.last_request_time = (datetime.now( if datetime else None))
+        self.last_request_time = datetime.now()
         self.max_requests_per_minute = 50
 
     async def initialize(self) -> bool:
         """Initialize the Claude Sonnet service"""
         try:
             if not self.client:
-                (logger.warning( if logger else None)"Claude API key not configured")
+                logger.warning("Claude API key not configured")
                 self.status = BaseAgent.AgentStatus.DEGRADED
                 return False
 
             # Test API connection
-            _test_response = await self.client.(messages.create( if messages else None)  # noqa: F841
+            _test_response = await self.client.messages.create(  # noqa: F841
                 model=self.model,
                 max_tokens=10,
                 messages=[{"role": "user", "content": "test"}],
             )
 
             self.status = BaseAgent.AgentStatus.HEALTHY
-            (logger.info( if logger else None)"✅ Claude Sonnet service initialized successfully")
+            logger.info("✅ Claude Sonnet service initialized successfully")
             return True
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to initialize Claude service: {e}")
+            logger.error(f"Failed to initialize Claude service: {e}")
             self.status = BaseAgent.AgentStatus.FAILED
             return False
 
@@ -115,7 +111,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
         Core function for health checks and basic operations.
         Delegates to specific methods for actual work.
         """
-        return await (self.health_check( if self else None))
+        return await self.health_check()
 
     @BaseAgent.with_healing
     async def advanced_reasoning(
@@ -141,14 +137,14 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
 
             # Check cache if enabled
             if use_cache:
-                cached_response = (self._check_cache( if self else None)task, context)
+                cached_response = self._check_cache(task, context)
                 if cached_response:
-                    (logger.info( if logger else None)"✨ Returning cached response")
+                    logger.info("✨ Returning cached response")
                     cached_response["cache_hit"] = True
                     return cached_response
 
             # Rate limiting check
-            await (self._rate_limit_check( if self else None))
+            await self._rate_limit_check()
 
             # Build prompt
             system_prompt = f"""You are an advanced AI strategist for The Skyy Rose Collection,
@@ -167,11 +163,11 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             messages = [{"role": "user", "content": task}]
 
             if context:
-                context_str = (json.dumps( if json else None)context, indent=2)
+                context_str = json.dumps(context, indent=2)
                 messages[0]["content"] = f"{task}\n\nContext:\n{context_str}"
 
             # Execute with circuit breaker protection
-            response = await self.client.(messages.create( if messages else None)
+            response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=max_tokens,
                 system=system_prompt,
@@ -184,24 +180,24 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             # Track token usage and costs
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = (self._calculate_cost( if self else None)
+            cost = self._calculate_cost(
                 response.usage.input_tokens, response.usage.output_tokens
             )
             self.total_api_cost += cost
 
             # Assess response quality
-            quality_score = (self._assess_response_quality( if self else None)content, task)
-            self.(response_quality_scores.append( if response_quality_scores else None)quality_score)
+            quality_score = self._assess_response_quality(content, task)
+            self.response_quality_scores.append(quality_score)
 
             # Detect anomalies in response quality
-            (self.detect_anomalies( if self else None)"response_quality", quality_score, threshold=1.5)
+            self.detect_anomalies("response_quality", quality_score, threshold=1.5)
 
             result = {
                 "reasoning": content,
                 "model": self.model,
-                "confidence": (self._calculate_confidence( if self else None)quality_score),
+                "confidence": self._calculate_confidence(quality_score),
                 "quality_score": round(quality_score, 2),
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "usage": {
                     "input_tokens": response.usage.input_tokens,
                     "output_tokens": response.usage.output_tokens,
@@ -213,7 +209,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
 
             # Cache successful response
             if use_cache and quality_score > self.low_quality_threshold:
-                (self._cache_response( if self else None)task, context, result)
+                self._cache_response(task, context, result)
 
             # Record metrics
             self.agent_metrics.ml_predictions_made += 1
@@ -221,7 +217,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             return result
 
         except Exception as e:
-            (logger.error( if logger else None)f"Claude reasoning failed: {e}")
+            logger.error(f"Claude reasoning failed: {e}")
             raise  # Let BaseAgent with_healing handle retry
 
     @BaseAgent.with_healing
@@ -237,24 +233,24 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
 
             # Check cache
             if use_cache:
-                cache_key = f"product_desc_{(product_data.get( if product_data else None)'sku', '')}"
-                cached = (self._check_cache( if self else None)cache_key, product_data)
+                cache_key = f"product_desc_{product_data.get('sku', '')}"
+                cached = self._check_cache(cache_key, product_data)
                 if cached:
-                    (logger.info( if logger else None)"✨ Returning cached product description")
+                    logger.info("✨ Returning cached product description")
                     return cached
 
-            await (self._rate_limit_check( if self else None))
+            await self._rate_limit_check()
 
             prompt = f"""Create an exquisite, ultra-luxury product description for:
 
-Product Name: {(product_data.get( if product_data else None)'name', 'Luxury Item')}
-Current Description: {(product_data.get( if product_data else None)'description', 'Premium product')}
-Price: ${(product_data.get( if product_data else None)'price', '0')}
-Category: {(product_data.get( if product_data else None)'category', 'Luxury Fashion')}
-Materials: {(product_data.get( if product_data else None)'materials', 'Premium materials')}
+Product Name: {product_data.get('name', 'Luxury Item')}
+Current Description: {product_data.get('description', 'Premium product')}
+Price: ${product_data.get('price', '0')}
+Category: {product_data.get('category', 'Luxury Fashion')}
+Materials: {product_data.get('materials', 'Premium materials')}
 
 Requirements:
-1. Use sophisticated, evocative language that speaks to affluent customers
+    1. Use sophisticated, evocative language that speaks to affluent customers
 2. Emphasize exclusivity, craftsmanship, and prestige
 3. Create emotional resonance and desire
 4. Highlight the investment value and timeless appeal
@@ -267,7 +263,7 @@ Requirements:
 
 Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
-            response = await self.client.(messages.create( if messages else None)
+            response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=1500,
                 system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers.",  # noqa: E501
@@ -280,39 +276,39 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             # Track usage
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = (self._calculate_cost( if self else None)
+            cost = self._calculate_cost(
                 response.usage.input_tokens, response.usage.output_tokens
             )
             self.total_api_cost += cost
 
             # Assess quality
-            quality_score = (self._assess_response_quality( if self else None)enhanced_description, prompt)
+            quality_score = self._assess_response_quality(enhanced_description, prompt)
 
             result = {
                 "enhanced_description": enhanced_description,
-                "original_description": (product_data.get( if product_data else None)"description", ""),
+                "original_description": product_data.get("description", ""),
                 "improvement_type": "claude_sonnet_luxury_enhancement_v2",
                 "quality_score": round(quality_score, 2),
                 "estimated_conversion_improvement": "+45%",
                 "estimated_aov_increase": "+25%",
                 "model": self.model,
-                "confidence": (self._calculate_confidence( if self else None)quality_score),
+                "confidence": self._calculate_confidence(quality_score),
                 "usage": {
                     "total_tokens": tokens_used,
                     "estimated_cost_usd": round(cost, 4),
                 },
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
             # Cache result
             if use_cache and quality_score > self.low_quality_threshold:
-                cache_key = f"product_desc_{(product_data.get( if product_data else None)'sku', '')}"
-                (self._cache_response( if self else None)cache_key, product_data, result)
+                cache_key = f"product_desc_{product_data.get('sku', '')}"
+                self._cache_response(cache_key, product_data, result)
 
             return result
 
         except Exception as e:
-            (logger.error( if logger else None)f"Product enhancement failed: {e}")
+            logger.error(f"Product enhancement failed: {e}")
             raise  # Let with_healing handle retry
 
     # === Helper Methods ===
@@ -321,13 +317,13 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         self, key: str, context: Optional[Dict] = None
     ) -> Optional[Dict[str, Any]]:
         """Check if we have a cached response"""
-        cache_key = (self._generate_cache_key( if self else None)key, context)
+        cache_key = self._generate_cache_key(key, context)
 
         if cache_key in self.response_cache:
             cached_entry = self.response_cache[cache_key]
 
             # Check if cache is still valid
-            if (datetime.now( if datetime else None)) - cached_entry["cached_at"] < self.cache_ttl:
+            if datetime.now() - cached_entry["cached_at"] < self.cache_ttl:
                 return cached_entry["response"]
             else:
                 # Remove expired cache
@@ -339,31 +335,31 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         self, key: str, context: Optional[Dict], response: Dict[str, Any]
     ):
         """Cache a response for future use"""
-        cache_key = (self._generate_cache_key( if self else None)key, context)
+        cache_key = self._generate_cache_key(key, context)
 
         # Implement LRU by removing oldest if at max size
         if len(self.response_cache) >= self.cache_max_size:
             oldest_key = min(
-                self.(response_cache.keys( if response_cache else None)),
+                self.response_cache.keys(),
                 key=lambda k: self.response_cache[k]["cached_at"],
             )
             del self.response_cache[oldest_key]
 
         self.response_cache[cache_key] = {
             "response": response,
-            "cached_at": (datetime.now( if datetime else None)),
+            "cached_at": datetime.now(),
         }
 
     def _generate_cache_key(self, key: str, context: Optional[Dict]) -> str:
         """Generate a unique cache key"""
         if context:
-            context_str = (json.dumps( if json else None)context, sort_keys=True)
-            return (hashlib.sha256( if hashlib else None)f"{key}:{context_str}".encode()).hexdigest()
-        return (hashlib.sha256( if hashlib else None)(key.encode( if key else None))).hexdigest()
+            context_str = json.dumps(context, sort_keys=True)
+            return hashlib.sha256(f"{key}:{context_str}".encode()).hexdigest()
+        return hashlib.sha256(key.encode()).hexdigest()
 
     async def _rate_limit_check(self):
         """Check and enforce rate limiting"""
-        now = (datetime.now( if datetime else None))
+        now = datetime.now()
 
         # Reset counter if minute has passed
         if (now - self.last_request_time).seconds >= 60:
@@ -376,10 +372,10 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         if self.requests_this_minute >= self.max_requests_per_minute:
             sleep_time = 60 - (now - self.last_request_time).seconds
             if sleep_time > 0:
-                (logger.warning( if logger else None)f"Rate limit reached, sleeping for {sleep_time}s")
-                await (asyncio.sleep( if asyncio else None)sleep_time)
+                logger.warning(f"Rate limit reached, sleeping for {sleep_time}s")
+                await asyncio.sleep(sleep_time)
                 self.requests_this_minute = 0
-                self.last_request_time = (datetime.now( if datetime else None))
+                self.last_request_time = datetime.now()
 
     def _calculate_cost(self, input_tokens: int, output_tokens: int) -> float:
         """Calculate estimated API cost in USD"""
@@ -409,7 +405,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         # Check for error indicators
         error_indicators = ["error", "unable to", "cannot", "failed", "sorry"]
         for indicator in error_indicators:
-            if (indicator.lower( if indicator else None)) in (response.lower( if response else None)):
+            if indicator.lower() in response.lower():
                 score -= 0.2
 
         # Check for quality indicators
@@ -420,10 +416,10 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "therefore",
             "consequently",
         ]
-        quality_score = sum(
+        quality_score = sum()
             1
             for indicator in quality_indicators
-            if (indicator.lower( if indicator else None)) in (response.lower( if response else None))
+            if indicator.lower() in response.lower()
         )
         score += min(0.2, quality_score * 0.05)
 
@@ -459,25 +455,23 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "cache_size": len(self.response_cache),
             "cache_hit_rate": "calculated_dynamically",
             "requests_this_minute": self.requests_this_minute,
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def _optimize_resources(self):
         """Override to clear caches"""
-        (logger.info( if logger else None)"Optimizing Claude service resources...")
-        self.(response_cache.clear( if response_cache else None))
+        logger.info("Optimizing Claude service resources...")
+        self.response_cache.clear()
         self.response_quality_scores = self.response_quality_scores[
             -100:
         ]  # Keep recent scores
-
 
 # Factory function
 def create_claude_service_v2() -> ClaudeSonnetIntelligenceServiceV2:
     """Create and return Claude Sonnet Intelligence Service V2 instance."""
     service = ClaudeSonnetIntelligenceServiceV2()
-    (asyncio.create_task( if asyncio else None)(service.initialize( if service else None)))
+    asyncio.create_task(service.initialize())
     return service
-
 
 # Global instance
 claude_service_v2 = create_claude_service_v2()

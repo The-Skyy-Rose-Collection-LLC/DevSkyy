@@ -11,12 +11,9 @@ CQRS (Command Query Responsibility Segregation) Pattern
 Separates read and write operations for better scalability and maintainability
 """
 
-
-
 # ============================================================================
 # BASE TYPES
 # ============================================================================
-
 
 class Command(BaseModel):
     """Base class for all commands (write operations)"""
@@ -26,11 +23,10 @@ class Command(BaseModel):
 
     def __init__(self, **data):
         if "command_id" not in data or data["command_id"] is None:
-            data["command_id"] = str((uuid.uuid4( if uuid else None)))
+            data["command_id"] = str(uuid.uuid4())
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
+            data["timestamp"] = datetime.now(timezone.utc)
         super().__init__(**data)
-
 
 class Query(BaseModel):
     """Base class for all queries (read operations)"""
@@ -40,21 +36,18 @@ class Query(BaseModel):
 
     def __init__(self, **data):
         if "query_id" not in data or data["query_id"] is None:
-            data["query_id"] = str((uuid.uuid4( if uuid else None)))
+            data["query_id"] = str(uuid.uuid4())
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = (datetime.now( if datetime else None)timezone.utc)
+            data["timestamp"] = datetime.now(timezone.utc)
         super().__init__(**data)
-
 
 TCommand = TypeVar("TCommand", bound=Command)
 TQuery = TypeVar("TQuery", bound=Query)
 TResult = TypeVar("TResult")
 
-
 # ============================================================================
 # HANDLERS
 # ============================================================================
-
 
 class CommandHandler(ABC, Generic[TCommand, TResult]):
     """Abstract base class for command handlers"""
@@ -71,7 +64,6 @@ class CommandHandler(ABC, Generic[TCommand, TResult]):
             Result of command execution
         """
 
-
 class QueryHandler(ABC, Generic[TQuery, TResult]):
     """Abstract base class for query handlers"""
 
@@ -87,11 +79,9 @@ class QueryHandler(ABC, Generic[TQuery, TResult]):
             Result of query execution
         """
 
-
 # ============================================================================
 # BUS / MEDIATOR
 # ============================================================================
-
 
 class CommandBus:
     """
@@ -132,8 +122,7 @@ class CommandBus:
             )
 
         handler = self._handlers[command_type]
-        return await (handler.handle( if handler else None)command)
-
+        return await handler.handle(command)
 
 class QueryBus:
     """
@@ -174,8 +163,7 @@ class QueryBus:
             )
 
         handler = self._handlers[query_type]
-        return await (handler.handle( if handler else None)query)
-
+        return await handler.handle(query)
 
 # ============================================================================
 # GLOBAL INSTANCES
@@ -184,11 +172,9 @@ class QueryBus:
 command_bus = CommandBus()
 query_bus = QueryBus()
 
-
 # ============================================================================
 # EXAMPLE USAGE
 # ============================================================================
-
 
 # Example Command
 class CreateAgentCommand(Command):
@@ -197,7 +183,6 @@ class CreateAgentCommand(Command):
     name: str
     agent_type: str
     capabilities: Dict[str, Any]
-
 
 # Example Command Handler
 class CreateAgentHandler(CommandHandler[CreateAgentCommand, Dict]):
@@ -215,20 +200,18 @@ class CreateAgentHandler(CommandHandler[CreateAgentCommand, Dict]):
         """
         # Implementation would save to database
         return {
-            "agent_id": str((uuid.uuid4( if uuid else None))),
+            "agent_id": str(uuid.uuid4()),
             "name": command.name,
             "type": command.agent_type,
             "capabilities": command.capabilities,
             "created_at": command.timestamp,
         }
 
-
 # Example Query
 class GetAgentQuery(Query):
     """Query to get agent by ID"""
 
     agent_id: str
-
 
 # Example Query Handler
 class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[Dict]]):
@@ -252,7 +235,6 @@ class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[Dict]]):
             "status": "active",
         }
 
-
 # Register handlers (would be done at startup)
-# (command_bus.register( if command_bus else None)CreateAgentCommand, CreateAgentHandler())
-# (query_bus.register( if query_bus else None)GetAgentQuery, GetAgentHandler())
+# command_bus.register(CreateAgentCommand, CreateAgentHandler())
+# query_bus.register(GetAgentQuery, GetAgentHandler())

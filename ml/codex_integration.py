@@ -14,7 +14,7 @@ This integration uses GPT-4 and GPT-3.5-turbo as replacements,
 which provide superior code generation capabilities.
 
 Features:
-- Code generation (functions, classes, full applications)
+    - Code generation (functions, classes, full applications)
 - Code completion and suggestions
 - Code explanation and documentation
 - Code review and optimization
@@ -22,13 +22,11 @@ Features:
 - Context-aware generation with repository understanding
 """
 
-
 try:
-except ImportError:
+    except ImportError:
     AsyncOpenAI = None
 
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class CodexIntegration:
     """
@@ -43,17 +41,17 @@ class CodexIntegration:
         Args:
             api_key: OpenAI API key (uses environment variable if not provided)
         """
-        self.api_key = api_key or (os.getenv( if os else None)"OPENAI_API_KEY")
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.client = None
 
         if self.api_key and AsyncOpenAI:
             self.client = AsyncOpenAI(api_key=self.api_key)
-            (logger.info( if logger else None)"🤖 OpenAI Codex Integration initialized (using GPT-4)")
+            logger.info("🤖 OpenAI Codex Integration initialized (using GPT-4)")
         else:
             if not self.api_key:
-                (logger.warning( if logger else None)"⚠️  OpenAI API key not configured")
+                logger.warning("⚠️  OpenAI API key not configured")
             if not AsyncOpenAI:
-                (logger.warning( if logger else None)
+                logger.warning(
                     "⚠️  OpenAI library not installed - run: pip install openai"
                 )
 
@@ -135,16 +133,16 @@ class CodexIntegration:
 
         try:
             # Build system message with language-specific context
-            system_message = (self._build_system_message( if self else None)language, context)
+            system_message = self._build_system_message(language, context)
 
             # Build user prompt
-            user_message = (self._build_code_generation_prompt( if self else None)prompt, language, context)
+            user_message = self._build_code_generation_prompt(prompt, language, context)
 
             # Get model configuration
             model_config = self.models[model]
 
             # Make API call
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model=model_config["name"],
                 messages=[
                     {"role": "system", "content": system_message},
@@ -160,7 +158,7 @@ class CodexIntegration:
             finish_reason = response.choices[0].finish_reason
 
             # Parse and clean code
-            code = (self._extract_code_block( if self else None)generated_code, language)
+            code = self._extract_code_block(generated_code, language)
 
             return {
                 "status": "success",
@@ -172,11 +170,11 @@ class CodexIntegration:
                 "tokens_used": response.usage.total_tokens,
                 "prompt_tokens": response.usage.prompt_tokens,
                 "completion_tokens": response.usage.completion_tokens,
-                "timestamp": (datetime.utcnow( if datetime else None)).isoformat(),
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code generation failed: {e}")
+            logger.error(f"Code generation failed: {e}")
             return {"status": "error", "error": str(e)}
 
     async def complete_code(
@@ -206,7 +204,7 @@ class CodexIntegration:
 
             model_config = self.models[model]
 
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model=model_config["name"],
                 messages=[
                     {"role": "system", "content": system_message},
@@ -219,8 +217,8 @@ class CodexIntegration:
 
             completions = []
             for choice in response.choices:
-                code = (self._extract_code_block( if self else None)choice.message.content, language)
-                (completions.append( if completions else None)
+                code = self._extract_code_block(choice.message.content, language)
+                completions.append(
                     {"code": code, "finish_reason": choice.finish_reason}
                 )
 
@@ -233,7 +231,7 @@ class CodexIntegration:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code completion failed: {e}")
+            logger.error(f"Code completion failed: {e}")
             return {"status": "error", "error": str(e)}
 
     async def explain_code(self, code: str, language: str = "python") -> Dict[str, Any]:
@@ -259,7 +257,7 @@ class CodexIntegration:
                 f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
             )
 
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -279,7 +277,7 @@ class CodexIntegration:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code explanation failed: {e}")
+            logger.error(f"Code explanation failed: {e}")
             return {"status": "error", "error": str(e)}
 
     async def review_code(self, code: str, language: str = "python") -> Dict[str, Any]:
@@ -298,7 +296,7 @@ class CodexIntegration:
 
         try:
             system_message = """You are an expert code reviewer. Analyze code for:
-- Bugs and logic errors
+                - Bugs and logic errors
 - Security vulnerabilities
 - Performance issues
 - Code style and best practices
@@ -308,7 +306,7 @@ Provide specific, actionable feedback."""
 
             user_message = f"Review this {language} code:\n\n```{language}\n{code}\n```"
 
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -328,7 +326,7 @@ Provide specific, actionable feedback."""
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code review failed: {e}")
+            logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
     async def generate_documentation(
@@ -352,7 +350,7 @@ Provide specific, actionable feedback."""
 
             user_message = f"Generate documentation for:\n\n```{language}\n{code}\n```"
 
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -372,7 +370,7 @@ Provide specific, actionable feedback."""
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Documentation generation failed: {e}")
+            logger.error(f"Documentation generation failed: {e}")
             return {"status": "error", "error": str(e)}
 
     async def optimize_code(
@@ -396,7 +394,7 @@ Provide specific, actionable feedback."""
 
             user_message = f"Optimize this code:\n\n```{language}\n{code}\n```"
 
-            response = await self.client.chat.(completions.create( if completions else None)
+            response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=[
                     {"role": "system", "content": system_message},
@@ -407,7 +405,7 @@ Provide specific, actionable feedback."""
             )
 
             result = response.choices[0].message.content
-            optimized_code = (self._extract_code_block( if self else None)result, language)
+            optimized_code = self._extract_code_block(result, language)
 
             return {
                 "status": "success",
@@ -419,15 +417,15 @@ Provide specific, actionable feedback."""
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Code optimization failed: {e}")
+            logger.error(f"Code optimization failed: {e}")
             return {"status": "error", "error": str(e)}
 
     def _build_system_message(
         self, language: str, context: Optional[List[str]] = None
     ) -> str:
         """Build system message with language-specific context"""
-        lang_config = self.(language_configs.get( if language_configs else None)language, {})
-        frameworks = (lang_config.get( if lang_config else None)"framework_hints", [])
+        lang_config = self.language_configs.get(language, {})
+        frameworks = lang_config.get("framework_hints", [])
 
         message = f"You are an expert {language} programmer. "
         message += f"Generate clean, well-documented, production-ready code. "
@@ -472,17 +470,17 @@ message_list.append(...).join(context)
 
         for marker in markers:
             if marker in text:
-                parts = (text.split( if text else None)marker)
+                parts = text.split(marker)
                 if len(parts) >= 3:
                     # Get content between first pair of markers
                     code = parts[1].strip()
                     # Remove closing marker if present
                     if "```" in code:
-                        code = (code.split( if code else None)"```")[0].strip()
+                        code = code.split("```")[0].strip()
                     return code
 
         # If no code block found, return cleaned text
-        return (text.strip( if text else None))
+        return text.strip()
 
     def get_available_models(self) -> Dict[str, Any]:
         """Get information about available models"""
@@ -493,10 +491,9 @@ message_list.append(...).join(context)
 
     def get_supported_languages(self) -> List[str]:
         """Get list of supported programming languages"""
-        return list(self.(language_configs.keys( if language_configs else None)))
-
+        return list(self.language_configs.keys())
 
 # Global instance
 codex = CodexIntegration()
 
-(logger.info( if logger else None)"🤖 Codex Integration module loaded (GPT-4/GPT-3.5-turbo)")
+logger.info("🤖 Codex Integration module loaded (GPT-4/GPT-3.5-turbo)")

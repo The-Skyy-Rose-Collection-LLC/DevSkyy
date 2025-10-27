@@ -23,11 +23,7 @@ Enterprise-grade API discovery, evaluation, and management system for fashion e-
 Integrates with existing Redis, Elasticsearch, and Fashion Intelligence systems
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class APICategory(Enum):
     """API categories for fashion e-commerce"""
@@ -43,17 +39,15 @@ class APICategory(Enum):
     DEVOPS_AUTOMATION = "devops_automation"
     BUSINESS_INTELLIGENCE = "business_intelligence"
 
-
 class AuthenticationType(Enum):
     """API authentication types"""
 
-    api_key = (os.getenv( if os else None)"API_KEY", "")
+    api_key = os.getenv("API_KEY", "")
     OAUTH2 = "oauth2"
     JWT = "jwt"
     BASIC_AUTH = "basic_auth"
     BEARER_TOKEN = "bearer_token"
     CUSTOM = "custom"
-
 
 class APIStatus(Enum):
     """API operational status"""
@@ -63,7 +57,6 @@ class APIStatus(Enum):
     BETA = "beta"
     MAINTENANCE = "maintenance"
     UNAVAILABLE = "unavailable"
-
 
 @dataclass
 class APIEndpoint:
@@ -98,9 +91,8 @@ class APIEndpoint:
         data["category"] = self.category.value
         data["authentication"] = self.authentication.value
         data["status"] = self.status.value
-        data["last_evaluated"] = self.(last_evaluated.isoformat( if last_evaluated else None))
+        data["last_evaluated"] = self.last_evaluated.isoformat()
         return data
-
 
 @dataclass
 class APIEvaluationCriteria:
@@ -128,7 +120,6 @@ class APIEvaluationCriteria:
         self.features_weight /= total
         self.fashion_relevance_weight /= total
 
-
 class APIDiscoveryEngine:
     """Automated API discovery and evaluation engine"""
 
@@ -136,8 +127,8 @@ class APIDiscoveryEngine:
         self.discovered_apis: Dict[str, APIEndpoint] = {}
         self.api_registry: Dict[str, Dict[str, Any]] = {}
         self.evaluation_criteria = APIEvaluationCriteria()
-        self.discovery_sources = (self._initialize_discovery_sources( if self else None))
-        self.fashion_api_patterns = (self._initialize_fashion_patterns( if self else None))
+        self.discovery_sources = self._initialize_discovery_sources()
+        self.fashion_api_patterns = self._initialize_fashion_patterns()
 
         # Performance tracking
         self.discovery_metrics = {
@@ -148,7 +139,7 @@ class APIDiscoveryEngine:
             "discovery_duration": 0.0,
         }
 
-        (logger.info( if logger else None)"API Discovery Engine initialized")
+        logger.info("API Discovery Engine initialized")
 
     def _initialize_discovery_sources(self) -> Dict[str, Dict[str, Any]]:
         """Initialize API discovery sources"""
@@ -242,10 +233,10 @@ class APIDiscoveryEngine:
     ) -> Dict[str, List[APIEndpoint]]:
         """Discover APIs across multiple sources"""
 
-        start_time = (time.time( if time else None))
+        start_time = time.time()
         categories = categories or list(APICategory)
 
-        (logger.info( if logger else None)
+        logger.info(
             f"Starting API discovery for categories: {[c.value for c in categories]}"
         )
 
@@ -253,18 +244,18 @@ class APIDiscoveryEngine:
 
         # Check cache first
         if not force_refresh:
-            cached_results = await (self._get_cached_discovery_results( if self else None)categories)
+            cached_results = await self._get_cached_discovery_results(categories)
             if cached_results:
-                (logger.info( if logger else None)"Using cached API discovery results")
+                logger.info("Using cached API discovery results")
                 return cached_results
 
         # Discover from each source
-        for source_name, source_config in self.(discovery_sources.items( if discovery_sources else None)):
+        for source_name, source_config in self.discovery_sources.items():
             try:
                 if source_name == "fashion_specific":
-                    apis = await (self._discover_fashion_specific_apis( if self else None)source_config)
+                    apis = await self._discover_fashion_specific_apis(source_config)
                 else:
-                    apis = await (self._discover_from_source( if self else None)
+                    apis = await self._discover_from_source(
                         source_name, source_config, categories
                     )
 
@@ -274,36 +265,36 @@ class APIDiscoveryEngine:
                         discovered_apis[category_key] = []
                     discovered_apis[category_key].append(api)
 
-                (logger.info( if logger else None)f"Discovered {len(apis)} APIs from {source_name}")
+                logger.info(f"Discovered {len(apis)} APIs from {source_name}")
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error discovering APIs from {source_name}: {e}")
+                logger.error(f"Error discovering APIs from {source_name}: {e}")
 
         # Evaluate and score all discovered APIs
-        for category_apis in (discovered_apis.values( if discovered_apis else None)):
+        for category_apis in discovered_apis.values():
             for api in category_apis:
-                await (self._evaluate_api( if self else None)api)
+                await self._evaluate_api(api)
                 self.discovered_apis[api.api_id] = api
 
         # Cache results
-        await (self._cache_discovery_results( if self else None)discovered_apis)
+        await self._cache_discovery_results(discovered_apis)
 
         # Update metrics
-        discovery_duration = (time.time( if time else None)) - start_time
-        self.(discovery_metrics.update( if discovery_metrics else None)
+        discovery_duration = time.time() - start_time
+        self.discovery_metrics.update(
             {
-                "total_apis_discovered": sum(
-                    len(apis) for apis in (discovered_apis.values( if discovered_apis else None))
+                "total_apis_discovered": sum()
+                    len(apis) for apis in discovered_apis.values()
                 ),
                 "apis_by_category": {
-                    cat: len(apis) for cat, apis in (discovered_apis.items( if discovered_apis else None))
+                    cat: len(apis) for cat, apis in discovered_apis.items()
                 },
-                "last_discovery_run": (datetime.now( if datetime else None)).isoformat(),
+                "last_discovery_run": datetime.now().isoformat(),
                 "discovery_duration": discovery_duration,
             }
         )
 
-        (logger.info( if logger else None)f"API discovery completed in {discovery_duration:.2f}s")
+        logger.info(f"API discovery completed in {discovery_duration:.2f}s")
         return discovered_apis
 
     async def _discover_from_source(
@@ -317,11 +308,11 @@ class APIDiscoveryEngine:
         discovered_apis = []
 
         if source_name == "rapidapi":
-            discovered_apis = await (self._discover_rapidapi( if self else None)source_config, categories)
+            discovered_apis = await self._discover_rapidapi(source_config, categories)
         elif source_name == "apis_guru":
-            discovered_apis = await (self._discover_apis_guru( if self else None)source_config, categories)
+            discovered_apis = await self._discover_apis_guru(source_config, categories)
         elif source_name == "programmableweb":
-            discovered_apis = await (self._discover_programmableweb( if self else None)
+            discovered_apis = await self._discover_programmableweb(
                 source_config, categories
             )
 
@@ -337,7 +328,7 @@ class APIDiscoveryEngine:
         # Search for fashion and ecommerce APIs
         search_terms = ["fashion", "ecommerce", "retail", "trends", "style"]
 
-        async with (aiohttp.ClientSession( if aiohttp else None)) as session:
+        async with aiohttp.ClientSession() as session:
             for term in search_terms:
                 try:
                     url = f"{config['base_url']}{config['search_endpoint']}"
@@ -349,19 +340,19 @@ class APIDiscoveryEngine:
                         "X-RapidAPI-Host": "rapidapi.com",
                     }
 
-                    async with (session.get( if session else None)
+                    async with session.get(
                         url, params=params, headers=headers
                     ) as response:
                         if response.status == 200:
-                            data = await (response.json( if response else None))
+                            data = await response.json()
 
-                            for api_data in (data.get( if data else None)"results", []):
-                                api = (self._parse_rapidapi_result( if self else None)api_data)
-                                if api and (self._is_fashion_relevant( if self else None)api):
-                                    (apis.append( if apis else None)api)
+                            for api_data in data.get("results", []):
+                                api = self._parse_rapidapi_result(api_data)
+                                if api and self._is_fashion_relevant(api):
+                                    apis.append(api)
 
                 except Exception as e:
-                    (logger.error( if logger else None)f"Error searching RapidAPI for '{term}': {e}")
+                    logger.error(f"Error searching RapidAPI for '{term}': {e}")
 
         return apis
 
@@ -372,28 +363,28 @@ class APIDiscoveryEngine:
 
         apis = []
 
-        async with (aiohttp.ClientSession( if aiohttp else None)) as session:
+        async with aiohttp.ClientSession() as session:
             try:
                 url = f"{config['base_url']}{config['list_endpoint']}"
 
-                async with (session.get( if session else None)url) as response:
+                async with session.get(url) as response:
                     if response.status == 200:
-                        data = await (response.json( if response else None))
+                        data = await response.json()
 
-                        for provider, provider_apis in (data.items( if data else None)):
-                            for api_name, api_versions in (provider_apis.items( if provider_apis else None)):
+                        for provider, provider_apis in data.items():
+                            for api_name, api_versions in provider_apis.items():
                                 # Get the latest version
-                                latest_version = max((api_versions.keys( if api_versions else None)))
+                                latest_version = max(api_versions.keys())
                                 api_info = api_versions[latest_version]
 
-                                api = (self._parse_apis_guru_result( if self else None)
+                                api = self._parse_apis_guru_result(
                                     provider, api_name, api_info
                                 )
-                                if api and (self._is_fashion_relevant( if self else None)api):
-                                    (apis.append( if apis else None)api)
+                                if api and self._is_fashion_relevant(api):
+                                    apis.append(api)
 
             except Exception as e:
-                (logger.error( if logger else None)f"Error discovering from APIs.guru: {e}")
+                logger.error(f"Error discovering from APIs.guru: {e}")
 
         return apis
 
@@ -486,7 +477,7 @@ class APIDiscoveryEngine:
 
         for api_data in fashion_apis:
             api = APIEndpoint(
-                api_id=(hashlib.sha256( if hashlib else None)
+                api_id=hashlib.sha256(
                     f"{api_data['provider']}_{api_data['name']}".encode()
                 ).hexdigest(),
                 name=api_data["name"],
@@ -507,11 +498,11 @@ class APIDiscoveryEngine:
                 cost_score=0.0,  # Will be calculated
                 feature_score=0.0,  # Will be calculated
                 overall_score=0.0,  # Will be calculated
-                last_evaluated=(datetime.now( if datetime else None)),
+                last_evaluated=datetime.now(),
                 fashion_relevance=api_data["fashion_relevance"],
                 sustainability_support=False,  # Will be determined during evaluation
             )
-            (apis.append( if apis else None)api)
+            apis.append(api)
 
         return apis
 
@@ -519,31 +510,31 @@ class APIDiscoveryEngine:
         """Parse RapidAPI search result"""
         try:
             return APIEndpoint(
-                api_id=(api_data.get( if api_data else None)"id", ""),
-                name=(api_data.get( if api_data else None)"name", ""),
-                description=(api_data.get( if api_data else None)"description", ""),
-                base_url=(api_data.get( if api_data else None)"baseUrl", ""),
-                version=(api_data.get( if api_data else None)"version", "v1"),
-                category=(self._determine_category( if self else None)api_data),
-                provider=(api_data.get( if api_data else None)"provider", {}).get("name", ""),
-                authentication=(self._determine_auth_type( if self else None)api_data),
-                rate_limits=(api_data.get( if api_data else None)"rateLimits", {}),
-                pricing=(api_data.get( if api_data else None)"pricing", {}),
-                features=(api_data.get( if api_data else None)"features", []),
-                supported_formats=(api_data.get( if api_data else None)"formats", ["json"]),
-                documentation_url=(api_data.get( if api_data else None)"documentationUrl", ""),
+                api_id=api_data.get("id", ""),
+                name=api_data.get("name", ""),
+                description=api_data.get("description", ""),
+                base_url=api_data.get("baseUrl", ""),
+                version=api_data.get("version", "v1"),
+                category=self._determine_category(api_data),
+                provider=api_data.get("provider", {}).get("name", ""),
+                authentication=self._determine_auth_type(api_data),
+                rate_limits=api_data.get("rateLimits", {}),
+                pricing=api_data.get("pricing", {}),
+                features=api_data.get("features", []),
+                supported_formats=api_data.get("formats", ["json"]),
+                documentation_url=api_data.get("documentationUrl", ""),
                 status=APIStatus.ACTIVE,
                 reliability_score=0.0,
                 performance_score=0.0,
                 cost_score=0.0,
                 feature_score=0.0,
                 overall_score=0.0,
-                last_evaluated=(datetime.now( if datetime else None)),
+                last_evaluated=datetime.now(),
                 fashion_relevance=0.0,
                 sustainability_support=False,
             )
         except Exception as e:
-            (logger.error( if logger else None)f"Error parsing RapidAPI result: {e}")
+            logger.error(f"Error parsing RapidAPI result: {e}")
             return None
 
     def _parse_apis_guru_result(
@@ -551,18 +542,18 @@ class APIDiscoveryEngine:
     ) -> Optional[APIEndpoint]:
         """Parse APIs.guru result"""
         try:
-            swagger_url = (api_info.get( if api_info else None)"swaggerUrl", "")
+            swagger_url = api_info.get("swaggerUrl", "")
 
             return APIEndpoint(
-                api_id=(hashlib.sha256( if hashlib else None)f"{provider}_{api_name}".encode()).hexdigest(),
-                name=(api_info.get( if api_info else None)"info", {}).get("title", api_name),
-                description=(api_info.get( if api_info else None)"info", {}).get("description", ""),
+                api_id=hashlib.sha256(f"{provider}_{api_name}".encode()).hexdigest(),
+                name=api_info.get("info", {}).get("title", api_name),
+                description=api_info.get("info", {}).get("description", ""),
                 base_url=(
-                    (swagger_url.replace( if swagger_url else None)"/swagger.json", "") if swagger_url else ""
+                    swagger_url.replace("/swagger.json", "") if swagger_url else ""
                 ),
-                version=(api_info.get( if api_info else None)"info", {}).get("version", "v1"),
-                category=(self._determine_category_from_text( if self else None)
-                    (api_info.get( if api_info else None)"info", {}).get("description", "")
+                version=api_info.get("info", {}).get("version", "v1"),
+                category=self._determine_category_from_text(
+                    api_info.get("info", {}).get("description", "")
                 ),
                 provider=provider,
                 authentication=AuthenticationType.API_KEY,  # Default assumption
@@ -577,27 +568,27 @@ class APIDiscoveryEngine:
                 cost_score=0.0,
                 feature_score=0.0,
                 overall_score=0.0,
-                last_evaluated=(datetime.now( if datetime else None)),
+                last_evaluated=datetime.now(),
                 fashion_relevance=0.0,
                 sustainability_support=False,
             )
         except Exception as e:
-            (logger.error( if logger else None)f"Error parsing APIs.guru result: {e}")
+            logger.error(f"Error parsing APIs.guru result: {e}")
             return None
 
     def _determine_category(self, api_data: Dict[str, Any]) -> APICategory:
         """Determine API category from data"""
-        name = (api_data.get( if api_data else None)"name", "").lower()
-        description = (api_data.get( if api_data else None)"description", "").lower()
-        tags = [(tag.lower( if tag else None)) for tag in (api_data.get( if api_data else None)"tags", [])]
+        name = api_data.get("name", "").lower()
+        description = api_data.get("description", "").lower()
+        tags = [tag.lower() for tag in api_data.get("tags", [])]
 
         text = f"{name} {description} {' '.join(tags)}"
 
-        return (self._determine_category_from_text( if self else None)text)
+        return self._determine_category_from_text(text)
 
     def _determine_category_from_text(self, text: str) -> APICategory:
         """Determine API category from text content"""
-        text_lower = (text.lower( if text else None))
+        text_lower = text.lower()
 
         # Fashion and trends
         if any(
@@ -657,7 +648,7 @@ class APIDiscoveryEngine:
 
     def _determine_auth_type(self, api_data: Dict[str, Any]) -> AuthenticationType:
         """Determine authentication type from API data"""
-        auth_info = (api_data.get( if api_data else None)"authentication", {})
+        auth_info = api_data.get("authentication", {})
 
         if "oauth" in str(auth_info).lower():
             return AuthenticationType.OAUTH2
@@ -696,19 +687,19 @@ class APIDiscoveryEngine:
         """Evaluate API and calculate scores"""
 
         # Reliability score (based on provider reputation and status)
-        reliability_score = await (self._calculate_reliability_score( if self else None)api)
+        reliability_score = await self._calculate_reliability_score(api)
 
         # Performance score (based on response times and uptime)
-        performance_score = await (self._calculate_performance_score( if self else None)api)
+        performance_score = await self._calculate_performance_score(api)
 
         # Cost score (based on pricing model)
-        cost_score = await (self._calculate_cost_score( if self else None)api)
+        cost_score = await self._calculate_cost_score(api)
 
         # Feature score (based on available features)
-        feature_score = await (self._calculate_feature_score( if self else None)api)
+        feature_score = await self._calculate_feature_score(api)
 
         # Fashion relevance score
-        fashion_relevance = await (self._calculate_fashion_relevance( if self else None)api)
+        fashion_relevance = await self._calculate_fashion_relevance(api)
 
         # Calculate overall score
         criteria = self.evaluation_criteria
@@ -727,10 +718,10 @@ class APIDiscoveryEngine:
         api.feature_score = feature_score
         api.fashion_relevance = fashion_relevance
         api.overall_score = overall_score
-        api.last_evaluated = (datetime.now( if datetime else None))
+        api.last_evaluated = datetime.now()
 
         # Check sustainability support
-        api.sustainability_support = await (self._check_sustainability_support( if self else None)api)
+        api.sustainability_support = await self._check_sustainability_support(api)
 
     async def _calculate_reliability_score(self, api: APIEndpoint) -> float:
         """Calculate API reliability score"""
@@ -747,7 +738,7 @@ class APIDiscoveryEngine:
             "woocommerce": 0.70,
         }
 
-        base_score = (provider_scores.get( if provider_scores else None)api.(provider.lower( if provider else None)), 0.60)
+        base_score = provider_scores.get(api.provider.lower(), 0.60)
 
         # Adjust based on status
         status_multipliers = {
@@ -758,23 +749,23 @@ class APIDiscoveryEngine:
             APIStatus.UNAVAILABLE: 0.0,
         }
 
-        return base_score * (status_multipliers.get( if status_multipliers else None)api.status, 0.5)
+        return base_score * status_multipliers.get(api.status, 0.5)
 
     async def _calculate_performance_score(self, api: APIEndpoint) -> float:
         """Calculate API performance score"""
 
         # Simulate performance testing (in production, you'd do actual tests)
         try:
-            start_time = (time.time( if time else None))
+            start_time = time.time()
 
             # Mock API health check
-            async with (aiohttp.ClientSession( if aiohttp else None)) as session:
+            async with aiohttp.ClientSession() as session:
                 try:
                     # Try to access API documentation or health endpoint
-                    async with (session.get( if session else None)
+                    async with session.get(
                         api.documentation_url, timeout=5
                     ) as response:
-                        response_time = (time.time( if time else None)) - start_time
+                        response_time = time.time() - start_time
 
                         if response.status == 200:
                             # Good response time scoring
@@ -804,20 +795,20 @@ class APIDiscoveryEngine:
         pricing = api.pricing
 
         # Free tier gets highest score
-        if (pricing.get( if pricing else None)"tier") == "free" or (pricing.get( if pricing else None)"free_tier", False):
+        if pricing.get("tier") == "free" or pricing.get("free_tier", False):
             return 1.0
 
         # Freemium gets high score
-        if (pricing.get( if pricing else None)"tier") == "freemium":
+        if pricing.get("tier") == "freemium":
             return 0.9
 
         # Pay-per-use gets good score
-        if (pricing.get( if pricing else None)"model") == "pay_per_use":
+        if pricing.get("model") == "pay_per_use":
             return 0.7
 
         # Subscription models
-        if (pricing.get( if pricing else None)"model") == "subscription":
-            monthly_cost = (pricing.get( if pricing else None)"monthly_cost", 100)
+        if pricing.get("model") == "subscription":
+            monthly_cost = pricing.get("monthly_cost", 100)
             if monthly_cost < 50:
                 return 0.8
             elif monthly_cost < 200:
@@ -852,10 +843,10 @@ class APIDiscoveryEngine:
             "personalization",
             "analytics",
         ]
-        fashion_bonus = sum(
+        fashion_bonus = sum()
             0.1
             for feature in features
-            if any(ff in (feature.lower( if feature else None)) for ff in fashion_features)
+            if any(ff in feature.lower() for ff in fashion_features)
         )
 
         return min(base_score + fashion_bonus, 1.0)
@@ -865,11 +856,11 @@ class APIDiscoveryEngine:
 
         # Use fashion intelligence engine for context analysis
         context_text = f"{api.name} {api.description} {' '.join(api.features)}"
-        fashion_context = await (fashion_intelligence.analyze_fashion_context( if fashion_intelligence else None)
+        fashion_context = await fashion_intelligence.analyze_fashion_context(
             context_text
         )
 
-        return (fashion_context.get( if fashion_context else None)"fashion_relevance_score", 0.0)
+        return fashion_context.get("fashion_relevance_score", 0.0)
 
     async def _check_sustainability_support(self, api: APIEndpoint) -> bool:
         """Check if API supports sustainability features"""
@@ -898,38 +889,38 @@ class APIDiscoveryEngine:
         cache_key = f"api_discovery:{':'.join(sorted(c.value for c in categories))}"
 
         try:
-            cached_data = await (redis_manager.get( if redis_manager else None)cache_key, prefix="api_cache")
+            cached_data = await redis_manager.get(cache_key, prefix="api_cache")
             if cached_data:
                 # Convert back to APIEndpoint objects
                 results = {}
-                for category, api_list in (cached_data.items( if cached_data else None)):
+                for category, api_list in cached_data.items():
                     results[category] = [
                         APIEndpoint(**api_data) for api_data in api_list
                     ]
                 return results
         except Exception as e:
-            (logger.error( if logger else None)f"Error getting cached discovery results: {e}")
+            logger.error(f"Error getting cached discovery results: {e}")
 
         return None
 
     async def _cache_discovery_results(self, results: Dict[str, List[APIEndpoint]]):
         """Cache API discovery results"""
 
-        cache_key = f"api_discovery:{':'.join(sorted((results.keys( if results else None))))}"
+        cache_key = f"api_discovery:{':'.join(sorted(results.keys()))}"
 
         try:
             # Convert to serializable format
             cache_data = {}
-            for category, api_list in (results.items( if results else None)):
-                cache_data[category] = [(api.to_dict( if api else None)) for api in api_list]
+            for category, api_list in results.items():
+                cache_data[category] = [api.to_dict() for api in api_list]
 
             # Cache for 24 hours
-            await (redis_manager.set( if redis_manager else None)
+            await redis_manager.set(
                 cache_key, cache_data, ttl=86400, prefix="api_cache"
             )
 
         except Exception as e:
-            (logger.error( if logger else None)f"Error caching discovery results: {e}")
+            logger.error(f"Error caching discovery results: {e}")
 
     async def get_recommended_apis(
         self, category: APICategory, limit: int = 5, min_score: float = 0.6
@@ -939,12 +930,12 @@ class APIDiscoveryEngine:
         # Filter APIs by category and minimum score
         category_apis = [
             api
-            for api in self.(discovered_apis.values( if discovered_apis else None))
+            for api in self.discovered_apis.values()
             if api.category == category and api.overall_score >= min_score
         ]
 
         # Sort by overall score
-        (category_apis.sort( if category_apis else None)key=lambda x: x.overall_score, reverse=True)
+        category_apis.sort(key=lambda x: x.overall_score, reverse=True)
 
         return category_apis[:limit]
 
@@ -955,18 +946,18 @@ class APIDiscoveryEngine:
             "discovery_metrics": self.discovery_metrics,
             "total_apis_in_registry": len(self.discovered_apis),
             "apis_by_category": {
-                category.value: len(
+                category.value: len()
                     [
                         api
-                        for api in self.(discovered_apis.values( if discovered_apis else None))
+                        for api in self.discovered_apis.values()
                         if api.category == category
                     ]
                 )
                 for category in APICategory
             },
-            "top_providers": (self._get_top_providers( if self else None)),
-            "authentication_distribution": (self._get_auth_distribution( if self else None)),
-            "average_scores": (self._get_average_scores( if self else None)),
+            "top_providers": self._get_top_providers(),
+            "authentication_distribution": self._get_auth_distribution(),
+            "average_scores": self._get_average_scores(),
         }
 
     def _get_top_providers(self) -> List[Dict[str, Any]]:
@@ -974,7 +965,7 @@ class APIDiscoveryEngine:
 
         provider_stats = {}
 
-        for api in self.(discovered_apis.values( if discovered_apis else None)):
+        for api in self.discovered_apis.values():
             if api.provider not in provider_stats:
                 provider_stats[api.provider] = {"count": 0, "total_score": 0.0}
 
@@ -983,9 +974,9 @@ class APIDiscoveryEngine:
 
         # Calculate average scores and sort
         top_providers = []
-        for provider, stats in (provider_stats.items( if provider_stats else None)):
+        for provider, stats in provider_stats.items():
             avg_score = stats["total_score"] / stats["count"]
-            (top_providers.append( if top_providers else None)
+            top_providers.append(
                 {
                     "provider": provider,
                     "api_count": stats["count"],
@@ -1001,9 +992,9 @@ class APIDiscoveryEngine:
         """Get authentication type distribution"""
 
         auth_counts = {}
-        for api in self.(discovered_apis.values( if discovered_apis else None)):
+        for api in self.discovered_apis.values():
             auth_type = api.authentication.value
-            auth_counts[auth_type] = (auth_counts.get( if auth_counts else None)auth_type, 0) + 1
+            auth_counts[auth_type] = auth_counts.get(auth_type, 0) + 1
 
         return auth_counts
 
@@ -1016,23 +1007,23 @@ class APIDiscoveryEngine:
         total_apis = len(self.discovered_apis)
 
         return {
-            "reliability": sum(
-                api.reliability_score for api in self.(discovered_apis.values( if discovered_apis else None))
+            "reliability": sum()
+                api.reliability_score for api in self.discovered_apis.values()
             )
             / total_apis,
-            "performance": sum(
-                api.performance_score for api in self.(discovered_apis.values( if discovered_apis else None))
+            "performance": sum()
+                api.performance_score for api in self.discovered_apis.values()
             )
             / total_apis,
-            "cost": sum(api.cost_score for api in self.(discovered_apis.values( if discovered_apis else None)))
+            "cost": sum(api.cost_score for api in self.discovered_apis.values())
             / total_apis,
-            "features": sum(api.feature_score for api in self.(discovered_apis.values( if discovered_apis else None)))
+            "features": sum(api.feature_score for api in self.discovered_apis.values())
             / total_apis,
-            "fashion_relevance": sum(
-                api.fashion_relevance for api in self.(discovered_apis.values( if discovered_apis else None))
+            "fashion_relevance": sum()
+                api.fashion_relevance for api in self.discovered_apis.values()
             )
             / total_apis,
-            "overall": sum(api.overall_score for api in self.(discovered_apis.values( if discovered_apis else None)))
+            "overall": sum(api.overall_score for api in self.discovered_apis.values())
             / total_apis,
         }
 
@@ -1040,14 +1031,14 @@ class APIDiscoveryEngine:
         """Health check for API discovery engine"""
 
         try:
-            metrics = await (self.get_discovery_metrics( if self else None))
+            metrics = await self.get_discovery_metrics()
 
             return {
                 "status": "healthy",
                 "discovery_engine": "operational",
                 "total_apis_discovered": metrics["total_apis_in_registry"],
                 "discovery_sources": len(self.discovery_sources),
-                "last_discovery_run": self.(discovery_metrics.get( if discovery_metrics else None)"last_discovery_run"),
+                "last_discovery_run": self.discovery_metrics.get("last_discovery_run"),
                 "cache_status": "operational",
                 "fashion_intelligence_integration": "active",
                 "metrics": metrics,
@@ -1055,7 +1046,6 @@ class APIDiscoveryEngine:
 
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
-
 
 # Global API discovery engine instance
 api_discovery_engine = APIDiscoveryEngine()

@@ -15,9 +15,7 @@ Comprehensive knowledge base and intelligence system for fashion industry contex
 Integrated into all agents for fashion-specific insights and decision making
 """
 
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class FashionSeason(Enum):
     """Fashion seasons"""
@@ -27,7 +25,6 @@ class FashionSeason(Enum):
     PRE_FALL = "pre_fall"
     RESORT = "resort"
     CRUISE = "cruise"
-
 
 class FashionCategory(Enum):
     """Fashion categories"""
@@ -41,7 +38,6 @@ class FashionCategory(Enum):
     BEAUTY = "beauty"
     HOME_DECOR = "home_decor"
 
-
 class TrendStatus(Enum):
     """Trend lifecycle status"""
 
@@ -51,7 +47,6 @@ class TrendStatus(Enum):
     DECLINING = "declining"
     REVIVAL = "revival"
 
-
 class SustainabilityLevel(Enum):
     """Sustainability levels"""
 
@@ -60,7 +55,6 @@ class SustainabilityLevel(Enum):
     ECO_FRIENDLY = "eco_friendly"
     CIRCULAR = "circular"
     REGENERATIVE = "regenerative"
-
 
 @dataclass
 class FashionTrend:
@@ -93,10 +87,9 @@ class FashionTrend:
         data["category"] = self.category.value
         data["season"] = self.season.value
         data["status"] = self.status.value
-        data["created_at"] = self.(created_at.isoformat( if created_at else None))
-        data["updated_at"] = self.(updated_at.isoformat( if updated_at else None))
+        data["created_at"] = self.created_at.isoformat()
+        data["updated_at"] = self.updated_at.isoformat()
         return data
-
 
 @dataclass
 class FashionInsight:
@@ -113,7 +106,6 @@ class FashionInsight:
     business_impact: str
     created_at: datetime
 
-
 @dataclass
 class MarketIntelligence:
     """Market intelligence data"""
@@ -129,7 +121,6 @@ class MarketIntelligence:
     sustainability_trends: Dict[str, Any]
     technology_adoption: Dict[str, float]
     last_updated: datetime
-
 
 class FashionIntelligenceEngine:
     """Comprehensive fashion industry intelligence engine"""
@@ -148,13 +139,13 @@ class FashionIntelligenceEngine:
         self.retail_best_practices = {}
 
         # Fashion terminology and patterns
-        self.fashion_vocabulary = (self._build_fashion_vocabulary( if self else None))
-        self.trend_patterns = (self._build_trend_patterns( if self else None))
+        self.fashion_vocabulary = self._build_fashion_vocabulary()
+        self.trend_patterns = self._build_trend_patterns()
 
         # Initialize with current fashion intelligence
-        (self._initialize_fashion_knowledge( if self else None))
+        self._initialize_fashion_knowledge()
 
-        (logger.info( if logger else None)"Fashion Intelligence Engine initialized")
+        logger.info("Fashion Intelligence Engine initialized")
 
     def _build_fashion_vocabulary(self) -> Dict[str, List[str]]:
         """Build comprehensive fashion vocabulary"""
@@ -428,14 +419,14 @@ class FashionIntelligenceEngine:
             "recommendations": [],
         }
 
-        text_lower = (text.lower( if text else None))
+        text_lower = text.lower()
 
         # Calculate fashion relevance score
         fashion_keywords = []
-        for category, keywords in self.(fashion_vocabulary.items( if fashion_vocabulary else None)):
+        for category, keywords in self.fashion_vocabulary.items():
             for keyword in keywords:
-                if (keyword.lower( if keyword else None)) in text_lower:
-                    (fashion_keywords.append( if fashion_keywords else None)(category, keyword))
+                if keyword.lower() in text_lower:
+                    fashion_keywords.append((category, keyword))
 
         context_analysis["fashion_relevance_score"] = min(
             len(fashion_keywords) / 10.0, 1.0
@@ -448,18 +439,18 @@ class FashionIntelligenceEngine:
 
         context_analysis["identified_categories"] = [
             {"category": cat, "mentions": count}
-            for cat, count in (category_matches.most_common( if category_matches else None)5)
+            for cat, count in category_matches.most_common(5)
         ]
 
         # Detect trend indicators
         trend_indicators = []
-        for pattern_type, patterns in self.(trend_patterns.items( if trend_patterns else None)):
+        for pattern_type, patterns in self.trend_patterns.items():
             if pattern_type == "seasonal_cycles":
-                for season, attributes in (patterns.items( if patterns else None)):
-                    for attr_type, keywords in (attributes.items( if attributes else None)):
+                for season, attributes in patterns.items():
+                    for attr_type, keywords in attributes.items():
                         for keyword in keywords:
                             if keyword in text_lower:
-                                (trend_indicators.append( if trend_indicators else None)
+                                trend_indicators.append(
                                     {
                                         "type": "seasonal",
                                         "season": season,
@@ -473,13 +464,13 @@ class FashionIntelligenceEngine:
         # Identify sustainability mentions
         sustainability_mentions = []
         for keyword in self.fashion_vocabulary["sustainability"]:
-            if (keyword.lower( if keyword else None)) in text_lower:
-                (sustainability_mentions.append( if sustainability_mentions else None)keyword)
+            if keyword.lower() in text_lower:
+                sustainability_mentions.append(keyword)
 
         context_analysis["sustainability_mentions"] = sustainability_mentions
 
         # Determine seasonal context
-        current_month = (datetime.now( if datetime else None)).month
+        current_month = datetime.now().month
         if current_month in [3, 4, 5, 6]:
             context_analysis["seasonal_context"] = "spring_summer"
         elif current_month in [9, 10, 11, 12]:
@@ -492,20 +483,20 @@ class FashionIntelligenceEngine:
             implications = []
 
             if sustainability_mentions:
-                (implications.append( if implications else None)
+                implications.append(
                     "High sustainability focus - consider eco-friendly alternatives"
                 )
 
             if any(
-                "luxury" in (indicator.get( if indicator else None)"keyword", "")
+                "luxury" in indicator.get("keyword", "")
                 for indicator in trend_indicators
             ):
-                (implications.append( if implications else None)
+                implications.append(
                     "Luxury market positioning - emphasize quality and exclusivity"
                 )
 
             if context_analysis["seasonal_context"] in ["spring_summer", "fall_winter"]:
-                (implications.append( if implications else None)
+                implications.append(
                     f"Seasonal relevance - align with {context_analysis['seasonal_context']} trends"
                 )
 
@@ -526,7 +517,7 @@ class FashionIntelligenceEngine:
 
         # Filter trends based on criteria
         relevant_trends = []
-        for trend in self.(trends_database.values( if trends_database else None)):
+        for trend in self.trends_database.values():
             if category and trend.category != category:
                 continue
             if season and trend.season != season:
@@ -539,10 +530,10 @@ class FashionIntelligenceEngine:
             if sustainability_focus and trend.sustainability_score < 0.7:
                 continue
 
-            (relevant_trends.append( if relevant_trends else None)trend)
+            relevant_trends.append(trend)
 
         # Sort by popularity and relevance
-        (relevant_trends.sort( if relevant_trends else None)key=lambda t: t.popularity_score, reverse=True)
+        relevant_trends.sort(key=lambda t: t.popularity_score, reverse=True)
 
         # Generate recommendations
         for trend in relevant_trends[:10]:  # Top 10 recommendations
@@ -556,12 +547,12 @@ class FashionIntelligenceEngine:
                     "materials": trend.materials[:3],
                     "target_demographics": trend.target_demographics,
                 },
-                "business_potential": (self._calculate_business_potential( if self else None)trend),
-                "implementation_suggestions": (self._generate_implementation_suggestions( if self else None)
+                "business_potential": self._calculate_business_potential(trend),
+                "implementation_suggestions": self._generate_implementation_suggestions(
                     trend
                 ),
             }
-            (recommendations.append( if recommendations else None)recommendation)
+            recommendations.append(recommendation)
 
         return recommendations
 
@@ -580,7 +571,7 @@ class FashionIntelligenceEngine:
             TrendStatus.REVIVAL: 1.1,  # Moderate potential
         }
 
-        adjusted_score = base_score * (status_multipliers.get( if status_multipliers else None)trend.status, 1.0)
+        adjusted_score = base_score * status_multipliers.get(trend.status, 1.0)
 
         # Consider sustainability factor
         if trend.sustainability_score > 0.8:
@@ -593,8 +584,8 @@ class FashionIntelligenceEngine:
                 if trend.status in [TrendStatus.GROWING, TrendStatus.PEAK]
                 else "medium"
             ),
-            "time_to_market": (self._estimate_time_to_market( if self else None)trend),
-            "investment_level": (self._estimate_investment_level( if self else None)trend),
+            "time_to_market": self._estimate_time_to_market(trend),
+            "investment_level": self._estimate_investment_level(trend),
         }
 
     def _estimate_time_to_market(self, trend: FashionTrend) -> str:
@@ -625,29 +616,29 @@ class FashionIntelligenceEngine:
 
         # Color implementation
         if trend.color_palette:
-            (suggestions.append( if suggestions else None)
+            suggestions.append(
                 f"Incorporate {', '.join(trend.color_palette[:2])} in key pieces"
             )
 
         # Material suggestions
         if trend.materials:
-            (suggestions.append( if suggestions else None)
+            suggestions.append(
                 f"Focus on {', '.join(trend.materials[:2])} for authenticity"
             )
 
         # Target demographic alignment
         if trend.target_demographics:
-            (suggestions.append( if suggestions else None)
+            suggestions.append(
                 f"Target {', '.join(trend.target_demographics[:2])} segments"
             )
 
         # Sustainability integration
         if trend.sustainability_score > 0.7:
-            (suggestions.append( if suggestions else None)"Emphasize sustainable production methods")
+            suggestions.append("Emphasize sustainable production methods")
 
         # Seasonal timing
-        (suggestions.append( if suggestions else None)
-            f"Launch during {trend.season.(value.replace( if value else None)'_', ' ')} season"
+        suggestions.append(
+            f"Launch during {trend.season.value.replace('_', ' ')} season"
         )
 
         return suggestions
@@ -659,16 +650,16 @@ class FashionIntelligenceEngine:
 
         # Find relevant market data
         relevant_markets = []
-        for market in self.(market_intelligence.values( if market_intelligence else None)):
+        for market in self.market_intelligence.values():
             if region != "global" and market.region != region:
                 continue
             if segment and market.segment != segment:
                 continue
-            (relevant_markets.append( if relevant_markets else None)market)
+            relevant_markets.append(market)
 
         if not relevant_markets:
             # Return default global intelligence
-            return (self._get_default_market_intelligence( if self else None)region, segment)
+            return self._get_default_market_intelligence(region, segment)
 
         # Aggregate market intelligence
         aggregated_intelligence = {
@@ -677,13 +668,13 @@ class FashionIntelligenceEngine:
             "total_market_size_usd": sum(m.market_size_usd for m in relevant_markets),
             "average_growth_rate": sum(m.growth_rate for m in relevant_markets)
             / len(relevant_markets),
-            "key_trends": (self._extract_key_trends( if self else None)relevant_markets),
-            "consumer_insights": (self._aggregate_consumer_insights( if self else None)relevant_markets),
-            "competitive_landscape": (self._analyze_competitive_landscape( if self else None)
+            "key_trends": self._extract_key_trends(relevant_markets),
+            "consumer_insights": self._aggregate_consumer_insights(relevant_markets),
+            "competitive_landscape": self._analyze_competitive_landscape(
                 relevant_markets
             ),
-            "opportunities": (self._identify_opportunities( if self else None)relevant_markets),
-            "challenges": (self._identify_challenges( if self else None)relevant_markets),
+            "opportunities": self._identify_opportunities(relevant_markets),
+            "challenges": self._identify_challenges(relevant_markets),
         }
 
         return aggregated_intelligence
@@ -737,15 +728,15 @@ class FashionIntelligenceEngine:
         # Growth rate analysis
         avg_growth = sum(m.growth_rate for m in markets) / len(markets)
         if avg_growth > 0.05:
-            (trends.append( if trends else None)"Strong market growth momentum")
+            trends.append("Strong market growth momentum")
 
         # Sustainability analysis
-        sustainability_focus = sum(
-            m.(sustainability_trends.get( if sustainability_trends else None)"importance_score", 0) for m in markets
+        sustainability_focus = sum()
+            m.sustainability_trends.get("importance_score", 0) for m in markets
         ) / len(markets)
 
         if sustainability_focus > 0.7:
-            (trends.append( if trends else None)"High sustainability focus across markets")
+            trends.append("High sustainability focus across markets")
 
         return trends
 
@@ -756,14 +747,14 @@ class FashionIntelligenceEngine:
 
         all_preferences = {}
         for market in markets:
-            for key, value in market.(consumer_preferences.items( if consumer_preferences else None)):
+            for key, value in market.consumer_preferences.items():
                 if key not in all_preferences:
                     all_preferences[key] = []
                 all_preferences[key].append(value)
 
         # Calculate averages
         aggregated_preferences = {}
-        for key, values in (all_preferences.items( if all_preferences else None)):
+        for key, values in all_preferences.items():
             if isinstance(values[0], (int, float)):
                 aggregated_preferences[key] = sum(values) / len(values)
             else:
@@ -783,13 +774,13 @@ class FashionIntelligenceEngine:
 
         all_players = []
         for market in markets:
-            (all_players.extend( if all_players else None)market.key_players)
+            all_players.extend(market.key_players)
 
         player_frequency = Counter(all_players)
 
         return {
             "dominant_players": [
-                player for player, count in (player_frequency.most_common( if player_frequency else None)5)
+                player for player, count in player_frequency.most_common(5)
             ],
             "market_fragmentation": (
                 len(set(all_players)) / len(all_players) if all_players else 0
@@ -805,7 +796,7 @@ class FashionIntelligenceEngine:
         # High growth markets
         high_growth_markets = [m for m in markets if m.growth_rate > 0.06]
         if high_growth_markets:
-            (opportunities.append( if opportunities else None)
+            opportunities.append(
                 f"High growth potential in {len(high_growth_markets)} markets"
             )
 
@@ -813,11 +804,11 @@ class FashionIntelligenceEngine:
         sustainability_gaps = [
             m
             for m in markets
-            if m.(sustainability_trends.get( if sustainability_trends else None)"demand", 0)
-            > m.(sustainability_trends.get( if sustainability_trends else None)"supply", 0)
+            if m.sustainability_trends.get("demand", 0)
+            > m.sustainability_trends.get("supply", 0)
         ]
         if sustainability_gaps:
-            (opportunities.append( if opportunities else None)
+            opportunities.append(
                 "Sustainability supply-demand gap presents opportunities"
             )
 
@@ -831,12 +822,12 @@ class FashionIntelligenceEngine:
         # Low growth markets
         low_growth_markets = [m for m in markets if m.growth_rate < 0.02]
         if low_growth_markets:
-            (challenges.append( if challenges else None)f"Slow growth in {len(low_growth_markets)} markets")
+            challenges.append(f"Slow growth in {len(low_growth_markets)} markets")
 
         # High competition
         high_competition_markets = [m for m in markets if len(m.key_players) > 10]
         if high_competition_markets:
-            (challenges.append( if challenges else None)"Intense competition in major markets")
+            challenges.append("Intense competition in major markets")
 
         return challenges
 
@@ -854,12 +845,12 @@ class FashionIntelligenceEngine:
                 self.market_intelligence[market.market_id] = market
 
         if "color_trends" in new_data:
-            self.(color_trends.update( if color_trends else None)new_data["color_trends"])
+            self.color_trends.update(new_data["color_trends"])
 
         if "material_innovations" in new_data:
-            self.(material_innovations.update( if material_innovations else None)new_data["material_innovations"])
+            self.material_innovations.update(new_data["material_innovations"])
 
-        (logger.info( if logger else None)"Fashion knowledge base updated")
+        logger.info("Fashion knowledge base updated")
 
     async def get_fashion_health_check(self) -> Dict[str, Any]:
         """Get fashion intelligence system health check"""
@@ -875,12 +866,12 @@ class FashionIntelligenceEngine:
             },
             "data_freshness": {
                 "latest_trend_update": max(
-                    (t.updated_at for t in self.(trends_database.values( if trends_database else None))),
-                    default=(datetime.now( if datetime else None)),
+                    (t.updated_at for t in self.trends_database.values()),
+                    default=datetime.now(),
                 ).isoformat(),
                 "latest_market_update": max(
-                    (m.last_updated for m in self.(market_intelligence.values( if market_intelligence else None))),
-                    default=(datetime.now( if datetime else None)),
+                    (m.last_updated for m in self.market_intelligence.values()),
+                    default=datetime.now(),
                 ).isoformat(),
             },
             "coverage": {
@@ -889,7 +880,6 @@ class FashionIntelligenceEngine:
                 "sustainability_levels": len(SustainabilityLevel),
             },
         }
-
 
 # Global fashion intelligence engine instance
 fashion_intelligence = FashionIntelligenceEngine()

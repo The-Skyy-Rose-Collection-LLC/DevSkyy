@@ -6,7 +6,7 @@ from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
     from api.v1.auth0_endpoints import router as auth0_router
 from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
-from typing import Dict
+    from typing import Dict
 import logging
 
 """
@@ -15,9 +15,7 @@ JWT/OAuth2 authentication with user management
 Includes Auth0 integration for enterprise authentication
 """
 
-
 # datetime not needed in this module
-
 
     create_user_tokens,
     get_current_active_user,
@@ -29,26 +27,24 @@ Includes Auth0 integration for enterprise authentication
     verify_token,
 )
 
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 # Import and include Auth0 endpoints
 try:
-    (router.include_router( if router else None)auth0_router)
+    router.include_router(auth0_router)
     logger.info("✅ Auth0 authentication endpoints loaded")
 except ImportError as e:
     logger.warning(f"⚠️ Auth0 endpoints not available: {sanitize_for_log(str(e))}")
 except Exception as e:
     logger.error(f"❌ Failed to load Auth0 endpoints: {sanitize_for_log(str(e))}")
 
-
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/register", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def register(request: EnhancedRegisterRequest):
     """
     Register a new user
@@ -58,7 +54,7 @@ async def register(request: EnhancedRegisterRequest):
     """
     try:
         # Check if user already exists
-        existing_user = (user_manager.get_user_by_email( if user_manager else None)request.email)
+        existing_user = user_manager.get_user_by_email(request.email)
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -66,7 +62,7 @@ async def register(request: EnhancedRegisterRequest):
             )
 
         # Create user with enhanced validation
-        user = (user_manager.create_user( if user_manager else None)
+        user = user_manager.create_user(
             email=request.email,
             username=request.username,
             password=request.password,
@@ -91,8 +87,7 @@ async def register(request: EnhancedRegisterRequest):
             detail="Registration failed",
         )
 
-
-@(router.post( if router else None)"/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Login and get access token
@@ -102,7 +97,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     try:
         # Authenticate user with username/email and password
-        user = (user_manager.authenticate_user( if user_manager else None)form_data.username, form_data.password)
+        user = user_manager.authenticate_user(form_data.username, form_data.password)
 
         if not user:
             raise HTTPException(
@@ -134,8 +129,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Login failed",
         )
 
-
-@(router.post( if router else None)"/refresh", response_model=TokenResponse)
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(refresh_token: str):
     """
     Refresh access token using refresh token
@@ -147,7 +141,7 @@ async def refresh_token(refresh_token: str):
         token_data = verify_token(refresh_token, token_type="refresh")
 
         # Get user
-        user = (user_manager.get_user_by_id( if user_manager else None)token_data.user_id)
+        user = user_manager.get_user_by_id(token_data.user_id)
 
         if not user:
             raise HTTPException(
@@ -167,8 +161,7 @@ async def refresh_token(refresh_token: str):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
         )
 
-
-@(router.get( if router else None)"/me", response_model=User)
+@router.get("/me", response_model=User)
 async def get_current_user_info(
     current_user: TokenData = Depends(get_current_active_user),
 ):
@@ -177,7 +170,7 @@ async def get_current_user_info(
 
     Returns the currently authenticated user's profile.
     """
-    user = (user_manager.get_user_by_id( if user_manager else None)current_user.user_id)
+    user = user_manager.get_user_by_id(current_user.user_id)
 
     if not user:
         raise HTTPException(
@@ -186,8 +179,7 @@ async def get_current_user_info(
 
     return user
 
-
-@(router.post( if router else None)"/logout")
+@router.post("/logout")
 async def logout(current_user: TokenData = Depends(get_current_active_user)):
     """
     Logout current user
@@ -199,13 +191,11 @@ async def logout(current_user: TokenData = Depends(get_current_active_user)):
 
     return {"message": "Successfully logged out", "user": current_user.email}
 
-
 # ============================================================================
 # USER MANAGEMENT
 # ============================================================================
 
-
-@(router.get( if router else None)"/users", response_model=Dict[str, list])
+@router.get("/users", response_model=Dict[str, list])
 async def list_users(current_user: TokenData = Depends(get_current_active_user)):
     """
     List all users (admin only in production)
@@ -218,10 +208,9 @@ async def list_users(current_user: TokenData = Depends(get_current_active_user))
             status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
         )
 
-    users = list(user_manager.(users.values( if users else None)))
+    users = list(user_manager.users.values())
 
-    return {"users": [(user.model_dump( if user else None)) for user in users], "count": len(users)}
-
+    return {"users": [user.model_dump() for user in users], "count": len(users)}
 
 logger.info("✅ Authentication API endpoints registered")
 

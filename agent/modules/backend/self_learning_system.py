@@ -17,7 +17,7 @@ Self-Learning System with Machine Learning
 Learns from every mistake, conflict, and failure to prevent future issues
 
 Features:
-- Error pattern recognition
+    - Error pattern recognition
 - Conflict resolution learning
 - Predictive failure detection
 - Automatic solution generation
@@ -25,10 +25,7 @@ Features:
 - Knowledge persistence
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class SelfLearningSystem:
     """
@@ -37,7 +34,7 @@ class SelfLearningSystem:
 
     def __init__(self):
         self.knowledge_base_path = Path("knowledge_base")
-        self.(knowledge_base_path.mkdir( if knowledge_base_path else None)exist_ok=True)
+        self.knowledge_base_path.mkdir(exist_ok=True)
 
         # Initialize ML models
         self.error_classifier = None
@@ -57,9 +54,9 @@ class SelfLearningSystem:
         self.improvement_score = 0.0
 
         # Load existing knowledge
-        (self.load_knowledge( if self else None))
+        self.load_knowledge()
 
-        (logger.info( if logger else None)"🧠 Self-Learning System initialized with ML capabilities")
+        logger.info("🧠 Self-Learning System initialized with ML capabilities")
 
     def learn_from_error(self, error_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -72,36 +69,36 @@ class SelfLearningSystem:
             Learning outcome and recommended solution
         """
         # Extract error features
-        error_features = (self._extract_error_features( if self else None)error_data)
+        error_features = self._extract_error_features(error_data)
 
         # Add to history
-        self.(error_history.append( if error_history else None)
+        self.error_history.append(
             {
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "error": error_data,
                 "features": error_features,
-                "environment": (self._get_environment_context( if self else None)),
+                "environment": self._get_environment_context(),
             }
         )
 
         # Find similar past errors
-        similar_errors = (self._find_similar_errors( if self else None)error_features)
+        similar_errors = self._find_similar_errors(error_features)
 
         # Generate solution
-        solution = (self._generate_solution( if self else None)error_data, similar_errors)
+        solution = self._generate_solution(error_data, similar_errors)
 
         # Update ML models
-        (self._update_error_model( if self else None)error_features, solution["success"])
+        self._update_error_model(error_features, solution["success"])
 
         # Calculate learning metrics
-        self.improvement_score = (self._calculate_improvement( if self else None))
+        self.improvement_score = self._calculate_improvement()
 
-        (logger.info( if logger else None)
-            f"🧠 Learned from error: {(error_data.get( if error_data else None)'type')} (Confidence: {solution['confidence']:.2%})"
+        logger.info(
+            f"🧠 Learned from error: {error_data.get('type')} (Confidence: {solution['confidence']:.2%})"
         )
 
         return {
-            "error_type": (error_data.get( if error_data else None)"type"),
+            "error_type": error_data.get("type"),
             "solution": solution,
             "similar_cases": len(similar_errors),
             "confidence": solution["confidence"],
@@ -120,12 +117,12 @@ class SelfLearningSystem:
             Resolution strategy
         """
         # Analyze conflict pattern
-        conflict_pattern = (self._analyze_conflict_pattern( if self else None)conflict_data)
+        conflict_pattern = self._analyze_conflict_pattern(conflict_data)
 
         # Store in history
-        self.(conflict_history.append( if conflict_history else None)
+        self.conflict_history.append(
             {
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "conflict": conflict_data,
                 "pattern": conflict_pattern,
                 "resolution": None,  # Will be updated when resolved
@@ -133,18 +130,18 @@ class SelfLearningSystem:
         )
 
         # Predict best resolution
-        resolution = (self._predict_conflict_resolution( if self else None)conflict_pattern)
+        resolution = self._predict_conflict_resolution(conflict_pattern)
 
         # If git conflict, learn merge patterns
-        if (conflict_data.get( if conflict_data else None)"type") == "git":
-            (self._learn_git_patterns( if self else None)conflict_data)
+        if conflict_data.get("type") == "git":
+            self._learn_git_patterns(conflict_data)
 
-        (logger.info( if logger else None)f"🔄 Learning from conflict: {(conflict_data.get( if conflict_data else None)'type')}")
+        logger.info(f"🔄 Learning from conflict: {conflict_data.get('type')}")
 
         return {
-            "conflict_type": (conflict_data.get( if conflict_data else None)"type"),
+            "conflict_type": conflict_data.get("type"),
             "resolution_strategy": resolution,
-            "prevention_tips": (self._get_prevention_tips( if self else None)conflict_pattern),
+            "prevention_tips": self._get_prevention_tips(conflict_pattern),
             "auto_resolve": resolution["confidence"] > 0.9,
         }
 
@@ -155,18 +152,18 @@ class SelfLearningSystem:
         Args:
             success_data: Information about successful operation
         """
-        self.(success_patterns.append( if success_patterns else None)
+        self.success_patterns.append(
             {
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "operation": success_data,
-                "context": (self._get_environment_context( if self else None)),
+                "context": self._get_environment_context(),
             }
         )
 
         # Reinforce successful patterns
-        (self._reinforce_success_patterns( if self else None)success_data)
+        self._reinforce_success_patterns(success_data)
 
-        (logger.info( if logger else None)f"✅ Learned from success: {(success_data.get( if success_data else None)'operation')}")
+        logger.info(f"✅ Learned from success: {success_data.get('operation')}")
 
     def predict_failure(self, operation_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -179,16 +176,16 @@ class SelfLearningSystem:
             Failure prediction with probability
         """
         # Extract features
-        features = (self._extract_operation_features( if self else None)operation_data)
+        features = self._extract_operation_features(operation_data)
 
         # Check for anomalies
-        is_anomaly = (self._detect_anomaly( if self else None)features)
+        is_anomaly = self._detect_anomaly(features)
 
         # Predict failure probability
-        failure_probability = (self._predict_failure_probability( if self else None)features)
+        failure_probability = self._predict_failure_probability(features)
 
         # Get preventive measures
-        preventive_measures = (self._get_preventive_measures( if self else None)
+        preventive_measures = self._get_preventive_measures(
             operation_data, failure_probability
         )
 
@@ -197,7 +194,7 @@ class SelfLearningSystem:
             "failure_probability": failure_probability,
             "is_anomaly": is_anomaly,
             "preventive_measures": preventive_measures,
-            "confidence": (self._calculate_prediction_confidence( if self else None)features),
+            "confidence": self._calculate_prediction_confidence(features),
         }
 
     def auto_fix(self, issue: Dict[str, Any]) -> Dict[str, Any]:
@@ -211,10 +208,10 @@ class SelfLearningSystem:
             Fix result
         """
         # Analyze issue
-        issue_analysis = (self._analyze_issue( if self else None)issue)
+        issue_analysis = self._analyze_issue(issue)
 
         # Get historical fixes
-        similar_fixes = (self._get_similar_fixes( if self else None)issue_analysis)
+        similar_fixes = self._get_similar_fixes(issue_analysis)
 
         if not similar_fixes:
             return {
@@ -224,14 +221,14 @@ class SelfLearningSystem:
             }
 
         # Apply most successful fix
-        best_fix = (self._select_best_fix( if self else None)similar_fixes)
+        best_fix = self._select_best_fix(similar_fixes)
 
         try:
             # Execute fix
-            fix_result = (self._execute_fix( if self else None)best_fix, issue)
+            fix_result = self._execute_fix(best_fix, issue)
 
             # Learn from result
-            (self._update_fix_knowledge( if self else None)issue, best_fix, fix_result["success"])
+            self._update_fix_knowledge(issue, best_fix, fix_result["success"])
 
             return {
                 "fixed": fix_result["success"],
@@ -241,8 +238,8 @@ class SelfLearningSystem:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Auto-fix failed: {e}")
-            (self.learn_from_error( if self else None)
+            logger.error(f"Auto-fix failed: {e}")
+            self.learn_from_error(
                 {"type": "auto_fix_failure", "error": str(e), "issue": issue}
             )
             return {
@@ -265,38 +262,38 @@ class SelfLearningSystem:
             "permission",
             "other",
         ]
-        error_type = (error_data.get( if error_data else None)"type", "other")
+        error_type = error_data.get("type", "other")
         type_encoding = [1 if t == error_type else 0 for t in error_types]
-        (features.extend( if features else None)type_encoding)
+        features.extend(type_encoding)
 
         # Time features
-        hour = (datetime.now( if datetime else None)).hour
-        day_of_week = (datetime.now( if datetime else None)).weekday()
-        (features.extend( if features else None)[hour / 24, day_of_week / 7])
+        hour = datetime.now().hour
+        day_of_week = datetime.now().weekday()
+        features.extend([hour / 24, day_of_week / 7])
 
         # Context features
-        (features.append( if features else None)
-            len((error_data.get( if error_data else None)"message", "")) / 1000
+        features.append(
+            len(error_data.get("message", "")) / 1000
         )  # Normalized message length
-        (features.append( if features else None)(error_data.get( if error_data else None)"severity", 5) / 10)  # Normalized severity
+        features.append(error_data.get("severity", 5) / 10)  # Normalized severity
 
-        return (np.array( if np else None)features)
+        return np.array(features)
 
     def _find_similar_errors(self, error_features: np.ndarray) -> List[Dict[str, Any]]:
         """Find similar errors from history."""
         similar = []
 
         for past_error in self.error_history[-100:]:  # Check last 100 errors
-            past_features = (past_error.get( if past_error else None)"features")
+            past_features = past_error.get("features")
             if past_features is not None:
                 # Calculate similarity (cosine similarity)
-                similarity = (np.dot( if np else None)error_features, past_features) / (
-                    np.(linalg.norm( if linalg else None)error_features) * np.(linalg.norm( if linalg else None)past_features)
+                similarity = np.dot(error_features, past_features) / (
+                    np.linalg.norm(error_features) * np.linalg.norm(past_features)
                     + 1e-10
                 )
 
                 if similarity > 0.8:
-                    (similar.append( if similar else None)past_error)
+                    similar.append(past_error)
 
         return similar
 
@@ -307,16 +304,16 @@ class SelfLearningSystem:
         # If we have similar cases, use their solutions
         if similar_errors:
             successful_solutions = [
-                (e.get( if e else None)"solution")
+                e.get("solution")
                 for e in similar_errors
-                if (e.get( if e else None)"solution", {}).get("success")
+                if e.get("solution", {}).get("success")
             ]
 
             if successful_solutions:
                 # Use most common successful solution
 
                 solution_texts = [
-                    (s.get( if s else None)"text") for s in successful_solutions if (s.get( if s else None)"text")
+                    s.get("text") for s in successful_solutions if s.get("text")
                 ]
                 if solution_texts:
                     most_common = Counter(solution_texts).most_common(1)[0][0]
@@ -328,11 +325,11 @@ class SelfLearningSystem:
                     }
 
         # Generate new solution using ML
-        return (self._generate_ml_solution( if self else None)error_data)
+        return self._generate_ml_solution(error_data)
 
     def _generate_ml_solution(self, error_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate solution using ML models."""
-        error_type = (error_data.get( if error_data else None)"type", "unknown")
+        error_type = error_data.get("type", "unknown")
 
         solutions = {
             "dependency": {
@@ -353,7 +350,7 @@ class SelfLearningSystem:
             },
         }
 
-        solution = (solutions.get( if solutions else None)
+        solution = solutions.get(
             error_type,
             {
                 "text": "Investigate error logs and stack trace for root cause",
@@ -363,7 +360,7 @@ class SelfLearningSystem:
 
         return {
             "text": solution["text"],
-            "commands": (solution.get( if solution else None)"commands", []),
+            "commands": solution.get("commands", []),
             "confidence": 0.7,
             "success": False,  # Not yet verified
             "source": "ml_generated",
@@ -374,16 +371,16 @@ class SelfLearningSystem:
     ) -> Dict[str, Any]:
         """Analyze conflict to identify patterns."""
         pattern = {
-            "type": (conflict_data.get( if conflict_data else None)"type"),
-            "frequency": (self._get_conflict_frequency( if self else None)conflict_data),
-            "complexity": (self._assess_conflict_complexity( if self else None)conflict_data),
-            "files_affected": len((conflict_data.get( if conflict_data else None)"files", [])),
+            "type": conflict_data.get("type"),
+            "frequency": self._get_conflict_frequency(conflict_data),
+            "complexity": self._assess_conflict_complexity(conflict_data),
+            "files_affected": len(conflict_data.get("files", [])),
         }
 
         # For git conflicts, analyze merge patterns
-        if (conflict_data.get( if conflict_data else None)"type") == "git":
-            pattern["merge_conflicts"] = (conflict_data.get( if conflict_data else None)"conflicts", [])
-            pattern["branch_divergence"] = (conflict_data.get( if conflict_data else None)"divergence", 0)
+        if conflict_data.get("type") == "git":
+            pattern["merge_conflicts"] = conflict_data.get("conflicts", [])
+            pattern["branch_divergence"] = conflict_data.get("divergence", 0)
 
         return pattern
 
@@ -391,7 +388,7 @@ class SelfLearningSystem:
         self, conflict_pattern: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Predict best resolution for conflict."""
-        conflict_type = (conflict_pattern.get( if conflict_pattern else None)"type")
+        conflict_type = conflict_pattern.get("type")
 
         resolutions = {
             "git": {
@@ -420,7 +417,7 @@ class SelfLearningSystem:
             },
         }
 
-        return (resolutions.get( if resolutions else None)
+        return resolutions.get(
             conflict_type,
             {
                 "strategy": "manual",
@@ -432,26 +429,26 @@ class SelfLearningSystem:
     def _learn_git_patterns(self, conflict_data: Dict[str, Any]) -> None:
         """Learn from git conflict patterns."""
         # Track which files commonly conflict
-        conflicting_files = (conflict_data.get( if conflict_data else None)"files", [])
+        conflicting_files = conflict_data.get("files", [])
 
         for file in conflicting_files:
             # Store pattern
             pattern = {
                 "file": file,
                 "conflict_count": 1,
-                "last_conflict": (datetime.now( if datetime else None)).isoformat(),
+                "last_conflict": datetime.now().isoformat(),
             }
 
             # Update or add to knowledge base
-            (self._update_git_knowledge( if self else None)pattern)
+            self._update_git_knowledge(pattern)
 
     def _update_git_knowledge(self, pattern: Dict[str, Any]) -> None:
         """Update git conflict knowledge base."""
         git_knowledge_file = self.knowledge_base_path / "git_conflicts.json"
 
-        if (git_knowledge_file.exists( if git_knowledge_file else None)):
+        if git_knowledge_file.exists():
             with open(git_knowledge_file, "r") as f:
-                knowledge = (json.load( if json else None)f)
+                knowledge = json.load(f)
         else:
             knowledge = {}
 
@@ -463,14 +460,14 @@ class SelfLearningSystem:
             knowledge[file_path] = pattern
 
         with open(git_knowledge_file, "w") as f:
-            (json.dump( if json else None)knowledge, f, indent=2)
+            json.dump(knowledge, f, indent=2)
 
     def _get_prevention_tips(self, conflict_pattern: Dict[str, Any]) -> List[str]:
         """Get tips to prevent future conflicts."""
         tips = []
 
-        if (conflict_pattern.get( if conflict_pattern else None)"type") == "git":
-            (tips.extend( if tips else None)
+        if conflict_pattern.get("type") == "git":
+            tips.extend(
                 [
                     "Pull changes before starting work: git pull --rebase",
                     "Commit frequently with clear messages",
@@ -480,11 +477,11 @@ class SelfLearningSystem:
             )
 
             # Add specific tips based on frequency
-            if (conflict_pattern.get( if conflict_pattern else None)"frequency", 0) > 5:
-                (tips.append( if tips else None)"Consider using git hooks to auto-sync before commits")
+            if conflict_pattern.get("frequency", 0) > 5:
+                tips.append("Consider using git hooks to auto-sync before commits")
 
-        elif (conflict_pattern.get( if conflict_pattern else None)"type") == "dependency":
-            (tips.extend( if tips else None)
+        elif conflict_pattern.get("type") == "dependency":
+            tips.extend(
                 [
                     "Pin dependency versions in requirements.txt",
                     "Use virtual environments for isolation",
@@ -498,39 +495,39 @@ class SelfLearningSystem:
     def _reinforce_success_patterns(self, success_data: Dict[str, Any]) -> None:
         """Reinforce patterns that lead to success."""
         # Update success weights
-        operation = (success_data.get( if success_data else None)"operation")
+        operation = success_data.get("operation")
 
         # Store successful configuration
         success_config = {
             "operation": operation,
-            "context": (self._get_environment_context( if self else None)),
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "context": self._get_environment_context(),
+            "timestamp": datetime.now().isoformat(),
         }
 
         # Save to knowledge base
         success_file = self.knowledge_base_path / "success_patterns.json"
 
-        if (success_file.exists( if success_file else None)):
+        if success_file.exists():
             with open(success_file, "r") as f:
-                patterns = (json.load( if json else None)f)
+                patterns = json.load(f)
         else:
             patterns = []
 
-        (patterns.append( if patterns else None)success_config)
+        patterns.append(success_config)
 
         # Keep only last 1000 successes
         patterns = patterns[-1000:]
 
         with open(success_file, "w") as f:
-            (json.dump( if json else None)patterns, f, indent=2)
+            json.dump(patterns, f, indent=2)
 
     def _get_environment_context(self) -> Dict[str, Any]:
         """Get current environment context."""
         return {
             "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
             "platform": sys.platform,
-            "cwd": (os.getcwd( if os else None)),
-            "env_vars_set": len([k for k in os.environ if (k.startswith( if k else None)"DEVSKY")]),
+            "cwd": os.getcwd(),
+            "env_vars_set": len([k for k in os.environ if k.startswith("DEVSKY")]),
         }
 
     def _detect_anomaly(self, features: np.ndarray) -> bool:
@@ -540,8 +537,8 @@ class SelfLearningSystem:
 
         try:
             # Reshape for sklearn
-            features_reshaped = (features.reshape( if features else None)1, -1)
-            prediction = self.(anomaly_detector.predict( if anomaly_detector else None)features_reshaped)
+            features_reshaped = features.reshape(1, -1)
+            prediction = self.anomaly_detector.predict(features_reshaped)
             return prediction[0] == -1  # -1 indicates anomaly
         except Exception:
             return False
@@ -553,18 +550,22 @@ class SelfLearningSystem:
 
         # Compare error rate over time
         recent_errors = len(
+
             [
                 e
                 for e in self.error_history[-50:]
-                if not (e.get( if e else None)"solution", {}).get("success")
+                if not e.get("solution", {}).get("success")
             ]
+
         )
         older_errors = len(
+
             [
                 e
                 for e in self.error_history[-100:-50]
-                if not (e.get( if e else None)"solution", {}).get("success")
+                if not e.get("solution", {}).get("success")
             ]
+
         )
 
         if older_errors == 0:
@@ -577,82 +578,77 @@ class SelfLearningSystem:
         """Save learned knowledge to disk."""
         # Save error history
         with open(self.knowledge_base_path / "error_history.json", "w") as f:
-            (json.dump( if json else None)self.error_history[-1000:], f, default=str)
+            json.dump(self.error_history[-1000:], f, default=str)
 
         # Save conflict history
         with open(self.knowledge_base_path / "conflict_history.json", "w") as f:
-            (json.dump( if json else None)self.conflict_history[-1000:], f, default=str)
+            json.dump(self.conflict_history[-1000:], f, default=str)
 
         # Save ML models if trained
         if self.error_classifier:
             with open(self.knowledge_base_path / "error_classifier.pkl", "wb") as f:
-                (pickle.dump( if pickle else None)self.error_classifier, f)
+                pickle.dump(self.error_classifier, f)
 
-        (logger.info( if logger else None)f"💾 Knowledge saved (Improvement: {self.improvement_score:.2%})")
+        logger.info(f"💾 Knowledge saved (Improvement: {self.improvement_score:.2%})")
 
     def load_knowledge(self) -> None:
         """Load previously learned knowledge."""
         # Load error history
         error_file = self.knowledge_base_path / "error_history.json"
-        if (error_file.exists( if error_file else None)):
+        if error_file.exists():
             with open(error_file, "r") as f:
-                self.error_history = (json.load( if json else None)f)
+                self.error_history = json.load(f)
 
         # Load conflict history
         conflict_file = self.knowledge_base_path / "conflict_history.json"
-        if (conflict_file.exists( if conflict_file else None)):
+        if conflict_file.exists():
             with open(conflict_file, "r") as f:
-                self.conflict_history = (json.load( if json else None)f)
+                self.conflict_history = json.load(f)
 
         # Load ML models
         model_file = self.knowledge_base_path / "error_classifier.pkl"
-        if (model_file.exists( if model_file else None)):
+        if model_file.exists():
             with open(model_file, "rb") as f:
-                self.error_classifier = (pickle.load( if pickle else None)f)
+                self.error_classifier = pickle.load(f)
 
-        (logger.info( if logger else None)
+        logger.info(
             f"🧠 Loaded knowledge: {len(self.error_history)} errors, {len(self.conflict_history)} conflicts"
         )
-
 
 # Global instance
 self_learning_system = SelfLearningSystem()
 
-
 # Integration functions
 async def learn_and_fix(error: Dict[str, Any]) -> Dict[str, Any]:
     """Learn from error and attempt auto-fix."""
-    learning_result = (self_learning_system.learn_from_error( if self_learning_system else None)error)
+    learning_result = self_learning_system.learn_from_error(error)
 
     if learning_result["auto_fix_available"]:
-        fix_result = (self_learning_system.auto_fix( if self_learning_system else None)error)
+        fix_result = self_learning_system.auto_fix(error)
         return fix_result
 
     return learning_result
 
-
 async def predict_and_prevent(operation: Dict[str, Any]) -> Dict[str, Any]:
     """Predict failures and prevent them."""
-    prediction = (self_learning_system.predict_failure( if self_learning_system else None)operation)
+    prediction = self_learning_system.predict_failure(operation)
 
     if prediction["will_likely_fail"]:
-        (logger.warning( if logger else None)
+        logger.warning(
             f"⚠️ Operation likely to fail (probability: {prediction['failure_probability']:.2%})"
         )
-        (logger.info( if logger else None)f"Preventive measures: {prediction['preventive_measures']}")
+        logger.info(f"Preventive measures: {prediction['preventive_measures']}")
 
     return prediction
-
 
 # Auto-save knowledge periodically
 async def auto_save_knowledge():
     """Automatically save learned knowledge every hour."""
     while True:
-        await (asyncio.sleep( if asyncio else None)3600)  # TODO: Move to config  # Every hour
-        (self_learning_system.save_knowledge( if self_learning_system else None))
-
+        await asyncio.sleep(3600)  # TODO: Move to config  # Every hour
+        self_learning_system.save_knowledge()
 
 # Start auto-save task
 
 if __name__ == "__main__":
-    (asyncio.run( if asyncio else None)auto_save_knowledge())
+    asyncio.run(auto_save_knowledge())

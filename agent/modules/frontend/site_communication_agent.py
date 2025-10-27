@@ -8,10 +8,7 @@ import logging
 import random
 import uuid
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 async def communicate_with_site() -> Dict[str, Any]:
     """Main function to communicate with site and gather insights."""
@@ -21,10 +18,9 @@ async def communicate_with_site() -> Dict[str, Any]:
         "communication_status": "active",
         "insights_gathered": True,
         "chatbot_connected": True,
-        "last_communication": (datetime.now( if datetime else None)).isoformat(),
+        "last_communication": datetime.now().isoformat(),
         "agent_status": "optimal",
     }
-
 
 class SiteCommunicationAgent:
     """Agent for communicating with website chatbots and gathering insights."""
@@ -36,7 +32,7 @@ class SiteCommunicationAgent:
         self.market_insights_cache = {}
         self.agent_type = "site_communication"
         self.telemetry = Telemetry("site_communication")
-        (logger.info( if logger else None)"💬 Site Communication Agent initialized")
+        logger.info("💬 Site Communication Agent initialized")
 
     async def connect_to_chatbot(
         self, website_url: str, api_key: str = None
@@ -47,7 +43,7 @@ class SiteCommunicationAgent:
             # Simulate chatbot connection
             connection_data = {
                 "website": website_url,
-                "connection_time": (datetime.now( if datetime else None)).isoformat(),
+                "connection_time": datetime.now().isoformat(),
                 "status": "connected",
                 "chatbot_type": "avatar_chatbot",
                 "api_key_provided": api_key is not None,
@@ -63,7 +59,7 @@ class SiteCommunicationAgent:
             self.chatbot_connections[website_url] = connection_data
 
             # Get initial insights
-            initial_insights = await (self._gather_chatbot_insights( if self else None)website_url)
+            initial_insights = await self._gather_chatbot_insights(website_url)
             connection_data["initial_insights"] = initial_insights
 
             return connection_data
@@ -73,14 +69,14 @@ class SiteCommunicationAgent:
                 "website": website_url,
                 "status": "connection_failed",
                 "error": str(e),
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
     async def _gather_chatbot_insights(self, website_url: str) -> Dict[str, Any]:
         """Gather insights from connected chatbot."""
 
         # Simulate real chatbot data gathering
-        await (asyncio.sleep( if asyncio else None)1)  # TODO: Move to config  # Simulate API call delay
+        await asyncio.sleep(1)  # TODO: Move to config  # Simulate API call delay
 
         insights = {
             "recent_interactions": 47,
@@ -108,25 +104,25 @@ class SiteCommunicationAgent:
 
         try:
             # Make actual request to check site health
-            with self.(telemetry.span( if telemetry else None)"gather_site_health"):
-                response = (http_client.get( if http_client else None)website_url, timeout=10)
+            with self.telemetry.span("gather_site_health"):
+                response = http_client.get(website_url, timeout=10)
 
             health_data = {
                 "website": website_url,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "uptime_status": (
                     "online" if response.status_code == 200 else "issues_detected"
                 ),
-                "response_time": round(response.(elapsed.total_seconds( if elapsed else None)) * 1000, 2),
+                "response_time": round(response.elapsed.total_seconds() * 1000, 2),
                 "status_code": response.status_code,
                 "ssl_certificate": (
-                    "valid" if (website_url.startswith( if website_url else None)"https") else "missing"
+                    "valid" if website_url.startswith("https") else "missing"
                 ),
                 "mobile_friendly": True,
-                "page_speed_score": (random.randint( if random else None)85, 98),
-                "seo_score": (random.randint( if random else None)88, 96),
-                "security_score": (random.randint( if random else None)90, 99),
-                "accessibility_score": (random.randint( if random else None)85, 94),
+                "page_speed_score": random.randint(85, 98),
+                "seo_score": random.randint(88, 96),
+                "security_score": random.randint(90, 99),
+                "accessibility_score": random.randint(85, 94),
             }
 
             # Performance analysis
@@ -148,7 +144,7 @@ class SiteCommunicationAgent:
         except Exception as e:
             return {
                 "website": website_url,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "uptime_status": "connection_failed",
                 "error": str(e),
                 "recommendations": ["Check server connectivity", "Verify DNS settings"],
@@ -168,7 +164,7 @@ class SiteCommunicationAgent:
 
         sentiment_analysis = {
             "website": website_url,
-            "analysis_date": (datetime.now( if datetime else None)).isoformat(),
+            "analysis_date": datetime.now().isoformat(),
             "overall_sentiment": "positive",
             "sentiment_score": 4.3,
             "total_feedback_analyzed": 150,
@@ -178,7 +174,7 @@ class SiteCommunicationAgent:
         }
 
         # Calculate category insights
-        for category, data in (feedback_categories.items( if feedback_categories else None)):
+        for category, data in feedback_categories.items():
             data["avg_rating"] = sum(data["ratings"]) / len(data["ratings"])
             sentiment_analysis["category_insights"][category] = {
                 "feedback_count": data["count"],
@@ -199,7 +195,7 @@ class SiteCommunicationAgent:
             elif insights["feedback_count"] > 2:
                 sentiment_analysis["trending_topics"].append(category)
 
-        self.(customer_feedback_db.append( if customer_feedback_db else None)sentiment_analysis)
+        self.customer_feedback_db.append(sentiment_analysis)
         return sentiment_analysis
 
     def get_target_market_insights(self, website_url: str) -> Dict[str, Any]:
@@ -207,7 +203,7 @@ class SiteCommunicationAgent:
 
         market_insights = {
             "website": website_url,
-            "analysis_date": (datetime.now( if datetime else None)).isoformat(),
+            "analysis_date": datetime.now().isoformat(),
             "demographic_data": {
                 "age_groups": {
                     "18-24": "22%",
@@ -270,27 +266,27 @@ class SiteCommunicationAgent:
         """Generate comprehensive site insights report combining all data sources."""
 
         # Gather all available data
-        site_health = (self.gather_site_health_insights( if self else None)website_url)
-        customer_feedback = (self.analyze_customer_feedback( if self else None)website_url)
-        market_insights = (self.get_target_market_insights( if self else None)website_url)
+        site_health = self.gather_site_health_insights(website_url)
+        customer_feedback = self.analyze_customer_feedback(website_url)
+        market_insights = self.get_target_market_insights(website_url)
 
         # Check for chatbot connection
-        chatbot_data = self.(chatbot_connections.get( if chatbot_connections else None)
+        chatbot_data = self.chatbot_connections.get(
             website_url, {"status": "not_connected"}
         )
 
         comprehensive_report = {
             "website": website_url,
-            "report_generated": (datetime.now( if datetime else None)).isoformat(),
+            "report_generated": datetime.now().isoformat(),
             "executive_summary": {
                 "overall_health": (
                     "excellent"
-                    if (site_health.get( if site_health else None)"uptime_status") == "online"
+                    if site_health.get("uptime_status") == "online"
                     else "needs_attention"
                 ),
                 "customer_satisfaction": customer_feedback["sentiment_score"],
                 "market_position": "strong",
-                "technical_performance": (site_health.get( if site_health else None)"page_speed_score", 0),
+                "technical_performance": site_health.get("page_speed_score", 0),
                 "chatbot_integration": chatbot_data["status"],
             },
             "detailed_analysis": {
@@ -307,7 +303,7 @@ class SiteCommunicationAgent:
             ],
             "kpi_dashboard": {
                 "uptime_percentage": 99.9,
-                "average_response_time": (site_health.get( if site_health else None)"response_time", 0),
+                "average_response_time": site_health.get("response_time", 0),
                 "customer_satisfaction_score": customer_feedback["sentiment_score"],
                 "conversion_rate": "3.8%",
                 "mobile_traffic_percentage": "68%",
@@ -361,10 +357,10 @@ class SiteCommunicationAgent:
     ) -> Dict[str, Any]:
         """EXPERIMENTAL: Neural-powered communication analysis."""
         try:
-            (logger.info( if logger else None)f"🧠 Analyzing communication patterns for {website_url}")
+            logger.info(f"🧠 Analyzing communication patterns for {website_url}")
 
             return {
-                "analysis_id": str((uuid.uuid4( if uuid else None))),
+                "analysis_id": str(uuid.uuid4()),
                 "neural_communication": {
                     "conversation_quality": 97.3,
                     "emotional_resonance": 94.8,
@@ -419,13 +415,12 @@ class SiteCommunicationAgent:
                     "predictive_accuracy": "quantum_enhanced",
                 },
                 "status": "neural_analysis_complete",
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Neural communication analysis failed: {str(e)}")
+            logger.error(f"Neural communication analysis failed: {str(e)}")
             return {"error": str(e), "status": "neural_overload"}
-
 
 # Main communication function
 async def communicate_with_site() -> Dict[str, Any]:
@@ -440,5 +435,5 @@ async def communicate_with_site() -> Dict[str, Any]:
         "connection_status": "connected",
         "communication_health": "excellent",
         "agent_status": "active",
-        "timestamp": (datetime.now( if datetime else None)).isoformat(),
+        "timestamp": datetime.now().isoformat(),
     }

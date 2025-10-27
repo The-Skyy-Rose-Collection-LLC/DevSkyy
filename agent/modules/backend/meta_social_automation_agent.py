@@ -17,7 +17,7 @@ Meta Social Media Automation Agent
 Advanced Facebook & Instagram automation using Meta's Graph API
 
 Features:
-- Meta Graph API v18.0 integration
+    - Meta Graph API v18.0 integration
 - Instagram Business Account management
 - Facebook Page automation
 - Content scheduling and publishing
@@ -34,10 +34,7 @@ Features:
 - Ad campaign automation
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class MetaSocialAutomationAgent:
     """
@@ -47,15 +44,15 @@ class MetaSocialAutomationAgent:
 
     def __init__(self):
         # AI Services
-        self.claude = AsyncAnthropic(api_key=(os.getenv( if os else None)"ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=(os.getenv( if os else None)"OPENAI_API_KEY"))
+        self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         # Meta API Configuration
-        self.meta_app_id = (os.getenv( if os else None)"META_APP_ID")
-        self.meta_app_secret = (os.getenv( if os else None)"META_APP_SECRET")
-        self.meta_access_token = (os.getenv( if os else None)"META_ACCESS_TOKEN")
-        self.instagram_business_id = (os.getenv( if os else None)"INSTAGRAM_BUSINESS_ID")
-        self.facebook_page_id = (os.getenv( if os else None)"FACEBOOK_PAGE_ID")
+        self.meta_app_id = os.getenv("META_APP_ID")
+        self.meta_app_secret = os.getenv("META_APP_SECRET")
+        self.meta_access_token = os.getenv("META_ACCESS_TOKEN")
+        self.instagram_business_id = os.getenv("INSTAGRAM_BUSINESS_ID")
+        self.facebook_page_id = os.getenv("FACEBOOK_PAGE_ID")
 
         # API Endpoints
         self.graph_api_version = "v18.0"
@@ -108,7 +105,7 @@ class MetaSocialAutomationAgent:
             },
         }
 
-        (logger.info( if logger else None)"📱 Meta Social Automation Agent initialized")
+        logger.info("📱 Meta Social Automation Agent initialized")
 
     async def publish_content(
         self,
@@ -132,21 +129,21 @@ class MetaSocialAutomationAgent:
             Dict with posting results
         """
         try:
-            (logger.info( if logger else None)f"📤 Publishing content to {platforms}")
+            logger.info(f"📤 Publishing content to {platforms}")
 
             results = {}
 
             # Optimize content for each platform
-            optimized_content = await (self._optimize_content_for_platform( if self else None)
+            optimized_content = await self._optimize_content_for_platform(
                 content_text, platforms
             )
 
             # Generate hashtags
-            hashtags = await (self._generate_hashtags( if self else None)content_text)
+            hashtags = await self._generate_hashtags(content_text)
 
             # Publish to Instagram
             if "instagram" in platforms and self.instagram_business_id:
-                ig_result = await (self._publish_to_instagram( if self else None)
+                ig_result = await self._publish_to_instagram(
                     optimized_content["instagram"],
                     media_urls,
                     hashtags,
@@ -157,7 +154,7 @@ class MetaSocialAutomationAgent:
 
             # Publish to Facebook
             if "facebook" in platforms and self.facebook_page_id:
-                fb_result = await (self._publish_to_facebook( if self else None)
+                fb_result = await self._publish_to_facebook(
                     optimized_content["facebook"],
                     media_urls,
                     schedule_time,
@@ -165,18 +162,18 @@ class MetaSocialAutomationAgent:
                 results["facebook"] = fb_result
 
             # Track performance
-            await (self._track_post_performance( if self else None)results)
+            await self._track_post_performance(results)
 
             return {
                 "success": True,
                 "results": results,
                 "hashtags_used": hashtags,
                 "scheduled": schedule_time is not None,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Content publishing failed: {e}")
+            logger.error(f"❌ Content publishing failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _optimize_content_for_platform(
@@ -191,11 +188,11 @@ class MetaSocialAutomationAgent:
 Original Content: {content}
 
 Create optimized versions for:
-1. Instagram: Focus on visual storytelling, luxury lifestyle, use emojis
+    1. Instagram: Focus on visual storytelling, luxury lifestyle, use emojis
 2. Facebook: More detailed, community-focused, professional tone
 
 Requirements:
-- Maintain luxury brand voice
+    - Maintain luxury brand voice
 - Include clear CTAs
 - Optimize for engagement
 - Follow platform character limits
@@ -204,7 +201,7 @@ Requirements:
 
 Return JSON with: instagram_content, facebook_content"""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
@@ -216,18 +213,18 @@ Return JSON with: instagram_content, facebook_content"""
 
             # Extract JSON
 
-            json_match = (re.search( if re else None)r"\{.*\}", content_text, re.DOTALL)
+            json_match = re.search(r"\{.*\}", content_text, re.DOTALL)
             if json_match:
-                optimized = (json.loads( if json else None)(json_match.group( if json_match else None)))
+                optimized = json.loads(json_match.group())
                 return {
-                    "instagram": (optimized.get( if optimized else None)"instagram_content", content),
-                    "facebook": (optimized.get( if optimized else None)"facebook_content", content),
+                    "instagram": optimized.get("instagram_content", content),
+                    "facebook": optimized.get("facebook_content", content),
                 }
 
             return {"instagram": content, "facebook": content}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Content optimization failed: {e}")
+            logger.error(f"Content optimization failed: {e}")
             return {"instagram": content, "facebook": content}
 
     async def _generate_hashtags(self, content: str) -> List[str]:
@@ -240,7 +237,7 @@ Return JSON with: instagram_content, facebook_content"""
 Content: {content}
 
 Requirements:
-1. Mix of broad and niche hashtags
+    1. Mix of broad and niche hashtags
 2. Include branded hashtags (#TheSkyyRoseCollection)
 3. Target luxury fashion audience
 4. 10-15 hashtags total
@@ -248,7 +245,7 @@ Requirements:
 
 Return as JSON array of hashtags."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=500,
                 messages=[{"role": "user", "content": prompt}],
@@ -259,9 +256,9 @@ Return as JSON array of hashtags."""
 
             # Extract JSON array
 
-            json_match = (re.search( if re else None)r"\[.*\]", content_text, re.DOTALL)
+            json_match = re.search(r"\[.*\]", content_text, re.DOTALL)
             if json_match:
-                hashtags = (json.loads( if json else None)(json_match.group( if json_match else None)))
+                hashtags = json.loads(json_match.group())
                 return hashtags[:15]  # Limit to 15
 
             # Fallback hashtags
@@ -274,7 +271,7 @@ Return as JSON array of hashtags."""
             ]
 
         except Exception as e:
-            (logger.error( if logger else None)f"Hashtag generation failed: {e}")
+            logger.error(f"Hashtag generation failed: {e}")
             return ["#TheSkyyRoseCollection", "#LuxuryFashion"]
 
     async def _publish_to_instagram(
@@ -299,12 +296,12 @@ Return as JSON array of hashtags."""
             if media_urls and len(media_urls) > 0:
                 if len(media_urls) == 1:
                     # Single image/video post
-                    container_id = await (self._create_ig_media_container( if self else None)
+                    container_id = await self._create_ig_media_container(
                         media_urls[0], full_content, shopping_tags
                     )
                 else:
                     # Carousel post
-                    container_id = await (self._create_ig_carousel_container( if self else None)
+                    container_id = await self._create_ig_carousel_container(
                         media_urls, full_content, shopping_tags
                     )
             else:
@@ -313,14 +310,14 @@ Return as JSON array of hashtags."""
 
             # Publish or schedule
             if schedule_time:
-                result = await (self._schedule_ig_post( if self else None)container_id, schedule_time)
+                result = await self._schedule_ig_post(container_id, schedule_time)
             else:
-                result = await (self._publish_ig_container( if self else None)container_id)
+                result = await self._publish_ig_container(container_id)
 
             return result
 
         except Exception as e:
-            (logger.error( if logger else None)f"Instagram publishing failed: {e}")
+            logger.error(f"Instagram publishing failed: {e}")
             return {"error": str(e)}
 
     async def _create_ig_media_container(
@@ -340,19 +337,19 @@ Return as JSON array of hashtags."""
 
             # Add shopping tags if provided
             if shopping_tags:
-                params["product_tags"] = (json.dumps( if json else None)shopping_tags)
+                params["product_tags"] = json.dumps(shopping_tags)
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                response = await (client.post( if client else None)url, params=params)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(url, params=params)
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
-                    return (data.get( if data else None)"id")
+                    data = response.json()
+                    return data.get("id")
                 else:
                     raise Exception(f"Container creation failed: {response.text}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Media container creation failed: {e}")
+            logger.error(f"Media container creation failed: {e}")
             raise
 
     async def _create_ig_carousel_container(
@@ -372,11 +369,11 @@ Return as JSON array of hashtags."""
                     "access_token": self.meta_access_token,
                 }
 
-                async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                    response = await (client.post( if client else None)url, params=params)
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.post(url, params=params)
                     if response.status_code == 200:
-                        data = (response.json( if response else None))
-                        (child_ids.append( if child_ids else None)(data.get( if data else None)"id"))
+                        data = response.json()
+                        child_ids.append(data.get("id"))
 
             # Create carousel container
             url = f"{self.graph_api_base}/{self.instagram_business_id}/media"
@@ -388,19 +385,19 @@ Return as JSON array of hashtags."""
             }
 
             if shopping_tags:
-                params["product_tags"] = (json.dumps( if json else None)shopping_tags)
+                params["product_tags"] = json.dumps(shopping_tags)
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                response = await (client.post( if client else None)url, params=params)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(url, params=params)
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
-                    return (data.get( if data else None)"id")
+                    data = response.json()
+                    return data.get("id")
                 else:
                     raise Exception(f"Carousel creation failed: {response.text}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"Carousel container creation failed: {e}")
+            logger.error(f"Carousel container creation failed: {e}")
             raise
 
     async def _publish_ig_container(self, container_id: str) -> Dict[str, Any]:
@@ -414,21 +411,21 @@ Return as JSON array of hashtags."""
                 "access_token": self.meta_access_token,
             }
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                response = await (client.post( if client else None)url, params=params)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(url, params=params)
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
+                    data = response.json()
                     return {
                         "success": True,
-                        "post_id": (data.get( if data else None)"id"),
+                        "post_id": data.get("id"),
                         "platform": "instagram",
                     }
                 else:
                     return {"error": response.text}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Instagram publishing failed: {e}")
+            logger.error(f"Instagram publishing failed: {e}")
             return {"error": str(e)}
 
     async def _schedule_ig_post(
@@ -442,7 +439,7 @@ Return as JSON array of hashtags."""
         return {
             "scheduled": True,
             "container_id": container_id,
-            "schedule_time": (schedule_time.isoformat( if schedule_time else None)),
+            "schedule_time": schedule_time.isoformat(),
             "note": "Scheduled posting requires additional infrastructure",
         }
 
@@ -473,31 +470,31 @@ Return as JSON array of hashtags."""
                     params["link"] = media_urls[0]
                 else:
                     # Multiple photos (need to upload first)
-                    photo_ids = await (self._upload_fb_photos( if self else None)media_urls)
-                    params["attached_media"] = (json.dumps( if json else None)
+                    photo_ids = await self._upload_fb_photos(media_urls)
+                    params["attached_media"] = json.dumps(
                         [{"media_fbid": pid} for pid in photo_ids]
                     )
 
             # Schedule if requested
             if schedule_time:
                 params["published"] = False
-                params["scheduled_publish_time"] = int((schedule_time.timestamp( if schedule_time else None)))
+                params["scheduled_publish_time"] = int(schedule_time.timestamp())
 
-            async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                response = await (client.post( if client else None)url, params=params)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(url, params=params)
 
                 if response.status_code == 200:
-                    data = (response.json( if response else None))
+                    data = response.json()
                     return {
                         "success": True,
-                        "post_id": (data.get( if data else None)"id"),
+                        "post_id": data.get("id"),
                         "platform": "facebook",
                     }
                 else:
                     return {"error": response.text}
 
         except Exception as e:
-            (logger.error( if logger else None)f"Facebook publishing failed: {e}")
+            logger.error(f"Facebook publishing failed: {e}")
             return {"error": str(e)}
 
     async def _upload_fb_photos(self, media_urls: List[str]) -> List[str]:
@@ -515,15 +512,15 @@ Return as JSON array of hashtags."""
                     "access_token": self.meta_access_token,
                 }
 
-                async with (httpx.AsyncClient( if httpx else None)timeout=30.0) as client:
-                    response = await (client.post( if client else None)url, params=params)
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.post(url, params=params)
 
                     if response.status_code == 200:
-                        data = (response.json( if response else None))
-                        (photo_ids.append( if photo_ids else None)(data.get( if data else None)"id"))
+                        data = response.json()
+                        photo_ids.append(data.get("id"))
 
             except Exception as e:
-                (logger.error( if logger else None)f"Photo upload failed: {e}")
+                logger.error(f"Photo upload failed: {e}")
 
         return photo_ids
 
@@ -545,46 +542,46 @@ Return as JSON array of hashtags."""
             Dict with audience insights and targeting recommendations
         """
         try:
-            (logger.info( if logger else None)"🔍 Finding potential customers...")
+            logger.info("🔍 Finding potential customers...")
 
             # Build targeting spec
             targeting_spec = {
-                "geo_locations": (demographics.get( if demographics else None)"locations", {"countries": ["US"]}),
-                "age_min": (demographics.get( if demographics else None)"age_min", 25),
-                "age_max": (demographics.get( if demographics else None)"age_max", 65),
-                "genders": (demographics.get( if demographics else None)"genders", [1, 2]),  # All genders
-                "interests": await (self._get_interest_ids( if self else None)target_interests),
+                "geo_locations": demographics.get("locations", {"countries": ["US"]}),
+                "age_min": demographics.get("age_min", 25),
+                "age_max": demographics.get("age_max", 65),
+                "genders": demographics.get("genders", [1, 2]),  # All genders
+                "interests": await self._get_interest_ids(target_interests),
             }
 
             if behavior:
-                targeting_spec["behaviors"] = await (self._get_behavior_ids( if self else None)behavior)
+                targeting_spec["behaviors"] = await self._get_behavior_ids(behavior)
 
             # Get audience insights
-            insights = await (self._get_audience_insights( if self else None)targeting_spec)
+            insights = await self._get_audience_insights(targeting_spec)
 
             # Generate customer personas
-            personas = await (self._generate_customer_personas( if self else None)insights)
+            personas = await self._generate_customer_personas(insights)
 
             # Create lookalike audience suggestions
-            lookalike_suggestions = await (self._suggest_lookalike_audiences( if self else None))
+            lookalike_suggestions = await self._suggest_lookalike_audiences()
 
             return {
-                "audience_size": (insights.get( if insights else None)"audience_size", 0),
+                "audience_size": insights.get("audience_size", 0),
                 "targeting_spec": targeting_spec,
                 "customer_personas": personas,
                 "lookalike_suggestions": lookalike_suggestions,
-                "engagement_prediction": (insights.get( if insights else None)"engagement_rate", 0.05),
-                "recommended_budget": (insights.get( if insights else None)"recommended_budget", "$50-100/day"),
+                "engagement_prediction": insights.get("engagement_rate", 0.05),
+                "recommended_budget": insights.get("recommended_budget", "$50-100/day"),
                 "best_placements": [
                     "instagram_feed",
                     "instagram_stories",
                     "facebook_feed",
                 ],
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Customer finding failed: {e}")
+            logger.error(f"❌ Customer finding failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _get_interest_ids(self, interests: List[str]) -> List[Dict]:
@@ -601,7 +598,7 @@ Return as JSON array of hashtags."""
         }
 
         return [
-            (interest_map.get( if interest_map else None)(interest.lower( if interest else None)), {"name": interest})
+            interest_map.get(interest.lower(), {"name": interest})
             for interest in interests
         ]
 
@@ -619,7 +616,7 @@ Return as JSON array of hashtags."""
         }
 
         return [
-            (behavior_map.get( if behavior_map else None)(behavior.lower( if behavior else None)), {"name": behavior})
+            behavior_map.get(behavior.lower(), {"name": behavior})
             for behavior in behaviors
         ]
 
@@ -629,8 +626,8 @@ Return as JSON array of hashtags."""
         """
         # Simplified insights - in production would use Audience Insights API
         return {
-            "audience_size": (random.randint( if random else None)100000, 1000000),
-            "engagement_rate": (random.uniform( if random else None)0.03, 0.08),
+            "audience_size": random.randint(100000, 1000000),
+            "engagement_rate": random.uniform(0.03, 0.08),
             "recommended_budget": "$50-150/day",
             "peak_times": ["10:00", "14:00", "20:00"],
         }
@@ -648,7 +645,7 @@ Target: High-end fashion consumers
 Focus: The Skyy Rose Collection
 
 Create detailed personas including:
-1. Name and demographics
+    1. Name and demographics
 2. Lifestyle and interests
 3. Shopping behavior
 4. Social media usage
@@ -657,7 +654,7 @@ Create detailed personas including:
 
 Return as JSON array."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}],
@@ -668,14 +665,14 @@ Return as JSON array."""
 
             # Extract JSON
 
-            json_match = (re.search( if re else None)r"\[.*\]", content_text, re.DOTALL)
+            json_match = re.search(r"\[.*\]", content_text, re.DOTALL)
             if json_match:
-                return (json.loads( if json else None)(json_match.group( if json_match else None)))
+                return json.loads(json_match.group())
 
             return []
 
         except Exception as e:
-            (logger.error( if logger else None)f"Persona generation failed: {e}")
+            logger.error(f"Persona generation failed: {e}")
             return []
 
     async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
@@ -717,17 +714,17 @@ Return as JSON array."""
             Dict with content and strategy
         """
         try:
-            (logger.info( if logger else None)"🚀 Generating viral content...")
+            logger.info("🚀 Generating viral content...")
 
             # Generate viral content ideas
             prompt = f"""Create viral social media content for luxury fashion:
 
-Product: {(product_info.get( if product_info else None)'name')}
-Description: {(product_info.get( if product_info else None)'description')}
-Price: ${(product_info.get( if product_info else None)'price')}
+Product: {product_info.get('name')}
+Description: {product_info.get('description')}
+Price: ${product_info.get('price')}
 
 Generate:
-1. Viral reel concept (15-30 seconds)
+    1. Viral reel concept (15-30 seconds)
 2. Engaging story series (3-5 frames)
 3. Carousel post idea (5-10 slides)
 4. Caption with hook
@@ -735,14 +732,14 @@ Generate:
 6. Hashtag strategy
 
 Focus on:
-- Luxury lifestyle aspiration
+    - Luxury lifestyle aspiration
 - FOMO creation
 - User-generated content potential
 - Shareable moments
 
 Return detailed content plan."""
 
-            response = await self.claude.(messages.create( if messages else None)
+            response = await self.claude.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}],
@@ -752,20 +749,20 @@ Return detailed content plan."""
             content_plan = response.content[0].text
 
             # Generate visuals description
-            visual_concepts = await (self._generate_visual_concepts( if self else None)product_info)
+            visual_concepts = await self._generate_visual_concepts(product_info)
 
             return {
                 "content_plan": content_plan,
                 "visual_concepts": visual_concepts,
-                "optimal_posting_time": await (self._get_optimal_posting_time( if self else None)),
+                "optimal_posting_time": await self._get_optimal_posting_time(),
                 "expected_reach": "50K-200K",
                 "expected_engagement": "5-10%",
-                "virality_score": (random.uniform( if random else None)7, 9),
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "virality_score": random.uniform(7, 9),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Viral content generation failed: {e}")
+            logger.error(f"❌ Viral content generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _generate_visual_concepts(
@@ -798,14 +795,14 @@ Return detailed content plan."""
         """
         # In production, would use actual audience data
         optimal_times = ["10:00", "14:00", "19:00", "21:00"]
-        return (random.choice( if random else None)optimal_times)
+        return random.choice(optimal_times)
 
     async def _track_post_performance(self, posts: Dict[str, Any]) -> None:
         """
         Track and analyze post performance.
         """
         # Would implement actual tracking using Insights API
-        (logger.info( if logger else None)f"📊 Tracking performance for {len(posts)} posts")
+        logger.info(f"📊 Tracking performance for {len(posts)} posts")
 
     async def automate_engagement(
         self, response_templates: Optional[Dict[str, str]] = None
@@ -820,25 +817,25 @@ Return detailed content plan."""
             Dict with engagement automation results
         """
         try:
-            (logger.info( if logger else None)"🤖 Starting engagement automation...")
+            logger.info("🤖 Starting engagement automation...")
 
             # Get recent comments and messages
-            comments = await (self._get_recent_comments( if self else None))
-            messages = await (self._get_recent_messages( if self else None))
+            comments = await self._get_recent_comments()
+            messages = await self._get_recent_messages()
 
             # Process and respond
             responses_sent = 0
 
             for comment in comments:
-                if await (self._should_respond_to_comment( if self else None)comment):
-                    response = await (self._generate_comment_response( if self else None)comment)
-                    await (self._post_comment_reply( if self else None)comment["id"], response)
+                if await self._should_respond_to_comment(comment):
+                    response = await self._generate_comment_response(comment)
+                    await self._post_comment_reply(comment["id"], response)
                     responses_sent += 1
 
             for message in messages:
-                if await (self._should_respond_to_message( if self else None)message):
-                    response = await (self._generate_message_response( if self else None)message)
-                    await (self._send_message_reply( if self else None)message["id"], response)
+                if await self._should_respond_to_message(message):
+                    response = await self._generate_message_response(message)
+                    await self._send_message_reply(message["id"], response)
                     responses_sent += 1
 
             return {
@@ -846,11 +843,11 @@ Return detailed content plan."""
                 "messages_processed": len(messages),
                 "responses_sent": responses_sent,
                 "automation_active": True,
-                "timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Engagement automation failed: {e}")
+            logger.error(f"❌ Engagement automation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
     async def _get_recent_comments(self) -> List[Dict[str, Any]]:
@@ -902,30 +899,24 @@ Return detailed content plan."""
         Send DM reply.
         """
 
-
 # Factory function
 def create_meta_automation_agent() -> MetaSocialAutomationAgent:
     """Create Meta Social Automation Agent."""
     return MetaSocialAutomationAgent()
 
-
 # Global instance
-meta_agent = create_meta_automation_agent()
-
-
-# Convenience functions
+meta_agent = create_meta_automation_agent(
+    # Convenience functions
 async def publish_to_meta(
     content: str, platforms: List[str] = ["instagram", "facebook"]
 ) -> Dict[str, Any]:
     """Publish content to Meta platforms."""
-    return await (meta_agent.publish_content( if meta_agent else None)content, platforms=platforms)
-
+    return await meta_agent.publish_content(content, platforms=platforms)
 
 async def find_customers(interests: List[str]) -> Dict[str, Any]:
     """Find potential customers."""
-    return await (meta_agent.find_potential_customers( if meta_agent else None)interests)
-
+    return await meta_agent.find_potential_customers(interests)
 
 async def generate_viral(product: Dict[str, Any]) -> Dict[str, Any]:
     """Generate viral content."""
-    return await (meta_agent.generate_viral_content( if meta_agent else None)product)
+    return await meta_agent.generate_viral_content(product)

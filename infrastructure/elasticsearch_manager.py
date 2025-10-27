@@ -15,10 +15,7 @@ Implements full-text search, real-time analytics, and fashion industry specific 
 Target: <2-second query response times with relevance scoring
 """
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 @dataclass
 class SearchMetrics:
@@ -47,10 +44,9 @@ class SearchMetrics:
             "success_rate": self.success_rate,
             "avg_response_time": self.avg_response_time,
             "last_updated": (
-                self.(last_updated.isoformat( if last_updated else None)) if self.last_updated else None
+                self.last_updated.isoformat() if self.last_updated else None
             ),
         }
-
 
 class ElasticsearchManager:
     """Enterprise Elasticsearch manager with fashion industry optimization"""
@@ -103,12 +99,12 @@ class ElasticsearchManager:
         }
 
         # Index mappings for fashion e-commerce
-        self.index_mappings = (self._get_index_mappings( if self else None))
+        self.index_mappings = self._get_index_mappings()
 
         # ILM policies for automated index lifecycle management
-        self.ilm_policies = (self._get_ilm_policies( if self else None))
+        self.ilm_policies = self._get_ilm_policies()
 
-        (logger.info( if logger else None)f"Elasticsearch manager initialized - Hosts: {self.hosts}")
+        logger.info(f"Elasticsearch manager initialized - Hosts: {self.hosts}")
 
     def _get_index_mappings(self) -> Dict[str, Dict]:
         """Get index mappings for fashion e-commerce"""
@@ -302,69 +298,69 @@ class ElasticsearchManager:
         """Establish Elasticsearch connection and verify connectivity"""
         try:
             # Test connection
-            info = await self.(client.info( if client else None))
+            info = await self.client.info()
             self.is_connected = True
 
-            (logger.info( if logger else None)f"✅ Elasticsearch connected: {info['version']['number']}")
+            logger.info(f"✅ Elasticsearch connected: {info['version']['number']}")
 
             # Initialize indices and ILM policies
-            await (self._initialize_indices( if self else None))
-            await (self._setup_ilm_policies( if self else None))
+            await self._initialize_indices()
+            await self._setup_ilm_policies()
 
             return True
 
         except ElasticsearchException as e:
-            (logger.error( if logger else None)f"❌ Elasticsearch connection failed: {e}")
+            logger.error(f"❌ Elasticsearch connection failed: {e}")
             self.is_connected = False
             return False
 
     async def disconnect(self):
         """Close Elasticsearch connection"""
         try:
-            await self.(client.close( if client else None))
+            await self.client.close()
             self.is_connected = False
-            (logger.info( if logger else None)"Elasticsearch connection closed")
+            logger.info("Elasticsearch connection closed")
         except Exception as e:
-            (logger.error( if logger else None)f"Error closing Elasticsearch connection: {e}")
+            logger.error(f"Error closing Elasticsearch connection: {e}")
 
     async def _initialize_indices(self):
         """Initialize indices with proper mappings"""
-        for index_name, index_config in self.(index_mappings.items( if index_mappings else None)):
+        for index_name, index_config in self.index_mappings.items():
             full_index_name = self.indices[index_name]
 
             try:
                 # Check if index exists
-                exists = await self.client.(indices.exists( if indices else None)index=full_index_name)
+                exists = await self.client.indices.exists(index=full_index_name)
 
                 if not exists:
                     # Create index with mapping
-                    await self.client.(indices.create( if indices else None)
+                    await self.client.indices.create(
                         index=full_index_name, body=index_config
                     )
-                    (logger.info( if logger else None)f"Created index: {full_index_name}")
+                    logger.info(f"Created index: {full_index_name}")
                 else:
-                    (logger.debug( if logger else None)f"Index already exists: {full_index_name}")
+                    logger.debug(f"Index already exists: {full_index_name}")
 
             except RequestError as e:
-                (logger.error( if logger else None)f"Error creating index {full_index_name}: {e}")
+                logger.error(f"Error creating index {full_index_name}: {e}")
 
     async def _setup_ilm_policies(self):
         """Setup Index Lifecycle Management policies"""
-        for policy_name, policy_config in self.(ilm_policies.items( if ilm_policies else None)):
+        for policy_name, policy_config in self.ilm_policies.items():
             try:
                 # Check if policy exists
                 try:
-                    await self.client.(ilm.get_lifecycle( if ilm else None)policy=policy_name)
-                    (logger.debug( if logger else None)f"ILM policy already exists: {policy_name}")
+                    await self.client.ilm.get_lifecycle(policy=policy_name)
+                    logger.debug(f"ILM policy already exists: {policy_name}")
                 except NotFoundError:
                     # Create policy
-                    await self.client.(ilm.put_lifecycle( if ilm else None)
+                    await self.client.ilm.put_lifecycle(
                         policy=policy_name, body=policy_config
                     )
-                    (logger.info( if logger else None)f"Created ILM policy: {policy_name}")
+                    logger.info(f"Created ILM policy: {policy_name}")
 
             except RequestError as e:
-                (logger.error( if logger else None)f"Error creating ILM policy {policy_name}: {e}")
+                logger.error(f"Error creating ILM policy {policy_name}: {e}")
 
     async def _record_metrics(self, response_time: float, success: bool):
         """Record search performance metrics"""
@@ -379,38 +375,38 @@ class ElasticsearchManager:
         self.metrics.avg_response_time = (
             self.metrics.total_response_time / self.metrics.total_queries
         )
-        self.metrics.last_updated = (datetime.now( if datetime else None))
+        self.metrics.last_updated = datetime.now()
 
     async def index_document(
         self, index_type: str, document: Dict[str, Any], doc_id: Optional[str] = None
     ) -> bool:
         """Index a document"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            index_name = self.(indices.get( if indices else None)index_type)
+            index_name = self.indices.get(index_type)
             if not index_name:
                 raise ValueError(f"Unknown index type: {index_type}")
 
             # Add timestamp if not present
             if "timestamp" not in document:
-                document["timestamp"] = (datetime.now( if datetime else None)).isoformat()
+                document["timestamp"] = datetime.now().isoformat()
 
             # Index document
-            response = await self.(client.index( if client else None)
+            response = await self.client.index(
                 index=index_name, body=document, id=doc_id
             )
 
-            response_time = ((time.time( if time else None)) - start_time) * 1000
-            await (self._record_metrics( if self else None)response_time, True)
+            response_time = (time.time() - start_time) * 1000
+            await self._record_metrics(response_time, True)
 
-            (logger.debug( if logger else None)f"Document indexed: {index_name}/{response['_id']}")
+            logger.debug(f"Document indexed: {index_name}/{response['_id']}")
             return True
 
         except ElasticsearchException as e:
-            response_time = ((time.time( if time else None)) - start_time) * 1000
-            await (self._record_metrics( if self else None)response_time, False)
-            (logger.error( if logger else None)f"Error indexing document: {e}")
+            response_time = (time.time() - start_time) * 1000
+            await self._record_metrics(response_time, False)
+            logger.error(f"Error indexing document: {e}")
             return False
 
     async def search(
@@ -422,10 +418,10 @@ class ElasticsearchManager:
         sort: List[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Perform search query"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
-            index_name = self.(indices.get( if indices else None)index_type)
+            index_name = self.indices.get(index_type)
             if not index_name:
                 raise ValueError(f"Unknown index type: {index_type}")
 
@@ -434,14 +430,14 @@ class ElasticsearchManager:
             if sort:
                 search_body["sort"] = sort
 
-            response = await self.(client.search( if client else None)index=index_name, body=search_body)
+            response = await self.client.search(index=index_name, body=search_body)
 
-            response_time = ((time.time( if time else None)) - start_time) * 1000
-            await (self._record_metrics( if self else None)response_time, True)
+            response_time = (time.time() - start_time) * 1000
+            await self._record_metrics(response_time, True)
 
             # Check if response time meets target (<2 seconds)
             if response_time > 2000:
-                (logger.warning( if logger else None)
+                logger.warning(
                     f"Search query exceeded target response time: {response_time:.2f}ms"
                 )
 
@@ -454,9 +450,9 @@ class ElasticsearchManager:
             }
 
         except ElasticsearchException as e:
-            response_time = ((time.time( if time else None)) - start_time) * 1000
-            await (self._record_metrics( if self else None)response_time, False)
-            (logger.error( if logger else None)f"Search error: {e}")
+            response_time = (time.time() - start_time) * 1000
+            await self._record_metrics(response_time, False)
+            logger.error(f"Search error: {e}")
             return {
                 "hits": [],
                 "total": 0,
@@ -509,7 +505,7 @@ class ElasticsearchManager:
         if min_score > 0:
             query["bool"]["filter"] = {"range": {"_score": {"gte": min_score}}}
 
-        return await (self.search( if self else None)
+        return await self.search(
             index_type=index_type,
             query=query,
             size=size,
@@ -556,7 +552,7 @@ class ElasticsearchManager:
                 {"range": {"popularity_score": {"gte": min_popularity}}}
             )
 
-        return await (self.search( if self else None)
+        return await self.search(
             index_type="fashion_trends",
             query=query,
             sort=[
@@ -582,8 +578,8 @@ class ElasticsearchManager:
                     {
                         "range": {
                             "timestamp": {
-                                "gte": (start_date.isoformat( if start_date else None)),
-                                "lte": (end_date.isoformat( if end_date else None)),
+                                "gte": start_date.isoformat(),
+                                "lte": end_date.isoformat(),
                             }
                         }
                     },
@@ -599,7 +595,7 @@ class ElasticsearchManager:
         }
 
         try:
-            response = await self.(client.search( if client else None)
+            response = await self.client.search(
                 index=self.indices["analytics"],
                 body={"query": query, "aggs": aggs, "size": 0},
             )
@@ -621,7 +617,7 @@ class ElasticsearchManager:
             }
 
         except ElasticsearchException as e:
-            (logger.error( if logger else None)f"Analytics query error: {e}")
+            logger.error(f"Analytics query error: {e}")
             return {"error": str(e)}
 
     async def get_metrics(self) -> Dict[str, Any]:
@@ -630,32 +626,32 @@ class ElasticsearchManager:
         indices_stats = None
 
         try:
-            cluster_health = await self.client.(cluster.health( if cluster else None))
-            indices_stats = await self.client.(indices.stats( if indices else None))
+            cluster_health = await self.client.cluster.health()
+            indices_stats = await self.client.indices.stats()
         except ElasticsearchException as e:
-            (logger.error( if logger else None)f"Error getting cluster metrics: {e}")
+            logger.error(f"Error getting cluster metrics: {e}")
 
         return {
-            "search_metrics": self.(metrics.to_dict( if metrics else None)),
+            "search_metrics": self.metrics.to_dict(),
             "cluster_health": cluster_health,
             "indices_stats": indices_stats,
             "is_connected": self.is_connected,
-            "configured_indices": list(self.(indices.keys( if indices else None))),
+            "configured_indices": list(self.indices.keys()),
         }
 
     async def health_check(self) -> Dict[str, Any]:
         """Comprehensive health check"""
-        start_time = (time.time( if time else None))
+        start_time = time.time()
 
         try:
             # Test basic connectivity
-            cluster_health = await self.client.(cluster.health( if cluster else None))
+            cluster_health = await self.client.cluster.health()
 
             # Test search operation
             test_query = {"match_all": {}}
-            search_result = await (self.search( if self else None)"logs", test_query, size=1)
+            search_result = await self.search("logs", test_query, size=1)
 
-            response_time = ((time.time( if time else None)) - start_time) * 1000
+            response_time = (time.time() - start_time) * 1000
 
             return {
                 "status": "healthy",
@@ -666,16 +662,15 @@ class ElasticsearchManager:
                 "target_response_time": "<2000ms",
                 "meets_target": response_time < 2000,
                 "search_test": "passed" if "error" not in search_result else "failed",
-                "metrics": await (self.get_metrics( if self else None)),
+                "metrics": await self.get_metrics(),
             }
 
         except Exception as e:
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "response_time_ms": ((time.time( if time else None)) - start_time) * 1000,
+                "response_time_ms": (time.time() - start_time) * 1000,
             }
-
 
 # Global Elasticsearch manager instance
 elasticsearch_manager = ElasticsearchManager()

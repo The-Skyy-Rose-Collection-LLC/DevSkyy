@@ -6,27 +6,27 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
         from agent.modules.backend.advanced_code_generation_agent import (
-        from agent.modules.backend.blockchain_nft_luxury_assets import (
-        from agent.modules.backend.brand_intelligence_agent import agent as brand_agent
+            from agent.modules.backend.blockchain_nft_luxury_assets import (
+                from agent.modules.backend.brand_intelligence_agent import agent as brand_agent
         from agent.modules.backend.claude_sonnet_intelligence_service import (
-        from agent.modules.backend.customer_service_agent import agent as cs_agent
+            from agent.modules.backend.customer_service_agent import agent as cs_agent
         from agent.modules.backend.ecommerce_agent import agent as ecom_agent
         from agent.modules.backend.email_sms_automation_agent import (
-        from agent.modules.backend.financial_agent import agent as financial_agent
+            from agent.modules.backend.financial_agent import agent as financial_agent
         from agent.modules.backend.fixer import fixer_agent
         from agent.modules.backend.fixer_v2 import fixer_agent
         from agent.modules.backend.inventory_agent import agent as inventory_agent
         from agent.modules.backend.multi_model_ai_orchestrator import agent as mm_agent
         from agent.modules.backend.openai_intelligence_service import (
-        from agent.modules.backend.performance_agent import agent as perf_agent
+            from agent.modules.backend.performance_agent import agent as perf_agent
         from agent.modules.backend.scanner import scanner_agent
         from agent.modules.backend.scanner_v2 import scanner_agent
         from agent.modules.backend.security_agent import agent as security_agent
         from agent.modules.backend.seo_marketing_agent import agent as seo_agent
         from agent.modules.backend.social_media_automation_agent import (
-        from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
+            from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
         from agent.modules.marketing_content_generation_agent import (
-from api.validation_models import AgentExecutionRequest
+            from api.validation_models import AgentExecutionRequest
 from typing import Any, Dict, List, Optional
 import logging
 
@@ -35,18 +35,13 @@ Complete Agent API Endpoints - All 54 Agents
 Organized by category with consistent interface
 """
 
-
-
-
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/agents", tags=["agents"])
-
 
 # ============================================================================
 # REQUEST/RESPONSE MODELS
 # ============================================================================
-
 
 # Using enhanced AgentExecutionRequest from validation_models
 # Legacy model kept for backward compatibility
@@ -59,7 +54,6 @@ class LegacyAgentExecutionRequest(BaseModel):
     )
     priority: Optional[str] = Field(default="medium", description="Execution priority")
 
-
 class AgentExecuteResponse(BaseModel):
     """Generic agent execution response"""
 
@@ -69,7 +63,6 @@ class AgentExecuteResponse(BaseModel):
     execution_time_ms: float
     timestamp: str
 
-
 class BatchRequest(BaseModel):
     """Batch execution request"""
 
@@ -78,13 +71,11 @@ class BatchRequest(BaseModel):
     )
     parallel: bool = Field(default=True, description="Execute operations in parallel")
 
-
 # ============================================================================
 # SCANNER AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/scanner/execute", response_model=AgentExecuteResponse)
+@router.post("/scanner/execute", response_model=AgentExecuteResponse)
 async def execute_scanner(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -92,21 +83,20 @@ async def execute_scanner(
     """Execute Scanner Agent - Code and site analysis"""
     try:
 
-        result = await (scanner_agent.execute_core_function( if scanner_agent else None)**request.parameters)
+        result = await scanner_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Scanner",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Scanner execution failed: {e}")
+        logger.error(f"Scanner execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/scanner-v2/execute", response_model=AgentExecuteResponse)
+@router.post("/scanner-v2/execute", response_model=AgentExecuteResponse)
 async def execute_scanner_v2(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -114,73 +104,68 @@ async def execute_scanner_v2(
     """Execute Scanner Agent V2 - Enhanced scanner with security scanning"""
     try:
 
-        result = await (scanner_agent.execute_core_function( if scanner_agent else None)**request.parameters)
+        result = await scanner_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Scanner V2",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Scanner V2 execution failed: {e}")
+        logger.error(f"Scanner V2 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # FIXER AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/fixer/execute", response_model=AgentExecuteResponse)
+@router.post("/fixer/execute", response_model=AgentExecuteResponse)
 async def execute_fixer(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Fixer Agent - Automated code fixing"""
     try:
 
-        result = await (fixer_agent.execute_core_function( if fixer_agent else None)**request.parameters)
+        result = await fixer_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Fixer",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Fixer execution failed: {e}")
+        logger.error(f"Fixer execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/fixer-v2/execute", response_model=AgentExecuteResponse)
+@router.post("/fixer-v2/execute", response_model=AgentExecuteResponse)
 async def execute_fixer_v2(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Fixer Agent V2 - Enhanced auto-fixing with AI"""
     try:
 
-        result = await (fixer_agent.execute_core_function( if fixer_agent else None)**request.parameters)
+        result = await fixer_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Fixer V2",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Fixer V2 execution failed: {e}")
+        logger.error(f"Fixer V2 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # AI INTELLIGENCE SERVICES
 # ============================================================================
 
-
-@(router.post( if router else None)"/claude-sonnet/execute", response_model=AgentExecuteResponse)
+@router.post("/claude-sonnet/execute", response_model=AgentExecuteResponse)
 async def execute_claude_sonnet(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -190,21 +175,20 @@ async def execute_claude_sonnet(
             agent as claude_agent,
         )
 
-        result = await (claude_agent.execute_core_function( if claude_agent else None)**request.parameters)
+        result = await claude_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Claude Sonnet",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Claude Sonnet execution failed: {e}")
+        logger.error(f"Claude Sonnet execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/openai/execute", response_model=AgentExecuteResponse)
+@router.post("/openai/execute", response_model=AgentExecuteResponse)
 async def execute_openai(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -214,21 +198,20 @@ async def execute_openai(
             agent as openai_agent,
         )
 
-        result = await (openai_agent.execute_core_function( if openai_agent else None)**request.parameters)
+        result = await openai_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="OpenAI",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"OpenAI execution failed: {e}")
+        logger.error(f"OpenAI execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/multi-model-ai/execute", response_model=AgentExecuteResponse)
+@router.post("/multi-model-ai/execute", response_model=AgentExecuteResponse)
 async def execute_multi_model_ai(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -236,26 +219,24 @@ async def execute_multi_model_ai(
     """Execute Multi-Model AI Orchestrator - Routes to best model"""
     try:
 
-        result = await (mm_agent.execute_core_function( if mm_agent else None)**request.parameters)
+        result = await mm_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Multi-Model AI",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Multi-Model AI execution failed: {e}")
+        logger.error(f"Multi-Model AI execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # E-COMMERCE AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/ecommerce/execute", response_model=AgentExecuteResponse)
+@router.post("/ecommerce/execute", response_model=AgentExecuteResponse)
 async def execute_ecommerce(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -263,21 +244,20 @@ async def execute_ecommerce(
     """Execute E-commerce Agent - General e-commerce operations"""
     try:
 
-        result = await (ecom_agent.execute_core_function( if ecom_agent else None)**request.parameters)
+        result = await ecom_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="E-commerce",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"E-commerce execution failed: {e}")
+        logger.error(f"E-commerce execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/inventory/execute", response_model=AgentExecuteResponse)
+@router.post("/inventory/execute", response_model=AgentExecuteResponse)
 async def execute_inventory(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -285,21 +265,20 @@ async def execute_inventory(
     """Execute Inventory Agent - Inventory management and forecasting"""
     try:
 
-        result = await (inventory_agent.execute_core_function( if inventory_agent else None)**request.parameters)
+        result = await inventory_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Inventory",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Inventory execution failed: {e}")
+        logger.error(f"Inventory execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/financial/execute", response_model=AgentExecuteResponse)
+@router.post("/financial/execute", response_model=AgentExecuteResponse)
 async def execute_financial(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -307,26 +286,24 @@ async def execute_financial(
     """Execute Financial Agent - Payment processing and analytics"""
     try:
 
-        result = await (financial_agent.execute_core_function( if financial_agent else None)**request.parameters)
+        result = await financial_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Financial",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Financial execution failed: {e}")
+        logger.error(f"Financial execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # MARKETING & BRAND AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/brand-intelligence/execute", response_model=AgentExecuteResponse)
+@router.post("/brand-intelligence/execute", response_model=AgentExecuteResponse)
 async def execute_brand_intelligence(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -334,21 +311,20 @@ async def execute_brand_intelligence(
     """Execute Brand Intelligence Agent - Brand insights and analysis"""
     try:
 
-        result = await (brand_agent.execute_core_function( if brand_agent else None)**request.parameters)
+        result = await brand_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Brand Intelligence",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Brand Intelligence execution failed: {e}")
+        logger.error(f"Brand Intelligence execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/seo-marketing/execute", response_model=AgentExecuteResponse)
+@router.post("/seo-marketing/execute", response_model=AgentExecuteResponse)
 async def execute_seo_marketing(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -356,21 +332,20 @@ async def execute_seo_marketing(
     """Execute SEO Marketing Agent - SEO optimization and strategy"""
     try:
 
-        result = await (seo_agent.execute_core_function( if seo_agent else None)**request.parameters)
+        result = await seo_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="SEO Marketing",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"SEO Marketing execution failed: {e}")
+        logger.error(f"SEO Marketing execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/social-media/execute", response_model=AgentExecuteResponse)
+@router.post("/social-media/execute", response_model=AgentExecuteResponse)
 async def execute_social_media(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -380,21 +355,20 @@ async def execute_social_media(
             agent as social_agent,
         )
 
-        result = await (social_agent.execute_core_function( if social_agent else None)**request.parameters)
+        result = await social_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Social Media",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Social Media execution failed: {e}")
+        logger.error(f"Social Media execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/email-sms/execute", response_model=AgentExecuteResponse)
+@router.post("/email-sms/execute", response_model=AgentExecuteResponse)
 async def execute_email_sms(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -404,21 +378,20 @@ async def execute_email_sms(
             agent as email_agent,
         )
 
-        result = await (email_agent.execute_core_function( if email_agent else None)**request.parameters)
+        result = await email_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Email/SMS",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Email/SMS execution failed: {e}")
+        logger.error(f"Email/SMS execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/marketing-content/execute", response_model=AgentExecuteResponse)
+@router.post("/marketing-content/execute", response_model=AgentExecuteResponse)
 async def execute_marketing_content(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -428,26 +401,24 @@ async def execute_marketing_content(
             agent as content_agent,
         )
 
-        result = await (content_agent.execute_core_function( if content_agent else None)**request.parameters)
+        result = await content_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Marketing Content",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Marketing Content execution failed: {e}")
+        logger.error(f"Marketing Content execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # WORDPRESS & CMS AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/wordpress/execute", response_model=AgentExecuteResponse)
+@router.post("/wordpress/execute", response_model=AgentExecuteResponse)
 async def execute_wordpress(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -455,21 +426,20 @@ async def execute_wordpress(
     """Execute WordPress Agent - WordPress integration"""
     try:
 
-        result = await (wp_agent.execute_core_function( if wp_agent else None)**request.parameters)
+        result = await wp_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="WordPress",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"WordPress execution failed: {e}")
+        logger.error(f"WordPress execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/wordpress-theme-builder/execute", response_model=AgentExecuteResponse)
+@router.post("/wordpress-theme-builder/execute", response_model=AgentExecuteResponse)
 async def execute_wordpress_theme_builder(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -484,19 +454,17 @@ async def execute_wordpress_theme_builder(
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"WordPress Theme Builder execution failed: {e}")
+        logger.error(f"WordPress Theme Builder execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # CUSTOMER SERVICE AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/customer-service/execute", response_model=AgentExecuteResponse)
+@router.post("/customer-service/execute", response_model=AgentExecuteResponse)
 async def execute_customer_service(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -504,21 +472,20 @@ async def execute_customer_service(
     """Execute Customer Service Agent - AI customer support"""
     try:
 
-        result = await (cs_agent.execute_core_function( if cs_agent else None)**request.parameters)
+        result = await cs_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Customer Service",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Customer Service execution failed: {e}")
+        logger.error(f"Customer Service execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/voice-audio/execute", response_model=AgentExecuteResponse)
+@router.post("/voice-audio/execute", response_model=AgentExecuteResponse)
 async def execute_voice_audio(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -526,26 +493,24 @@ async def execute_voice_audio(
     """Execute Voice/Audio Content Agent - Voice synthesis and processing"""
     try:
 
-        result = await (voice_agent.execute_core_function( if voice_agent else None)**request.parameters)
+        result = await voice_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Voice/Audio",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Voice/Audio execution failed: {e}")
+        logger.error(f"Voice/Audio execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # ADVANCED AGENTS
 # ============================================================================
 
-
-@(router.post( if router else None)"/blockchain-nft/execute", response_model=AgentExecuteResponse)
+@router.post("/blockchain-nft/execute", response_model=AgentExecuteResponse)
 async def execute_blockchain_nft(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -555,21 +520,20 @@ async def execute_blockchain_nft(
             agent as nft_agent,
         )
 
-        result = await (nft_agent.execute_core_function( if nft_agent else None)**request.parameters)
+        result = await nft_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Blockchain/NFT",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Blockchain/NFT execution failed: {e}")
+        logger.error(f"Blockchain/NFT execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/code-generation/execute", response_model=AgentExecuteResponse)
+@router.post("/code-generation/execute", response_model=AgentExecuteResponse)
 async def execute_code_generation(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
@@ -578,42 +542,40 @@ async def execute_code_generation(
             agent as codegen_agent,
         )
 
-        result = await (codegen_agent.execute_core_function( if codegen_agent else None)**request.parameters)
+        result = await codegen_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Code Generation",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Code Generation execution failed: {e}")
+        logger.error(f"Code Generation execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/security/execute", response_model=AgentExecuteResponse)
+@router.post("/security/execute", response_model=AgentExecuteResponse)
 async def execute_security(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Security Agent - Security scanning and threat detection"""
     try:
 
-        result = await (security_agent.execute_core_function( if security_agent else None)**request.parameters)
+        result = await security_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Security",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Security execution failed: {e}")
+        logger.error(f"Security execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@(router.post( if router else None)"/performance/execute", response_model=AgentExecuteResponse)
+@router.post("/performance/execute", response_model=AgentExecuteResponse)
 async def execute_performance(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
@@ -621,26 +583,24 @@ async def execute_performance(
     """Execute Performance Agent - Performance analysis and optimization"""
     try:
 
-        result = await (perf_agent.execute_core_function( if perf_agent else None)**request.parameters)
+        result = await perf_agent.execute_core_function(**request.parameters)
 
         return AgentExecuteResponse(
             agent_name="Performance",
             status="success",
             result=result,
             execution_time_ms=0,
-            timestamp=str(__import__("datetime").(datetime.now( if datetime else None))),
+            timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        (logger.error( if logger else None)f"Performance execution failed: {e}")
+        logger.error(f"Performance execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # BATCH OPERATIONS
 # ============================================================================
 
-
-@(router.post( if router else None)"/batch", response_model=Dict[str, Any])
+@router.post("/batch", response_model=Dict[str, Any])
 async def batch_execute(
     request: BatchRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
@@ -653,12 +613,12 @@ async def batch_execute(
         results = []
 
         for operation in request.operations:
-            agent_name = (operation.get( if operation else None)"agent")
-            _parameters = (operation.get( if operation else None)"parameters", {})  # noqa: F841
+            agent_name = operation.get("agent")
+            _parameters = operation.get("parameters", {})  # noqa: F841
 
             # Execute agent based on name
             # This would route to the appropriate agent endpoint
-            (results.append( if results else None){"agent": agent_name, "status": "completed", "result": {}})
+            results.append({"agent": agent_name, "status": "completed", "result": {}})
 
         return {
             "status": "success",
@@ -668,16 +628,14 @@ async def batch_execute(
         }
 
     except Exception as e:
-        (logger.error( if logger else None)f"Batch execution failed: {e}")
+        logger.error(f"Batch execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================================
 # AGENT DISCOVERY
 # ============================================================================
 
-
-@(router.get( if router else None)"/list", response_model=Dict[str, Any])
+@router.get("/list", response_model=Dict[str, Any])
 async def list_all_agents(current_user: TokenData = Depends(get_current_active_user)):
     """List all available agents with their capabilities"""
     agents = {
@@ -804,9 +762,8 @@ async def list_all_agents(current_user: TokenData = Depends(get_current_active_u
         ],
     }
 
-    total_count = sum(len(category) for category in (agents.values( if agents else None)))
+    total_count = sum(len(category) for category in agents.values())
 
     return {"agents": agents, "total_count": total_count, "api_version": "v1"}
 
-
-(logger.info( if logger else None)"✅ Agent API endpoints registered")
+logger.info("✅ Agent API endpoints registered")

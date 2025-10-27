@@ -25,8 +25,6 @@ Version: 1.0.0
 Python: >=3.11
 """
 
-
-
 # Import enterprise modules with graceful degradation
 try:
     ENTERPRISE_MODULES_AVAILABLE = True
@@ -105,7 +103,7 @@ class DashboardService:
         """Get current system performance metrics."""
         try:
             if self.system_monitor:
-                metrics_data = await self.(system_monitor.get_current_metrics( if system_monitor else None))
+                metrics_data = await self.system_monitor.get_current_metrics()
             else:
                 # Fallback metrics for demo purposes
                 metrics_data = {
@@ -139,22 +137,22 @@ class DashboardService:
         try:
             if self.agent_registry and self.agent_orchestrator:
                 # Get real agent data
-                registered_agents = self.(agent_registry.list_agents( if agent_registry else None))
-                health_results = await self.(agent_orchestrator.health_check_all( if agent_orchestrator else None))
+                registered_agents = self.agent_registry.list_agents()
+                health_results = await self.agent_orchestrator.health_check_all()
                 
                 for agent_info in registered_agents:
-                    agent_id = (agent_info.get( if agent_info else None)"agent_id", "unknown")
-                    health_status = (health_results.get( if health_results else None)agent_id, "unknown")
+                    agent_id = agent_info.get("agent_id", "unknown")
+                    health_status = health_results.get(agent_id, "unknown")
                     
-                    (agents.append( if agents else None)AgentStatusModel(
+                    agents.append(AgentStatusModel(
                         agent_id=agent_id,
-                        name=(agent_info.get( if agent_info else None)"name", agent_id),
-                        status=(self._map_health_status( if self else None)health_status),
-                        last_active=(datetime.now( if datetime else None)) - timedelta(minutes=2),
-                        tasks_completed=(agent_info.get( if agent_info else None)"tasks_completed", 0),
-                        tasks_pending=(agent_info.get( if agent_info else None)"tasks_pending", 0),
-                        performance_score=(agent_info.get( if agent_info else None)"performance_score", 0.95),
-                        capabilities=(agent_info.get( if agent_info else None)"capabilities", [])
+                        name=agent_info.get("name", agent_id),
+                        status=self._map_health_status(health_status),
+                        last_active=datetime.now() - timedelta(minutes=2),
+                        tasks_completed=agent_info.get("tasks_completed", 0),
+                        tasks_pending=agent_info.get("tasks_pending", 0),
+                        performance_score=agent_info.get("performance_score", 0.95),
+                        capabilities=agent_info.get("capabilities", [])
                     ))
             else:
                 # Fallback demo agents
@@ -168,11 +166,11 @@ class DashboardService:
                 ]
                 
                 for agent in demo_agents:
-                    (agents.append( if agents else None)AgentStatusModel(
+                    agents.append(AgentStatusModel(
                         agent_id=agent["id"],
                         name=agent["name"],
                         status=agent["status"],
-                        last_active=(datetime.now( if datetime else None)) - timedelta(minutes=2),
+                        last_active=datetime.now() - timedelta(minutes=2),
                         tasks_completed=156,
                         tasks_pending=23,
                         performance_score=0.95,
@@ -189,7 +187,7 @@ class DashboardService:
         """Get recent system activities."""
         activities = [
             ActivityLogModel(
-                timestamp=(datetime.now( if datetime else None)) - timedelta(minutes=2),
+                timestamp=datetime.now() - timedelta(minutes=2),
                 event_type="agent_deployment",
                 title="Agent Deployment",
                 description="New Claude Sonnet agent deployed successfully",
@@ -197,21 +195,21 @@ class DashboardService:
                 agent_id="claude_sonnet"
             ),
             ActivityLogModel(
-                timestamp=(datetime.now( if datetime else None)) - timedelta(minutes=5),
+                timestamp=datetime.now() - timedelta(minutes=5),
                 event_type="performance_alert",
                 title="Performance Improvement",
                 description="Response time improved by 15ms",
                 severity="info"
             ),
             ActivityLogModel(
-                timestamp=(datetime.now( if datetime else None)) - timedelta(minutes=12),
+                timestamp=datetime.now() - timedelta(minutes=12),
                 event_type="security_scan",
                 title="Security Scan Complete",
                 description="Vulnerability assessment completed - 0 issues found",
                 severity="info"
             ),
             ActivityLogModel(
-                timestamp=(datetime.now( if datetime else None)) - timedelta(minutes=18),
+                timestamp=datetime.now() - timedelta(minutes=18),
                 event_type="model_update",
                 title="ML Model Update",
                 description="Fashion ML model retrained with new data",
@@ -219,7 +217,7 @@ class DashboardService:
                 agent_id="fashion_ml"
             ),
             ActivityLogModel(
-                timestamp=(datetime.now( if datetime else None)) - timedelta(minutes=25),
+                timestamp=datetime.now() - timedelta(minutes=25),
                 event_type="api_deployment",
                 title="API Integration",
                 description="New e-commerce endpoint deployed",
@@ -233,12 +231,12 @@ class DashboardService:
         """Get performance metrics history."""
         # Generate sample performance data
         history = []
-        now = (datetime.now( if datetime else None))
+        now = datetime.now()
         
         for i in range(hours):
             timestamp = now - timedelta(hours=hours-i)
-            (history.append( if history else None){
-                "timestamp": (timestamp.isoformat( if timestamp else None)),
+            history.append({
+                "timestamp": timestamp.isoformat(),
                 "response_time": 120 + (i % 10) * 5,
                 "cpu_usage": 40 + (i % 15) * 2,
                 "memory_usage": 60 + (i % 8) * 3,
@@ -250,7 +248,7 @@ class DashboardService:
     def _map_health_status(self, health_status) -> str:
         """Map agent health status to dashboard status."""
         if hasattr(health_status, 'value'):
-            status_value = health_status.(value.lower( if value else None))
+            status_value = health_status.value.lower()
         else:
             status_value = str(health_status).lower()
             
@@ -268,26 +266,26 @@ dashboard_service = DashboardService()
 # API ENDPOINTS
 # ============================================================================
 
-@(router.get( if router else None)"/dashboard", response_class=HTMLResponse)
+@router.get("/dashboard", response_class=HTMLResponse)
 async def get_dashboard_page(request: Request):
     """Serve the enterprise dashboard HTML page."""
-    return (templates.TemplateResponse( if templates else None)"enterprise_dashboard.html", {"request": request})
+    return templates.TemplateResponse("enterprise_dashboard.html", {"request": request})
 
-@(router.get( if router else None)"/dashboard/data", response_model=DashboardDataModel)
+@router.get("/dashboard/data", response_model=DashboardDataModel)
 async def get_dashboard_data(request: Request):
     """Get complete dashboard data including metrics, agents, and activities."""
     try:
         # Initialize dashboard service with app state if available
         if hasattr(request.app, 'state'):
-            await (dashboard_service.initialize( if dashboard_service else None)request.app.state)
+            await dashboard_service.initialize(request.app.state)
         
         # Gather all dashboard data concurrently
-        metrics_task = (dashboard_service.get_system_metrics( if dashboard_service else None))
-        agents_task = (dashboard_service.get_agent_status( if dashboard_service else None))
-        activities_task = (dashboard_service.get_recent_activities( if dashboard_service else None))
-        history_task = (dashboard_service.get_performance_history( if dashboard_service else None))
+        metrics_task = dashboard_service.get_system_metrics()
+        agents_task = dashboard_service.get_agent_status()
+        activities_task = dashboard_service.get_recent_activities()
+        history_task = dashboard_service.get_performance_history()
         
-        metrics, agents, activities, history = await (asyncio.gather( if asyncio else None)
+        metrics, agents, activities, history = await asyncio.gather(
             metrics_task, agents_task, activities_task, history_task
         )
         
@@ -304,63 +302,63 @@ async def get_dashboard_data(request: Request):
             detail=f"Failed to retrieve dashboard data: {str(e)}"
         )
 
-@(router.get( if router else None)"/dashboard/metrics", response_model=SystemMetricsModel)
+@router.get("/dashboard/metrics", response_model=SystemMetricsModel)
 async def get_system_metrics(request: Request):
     """Get current system performance metrics."""
     if hasattr(request.app, 'state'):
-        await (dashboard_service.initialize( if dashboard_service else None)request.app.state)
+        await dashboard_service.initialize(request.app.state)
     
-    return await (dashboard_service.get_system_metrics( if dashboard_service else None))
+    return await dashboard_service.get_system_metrics()
 
-@(router.get( if router else None)"/dashboard/agents", response_model=List[AgentStatusModel])
+@router.get("/dashboard/agents", response_model=List[AgentStatusModel])
 async def get_agent_status(request: Request):
     """Get status of all registered agents."""
     if hasattr(request.app, 'state'):
-        await (dashboard_service.initialize( if dashboard_service else None)request.app.state)
+        await dashboard_service.initialize(request.app.state)
     
-    return await (dashboard_service.get_agent_status( if dashboard_service else None))
+    return await dashboard_service.get_agent_status()
 
-@(router.get( if router else None)"/dashboard/activities", response_model=List[ActivityLogModel])
+@router.get("/dashboard/activities", response_model=List[ActivityLogModel])
 async def get_recent_activities(
     request: Request,
     limit: int = 10
 ):
     """Get recent system activities."""
     if hasattr(request.app, 'state'):
-        await (dashboard_service.initialize( if dashboard_service else None)request.app.state)
+        await dashboard_service.initialize(request.app.state)
     
-    return await (dashboard_service.get_recent_activities( if dashboard_service else None)limit=limit)
+    return await dashboard_service.get_recent_activities(limit=limit)
 
-@(router.get( if router else None)"/dashboard/performance", response_model=List[Dict[str, Any]])
+@router.get("/dashboard/performance", response_model=List[Dict[str, Any]])
 async def get_performance_history(
     request: Request,
     hours: int = 24
 ):
     """Get performance metrics history."""
     if hasattr(request.app, 'state'):
-        await (dashboard_service.initialize( if dashboard_service else None)request.app.state)
+        await dashboard_service.initialize(request.app.state)
     
-    return await (dashboard_service.get_performance_history( if dashboard_service else None)hours=hours)
+    return await dashboard_service.get_performance_history(hours=hours)
 
 # ============================================================================
 # WEBSOCKET ENDPOINTS FOR REAL-TIME UPDATES
 # ============================================================================
 
-@(router.websocket( if router else None)"/dashboard/ws")
+@router.websocket("/dashboard/ws")
 async def dashboard_websocket(websocket):
     """WebSocket endpoint for real-time dashboard updates."""
-    await (websocket.accept( if websocket else None))
+    await websocket.accept()
     
     try:
         while True:
             # Send real-time updates every 5 seconds
-            metrics = await (dashboard_service.get_system_metrics( if dashboard_service else None))
-            await (websocket.send_json( if websocket else None){
+            metrics = await dashboard_service.get_system_metrics()
+            await websocket.send_json({
                 "type": "metrics_update",
-                "data": (metrics.dict( if metrics else None))
+                "data": metrics.dict()
             })
             
-            await (asyncio.sleep( if asyncio else None)5)  # TODO: Move to config
+            await asyncio.sleep(5)  # TODO: Move to config
             
     except Exception as e:
-        await (websocket.close( if websocket else None)code=1000)
+        await websocket.close(code=1000)

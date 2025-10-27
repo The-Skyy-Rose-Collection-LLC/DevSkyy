@@ -7,7 +7,7 @@ from api_integration.auth_manager import auth_manager, AuthenticationType
 from api_integration.discovery_engine import api_discovery_engine, APICategory
 from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
-from fashion.intelligence_engine import fashion_intelligence
+    from fashion.intelligence_engine import fashion_intelligence
 from typing import Any, Dict, List, Optional
 import asyncio
 import logging
@@ -18,8 +18,6 @@ Comprehensive examples for fashion e-commerce API integrations
 with real-world use cases and implementation patterns
 """
 
-
-
 # Import our API integration components
     ActionType,
     TriggerType,
@@ -29,25 +27,24 @@ with real-world use cases and implementation patterns
     WorkflowTrigger,
 )
 
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class FashionAPIExamples:
     """Comprehensive examples for fashion API integrations"""
 
     def __init__(self):
         self.examples_run = []
-        (logger.info( if logger else None)"Fashion API Examples initialized")
+        logger.info("Fashion API Examples initialized")
 
     async def example_1_api_discovery_and_setup(self):
         """Example 1: Discover and setup fashion APIs"""
 
-        (logger.info( if logger else None)"\n🔍 EXAMPLE 1: API Discovery and Setup")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n🔍 EXAMPLE 1: API Discovery and Setup")
+        logger.info("=" * 50)
 
         # Step 1: Discover fashion-relevant APIs
-        (logger.info( if logger else None)"Step 1: Discovering fashion APIs...")
-        discovered_apis = await (api_discovery_engine.discover_apis( if api_discovery_engine else None)
+        logger.info("Step 1: Discovering fashion APIs...")
+        discovered_apis = await api_discovery_engine.discover_apis(
             [
                 APICategory.FASHION_TRENDS,
                 APICategory.PRODUCT_CATALOG,
@@ -55,28 +52,28 @@ class FashionAPIExamples:
             ]
         )
 
-        (logger.info( if logger else None)
-            f"✅ Discovered {sum(len(apis) for apis in (discovered_apis.values( if discovered_apis else None)))} APIs"
+        logger.info(
+            f"✅ Discovered {sum(len(apis) for apis in discovered_apis.values())} APIs"
         )
 
         # Step 2: Get recommendations for fashion trends
-        (logger.info( if logger else None)"\nStep 2: Getting API recommendations...")
-        trend_apis = await (api_discovery_engine.get_recommended_apis( if api_discovery_engine else None)
+        logger.info("\nStep 2: Getting API recommendations...")
+        trend_apis = await api_discovery_engine.get_recommended_apis(
             category=APICategory.FASHION_TRENDS, min_score=0.7
         )
 
         for api in trend_apis[:3]:  # Show top 3
-            (logger.info( if logger else None)f"  📊 {api.name} (Score: {api.overall_score:.2f})")
-            (logger.info( if logger else None)f"     Provider: {api.provider}")
-            (logger.info( if logger else None)f"     Fashion Relevance: {api.fashion_relevance:.2f}")
+            logger.info(f"  📊 {api.name} (Score: {api.overall_score:.2f})")
+            logger.info(f"     Provider: {api.provider}")
+            logger.info(f"     Fashion Relevance: {api.fashion_relevance:.2f}")
 
         # Step 3: Setup authentication for top API
         if trend_apis:
             top_api = trend_apis[0]
-            (logger.info( if logger else None)f"\nStep 3: Setting up authentication for {top_api.name}...")
+            logger.info(f"\nStep 3: Setting up authentication for {top_api.name}...")
 
             # Store credentials (example with API key)
-            success = await (auth_manager.store_credentials( if auth_manager else None)
+            success = await auth_manager.store_credentials(
                 api_id=top_api.api_id,
                 auth_type=AuthenticationType.API_KEY,
                 credentials={
@@ -86,21 +83,21 @@ class FashionAPIExamples:
             )
 
             if success:
-                (logger.info( if logger else None)"✅ Authentication configured successfully")
+                logger.info("✅ Authentication configured successfully")
             else:
-                (logger.info( if logger else None)"❌ Authentication setup failed")
+                logger.info("❌ Authentication setup failed")
 
-        self.(examples_run.append( if examples_run else None)"api_discovery_and_setup")
+        self.examples_run.append("api_discovery_and_setup")
         return discovered_apis
 
     async def example_2_fashion_trend_analysis(self):
         """Example 2: Automated fashion trend analysis"""
 
-        (logger.info( if logger else None)"\n👗 EXAMPLE 2: Fashion Trend Analysis")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n👗 EXAMPLE 2: Fashion Trend Analysis")
+        logger.info("=" * 50)
 
         # Step 1: Analyze fashion context from text
-        (logger.info( if logger else None)"Step 1: Analyzing fashion context...")
+        logger.info("Step 1: Analyzing fashion context...")
 
         fashion_text = """
         Spring 2024 fashion trends are embracing sustainable materials and vibrant colors.
@@ -108,60 +105,59 @@ class FashionAPIExamples:
         Consumers are increasingly focused on eco-friendly fashion choices.
         """
 
-        context_analysis = await (fashion_intelligence.analyze_fashion_context( if fashion_intelligence else None)
+        context_analysis = await fashion_intelligence.analyze_fashion_context(
             fashion_text
         )
 
-        (logger.info( if logger else None)
+        logger.info(
             f"  Fashion Relevance Score: {context_analysis['fashion_relevance_score']:.2f}"
         )
-        (logger.info( if logger else None)f"  Identified Categories: {context_analysis['identified_categories']}")
-        (logger.info( if logger else None)
+        logger.info(f"  Identified Categories: {context_analysis['identified_categories']}")
+        logger.info(
             f"  Sustainability Mentions: {context_analysis['sustainability_mentions']}"
         )
-        (logger.info( if logger else None)f"  Seasonal Context: {context_analysis['seasonal_context']}")
+        logger.info(f"  Seasonal Context: {context_analysis['seasonal_context']}")
 
         # Step 2: Get trend recommendations
-        (logger.info( if logger else None)"\nStep 2: Getting trend recommendations...")
+        logger.info("\nStep 2: Getting trend recommendations...")
 
-
-        recommendations = await (fashion_intelligence.get_trend_recommendations( if fashion_intelligence else None)
+        recommendations = await fashion_intelligence.get_trend_recommendations(
             category=FashionCategory.WOMENS_WEAR,
             season=FashionSeason.SPRING_SUMMER,
             sustainability_focus=True,
         )
 
-        (logger.info( if logger else None)f"✅ Generated {len(recommendations)} trend recommendations")
+        logger.info(f"✅ Generated {len(recommendations)} trend recommendations")
 
         for rec in recommendations[:2]:  # Show top 2
-            (logger.info( if logger else None)f"  🌟 {rec['trend_name']}")
-            (logger.info( if logger else None)f"     Popularity: {rec['popularity_score']:.2f}")
-            (logger.info( if logger else None)f"     Key Colors: {', '.join(rec['key_elements']['colors'])}")
-            (logger.info( if logger else None)f"     Materials: {', '.join(rec['key_elements']['materials'])}")
+            logger.info(f"  🌟 {rec['trend_name']}")
+            logger.info(f"     Popularity: {rec['popularity_score']:.2f}")
+            logger.info(f"     Key Colors: {', '.join(rec['key_elements']['colors'])}")
+            logger.info(f"     Materials: {', '.join(rec['key_elements']['materials'])}")
 
         # Step 3: Sync trends from social media
-        (logger.info( if logger else None)"\nStep 3: Syncing trends from social media...")
+        logger.info("\nStep 3: Syncing trends from social media...")
 
-        sync_result = await (fashion_api_integrator.sync_fashion_trends( if fashion_api_integrator else None)
+        sync_result = await fashion_api_integrator.sync_fashion_trends(
             sources=["pinterest", "instagram"],
             categories=[FashionCategory.WOMENS_WEAR, FashionCategory.ACCESSORIES],
         )
 
-        (logger.info( if logger else None)
+        logger.info(
             f"✅ Synced {sync_result['trends_synced']} trends from {len(sync_result['sources'])} sources"
         )
 
-        self.(examples_run.append( if examples_run else None)"fashion_trend_analysis")
+        self.examples_run.append("fashion_trend_analysis")
         return context_analysis, recommendations
 
     async def example_3_automated_workflow_creation(self):
         """Example 3: Create and execute automated workflows"""
 
-        (logger.info( if logger else None)"\n🔄 EXAMPLE 3: Automated Workflow Creation")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n🔄 EXAMPLE 3: Automated Workflow Creation")
+        logger.info("=" * 50)
 
         # Step 1: Create a fashion inventory sync workflow
-        (logger.info( if logger else None)"Step 1: Creating inventory sync workflow...")
+        logger.info("Step 1: Creating inventory sync workflow...")
 
         inventory_trigger = WorkflowTrigger(
             trigger_id="inventory_sync_demo",
@@ -226,54 +222,54 @@ class FashionAPIExamples:
             steps=inventory_steps,
             fashion_context=True,
             variables={
-                "sync_timestamp": (datetime.now( if datetime else None)).isoformat(),
+                "sync_timestamp": datetime.now().isoformat(),
                 "fashion_categories": ["womens_wear", "accessories"],
                 "sustainability_check": True,
             },
         )
 
         # Register the workflow
-        success = await (workflow_engine.register_workflow( if workflow_engine else None)inventory_workflow)
+        success = await workflow_engine.register_workflow(inventory_workflow)
 
         if success:
-            (logger.info( if logger else None)"✅ Inventory sync workflow registered successfully")
+            logger.info("✅ Inventory sync workflow registered successfully")
 
             # Step 2: Trigger the workflow manually for demo
-            (logger.info( if logger else None)"\nStep 2: Triggering workflow execution...")
+            logger.info("\nStep 2: Triggering workflow execution...")
 
-            execution_id = await (workflow_engine.trigger_workflow( if workflow_engine else None)
+            execution_id = await workflow_engine.trigger_workflow(
                 workflow_id="demo_inventory_sync",
                 trigger_data={"demo_mode": True, "source": "api_example"},
             )
 
-            (logger.info( if logger else None)f"✅ Workflow triggered with execution ID: {execution_id}")
+            logger.info(f"✅ Workflow triggered with execution ID: {execution_id}")
 
             # Step 3: Monitor workflow status
-            (logger.info( if logger else None)"\nStep 3: Monitoring workflow status...")
+            logger.info("\nStep 3: Monitoring workflow status...")
 
             # Wait a bit for workflow to start
-            await (asyncio.sleep( if asyncio else None)2)  # TODO: Move to config
+            await asyncio.sleep(2)  # TODO: Move to config
 
-            status = await (workflow_engine.get_workflow_status( if workflow_engine else None)execution_id)
-            (logger.info( if logger else None)f"  Workflow Status: {(status.get( if status else None)'status', 'unknown')}")
+            status = await workflow_engine.get_workflow_status(execution_id)
+            logger.info(f"  Workflow Status: {status.get('status', 'unknown')}")
 
         else:
-            (logger.info( if logger else None)"❌ Failed to register workflow")
+            logger.info("❌ Failed to register workflow")
 
-        self.(examples_run.append( if examples_run else None)"automated_workflow_creation")
+        self.examples_run.append("automated_workflow_creation")
         return inventory_workflow
 
     async def example_4_api_gateway_usage(self):
         """Example 4: Using the API Gateway for external calls"""
 
-        (logger.info( if logger else None)"\n⚡ EXAMPLE 4: API Gateway Usage")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n⚡ EXAMPLE 4: API Gateway Usage")
+        logger.info("=" * 50)
 
         # Step 1: Make a simple API call through the gateway
-        (logger.info( if logger else None)"Step 1: Making API call through gateway...")
+        logger.info("Step 1: Making API call through gateway...")
 
         # Example: Fetch fashion trends from a mock API
-        result = await (api_gateway.make_request( if api_gateway else None)
+        result = await api_gateway.make_request(
             api_id="fashion_trends_api",
             endpoint="/trends/current",
             method="GET",
@@ -282,58 +278,58 @@ class FashionAPIExamples:
             transform_response=True,
         )
 
-        (logger.info( if logger else None)f"  Success: {result['success']}")
-        (logger.info( if logger else None)f"  Execution Time: {result['execution_time']:.3f}s")
+        logger.info(f"  Success: {result['success']}")
+        logger.info(f"  Execution Time: {result['execution_time']:.3f}s")
 
         if result["success"]:
-            (logger.info( if logger else None)f"  Data Type: {type(result['data'])}")
-            (logger.info( if logger else None)"✅ API call completed successfully")
+            logger.info(f"  Data Type: {type(result['data'])}")
+            logger.info("✅ API call completed successfully")
         else:
-            (logger.info( if logger else None)f"  Error: {result['error']}")
-            (logger.info( if logger else None)"❌ API call failed")
+            logger.info(f"  Error: {result['error']}")
+            logger.info("❌ API call failed")
 
         # Step 2: Demonstrate caching
-        (logger.info( if logger else None)"\nStep 2: Testing cache performance...")
+        logger.info("\nStep 2: Testing cache performance...")
 
         # Make the same call again to test caching
-        start_time = (datetime.now( if datetime else None))
-        cached_result = await (api_gateway.make_request( if api_gateway else None)
+        start_time = datetime.now()
+        cached_result = await api_gateway.make_request(
             api_id="fashion_trends_api",
             endpoint="/trends/current",
             method="GET",
             params={"category": "womens_wear", "season": "spring_summer", "limit": 10},
             use_cache=True,
         )
-        end_time = (datetime.now( if datetime else None))
+        end_time = datetime.now()
 
         cache_time = (end_time - start_time).total_seconds()
-        (logger.info( if logger else None)f"  Cached Response Time: {cache_time:.3f}s")
-        (logger.info( if logger else None)"✅ Cache performance demonstrated")
+        logger.info(f"  Cached Response Time: {cache_time:.3f}s")
+        logger.info("✅ Cache performance demonstrated")
 
         # Step 3: Get API Gateway metrics
-        (logger.info( if logger else None)"\nStep 3: Checking API Gateway metrics...")
+        logger.info("\nStep 3: Checking API Gateway metrics...")
 
-        metrics = await (api_gateway.get_metrics( if api_gateway else None))
+        metrics = await api_gateway.get_metrics()
 
-        (logger.info( if logger else None)f"  Total Requests: {metrics['gateway_metrics']['total_requests']}")
-        (logger.info( if logger else None)
+        logger.info(f"  Total Requests: {metrics['gateway_metrics']['total_requests']}")
+        logger.info(
             f"  Success Rate: {metrics['gateway_metrics']['successful_requests'] / max(metrics['gateway_metrics']['total_requests'], 1) * 100:.1f}%"
         )
-        (logger.info( if logger else None)
+        logger.info(
             f"  Average Response Time: {metrics['gateway_metrics']['average_response_time']:.3f}s"
         )
 
-        self.(examples_run.append( if examples_run else None)"api_gateway_usage")
+        self.examples_run.append("api_gateway_usage")
         return result
 
     async def example_5_fashion_personalization(self):
         """Example 5: Fashion personalization and recommendations"""
 
-        (logger.info( if logger else None)"\n🎯 EXAMPLE 5: Fashion Personalization")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n🎯 EXAMPLE 5: Fashion Personalization")
+        logger.info("=" * 50)
 
         # Step 1: Analyze customer fashion preferences
-        (logger.info( if logger else None)"Step 1: Analyzing customer preferences...")
+        logger.info("Step 1: Analyzing customer preferences...")
 
         customer_data = {
             "user_id": "customer_123",
@@ -357,25 +353,24 @@ class FashionAPIExamples:
         Frequently browses dresses and accessories in mid-range price category.
         """
 
-        customer_analysis = await (fashion_intelligence.analyze_fashion_context( if fashion_intelligence else None)
+        customer_analysis = await fashion_intelligence.analyze_fashion_context(
             customer_text
         )
 
-        (logger.info( if logger else None)
+        logger.info(
             f"  Fashion Relevance: {customer_analysis['fashion_relevance_score']:.2f}"
         )
-        (logger.info( if logger else None)
+        logger.info(
             f"  Sustainability Focus: {len(customer_analysis['sustainability_mentions'])} mentions"
         )
-        (logger.info( if logger else None)
+        logger.info(
             f"  Style Categories: {[cat['category'] for cat in customer_analysis['identified_categories'][:3]]}"
         )
 
         # Step 2: Generate personalized recommendations
-        (logger.info( if logger else None)"\nStep 2: Generating personalized recommendations...")
+        logger.info("\nStep 2: Generating personalized recommendations...")
 
-
-        recommendations = await (fashion_intelligence.get_trend_recommendations( if fashion_intelligence else None)
+        recommendations = await fashion_intelligence.get_trend_recommendations(
             category=FashionCategory.WOMENS_WEAR,
             target_demographic="millennial",
             sustainability_focus=True,
@@ -392,19 +387,19 @@ class FashionAPIExamples:
                 rec["personalization_score"] = (
                     rec["popularity_score"] * 1.2
                 )  # Boost for preferred colors
-                (personalized_recs.append( if personalized_recs else None)rec)
+                personalized_recs.append(rec)
 
-        (logger.info( if logger else None)f"✅ Generated {len(personalized_recs)} personalized recommendations")
+        logger.info(f"✅ Generated {len(personalized_recs)} personalized recommendations")
 
         for rec in personalized_recs[:2]:  # Show top 2
-            (logger.info( if logger else None)f"  🌟 {rec['trend_name']}")
-            (logger.info( if logger else None)
-                f"     Personalization Score: {(rec.get( if rec else None)'personalization_score', 0):.2f}"
+            logger.info(f"  🌟 {rec['trend_name']}")
+            logger.info(
+                f"     Personalization Score: {rec.get('personalization_score', 0):.2f}"
             )
-            (logger.info( if logger else None)f"     Matching Colors: {rec['key_elements']['colors']}")
+            logger.info(f"     Matching Colors: {rec['key_elements']['colors']}")
 
         # Step 3: Create personalization workflow
-        (logger.info( if logger else None)"\nStep 3: Setting up personalization automation...")
+        logger.info("\nStep 3: Setting up personalization automation...")
 
         personalization_trigger = WorkflowTrigger(
             trigger_id="customer_personalization",
@@ -468,79 +463,79 @@ class FashionAPIExamples:
             },
         )
 
-        success = await (workflow_engine.register_workflow( if workflow_engine else None)personalization_workflow)
+        success = await workflow_engine.register_workflow(personalization_workflow)
 
         if success:
-            (logger.info( if logger else None)"✅ Personalization workflow registered successfully")
+            logger.info("✅ Personalization workflow registered successfully")
         else:
-            (logger.info( if logger else None)"❌ Failed to register personalization workflow")
+            logger.info("❌ Failed to register personalization workflow")
 
-        self.(examples_run.append( if examples_run else None)"fashion_personalization")
+        self.examples_run.append("fashion_personalization")
         return customer_analysis, personalized_recs
 
     async def example_6_comprehensive_health_check(self):
         """Example 6: Comprehensive system health check"""
 
-        (logger.info( if logger else None)"\n🏥 EXAMPLE 6: System Health Check")
-        (logger.info( if logger else None)"=" * 50)
+        logger.info("\n🏥 EXAMPLE 6: System Health Check")
+        logger.info("=" * 50)
 
         # Check all system components
         health_results = {}
 
         # API Discovery Engine
-        (logger.info( if logger else None)"Checking API Discovery Engine...")
-        discovery_health = await (api_discovery_engine.health_check( if api_discovery_engine else None))
+        logger.info("Checking API Discovery Engine...")
+        discovery_health = await api_discovery_engine.health_check()
         health_results["api_discovery"] = discovery_health
-        (logger.info( if logger else None)f"  Status: {discovery_health['status']}")
-        (logger.info( if logger else None)f"  APIs Discovered: {(discovery_health.get( if discovery_health else None)'total_apis_discovered', 0)}")
+        logger.info(f"  Status: {discovery_health['status']}")
+        logger.info(f"  APIs Discovered: {discovery_health.get('total_apis_discovered', 0)}")
 
         # API Gateway
-        (logger.info( if logger else None)"\nChecking API Gateway...")
-        gateway_health = await (api_gateway.health_check( if api_gateway else None))
+        logger.info("\nChecking API Gateway...")
+        gateway_health = await api_gateway.health_check()
         health_results["api_gateway"] = gateway_health
-        (logger.info( if logger else None)f"  Status: {gateway_health['status']}")
-        (logger.info( if logger else None)f"  Success Rate: {(gateway_health.get( if gateway_health else None)'success_rate', 0) * 100:.1f}%")
-        (logger.info( if logger else None)
-            f"  Average Response Time: {(gateway_health.get( if gateway_health else None)'average_response_time', 0):.3f}s"
+        logger.info(f"  Status: {gateway_health['status']}")
+        logger.info(f"  Success Rate: {gateway_health.get('success_rate', 0) * 100:.1f}%")
+        logger.info(
+            f"  Average Response Time: {gateway_health.get('average_response_time', 0):.3f}s"
         )
 
         # Workflow Engine
-        (logger.info( if logger else None)"\nChecking Workflow Engine...")
-        workflow_health = await (workflow_engine.health_check( if workflow_engine else None))
+        logger.info("\nChecking Workflow Engine...")
+        workflow_health = await workflow_engine.health_check()
         health_results["workflow_engine"] = workflow_health
-        (logger.info( if logger else None)f"  Status: {workflow_health['status']}")
-        (logger.info( if logger else None)
-            f"  Registered Workflows: {(workflow_health.get( if workflow_health else None)'registered_workflows', 0)}"
+        logger.info(f"  Status: {workflow_health['status']}")
+        logger.info(
+            f"  Registered Workflows: {workflow_health.get('registered_workflows', 0)}"
         )
-        (logger.info( if logger else None)f"  Running Workflows: {(workflow_health.get( if workflow_health else None)'running_workflows', 0)}")
+        logger.info(f"  Running Workflows: {workflow_health.get('running_workflows', 0)}")
 
         # Fashion API Integrator
-        (logger.info( if logger else None)"\nChecking Fashion API Integrator...")
-        fashion_health = await (fashion_api_integrator.health_check( if fashion_api_integrator else None))
+        logger.info("\nChecking Fashion API Integrator...")
+        fashion_health = await fashion_api_integrator.health_check()
         health_results["fashion_apis"] = fashion_health
-        (logger.info( if logger else None)f"  Status: {fashion_health['status']}")
-        (logger.info( if logger else None)
-            f"  Fashion APIs Health: {(fashion_health.get( if fashion_health else None)'fashion_apis_healthy', 'N/A')}"
+        logger.info(f"  Status: {fashion_health['status']}")
+        logger.info(
+            f"  Fashion APIs Health: {fashion_health.get('fashion_apis_healthy', 'N/A')}"
         )
 
         # Fashion Intelligence Engine
-        (logger.info( if logger else None)"\nChecking Fashion Intelligence Engine...")
-        intelligence_health = await (fashion_intelligence.get_fashion_health_check( if fashion_intelligence else None))
+        logger.info("\nChecking Fashion Intelligence Engine...")
+        intelligence_health = await fashion_intelligence.get_fashion_health_check()
         health_results["fashion_intelligence"] = intelligence_health
-        (logger.info( if logger else None)f"  Status: {intelligence_health['status']}")
-        (logger.info( if logger else None)
+        logger.info(f"  Status: {intelligence_health['status']}")
+        logger.info(
             f"  Trends Count: {intelligence_health['knowledge_base_stats']['trends_count']}"
         )
-        (logger.info( if logger else None)
+        logger.info(
             f"  Market Intelligence: {intelligence_health['knowledge_base_stats']['market_intelligence_count']}"
         )
 
         # Overall system health
-        (logger.info( if logger else None)"\n📊 OVERALL SYSTEM HEALTH:")
-        (logger.info( if logger else None)"=" * 30)
+        logger.info("\n📊 OVERALL SYSTEM HEALTH:")
+        logger.info("=" * 30)
 
-        healthy_components = sum(
-            1 for health in (health_results.values( if health_results else None)) if (health.get( if health else None)"status") == "healthy"
+        healthy_components = sum()
+            1 for health in health_results.values() if health.get("status") == "healthy"
         )
         total_components = len(health_results)
 
@@ -548,48 +543,47 @@ class FashionAPIExamples:
             "healthy" if healthy_components == total_components else "degraded"
         )
 
-        (logger.info( if logger else None)f"Overall Status: {(overall_health.upper( if overall_health else None))}")
-        (logger.info( if logger else None)f"Healthy Components: {healthy_components}/{total_components}")
-        (logger.info( if logger else None)f"System Readiness: {healthy_components / total_components * 100:.1f}%")
+        logger.info(f"Overall Status: {overall_health.upper()}")
+        logger.info(f"Healthy Components: {healthy_components}/{total_components}")
+        logger.info(f"System Readiness: {healthy_components / total_components * 100:.1f}%")
 
         if overall_health == "healthy":
-            (logger.info( if logger else None)"✅ All systems operational - Ready for production!")
+            logger.info("✅ All systems operational - Ready for production!")
         else:
-            (logger.info( if logger else None)"⚠️ Some components need attention")
+            logger.info("⚠️ Some components need attention")
 
-        self.(examples_run.append( if examples_run else None)"comprehensive_health_check")
+        self.examples_run.append("comprehensive_health_check")
         return health_results
 
     async def run_all_examples(self):
         """Run all API integration examples"""
 
-        (logger.info( if logger else None)"\n🚀 RUNNING ALL API INTEGRATION EXAMPLES")
-        (logger.info( if logger else None)"=" * 60)
-        (logger.info( if logger else None)"DevSkyy Enterprise Fashion Platform - API Integration System")
-        (logger.info( if logger else None)"Comprehensive demonstration of automated API orchestration")
-        (logger.info( if logger else None)"=" * 60)
+        logger.info("\n🚀 RUNNING ALL API INTEGRATION EXAMPLES")
+        logger.info("=" * 60)
+        logger.info("DevSkyy Enterprise Fashion Platform - API Integration System")
+        logger.info("Comprehensive demonstration of automated API orchestration")
+        logger.info("=" * 60)
 
         try:
             # Run all examples in sequence
-            await (self.example_1_api_discovery_and_setup( if self else None))
-            await (self.example_2_fashion_trend_analysis( if self else None))
-            await (self.example_3_automated_workflow_creation( if self else None))
-            await (self.example_4_api_gateway_usage( if self else None))
-            await (self.example_5_fashion_personalization( if self else None))
-            await (self.example_6_comprehensive_health_check( if self else None))
+            await self.example_1_api_discovery_and_setup()
+            await self.example_2_fashion_trend_analysis()
+            await self.example_3_automated_workflow_creation()
+            await self.example_4_api_gateway_usage()
+            await self.example_5_fashion_personalization()
+            await self.example_6_comprehensive_health_check()
 
             # Summary
-            (logger.info( if logger else None)"\n🎉 ALL EXAMPLES COMPLETED SUCCESSFULLY!")
-            (logger.info( if logger else None)"=" * 50)
-            (logger.info( if logger else None)f"Examples Run: {len(self.examples_run)}")
-            (logger.info( if logger else None)f"Components Demonstrated: {', '.join(self.examples_run)}")
-            (logger.info( if logger else None)"\n✅ DevSkyy API Integration System is fully operational!")
-            (logger.info( if logger else None)"🌟 Ready for enterprise fashion e-commerce automation!")
+            logger.info("\n🎉 ALL EXAMPLES COMPLETED SUCCESSFULLY!")
+            logger.info("=" * 50)
+            logger.info(f"Examples Run: {len(self.examples_run)}")
+            logger.info(f"Components Demonstrated: {', '.join(self.examples_run)}")
+            logger.info("\n✅ DevSkyy API Integration System is fully operational!")
+            logger.info("🌟 Ready for enterprise fashion e-commerce automation!")
 
         except Exception as e:
-            (logger.info( if logger else None)f"\n❌ Error running examples: {e}")
-            (logger.error( if logger else None)f"Example execution failed: {e}")
-
+            logger.info(f"\n❌ Error running examples: {e}")
+            logger.error(f"Example execution failed: {e}")
 
 # Example usage and demonstration
 async def main():
@@ -599,9 +593,8 @@ async def main():
     examples = FashionAPIExamples()
 
     # Run all examples
-    await (examples.run_all_examples( if examples else None))
-
+    await examples.run_all_examples()
 
 if __name__ == "__main__":
     # Run the examples
-    (asyncio.run( if asyncio else None)main())
+    asyncio.run(main())

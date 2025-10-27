@@ -4,15 +4,12 @@ import os
 import requests
 
             from agent.modules.woocommerce_integration_service import (
-            import xmlrpc.client
+                import xmlrpc.client
 from typing import Any, Dict, List
 import httpx
 import logging
 
-
-
-logger = (logging.getLogger( if logging else None)__name__)
-
+logger = logging.getLogger(__name__)
 
 class WordPressDirectService:
     """Direct WordPress connection using Application Password - No OAuth needed!"""
@@ -26,9 +23,9 @@ class WordPressDirectService:
         # secrets, CI secrets, or a .env file that is **never** committed).
         # ---------------------------------------------------------------------
 
-        self.site_url = (os.getenv( if os else None)"WORDPRESS_SITE_URL")
-        self.username = (os.getenv( if os else None)"WORDPRESS_USERNAME")
-        self.password = (os.getenv( if os else None)"WORDPRESS_PASSWORD")
+        self.site_url = os.getenv("WORDPRESS_SITE_URL")
+        self.username = os.getenv("WORDPRESS_USERNAME")
+        self.password = os.getenv("WORDPRESS_PASSWORD")
         self.use_basic_auth = True
 
         # Fail fast if any credential is missing – safer than silently falling
@@ -41,10 +38,10 @@ class WordPressDirectService:
             )
 
         # Clean up the password (remove any extra whitespace)
-        self.password = self.(password.strip( if password else None))
+        self.password = self.password.strip()
 
         # WordPress REST API base URL
-        self.api_base = f"{self.(site_url.rstrip( if site_url else None)'/')}/wp-json/wp/v2"
+        self.api_base = f"{self.site_url.rstrip('/')}/wp-json/wp/v2"
 
         # Set up multiple authentication methods for bulletproof connection
         self.auth = HTTPBasicAuth(self.username, self.password)
@@ -60,9 +57,9 @@ class WordPressDirectService:
         self.connected = False
         self.site_info = {}
 
-        (logger.info( if logger else None)f"🔥 WordPress Direct Service initialized for {self.site_url}")
-        (logger.info( if logger else None)f"👤 Username: {self.username}")
-        (logger.info( if logger else None)"🔑 Authentication: Basic Auth (Guaranteed Connection)")
+        logger.info(f"🔥 WordPress Direct Service initialized for {self.site_url}")
+        logger.info(f"👤 Username: {self.username}")
+        logger.info("🔑 Authentication: Basic Auth (Guaranteed Connection)")
 
     async def connect_and_verify(self) -> Dict[str, Any]:
         """BULLETPROOF WordPress connection with multiple fallback methods."""
@@ -76,23 +73,23 @@ class WordPressDirectService:
             ["REST API", "XML-RPC", "Direct Login"], connection_methods
         ):
             try:
-                (logger.info( if logger else None)f"🔄 Attempting {method_name} connection...")
+                logger.info(f"🔄 Attempting {method_name} connection...")
                 result = await method()
 
-                if (result.get( if result else None)"status") == "connected":
-                    (logger.info( if logger else None)f"✅ {method_name} connection SUCCESS!")
+                if result.get("status") == "connected":
+                    logger.info(f"✅ {method_name} connection SUCCESS!")
                     self.connected = True
                     return result
 
             except Exception as e:
-                (logger.warning( if logger else None)f"⚠️ {method_name} failed: {str(e)}")
+                logger.warning(f"⚠️ {method_name} failed: {str(e)}")
                 continue
 
         # All connection attempts failed. Bubble up a clear error instead of
         # returning fabricated success data. This prevents the application from
         # operating under a false sense of security and avoids misleading the
         # user about the connection status.
-        (logger.error( if logger else None)"❌ All WordPress connection methods failed")
+        logger.error("❌ All WordPress connection methods failed")
         raise ConnectionError(
             "Unable to connect to WordPress with the provided credentials"
         )
@@ -101,7 +98,7 @@ class WordPressDirectService:
         """Try REST API connection with user credentials."""
         try:
             # First, try to get user info with basic auth
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.api_base}/users/me",
                 auth=self.auth,
                 headers=self.headers,
@@ -110,18 +107,18 @@ class WordPressDirectService:
             )
 
             if response.status_code == 200:
-                user_info = (response.json( if response else None))
+                user_info = response.json()
 
                 # Get site information
-                site_response = (httpx.get( if httpx else None)
-                    f"{self.(site_url.rstrip( if site_url else None)'/')}/wp-json",
+                site_response = httpx.get(
+                    f"{self.site_url.rstrip('/')}/wp-json",
                     headers=self.headers,
                     timeout=10,
                 )
 
                 site_info = {}
                 if site_response.status_code == 200:
-                    site_info = (site_response.json( if site_response else None))
+                    site_info = site_response.json()
 
                 return {
                     "status": "connected",
@@ -129,7 +126,7 @@ class WordPressDirectService:
                     "site_url": self.site_url,
                     "user_info": user_info,
                     "site_info": site_info,
-                    "capabilities": (user_info.get( if user_info else None)"capabilities", {}),
+                    "capabilities": user_info.get("capabilities", {}),
                     "connection_method": "basic_auth_rest_api",
                     "agents_ready": True,
                     "health": "excellent",
@@ -137,16 +134,16 @@ class WordPressDirectService:
                 }
 
             elif response.status_code == 401:
-                (logger.warning( if logger else None)
+                logger.warning(
                     "🔑 REST API authentication failed - trying alternative methods"
                 )
                 raise Exception("Authentication failed")
             else:
-                (logger.warning( if logger else None)f"🌐 REST API returned {response.status_code}")
+                logger.warning(f"🌐 REST API returned {response.status_code}")
                 raise Exception(f"HTTP {response.status_code}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ REST API connection failed: {str(e)}")
+            logger.error(f"❌ REST API connection failed: {str(e)}")
             raise e
 
     async def _try_xmlrpc_connection(self) -> Dict[str, Any]:
@@ -154,13 +151,13 @@ class WordPressDirectService:
         try:
 
             # WordPress XML-RPC endpoint
-            xmlrpc_url = f"{self.(site_url.rstrip( if site_url else None)'/')}/xmlrpc.php"
+            xmlrpc_url = f"{self.site_url.rstrip('/')}/xmlrpc.php"
 
             # Create XML-RPC client
-            server = xmlrpc.(client.ServerProxy( if client else None)xmlrpc_url)
+            server = xmlrpc.client.ServerProxy(xmlrpc_url)
 
             # Test authentication
-            result = server.(wp.getProfile( if wp else None)0, self.username, self.password)
+            result = server.wp.getProfile(0, self.username, self.password)
 
             if result:
                 return {
@@ -177,18 +174,18 @@ class WordPressDirectService:
                 raise Exception("XML-RPC authentication failed")
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ XML-RPC connection failed: {str(e)}")
+            logger.error(f"❌ XML-RPC connection failed: {str(e)}")
             raise e
 
     async def _try_direct_login_simulation(self) -> Dict[str, Any]:
         """Try simulating direct WordPress login."""
         try:
-            session = (requests.Session( if requests else None))
+            session = requests.Session()
 
             # Get login page first
-            login_url = f"{self.(site_url.rstrip( if site_url else None)'/')}/wp-login.php"
+            login_url = f"{self.site_url.rstrip('/')}/wp-login.php"
 
-            response = (session.get( if session else None)login_url, timeout=10)
+            response = session.get(login_url, timeout=10)
 
             if response.status_code == 200:
                 # Extract any necessary tokens or nonces from the login page
@@ -208,7 +205,7 @@ class WordPressDirectService:
                 raise Exception(f"Site not accessible: {response.status_code}")
 
         except Exception as e:
-            (logger.error( if logger else None)f"❌ Direct access failed: {str(e)}")
+            logger.error(f"❌ Direct access failed: {str(e)}")
             raise e
 
     # NOTE: _guaranteed_connection_response removed – silent success paths are
@@ -222,12 +219,12 @@ class WordPressDirectService:
             )
 
             # Set the site URL for WooCommerce
-            (woocommerce_service.set_site_url( if woocommerce_service else None)self.site_url)
+            woocommerce_service.set_site_url(self.site_url)
 
-            (logger.info( if logger else None)"🛒 WooCommerce integration configured for skyyrose.co")
+            logger.info("🛒 WooCommerce integration configured for skyyrose.co")
 
         except Exception as e:
-            (logger.error( if logger else None)f"WooCommerce setup failed: {str(e)}")
+            logger.error(f"WooCommerce setup failed: {str(e)}")
 
     async def get_site_posts(self, per_page: int = 10) -> Dict[str, Any]:
         """Get WordPress posts."""
@@ -235,23 +232,23 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.api_base}/posts",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            posts = (response.json( if response else None))
+            posts = response.json()
 
             return {
                 "posts": posts,
                 "total_posts": len(posts),
-                "analysis": await (self._analyze_posts_for_luxury_optimization( if self else None)posts),
+                "analysis": await self._analyze_posts_for_luxury_optimization(posts),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to get posts: {str(e)}")
+            logger.error(f"Failed to get posts: {str(e)}")
             return {"error": str(e)}
 
     async def get_site_pages(self, per_page: int = 20) -> Dict[str, Any]:
@@ -260,25 +257,25 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = (httpx.get( if httpx else None)
+            response = httpx.get(
                 f"{self.api_base}/pages",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            pages = (response.json( if response else None))
+            pages = response.json()
 
             return {
                 "pages": pages,
                 "total_pages": len(pages),
-                "optimization_opportunities": await (self._analyze_pages_for_luxury_enhancement( if self else None)
+                "optimization_opportunities": await self._analyze_pages_for_luxury_enhancement(
                     pages
                 ),
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to get pages: {str(e)}")
+            logger.error(f"Failed to get pages: {str(e)}")
             return {"error": str(e)}
 
     async def create_luxury_page(self, page_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -288,26 +285,26 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             # Create the page
-            response = (httpx.post( if httpx else None)
+            response = httpx.post(
                 f"{self.api_base}/pages", auth=self.auth, json=page_data
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            created_page = (response.json( if response else None))
+            created_page = response.json()
 
-            (logger.info( if logger else None)
-                f"🎨 Luxury page created: {(created_page.get( if created_page else None)'title', {}).get('rendered', 'New Page')}"
+            logger.info(
+                f"🎨 Luxury page created: {created_page.get('title', {}).get('rendered', 'New Page')}"
             )
 
             return {
                 "page": created_page,
-                "page_url": (created_page.get( if created_page else None)"link"),
+                "page_url": created_page.get("link"),
                 "status": "success",
                 "luxury_optimized": True,
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to create page: {str(e)}")
+            logger.error(f"Failed to create page: {str(e)}")
             return {"error": str(e)}
 
     async def update_site_content(
@@ -318,14 +315,14 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = (httpx.post( if httpx else None)
+            response = httpx.post(
                 f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates
             )
-            (response.raise_for_status( if response else None))
+            response.raise_for_status()
 
-            updated_post = (response.json( if response else None))
+            updated_post = response.json()
 
-            (logger.info( if logger else None)f"✨ Content updated: Post {post_id}")
+            logger.info(f"✨ Content updated: Post {post_id}")
 
             return {
                 "post": updated_post,
@@ -334,7 +331,7 @@ class WordPressDirectService:
             }
 
         except Exception as e:
-            (logger.error( if logger else None)f"Failed to update content: {str(e)}")
+            logger.error(f"Failed to update content: {str(e)}")
             return {"error": str(e)}
 
     async def get_site_health(self) -> Dict[str, Any]:
@@ -347,14 +344,14 @@ class WordPressDirectService:
             health_data = {
                 "connection_status": "connected",
                 "site_url": self.site_url,
-                "last_check": (datetime.now( if datetime else None)).isoformat(),
+                "last_check": datetime.now().isoformat(),
                 "agents_status": {
                     "design_agent": "monitoring_site_aesthetics",
                     "performance_agent": "optimizing_speed_and_security",
                     "wordpress_agent": "managing_content_and_plugins",
                     "brand_agent": "enforcing_luxury_consistency",
                 },
-                "optimization_opportunities": await (self._identify_optimization_opportunities( if self else None)),
+                "optimization_opportunities": await self._identify_optimization_opportunities(),
                 "luxury_score": 92,  # AI-calculated luxury brand score
                 "ready_for_agents": True,
             }
@@ -362,7 +359,7 @@ class WordPressDirectService:
             return health_data
 
         except Exception as e:
-            (logger.error( if logger else None)f"Site health check failed: {str(e)}")
+            logger.error(f"Site health check failed: {str(e)}")
             return {"error": str(e)}
 
     async def _analyze_posts_for_luxury_optimization(
@@ -372,8 +369,8 @@ class WordPressDirectService:
         opportunities = []
 
         for post in posts:
-            title = (post.get( if post else None)"title", {}).get("rendered", "")
-            content = (post.get( if post else None)"content", {}).get("rendered", "")
+            title = post.get("title", {}).get("rendered", "")
+            content = post.get("content", {}).get("rendered", "")
 
             post_opportunities = []
 
@@ -386,23 +383,23 @@ class WordPressDirectService:
                 "sophisticated",
             ]
             if not any(
-                keyword in (title.lower( if title else None)) or keyword in (content.lower( if content else None))
+                keyword in title.lower() or keyword in content.lower()
                 for keyword in luxury_keywords
             ):
-                (post_opportunities.append( if post_opportunities else None)"add_luxury_positioning_language")
+                post_opportunities.append("add_luxury_positioning_language")
 
             # Check content length
             if len(content) < 500:
-                (post_opportunities.append( if post_opportunities else None)"enhance_content_depth")
+                post_opportunities.append("enhance_content_depth")
 
             # Check for featured image
-            if not (post.get( if post else None)"featured_media"):
-                (post_opportunities.append( if post_opportunities else None)"add_high_quality_featured_image")
+            if not post.get("featured_media"):
+                post_opportunities.append("add_high_quality_featured_image")
 
             if post_opportunities:
-                (opportunities.append( if opportunities else None)
+                opportunities.append(
                     {
-                        "post_id": (post.get( if post else None)"id"),
+                        "post_id": post.get("id"),
                         "title": title,
                         "opportunities": post_opportunities,
                     }
@@ -429,25 +426,25 @@ class WordPressDirectService:
         for page in pages:
             page_enhancements = []
 
-            title = (page.get( if page else None)"title", {}).get("rendered", "")
-            content = (page.get( if page else None)"content", {}).get("rendered", "")
+            title = page.get("title", {}).get("rendered", "")
+            content = page.get("content", {}).get("rendered", "")
 
             # Check for conversion optimization
-            if "contact" in (title.lower( if title else None)) and "luxury" not in (content.lower( if content else None)):
-                (page_enhancements.append( if page_enhancements else None)"add_luxury_contact_experience")
+            if "contact" in title.lower() and "luxury" not in content.lower():
+                page_enhancements.append("add_luxury_contact_experience")
 
             # Check for about page optimization
-            if "about" in (title.lower( if title else None)):
-                (page_enhancements.append( if page_enhancements else None)"enhance_brand_story_with_luxury_narrative")
+            if "about" in title.lower():
+                page_enhancements.append("enhance_brand_story_with_luxury_narrative")
 
             # Check for services/products pages
-            if any(word in (title.lower( if title else None)) for word in ["service", "product", "offer"]):
-                (page_enhancements.append( if page_enhancements else None)"optimize_for_premium_positioning")
+            if any(word in title.lower() for word in ["service", "product", "offer"]):
+                page_enhancements.append("optimize_for_premium_positioning")
 
             if page_enhancements:
-                (enhancements.append( if enhancements else None)
+                enhancements.append(
                     {
-                        "page_id": (page.get( if page else None)"id"),
+                        "page_id": page.get("id"),
                         "title": title,
                         "enhancements": page_enhancements,
                         "priority": "high" if len(page_enhancements) > 1 else "medium",
@@ -489,9 +486,7 @@ class WordPressDirectService:
             },
         ]
 
-
 # Factory function
-
 
 def create_wordpress_direct_service() -> WordPressDirectService:
     """Create WordPress Direct Service instance."""

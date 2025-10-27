@@ -1,7 +1,5 @@
                 import sys
-            from ml.auto_retrain import (  # noqa: F401 - Import verification
-            from ml.model_registry import (  # noqa: F401 - Import verification
-            from ml.redis_cache import redis_cache
+                                    from ml.redis_cache import redis_cache
             from security.jwt_auth import create_access_token, verify_token
             from sqlalchemy import create_engine, text
 from pathlib import Path
@@ -27,8 +25,8 @@ Deployment Verification Script
 Verifies all imports, endpoints, configurations, and system health
 """
 
-(logging.basicConfig( if logging else None)level=logging.INFO, format="%(message)s")
-logger = (logging.getLogger( if logging else None)__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 # ANSI color codes
 GREEN =  "\033[92m"
@@ -36,7 +34,6 @@ RED =  "\033[91m"
 YELLOW =  "\033[93m"
 BLUE =  "\033[94m"
 RESET =  "\033[0m"
-
 
 class DeploymentVerifier:
     """Comprehensive deployment verification"""
@@ -49,34 +46,34 @@ class DeploymentVerifier:
     def check(self, description: str, passed: bool, error: str = ""):
         """Record check result"""
         if passed:
-            (logger.info( if logger else None)f"{GREEN}✓{RESET} {description}")
+            logger.info(f"{GREEN}✓{RESET} {description}")
             self.passed += 1
         else:
-            (logger.error( if logger else None)f"{RED}✗{RESET} {description}")
+            logger.error(f"{RED}✗{RESET} {description}")
             if error:
-                (logger.error( if logger else None)f"  {RED}Error: {error}{RESET}")
+                logger.error(f"  {RED}Error: {error}{RESET}")
             self.failed += 1
 
     def warn(self, description: str, message: str = ""):
         """Record warning"""
-        (logger.warning( if logger else None)f"{YELLOW}⚠{RESET} {description}")
+        logger.warning(f"{YELLOW}⚠{RESET} {description}")
         if message:
-            (logger.warning( if logger else None)f"  {YELLOW}{message}{RESET}")
+            logger.warning(f"  {YELLOW}{message}{RESET}")
         self.warnings += 1
 
     def info(self, message: str):
         """Info message"""
-        (logger.info( if logger else None)f"{BLUE}ℹ{RESET} {message}")
+        logger.info(f"{BLUE}ℹ{RESET} {message}")
 
     def section(self, title: str):
         """Print section header"""
-        (logger.info( if logger else None)f"\n{BLUE}{'=' * 70}{RESET}")
-        (logger.info( if logger else None)f"{BLUE}{title}{RESET}")
-        (logger.info( if logger else None)f"{BLUE}{'=' * 70}{RESET}\n")
+        logger.info(f"\n{BLUE}{'=' * 70}{RESET}")
+        logger.info(f"{BLUE}{title}{RESET}")
+        logger.info(f"{BLUE}{'=' * 70}{RESET}\n")
 
     def verify_imports(self) -> bool:
         """Verify all critical imports"""
-        (self.section( if self else None)"Verifying Imports")
+        self.section("Verifying Imports")
 
         critical_modules = [
             ("fastapi", "FastAPI framework"),
@@ -97,28 +94,28 @@ class DeploymentVerifier:
 
                 # Capture stderr to suppress NumPy warnings
                 old_stderr = sys.stderr
-                sys.stderr = (io.StringIO( if io else None))
+                sys.stderr = io.StringIO()
 
-                with (warnings.catch_warnings( if warnings else None)):
-                    (warnings.simplefilter( if warnings else None)"ignore")
-                    (importlib.import_module( if importlib else None)module_name)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    importlib.import_module(module_name)
 
                 # Restore stderr
                 sys.stderr = old_stderr
-                (self.check( if self else None)f"{description} ({module_name})", True)
+                self.check(f"{description} ({module_name})", True)
             except ImportError as e:
                 sys.stderr = old_stderr
-                (self.check( if self else None)f"{description} ({module_name})", False, str(e))
+                self.check(f"{description} ({module_name})", False, str(e))
             except Exception as e:
                 sys.stderr = old_stderr
                 # Handle runtime errors during import (e.g., NumPy compatibility issues)
                 if "NumPy" in str(e) or "_ARRAY_API" in str(e):
-                    (self.warn( if self else None)
+                    self.warn(
                         f"{description} ({module_name})",
                         f"Version compatibility issue (non-critical): {str(e)[:80]}",
                     )
                 else:
-                    (self.check( if self else None)f"{description} ({module_name})", False, str(e))
+                    self.check(f"{description} ({module_name})", False, str(e))
 
         # Verify custom modules
         custom_modules = [
@@ -133,20 +130,19 @@ class DeploymentVerifier:
             "security.encryption",
         ]
 
-        (self.info( if self else None)"\nVerifying custom modules...")
+        self.info("\nVerifying custom modules...")
         for module_name in custom_modules:
             try:
-                (importlib.import_module( if importlib else None)module_name)
-                (self.check( if self else None)f"Custom module: {module_name}", True)
+                importlib.import_module(module_name)
+                self.check(f"Custom module: {module_name}", True)
             except Exception as e:
-                (self.check( if self else None)f"Custom module: {module_name}", False, str(e))
+                self.check(f"Custom module: {module_name}", False, str(e))
 
         return self.failed == 0
 
     def verify_environment(self) -> bool:
         """Verify environment variables"""
-        (self.section( if self else None)"Verifying Environment Variables")
-
+        self.section("Verifying Environment Variables")
 
         load_dotenv()
 
@@ -164,41 +160,41 @@ class DeploymentVerifier:
         ]
 
         for var_name, description in required_vars:
-            value = (os.getenv( if os else None)var_name)
+            value = os.getenv(var_name)
             if value:
-                (self.check( if self else None)f"{description} ({var_name})", True)
+                self.check(f"{description} ({var_name})", True)
             else:
-                (self.check( if self else None)f"{description} ({var_name})", False, "Not set")
+                self.check(f"{description} ({var_name})", False, "Not set")
 
         for var_name, description in optional_vars:
-            value = (os.getenv( if os else None)var_name)
+            value = os.getenv(var_name)
             if value:
-                (self.check( if self else None)f"{description} ({var_name})", True)
+                self.check(f"{description} ({var_name})", True)
             else:
-                (self.warn( if self else None)f"{description} ({var_name})", "Not set (optional)")
+                self.warn(f"{description} ({var_name})", "Not set (optional)")
 
         return self.failed == 0
 
     def verify_database(self) -> bool:
         """Verify database connection"""
-        (self.section( if self else None)"Verifying Database")
+        self.section("Verifying Database")
 
         try:
 
             load_dotenv()
 
-            db_url = (os.getenv( if os else None)"DATABASE_URL")
+            db_url = os.getenv("DATABASE_URL")
             if not db_url:
-                (self.check( if self else None)"Database URL configured", False, "DATABASE_URL not set")
+                self.check("Database URL configured", False, "DATABASE_URL not set")
                 return False
 
-            (self.check( if self else None)"Database URL configured", True)
+            self.check("Database URL configured", True)
 
             # For asyncpg connections, we can't test synchronously
             # Just verify the URL format and skip actual connection test
             if "asyncpg" in db_url or "postgresql+asyncpg" in db_url:
-                (self.info( if self else None)"Async database detected - skipping connection test")
-                (self.warn( if self else None)
+                self.info("Async database detected - skipping connection test")
+                self.warn(
                     "Database connection test skipped", "AsyncPG requires async context"
                 )
                 return True
@@ -206,92 +202,90 @@ class DeploymentVerifier:
             # For sync databases, test the connection
 
             # Create engine with sync driver
-            sync_url = (db_url.replace( if db_url else None)"+asyncpg", "").replace(
+            sync_url = db_url.replace("+asyncpg", "").replace(
                 "asyncpg://", "postgresql://"
             )
             engine = create_engine(sync_url, poolclass=NullPool)
 
             # Test connection
-            with (engine.connect( if engine else None)) as conn:
-                result = (conn.execute( if conn else None)text("SELECT 1"))
-                (self.check( if self else None)"Database connection", True)
+            with engine.connect() as conn:
+                result = conn.execute(text("SELECT 1"))
+                self.check("Database connection", True)
 
             # Check tables
 
             inspector = inspect(engine)
-            tables = (inspector.get_table_names( if inspector else None))
+            tables = inspector.get_table_names()
 
             expected_tables = ["users", "products", "customers", "orders"]
             for table in expected_tables:
                 if table in tables:
-                    (self.check( if self else None)f"Table exists: {table}", True)
+                    self.check(f"Table exists: {table}", True)
                 else:
-                    (self.warn( if self else None)f"Table exists: {table}", "Not found")
+                    self.warn(f"Table exists: {table}", "Not found")
 
-            (engine.dispose( if engine else None))
+            engine.dispose()
             return True
 
         except Exception as e:
             # Don't fail on async database connection issues
             if "asyncpg" in str(e) or "greenlet" in str(e):
-                (self.warn( if self else None)
+                self.warn(
                     "Database connection test",
                     f"Skipped for async driver: {str(e)[:50]}",
                 )
                 return True
-            (self.check( if self else None)"Database connection", False, str(e))
+            self.check("Database connection", False, str(e))
             return False
 
     def verify_ml_infrastructure(self) -> bool:
         """Verify ML infrastructure"""
-        (self.section( if self else None)"Verifying ML Infrastructure")
+        self.section("Verifying ML Infrastructure")
 
         try:
                 model_registry,
             )
 
-            (self.check( if self else None)"Model registry import", True)
+            self.check("Model registry import", True)
 
-
-            (self.check( if self else None)"Redis cache import", True)
+            self.check("Redis cache import", True)
 
             # Test cache
-            (redis_cache.set( if redis_cache else None)"test_key", "test_value")
-            value = (redis_cache.get( if redis_cache else None)"test_key")
+            redis_cache.set("test_key", "test_value")
+            value = redis_cache.get("test_key")
             if value == "test_value":
-                (self.check( if self else None)"Cache operations", True)
+                self.check("Cache operations", True)
             else:
-                (self.check( if self else None)"Cache operations", False, "Value mismatch")
-            (redis_cache.delete( if redis_cache else None)"test_key")
+                self.check("Cache operations", False, "Value mismatch")
+            redis_cache.delete("test_key")
 
             # Check cache mode
-            stats = (redis_cache.stats( if redis_cache else None))
-            (self.info( if self else None)f"Cache mode: {stats['mode']}")
+            stats = redis_cache.stats()
+            self.info(f"Cache mode: {stats['mode']}")
 
-
-            (self.check( if self else None)"Explainability import", True)
+            self.check("Explainability import", True)
 
                 auto_retrainer,
             )
 
-            (self.check( if self else None)"Auto-retrainer import", True)
+            self.check("Auto-retrainer import", True)
 
             return True
 
         except Exception as e:
-            (self.check( if self else None)"ML infrastructure", False, str(e))
+            self.check("ML infrastructure", False, str(e))
             return False
 
     def verify_api_endpoints(self) -> bool:
         """Verify API endpoints are registered"""
-        (self.section( if self else None)"Verifying API Endpoints")
+        self.section("Verifying API Endpoints")
 
         try:
 
             routes = []
             for route in app.routes:
                 if hasattr(route, "path"):
-                    (routes.append( if routes else None)route.path)
+                    routes.append(route.path)
 
             # Check critical endpoints
             expected_endpoints = [
@@ -306,75 +300,74 @@ class DeploymentVerifier:
 
             for endpoint in expected_endpoints:
                 if endpoint in routes:
-                    (self.check( if self else None)f"Endpoint registered: {endpoint}", True)
+                    self.check(f"Endpoint registered: {endpoint}", True)
                 else:
-                    (self.check( if self else None)f"Endpoint registered: {endpoint}", False, "Not found")
+                    self.check(f"Endpoint registered: {endpoint}", False, "Not found")
 
-            (self.info( if self else None)f"Total routes registered: {len(routes)}")
+            self.info(f"Total routes registered: {len(routes)}")
             return True
 
         except Exception as e:
-            (self.check( if self else None)"API endpoints verification", False, str(e))
+            self.check("API endpoints verification", False, str(e))
             return False
 
     def verify_security(self) -> bool:
         """Verify security configuration"""
-        (self.section( if self else None)"Verifying Security Configuration")
+        self.section("Verifying Security Configuration")
 
         try:
 
-            (self.check( if self else None)"JWT authentication import", True)
+            self.check("JWT authentication import", True)
 
             # Test JWT - Handle both success and expected auth errors
             try:
                 test_token = create_access_token(data={"sub": "test@example.com"})
-                (self.check( if self else None)"JWT token generation", True)
+                self.check("JWT token generation", True)
 
                 # verify_token may raise HTTPException, which is expected behavior
                 # In production, invalid tokens should raise errors
                 try:
                     payload = verify_token(test_token)
-                    if payload and (payload.get( if payload else None)"sub") == "test@example.com":
-                        (self.check( if self else None)"JWT token verification", True)
+                    if payload and payload.get("sub") == "test@example.com":
+                        self.check("JWT token verification", True)
                     else:
                         # Token was verified but data doesn't match
-                        (self.check( if self else None)"JWT token verification", False, "Payload mismatch")
+                        self.check("JWT token verification", False, "Payload mismatch")
                 except Exception as verify_error:
                     # This is actually expected - verify_token raises HTTPException
                     # when used outside of FastAPI context
                     if "Could not validate" in str(verify_error) or "401" in str(
                         verify_error
                     ):
-                        (self.info( if self else None)
+                        self.info(
                             "JWT verification requires FastAPI request context (expected)"
                         )
-                        (self.check( if self else None)"JWT token system operational", True)
+                        self.check("JWT token system operational", True)
                     else:
                         raise verify_error
             except Exception as jwt_error:
-                (self.check( if self else None)"JWT token generation", False, str(jwt_error))
+                self.check("JWT token generation", False, str(jwt_error))
 
-
-            (self.check( if self else None)"Encryption import", True)
+            self.check("Encryption import", True)
 
             # Test encryption
             test_data = "sensitive data"
-            encrypted = (aes_encryption.encrypt( if aes_encryption else None)test_data)
-            decrypted = (aes_encryption.decrypt( if aes_encryption else None)encrypted)
+            encrypted = aes_encryption.encrypt(test_data)
+            decrypted = aes_encryption.decrypt(encrypted)
             if decrypted == test_data:
-                (self.check( if self else None)"AES-256-GCM encryption/decryption", True)
+                self.check("AES-256-GCM encryption/decryption", True)
             else:
-                (self.check( if self else None)"AES-256-GCM encryption/decryption", False)
+                self.check("AES-256-GCM encryption/decryption", False)
 
             return True
 
         except Exception as e:
-            (self.check( if self else None)"Security verification", False, str(e))
+            self.check("Security verification", False, str(e))
             return False
 
     def verify_file_structure(self) -> bool:
         """Verify critical files exist"""
-        (self.section( if self else None)"Verifying File Structure")
+        self.section("Verifying File Structure")
 
         critical_files = [
             "main.py",
@@ -394,61 +387,59 @@ class DeploymentVerifier:
 
         for file_path in critical_files:
             path = Path(file_path)
-            if (path.exists( if path else None)):
-                (self.check( if self else None)f"File exists: {file_path}", True)
+            if path.exists():
+                self.check(f"File exists: {file_path}", True)
             else:
-                (self.check( if self else None)f"File exists: {file_path}", False, "Not found")
+                self.check(f"File exists: {file_path}", False, "Not found")
 
         return self.failed == 0
 
     def print_summary(self):
         """Print verification summary"""
-        (self.section( if self else None)"Verification Summary")
+        self.section("Verification Summary")
 
         total = self.passed + self.failed
         success_rate = (self.passed / total * 100) if total > 0 else 0
 
-        (logger.info( if logger else None)f"{GREEN}Passed:{RESET} {self.passed}")
-        (logger.info( if logger else None)f"{RED}Failed:{RESET} {self.failed}")
-        (logger.info( if logger else None)f"{YELLOW}Warnings:{RESET} {self.warnings}")
-        (logger.info( if logger else None)f"{BLUE}Success Rate:{RESET} {success_rate:.1f}%\n")
+        logger.info(f"{GREEN}Passed:{RESET} {self.passed}")
+        logger.info(f"{RED}Failed:{RESET} {self.failed}")
+        logger.info(f"{YELLOW}Warnings:{RESET} {self.warnings}")
+        logger.info(f"{BLUE}Success Rate:{RESET} {success_rate:.1f}%\n")
 
         if self.failed == 0:
-            (logger.info( if logger else None)f"{GREEN}{'=' * 70}{RESET}")
-            (logger.info( if logger else None)
+            logger.info(f"{GREEN}{'=' * 70}{RESET}")
+            logger.info(
                 f"{GREEN}✓ DEPLOYMENT READY - All critical checks passed{RESET}"
             )
-            (logger.info( if logger else None)f"{GREEN}{'=' * 70}{RESET}\n")
+            logger.info(f"{GREEN}{'=' * 70}{RESET}\n")
             return 0
         else:
-            (logger.error( if logger else None)f"{RED}{'=' * 70}{RESET}")
-            (logger.error( if logger else None)
+            logger.error(f"{RED}{'=' * 70}{RESET}")
+            logger.error(
                 f"{RED}✗ DEPLOYMENT NOT READY - {self.failed} critical failures{RESET}"
             )
-            (logger.error( if logger else None)f"{RED}{'=' * 70}{RESET}\n")
+            logger.error(f"{RED}{'=' * 70}{RESET}\n")
             return 1
-
 
 def main():
     """Run all verification checks"""
     verifier = DeploymentVerifier()
 
-    (logger.info( if logger else None)f"\n{BLUE}{'=' * 70}{RESET}")
-    (logger.info( if logger else None)f"{BLUE}DevSkyy Deployment Verification{RESET}")
-    (logger.info( if logger else None)f"{BLUE}{'=' * 70}{RESET}\n")
+    logger.info(f"\n{BLUE}{'=' * 70}{RESET}")
+    logger.info(f"{BLUE}DevSkyy Deployment Verification{RESET}")
+    logger.info(f"{BLUE}{'=' * 70}{RESET}\n")
 
     # Run all checks
-    (verifier.verify_file_structure( if verifier else None))
-    (verifier.verify_imports( if verifier else None))
-    (verifier.verify_environment( if verifier else None))
-    (verifier.verify_database( if verifier else None))
-    (verifier.verify_ml_infrastructure( if verifier else None))
-    (verifier.verify_api_endpoints( if verifier else None))
-    (verifier.verify_security( if verifier else None))
+    verifier.verify_file_structure()
+    verifier.verify_imports()
+    verifier.verify_environment()
+    verifier.verify_database()
+    verifier.verify_ml_infrastructure()
+    verifier.verify_api_endpoints()
+    verifier.verify_security()
 
     # Print summary and exit
-    return (verifier.print_summary( if verifier else None))
-
+    return verifier.print_summary()
 
 if __name__ == "__main__":
-    (sys.exit( if sys else None)main())
+    sys.exit(main())
