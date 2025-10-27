@@ -1,5 +1,4 @@
-            import re
-            import re
+import re
 from datetime import datetime
 from pathlib import Path
 import os
@@ -772,8 +771,9 @@ def create_theme_builder() -> WordPressFullStackThemeBuilderAgent:
     return WordPressFullStackThemeBuilderAgent()
 
 # Global instance
-theme_builder = create_theme_builder(
-    # Convenience function
+theme_builder = create_theme_builder()
+
+# Convenience function
 async def build_wordpress_theme(
     name: str, description: str, features: List[str]
 ) -> Dict[str, Any]:
