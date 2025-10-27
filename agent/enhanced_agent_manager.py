@@ -19,7 +19,7 @@ Advanced agent orchestration with circuit breakers, monitoring, and performance 
 
 
 
-logger = (logging.getLogger( if logging else None)__name__)
+logger = logging.getLogger(__name__)
 
 
 class AgentStatus(Enum):
@@ -58,7 +58,7 @@ class CircuitBreaker:
         elif self.state == CircuitBreakerState.OPEN:
             if (
                 self.last_failure_time
-                and (datetime.now( if datetime else None)) - self.last_failure_time
+                and datetime.now() - self.last_failure_time
                 > timedelta(seconds=self.recovery_timeout)
             ):
                 self.state = CircuitBreakerState.HALF_OPEN
@@ -75,11 +75,11 @@ class CircuitBreaker:
     def record_failure(self):
         """Record failed execution"""
         self.failure_count += 1
-        self.last_failure_time = (datetime.now( if datetime else None))
+        self.last_failure_time = datetime.now()
 
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitBreakerState.OPEN
-            (logger.warning( if logger else None)
+            logger.warning(
                 f"Circuit breaker opened after {self.failure_count} failures"
             )
 
@@ -99,14 +99,14 @@ class AgentMetrics:
         """Record execution metrics"""
         self.execution_count += 1
         self.total_execution_time += duration
-        self.last_execution_time = (datetime.now( if datetime else None))
+        self.last_execution_time = datetime.now()
 
         if success:
             self.success_count += 1
         else:
             self.failure_count += 1
 
-        self.(execution_history.append( if execution_history else None)
+        self.execution_history.append(
             {
                 "timestamp": self.last_execution_time,
                 "duration": duration,
@@ -151,12 +151,12 @@ class EnhancedAgentManager:
             "max_concurrent_executions": 10,
         }
 
-        (logger.info( if logger else None)"Enhanced Agent Manager initialized")
+        logger.info("Enhanced Agent Manager initialized")
 
     def register_agent(self, agent_type: str, agent_class: type):
         """Register a new agent type"""
         self.agent_registry[agent_type] = agent_class
-        (logger.info( if logger else None)f"Registered agent type: {agent_type}")
+        logger.info(f"Registered agent type: {agent_type}")
 
     def get_or_create_agent(self, agent_type: str) -> BaseAgent:
         """Get existing agent or create new one"""
@@ -169,7 +169,7 @@ class EnhancedAgentManager:
             self.circuit_breakers[agent_type] = CircuitBreaker()
             self.metrics[agent_type] = AgentMetrics()
 
-            (logger.info( if logger else None)f"Created new agent: {agent_type}")
+            logger.info(f"Created new agent: {agent_type}")
 
         return self.agents[agent_type]
 
@@ -177,14 +177,14 @@ class EnhancedAgentManager:
         self, agent_type: str, task_data: Dict[str, Any], timeout: int = 300
     ) -> Dict[str, Any]:
         """Execute agent with enhanced error handling and monitoring"""
-        execution_id = f"{agent_type}_{int((time.time( if time else None)) * 1000)}"
-        start_time = (time.time( if time else None))
+        execution_id = f"{agent_type}_{int(time.time() * 1000)}"
+        start_time = time.time()
 
         try:
             # Check circuit breaker
-            circuit_breaker = self.(circuit_breakers.get( if circuit_breakers else None)agent_type)
-            if circuit_breaker and not (circuit_breaker.can_execute( if circuit_breaker else None)):
-                (logger.warning( if logger else None)f"Circuit breaker open for agent: {agent_type}")
+            circuit_breaker = self.circuit_breakers.get(agent_type)
+            if circuit_breaker and not circuit_breaker.can_execute():
+                logger.warning(f"Circuit breaker open for agent: {agent_type}")
                 return {
                     "success": False,
                     "error": "Circuit breaker open",
@@ -197,7 +197,7 @@ class EnhancedAgentManager:
                 len(self.active_executions)
                 >= self.performance_thresholds["max_concurrent_executions"]
             ):
-                (logger.warning( if logger else None)"Maximum concurrent executions reached")
+                logger.warning("Maximum concurrent executions reached")
                 return {
                     "success": False,
                     "error": "Maximum concurrent executions reached",
@@ -213,21 +213,21 @@ class EnhancedAgentManager:
             }
 
             # Get agent
-            agent = (self.get_or_create_agent( if self else None)agent_type)
+            agent = self.get_or_create_agent(agent_type)
 
             # Execute with timeout
             try:
-                result = await (asyncio.wait_for( if asyncio else None)
-                    (agent.execute( if agent else None)task_data), timeout=timeout
+                result = await asyncio.wait_for(
+                    agent.execute(task_data), timeout=timeout
                 )
 
                 # Record success
-                execution_time = (time.time( if time else None)) - start_time
+                execution_time = time.time() - start_time
                 self.metrics[agent_type].record_execution(execution_time, True)
                 if circuit_breaker:
-                    (circuit_breaker.record_success( if circuit_breaker else None))
+                    circuit_breaker.record_success()
 
-                (logger.info( if logger else None)
+                logger.info(
                     f"Agent {agent_type} executed successfully in {execution_time:.2f}s"
                 )
 
@@ -240,11 +240,11 @@ class EnhancedAgentManager:
                 }
 
             except asyncio.TimeoutError:
-                (logger.error( if logger else None)f"Agent {agent_type} execution timeout after {timeout}s")
-                execution_time = (time.time( if time else None)) - start_time
+                logger.error(f"Agent {agent_type} execution timeout after {timeout}s")
+                execution_time = time.time() - start_time
                 self.metrics[agent_type].record_execution(execution_time, False)
                 if circuit_breaker:
-                    (circuit_breaker.record_failure( if circuit_breaker else None))
+                    circuit_breaker.record_failure()
 
                 return {
                     "success": False,
@@ -255,14 +255,14 @@ class EnhancedAgentManager:
                 }
 
         except Exception as e:
-            execution_time = (time.time( if time else None)) - start_time
-            (logger.error( if logger else None)f"Agent {agent_type} execution failed: {str(e)}")
+            execution_time = time.time() - start_time
+            logger.error(f"Agent {agent_type} execution failed: {str(e)}")
 
             # Record failure
             if agent_type in self.metrics:
                 self.metrics[agent_type].record_execution(execution_time, False)
             if circuit_breaker:
-                (circuit_breaker.record_failure( if circuit_breaker else None))
+                circuit_breaker.record_failure()
 
             return {
                 "success": False,
@@ -283,7 +283,7 @@ class EnhancedAgentManager:
             return {"error": f"No metrics available for agent: {agent_type}"}
 
         metrics = self.metrics[agent_type]
-        circuit_breaker = self.(circuit_breakers.get( if circuit_breakers else None)agent_type)
+        circuit_breaker = self.circuit_breakers.get(agent_type)
 
         return {
             "agent_type": agent_type,
@@ -293,7 +293,7 @@ class EnhancedAgentManager:
             "success_rate": metrics.success_rate,
             "average_execution_time": metrics.average_execution_time,
             "last_execution_time": (
-                metrics.(last_execution_time.isoformat( if last_execution_time else None))
+                metrics.last_execution_time.isoformat()
                 if metrics.last_execution_time
                 else None
             ),
@@ -309,8 +309,8 @@ class EnhancedAgentManager:
         active_executions = len(self.active_executions)
 
         # Calculate overall metrics
-        total_executions = sum(m.execution_count for m in self.(metrics.values( if metrics else None)))
-        total_successes = sum(m.success_count for m in self.(metrics.values( if metrics else None)))
+        total_executions = sum(m.execution_count for m in self.metrics.values())
+        total_successes = sum(m.success_count for m in self.metrics.values())
         overall_success_rate = (
             total_successes / total_executions if total_executions > 0 else 0
         )
@@ -318,12 +318,12 @@ class EnhancedAgentManager:
         # Check circuit breaker states
         open_circuits = sum(
             1
-            for cb in self.(circuit_breakers.values( if circuit_breakers else None))
+            for cb in self.circuit_breakers.values()
             if cb.state == CircuitBreakerState.OPEN
         )
 
         return {
-            "timestamp": (datetime.now( if datetime else None)).isoformat(),
+            "timestamp": datetime.now().isoformat(),
             "total_agents": total_agents,
             "active_executions": active_executions,
             "total_executions": total_executions,
@@ -338,7 +338,7 @@ class EnhancedAgentManager:
 
     def list_available_agents(self) -> List[str]:
         """List all available agent types"""
-        return list(self.(agent_registry.keys( if agent_registry else None)))
+        return list(self.agent_registry.keys())
 
 
 # Global instance
