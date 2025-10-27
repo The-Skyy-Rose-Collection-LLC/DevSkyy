@@ -595,13 +595,20 @@ class VirtualTryOnHuggingFaceAgent:
         high fashion, editorial quality, 8K, ultra detailed, photorealistic
         """
 
-        # TODO: Integrate actual SDXL generation
-        # For now, create placeholder
-        placeholder = Image.new("RGB", (1024, 1536), color=(200, 200, 200))
+        # Requires SDXL integration
+        # Install: pip install diffusers transformers accelerate
+        # Example:
+        # from diffusers import StableDiffusionXLPipeline
+        # pipe = StableDiffusionXLPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0")
+        # image = pipe(prompt).images[0]
 
-        logger.info("AI model generated (placeholder)")
-
-        return placeholder
+        logger.error("AI model generation requires SDXL model integration")
+        raise NotImplementedError(
+            "AI model generation requires Stable Diffusion XL integration. "
+            "Install: pip install diffusers transformers accelerate. "
+            "Load model: StableDiffusionXLPipeline.from_pretrained('stabilityai/stable-diffusion-xl-base-1.0'). "
+            "This generates photorealistic fashion models based on specifications."
+        )
 
     async def _apply_virtual_tryon(
         self, product_image: Image.Image, model_image: Image.Image, request: TryOnRequest
@@ -618,31 +625,55 @@ class VirtualTryOnHuggingFaceAgent:
         """
         logger.info("👗 Applying virtual try-on")
 
-        # TODO: Integrate IDM-VTON for production
-        # For now, create placeholder variations
+        # Requires IDM-VTON or OOTDiffusion integration
+        # IDM-VTON: https://github.com/yisol/IDM-VTON
+        # OOTDiffusion: https://github.com/levihsu/OOTDiffusion
+        #
+        # Example with IDM-VTON:
+        # from idm_vton import IDMVTONModel
+        # model = IDMVTONModel.from_pretrained("yisol/IDM-VTON")
+        # result = model(model_image, product_image, category="upper_body")
+        #
+        # Process:
+        # 1. Detect model pose (OpenPose/DWPose)
+        # 2. Segment product (SAM/CLIPSeg)
+        # 3. Warp product to fit pose (TPS/flow-based)
+        # 4. Blend with realistic physics
 
-        variations = []
-        for i in range(request.num_variations):
-            # Composite product onto model (placeholder)
-            result = model_image.copy()
-            # In production, this would use IDM-VTON to properly fit the product
-            variations.append(result)
-
-        logger.info(f"Generated {len(variations)} try-on variations (placeholder)")
-
-        return variations
+        logger.error("Virtual try-on requires IDM-VTON or OOTDiffusion model")
+        raise NotImplementedError(
+            "Virtual try-on requires IDM-VTON or OOTDiffusion integration. "
+            "These are state-of-the-art models that realistically fit clothing onto models. "
+            "IDM-VTON: pip install git+https://github.com/yisol/IDM-VTON.git. "
+            "Download model weights from HuggingFace: yisol/IDM-VTON."
+        )
 
     async def _generate_with_product(
         self, product_image: Image.Image, request: TryOnRequest
     ) -> List[Image.Image]:
-        """Generate using product as reference (style transfer approach)."""
-        # Alternative approach using IP-Adapter or ControlNet
+        """
+        Generate using product as reference (style transfer approach).
+
+        Alternative to direct try-on: generate new models styled with the product.
+        Uses IP-Adapter, ControlNet, or InstantStyle for style transfer.
+
+        Example with IP-Adapter:
+        ```python
+        from diffusers import StableDiffusionXLPipeline, IPAdapterXL
+        pipe = StableDiffusionXLPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0")
+        pipe.load_ip_adapter("h94/IP-Adapter", subfolder="sdxl_models", weight_name="ip-adapter_sdxl.bin")
+        images = pipe(prompt="fashion model", ip_adapter_image=product_image, num_images=4).images
+        ```
+        """
         logger.info("🎨 Generating with product reference")
 
-        # Placeholder
-        variations = [product_image.copy() for _ in range(request.num_variations)]
-
-        return variations
+        logger.error("Style transfer generation requires IP-Adapter or ControlNet integration")
+        raise NotImplementedError(
+            "Product-referenced generation requires IP-Adapter or ControlNet. "
+            "Install: pip install diffusers transformers. "
+            "Load IP-Adapter: pipe.load_ip_adapter('h94/IP-Adapter'). "
+            "Generates new models wearing similar styles to the product."
+        )
 
     async def _generate_tryon_video(
         self, image: Image.Image, request: TryOnRequest
@@ -657,12 +688,25 @@ class VirtualTryOnHuggingFaceAgent:
         video_filename = f"{request.request_id}_video.mp4"
         video_path = self.videos_dir / video_filename
 
-        # TODO: Integrate AnimateDiff or SVD for production
-        # For now, create placeholder
+        # Requires video generation model integration
+        # Options:
+        # - AnimateDiff: https://github.com/guoyww/AnimateDiff
+        # - Stable Video Diffusion: https://github.com/Stability-AI/generative-models
+        # - CogVideoX: https://github.com/THUDM/CogVideo
+        #
+        # Example with Stable Video Diffusion:
+        # from diffusers import StableVideoDiffusionPipeline
+        # pipe = StableVideoDiffusionPipeline.from_pretrained("stabilityai/stable-video-diffusion-img2vid")
+        # frames = pipe(image, num_frames=25).frames[0]
+        # save_video(frames, video_path)
 
-        logger.info(f"Video generated (placeholder): {video_path}")
-
-        return video_path
+        logger.error("Video generation requires AnimateDiff or SVD integration")
+        raise NotImplementedError(
+            "Try-on video generation requires AnimateDiff or Stable Video Diffusion. "
+            "Install: pip install diffusers[torch]. "
+            "Load SVD: StableVideoDiffusionPipeline.from_pretrained('stabilityai/stable-video-diffusion-img2vid'). "
+            "Generates smooth video animations from static try-on images."
+        )
 
     async def _generate_3d_tryon(
         self, tryon_image: Image.Image, product_image: Image.Image, request: TryOnRequest
@@ -673,11 +717,19 @@ class VirtualTryOnHuggingFaceAgent:
         model_filename = f"{request.request_id}_3d.glb"
         model_path = self.models_3d_dir / model_filename
 
-        # TODO: Integrate TripoSR or Wonder3D for production
+        # Requires 3D reconstruction model integration
+        # Same models as asset_preprocessing_pipeline.py:
+        # - TripoSR: https://github.com/VAST-AI-Research/TripoSR
+        # - Wonder3D: https://github.com/xxlong0/Wonder3D
+        #
+        # Converts 2D try-on result to rotatable 3D model
 
-        logger.info(f"3D model generated (placeholder): {model_path}")
-
-        return model_path
+        logger.error("3D try-on requires TripoSR or Wonder3D integration")
+        raise NotImplementedError(
+            "3D try-on model generation requires TripoSR or Wonder3D. "
+            "See agent/modules/content/asset_preprocessing_pipeline.py _generate_3d_model() for implementation example. "
+            "Converts 2D try-on images to 3D models for virtual showrooms."
+        )
 
     async def _calculate_quality(self, image: Image.Image) -> float:
         """Calculate quality score."""

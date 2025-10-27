@@ -479,16 +479,24 @@ class AssetPreprocessingPipeline:
 
         upscale_factor = target_width / current_width
 
-        # TODO: Integrate Real-ESRGAN for production
-        # For now, use high-quality PIL resampling
+        # Use Lanczos resampling (high-quality standard method)
+        # Lanczos is acceptable for production use up to 2-4x scaling
+        # For extreme upscaling (>4x) or AI enhancement, integrate Real-ESRGAN
+        # Reference: Lanczos is industry standard, used by Photoshop and other tools
         new_size = (
             int(image.size[0] * upscale_factor),
             int(image.size[1] * upscale_factor),
         )
 
+        if upscale_factor > 4.0:
+            logger.warning(
+                f"Upscaling factor {upscale_factor:.2f}x exceeds recommended limit (4x). "
+                "Consider integrating Real-ESRGAN for better quality on extreme upscaling."
+            )
+
         upscaled = image.resize(new_size, Image.Resampling.LANCZOS)
 
-        logger.info(f"Upscaled {upscale_factor:.2f}x using LANCZOS")
+        logger.info(f"Upscaled {upscale_factor:.2f}x using Lanczos (high-quality bicubic)")
 
         return upscaled, upscale_factor
 
@@ -506,10 +514,13 @@ class AssetPreprocessingPipeline:
         """
         enhanced = image
 
-        # Denoise
+        # Denoise - basic implementation
         if request.denoise:
-            # TODO: Implement AI denoising
-            pass
+            # Use PIL's median filter for basic noise reduction
+            # For AI-powered denoising, integrate Real-ESRGAN or similar
+            from PIL import ImageFilter
+            logger.info("Applying basic denoising (median filter)")
+            enhanced = enhanced.filter(ImageFilter.MedianFilter(size=3))
 
         # Sharpen
         if request.sharpen:
@@ -528,42 +539,70 @@ class AssetPreprocessingPipeline:
         return enhanced
 
     async def _remove_background(self, image: Image.Image) -> Image.Image:
-        """Remove background and create alpha channel."""
-        # TODO: Integrate RemBG or similar for production
-        # For now, return image with transparency if PNG
+        """
+        Remove background and create alpha channel.
+
+        Current Implementation: Basic RGBA conversion (manual background removal required)
+
+        For AI-powered background removal, integrate one of:
+        - rembg (U2Net, recommended): pip install rembg
+        - remove.bg API: https://remove.bg/api
+        - BackgroundRemover: pip install backgroundremover
+
+        Example with rembg:
+        ```python
+        from rembg import remove
+        image_no_bg = remove(image)
+        ```
+
+        Returns:
+            Image with alpha channel (RGBA mode)
+        """
         if image.mode != "RGBA":
             image = image.convert("RGBA")
 
-        logger.info("Background removal (placeholder)")
+        logger.warning(
+            "Background removal: Basic RGBA conversion only. "
+            "For AI background removal, integrate rembg or remove.bg API."
+        )
         return image
 
     async def _generate_3d_model(
         self, image: Image.Image, asset_id: str, request: ProcessingRequest
     ) -> Tuple[Path, Dict[str, Any]]:
         """
-        Generate 3D model from 2D image.
+        Generate 3D model from 2D image using AI.
 
-        Uses TripoSR, Wonder3D, or similar.
+        Requires integration with 3D reconstruction models:
+        - TripoSR (stable-fast-3d): https://github.com/VAST-AI-Research/TripoSR
+        - Wonder3D: https://github.com/xxlong0/Wonder3D
+        - OpenLRM: https://github.com/3DTopia/OpenLRM
+
+        Example TripoSR integration:
+        ```python
+        from tsr.system import TSR
+        model = TSR.from_pretrained("stabilityai/TripoSR")
+        mesh = model.run(image)
+        mesh.export(model_path)
+        ```
+
+        Args:
+            image: Input 2D image
+            asset_id: Unique asset identifier
+            request: Processing configuration
+
+        Raises:
+            NotImplementedError: 3D model generation requires external model integration
+
+        Returns:
+            Path to generated OBJ file and mesh statistics
         """
-        model_filename = f"{asset_id}_model.obj"
-        model_path = self.models_3d_dir / model_filename
-
-        # TODO: Integrate TripoSR or Wonder3D for production
-        # For now, create placeholder
-        mesh_stats = {
-            "vertices": 10000,
-            "faces": 20000,
-            "quality": request.mesh_quality,
-        }
-
-        # Create simple OBJ file (placeholder)
-        with open(model_path, 'w') as f:
-            f.write("# OBJ file (placeholder)\n")
-            f.write(f"# Generated for asset {asset_id}\n")
-
-        logger.info(f"3D model generated (placeholder): {model_path}")
-
-        return model_path, mesh_stats
+        logger.error("3D model generation not implemented - requires TripoSR/Wonder3D integration")
+        raise NotImplementedError(
+            "3D model generation requires integration with TripoSR, Wonder3D, or OpenLRM. "
+            "See function docstring for implementation example. "
+            "These are AI models that convert 2D images to 3D meshes."
+        )
 
     async def _extract_textures(
         self, image: Image.Image, asset_id: str, request: ProcessingRequest
@@ -580,19 +619,31 @@ class AssetPreprocessingPipeline:
         """
         texture_files = {}
 
-        # Albedo (base color)
+        # Albedo (base color) - always generated
         albedo_filename = f"{asset_id}_albedo.png"
         albedo_path = self.textures_dir / albedo_filename
         image.save(albedo_path, "PNG")
         texture_files["albedo"] = str(albedo_path)
 
-        # TODO: Generate other PBR maps
-        # - Normal map (for surface detail)
-        # - Roughness (for material properties)
-        # - Metallic (for metallic surfaces)
-        # - AO (for shadows and depth)
+        # PBR texture generation requires specialized AI models:
+        # - Normal map: depth-from-photo models (e.g., MiDaS, DPT)
+        # - Roughness/Metallic: material estimation models
+        # - AO: ambient occlusion estimation
+        #
+        # For production PBR textures, integrate:
+        # - Adobe Substance 3D Sampler
+        # - Materialize (open source): https://boundingboxsoftware.com/materialize/
+        # - NormalMap-Online: https://cpetry.github.io/NormalMap-Online/
+        #
+        # Example with MiDaS for normal maps:
+        # ```python
+        # from transformers import pipeline
+        # depth_estimator = pipeline("depth-estimation", model="Intel/dpt-large")
+        # depth = depth_estimator(image)
+        # normal_map = depth_to_normal(depth)
+        # ```
 
-        logger.info(f"Textures extracted: {len(texture_files)}")
+        logger.info(f"Textures extracted: {len(texture_files)} (albedo only, PBR maps require model integration)")
 
         return texture_files
 
@@ -610,9 +661,31 @@ class AssetPreprocessingPipeline:
         return thumbnail_path
 
     async def _calculate_quality_score(self, image: Image.Image) -> float:
-        """Calculate overall quality score (0-100)."""
-        # TODO: Implement BRISQUE or similar IQA metric
-        # For now, simple heuristic based on resolution
+        """
+        Calculate overall quality score (0-100).
+
+        Current Implementation: Resolution-based heuristic
+        - 8K (7680x4320): 100 points
+        - 4K (3840x2160): 95 points
+        - QHD (2560x1440): 85 points
+        - HD (1920x1080): 75 points
+        - Lower: 60 points
+
+        For perception-based quality assessment, integrate:
+        - BRISQUE (Blind/Referenceless Image Spatial Quality Evaluator)
+        - NIQE (Natural Image Quality Evaluator)
+        - PIQE (Perception based Image Quality Evaluator)
+
+        Example with PyIQA library:
+        ```python
+        import pyiqa
+        iqa_metric = pyiqa.create_metric('brisque')
+        quality = iqa_metric(image)  # Returns 0-100 score
+        ```
+
+        Reference: Resolution-based scoring is acceptable for automated pipelines
+        where higher resolution generally indicates higher quality.
+        """
         width, height = image.size
         pixels = width * height
 

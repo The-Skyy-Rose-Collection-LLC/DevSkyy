@@ -425,10 +425,25 @@ class CodeRecoveryCursorAgent:
             )
 
     async def _generate_with_cursor(self, request: CodeGenerationRequest) -> str:
-        """Generate code using Cursor AI."""
-        # Placeholder - would integrate with actual Cursor API
-        logger.info("Generating with Cursor AI (placeholder)")
-        return self._generate_placeholder_code(request)
+        """
+        Generate code using Cursor AI.
+
+        Note: Cursor does not provide a public API as of 2024.
+        This method is reserved for future integration if/when Cursor releases an API.
+
+        Raises:
+            NotImplementedError: Cursor API not available
+
+        References:
+            - Cursor is a VS Code fork with AI features but no public API
+            - For code generation, use Claude or Codex providers instead
+        """
+        logger.error("Cursor AI does not provide a public API")
+        raise NotImplementedError(
+            "Cursor AI integration not available. "
+            "Use 'claude' or 'codex' as the model instead. "
+            "Cursor does not provide a public API for external integration."
+        )
 
     async def _generate_with_codex(self, request: CodeGenerationRequest) -> str:
         """Generate code using OpenAI Codex."""
@@ -453,7 +468,10 @@ class CodeRecoveryCursorAgent:
 
         except Exception as e:
             logger.error(f"Codex generation failed: {e}")
-            return self._generate_placeholder_code(request)
+            raise HTTPException(
+                status_code=503,
+                detail=f"Code generation with Codex failed: {str(e)}. Check OPENAI_API_KEY environment variable."
+            )
 
     async def _generate_with_claude(self, request: CodeGenerationRequest) -> str:
         """Generate code using Claude."""
@@ -477,11 +495,26 @@ class CodeRecoveryCursorAgent:
 
         except Exception as e:
             logger.error(f"Claude generation failed: {e}")
-            return self._generate_placeholder_code(request)
+            raise HTTPException(
+                status_code=503,
+                detail=f"Code generation with Claude failed: {str(e)}. Check ANTHROPIC_API_KEY environment variable."
+            )
 
     async def _generate_with_template(self, request: CodeGenerationRequest) -> str:
-        """Generate code using templates (fallback)."""
-        return self._generate_placeholder_code(request)
+        """
+        Generate code using templates (fallback).
+
+        This is a basic fallback that generates code structure from templates.
+        Not suitable for complex code generation - use AI providers instead.
+
+        Raises:
+            NotImplementedError: Template-based generation not implemented
+        """
+        logger.error("Template-based code generation not implemented")
+        raise NotImplementedError(
+            "Template-based code generation not available. "
+            "Use AI providers: 'claude' (recommended) or 'codex' (requires OpenAI API key)."
+        )
 
     def _build_code_generation_prompt(self, request: CodeGenerationRequest) -> str:
         """Build prompt for code generation."""
@@ -526,7 +559,22 @@ Please generate clean, production-ready code with:
         return response.strip()
 
     def _generate_placeholder_code(self, request: CodeGenerationRequest) -> str:
-        """Generate placeholder code."""
+        """
+        Generate placeholder code (DEPRECATED - violates Truth Protocol).
+
+        This method is deprecated and should not be called.
+        Keeping for backwards compatibility but will be removed.
+
+        Raises:
+            DeprecationWarning: This method violates CLAUDE.md Truth Protocol
+        """
+        import warnings
+        warnings.warn(
+            "_generate_placeholder_code violates Truth Protocol. Use real AI providers.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        logger.error("Placeholder code generation called - this violates Truth Protocol")
         if request.language == CodeLanguage.PYTHON:
             return f'''"""
 {request.description}

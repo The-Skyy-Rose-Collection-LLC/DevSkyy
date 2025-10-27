@@ -5,14 +5,63 @@ Comprehensive API endpoints for all multi-agent automation systems
 
 Author: DevSkyy Team
 Version: 1.0.0-production
+
+SECURITY STATUS (Per CLAUDE.md Truth Protocol):
+=================================================
+✅ JWT Authentication Module: security/jwt_auth.py (RFC 7519 compliant)
+✅ RBAC System: 5-role hierarchy (SUPER_ADMIN, ADMIN, DEVELOPER, API_USER, READ_ONLY)
+✅ Input Validation: security/input_validation.py (OWASP compliant)
+✅ Security imports present in this file
+
+⚠️  AUTHENTICATION ENFORCEMENT STATUS:
+- 2/27 endpoints have authentication enforced (assets/upload, assets/{asset_id})
+- Remaining 25 endpoints require Depends(require_role(UserRole.XXX)) parameter
+- Pattern established - see existing endpoints for implementation example
+
+TO COMPLETE AUTHENTICATION (For each remaining endpoint):
+1. Add parameter: current_user: Dict[str, Any] = Depends(require_role(UserRole.XXX) if SECURITY_AVAILABLE else get_current_user)
+2. Update docstring with: **Authentication Required:** XXX role or higher
+3. Update docstring with: **RBAC:** [list of allowed roles]
+
+Role Requirements by Endpoint Type:
+- Assets (create): DEVELOPER
+- Assets (read): API_USER
+- Try-On (generate): DEVELOPER
+- Try-On (read): API_USER
+- Finance operations: ADMIN
+- Finance read: API_USER
+- Marketing operations: ADMIN
+- Code generation: DEVELOPER
+- Workflows: ADMIN
+- System status: READ_ONLY
 """
 
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, HTTPException, BackgroundTasks, status, Depends
 from pydantic import BaseModel, Field
+
+# Security imports (RFC 7519 JWT + RBAC)
+try:
+    from security.jwt_auth import (
+        require_role,
+        UserRole,
+        get_current_user,
+    )
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
+    logging.warning("JWT authentication module not available - endpoints will be unprotected")
+
+# Input sanitization (OWASP compliance)
+try:
+    from security.input_validation import input_sanitizer
+    INPUT_VALIDATION_AVAILABLE = True
+except ImportError:
+    INPUT_VALIDATION_AVAILABLE = False
+    logging.warning("Input validation not available")
 
 # Import agents
 try:
@@ -217,10 +266,13 @@ class VirtualTryOnRequestModel(BaseModel):
 @router.post("/assets/upload", tags=["Assets"])
 async def upload_and_process_asset(
     request: AssetUploadRequest,
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Upload and preprocess a fashion asset.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Automatic processing:
     1. Upscale to target quality (up to 8K)
@@ -230,6 +282,8 @@ async def upload_and_process_asset(
     5. Texture extraction (PBR materials)
 
     Returns preprocessed asset ID for use in try-on generation.
+
+    **RBAC:** DEVELOPER, ADMIN, SUPER_ADMIN
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
@@ -285,8 +339,16 @@ async def upload_and_process_asset(
 
 
 @router.get("/assets/{asset_id}", tags=["Assets"])
-async def get_asset_info(asset_id: str):
-    """Get information about a preprocessed asset."""
+async def get_asset_info(
+    asset_id: str,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user)
+):
+    """
+    Get information about a preprocessed asset.
+
+    **Authentication Required:** API_USER role or higher
+    **RBAC:** API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
