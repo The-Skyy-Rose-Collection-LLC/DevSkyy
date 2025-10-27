@@ -913,6 +913,176 @@ async def get_active_incidents():
         logger.error(f"Incidents endpoint error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================================
+# AUTOMATED THEME BUILDER ENDPOINTS
+# ============================================================================
+
+@app.post("/api/v1/themes/build-and-deploy")
+async def build_and_deploy_theme(theme_request: Dict[str, Any]):
+    """Build and deploy a WordPress theme automatically."""
+    try:
+        from agent.wordpress.theme_builder_orchestrator import (
+            theme_builder_orchestrator,
+            ThemeBuildRequest,
+            ThemeType,
+            UploadMethod
+        )
+        from agent.wordpress.automated_theme_uploader import WordPressCredentials
+
+        # Parse request
+        credentials = WordPressCredentials(
+            site_url=theme_request["site_url"],
+            username=theme_request["username"],
+            password=theme_request["password"],
+            application_password=theme_request.get("application_password"),
+            ftp_host=theme_request.get("ftp_host"),
+            ftp_username=theme_request.get("ftp_username"),
+            ftp_password=theme_request.get("ftp_password")
+        )
+
+        build_request = ThemeBuildRequest(
+            theme_name=theme_request["theme_name"],
+            theme_type=ThemeType(theme_request.get("theme_type", "luxury_fashion")),
+            brand_guidelines=theme_request.get("brand_guidelines", {}),
+            target_site=theme_request["site_url"],
+            deployment_credentials=credentials,
+            customizations=theme_request.get("customizations", {}),
+            auto_deploy=theme_request.get("auto_deploy", True),
+            activate_after_deploy=theme_request.get("activate_after_deploy", False),
+            upload_method=UploadMethod(theme_request.get("upload_method", "wordpress_rest_api"))
+        )
+
+        # Start build process
+        result = await theme_builder_orchestrator.build_and_deploy_theme(build_request)
+
+        return {
+            "build_id": result.build_id,
+            "status": result.status.value,
+            "theme_name": result.request.theme_name,
+            "theme_path": result.theme_path,
+            "deployment_success": result.deployment_result.success if result.deployment_result else None,
+            "deployment_id": result.deployment_result.deployment_id if result.deployment_result else None,
+            "build_log": result.build_log[-5:],  # Last 5 log entries
+            "created_at": result.created_at.isoformat(),
+            "completed_at": result.completed_at.isoformat() if result.completed_at else None,
+            "error_message": result.error_message
+        }
+
+    except Exception as e:
+        logger.error(f"Theme build error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/themes/build-status/{build_id}")
+async def get_theme_build_status(build_id: str):
+    """Get theme build status."""
+    try:
+        from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator
+
+        result = theme_builder_orchestrator.get_build_status(build_id)
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Build not found")
+
+        return {
+            "build_id": result.build_id,
+            "status": result.status.value,
+            "theme_name": result.request.theme_name,
+            "theme_type": result.request.theme_type.value,
+            "target_site": result.request.target_site,
+            "theme_path": result.theme_path,
+            "deployment_result": {
+                "success": result.deployment_result.success,
+                "deployment_id": result.deployment_result.deployment_id,
+                "status": result.deployment_result.status.value,
+                "deployed_at": result.deployment_result.deployed_at.isoformat() if result.deployment_result.deployed_at else None
+            } if result.deployment_result else None,
+            "build_log": result.build_log,
+            "created_at": result.created_at.isoformat(),
+            "completed_at": result.completed_at.isoformat() if result.completed_at else None,
+            "error_message": result.error_message
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Build status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/v1/themes/upload-only")
+async def upload_theme_only(upload_request: Dict[str, Any]):
+    """Upload an existing theme package without building."""
+    try:
+        from agent.wordpress.automated_theme_uploader import (
+            automated_theme_uploader,
+            WordPressCredentials,
+            UploadMethod
+        )
+
+        # Parse credentials
+        credentials = WordPressCredentials(
+            site_url=upload_request["site_url"],
+            username=upload_request["username"],
+            password=upload_request["password"],
+            application_password=upload_request.get("application_password")
+        )
+
+        # Create theme package
+        theme_info = {
+            "name": upload_request["theme_name"],
+            "version": upload_request.get("version", "1.0.0"),
+            "description": upload_request.get("description", ""),
+            "author": upload_request.get("author", "DevSkyy Platform")
+        }
+
+        package = await automated_theme_uploader.create_theme_package(
+            upload_request["theme_path"],
+            theme_info
+        )
+
+        # Deploy theme
+        result = await automated_theme_uploader.deploy_theme(
+            package,
+            credentials,
+            UploadMethod(upload_request.get("upload_method", "wordpress_rest_api")),
+            upload_request.get("activate_theme", False)
+        )
+
+        return {
+            "deployment_id": result.deployment_id,
+            "success": result.success,
+            "status": result.status.value,
+            "theme_name": result.theme_package.name,
+            "deployed_at": result.deployed_at.isoformat() if result.deployed_at else None,
+            "error_message": result.error_message,
+            "validation_results": result.validation_results
+        }
+
+    except Exception as e:
+        logger.error(f"Theme upload error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/themes/system-status")
+async def get_theme_system_status():
+    """Get theme builder and uploader system status."""
+    try:
+        from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator
+
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "theme_builder_orchestrator": theme_builder_orchestrator.get_system_status(),
+            "available_theme_types": [
+                "luxury_fashion", "streetwear", "minimalist",
+                "ecommerce", "blog", "portfolio", "corporate"
+            ],
+            "supported_upload_methods": [
+                "wordpress_rest_api", "ftp", "sftp", "staging_area"
+            ]
+        }
+
+    except Exception as e:
+        logger.error(f"Theme system status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ============================================================================
 # STATIC FILES AND ASSETS
