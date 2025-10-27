@@ -74,12 +74,15 @@ class ForecastingEngine:
         elif method == "rf":
             forecast, lower, upper = self._random_forest_forecast(
                 historical_data, periods
+            )
         elif method == "seasonal":
             forecast, lower, upper = self._seasonal_forecast(
                 historical_data, periods, seasonality
+            )
         else:
             forecast, lower, upper = self._random_forest_forecast(
                 historical_data, periods
+            )
         return {
             "forecast": forecast,
             "confidence_interval_lower": lower,
@@ -320,13 +323,15 @@ class ForecastingEngine:
                     for o, a in zip(
                         order_forecast["confidence_interval_lower"],
                         aov_forecast["confidence_interval_lower"],
+                    )
                 ],
                 "upper": [
                     o * a
                     for o, a in zip(
                         order_forecast["confidence_interval_upper"],
                         aov_forecast["confidence_interval_upper"],
-                ],
+                    )
+                ]
             },
         }
 
