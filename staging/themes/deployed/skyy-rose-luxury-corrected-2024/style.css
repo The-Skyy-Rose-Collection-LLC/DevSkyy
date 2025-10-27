@@ -1,0 +1,712 @@
+/*
+Theme Name: Skyy Rose Luxury Corrected 2024
+Description: FIXED Luxury fashion theme for Skyy Rose Collection with verifiable styling
+Version: 1.2.0
+Author: DevSkyy Platform - Fixed Version
+Text Domain: skyy-rose-luxury-fixed-2024
+Tags: luxury, fashion, ecommerce, responsive, woocommerce, fixed, verified
+*/
+
+/* ============================================================================
+   SKYY ROSE COLLECTION - LUXURY FASHION STYLES (FIXED VERSION)
+   ============================================================================ */
+
+/* Google Fonts Import - VERIFIED */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+
+/* CSS Custom Properties - VERIFIED LUXURY COLORS */
+:root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #d4af37;
+    --accent-color: #8b7355;
+    --background-color: #ffffff;
+    --text-color: #333333;
+    --heading-font: 'Playfair Display', serif;
+    --body-font: 'Source Sans Pro', sans-serif;
+    --accent-font: 'Dancing Script', cursive;
+    
+    /* Additional luxury colors */
+    --light-gold: rgba(212, 175, 55, 0.1);
+    --dark-overlay: rgba(26, 26, 26, 0.8);
+    --luxury-shadow: 0 10px 30px rgba(26, 26, 26, 0.15);
+    --elegant-border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* ============================================================================
+   GLOBAL RESET AND BASE STYLES
+   ============================================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--body-font);
+    font-weight: 300;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   LUXURY TYPOGRAPHY SYSTEM
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    font-weight: 400;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+}
+
+h3 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400;
+}
+
+h4 {
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    font-weight: 400;
+}
+
+h5 {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+h6 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   LUXURY CONTAINER SYSTEM
+   ============================================================================ */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.container-wide {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.container-narrow {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* ============================================================================
+   LUXURY HEADER DESIGN
+   ============================================================================ */
+
+.site-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: var(--elegant-border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--luxury-shadow);
+}
+
+.site-branding {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.site-title {
+    font-family: var(--heading-font);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.site-title a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.site-title a:hover {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+.site-title a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+    transition: width 0.4s ease;
+}
+
+.site-title a:hover::after {
+    width: 100%;
+}
+
+.site-description {
+    font-family: var(--accent-font);
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* ============================================================================
+   LUXURY NAVIGATION SYSTEM
+   ============================================================================ */
+
+.main-navigation {
+    text-align: center;
+}
+
+.main-navigation ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    margin: 0;
+    padding: 0;
+}
+
+.main-navigation li {
+    position: relative;
+}
+
+.main-navigation a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.main-navigation a:hover {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+.main-navigation a::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 1px;
+    background: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.main-navigation a:hover::before {
+    width: 20px;
+}
+
+.main-navigation a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+    transition: width 0.3s ease;
+}
+
+.main-navigation a:hover::after {
+    width: 100%;
+}
+
+/* Fallback menu when no menu is assigned */
+.main-navigation .menu-fallback {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.main-navigation .menu-fallback a {
+    color: var(--accent-color);
+    font-style: italic;
+}
+
+/* ============================================================================
+   LUXURY HERO SECTION
+   ============================================================================ */
+
+.skyy-rose-hero {
+    background: linear-gradient(135deg, 
+        var(--background-color) 0%, 
+        var(--light-gold) 50%, 
+        var(--background-color) 100%);
+    padding: 8rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.skyy-rose-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23d4af37" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23d4af37" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.skyy-rose-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.skyy-rose-hero h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 300;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.skyy-rose-hero p {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    color: var(--text-color);
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    font-weight: 300;
+    line-height: 1.6;
+}
+
+.skyy-rose-hero .cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: var(--background-color);
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: var(--luxury-shadow);
+}
+
+.skyy-rose-hero .cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(26, 26, 26, 0.2);
+    background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+}
+
+/* ============================================================================
+   LUXURY CONTENT AREAS
+   ============================================================================ */
+
+.site-main {
+    padding: 6rem 0;
+}
+
+.luxury-post {
+    margin-bottom: 6rem;
+    padding-bottom: 4rem;
+    border-bottom: var(--elegant-border);
+    position: relative;
+}
+
+.luxury-post:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.luxury-post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+}
+
+.entry-header {
+    margin-bottom: 3rem;
+}
+
+.entry-title {
+    margin-bottom: 1rem;
+}
+
+.entry-title a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.entry-title a:hover {
+    color: var(--secondary-color);
+}
+
+.entry-meta {
+    font-family: var(--body-font);
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+}
+
+.entry-meta time {
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+.post-content p:first-child {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+/* ============================================================================
+   WOOCOMMERCE LUXURY STYLING
+   ============================================================================ */
+
+.woocommerce .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+    margin: 4rem 0;
+}
+
+.woocommerce .product {
+    background: var(--background-color);
+    border: var(--elegant-border);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.woocommerce .product::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--light-gold), transparent);
+    transition: left 0.6s ease;
+}
+
+.woocommerce .product:hover::before {
+    left: 100%;
+}
+
+.woocommerce .product:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--luxury-shadow);
+    border-color: var(--secondary-color);
+}
+
+.woocommerce .product img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+    transition: transform 0.4s ease;
+}
+
+.woocommerce .product:hover img {
+    transform: scale(1.05);
+}
+
+.woocommerce .product h3 {
+    font-family: var(--heading-font);
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.woocommerce .price {
+    font-family: var(--heading-font);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+.woocommerce .price del {
+    color: var(--accent-color);
+    opacity: 0.6;
+    font-size: 1.2rem;
+}
+
+.woocommerce .button {
+    background: var(--primary-color);
+    color: var(--background-color);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.woocommerce .button:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* ============================================================================
+   LUXURY FOOTER DESIGN
+   ============================================================================ */
+
+.site-footer {
+    background: var(--primary-color);
+    color: var(--background-color);
+    padding: 4rem 0 2rem;
+    margin-top: 6rem;
+    position: relative;
+}
+
+.site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+}
+
+.site-info {
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    letter-spacing: 0.05em;
+}
+
+.site-info p {
+    margin-bottom: 0.5rem;
+}
+
+.site-info a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+
+.site-info a:hover {
+    color: var(--background-color);
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .container,
+    .container-wide,
+    .container-narrow {
+        padding: 0 1rem;
+    }
+    
+    .site-header {
+        padding: 1rem 0;
+    }
+    
+    .site-branding {
+        margin-bottom: 1rem;
+    }
+    
+    .main-navigation ul {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .skyy-rose-hero {
+        padding: 4rem 0;
+    }
+    
+    .site-main {
+        padding: 3rem 0;
+    }
+    
+    .luxury-post {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+    }
+    
+    .woocommerce .products {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-navigation ul {
+        gap: 1rem;
+    }
+    
+    .skyy-rose-hero {
+        padding: 3rem 0;
+    }
+    
+    .site-main {
+        padding: 2rem 0;
+    }
+}
+
+/* ============================================================================
+   LUXURY ANIMATIONS
+   ============================================================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.luxury-post {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.site-branding {
+    animation: fadeInLeft 0.6s ease-out;
+}
+
+.main-navigation {
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mb-3 { margin-bottom: 3rem; }
+
+.luxury-accent {
+    color: var(--secondary-color);
+    font-family: var(--accent-font);
+    font-style: italic;
+}
+
+.luxury-divider {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+    margin: 3rem auto;
+    border: none;
+}
+
+/* ============================================================================
+   END OF LUXURY THEME STYLES
+   ============================================================================ */
