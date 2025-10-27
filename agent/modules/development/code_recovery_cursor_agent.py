@@ -273,6 +273,11 @@ class CodeRecoveryCursorAgent:
     """
 
     def __init__(self):
+        """
+        Create and configure a Code Recovery & Cursor Integration Agent instance.
+        
+        Sets agent metadata (name, type, version), ensures workspace and recovery directories exist, initializes available AI model clients, establishes performance counters (generation, recovery, scraping), defines code quality thresholds, and records startup in the logger.
+        """
         self.agent_name = "Code Recovery & Cursor Integration Agent"
         self.agent_type = "code_development"
         self.version = "1.0.0-production"
@@ -302,7 +307,16 @@ class CodeRecoveryCursorAgent:
         logger.info(f"✅ {self.agent_name} v{self.version} initialized")
 
     def _initialize_ai_clients(self) -> Dict[str, Any]:
-        """Initialize AI model clients."""
+        """
+        Build and return a mapping of available AI model clients detected from environment variables.
+        
+        Returns:
+            clients (Dict[str, Any]): A dictionary keyed by provider name ("cursor", "codex", "claude") for each detected client. Each entry contains provider-specific connection info and an `available` boolean, for example:
+                - "cursor": {"api_key": str, "endpoint": str, "available": True}
+                - "codex": {"client": <openai.OpenAI>, "available": True}
+                - "claude": {"client": <anthropic.Anthropic>, "available": True}
+            Providers are included only if their corresponding environment variable is present; SDK-based clients are added only when the SDK can be imported.
+        """
         clients = {}
 
         # Cursor AI (placeholder - would use actual Cursor API)
@@ -343,13 +357,12 @@ class CodeRecoveryCursorAgent:
         self, request: CodeGenerationRequest
     ) -> CodeGenerationResult:
         """
-        Generate code using AI models.
-
-        Implements:
-        - Multi-model code generation
-        - Quality validation
-        - Style formatting
-        - Documentation generation
+        Generate source code for a CodeGenerationRequest using available AI backends and return a CodeGenerationResult.
+        
+        Performs model selection based on the request and available AI clients, formats the generated code, runs a quality analysis, optionally adds documentation, and persists the result. If request.file_path is provided the generated code is written into the agent's workspace; the agent's generation counter is incremented. On failure the returned CodeGenerationResult has success=False and the error field populated.
+        
+        Returns:
+            CodeGenerationResult: Result object containing success flag, generated code (if any), file path (if saved), language, quality and complexity metrics, any issues or suggestions, docstrings_generated flag, model_used, generation_time, and an error message when generation failed.
         """
         start_time = datetime.now()
 
@@ -446,7 +459,20 @@ class CodeRecoveryCursorAgent:
         )
 
     async def _generate_with_codex(self, request: CodeGenerationRequest) -> str:
-        """Generate code using OpenAI Codex."""
+        """
+        Generate source code using the configured OpenAI Codex-compatible client.
+        
+        Builds a prompt from the provided CodeGenerationRequest, sends it to the Codex/chat completions API with the request's temperature and max_tokens, and returns the extracted source code text from the model response.
+        
+        Parameters:
+            request (CodeGenerationRequest): Request object containing the description, generation constraints, and model parameters (e.g., temperature, max_tokens) used to construct the prompt and control the generation.
+        
+        Returns:
+            str: The generated source code extracted from the model's response.
+        
+        Raises:
+            HTTPException: If the Codex generation call fails or an unexpected error occurs while communicating with the Codex client.
+        """
         try:
             client = self.ai_clients["codex"]["client"]
 
@@ -474,7 +500,18 @@ class CodeRecoveryCursorAgent:
             )
 
     async def _generate_with_claude(self, request: CodeGenerationRequest) -> str:
-        """Generate code using Claude."""
+        """
+        Generate source code for the given CodeGenerationRequest using the Claude model.
+        
+        Parameters:
+            request (CodeGenerationRequest): The generation request containing prompt details, target language, model and generation options (e.g., temperature, max_tokens), formatting and documentation preferences.
+        
+        Returns:
+            str: Generated source code extracted from Claude's response.
+        
+        Raises:
+            HTTPException: If Claude-based generation fails; the exception detail will include the error and a hint to check the ANTHROPIC_API_KEY environment variable.
+        """
         try:
             client = self.ai_clients["claude"]["client"]
 
@@ -517,7 +554,17 @@ class CodeRecoveryCursorAgent:
         )
 
     def _build_code_generation_prompt(self, request: CodeGenerationRequest) -> str:
-        """Build prompt for code generation."""
+        """
+        Constructs a natural-language prompt for an AI code generator based on the CodeGenerationRequest.
+        
+        Includes the target language, description, bulletized requirements, and optional framework, libraries, and style guide. Adds instructions to produce production-ready code (error handling, type hints, docstrings/comments) and appends a request for unit tests if test_requirements is set.
+        
+        Parameters:
+            request (CodeGenerationRequest): Source data for prompt construction; uses fields such as language, description, requirements, framework, libraries, style_guide, and test_requirements.
+        
+        Returns:
+            str: The assembled prompt string ready to be sent to an AI model.
+        """
         prompt = f"""Generate {request.language.value} code for the following requirements:
 
 Description: {request.description}
@@ -548,7 +595,14 @@ Please generate clean, production-ready code with:
         return prompt
 
     def _extract_code_from_response(self, response: str) -> str:
-        """Extract code from AI response (removes markdown, explanations)."""
+        """
+        Extracts the first Markdown fenced code block from an AI response or returns the trimmed response if none is found.
+        
+        Searches for fenced code blocks (```...```) and returns the contents of the first matched block.
+        
+        Returns:
+            str: The extracted code from the first Markdown fenced code block, trimmed of surrounding whitespace; if no fenced block is found, the trimmed original response.
+        """
         # Remove markdown code blocks
         code_pattern = r"```(?:\w+)?\n(.*?)```"
         matches = re.findall(code_pattern, response, re.DOTALL)
@@ -560,13 +614,19 @@ Please generate clean, production-ready code with:
 
     def _generate_placeholder_code(self, request: CodeGenerationRequest) -> str:
         """
-        Generate placeholder code (DEPRECATED - violates Truth Protocol).
-
-        This method is deprecated and should not be called.
-        Keeping for backwards compatibility but will be removed.
-
-        Raises:
-            DeprecationWarning: This method violates CLAUDE.md Truth Protocol
+        Generate a simple placeholder source file for the requested language (deprecated).
+        
+        This function is deprecated and retained only for backward compatibility; it will be removed in a future release.
+        As a side effect it emits a DeprecationWarning and logs an error if called. The returned string uses
+        request.description as a header/comment and varies by request.language (special-cased for Python and JavaScript,
+        generic comment for other languages).
+        
+        Parameters:
+            request (CodeGenerationRequest): Input request whose `language` selects the template and whose `description`
+                is embedded in the generated placeholder.
+        
+        Returns:
+            str: Placeholder source code tailored to the requested language.
         """
         import warnings
         warnings.warn(
@@ -608,7 +668,17 @@ module.exports = {{ main }};
     async def _format_code(
         self, code: str, language: CodeLanguage, formatter: Optional[str]
     ) -> str:
-        """Format code using appropriate formatter."""
+        """
+        Format source code using the specified formatter when available.
+        
+        Parameters:
+            code (str): The source code to format.
+            language (CodeLanguage): The programming language of the source code.
+            formatter (Optional[str]): Name of the formatter to apply (e.g., "black" for Python, "prettier" for JavaScript/TypeScript). If None or unsupported, the original code is returned unchanged.
+        
+        Returns:
+            str: The formatted source code if formatting succeeded and a supported formatter was specified; otherwise, the original input `code`.
+        """
         if not formatter:
             return code
 
@@ -641,7 +711,22 @@ module.exports = {{ main }};
     async def _analyze_code_quality(
         self, code: str, language: CodeLanguage
     ) -> Dict[str, Any]:
-        """Analyze code quality."""
+        """
+        Perform a lightweight static assessment of the provided source code and produce basic quality metrics and findings.
+        
+        Parameters:
+            code (str): Source code to analyze.
+            language (CodeLanguage): Language of the source code; controls language-specific checks.
+        
+        Returns:
+            dict: Analysis results containing:
+                - `quality` (float): Overall quality score (0–100).
+                - `complexity` (float): Estimated complexity score.
+                - `maintainability` (float): Estimated maintainability score (0–100).
+                - `issues` (list[dict]): Detected issues; each issue contains `type`, `message`, and `severity`.
+                - `suggestions` (list[str]): Actionable suggestions to improve the code.
+                - `lines_of_code` (int): Count of non-blank source lines analyzed.
+        """
         analysis = {
             "quality": 75.0,  # Default score
             "complexity": 5.0,
@@ -667,7 +752,18 @@ module.exports = {{ main }};
         return analysis
 
     async def _add_documentation(self, code: str, language: CodeLanguage) -> str:
-        """Add documentation to code."""
+        """
+        Insert or augment documentation (docstrings and inline comments) into the provided source code.
+        
+        Preserves existing documentation when possible and adds missing module, class, and function docstrings or language-appropriate comments according to the target language's conventions.
+        
+        Parameters:
+            code (str): Source code to document.
+            language (CodeLanguage): Target language to guide documentation style and placement.
+        
+        Returns:
+            str: Source code with documentation added or updated.
+        """
         # Placeholder - would use AI to generate meaningful docstrings
         return code
 
@@ -675,13 +771,13 @@ module.exports = {{ main }};
         self, request: CodeRecoveryRequest
     ) -> CodeRecoveryResult:
         """
-        Recover code from version control or backups.
-
-        Implements:
-        - Git repository cloning
-        - Historical code retrieval
-        - Integrity verification
-        - Automated testing
+        Orchestrates recovery of source files using the requested recovery strategy.
+        
+        Parameters:
+            request (CodeRecoveryRequest): Specifies the recovery strategy and target details (for example, repository_url, file_path, branch or commit_hash) and options such as prefer_latest, include_tests, and verify_integrity.
+        
+        Returns:
+            CodeRecoveryResult: Result object indicating success or failure and containing recovered files info (files_recovered, total_files, total_lines), strategy_used, commit_hash when applicable, recovery_time in seconds, integrity_verified and tests_passed flags, any issues_found, and an error message on failure.
         """
         start_time = datetime.now()
 
@@ -723,7 +819,30 @@ module.exports = {{ main }};
     async def _recover_from_git(
         self, request: CodeRecoveryRequest
     ) -> CodeRecoveryResult:
-        """Recover code from Git repository."""
+        """
+        Recover repository files from a Git repository URL into the agent's recovery directory.
+        
+        Clones the repository (or pulls latest changes if already present), optionally checks out
+        a specific commit, and collects Python source files found under the repository. Each
+        recovered file includes its relative path, full content, and line count.
+        
+        Parameters:
+            request (CodeRecoveryRequest): Recovery request containing at minimum `repository_url`.
+                If `commit_hash` is provided, the function will attempt to check out that commit.
+                Other fields are used to control recovery behavior (e.g., branch, prefer_latest).
+        
+        Returns:
+            CodeRecoveryResult: Result object with `success` set to `True` on success and fields:
+                - files_recovered: list of dicts with `path`, `content`, and `lines`
+                - total_files: number of recovered files
+                - total_lines: sum of lines across recovered files
+                - strategy_used: set to `RecoveryStrategy.GIT_HISTORY`
+                - integrity_verified: `True` when repository operations completed without error
+        
+        Raises:
+            Exception: Propagates any underlying error encountered during cloning, pulling,
+            checkout, or file collection.
+        """
         try:
             if not request.repository_url:
                 raise ValueError("Repository URL required for Git recovery")
@@ -795,7 +914,14 @@ module.exports = {{ main }};
     async def _recover_from_backup(
         self, request: CodeRecoveryRequest
     ) -> CodeRecoveryResult:
-        """Recover code from backup."""
+        """
+        Attempt to recover repository files from a backup source.
+        
+        Currently not implemented; returns a CodeRecoveryResult with success set to `False`, strategy_used set to `RecoveryStrategy.BACKUP_RESTORE`, and an `error` message indicating that backup recovery is not yet implemented.
+        
+        Returns:
+            CodeRecoveryResult: Result object indicating the recovery attempt failed with an explanatory error message.
+        """
         # Placeholder for backup recovery logic
         return CodeRecoveryResult(
             request_id=request.request_id,
@@ -808,13 +934,21 @@ module.exports = {{ main }};
         self, request: WebScrapingRequest
     ) -> WebScrapingResult:
         """
-        Scrape website for data collection.
-
-        Implements:
-        - Ethical scraping with rate limiting
-        - Content extraction
-        - Data structuring
-        - Analysis and insights
+        Scrapes a website according to the provided WebScrapingRequest and returns structured extraction, metrics, and insights.
+        
+        This method performs a web scraping operation driven by the fields of the given WebScrapingRequest (target URL, extraction options, link-following, limits, and authentication). On success it returns a WebScrapingResult containing extracted data, computed insights, and timing/metric information; on failure it returns a WebScrapingResult with success set to `False` and an error message.
+        
+        Returns:
+            WebScrapingResult: Result object containing:
+                - `request_id`: echoed request identifier.
+                - `success`: `True` if scraping completed, `False` otherwise.
+                - `pages_scraped`: number of pages successfully scraped.
+                - `data_extracted`: structured payload of extracted content (e.g., title, text, metadata, images).
+                - `images_downloaded`: count or list of downloaded images when applicable.
+                - `insights` / `trends_identified`: derived observations from the scraped content.
+                - `scraping_time`: total elapsed time in seconds.
+                - `error`: error message when `success` is `False`.
+                - `warnings`: any non-fatal warnings encountered.
         """
         start_time = datetime.now()
 
@@ -852,7 +986,19 @@ module.exports = {{ main }};
             )
 
     def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """
+        Provide the agent's runtime status and configuration summary.
+        
+        Returns:
+            status (dict): Mapping containing:
+                - agent_name (str): Agent identifier.
+                - version (str): Agent version string.
+                - performance (dict): Counters with keys `generation_count`, `recovery_count`, and `scraping_count`.
+                - ai_clients (dict): Per-model availability mapping; each value contains an `available` boolean.
+                - workspace_directory (str): Path to the agent's workspace directory.
+                - recovery_directory (str): Path to the agent's recovery directory.
+                - quality_thresholds (dict): Mapping of quality metric names to threshold values.
+        """
         return {
             "agent_name": self.agent_name,
             "version": self.version,

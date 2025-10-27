@@ -243,6 +243,11 @@ class VirtualTryOnHuggingFaceAgent:
     """
 
     def __init__(self):
+        """
+        Constructs the agent and prepares its runtime environment and resources.
+        
+        Creates required output directories for images, videos, and 3D models; initializes the HuggingFace model registry and the lazy-loaded model store; sets up performance counters for generation tracking; detects the compute device and numeric dtype to use; and emits startup logs.
+        """
         self.agent_name = "Virtual Try-On & HuggingFace Agent"
         self.version = "1.0.0-limitless"
 
@@ -273,7 +278,18 @@ class VirtualTryOnHuggingFaceAgent:
         logger.info(f"📦 {len(self.hf_models)} HuggingFace models available")
 
     def _initialize_hf_models(self) -> Dict[str, Dict[str, Any]]:
-        """Initialize HuggingFace model registry."""
+        """
+        Create and return a registry of HuggingFace models with metadata used by the agent.
+        
+        Returns:
+            registry (Dict[str, Dict[str, Any]]): Mapping from internal model keys to metadata objects. Each metadata object contains:
+                - name: human-readable model name
+                - model_id: HuggingFace model identifier
+                - task: high-level task or capability
+                - description: short description of the model
+                - quality: numeric quality score
+                - speed: relative speed descriptor
+        """
         return {
             # Virtual Try-On Models
             "idm_vton": {
@@ -460,15 +476,15 @@ class VirtualTryOnHuggingFaceAgent:
         self, request: TryOnRequest
     ) -> TryOnResult:
         """
-        Generate AI model wearing real product.
-
-        Complete workflow:
-        1. Load product asset (preprocessed)
-        2. Generate or load model image
-        3. Apply virtual try-on
-        4. Generate variations
-        5. Optionally generate video
-        6. Optionally generate 3D
+        Orchestrates a full virtual try-on generation workflow for a given TryOnRequest.
+        
+        Loads the product asset, loads or generates a model image per the request, applies the virtual try-on or an alternative product-aware generation path, saves generated images (and optionally a video and 3D preview), computes basic quality metrics, updates internal counters, and returns a TryOnResult summarizing outputs and metrics. On failure returns a TryOnResult with `success=False` and an error message instead of raising.
+        
+        Parameters:
+            request (TryOnRequest): Request specifying the product, model specification or custom model, generation options (variations, video, 3D preview), and metadata.
+        
+        Returns:
+            TryOnResult: Result object containing request_id, success flag, paths to generated images/videos/3D model, model identifier used, seed/variations info, quality/product/realism scores, generation_time, and an error message if generation failed.
         """
         start_time = datetime.now()
 
@@ -555,7 +571,18 @@ class VirtualTryOnHuggingFaceAgent:
     async def _load_product_image(
         self, request: TryOnRequest
     ) -> Image.Image:
-        """Load preprocessed product image."""
+        """
+        Load the request's product image, preferring an explicit product image path and falling back to the asset pipeline.
+        
+        Parameters:
+            request (TryOnRequest): Try-on request containing either `product_image_path` or `product_asset_id`.
+        
+        Returns:
+            Image.Image: PIL Image of the product.
+        
+        Raises:
+            ValueError: If `product_image_path` is not provided and the asset referenced by `product_asset_id` cannot be found.
+        """
         if request.product_image_path:
             return Image.open(request.product_image_path)
 
@@ -569,16 +596,33 @@ class VirtualTryOnHuggingFaceAgent:
         return Image.open(asset.processed_path)
 
     async def _load_custom_model(self, model_path: str) -> Image.Image:
-        """Load custom model image."""
+        """
+        Load a custom model image from the given file path.
+        
+        Parameters:
+            model_path (str): Filesystem path to the image file to load.
+        
+        Returns:
+            Image.Image: A PIL Image object for the loaded model image.
+        """
         return Image.open(model_path)
 
     async def _generate_ai_model(
         self, spec: ModelSpecification
     ) -> Image.Image:
         """
-        Generate AI fashion model based on specification.
-
-        Uses Stable Diffusion XL with detailed prompts.
+        Generate a photorealistic fashion model image that matches the provided ModelSpecification.
+        
+        Builds a detailed generation intent from the specification (appearance, pose, expression, environment) and produces a high-resolution, editorial-quality model image.
+        
+        Parameters:
+            spec (ModelSpecification): Desired characteristics for the generated model (demographics, appearance, pose/expression, and environment).
+        
+        Returns:
+            Image.Image: A generated PIL image of the model matching the specification.
+        
+        Raises:
+            NotImplementedError: Always raised until Stable Diffusion XL (SDXL) or another image-generation pipeline is integrated and configured.
         """
         logger.info("🎨 Generating AI fashion model")
 
@@ -614,14 +658,18 @@ class VirtualTryOnHuggingFaceAgent:
         self, product_image: Image.Image, model_image: Image.Image, request: TryOnRequest
     ) -> List[Image.Image]:
         """
-        Apply virtual try-on using IDM-VTON or OOTDiffusion.
-
-        Process:
-        1. Detect model pose
-        2. Segment product
-        3. Warp product to fit model
-        4. Blend with realistic shadows
-        5. Apply fabric physics simulation
+        Apply a virtual try-on of the product image onto the model image and produce one or more composited try-on images.
+        
+        Parameters:
+            product_image (PIL.Image.Image): Source image of the product (garment) to place on the model.
+            model_image (PIL.Image.Image): Image of the model or generated avatar to wear the product.
+            request (TryOnRequest): Controls generation options (e.g., number of variations, realistic_shadows, fabric_physics, pose settings).
+        
+        Returns:
+            List[PIL.Image.Image]: A list of composited try-on images (one per variation) showing the product fitted to the model.
+        
+        Raises:
+            NotImplementedError: If no virtual-tryon integration (e.g., IDM-VTON or OOTDiffusion) is configured or available.
         """
         logger.info("👗 Applying virtual try-on")
 
@@ -652,18 +700,19 @@ class VirtualTryOnHuggingFaceAgent:
         self, product_image: Image.Image, request: TryOnRequest
     ) -> List[Image.Image]:
         """
-        Generate using product as reference (style transfer approach).
-
-        Alternative to direct try-on: generate new models styled with the product.
-        Uses IP-Adapter, ControlNet, or InstantStyle for style transfer.
-
-        Example with IP-Adapter:
-        ```python
-        from diffusers import StableDiffusionXLPipeline, IPAdapterXL
-        pipe = StableDiffusionXLPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0")
-        pipe.load_ip_adapter("h94/IP-Adapter", subfolder="sdxl_models", weight_name="ip-adapter_sdxl.bin")
-        images = pipe(prompt="fashion model", ip_adapter_image=product_image, num_images=4).images
-        ```
+        Generate synthetic model images influenced by the provided product image using a style-transfer approach.
+        
+        This method should produce one or more model images that reflect the product's visual style (fabric, color, texture, prints) while respecting options in the TryOnRequest (for example `num_variations`, `style_prompt`, `negative_prompt`, `seed`). Implementations typically use adapters or conditioning modules such as IP-Adapter, ControlNet, or other style-transfer/conditioning pipelines to guide a text-to-image model with the product image as a visual reference.
+        
+        Parameters:
+            product_image (PIL.Image.Image): The product/reference image used to condition style and appearance.
+            request (TryOnRequest): Request object containing generation options and model specification that influence outputs (variations count, prompts, realism controls, etc.).
+        
+        Returns:
+            List[PIL.Image.Image]: A list of generated model images styled to incorporate the product's appearance.
+        
+        Raises:
+            NotImplementedError: If no style-transfer or conditioning pipeline (e.g., IP-Adapter, ControlNet) has been integrated and configured.
         """
         logger.info("🎨 Generating with product reference")
 
@@ -679,9 +728,17 @@ class VirtualTryOnHuggingFaceAgent:
         self, image: Image.Image, request: TryOnRequest
     ) -> Path:
         """
-        Generate video of model wearing product.
-
-        Uses AnimateDiff or Stable Video Diffusion.
+        Generate an animated video from a completed try-on image and save it to the agent's videos directory.
+        
+        Parameters:
+            image (PIL.Image.Image): The generated try-on image to animate.
+            request (TryOnRequest): The original try-on request; used to derive output filename and to read video options (e.g., video_duration_seconds).
+        
+        Returns:
+            Path: Filesystem path to the saved MP4 video.
+        
+        Raises:
+            NotImplementedError: If no video-generation backend (e.g., AnimateDiff or Stable Video Diffusion) is configured.
         """
         logger.info("🎬 Generating try-on video")
 
@@ -711,7 +768,20 @@ class VirtualTryOnHuggingFaceAgent:
     async def _generate_3d_tryon(
         self, tryon_image: Image.Image, product_image: Image.Image, request: TryOnRequest
     ) -> Path:
-        """Generate 3D model of try-on result."""
+        """
+        Generate a rotatable 3D GLB model from a 2D try-on result image.
+        
+        Parameters:
+            tryon_image (PIL.Image.Image): Rendered 2D try-on image to convert.
+            product_image (PIL.Image.Image): Original product image referenced during generation.
+            request (TryOnRequest): Original try-on request containing metadata (e.g., request_id).
+        
+        Returns:
+            Path: Filesystem path to the generated `.glb` 3D model file.
+        
+        Raises:
+            NotImplementedError: If the 3D reconstruction pipeline (e.g., TripoSR or Wonder3D) is not integrated.
+        """
         logger.info("🎭 Generating 3D try-on model")
 
         model_filename = f"{request.request_id}_3d.glb"
@@ -732,14 +802,30 @@ class VirtualTryOnHuggingFaceAgent:
         )
 
     async def _calculate_quality(self, image: Image.Image) -> float:
-        """Calculate quality score."""
+        """
+        Evaluate perceptual quality of the provided image.
+        
+        Parameters:
+            image (PIL.Image.Image): Image to evaluate for visual quality.
+        
+        Returns:
+            float: Quality score in the range 0.0 to 1.0, where higher values indicate better perceived quality.
+        """
         # Placeholder
         return 0.92
 
     async def batch_generate(
         self, requests: List[TryOnRequest]
     ) -> List[TryOnResult]:
-        """Generate multiple try-ons concurrently."""
+        """
+        Run multiple try-on generations concurrently.
+        
+        Parameters:
+            requests (List[TryOnRequest]): Sequence of try-on requests to process.
+        
+        Returns:
+            results (List[TryOnResult]): A list of TryOnResult objects in the same order as `requests`. For requests that raised exceptions, the corresponding TryOnResult will have `success=False` and `error` set to the exception message; successful generations return their normal TryOnResult.
+        """
         logger.info(f"👗 Batch generating {len(requests)} try-ons")
 
         results = await asyncio.gather(
@@ -764,7 +850,17 @@ class VirtualTryOnHuggingFaceAgent:
         return processed_results
 
     def get_available_models(self) -> Dict[str, Any]:
-        """Get list of available HuggingFace models."""
+        """
+        Return a mapping of registered HuggingFace model keys to their public metadata.
+        
+        Returns:
+            available_models (dict): Mapping where each key is the model registry key and each value is a dict containing:
+                - `name`: human-readable model name
+                - `task`: primary capability or task (e.g., "text2img", "pose_control")
+                - `description`: short description of the model
+                - `quality`: estimated quality score or descriptor
+                - `speed`: relative speed descriptor
+        """
         return {
             model_key: {
                 "name": info["name"],
@@ -777,7 +873,23 @@ class VirtualTryOnHuggingFaceAgent:
         }
 
     def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """
+        Return a snapshot of the agent's current system and performance status.
+        
+        Returns:
+            status (Dict[str, Any]): A dictionary containing:
+                - agent_name (str): The agent's configured name.
+                - version (str): Agent version string.
+                - device (str): Execution device identifier (e.g., "cuda" or "cpu").
+                - performance (dict): Performance metrics with keys:
+                    - generations_count (int): Total number of completed generations.
+                    - total_generation_time (float): Cumulative generation time in seconds.
+                    - avg_generation_time (float): Average time per generation in seconds (0.0 if none).
+                - available_models (int): Count of registered HuggingFace models.
+                - loaded_models (int): Count of currently loaded model instances.
+                - output_directory (str): Path to the directory where outputs are written.
+                - capabilities (List[str]): Human-readable list of supported capabilities.
+        """
         return {
             "agent_name": self.agent_name,
             "version": self.version,

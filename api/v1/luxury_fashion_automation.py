@@ -270,20 +270,30 @@ async def upload_and_process_asset(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Upload and preprocess a fashion asset.
-
-    **Authentication Required:** DEVELOPER role or higher
-
-    Automatic processing:
-    1. Upscale to target quality (up to 8K)
-    2. AI enhancement and restoration
-    3. Background removal with alpha channel
-    4. 3D model generation
-    5. Texture extraction (PBR materials)
-
-    Returns preprocessed asset ID for use in try-on generation.
-
-    **RBAC:** DEVELOPER, ADMIN, SUPER_ADMIN
+    Upload an asset and run the asset preprocessing pipeline to produce processed files and metadata for downstream use.
+    
+    Processes the uploaded asset through enhancement, upscaling, background removal, optional 3D generation, and texture extraction (when enabled) and returns resulting file paths and quality metrics.
+    
+    Parameters:
+        request (AssetUploadRequest): Specifications for the uploaded asset and preprocessing options.
+    
+    Returns:
+        dict: Contains processed asset metadata and output file references:
+            - success (bool): `True` if processing succeeded.
+            - asset_id (str): Identifier of the preprocessed asset.
+            - original_resolution (dict): { "width": int, "height": int } of the original asset.
+            - final_resolution (dict): { "width": int, "height": int } of the processed asset.
+            - processed_file (str): Path or URL to the processed asset file.
+            - thumbnail_file (str): Path or URL to the generated thumbnail.
+            - model_3d_file (Optional[str]): Path or URL to the generated 3D model, if any.
+            - texture_files (List[str]): Paths or URLs to extracted texture files, if any.
+            - quality_score (float): Overall quality score assigned to the processed asset.
+            - sharpness_score (float): Sharpness metric for the processed asset.
+            - processing_time (float): Total processing time in seconds.
+            - stages_completed (List[str]): Ordered list of completed processing stage identifiers.
+    
+    Raises:
+        HTTPException: With 503 when the asset preprocessing pipeline is unavailable, or with 500 when processing fails.
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
@@ -344,10 +354,31 @@ async def get_asset_info(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get information about a preprocessed asset.
-
-    **Authentication Required:** API_USER role or higher
-    **RBAC:** API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Retrieve metadata for a preprocessed asset by its ID.
+    
+    Raises:
+        HTTPException: 503 if the asset preprocessing pipeline is unavailable.
+        HTTPException: 404 if no asset with the given ID is found.
+    
+    Parameters:
+        asset_id (str): Unique identifier of the asset to retrieve.
+    
+    Returns:
+        dict: Asset metadata containing:
+            - asset_id (str): Asset identifier.
+            - asset_type (str): Asset type name.
+            - product_name (Optional[str]): Associated product name.
+            - brand (Optional[str]): Brand name.
+            - collection (Optional[str]): Collection name.
+            - original_resolution (dict): {"width": int, "height": int} before processing.
+            - final_resolution (dict): {"width": int, "height": int} after processing.
+            - upscale_factor (float): Applied upscale multiplier.
+            - has_3d_model (bool): Whether a 3D model was generated.
+            - processed_path (str): Filesystem or storage path to the processed asset.
+            - thumbnail_path (str): Path to the thumbnail image.
+            - model_3d_path (Optional[str]): Path to the 3D model file, if present.
+            - uploaded_at (str): ISO 8601 timestamp when the asset was uploaded.
+            - processed_at (Optional[str]): ISO 8601 timestamp when processing completed, or `None`.
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
@@ -385,7 +416,16 @@ async def get_asset_info(
 
 @router.get("/assets", tags=["Assets"])
 async def list_assets():
-    """List all preprocessed assets."""
+    """
+    Retrieve aggregated metrics about preprocessed assets.
+    
+    Returns:
+        dict: Aggregated asset metrics with keys:
+            total_assets (int): Total number of assets tracked by the pipeline.
+            3d_models (int): Number of assets that are 3D models.
+            assets_processed (int): Number of assets that have been processed.
+            avg_processing_time (float): Average processing time (in seconds) for assets.
+    """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -412,23 +452,28 @@ async def generate_virtual_tryon(
     background_tasks: BackgroundTasks
 ):
     """
-    Generate AI models wearing your actual products.
-
-    LIMITLESS CAPABILITIES:
-    - 20+ HuggingFace models integrated
-    - Virtual try-on with real product placement
-    - AI model generation (any ethnicity, body type, pose)
-    - Video generation of models wearing products
-    - 3D preview generation
-    - Multiple angles and variations
-
-    Uses cutting-edge models:
-    - IDM-VTON for virtual try-on
-    - SDXL for high-quality generation
-    - ControlNet for pose control
-    - InstantID for face consistency
-    - AnimateDiff/SVD for video
-    - TripoSR for 3D generation
+    Generate virtual try-on assets (images, optional videos and 3D previews) for a product using the provided model specification.
+    
+    Parameters:
+        request (VirtualTryOnRequestModel): Specifies the product asset ID, target model demographics (gender, ethnicity, age_range, body_type), pose, number of variations, and flags for video, multiple angles, and 3D preview generation.
+        
+    Returns:
+        dict: A result payload containing:
+            - `success` (bool): `True` when generation succeeded.
+            - `request_id` (str): Unique identifier for the generation request.
+            - `images` (List[str]): Generated image URLs or encoded image data.
+            - `videos` (List[str]): Generated video URLs or encoded video data (may be empty if not requested).
+            - `model_3d` (Optional[dict or str]): 3D preview data or URL when `generate_3d_preview` is requested.
+            - `variations_generated` (int): Number of variations produced.
+            - `quality_score` (float): Overall quality metric for the generated outputs.
+            - `product_accuracy_score` (float): Metric indicating how accurately the product is placed on the model.
+            - `realism_score` (float): Perceived realism metric for the outputs.
+            - `generation_time` (float): Time in seconds taken to generate outputs.
+            - `model_used` (str): Identifier or name of the underlying model(s) used.
+    
+    Raises:
+        HTTPException: 503 if the virtual try-on agent is unavailable.
+        HTTPException: 500 if generation fails or an internal error occurs.
     """
     if not VIRTUAL_TRYON_AVAILABLE:
         raise HTTPException(
@@ -488,15 +533,17 @@ async def generate_virtual_tryon(
 @router.get("/tryon/models", tags=["Virtual Try-On"])
 async def get_available_models():
     """
-    Get list of all available HuggingFace models.
-
-    Returns information about 20+ integrated models including:
-    - Virtual try-on models
-    - Image generation models
-    - Video generation models
-    - 3D generation models
-    - Enhancement models
-    - Control models (pose, depth, segmentation)
+    Return available HuggingFace models and their high-level capabilities for the virtual try-on subsystem.
+    
+    Returns:
+        dict: {
+            "total_models": int — count of discovered models,
+            "models": list — detailed model entries returned by the agent,
+            "capabilities": list — human-readable capability categories supported by the models
+        }
+    
+    Raises:
+        fastapi.HTTPException: If the virtual try-on agent is not available (HTTP 503).
     """
     if not VIRTUAL_TRYON_AVAILABLE:
         raise HTTPException(
@@ -526,7 +573,15 @@ async def get_available_models():
 
 @router.get("/tryon/status", tags=["Virtual Try-On"])
 async def get_tryon_status():
-    """Get virtual try-on system status."""
+    """
+    Get virtual try-on system status.
+    
+    Returns:
+        dict: Status payload containing:
+            - `available` (bool): True if the virtual try-on agent is available, False otherwise.
+            - `status` (Any): System status from the virtual try-on agent when available.
+            - `error` (str): Error message when the agent is not available.
+    """
     if not VIRTUAL_TRYON_AVAILABLE:
         return {"available": False, "error": "Virtual try-on agent not available"}
 
@@ -546,14 +601,22 @@ async def generate_visual_content(
     background_tasks: BackgroundTasks
 ):
     """
-    Generate visual content (images, videos) for luxury fashion brand.
-
-    Supports:
-    - Product photography
-    - Lifestyle images
-    - Fashion lookbooks
-    - Social media posts
-    - Banner ads
+    Generate visual content for the brand based on the provided VisualContentRequest.
+    
+    Returns:
+        dict: Result payload with keys:
+            - `success` (bool): `true` when generation succeeded, `false` otherwise.
+            - `request_id` (str|None): Provider request identifier when available.
+            - `provider` (str|None): Name of the content provider used.
+            - `images` (List[dict]|None): Generated image objects or metadata.
+            - `quality_score` (float|None): Estimated quality or confidence score.
+            - `generation_time` (float|None): Time taken to generate content in seconds.
+            - `cost` (float|None): Estimated cost for the generation operation.
+            - `error` (str|None): Error message when generation failed.
+    
+    Raises:
+        HTTPException: With 503 when the visual content agent is unavailable.
+        HTTPException: With 500 when generation fails due to an internal error.
     """
     if not VISUAL_AGENT_AVAILABLE:
         raise HTTPException(
@@ -598,9 +661,20 @@ async def batch_generate_visual_content(
     requests: List[VisualContentRequest]
 ):
     """
-    Generate multiple visual content items concurrently.
-
-    Optimized for bulk content generation.
+    Generate visual content for a batch of VisualContentRequest objects.
+    
+    Parameters:
+        requests (List[VisualContentRequest]): List of visual content requests to process in bulk.
+    
+    Returns:
+        dict: Summary of the batch operation with keys:
+            - `success` (bool): `True` if the batch request was submitted and processed.
+            - `total_requests` (int): Number of requests in the batch.
+            - `results` (List[dict]): Per-request results, each containing:
+                - `request_id` (str): Identifier for the generated request.
+                - `success` (bool): `True` if that request succeeded, `false` otherwise.
+                - `images` (List[str]): Generated image asset paths or URLs.
+                - `error` (str | None): Error message when generation failed, otherwise `None`.
     """
     if not VISUAL_AGENT_AVAILABLE:
         raise HTTPException(
@@ -646,7 +720,12 @@ async def batch_generate_visual_content(
 
 @router.get("/visual-content/status", tags=["Visual Content"])
 async def get_visual_content_status():
-    """Get visual content generation system status."""
+    """
+    Report availability and system status of the visual content agent.
+    
+    Returns:
+        dict: If the agent is available, returns {"available": True, "status": <status>} where <status> is the agent's system status. If unavailable, returns {"available": False, "error": "<message>"}.
+    """
     if not VISUAL_AGENT_AVAILABLE:
         return {"available": False, "error": "Visual content agent not available"}
 
@@ -663,9 +742,13 @@ async def get_visual_content_status():
 @router.post("/finance/inventory/sync", tags=["Finance & Inventory"])
 async def sync_inventory(request: InventorySyncRequest):
     """
-    Synchronize inventory from external channel.
-
-    Supports: WooCommerce, Shopify, Magento, Amazon, eBay
+    Synchronize inventory from an external sales channel specified in the request.
+    
+    Parameters:
+        request (InventorySyncRequest): Sync request containing `channel` (the external platform name) and `items` to be synchronized. Supported channels include WooCommerce, Shopify, Magento, Amazon, and eBay.
+    
+    Returns:
+        dict: Result object describing the synchronization outcome, for example keys such as `success` (bool), `processed_count` (int), and `errors` (list) when applicable.
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -687,9 +770,25 @@ async def sync_inventory(request: InventorySyncRequest):
 @router.post("/finance/transactions/record", tags=["Finance & Inventory"])
 async def record_transaction(request: FinancialTransactionRequest):
     """
-    Record a financial transaction.
-
-    Includes automatic inventory updates and tax calculations.
+    Record a financial transaction and apply related inventory updates and tax calculations.
+    
+    Parameters:
+        request (FinancialTransactionRequest): Transaction details (type, amount, currency, channel, order_id, customer_id, line_items, payment_method, etc.).
+    
+    Returns:
+        dict: {
+            "success": True if recording succeeded, False otherwise,
+            "transaction_id": Unique identifier of the recorded transaction,
+            "type": Transaction type as a string,
+            "amount": Total transaction amount as a float,
+            "currency": Currency code,
+            "status": Payment status string,
+            "created_at": ISO 8601 timestamp when the transaction was created
+        }
+    
+    Raises:
+        HTTPException: 503 if the finance & inventory agent is unavailable.
+        HTTPException: 500 if an error occurs while recording the transaction.
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -722,9 +821,26 @@ async def get_demand_forecast(
     forecast_period_days: int = 30
 ):
     """
-    Generate demand forecast for an inventory item.
-
-    Uses time series analysis and seasonal decomposition.
+    Produce a demand forecast for a given inventory item.
+    
+    Parameters:
+        item_id (str): Identifier of the inventory item (SKU or internal ID).
+        forecast_period_days (int): Forecast horizon in days (default 30).
+    
+    Returns:
+        dict: Forecast payload containing:
+            - forecast_id: Unique identifier for the forecast.
+            - item_id: The requested item identifier.
+            - sku: Item SKU.
+            - predicted_demand: Estimated demand quantity for the period.
+            - confidence_interval: Dict with `lower` and `upper` bounds.
+            - confidence_score: Numeric confidence metric for the prediction.
+            - recommended_order_quantity: Suggested order quantity based on the forecast.
+            - forecast_period: Human-readable period string (e.g., "30 days").
+            - generated_at: ISO 8601 timestamp when the forecast was produced.
+    
+    Raises:
+        HTTPException: If the finance & inventory agent is unavailable or if forecasting fails.
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -763,9 +879,22 @@ async def generate_financial_report(
     end_date: datetime
 ):
     """
-    Generate comprehensive financial report.
-
-    Includes revenue, profit margins, top-selling items, and channel breakdown.
+    Generate a financial report for the specified date range.
+    
+    Parameters:
+        start_date (datetime): Start of the reporting period (inclusive).
+        end_date (datetime): End of the reporting period (inclusive).
+    
+    Returns:
+        dict: A report containing aggregated financial metrics and breakdowns, typically including:
+            - revenue: total revenue for the period
+            - profit_margins: overall and/or per-channel profit margin metrics
+            - top_selling_items: list of top items with sales and revenue stats
+            - channel_breakdown: revenue and performance by sales channel
+            - totals: aggregated totals (orders, units, refunds, etc.)
+            - time_range: the report's start and end timestamps
+            - generated_at: timestamp when the report was produced
+            - any additional aggregated metrics or confidence/quality indicators provided by the agent
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -787,7 +916,14 @@ async def generate_financial_report(
 
 @router.get("/finance/status", tags=["Finance & Inventory"])
 async def get_finance_inventory_status():
-    """Get finance & inventory system status."""
+    """
+    Return availability and operational status for the finance and inventory agent.
+    
+    Returns:
+        dict: A status payload with either:
+            - When the agent is available: {"available": True, "status": <agent status dict>}
+            - When the agent is unavailable: {"available": False, "error": "<error message>"}
+    """
     if not FINANCE_AGENT_AVAILABLE:
         return {"available": False, "error": "Finance agent not available"}
 
@@ -805,13 +941,21 @@ async def get_finance_inventory_status():
 async def create_campaign(request: CampaignRequest):
     """
     Create a new marketing campaign.
-
-    Supports:
-    - Email campaigns
-    - SMS campaigns
-    - Social media ads (Facebook, Instagram, TikTok)
-    - Push notifications
-    - A/B testing with multiple variants
+    
+    Parameters:
+        request (CampaignRequest): Campaign definition including name, description, campaign_type, channels, target segments, variants, budget, and scheduling.
+    
+    Returns:
+        dict: Metadata about the created campaign containing:
+            - success (bool): `True` when creation succeeded.
+            - campaign_id (str): Unique identifier for the campaign.
+            - name (str): Campaign name.
+            - type (str): Campaign type.
+            - status (str): Current campaign status.
+            - channels (List[str]): Enabled distribution channels.
+            - enable_testing (bool): Whether A/B testing is enabled.
+            - variants_count (int): Number of campaign variants.
+            - created_at (str): ISO-8601 timestamp when the campaign was created.
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
@@ -843,9 +987,11 @@ async def create_campaign(request: CampaignRequest):
 @router.post("/marketing/campaigns/{campaign_id}/launch", tags=["Marketing"])
 async def launch_campaign(campaign_id: str):
     """
-    Launch a marketing campaign.
-
-    Initiates multi-channel distribution and starts A/B testing if enabled.
+    Launches a marketing campaign across configured channels and starts A/B testing when enabled.
+    
+    @param campaign_id: Identifier of the campaign to launch.
+    @returns: A dictionary with launch metadata (e.g., `campaign_id`, `status`, `launch_time`, and any provider-specific details or errors).
+    @raises HTTPException: Raised with status 503 if the marketing orchestrator is unavailable; raised with status 500 if the campaign launch fails.
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
@@ -865,9 +1011,16 @@ async def launch_campaign(campaign_id: str):
 @router.post("/marketing/campaigns/{campaign_id}/complete", tags=["Marketing"])
 async def complete_campaign(campaign_id: str):
     """
-    Complete a campaign and generate final report.
-
-    Returns comprehensive analytics including ROI, conversion rates, and A/B test results.
+    Finalize a marketing campaign and produce its final performance report.
+    
+    Parameters:
+        campaign_id (str): Identifier of the campaign to complete.
+    
+    Returns:
+        dict: Final campaign metadata and analytics, typically including fields such as `campaign_id`, `status`, `roi`, `conversion_rates`, `ab_test_results`, and `completed_at`.
+    
+    Raises:
+        HTTPException: If the marketing orchestrator is unavailable or the completion operation fails.
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
@@ -888,8 +1041,21 @@ async def complete_campaign(campaign_id: str):
 async def create_segment(segment_data: Dict[str, Any]):
     """
     Create a customer segment for targeted marketing.
-
-    Supports segmentation by demographics, behavior, purchase history, engagement.
+    
+    Parameters:
+        segment_data (Dict[str, Any]): Criteria and metadata for the segment (for example: "name", "demographics", "behavior", "purchase_history", "engagement", "filters"). Keys and value shapes depend on the marketing orchestrator's schema.
+    
+    Returns:
+        dict: Result object with keys:
+            - success (bool): `True` on successful creation.
+            - segment_id (str): Identifier of the created segment.
+            - name (str): Segment name.
+            - customer_count (int): Number of customers included in the segment.
+            - created_at (str): ISO 8601 timestamp of creation.
+    
+    Raises:
+        HTTPException: `503` if the marketing orchestrator is unavailable.
+        HTTPException: `500` if segment creation fails due to an internal error.
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
@@ -915,7 +1081,12 @@ async def create_segment(segment_data: Dict[str, Any]):
 
 @router.get("/marketing/status", tags=["Marketing"])
 async def get_marketing_status():
-    """Get marketing orchestrator system status."""
+    """
+    Return the availability and system status of the marketing orchestrator.
+    
+    Returns:
+        dict: `{"available": True, "status": <status_payload>}` when the orchestrator is available; `{"available": False, "error": "<message>"}` when it is not.
+    """
     if not MARKETING_AGENT_AVAILABLE:
         return {"available": False, "error": "Marketing orchestrator not available"}
 
@@ -932,9 +1103,29 @@ async def get_marketing_status():
 @router.post("/code/generate", tags=["Code Development"])
 async def generate_code(request: CodeGenerationRequest):
     """
-    Generate code using AI models (Cursor, Claude, GPT-4).
-
-    Includes quality analysis, formatting, and documentation generation.
+    Generate source code and accompanying metadata from a high-level code specification.
+    
+    Parameters:
+        request (CodeGenerationRequest): Generation parameters including a textual description, target language and framework, dependency requirements, whether to include tests and documentation, and the preferred model.
+    
+    Returns:
+        dict: Generation result with keys:
+            - `success` (bool): `true` if generation completed without fatal errors, `false` otherwise.
+            - `request_id` (str): Provider or agent request identifier.
+            - `code` (str): Generated source code (may be multi-file concatenation or a single file content).
+            - `file_path` (str|None): Suggested or persisted file path for the generated code, if available.
+            - `language` (str): Target programming language.
+            - `quality_score` (float|None): Heuristic quality score for the generated code.
+            - `complexity_score` (float|None): Heuristic complexity metric.
+            - `issues_found` (List[dict]|None): Detected issues or linting findings.
+            - `suggestions` (List[str]|None): Recommendations to improve or refactor the generated code.
+            - `generation_time` (float|None): Time in seconds taken to generate the code.
+            - `model_used` (str|None): Model identifier used for generation.
+            - `error` (str|None): Error message when generation failed.
+    
+    Raises:
+        HTTPException: with status 503 if the code recovery agent is unavailable.
+        HTTPException: with status 500 on internal generation failures.
     """
     if not CODE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -978,9 +1169,25 @@ async def generate_code(request: CodeGenerationRequest):
 @router.post("/code/recover", tags=["Code Development"])
 async def recover_code(request: CodeRecoveryRequestModel):
     """
-    Recover code from version control or backups.
-
-    Supports Git history, backup restoration, and version control systems.
+    Recover source code from a repository or backups using the code recovery agent.
+    
+    Parameters:
+        request (CodeRecoveryRequestModel): Recovery parameters including recovery_type (strategy), repository_url, file_path, branch, and commit_hash.
+    
+    Returns:
+        dict: Recovery result containing:
+            - `success`: `true` if recovery succeeded, `false` otherwise.
+            - `request_id`: Unique identifier for the recovery request.
+            - `files_recovered`: Number of files successfully recovered.
+            - `total_lines`: Total number of lines recovered across all files.
+            - `strategy_used`: Name of the recovery strategy applied.
+            - `integrity_verified`: `true` if recovered content passed integrity checks, `false` otherwise.
+            - `recovery_time`: Recovery duration or timestamp as provided by the agent.
+            - `error`: Error message when recovery failed, or `null` on success.
+    
+    Raises:
+        HTTPException: 503 when the code recovery agent is unavailable.
+        HTTPException: 500 for internal errors encountered during recovery.
     """
     if not CODE_AGENT_AVAILABLE:
         raise HTTPException(
@@ -1017,7 +1224,13 @@ async def recover_code(request: CodeRecoveryRequestModel):
 
 @router.get("/code/status", tags=["Code Development"])
 async def get_code_agent_status():
-    """Get code recovery agent system status."""
+    """
+    Report the availability and system status of the code recovery agent.
+    
+    Returns:
+        dict: If the agent is available, returns {"available": True, "status": <status dict>}.
+              If the agent is unavailable, returns {"available": False, "error": "<error message>"}.
+    """
     if not CODE_AGENT_AVAILABLE:
         return {"available": False, "error": "Code agent not available"}
 
@@ -1035,13 +1248,26 @@ async def get_code_agent_status():
 async def create_workflow(request: WorkflowExecutionRequest):
     """
     Create a multi-agent workflow.
-
-    Pre-defined workflows:
+    
+    Supported workflow types:
     - fashion_brand_launch: Complete brand launch automation
     - product_launch: New product launch with marketing
     - marketing_campaign: Multi-channel campaign with A/B testing
     - inventory_sync: Cross-platform inventory synchronization
     - content_generation: Automated content pipeline
+    
+    Returns:
+        dict: Workflow creation result containing:
+            - `success` (bool): `True` if creation succeeded.
+            - `workflow_id` (str): Identifier of the created workflow.
+            - `name` (str): Workflow name.
+            - `type` (str): Workflow type value.
+            - `total_tasks` (int): Number of tasks in the workflow.
+            - `status` (str): Current workflow status value.
+    
+    Raises:
+        HTTPException: 503 if the workflow engine is not available.
+        HTTPException: 500 if workflow creation fails.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
         raise HTTPException(
@@ -1072,9 +1298,16 @@ async def create_workflow(request: WorkflowExecutionRequest):
 @router.post("/workflows/{workflow_id}/execute", tags=["Workflows"])
 async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
     """
-    Execute a workflow.
-
-    The workflow will run in the background with automatic retry and rollback.
+    Start execution of the specified workflow and schedule it to run in the background.
+    
+    Schedules the workflow engine to execute the workflow identified by `workflow_id`. If the workflow engine is unavailable an HTTP 503 is raised.
+    
+    Returns:
+        result (dict): Execution acknowledgement containing:
+            - `success` (bool): `True` when execution was scheduled.
+            - `workflow_id` (str): The id of the scheduled workflow.
+            - `message` (str): Human-readable status message.
+            - `status_endpoint` (str): URL where the workflow status can be queried.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
         raise HTTPException(
@@ -1096,9 +1329,15 @@ async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
 @router.get("/workflows/{workflow_id}/status", tags=["Workflows"])
 async def get_workflow_status(workflow_id: str):
     """
-    Get workflow execution status and progress.
-
-    Returns real-time status, progress percentage, and task results.
+    Fetch the current execution status and progress for a workflow.
+    
+    Returns:
+    	A dict with workflow runtime state and metadata, typically including keys such as `status`, `progress` (percentage), and `tasks` (per-task results).
+    
+    Raises:
+    	HTTPException: 503 if the workflow engine is unavailable.
+    	HTTPException: 404 if the requested workflow reports an error or is not found.
+    	HTTPException: 500 for unexpected server-side errors.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
         raise HTTPException(
@@ -1123,7 +1362,15 @@ async def get_workflow_status(workflow_id: str):
 
 @router.get("/workflows/status", tags=["Workflows"])
 async def get_workflow_engine_status():
-    """Get workflow engine system status."""
+    """
+    Get the workflow engine's availability and current system status.
+    
+    Returns:
+        dict: A status payload with:
+            - available (bool): True when the workflow engine is available, False otherwise.
+            - status (Any): System status object from the workflow engine when available.
+            - error (str): Error message when the workflow engine is unavailable.
+    """
     if not WORKFLOW_ENGINE_AVAILABLE:
         return {"available": False, "error": "Workflow engine not available"}
 
@@ -1140,14 +1387,15 @@ async def get_workflow_engine_status():
 @router.get("/system/status", tags=["System"])
 async def get_system_status():
     """
-    Get comprehensive system status for all agents and services.
-
-    Returns availability and performance metrics for:
-    - Visual Content Generation
-    - Finance & Inventory
-    - Marketing Orchestration
-    - Code Development
-    - Workflow Engine
+    Get the overall runtime status of the system and its optional agents.
+    
+    Returns:
+        dict: A dictionary with keys:
+            - `timestamp` (str): ISO 8601 timestamp of the status snapshot.
+            - `version` (str): Service version identifier.
+            - `agents` (dict): Mapping of agent names to status objects. Each agent entry contains:
+                - `available` (bool): Whether the agent is present and enabled.
+                - `status` (object|None): Agent-specific status information when available, or `None` when unavailable.
     """
     return {
         "timestamp": datetime.now().isoformat(),

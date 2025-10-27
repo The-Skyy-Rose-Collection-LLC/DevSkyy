@@ -281,6 +281,23 @@ class MarketingCampaignOrchestrator:
     """
 
     def __init__(self):
+        """
+        Initialize the orchestrator and set up in-memory stores, integrations, and baseline metrics.
+        
+        Initializes agent metadata (name, type, version), empty registries for campaigns, segments, and analytics, tracking sets and counters for active campaigns and overall performance, default channel integration settings, and recommended send times per channel. Attributes:
+            agent_name (str): Human-friendly orchestrator name.
+            agent_type (str): Internal agent classification.
+            version (str): Agent version string.
+            campaigns (Dict[str, Campaign]): In-memory store of campaigns by ID.
+            segments (Dict[str, CustomerSegment]): In-memory store of customer segments by ID.
+            analytics (Dict[str, CampaignAnalytics]): In-memory store of campaign analytics by ID.
+            active_campaigns (Set[str]): IDs of currently active campaigns.
+            campaign_count (int): Total number of created campaigns.
+            total_sent (int): Cumulative total messages sent across campaigns.
+            total_conversions (int): Cumulative total conversions recorded.
+            channel_integrations (Dict[Channel, Dict[str, Any]]): Default channel provider configurations and enabled flags.
+            optimal_send_times (Dict[Channel, List[int]]): Recommended send-hour windows (24h) per channel.
+        """
         self.agent_name = "Marketing Campaign Orchestrator"
         self.agent_type = "marketing_orchestration"
         self.version = "1.0.0-production"
@@ -320,13 +337,27 @@ class MarketingCampaignOrchestrator:
         self, campaign_data: Dict[str, Any]
     ) -> Campaign:
         """
-        Create a new marketing campaign.
-
-        Args:
-            campaign_data: Campaign configuration
-
+        Create and store a Campaign from the provided configuration.
+        
+        Builds a Campaign object using keys from campaign_data, optionally constructs A/B or multivariate variants when testing is enabled and at least two variants are provided, persists the campaign in the orchestrator's store, and updates internal counters.
+        
+        Parameters:
+            campaign_data (Dict[str, Any]): Configuration mapping for the campaign. Expected keys:
+                - name (str): Required display name for the campaign.
+                - description (str): Optional human-readable description.
+                - type (str|CampaignType): Campaign type identifier (e.g., "email").
+                - channels (List[str|Channel]): List of channels to use.
+                - target_segments (List[str]): List of segment IDs or identifiers.
+                - scheduled_start, scheduled_end: Optional scheduling timestamps.
+                - enable_testing (bool): Whether to enable A/B or multivariate testing.
+                - variants (List[Dict]): Variant definitions when testing is enabled.
+                - budget (float): Campaign budget.
+                - target_conversions (int): Optional conversion target.
+                - personalization_enabled (bool): Whether personalization is enabled.
+                - created_by (str): Identifier of the creator.
+        
         Returns:
-            Created campaign object
+            Campaign: The created and stored Campaign instance.
         """
         try:
             campaign = Campaign(
@@ -382,14 +413,19 @@ class MarketingCampaignOrchestrator:
 
     async def launch_campaign(self, campaign_id: str) -> Dict[str, Any]:
         """
-        Launch a campaign.
-
-        Implements:
-        - Pre-launch validation
-        - Segment targeting
-        - Channel distribution
-        - A/B test initialization
-        - Performance monitoring
+        Launches a campaign by validating it, activating scheduling, distributing to configured channels, initializing analytics, and starting background performance monitoring.
+        
+        Returns:
+            result (dict): Launch outcome with keys:
+                - success (bool): `True` when launch succeeded, `False` on failure.
+                - campaign_id (str): ID of the launched campaign (present on success).
+                - status (str): Final campaign status value (present on success).
+                - estimated_reach (int): Estimated total reach calculated from target segments (present on success).
+                - channels (List[str]): List of channel names used for distribution (present on success).
+                - distribution_results (dict): Per-channel distribution/send results (present on success).
+                - launched_at (str): ISO 8601 timestamp when campaign was started (present on success).
+                - error (str): Error message describing failure (present on failure).
+                - validation_errors (List[str]): Validation error messages when validation fails.
         """
         try:
             if campaign_id not in self.campaigns:
@@ -447,7 +483,20 @@ class MarketingCampaignOrchestrator:
             }
 
     async def _validate_campaign(self, campaign: Campaign) -> Dict[str, Any]:
-        """Validate campaign before launch."""
+        """
+        Validate a Campaign object for launch readiness.
+        
+        Performs a set of sanity checks and collects any validation errors:
+        - Verifies at least one target segment is specified.
+        - If A/B testing is enabled, ensures variants are defined.
+        - Ensures at least one channel is configured.
+        - Ensures budget is greater than 0.
+        
+        Returns:
+            dict: A validation result with keys:
+                - "valid" (bool): `True` if no validation errors were found, `False` otherwise.
+                - "errors" (List[str]): A list of human-readable error messages describing failed checks.
+        """
         errors = []
 
         # Check segments
@@ -476,7 +525,12 @@ class MarketingCampaignOrchestrator:
         }
 
     async def _calculate_campaign_reach(self, campaign: Campaign) -> int:
-        """Calculate estimated campaign reach."""
+        """
+        Estimate the total reach for a campaign by summing customer counts of its target segments present in the registry.
+        
+        Returns:
+        	total_reach (int): Sum of `customer_count` for each segment in `campaign.target_segments` that exists in the orchestrator's segment store.
+        """
         total_reach = 0
 
         for segment_id in campaign.target_segments:
@@ -489,7 +543,17 @@ class MarketingCampaignOrchestrator:
     async def _distribute_to_channels(
         self, campaign: Campaign
     ) -> Dict[str, Any]:
-        """Distribute campaign to all configured channels."""
+        """
+        Distribute a Campaign across its configured channels and collect per-channel results.
+        
+        Iterates the campaign's channels, invokes the appropriate channel-specific send/launch handler, and captures any per-channel failures so distribution can continue for other channels.
+        
+        Parameters:
+            campaign (Campaign): The campaign to distribute; its `channels` list determines which channel handlers are invoked.
+        
+        Returns:
+            Dict[str, Any]: A mapping from channel name (string) to the channel's result dictionary. Each result contains channel-specific keys (e.g., sent/delivered counts) or an `error` entry when distribution failed for that channel.
+        """
         results = {}
 
         for channel in campaign.channels:
@@ -512,7 +576,18 @@ class MarketingCampaignOrchestrator:
         return results
 
     async def _send_email_campaign(self, campaign: Campaign) -> Dict[str, Any]:
-        """Send email campaign."""
+        """
+        Simulate sending an email campaign and update delivery metrics for the campaign or its variants.
+        
+        Parameters:
+            campaign (Campaign): Campaign to send; if `campaign.enable_testing` is true, per-variant sent/delivered counts are updated using each variant's `traffic_allocation`, otherwise the campaign's total sent/delivered counts are updated.
+        
+        Returns:
+            result (dict): A summary containing:
+                - `success` (bool): `True` when the send simulation completed.
+                - `sent` (int): Estimated number of recipients targeted.
+                - `delivered` (int): Estimated number of successfully delivered messages.
+        """
         # Simulate email sending
         logger.info(f"📧 Sending email campaign: {campaign.name}")
 
@@ -540,7 +615,15 @@ class MarketingCampaignOrchestrator:
         }
 
     async def _send_sms_campaign(self, campaign: Campaign) -> Dict[str, Any]:
-        """Send SMS campaign."""
+        """
+        Simulate sending an SMS campaign and report per-channel delivery counts.
+        
+        Returns:
+            dict: Result containing:
+                - "success": `True` if the send was simulated successfully.
+                - "sent": integer number of messages attempted to be sent.
+                - "delivered": integer number of messages delivered (applies a 99% delivery rate).
+        """
         logger.info(f"📱 Sending SMS campaign: {campaign.name}")
 
         reach = await self._calculate_campaign_reach(campaign)
@@ -555,7 +638,20 @@ class MarketingCampaignOrchestrator:
     async def _launch_social_campaign(
         self, campaign: Campaign, channel: Channel
     ) -> Dict[str, Any]:
-        """Launch social media campaign."""
+        """
+        Launches a campaign on a social media channel and returns the channel-specific launch results.
+        
+        Parameters:
+            campaign (Campaign): Campaign to deploy to the specified social channel.
+            channel (Channel): Target social media channel for the launch.
+        
+        Returns:
+            result (dict): Launch outcome with keys:
+                - "success" (bool): `true` if the launch succeeded, `false` otherwise.
+                - "ad_set_created" (bool): `true` if an ad set was created for the campaign.
+                - "estimated_reach" (int): Estimated audience reach for the campaign on the channel.
+                - "budget_allocated" (float): Portion of the campaign budget allocated to this channel.
+        """
         logger.info(f"📱 Launching {channel.value} campaign: {campaign.name}")
 
         reach = await self._calculate_campaign_reach(campaign)
@@ -569,7 +665,13 @@ class MarketingCampaignOrchestrator:
         }
 
     async def _monitor_campaign_performance(self, campaign_id: str):
-        """Monitor campaign performance in real-time."""
+        """
+        Continuously monitor a campaign's live performance and update its metrics.
+        
+        Runs while the campaign's status is ACTIVE. Periodically (approximately every minute) updates simulated variant and campaign metrics when A/B/multivariate testing is enabled, evaluates test significance, and finalizes the campaign when its scheduled end is reached. Errors encountered during monitoring are logged.
+        Parameters:
+        	campaign_id (str): Identifier of the campaign to monitor.
+        """
         try:
             campaign = self.campaigns[campaign_id]
 
@@ -602,7 +704,14 @@ class MarketingCampaignOrchestrator:
             logger.error(f"❌ Campaign monitoring failed: {e}")
 
     async def _check_ab_test_significance(self, campaign: Campaign):
-        """Check if A/B test has statistical significance."""
+        """
+        Evaluate A/B test variants in a campaign and mark any variant that meets simple significance criteria as a provisional winner.
+        
+        This inspects the campaign's variants (requires at least two). It selects the control variant (the one with `is_control = True`, or the first variant if none is marked) and compares each non-control variant's conversion rate to the control's. For variants with more than 100 delivered impressions for both control and variant, it computes a relative improvement; if the improvement exceeds 10% the method assigns a `confidence_level` (capped at 0.95) and sets `is_winner` when the confidence reaches 0.95. This function mutates variant objects (updates `confidence_level` and `is_winner`) and logs winners when identified.
+        
+        Parameters:
+            campaign (Campaign): Campaign whose A/B test variants will be evaluated.
+        """
         if not campaign.variants or len(campaign.variants) < 2:
             return
 
@@ -636,7 +745,31 @@ class MarketingCampaignOrchestrator:
                         )
 
     async def complete_campaign(self, campaign_id: str) -> Dict[str, Any]:
-        """Complete a campaign and generate final report."""
+        """
+        Finalize a campaign, compute final metrics and ROI, generate a final analytics report, and mark the campaign completed.
+        
+        Parameters:
+            campaign_id (str): Identifier of the campaign to finalize.
+        
+        Returns:
+            Dict[str, Any]: Result object with:
+                - "success" (bool): `true` if completion succeeded, `false` otherwise.
+                - On success:
+                    - "campaign_id" (str): The finalized campaign id.
+                    - "status" (str): Final campaign status value ("COMPLETED").
+                    - "final_metrics" (dict): Aggregated metrics including
+                        "total_sent", "total_delivered", "total_opens", "total_clicks",
+                        "total_conversions", "total_revenue", "roi_percentage", "cost_per_acquisition".
+                    - "report" (dict): Final analytics report produced for the campaign.
+                    - "completed_at" (str): ISO-formatted completion timestamp.
+                - On failure:
+                    - "error" (str): Error message describing the failure.
+        
+        Notes:
+            - The campaign's status is set to COMPLETED and its completion timestamp is recorded.
+            - If A/B or multivariate testing was enabled, variant metrics are aggregated into campaign totals.
+            - Revenue and ROI calculations use an assumed average order value (150.0) when conversions are present.
+        """
         try:
             if campaign_id not in self.campaigns:
                 raise ValueError(f"Campaign not found: {campaign_id}")
@@ -703,7 +836,22 @@ class MarketingCampaignOrchestrator:
             }
 
     async def _generate_campaign_report(self, campaign: Campaign) -> Dict[str, Any]:
-        """Generate comprehensive campaign report."""
+        """
+        Builds a comprehensive report dictionary summarizing a campaign's performance and financials.
+        
+        Parameters:
+            campaign (Campaign): Campaign instance to summarize.
+        
+        Returns:
+            dict: Report containing:
+                - campaign_id: Campaign identifier.
+                - campaign_name: Campaign name.
+                - campaign_type: Campaign type as a string.
+                - duration: Campaign duration in hours (0 if start or completion timestamps are missing).
+                - performance_summary: Dict with `delivery_rate`, `open_rate`, `click_rate`, and `conversion_rate` (each 0 when denominators are zero).
+                - financial_summary: Dict with `budget`, `cost`, `revenue`, `roi_percentage`, and `cost_per_acquisition`.
+                - ab_test_results (optional): List of per-variant dicts (present when A/B testing is enabled) each containing `variant_name`, `is_control`, `is_winner`, `confidence_level`, `conversion_rate`, and `revenue_generated`.
+        """
         report = {
             "campaign_id": campaign.campaign_id,
             "campaign_name": campaign.name,
@@ -757,7 +905,20 @@ class MarketingCampaignOrchestrator:
     async def create_segment(
         self, segment_data: Dict[str, Any]
     ) -> CustomerSegment:
-        """Create a customer segment."""
+        """
+        Create a CustomerSegment from provided input data and store it in the orchestrator's segment registry.
+        
+        Parameters:
+        	segment_data (Dict[str, Any]): Input mapping with keys:
+        		- name (str): Required segment name.
+        		- description (str, optional): Human-readable description.
+        		- criteria (Dict[str, Any], optional): Mapping of criteria keys (matching SegmentCriteria names) to their values.
+        		- filters (Dict[str, Any], optional): Additional filter definitions for the segment.
+        		- customer_count (int, optional): Number of customers in the segment.
+        
+        Returns:
+        	CustomerSegment: The created segment instance with an assigned segment_id and stored in the orchestrator.
+        """
         segment = CustomerSegment(
             name=segment_data["name"],
             description=segment_data.get("description", ""),
@@ -778,7 +939,27 @@ class MarketingCampaignOrchestrator:
         return segment
 
     def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """
+        Return a snapshot of the orchestrator's current system status.
+        
+        Returns:
+            status (Dict[str, Any]): A dictionary with the following top-level keys:
+                - agent_name: Orchestrator agent name.
+                - version: Orchestrator version string.
+                - campaigns: Summary of campaigns including:
+                    - total_campaigns: Total campaigns stored.
+                    - active_campaigns: Number of campaigns currently active.
+                    - campaign_count: Counter of created campaigns.
+                    - status_breakdown: Mapping of campaign status names to counts.
+                - segments: Summary of segments including:
+                    - total_segments: Number of stored customer segments.
+                    - total_customers: Sum of customer_count across segments.
+                - performance: Aggregate performance metrics including:
+                    - total_sent: Total messages sent across campaigns.
+                    - total_conversions: Total conversions recorded.
+                    - avg_conversion_rate: total_conversions divided by total_sent (0 if total_sent is 0).
+                - channel_integrations: Mapping of channel names to their integration/configuration dictionaries.
+        """
         return {
             "agent_name": self.agent_name,
             "version": self.version,

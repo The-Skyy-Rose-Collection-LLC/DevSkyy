@@ -87,18 +87,14 @@ ROLE_HIERARCHY = {
 
 def has_permission(user_role: UserRole, required_role: UserRole) -> bool:
     """
-    Check if user role has sufficient permissions.
-
-    Args:
-        user_role: User's current role
-        required_role: Minimum required role
-
+    Determine whether a user's role meets or exceeds a required role.
+    
+    Parameters:
+        user_role (UserRole): The user's current role.
+        required_role (UserRole): The minimum role required to perform an action.
+    
     Returns:
-        True if user has sufficient permissions
-
-    Example:
-        >>> has_permission(UserRole.ADMIN, UserRole.DEVELOPER)
-        True  # Admin has higher privileges than Developer
+        True if `user_role` has equal or higher privilege than `required_role`, False otherwise.
     """
     return ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[required_role]
 
@@ -337,40 +333,36 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
     """
-    FastAPI dependency to verify JWT token on every protected endpoint
+    Resolve and validate the current user from the request's access token.
     
-    Usage in endpoints:
-        @app.get("/protected")
-        async def protected_endpoint(current_user: Dict = Depends(get_current_user)):
-            return {"user_id": current_user["sub"]}
+    Returns:
+        dict: Decoded JWT payload containing the authenticated user's claims (e.g., `sub`, `roles`, `exp`, `iat`, `jti`).
     """
     return verify_access_token(token)
 
 def require_role(required_role: UserRole):
     """
-    FastAPI dependency factory for RBAC enforcement.
-
-    Enforces role hierarchy: higher roles can access lower role endpoints.
-
-    Args:
-        required_role: Minimum required role
-
+    Create a FastAPI dependency that enforces a minimum user role according to the RBAC hierarchy.
+    
+    Parameters:
+        required_role (UserRole): Minimum role required to access the protected endpoint.
+    
     Returns:
-        FastAPI dependency function
-
-    Usage:
-        @router.post("/assets/upload")
-        async def upload_asset(
-            request: AssetUploadRequest,
-            user: Dict = Depends(require_role(UserRole.DEVELOPER))
-        ):
-            pass
-
-    Example:
-        >>> # ADMIN accessing DEVELOPER endpoint: ALLOWED (4 >= 3)
-        >>> # API_USER accessing ADMIN endpoint: DENIED (2 < 4)
+        Callable: A FastAPI dependency function that resolves the current user (via get_current_user), determines the user's highest role (defaults to `UserRole.READ_ONLY` when no valid roles are present), and raises HTTPException(status_code=403) if the user's role level is lower than `required_role`. On success, the dependency returns the `current_user` dict.
     """
     async def role_checker(current_user: Dict = Depends(get_current_user)) -> Dict[str, Any]:
+        """
+        Enforces that the current user has at least the required role and returns the user's decoded payload.
+        
+        Parameters:
+        	current_user (Dict): Decoded user payload (JWT claims) — may include a "roles" list of role names.
+        
+        Returns:
+        	Dict[str, Any]: The same `current_user` payload when the user has sufficient permissions.
+        
+        Raises:
+        	HTTPException: 403 Forbidden if the user's highest role does not meet the required role.
+        """
         user_roles = current_user.get("roles", [])
 
         # If no roles, default to READ_ONLY
@@ -410,8 +402,15 @@ async def get_current_admin(
     current_user: Dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
-    FastAPI dependency for admin-only endpoints (RBAC).
+    Dependency that enforces admin-level access for the resolved current user.
+    
     Deprecated: Use require_role(UserRole.ADMIN) instead.
+    
+    Returns:
+        dict: The current user dictionary as returned by `get_current_user`.
+    
+    Raises:
+        fastapi.HTTPException: HTTP 403 if the current user does not have `admin` or `super_admin` role.
     """
     user_roles = current_user.get("roles", [])
 
@@ -451,36 +450,16 @@ async def require_scope(required_scope: str):
 
 async def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """
-    Authenticate user credentials against database.
-
-    This function should be implemented by importing your User model and database session.
-
+    Authenticate user credentials against the application's user store.
+    
+    This function is a placeholder and currently always returns None to fail closed; replace its body with a database-backed lookup that verifies the supplied password (e.g., using verify_password) and returns a user dictionary on success.
+    
     Args:
-        username: Username
-        password: Plaintext password
-
+        username (str): The username to authenticate.
+        password (str): The plaintext password to verify.
+    
     Returns:
-        User dict if credentials valid, None otherwise
-
-    Implementation Example:
-        ```python
-        from database.models import User
-        from database.session import get_db
-
-        async with get_db() as db:
-            user = await db.query(User).filter(User.username == username).first()
-            if user and verify_password(password, user.hashed_password):
-                return {
-                    "id": str(user.id),
-                    "username": user.username,
-                    "email": user.email,
-                    "roles": user.roles
-                }
-        return None
-        ```
-
-    Note: This function intentionally returns None to fail authentication safely.
-    Integrate with your database by modifying this function.
+        Optional[Dict[str, Any]]: A dictionary with user information (e.g., id, username, email, roles) if authentication succeeds, `None` otherwise.
     """
     logger.error(
         "authenticate_user() not integrated with database. "
@@ -493,16 +472,16 @@ async def authenticate_user(username: str, password: str) -> Optional[Dict[str, 
 
 async def login(credentials: UserCredentials) -> AccessToken:
     """
-    Login endpoint - authenticate and return tokens
+    Authenticate user credentials and return new access and refresh tokens.
     
-    Args:
-        credentials: Username and password
-        
+    Parameters:
+        credentials (UserCredentials): Login credentials containing `username` and `password`.
+    
     Returns:
-        AccessToken with access_token, refresh_token, expires_in
-        
+        AccessToken: Contains `access_token`, `refresh_token`, `token_type` ("bearer"), and `expires_in` (seconds until the access token expires).
+    
     Raises:
-        HTTPException: If credentials invalid
+        HTTPException: If the provided credentials are invalid (401 Unauthorized).
     """
     user = await authenticate_user(credentials.username, credentials.password)
     if not user:
@@ -525,24 +504,16 @@ async def login(credentials: UserCredentials) -> AccessToken:
 
 async def refresh(request: RefreshTokenRequest) -> AccessToken:
     """
-    Refresh endpoint - exchange refresh token for new access token.
-
-    Args:
-        request: RefreshTokenRequest with refresh_token
-
+    Exchange a refresh token for a new access token and a rotated refresh token.
+    
+    Parameters:
+        request (RefreshTokenRequest): Payload containing the `refresh_token` to verify.
+    
     Returns:
-        New AccessToken pair
-
-    Citation: RFC 6749 Section 6 (Refreshing an Access Token)
-
-    Implementation Note:
-        Roles should be retrieved from database for security.
-        Example:
-        ```python
-        from database.models import User
-        user = await db.query(User).filter(User.id == user_id).first()
-        roles = user.roles if user else [UserRole.READ_ONLY.value]
-        ```
+        AccessToken: Model containing the new `access_token`, rotated `refresh_token`, and `expires_in` (seconds).
+    
+    Notes:
+        Roles are taken from the decoded refresh token payload; in production, the authoritative role set should be reloaded from the database if up-to-date role enforcement is required.
     """
     payload = verify_refresh_token(request.refresh_token)
     user_id = payload["sub"]

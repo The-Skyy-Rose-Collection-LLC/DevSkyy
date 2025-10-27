@@ -174,6 +174,11 @@ class EnterpriseWorkflowEngine:
     """
 
     def __init__(self):
+        """
+        Initialize the EnterpriseWorkflowEngine instance and its internal state.
+        
+        Sets engine metadata (name and version), creates in-memory registries for workflows and templates, registers the agent registry, initializes execution state (active workflows set and workflow queue), configures runtime metrics (workflows_executed, tasks_executed, rollbacks_performed), and prepares event subscriber storage. Also loads built-in workflow templates by calling the internal template initializer.
+        """
         self.engine_name = "Enterprise Workflow Engine"
         self.version = "1.0.0-production"
 
@@ -212,7 +217,13 @@ class EnterpriseWorkflowEngine:
         logger.info(f"✅ {len(self.workflow_templates)} workflow templates loaded")
 
     def register_agent(self, agent_type: str, agent_instance: Any):
-        """Register an agent for workflow execution."""
+        """
+        Register an agent instance under a specific agent type for use when executing tasks.
+        
+        Parameters:
+            agent_type (str): Identifier used to look up the agent when resolving task execution.
+            agent_instance (Any): Agent object (typically providing callable methods) that will be invoked for tasks of this type.
+        """
         self.agents[agent_type] = agent_instance
         logger.info(f"✅ Agent registered: {agent_type}")
 
@@ -220,14 +231,16 @@ class EnterpriseWorkflowEngine:
         self, workflow_type: WorkflowType, workflow_data: Dict[str, Any]
     ) -> Workflow:
         """
-        Create a workflow from template or custom definition.
-
-        Args:
-            workflow_type: Type of workflow to create
-            workflow_data: Configuration data for the workflow
-
+        Create a workflow from a predefined template or from a custom workflow definition.
+        
+        If a template exists for the given workflow_type, uses that template; otherwise builds a Workflow from workflow_data, constructs Task objects, computes a topological task order, stores the workflow in the engine, and returns it.
+        
+        Parameters:
+            workflow_type (WorkflowType): The workflow template type or WorkflowType.CUSTOM for custom definitions.
+            workflow_data (Dict[str, Any]): Configuration for the workflow or template; for custom workflows this may include keys such as `name`, `description`, `max_parallel_tasks`, `enable_rollback`, `continue_on_failure`, `created_by`, and a `tasks` list of task definitions.
+        
         Returns:
-            Created workflow instance
+            Workflow: The created and stored Workflow instance.
         """
         try:
             if workflow_type in self.workflow_templates:
@@ -282,14 +295,31 @@ class EnterpriseWorkflowEngine:
         self, workflow_id: str
     ) -> Dict[str, Any]:
         """
-        Execute a workflow with all its tasks.
-
-        Implements:
-        - Dependency resolution
-        - Parallel execution
-        - Error handling with retry
-        - Rollback on failure
-        - Progress tracking
+        Execute the workflow identified by `workflow_id`, run its tasks according to dependencies, and update workflow state.
+        
+        Executes tasks with dependency-aware parallelism, applies per-task retry/timeout behavior, emits lifecycle events ("workflow_started", "workflow_completed", "workflow_failed"), and, on failure, optionally performs saga-style rollback of completed tasks. Updates the workflow's status, timing, results, and internal engine metrics.
+        
+        Parameters:
+            workflow_id (str): Identifier of the workflow to execute.
+        
+        Returns:
+            result (dict): Execution summary containing:
+                - "success" (bool): `true` if the workflow completed, `false` if it failed.
+                - "workflow_id" (str): The input workflow identifier.
+                - "status" (str): Final workflow status name.
+                - On success:
+                    - "duration_seconds" (float): Total execution time in seconds.
+                    - "tasks_completed" (int): Number of tasks completed.
+                    - "tasks_failed" (int): Number of tasks that failed (should be 0 on success).
+                    - "results" (dict): Aggregated per-task results.
+                - On failure:
+                    - "error" (str): Error message or exception string.
+                    - "tasks_completed" (int): Number of tasks completed before failure.
+                    - "tasks_failed" (int): Number of tasks that failed.
+                    - "rolled_back" (bool): `true` if rollback was attempted, `false` otherwise.
+        
+        Raises:
+            ValueError: If `workflow_id` does not correspond to a known workflow.
         """
         try:
             if workflow_id not in self.workflows:
@@ -448,7 +478,11 @@ class EnterpriseWorkflowEngine:
                 break
 
     async def _execute_task(self, workflow: Workflow, task: Task):
-        """Execute a single task with retry logic."""
+        """
+        Execute a single task by invoking its registered agent method and applying retries with exponential backoff.
+        
+        Attempts the task up to `task.retry_count` times, setting `task.status` to RUNNING and recording `task.start_time` before execution. Resolves the task's agent and method, executes it with a per-attempt timeout, and on success sets `task.status` to COMPLETED, stores `task.result`, records `task.end_time`, and increments the engine's `tasks_executed` counter. On failure (including timeout) the function retries using an exponential backoff based on `task.retry_delay_seconds`; after all attempts are exhausted it sets `task.status` to FAILED`, records `task.error` and `task.end_time`. The task's `attempts` field is updated for each attempt.
+        """
         task.status = TaskStatus.RUNNING
         task.start_time = datetime.now()
 
@@ -517,9 +551,9 @@ class EnterpriseWorkflowEngine:
 
     async def _rollback_workflow(self, workflow: Workflow):
         """
-        Rollback workflow using Saga pattern compensation.
-
-        Executes compensation methods for all completed tasks in reverse order.
+        Perform Saga-style compensation for a workflow by executing compensation methods for completed tasks in reverse order.
+        
+        Sets the workflow's status to ROLLED_BACK and increments the engine's rollback counter. For each task that completed (walking tasks in reverse topological order) calls the task's compensation method if one is configured; on successful compensation the task is marked as `TaskStatus.ROLLED_BACK`. Tasks are skipped when their agent or compensation method is missing, and any compensation errors are logged. Emits a "workflow_rolled_back" event containing the number of tasks attempted for rollback.
         """
         logger.warning(f"🔄 Rolling back workflow: {workflow.name}")
 
@@ -571,7 +605,15 @@ class EnterpriseWorkflowEngine:
         })
 
     def _topological_sort(self, workflow: Workflow) -> List[str]:
-        """Sort tasks based on dependencies (topological sort)."""
+        """
+        Produce a topological ordering of task IDs respecting each task's dependencies.
+        
+        Returns:
+            A list of task IDs ordered so that each task appears after all tasks it depends on.
+        
+        Raises:
+            ValueError: If the workflow's task dependency graph contains a cycle.
+        """
         # Build adjacency list
         graph = {task_id: [] for task_id in workflow.tasks.keys()}
         in_degree = {task_id: 0 for task_id in workflow.tasks.keys()}
@@ -624,7 +666,19 @@ class EnterpriseWorkflowEngine:
         logger.debug(f"📡 Event emitted: {event_type} for workflow {workflow_id}")
 
     def subscribe_to_events(self, event_type: str, callback: Callable):
-        """Subscribe to workflow events."""
+        """
+        Register a callback to be notified when events of the given type are emitted.
+        
+        The provided callback will be invoked with a single event dictionary when an event matching event_type is emitted. The event dictionary contains at least the keys:
+        - `workflow_id` (str)
+        - `event_type` (str)
+        - `data` (dict)
+        - `timestamp` (float)
+        
+        Parameters:
+            event_type (str): Name of the event to subscribe to.
+            callback (Callable): A callable that accepts one argument (the event dict) and will be invoked for each emitted event of the given type.
+        """
         if event_type not in self.event_subscribers:
             self.event_subscribers[event_type] = []
 
@@ -638,7 +692,26 @@ class EnterpriseWorkflowEngine:
     async def _create_brand_launch_workflow(
         self, workflow_data: Dict[str, Any]
     ) -> Workflow:
-        """Create a complete fashion brand launch workflow."""
+        """
+        Constructs a Workflow preconfigured for a fashion brand launch.
+        
+        The returned Workflow contains a set of tasks and default execution settings appropriate for launching a luxury fashion brand:
+        - Generate Brand Visual Assets (with optional compensation to delete generated content)
+        - Build Brand Website (depends on visual assets)
+        - Setup Inventory System
+        - Launch Marketing Campaign (depends on website and visual assets)
+        
+        Parameters:
+            workflow_data (Dict[str, Any]): Optional configuration values used to customize the workflow. Recognized keys:
+                - "max_parallel_tasks" (int): maximum concurrent tasks for the workflow.
+                - "visual_assets_params" (dict): parameters for the visual content generation task.
+                - "website_params" (dict): parameters for the website build task.
+                - "inventory_params" (dict): parameters for the inventory setup task.
+                - "marketing_params" (dict): parameters for the marketing campaign task.
+        
+        Returns:
+            Workflow: A Workflow instance configured for a fashion brand launch.
+        """
         workflow = Workflow(
             name="Fashion Brand Launch",
             description="Complete automation for launching a luxury fashion brand",
@@ -695,7 +768,15 @@ class EnterpriseWorkflowEngine:
     async def _create_product_launch_workflow(
         self, workflow_data: Dict[str, Any]
     ) -> Workflow:
-        """Create a product launch workflow."""
+        """
+        Create a product launch workflow template tailored for launching a single product.
+        
+        Parameters:
+            workflow_data (Dict[str, Any]): Optional overrides and configuration for the template (e.g., custom name, description, task definitions, max_parallel_tasks, enable_rollback, metadata). Keys not provided use sensible defaults for a product launch workflow.
+        
+        Returns:
+            Workflow: A constructed Workflow instance configured for a product launch.
+        """
         # Implementation similar to brand launch but focused on single product
         workflow = Workflow(
             name="Product Launch",
@@ -708,7 +789,17 @@ class EnterpriseWorkflowEngine:
     async def _create_marketing_campaign_workflow(
         self, workflow_data: Dict[str, Any]
     ) -> Workflow:
-        """Create a marketing campaign workflow."""
+        """
+        Builds a predefined Marketing Campaign workflow template.
+        
+        Accepts optional configuration in `workflow_data` to customize the template (for example: overriding name/description, supplying task definitions, tuning max_parallel_tasks, enable_rollback, or attaching metadata). The returned Workflow is initialized with type `WorkflowType.MARKETING_CAMPAIGN` and is ready for downstream topological sorting and execution.
+        
+        Parameters:
+            workflow_data (Dict[str, Any]): Optional template overrides and task definitions used to customize the created workflow.
+        
+        Returns:
+            Workflow: A Workflow instance configured as a Marketing Campaign template.
+        """
         workflow = Workflow(
             name="Marketing Campaign",
             description="Execute multi-channel marketing campaign with A/B testing",
@@ -720,7 +811,15 @@ class EnterpriseWorkflowEngine:
     async def _create_content_generation_workflow(
         self, workflow_data: Dict[str, Any]
     ) -> Workflow:
-        """Create a content generation workflow."""
+        """
+        Builds a Content Generation Pipeline workflow template.
+        
+        Parameters:
+            workflow_data (Dict[str, Any]): Optional configuration to customize the template (for example overrides for name, description, max_parallel_tasks, task definitions, or metadata). Unknown keys are passed through to the constructed Workflow where applicable.
+        
+        Returns:
+            Workflow: A Workflow pre-populated with tasks and settings for generating visual and written content (content generation template).
+        """
         workflow = Workflow(
             name="Content Generation Pipeline",
             description="Generate visual and written content for brand",
@@ -730,7 +829,28 @@ class EnterpriseWorkflowEngine:
         return workflow
 
     def get_workflow_status(self, workflow_id: str) -> Dict[str, Any]:
-        """Get current status of a workflow."""
+        """
+        Return a structured snapshot of a workflow's current status, progress, timing, results, and errors.
+        
+        Returns:
+        	details (dict): If the workflow_id is not found, returns {"error": "Workflow not found"}.
+        	Otherwise returns a dictionary with the following keys:
+        		- workflow_id (str): The workflow identifier.
+        		- name (str): The workflow name.
+        		- status (str): The workflow's current status value.
+        		- progress (dict):
+        			- total_tasks (int): Total number of tasks in the workflow.
+        			- completed_tasks (int): Number of tasks marked completed.
+        			- failed_tasks (int): Number of tasks that failed.
+        			- current_tasks (int): Number of tasks currently in flight.
+        			- percentage (float): Completion percentage (completed / total * 100), 0 if no tasks.
+        		- timing (dict):
+        			- start_time (str | None): ISO8601 start time, or None if not started.
+        			- end_time (str | None): ISO8601 end time, or None if not finished.
+        			- duration_seconds (float | None): Total duration in seconds if start and end times are present, otherwise None.
+        		- results (dict): Collected task/workflow results.
+        		- errors (dict): Collected task/workflow errors.
+        """
         if workflow_id not in self.workflows:
             return {"error": "Workflow not found"}
 
@@ -763,7 +883,24 @@ class EnterpriseWorkflowEngine:
         }
 
     def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """
+        Provide a snapshot of engine metadata, aggregated metrics, and available agents/templates.
+        
+        Returns:
+            status (dict): A mapping with keys:
+                - engine_name (str): Engine instance name.
+                - version (str): Engine version.
+                - workflows (dict): Aggregated workflow metrics:
+                    - total_workflows (int): Number of workflows stored.
+                    - active_workflows (int): Number of workflows currently active.
+                    - workflows_executed (int): Total workflows executed by the engine.
+                - tasks (dict):
+                    - tasks_executed (int): Total tasks executed by the engine.
+                - reliability (dict):
+                    - rollbacks_performed (int): Total rollbacks performed.
+                - registered_agents (List[str]): Registered agent types.
+                - available_templates (List[str]): Available workflow template names.
+        """
         return {
             "engine_name": self.engine_name,
             "version": self.version,
