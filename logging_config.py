@@ -235,7 +235,7 @@ def setup_logging():
             },
             "security": {
                 "()": SecurityFormatter,
-            },
+                exc_info=(type(error), error, error.__traceback__),
             "console": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
         },
         "handlers": {
