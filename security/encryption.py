@@ -1,7 +1,24 @@
 """
 Enterprise-Grade Encryption System
-AES-256-GCM encryption replacing XOR cipher
-Includes key derivation, secure random generation, and encryption helpers
+AES-256-GCM encryption replacing XOR cipher per NIST SP 800-38D
+Includes key derivation (NIST SP 800-132), secure random generation, and encryption helpers
+
+Standards Compliance:
+- NIST SP 800-38D: Recommendation for Block Cipher Modes of Operation: GCM and GMAC
+  - AES-256-GCM for authenticated encryption
+  - 96-bit (12-byte) IV per NIST recommendations
+  - 128-bit (16-byte) authentication tag
+
+- NIST SP 800-132: Recommendation for Password-Based Key Derivation
+  - PBKDF2-HMAC-SHA256 for key derivation
+  - Minimum 100,000 iterations per OWASP 2023 recommendations
+  - 32-byte (256-bit) salt for cryptographic operations
+
+- NIST SP 800-90Ar1: Recommendation for Random Number Generation
+  - secrets module for CSPRNG (cryptographically secure pseudo-random number generator)
+
+Reference: https://csrc.nist.gov/publications/detail/sp/800-38d/final
+Reference: https://csrc.nist.gov/publications/detail/sp/800-132/final
 """
 
 import base64
@@ -18,6 +35,23 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 logger = logging.getLogger(__name__)
+
+# ============================================================================
+# CRYPTOGRAPHIC CONSTANTS - Per NIST & OWASP Standards
+# ============================================================================
+
+# NIST SP 800-132 & OWASP 2023 Password Storage Cheat Sheet
+# https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+PBKDF2_ITERATIONS = 100000  # Minimum recommended by OWASP 2023
+PBKDF2_ALGORITHM = "sha256"  # HMAC-SHA256 per NIST SP 800-132
+
+# NIST SP 800-38D: GCM Mode requirements
+AES_KEY_SIZE = 32  # 256 bits for AES-256
+GCM_IV_SIZE = 12   # 96 bits (12 bytes) per NIST SP 800-38D Section 8.2.1
+GCM_TAG_SIZE = 16  # 128 bits (16 bytes) authentication tag
+
+# NIST SP 800-132: Salt requirements
+SALT_SIZE = 32  # 256 bits (32 bytes) minimum for cryptographic operations
 
 
 # ============================================================================
@@ -47,26 +81,39 @@ class KeyManager:
         logger.warning(f"ENCRYPTION_MASTER_KEY={key.decode()}")
         return key.decode()
 
-    def derive_key(self, password: str, salt: Optional[bytes] = None, key_size: int = 32) -> tuple[bytes, bytes]:
+    def derive_key(
+        self, password: str, salt: Optional[bytes] = None, key_size: int = AES_KEY_SIZE
+    ) -> tuple[bytes, bytes]:
         """
-        Derive an encryption key from a password using PBKDF2
+        Derive an encryption key from a password using PBKDF2 per NIST SP 800-132.
+
+        Implements NIST SP 800-132 Section 5.3 recommendations:
+        - PBKDF2-HMAC-SHA256 algorithm
+        - Minimum 100,000 iterations (OWASP 2023 guidance)
+        - 32-byte salt (256 bits) for cryptographic operations
+        - Configurable key size (default: 32 bytes for AES-256)
+
+        Reference: NIST SP 800-132 "Recommendation for Password-Based Key Derivation"
+        Reference: OWASP Password Storage Cheat Sheet (2023)
 
         Args:
             password: Password to derive key from
-            salt: Salt for key derivation (generated if not provided)
-            key_size: Size of derived key in bytes
+            salt: Salt for key derivation (auto-generated if not provided per NIST SP 800-132)
+            key_size: Size of derived key in bytes (default: AES_KEY_SIZE = 32)
 
         Returns:
             Tuple of (derived_key, salt)
         """
         if salt is None:
-            salt = secrets.token_bytes(16)
+            # NIST SP 800-132: Salt should be at least 128 bits; we use 256 bits
+            salt = secrets.token_bytes(SALT_SIZE)
 
+        # NIST SP 800-132 Section 5.3: PBKDF2 with HMAC-SHA256
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=key_size,
             salt=salt,
-            iterations=100000,
+            iterations=PBKDF2_ITERATIONS,  # Per OWASP 2023 recommendations
             backend=default_backend(),
         )
 
@@ -273,67 +320,22 @@ class FieldEncryption:
 
 
 # ============================================================================
-# PASSWORD HASHING (One-way)
+# PASSWORD HASHING (One-way) - DEPRECATED
+# ============================================================================
+#
+# ⚠️  DEPRECATED: The custom PasswordHasher class has been removed.
+#
+# Truth Protocol Violation: Custom password hashing violates OWASP 2023
+# Password Storage Cheat Sheet and NIST SP 800-63B recommendations.
+#
+# ✅ RECOMMENDED: Use passlib.context.CryptContext (see security/jwt_auth.py)
+#
+# References:
+# - OWASP: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+# - NIST SP 800-63B Section 5.1.1.2: https://pages.nist.gov/800-63-3/sp800-63b.html
 # ============================================================================
 
 
-class PasswordHasher:
-    """Secure password hashing using bcrypt or argon2"""
-
-    @staticmethod
-    def hash_password(password: str, salt_rounds: int = 12) -> str:
-        """
-        Hash a password using SHA-256 with salt
-
-        Args:
-            password: Password to hash
-            salt_rounds: Number of salt rounds (complexity)
-
-        Returns:
-            Hashed password
-        """
-        # Generate salt
-        salt = secrets.token_bytes(32)
-
-        # Hash password
-        key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000 + salt_rounds * 10000)
-
-        # Combine salt and hash
-        storage = salt + key
-
-        return base64.b64encode(storage).decode()
-
-    @staticmethod
-    def verify_password(password: str, hashed: str) -> bool:
-        """
-        Verify a password against its hash
-
-        Args:
-            password: Password to verify
-            hashed: Hashed password
-
-        Returns:
-            True if password matches
-        """
-        try:
-            # Decode stored hash
-            storage = base64.b64decode(hashed)
-
-            # Extract salt and hash
-            salt = storage[:32]
-            stored_key = storage[32:]
-
-            # Hash provided password
-            key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
-
-            # Constant-time comparison
-            return secrets.compare_digest(key, stored_key)
-
-        except Exception:
-            return False
-
-
-# ============================================================================
 # SECURE RANDOM GENERATION
 # ============================================================================
 
@@ -367,7 +369,7 @@ class SecureRandom:
 key_manager = KeyManager()
 aes_encryption = AESEncryption(key_manager)
 field_encryption = FieldEncryption(aes_encryption)
-password_hasher = PasswordHasher()
+# password_hasher = PasswordHasher()  # DEPRECATED - Use passlib instead
 secure_random = SecureRandom()
 
 logger.info("🔐 Enterprise AES-256 Encryption System initialized")

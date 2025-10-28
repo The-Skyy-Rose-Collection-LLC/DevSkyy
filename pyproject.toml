@@ -22,31 +22,61 @@ classifiers = [
     "Topic :: Artistic Software",
 ]
 requires-python = ">=3.11"
+# Truth Protocol Compliance: All versions pinned exactly per CLAUDE.md requirements
+# References requirements.txt as single source of truth for production dependencies
 dependencies = [
-    "fastapi>=0.115.6",
-    "uvicorn>=0.34.0",
-    "pymongo>=4.10.1",
-    "python-dotenv>=1.0.1",
-    "pydantic>=2.10.4",
-    "requests>=2.32.3",
-    "python-multipart>=0.0.17",
-    "aiofiles>=24.1.0",
-    "motor>=3.6.0",
-    "python-jose[cryptography]>=3.3.0",
-    "passlib[bcrypt]>=1.7.4",
-    "openai>=1.55.3",
-    "certifi>=2024.8.30",
-    "dnspython>=2.7.0",
-    "paramiko>=3.5.0",
+    # Core Framework - Versions per PEP 440, pinned for reproducibility
+    "fastapi==0.119.0",           # FastAPI web framework
+    "uvicorn[standard]==0.34.0",  # ASGI server
+    "python-dotenv==1.0.1",       # Environment configuration
+    "pydantic==2.7.4",            # Data validation (langchain compatibility >=2.7.4)
+    "starlette==0.48.0",          # FastAPI dependency
+
+    # HTTP & API
+    "requests==2.32.4",           # HTTP client (GHSA-9hjg-9r4m-mvj7 fixed)
+    "python-multipart==0.0.18",   # Form data parsing
+    "aiofiles==24.1.0",           # Async file operations
+    "httpx==0.28.1",              # Async HTTP client
+
+    # Database - SQLAlchemy (primary), MongoDB support via Motor
+    "SQLAlchemy==2.0.36",         # ORM framework
+    "aiosqlite==0.20.0",          # Async SQLite driver
+    "asyncpg==0.30.0",            # Async PostgreSQL driver
+    "pymongo==4.10.1",            # MongoDB driver (legacy support)
+    "motor==3.6.0",               # Async MongoDB driver
+    "dnspython==2.7.0",           # DNS resolution for MongoDB
+
+    # Authentication & Security - RFC 7519 (JWT), NIST SP 800-132 (PBKDF2), OWASP guidance
+    "PyJWT==2.10.1",              # RFC 7519 JWT implementation (replaces python-jose)
+    "passlib[bcrypt]==1.7.4",     # Password hashing per OWASP
+    "bcrypt==4.2.1",              # Bcrypt algorithm (fallback)
+    "argon2-cffi==23.1.0",        # Argon2id per OWASP 2023 recommendations (primary)
+    "cryptography==46.0.2",       # NIST SP 800-38D AES-GCM, multiple CVE fixes
+    "certifi==2024.12.14",        # CA certificates
+    "paramiko==3.5.0",            # SSH client
+
+    # Security Middleware
+    "slowapi==0.1.9",             # Rate limiting
+    "secure==0.3.0",              # Security headers
+
+    # AI & ML
+    "anthropic==0.69.0",          # Claude AI
+    "openai==2.3.0",              # OpenAI API
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "black>=23.0.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
+    # Development & Testing - Pinned versions per Truth Protocol
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
+    "pytest-cov==6.0.0",
+    "black==24.10.0",
+    "flake8==7.1.1",
+    "mypy==1.13.0",
+    "isort==5.13.2",
+    "bandit==1.8.0",              # Security linting
+    "safety==3.2.11",             # Vulnerability scanning
+    "pip-audit==2.8.0",           # Dependency audit
 ]
 
 [project.urls]
