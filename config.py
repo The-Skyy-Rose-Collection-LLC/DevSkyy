@@ -1,14 +1,12 @@
-from typing import Any, Dict, List, Optional
-
-"""
-Production Configuration for The Skyy Rose Collection Platform
-"""
 import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+"""
+Production Configuration for The Skyy Rose Collection Platform
+"""
 
+load_dotenv()
 
 class Config:
     """Base configuration."""
@@ -26,6 +24,21 @@ class Config:
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
     STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY")
 
+    # WordPress Credentials (Skyy Rose Collection)
+    SKYY_ROSE_SITE_URL = os.environ.get("SKYY_ROSE_SITE_URL")
+    SKYY_ROSE_USERNAME = os.environ.get("SKYY_ROSE_USERNAME")
+    SKYY_ROSE_PASSWORD = os.environ.get("SKYY_ROSE_PASSWORD")
+    SKYY_ROSE_APP_PASSWORD = os.environ.get("SKYY_ROSE_APP_PASSWORD")
+
+    # FTP/SFTP Credentials
+    SKYY_ROSE_FTP_HOST = os.environ.get("SKYY_ROSE_FTP_HOST")
+    SKYY_ROSE_FTP_USERNAME = os.environ.get("SKYY_ROSE_FTP_USERNAME")
+    SKYY_ROSE_FTP_PASSWORD = os.environ.get("SKYY_ROSE_FTP_PASSWORD")
+    SKYY_ROSE_SFTP_HOST = os.environ.get("SKYY_ROSE_SFTP_HOST")
+    SKYY_ROSE_SFTP_USERNAME = os.environ.get("SKYY_ROSE_SFTP_USERNAME")
+    SKYY_ROSE_SFTP_PASSWORD = os.environ.get("SKYY_ROSE_SFTP_PASSWORD")
+    SKYY_ROSE_SFTP_PRIVATE_KEY = os.environ.get("SKYY_ROSE_SFTP_PRIVATE_KEY")
+
     # Brand Settings
     BRAND_NAME = "The Skyy Rose Collection"
     BRAND_DOMAIN = "theskyy-rose-collection.com"
@@ -37,14 +50,12 @@ class Config:
     CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
     TRUSTED_HOSTS = ["theskyy-rose-collection.com"]
 
-
 class DevelopmentConfig(Config):
     """Development configuration."""
 
     DEBUG = True
     CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
     TRUSTED_HOSTS = ["localhost", "127.0.0.1"]
-
 
 class ProductionConfig(Config):
     """Production configuration."""
@@ -56,14 +67,12 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
-
 class TestingConfig(Config):
     """Testing configuration."""
 
     TESTING = True
     DATABASE_URL = "sqlite:///:memory:"
     SECRET_KEY = "test-secret-key"  # Allow test secret key
-
 
 # Configuration mapping
 config = {

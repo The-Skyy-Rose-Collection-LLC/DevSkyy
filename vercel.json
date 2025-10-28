@@ -1,0 +1,98 @@
+{
+  "version": 2,
+  "name": "devskyy-enterprise-platform",
+  "framework": "other",
+  "buildCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt && pip install email-validator==2.1.0",
+  "outputDirectory": ".",
+  "installCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt",
+  "devCommand": "uvicorn main:app --host 0.0.0.0 --port $PORT --reload",
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.11",
+        "excludeFiles": "**/{__pycache__,*.pyc,tests,docs,htmlcov}/**",
+        "pythonBinPath": "python3.11"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": ".",
+    "ENVIRONMENT": "production",
+    "LOG_LEVEL": "INFO",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "functions": {
+    "main.py": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "python3.11",
+      "includeFiles": "templates/**"
+    }
+  },
+  "regions": ["iad1"],
+  "github": {
+    "autoDeployment": true,
+    "autoJobCancelation": true
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "X-Deployment-Platform",
+          "value": "vercel"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/health",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "https://github.com/SkyyRoseLLC/DevSkyy/blob/main/README.md",
+      "permanent": false
+    }
+  ]
+}

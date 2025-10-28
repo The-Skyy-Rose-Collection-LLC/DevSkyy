@@ -1,18 +1,17 @@
-from typing import Any, Dict, List, Optional
-from unittest.mock import MagicMock, patch
-
-import pytest
-
-from agent.modules.customer_service import CustomerServiceAgent, handle_customer_service
-from agent.modules.financial import FinancialAgent, monitor_financial_health
-from agent.modules.inventory import InventoryAgent, manage_inventory
-from agent.modules.marketing import MarketingAgent, optimize_marketing
-
+from agent.modules.backend.customer_service_agent import CustomerServiceAgent
+from agent.modules.backend.financial_agent import FinancialAgent
+from agent.modules.backend.inventory_agent import InventoryAgent
+from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 
 class TestFinancialAgent:
 
     def test_chargeback_monitoring(self):
-        """TODO: Add docstring for test_chargeback_monitoring."""
+        """Test chargeback monitoring functionality.
+
+        This test verifies that the chargeback monitoring system properly
+        detects, tracks, and responds to chargeback events in the payment
+        processing pipeline.
+        """
         agent = FinancialAgent()
         result = agent.monitor_chargebacks()
 
@@ -30,7 +29,6 @@ class TestFinancialAgent:
         assert result["fraud_score"] > 0
         assert result["risk_level"] in ["HIGH", "LOW"]
         assert "indicators" in result
-
 
 class TestInventoryAgent:
 
@@ -50,7 +48,6 @@ class TestInventoryAgent:
         assert "predicted_weekly_demand" in result
         assert "confidence" in result
         assert "recommended_reorder_quantity" in result
-
 
 class TestCustomerServiceAgent:
 
@@ -72,11 +69,10 @@ class TestCustomerServiceAgent:
         assert "shipping" in response.lower()
         assert len(response) > 50
 
-
 class TestMarketingAgent:
 
     def test_campaign_analysis(self):
-        agent = MarketingAgent()
+        agent = SEOMarketingAgent()
         result = agent.analyze_campaign_performance()
 
         assert "campaigns" in result
@@ -84,42 +80,50 @@ class TestMarketingAgent:
         assert "underperforming_count" in result
 
     def test_customer_segmentation(self):
-        agent = MarketingAgent()
+        agent = SEOMarketingAgent()
         result = agent.segment_customers()
 
         assert "segments" in result
         assert "total_customers" in result
-        expected_segments = ["high_value", "frequent_buyers", "at_risk", "new_customers"]
+        expected_segments = [
+            "high_value",
+            "frequent_buyers",
+            "at_risk",
+            "new_customers",
+        ]
         for segment in expected_segments:
             assert segment in result["segments"]
-
 
 class TestMainFunctions:
 
     def test_financial_health_monitoring(self):
-        result = monitor_financial_health()
+        agent = FinancialAgent()
+        result = agent.monitor_chargebacks()
 
-        assert "chargebacks" in result
-        assert "reconciliation" in result
-        assert "overall_status" in result
+        assert "chargeback_rate" in result
+        assert "threshold_exceeded" in result
+        assert "timestamp" in result
 
     def test_inventory_management(self):
-        result = manage_inventory()
+        agent = InventoryAgent()
+        result = agent.optimize_inventory()
 
-        assert "stock_status" in result
-        assert "reorder_suggestions" in result
-        assert "action_required" in result
+        assert "optimization_results" in result
+        assert "recommendations" in result
+        assert "timestamp" in result
 
     def test_customer_service_handling(self):
-        result = handle_customer_service()
+        agent = CustomerServiceAgent()
+        result = agent.handle_inquiry("test inquiry")
 
-        assert "response_metrics" in result
-        assert "satisfaction_metrics" in result
-        assert "overall_status" in result
+        assert "response" in result
+        assert "confidence" in result
+        assert "timestamp" in result
 
     def test_marketing_optimization(self):
-        result = optimize_marketing()
+        agent = SEOMarketingAgent()
+        result = agent.analyze_campaign_performance()
 
-        assert "campaign_performance" in result
-        assert "customer_segments" in result
-        assert "ad_optimization" in result
+        assert "campaigns" in result
+        assert "total_campaigns" in result
+        assert "underperforming_count" in result

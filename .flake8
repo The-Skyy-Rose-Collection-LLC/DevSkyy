@@ -1,0 +1,33 @@
+[flake8]
+max-line-length = 88
+exclude =
+    node_modules,
+    __pycache__,
+    .git,
+    .venv,
+    venv,
+    frontend,
+    migrations,
+    backups,
+    build,
+    dist,
+    *.egg-info,
+    devskyy-platform,
+    htmlcov,
+    .pytest_cache
+extend-ignore =
+    E203,
+    W503,
+    E501,
+    W293,
+    W291
+per-file-ignores =
+    __init__.py:F401
+    tests/*:F401,F841
+    */test_*.py:F401,F841
+    create_user.py:E402
+    main.py:E402
+    logger_config.py:E402
+    monitoring/observability.py:E402
+statistics = True
+count = True

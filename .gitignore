@@ -51,3 +51,65 @@ htmlcov/
 *.db
 *.sqlite
 *.sqlite3
+
+# Large files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.iso
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm/
+.yarn/
+
+# Docker
+docker-compose.override.yml
+.dockerignore.local
+
+# ML/AI Models
+*.h5
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.onnx
+*.pb
+*.tflite
+models/
+checkpoints/
+*.model
+
+# Cloud & Credentials
+.aws/
+.gcloud/
+credentials.json
+service-account.json
+*-key.json
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Cache
+.cache/
+*.cache
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Build artifacts
+*.whl
+.eggs/
+pip-wheel-metadata/

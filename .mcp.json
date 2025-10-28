@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "wordpress": {
+      "command": "npx",
+      "args": ["-y", "@instawp/mcp-wp"],
+      "env": {
+        "WORDPRESS_API_URL": "https://skyyrose.co",
+        "WORDPRESS_USERNAME": "skyyroseco",
+        "WORDPRESS_PASSWORD": "0xnUAno1cDs8kli4Iy4cvP2M"
+      }
+    },
+    "wordpress-files": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/coreyfoster/DevSkyy/wordpress-plugin"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+./agent/ecommerce/analytics_engine.py:16:1: F401 'datetime.timedelta' imported but unused
+./agent/ecommerce/customer_intelligence.py:19:1: F401 'sklearn.cluster.KMeans' imported but unused
+./agent/ecommerce/order_automation.py:18:1: F401 'typing.Optional' imported but unused
+./agent/ecommerce/order_automation.py:332:9: F841 local variable 'shipping_address' is assigned to but never used
+./agent/ml_models/forecasting_engine.py:15:1: F401 'datetime.datetime' imported but unused
+./agent/ml_models/forecasting_engine.py:15:1: F401 'datetime.timedelta' imported but unused
+./agent/ml_models/forecasting_engine.py:16:1: F401 'typing.Optional' imported but unused
+./agent/modules/backend/openai_intelligence_service.py:1:1: F401 'json' imported but unused
+./agent/modules/backend/self_learning_system.py:608:1: E402 module level import not at top of file
+./agent/modules/backend/wordpress_integration_service.py:382:9: F841 local variable 'collection_type' is assigned to but never used
+./agent/modules/backend/wordpress_integration_service.py:383:9: F841 local variable 'title' is assigned to but never used
+./agent/modules/backend/wordpress_integration_service.py:384:9: F841 local variable 'description' is assigned to but never used
+./agent/modules/marketing_content_generation_agent.py:291:13: F841 local variable 'launch_date' is assigned to but never used
+./agent/wordpress/content_generator.py:217:9: F841 local variable 'brand_name' is assigned to but never used
+./agent/wordpress/content_generator.py:219:19: F541 f-string is missing placeholders
+./agent/wordpress/seo_optimizer.py:14:1: F401 'json' imported but unused
+./agent/wordpress/seo_optimizer.py:414:24: F541 f-string is missing placeholders
+./agent/wordpress/seo_optimizer.py:419:24: F541 f-string is missing placeholders
+./api/v1/auth.py:7:1: F401 'datetime.datetime' imported but unused
+./api/v1/gdpr.py:16:1: F401 'pydantic.EmailStr' imported but unused
+./api/v1/gdpr.py:137:25: F541 f-string is missing placeholders
+./api/v1/gdpr.py:146:25: F541 f-string is missing placeholders
+./api/v1/gdpr.py:232:25: F541 f-string is missing placeholders
+./api/v1/gdpr.py:235:13: F841 local variable 'anonymized_user_data' is assigned to but never used
+./api/v1/gdpr.py:249:25: F541 f-string is missing placeholders
+./api/v1/gdpr.py:258:29: F541 f-string is missing placeholders
+./api/v1/gdpr.py:262:25: F541 f-string is missing placeholders
+./api/v1/gdpr.py:268:21: F541 f-string is missing placeholders
+./api/v1/ml.py:10:1: F401 'fastapi.status' imported but unused
+./api/v1/ml.py:75:5: F841 local variable 'e' is assigned to but never used
+./create_user.py:68:15: F541 f-string is missing placeholders
+./create_user.py:76:15: F541 f-string is missing placeholders
+./create_user.py:91:19: F541 f-string is missing placeholders
+./create_user.py:93:19: F541 f-string is missing placeholders
+./deployment_verification.py:11:1: F401 'typing.Dict' imported but unused
+./deployment_verification.py:11:1: F401 'typing.List' imported but unused
+./deployment_verification.py:11:1: F401 'typing.Tuple' imported but unused
+./deployment_verification.py:201:17: F841 local variable 'result' is assigned to but never used
+./deployment_verification.py:233:13: F401 'ml.model_registry.model_registry' imported but unused
+./deployment_verification.py:254:13: F401 'ml.explainability.explainer' imported but unused
+./deployment_verification.py:258:13: F401 'ml.auto_retrain.auto_retrainer' imported but unused
+./init_database.py:24:9: F401 'models_sqlalchemy' imported but unused
+./main.py:244:9: F841 local variable 'health_results' is assigned to but never used
+./ml/auto_retrain.py:9:1: F401 'typing.Any' imported but unused
+./ml/auto_retrain.py:9:1: F401 'typing.Dict' imported but unused
+./ml/auto_retrain.py:9:1: F401 'typing.Optional' imported but unused
+./ml/codex_integration.py:404:20: F541 f-string is missing placeholders
+./ml/codex_integration.py:410:24: F541 f-string is missing placeholders
+./ml/model_registry.py:13:1: F401 'os' imported but unused
+1     E402 module level import not at top of file
+22    F401 'datetime.timedelta' imported but unused
+16    F541 f-string is missing placeholders
+10    F841 local variable 'shipping_address' is assigned to but never used
+49
