@@ -41,7 +41,7 @@ def validate_no_sql_injection(value: str) -> str:
     ]
 
     for pattern in sql_patterns:
-        if re.search(pattern, value.upper()):
+        if re.search(pattern, value, re.IGNORECASE):
             raise ValueError(f"Potential SQL injection detected: {pattern}")
 
     return value
