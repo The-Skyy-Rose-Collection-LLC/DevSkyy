@@ -167,7 +167,11 @@ class EnhancedAgentManager:
         start_time = time.time()
 
         try:
-            # Check circuit breaker
+            # Ensure circuit breaker and metrics exist for this agent_type
+            if agent_type not in self.circuit_breakers:
+                self.circuit_breakers[agent_type] = CircuitBreaker()
+            if agent_type not in self.metrics:
+                self.metrics[agent_type] = AgentMetrics()
             circuit_breaker = self.circuit_breakers.get(agent_type)
             if circuit_breaker and not circuit_breaker.can_execute():
                 logger.warning(f"Circuit breaker open for agent: {agent_type}")
