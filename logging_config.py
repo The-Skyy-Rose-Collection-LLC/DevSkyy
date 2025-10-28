@@ -256,7 +256,7 @@ def setup_logging():
                 "filename": "logs/security.log",
                 "maxBytes": 10485760,  # 10MB
                 "backupCount": 10,
-                "formatter": "security",
+                    exc_info=(type(error), error, error.__traceback__),
             },
             "error": {
                 "class": "logging.handlers.RotatingFileHandler",
