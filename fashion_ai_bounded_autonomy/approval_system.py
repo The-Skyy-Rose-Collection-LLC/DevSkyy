@@ -405,29 +405,54 @@ class ApprovalSystem:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
-            UPDATE review_queue
-            SET status = 'executed', execution_result = ?
-            WHERE action_id = ? AND status = 'approved'
-        """, (json.dumps(result), action_id))
+        try:
+            # Update review queue status
+            cursor.execute("""
+                UPDATE review_queue
+                SET status = 'executed', execution_result = ?
+                WHERE action_id = ? AND status = 'approved'
+            """, (json.dumps(result), action_id))
 
-        # Capture rowcount immediately after UPDATE
-        rows_affected = cursor.rowcount
+            # Capture rowcount immediately after UPDATE
+            rows_affected = cursor.rowcount
 
-        cursor.execute("""
-            INSERT INTO approval_history (action_id, event_type, timestamp, details)
-            VALUES (?, ?, ?, ?)
-        """, (
-            action_id,
-            "executed",
-            datetime.now().isoformat(),
-            json.dumps(result)
-        ))
+            # Check if UPDATE succeeded
+            if rows_affected == 0:
+                conn.close()
+                logger.warning(f"❌ Failed to mark action {action_id} as executed - not found or not approved")
+                return False
 
-        conn.commit()
-        conn.close()
+            # Insert into approval history
+            cursor.execute("""
+                INSERT INTO approval_history (action_id, event_type, timestamp, details)
+                VALUES (?, ?, ?, ?)
+            """, (
+                action_id,
+                "executed",
+                datetime.now().isoformat(),
+                json.dumps(result)
+            ))
 
-        return rows_affected > 0
+            # Commit both operations together
+            conn.commit()
+            logger.info(f"✅ Action {action_id} marked as executed")
+            return True
+
+        except sqlite3.Error as e:
+            # Rollback on any database error
+            conn.rollback()
+            logger.error(f"❌ Database error marking action {action_id} as executed: {e}")
+            return False
+
+        except Exception as e:
+            # Rollback on any unexpected error
+            conn.rollback()
+            logger.error(f"❌ Unexpected error marking action {action_id} as executed: {e}")
+            return False
+
+        finally:
+            # Always close the connection
+            conn.close()
 
     async def cleanup_expired(self) -> int:
         """Clean up expired actions"""
