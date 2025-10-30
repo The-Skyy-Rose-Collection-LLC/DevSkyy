@@ -10,7 +10,7 @@ from datetime import datetime
 from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel
 from agent.modules.base_agent import BaseAgent, AgentStatus
-from agent.orchestrator import ExecutionPriority, TaskStatus
+from agent.orchestrator import ExecutionPriority
 
 
 class MockAgent(BaseAgent):
