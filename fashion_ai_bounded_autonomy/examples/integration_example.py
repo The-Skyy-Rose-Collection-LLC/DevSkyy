@@ -5,22 +5,22 @@ Demonstrates how to integrate existing DevSkyy agents with Bounded Autonomy Syst
 """
 
 import asyncio
-import sys
 from pathlib import Path
+import sys
+
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from fashion_ai_bounded_autonomy import (
-    BoundedOrchestrator,
-    ApprovalSystem,
-    DataPipeline,
-    Watchdog,
-    PerformanceTracker,
-    ReportGenerator
-)
-from agent.orchestrator import ExecutionPriority
 from agent.modules.base_agent import BaseAgent
+from agent.orchestrator import ExecutionPriority
+from fashion_ai_bounded_autonomy import (
+    ApprovalSystem,
+    BoundedOrchestrator,
+    DataPipeline,
+    PerformanceTracker,
+    ReportGenerator,
+)
 
 
 # Example: Create a simple fashion agent
@@ -179,7 +179,7 @@ async def main():
 
     # Generate weekly report
     weekly_report = await performance_tracker.compute_weekly_report()
-    print(f"   📊 Weekly report generated")
+    print("   📊 Weekly report generated")
     print(f"   Agent performance data points: {len(weekly_report.get('agent_performance', {}))}\n")
 
     # ========================================

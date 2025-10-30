@@ -7,7 +7,7 @@ import pytest
 import tempfile
 import shutil
 from pathlib import Path
-from unittest.mock import Mock, AsyncMock, MagicMock
+from unittest.mock import Mock
 
 from fashion_ai_bounded_autonomy.watchdog import Watchdog
 from agent.modules.base_agent import BaseAgent, AgentStatus

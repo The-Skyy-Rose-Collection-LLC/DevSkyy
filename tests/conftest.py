@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from models_sqlalchemy import Base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from httpx import AsyncClient
+from security.jwt_auth import User, user_manager, UserRole
 
-    from httpx import AsyncClient
-    from security.jwt_auth import User, user_manager, UserRole
 from main import app
 from typing import AsyncGenerator, Generator
 import asyncio

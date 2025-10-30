@@ -5,13 +5,12 @@ Tests orchestration with bounded autonomy controls
 
 import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, MagicMock
 from datetime import datetime
 
 from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel
 from agent.modules.base_agent import BaseAgent, AgentStatus
-from agent.orchestrator import ExecutionPriority, TaskStatus
+from agent.orchestrator import ExecutionPriority
 
 
 class MockAgent(BaseAgent):

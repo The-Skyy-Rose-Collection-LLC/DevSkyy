@@ -10,18 +10,15 @@ Features:
 - Emergency controls
 """
 
-import asyncio
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
-from agent.orchestrator import AgentOrchestrator, ExecutionPriority, AgentTask, TaskStatus
 from agent.modules.base_agent import BaseAgent
-from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import (
-    BoundedAutonomyWrapper,
-    ActionRiskLevel
-)
+from agent.orchestrator import AgentOrchestrator, AgentTask, ExecutionPriority, TaskStatus
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
+from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
+
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +47,7 @@ class BoundedOrchestrator(AgentOrchestrator):
         self.auto_approve_low_risk = auto_approve_low_risk
 
         # Bounded autonomy components
-        self.wrapped_agents: Dict[str, BoundedAutonomyWrapper] = {}
+        self.wrapped_agents: dict[str, BoundedAutonomyWrapper] = {}
         self.approval_system = ApprovalSystem()
 
         # Emergency controls
@@ -65,8 +62,8 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def register_agent(
         self,
         agent: BaseAgent,
-        capabilities: List[str],
-        dependencies: List[str] = None,
+        capabilities: list[str],
+        dependencies: list[str] = None,
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
     ) -> bool:
         """
@@ -103,11 +100,11 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def execute_task(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
-        required_capabilities: List[str],
+        parameters: dict[str, Any],
+        required_capabilities: list[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
         require_approval: Optional[bool] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute task with bounded autonomy controls.
 
@@ -192,7 +189,7 @@ class BoundedOrchestrator(AgentOrchestrator):
         # Execute immediately
         return await self._execute_bounded_task(task)
 
-    async def execute_approved_task(self, task_id: str, approved_by: str) -> Dict[str, Any]:
+    async def execute_approved_task(self, task_id: str, approved_by: str) -> dict[str, Any]:
         """
         Execute a previously approved task and record its execution with the approval system.
         
@@ -219,7 +216,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
         return result
 
-    async def _execute_bounded_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_bounded_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute task through bounded agents"""
         task.status = TaskStatus.RUNNING
         task.started_at = datetime.now()
@@ -274,7 +271,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
                 except Exception as e:
                     logger.error(f"Agent {agent_name} failed: {e}")
-                    errors.append(f"{agent_name}: {str(e)}")
+                    errors.append(f"{agent_name}: {e!s}")
                     results[agent_name] = {"error": str(e)}
 
                     execution_time = (datetime.now() - start_time).total_seconds()
@@ -304,8 +301,8 @@ class BoundedOrchestrator(AgentOrchestrator):
     def _assess_task_risk(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
-        agents: List[str]
+        parameters: dict[str, Any],
+        agents: list[str]
     ) -> ActionRiskLevel:
         """Assess overall risk level of a task"""
         task_lower = task_type.lower()
@@ -383,18 +380,8 @@ class BoundedOrchestrator(AgentOrchestrator):
 
         return {"status": "resumed", "operator": operator}
 
-    async def get_bounded_status(self) -> Dict[str, Any]:
-        """
-        Return orchestrator health merged with bounded-autonomy controls, per-agent bounded wrapper statuses, and pending approval count.
-        
-        The returned dictionary contains the base orchestrator health keys plus a `bounded_autonomy` key with:
-        - `system_controls`: current control flags (`emergency_stop`, `paused`, `local_only`, `auto_approve_low_risk`).
-        - `wrapped_agents`: mapping of agent name to that agent's bounded-wrapper status.
-        - `pending_approvals`: integer count of pending approval actions.
-        
-        Returns:
-            dict: Combined health payload including a `bounded_autonomy` sub-dictionary as described above.
-        """
+    async def get_bounded_status(self) -> dict[str, Any]:
+        """Get bounded orchestrator status"""
         base_health = await self.get_orchestrator_health()
 
         # Add bounded autonomy status

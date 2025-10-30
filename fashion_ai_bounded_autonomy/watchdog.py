@@ -4,12 +4,13 @@ Monitors agent health, detects anomalies, and performs automatic recovery
 """
 
 import asyncio
-import logging
 from datetime import datetime
-from typing import Dict, List, Optional
-from pathlib import Path
 import json
+import logging
+from pathlib import Path
+
 import yaml
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +37,12 @@ class Watchdog:
         self.max_restart_attempts = max_restart_attempts
 
         # Agent monitoring state
-        self.agent_error_counts: Dict[str, int] = {}
-        self.agent_restart_counts: Dict[str, int] = {}
-        self.halted_agents: List[str] = {}
+        self.agent_error_counts: dict[str, int] = {}
+        self.agent_restart_counts: dict[str, int] = {}
+        self.halted_agents: list[str] = {}
 
         # Incident tracking
-        self.incidents: List[Dict] = []
+        self.incidents: list[dict] = []
         self.incident_log_path = Path("logs/incidents/")
         self.incident_log_path.mkdir(parents=True, exist_ok=True)
 
@@ -49,7 +50,7 @@ class Watchdog:
 
         logger.info("👁️  Watchdog system initialized")
 
-    def _load_config(self) -> Dict:
+    def _load_config(self) -> dict:
         """Load watchdog configuration"""
         with open(self.config_path) as f:
             config = yaml.safe_load(f)
@@ -90,13 +91,12 @@ class Watchdog:
                 await self._handle_agent_failure(agent_name, agent)
             elif health.get("status") in ["degraded", "recovering"]:
                 await self._handle_agent_degraded(agent_name, agent)
-            else:
-                # Agent healthy - clear error count
-                if agent_name in self.agent_error_counts:
-                    await self._handle_agent_recovery(agent_name)
+            # Agent healthy - clear error count
+            elif agent_name in self.agent_error_counts:
+                await self._handle_agent_recovery(agent_name)
 
         except Exception as e:
-            logger.error(f"Watchdog check failed for {agent_name}: {str(e)}")
+            logger.error(f"Watchdog check failed for {agent_name}: {e!s}")
             await self._handle_agent_error(agent_name, str(e))
 
     async def _handle_agent_failure(self, agent_name: str, agent):
@@ -171,8 +171,8 @@ class Watchdog:
                 await self._halt_agent(agent_name, "restart_failed")
 
         except Exception as e:
-            logger.error(f"❌ Error restarting {agent_name}: {str(e)}")
-            await self._halt_agent(agent_name, f"restart_error: {str(e)}")
+            logger.error(f"❌ Error restarting {agent_name}: {e!s}")
+            await self._halt_agent(agent_name, f"restart_error: {e!s}")
 
     async def _halt_agent(self, agent_name: str, reason: str):
         """Halt agent and notify operator"""
@@ -217,7 +217,7 @@ class Watchdog:
             "timestamp": datetime.now().isoformat()
         })
 
-    def _log_incident(self, incident: Dict):
+    def _log_incident(self, incident: dict):
         """Log incident to file and memory"""
         self.incidents.append(incident)
 
@@ -226,7 +226,7 @@ class Watchdog:
         with open(incident_file, "a") as f:
             f.write(json.dumps(incident) + "\n")
 
-    async def _notify_operator(self, incident: Dict):
+    async def _notify_operator(self, incident: dict):
         """Notify operator of critical incident"""
         logger.critical(f"🚨 OPERATOR NOTIFICATION REQUIRED: {json.dumps(incident, indent=2)}")
 
@@ -246,7 +246,7 @@ class Watchdog:
         with open(notification_file, "w") as f:
             json.dump(notifications, f, indent=2)
 
-    async def get_status(self) -> Dict:
+    async def get_status(self) -> dict:
         """Get watchdog status"""
         return {
             "running": self.running,
