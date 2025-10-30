@@ -28,6 +28,37 @@ class ActionRiskLevel(Enum):
     HIGH = "high"  # Data modifications, external calls
     CRITICAL = "critical"  # System changes, deployments
 
+    @property
+    def priority(self) -> int:
+        """Get numeric priority for comparison"""
+        priorities = {
+            ActionRiskLevel.LOW: 1,
+            ActionRiskLevel.MEDIUM: 2,
+            ActionRiskLevel.HIGH: 3,
+            ActionRiskLevel.CRITICAL: 4
+        }
+        return priorities[self]
+
+    def __lt__(self, other):
+        if not isinstance(other, ActionRiskLevel):
+            return NotImplemented
+        return self.priority < other.priority
+
+    def __le__(self, other):
+        if not isinstance(other, ActionRiskLevel):
+            return NotImplemented
+        return self.priority <= other.priority
+
+    def __gt__(self, other):
+        if not isinstance(other, ActionRiskLevel):
+            return NotImplemented
+        return self.priority > other.priority
+
+    def __ge__(self, other):
+        if not isinstance(other, ActionRiskLevel):
+            return NotImplemented
+        return self.priority >= other.priority
+
 
 class ApprovalStatus(Enum):
     """Status of approval workflow"""

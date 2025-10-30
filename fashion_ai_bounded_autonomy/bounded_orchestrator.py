@@ -213,7 +213,9 @@ class BoundedOrchestrator(AgentOrchestrator):
         result = await self._execute_bounded_task(task)
 
         # Mark as executed in approval system
-        await self.approval_system.mark_executed(task_id, result)
+        # Sanitize result to prevent circular references before JSON serialization
+        sanitized_result = self._sanitize_for_json(result)
+        await self.approval_system.mark_executed(task_id, sanitized_result)
 
         return result
 
@@ -407,3 +409,29 @@ class BoundedOrchestrator(AgentOrchestrator):
             **base_health,
             "bounded_autonomy": bounded_status
         }
+
+    def _sanitize_for_json(self, data: Any) -> Any:
+        """
+        Sanitize data for JSON serialization by removing circular references
+        and non-serializable objects.
+        """
+        if isinstance(data, dict):
+            sanitized = {}
+            for key, value in data.items():
+                # Skip internal circular reference keys
+                if key in ("_previous_results", "_shared_context"):
+                    continue
+                try:
+                    # Recursively sanitize nested structures
+                    sanitized[key] = self._sanitize_for_json(value)
+                except (TypeError, ValueError):
+                    # Skip non-serializable values
+                    sanitized[key] = str(value)
+            return sanitized
+        elif isinstance(data, (list, tuple)):
+            return [self._sanitize_for_json(item) for item in data]
+        elif isinstance(data, (str, int, float, bool, type(None))):
+            return data
+        else:
+            # Convert other types to string
+            return str(data)

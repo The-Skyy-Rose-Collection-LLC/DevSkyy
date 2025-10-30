@@ -60,6 +60,11 @@ class DataPipeline:
         start_time = datetime.now()
         file_path = Path(file_path)
 
+        # Check for supported types first
+        supported_types = ["csv", "json", "parquet", "image"]
+        if source_type not in supported_types:
+            return {"status": "error", "reason": "unsupported_type"}
+
         # Validate source
         if not self._is_approved_source(file_path, source_type):
             logger.error(f"❌ Unapproved data source: {file_path}")

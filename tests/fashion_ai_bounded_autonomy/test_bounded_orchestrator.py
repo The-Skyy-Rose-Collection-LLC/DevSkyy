@@ -203,8 +203,8 @@ class TestRiskAssessment:
         risk_multiple = orchestrator._assess_task_risk(
             "analyze_data", {}, ["agent1", "agent2", "agent3", "agent4"]
         )
-        
-        assert risk_multiple.value >= risk_single.value
+
+        assert risk_multiple >= risk_single
 
 
 class TestApprovedTaskExecution:

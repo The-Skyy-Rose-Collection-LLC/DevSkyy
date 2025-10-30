@@ -22,16 +22,23 @@ from agent.modules.base_agent import BaseAgent, AgentStatus
 
 class MockAgent(BaseAgent):
     """Mock agent for testing"""
-    
+
     async def initialize(self) -> bool:
         self.status = AgentStatus.HEALTHY
         return True
-    
+
     async def execute_core_function(self, **kwargs):
         return {"status": "success", "data": kwargs}
-    
+
     async def health_check(self):
         return {"status": "healthy"}
+
+    def __getattr__(self, name):
+        """Dynamically handle any method call for testing"""
+        # Return an async function that simulates successful execution
+        async def dynamic_method(**kwargs):
+            return {"status": "success", "function": name, "data": kwargs}
+        return dynamic_method
 
 
 @pytest.fixture

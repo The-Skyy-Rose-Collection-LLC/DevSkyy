@@ -411,6 +411,9 @@ class ApprovalSystem:
             WHERE action_id = ? AND status = 'approved'
         """, (json.dumps(result), action_id))
 
+        # Capture rowcount immediately after UPDATE
+        rows_affected = cursor.rowcount
+
         cursor.execute("""
             INSERT INTO approval_history (action_id, event_type, timestamp, details)
             VALUES (?, ?, ?, ?)
@@ -422,7 +425,6 @@ class ApprovalSystem:
         ))
 
         conn.commit()
-        rows_affected = cursor.rowcount
         conn.close()
 
         return rows_affected > 0
