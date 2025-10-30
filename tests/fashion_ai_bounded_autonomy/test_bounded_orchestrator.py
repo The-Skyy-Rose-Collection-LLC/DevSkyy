@@ -370,3 +370,197 @@ class TestTaskManagement:
         )
         
         assert "error" in result
+
+
+class TestSanitizeForJSON:
+    """Test _sanitize_for_json method with depth protection and circular reference detection"""
+
+    def test_sanitize_basic_types(self, orchestrator):
+        """Test sanitization of basic JSON-serializable types"""
+        assert orchestrator._sanitize_for_json("string") == "string"
+        assert orchestrator._sanitize_for_json(123) == 123
+        assert orchestrator._sanitize_for_json(45.67) == 45.67
+        assert orchestrator._sanitize_for_json(True) is True
+        assert orchestrator._sanitize_for_json(False) is False
+        assert orchestrator._sanitize_for_json(None) is None
+
+    def test_sanitize_simple_dict(self, orchestrator):
+        """Test sanitization of simple dictionary"""
+        data = {"key1": "value1", "key2": 123, "key3": True}
+        result = orchestrator._sanitize_for_json(data)
+        assert result == data
+
+    def test_sanitize_simple_list(self, orchestrator):
+        """Test sanitization of simple list"""
+        data = ["string", 123, True, None]
+        result = orchestrator._sanitize_for_json(data)
+        assert result == data
+
+    def test_sanitize_nested_structures(self, orchestrator):
+        """Test sanitization of nested dictionaries and lists"""
+        data = {
+            "level1": {
+                "level2": {
+                    "level3": ["a", "b", "c"],
+                    "number": 42
+                }
+            },
+            "list": [1, 2, {"nested": "dict"}]
+        }
+        result = orchestrator._sanitize_for_json(data)
+        assert result == data
+
+    def test_sanitize_skips_circular_keys(self, orchestrator):
+        """Test that specific keys are skipped"""
+        data = {
+            "normal_key": "value",
+            "_previous_results": "should be skipped",
+            "_shared_context": "should be skipped"
+        }
+        result = orchestrator._sanitize_for_json(data)
+        assert result == {"normal_key": "value"}
+        assert "_previous_results" not in result
+        assert "_shared_context" not in result
+
+    def test_sanitize_circular_reference_dict(self, orchestrator):
+        """Test circular reference detection in dictionaries"""
+        data = {"key": "value"}
+        data["self"] = data  # Create circular reference
+        
+        result = orchestrator._sanitize_for_json(data)
+        assert result["key"] == "value"
+        assert result["self"] == "<circular_reference>"
+
+    def test_sanitize_circular_reference_list(self, orchestrator):
+        """Test circular reference detection in lists"""
+        data = [1, 2, 3]
+        data.append(data)  # Create circular reference
+        
+        result = orchestrator._sanitize_for_json(data)
+        assert result[0] == 1
+        assert result[1] == 2
+        assert result[2] == 3
+        assert result[3] == "<circular_reference>"
+
+    def test_sanitize_max_depth_exceeded(self, orchestrator):
+        """Test max depth protection"""
+        # Create deeply nested structure
+        data = {"level": 1}
+        current = data
+        for i in range(2, 102):
+            current["nested"] = {"level": i}
+            current = current["nested"]
+        
+        # Sanitize with max_depth=100
+        result = orchestrator._sanitize_for_json(data, max_depth=100)
+        
+        # Navigate down to depth 99 (should exist)
+        current_result = result
+        for i in range(99):
+            if "nested" in current_result and isinstance(current_result["nested"], dict):
+                current_result = current_result["nested"]
+            else:
+                break
+        
+        # At depth 100, should see max_depth_exceeded
+        assert "nested" in current_result
+        assert "<max_depth_exceeded:" in str(current_result["nested"])
+
+    def test_sanitize_custom_max_depth(self, orchestrator):
+        """Test custom max_depth parameter"""
+        # Create nested structure with depth 10
+        data = {"level": 1}
+        current = data
+        for i in range(2, 12):
+            current["nested"] = {"level": i}
+            current = current["nested"]
+        
+        # Sanitize with max_depth=5
+        result = orchestrator._sanitize_for_json(data, max_depth=5)
+        
+        # Navigate down
+        current_result = result
+        for _ in range(4):  # depth 0-4 should work
+            if "nested" in current_result and isinstance(current_result["nested"], dict):
+                current_result = current_result["nested"]
+        
+        # At depth 5, should see max_depth_exceeded
+        assert "nested" in current_result
+        assert "<max_depth_exceeded:" in str(current_result["nested"])
+
+    def test_sanitize_non_serializable_objects(self, orchestrator):
+        """Test handling of non-serializable objects"""
+        class CustomObject:
+            def __repr__(self):
+                return "CustomObject(test)"
+        
+        data = {
+            "normal": "value",
+            "custom": CustomObject(),
+            "nested": {
+                "obj": CustomObject()
+            }
+        }
+        
+        result = orchestrator._sanitize_for_json(data)
+        assert result["normal"] == "value"
+        assert "CustomObject(test)" in result["custom"]
+        assert "CustomObject(test)" in result["nested"]["obj"]
+
+    def test_sanitize_tuple(self, orchestrator):
+        """Test sanitization of tuples"""
+        data = (1, 2, 3, "test")
+        result = orchestrator._sanitize_for_json(data)
+        assert result == [1, 2, 3, "test"]
+
+    def test_sanitize_mixed_structure(self, orchestrator):
+        """Test complex mixed structure"""
+        data = {
+            "users": [
+                {"name": "Alice", "age": 30},
+                {"name": "Bob", "age": 25}
+            ],
+            "settings": {
+                "enabled": True,
+                "limit": 100,
+                "features": ["a", "b", "c"]
+            },
+            "metadata": None
+        }
+        
+        result = orchestrator._sanitize_for_json(data)
+        assert result == data
+
+    def test_sanitize_prevents_stack_overflow(self, orchestrator):
+        """Test that deeply nested structures don't cause stack overflow"""
+        # Create extremely deep structure (200 levels)
+        data = {"level": 1}
+        current = data
+        for i in range(2, 202):
+            current["nested"] = {"level": i}
+            current = current["nested"]
+        
+        # Should not raise RecursionError
+        result = orchestrator._sanitize_for_json(data, max_depth=100)
+        assert result is not None
+        assert isinstance(result, dict)
+
+    def test_sanitize_complex_circular_reference(self, orchestrator):
+        """Test complex circular reference scenario"""
+        # Create structure with multiple circular references
+        parent = {"name": "parent"}
+        child1 = {"name": "child1", "parent": parent}
+        child2 = {"name": "child2", "parent": parent}
+        parent["children"] = [child1, child2]
+        child1["sibling"] = child2
+        child2["sibling"] = child1
+        
+        result = orchestrator._sanitize_for_json(parent)
+        
+        # Parent should be sanitized
+        assert result["name"] == "parent"
+        assert isinstance(result["children"], list)
+        
+        # Children should reference parent but detect circular reference
+        assert result["children"][0]["name"] == "child1"
+        assert result["children"][0]["parent"] == "<circular_reference>"

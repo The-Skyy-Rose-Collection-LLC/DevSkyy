@@ -410,12 +410,42 @@ class BoundedOrchestrator(AgentOrchestrator):
             "bounded_autonomy": bounded_status
         }
 
-    def _sanitize_for_json(self, data: Any) -> Any:
+    def _sanitize_for_json(
+        self,
+        data: Any,
+        max_depth: int = 100,
+        visited: Optional[set] = None,
+        current_depth: int = 0
+    ) -> Any:
         """
         Sanitize data for JSON serialization by removing circular references
         and non-serializable objects.
+
+        Args:
+            data: The data to sanitize
+            max_depth: Maximum recursion depth (default: 100)
+            visited: Set of visited object ids to detect circular references
+            current_depth: Current recursion depth
+
+        Returns:
+            Sanitized data safe for JSON serialization
         """
+        # Initialize visited set on first call
+        if visited is None:
+            visited = set()
+
+        # Check depth limit
+        if current_depth >= max_depth:
+            return f"<max_depth_exceeded:{type(data).__name__}>"
+
+        # Check for circular references using object id
+        obj_id = id(data)
+        if isinstance(data, (dict, list, tuple)) and obj_id in visited:
+            return "<circular_reference>"
+
         if isinstance(data, dict):
+            # Add to visited set to detect circular references
+            visited.add(obj_id)
             sanitized = {}
             for key, value in data.items():
                 # Skip internal circular reference keys
@@ -423,13 +453,33 @@ class BoundedOrchestrator(AgentOrchestrator):
                     continue
                 try:
                     # Recursively sanitize nested structures
-                    sanitized[key] = self._sanitize_for_json(value)
+                    sanitized[key] = self._sanitize_for_json(
+                        value,
+                        max_depth=max_depth,
+                        visited=visited,
+                        current_depth=current_depth + 1
+                    )
                 except (TypeError, ValueError):
                     # Skip non-serializable values
                     sanitized[key] = str(value)
+            # Remove from visited after processing to allow the same object in different branches
+            visited.remove(obj_id)
             return sanitized
         elif isinstance(data, (list, tuple)):
-            return [self._sanitize_for_json(item) for item in data]
+            # Add to visited set to detect circular references
+            visited.add(obj_id)
+            sanitized = [
+                self._sanitize_for_json(
+                    item,
+                    max_depth=max_depth,
+                    visited=visited,
+                    current_depth=current_depth + 1
+                )
+                for item in data
+            ]
+            # Remove from visited after processing
+            visited.remove(obj_id)
+            return sanitized
         elif isinstance(data, (str, int, float, bool, type(None))):
             return data
         else:
