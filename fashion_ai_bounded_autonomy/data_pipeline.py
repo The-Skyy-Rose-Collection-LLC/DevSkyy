@@ -152,7 +152,9 @@ class DataPipeline:
         validated_file = self.validated_path / f"validated_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(validated_file, "w") as f:
             if isinstance(cleaned_data, pd.DataFrame):
-                cleaned_data.to_json(f, orient="records", indent=2)
+                # Convert DataFrame to dict, then dump with indent
+                data_dict = cleaned_data.to_dict(orient="records")
+                json.dump(data_dict, f, indent=2)
             else:
                 json.dump(cleaned_data, f, indent=2)
 

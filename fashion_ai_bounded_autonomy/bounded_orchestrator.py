@@ -252,14 +252,23 @@ class BoundedOrchestrator(AgentOrchestrator):
                     )
 
                     results[agent_name] = result
+                    execution_time = (datetime.now() - start_time).total_seconds()
 
-                    # Update shared context
-                    if result and isinstance(result, dict):
+                    # Check result status
+                    if result and isinstance(result, dict) and result.get("status") == "completed":
+                        # Update shared context on success
                         self.shared_context.update(result.get("_shared_data", {}))
 
-                    # Track success
-                    execution_time = (datetime.now() - start_time).total_seconds()
-                    self._record_execution(agent_name, True, execution_time)
+                        # Track success
+                        self._record_execution(agent_name, True, execution_time)
+                    else:
+                        # Treat non-completed status as failure
+                        status = result.get("status") if isinstance(result, dict) else "unknown"
+                        error_msg = result.get("error", "Non-completed status") if isinstance(result, dict) else "Invalid result"
+                        errors.append(f"{agent_name}: status={status}, {error_msg}")
+
+                        # Track failure
+                        self._record_execution(agent_name, False, execution_time)
 
                 except Exception as e:
                     logger.error(f"Agent {agent_name} failed: {e}")

@@ -138,7 +138,7 @@ security:
 
 monitoring:
   prometheus_enabled: true
-  prometheus_port: 9090
+  prometheus_port: 9091
   metrics_interval_seconds: 30
   health_check_interval_seconds: 60
   alert_on_failures: true
