@@ -30,7 +30,12 @@ class ActionRiskLevel(Enum):
 
     @property
     def priority(self) -> int:
-        """Get numeric priority for comparison"""
+        """
+        Return numeric priority used for ordering risk levels.
+        
+        Returns:
+            int: Priority value where 1 = LOW, 2 = MEDIUM, 3 = HIGH, 4 = CRITICAL.
+        """
         priorities = {
             ActionRiskLevel.LOW: 1,
             ActionRiskLevel.MEDIUM: 2,
@@ -40,21 +45,57 @@ class ActionRiskLevel(Enum):
         return priorities[self]
 
     def __lt__(self, other):
+        """
+        Compare this ActionRiskLevel to another by their numeric priority.
+        
+        Parameters:
+            other (ActionRiskLevel): The level to compare against.
+        
+        Returns:
+            bool or NotImplemented: `True` if this level's priority is less than `other`'s priority, `False` otherwise. Returns `NotImplemented` if `other` is not an ActionRiskLevel.
+        """
         if not isinstance(other, ActionRiskLevel):
             return NotImplemented
         return self.priority < other.priority
 
     def __le__(self, other):
+        """
+        Compare this risk level to another by their numeric priority.
+        
+        Parameters:
+            other (ActionRiskLevel): The risk level to compare against.
+        
+        Returns:
+            bool or NotImplemented: `True` if this level's priority is less than or equal to `other`'s priority, `False` otherwise. Returns `NotImplemented` if `other` is not an ActionRiskLevel.
+        """
         if not isinstance(other, ActionRiskLevel):
             return NotImplemented
         return self.priority <= other.priority
 
     def __gt__(self, other):
+        """
+        Determine whether this risk level has a higher priority than another ActionRiskLevel.
+        
+        Parameters:
+            other (ActionRiskLevel): The risk level to compare against.
+        
+        Returns:
+            True if this risk level's priority is greater than `other`'s priority, False otherwise.
+        """
         if not isinstance(other, ActionRiskLevel):
             return NotImplemented
         return self.priority > other.priority
 
     def __ge__(self, other):
+        """
+        Determine whether this risk level is greater than or equal to another risk level.
+        
+        Parameters:
+            other (ActionRiskLevel): The risk level to compare against.
+        
+        Returns:
+            True if this level's priority is greater than or equal to the other's priority, `False` otherwise; returns `NotImplemented` when `other` is not an ActionRiskLevel.
+        """
         if not isinstance(other, ActionRiskLevel):
             return NotImplemented
         return self.priority >= other.priority

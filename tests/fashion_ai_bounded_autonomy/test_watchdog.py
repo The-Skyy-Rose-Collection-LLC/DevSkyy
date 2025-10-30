@@ -17,19 +17,50 @@ class MockAgent(BaseAgent):
     """Mock agent for testing"""
     
     def __init__(self, name, fail_health_check=False):
+        """
+        Create a test MockAgent with controllable health-check behavior.
+        
+        Parameters:
+            name (str): Agent identifier.
+            fail_health_check (bool): If True, the agent will simulate failing health checks; if False, it will simulate healthy checks.
+        
+        Notes:
+            - Initializes an `initialize_count` counter to 0.
+            - Sets the agent version to "1.0.0" via the base class initializer.
+        """
         super().__init__(name, version="1.0.0")
         self.fail_health_check = fail_health_check
         self.initialize_count = 0
     
     async def initialize(self) -> bool:
+        """
+        Initialize the mock agent and set its status to healthy.
+        
+        Increments the agent's internal initialize counter and sets its status to AgentStatus.HEALTHY.
+        
+        Returns:
+            bool: `True` if initialization succeeded.
+        """
         self.initialize_count += 1
         self.status = AgentStatus.HEALTHY
         return True
     
     async def execute_core_function(self, **_kwargs):
+        """
+        Execute the agent's primary core function and indicate success.
+        
+        Returns:
+            dict: A dictionary with "status" set to "success".
+        """
         return {"status": "success"}
     
     async def health_check(self):
+        """
+        Report the agent's current health status.
+        
+        Returns:
+            dict: `{'status': 'healthy'}` if the agent is healthy, `{'status': 'failed'}` if configured to fail health checks.
+        """
         if self.fail_health_check:
             return {"status": "failed"}
         return {"status": "healthy"}
@@ -37,7 +68,17 @@ class MockAgent(BaseAgent):
 
 @pytest.fixture
 def temp_config():
-    """Create temporary configuration"""
+    """
+    Create a temporary Watchdog configuration file and yield its path.
+    
+    Writes a YAML file at a temporary config/monitor.yaml containing a minimal
+    watchdog configuration (enabled: True, check_interval_seconds: 1,
+    error_threshold: 3). Yields the string path to the created monitor.yaml and
+    removes the entire temporary directory after the caller finishes using the fixture.
+    
+    Returns:
+        config_path (str): Filesystem path to the generated monitor.yaml file.
+    """
     temp_dir = tempfile.mkdtemp()
     config_dir = Path(temp_dir) / "config"
     config_dir.mkdir()
@@ -63,7 +104,15 @@ def temp_config():
 
 @pytest.fixture
 def watchdog(temp_config):
-    """Create Watchdog instance"""
+    """
+    Create a Watchdog instance using the provided configuration path.
+    
+    Parameters:
+        temp_config (str): File path to the monitor configuration (e.g., config/monitor.yaml).
+    
+    Returns:
+        Watchdog: An initialized Watchdog configured with the given config path.
+    """
     return Watchdog(config_path=temp_config)
 
 
@@ -84,7 +133,11 @@ class TestHealthChecking:
 
     @pytest.mark.asyncio
     async def test_check_healthy_agent(self, watchdog):
-        """Test checking healthy agent"""
+        """
+        Verifies that Watchdog._check_agent does not record an error for an agent that reports healthy.
+        
+        Sets up a MockAgent marked healthy and a mocked orchestrator containing that agent, invokes _check_agent, and asserts the agent has no entry in watchdog.agent_error_counts.
+        """
         agent = MockAgent("test_agent", fail_health_check=False)
         
         # Mock orchestrator

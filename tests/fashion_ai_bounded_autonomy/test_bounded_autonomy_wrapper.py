@@ -24,26 +24,76 @@ class MockAgent(BaseAgent):
     """Mock agent for testing"""
 
     async def initialize(self) -> bool:
+        """
+        Mark the agent as healthy and indicate successful initialization.
+        
+        Returns:
+            bool: True if initialization succeeded.
+        """
         self.status = AgentStatus.HEALTHY
         return True
 
     async def execute_core_function(self, **kwargs):
+        """
+        Execute the agent's core function and produce a result dictionary.
+        
+        Returns:
+            result (dict): A dictionary with keys:
+                - "status": the string "success".
+                - "data": a mapping of the keyword arguments passed to the function.
+        """
         return {"status": "success", "data": kwargs}
 
     async def health_check(self):
+        """
+        Report the agent's health status.
+        
+        Returns:
+            dict: A dictionary with key "status" set to "healthy".
+        """
         return {"status": "healthy"}
 
     def __getattr__(self, name):
-        """Dynamically handle any method call for testing"""
+        """
+        Provide a dynamic async method for any attribute access to simulate agent behavior in tests.
+        
+        Parameters:
+            name (str): The attribute or method name being accessed.
+        
+        Returns:
+            callable: An async function that accepts keyword arguments and returns a dict with keys:
+                - "status": "success"
+                - "function": the accessed attribute name
+                - "data": the provided keyword arguments
+        """
         # Return an async function that simulates successful execution
         async def dynamic_method(**kwargs):
+            """
+            Simulated dynamic agent method that echoes provided keyword arguments.
+            
+            This function represents a generic, dynamically created agent method used in tests. It returns a dictionary containing a success status, the name of the simulated function, and the keyword arguments passed to it under the `data` key.
+            
+            Parameters:
+                **kwargs: Arbitrary keyword arguments to be echoed back in the response.
+            
+            Returns:
+                dict: A mapping with keys:
+                    - "status": the string "success".
+                    - "function": the name of the simulated function.
+                    - "data": a dict containing the passed keyword arguments.
+            """
             return {"status": "success", "function": name, "data": kwargs}
         return dynamic_method
 
 
 @pytest.fixture
 def temp_audit_dir():
-    """Create temporary audit log directory"""
+    """
+    Provide a temporary directory path for audit logs and remove it after the test completes.
+    
+    Returns:
+        temp_dir (str): Path to the temporary directory created for audit logs. The directory is deleted during fixture teardown.
+    """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
     shutil.rmtree(temp_dir)
@@ -51,13 +101,27 @@ def temp_audit_dir():
 
 @pytest.fixture
 def mock_agent():
-    """Create mock agent"""
+    """
+    Provide a MockAgent instance named "test_agent" with version "1.0.0" for use in tests.
+    
+    Returns:
+        MockAgent: A mock agent configured with name "test_agent" and version "1.0.0".
+    """
     return MockAgent("test_agent", version="1.0.0")
 
 
 @pytest.fixture
 def wrapper(mock_agent, temp_audit_dir):
-    """Create BoundedAutonomyWrapper instance"""
+    """
+    Create a BoundedAutonomyWrapper configured for tests.
+    
+    Parameters:
+        mock_agent: The agent instance to be wrapped.
+        temp_audit_dir (str or pathlib.Path): Filesystem path used as the wrapper's audit_log_path.
+    
+    Returns:
+        BoundedAutonomyWrapper: A wrapper with auto_approve_low_risk enabled, local_only mode enabled, and audit logging directed to `temp_audit_dir`.
+    """
     return BoundedAutonomyWrapper(
         wrapped_agent=mock_agent,
         auto_approve_low_risk=True,
