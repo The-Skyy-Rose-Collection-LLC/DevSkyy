@@ -123,4 +123,4 @@ fashion_ai_bounded_autonomy/review_queue.json
 fashion_ai_bounded_autonomy/quarantine/
 fashion_ai_bounded_autonomy/validated/
 fashion_ai_bounded_autonomy/performance_metrics.db
-fashion_ai_bounded_autonomy/approval_queue.db
+fashion_ai_bounded_autonomy/review_queue.db
