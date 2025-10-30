@@ -14,7 +14,12 @@ from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 
 @pytest.fixture
 def temp_output():
-    """Create temporary output directory"""
+    """
+    Create a temporary directory for test output and remove it after the fixture completes.
+    
+    Returns:
+        temp_dir (str): Path to the created temporary directory. The directory is deleted when the fixture teardown runs.
+    """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
     shutil.rmtree(temp_dir)
@@ -22,7 +27,15 @@ def temp_output():
 
 @pytest.fixture
 def generator(temp_output):
-    """Create ReportGenerator instance"""
+    """
+    Create a ReportGenerator configured to use the given temporary output directory.
+    
+    Parameters:
+        temp_output (pathlike): Path to a temporary directory to store generated reports.
+    
+    Returns:
+        ReportGenerator: An instance of ReportGenerator with its output_path set to `temp_output`.
+    """
     return ReportGenerator(output_path=temp_output)
 
 

@@ -50,14 +50,14 @@ class DataPipeline:
 
     async def ingest(self, file_path: str, source_type: str) -> dict[str, Any]:
         """
-        Ingest data from approved source.
-
-        Args:
-            file_path: Path to data file
-            source_type: Type of data source (csv, json, image, parquet)
-
+        Ingest data from an approved source into the pipeline.
+        
+        Parameters:
+            file_path (str): Path to the input file.
+            source_type (str): Source type; one of "csv", "json", "parquet", or "image".
+        
         Returns:
-            Ingestion result
+            dict: Result object. On success includes keys "status" (value "ingested"), "file_path", "source_type", "file_hash", "size_mb", "ingestion_time_seconds", and "data". On failure or rejection includes "status" and "reason".
         """
         start_time = datetime.now()
         file_path = Path(file_path)

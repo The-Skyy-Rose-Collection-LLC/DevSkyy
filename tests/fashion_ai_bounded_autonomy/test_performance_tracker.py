@@ -14,7 +14,12 @@ from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 
 @pytest.fixture
 def temp_db():
-    """Create temporary database"""
+    """
+    Create a temporary directory containing a test database path and remove it after use.
+    
+    Yields:
+        str: Filesystem path to the temporary database file named "test_metrics.db".
+    """
     temp_dir = tempfile.mkdtemp()
     db_path = Path(temp_dir) / "test_metrics.db"
     yield str(db_path)
@@ -23,7 +28,15 @@ def temp_db():
 
 @pytest.fixture
 def tracker(temp_db):
-    """Create PerformanceTracker instance"""
+    """
+    Create a PerformanceTracker configured to use the provided temporary database path.
+    
+    Parameters:
+        temp_db (str | pathlib.Path): Filesystem path to the temporary SQLite database to be used by the tracker.
+    
+    Returns:
+        PerformanceTracker: A new PerformanceTracker instance using the given database path.
+    """
     return PerformanceTracker(db_path=temp_db)
 
 
@@ -31,7 +44,9 @@ class TestTrackerInitialization:
     """Test performance tracker initialization"""
 
     def test_initialization(self, temp_db):
-        """Test basic initialization"""
+        """
+        Verify PerformanceTracker initializes with the provided database path and ensures the proposals directory's parent exists.
+        """
         tracker = PerformanceTracker(db_path=temp_db)
         
         assert Path(temp_db).exists()
@@ -79,7 +94,11 @@ class TestWeeklyReport:
 
     @pytest.mark.asyncio
     async def test_compute_weekly_report_with_data(self, tracker):
-        """Test computing report with data"""
+        """
+        Verify that compute_weekly_report includes both agent and system performance when metrics are present.
+        
+        Logs sample metrics for an agent, invokes compute_weekly_report, and asserts the report contains the "agent_performance" and "system_performance" sections.
+        """
         # Log some test data
         tracker.log_metric("test_agent", "execution_time", 1.5)
         tracker.log_metric("test_agent", "execution_time", 2.0)

@@ -400,6 +400,19 @@ class ApprovalSystem:
             "history": history
         }
 
+    async def mark_executed(self, action_id: str, result: Dict[str, Any]) -> bool:
+        """
+        Mark an approved action as executed and record its execution result.
+        
+        This updates the action's status to "executed" only if its current status is "approved" and appends an "executed" event to the approval history. The provided `result` is serialized and stored as the action's execution result and as the event details.
+        
+        Parameters:
+            action_id (str): Identifier of the action to mark as executed.
+            result (dict): Execution result data to store with the action and history (will be JSON-serialized).
+        
+        Returns:
+            bool: `True` if the action's status was changed to "executed", `False` otherwise.
+        """
     async def mark_executed(self, action_id: str, result: dict[str, Any]) -> bool:
         """Mark an action as executed"""
         conn = sqlite3.connect(self.db_path)

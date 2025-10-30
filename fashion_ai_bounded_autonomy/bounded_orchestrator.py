@@ -191,14 +191,14 @@ class BoundedOrchestrator(AgentOrchestrator):
 
     async def execute_approved_task(self, task_id: str, approved_by: str) -> dict[str, Any]:
         """
-        Execute a task that has been approved.
-
-        Args:
-            task_id: Task ID to execute
-            approved_by: Operator who approved
-
+        Execute a previously approved task and record its execution with the approval system.
+        
+        Parameters:
+            task_id (str): Identifier of the approved task to execute.
+            approved_by (str): Operator who approved the task.
+        
         Returns:
-            Execution result
+            dict: Execution outcome containing at least `task_id`, `status`, `results`, and `execution_time`; includes `errors` when failures occurred or an `error` key with `status: "error"` if the task was not found.
         """
         if task_id not in self.tasks:
             return {"error": "Task not found", "status": "error"}
@@ -409,8 +409,15 @@ class BoundedOrchestrator(AgentOrchestrator):
 
     def _sanitize_for_json(self, data: Any) -> Any:
         """
-        Sanitize data for JSON serialization by removing circular references
-        and non-serializable objects.
+        Produce a JSON-serializable copy of `data` by removing internal circular-reference keys and converting non-serializable values to strings.
+        
+        Recursively processes dictionaries, lists, and tuples. For dictionaries, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other non-serializable or unknown types are converted to their string representation.
+        
+        Parameters:
+            data (Any): The input value to sanitize for JSON serialization.
+        
+        Returns:
+            Any: A sanitized, JSON-serializable representation of `data` with internal reference keys removed and non-serializable values converted to strings.
         """
         if isinstance(data, dict):
             sanitized = {}

@@ -15,7 +15,17 @@ from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
 
 @pytest.fixture
 def temp_dirs():
-    """Create temporary directories for testing"""
+    """
+    Provide a temporary dataflow.yaml path with a minimal pipeline configuration for tests.
+    
+    The created YAML contains a minimal `data_pipeline` configuration including
+    `approved_sources`, `schemas`, and `inference_config`. The fixture yields the
+    path to the generated `dataflow.yaml` and removes the temporary directory and
+    file after the test completes.
+    
+    Returns:
+        str: Filesystem path to the generated `dataflow.yaml`.
+    """
     temp_dir = tempfile.mkdtemp()
     config_dir = Path(temp_dir) / "config"
     config_dir.mkdir()
@@ -57,7 +67,15 @@ def temp_dirs():
 
 @pytest.fixture
 def pipeline(temp_dirs):
-    """Create DataPipeline instance"""
+    """
+    Create a DataPipeline configured from the provided temporary config path.
+    
+    Parameters:
+        temp_dirs (str | pathlib.Path): Path to the generated dataflow.yaml configuration file used to initialize the pipeline.
+    
+    Returns:
+        DataPipeline: An instance of DataPipeline initialized with the given config_path.
+    """
     return DataPipeline(config_path=temp_dirs)
 
 

@@ -17,19 +17,45 @@ class MockAgent(BaseAgent):
     """Mock agent for testing"""
     
     async def initialize(self) -> bool:
+        """
+        Initialize the agent and mark it as healthy.
+        
+        Returns:
+            True if initialization completes successfully.
+        """
         self.status = AgentStatus.HEALTHY
         return True
     
     async def execute_core_function(self, **kwargs):
+        """
+        Execute the agent's core function and return a success result that echoes the provided inputs.
+        
+        Parameters:
+            **kwargs: Arbitrary keyword arguments passed to the core function; these are returned unchanged in the result.
+        
+        Returns:
+            dict: A dictionary with "status" set to "success" and "result" containing the provided kwargs.
+        """
         return {"status": "success", "result": kwargs}
     
     async def health_check(self):
+        """
+        Report the agent's health status.
+        
+        Returns:
+            dict: A mapping with keys `"status"` set to `"healthy"` and `"agent_name"` set to the agent's name.
+        """
         return {"status": "healthy", "agent_name": self.agent_name}
 
 
 @pytest.fixture
 def orchestrator():
-    """Create BoundedOrchestrator instance"""
+    """
+    Create a BoundedOrchestrator configured for local-only testing with automatic approval for low-risk actions.
+    
+    Returns:
+        BoundedOrchestrator: An orchestrator instance configured with local_only=True and auto_approve_low_risk=True.
+    """
     return BoundedOrchestrator(
         local_only=True,
         auto_approve_low_risk=True
@@ -38,7 +64,12 @@ def orchestrator():
 
 @pytest.fixture
 def mock_agent():
-    """Create mock agent"""
+    """
+    Create a MockAgent instance configured for tests.
+    
+    Returns:
+        MockAgent: A MockAgent named "test_agent" with version "1.0.0".
+    """
     return MockAgent("test_agent", version="1.0.0")
 
 
@@ -46,7 +77,14 @@ class TestOrchestratorInitialization:
     """Test orchestrator initialization"""
 
     def test_initialization(self):
-        """Test basic initialization"""
+        """
+        Verify BoundedOrchestrator initializes with provided control flags and default operational states.
+        
+        Asserts that:
+        - the `local_only` and `auto_approve_low_risk` flags reflect the constructor arguments,
+        - the orchestrator starts with `system_paused` set to False,
+        - the orchestrator starts with `emergency_stop_active` set to False.
+        """
         orch = BoundedOrchestrator(
             local_only=True,
             auto_approve_low_risk=True,
@@ -312,7 +350,11 @@ class TestStatusReporting:
 
     @pytest.mark.asyncio
     async def test_get_bounded_status(self, orchestrator, mock_agent):
-        """Test getting bounded orchestrator status"""
+        """
+        Verify the orchestrator's bounded autonomy status includes system controls, wrapped agents, and pending approvals.
+        
+        Registers a mock agent and retrieves the bounded status, asserting that "system_controls", "wrapped_agents", and "pending_approvals" exist under "bounded_autonomy".
+        """
         await orchestrator.register_agent(
             agent=mock_agent,
             capabilities=["test"]

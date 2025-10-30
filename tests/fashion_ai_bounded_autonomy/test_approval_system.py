@@ -21,7 +21,12 @@ from fashion_ai_bounded_autonomy.approval_system import (
 
 @pytest.fixture
 def temp_db():
-    """Create temporary database for testing"""
+    """
+    Create a temporary SQLite database file for tests and remove it when the fixture is torn down.
+    
+    Yields:
+        str: Filesystem path to the temporary SQLite database file to be used by tests.
+    """
     temp_dir = tempfile.mkdtemp()
     db_path = Path(temp_dir) / "test_review_queue.db"
     yield str(db_path)
@@ -30,7 +35,12 @@ def temp_db():
 
 @pytest.fixture
 def approval_system(temp_db):
-    """Create ApprovalSystem instance with temporary database"""
+    """
+    Provide an ApprovalSystem instance configured to use the temporary database.
+    
+    Returns:
+        ApprovalSystem: Instance initialized with the temporary database path from the test fixture.
+    """
     return ApprovalSystem(db_path=temp_db)
 
 
@@ -110,7 +120,11 @@ class TestSubmitForReview:
 
     @pytest.mark.asyncio
     async def test_submit_with_custom_timeout(self, approval_system):
-        """Test submission with custom timeout"""
+        """
+        Verify that submitting an action with a custom timeout sets the action's timeout_at to approximately the requested number of hours in the future.
+        
+        This test submits an action with timeout_hours=48 and asserts that the returned `timeout_at` timestamp is about 48 hours from the current time (within a one-hour margin).
+        """
         result = await approval_system.submit_for_review(
             action_id="test_action_003",
             agent_name="test_agent",
@@ -615,7 +629,11 @@ class TestWorkflowTypes:
 
     @pytest.mark.asyncio
     async def test_high_risk_workflow(self, approval_system):
-        """Test high-risk workflow type"""
+        """
+        Verify that submitting a critical-risk action selects the high-risk workflow.
+        
+        This test submits an action with risk_level "critical" and workflow_type HIGH_RISK and asserts the returned workflow is "high_risk".
+        """
         result = await approval_system.submit_for_review(
             action_id="workflow_test_2",
             agent_name="test_agent",
