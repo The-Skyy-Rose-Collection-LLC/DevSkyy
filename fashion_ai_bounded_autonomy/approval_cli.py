@@ -11,13 +11,13 @@ Usage:
     python -m fashion_ai_bounded_autonomy.approval_cli stats [--operator <name>]
 """
 
-import asyncio
-import sys
 import argparse
+import asyncio
 import json
 from pathlib import Path
-from datetime import datetime
+import sys
 from typing import Optional
+
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -72,7 +72,7 @@ class ApprovalCLI:
             print()
 
         print(self.colorize(f"\nTotal pending: {len(actions)}", "BOLD"))
-        print(f"\nTo review: python -m fashion_ai_bounded_autonomy.approval_cli review <action_id>")
+        print("\nTo review: python -m fashion_ai_bounded_autonomy.approval_cli review <action_id>")
 
     async def review_action(self, action_id: str):
         """Show detailed information about an action"""
@@ -259,7 +259,7 @@ async def main():
         elif args.command == "cleanup":
             await cli.cleanup_expired()
     except Exception as e:
-        print(cli.colorize(f"\n❌ Error: {str(e)}", "RED"))
+        print(cli.colorize(f"\n❌ Error: {e!s}", "RED"))
         import traceback
         traceback.print_exc()
 

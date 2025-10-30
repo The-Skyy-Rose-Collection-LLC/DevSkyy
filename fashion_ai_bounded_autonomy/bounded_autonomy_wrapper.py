@@ -7,16 +7,16 @@ Wraps existing agents with bounded autonomy controls:
 - Deterministic execution tracking
 """
 
-import asyncio
-import json
-import logging
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field
+import json
+import logging
 from pathlib import Path
+from typing import Any, Optional
 
-from agent.modules.base_agent import BaseAgent, AgentStatus
+from agent.modules.base_agent import BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class BoundedAction:
     action_id: str
     agent_name: str
     function_name: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     risk_level: ActionRiskLevel
     requires_approval: bool
     approval_status: ApprovalStatus = ApprovalStatus.PENDING
@@ -82,8 +82,8 @@ class BoundedAction:
     approved_at: Optional[datetime] = None
     approved_by: Optional[str] = None
     executed_at: Optional[datetime] = None
-    result: Optional[Dict[str, Any]] = None
-    audit_trail: List[Dict[str, Any]] = field(default_factory=list)
+    result: Optional[dict[str, Any]] = None
+    audit_trail: list[dict[str, Any]] = field(default_factory=list)
 
 
 class BoundedAutonomyWrapper:
@@ -112,8 +112,8 @@ class BoundedAutonomyWrapper:
         self.audit_log_path.mkdir(parents=True, exist_ok=True)
 
         # Action queue for approval
-        self.pending_actions: Dict[str, BoundedAction] = {}
-        self.completed_actions: List[BoundedAction] = []
+        self.pending_actions: dict[str, BoundedAction] = {}
+        self.completed_actions: list[BoundedAction] = []
 
         # Operator controls
         self.emergency_stop = False
@@ -130,9 +130,9 @@ class BoundedAutonomyWrapper:
     async def execute(
         self,
         function_name: str,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         require_approval: Optional[bool] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute an agent function with bounded autonomy controls.
 
@@ -196,7 +196,7 @@ class BoundedAutonomyWrapper:
         # Execute immediately for low-risk actions
         return await self._execute_action(action)
 
-    async def _execute_action(self, action: BoundedAction) -> Dict[str, Any]:
+    async def _execute_action(self, action: BoundedAction) -> dict[str, Any]:
         """Execute the wrapped agent function"""
         try:
             # Network isolation check
@@ -248,7 +248,7 @@ class BoundedAutonomyWrapper:
             }
 
         except Exception as e:
-            logger.error(f"❌ Action {action.action_id} failed: {str(e)}")
+            logger.error(f"❌ Action {action.action_id} failed: {e!s}")
             action.audit_trail.append({
                 "event": "execution_failed",
                 "timestamp": datetime.now().isoformat(),
@@ -262,7 +262,7 @@ class BoundedAutonomyWrapper:
                 "error": str(e)
             }
 
-    async def approve_action(self, action_id: str, approved_by: str) -> Dict[str, Any]:
+    async def approve_action(self, action_id: str, approved_by: str) -> dict[str, Any]:
         """
         Approve a pending action.
 
@@ -289,7 +289,7 @@ class BoundedAutonomyWrapper:
         # Execute
         return await self._execute_action(action)
 
-    async def reject_action(self, action_id: str, rejected_by: str, reason: str) -> Dict[str, Any]:
+    async def reject_action(self, action_id: str, rejected_by: str, reason: str) -> dict[str, Any]:
         """Reject a pending action"""
         if action_id not in self.pending_actions:
             return {"error": "Action not found", "status": "error"}
@@ -314,7 +314,7 @@ class BoundedAutonomyWrapper:
             "reason": reason
         }
 
-    def _assess_risk(self, function_name: str, parameters: Dict[str, Any]) -> ActionRiskLevel:
+    def _assess_risk(self, function_name: str, parameters: dict[str, Any]) -> ActionRiskLevel:
         """Assess risk level of an action"""
         function_lower = function_name.lower()
 
@@ -342,7 +342,7 @@ class BoundedAutonomyWrapper:
     def _requires_approval(
         self,
         function_name: str,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         override: Optional[bool]
     ) -> bool:
         """Determine if action requires approval"""
@@ -378,7 +378,7 @@ class BoundedAutonomyWrapper:
         self,
         action: BoundedAction,
         event: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Write to audit log"""
         log_entry = {
@@ -449,7 +449,7 @@ class BoundedAutonomyWrapper:
         self.paused = False
         logger.info(f"▶️  Agent {self.wrapped_agent.agent_name} resumed")
 
-    async def get_status(self) -> Dict[str, Any]:
+    async def get_status(self) -> dict[str, Any]:
         """Get bounded autonomy status"""
         return {
             "agent_name": self.wrapped_agent.agent_name,
