@@ -34,8 +34,10 @@ logs/
 
 # Testing
 .coverage
+coverage.xml
 .pytest_cache/
 htmlcov/
+*.backup
 
 # Security
 *.key
@@ -113,3 +115,12 @@ service-account.json
 *.whl
 .eggs/
 pip-wheel-metadata/
+
+# Bounded Autonomy Runtime Files
+fashion_ai_bounded_autonomy/notifications.json
+fashion_ai_bounded_autonomy/proposals.json
+fashion_ai_bounded_autonomy/review_queue.json
+fashion_ai_bounded_autonomy/quarantine/
+fashion_ai_bounded_autonomy/validated/
+fashion_ai_bounded_autonomy/performance_metrics.db
+fashion_ai_bounded_autonomy/approval_queue.db
