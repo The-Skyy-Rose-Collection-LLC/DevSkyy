@@ -1,0 +1,152 @@
+# LAYER 1 — ARCHITECTURE DEFINITION
+# Bounded Autonomous Fashion AI Infrastructure
+# Purpose: Define structural hierarchy and agent responsibilities
+# All operations are local, logged, and human-reviewed
+
+system:
+  name: "Fashion AI Bounded Autonomy System"
+  version: "1.0.0"
+  mode: "local_only"
+  network_access: false
+  auto_execution: false  # All actions require human approval
+
+components:
+  # Coordination Controller - Master orchestrator
+  coordination_controller:
+    port: 8100
+    process_name: "coordinator"
+    role: "orchestration"
+    dependencies: []
+    permissions:
+      - "agent_lifecycle_management"
+      - "task_distribution"
+      - "review_queue_management"
+      - "system_monitoring"
+    auto_restart: true
+    max_retries: 3
+
+  # Designer Agent - Fashion design and trend analysis
+  designer_agent:
+    port: 8101
+    process_name: "designer"
+    role: "design_intelligence"
+    dependencies: ["coordination_controller"]
+    permissions:
+      - "trend_analysis"
+      - "color_palette_generation"
+      - "style_recommendation"
+      - "design_validation"
+    auto_restart: true
+    max_retries: 2
+
+  # Commerce Agent - E-commerce operations
+  commerce_agent:
+    port: 8102
+    process_name: "commerce"
+    role: "ecommerce_automation"
+    dependencies: ["coordination_controller", "finance_agent"]
+    permissions:
+      - "product_management"
+      - "inventory_tracking"
+      - "order_processing"
+      - "pricing_analysis"
+    auto_restart: true
+    max_retries: 2
+
+  # Marketing Agent - Marketing and customer engagement
+  marketing_agent:
+    port: 8103
+    process_name: "marketing"
+    role: "marketing_automation"
+    dependencies: ["coordination_controller", "designer_agent"]
+    permissions:
+      - "campaign_analysis"
+      - "content_generation"
+      - "customer_segmentation"
+      - "ab_testing"
+    auto_restart: true
+    max_retries: 2
+
+  # Finance Agent - Financial analysis and reporting
+  finance_agent:
+    port: 8104
+    process_name: "finance"
+    role: "financial_intelligence"
+    dependencies: ["coordination_controller"]
+    permissions:
+      - "revenue_analysis"
+      - "cost_optimization"
+      - "forecasting"
+      - "reporting"
+    auto_restart: true
+    max_retries: 2
+
+  # Operations Agent - Infrastructure and monitoring
+  operations_agent:
+    port: 8105
+    process_name: "operations"
+    role: "infrastructure_management"
+    dependencies: ["coordination_controller"]
+    permissions:
+      - "system_monitoring"
+      - "performance_tracking"
+      - "anomaly_detection"
+      - "backup_management"
+    auto_restart: true
+    max_retries: 2
+
+communication:
+  type: "local_queue"
+  backend: "sqlite"
+  queue_path: "logs/agents/message_queue.db"
+  message_ttl: 3600  # 1 hour
+  max_queue_size: 10000
+  encryption: true
+  encryption_algorithm: "AES-256-GCM"
+
+logging:
+  level: "INFO"
+  format: "json"
+  retention_days: 90
+  paths:
+    agent_logs: "logs/agents/"
+    system_logs: "logs/system/"
+    audit_logs: "logs/audit/"
+    error_logs: "logs/errors/"
+  structured: true
+  include_stack_traces: true
+
+database:
+  type: "sqlite"
+  path: "fashion_ai_bounded.db"
+  backup_enabled: true
+  backup_interval_hours: 6
+  backup_retention_days: 30
+  encryption_at_rest: true
+
+security:
+  sandboxing_enabled: true
+  network_isolation: true
+  credential_storage: ".env"
+  credential_encryption: "AES-256"
+  audit_all_actions: true
+  require_approval_for:
+    - "data_modification"
+    - "model_deployment"
+    - "external_communication"
+    - "configuration_changes"
+
+monitoring:
+  prometheus_enabled: true
+  prometheus_port: 9091
+  metrics_interval_seconds: 30
+  health_check_interval_seconds: 60
+  alert_on_failures: true
+  alert_threshold: 3
+
+recovery:
+  auto_backup_enabled: true
+  snapshot_interval_hours: 12
+  recovery_point_retention: 7
+  rollback_enabled: true
+  checkpoint_on_approval: true

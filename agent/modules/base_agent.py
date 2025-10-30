@@ -509,13 +509,11 @@ class BaseAgent(ABC):
                 "issues": {
                     "total": len(self.detected_issues),
                     "unresolved": len(unresolved_issues),
-                    "critical": len()
-                        [
-                            i
-                            for i in unresolved_issues
-                            if i.severity == SeverityLevel.CRITICAL
-                        ]
-                    ),
+                    "critical": len([
+                        i
+                        for i in unresolved_issues
+                        if i.severity == SeverityLevel.CRITICAL
+                    ]),
                 },
                 "performance_prediction": self.predict_performance(),
                 "timestamp": datetime.now().isoformat(),
