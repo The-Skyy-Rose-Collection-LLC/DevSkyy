@@ -1,0 +1,157 @@
+"""Message queue management using Redis."""
+
+import json
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Dict, Optional
+
+import redis
+from pydantic import BaseModel
+
+
+class Message(BaseModel):
+    """Message schema for agent communication."""
+
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    source_agent: str
+    target_agent: str
+    task_type: str
+    payload: Dict[str, Any]
+    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    priority: Optional[str] = None
+    retry_count: int = 0
+    correlation_id: Optional[str] = None
+
+
+class QueueManager:
+    """Redis-based queue manager for agent communication."""
+
+    def __init__(
+        self,
+        host: str = "localhost",
+        port: int = 6379,
+        db: int = 0,
+        password: Optional[str] = None,
+        prefix: str = "fashion_ai",
+    ):
+        """Initialize queue manager.
+
+        Args:
+            host: Redis host
+            port: Redis port
+            db: Redis database number
+            password: Redis password
+            prefix: Queue prefix for namespacing
+        """
+        self.redis_client = redis.Redis(
+            host=host,
+            port=port,
+            db=db,
+            password=password,
+            decode_responses=True,
+        )
+        self.prefix = prefix
+        self.pubsub = self.redis_client.pubsub()
+
+    def publish(self, channel: str, message: Message) -> bool:
+        """Publish message to channel.
+
+        Args:
+            channel: Channel name
+            message: Message to publish
+
+        Returns:
+            True if successful
+        """
+        try:
+            channel_name = f"{self.prefix}:{channel}"
+            message_json = message.model_dump_json()
+            self.redis_client.publish(channel_name, message_json)
+            return True
+        except Exception as e:
+            print(f"Error publishing message: {e}")
+            return False
+
+    def subscribe(self, channels: list[str]) -> None:
+        """Subscribe to channels.
+
+        Args:
+            channels: List of channel names
+        """
+        channel_names = [f"{self.prefix}:{ch}" for ch in channels]
+        self.pubsub.subscribe(*channel_names)
+
+    def listen(self) -> Optional[Message]:
+        """Listen for messages on subscribed channels.
+
+        Returns:
+            Message if available, None otherwise
+        """
+        try:
+            message = self.pubsub.get_message(timeout=1.0)
+            if message and message["type"] == "message":
+                data = json.loads(message["data"])
+                return Message(**data)
+            return None
+        except Exception as e:
+            print(f"Error listening for message: {e}")
+            return None
+
+    def push_task(self, queue: str, message: Message) -> bool:
+        """Push task to queue (list-based).
+
+        Args:
+            queue: Queue name
+            message: Message to push
+
+        Returns:
+            True if successful
+        """
+        try:
+            queue_name = f"{self.prefix}:queue:{queue}"
+            message_json = message.model_dump_json()
+            self.redis_client.rpush(queue_name, message_json)
+            return True
+        except Exception as e:
+            print(f"Error pushing task: {e}")
+            return False
+
+    def pop_task(self, queue: str, timeout: int = 5) -> Optional[Message]:
+        """Pop task from queue (blocking).
+
+        Args:
+            queue: Queue name
+            timeout: Blocking timeout in seconds
+
+        Returns:
+            Message if available, None otherwise
+        """
+        try:
+            queue_name = f"{self.prefix}:queue:{queue}"
+            result = self.redis_client.blpop(queue_name, timeout=timeout)
+            if result:
+                _, message_json = result
+                data = json.loads(message_json)
+                return Message(**data)
+            return None
+        except Exception as e:
+            print(f"Error popping task: {e}")
+            return None
+
+    def get_queue_depth(self, queue: str) -> int:
+        """Get current queue depth.
+
+        Args:
+            queue: Queue name
+
+        Returns:
+            Number of messages in queue
+        """
+        queue_name = f"{self.prefix}:queue:{queue}"
+        return self.redis_client.llen(queue_name)
+
+    def close(self) -> None:
+        """Close connections."""
+        self.pubsub.close()
+        self.redis_client.close()

@@ -1,0 +1,42 @@
+project:
+  name: "Fashion AI Autonomous Commerce Platform"
+  version: "1.0.0"
+  description: "End-to-end autonomous fashion design and commerce system"
+
+environment:
+  development:
+    debug: true
+    log_level: "DEBUG"
+  production:
+    debug: false
+    log_level: "INFO"
+
+paths:
+  data_root: "./data"
+  designs_raw: "./data/designs/raw"
+  designs_processed: "./data/designs/processed"
+  commerce: "./data/commerce"
+  marketing: "./data/marketing"
+  finance: "./data/finance"
+  logs: "./logs"
+  backups: "./data/backups"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8000"
+  rate_limit:
+    requests_per_minute: 60
+    burst: 10
+
+monitoring:
+  health_check_interval: 60
+  metrics_port: 9090
+  alert_thresholds:
+    queue_depth: 1000
+    disk_usage_percent: 90
+    response_time_ms: 1000
+    error_rate_percent: 1.0
