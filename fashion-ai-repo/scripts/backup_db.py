@@ -14,7 +14,14 @@ from src.core.utils import ensure_directories, format_bytes, save_json
 
 
 def main():
-    """Run backup."""
+    """
+    Create a timestamped backup of project data and logs, write a manifest, and prune older backups.
+    
+    Ensures the configured backup directory exists, copies present data subdirectories ("designs", "commerce", "marketing", "finance") and the logs directory into a new timestamped backup folder, computes and records the total size in bytes, and writes a manifest.json describing the backup. After completion, removes older backups leaving the most recent seven.
+    
+    Returns:
+        exit_code (int): `0` on successful completion.
+    """
     print("Fashion AI Platform - Backup")
     print("=" * 50)
 

@@ -60,13 +60,14 @@ class SystemStatusResponse(BaseModel):
 
 @router.post("/design/generate", response_model=DesignResponse)
 async def generate_design(request: DesignRequest) -> DesignResponse:
-    """Generate new fashion design.
-
-    Args:
-        request: Design parameters
-
+    """
+    Queue a new fashion design generation request.
+    
+    Parameters:
+        request (DesignRequest): Design parameters; includes `style` (default "modern"), `color` (default "neutral"), and `season` (default "all-season").
+    
     Returns:
-        Generated design information
+        DesignResponse: Response with `status`, `message`, and a `payload` containing a `design_id` (placeholder) and the echoed request fields (`style`, `color`, `season`).
     """
     # Placeholder - In production, queue task to DesignerAgent
     return DesignResponse(
@@ -83,13 +84,14 @@ async def generate_design(request: DesignRequest) -> DesignResponse:
 
 @router.get("/design/feed", response_model=Dict[str, Any])
 async def get_design_feed(limit: int = 10) -> Dict[str, Any]:
-    """Get recent designs.
-
-    Args:
-        limit: Number of designs to return
-
+    """
+    Retrieve a list of recent design entries.
+    
+    Parameters:
+        limit (int): Maximum number of designs to return.
+    
     Returns:
-        List of designs
+        response (Dict[str, Any]): Dictionary with keys `status` (int), `message` (str), and `payload` (list of design objects; currently a placeholder).
     """
     return {
         "status": 200,
@@ -100,13 +102,11 @@ async def get_design_feed(limit: int = 10) -> Dict[str, Any]:
 
 @router.get("/design/{design_id}", response_model=Dict[str, Any])
 async def get_design(design_id: str) -> Dict[str, Any]:
-    """Get specific design by ID.
-
-    Args:
-        design_id: Design identifier
-
+    """
+    Retrieve a design by its identifier.
+    
     Returns:
-        Design details
+        A dictionary with keys 'status' (int), 'message' (str), and 'payload' (dict) containing the requested 'design_id'.
     """
     return {
         "status": 200,
@@ -122,14 +122,15 @@ async def get_design(design_id: str) -> Dict[str, Any]:
 
 @router.get("/products", response_model=Dict[str, Any])
 async def get_products(limit: int = 20, offset: int = 0) -> Dict[str, Any]:
-    """Get product catalog.
-
-    Args:
-        limit: Number of products to return
-        offset: Pagination offset
-
+    """
+    Return a slice of the product catalog.
+    
+    Parameters:
+        limit (int): Maximum number of products to include.
+        offset (int): Pagination offset (number of products to skip).
+    
     Returns:
-        List of products
+        dict: Response containing 'status' (HTTP status code), 'message' (summary), and 'payload' (list of product entries).
     """
     return {
         "status": 200,
@@ -140,13 +141,14 @@ async def get_products(limit: int = 20, offset: int = 0) -> Dict[str, Any]:
 
 @router.get("/products/{sku}", response_model=Dict[str, Any])
 async def get_product(sku: str) -> Dict[str, Any]:
-    """Get specific product by SKU.
-
-    Args:
-        sku: Product SKU
-
+    """
+    Retrieve product details for the given SKU.
+    
+    Parameters:
+        sku (str): Stock-keeping unit identifying the product.
+    
     Returns:
-        Product details
+        Dict[str, Any]: Response with keys "status", "message", and "payload"; "payload" contains the product data including the provided `sku`.
     """
     return {
         "status": 200,
@@ -157,13 +159,14 @@ async def get_product(sku: str) -> Dict[str, Any]:
 
 @router.post("/orders", response_model=Dict[str, Any])
 async def create_order(order: Dict[str, Any]) -> Dict[str, Any]:
-    """Create new order.
-
-    Args:
-        order: Order details
-
+    """
+    Create a new order and return a confirmation payload.
+    
+    Parameters:
+        order (Dict[str, Any]): Order details (for example: items, billing, and shipping information).
+    
     Returns:
-        Order confirmation
+        dict: Confirmation with keys `status` (HTTP-like code), `message`, and `payload` containing `order_id` (currently "pending").
     """
     return {
         "status": 200,
@@ -179,13 +182,14 @@ async def create_order(order: Dict[str, Any]) -> Dict[str, Any]:
 
 @router.post("/marketing/campaign", response_model=Dict[str, Any])
 async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
-    """Create marketing campaign.
-
-    Args:
-        request: Campaign parameters
-
+    """
+    Create a marketing campaign and return its details.
+    
+    Parameters:
+        request (CampaignRequest): Campaign creation parameters including `name`, `type`, and `target_audience`.
+    
     Returns:
-        Campaign details
+        Response dictionary containing `status`, `message`, and `payload` with the created campaign's details (`campaign_id`, `name`, `type`).
     """
     return {
         "status": 200,
@@ -200,13 +204,19 @@ async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
 
 @router.get("/analytics", response_model=Dict[str, Any])
 async def get_analytics(period: str = "week") -> Dict[str, Any]:
-    """Get analytics data.
-
-    Args:
-        period: Time period (day, week, month)
-
+    """
+    Provide analytics metrics aggregated for the specified time period.
+    
+    Parameters:
+        period (str): Time period to aggregate metrics for; expected values include "day", "week", or "month".
+    
     Returns:
-        Analytics summary
+        dict: Response object with keys:
+            - status (int): HTTP-like status code.
+            - message (str): Short status message.
+            - payload (dict): Contains:
+                - period (str): The requested period.
+                - metrics (dict): Numeric metrics with keys `impressions`, `clicks`, and `conversions`.
     """
     return {
         "status": 200,
@@ -229,13 +239,17 @@ async def get_analytics(period: str = "week") -> Dict[str, Any]:
 
 @router.get("/finance/summary", response_model=Dict[str, Any])
 async def get_finance_summary(period: str = "month") -> Dict[str, Any]:
-    """Get financial summary.
-
-    Args:
-        period: Time period
-
+    """
+    Retrieve a financial summary for the requested period.
+    
+    Parameters:
+        period (str): Time period to summarize (e.g., "month", "week", "year").
+    
     Returns:
-        Financial summary
+        Dict[str, Any]: Response object containing `status` (int), `message` (str), and `payload` (dict) with keys:
+            - `period` (str): Echoes the requested period.
+            - `revenue_cents` (int): Total revenue in cents.
+            - `transactions` (int): Number of transactions.
     """
     return {
         "status": 200,
@@ -250,13 +264,17 @@ async def get_finance_summary(period: str = "month") -> Dict[str, Any]:
 
 @router.get("/finance/ledger", response_model=Dict[str, Any])
 async def get_ledger(limit: int = 50) -> Dict[str, Any]:
-    """Get ledger entries.
-
-    Args:
-        limit: Number of entries to return
-
+    """
+    Retrieve a slice of ledger entries.
+    
+    Parameters:
+        limit (int): Maximum number of ledger entries to include in the response payload.
+    
     Returns:
-        Ledger entries
+        dict: Response object with keys:
+            - status (int): HTTP-like status code.
+            - message (str): Human-readable status message.
+            - payload (list): List of ledger entry objects (may be empty).
     """
     return {
         "status": 200,
@@ -272,10 +290,16 @@ async def get_ledger(limit: int = 50) -> Dict[str, Any]:
 
 @router.get("/system/status", response_model=SystemStatusResponse)
 async def get_system_status() -> SystemStatusResponse:
-    """Get system status.
-
+    """
+    Report current system operational state and service metrics.
+    
+    The payload includes overall API health, per-agent statuses, and queue depths for background work queues.
+    
     Returns:
-        System status and metrics
+        SystemStatusResponse: Contains an HTTP-like status code, a human-readable message, and a `payload` dict with keys:
+            - "api": overall API health as a string
+            - "agents": mapping of agent names to their status strings
+            - "queue_depths": mapping of agent names to integer queue depths
     """
     return SystemStatusResponse(
         status=200,
@@ -301,10 +325,14 @@ async def get_system_status() -> SystemStatusResponse:
 
 @router.get("/system/health", response_model=Dict[str, Any])
 async def get_system_health() -> Dict[str, Any]:
-    """Get detailed system health.
-
+    """
+    Provide a detailed system health payload.
+    
     Returns:
-        Health check details
+        response (Dict[str, Any]): Dictionary with keys:
+            - "status" (int): HTTP-like status code.
+            - "message" (str): Short status message.
+            - "payload" (Dict[str, Any]): Health details including "status" (overall health string) and "checks" (mapping of individual checks such as "disk_usage_percent" and "queue_depths").
     """
     return {
         "status": 200,
@@ -321,10 +349,17 @@ async def get_system_health() -> Dict[str, Any]:
 
 @router.get("/system/metrics", response_model=Dict[str, Any])
 async def get_system_metrics() -> Dict[str, Any]:
-    """Get system metrics.
-
+    """
+    Return current system metrics and metadata.
+    
     Returns:
-        System metrics
+        dict: Response containing:
+            status (int): HTTP-like status code.
+            message (str): Human-readable status message.
+            payload (dict): Metrics payload with:
+                api_uptime_percent (float): API uptime percentage.
+                avg_response_ms (int): Average response time in milliseconds.
+                error_rate_percent (float): Error rate percentage.
     """
     return {
         "status": 200,

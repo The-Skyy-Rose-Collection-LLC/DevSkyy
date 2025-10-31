@@ -55,14 +55,15 @@ class QueueManager:
         self.pubsub = self.redis_client.pubsub()
 
     def publish(self, channel: str, message: Message) -> bool:
-        """Publish message to channel.
-
-        Args:
-            channel: Channel name
-            message: Message to publish
-
+        """
+        Publish a Message to the specified logical Redis channel within the manager's namespace.
+        
+        Parameters:
+            channel (str): Logical channel name (without the manager prefix).
+            message (Message): Message object to publish.
+        
         Returns:
-            True if successful
+            `true` if the message was published successfully, `false` otherwise.
         """
         try:
             channel_name = f"{self.prefix}:{channel}"
@@ -74,19 +75,21 @@ class QueueManager:
             return False
 
     def subscribe(self, channels: list[str]) -> None:
-        """Subscribe to channels.
-
-        Args:
-            channels: List of channel names
+        """
+        Subscribe to the given Redis channels under this manager's namespace prefix.
+        
+        Parameters:
+            channels (list[str]): Channel names (without the manager prefix) to subscribe to.
         """
         channel_names = [f"{self.prefix}:{ch}" for ch in channels]
         self.pubsub.subscribe(*channel_names)
 
     def listen(self) -> Optional[Message]:
-        """Listen for messages on subscribed channels.
-
+        """
+        Waits for the next message on currently subscribed channels.
+        
         Returns:
-            Message if available, None otherwise
+            Message parsed from the channel payload when a new message is received; `None` if no message arrives within the internal timeout or an error occurs.
         """
         try:
             message = self.pubsub.get_message(timeout=1.0)
@@ -99,14 +102,15 @@ class QueueManager:
             return None
 
     def push_task(self, queue: str, message: Message) -> bool:
-        """Push task to queue (list-based).
-
-        Args:
-            queue: Queue name
-            message: Message to push
-
+        """
+        Append a Message to the named namespaced queue.
+        
+        Parameters:
+            queue (str): Logical queue name (without prefix).
+            message (Message): Message object to enqueue.
+        
         Returns:
-            True if successful
+            bool: `True` if the message was successfully enqueued, `False` otherwise.
         """
         try:
             queue_name = f"{self.prefix}:queue:{queue}"
@@ -118,14 +122,16 @@ class QueueManager:
             return False
 
     def pop_task(self, queue: str, timeout: int = 5) -> Optional[Message]:
-        """Pop task from queue (blocking).
-
-        Args:
-            queue: Queue name
-            timeout: Blocking timeout in seconds
-
+        """
+        Remove and return a message from the named queue, waiting up to the given timeout.
+        
+        Parameters:
+            queue (str): Name of the queue (without prefix).
+            timeout (int): Maximum seconds to block waiting for a message.
+        
         Returns:
-            Message if available, None otherwise
+            Message: The retrieved Message when available.
+            None: If no message is available before the timeout or if an error occurs.
         """
         try:
             queue_name = f"{self.prefix}:queue:{queue}"
@@ -140,18 +146,20 @@ class QueueManager:
             return None
 
     def get_queue_depth(self, queue: str) -> int:
-        """Get current queue depth.
-
-        Args:
-            queue: Queue name
-
+        """
+        Get the number of messages currently in the named queue.
+        
         Returns:
-            Number of messages in queue
+            Number of messages in the queue.
         """
         queue_name = f"{self.prefix}:queue:{queue}"
         return self.redis_client.llen(queue_name)
 
     def close(self) -> None:
-        """Close connections."""
+        """
+        Close the manager's Redis resources.
+        
+        Closes the pubsub subscription and the underlying Redis client connection. After calling this method the QueueManager must not be used for further publish/subscribe or queue operations.
+        """
         self.pubsub.close()
         self.redis_client.close()
