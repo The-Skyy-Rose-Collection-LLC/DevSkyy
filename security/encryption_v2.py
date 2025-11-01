@@ -320,14 +320,14 @@ def generate_master_key() -> str:
 if __name__ == "__main__":
     # Demo: Generate key and encrypt data
     key = generate_master_key()
-    print(f"New master key (set as ENCRYPTION_MASTER_KEY): {key}")
+    logger.info(f"New master key (set as ENCRYPTION_MASTER_KEY): {key}")
 
     # Encrypt and decrypt example
     plaintext = "sensitive_data_123"
     encrypted = encrypt_field(plaintext)
     decrypted = decrypt_field(encrypted)
 
-    print(f"Original:  {plaintext}")
-    print(f"Encrypted: {encrypted}")
-    print(f"Decrypted: {decrypted}")
-    print(f"Match: {plaintext == decrypted}")
+    logger.info(f"Original:  {plaintext}")
+    logger.info(f"Encrypted: {encrypted}")
+    logger.info(f"Decrypted: {decrypted}")
+    logger.info(f"Match: {plaintext == decrypted}")

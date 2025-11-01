@@ -14,6 +14,7 @@ from database import AsyncSessionLocal
 from dotenv import load_dotenv
 import asyncio
 import logging
+import os
 
 """
 Initialize DevSkyy Database
@@ -130,7 +131,7 @@ async def create_sample_data():
                 email="admin@devskyy.com",
                 username="admin",
                 full_name="DevSkyy Admin",
-                hashed_password="<replace with hashed password>",
+                hashed_password = os.getenv("HASHED_PASSWORD")
                 is_superuser=True,
             )
             session.add(sample_user)

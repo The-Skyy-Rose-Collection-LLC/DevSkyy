@@ -409,7 +409,7 @@ async def require_scope(required_scope: str):
             current_user: Dict = Depends(get_current_user),
             _: None = Depends(require_scope("api:read"))
         ):
-            pass
+            raise NotImplementedError("Production implementation required")
     """
 
     async def scope_checker(current_user: Dict = Depends(get_current_user)):

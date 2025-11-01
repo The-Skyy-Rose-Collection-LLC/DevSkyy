@@ -83,9 +83,7 @@ class BaseAgent(ABC):
         """
         for attempt in range(self.retry_attempts):
             try:
-                self.logger.info(
-                    f"Executing task: {task_type} (attempt {attempt + 1}/{self.retry_attempts})"
-                )
+                self.logger.info(f"Executing task: {task_type} (attempt {attempt + 1}/{self.retry_attempts})")
                 result = await self.process_task(task_type, payload)
                 self.logger.info(f"Task completed successfully: {task_type}")
                 return result

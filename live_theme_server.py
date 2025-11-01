@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 DevSkyy Live Theme Builder Server
 Simplified server for live theme building and deployment
@@ -42,14 +46,14 @@ from config.wordpress_credentials import get_skyy_rose_credentials
 credentials = get_skyy_rose_credentials()
 app.state.wordpress_credentials = credentials
 
-print(f"✅ WordPress credentials loaded: {credentials.site_url}")
+logger.info(f"✅ WordPress credentials loaded: {credentials.site_url}")
 
 
 @app.post("/api/v1/themes/skyy-rose/build")
 async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
     """Build and deploy a luxury fashion theme for Skyy Rose Collection."""
     try:
-        print(f'🎨 Building theme: {theme_request.get("theme_name", "skyy-rose-luxury")}')
+        logger.info(f'🎨 Building theme: {theme_request.get("theme_name", "skyy-rose-luxury")}')
 
         # Import theme builder components
         from agent.wordpress.automated_theme_uploader import automated_theme_uploader
@@ -63,9 +67,9 @@ async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
         if not credentials:
             raise HTTPException(status_code=400, detail="WordPress credentials not configured")
 
-        print(f"✅ Using credentials for: {credentials.site_url}")
-        print(f"✅ Theme name: {theme_name}")
-        print(f"✅ Auto deploy: {auto_deploy}")
+        logger.info(f"✅ Using credentials for: {credentials.site_url}")
+        logger.info(f"✅ Theme name: {theme_name}")
+        logger.info(f"✅ Auto deploy: {auto_deploy}")
 
         # Create luxury fashion theme package
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -85,20 +89,20 @@ async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
 
             package = await automated_theme_uploader.create_theme_package(str(theme_dir), theme_info)
 
-            print(f"✅ Theme package created: {package.name}")
+            logger.info(f"✅ Theme package created: {package.name}")
 
             # Deploy if requested (using staging for WordPress.com compatibility)
             deployment_result = None
             if auto_deploy:
-                print("🚀 Deploying theme to staging area (WordPress.com compatible)...")
+                logger.info("🚀 Deploying theme to staging area (WordPress.com compatible)...")
                 from agent.wordpress.automated_theme_uploader import UploadMethod
 
                 deployment_result = await automated_theme_uploader.deploy_theme(
                     package, credentials, UploadMethod.STAGING_AREA, False
                 )
-                print(f"✅ Deployment result: {deployment_result.success}")
+                logger.info(f"✅ Deployment result: {deployment_result.success}")
                 if not deployment_result.success:
-                    print(f"❌ Deployment error: {deployment_result.error_message}")
+                    logger.error(f"❌ Deployment error: {deployment_result.error_message}")
 
             return {
                 "success": True,
@@ -118,7 +122,7 @@ async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
             }
 
     except Exception as e:
-        print(f"❌ Theme build failed: {e}")
+        logger.error(f"❌ Theme build failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -426,7 +430,7 @@ add_action('wp_enqueue_scripts', '{theme_name.replace('-', '_')}_scripts');
 """
     )
 
-    print(f'✅ Generated {len(list(theme_dir.glob("*")))} theme files for {theme_name}')
+    logger.info(f'✅ Generated {len(list(theme_dir.glob("*")))} theme files for {theme_name}')
 
 
 @app.get("/api/v1/themes/system-status")
@@ -451,12 +455,12 @@ async def root():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting DevSkyy Live Theme Builder Server")
-    print("=" * 55)
-    print(f'✅ WordPress credentials loaded: {credentials.site_url if credentials else "Not configured"}')
-    print("\n🚀 Starting server on http://localhost:8000")
-    print("📋 Available endpoints:")
-    print("   POST /api/v1/themes/skyy-rose/build - Build luxury theme")
-    print("   GET /api/v1/themes/system-status - System status")
+    logger.info("🚀 Starting DevSkyy Live Theme Builder Server")
+    logger.info("=" * 55)
+    logger.info(f'✅ WordPress credentials loaded: {credentials.site_url if credentials else "Not configured"}')
+    logger.info("\n🚀 Starting server on http://localhost:8000")
+    logger.info("📋 Available endpoints:")
+    logger.info("   POST /api/v1/themes/skyy-rose/build - Build luxury theme")
+    logger.info("   GET /api/v1/themes/system-status - System status")
 
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

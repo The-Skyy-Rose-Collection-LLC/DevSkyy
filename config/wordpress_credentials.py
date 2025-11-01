@@ -295,30 +295,30 @@ def save_env_template(file_path: str = ".env.template"):
 
 if __name__ == "__main__":
     # Test credential loading
-    print("🔐 WordPress Credentials Manager Test")
-    print("=" * 50)
+    logger.info("🔐 WordPress Credentials Manager Test")
+    logger.info("=" * 50)
 
     # Validate environment setup
     env_validation = validate_environment_setup()
-    print(f"Environment validation: {'✅ VALID' if env_validation['valid'] else '❌ INVALID'}")
+    logger.info(f"Environment validation: {'✅ VALID' if env_validation['valid'] else '❌ INVALID'}")
 
     if env_validation["missing_required"]:
-        print(f"Missing required variables: {env_validation['missing_required']}")
+        logger.info(f"Missing required variables: {env_validation['missing_required']}")
 
     if env_validation["configured_vars"]:
-        print(f"Configured variables: {len(env_validation['configured_vars'])}")
+        logger.info(f"Configured variables: {len(env_validation['configured_vars'])}")
 
     # Test credential loading
     credentials = get_skyy_rose_credentials()
     if credentials:
-        print(f"✅ Skyy Rose credentials loaded: {credentials.site_url}")
-        print(f"   Username: {credentials.username}")
-        print(f"   Has app password: {bool(credentials.application_password)}")
-        print(f"   Has FTP: {credentials.has_ftp_credentials()}")
-        print(f"   Has SFTP: {credentials.has_sftp_credentials()}")
+        logger.info(f"✅ Skyy Rose credentials loaded: {credentials.site_url}")
+        logger.info(f"   Username: {credentials.username}")
+        logger.info(f"   Has app password: {bool(credentials.application_password)}")
+        logger.info(f"   Has FTP: {credentials.has_ftp_credentials()}")
+        logger.info(f"   Has SFTP: {credentials.has_sftp_credentials()}")
     else:
-        print("❌ No Skyy Rose credentials found")
+        logger.info("❌ No Skyy Rose credentials found")
 
     # List all sites
     sites = list_configured_sites()
-    print(f"Configured sites: {sites}")
+    logger.info(f"Configured sites: {sites}")

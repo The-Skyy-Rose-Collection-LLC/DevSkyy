@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 WordPress Integration Testing Script
 Test all WordPress credential configurations and theme builder integration
@@ -18,8 +22,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 async def test_credential_loading():
     """Test credential loading from environment."""
-    print("🔐 Testing Credential Loading")
-    print("-" * 40)
+    logger.info("🔐 Testing Credential Loading")
+    logger.info("-" * 40)
 
     try:
         from config.wordpress_credentials import (
@@ -31,38 +35,38 @@ async def test_credential_loading():
 
         # Test environment validation
         env_validation = validate_environment_setup()
-        print(f"Environment validation: {'✅ VALID' if env_validation['valid'] else '❌ INVALID'}")
+        logger.info(f"Environment validation: {'✅ VALID' if env_validation['valid'] else '❌ INVALID'}")
 
         if env_validation["missing_required"]:
-            print(f"❌ Missing required variables: {env_validation['missing_required']}")
+            logger.info(f"❌ Missing required variables: {env_validation['missing_required']}")
             return False
 
         if env_validation["configured_vars"]:
-            print(f"✅ Configured variables: {len(env_validation['configured_vars'])}")
+            logger.info(f"✅ Configured variables: {len(env_validation['configured_vars'])}")
 
         # Test credential loading
         credentials = get_skyy_rose_credentials()
         if credentials:
-            print(f"✅ Skyy Rose credentials loaded")
-            print(f"   Site URL: {credentials.site_url}")
-            print(f"   Username: {credentials.username}")
-            print(f"   Has app password: {bool(credentials.application_password)}")
-            print(f"   Has FTP: {credentials.has_ftp_credentials()}")
-            print(f"   Has SFTP: {credentials.has_sftp_credentials()}")
+            logger.info(f"✅ Skyy Rose credentials loaded")
+            logger.info(f"   Site URL: {credentials.site_url}")
+            logger.info(f"   Username: {credentials.username}")
+            logger.info(f"   Has app password: {bool(credentials.application_password)}")
+            logger.info(f"   Has FTP: {credentials.has_ftp_credentials()}")
+            logger.info(f"   Has SFTP: {credentials.has_sftp_credentials()}")
             return True
         else:
-            print("❌ No Skyy Rose credentials found")
+            logger.info("❌ No Skyy Rose credentials found")
             return False
 
     except Exception as e:
-        print(f"❌ Credential loading failed: {e}")
+        logger.error(f"❌ Credential loading failed: {e}")
         return False
 
 
 async def test_wordpress_connection():
     """Test WordPress REST API connection."""
-    print("\n🌐 Testing WordPress Connection")
-    print("-" * 40)
+    logger.info("\n🌐 Testing WordPress Connection")
+    logger.info("-" * 40)
 
     try:
         from config.wordpress_credentials import get_skyy_rose_credentials
@@ -71,29 +75,29 @@ async def test_wordpress_connection():
 
         credentials = get_skyy_rose_credentials()
         if not credentials:
-            print("❌ No credentials available for testing")
+            logger.info("❌ No credentials available for testing")
             return False
 
         # Test basic site connectivity
-        print(f"🔍 Testing connection to: {credentials.site_url}")
+        logger.info(f"🔍 Testing connection to: {credentials.site_url}")
 
         try:
             response = requests.get(f"{credentials.site_url}/wp-json/wp/v2", timeout=10)
             api_accessible = response.status_code == 200
 
             if api_accessible:
-                print("✅ WordPress REST API accessible")
+                logger.info("✅ WordPress REST API accessible")
             else:
-                print(f"❌ WordPress REST API not accessible (Status: {response.status_code})")
+                logger.info(f"❌ WordPress REST API not accessible (Status: {response.status_code})")
                 return False
 
         except requests.RequestException as e:
-            print(f"❌ Connection failed: {e}")
+            logger.error(f"❌ Connection failed: {e}")
             return False
 
         # Test authentication
         if credentials.application_password:
-            print("🔑 Testing authentication with application password...")
+            logger.info("🔑 Testing authentication with application password...")
 
             auth_header = base64.b64encode(
                 f"{credentials.username}:{credentials.application_password}".encode()
@@ -108,31 +112,31 @@ async def test_wordpress_connection():
 
                 if auth_response.status_code == 200:
                     user_data = auth_response.json()
-                    print(f"✅ Authentication successful")
-                    print(f"   Logged in as: {user_data.get('name', 'Unknown')}")
-                    print(f"   User roles: {user_data.get('roles', [])}")
+                    logger.info(f"✅ Authentication successful")
+                    logger.info(f"   Logged in as: {user_data.get('name', 'Unknown')}")
+                    logger.info(f"   User roles: {user_data.get('roles', [])}")
                     return True
                 else:
-                    print(f"❌ Authentication failed (Status: {auth_response.status_code})")
-                    print(f"   Response: {auth_response.text[:200]}")
+                    logger.error(f"❌ Authentication failed (Status: {auth_response.status_code})")
+                    logger.info(f"   Response: {auth_response.text[:200]}")
                     return False
 
             except requests.RequestException as e:
-                print(f"❌ Authentication test failed: {e}")
+                logger.error(f"❌ Authentication test failed: {e}")
                 return False
         else:
-            print("⚠️ No application password configured - skipping auth test")
+            logger.info("⚠️ No application password configured - skipping auth test")
             return True
 
     except Exception as e:
-        print(f"❌ WordPress connection test failed: {e}")
+        logger.error(f"❌ WordPress connection test failed: {e}")
         return False
 
 
 async def test_theme_package_creation():
     """Test theme package creation."""
-    print("\n📦 Testing Theme Package Creation")
-    print("-" * 40)
+    logger.info("\n📦 Testing Theme Package Creation")
+    logger.info("-" * 40)
 
     try:
         from agent.wordpress.automated_theme_uploader import automated_theme_uploader
@@ -171,7 +175,7 @@ add_action('after_setup_theme', 'test_theme_setup');
 ?>"""
             )
 
-            print(f"📁 Created test theme at: {theme_dir}")
+            logger.info(f"📁 Created test theme at: {theme_dir}")
 
             # Test package creation
             theme_info = {
@@ -183,22 +187,22 @@ add_action('after_setup_theme', 'test_theme_setup');
 
             package = await automated_theme_uploader.create_theme_package(str(theme_dir), theme_info)
 
-            print(f"✅ Theme package created successfully")
-            print(f"   Package name: {package.name}")
-            print(f"   Package size: {package.size_bytes / 1024:.1f} KB")
-            print(f"   Files count: {len(package.files)}")
-            print(f"   Checksum: {package.checksum[:16]}...")
+            logger.info(f"✅ Theme package created successfully")
+            logger.info(f"   Package name: {package.name}")
+            logger.info(f"   Package size: {package.size_bytes / 1024:.1f} KB")
+            logger.info(f"   Files count: {len(package.files)}")
+            logger.info(f"   Checksum: {package.checksum[:16]}...")
 
             # Test package validation
             validation_results = await automated_theme_uploader.validate_theme_package(package)
 
             if validation_results["valid"]:
-                print("✅ Theme package validation passed")
+                logger.info("✅ Theme package validation passed")
                 if validation_results["warnings"]:
-                    print(f"   Warnings: {len(validation_results['warnings'])}")
+                    logger.warning(f"   Warnings: {len(validation_results['warnings'])}")
             else:
-                print("❌ Theme package validation failed")
-                print(f"   Errors: {validation_results['errors']}")
+                logger.error("❌ Theme package validation failed")
+                logger.error(f"   Errors: {validation_results['errors']}")
                 return False
 
             # Clean up package file
@@ -208,14 +212,14 @@ add_action('after_setup_theme', 'test_theme_setup');
             return True
 
     except Exception as e:
-        print(f"❌ Theme package creation failed: {e}")
+        logger.error(f"❌ Theme package creation failed: {e}")
         return False
 
 
 async def test_theme_builder_orchestrator():
     """Test theme builder orchestrator."""
-    print("\n🎨 Testing Theme Builder Orchestrator")
-    print("-" * 40)
+    logger.info("\n🎨 Testing Theme Builder Orchestrator")
+    logger.info("-" * 40)
 
     try:
         from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator, ThemeType
@@ -223,7 +227,7 @@ async def test_theme_builder_orchestrator():
 
         credentials = get_skyy_rose_credentials()
         if not credentials:
-            print("❌ No credentials available for testing")
+            logger.info("❌ No credentials available for testing")
             return False
 
         # Test creating a build request
@@ -235,32 +239,32 @@ async def test_theme_builder_orchestrator():
         )
 
         if build_request:
-            print("✅ Theme build request created successfully")
-            print(f"   Theme name: {build_request.theme_name}")
-            print(f"   Theme type: {build_request.theme_type.value}")
-            print(f"   Target site: {build_request.target_site}")
-            print(f"   Auto deploy: {build_request.auto_deploy}")
+            logger.info("✅ Theme build request created successfully")
+            logger.info(f"   Theme name: {build_request.theme_name}")
+            logger.info(f"   Theme type: {build_request.theme_type.value}")
+            logger.info(f"   Target site: {build_request.target_site}")
+            logger.info(f"   Auto deploy: {build_request.auto_deploy}")
 
             # Test system status
             status = theme_builder_orchestrator.get_system_status()
-            print(f"✅ Orchestrator system status retrieved")
-            print(f"   Supported theme types: {len(status['supported_theme_types'])}")
-            print(f"   Available sites: {status['available_sites']}")
+            logger.info(f"✅ Orchestrator system status retrieved")
+            logger.info(f"   Supported theme types: {len(status['supported_theme_types'])}")
+            logger.info(f"   Available sites: {status['available_sites']}")
 
             return True
         else:
-            print("❌ Failed to create theme build request")
+            logger.error("❌ Failed to create theme build request")
             return False
 
     except Exception as e:
-        print(f"❌ Theme builder orchestrator test failed: {e}")
+        logger.error(f"❌ Theme builder orchestrator test failed: {e}")
         return False
 
 
 async def test_api_endpoints():
     """Test API endpoints (if server is running)."""
-    print("\n🌐 Testing API Endpoints")
-    print("-" * 40)
+    logger.info("\n🌐 Testing API Endpoints")
+    logger.info("-" * 40)
 
     try:
         import requests
@@ -272,13 +276,13 @@ async def test_api_endpoints():
             response = requests.get(f"{base_url}/api/v1/themes/credentials/status", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                print("✅ Credentials status endpoint working")
-                print(f"   Configured sites: {data.get('configured_sites', [])}")
-                print(f"   Has default credentials: {data.get('has_default_credentials', False)}")
+                logger.info("✅ Credentials status endpoint working")
+                logger.info(f"   Configured sites: {data.get('configured_sites', [])}")
+                logger.info(f"   Has default credentials: {data.get('has_default_credentials', False)}")
             else:
-                print(f"⚠️ Credentials status endpoint returned: {response.status_code}")
+                logger.info(f"⚠️ Credentials status endpoint returned: {response.status_code}")
         except requests.RequestException:
-            print("⚠️ API server not running - skipping endpoint tests")
+            logger.info("⚠️ API server not running - skipping endpoint tests")
             return True
 
         # Test system status endpoint
@@ -286,13 +290,13 @@ async def test_api_endpoints():
             response = requests.get(f"{base_url}/api/v1/themes/system-status", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                print("✅ System status endpoint working")
-                print(f"   Available theme types: {len(data.get('available_theme_types', []))}")
-                print(f"   Upload methods: {len(data.get('supported_upload_methods', []))}")
+                logger.info("✅ System status endpoint working")
+                logger.info(f"   Available theme types: {len(data.get('available_theme_types', []))}")
+                logger.info(f"   Upload methods: {len(data.get('supported_upload_methods', []))}")
             else:
-                print(f"⚠️ System status endpoint returned: {response.status_code}")
+                logger.info(f"⚠️ System status endpoint returned: {response.status_code}")
         except requests.RequestException as e:
-            print(f"⚠️ System status endpoint failed: {e}")
+            logger.error(f"⚠️ System status endpoint failed: {e}")
 
         # Test WordPress connection endpoint
         try:
@@ -301,26 +305,26 @@ async def test_api_endpoints():
             )
             if response.status_code == 200:
                 data = response.json()
-                print("✅ WordPress connection test endpoint working")
-                print(f"   Connection status: {data.get('status', 'unknown')}")
-                print(f"   API accessible: {data.get('api_accessible', False)}")
-                print(f"   Auth test: {data.get('authentication_test', False)}")
+                logger.info("✅ WordPress connection test endpoint working")
+                logger.info(f"   Connection status: {data.get('status', 'unknown')}")
+                logger.info(f"   API accessible: {data.get('api_accessible', False)}")
+                logger.info(f"   Auth test: {data.get('authentication_test', False)}")
             else:
-                print(f"⚠️ WordPress connection test returned: {response.status_code}")
+                logger.info(f"⚠️ WordPress connection test returned: {response.status_code}")
         except requests.RequestException as e:
-            print(f"⚠️ WordPress connection test failed: {e}")
+            logger.error(f"⚠️ WordPress connection test failed: {e}")
 
         return True
 
     except Exception as e:
-        print(f"❌ API endpoint testing failed: {e}")
+        logger.error(f"❌ API endpoint testing failed: {e}")
         return False
 
 
 async def main():
     """Run all integration tests."""
-    print("🧪 DevSkyy WordPress Integration Test Suite")
-    print("=" * 60)
+    logger.info("🧪 DevSkyy WordPress Integration Test Suite")
+    logger.info("=" * 60)
 
     tests = [
         ("Credential Loading", test_credential_loading),
@@ -337,30 +341,30 @@ async def main():
             result = await test_func()
             results.append((test_name, result))
         except Exception as e:
-            print(f"❌ {test_name} test crashed: {e}")
+            logger.info(f"❌ {test_name} test crashed: {e}")
             results.append((test_name, False))
 
     # Summary
-    print("\n" + "=" * 60)
-    print("🏁 TEST RESULTS SUMMARY")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("🏁 TEST RESULTS SUMMARY")
+    logger.info("=" * 60)
 
     passed = 0
     total = len(results)
 
     for test_name, result in results:
         status = "✅ PASS" if result else "❌ FAIL"
-        print(f"{status} {test_name}")
+        logger.info(f"{status} {test_name}")
         if result:
             passed += 1
 
-    print(f"\nOverall: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+    logger.info(f"\nOverall: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
 
     if passed == total:
-        print("🎉 All tests passed! WordPress integration is ready.")
+        logger.info("🎉 All tests passed! WordPress integration is ready.")
         return 0
     else:
-        print("⚠️ Some tests failed. Check configuration and try again.")
+        logger.error("⚠️ Some tests failed. Check configuration and try again.")
         return 1
 
 

@@ -54,7 +54,7 @@ try:
 
     CORE_MODULES_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Core modules not available: {e}")
+    logger.warning(f"Warning: Core modules not available: {e}")
     CORE_MODULES_AVAILABLE = False
 
 # Security imports
@@ -67,7 +67,7 @@ try:
 
     SECURITY_MODULES_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Security modules not available: {e}")
+    logger.warning(f"Warning: Security modules not available: {e}")
     SECURITY_MODULES_AVAILABLE = False
 
 # Webhook system
@@ -76,7 +76,7 @@ try:
 
     WEBHOOK_SYSTEM_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Webhook system not available: {e}")
+    logger.warning(f"Warning: Webhook system not available: {e}")
     WEBHOOK_SYSTEM_AVAILABLE = False
 
 # Agent modules with error handling
@@ -90,7 +90,7 @@ try:
 
     AGENT_MODULES_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Agent modules not available: {e}")
+    logger.warning(f"Warning: Agent modules not available: {e}")
     AGENT_MODULES_AVAILABLE = False
 
 # AI Intelligence Services
@@ -102,7 +102,7 @@ try:
 
     AI_SERVICES_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: AI services not available: {e}")
+    logger.warning(f"Warning: AI services not available: {e}")
     AI_SERVICES_AVAILABLE = False
 
 # ============================================================================
@@ -132,7 +132,7 @@ def setup_logging():
         return logger
 
     except Exception as e:
-        print(f"❌ Failed to setup logging: {e}")
+        logger.error(f"❌ Failed to setup logging: {e}")
         return logging.getLogger(__name__)
 
 

@@ -438,7 +438,7 @@ if __name__ == "__main__":
             events=["agent.completed", "product.created"],
             metadata={"source": "demo"},
         )
-        print(f"Subscription created: {sub.subscription_id}")
+        logger.info(f"Subscription created: {sub.subscription_id}")
 
         # Emit event
         await webhook_manager.emit(WebhookEvent.AGENT_COMPLETED, {"agent_id": "scanner", "status": "success"})

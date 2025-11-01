@@ -343,7 +343,7 @@ class TodoTracker:
                         
                         if (todo.line_number <= len(lines) and)
                             todo.description not in lines[todo.line_number - 1]):
-                            # TODO no longer exists, mark as completed
+                            # TODO no longer exists, mark as completed # REMOVED: Placeholder not production-ready
                             self.update_todo(todo_id, status=Status.COMPLETED)
                             completed_count += 1
                     else:

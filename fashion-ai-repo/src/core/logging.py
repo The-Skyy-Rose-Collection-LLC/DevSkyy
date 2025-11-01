@@ -67,9 +67,7 @@ class AgentLogger:
 
         if log_file:
             handler = logging.FileHandler(log_file)
-            formatter = logging.Formatter(
-                f"%(asctime)s - {agent_name} - %(levelname)s - %(message)s"
-            )
+            formatter = logging.Formatter(f"%(asctime)s - {agent_name} - %(levelname)s - %(message)s")
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
 

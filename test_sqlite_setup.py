@@ -45,8 +45,8 @@ class SQLiteTestSuite:
 
     async def run_all_tests(self) -> Dict[str, bool]:
         """Run all SQLite tests."""
-        print("🧪 DevSkyy SQLite Test Suite")
-        print("=" * 60)
+        logger.info("🧪 DevSkyy SQLite Test Suite")
+        logger.info("=" * 60)
 
         tests = [
             ("Database Configuration", self.test_database_config),
@@ -62,15 +62,15 @@ class SQLiteTestSuite:
         ]
 
         for test_name, test_func in tests:
-            print(f"\n🔍 Testing: {test_name}")
+            logger.info(f"\n🔍 Testing: {test_name}")
             try:
                 success = await test_func()
                 self.test_results[test_name] = success
                 status = "✅ PASS" if success else "❌ FAIL"
-                print(f"   {status}")
+                logger.info(f"   {status}")
             except Exception as e:
                 self.test_results[test_name] = False
-                print(f"   ❌ FAIL - {e}")
+                logger.error(f"   ❌ FAIL - {e}")
                 logger.error(f"Test {test_name} failed: {e}")
 
         return self.test_results
@@ -84,21 +84,21 @@ class SQLiteTestSuite:
 
             # Verify SQLite configuration
             if "sqlite" not in DATABASE_URL:
-                print(f"   ⚠️  Not using SQLite: {DB_PROVIDER}")
+                logger.info(f"   ⚠️  Not using SQLite: {DB_PROVIDER}")
                 return True  # Not a failure, just different config
 
             # Check if database file exists or can be created
             if "sqlite" in DATABASE_URL:
                 db_path = Path("./devskyy.db")
                 if not db_path.exists():
-                    print(f"   ℹ️  Database file will be created: {db_path}")
+                    logger.info(f"   ℹ️  Database file will be created: {db_path}")
 
-            print(f"   ✓ Database Provider: {DB_PROVIDER}")
-            print(f"   ✓ Database URL: {DATABASE_URL}")
+            logger.info(f"   ✓ Database Provider: {DB_PROVIDER}")
+            logger.info(f"   ✓ Database URL: {DATABASE_URL}")
             return True
 
         except Exception as e:
-            print(f"   ❌ Configuration error: {e}")
+            logger.error(f"   ❌ Configuration error: {e}")
             return False
 
     async def test_database_connection(self) -> bool:
@@ -108,7 +108,7 @@ class SQLiteTestSuite:
             health = await db_manager.health_check()
 
             if health.get("status") != "healthy":
-                print(f"   ❌ Health check failed: {health}")
+                logger.error(f"   ❌ Health check failed: {health}")
                 return False
 
             # Test direct connection
@@ -118,11 +118,11 @@ class SQLiteTestSuite:
                 if value != 1:
                     return False
 
-            print(f"   ✓ Connection healthy: {health.get('type')}")
+            logger.info(f"   ✓ Connection healthy: {health.get('type')}")
             return True
 
         except Exception as e:
-            print(f"   ❌ Connection error: {e}")
+            logger.error(f"   ❌ Connection error: {e}")
             return False
 
     async def test_table_creation(self) -> bool:
@@ -148,14 +148,14 @@ class SQLiteTestSuite:
             missing_tables = [t for t in expected_tables if t not in tables]
 
             if missing_tables:
-                print(f"   ❌ Missing tables: {missing_tables}")
+                logger.info(f"   ❌ Missing tables: {missing_tables}")
                 return False
 
-            print(f"   ✓ Created {len(tables)} tables: {', '.join(sorted(tables))}")
+            logger.info(f"   ✓ Created {len(tables)} tables: {', '.join(sorted(tables))}")
             return True
 
         except Exception as e:
-            print(f"   ❌ Table creation error: {e}")
+            logger.error(f"   ❌ Table creation error: {e}")
             return False
 
     async def test_model_operations(self) -> bool:
@@ -198,11 +198,11 @@ class SQLiteTestSuite:
 
                 self.test_data_ids["product_id"] = product.id
 
-                print(f"   ✓ Created user (ID: {user.id}) and product (ID: {product.id})")
+                logger.info(f"   ✓ Created user (ID: {user.id}) and product (ID: {product.id})")
                 return True
 
         except Exception as e:
-            print(f"   ❌ Model operation error: {e}")
+            logger.error(f"   ❌ Model operation error: {e}")
             return False
 
     async def test_crud_operations(self) -> bool:
@@ -232,11 +232,11 @@ class SQLiteTestSuite:
                 # await session.delete(user)
                 # await session.commit()
 
-                print(f"   ✓ CRUD operations successful")
+                logger.info(f"   ✓ CRUD operations successful")
                 return True
 
         except Exception as e:
-            print(f"   ❌ CRUD operation error: {e}")
+            logger.error(f"   ❌ CRUD operation error: {e}")
             return False
 
     async def test_query_performance(self) -> bool:
@@ -273,13 +273,13 @@ class SQLiteTestSuite:
 
                 # Performance should be reasonable (< 1 second for 100 records)
                 if query_time > 1.0:
-                    print(f"   ⚠️  Query took {query_time:.3f}s (may be slow)")
+                    logger.info(f"   ⚠️  Query took {query_time:.3f}s (may be slow)")
 
-                print(f"   ✓ Queried {len(perf_products)} records in {query_time:.3f}s")
+                logger.info(f"   ✓ Queried {len(perf_products)} records in {query_time:.3f}s")
                 return True
 
         except Exception as e:
-            print(f"   ❌ Performance test error: {e}")
+            logger.error(f"   ❌ Performance test error: {e}")
             return False
 
     async def test_transaction_handling(self) -> bool:
@@ -326,11 +326,11 @@ class SQLiteTestSuite:
                     if user is not None:
                         return False
 
-                    print(f"   ✓ Transaction rollback successful")
+                    logger.info(f"   ✓ Transaction rollback successful")
                     return True
 
         except Exception as e:
-            print(f"   ❌ Transaction test error: {e}")
+            logger.error(f"   ❌ Transaction test error: {e}")
             return False
 
     async def test_health_checks(self) -> bool:
@@ -350,11 +350,11 @@ class SQLiteTestSuite:
             if not health["connected"]:
                 return False
 
-            print(f"   ✓ Health check passed: {health}")
+            logger.info(f"   ✓ Health check passed: {health}")
             return True
 
         except Exception as e:
-            print(f"   ❌ Health check error: {e}")
+            logger.error(f"   ❌ Health check error: {e}")
             return False
 
     async def test_concurrent_operations(self) -> bool:
@@ -379,11 +379,11 @@ class SQLiteTestSuite:
             if len(successful_ops) != 10:
                 return False
 
-            print(f"   ✓ {len(successful_ops)} concurrent operations successful")
+            logger.info(f"   ✓ {len(successful_ops)} concurrent operations successful")
             return True
 
         except Exception as e:
-            print(f"   ❌ Concurrent operations error: {e}")
+            logger.error(f"   ❌ Concurrent operations error: {e}")
             return False
 
     async def test_data_integrity(self) -> bool:
@@ -412,46 +412,46 @@ class SQLiteTestSuite:
                 if not brand_asset.created_at:
                     return False
 
-                print(f"   ✓ Data integrity verified (JSON, timestamps)")
+                logger.info(f"   ✓ Data integrity verified (JSON, timestamps)")
                 return True
 
         except Exception as e:
-            print(f"   ❌ Data integrity error: {e}")
+            logger.error(f"   ❌ Data integrity error: {e}")
             return False
 
     def print_summary(self):
         """Print test summary."""
-        print("\n" + "=" * 60)
-        print("📊 SQLite Test Summary")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("📊 SQLite Test Summary")
+        logger.info("=" * 60)
 
         passed = sum(1 for result in self.test_results.values() if result)
         total = len(self.test_results)
 
-        print(f"Tests Passed: {passed}/{total}")
-        print(f"Success Rate: {(passed/total)*100:.1f}%")
+        logger.info(f"Tests Passed: {passed}/{total}")
+        logger.info(f"Success Rate: {(passed/total)*100:.1f}%")
 
-        print("\n📋 Detailed Results:")
+        logger.info("\n📋 Detailed Results:")
         for test_name, result in self.test_results.items():
             status = "✅ PASS" if result else "❌ FAIL"
-            print(f"  {status} - {test_name}")
+            logger.info(f"  {status} - {test_name}")
 
-        print("\n🎯 SQLite Setup Status:")
+        logger.info("\n🎯 SQLite Setup Status:")
         if passed == total:
-            print("✅ SQLITE SETUP COMPLETE")
-            print("   All tests passed. Database is ready for production.")
+            logger.info("✅ SQLITE SETUP COMPLETE")
+            logger.info("   All tests passed. Database is ready for production.")
         else:
-            print("❌ SQLITE SETUP ISSUES")
-            print("   Some tests failed. Review errors before deployment.")
+            logger.info("❌ SQLITE SETUP ISSUES")
+            logger.error("   Some tests failed. Review errors before deployment.")
 
             failed_tests = [name for name, result in self.test_results.items() if not result]
-            print(f"   Failed tests: {', '.join(failed_tests)}")
+            logger.error(f"   Failed tests: {', '.join(failed_tests)}")
 
 
 async def main():
     """Main test function."""
-    print("🚀 DevSkyy SQLite Setup Test Suite")
-    print("Testing database configuration and operations...")
+    logger.info("🚀 DevSkyy SQLite Setup Test Suite")
+    logger.info("Testing database configuration and operations...")
 
     test_suite = SQLiteTestSuite()
     results = await test_suite.run_all_tests()
@@ -462,10 +462,10 @@ async def main():
     total = len(results)
 
     if passed == total:
-        print("\n🎉 All SQLite tests passed! Database setup is complete.")
+        logger.info("\n🎉 All SQLite tests passed! Database setup is complete.")
         sys.exit(0)
     else:
-        print("\n💥 Some SQLite tests failed! Review errors before proceeding.")
+        logger.error("\n💥 Some SQLite tests failed! Review errors before proceeding.")
         sys.exit(1)
 
 

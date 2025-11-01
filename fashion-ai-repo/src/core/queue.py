@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 """Message queue management using Redis."""
 
 import json
@@ -71,7 +75,7 @@ class QueueManager:
             self.redis_client.publish(channel_name, message_json)
             return True
         except Exception as e:
-            print(f"Error publishing message: {e}")
+            logger.error(f"Error publishing message: {e}")
             return False
 
     def subscribe(self, channels: list[str]) -> None:
@@ -98,7 +102,7 @@ class QueueManager:
                 return Message(**data)
             return None
         except Exception as e:
-            print(f"Error listening for message: {e}")
+            logger.error(f"Error listening for message: {e}")
             return None
 
     def push_task(self, queue: str, message: Message) -> bool:
@@ -118,7 +122,7 @@ class QueueManager:
             self.redis_client.rpush(queue_name, message_json)
             return True
         except Exception as e:
-            print(f"Error pushing task: {e}")
+            logger.error(f"Error pushing task: {e}")
             return False
 
     def pop_task(self, queue: str, timeout: int = 5) -> Optional[Message]:
@@ -142,7 +146,7 @@ class QueueManager:
                 return Message(**data)
             return None
         except Exception as e:
-            print(f"Error popping task: {e}")
+            logger.error(f"Error popping task: {e}")
             return None
 
     def get_queue_depth(self, queue: str) -> int:

@@ -459,18 +459,18 @@ import argparse
                 script = processor.generate_download_script(args.drive_url)
                 with open("download_skyy_rose.sh", "w") as f:
                     f.write(script)
-                print("📝 Download script generated: download_skyy_rose.sh")
+                logger.info("📝 Download script generated: download_skyy_rose.sh")
             else:
                 result = await processor.download_from_google_drive(args.drive_url)
-                print(json.dumps(result, indent=2))
+                logger.info(json.dumps(result, indent=2))
         
         elif args.process_local:
             result = await processor.process_local_images(args.process_local)
-            print(json.dumps(result, indent=2))
+            logger.info(json.dumps(result, indent=2))
             
             if result.get("success") and args.upload:
                 upload_result = await processor.upload_to_training_interface(args.process_local)
-                print("Upload result:", json.dumps(upload_result, indent=2))
+                logger.info("Upload result:", json.dumps(upload_result, indent=2))
         
         else:
             parser.print_help()

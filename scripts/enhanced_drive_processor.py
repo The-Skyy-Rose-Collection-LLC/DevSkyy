@@ -431,16 +431,16 @@ import argparse
     async def main():
         if args.create_guide:
             result = await processor.create_processing_guide()
-            print(json.dumps(result, indent=2))
+            logger.info(json.dumps(result, indent=2))
         elif args.folder_info:
             info = processor.get_folder_info()
-            print(json.dumps(info, indent=2))
+            logger.info(json.dumps(info, indent=2))
         else:
             # Default: create comprehensive guide
             result = await processor.create_processing_guide()
-            print("🌹 Skyy Rose Collection Processing Guide Created!")
-            print(f"📋 Instructions: {result['success']}")
-            print(f"📜 Download script: {result['script_path']}")
-            print(f"🌐 Drag & Drop Interface: {result['interfaces_available']['drag_drop']}")
+            logger.info("🌹 Skyy Rose Collection Processing Guide Created!")
+            logger.info(f"📋 Instructions: {result['success']}")
+            logger.info(f"📜 Download script: {result['script_path']}")
+            logger.info(f"🌐 Drag & Drop Interface: {result['interfaces_available']['drag_drop']}")
     
     asyncio.run(main())

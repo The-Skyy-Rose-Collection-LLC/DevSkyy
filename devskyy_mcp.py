@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 DevSkyy MCP Server
 Industry-First Multi-Agent AI Platform Integration via Model Context Protocol
@@ -926,44 +930,44 @@ async def devskyy_analytics_dashboard() -> str:
 
 def print_banner():
     """Print startup banner."""
-    print("╔══════════════════════════════════════════════════════════════════╗")
-    print("║   DevSkyy MCP Server v1.1.0 - Enhanced Edition                  ║")
-    print("║   Industry-First Multi-Agent AI Platform Integration            ║")
-    print("╚══════════════════════════════════════════════════════════════════╝")
-    print()
-    print("✅ Configuration:")
-    print(f"   API URL: {DEVSKYY_API_URL}")
-    print(f"   API Key: {'Set ✓' if DEVSKYY_API_KEY else 'Not Set ✗'}")
-    print()
-    print("🔧 Tools Available: 14 (Enhanced with Security & Analytics)")
-    print("   📋 Core Tools (11):")
-    print("     - devskyy_list_agents")
-    print("     - devskyy_scan_code")
-    print("     - devskyy_fix_code")
-    print("     - devskyy_self_healing")
-    print("     - devskyy_generate_wordpress_theme")
-    print("     - devskyy_ml_prediction")
-    print("     - devskyy_manage_products")
-    print("     - devskyy_dynamic_pricing")
-    print("     - devskyy_marketing_campaign")
-    print("     - devskyy_multi_agent_workflow")
-    print("     - devskyy_system_monitoring")
-    print()
-    print("   🔒 Security Tools (2):")
-    print("     - devskyy_security_scan")
-    print("     - devskyy_security_remediate")
-    print()
-    print("   📊 Analytics Tools (1):")
-    print("     - devskyy_analytics_dashboard")
-    print()
-    print("🚀 New Features:")
-    print("   - Comprehensive vulnerability scanning")
-    print("   - Automated security remediation")
-    print("   - Real-time analytics dashboard")
-    print("   - Enhanced error handling")
-    print()
-    print("Starting MCP server on stdio...")
-    print()
+    logger.info("╔══════════════════════════════════════════════════════════════════╗")
+    logger.info("║   DevSkyy MCP Server v1.1.0 - Enhanced Edition                  ║")
+    logger.info("║   Industry-First Multi-Agent AI Platform Integration            ║")
+    logger.info("╚══════════════════════════════════════════════════════════════════╝")
+    logger.info()
+    logger.info("✅ Configuration:")
+    logger.info(f"   API URL: {DEVSKYY_API_URL}")
+    logger.info(f"   API Key: {'Set ✓' if DEVSKYY_API_KEY else 'Not Set ✗'}")
+    logger.info()
+    logger.info("🔧 Tools Available: 14 (Enhanced with Security & Analytics)")
+    logger.info("   📋 Core Tools (11):")
+    logger.info("     - devskyy_list_agents")
+    logger.info("     - devskyy_scan_code")
+    logger.info("     - devskyy_fix_code")
+    logger.info("     - devskyy_self_healing")
+    logger.info("     - devskyy_generate_wordpress_theme")
+    logger.info("     - devskyy_ml_prediction")
+    logger.info("     - devskyy_manage_products")
+    logger.info("     - devskyy_dynamic_pricing")
+    logger.info("     - devskyy_marketing_campaign")
+    logger.info("     - devskyy_multi_agent_workflow")
+    logger.info("     - devskyy_system_monitoring")
+    logger.info()
+    logger.info("   🔒 Security Tools (2):")
+    logger.info("     - devskyy_security_scan")
+    logger.info("     - devskyy_security_remediate")
+    logger.info()
+    logger.info("   📊 Analytics Tools (1):")
+    logger.info("     - devskyy_analytics_dashboard")
+    logger.info()
+    logger.info("🚀 New Features:")
+    logger.info("   - Comprehensive vulnerability scanning")
+    logger.info("   - Automated security remediation")
+    logger.info("   - Real-time analytics dashboard")
+    logger.error("   - Enhanced error handling")
+    logger.info()
+    logger.info("Starting MCP server on stdio...")
+    logger.info()
 
 
 if __name__ == "__main__":
@@ -971,9 +975,9 @@ if __name__ == "__main__":
 
     # Validate configuration
     if not DEVSKYY_API_KEY:
-        print("⚠️  WARNING: DEVSKYY_API_KEY not set. Some features may not work.")
-        print("   Set it with: export DEVSKYY_API_KEY='your-api-key'")
-        print()
+        logger.warning("⚠️  WARNING: DEVSKYY_API_KEY not set. Some features may not work.")
+        logger.info("   Set it with: export DEVSKYY_API_KEY='your-api-key'")
+        logger.info()
 
     # Run MCP server
     mcp.run()

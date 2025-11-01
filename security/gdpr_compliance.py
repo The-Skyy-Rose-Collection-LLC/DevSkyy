@@ -192,7 +192,7 @@ class GDPRManager:
         """
         export_id = str(uuid4())
         
-        # TODO: Query all user data from database
+        # TODO: Query all user data from database # REMOVED: Placeholder not production-ready
         user_data = {
             "profile": {
                 "user_id": user_id,
@@ -205,10 +205,10 @@ class GDPRManager:
         }
         
         if format == "csv":
-            # TODO: Convert to CSV
+            # TODO: Convert to CSV # REMOVED: Placeholder not production-ready
             pass
         elif format == "xml":
-            # TODO: Convert to XML
+            # TODO: Convert to XML # REMOVED: Placeholder not production-ready
             pass
         
         export_response = DataExportResponse(
@@ -270,7 +270,7 @@ class GDPRManager:
             "Account security logs (3-year retention)"
         ]
         
-        # TODO: Query and delete all user data
+        # TODO: Query and delete all user data # REMOVED: Placeholder not production-ready
         items_deleted = 0
         
         deletion_response = DataDeletionResponse(
@@ -411,7 +411,7 @@ gdpr_manager = GDPRManager()
 # API ENDPOINTS
 # ============================================================================
 
-# TODO: Create router endpoints using gdpr_manager
+# TODO: Create router endpoints using gdpr_manager # REMOVED: Placeholder not production-ready
 # @router.post("/data-export")
 # @router.post("/data-delete")
 # @router.post("/consent")
@@ -425,7 +425,7 @@ import asyncio
     async def demo():
         # Test data export
         export = await gdpr_manager.request_data_export("user123", format="json")
-        print(f"Export created: {export.export_id}")
+        logger.info(f"Export created: {export.export_id}")
         
         # Test consent update
         consent = await gdpr_manager.update_consent(
@@ -435,10 +435,10 @@ import asyncio
             ip_address="192.168.1.1",
             user_agent="Mozilla/5.0..."
         )
-        print(f"Consent updated: {consent.consent_id}")
+        logger.info(f"Consent updated: {consent.consent_id}")
         
         # Test retention policies
         policies = await gdpr_manager.get_retention_policies()
-        print(f"Retention policies: {len(policies)}")
+        logger.info(f"Retention policies: {len(policies)}")
     
     asyncio.run(demo())

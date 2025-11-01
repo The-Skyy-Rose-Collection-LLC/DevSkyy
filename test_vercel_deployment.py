@@ -231,43 +231,43 @@ def run_all_tests() -> Dict[str, Tuple[bool, str]]:
 
     results = {}
 
-    print("🧪 Running DevSkyy Vercel Deployment Tests...")
-    print("=" * 60)
+    logger.info("🧪 Running DevSkyy Vercel Deployment Tests...")
+    logger.info("=" * 60)
 
     for test_name, test_func in tests.items():
-        print(f"\n🔍 Testing: {test_name}")
+        logger.info(f"\n🔍 Testing: {test_name}")
         try:
             success, message = test_func()
             results[test_name] = (success, message)
-            print(f"   {message}")
+            logger.info(f"   {message}")
         except Exception as e:
             error_msg = f"❌ Test execution failed: {e}"
             results[test_name] = (False, error_msg)
-            print(f"   {error_msg}")
-            print(f"   Traceback: {traceback.format_exc()}")
+            logger.error(f"   {error_msg}")
+            logger.info(f"   Traceback: {traceback.format_exc()}")
 
     return results
 
 def print_summary(results: Dict[str, Tuple[bool, str]]):
     """Print test summary."""
-    print("\n" + "=" * 60)
-    print("📊 TEST SUMMARY")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("📊 TEST SUMMARY")
+    logger.info("=" * 60)
 
     passed = sum(1 for success, _ in results.values() if success)
     total = len(results)
 
-    print(f"Tests Passed: {passed}/{total}")
-    print(f"Success Rate: {(passed/total)*100:.1f}%")
+    logger.info(f"Tests Passed: {passed}/{total}")
+    logger.info(f"Success Rate: {(passed/total)*100:.1f}%")
 
-    print("\n📋 DETAILED RESULTS:")
+    logger.info("\n📋 DETAILED RESULTS:")
     for test_name, (success, message) in results.items():
         status = "✅ PASS" if success else "❌ FAIL"
-        print(f"  {status} - {test_name}")
+        logger.info(f"  {status} - {test_name}")
         if not success:
-            print(f"    └─ {message}")
+            logger.info(f"    └─ {message}")
 
-    print("\n🎯 DEPLOYMENT READINESS:")
+    logger.info("\n🎯 DEPLOYMENT READINESS:")
     critical_tests = [
         "Pydantic Functionality",
         "FastAPI Imports",
@@ -280,16 +280,16 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
     )
 
     if critical_passed == len(critical_tests):
-        print("✅ READY FOR DEPLOYMENT")
-        print("   All critical tests passed. Application should deploy successfully.")
+        logger.info("✅ READY FOR DEPLOYMENT")
+        logger.info("   All critical tests passed. Application should deploy successfully.")
     else:
-        print("❌ NOT READY FOR DEPLOYMENT")
-        print("   Critical tests failed. Fix issues before deploying.")
+        logger.info("❌ NOT READY FOR DEPLOYMENT")
+        logger.error("   Critical tests failed. Fix issues before deploying.")
 
         failed_critical = [
             test for test in critical_tests if not results.get(test, (False, ""))[0]
         ]
-        print(f"   Failed critical tests: {', '.join(failed_critical)}")
+        logger.error(f"   Failed critical tests: {', '.join(failed_critical)}")
 
     # Optional features summary
     optional_tests = [
@@ -302,11 +302,11 @@ def print_summary(results: Dict[str, Tuple[bool, str]]):
     optional_passed = sum()
         1 for test in optional_tests if results.get(test, (False, ""))[0]
     )
-    print(f"\n📈 Optional Features: {optional_passed}/{len(optional_tests)} available")
+    logger.info(f"\n📈 Optional Features: {optional_passed}/{len(optional_tests)} available")
 
 if __name__ == "__main__":
-    print("🚀 DevSkyy Vercel Deployment Test Suite")
-    print("Testing deployment readiness and dependency validation...")
+    logger.info("🚀 DevSkyy Vercel Deployment Test Suite")
+    logger.info("Testing deployment readiness and dependency validation...")
 
     results = run_all_tests()
     print_summary(results)
@@ -323,8 +323,8 @@ if __name__ == "__main__":
     )
 
     if critical_passed == len(critical_tests):
-        print("\n🎉 All critical tests passed! Ready for Vercel deployment.")
+        logger.info("\n🎉 All critical tests passed! Ready for Vercel deployment.")
         sys.exit(0)
     else:
-        print("\n💥 Critical tests failed! Fix issues before deployment.")
+        logger.error("\n💥 Critical tests failed! Fix issues before deployment.")
         sys.exit(1)

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """Run system health check."""
 
 import asyncio
@@ -23,8 +27,8 @@ async def main():
     Returns:
         int: `0` on success, `1` if an error occurred during the health check.
     """
-    print("Fashion AI Platform - Health Check")
-    print("=" * 50)
+    logger.info("Fashion AI Platform - Health Check")
+    logger.info("=" * 50)
 
     # Load configuration
     config = load_config()
@@ -48,20 +52,20 @@ async def main():
     try:
         health_result = await ops_agent.process_task("health_check", {})
 
-        print(f"\nStatus: {health_result['status']}")
-        print(f"\nChecks:")
+        logger.info(f"\nStatus: {health_result['status']}")
+        logger.info(f"\nChecks:")
         for check_name, check_value in health_result["checks"].items():
-            print(f"  - {check_name}: {check_value}")
+            logger.info(f"  - {check_name}: {check_value}")
 
         if health_result.get("alerts"):
-            print(f"\nAlerts:")
+            logger.info(f"\nAlerts:")
             for alert in health_result["alerts"]:
-                print(f"  ⚠ {alert}")
+                logger.info(f"  ⚠ {alert}")
 
-        print("\nHealth check complete!")
+        logger.info("\nHealth check complete!")
 
     except Exception as e:
-        print(f"\nError during health check: {e}", file=sys.stderr)
+        logger.error(f"\nError during health check: {e}", file=sys.stderr)
         return 1
 
     finally:

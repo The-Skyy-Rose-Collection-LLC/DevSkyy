@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 WordPress Credentials Setup Script for DevSkyy Platform
 Interactive script to configure WordPress credentials securely
@@ -14,11 +18,11 @@ from typing import Dict, Any
 
 def print_header():
     """Print setup header."""
-    print("🔐 DevSkyy WordPress Credentials Setup")
-    print("=" * 50)
-    print("This script will help you configure WordPress credentials")
-    print("for the Skyy Rose Collection automated theme builder.")
-    print()
+    logger.info("🔐 DevSkyy WordPress Credentials Setup")
+    logger.info("=" * 50)
+    logger.info("This script will help you configure WordPress credentials")
+    logger.info("for the Skyy Rose Collection automated theme builder.")
+    logger.info()
 
 
 def get_user_input(prompt: str, required: bool = True, sensitive: bool = False) -> str:
@@ -32,7 +36,7 @@ def get_user_input(prompt: str, required: bool = True, sensitive: bool = False) 
         if value or not required:
             return value
 
-        print("❌ This field is required. Please enter a value.")
+        logger.info("❌ This field is required. Please enter a value.")
 
 
 def test_wordpress_connection(site_url: str, username: str, password: str, app_password: str = None) -> Dict[str, Any]:
@@ -43,7 +47,7 @@ def test_wordpress_connection(site_url: str, username: str, password: str, app_p
             site_url = f"https://{site_url}"
         site_url = site_url.rstrip("/")
 
-        print(f"🔍 Testing connection to: {site_url}")
+        logger.info(f"🔍 Testing connection to: {site_url}")
 
         # Test basic site connectivity
         response = requests.get(f"{site_url}/wp-json/wp/v2", timeout=10)
@@ -82,8 +86,8 @@ def test_wordpress_connection(site_url: str, username: str, password: str, app_p
 
 def collect_wordpress_credentials() -> Dict[str, str]:
     """Collect WordPress credentials from user."""
-    print("📝 WordPress Site Configuration")
-    print("-" * 30)
+    logger.info("📝 WordPress Site Configuration")
+    logger.info("-" * 30)
 
     credentials = {}
 
@@ -93,9 +97,9 @@ def collect_wordpress_credentials() -> Dict[str, str]:
     credentials["SKYY_ROSE_PASSWORD"] = get_user_input("WordPress Admin Password", sensitive=True)
 
     # Application password (recommended)
-    print("\n💡 Application Password (Recommended)")
-    print("   Application passwords are more secure than regular passwords.")
-    print("   You can create one in WordPress Admin > Users > Your Profile")
+    logger.info("\n💡 Application Password (Recommended)")
+    logger.info("   Application passwords are more secure than regular passwords.")
+    logger.info("   You can create one in WordPress Admin > Users > Your Profile")
 
     app_password = get_user_input("Application Password (optional, but recommended)", required=False, sensitive=True)
     if app_password:
@@ -106,9 +110,9 @@ def collect_wordpress_credentials() -> Dict[str, str]:
 
 def collect_ftp_credentials() -> Dict[str, str]:
     """Collect FTP credentials from user."""
-    print("\n📁 FTP Configuration (Optional)")
-    print("-" * 30)
-    print("FTP credentials allow direct file upload to your server.")
+    logger.info("\n📁 FTP Configuration (Optional)")
+    logger.info("-" * 30)
+    logger.info("FTP credentials allow direct file upload to your server.")
 
     use_ftp = input("Configure FTP credentials? (y/N): ").lower().startswith("y")
 
@@ -129,9 +133,9 @@ def collect_ftp_credentials() -> Dict[str, str]:
 
 def collect_sftp_credentials() -> Dict[str, str]:
     """Collect SFTP credentials from user."""
-    print("\n🔒 SFTP Configuration (Optional)")
-    print("-" * 30)
-    print("SFTP provides secure file transfer with SSH.")
+    logger.info("\n🔒 SFTP Configuration (Optional)")
+    logger.info("-" * 30)
+    logger.info("SFTP provides secure file transfer with SSH.")
 
     use_sftp = input("Configure SFTP credentials? (y/N): ").lower().startswith("y")
 
@@ -198,7 +202,7 @@ def update_env_file(credentials: Dict[str, str]):
         for var in sorted(other_vars):
             f.write(f"{var}={existing_vars[var]}\n")
 
-    print(f"✅ Environment variables saved to: {env_file.absolute()}")
+    logger.info(f"✅ Environment variables saved to: {env_file.absolute()}")
 
 
 def main():
@@ -210,7 +214,7 @@ def main():
         wp_credentials = collect_wordpress_credentials()
 
         # Test connection
-        print("\n🔍 Testing WordPress Connection...")
+        logger.info("\n🔍 Testing WordPress Connection...")
         test_result = test_wordpress_connection(
             wp_credentials["SKYY_ROSE_SITE_URL"],
             wp_credentials["SKYY_ROSE_USERNAME"],
@@ -219,16 +223,16 @@ def main():
         )
 
         if test_result["success"]:
-            print("✅ WordPress connection successful!")
-            print(f"   Site URL: {test_result['site_url']}")
-            print(f"   API accessible: {test_result['api_accessible']}")
-            print(f"   Authentication test: {test_result['auth_test']}")
+            logger.info("✅ WordPress connection successful!")
+            logger.info(f"   Site URL: {test_result['site_url']}")
+            logger.info(f"   API accessible: {test_result['api_accessible']}")
+            logger.info(f"   Authentication test: {test_result['auth_test']}")
         else:
-            print(f"❌ WordPress connection failed: {test_result['error']}")
+            logger.error(f"❌ WordPress connection failed: {test_result['error']}")
 
             continue_anyway = input("Continue with setup anyway? (y/N): ").lower().startswith("y")
             if not continue_anyway:
-                print("Setup cancelled.")
+                logger.info("Setup cancelled.")
                 return 1
 
         # Collect optional credentials
@@ -239,30 +243,30 @@ def main():
         all_credentials = {**wp_credentials, **ftp_credentials, **sftp_credentials}
 
         # Update .env file
-        print("\n💾 Saving Configuration...")
+        logger.info("\n💾 Saving Configuration...")
         update_env_file(all_credentials)
 
         # Final summary
-        print("\n🎉 Setup Complete!")
-        print("-" * 20)
-        print(f"✅ WordPress site: {wp_credentials['SKYY_ROSE_SITE_URL']}")
-        print(f"✅ Username: {wp_credentials['SKYY_ROSE_USERNAME']}")
-        print(f"✅ Application password: {'Yes' if wp_credentials.get('SKYY_ROSE_APP_PASSWORD') else 'No'}")
-        print(f"✅ FTP configured: {'Yes' if ftp_credentials else 'No'}")
-        print(f"✅ SFTP configured: {'Yes' if sftp_credentials else 'No'}")
+        logger.info("\n🎉 Setup Complete!")
+        logger.info("-" * 20)
+        logger.info(f"✅ WordPress site: {wp_credentials['SKYY_ROSE_SITE_URL']}")
+        logger.info(f"✅ Username: {wp_credentials['SKYY_ROSE_USERNAME']}")
+        logger.info(f"✅ Application password: {'Yes' if wp_credentials.get('SKYY_ROSE_APP_PASSWORD') else 'No'}")
+        logger.info(f"✅ FTP configured: {'Yes' if ftp_credentials else 'No'}")
+        logger.info(f"✅ SFTP configured: {'Yes' if sftp_credentials else 'No'}")
 
-        print("\n📋 Next Steps:")
-        print("1. Restart your DevSkyy application to load new credentials")
-        print("2. Test the theme builder with: POST /api/v1/themes/skyy-rose/build")
-        print("3. Check credential status with: GET /api/v1/themes/credentials/status")
+        logger.info("\n📋 Next Steps:")
+        logger.info("1. Restart your DevSkyy application to load new credentials")
+        logger.info("2. Test the theme builder with: POST /api/v1/themes/skyy-rose/build")
+        logger.info("3. Check credential status with: GET /api/v1/themes/credentials/status")
 
         return 0
 
     except KeyboardInterrupt:
-        print("\n\n❌ Setup cancelled by user.")
+        logger.info("\n\n❌ Setup cancelled by user.")
         return 1
     except Exception as e:
-        print(f"\n❌ Setup failed: {e}")
+        logger.error(f"\n❌ Setup failed: {e}")
         return 1
 
 

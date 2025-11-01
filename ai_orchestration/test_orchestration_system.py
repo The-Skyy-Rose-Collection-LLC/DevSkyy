@@ -429,38 +429,38 @@ class OrchestrationSystemTest:
         end_time = datetime.now()
         duration = end_time - self.start_time
 
-        print("\n" + "=" * 60)
-        print("🧪 AI Orchestration System Test Summary")
-        print("=" * 60)
+        logger.info("\n" + "=" * 60)
+        logger.info("🧪 AI Orchestration System Test Summary")
+        logger.info("=" * 60)
 
         passed = sum(1 for result in self.test_results.values() if result)
         total = len(self.test_results)
 
-        print(f"Tests Passed: {passed}/{total}")
-        print(f"Success Rate: {(passed/total)*100:.1f}%")
-        print(f"Test Duration: {duration.total_seconds():.2f} seconds")
+        logger.info(f"Tests Passed: {passed}/{total}")
+        logger.info(f"Success Rate: {(passed/total)*100:.1f}%")
+        logger.info(f"Test Duration: {duration.total_seconds():.2f} seconds")
 
-        print("\n📋 Detailed Results:")
+        logger.info("\n📋 Detailed Results:")
         for test_name, result in self.test_results.items():
             status = "✅ PASS" if result else "❌ FAIL"
-            print(f"  {status} - {test_name}")
+            logger.info(f"  {status} - {test_name}")
 
-        print("\n🎯 System Status:")
+        logger.info("\n🎯 System Status:")
         if passed == total:
-            print("✅ AI ORCHESTRATION SYSTEM FULLY OPERATIONAL")
-            print("   All tests passed. System ready for production deployment.")
+            logger.info("✅ AI ORCHESTRATION SYSTEM FULLY OPERATIONAL")
+            logger.info("   All tests passed. System ready for production deployment.")
         else:
-            print("❌ AI ORCHESTRATION SYSTEM ISSUES DETECTED")
-            print("   Some tests failed. Review errors before deployment.")
+            logger.info("❌ AI ORCHESTRATION SYSTEM ISSUES DETECTED")
+            logger.error("   Some tests failed. Review errors before deployment.")
 
             failed_tests = [name for name, result in self.test_results.items() if not result]
-            print(f"   Failed tests: {', '.join(failed_tests)}")
+            logger.error(f"   Failed tests: {', '.join(failed_tests)}")
 
 
 async def main():
     """Main test execution"""
-    print("🚀 DevSkyy AI Orchestration System Test Suite")
-    print("Testing all partnership implementations and integrations...")
+    logger.info("🚀 DevSkyy AI Orchestration System Test Suite")
+    logger.info("Testing all partnership implementations and integrations...")
 
     test_suite = OrchestrationSystemTest()
     results = await test_suite.run_all_tests()
@@ -471,10 +471,10 @@ async def main():
     total = len(results)
 
     if passed == total:
-        print("\n🎉 All orchestration tests passed! System is production-ready.")
+        logger.info("\n🎉 All orchestration tests passed! System is production-ready.")
         sys.exit(0)
     else:
-        print("\n💥 Some orchestration tests failed! Review errors before proceeding.")
+        logger.error("\n💥 Some orchestration tests failed! Review errors before proceeding.")
         sys.exit(1)
 
 

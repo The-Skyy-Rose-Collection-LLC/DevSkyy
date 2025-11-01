@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 Test script for production-grade bulk quality processing
 Tests the enhanced quality update functionality with comprehensive error handling
@@ -20,7 +24,7 @@ TEST_DIR = Path("test_quality_images")
 
 def create_test_images():
     """Create test images for quality processing."""
-    print("🖼️ Creating test images...")
+    logger.info("🖼️ Creating test images...")
 
     TEST_DIR.mkdir(exist_ok=True)
 
@@ -51,13 +55,13 @@ def create_test_images():
     img4.save(img4_path, "JPEG", quality=70)
     test_images.append(str(img4_path))
 
-    print(f"✅ Created {len(test_images)} test images")
+    logger.info(f"✅ Created {len(test_images)} test images")
     return test_images
 
 
 def test_quality_settings_validation():
     """Test quality settings validation."""
-    print("\n🔍 Testing quality settings validation...")
+    logger.info("\n🔍 Testing quality settings validation...")
 
     # Test valid settings
     valid_settings = {
@@ -72,9 +76,9 @@ def test_quality_settings_validation():
     response = requests.post(f"{API_BASE}/bulk/preview", json={"operation_type": "quality_update", **valid_settings})
 
     if response.status_code == 200:
-        print("✅ Valid settings accepted")
+        logger.info("✅ Valid settings accepted")
     else:
-        print(f"❌ Valid settings rejected: {response.status_code}")
+        logger.info(f"❌ Valid settings rejected: {response.status_code}")
         return False
 
     # Test invalid dimensions
@@ -90,9 +94,9 @@ def test_quality_settings_validation():
     response = requests.post(f"{API_BASE}/bulk/quality-update", json=invalid_settings)
 
     if response.status_code != 200:
-        print("✅ Invalid dimensions properly rejected")
+        logger.info("✅ Invalid dimensions properly rejected")
     else:
-        print("❌ Invalid dimensions should have been rejected")
+        logger.info("❌ Invalid dimensions should have been rejected")
         return False
 
     return True
@@ -100,7 +104,7 @@ def test_quality_settings_validation():
 
 def test_bulk_quality_processing(test_images):
     """Test the bulk quality processing functionality."""
-    print(f"\n⚡ Testing bulk quality processing with {len(test_images)} images...")
+    logger.info(f"\n⚡ Testing bulk quality processing with {len(test_images)} images...")
 
     # Test settings
     quality_settings = {
@@ -116,17 +120,17 @@ def test_bulk_quality_processing(test_images):
     response = requests.post(f"{API_BASE}/bulk/quality-update", json=quality_settings)
 
     if response.status_code != 200:
-        print(f"❌ Bulk quality update failed: {response.status_code}")
-        print(f"Response: {response.text}")
+        logger.error(f"❌ Bulk quality update failed: {response.status_code}")
+        logger.info(f"Response: {response.text}")
         return False
 
     result = response.json()
     if not result.get("success"):
-        print(f"❌ Bulk quality update not successful: {result}")
+        logger.info(f"❌ Bulk quality update not successful: {result}")
         return False
 
     operation_id = result.get("operation_id")
-    print(f"✅ Bulk quality update started: {operation_id}")
+    logger.info(f"✅ Bulk quality update started: {operation_id}")
 
     # Monitor operation progress
     max_wait_time = 120  # 2 minutes
@@ -140,14 +144,14 @@ def test_bulk_quality_processing(test_images):
         status_response = requests.get(f"{API_BASE}/bulk/operations/{operation_id}")
 
         if status_response.status_code != 200:
-            print(f"❌ Failed to get operation status: {status_response.status_code}")
+            logger.error(f"❌ Failed to get operation status: {status_response.status_code}")
             return False
 
         status_result = status_response.json()
         operation = status_result.get("operation", {})
         status = operation.get("status", "unknown")
 
-        print(f"⏳ Operation status: {status} (waited {wait_time}s)")
+        logger.info(f"⏳ Operation status: {status} (waited {wait_time}s)")
 
         if status == "completed":
             results = operation.get("results", {})
@@ -155,30 +159,30 @@ def test_bulk_quality_processing(test_images):
             failed = results.get("failed_updates", 0)
             skipped = results.get("skipped_updates", 0)
 
-            print(f"✅ Operation completed!")
-            print(f"   Successful: {successful}")
-            print(f"   Failed: {failed}")
-            print(f"   Skipped: {skipped}")
+            logger.info(f"✅ Operation completed!")
+            logger.info(f"   Successful: {successful}")
+            logger.error(f"   Failed: {failed}")
+            logger.info(f"   Skipped: {skipped}")
 
             if successful > 0:
-                print("✅ Quality processing test PASSED")
+                logger.info("✅ Quality processing test PASSED")
                 return True
             else:
-                print("❌ No images were successfully processed")
+                logger.info("❌ No images were successfully processed")
                 return False
 
         elif status == "failed":
             error = operation.get("error", "Unknown error")
-            print(f"❌ Operation failed: {error}")
+            logger.error(f"❌ Operation failed: {error}")
             return False
 
-    print(f"❌ Operation timed out after {max_wait_time} seconds")
+    logger.info(f"❌ Operation timed out after {max_wait_time} seconds")
     return False
 
 
 def test_error_handling():
     """Test error handling with invalid inputs."""
-    print("\n🛡️ Testing error handling...")
+    logger.error("\n🛡️ Testing error handling...")
 
     # Test with non-existent files
     invalid_settings = {
@@ -207,16 +211,16 @@ def test_error_handling():
 
             skipped = results.get("skipped_updates", 0)
             if skipped > 0:
-                print("✅ Non-existent files properly skipped")
+                logger.info("✅ Non-existent files properly skipped")
                 return True
 
-    print("❌ Error handling test failed")
+    logger.error("❌ Error handling test failed")
     return False
 
 
 def verify_processed_images(test_images):
     """Verify that images were actually processed."""
-    print("\n🔍 Verifying processed images...")
+    logger.info("\n🔍 Verifying processed images...")
 
     processed_count = 0
 
@@ -230,48 +234,48 @@ def verify_processed_images(test_images):
             with Image.open(path_obj) as img:
                 if img.size == (1024, 1024):
                     processed_count += 1
-                    print(f"✅ {path_obj.name}: Correctly resized to {img.size}")
+                    logger.info(f"✅ {path_obj.name}: Correctly resized to {img.size}")
                 else:
-                    print(f"⚠️ {path_obj.name}: Size is {img.size}, expected (1024, 1024)")
+                    logger.info(f"⚠️ {path_obj.name}: Size is {img.size}, expected (1024, 1024)")
         except Exception as e:
-            print(f"❌ {path_obj.name}: Error opening image: {e}")
+            logger.error(f"❌ {path_obj.name}: Error opening image: {e}")
 
     if processed_count > 0:
-        print(f"✅ {processed_count}/{len(test_images)} images were properly processed")
+        logger.info(f"✅ {processed_count}/{len(test_images)} images were properly processed")
         return True
     else:
-        print("❌ No images were properly processed")
+        logger.info("❌ No images were properly processed")
         return False
 
 
 def cleanup_test_files():
     """Clean up test files."""
-    print("\n🧹 Cleaning up test files...")
+    logger.info("\n🧹 Cleaning up test files...")
 
     try:
         if TEST_DIR.exists():
             shutil.rmtree(TEST_DIR)
-        print("✅ Test files cleaned up")
+        logger.info("✅ Test files cleaned up")
     except Exception as e:
-        print(f"⚠️ Failed to clean up test files: {e}")
+        logger.error(f"⚠️ Failed to clean up test files: {e}")
 
 
 def main():
     """Run all quality processing tests."""
-    print("🌹 Skyy Rose Collection - Quality Processing Test Suite")
-    print("=" * 60)
+    logger.info("🌹 Skyy Rose Collection - Quality Processing Test Suite")
+    logger.info("=" * 60)
 
     # Check if server is running
     try:
         response = requests.get(f"{API_BASE}/bulk/operations")
         if response.status_code != 200:
-            print("❌ Server is not running or not responding")
+            logger.info("❌ Server is not running or not responding")
             sys.exit(1)
     except Exception as e:
-        print(f"❌ Cannot connect to server: {e}")
+        logger.info(f"❌ Cannot connect to server: {e}")
         sys.exit(1)
 
-    print("✅ Server is running")
+    logger.info("✅ Server is running")
 
     # Run tests
     tests_passed = 0
@@ -302,14 +306,14 @@ def main():
         cleanup_test_files()
 
     # Results
-    print("\n" + "=" * 60)
-    print(f"🎯 Test Results: {tests_passed}/{total_tests} tests passed")
+    logger.info("\n" + "=" * 60)
+    logger.info(f"🎯 Test Results: {tests_passed}/{total_tests} tests passed")
 
     if tests_passed == total_tests:
-        print("🎉 ALL TESTS PASSED! Quality processing is working correctly.")
+        logger.info("🎉 ALL TESTS PASSED! Quality processing is working correctly.")
         sys.exit(0)
     else:
-        print("❌ Some tests failed. Please check the implementation.")
+        logger.error("❌ Some tests failed. Please check the implementation.")
         sys.exit(1)
 
 

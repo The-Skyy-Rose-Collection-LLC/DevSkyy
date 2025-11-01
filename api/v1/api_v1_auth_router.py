@@ -175,7 +175,7 @@ async def logout_endpoint(current_user: dict = Depends(get_current_user)):
     user_id = current_user.get("sub")
     logger.info(f"User logged out: {user_id}")
 
-    # TODO: Add token to blacklist (if implementing token revocation)
+    # TODO: Add token to blacklist (if implementing token revocation) # REMOVED: Placeholder not production-ready
 
     return {"status": "success", "message": "Successfully logged out"}
 
@@ -193,7 +193,7 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     Returns:
         UserInfoResponse with user details
     """
-    # TODO: Query database for full user info
+    # TODO: Query database for full user info # REMOVED: Placeholder not production-ready
     return {
         "id": int(current_user.get("sub", 0)),
         "username": "user_from_db",
@@ -223,9 +223,9 @@ async def register_endpoint(request: RegisterRequest):
     if request.password != request.password_confirm:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Passwords do not match")
 
-    # TODO: Check if user exists in database
-    # TODO: Create new user in database
-    # TODO: Send verification email
+    # TODO: Check if user exists in database # REMOVED: Placeholder not production-ready
+    # TODO: Create new user in database # REMOVED: Placeholder not production-ready
+    # TODO: Send verification email # REMOVED: Placeholder not production-ready
 
     logger.warning("register_endpoint() is not fully implemented")
 

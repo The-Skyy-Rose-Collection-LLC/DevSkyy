@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import logging
+
+logger = logging.getLogger(__name__)
+
 """
 Complete Integration Example
 Demonstrates how to integrate existing DevSkyy agents with Bounded Autonomy System
@@ -51,39 +55,39 @@ class SimpleFashionAgent(BaseAgent):
 
 async def main():
     """Main integration example"""
-    print("=" * 70)
-    print("FASHION AI BOUNDED AUTONOMY - INTEGRATION EXAMPLE")
-    print("=" * 70)
-    print()
+    logger.info("=" * 70)
+    logger.info("FASHION AI BOUNDED AUTONOMY - INTEGRATION EXAMPLE")
+    logger.info("=" * 70)
+    logger.info()
 
     # ========================================
     # 1. Create Bounded Orchestrator
     # ========================================
-    print("1️⃣  Creating Bounded Orchestrator...")
+    logger.info("1️⃣  Creating Bounded Orchestrator...")
     orchestrator = BoundedOrchestrator(local_only=True, auto_approve_low_risk=True)
-    print("   ✅ Orchestrator created\n")
+    logger.info("   ✅ Orchestrator created\n")
 
     # ========================================
     # 2. Initialize Supporting Systems
     # ========================================
-    print("2️⃣  Initializing supporting systems...")
+    logger.info("2️⃣  Initializing supporting systems...")
     approval_system = ApprovalSystem()
     data_pipeline = DataPipeline()
     performance_tracker = PerformanceTracker()
     report_generator = ReportGenerator()
-    print("   ✅ Systems initialized\n")
+    logger.info("   ✅ Systems initialized\n")
 
     # ========================================
     # 3. Register Agents with Bounded Controls
     # ========================================
-    print("3️⃣  Registering agents with bounded controls...")
+    logger.info("3️⃣  Registering agents with bounded controls...")
 
     # Create and register designer agent
     designer_agent = SimpleFashionAgent("designer_agent", version="1.0.0")
     await orchestrator.register_agent(
         agent=designer_agent, capabilities=["trend_analysis", "design_generation"], priority=ExecutionPriority.MEDIUM
     )
-    print("   ✅ Designer agent registered")
+    logger.info("   ✅ Designer agent registered")
 
     # Create and register commerce agent
     commerce_agent = SimpleFashionAgent("commerce_agent", version="1.0.0")
@@ -92,12 +96,12 @@ async def main():
         capabilities=["product_management", "inventory_optimization"],
         priority=ExecutionPriority.HIGH,
     )
-    print("   ✅ Commerce agent registered\n")
+    logger.info("   ✅ Commerce agent registered\n")
 
     # ========================================
     # 4. Execute Low-Risk Task (Auto-Approved)
     # ========================================
-    print("4️⃣  Executing low-risk task (auto-approved)...")
+    logger.info("4️⃣  Executing low-risk task (auto-approved)...")
     result = await orchestrator.execute_task(
         task_type="analyze_trend",
         parameters={"task": "analyze_trend", "category": "sustainable"},
@@ -106,15 +110,15 @@ async def main():
     )
 
     if result.get("status") == "completed":
-        print("   ✅ Task completed automatically")
-        print(f"   Result: {result.get('results', {})}\n")
+        logger.info("   ✅ Task completed automatically")
+        logger.info(f"   Result: {result.get('results', {})}\n")
     else:
-        print(f"   ⚠️  Unexpected status: {result.get('status')}\n")
+        logger.info(f"   ⚠️  Unexpected status: {result.get('status')}\n")
 
     # ========================================
     # 5. Execute High-Risk Task (Requires Approval)
     # ========================================
-    print("5️⃣  Executing high-risk task (requires approval)...")
+    logger.info("5️⃣  Executing high-risk task (requires approval)...")
     result = await orchestrator.execute_task(
         task_type="generate_design",
         parameters={"task": "generate_design", "style": "luxury", "season": "fall"},
@@ -125,65 +129,67 @@ async def main():
 
     if result.get("status") == "pending_approval":
         action_id = result.get("action_id")
-        print(f"   ⏳ Task pending approval: {action_id}")
-        print(f"   Review command: {result.get('review_command')}\n")
+        logger.info(f"   ⏳ Task pending approval: {action_id}")
+        logger.info(f"   Review command: {result.get('review_command')}\n")
 
         # Simulate operator approval
-        print("6️⃣  Simulating operator approval...")
+        logger.info("6️⃣  Simulating operator approval...")
         approval_result = await approval_system.approve(
             action_id=action_id, operator="demo_operator", notes="Approved for demonstration"
         )
-        print(f"   ✅ Approved: {approval_result}\n")
+        logger.info(f"   ✅ Approved: {approval_result}\n")
 
         # Execute the approved task
-        print("7️⃣  Executing approved task...")
+        logger.info("7️⃣  Executing approved task...")
         execution_result = await orchestrator.execute_approved_task(task_id=action_id, approved_by="demo_operator")
-        print(f"   ✅ Execution result: {execution_result.get('status')}\n")
+        logger.info(f"   ✅ Execution result: {execution_result.get('status')}\n")
     else:
-        print(f"   ⚠️  Unexpected status: {result.get('status')}\n")
+        logger.info(f"   ⚠️  Unexpected status: {result.get('status')}\n")
 
     # ========================================
     # 8. Data Pipeline Example
     # ========================================
-    print("8️⃣  Data Pipeline Example...")
-    print("   (Would process approved data files)")
-    print("   Supported: CSV, JSON, Parquet, Images")
-    print("   All data validated against schemas\n")
+    logger.info("8️⃣  Data Pipeline Example...")
+    logger.info("   (Would process approved data files)")
+    logger.info("   Supported: CSV, JSON, Parquet, Images")
+    logger.info("   All data validated against schemas\n")
 
     # ========================================
     # 9. Performance Tracking
     # ========================================
-    print("9️⃣  Performance Tracking...")
+    logger.info("9️⃣  Performance Tracking...")
 
     # Log some metrics
     performance_tracker.log_metric("designer_agent", "execution_time", 1.2)
     performance_tracker.log_metric("designer_agent", "success_rate", 1.0)
     performance_tracker.log_metric("commerce_agent", "execution_time", 0.8)
 
-    print("   ✅ Metrics logged\n")
+    logger.info("   ✅ Metrics logged\n")
 
     # Generate weekly report
     weekly_report = await performance_tracker.compute_weekly_report()
-    print(f"   📊 Weekly report generated")
-    print(f"   Agent performance data points: {len(weekly_report.get('agent_performance', {}))}\n")
+    logger.info(f"   📊 Weekly report generated")
+    logger.info(f"   Agent performance data points: {len(weekly_report.get('agent_performance', {}))}\n")
 
     # ========================================
     # 10. System Status
     # ========================================
-    print("🔟 System Status...")
+    logger.info("🔟 System Status...")
     status = await orchestrator.get_bounded_status()
 
-    print(f"   System Status: {status.get('system_status')}")
-    print(f"   Registered Agents: {status.get('registered_agents')}")
-    print(f"   Pending Approvals: {status.get('bounded_autonomy', {}).get('pending_approvals', 0)}")
-    print(f"   Emergency Stop: {status.get('bounded_autonomy', {}).get('system_controls', {}).get('emergency_stop')}")
-    print(f"   Local Only: {status.get('bounded_autonomy', {}).get('system_controls', {}).get('local_only')}")
-    print()
+    logger.info(f"   System Status: {status.get('system_status')}")
+    logger.info(f"   Registered Agents: {status.get('registered_agents')}")
+    logger.info(f"   Pending Approvals: {status.get('bounded_autonomy', {}).get('pending_approvals', 0)}")
+    logger.info(
+        f"   Emergency Stop: {status.get('bounded_autonomy', {}).get('system_controls', {}).get('emergency_stop')}"
+    )
+    logger.info(f"   Local Only: {status.get('bounded_autonomy', {}).get('system_controls', {}).get('local_only')}")
+    logger.info()
 
     # ========================================
     # 11. Generate Reports
     # ========================================
-    print("1️⃣1️⃣  Generating Reports...")
+    logger.info("1️⃣1️⃣  Generating Reports...")
 
     # Daily summary
     approval_stats = {
@@ -195,21 +201,21 @@ async def main():
     daily_report = await report_generator.generate_daily_summary(
         orchestrator_status=status, performance_data=weekly_report, approval_stats=approval_stats
     )
-    print(f"   ✅ Daily summary: {daily_report}\n")
+    logger.info(f"   ✅ Daily summary: {daily_report}\n")
 
     # ========================================
     # Final Summary
     # ========================================
-    print("=" * 70)
-    print("✅ INTEGRATION EXAMPLE COMPLETE")
-    print("=" * 70)
-    print()
-    print("Next Steps:")
-    print("1. Review approval queue: python -m fashion_ai_bounded_autonomy.approval_cli list")
-    print("2. Check logs: ls -la logs/")
-    print("3. Review reports: ls -la fashion_ai_bounded_autonomy/output/summaries/")
-    print("4. Integrate your own agents following this pattern")
-    print()
+    logger.info("=" * 70)
+    logger.info("✅ INTEGRATION EXAMPLE COMPLETE")
+    logger.info("=" * 70)
+    logger.info()
+    logger.info("Next Steps:")
+    logger.info("1. Review approval queue: python -m fashion_ai_bounded_autonomy.approval_cli list")
+    logger.info("2. Check logs: ls -la logs/")
+    logger.info("3. Review reports: ls -la fashion_ai_bounded_autonomy/output/summaries/")
+    logger.info("4. Integrate your own agents following this pattern")
+    logger.info()
 
 
 if __name__ == "__main__":
