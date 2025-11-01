@@ -1,0 +1,161 @@
+# LAYER 3 — DATA PIPELINE CONFIGURATION
+# Defines all data routes, validation, and processing flows
+
+data_pipeline:
+  version: "1.0.0"
+  mode: "local_only"
+
+  # Approved data sources
+  approved_sources:
+    - type: "csv"
+      path_pattern: "uploads/*.csv"
+      max_size_mb: 100
+      schema_validation: required
+
+    - type: "json"
+      path_pattern: "uploads/*.json"
+      max_size_mb: 50
+      schema_validation: required
+
+    - type: "image"
+      path_pattern: "uploads/images/*.{jpg,png,webp}"
+      max_size_mb: 10
+      allowed_formats: ["jpg", "png", "webp"]
+      max_dimensions: [4096, 4096]
+
+    - type: "parquet"
+      path_pattern: "uploads/*.parquet"
+      max_size_mb: 500
+      schema_validation: required
+
+  # Data flow stages
+  stages:
+    ingestion:
+      enabled: true
+      validate_source: true
+      quarantine_invalid: true
+      log_all_ingests: true
+
+    preprocessing:
+      enabled: true
+      functions:
+        - schema_validation
+        - data_cleaning
+        - normalization
+        - feature_extraction
+      output_path: "validated/"
+
+    inference:
+      enabled: true
+      local_models_only: true
+      max_batch_size: 100
+      timeout_seconds: 300
+
+    storage:
+      enabled: true
+      encrypt_at_rest: true
+      retention_days: 90
+      backup_enabled: true
+
+  # Schema definitions
+  schemas:
+    product_data:
+      required_fields:
+        - product_id: string
+        - name: string
+        - category: string
+        - price: float
+      optional_fields:
+        - description: string
+        - tags: array
+        - images: array
+        - metadata: object
+
+    customer_data:
+      required_fields:
+        - customer_id: string
+        - created_at: datetime
+      optional_fields:
+        - name: string
+        - email: string
+        - preferences: object
+
+    sales_data:
+      required_fields:
+        - order_id: string
+        - product_id: string
+        - quantity: integer
+        - total: float
+        - timestamp: datetime
+      optional_fields:
+        - customer_id: string
+        - discount: float
+        - metadata: object
+
+  # Validation rules
+  validation:
+    strict_mode: true
+    reject_on_validation_error: true
+    max_error_rate: 0.01  # 1%
+    log_validation_errors: true
+
+  # Data quality checks
+  quality_checks:
+    - name: "completeness"
+      threshold: 0.95  # 95% of required fields must be present
+    - name: "uniqueness"
+      fields: ["product_id", "customer_id", "order_id"]
+    - name: "consistency"
+      rules:
+        - "price > 0"
+        - "quantity > 0"
+        - "total >= 0"
+    - name: "freshness"
+      max_age_days: 90
+
+  # Model inference configuration
+  inference_config:
+    models:
+      trend_forecasting:
+        path: "ml/models/trend_forecasting_model.pkl"
+        type: "sklearn"
+        input_features: ["season", "category", "price_range"]
+        output: "trend_score"
+
+      demand_prediction:
+        path: "ml/models/demand_prediction_model.pkl"
+        type: "sklearn"
+        input_features: ["product_id", "historical_sales", "season"]
+        output: "predicted_demand"
+
+      price_optimization:
+        path: "ml/models/pricing_model.pkl"
+        type: "sklearn"
+        input_features: ["cost", "demand", "competition", "margin_target"]
+        output: "optimized_price"
+
+    batch_processing:
+      enabled: true
+      batch_size: 100
+      parallel_workers: 4
+
+  # Output configuration
+  output:
+    format: "json"
+    include_metadata: true
+    include_confidence_scores: true
+    encryption: "AES-256-GCM"
+
+  # Error handling
+  error_handling:
+    on_validation_error: "quarantine"  # or "reject", "log"
+    on_processing_error: "retry"  # or "skip", "halt"
+    max_retries: 3
+    retry_delay_seconds: 5
+
+  # Audit logging
+  audit:
+    log_all_operations: true
+    log_path: "logs/data_pipeline/"
+    include_data_samples: false  # Don't log PII
+    retention_days: 365

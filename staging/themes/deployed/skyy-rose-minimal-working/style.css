@@ -1,0 +1,84 @@
+/*
+Theme Name: Skyy Rose Minimal Working
+Description: Emergency minimal theme to restore site functionality
+Version: 1.0.0
+Author: DevSkyy Platform
+*/
+
+/* Minimal luxury styling */
+:root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #d4af37;
+    --accent-color: #8b7355;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600&family=Source+Sans+Pro:wght@300;400;500&display=swap');
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: var(--primary-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-color);
+}
+
+.site-header {
+    background: white;
+    padding: 2rem 0;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.site-title {
+    font-size: 2.5rem;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.site-title a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.site-title a:hover {
+    color: var(--secondary-color);
+}
+
+.site-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.luxury-post {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.entry-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.entry-title a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.entry-title a:hover {
+    color: var(--secondary-color);
+}
+
+.site-footer {
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    margin-top: 3rem;
+}

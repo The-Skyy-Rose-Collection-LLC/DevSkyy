@@ -1,0 +1,631 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devskyy-api-integration
+  labels:
+    name: devskyy-api-integration
+    environment: production
+    fashion-platform: "true"
+
+---
+# ============================================================================
+# CONFIG MAPS & SECRETS
+# ============================================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-integration-config
+  namespace: devskyy-api-integration
+data:
+  REDIS_URL: "redis://redis-service:6379"
+  ELASTICSEARCH_URL: "http://elasticsearch-service:9200"
+  FASHION_INTELLIGENCE_ENABLED: "true"
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+  FASHION_WORKFLOWS_ENABLED: "true"
+  SUSTAINABILITY_TRACKING: "true"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-keys
+  namespace: devskyy-api-integration
+type: Opaque
+data:
+  # Base64 encoded API keys (replace with actual values)
+  PINTEREST_API_KEY: cGludGVyZXN0X2FwaV9rZXlfaGVyZQ==
+  INSTAGRAM_API_KEY: aW5zdGFncmFtX2FwaV9rZXlfaGVyZQ==
+  SHOPIFY_API_KEY: c2hvcGlmeV9hcGlfa2V5X2hlcmU=
+  OPENAI_API_KEY: b3BlbmFpX2FwaV9rZXlfaGVyZQ==
+
+---
+# ============================================================================
+# API GATEWAY DEPLOYMENT
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: devskyy-api-integration
+  labels:
+    app: api-gateway
+    component: core
+    fashion-platform: "true"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        component: core
+        fashion-platform: "true"
+    spec:
+      containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
+      - name: api-gateway
+        image: devskyy/api-gateway:v1.0.0
+        ports:
+        - containerPort: 8000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: api-integration-config
+        - secretRef:
+            name: api-keys
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service
+  namespace: devskyy-api-integration
+  labels:
+    app: api-gateway
+spec:
+  selector:
+    app: api-gateway
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  type: ClusterIP
+
+---
+# ============================================================================
+# WORKFLOW ENGINE DEPLOYMENT
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workflow-engine
+  namespace: devskyy-api-integration
+  labels:
+    app: workflow-engine
+    component: automation
+    fashion-platform: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: workflow-engine
+  template:
+    metadata:
+      labels:
+        app: workflow-engine
+        component: automation
+        fashion-platform: "true"
+    spec:
+      containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
+      - name: workflow-engine
+        image: devskyy/workflow-engine:v1.0.0
+        ports:
+        - containerPort: 8001
+          name: http
+        envFrom:
+        - configMapRef:
+            name: api-integration-config
+        - secretRef:
+            name: api-keys
+        env:
+        - name: API_GATEWAY_URL
+          value: "http://api-gateway-service:8000"
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "750m"
+          limits:
+            memory: "1.5Gi"
+            cpu: "1500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workflow-engine-service
+  namespace: devskyy-api-integration
+spec:
+  selector:
+    app: workflow-engine
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: http
+
+---
+# ============================================================================
+# FASHION API INTEGRATOR DEPLOYMENT
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fashion-api-integrator
+  namespace: devskyy-api-integration
+  labels:
+    app: fashion-api-integrator
+    component: fashion
+    fashion-platform: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fashion-api-integrator
+  template:
+    metadata:
+      labels:
+        app: fashion-api-integrator
+        component: fashion
+        fashion-platform: "true"
+    spec:
+      containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
+      - name: fashion-api-integrator
+        image: devskyy/fashion-api-integrator:v1.0.0
+        ports:
+        - containerPort: 8002
+          name: http
+        envFrom:
+        - configMapRef:
+            name: api-integration-config
+        - secretRef:
+            name: api-keys
+        env:
+        - name: FASHION_INTELLIGENCE_URL
+          value: "http://fashion-intelligence-service:8003"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fashion-api-integrator-service
+  namespace: devskyy-api-integration
+spec:
+  selector:
+    app: fashion-api-integrator
+  ports:
+  - port: 8002
+    targetPort: 8002
+    name: http
+
+---
+# ============================================================================
+# FASHION INTELLIGENCE DEPLOYMENT
+# ============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fashion-intelligence
+  namespace: devskyy-api-integration
+  labels:
+    app: fashion-intelligence
+    component: ai
+    fashion-platform: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fashion-intelligence
+  template:
+    metadata:
+      labels:
+        app: fashion-intelligence
+        component: ai
+        fashion-platform: "true"
+    spec:
+      containers:
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
+      - name: fashion-intelligence
+        image: devskyy/fashion-intelligence:v1.0.0
+        ports:
+        - containerPort: 8003
+          name: http
+        envFrom:
+        - configMapRef:
+            name: api-integration-config
+        - secretRef:
+            name: api-keys
+        env:
+        - name: FASHION_DATA_PATH
+          value: "/app/fashion_data"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: fashion-data
+          mountPath: /app/fashion_data
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8003
+          initialDelaySeconds: 45
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8003
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: fashion-data
+        persistentVolumeClaim:
+          claimName: fashion-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fashion-intelligence-service
+  namespace: devskyy-api-integration
+spec:
+  selector:
+    app: fashion-intelligence
+  ports:
+  - port: 8003
+    targetPort: 8003
+    name: http
+
+---
+# ============================================================================
+# PERSISTENT VOLUME CLAIMS
+# ============================================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fashion-data-pvc
+  namespace: devskyy-api-integration
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+
+---
+# ============================================================================
+# HORIZONTAL POD AUTOSCALER
+# ============================================================================
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-gateway-hpa
+  namespace: devskyy-api-integration
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-gateway
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: workflow-engine-hpa
+  namespace: devskyy-api-integration
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: workflow-engine
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+
+---
+# ============================================================================
+# NETWORK POLICIES
+# ============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-integration-network-policy
+  namespace: devskyy-api-integration
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: devskyy-frontend
+    - namespaceSelector:
+        matchLabels:
+          name: devskyy-monitoring
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+    - protocol: TCP
+      port: 8002
+    - protocol: TCP
+      port: 8003
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+
+---
+# ============================================================================
+# INGRESS CONFIGURATION
+# ============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-integration-ingress
+  namespace: devskyy-api-integration
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - api.devskyy.com
+    secretName: api-integration-tls
+  rules:
+  - host: api.devskyy.com
+    http:
+      paths:
+      - path: /api/v1/gateway
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service
+            port:
+              number: 8000
+      - path: /api/v1/workflows
+        pathType: Prefix
+        backend:
+          service:
+            name: workflow-engine-service
+            port:
+              number: 8001
+      - path: /api/v1/fashion
+        pathType: Prefix
+        backend:
+          service:
+            name: fashion-api-integrator-service
+            port:
+              number: 8002
+      - path: /api/v1/intelligence
+        pathType: Prefix
+        backend:
+          service:
+            name: fashion-intelligence-service
+            port:
+              number: 8003
+
+---
+# ============================================================================
+# SERVICE MONITOR FOR PROMETHEUS
+# ============================================================================
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-integration-metrics
+  namespace: devskyy-api-integration
+  labels:
+    app: api-integration
+    fashion-platform: "true"
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+
+---
+# ============================================================================
+# POD DISRUPTION BUDGET
+# ============================================================================
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-gateway-pdb
+  namespace: devskyy-api-integration
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: workflow-engine-pdb
+  namespace: devskyy-api-integration
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: workflow-engine

@@ -1,0 +1,117 @@
+# DevSkyy Auth0 Tenant Configuration
+# Enterprise-grade authentication setup for unicorn-ready platform
+
+tenant:
+  # Tenant Settings
+  friendly_name: "DevSkyy Enterprise Platform"
+  picture_url: "https://devskyy.com/logo.png"
+  support_email: "support@devskyy.com"
+  support_url: "https://devskyy.com/support"
+  
+  # Security Settings
+  default_audience: "https://api.devskyy.com"
+  default_directory: "Username-Password-Authentication"
+  
+  # Session Settings
+  session_lifetime: 168  # 7 days in hours
+  idle_session_lifetime: 72  # 3 days in hours
+  session_cookie_timeout: 168
+  
+  # Password Policy
+  password_policy: "good"
+  password_complexity_options:
+    min_length: 8
+  password_no_personal_info:
+    enable: true
+  password_dictionary:
+    enable: true
+    dictionary: []
+  password_history:
+    enable: true
+    size: 5
+  
+  # Brute Force Protection
+  brute_force_protection: true
+  
+  # Multi-Factor Authentication
+  guardian_mfa_page:
+    enabled: true
+    html: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>DevSkyy - Multi-Factor Authentication</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="https://cdn.auth0.com/guardian/latest/guardian-multifactor.min.css">
+      </head>
+      <body>
+        <div id="guardian-multifactor"></div>
+        <script src="https://cdn.auth0.com/guardian/latest/guardian-multifactor.min.js"></script>
+        <script>
+          new Auth0GuardianMultifactor({
+            container: '#guardian-multifactor',
+            logo: 'https://devskyy.com/logo.png',
+            primaryColor: '#667eea'
+          });
+        </script>
+      </body>
+      </html>
+  
+  # Universal Login
+  universal_login:
+    colors:
+      primary: "#667eea"
+      page_background: "#ffffff"
+    logo_url: "https://devskyy.com/logo.png"
+  
+  # Error Pages
+  error_page:
+    html: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>DevSkyy - Authentication Error</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+          .error-container { max-width: 400px; margin: 100px auto; padding: 20px; text-align: center; }
+          .error-title { color: #e53e3e; font-size: 24px; margin-bottom: 16px; }
+          .error-message { color: #4a5568; margin-bottom: 24px; }
+          .back-button { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 6px; text-decoration: none; display: inline-block; }
+        </style>
+      </head>
+      <body>
+        <div class="error-container">
+          <h1 class="error-title">Authentication Error</h1>
+          <p class="error-message">{{description}}</p>
+          <a href="https://devskyy.com" class="back-button">Return to DevSkyy</a>
+        </div>
+      </body>
+      </html>
+    show_log_link: false
+    url: "https://devskyy.com/auth/error"
+  
+  # Flags
+  flags:
+    enable_client_connections: true
+    enable_apis_section: true
+    enable_pipeline2: true
+    enable_dynamic_client_registration: false
+    enable_custom_domain_in_emails: true
+    universal_login: true
+    enable_legacy_logs_search_v2: false
+    disable_clickjack_protection_headers: false
+    enable_public_signup_user_exists_error: false
+    use_scope_descriptions_for_consent: false
+    no_disclose_enterprise_connections: false
+    disable_management_api_sms_obfuscation: false
+    enable_adfs_waad_email_verification: false
+    revoke_refresh_token_grant: false
+    dashboard_log_streams_next: false
+    dashboard_insights_view: false
+    disable_fields_map_fix: false
+    enable_pipeline2: true
+    enable_dynamic_client_registration: false

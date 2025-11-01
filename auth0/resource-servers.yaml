@@ -1,0 +1,187 @@
+# DevSkyy Auth0 APIs Configuration
+# Resource servers and scopes for enterprise API access
+
+resourceServers:
+  # Main DevSkyy API
+  - name: "DevSkyy Enterprise API"
+    identifier: "https://api.devskyy.com"
+    
+    # API Settings
+    allow_offline_access: true
+    skip_consent_for_verifiable_first_party_clients: true
+    token_lifetime: 86400  # 24 hours
+    token_lifetime_for_web: 7200  # 2 hours for web clients
+    
+    # Signing Algorithm
+    signing_alg: "RS256"
+    signing_secret: ""  # Will be auto-generated
+    
+    # Token Dialect
+    token_dialect: "access_token_authz"
+    
+    # Scopes for DevSkyy API
+    scopes:
+      # User Management Scopes
+      - value: "read:profile"
+        description: "Read user profile information"
+      - value: "write:profile"
+        description: "Update user profile information"
+      - value: "delete:profile"
+        description: "Delete user profile (GDPR compliance)"
+      
+      # Product Management Scopes
+      - value: "read:products"
+        description: "Read product catalog and details"
+      - value: "write:products"
+        description: "Create and update products"
+      - value: "delete:products"
+        description: "Delete products from catalog"
+      - value: "manage:inventory"
+        description: "Manage product inventory levels"
+      
+      # Order Management Scopes
+      - value: "read:orders"
+        description: "Read order information"
+      - value: "write:orders"
+        description: "Create and update orders"
+      - value: "process:orders"
+        description: "Process and fulfill orders"
+      - value: "refund:orders"
+        description: "Process order refunds"
+      
+      # Payment Scopes
+      - value: "read:payments"
+        description: "Read payment information"
+      - value: "process:payments"
+        description: "Process payments and transactions"
+      - value: "refund:payments"
+        description: "Process payment refunds"
+      
+      # Agent Management Scopes
+      - value: "read:agents"
+        description: "Read AI agent information and status"
+      - value: "execute:agents"
+        description: "Execute AI agent tasks"
+      - value: "manage:agents"
+        description: "Configure and manage AI agents"
+      - value: "orchestrate:agents"
+        description: "Orchestrate multi-agent workflows"
+      
+      # Analytics Scopes
+      - value: "read:analytics"
+        description: "Read business analytics and reports"
+      - value: "export:analytics"
+        description: "Export analytics data"
+      - value: "create:reports"
+        description: "Create custom analytics reports"
+      
+      # Admin Scopes
+      - value: "admin:users"
+        description: "Full user management capabilities"
+      - value: "admin:system"
+        description: "System administration capabilities"
+      - value: "admin:security"
+        description: "Security management and audit access"
+      - value: "admin:billing"
+        description: "Billing and subscription management"
+      
+      # Fashion Intelligence Scopes
+      - value: "analyze:fashion"
+        description: "Access fashion analysis AI capabilities"
+      - value: "predict:trends"
+        description: "Access trend prediction services"
+      - value: "generate:outfits"
+        description: "Generate AI-powered outfit recommendations"
+      
+      # Webhook Scopes
+      - value: "read:webhooks"
+        description: "Read webhook configurations"
+      - value: "manage:webhooks"
+        description: "Create and manage webhooks"
+      - value: "receive:webhooks"
+        description: "Receive webhook notifications"
+      
+      # GDPR Compliance Scopes
+      - value: "gdpr:access"
+        description: "Access user data for GDPR requests"
+      - value: "gdpr:delete"
+        description: "Delete user data for GDPR compliance"
+      - value: "gdpr:export"
+        description: "Export user data for portability"
+      
+      # Monitoring Scopes
+      - value: "read:metrics"
+        description: "Read system metrics and health data"
+      - value: "read:logs"
+        description: "Read application logs"
+      - value: "manage:monitoring"
+        description: "Configure monitoring and alerting"
+
+  # DevSkyy Management API
+  - name: "DevSkyy Management API"
+    identifier: "https://management.devskyy.com"
+    
+    # API Settings
+    allow_offline_access: false
+    skip_consent_for_verifiable_first_party_clients: true
+    token_lifetime: 3600  # 1 hour for management operations
+    token_lifetime_for_web: 1800  # 30 minutes for web
+    
+    # Signing Algorithm
+    signing_alg: "RS256"
+    
+    # Token Dialect
+    token_dialect: "access_token_authz"
+    
+    # Management Scopes
+    scopes:
+      # System Management
+      - value: "manage:tenant"
+        description: "Manage tenant configuration"
+      - value: "manage:applications"
+        description: "Manage Auth0 applications"
+      - value: "manage:connections"
+        description: "Manage authentication connections"
+      
+      # User Management
+      - value: "manage:users"
+        description: "Full user management in Auth0"
+      - value: "manage:roles"
+        description: "Manage user roles and permissions"
+      - value: "manage:organizations"
+        description: "Manage organizations and memberships"
+      
+      # Security Management
+      - value: "manage:rules"
+        description: "Manage Auth0 rules and hooks"
+      - value: "manage:actions"
+        description: "Manage Auth0 actions"
+      - value: "read:logs"
+        description: "Read Auth0 logs"
+      
+      # Monitoring
+      - value: "read:stats"
+        description: "Read authentication statistics"
+      - value: "read:anomaly_detection"
+        description: "Read anomaly detection data"
+
+  # DevSkyy Webhook API
+  - name: "DevSkyy Webhook API"
+    identifier: "https://webhooks.devskyy.com"
+    
+    # API Settings
+    allow_offline_access: false
+    skip_consent_for_verifiable_first_party_clients: true
+    token_lifetime: 300  # 5 minutes for webhook tokens
+    
+    # Signing Algorithm
+    signing_alg: "RS256"
+    
+    # Webhook Scopes
+    scopes:
+      - value: "webhook:receive"
+        description: "Receive webhook notifications"
+      - value: "webhook:validate"
+        description: "Validate webhook signatures"
+      - value: "webhook:process"
+        description: "Process webhook payloads"

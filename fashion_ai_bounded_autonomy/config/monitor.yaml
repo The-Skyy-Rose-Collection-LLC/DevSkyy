@@ -1,0 +1,172 @@
+# LAYER 4 — MONITORING AND LOGGING CONFIGURATION
+# Track agent performance, detect anomalies, maintain observability
+
+monitoring:
+  version: "1.0.0"
+
+  # Prometheus metrics
+  prometheus:
+    enabled: true
+    port: 9091
+    path: "/metrics"
+    scrape_interval_seconds: 30
+
+  metrics:
+    # System metrics
+    - name: "agent_operations_total"
+      type: "counter"
+      description: "Total number of agent operations"
+      labels: ["agent_name", "status"]
+
+    - name: "agent_execution_time_seconds"
+      type: "histogram"
+      description: "Agent execution time"
+      labels: ["agent_name", "function"]
+      buckets: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+
+    - name: "approval_queue_size"
+      type: "gauge"
+      description: "Number of actions pending approval"
+
+    - name: "error_rate"
+      type: "gauge"
+      description: "Error rate per minute"
+      labels: ["agent_name", "error_type"]
+
+    - name: "network_calls_blocked"
+      type: "counter"
+      description: "Number of network calls blocked"
+      labels: ["agent_name"]
+
+  # Watchdog configuration
+  watchdog:
+    enabled: true
+    check_interval_seconds: 60
+    error_threshold: 3  # Restart after 3 consecutive errors
+
+    actions:
+      on_error:
+        - "log_error"
+        - "capture_stack_trace"
+        - "attempt_restart"
+
+      on_repeated_error:
+        - "halt_agent"
+        - "notify_operator"
+        - "create_incident_report"
+
+      on_recovery:
+        - "log_recovery"
+        - "clear_error_count"
+
+  # Alert rules
+  alerts:
+    - name: "high_error_rate"
+      condition: "error_rate > 0.1"  # 10% error rate
+      severity: "critical"
+      notification: ["email", "log"]
+
+    - name: "agent_down"
+      condition: "agent_status == 'failed'"
+      severity: "critical"
+      notification: ["email", "log"]
+
+    - name: "approval_queue_backlog"
+      condition: "approval_queue_size > 50"
+      severity: "warning"
+      notification: ["log"]
+
+    - name: "slow_execution"
+      condition: "avg_execution_time > 10.0"
+      severity: "warning"
+      notification: ["log"]
+
+  # Health checks
+  health_checks:
+    agent_health:
+      interval_seconds: 60
+      timeout_seconds: 10
+      critical_threshold: 0.5  # <50% success rate = critical
+
+    database_health:
+      interval_seconds: 120
+      checks:
+        - "connection_available"
+        - "disk_space_available"
+
+    system_health:
+      interval_seconds: 30
+      checks:
+        - "cpu_usage < 90"
+        - "memory_usage < 90"
+        - "disk_usage < 85"
+
+  # Logging configuration
+  logging:
+    level: "INFO"
+    format: "json"
+    output:
+      - type: "file"
+        path: "logs/system/system.log"
+        rotation: "daily"
+        retention_days: 90
+
+      - type: "file"
+        path: "logs/agents/agents.log"
+        rotation: "daily"
+        retention_days: 90
+
+      - type: "file"
+        path: "logs/errors/errors.log"
+        rotation: "daily"
+        retention_days: 365
+
+    include:
+      - timestamp
+      - level
+      - agent_name
+      - function_name
+      - execution_time
+      - status
+      - error_message
+      - stack_trace
+
+  # Dashboard
+  dashboard:
+    enabled: true
+    refresh_interval_seconds: 30
+    panels:
+      - name: "System Overview"
+        metrics:
+          - "total_agents"
+          - "active_tasks"
+          - "pending_approvals"
+          - "error_rate"
+
+      - name: "Agent Performance"
+        metrics:
+          - "operations_per_minute"
+          - "average_execution_time"
+          - "success_rate"
+
+      - name: "Resource Usage"
+        metrics:
+          - "cpu_usage"
+          - "memory_usage"
+          - "disk_usage"
+
+  # Anomaly detection
+  anomaly_detection:
+    enabled: true
+    algorithms:
+      - "statistical_z_score"  # Z-score based detection
+      - "moving_average"  # Moving average deviation
+
+    thresholds:
+      z_score: 3.0  # 3 standard deviations
+      moving_average_window: 50
+
+    metrics_to_monitor:
+      - "execution_time"
+      - "error_rate"
+      - "resource_usage"

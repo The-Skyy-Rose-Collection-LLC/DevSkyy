@@ -1,0 +1,277 @@
+# DevSkyy Auth0 Connections Configuration
+# Database and social connections for enterprise authentication
+
+connections:
+  # Primary Database Connection
+  - name: "DevSkyy-Users"
+    strategy: "auth0"
+    
+    # Connection Options
+    options:
+      # Password Policy
+      password_policy: "good"
+      password_complexity_options:
+        min_length: 8
+      password_no_personal_info:
+        enable: true
+      password_dictionary:
+        enable: true
+        dictionary: []
+      password_history:
+        enable: true
+        size: 5
+      
+      # Brute Force Protection
+      brute_force_protection: true
+      
+      # User Registration
+      disable_signup: false
+      requires_username: false
+      
+      # Custom Database Scripts (if using external database)
+      custom_scripts:
+        login: |
+          function login(email, password, callback) {
+            // Custom login logic for DevSkyy users
+            // This would connect to your PostgreSQL database
+            const bcrypt = require('bcrypt');
+            const { Client } = require('pg');
+            
+            const client = new Client({
+              connectionString: configuration.DATABASE_URL
+            });
+            
+            client.connect();
+            
+            const query = 'SELECT id, email, password_hash, is_active FROM users WHERE email = $1';
+            client.query(query, [email], (err, result) => {
+              if (err) return callback(err);
+              if (result.rows.length === 0) return callback(new WrongUsernameOrPasswordError(email));
+              
+              const user = result.rows[0];
+              if (!user.is_active) return callback(new Error('User account is disabled'));
+              
+              bcrypt.compare(password, user.password_hash, (err, isValid) => {
+                if (err) return callback(err);
+                if (!isValid) return callback(new WrongUsernameOrPasswordError(email));
+                
+                callback(null, {
+                  user_id: user.id,
+                  email: user.email,
+                  email_verified: true
+                });
+              });
+              
+              client.end();
+            });
+          }
+        
+        create: |
+          function create(user, callback) {
+            // Custom user creation logic
+            const bcrypt = require('bcrypt');
+            const { Client } = require('pg');
+            const { v4: uuidv4 } = require('uuid');
+            
+            const client = new Client({
+              connectionString: configuration.DATABASE_URL
+            });
+            
+            client.connect();
+            
+            bcrypt.hash(user.password, 10, (err, hash) => {
+              if (err) return callback(err);
+              
+              const userId = uuidv4();
+              const query = `
+                INSERT INTO users (id, email, password_hash, first_name, last_name, created_at, is_active, email_verified)
+                VALUES ($1, $2, $3, $4, $5, NOW(), true, false)
+                RETURNING id, email
+              `;
+              
+              client.query(query, [
+                userId,
+                user.email,
+                hash,
+                user.given_name || '',
+                user.family_name || ''
+              ], (err, result) => {
+                if (err) return callback(err);
+                
+                const newUser = result.rows[0];
+                callback(null, {
+                  user_id: newUser.id,
+                  email: newUser.email,
+                  email_verified: false
+                });
+                
+                client.end();
+              });
+            });
+          }
+        
+        verify: |
+          function verify(email, callback) {
+            // Email verification logic
+            const { Client } = require('pg');
+            
+            const client = new Client({
+              connectionString: configuration.DATABASE_URL
+            });
+            
+            client.connect();
+            
+            const query = 'UPDATE users SET email_verified = true WHERE email = $1 RETURNING id, email';
+            client.query(query, [email], (err, result) => {
+              if (err) return callback(err);
+              if (result.rows.length === 0) return callback(new Error('User not found'));
+              
+              callback(null, result.rows[0]);
+              client.end();
+            });
+          }
+        
+        change_password: |
+          function changePassword(email, newPassword, callback) {
+            // Password change logic
+            const bcrypt = require('bcrypt');
+            const { Client } = require('pg');
+            
+            const client = new Client({
+              connectionString: configuration.DATABASE_URL
+            });
+            
+            client.connect();
+            
+            bcrypt.hash(newPassword, 10, (err, hash) => {
+              if (err) return callback(err);
+              
+              const query = 'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE email = $2';
+              client.query(query, [hash, email], (err, result) => {
+                if (err) return callback(err);
+                callback(null);
+                client.end();
+              });
+            });
+          }
+        
+        get_user: |
+          function getByEmail(email, callback) {
+            // Get user by email
+            const { Client } = require('pg');
+            
+            const client = new Client({
+              connectionString: configuration.DATABASE_URL
+            });
+            
+            client.connect();
+            
+            const query = `
+              SELECT id, email, first_name, last_name, created_at, email_verified, is_active
+              FROM users WHERE email = $1
+            `;
+            
+            client.query(query, [email], (err, result) => {
+              if (err) return callback(err);
+              if (result.rows.length === 0) return callback(null);
+              
+              const user = result.rows[0];
+              callback(null, {
+                user_id: user.id,
+                email: user.email,
+                given_name: user.first_name,
+                family_name: user.last_name,
+                created_at: user.created_at,
+                email_verified: user.email_verified
+              });
+              
+              client.end();
+            });
+          }
+      
+      # Configuration for custom database
+      configuration:
+        DATABASE_URL: "@@DATABASE_URL@@"  # Will be replaced with actual value
+    
+    # Enabled Applications
+    enabled_clients:
+      - "DevSkyy Web Application"
+      - "DevSkyy Mobile Application"
+      - "DevSkyy Admin Dashboard"
+
+  # Google Social Connection
+  - name: "google-oauth2"
+    strategy: "google-oauth2"
+    
+    options:
+      client_id: "@@GOOGLE_CLIENT_ID@@"
+      client_secret: "@@GOOGLE_CLIENT_SECRET@@"
+      
+      # Scopes
+      scope:
+        - "email"
+        - "profile"
+      
+      # Attributes
+      attributes:
+        email: "email"
+        email_verified: "email_verified"
+        name: "name"
+        given_name: "given_name"
+        family_name: "family_name"
+        picture: "picture"
+    
+    enabled_clients:
+      - "DevSkyy Web Application"
+      - "DevSkyy Mobile Application"
+
+  # Apple Social Connection
+  - name: "apple"
+    strategy: "apple"
+    
+    options:
+      client_id: "@@APPLE_CLIENT_ID@@"
+      client_secret: "@@APPLE_CLIENT_SECRET@@"
+      team_id: "@@APPLE_TEAM_ID@@"
+      key_id: "@@APPLE_KEY_ID@@"
+      
+      # Scopes
+      scope:
+        - "email"
+        - "name"
+    
+    enabled_clients:
+      - "DevSkyy Mobile Application"
+
+  # GitHub Social Connection (for developers)
+  - name: "github"
+    strategy: "github"
+    
+    options:
+      client_id: "@@GITHUB_CLIENT_ID@@"
+      client_secret: "@@GITHUB_CLIENT_SECRET@@"
+      
+      # Scopes
+      scope:
+        - "user:email"
+        - "read:user"
+    
+    enabled_clients:
+      - "DevSkyy Admin Dashboard"
+
+  # LinkedIn Social Connection (for business users)
+  - name: "linkedin"
+    strategy: "linkedin"
+    
+    options:
+      client_id: "@@LINKEDIN_CLIENT_ID@@"
+      client_secret: "@@LINKEDIN_CLIENT_SECRET@@"
+      
+      # Scopes
+      scope:
+        - "r_liteprofile"
+        - "r_emailaddress"
+    
+    enabled_clients:
+      - "DevSkyy Web Application"
+      - "DevSkyy Admin Dashboard"

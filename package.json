@@ -1,0 +1,53 @@
+{
+  "name": "devskyy-enterprise-platform",
+  "version": "5.2.0",
+  "description": "DevSkyy Enterprise Fashion E-commerce Automation Platform",
+  "main": "main.py",
+  "scripts": {
+    "build": "pip install -r requirements.txt",
+    "start": "uvicorn main:app --host 0.0.0.0 --port $PORT",
+    "dev": "uvicorn main:app --host 0.0.0.0 --port $PORT --reload",
+    "test": "python -m pytest tests/",
+    "lint": "python -m flake8 .",
+    "format": "python -m black .",
+    "type-check": "python -m mypy .",
+    "security-scan": "python -m bandit -r .",
+    "deploy": "vercel --prod",
+    "deploy-preview": "vercel"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "python": ">=3.11.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SkyyRoseLLC/DevSkyy.git"
+  },
+  "keywords": [
+    "fashion",
+    "ecommerce",
+    "ai",
+    "automation",
+    "enterprise",
+    "fastapi",
+    "python",
+    "machine-learning",
+    "agents",
+    "orchestration"
+  ],
+  "author": "Skyy Rose LLC",
+  "license": "MIT",
+  "homepage": "https://devskyy.vercel.app",
+  "bugs": {
+    "url": "https://github.com/SkyyRoseLLC/DevSkyy/issues"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "vercel": {
+    "framework": "other",
+    "buildCommand": "pip install -r requirements.txt",
+    "outputDirectory": ".",
+    "installCommand": "pip install --upgrade pip && pip install -r requirements.txt"
+  }
+}

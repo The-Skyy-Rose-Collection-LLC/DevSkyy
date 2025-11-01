@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "devskyy": {
+      "command": "/opt/anaconda3/bin/python3",
+      "args": ["/Users/coreyfoster/DevSkyy/devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_KEY": "your-api-key-here",
+        "DEVSKYY_API_URL": "http://localhost:8000"
+      }
+    }
+  }
+}

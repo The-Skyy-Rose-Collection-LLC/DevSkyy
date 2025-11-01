@@ -1,0 +1,401 @@
+/*
+Theme Name: WordPress Mastery Boilerplate
+Description: Production-ready WordPress theme boilerplate following WordPress.com compatibility standards
+Version: 1.0.0
+Author: DevSkyy WordPress Development Specialist
+Text Domain: wp-mastery-boilerplate
+Domain Path: /languages
+Tags: responsive, accessibility-ready, custom-colors, custom-menu, editor-style, featured-images, flexible-header, microformats, post-formats, rtl-language-support, sticky-post, threaded-comments, translation-ready
+Requires at least: 5.0
+Tested up to: 6.4
+Requires PHP: 8.1
+License: GPL v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+WordPress Mastery Boilerplate is a production-ready theme following WordPress.com compatibility standards.
+*/
+
+/* ==========================================================================
+   RESET AND BASE STYLES
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 16px;
+	line-height: 1.6;
+	scroll-behavior: smooth;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-size: 1rem;
+	line-height: 1.6;
+	color: #333;
+	background-color: #fff;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0 0 1rem 0;
+	font-weight: 600;
+	line-height: 1.2;
+	color: #222;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+p {
+	margin: 0 0 1.5rem 0;
+}
+
+a {
+	color: #0073aa;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+a:hover,
+a:focus {
+	color: #005177;
+	text-decoration: underline;
+}
+
+/* ==========================================================================
+   LAYOUT STRUCTURE
+   ========================================================================== */
+
+.site {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.site-header {
+	background: #fff;
+	border-bottom: 1px solid #e1e1e1;
+	padding: 1rem 0;
+}
+
+.site-main {
+	flex: 1;
+	padding: 2rem 0;
+}
+
+.site-footer {
+	background: #f8f9fa;
+	border-top: 1px solid #e1e1e1;
+	padding: 2rem 0;
+	margin-top: auto;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 1rem;
+}
+
+/* ==========================================================================
+   HEADER STYLES
+   ========================================================================== */
+
+.site-branding {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.site-title {
+	margin: 0;
+	font-size: 2rem;
+	font-weight: 700;
+}
+
+.site-title a {
+	color: #222;
+	text-decoration: none;
+}
+
+.site-title a:hover {
+	color: #0073aa;
+	text-decoration: none;
+}
+
+.site-description {
+	margin: 0.5rem 0 0 0;
+	font-size: 1rem;
+	color: #666;
+	font-style: italic;
+}
+
+/* ==========================================================================
+   NAVIGATION STYLES
+   ========================================================================== */
+
+.main-navigation {
+	text-align: center;
+}
+
+.main-navigation ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 2rem;
+}
+
+.main-navigation li {
+	position: relative;
+}
+
+.main-navigation a {
+	display: block;
+	padding: 0.5rem 0;
+	color: #333;
+	font-weight: 500;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.main-navigation a:hover,
+.main-navigation a:focus {
+	color: #0073aa;
+	text-decoration: none;
+}
+
+.main-navigation .current-menu-item > a,
+.main-navigation .current_page_item > a {
+	color: #0073aa;
+}
+
+/* ==========================================================================
+   CONTENT STYLES
+   ========================================================================== */
+
+.content-area {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.entry {
+	margin-bottom: 3rem;
+	padding-bottom: 2rem;
+	border-bottom: 1px solid #e1e1e1;
+}
+
+.entry:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+}
+
+.entry-header {
+	margin-bottom: 1.5rem;
+}
+
+.entry-title {
+	margin-bottom: 0.5rem;
+}
+
+.entry-title a {
+	color: #222;
+	text-decoration: none;
+}
+
+.entry-title a:hover {
+	color: #0073aa;
+}
+
+.entry-meta {
+	font-size: 0.875rem;
+	color: #666;
+	margin-bottom: 1rem;
+}
+
+.entry-meta a {
+	color: #666;
+}
+
+.entry-meta a:hover {
+	color: #0073aa;
+}
+
+.entry-content {
+	line-height: 1.7;
+}
+
+.entry-content img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* ==========================================================================
+   FOOTER STYLES
+   ========================================================================== */
+
+.site-info {
+	text-align: center;
+	font-size: 0.875rem;
+	color: #666;
+}
+
+.site-info a {
+	color: #666;
+}
+
+.site-info a:hover {
+	color: #0073aa;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	html {
+		font-size: 14px;
+	}
+	
+	.container {
+		padding: 0 0.75rem;
+	}
+	
+	.main-navigation ul {
+		flex-direction: column;
+		gap: 1rem;
+	}
+	
+	.site-main {
+		padding: 1.5rem 0;
+	}
+	
+	h1 { font-size: 2rem; }
+	h2 { font-size: 1.75rem; }
+	h3 { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+	.container {
+		padding: 0 0.5rem;
+	}
+	
+	.site-header,
+	.site-footer {
+		padding: 1rem 0;
+	}
+	
+	.site-main {
+		padding: 1rem 0;
+	}
+	
+	.entry {
+		margin-bottom: 2rem;
+		padding-bottom: 1.5rem;
+	}
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+	background-color: #f1f1f1;
+	border-radius: 3px;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+	clip: auto !important;
+	clip-path: none;
+	color: #21759b;
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 700;
+	height: auto;
+	left: 5px;
+	line-height: normal;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	top: 5px;
+	width: auto;
+	z-index: 100000;
+}
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+.visually-hidden {
+	position: absolute !important;
+	clip: rect(1px 1px 1px 1px);
+	clip: rect(1px, 1px, 1px, 1px);
+	padding: 0 !important;
+	border: 0 !important;
+	height: 1px !important;
+	width: 1px !important;
+	overflow: hidden;
+}
+
+/* ==========================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+	*,
+	*::before,
+	*::after {
+		background: #fff !important;
+		color: #000 !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+	}
+	
+	a,
+	a:visited {
+		text-decoration: underline;
+	}
+	
+	a[href]::after {
+		content: " (" attr(href) ")";
+	}
+	
+	.site-header,
+	.site-footer,
+	.main-navigation {
+		display: none;
+	}
+}

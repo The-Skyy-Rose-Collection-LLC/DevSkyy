@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyy Rose Collection - Training Data Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .upload-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .supported-formats {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .supported-formats h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .format-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .format-tag {
+            background: #0066cc;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌹 Skyy Rose Collection</h1>
+            <p>Training Data Upload Interface</p>
+        </div>
+        
+        <div class="content">
+            <!-- Supported Formats Info -->
+            <div class="supported-formats">
+                <h4>📁 Supported Image Formats</h4>
+                <div class="format-list">
+                    <span class="format-tag">JPG</span>
+                    <span class="format-tag">JPEG</span>
+                    <span class="format-tag">PNG</span>
+                    <span class="format-tag">WEBP</span>
+                    <span class="format-tag">HEIC</span>
+                    <span class="format-tag">BMP</span>
+                    <span class="format-tag">TIFF</span>
+                    <span class="format-tag">ZIP Archives</span>
+                </div>
+                <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                    Any resolution accepted - automatically processed to 1024x1024 for optimal training
+                </p>
+            </div>
+            
+            <!-- Single Image Upload -->
+            <div class="upload-section">
+                <h3>📸 Single Image Upload</h3>
+                <form id="singleUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="singleFile">Select Image File:</label>
+                        <input type="file" id="singleFile" name="file" accept=".jpg,.jpeg,.png,.webp,.heic,.bmp,.tiff" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="singleCategory">Category:</label>
+                        <select id="singleCategory" name="category">
+                            <option value="dresses">Dresses</option>
+                            <option value="tops">Tops</option>
+                            <option value="bottoms">Bottoms</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="outerwear">Outerwear</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="singleDescription">Description (Optional):</label>
+                        <textarea id="singleDescription" name="description" rows="3" placeholder="Describe the item (e.g., 'Elegant black evening dress with sequin details')"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="singleAutoProcess" name="auto_process" checked>
+                            Auto-process for training
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn">Upload Single Image</button>
+                </form>
+            </div>
+            
+            <!-- Batch Upload -->
+            <div class="upload-section">
+                <h3>📁 Batch Image Upload</h3>
+                <form id="batchUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="batchFiles">Select Multiple Images:</label>
+                        <input type="file" id="batchFiles" name="files" multiple accept=".jpg,.jpeg,.png,.webp,.heic,.bmp,.tiff" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="batchCategory">Category for All Images:</label>
+                        <select id="batchCategory" name="category">
+                            <option value="dresses">Dresses</option>
+                            <option value="tops">Tops</option>
+                            <option value="bottoms">Bottoms</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="outerwear">Outerwear</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="batchAutoProcess" name="auto_process" checked>
+                            Auto-process for training
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn">Upload Batch Images</button>
+                </form>
+            </div>
+            
+            <!-- ZIP Archive Upload -->
+            <div class="upload-section">
+                <h3>🗜️ ZIP Archive Upload</h3>
+                <form id="zipUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="zipFile">Select ZIP Archive:</label>
+                        <input type="file" id="zipFile" name="file" accept=".zip" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="zipCategory">Category for All Images:</label>
+                        <select id="zipCategory" name="category">
+                            <option value="complete_collection">Complete Collection</option>
+                            <option value="dresses">Dresses</option>
+                            <option value="tops">Tops</option>
+                            <option value="bottoms">Bottoms</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="outerwear">Outerwear</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="zipAutoProcess" name="auto_process" checked>
+                            Auto-process for training
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-secondary">Upload ZIP Archive</button>
+                </form>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress" id="progressBar">
+                <div class="progress-bar" id="progressBarFill"></div>
+            </div>
+            
+            <!-- Status Messages -->
+            <div class="status" id="statusMessage"></div>
+            
+            <!-- Upload Status -->
+            <div class="upload-section">
+                <h3>📊 Upload Status</h3>
+                <button type="button" class="btn" onclick="checkStatus()">Check Upload Status</button>
+                <div id="statusInfo" class="file-info" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        
+        // Single image upload
+        document.getElementById('singleUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await uploadFile('/upload/single-image', formData);
+        });
+        
+        // Batch upload
+        document.getElementById('batchUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await uploadFile('/upload/batch-images', formData);
+        });
+        
+        // ZIP upload
+        document.getElementById('zipUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await uploadFile('/upload/zip-archive', formData);
+        });
+        
+        async function uploadFile(endpoint, formData) {
+            const progressBar = document.getElementById('progressBar');
+            const progressBarFill = document.getElementById('progressBarFill');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            try {
+                progressBar.style.display = 'block';
+                statusMessage.style.display = 'none';
+                
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                progressBarFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    
+                    if (result.success) {
+                        showStatus('success', `✅ Upload successful! ${result.message}`);
+                    } else {
+                        showStatus('error', `❌ Upload failed: ${result.detail || 'Unknown error'}`);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                progressBar.style.display = 'none';
+                showStatus('error', `❌ Upload failed: ${error.message}`);
+            }
+        }
+        
+        function showStatus(type, message) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.className = `status ${type}`;
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function checkStatus() {
+            try {
+                const response = await fetch(API_BASE + '/status/uploads');
+                const result = await response.json();
+                
+                const statusInfo = document.getElementById('statusInfo');
+                
+                if (result.success) {
+                    let html = '<h4>📊 Upload Statistics</h4>';
+                    html += `<p><strong>Total Categories:</strong> ${result.total_categories}</p>`;
+                    
+                    for (const [category, info] of Object.entries(result.categories)) {
+                        html += `
+                            <div style="margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid #667eea;">
+                                <h5>📁 ${category.charAt(0).toUpperCase() + category.slice(1)}</h5>
+                                <p><strong>Total Images:</strong> ${info.total_images}</p>
+                                <p><strong>Processed:</strong> ${info.processed_images}</p>
+                                <p><strong>Total Size:</strong> ${(info.total_size / (1024*1024)).toFixed(2)} MB</p>
+                            </div>
+                        `;
+                    }
+                    
+                    statusInfo.innerHTML = html;
+                    statusInfo.style.display = 'block';
+                } else {
+                    showStatus('error', 'Failed to get upload status');
+                }
+            } catch (error) {
+                showStatus('error', `Failed to check status: ${error.message}`);
+            }
+        }
+        
+        // File input change handlers for file info
+        document.getElementById('singleFile').addEventListener('change', (e) => {
+            showFileInfo(e.target.files, 'single');
+        });
+        
+        document.getElementById('batchFiles').addEventListener('change', (e) => {
+            showFileInfo(e.target.files, 'batch');
+        });
+        
+        document.getElementById('zipFile').addEventListener('change', (e) => {
+            showFileInfo(e.target.files, 'zip');
+        });
+        
+        function showFileInfo(files, type) {
+            if (files.length === 0) return;
+            
+            let totalSize = 0;
+            for (let file of files) {
+                totalSize += file.size;
+            }
+            
+            const info = `📁 Selected: ${files.length} file(s), Total size: ${(totalSize / (1024*1024)).toFixed(2)} MB`;
+            
+            // You could add file info display here if needed
+            console.log(info);
+        }
+    </script>
+</body>
+</html>

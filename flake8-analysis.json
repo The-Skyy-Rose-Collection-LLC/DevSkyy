@@ -1,0 +1,45 @@
+{
+  "analysis_timestamp": "2024-12-19T10:30:00Z",
+  "total_files_analyzed": 127,
+  "total_issues_found": 98,
+  "issues_by_type": {
+    "E128": {
+      "count": 12,
+      "description": "continuation line under-indented for visual indent"
+    },
+    "E402": {
+      "count": 3,
+      "description": "module level import not at top of file"
+    },
+    "F401": {
+      "count": 36,
+      "description": "imported but unused"
+    },
+    "F541": {
+      "count": 13,
+      "description": "f-string is missing placeholders"
+    },
+    "F722": {
+      "count": 6,
+      "description": "syntax error in forward annotation"
+    },
+    "F811": {
+      "count": 2,
+      "description": "redefinition of unused variable"
+    },
+    "F821": {
+      "count": 23,
+      "description": "undefined name"
+    },
+    "F841": {
+      "count": 3,
+      "description": "local variable assigned but never used"
+    }
+  },
+  "status": "NEEDS_FIXES",
+  "priority_fixes": [
+    "F821: undefined name 'AgentExecuteRequest'",
+    "F722: syntax error in forward annotation",
+    "F401: Remove unused imports"
+  ]
+}

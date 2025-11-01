@@ -1,0 +1,78 @@
+/* ==========================================================================
+   SKYY ROSE COLLECTION - LOGO CUSTOMIZATION GUIDE
+   ========================================================================== */
+
+/* 
+   This file contains examples of how to customize the logo appearance.
+   Copy the desired styles to your theme's style.css or child theme.
+*/
+
+/* Example 1: Change logo size */
+.skyy-rose-logo-gif {
+    width: 80px;
+    height: 80px;
+}
+
+/* Example 2: Add logo border */
+.skyy-rose-logo-gif {
+    border: 2px solid var(--secondary-color);
+}
+
+/* Example 3: Change logo hover effect */
+.skyy-rose-logo-link:hover .skyy-rose-logo-gif {
+    transform: rotate(5deg) scale(1.1);
+}
+
+/* Example 4: Logo with shadow */
+.skyy-rose-logo-gif {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Example 5: Circular logo */
+.skyy-rose-logo-gif {
+    border-radius: 50%;
+}
+
+/* Example 6: Logo animation on page load */
+@keyframes logoEntrance {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.skyy-rose-logo-gif {
+    animation: logoEntrance 0.8s ease-out;
+}
+
+/* Example 7: Different mobile logo positioning */
+@media (max-width: 768px) {
+    .skyy-rose-logo-container {
+        justify-content: flex-start;
+    }
+}
+
+/* Example 8: Logo with gradient background */
+.skyy-rose-logo-gif {
+    background: linear-gradient(45deg, var(--skyy-rose-gold), var(--skyy-rose-rose));
+    padding: 4px;
+}
+
+/* Example 9: Logo text styling */
+.site-title-h1,
+.site-title {
+    font-family: 'Your Custom Font', serif;
+    color: var(--secondary-color);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Example 10: Logo container background */
+.skyy-rose-logo-link {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}

@@ -1,0 +1,100 @@
+agents:
+  designer:
+    name: "DesignerAgent"
+    description: "Creates, validates, and curates AI-generated fashion designs"
+    enabled: true
+    io_path: "/data/designs/"
+    communication:
+      queue: "redis"
+      api_endpoints:
+        - "/api/design/generate"
+        - "/api/design/validate"
+        - "/api/design/feed"
+    tasks:
+      - "generate_design"
+      - "validate_design"
+      - "extract_features"
+    retry_attempts: 3
+    timeout: 120
+
+  commerce:
+    name: "CommerceAgent"
+    description: "Manages product listings, pricing, and SKU synchronization"
+    enabled: true
+    io_path: "/data/commerce/"
+    communication:
+      queue: "redis"
+      api_endpoints:
+        - "/api/products"
+        - "/api/orders"
+        - "/api/inventory"
+    tasks:
+      - "list_sku"
+      - "update_pricing"
+      - "sync_inventory"
+    retry_attempts: 3
+    timeout: 60
+
+  marketing:
+    name: "MarketingAgent"
+    description: "Handles campaign creation, content scheduling, and analytics"
+    enabled: true
+    io_path: "/data/marketing/"
+    communication:
+      queue: "redis"
+      api_endpoints:
+        - "/api/marketing/campaign"
+        - "/api/marketing/content"
+        - "/api/analytics"
+    tasks:
+      - "create_campaign"
+      - "schedule_content"
+      - "analyze_engagement"
+    retry_attempts: 2
+    timeout: 90
+
+  finance:
+    name: "FinanceAgent"
+    description: "Conducts financial logging, order ledger, and revenue summaries"
+    enabled: true
+    io_path: "/data/finance/"
+    communication:
+      queue: "redis"
+      api_endpoints:
+        - "/api/finance/ledger"
+        - "/api/finance/summary"
+        - "/api/finance/reports"
+    tasks:
+      - "record_ledger"
+      - "calculate_revenue"
+      - "generate_reports"
+    retry_attempts: 5
+    timeout: 30
+
+  ops:
+    name: "OpsAgent"
+    description: "Oversees uptime, queue metrics, and system-level automation"
+    enabled: true
+    io_path: "/logs/"
+    communication:
+      queue: "redis"
+      api_endpoints:
+        - "/api/system/status"
+        - "/api/system/health"
+        - "/api/system/metrics"
+    tasks:
+      - "health_check"
+      - "collect_metrics"
+      - "trigger_backup"
+      - "scale_services"
+    retry_attempts: 3
+    timeout: 45
+
+queue:
+  prefix: "fashion_ai"
+  channels:
+    - "designer_to_commerce"
+    - "commerce_to_marketing"
+    - "marketing_to_finance"
+    - "finance_to_ops"
+  message_ttl: 3600

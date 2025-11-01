@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "wordpress": {
+      "command": "npx",
+      "args": ["-y", "@instawp/mcp-wp"],
+      "env": {
+        "WORDPRESS_API_URL": "https://your-wordpress-site.com",
+        "WORDPRESS_USERNAME": "your_username",
+        "WORDPRESS_PASSWORD": "your_application_password"
+      }
+    },
+    "wordpress-files": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/wordpress-plugin"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    }
+  }
+}

@@ -1,0 +1,354 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-10-29",
+  "agents": {
+    "coordination_controller": {
+      "agent_id": "coord-001",
+      "name": "Coordination Controller",
+      "role": "Master orchestrator for bounded autonomous operations",
+      "capabilities": [
+        "task_orchestration",
+        "agent_lifecycle_management",
+        "review_queue_management",
+        "system_health_monitoring",
+        "approval_workflow_management"
+      ],
+      "permissions": {
+        "can_start_agents": true,
+        "can_stop_agents": true,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": true
+      },
+      "schedules": [
+        {
+          "task": "health_check",
+          "cron": "*/5 * * * *",
+          "description": "Check health of all agents every 5 minutes"
+        },
+        {
+          "task": "backup",
+          "cron": "0 */6 * * *",
+          "description": "Create system backup every 6 hours"
+        },
+        {
+          "task": "metrics_aggregation",
+          "cron": "0 0 * * *",
+          "description": "Aggregate daily metrics at midnight"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 2048,
+        "max_cpu_percent": 50,
+        "max_concurrent_tasks": 100
+      }
+    },
+    "designer_agent": {
+      "agent_id": "design-001",
+      "name": "Designer Agent",
+      "role": "Fashion design intelligence and trend analysis",
+      "capabilities": [
+        "trend_forecasting",
+        "color_palette_generation",
+        "style_classification",
+        "design_recommendation",
+        "material_analysis",
+        "seasonal_planning"
+      ],
+      "permissions": {
+        "can_start_agents": false,
+        "can_stop_agents": false,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": false
+      },
+      "schedules": [
+        {
+          "task": "trend_analysis",
+          "cron": "0 2 * * 1",
+          "description": "Weekly trend analysis every Monday at 2 AM"
+        },
+        {
+          "task": "style_update",
+          "cron": "0 3 1 * *",
+          "description": "Monthly style database update on 1st at 3 AM"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 4096,
+        "max_cpu_percent": 70,
+        "max_concurrent_tasks": 10
+      },
+      "models": {
+        "primary": "claude-sonnet-4.5",
+        "fallback": "local_fashion_model",
+        "local_only": true
+      }
+    },
+    "commerce_agent": {
+      "agent_id": "commerce-001",
+      "name": "Commerce Agent",
+      "role": "E-commerce automation and product management",
+      "capabilities": [
+        "product_catalog_management",
+        "inventory_optimization",
+        "demand_forecasting",
+        "price_optimization",
+        "order_automation",
+        "customer_analytics"
+      ],
+      "permissions": {
+        "can_start_agents": false,
+        "can_stop_agents": false,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": false
+      },
+      "schedules": [
+        {
+          "task": "inventory_check",
+          "cron": "0 */4 * * *",
+          "description": "Check inventory levels every 4 hours"
+        },
+        {
+          "task": "demand_forecast",
+          "cron": "0 1 * * *",
+          "description": "Daily demand forecasting at 1 AM"
+        },
+        {
+          "task": "price_optimization",
+          "cron": "0 4 * * *",
+          "description": "Daily price optimization at 4 AM"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 3072,
+        "max_cpu_percent": 60,
+        "max_concurrent_tasks": 20
+      },
+      "models": {
+        "primary": "inventory_forecasting_model",
+        "pricing": "dynamic_pricing_model",
+        "local_only": true
+      }
+    },
+    "marketing_agent": {
+      "agent_id": "marketing-001",
+      "name": "Marketing Agent",
+      "role": "Marketing automation and customer engagement",
+      "capabilities": [
+        "campaign_optimization",
+        "content_generation",
+        "customer_segmentation",
+        "ab_testing",
+        "sentiment_analysis",
+        "conversion_optimization"
+      ],
+      "permissions": {
+        "can_start_agents": false,
+        "can_stop_agents": false,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": false
+      },
+      "schedules": [
+        {
+          "task": "campaign_analysis",
+          "cron": "0 9 * * *",
+          "description": "Daily campaign analysis at 9 AM"
+        },
+        {
+          "task": "segment_update",
+          "cron": "0 10 * * 0",
+          "description": "Weekly customer segmentation update on Sunday at 10 AM"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 3072,
+        "max_cpu_percent": 60,
+        "max_concurrent_tasks": 15
+      },
+      "models": {
+        "primary": "claude-sonnet-4.5",
+        "sentiment": "local_sentiment_model",
+        "local_only": true
+      }
+    },
+    "finance_agent": {
+      "agent_id": "finance-001",
+      "name": "Finance Agent",
+      "role": "Financial analysis and reporting",
+      "capabilities": [
+        "revenue_analysis",
+        "cost_tracking",
+        "profit_optimization",
+        "financial_forecasting",
+        "budget_management",
+        "reporting"
+      ],
+      "permissions": {
+        "can_start_agents": false,
+        "can_stop_agents": false,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": false
+      },
+      "schedules": [
+        {
+          "task": "daily_revenue_report",
+          "cron": "0 23 * * *",
+          "description": "Daily revenue report at 11 PM"
+        },
+        {
+          "task": "weekly_financial_summary",
+          "cron": "0 8 * * 1",
+          "description": "Weekly financial summary on Monday at 8 AM"
+        },
+        {
+          "task": "monthly_forecast",
+          "cron": "0 9 1 * *",
+          "description": "Monthly financial forecast on 1st at 9 AM"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 2048,
+        "max_cpu_percent": 50,
+        "max_concurrent_tasks": 10
+      },
+      "models": {
+        "primary": "financial_forecasting_model",
+        "local_only": true
+      }
+    },
+    "operations_agent": {
+      "agent_id": "ops-001",
+      "name": "Operations Agent",
+      "role": "Infrastructure management and monitoring",
+      "capabilities": [
+        "system_monitoring",
+        "performance_tracking",
+        "anomaly_detection",
+        "log_analysis",
+        "backup_management",
+        "resource_optimization"
+      ],
+      "permissions": {
+        "can_start_agents": false,
+        "can_stop_agents": false,
+        "can_approve_tasks": false,
+        "can_modify_config": false,
+        "can_access_logs": true,
+        "can_create_backups": true
+      },
+      "schedules": [
+        {
+          "task": "system_health_check",
+          "cron": "*/10 * * * *",
+          "description": "System health check every 10 minutes"
+        },
+        {
+          "task": "performance_analysis",
+          "cron": "0 */2 * * *",
+          "description": "Performance analysis every 2 hours"
+        },
+        {
+          "task": "log_aggregation",
+          "cron": "0 0 * * *",
+          "description": "Daily log aggregation at midnight"
+        }
+      ],
+      "resource_limits": {
+        "max_memory_mb": 2048,
+        "max_cpu_percent": 40,
+        "max_concurrent_tasks": 50
+      },
+      "models": {
+        "primary": "anomaly_detection_model",
+        "local_only": true
+      }
+    }
+  },
+  "inter_agent_communication": {
+    "protocol": "local_queue",
+    "message_format": "json",
+    "encryption_required": true,
+    "audit_all_messages": true,
+    "max_message_size_kb": 10240,
+    "queue_priority_levels": ["critical", "high", "medium", "low"],
+    "message_retention_hours": 24
+  },
+  "approval_workflows": {
+    "default_workflow": {
+      "steps": [
+        {
+          "step": 1,
+          "name": "agent_execution",
+          "automatic": true
+        },
+        {
+          "step": 2,
+          "name": "result_validation",
+          "automatic": true
+        },
+        {
+          "step": 3,
+          "name": "human_review",
+          "automatic": false,
+          "timeout_hours": 24
+        },
+        {
+          "step": 4,
+          "name": "implementation",
+          "automatic": false
+        }
+      ]
+    },
+    "high_risk_workflow": {
+      "steps": [
+        {
+          "step": 1,
+          "name": "agent_proposal",
+          "automatic": true
+        },
+        {
+          "step": 2,
+          "name": "risk_assessment",
+          "automatic": true
+        },
+        {
+          "step": 3,
+          "name": "senior_review",
+          "automatic": false,
+          "required_approvers": 2,
+          "timeout_hours": 48
+        },
+        {
+          "step": 4,
+          "name": "controlled_implementation",
+          "automatic": false,
+          "requires_backup": true
+        }
+      ]
+    }
+  },
+  "governance": {
+    "principles": [
+      "Human oversight required for all material changes",
+      "No self-modification or auto-deployment allowed",
+      "All actions must be logged and auditable",
+      "System must remain locally contained",
+      "Improvements through analysis, not self-alteration"
+    ],
+    "operator_controls": {
+      "emergency_stop": true,
+      "manual_override": true,
+      "audit_access": true,
+      "configuration_lock": true
+    }
+  }
+}

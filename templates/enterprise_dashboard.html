@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSkyy Enterprise Dashboard - AI Platform Control Center</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .metric-change.positive {
+            color: var(--success-color);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .agents-status {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .agent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .agent-item:last-child {
+            border-bottom: none;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .agent-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .agent-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-healthy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .activity-feed {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .refresh-controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .control-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-rocket"></i>
+                <h1>DevSkyy Enterprise Dashboard</h1>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>All Systems Operational</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Active Agents</span>
+                    <div class="metric-icon" style="background: var(--primary-color);">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="active-agents">57</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+3 from last hour</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">API Requests/min</span>
+                    <div class="metric-icon" style="background: var(--success-color);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="api-requests">2,847</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% from yesterday</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Response Time</span>
+                    <div class="metric-icon" style="background: var(--warning-color);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="response-time">127ms</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-15ms from average</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">System Health</span>
+                    <div class="metric-icon" style="background: var(--success-color);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div class="metric-value" id="system-health">99.8%</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Excellent</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Performance Metrics (Last 24 Hours)</h3>
+                <canvas id="performanceChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="agents-status">
+                <h3 class="chart-title">Agent Status</h3>
+                <div id="agents-list">
+                    <!-- Agent items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="activity-feed">
+            <h3 class="chart-title">Recent Activity</h3>
+            <div id="activity-list">
+                <!-- Activity items will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <div class="refresh-controls">
+        <button class="control-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="control-btn" onclick="toggleAutoRefresh()" title="Toggle Auto Refresh">
+            <i class="fas fa-play" id="auto-refresh-icon"></i>
+        </button>
+    </div>
+
+    <script>
+        // Dashboard data and functionality will be added in the next part
+        let autoRefreshEnabled = true;
+        let refreshInterval;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAgentStatus();
+            loadActivityFeed();
+            startAutoRefresh();
+        });
+
+        function initializeCharts() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: [145, 132, 128, 135, 127, 124, 127],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'CPU Usage (%)',
+                        data: [65, 59, 80, 81, 56, 55, 40],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#cbd5e1'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#cbd5e1'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadAgentStatus() {
+            const agents = [
+                { name: 'Claude Sonnet', status: 'healthy', avatar: '🤖' },
+                { name: 'Brand Intelligence', status: 'healthy', avatar: '🌟' },
+                { name: 'E-commerce Engine', status: 'healthy', avatar: '🛍️' },
+                { name: 'WordPress Builder', status: 'warning', avatar: '🌐' },
+                { name: 'Security Monitor', status: 'healthy', avatar: '🛡️' },
+                { name: 'Performance Optimizer', status: 'healthy', avatar: '⚡' }
+            ];
+
+            const agentsList = document.getElementById('agents-list');
+            agentsList.innerHTML = agents.map(agent => `
+                <div class="agent-item">
+                    <div class="agent-info">
+                        <div class="agent-avatar">${agent.avatar}</div>
+                        <div>
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-status">Last active: 2 min ago</div>
+                        </div>
+                    </div>
+                    <span class="status-badge status-${agent.status}">${agent.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function loadActivityFeed() {
+            const activities = [
+                { time: '2 min', title: 'Agent Deployment', description: 'New Claude Sonnet agent deployed successfully' },
+                { time: '5 min', title: 'Performance Alert', description: 'Response time improved by 15ms' },
+                { time: '12 min', title: 'Security Scan', description: 'Completed vulnerability assessment - 0 issues found' },
+                { time: '18 min', title: 'Model Update', description: 'Fashion ML model retrained with new data' },
+                { time: '25 min', title: 'API Integration', description: 'New e-commerce endpoint deployed' }
+            ];
+
+            const activityList = document.getElementById('activity-list');
+            activityList.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-time">${activity.time}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function refreshDashboard() {
+            const refreshBtn = document.querySelector('.control-btn');
+            refreshBtn.style.transform = 'rotate(360deg)';
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                loadAgentStatus();
+                loadActivityFeed();
+                updateMetrics();
+                refreshBtn.style.transform = '';
+            }, 1000);
+        }
+
+        function updateMetrics() {
+            // Simulate real-time metric updates
+            const metrics = {
+                'active-agents': Math.floor(Math.random() * 5) + 55,
+                'api-requests': Math.floor(Math.random() * 500) + 2500,
+                'response-time': Math.floor(Math.random() * 50) + 100,
+                'system-health': (99.5 + Math.random() * 0.5).toFixed(1)
+            };
+
+            Object.entries(metrics).forEach(([id, value]) => {
+                document.getElementById(id).textContent = value + (id === 'system-health' ? '%' : id === 'response-time' ? 'ms' : '');
+            });
+        }
+
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const icon = document.getElementById('auto-refresh-icon');
+            
+            if (autoRefreshEnabled) {
+                icon.className = 'fas fa-pause';
+                startAutoRefresh();
+            } else {
+                icon.className = 'fas fa-play';
+                clearInterval(refreshInterval);
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshEnabled) {
+                refreshInterval = setInterval(() => {
+                    updateMetrics();
+                    loadActivityFeed();
+                }, 30000); // Refresh every 30 seconds
+            }
+        }
+    </script>
+</body>
+</html>

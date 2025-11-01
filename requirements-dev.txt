@@ -1,0 +1,316 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - DEVELOPMENT DEPENDENCIES
+# Development, Testing, and Quality Assurance Tools
+# Version: 5.2.0
+# ============================================================================
+
+# Include production dependencies
+-r requirements.txt
+
+# ============================================================================
+# CODE QUALITY & FORMATTING
+# ============================================================================
+
+# Code Formatting
+black>=24.10.0
+isort>=5.13.2
+autopep8>=2.3.1
+
+# Linting & Static Analysis
+flake8>=7.1.1
+pylint>=3.3.2
+mypy>=1.13.0
+ruff>=0.8.4
+
+# Code Complexity Analysis
+radon>=6.0.1
+xenon>=0.9.1
+vulture>=2.14
+
+# Import Sorting & Organization
+isort>=5.13.2
+autoflake>=2.3.1
+
+# ============================================================================
+# SECURITY & VULNERABILITY SCANNING
+# ============================================================================
+
+# Security Linting
+bandit>=1.8.0
+safety>=3.2.11
+semgrep>=1.95.0
+
+# Dependency Security
+pip-audit>=2.7.3
+cyclonedx-bom>=4.6.1
+
+# ============================================================================
+# TESTING FRAMEWORK
+# ============================================================================
+
+# Core Testing
+pytest>=8.4.2
+pytest-asyncio>=0.24.0
+pytest-cov>=6.0.0
+pytest-mock>=3.14.0
+pytest-xdist>=3.6.0
+pytest-benchmark>=4.0.0
+pytest-timeout>=2.3.1
+pytest-env>=1.1.5
+pytest-html>=4.1.1
+pytest-json-report>=1.5.0
+
+# Test Data & Factories
+factory-boy>=3.3.1
+faker>=33.1.0
+hypothesis>=6.122.1
+
+# HTTP Testing
+httpx>=0.28.1
+responses>=0.25.3
+pytest-httpx>=0.32.0
+
+# Database Testing
+pytest-postgresql>=6.1.1
+pytest-redis>=3.1.2
+pytest-mongodb>=2.4.3
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+
+# Documentation Generation
+sphinx>=8.1.3
+sphinx-rtd-theme>=3.0.2
+sphinx-autodoc-typehints>=2.4.4
+myst-parser>=4.0.0
+
+# API Documentation
+mkdocs>=1.6.1
+mkdocs-material>=9.5.47
+mkdocs-swagger-ui-tag>=0.6.10
+
+# ============================================================================
+# DEVELOPMENT TOOLS
+# ============================================================================
+
+# Pre-commit Hooks
+pre-commit>=3.8.0
+
+# Environment Management
+python-dotenv>=1.0.1
+environs>=11.2.1
+
+# Debugging
+ipdb>=0.13.13
+pdb++>=0.10.3
+icecream>=2.1.3
+
+# Profiling & Performance
+py-spy>=0.3.14
+memory-profiler>=0.61.0
+line-profiler>=4.1.3
+pympler>=0.9
+
+# ============================================================================
+# MONITORING & OBSERVABILITY (DEV)
+# ============================================================================
+
+# Local Monitoring
+prometheus-client>=0.22.0
+grafana-api>=1.0.3
+
+# Logging
+structlog>=24.4.0
+loguru>=0.7.3
+python-json-logger>=3.2.0
+
+# ============================================================================
+# DATABASE DEVELOPMENT
+# ============================================================================
+
+# Database Tools
+alembic>=1.14.0
+sqlalchemy-utils>=0.41.2
+sqlalchemy-stubs>=0.4
+
+# Database Inspection
+sqlparse>=0.5.2
+sqlalchemy-migrate>=0.13.0
+
+# ============================================================================
+# API DEVELOPMENT & TESTING
+# ============================================================================
+
+# API Testing
+tavern>=2.12.1
+schemathesis>=3.34.1
+
+# OpenAPI Tools
+openapi-spec-validator>=0.7.1
+swagger-spec-validator>=3.0.4
+
+# ============================================================================
+# CONTAINERIZATION & DEPLOYMENT
+# ============================================================================
+
+# Docker Tools
+docker>=7.1.0
+docker-compose>=1.29.2
+
+# Kubernetes Tools
+kubernetes>=31.0.0
+pykube-ng>=24.3.0
+
+# ============================================================================
+# CI/CD TOOLS
+# ============================================================================
+
+# GitHub Actions
+github3.py>=4.0.1
+pygithub>=2.5.0
+
+# Build Tools
+build>=1.2.2
+twine>=6.0.1
+wheel>=0.45.1
+
+# ============================================================================
+# LOAD TESTING & PERFORMANCE
+# ============================================================================
+
+# Load Testing
+locust>=2.32.4
+artillery>=1.0.0
+
+# Performance Testing
+pytest-benchmark>=4.0.0
+py-spy>=0.3.14
+
+# ============================================================================
+# MACHINE LEARNING DEVELOPMENT
+# ============================================================================
+
+# ML Development
+jupyter>=1.1.1
+jupyterlab>=4.3.3
+notebook>=7.3.1
+
+# Data Science
+pandas-profiling>=3.6.6
+sweetviz>=2.3.1
+
+# Model Development
+mlflow>=3.1.0
+wandb>=0.18.7
+tensorboard>=2.18.0
+
+# ============================================================================
+# FASHION INDUSTRY SPECIFIC TOOLS
+# ============================================================================
+
+# Web Scraping Development
+scrapy>=2.12.0
+scrapy-splash>=0.8.0
+
+# Image Processing Development
+opencv-contrib-python>=4.11.0.86
+scikit-image>=0.24.0
+
+# ============================================================================
+# UTILITY TOOLS
+# ============================================================================
+
+# File Processing
+watchdog>=6.0.0
+pathlib2>=2.3.7.post1
+
+# JSON/YAML Processing
+pyyaml>=6.0.2
+jsonschema>=4.23.0
+yamllint>=1.35.1
+
+# Text Processing
+textdistance>=4.6.3
+fuzzywuzzy>=0.18.0
+python-levenshtein>=0.26.0
+
+# ============================================================================
+# DEVELOPMENT UTILITIES
+# ============================================================================
+
+# Code Navigation
+jedi>=0.19.2
+rope>=1.13.0
+
+# Terminal Enhancement
+rich>=13.9.4
+typer>=0.15.1
+click>=8.1.8
+
+# Time & Date Development
+freezegun>=1.5.1
+time-machine>=2.16.0
+
+# ============================================================================
+# CONFIGURATION & SECRETS MANAGEMENT
+# ============================================================================
+
+# Configuration Management
+dynaconf>=3.2.8
+python-decouple>=3.8
+configparser>=7.1.0
+
+# Secrets Management (Development)
+keyring>=25.5.0
+python-keyring>=25.5.0
+
+# ============================================================================
+# NETWORKING & HTTP DEVELOPMENT
+# ============================================================================
+
+# HTTP Development
+httpie>=3.2.4
+curl-cffi>=0.7.3
+
+# Network Testing
+pytest-socket>=0.7.0
+responses>=0.25.3
+
+# ============================================================================
+# ENTERPRISE DEVELOPMENT TOOLS
+# ============================================================================
+
+# Enterprise Logging
+python-json-logger>=3.2.0
+structlog>=24.4.0
+
+# Enterprise Monitoring
+datadog>=0.50.2
+newrelic>=10.4.0
+
+# Enterprise Security
+cryptography>=46.0.2
+pycryptodome>=3.21.0
+
+# ============================================================================
+# VERSION CONTROL & GIT TOOLS
+# ============================================================================
+
+# Git Integration
+gitpython>=3.1.43
+pygit2>=1.16.0
+pre-commit>=3.8.0
+
+# ============================================================================
+# PACKAGE MANAGEMENT
+# ============================================================================
+
+# Package Tools
+pip-tools>=7.4.1
+pipdeptree>=2.23.4
+pip-check>=2.8.1
+
+# Dependency Analysis
+pipreqs>=0.5.0
+johnnydep>=1.20.4
