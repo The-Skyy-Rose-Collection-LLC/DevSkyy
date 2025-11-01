@@ -89,7 +89,7 @@ class QueueManager:
         Waits for the next message on currently subscribed channels.
         
         Returns:
-            Message parsed from the channel payload when a new message is received; `None` if no message arrives within the internal timeout or an error occurs.
+            Message parsed from the channel payload when a new message is received; None if no message arrives within the internal timeout or an error occurs.
         """
         try:
             message = self.pubsub.get_message(timeout=1.0)
