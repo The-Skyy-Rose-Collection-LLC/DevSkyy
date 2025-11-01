@@ -13,24 +13,37 @@ class OpsAgent(BaseAgent):
     """Agent responsible for operational monitoring and system management."""
 
     def __init__(self, *args, **kwargs):
-        """Initialize Ops Agent."""
+        """
+        Create an OpsAgent named "OpsAgent" and ensure a "logs" directory exists for metrics.
+        
+        Initializes the BaseAgent with the name "OpsAgent" and creates the `metrics_path` attribute pointing to the "logs" directory, creating the directory if it does not already exist.
+        """
         super().__init__(name="OpsAgent", *args, **kwargs)
         self.metrics_path = Path("logs")
         self.metrics_path.mkdir(parents=True, exist_ok=True)
 
     def get_supported_tasks(self) -> List[str]:
-        """Get supported task types."""
+        """
+        Return the task type identifiers this agent can handle.
+        
+        Returns:
+            List[str]: Supported task type identifiers: "health_check", "collect_metrics", "trigger_backup", "scale_services".
+        """
         return ["health_check", "collect_metrics", "trigger_backup", "scale_services"]
 
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Process ops-related tasks.
-
-        Args:
-            task_type: Type of ops task
-            payload: Task parameters
-
+        """
+        Dispatch and execute an OpsAgent task based on its type.
+        
+        Parameters:
+            task_type (str): One of "health_check", "collect_metrics", "trigger_backup", or "scale_services".
+            payload (Dict[str, Any]): Task-specific parameters used by the selected task handler.
+        
         Returns:
-            Task result
+            Dict[str, Any]: A task-specific result object (health report, metrics, backup descriptor, or scaling descriptor).
+        
+        Raises:
+            ValueError: If task_type is not one of the supported types.
         """
         if task_type == "health_check":
             return await self._health_check(payload)
@@ -44,13 +57,22 @@ class OpsAgent(BaseAgent):
             raise ValueError(f"Unsupported task type: {task_type}")
 
     async def _health_check(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Perform system health check.
-
-        Args:
-            payload: Health check parameters
-
+        """
+        Perform a system health check and produce a structured health report.
+        
+        Parameters:
+            payload (Dict[str, Any]): Optional parameters for the check (currently unused).
+        
         Returns:
-            Health status
+            Dict[str, Any]: Health report with the following keys:
+                - `status` (str): Overall health status, e.g., "healthy" or "warning".
+                - `timestamp` (float): UNIX timestamp when the check was performed.
+                - `checks` (dict): Detailed measurements:
+                    - `disk_usage_percent` (float): Disk usage percentage.
+                    - `disk_free_gb` (float): Free disk space in gigabytes.
+                    - `queue_depths` (dict): Per-service queue depths.
+                    - `max_queue_depth` (int): Maximum queue depth across services.
+                - `alerts` (List[str]): List of alert messages triggered by threshold breaches.
         """
         self.logger.info("Performing health check")
 
@@ -100,13 +122,14 @@ class OpsAgent(BaseAgent):
         return health
 
     async def _collect_metrics(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Collect system metrics.
-
-        Args:
-            payload: Metrics collection parameters
-
+        """
+        Gather and persist current queue and API metrics.
+        
+        Parameters:
+            payload (Dict[str, Any]): Optional collection parameters (unused by default) that may influence which metrics are gathered.
+        
         Returns:
-            Collected metrics
+            Dict[str, Any]: Metrics snapshot containing `timestamp`, `queues` (per-service depth and throughput), and `api` (uptime_percent, avg_response_ms, error_rate_percent).
         """
         self.logger.info("Collecting system metrics")
 
@@ -148,13 +171,21 @@ class OpsAgent(BaseAgent):
         return metrics
 
     async def _trigger_backup(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Trigger system backup.
-
-        Args:
-            payload: Backup parameters
-
+        """
+        Initiates a backup operation and produces a descriptor with its metadata.
+        
+        Parameters:
+            payload (Dict[str, Any]): Backup parameters. Recognized key:
+                - "type": optional; backup type string (defaults to "full").
+        
         Returns:
-            Backup result
+            Dict[str, Any]: Backup descriptor containing keys:
+                - "backup_id": unique backup identifier
+                - "backup_type": the requested backup type
+                - "status": final backup status
+                - "size_bytes": size of the backup in bytes
+                - "started_at": start timestamp (epoch seconds)
+                - "completed_at": completion timestamp (epoch seconds)
         """
         self.logger.info("Triggering backup")
 
@@ -173,13 +204,21 @@ class OpsAgent(BaseAgent):
         return backup
 
     async def _scale_services(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Scale services based on load.
-
-        Args:
-            payload: Scaling parameters
-
+        """
+        Initiates a scaling operation for a service and returns a descriptor of the requested scaling action.
+        
+        Parameters:
+            payload (Dict[str, Any]): Parameters for scaling. Expected keys:
+                - "service" (str): Name of the service to scale.
+                - "instances" (int, optional): Desired target instance count; defaults to 2.
+        
         Returns:
-            Scaling result
+            Dict[str, Any]: A descriptor of the scaling operation containing:
+                - "service": requested service name
+                - "current_instances": current instance count (placeholder)
+                - "target_instances": requested target instance count
+                - "status": operation status (e.g., "scaling")
+                - "initiated_at": Unix timestamp when scaling was initiated
         """
         self.logger.info(f"Scaling services: {payload}")
 

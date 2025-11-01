@@ -15,7 +15,14 @@ from src.core.queue import QueueManager
 
 
 async def main():
-    """Run health check."""
+    """
+    Run the platform health check and report results to standard output.
+    
+    Loads configuration, initializes logging and the queue manager, executes the OpsAgent "health_check" task, prints the overall status, individual checks, and any alerts, and ensures the queue manager is closed before exit.
+    
+    Returns:
+        int: `0` on success, `1` if an error occurred during the health check.
+    """
     print("Fashion AI Platform - Health Check")
     print("=" * 50)
 

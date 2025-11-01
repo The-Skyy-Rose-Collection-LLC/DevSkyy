@@ -8,7 +8,15 @@ from src.core.queue import Message, QueueManager
 
 @pytest.fixture
 def queue_manager(config):
-    """Create queue manager for testing."""
+    """
+    Provide a QueueManager configured for integration tests and ensure it is closed after use.
+    
+    Parameters:
+        config: Test configuration object exposing `redis_host` and `redis_port`.
+    
+    Returns:
+        QueueManager: a QueueManager instance connected to the configured Redis and using the "test_fashion_ai" prefix.
+    """
     qm = QueueManager(
         host=config.redis_host,
         port=config.redis_port,
@@ -20,7 +28,11 @@ def queue_manager(config):
 
 @pytest.mark.integration
 async def test_design_to_commerce_flow(queue_manager, config):
-    """Test design generation to commerce listing flow."""
+    """
+    Verify that a DesignerAgent can generate a design and return a listing identifier.
+    
+    Creates a DesignerAgent pointing at the test designs directory and submits a generate_design task with a sample payload. Asserts the result has a "status" of "generated" and includes a "design_id".
+    """
     # Create agents
     designer = DesignerAgent(
         io_path=config.data_path / "designs",
@@ -37,7 +49,12 @@ async def test_design_to_commerce_flow(queue_manager, config):
 
 @pytest.mark.integration
 async def test_full_pipeline(queue_manager, config):
-    """Test full pipeline from design to finance."""
+    """
+    Placeholder integration test for the end-to-end agent pipeline from design to finance.
+    
+    Intended to exercise the full flow: Designer -> Commerce -> Marketing -> Finance -> Ops using real queue communication.
+    Currently a stub that always passes.
+    """
     # This would test:
     # Designer -> Commerce -> Marketing -> Finance -> Ops
     # In production with actual queue communication

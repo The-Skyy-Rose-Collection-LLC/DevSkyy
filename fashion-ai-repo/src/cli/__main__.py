@@ -14,23 +14,34 @@ from src.core.queue import QueueManager
 
 @click.group()
 def cli():
-    """Fashion AI Autonomous Commerce Platform CLI."""
+    """
+    Root Click command group for the Fashion AI Autonomous Commerce Platform CLI.
+    
+    Provides the top-level command namespace that groups subcommands for reporting the
+    version, starting individual agents, starting all agents (informational stub),
+    and performing a basic health check.
+    """
     pass
 
 
 @cli.command()
 def version():
-    """Show version information."""
+    """
+    Display the CLI version string for the Fashion AI Platform.
+    """
     click.echo("Fashion AI Platform v1.0.0")
 
 
 @cli.command()
 @click.option("--agent", type=click.Choice(["designer", "commerce", "marketing", "finance", "ops"]))
 def start(agent: str):
-    """Start a specific agent.
-
-    Args:
-        agent: Agent name to start
+    """
+    Start the specified agent process.
+    
+    Loads configuration, configures logging, initializes a QueueManager, instantiates the requested agent with its IO path, retry attempts, and timeout, then runs the agent's main loop. Exits with status 1 if the provided agent name is not recognized.
+    
+    Parameters:
+        agent: Name of the agent to start. Allowed values: "designer", "commerce", "marketing", "finance", "ops".
     """
     config = load_config()
     setup_logging(log_level=config.agent_log_level)
@@ -69,7 +80,13 @@ def start(agent: str):
 
 @cli.command()
 def start_all():
-    """Start all agents."""
+    """
+    Announces that all agents are starting and prints a readiness line for each known agent.
+    
+    Prints "Starting all agents..." followed by "  - {agent}: ready" for each configured agent.
+    This function only reports readiness and does not launch any agent processes; use an orchestrator
+    or multiprocessing to start agents in production.
+    """
     agents = ["designer", "commerce", "marketing", "finance", "ops"]
     click.echo("Starting all agents...")
 
@@ -80,7 +97,11 @@ def start_all():
 
 @cli.command()
 def health():
-    """Check system health."""
+    """
+    Report a basic CLI health status.
+    
+    Prints a brief health-check message to standard output indicating the system is healthy.
+    """
     click.echo("Running health check...")
     click.echo("System: healthy")
 
