@@ -110,7 +110,7 @@ class QueueManager:
             message (Message): Message object to enqueue.
         
         Returns:
-            bool: `True` if the message was successfully enqueued, `False` otherwise.
+            bool: True if the message was successfully enqueued, False otherwise.
         """
         try:
             queue_name = f"{self.prefix}:queue:{queue}"
