@@ -63,7 +63,7 @@ class QueueManager:
             message (Message): Message object to publish.
         
         Returns:
-            `true` if the message was published successfully, `false` otherwise.
+            True if the message was published successfully, False otherwise.
         """
         try:
             channel_name = f"{self.prefix}:{channel}"
