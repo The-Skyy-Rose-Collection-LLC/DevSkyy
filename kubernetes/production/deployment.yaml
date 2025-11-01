@@ -24,10 +24,30 @@ data:
   PORT: "8000"
   WORKERS: "4"
   LOG_LEVEL: "INFO"
-  DATABASE_URL: "postgresql://devskyy:password@postgres-service:5432/devskyy"
+  # DATABASE_URL is now set via Secret injection for security
+  # See database-credentials secret below
 
 ---
 # Secret for sensitive data (create manually or via CI/CD)
+# 
+# SECURITY WARNING: This Secret resource contains placeholder values.
+# NEVER commit real secrets to version control!
+#
+# Create the secret using one of these methods:
+#
+# Method 1: kubectl create secret (recommended)
+# kubectl create secret generic devskyy-secrets \
+#   --from-literal=JWT_SECRET_KEY="$(openssl rand -base64 32)" \
+#   --from-literal=ENCRYPTION_MASTER_KEY="$(openssl rand -base64 32)" \
+#   --from-literal=ANTHROPIC_API_KEY="sk-ant-YOUR-ACTUAL-KEY" \
+#   --from-literal=OPENAI_API_KEY="sk-YOUR-ACTUAL-KEY" \
+#   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
+#   --namespace=production
+#
+# Method 2: External Secret Manager (production best practice)
+# Use AWS Secrets Manager, HashiCorp Vault, or Azure Key Vault
+# and reference via Sealed Secrets or External Secrets Operator
+#
 apiVersion: v1
 kind: Secret
 metadata:
@@ -35,12 +55,14 @@ metadata:
   namespace: production
 type: Opaque
 stringData:
-  JWT_SECRET_KEY: "your-jwt-secret-key-change-me"
-  ENCRYPTION_MASTER_KEY: "your-encryption-key-change-me"
-  ANTHROPIC_API_KEY: "sk-ant-your-key-here"
-  OPENAI_API_KEY: "sk-your-key-here"
-  DOCKER_USERNAME: "skyyrosellc"
-  DOCKER_PASSWORD: "your-docker-password"
+  # CRITICAL: Replace all values below with real secrets before deploying!
+  JWT_SECRET_KEY: "REPLACE-WITH-SECURE-RANDOM-STRING-MIN-32-CHARS"
+  ENCRYPTION_MASTER_KEY: "REPLACE-WITH-SECURE-RANDOM-STRING-32-BYTES"
+  ANTHROPIC_API_KEY: "sk-ant-REPLACE-WITH-ACTUAL-KEY"
+  OPENAI_API_KEY: "sk-REPLACE-WITH-ACTUAL-KEY"
+  DATABASE_URL: "postgresql://user:password@postgres-service:5432/devskyy"
+  DOCKER_USERNAME: "REPLACE-WITH-ACTUAL-USERNAME"
+  DOCKER_PASSWORD: "REPLACE-WITH-ACTUAL-PASSWORD"
 
 ---
 # Blue Deployment
@@ -401,8 +423,11 @@ spec:
 
 ---
 # Docker Cloud registry secret (create with kubectl)
+# 
+# SECURITY WARNING: Replace with actual credentials before deploying!
+#
 # kubectl create secret docker-registry docker-cloud-credentials \
 #   --docker-server=cloud://skyyrosellc \
-#   --docker-username=skyyrosellc \
-#   --docker-password=your-password \
+#   --docker-username=YOUR-ACTUAL-USERNAME \
+#   --docker-password=YOUR-ACTUAL-PASSWORD \
 #   --namespace=production

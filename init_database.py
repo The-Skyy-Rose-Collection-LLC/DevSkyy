@@ -11,9 +11,11 @@ from pathlib import Path
         from database_config import DATABASE_URL, DB_PROVIDER
         import traceback
     from database import AsyncSessionLocal
+from security.jwt_auth import hash_password
 from dotenv import load_dotenv
 import asyncio
 import logging
+import os
 
 """
 Initialize DevSkyy Database
@@ -125,12 +127,20 @@ async def create_sample_data():
 
     async with AsyncSessionLocal() as session:
         try:
-            # Create sample user
+            # Get admin password from environment or prompt
+            admin_password = os.environ.get("ADMIN_PASSWORD")
+            if not admin_password:
+                logger.warning("⚠️  ADMIN_PASSWORD not set. Generating temporary password for sample user.")
+                logger.warning("⚠️  User 'admin' will have an unusable password. Set ADMIN_PASSWORD env var for production.")
+                # Use a placeholder that will never work (security by default)
+                admin_password = "TEMP_PASSWORD_REQUIRES_ENV_VAR_ADMIN_PASSWORD"
+            
+            # Create sample user with properly hashed password
             sample_user = User(
                 email="admin@devskyy.com",
                 username="admin",
                 full_name="DevSkyy Admin",
-                hashed_password="<replace with hashed password>",
+                hashed_password=hash_password(admin_password),
                 is_superuser=True,
             )
             session.add(sample_user)

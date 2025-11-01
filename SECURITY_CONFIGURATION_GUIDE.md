@@ -268,6 +268,101 @@ def test_security_headers():
 - ✅ **Regular Rotation**: Rotate keys every 90 days
 - ✅ **Access Control**: Limit who can access production keys
 
+### **1.5. Secret Management (CRITICAL)**
+DevSkyy follows the **Truth Protocol** requirement: **No hard-coded secrets in the repository**.
+
+#### ✅ **Correct: Environment Variables**
+```bash
+# Store in .env file (NOT committed to git)
+SECRET_KEY=your-secret-key-here
+JWT_SECRET_KEY=your-jwt-secret-here
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+
+# Load at runtime
+from dotenv import load_dotenv
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+```
+
+#### ❌ **Incorrect: Hardcoded Secrets**
+```python
+# NEVER do this!
+SECRET_KEY = "my-secret-key-123"  # This will be rejected in CI/CD
+API_KEY = "sk-ant-actual-key"     # This is a security violation
+```
+
+#### 🏢 **Production Secret Managers**
+For enterprise deployments, use external secret managers:
+
+**AWS Environment:**
+```bash
+# Use AWS Secrets Manager
+aws secretsmanager create-secret \
+  --name devskyy/production/jwt-secret \
+  --secret-string "$(openssl rand -hex 32)"
+
+# In application
+import boto3
+client = boto3.client('secretsmanager')
+secret = client.get_secret_value(SecretId='devskyy/production/jwt-secret')
+JWT_SECRET_KEY = secret['SecretString']
+```
+
+**Kubernetes Environment:**
+```bash
+# Create secret via kubectl (not in YAML files)
+kubectl create secret generic devskyy-secrets \
+  --from-literal=JWT_SECRET_KEY="$(openssl rand -hex 32)" \
+  --from-literal=ANTHROPIC_API_KEY="sk-ant-YOUR-KEY" \
+  --namespace=production
+
+# Reference in deployment.yaml
+env:
+  - name: JWT_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: devskyy-secrets
+        key: JWT_SECRET_KEY
+```
+
+**Docker Compose:**
+```yaml
+services:
+  app:
+    env_file: .env  # Load from .env (not committed)
+    # Or use Docker secrets
+    secrets:
+      - jwt_secret
+    environment:
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+
+secrets:
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt  # Not in repository
+```
+
+**HashiCorp Vault:**
+```bash
+# Store secret
+vault kv put secret/devskyy/production jwt_secret="$(openssl rand -hex 32)"
+
+# Retrieve in application
+import hvac
+client = hvac.Client(url='https://vault.example.com')
+secret = client.secrets.kv.v2.read_secret_version(path='devskyy/production')
+JWT_SECRET_KEY = secret['data']['data']['jwt_secret']
+```
+
+#### 📋 **Secret Management Checklist**
+- [ ] **No secrets in source code** - Verify with `git secrets scan`
+- [ ] **.env.example exists** - Template without real values
+- [ ] **.env in .gitignore** - Actual secrets never committed
+- [ ] **Kubernetes secrets** - Use kubectl, not hardcoded in YAML
+- [ ] **CI/CD secrets** - Use GitHub Secrets, GitLab CI Variables, etc.
+- [ ] **Rotate regularly** - Every 90 days minimum
+- [ ] **Audit access** - Who can view/change production secrets
+- [ ] **Monitor usage** - Alert on unexpected secret access
+
 ### **2. Authentication**
 - ✅ **Strong Passwords**: Enforce complexity requirements
 - ✅ **Multi-Factor Authentication**: Require MFA for admin accounts
