@@ -20,14 +20,15 @@ class BaseAgent(ABC):
         retry_attempts: int = 3,
         timeout: int = 60,
     ):
-        """Initialize base agent.
-
-        Args:
-            name: Agent name
-            io_path: Input/output path for agent data
-            queue_manager: Queue manager instance
-            retry_attempts: Number of retry attempts for failed tasks
-            timeout: Task timeout in seconds
+        """
+        Initialize the BaseAgent with identity, storage path, queue manager, and retry/time settings.
+        
+        Parameters:
+            name: Agent name used for identification and log file naming.
+            io_path: Filesystem path for agent input/output; the directory will be created if it does not exist.
+            queue_manager: QueueManager used to publish and consume messages for this agent.
+            retry_attempts: Maximum number of attempts to retry a failing task.
+            timeout: Per-task timeout in seconds.
         """
         self.name = name
         self.io_path = Path(io_path)
@@ -42,37 +43,45 @@ class BaseAgent(ABC):
 
     @abstractmethod
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Process a task.
-
-        Args:
-            task_type: Type of task to process
-            payload: Task payload
-
+        """
+        Process a single task identified by task_type using the provided payload and return the processing result.
+        
+        Parameters:
+            task_type (str): Identifier of the task to execute.
+            payload (Dict[str, Any]): Input data required to perform the task.
+        
         Returns:
-            Result dictionary
+            Dict[str, Any]: Result of task processing containing outcome details or response data.
         """
         pass
 
     @abstractmethod
     def get_supported_tasks(self) -> List[str]:
-        """Get list of supported task types.
-
+        """
+        List the task type identifiers that this agent can handle.
+        
         Returns:
-            List of task type strings
+            A list of supported task type strings.
         """
         pass
 
     async def execute_with_retry(
         self, task_type: str, payload: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Execute task with retry logic.
-
-        Args:
-            task_type: Type of task
-            payload: Task payload
-
+        """
+        Execute a task with retry logic and return its result.
+        
+        Attempts to run the specified task by calling process_task up to self.retry_attempts times, waiting with exponential backoff between retries when failures occur.
+        
+        Parameters:
+            task_type (str): Identifier for the task to execute.
+            payload (Dict[str, Any]): Data passed to the task.
+        
         Returns:
-            Result dictionary
+            Dict[str, Any]: The result produced by the successful task execution.
+        
+        Raises:
+            Exception: Re-raises the exception from the final failed attempt if the task keeps failing.
         """
         for attempt in range(self.retry_attempts):
             try:
@@ -96,15 +105,16 @@ class BaseAgent(ABC):
     def send_message(
         self, target_agent: str, task_type: str, payload: Dict[str, Any]
     ) -> bool:
-        """Send message to another agent.
-
-        Args:
-            target_agent: Target agent name
-            task_type: Task type
-            payload: Message payload
-
+        """
+        Send a task message to another agent via the queue manager.
+        
+        Parameters:
+            target_agent (str): Name of the recipient agent.
+            task_type (str): Type of task being requested.
+            payload (Dict[str, Any]): Data to deliver with the message.
+        
         Returns:
-            True if successful
+            True if the message was published successfully, False otherwise.
         """
         message = Message(
             source_agent=self.name,
@@ -123,12 +133,16 @@ class BaseAgent(ABC):
         return success
 
     def start(self) -> None:
-        """Start the agent."""
+        """
+        Mark the agent as running and log that it has started.
+        """
         self.running = True
         self.logger.info(f"Agent {self.name} started")
 
     def stop(self) -> None:
-        """Stop the agent."""
+        """
+        Set the agent to a stopped state and record the stop event in the agent log.
+        """
         self.running = False
         self.logger.info(f"Agent {self.name} stopped")
 

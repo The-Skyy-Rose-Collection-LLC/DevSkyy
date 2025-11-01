@@ -10,24 +10,37 @@ class DesignerAgent(BaseAgent):
     """Agent responsible for creating, validating, and curating fashion designs."""
 
     def __init__(self, *args, **kwargs):
-        """Initialize Designer Agent."""
+        """
+        Initialize the DesignerAgent and prepare its design storage.
+        
+        Sets the agent name to "DesignerAgent", stores the path to the agent's designs directory on `self.designs_path`, and ensures that directory exists (created if necessary). Additional positional and keyword arguments are passed to the BaseAgent initializer.
+        """
         super().__init__(name="DesignerAgent", *args, **kwargs)
         self.designs_path = self.io_path / "designs"
         self.designs_path.mkdir(parents=True, exist_ok=True)
 
     def get_supported_tasks(self) -> List[str]:
-        """Get supported task types."""
+        """
+        List the task types this agent can perform.
+        
+        Returns:
+            List[str]: Supported task type names: "generate_design", "validate_design", "extract_features", and "curate_collection".
+        """
         return ["generate_design", "validate_design", "extract_features", "curate_collection"]
 
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Process design-related tasks.
-
-        Args:
-            task_type: Type of design task
-            payload: Task parameters
-
+        """
+        Dispatches a design-related task to the appropriate handler and returns the task result.
+        
+        Parameters:
+            task_type (str): One of "generate_design", "validate_design", "extract_features", or "curate_collection" indicating which handler to invoke.
+            payload (Dict[str, Any]): Parameters required by the selected task handler.
+        
         Returns:
-            Task result
+            result (Dict[str, Any]): A dictionary containing the task-specific outcome.
+        
+        Raises:
+            ValueError: If task_type is not one of the supported task names.
         """
         if task_type == "generate_design":
             return await self._generate_design(payload)
@@ -41,13 +54,26 @@ class DesignerAgent(BaseAgent):
             raise ValueError(f"Unsupported task type: {task_type}")
 
     async def _generate_design(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate new fashion design.
-
-        Args:
-            payload: Design parameters (style, color, season, etc.)
-
+        """
+        Generate a new fashion design using the provided parameters.
+        
+        Parameters:
+            payload (Dict[str, Any]): Design parameters. Recognized keys:
+                - "style" (str): Design style, default "modern".
+                - "color" (str): Primary color or palette, default "neutral".
+                - "season" (str): Target season, default "all-season".
+                Additional keys are preserved in the returned metadata.
+        
         Returns:
-            Generated design information
+            Dict[str, Any]: A dictionary describing the generated design with keys:
+                - "design_id" (str): Unique identifier for the design.
+                - "design_file" (str): Path to the generated design file.
+                - "style" (str): Chosen style.
+                - "color" (str): Chosen color/palette.
+                - "season" (str): Target season.
+                - "status" (str): Generation status (e.g., "generated").
+                - "metadata" (dict): Generation metadata including "generated_at" (timestamp)
+                  and "parameters" (the provided payload).
         """
         self.logger.info(f"Generating design with parameters: {payload}")
 
@@ -85,13 +111,19 @@ class DesignerAgent(BaseAgent):
         return result
 
     async def _validate_design(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate design quality and standards.
-
-        Args:
-            payload: Design data to validate
-
+        """
+        Assess a design against quality and brand standards and produce a validation summary.
+        
+        Parameters:
+            payload (Dict[str, Any]): Design metadata; expected keys include "design_id" and optional "design_file".
+        
         Returns:
-            Validation result
+            Dict[str, Any]: Validation summary with keys:
+                - "design_id" (str | None): The design identifier from the payload.
+                - "valid" (bool): `True` if the design meets standards, `False` otherwise.
+                - "quality_score" (float): Numeric quality score (higher is better).
+                - "issues" (List[str]): Identified problems or failures.
+                - "recommendations" (List[str]): Suggested actions to improve the design.
         """
         self.logger.info(f"Validating design: {payload.get('design_id')}")
 
@@ -113,13 +145,18 @@ class DesignerAgent(BaseAgent):
         return validation_result
 
     async def _extract_features(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract features from design using CLIP or similar.
-
-        Args:
-            payload: Design data
-
+        """
+        Extracts visual feature embeddings for a design.
+        
+        Parameters:
+            payload (Dict[str, Any]): Input data for extraction. Must include 'design_id' to tag the features.
+        
         Returns:
-            Feature embeddings
+            Dict[str, Any]: A dictionary with keys:
+                - design_id (str | None): The design identifier from the payload.
+                - embeddings (List[float]): Feature vector representing the design (placeholder length 512).
+                - feature_dim (int): Dimensionality of the embeddings (512).
+                - model (str): Identifier of the model used to produce embeddings (e.g., "CLIP-ViT-B/32").
         """
         self.logger.info(f"Extracting features for: {payload.get('design_id')}")
 
@@ -139,13 +176,22 @@ class DesignerAgent(BaseAgent):
         return features
 
     async def _curate_collection(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Curate a collection from available designs.
-
-        Args:
-            payload: Curation parameters (theme, size, criteria)
-
+        """
+        Builds a curated collection descriptor based on provided curation parameters.
+        
+        Parameters:
+            payload (Dict[str, Any]): Curation parameters. Recognized keys:
+                - theme (str): Collection theme (default "seasonal").
+                - size (int): Desired number of designs in the collection (default 10).
+                - criteria (Any): Optional filtering or ranking criteria (implementation dependent).
+        
         Returns:
-            Curated collection
+            Dict[str, Any]: A collection dictionary containing:
+                - collection_id (str): Generated collection identifier.
+                - theme (str): Applied theme.
+                - designs (List[str]): List of selected design IDs (may be empty).
+                - size (int): Requested collection size.
+                - created_at (float): Creation timestamp (epoch seconds).
         """
         self.logger.info(f"Curating collection: {payload}")
 

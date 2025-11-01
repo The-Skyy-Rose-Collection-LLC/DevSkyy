@@ -13,10 +13,13 @@ class MLPipeline:
     """End-to-end ML pipeline for fashion design."""
 
     def __init__(self, config_path: Path = Path("config/ml.yaml")):
-        """Initialize ML pipeline.
-
-        Args:
-            config_path: Path to ML configuration file
+        """
+        Initialize the MLPipeline instance and prepare configured stages and output directories.
+        
+        If `config_path` exists, load configuration from the YAML file; otherwise use an empty configuration. Extract the "stages" mapping from the configuration and ensure the output directories for processed designs, embeddings, and generated items exist.
+        
+        Parameters:
+            config_path (Path): Path to the ML configuration YAML file. If the file does not exist, defaults are used.
         """
         self.config = load_yaml(config_path) if config_path.exists() else {}
         self.stages = self.config.get("stages", {})
@@ -31,13 +34,14 @@ class MLPipeline:
         logger.info("ML Pipeline initialized")
 
     async def run_pipeline(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Run the full ML pipeline.
-
-        Args:
-            input_data: Input parameters
-
+        """
+        Execute the configured ML pipeline stages in order and aggregate each stage's results.
+        
+        Parameters:
+            input_data (Dict[str, Any]): Inputs and parameters provided to the pipeline (e.g., source paths, generation prompts, or runtime options).
+        
         Returns:
-            Pipeline output
+            Dict[str, Any]: A mapping from stage names ("collect", "validate", "features", "generate", "evaluate", "store") to each stage's result dictionary.
         """
         logger.info("Starting ML pipeline execution")
 
@@ -65,52 +69,67 @@ class MLPipeline:
         return results
 
     async def _collect(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Collect and load input data.
-
-        Args:
-            data: Input parameters
-
+        """
+        Collect and load input data for the pipeline.
+        
+        Parameters:
+            data (Dict[str, Any]): Input parameters or options that control collection (for example, source paths or filters).
+        
         Returns:
-            Collected data
+            result (Dict[str, Any]): Collection summary with keys:
+                - files_collected (int): Number of files collected.
+                - status (str): Collection status (for example, "complete").
         """
         logger.info("Collecting input data")
         # Placeholder for data collection logic
         return {"files_collected": 0, "status": "complete"}
 
     async def _validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate collected data.
-
-        Args:
-            data: Collected data
-
+        """
+        Validate collected input data and return structured validation results.
+        
+        Parameters:
+            data (Dict[str, Any]): Collected input payload to validate (e.g., file references and metadata).
+        
         Returns:
-            Validation results
+            validation (Dict[str, Any]): Dictionary containing validation results:
+                - files_validated (int): Number of files checked.
+                - errors (List[Any]): List of validation errors found (empty if none).
+                - status (str): Overall validation status (e.g., "valid", "invalid").
         """
         logger.info("Validating input data")
         # Placeholder for validation logic
         return {"files_validated": 0, "errors": [], "status": "valid"}
 
     async def _extract_features(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract features using CLIP or similar.
-
-        Args:
-            data: Validated data
-
+        """
+        Extract feature embeddings from validated input data (e.g., using CLIP-like models).
+        
+        Parameters:
+            data (Dict[str, Any]): Validated input data produced by the pipeline's validation stage.
+        
         Returns:
-            Feature embeddings
+            Dict[str, Any]: Summary of extracted features containing:
+                - embeddings_count (int): Number of embeddings produced.
+                - embedding_dim (int): Dimensionality of each embedding.
+                - model (str): Identifier of the model used to extract embeddings.
         """
         logger.info("Extracting features")
         # Placeholder for CLIP feature extraction
         return {"embeddings_count": 0, "embedding_dim": 512, "model": "CLIP-ViT-B/32"}
 
     async def _generate(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate new designs using diffusion models.
-
-        Args:
-            data: Generation parameters
-
+        """
+        Generate new design items from the provided generation parameters.
+        
+        Parameters:
+            data (dict): Generation parameters such as prompts, number of samples, random seed, and other model-specific options.
+        
         Returns:
-            Generated designs
+            result (dict): Summary of the generation containing:
+                - designs_generated (int): Number of designs produced.
+                - model (str): Name of the model used for generation.
+                - output_path (str): Filesystem path where generated items are stored.
         """
         logger.info("Generating designs")
         # Placeholder for diffusion model generation
@@ -121,13 +140,17 @@ class MLPipeline:
         }
 
     async def _evaluate(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Evaluate generated designs.
-
-        Args:
-            data: Generated designs
-
+        """
+        Evaluate generated designs and produce aggregate quality and novelty metrics.
+        
+        Parameters:
+            data (Dict[str, Any]): Dictionary containing generated designs and related metadata.
+        
         Returns:
-            Evaluation metrics
+            Dict[str, Any]: Evaluation results with keys:
+                - "avg_novelty_score" (float): Mean novelty score across designs, range 0.0–1.0.
+                - "avg_quality_score" (float): Mean quality score across designs, range 0.0–1.0.
+                - "passed_threshold" (int): Number of designs that passed the configured acceptance thresholds.
         """
         logger.info("Evaluating designs")
         # Placeholder for evaluation logic
@@ -138,13 +161,16 @@ class MLPipeline:
         }
 
     async def _store(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Store processed designs.
-
-        Args:
-            data: Design data to store
-
+        """
+        Store processed design artifacts and metadata to persistent storage.
+        
+        Parameters:
+            data (Dict[str, Any]): Collected and processed design artifacts and associated metadata to persist.
+        
         Returns:
-            Storage confirmation
+            result (Dict[str, Any]): Storage outcome with keys:
+                - "designs_stored" (int): Number of designs successfully stored.
+                - "status" (str): Human-readable status of the storage operation.
         """
         logger.info("Storing designs")
         # Placeholder for storage logic

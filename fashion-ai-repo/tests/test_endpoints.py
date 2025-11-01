@@ -5,7 +5,11 @@ from fastapi.testclient import TestClient
 
 
 def test_root_endpoint(client: TestClient):
-    """Test root endpoint."""
+    """
+    Verify the API root (/) responds with service status "online" and includes a "version" field.
+    
+    Asserts the HTTP status code is 200, the JSON payload's "status" equals "online", and that a "version" key is present.
+    """
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
@@ -40,7 +44,11 @@ def test_get_products(client: TestClient):
 
 
 def test_system_status(client: TestClient):
-    """Test system status endpoint."""
+    """
+    Verify the /api/system/status endpoint responds with status 200 and includes a payload containing "agents".
+    
+    Asserts that the HTTP response code is 200, the JSON "status" field equals 200, a "payload" field is present, and that "agents" exists within the payload.
+    """
     response = client.get("/api/system/status")
     assert response.status_code == 200
     data = response.json()

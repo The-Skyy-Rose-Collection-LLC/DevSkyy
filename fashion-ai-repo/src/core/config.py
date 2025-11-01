@@ -68,23 +68,49 @@ class Config(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        """Construct database URL."""
+        """
+        Builds a PostgreSQL connection URL from the instance's database settings.
+        
+        Returns:
+            str: Connection URL in the form "postgresql://{user}:{password}@{host}:{port}/{dbname}".
+        """
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
     @property
     def redis_url(self) -> str:
-        """Construct Redis URL."""
+        """
+        Constructs a Redis connection URL from the configured host, port, database, and optional password.
+        
+        Returns:
+            redis_url (str): Redis connection URL. If a password is configured, the URL includes the credentials.
+        """
         if self.redis_password:
             return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
         return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
 
 def load_config(config_path: Optional[Path] = None) -> Config:
-    """Load configuration from file and environment."""
+    """
+    Create a Config instance populated from environment variables, the configured `.env` file, and module defaults.
+    
+    Parameters:
+        config_path (Path | None): Optional path hint for a config file; currently ignored by this implementation.
+    
+    Returns:
+        Config: A configuration object with values resolved from environment, `.env`, and the class defaults.
+    """
     return Config()
 
 
 def load_yaml_config(file_path: Path) -> Dict[str, Any]:
-    """Load YAML configuration file."""
+    """
+    Load and parse a YAML file into a Python dictionary.
+    
+    Parameters:
+        file_path (Path): Path to the YAML file to read.
+    
+    Returns:
+        dict: Parsed YAML content as a dictionary.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
