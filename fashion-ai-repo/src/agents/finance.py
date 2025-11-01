@@ -69,13 +69,13 @@ class FinanceAgent(BaseAgent):
         
         Returns:
             Dict[str, Any]: The saved ledger entry with keys:
-                - "entry_id": unique entry identifier
-                - "transaction_type": resolved transaction type
-                - "amount_cents": resolved amount in cents
-                - "currency": currency code ("USD")
-                - "reference_id": resolved reference identifier
-                - "recorded_at": timestamp when entry was recorded
-                - "metadata": original payload
+                - "entry_id" (str): unique entry identifier
+                - "transaction_type" (str): resolved transaction type
+                - "amount_cents" (int): resolved amount in cents
+                - "currency" (str): currency code ("USD")
+                - "reference_id" (str): resolved reference identifier
+                - "recorded_at" (float): timestamp when entry was recorded (seconds since epoch)
+                - "metadata" (Dict[str, Any]): original payload
         """
         self.logger.info(f"Recording ledger entry: {payload}")
 
