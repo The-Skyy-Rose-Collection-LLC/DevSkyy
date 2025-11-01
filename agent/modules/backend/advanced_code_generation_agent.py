@@ -1,16 +1,10 @@
 from ..dependencies import get_current_user
-import React, { useState, useEffect } from 'react';
 import os
-
+import asyncio
 from fastapi import APIRouter, HTTPException, Depends
-
-    import asyncio
-from ..models import {model_name}
 from typing import Any, Dict, List
-from typing import Dict, Any, List
 import logging
 import openai
-import { motion } from 'framer-motion';
 
 """
 Advanced Code Generation Agent
