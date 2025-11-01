@@ -30,7 +30,7 @@ passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.12.14
 cryptography==46.0.2  # Latest for security (multiple CVEs fixed)
-PyJWT==2.11.0  # JWT tokens (replaces python-jose)
+PyJWT==2.10.1  # JWT tokens (replaces python-jose) - Latest stable version
 bcrypt==4.2.1  # Latest
 argon2-cffi==23.1.0  # Additional password hashing
 
