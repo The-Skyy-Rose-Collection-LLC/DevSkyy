@@ -35,7 +35,7 @@ def sample_design_payload():
     Provide a sample design payload dictionary used in tests.
     
     Returns:
-        design_payload (dict): Dictionary with keys "style", "color", and "season" set to "modern", "crimson", and "spring", respectively.
+        dict: Dictionary with keys "style", "color", and "season" set to "modern", "crimson", and "spring", respectively.
     """
     return {"style": "modern", "color": "crimson", "season": "spring"}
 
