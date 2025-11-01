@@ -68,11 +68,16 @@ class ProductionConfig(Config):
     SESSION_COOKIE_HTTPONLY = True
 
 class TestingConfig(Config):
-    """Testing configuration."""
+    """Testing configuration.
+    
+    NOTE: This configuration bypasses the production SECRET_KEY requirement
+    to allow automated testing. NEVER use this configuration in production.
+    """
 
     TESTING = True
     DATABASE_URL = "sqlite:///:memory:"
-    SECRET_KEY = "test-secret-key"  # Allow test secret key
+    # Override base SECRET_KEY validation for testing only
+    SECRET_KEY = os.environ.get("TEST_SECRET_KEY", "test-secret-key-for-automated-tests-only")
 
 # Configuration mapping
 config = {

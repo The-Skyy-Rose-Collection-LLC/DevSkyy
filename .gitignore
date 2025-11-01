@@ -47,6 +47,15 @@ htmlcov/
 *.temp
 *.bak
 
+# Backup files (Truth Protocol: No backup files in repository)
+*.backup
+*.broken
+main.py.*
+!main.py
+*-backup/
+*-emergency-/
+*-EMERGENCY-*/
+
 # Database
 *.db
 *.sqlite
