@@ -10,18 +10,15 @@ Features:
 - Emergency controls
 """
 
-import asyncio
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
-from agent.orchestrator import AgentOrchestrator, ExecutionPriority, AgentTask, TaskStatus
 from agent.modules.base_agent import BaseAgent
-from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import (
-    BoundedAutonomyWrapper,
-    ActionRiskLevel
-)
+from agent.orchestrator import AgentOrchestrator, AgentTask, ExecutionPriority, TaskStatus
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
+from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
+
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +47,7 @@ class BoundedOrchestrator(AgentOrchestrator):
         self.auto_approve_low_risk = auto_approve_low_risk
 
         # Bounded autonomy components
-        self.wrapped_agents: Dict[str, BoundedAutonomyWrapper] = {}
+        self.wrapped_agents: dict[str, BoundedAutonomyWrapper] = {}
         self.approval_system = ApprovalSystem()
 
         # Emergency controls
@@ -65,8 +62,8 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def register_agent(
         self,
         agent: BaseAgent,
-        capabilities: List[str],
-        dependencies: List[str] = None,
+        capabilities: list[str],
+        dependencies: list[str] = None,
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
     ) -> bool:
         """
@@ -103,11 +100,11 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def execute_task(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
-        required_capabilities: List[str],
+        parameters: dict[str, Any],
+        required_capabilities: list[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
         require_approval: Optional[bool] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute task with bounded autonomy controls.
 
@@ -192,16 +189,16 @@ class BoundedOrchestrator(AgentOrchestrator):
         # Execute immediately
         return await self._execute_bounded_task(task)
 
-    async def execute_approved_task(self, task_id: str, approved_by: str) -> Dict[str, Any]:
+    async def execute_approved_task(self, task_id: str, approved_by: str) -> dict[str, Any]:
         """
-        Execute a task that has been approved.
-
-        Args:
-            task_id: Task ID to execute
-            approved_by: Operator who approved
-
+        Execute a previously approved task and record its execution with the approval system.
+        
+        Parameters:
+            task_id (str): Identifier of the approved task to execute.
+            approved_by (str): Operator who approved the task.
+        
         Returns:
-            Execution result
+            dict: Execution outcome containing at least `task_id`, `status`, `results`, and `execution_time`; includes `errors` when failures occurred or an `error` key with `status: "error"` if the task was not found.
         """
         if task_id not in self.tasks:
             return {"error": "Task not found", "status": "error"}
@@ -213,11 +210,13 @@ class BoundedOrchestrator(AgentOrchestrator):
         result = await self._execute_bounded_task(task)
 
         # Mark as executed in approval system
-        await self.approval_system.mark_executed(task_id, result)
+        # Sanitize result to prevent circular references before JSON serialization
+        sanitized_result = self._sanitize_for_json(result)
+        await self.approval_system.mark_executed(task_id, sanitized_result)
 
         return result
 
-    async def _execute_bounded_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_bounded_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute task through bounded agents"""
         task.status = TaskStatus.RUNNING
         task.started_at = datetime.now()
@@ -272,7 +271,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
                 except Exception as e:
                     logger.error(f"Agent {agent_name} failed: {e}")
-                    errors.append(f"{agent_name}: {str(e)}")
+                    errors.append(f"{agent_name}: {e!s}")
                     results[agent_name] = {"error": str(e)}
 
                     execution_time = (datetime.now() - start_time).total_seconds()
@@ -302,8 +301,8 @@ class BoundedOrchestrator(AgentOrchestrator):
     def _assess_task_risk(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
-        agents: List[str]
+        parameters: dict[str, Any],
+        agents: list[str]
     ) -> ActionRiskLevel:
         """Assess overall risk level of a task"""
         task_lower = task_type.lower()
@@ -381,7 +380,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
         return {"status": "resumed", "operator": operator}
 
-    async def get_bounded_status(self) -> Dict[str, Any]:
+    async def get_bounded_status(self) -> dict[str, Any]:
         """Get bounded orchestrator status"""
         base_health = await self.get_orchestrator_health()
 
@@ -407,3 +406,36 @@ class BoundedOrchestrator(AgentOrchestrator):
             **base_health,
             "bounded_autonomy": bounded_status
         }
+
+    def _sanitize_for_json(self, data: Any) -> Any:
+        """
+        Produce a JSON-serializable copy of `data` by removing internal circular-reference keys and converting non-serializable values to strings.
+        
+        Recursively processes dictionaries, lists, and tuples. For dictionaries, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other non-serializable or unknown types are converted to their string representation.
+        
+        Parameters:
+            data (Any): The input value to sanitize for JSON serialization.
+        
+        Returns:
+            Any: A sanitized, JSON-serializable representation of `data` with internal reference keys removed and non-serializable values converted to strings.
+        """
+        if isinstance(data, dict):
+            sanitized = {}
+            for key, value in data.items():
+                # Skip internal circular reference keys
+                if key in ("_previous_results", "_shared_context"):
+                    continue
+                try:
+                    # Recursively sanitize nested structures
+                    sanitized[key] = self._sanitize_for_json(value)
+                except (TypeError, ValueError):
+                    # Skip non-serializable values
+                    sanitized[key] = str(value)
+            return sanitized
+        elif isinstance(data, (list, tuple)):
+            return [self._sanitize_for_json(item) for item in data]
+        elif isinstance(data, (str, int, float, bool, type(None))):
+            return data
+        else:
+            # Convert other types to string
+            return str(data)

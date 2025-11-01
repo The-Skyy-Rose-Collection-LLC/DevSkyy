@@ -339,7 +339,7 @@ ignore = [
 known-first-party = ["devskyy", "agent", "api", "ml", "fashion", "infrastructure"]
 lines-after-imports = 2
 split-on-trailing-comma = true
-force-alphabetical-sort-within-sections = true
+force-sort-within-sections = true
 
 [tool.ruff.lint.mccabe]
 max-complexity = 12  # Slightly higher for complex business logic

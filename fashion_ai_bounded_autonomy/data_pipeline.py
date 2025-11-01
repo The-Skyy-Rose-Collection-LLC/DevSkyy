@@ -3,14 +3,16 @@ LAYER 3 — Data Pipeline
 Manages ingestion, preprocessing, inference, and storage with validation
 """
 
+from datetime import datetime
+import hashlib
 import json
-import yaml
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-from datetime import datetime
+from typing import Any
+
 import pandas as pd
-import hashlib
+import yaml
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,28 +39,33 @@ class DataPipeline:
         self.validated_path.mkdir(parents=True, exist_ok=True)
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-        self.processing_log: List[Dict[str, Any]] = []
+        self.processing_log: list[dict[str, Any]] = []
 
         logger.info("📊 Data pipeline initialized")
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load pipeline configuration"""
         with open(self.config_path) as f:
             return yaml.safe_load(f)["data_pipeline"]
 
-    async def ingest(self, file_path: str, source_type: str) -> Dict[str, Any]:
+    async def ingest(self, file_path: str, source_type: str) -> dict[str, Any]:
         """
-        Ingest data from approved source.
-
-        Args:
-            file_path: Path to data file
-            source_type: Type of data source (csv, json, image, parquet)
-
+        Ingest data from an approved source into the pipeline.
+        
+        Parameters:
+            file_path (str): Path to the input file.
+            source_type (str): Source type; one of "csv", "json", "parquet", or "image".
+        
         Returns:
-            Ingestion result
+            dict: Result object. On success includes keys "status" (value "ingested"), "file_path", "source_type", "file_hash", "size_mb", "ingestion_time_seconds", and "data". On failure or rejection includes "status" and "reason".
         """
         start_time = datetime.now()
         file_path = Path(file_path)
+
+        # Check for supported types first
+        supported_types = ["csv", "json", "parquet", "image"]
+        if source_type not in supported_types:
+            return {"status": "error", "reason": "unsupported_type"}
 
         # Validate source
         if not self._is_approved_source(file_path, source_type):
@@ -109,10 +116,10 @@ class DataPipeline:
             return result
 
         except Exception as e:
-            logger.error(f"❌ Ingestion failed: {str(e)}")
+            logger.error(f"❌ Ingestion failed: {e!s}")
             return {"status": "error", "reason": str(e)}
 
-    async def preprocess(self, data: Any, schema_name: str) -> Dict[str, Any]:
+    async def preprocess(self, data: Any, schema_name: str) -> dict[str, Any]:
         """
         Preprocess and validate data.
 
@@ -169,11 +176,11 @@ class DataPipeline:
         }
 
         self._log_operation("preprocess", result)
-        logger.info(f"✅ Data preprocessed and validated")
+        logger.info("✅ Data preprocessed and validated")
 
         return result
 
-    async def inference(self, data: Any, model_name: str) -> Dict[str, Any]:
+    async def inference(self, data: Any, model_name: str) -> dict[str, Any]:
         """
         Run model inference on validated data.
 
@@ -240,7 +247,7 @@ class DataPipeline:
                 sha256.update(block)
         return sha256.hexdigest()
 
-    def _validate_schema(self, data: Any, schema_name: str) -> Dict[str, Any]:
+    def _validate_schema(self, data: Any, schema_name: str) -> dict[str, Any]:
         """Validate data against schema"""
         if schema_name not in self.config["schemas"]:
             return {"valid": False, "errors": ["unknown_schema"]}
@@ -270,7 +277,7 @@ class DataPipeline:
         # Placeholder for data cleaning logic
         return data
 
-    def _log_operation(self, operation: str, result: Dict[str, Any]):
+    def _log_operation(self, operation: str, result: dict[str, Any]):
         """Log pipeline operation"""
         log_entry = {
             "timestamp": datetime.now().isoformat(),

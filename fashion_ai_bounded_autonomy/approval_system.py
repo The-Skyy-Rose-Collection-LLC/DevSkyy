@@ -3,14 +3,14 @@ Approval System for Bounded Autonomy
 Manages human review queue and approval workflows
 """
 
-import asyncio
-import json
-import sqlite3
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+import json
 import logging
+from pathlib import Path
+import sqlite3
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -98,11 +98,11 @@ class ApprovalSystem:
         action_id: str,
         agent_name: str,
         function_name: str,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         risk_level: str,
         workflow_type: ApprovalWorkflowType = ApprovalWorkflowType.DEFAULT,
         timeout_hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Submit an action for human review.
 
@@ -169,7 +169,7 @@ class ApprovalSystem:
         action_id: str,
         operator: str,
         notes: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Approve an action.
 
@@ -258,7 +258,7 @@ class ApprovalSystem:
         action_id: str,
         operator: str,
         reason: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Reject an action"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -321,7 +321,7 @@ class ApprovalSystem:
             "reason": reason
         }
 
-    async def get_pending_actions(self) -> List[Dict[str, Any]]:
+    async def get_pending_actions(self) -> list[dict[str, Any]]:
         """Get all pending actions"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -350,7 +350,7 @@ class ApprovalSystem:
         conn.close()
         return actions
 
-    async def get_action_details(self, action_id: str) -> Optional[Dict[str, Any]]:
+    async def get_action_details(self, action_id: str) -> Optional[dict[str, Any]]:
         """Get detailed information about an action"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -401,6 +401,19 @@ class ApprovalSystem:
         }
 
     async def mark_executed(self, action_id: str, result: Dict[str, Any]) -> bool:
+        """
+        Mark an approved action as executed and record its execution result.
+        
+        This updates the action's status to "executed" only if its current status is "approved" and appends an "executed" event to the approval history. The provided `result` is serialized and stored as the action's execution result and as the event details.
+        
+        Parameters:
+            action_id (str): Identifier of the action to mark as executed.
+            result (dict): Execution result data to store with the action and history (will be JSON-serialized).
+        
+        Returns:
+            bool: `True` if the action's status was changed to "executed", `False` otherwise.
+        """
+    async def mark_executed(self, action_id: str, result: dict[str, Any]) -> bool:
         """Mark an action as executed"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -410,6 +423,9 @@ class ApprovalSystem:
             SET status = 'executed', execution_result = ?
             WHERE action_id = ? AND status = 'approved'
         """, (json.dumps(result), action_id))
+
+        # Capture rowcount immediately after UPDATE
+        rows_affected = cursor.rowcount
 
         cursor.execute("""
             INSERT INTO approval_history (action_id, event_type, timestamp, details)
@@ -422,7 +438,6 @@ class ApprovalSystem:
         ))
 
         conn.commit()
-        rows_affected = cursor.rowcount
         conn.close()
 
         return rows_affected > 0
@@ -448,7 +463,7 @@ class ApprovalSystem:
 
         return expired_count
 
-    async def get_operator_statistics(self, operator: Optional[str] = None) -> Dict[str, Any]:
+    async def get_operator_statistics(self, operator: Optional[str] = None) -> dict[str, Any]:
         """Get operator activity statistics"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()

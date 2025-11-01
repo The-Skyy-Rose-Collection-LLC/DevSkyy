@@ -6,12 +6,13 @@ All enhancements are written to proposals.json and never executed automatically.
 Operator reviews and integrates approved updates manually.
 """
 
+from datetime import datetime, timedelta
 import json
 import logging
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Any, Optional
 import sqlite3
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ class PerformanceTracker:
         self,
         metric_name: str,
         metric_value: float,
-        metadata: Optional[Dict] = None
+        metadata: Optional[dict] = None
     ):
         """Log system-wide metric"""
         conn = sqlite3.connect(self.db_path)
@@ -111,7 +112,7 @@ class PerformanceTracker:
         conn.commit()
         conn.close()
 
-    async def compute_weekly_report(self) -> Dict[str, Any]:
+    async def compute_weekly_report(self) -> dict[str, Any]:
         """Compute weekly performance summary"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -167,7 +168,7 @@ class PerformanceTracker:
         logger.info("📊 Weekly performance report generated")
         return report
 
-    async def generate_proposals(self, report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    async def generate_proposals(self, report: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Generate improvement proposals based on performance data.
 
@@ -235,7 +236,7 @@ class PerformanceTracker:
         logger.info(f"💡 Generated {len(proposals)} improvement proposals")
         return proposals
 
-    async def _save_proposals(self, new_proposals: List[Dict[str, Any]]):
+    async def _save_proposals(self, new_proposals: list[dict[str, Any]]):
         """Save proposals to file"""
         existing_proposals = []
 
@@ -251,7 +252,7 @@ class PerformanceTracker:
 
         logger.info(f"📝 Saved {len(new_proposals)} proposals to {self.proposals_path}")
 
-    async def get_proposals(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
+    async def get_proposals(self, status: Optional[str] = None) -> list[dict[str, Any]]:
         """Get all proposals, optionally filtered by status"""
         if not self.proposals_path.exists():
             return []
@@ -270,7 +271,7 @@ class PerformanceTracker:
         status: str,
         operator: str,
         notes: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Update proposal status (approved/rejected/implemented)"""
         if not self.proposals_path.exists():
             return {"error": "No proposals found"}
@@ -295,7 +296,7 @@ class PerformanceTracker:
 
         return {"error": "Proposal not found"}
 
-    async def get_kpi_summary(self, days: int = 7) -> Dict[str, Any]:
+    async def get_kpi_summary(self, days: int = 7) -> dict[str, Any]:
         """Get KPI summary for specified period"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
