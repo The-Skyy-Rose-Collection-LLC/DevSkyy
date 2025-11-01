@@ -73,7 +73,7 @@ class DesignerAgent(BaseAgent):
                 - "season" (str): Target season.
                 - "status" (str): Generation status (e.g., "generated").
                 - "metadata" (dict): Generation metadata including "generated_at" (timestamp)
-                  and "parameters" (the provided payload).
+                    and "parameters" (the provided payload).
         """
         self.logger.info(f"Generating design with parameters: {payload}")
 
