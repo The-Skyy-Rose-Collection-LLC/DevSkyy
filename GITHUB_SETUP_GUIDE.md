@@ -1,6 +1,6 @@
 # GitHub Actions Setup Guide
 
-**Repository:** https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy  
+**Repository:** <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy>  
 **Status:** ✅ Main branch merged with enterprise refactor  
 **Next Steps:** Configure secrets and deploy
 
@@ -8,7 +8,7 @@
 
 ## 1. Configure GitHub Secrets
 
-Navigate to: **https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/settings/secrets/actions**
+Navigate to: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/settings/secrets/actions>
 
 Click **"New repository secret"** and add these:
 
@@ -181,18 +181,21 @@ jobs:
 ### Step-by-Step GitHub Actions Setup
 
 1. **Add Secrets:**
+
    ```bash
    # Go to repository Settings > Secrets and variables > Actions
    # Add each secret from the list above
    ```
 
 2. **Create Workflow File:**
+
    ```bash
    mkdir -p .github/workflows
    # Copy the ci-cd.yml content above
    ```
 
 3. **Commit and Push:**
+
    ```bash
    git add .github/workflows/ci-cd.yml
    git commit -m "🚀 Add CI/CD pipeline"
@@ -200,6 +203,7 @@ jobs:
    ```
 
 4. **Trigger Workflow:**
+
    ```bash
    # Workflow will auto-trigger on push
    # Or manually trigger: Actions > DevSkyy CI/CD > Run workflow
@@ -336,4 +340,3 @@ Before deploying, verify:
 ---
 
 **Ready to proceed?** Follow the steps above to complete setup!
-
