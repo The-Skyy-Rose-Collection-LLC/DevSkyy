@@ -11,6 +11,7 @@ ML-powered dynamic pricing optimization for fashion ecommerce
 
 logger = logging.getLogger(__name__)
 
+
 class DynamicPricingEngine:
     """
     Advanced dynamic pricing with ML
@@ -33,9 +34,7 @@ class DynamicPricingEngine:
 
         logger.info("💰 Dynamic Pricing Engine initialized")
 
-    async def optimize_price(
-        self, product_data: Dict[str, Any], market_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_price(self, product_data: Dict[str, Any], market_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Calculate optimal price for a product
 
@@ -83,9 +82,7 @@ class DynamicPricingEngine:
                 adjustment *= 0.60  # 40% off for items older than 180 days
 
             # Competitive adjustments with sophisticated pricing strategy
-            competitive_ratio = (
-                base_price / competitor_avg if competitor_avg > 0 else 1.0
-            )
+            competitive_ratio = base_price / competitor_avg if competitor_avg > 0 else 1.0
 
             if competitor_avg * 0.95 < base_price < competitor_avg * 1.05:
                 # Price competitive - maintain position with slight optimization
@@ -99,9 +96,7 @@ class DynamicPricingEngine:
                     # Maintain competitive position
                     adjustment *= 1.0
 
-                logger.debug(
-                    f"💰 Competitive pricing maintained: ratio={competitive_ratio:.3f}"
-                )
+                logger.debug(f"💰 Competitive pricing maintained: ratio={competitive_ratio:.3f}")
 
             elif base_price > competitor_avg * 1.1:
                 # Price too high - reduce more aggressively
@@ -112,9 +107,7 @@ class DynamicPricingEngine:
                     # Standard reduction
                     adjustment *= 0.95
 
-                logger.info(
-                    f"📉 Reducing high price: was {competitive_ratio:.1f}x competitor avg"
-                )
+                logger.info(f"📉 Reducing high price: was {competitive_ratio:.1f}x competitor avg")
 
             elif base_price < competitor_avg * 0.9:
                 # Price too low - increase strategically
@@ -125,9 +118,7 @@ class DynamicPricingEngine:
                     # Standard increase
                     adjustment *= 1.05
 
-                logger.info(
-                    f"📈 Increasing low price: was {competitive_ratio:.1f}x competitor avg"
-                )
+                logger.info(f"📈 Increasing low price: was {competitive_ratio:.1f}x competitor avg")
 
             # Seasonal adjustments
             adjustment *= season_factor
@@ -147,9 +138,7 @@ class DynamicPricingEngine:
             }
 
             # Calculate expected impact
-            expected_revenue = await self._calculate_expected_revenue(
-                optimal_price, demand_score, elasticity
-            )
+            expected_revenue = await self._calculate_expected_revenue(optimal_price, demand_score, elasticity)
 
             return {
                 "success": True,
@@ -166,18 +155,14 @@ class DynamicPricingEngine:
                     "competitor_avg": competitor_avg,
                     "elasticity": elasticity,
                 },
-                "recommendations": await self._get_pricing_recommendations(
-                    product_data, optimal_price, base_price
-                ),
+                "recommendations": await self._get_pricing_recommendations(product_data, optimal_price, base_price),
             }
 
         except Exception as e:
             logger.error(f"Price optimization failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _calculate_elasticity(
-        self, product_data: Dict, market_data: Dict
-    ) -> float:
+    async def _calculate_elasticity(self, product_data: Dict, market_data: Dict) -> float:
         """Calculate price elasticity of demand"""
         # Simplified elasticity calculation
         # In production, this would use historical price/demand data
@@ -192,9 +177,7 @@ class DynamicPricingEngine:
         else:
             return -1.0  # Unit elastic
 
-    async def _calculate_expected_revenue(
-        self, price: float, demand_score: float, elasticity: float
-    ) -> float:
+    async def _calculate_expected_revenue(self, price: float, demand_score: float, elasticity: float) -> float:
         """Calculate expected revenue at given price"""
         # Revenue = Price × Demand
         # Demand changes based on price elasticity
@@ -212,23 +195,17 @@ class DynamicPricingEngine:
         price_change = ((optimal_price / current_price) - 1) * 100
 
         if abs(price_change) > 10:
-            recommendations.append(
-                f"Consider gradual price adjustment of {price_change:.1f}% over 2-3 weeks"
-            )
+            recommendations.append(f"Consider gradual price adjustment of {price_change:.1f}% over 2-3 weeks")
 
         if product_data.get("inventory", 0) > 100:
-            recommendations.append(
-                "High inventory detected - consider promotional pricing"
-            )
+            recommendations.append("High inventory detected - consider promotional pricing")
 
         if product_data.get("age_days", 0) > 90:
             recommendations.append("Product aging - implement clearance strategy")
 
         return recommendations
 
-    async def create_pricing_strategy(
-        self, strategy_type: str, products: List[Dict]
-    ) -> Dict[str, Any]:
+    async def create_pricing_strategy(self, strategy_type: str, products: List[Dict]) -> Dict[str, Any]:
         """
         Create pricing strategy for multiple products
 
@@ -338,9 +315,7 @@ class DynamicPricingEngine:
                     "B": {"price": price_variant_b, "traffic_split": 0.5},
                 },
                 "start_date": datetime.utcnow().isoformat(),
-                "end_date": (
-                    datetime.utcnow() + timedelta(days=duration_days)
-                ).isoformat(),
+                "end_date": (datetime.utcnow() + timedelta(days=duration_days)).isoformat(),
                 "metrics_tracked": [
                     "conversion_rate",
                     "revenue_per_visitor",

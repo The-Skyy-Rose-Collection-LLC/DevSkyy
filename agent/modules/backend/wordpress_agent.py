@@ -7,6 +7,7 @@ import openai
 
 logger = logging.getLogger(__name__)
 
+
 class WordPressAgent:
     """AI-POWERED WORDPRESS & DIVI SPECIALIST WITH OPENAI GOD MODE."""
 
@@ -34,13 +35,9 @@ class WordPressAgent:
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning(
-                "🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)"
-            )
+            logger.warning("🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)")
 
-    async def optimize_wordpress_god_mode(
-        self, site_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_wordpress_god_mode(self, site_data: Dict[str, Any]) -> Dict[str, Any]:
         """AI-POWERED WORDPRESS OPTIMIZATION WITH GOD MODE INTELLIGENCE."""
         try:
             prompt = f"""
@@ -103,9 +100,7 @@ class WordPressAgent:
             logger.error(f"GOD MODE WordPress optimization failed: {str(e)}")
             return {"error": str(e), "fallback": "standard_optimization_available"}
 
-    async def create_divi_luxury_components_god_mode(
-        self, component_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def create_divi_luxury_components_god_mode(self, component_request: Dict[str, Any]) -> Dict[str, Any]:
         """AI-POWERED DIVI COMPONENT CREATION WITH LUXURY MASTERY."""
         try:
             prompt = f"""
@@ -161,9 +156,7 @@ class WordPressAgent:
             logger.error(f"Divi component creation failed: {str(e)}")
             return {"error": str(e)}
 
-    async def wordpress_security_god_mode(
-        self, security_audit: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def wordpress_security_god_mode(self, security_audit: Dict[str, Any]) -> Dict[str, Any]:
         """AI-POWERED WORDPRESS SECURITY WITH MILITARY-GRADE PROTECTION."""
         try:
             prompt = f"""
@@ -219,7 +212,9 @@ class WordPressAgent:
             logger.error(f"Security implementation failed: {str(e)}")
             return {"error": str(e)}
 
+
 # Factory function
+
 
 def create_wordpress_agent() -> WordPressAgent:
     """Create WordPress Agent with OpenAI GOD MODE."""

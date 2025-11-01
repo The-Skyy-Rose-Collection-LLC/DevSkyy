@@ -30,9 +30,11 @@ THEME_TEMPLATES = {
     },
 }
 
+
 def get_template(template_name: str) -> dict:
     """Get theme template by name"""
     return THEME_TEMPLATES.get(template_name, THEME_TEMPLATES["luxury_minimalist"])
+
 
 def list_templates() -> list:
     """List all available templates"""

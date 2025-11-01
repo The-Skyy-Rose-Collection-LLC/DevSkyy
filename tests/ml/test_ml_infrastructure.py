@@ -4,9 +4,9 @@ from ml.model_registry import ModelRegistry, ModelStage
 from ml.redis_cache import RedisCache
 from pathlib import Path
 
-        from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
 
-        from main import app
+from main import app
 from ml.explainability import ModelExplainer
 import numpy as np
 import pytest

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
 import os
 
-            from sqlalchemy import text
+from sqlalchemy import text
 from sqlalchemy.ext.declarative import declarative_base
 
 from database_config import CONNECTION_ARGS, DATABASE_URL
@@ -33,6 +33,7 @@ AsyncSessionLocal = async_sessionmaker(
 # Create base class for models
 Base = declarative_base()
 
+
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency function to get database session.
@@ -52,6 +53,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
+
 async def init_db():
     """
     Initialize database - create all tables.
@@ -60,12 +62,14 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+
 async def close_db():
     """
     Close database connections.
     Call this on application shutdown.
     """
     await engine.dispose()
+
 
 # For backward compatibility with MongoDB code
 class DatabaseManager:
@@ -111,12 +115,11 @@ class DatabaseManager:
                     "status": "healthy",
                     "connected": True,
                     "type": "SQLAlchemy",
-                    "url": (
-                        DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
-                    ),
+                    "url": (DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"),
                 }
         except Exception as e:
             return {"status": "unhealthy", "connected": False, "error": str(e)}
+
 
 # Global database instance
 db_manager = DatabaseManager()

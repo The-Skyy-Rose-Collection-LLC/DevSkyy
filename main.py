@@ -773,9 +773,8 @@ async def upload_3d_model(
         if not hasattr(app.state, 'skyy_rose_3d_pipeline'):
             raise HTTPException(status_code=503, detail="3D pipeline not available")
 
-        from fashion.skyy_rose_3d_pipeline import ModelFormat
-
         # Load and process model
+        from fashion.skyy_rose_3d_pipeline import ModelFormat
         model = await app.state.skyy_rose_3d_pipeline.load_3d_model(
             file_path=file_path,
             model_format=ModelFormat(model_format),
@@ -1309,7 +1308,7 @@ if ENVIRONMENT == "development":
 # ============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
+import uvicorn
 
     # Configuration for different environments
     config = {

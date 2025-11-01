@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt
 
 from security.jwt_auth import (
-    import pytest
+import pytest
 
 """
 DevSkyy Enterprise - JWT Authentication Unit Tests

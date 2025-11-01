@@ -11,7 +11,7 @@ from src.core.config import Config, load_config
 def client():
     """
     Create a TestClient bound to the FastAPI application for use in tests.
-    
+
     Returns:
         TestClient: A TestClient instance initialized with the FastAPI app.
     """
@@ -22,7 +22,7 @@ def client():
 def config():
     """
     Load and return the application's test configuration.
-    
+
     Returns:
         Config: The loaded configuration object.
     """
@@ -33,7 +33,7 @@ def config():
 def sample_design_payload():
     """
     Provide a sample design payload dictionary used in tests.
-    
+
     Returns:
         dict: Dictionary with keys "style", "color", and "season" set to "modern", "crimson", and "spring", respectively.
     """
@@ -44,7 +44,7 @@ def sample_design_payload():
 def sample_product_payload():
     """
     Provide a sample product payload used in tests.
-    
+
     Returns:
         dict: A product dictionary with keys:
             - "name": product title string,

@@ -587,7 +587,7 @@ class VirtualTryOnHuggingFaceAgent:
             return Image.open(request.product_image_path)
 
         # Load from asset pipeline
-        from agent.modules.content.asset_preprocessing_pipeline import asset_pipeline
+from agent.modules.content.asset_preprocessing_pipeline import asset_pipeline
 
         asset = asset_pipeline.get_asset(request.product_asset_id)
         if not asset:

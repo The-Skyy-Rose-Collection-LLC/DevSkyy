@@ -6,7 +6,6 @@ Implements comprehensive security headers for production deployment
 """
 
 
-
 class SecurityHeaders:
     """
     Enhanced security headers for enterprise-grade protection

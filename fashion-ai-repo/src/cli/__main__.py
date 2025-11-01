@@ -16,7 +16,7 @@ from src.core.queue import QueueManager
 def cli():
     """
     Root Click command group for the Fashion AI Autonomous Commerce Platform CLI.
-    
+
     Provides the top-level command namespace that groups subcommands for reporting the
     version, starting individual agents, starting all agents (informational stub),
     and performing a basic health check.
@@ -37,9 +37,9 @@ def version():
 def start(agent: str):
     """
     Start the specified agent process.
-    
+
     Loads configuration, configures logging, initializes a QueueManager, instantiates the requested agent with its IO path, retry attempts, and timeout, then runs the agent's main loop. Exits with status 1 if the provided agent name is not recognized.
-    
+
     Parameters:
         agent: Name of the agent to start. Allowed values: "designer", "commerce", "marketing", "finance", "ops".
     """
@@ -82,7 +82,7 @@ def start(agent: str):
 def start_all():
     """
     Announces that all agents are starting and prints a readiness line for each known agent.
-    
+
     Prints "Starting all agents..." followed by "  - {agent}: ready" for each configured agent.
     This function only reports readiness and does not launch any agent processes; use an orchestrator
     or multiprocessing to start agents in production.
@@ -99,7 +99,7 @@ def start_all():
 def health():
     """
     Report a basic CLI health status.
-    
+
     Prints a brief health-check message to standard output indicating the system is healthy.
     """
     click.echo("Running health check...")

@@ -13,7 +13,7 @@ class MarketingAgent(BaseAgent):
     def __init__(self, *args, **kwargs):
         """
         Initialize the MarketingAgent and prepare its campaigns storage.
-        
+
         Sets the instance attribute `campaigns_path` to a "campaigns" subdirectory under the agent's `io_path` and ensures that directory exists (creating parent directories if needed).
         """
         super().__init__(name="MarketingAgent", *args, **kwargs)
@@ -23,7 +23,7 @@ class MarketingAgent(BaseAgent):
     def get_supported_tasks(self) -> List[str]:
         """
         Return the list of supported task names the agent can process.
-        
+
         Returns:
             List[str]: Supported task names: "announce", "create_campaign", "schedule_content", "analyze_engagement".
         """
@@ -32,14 +32,14 @@ class MarketingAgent(BaseAgent):
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Dispatches the specified marketing task to the corresponding handler and returns the handler's result.
-        
+
         Parameters:
             task_type (str): The marketing task to perform ("announce", "create_campaign", "schedule_content", or "analyze_engagement").
             payload (Dict[str, Any]): Task-specific parameters required by the chosen handler.
-        
+
         Returns:
             Dict[str, Any]: A dictionary containing task-specific result data (announcement, campaign, schedule, or analysis).
-        
+
         Raises:
             ValueError: If `task_type` is not one of the supported task types.
         """
@@ -57,10 +57,10 @@ class MarketingAgent(BaseAgent):
     async def _announce_product(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create and schedule an announcement for a product listing.
-        
+
         Parameters:
             payload (Dict[str, Any]): Product information; expected keys include 'sku', 'name', and 'description'.
-        
+
         Returns:
             Dict[str, Any]: Announcement details containing:
                 - announcement_id: unique identifier string (e.g., "ANN-<timestamp>")
@@ -91,13 +91,13 @@ class MarketingAgent(BaseAgent):
     async def _create_campaign(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a marketing campaign record from provided parameters.
-        
+
         Parameters:
             payload (Dict[str, Any]): Input parameters. Recognized keys:
                 - name (str): Campaign name (required).
                 - type (str): Campaign type, defaults to "product_launch".
                 - target_audience (str): Target audience identifier, defaults to "all".
-        
+
         Returns:
             dict: Campaign details containing:
                 - campaign_id (str): Generated identifier like "CAMP-<timestamp>".
@@ -134,13 +134,13 @@ class MarketingAgent(BaseAgent):
     async def _schedule_content(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a schedule record for distributing content.
-        
+
         Parameters:
             payload (Dict[str, Any]): Scheduling parameters. Expected keys:
                 - content_id: identifier of the content to schedule.
                 - channels (List[str], optional): Delivery channels; defaults to ["social"].
                 - schedule_time (float, optional): UNIX timestamp for dispatch; defaults to one hour from now.
-        
+
         Returns:
             Dict[str, Any]: Schedule object with keys `content_id`, `channels`, `schedule_time`, and `status` set to "scheduled".
         """
@@ -163,16 +163,16 @@ class MarketingAgent(BaseAgent):
     async def _analyze_engagement(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Produce engagement metrics for a campaign and record its revenue with the FinanceAgent.
-        
+
         Parameters:
             payload (Dict[str, Any]): Input data that must include `campaign_id` identifying the campaign to analyze.
-        
+
         Returns:
             Dict[str, Any]: Analysis dictionary containing:
                 - `campaign_id` (str|None): The analyzed campaign identifier.
                 - `metrics` (dict): Engagement metrics with keys `impressions`, `clicks`, `conversions`, `ctr`, `conversion_rate`, and `revenue_cents`.
                 - `analyzed_at` (float): Epoch timestamp when the analysis was produced.
-        
+
         Side effects:
             Sends a message to the FinanceAgent with task_type `"record_ledger"` and payload including `campaign_id` and `revenue_cents` for revenue tracking.
         """
@@ -202,7 +202,10 @@ class MarketingAgent(BaseAgent):
         self.send_message(
             target_agent="FinanceAgent",
             task_type="record_ledger",
-            payload={"campaign_id": campaign_id, "revenue_cents": analysis["metrics"]["revenue_cents"]},
+            payload={
+                "campaign_id": campaign_id,
+                "revenue_cents": analysis["metrics"]["revenue_cents"],
+            },
         )
 
         return analysis

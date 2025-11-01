@@ -15,7 +15,7 @@ class FinanceAgent(BaseAgent):
     def __init__(self, *args, **kwargs):
         """
         Create a FinanceAgent and ensure its ledger directory exists under the agent's IO path.
-        
+
         This initializer sets the agent name and creates a "ledger" directory at `self.io_path / "ledger"` if it does not already exist.
         """
         super().__init__(name="FinanceAgent", *args, **kwargs)
@@ -25,7 +25,7 @@ class FinanceAgent(BaseAgent):
     def get_supported_tasks(self) -> List[str]:
         """
         List the task types this agent can handle.
-        
+
         Returns:
             supported_tasks (List[str]): Identifiers of supported tasks: "record_ledger", "calculate_revenue", "generate_reports", and "reconcile".
         """
@@ -34,14 +34,14 @@ class FinanceAgent(BaseAgent):
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Route a finance task to the appropriate handler and return its result.
-        
+
         Parameters:
             task_type (str): The task name to perform; one of "record_ledger", "calculate_revenue", "generate_reports", or "reconcile".
             payload (Dict[str, Any]): Task-specific parameters forwarded to the selected handler.
-        
+
         Returns:
             Dict[str, Any]: The result produced by the invoked task handler.
-        
+
         Raises:
             ValueError: If `task_type` is not one of the supported task names.
         """
@@ -59,14 +59,14 @@ class FinanceAgent(BaseAgent):
     async def _record_ledger(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create and persist a ledger entry for a financial transaction.
-        
+
         Parameters:
             payload (Dict[str, Any]): Transaction details. Recognized keys:
                 - "type": transaction type (defaults to "sale")
                 - "revenue_cents" or "total_cents": amount in cents (defaults to 0)
                 - "order_id" or "campaign_id": reference identifier (defaults to "unknown")
                 - any other keys are stored as metadata
-        
+
         Returns:
             Dict[str, Any]: The saved ledger entry with keys:
                 - "entry_id" (str): unique entry identifier
@@ -103,12 +103,12 @@ class FinanceAgent(BaseAgent):
     async def _calculate_revenue(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Compute revenue summary for a given period.
-        
+
         Parameters:
             payload (Dict[str, Any]): Input parameters; expected keys:
                 - "start_date": period start (string or timestamp)
                 - "end_date": period end (string or timestamp)
-        
+
         Returns:
             Dict[str, Any]: Revenue summary containing:
                 - "period_start": provided start_date
@@ -141,12 +141,12 @@ class FinanceAgent(BaseAgent):
     async def _generate_reports(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Builds and persists a financial report for the requested period and type.
-        
+
         Parameters:
             payload (Dict[str, Any]): Report options. Recognized keys:
                 - report_type (str): Type of report to generate (e.g., "monthly"). Defaults to "monthly".
                 - period (str): Reporting period identifier (e.g., "2025-10"). Defaults to current year-month.
-        
+
         Returns:
             Dict[str, Any]: A report object containing:
                 - report_id (str): Unique report identifier.
@@ -183,10 +183,10 @@ class FinanceAgent(BaseAgent):
     async def _reconcile(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Perform account reconciliation for the given parameters and return the reconciliation result.
-        
+
         Parameters:
             payload (Dict[str, Any]): Parameters that influence reconciliation (e.g., date range, account identifiers). Keys and accepted values are implementation-specific.
-        
+
         Returns:
             Dict[str, Any]: Reconciliation summary containing:
                 - reconciliation_id (str): Unique identifier for this reconciliation run.

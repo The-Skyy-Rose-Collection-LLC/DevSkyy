@@ -15,6 +15,7 @@ Stores state changes as a sequence of events for audit and replay
 # EVENT BASE CLASSES
 # ============================================================================
 
+
 class DomainEvent(BaseModel):
     """Base class for all domain events"""
 
@@ -36,9 +37,11 @@ class DomainEvent(BaseModel):
             data["event_type"] = self.__class__.__name__
         super().__init__(**data)
 
+
 # ============================================================================
 # EVENT STORE
 # ============================================================================
+
 
 class EventStore:
     """
@@ -120,9 +123,7 @@ class EventStore:
             all_events.extend(events)
         return sorted(all_events, key=lambda e: e.timestamp)
 
-    async def save_snapshot(
-        self, aggregate_id: str, state: Dict[str, Any], version: int
-    ):
+    async def save_snapshot(self, aggregate_id: str, state: Dict[str, Any], version: int):
         """
         Save snapshot of aggregate state for faster reconstruction
 
@@ -149,9 +150,11 @@ class EventStore:
         """
         return self._snapshots.get(aggregate_id)
 
+
 # ============================================================================
 # AGGREGATE ROOT
 # ============================================================================
+
 
 class AggregateRoot(ABC):
     """
@@ -209,22 +212,28 @@ class AggregateRoot(ABC):
         """Mark all uncommitted events as committed"""
         self.uncommitted_events.clear()
 
+
 # ============================================================================
 # EXAMPLE DOMAIN EVENTS
 # ============================================================================
 
+
 class AgentCreatedEvent(DomainEvent):
     """Event raised when an agent is created"""
+
 
 class AgentUpdatedEvent(DomainEvent):
     """Event raised when an agent is updated"""
 
+
 class AgentDeletedEvent(DomainEvent):
     """Event raised when an agent is deleted"""
+
 
 # ============================================================================
 # EXAMPLE AGGREGATE
 # ============================================================================
+
 
 class AgentAggregate(AggregateRoot):
     """
@@ -284,6 +293,7 @@ class AgentAggregate(AggregateRoot):
             data={"deleted_at": datetime.now(timezone.utc).isoformat()},
         )
         self.raise_event(event)
+
 
 # ============================================================================
 # GLOBAL EVENT STORE INSTANCE

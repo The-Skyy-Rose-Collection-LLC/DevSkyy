@@ -19,6 +19,7 @@ References:
 
 logger = logging.getLogger(__name__)
 
+
 class ModelStage(str, Enum):
     """Model lifecycle stages following MLflow convention"""
 
@@ -26,6 +27,7 @@ class ModelStage(str, Enum):
     STAGING = "staging"
     PRODUCTION = "production"
     ARCHIVED = "archived"
+
 
 class ModelMetadata:
     """Model metadata container"""
@@ -82,6 +84,7 @@ class ModelMetadata:
             dataset_info=data["dataset_info"],
             stage=data.get("stage", ModelStage.DEVELOPMENT),
         )
+
 
 class ModelRegistry:
     """
@@ -230,9 +233,7 @@ class ModelRegistry:
             if stage:
                 version = self._get_latest_version_by_stage(model_name, stage)
             else:
-                version = (
-                    self.index["models"].get(model_name, {}).get("latest_production")
-                )
+                version = self.index["models"].get(model_name, {}).get("latest_production")
 
             if not version:
                 raise ValueError(f"No production version found for {model_name}")
@@ -306,9 +307,7 @@ class ModelRegistry:
         """Archive a model version"""
         self.promote_model(model_name, version, ModelStage.ARCHIVED)
 
-    def compare_models(
-        self, model_name: str, version1: str, version2: str
-    ) -> Dict[str, Any]:
+    def compare_models(self, model_name: str, version1: str, version2: str) -> Dict[str, Any]:
         """
         Compare two model versions
 
@@ -339,9 +338,7 @@ class ModelRegistry:
             "stage2": meta2.stage,
         }
 
-    def _get_latest_version_by_stage(
-        self, model_name: str, stage: ModelStage
-    ) -> Optional[str]:
+    def _get_latest_version_by_stage(self, model_name: str, stage: ModelStage) -> Optional[str]:
         """Get latest version in a specific stage"""
         if model_name not in self.index["models"]:
             return None
@@ -376,8 +373,10 @@ class ModelRegistry:
             "models": list(self.index["models"].keys()),
         }
 
+
 # Global registry instance
 model_registry = ModelRegistry()
+
 
 def get_model_registry() -> ModelRegistry:
     """Get global model registry instance"""

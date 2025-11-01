@@ -564,7 +564,7 @@ class AgentOrchestrator:
         Returns:
             Task ID
         """
-        import uuid
+import uuid
         task_id = str(uuid.uuid4())
 
         # Determine required agents based on task type

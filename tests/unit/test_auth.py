@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-        from security.jwt_auth import blacklisted_tokens
-        from security.jwt_auth import failed_login_attempts, locked_accounts
+from security.jwt_auth import blacklisted_tokens
+from security.jwt_auth import failed_login_attempts, locked_accounts
 from api.validation_models import EnhancedLoginRequest, EnhancedRegisterRequest
 from main import app
 from security.jwt_auth import (
-    from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 import asyncio
 import pytest
 

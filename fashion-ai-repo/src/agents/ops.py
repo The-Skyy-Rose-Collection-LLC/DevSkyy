@@ -15,7 +15,7 @@ class OpsAgent(BaseAgent):
     def __init__(self, *args, **kwargs):
         """
         Create an OpsAgent named "OpsAgent" and ensure a "logs" directory exists for metrics.
-        
+
         Initializes the BaseAgent with the name "OpsAgent" and creates the `metrics_path` attribute pointing to the "logs" directory, creating the directory if it does not already exist.
         """
         super().__init__(name="OpsAgent", *args, **kwargs)
@@ -25,7 +25,7 @@ class OpsAgent(BaseAgent):
     def get_supported_tasks(self) -> List[str]:
         """
         Return the task type identifiers this agent can handle.
-        
+
         Returns:
             List[str]: Supported task type identifiers: "health_check", "collect_metrics", "trigger_backup", "scale_services".
         """
@@ -34,14 +34,14 @@ class OpsAgent(BaseAgent):
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Dispatch and execute an OpsAgent task based on its type.
-        
+
         Parameters:
             task_type (str): One of "health_check", "collect_metrics", "trigger_backup", or "scale_services".
             payload (Dict[str, Any]): Task-specific parameters used by the selected task handler.
-        
+
         Returns:
             Dict[str, Any]: A task-specific result object (health report, metrics, backup descriptor, or scaling descriptor).
-        
+
         Raises:
             ValueError: If task_type is not one of the supported types.
         """
@@ -59,10 +59,10 @@ class OpsAgent(BaseAgent):
     async def _health_check(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Perform a system health check and produce a structured health report.
-        
+
         Parameters:
             payload (Dict[str, Any]): Optional parameters for the check (currently unused).
-        
+
         Returns:
             Dict[str, Any]: Health report with the following keys:
                 - `status` (str): Overall health status, e.g., "healthy" or "warning".
@@ -124,10 +124,10 @@ class OpsAgent(BaseAgent):
     async def _collect_metrics(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Gather and persist current queue and API metrics.
-        
+
         Parameters:
             payload (Dict[str, Any]): Optional collection parameters (unused by default) that may influence which metrics are gathered.
-        
+
         Returns:
             Dict[str, Any]: Metrics snapshot containing `timestamp`, `queues` (per-service depth and throughput), and `api` (uptime_percent, avg_response_ms, error_rate_percent).
         """
@@ -173,11 +173,11 @@ class OpsAgent(BaseAgent):
     async def _trigger_backup(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Initiates a backup operation and produces a descriptor with its metadata.
-        
+
         Parameters:
             payload (Dict[str, Any]): Backup parameters. Recognized key:
                 - "type": optional; backup type string (defaults to "full").
-        
+
         Returns:
             Dict[str, Any]: Backup descriptor containing keys:
                 - "backup_id": unique backup identifier
@@ -206,12 +206,12 @@ class OpsAgent(BaseAgent):
     async def _scale_services(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Initiates a scaling operation for a service and returns a descriptor of the requested scaling action.
-        
+
         Parameters:
             payload (Dict[str, Any]): Parameters for scaling. Expected keys:
                 - "service" (str): Name of the service to scale.
                 - "instances" (int, optional): Desired target instance count; defaults to 2.
-        
+
         Returns:
             Dict[str, Any]: A descriptor of the scaling operation containing:
                 - "service": requested service name

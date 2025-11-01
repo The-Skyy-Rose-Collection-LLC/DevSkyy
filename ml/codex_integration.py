@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-    from openai import AsyncOpenAI
+from openai import AsyncOpenAI
 from typing import Any, Dict, List, Literal, Optional
 import logging
 

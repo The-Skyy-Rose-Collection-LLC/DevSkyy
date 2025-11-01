@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-    import argparse
+import argparse
 from typing import Dict, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
 

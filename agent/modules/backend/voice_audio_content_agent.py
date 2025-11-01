@@ -32,6 +32,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class VoiceAudioContentAgent:
     """
     Advanced voice and audio content generation agent for luxury brands.
@@ -143,20 +144,14 @@ class VoiceAudioContentAgent:
             enhanced_text = await self._enhance_text_for_speech(text, content_type)
 
             # 2. Generate speech with ElevenLabs
-            audio_data = await self._generate_elevenlabs_speech(
-                enhanced_text, voice_style
-            )
+            audio_data = await self._generate_elevenlabs_speech(enhanced_text, voice_style)
 
             if not audio_data:
                 # Fallback to OpenAI TTS
-                audio_data = await self._generate_openai_speech(
-                    enhanced_text, voice_style
-                )
+                audio_data = await self._generate_openai_speech(enhanced_text, voice_style)
 
             # 3. Process and enhance audio
-            processed_audio = await self._process_audio(
-                audio_data, content_type, add_music
-            )
+            processed_audio = await self._process_audio(audio_data, content_type, add_music)
 
             # 4. Save audio file
             filename = f"{content_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{output_format}"
@@ -219,9 +214,7 @@ Return the enhanced text optimized for voice generation."""
             logger.warning(f"Text enhancement failed, using original: {e}")
             return text
 
-    async def _generate_elevenlabs_speech(
-        self, text: str, voice_style: str
-    ) -> Optional[bytes]:
+    async def _generate_elevenlabs_speech(self, text: str, voice_style: str) -> Optional[bytes]:
         """
         Generate speech using ElevenLabs API.
         """
@@ -230,13 +223,9 @@ Return the enhanced text optimized for voice generation."""
                 logger.warning("ElevenLabs API key not configured")
                 return None
 
-            voice_config = self.brand_voices.get(
-                voice_style, self.brand_voices["luxury_female"]
-            )
+            voice_config = self.brand_voices.get(voice_style, self.brand_voices["luxury_female"])
 
-            url = (
-                f"{self.elevenlabs_base_url}/text-to-speech/{voice_config['voice_id']}"
-            )
+            url = f"{self.elevenlabs_base_url}/text-to-speech/{voice_config['voice_id']}"
 
             headers = {
                 "Accept": "audio/mpeg",
@@ -296,9 +285,7 @@ Return the enhanced text optimized for voice generation."""
             # Return empty audio as last resort
             return b""
 
-    async def _process_audio(
-        self, audio_data: bytes, content_type: str, add_music: bool
-    ) -> AudioSegment:
+    async def _process_audio(self, audio_data: bytes, content_type: str, add_music: bool) -> AudioSegment:
         """
         Process and enhance audio with effects and optional background music.
         """
@@ -314,9 +301,7 @@ Return the enhanced text optimized for voice generation."""
             audio = audio.fade_in(500).fade_out(500)
 
             # 3. Adjust for content type
-            self.audio_templates.get(
-                content_type, self.audio_templates["product_showcase"]
-            )
+            self.audio_templates.get(content_type, self.audio_templates["product_showcase"])
 
             if add_music:
                 # Add background music (simplified - would integrate with music library)
@@ -335,9 +320,7 @@ Return the enhanced text optimized for voice generation."""
             # Return original audio if processing fails
             return AudioSegment.from_file(io.BytesIO(audio_data))
 
-    async def transcribe_audio(
-        self, audio_path: Union[str, Path], language: str = "en"
-    ) -> Dict[str, Any]:
+    async def transcribe_audio(self, audio_path: Union[str, Path], language: str = "en") -> Dict[str, Any]:
         """
         Transcribe audio to text using OpenAI Whisper.
 
@@ -379,9 +362,7 @@ Return the enhanced text optimized for voice generation."""
 
             return {
                 "transcription": response.text,
-                "language": (
-                    response.language if hasattr(response, "language") else language
-                ),
+                "language": (response.language if hasattr(response, "language") else language),
                 "duration": response.duration if hasattr(response, "duration") else 0,
                 "segments": segments,
                 "timestamp": datetime.now().isoformat(),
@@ -391,9 +372,7 @@ Return the enhanced text optimized for voice generation."""
             logger.error(f"❌ Audio transcription failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_voice_sentiment(
-        self, audio_path: Union[str, Path]
-    ) -> Dict[str, Any]:
+    async def analyze_voice_sentiment(self, audio_path: Union[str, Path]) -> Dict[str, Any]:
         """
         Analyze sentiment and emotions from voice audio.
 
@@ -483,21 +462,15 @@ Consider this is for a luxury fashion brand customer interaction."""
             segments = []
 
             # Intro
-            intro_audio = await self.generate_voice_content(
-                intro_text, voice_style, "podcast", add_music=True
-            )
+            intro_audio = await self.generate_voice_content(intro_text, voice_style, "podcast", add_music=True)
             segments.append(intro_audio)
 
             # Main content
-            main_audio = await self.generate_voice_content(
-                script, voice_style, "podcast", add_music=False
-            )
+            main_audio = await self.generate_voice_content(script, voice_style, "podcast", add_music=False)
             segments.append(main_audio)
 
             # Outro
-            outro_audio = await self.generate_voice_content(
-                outro_text, voice_style, "podcast", add_music=True
-            )
+            outro_audio = await self.generate_voice_content(outro_text, voice_style, "podcast", add_music=True)
             segments.append(outro_audio)
 
             # Combine segments
@@ -520,9 +493,7 @@ Consider this is for a luxury fashion brand customer interaction."""
             logger.error(f"❌ Podcast creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _combine_audio_segments(
-        self, segments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def _combine_audio_segments(self, segments: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Combine multiple audio segments into one file.
         """
@@ -541,10 +512,7 @@ Consider this is for a luxury fashion brand customer interaction."""
                         combined += audio_segment
 
             # Save combined audio
-            output_path = (
-                self.audio_storage
-                / f"combined_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
-            )
+            output_path = self.audio_storage / f"combined_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp3"
             combined.export(output_path, format="mp3")
 
             return {
@@ -623,26 +591,32 @@ Format: Write the exact script to be read."""
             logger.error(f"❌ Audio ad generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
+
 # Factory function
 def create_voice_audio_agent() -> VoiceAudioContentAgent:
     """Create Voice & Audio Content Agent."""
     return VoiceAudioContentAgent()
 
+
 # Global instance
 voice_audio_agent = create_voice_audio_agent()
+
 
 # Convenience functions
 async def generate_voice(text: str, style: str = "luxury") -> Dict[str, Any]:
     """Generate voice content from text."""
     return await voice_audio_agent.generate_voice_content(text, style)
 
+
 async def transcribe(audio_path: str) -> Dict[str, Any]:
     """Transcribe audio to text."""
     return await voice_audio_agent.transcribe_audio(audio_path)
 
+
 async def analyze_voice(audio_path: str) -> Dict[str, Any]:
     """Analyze voice sentiment."""
     return await voice_audio_agent.analyze_voice_sentiment(audio_path)
+
 
 async def create_audio_ad(product: str, description: str, cta: str) -> Dict[str, Any]:
     """Create audio advertisement."""

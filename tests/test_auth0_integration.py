@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from main import app
 from security.auth0_integration import (
-    from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock
 import pytest
 
 """

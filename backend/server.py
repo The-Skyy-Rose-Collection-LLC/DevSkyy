@@ -1,7 +1,7 @@
 import os
 import sys
 
-    import uvicorn
+import uvicorn
 from main import app
 
 #!/usr/bin/env python3

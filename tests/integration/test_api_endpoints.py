@@ -2,7 +2,7 @@ from security.jwt_auth import create_user_tokens
 
 from fastapi.testclient import TestClient
 
-    from database import get_db
+from database import get_db
 from httpx import AsyncClient
 from main import app
 import asyncio

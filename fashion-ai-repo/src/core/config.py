@@ -55,9 +55,7 @@ class Config(BaseSettings):
     jwt_expiration_minutes: int = Field(default=60, env="JWT_EXPIRATION_MINUTES")
 
     # CORS
-    cors_origins: List[str] = Field(
-        default=["http://localhost:3000"], env="CORS_ORIGINS"
-    )
+    cors_origins: List[str] = Field(default=["http://localhost:3000"], env="CORS_ORIGINS")
 
     class Config:
         """Pydantic configuration."""
@@ -70,7 +68,7 @@ class Config(BaseSettings):
     def database_url(self) -> str:
         """
         Builds a PostgreSQL connection URL from the instance's database settings.
-        
+
         Returns:
             str: Connection URL in the form "postgresql://{user}:{password}@{host}:{port}/{dbname}".
         """
@@ -80,7 +78,7 @@ class Config(BaseSettings):
     def redis_url(self) -> str:
         """
         Constructs a Redis connection URL from the configured host, port, database, and optional password.
-        
+
         Returns:
             redis_url (str): Redis connection URL. If a password is configured, the URL includes the credentials.
         """
@@ -92,10 +90,10 @@ class Config(BaseSettings):
 def load_config(config_path: Optional[Path] = None) -> Config:
     """
     Create a Config instance populated from environment variables, the configured `.env` file, and module defaults.
-    
+
     Parameters:
         config_path (Path | None): Optional path hint for a config file; currently ignored by this implementation.
-    
+
     Returns:
         Config: A configuration object with values resolved from environment, `.env`, and the class defaults.
     """
@@ -105,10 +103,10 @@ def load_config(config_path: Optional[Path] = None) -> Config:
 def load_yaml_config(file_path: Path) -> Dict[str, Any]:
     """
     Load and parse a YAML file into a Python dictionary.
-    
+
     Parameters:
         file_path (Path): Path to the YAML file to read.
-    
+
     Returns:
         dict: Parsed YAML content as a dictionary.
     """

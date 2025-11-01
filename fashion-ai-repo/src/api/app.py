@@ -36,7 +36,7 @@ app.include_router(router, prefix="/api")
 async def root() -> dict:
     """
     Provide the application's root status payload including status, message, version, and docs path.
-    
+
     Returns:
         payload (dict): A dictionary with the following keys:
             - status (str): Service status, e.g., "online".
@@ -56,7 +56,7 @@ async def root() -> dict:
 async def health() -> dict:
     """
     Report the service health status and service name.
-    
+
     Returns:
         dict: Payload with 'status' set to "healthy" and 'service' set to the service name.
     """

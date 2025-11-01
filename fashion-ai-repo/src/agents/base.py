@@ -22,7 +22,7 @@ class BaseAgent(ABC):
     ):
         """
         Initialize the BaseAgent with identity, storage path, queue manager, and retry/time settings.
-        
+
         Parameters:
             name: Agent name used for identification and log file naming.
             io_path: Filesystem path for agent input/output; the directory will be created if it does not exist.
@@ -45,11 +45,11 @@ class BaseAgent(ABC):
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Process a single task identified by task_type using the provided payload and return the processing result.
-        
+
         Parameters:
             task_type (str): Identifier of the task to execute.
             payload (Dict[str, Any]): Input data required to perform the task.
-        
+
         Returns:
             Dict[str, Any]: Result of task processing containing outcome details or response data.
         """
@@ -59,27 +59,25 @@ class BaseAgent(ABC):
     def get_supported_tasks(self) -> List[str]:
         """
         List the task type identifiers that this agent can handle.
-        
+
         Returns:
             A list of supported task type strings.
         """
         pass
 
-    async def execute_with_retry(
-        self, task_type: str, payload: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def execute_with_retry(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Execute a task with retry logic and return its result.
-        
+
         Attempts to run the specified task by calling process_task up to self.retry_attempts times, waiting with exponential backoff between retries when failures occur.
-        
+
         Parameters:
             task_type (str): Identifier for the task to execute.
             payload (Dict[str, Any]): Data passed to the task.
-        
+
         Returns:
             Dict[str, Any]: The result produced by the successful task execution.
-        
+
         Raises:
             Exception: Re-raises the exception from the final failed attempt if the task keeps failing.
         """
@@ -102,17 +100,15 @@ class BaseAgent(ABC):
 
         raise RuntimeError(f"Task failed after {self.retry_attempts} attempts")
 
-    def send_message(
-        self, target_agent: str, task_type: str, payload: Dict[str, Any]
-    ) -> bool:
+    def send_message(self, target_agent: str, task_type: str, payload: Dict[str, Any]) -> bool:
         """
         Send a task message to another agent via the queue manager.
-        
+
         Parameters:
             target_agent (str): Name of the recipient agent.
             task_type (str): Type of task being requested.
             payload (Dict[str, Any]): Data to deliver with the message.
-        
+
         Returns:
             True if the message was published successfully, False otherwise.
         """
@@ -156,9 +152,7 @@ class BaseAgent(ABC):
                 message = self.queue_manager.pop_task(queue_name, timeout=5)
                 if message:
                     try:
-                        result = await self.execute_with_retry(
-                            message.task_type, message.payload
-                        )
+                        result = await self.execute_with_retry(message.task_type, message.payload)
                         self.logger.info(f"Task result: {result}")
                     except Exception as e:
                         self.logger.error(f"Failed to process task: {str(e)}")

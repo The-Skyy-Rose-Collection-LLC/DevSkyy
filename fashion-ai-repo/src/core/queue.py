@@ -57,11 +57,11 @@ class QueueManager:
     def publish(self, channel: str, message: Message) -> bool:
         """
         Publish a Message to the specified logical Redis channel within the manager's namespace.
-        
+
         Parameters:
             channel (str): Logical channel name (without the manager prefix).
             message (Message): Message object to publish.
-        
+
         Returns:
             True if the message was published successfully, False otherwise.
         """
@@ -77,7 +77,7 @@ class QueueManager:
     def subscribe(self, channels: list[str]) -> None:
         """
         Subscribe to the given Redis channels under this manager's namespace prefix.
-        
+
         Parameters:
             channels (list[str]): Channel names (without the manager prefix) to subscribe to.
         """
@@ -87,7 +87,7 @@ class QueueManager:
     def listen(self) -> Optional[Message]:
         """
         Waits for the next message on currently subscribed channels.
-        
+
         Returns:
             Message parsed from the channel payload when a new message is received; None if no message arrives within the internal timeout or an error occurs.
         """
@@ -104,11 +104,11 @@ class QueueManager:
     def push_task(self, queue: str, message: Message) -> bool:
         """
         Append a Message to the named namespaced queue.
-        
+
         Parameters:
             queue (str): Logical queue name (without prefix).
             message (Message): Message object to enqueue.
-        
+
         Returns:
             bool: True if the message was successfully enqueued, False otherwise.
         """
@@ -124,11 +124,11 @@ class QueueManager:
     def pop_task(self, queue: str, timeout: int = 5) -> Optional[Message]:
         """
         Remove and return a message from the named queue, waiting up to the given timeout.
-        
+
         Parameters:
             queue (str): Name of the queue (without prefix).
             timeout (int): Maximum seconds to block waiting for a message.
-        
+
         Returns:
             Message: The retrieved Message when available.
             None: If no message is available before the timeout or if an error occurs.
@@ -148,7 +148,7 @@ class QueueManager:
     def get_queue_depth(self, queue: str) -> int:
         """
         Get the number of messages currently in the named queue.
-        
+
         Returns:
             Number of messages in the queue.
         """
@@ -158,7 +158,7 @@ class QueueManager:
     def close(self) -> None:
         """
         Close the manager's Redis resources.
-        
+
         Closes the pubsub subscription and the underlying Redis client connection. After calling this method the QueueManager must not be used for further publish/subscribe or queue operations.
         """
         self.pubsub.close()

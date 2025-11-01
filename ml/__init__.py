@@ -1,15 +1,18 @@
-    import redis_cache, RedisCache
-from .model_registry import model_registry, ModelRegistry, ModelStage
-from .redis_cache try:
+"""ML Infrastructure - Model Registry, Caching, Explainability, Codex Integration"""
 
 from .codex_integration import codex, CodexIntegration
 from .codex_orchestrator import codex_orchestrator, CodexOrchestrator
 from .explainability import explainer, ModelExplainer
+from .model_registry import model_registry, ModelRegistry, ModelStage
 
-"""ML Infrastructure - Model Registry, Caching, Explainability, Codex Integration"""
+# Optional Redis caching support
+try:
+    from redis_cache import RedisCache
 
+    redis_cache = RedisCache()
 except ImportError:
-    redis = None  # Optional dependency
+    RedisCache = None  # type: ignore
+    redis_cache = None  # Optional dependency
 
 __all__ = [
     "ModelRegistry",

@@ -62,10 +62,10 @@ class SystemStatusResponse(BaseModel):
 async def generate_design(request: DesignRequest) -> DesignResponse:
     """
     Queue a new fashion design generation request.
-    
+
     Parameters:
         request (DesignRequest): Design parameters; includes `style` (default "modern"), `color` (default "neutral"), and `season` (default "all-season").
-    
+
     Returns:
         DesignResponse: Response with `status`, `message`, and a `payload` containing a `design_id` (placeholder) and the echoed request fields (`style`, `color`, `season`).
     """
@@ -86,10 +86,10 @@ async def generate_design(request: DesignRequest) -> DesignResponse:
 async def get_design_feed(limit: int = 10) -> Dict[str, Any]:
     """
     Retrieve a list of recent design entries.
-    
+
     Parameters:
         limit (int): Maximum number of designs to return.
-    
+
     Returns:
         response (Dict[str, Any]): Dictionary with keys `status` (int), `message` (str), and `payload` (list of design objects; currently a placeholder).
     """
@@ -104,10 +104,10 @@ async def get_design_feed(limit: int = 10) -> Dict[str, Any]:
 async def get_design(design_id: str) -> Dict[str, Any]:
     """
     Retrieve a design by its identifier.
-    
+
     Parameters:
         design_id (str): Unique identifier for the design to retrieve.
-    
+
     Returns:
         A dictionary with keys 'status' (int), 'message' (str), and 'payload' (dict) containing the requested 'design_id'.
     """
@@ -127,11 +127,11 @@ async def get_design(design_id: str) -> Dict[str, Any]:
 async def get_products(limit: int = 20, offset: int = 0) -> Dict[str, Any]:
     """
     Return a slice of the product catalog.
-    
+
     Parameters:
         limit (int): Maximum number of products to include.
         offset (int): Pagination offset (number of products to skip).
-    
+
     Returns:
         dict: Response containing 'status' (HTTP status code), 'message' (summary), and 'payload' (list of product entries).
     """
@@ -146,10 +146,10 @@ async def get_products(limit: int = 20, offset: int = 0) -> Dict[str, Any]:
 async def get_product(sku: str) -> Dict[str, Any]:
     """
     Retrieve product details for the given SKU.
-    
+
     Parameters:
         sku (str): Stock-keeping unit identifying the product.
-    
+
     Returns:
         Dict[str, Any]: Response with keys "status", "message", and "payload"; "payload" contains the product data including the provided `sku`.
     """
@@ -164,10 +164,10 @@ async def get_product(sku: str) -> Dict[str, Any]:
 async def create_order(order: Dict[str, Any]) -> Dict[str, Any]:
     """
     Create a new order and return a confirmation payload.
-    
+
     Parameters:
         order (Dict[str, Any]): Order details (for example: items, billing, and shipping information).
-    
+
     Returns:
         dict: Confirmation with keys `status` (HTTP-like code), `message`, and `payload` containing `order_id` (currently "pending").
     """
@@ -187,10 +187,10 @@ async def create_order(order: Dict[str, Any]) -> Dict[str, Any]:
 async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
     """
     Create a marketing campaign and return its details.
-    
+
     Parameters:
         request (CampaignRequest): Campaign creation parameters including `name`, `type`, and `target_audience`.
-    
+
     Returns:
         Response dictionary containing `status`, `message`, and `payload` with the created campaign's details (`campaign_id`, `name`, `type`).
     """
@@ -209,10 +209,10 @@ async def create_campaign(request: CampaignRequest) -> Dict[str, Any]:
 async def get_analytics(period: str = "week") -> Dict[str, Any]:
     """
     Provide analytics metrics aggregated for the specified time period.
-    
+
     Parameters:
         period (str): Time period to aggregate metrics for; expected values include "day", "week", or "month".
-    
+
     Returns:
         dict: Response object with keys:
             - status (int): HTTP-like status code.
@@ -244,10 +244,10 @@ async def get_analytics(period: str = "week") -> Dict[str, Any]:
 async def get_finance_summary(period: str = "month") -> Dict[str, Any]:
     """
     Retrieve a financial summary for the requested period.
-    
+
     Parameters:
         period (str): Time period to summarize (e.g., "month", "week", "year").
-    
+
     Returns:
         Dict[str, Any]: Response object containing `status` (int), `message` (str), and `payload` (dict) with keys:
             - `period` (str): Echoes the requested period.
@@ -269,10 +269,10 @@ async def get_finance_summary(period: str = "month") -> Dict[str, Any]:
 async def get_ledger(limit: int = 50) -> Dict[str, Any]:
     """
     Retrieve a slice of ledger entries.
-    
+
     Parameters:
         limit (int): Maximum number of ledger entries to include in the response payload.
-    
+
     Returns:
         dict: Response object with keys:
             - status (int): HTTP-like status code.
@@ -295,9 +295,9 @@ async def get_ledger(limit: int = 50) -> Dict[str, Any]:
 async def get_system_status() -> SystemStatusResponse:
     """
     Report current system operational state and service metrics.
-    
+
     The payload includes overall API health, per-agent statuses, and queue depths for background work queues.
-    
+
     Returns:
         SystemStatusResponse: Contains an HTTP-like status code, a human-readable message, and a `payload` dict with keys:
             - "api": overall API health as a string
@@ -330,7 +330,7 @@ async def get_system_status() -> SystemStatusResponse:
 async def get_system_health() -> Dict[str, Any]:
     """
     Provide a detailed system health payload.
-    
+
     Returns:
         response (Dict[str, Any]): Dictionary with keys:
             - "status" (int): HTTP-like status code.
@@ -354,7 +354,7 @@ async def get_system_health() -> Dict[str, Any]:
 async def get_system_metrics() -> Dict[str, Any]:
     """
     Return current system metrics and metadata.
-    
+
     Returns:
         dict: Response containing:
             status (int): HTTP-like status code.

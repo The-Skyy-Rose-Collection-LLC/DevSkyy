@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, JSON, String, Text
 
-    from database import Base
+from database import Base
 from typing import Any, Dict, List, Optional
 
 """

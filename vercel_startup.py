@@ -2,19 +2,19 @@
 import os
 import sys
 
-        from pydantic import BaseModel, Field
-        import fastapi
-        import pydantic
-        import pydantic.networks
-        import sqlalchemy
+from pydantic import BaseModel, Field
+import fastapi
+import pydantic
+import pydantic.networks
+import sqlalchemy
 
-            import email_validator
-            import subprocess
-        from typing import Optional
-        import anthropic
-        import email_validator
-        import openai
-        import uvicorn
+import email_validator
+import subprocess
+from typing import Optional
+import anthropic
+import email_validator
+import openai
+import uvicorn
 from typing import Optional
 import logging
 

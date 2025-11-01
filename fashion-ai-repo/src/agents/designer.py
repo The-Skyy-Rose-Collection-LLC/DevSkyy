@@ -12,7 +12,7 @@ class DesignerAgent(BaseAgent):
     def __init__(self, *args, **kwargs):
         """
         Initialize the DesignerAgent and prepare its design storage.
-        
+
         Sets the agent name to "DesignerAgent", stores the path to the agent's designs directory on `self.designs_path`, and ensures that directory exists (created if necessary). Additional positional and keyword arguments are passed to the BaseAgent initializer.
         """
         super().__init__(name="DesignerAgent", *args, **kwargs)
@@ -22,7 +22,7 @@ class DesignerAgent(BaseAgent):
     def get_supported_tasks(self) -> List[str]:
         """
         List the task types this agent can perform.
-        
+
         Returns:
             List[str]: Supported task type names: "generate_design", "validate_design", "extract_features", and "curate_collection".
         """
@@ -31,14 +31,14 @@ class DesignerAgent(BaseAgent):
     async def process_task(self, task_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Dispatches a design-related task to the appropriate handler and returns the task result.
-        
+
         Parameters:
             task_type (str): One of "generate_design", "validate_design", "extract_features", or "curate_collection" indicating which handler to invoke.
             payload (Dict[str, Any]): Parameters required by the selected task handler.
-        
+
         Returns:
             result (Dict[str, Any]): A dictionary containing the task-specific outcome.
-        
+
         Raises:
             ValueError: If task_type is not one of the supported task names.
         """
@@ -56,14 +56,14 @@ class DesignerAgent(BaseAgent):
     async def _generate_design(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate a new fashion design using the provided parameters.
-        
+
         Parameters:
             payload (Dict[str, Any]): Design parameters. Recognized keys:
                 - "style" (str): Design style, default "modern".
                 - "color" (str): Primary color or palette, default "neutral".
                 - "season" (str): Target season, default "all-season".
                 Additional keys are preserved in the returned metadata.
-        
+
         Returns:
             Dict[str, Any]: A dictionary describing the generated design with keys:
                 - "design_id" (str): Unique identifier for the design.
@@ -113,10 +113,10 @@ class DesignerAgent(BaseAgent):
     async def _validate_design(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Assess a design against quality and brand standards and produce a validation summary.
-        
+
         Parameters:
             payload (Dict[str, Any]): Design metadata; expected keys include "design_id" and optional "design_file".
-        
+
         Returns:
             Dict[str, Any]: Validation summary with keys:
                 - "design_id" (str | None): The design identifier from the payload.
@@ -147,10 +147,10 @@ class DesignerAgent(BaseAgent):
     async def _extract_features(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Extracts visual feature embeddings for a design.
-        
+
         Parameters:
             payload (Dict[str, Any]): Input data for extraction. Must include 'design_id' to tag the features.
-        
+
         Returns:
             Dict[str, Any]: A dictionary with keys:
                 - design_id (str | None): The design identifier from the payload.
@@ -178,13 +178,13 @@ class DesignerAgent(BaseAgent):
     async def _curate_collection(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Builds a curated collection descriptor based on provided curation parameters.
-        
+
         Parameters:
             payload (Dict[str, Any]): Curation parameters. Recognized keys:
                 - theme (str): Collection theme (default "seasonal").
                 - size (int): Desired number of designs in the collection (default 10).
                 - criteria (Any): Optional filtering or ranking criteria (implementation dependent).
-        
+
         Returns:
             Dict[str, Any]: A collection dictionary containing:
                 - collection_id (str): Generated collection identifier.

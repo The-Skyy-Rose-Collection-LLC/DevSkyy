@@ -1,7 +1,7 @@
         import re
 from datetime import datetime
 
-    import anthropic
+import anthropic
 from PIL import Image  # noqa: F401 - Reserved for Phase 3 image processing
 from typing import Any, Dict, List, Optional
 import logging

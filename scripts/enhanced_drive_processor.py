@@ -418,7 +418,7 @@ echo -e "${{GREEN}}🌹 Skyy Rose Collection processing setup complete!${{NC}}"
 
 # CLI interface
 if __name__ == "__main__":
-    import argparse
+import argparse
     
     parser = argparse.ArgumentParser(description="Enhanced Skyy Rose Collection Processor")
     parser.add_argument("--create-guide", action="store_true", help="Create comprehensive processing guide")

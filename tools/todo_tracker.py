@@ -5,8 +5,8 @@ import os
 import re
 import sys
 
-        import hashlib
-    import argparse
+import hashlib
+import argparse
 from dataclasses import dataclass, asdict
 from enum import Enum
 from typing import Dict, List, Optional, Set

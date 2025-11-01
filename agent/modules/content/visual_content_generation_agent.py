@@ -685,7 +685,7 @@ class VisualContentGenerationAgent:
         Raises:
             Exception: If the HTTP response status is not 200 or the download fails.
         """
-        import aiohttp
+import aiohttp
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:

@@ -12,6 +12,7 @@ Industry-leading automated WordPress/Elementor theme generation with ML
 
 logger = logging.getLogger(__name__)
 
+
 class ElementorThemeBuilder:
     """
     Advanced WordPress/Elementor theme builder with ML-powered design
@@ -121,9 +122,7 @@ class ElementorThemeBuilder:
             Complete theme configuration
         """
         try:
-            logger.info(
-                f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}"
-            )
+            logger.info(f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}")
 
             # Default pages for fashion ecommerce
             if pages is None:
@@ -148,9 +147,7 @@ class ElementorThemeBuilder:
                 page_layouts[page] = layout
 
             # Generate global settings
-            global_settings = await self._generate_global_settings(
-                brand_info, theme_type, colors, typography
-            )
+            global_settings = await self._generate_global_settings(brand_info, theme_type, colors, typography)
 
             # Create theme package
             theme = {
@@ -167,9 +164,7 @@ class ElementorThemeBuilder:
                 "typography": typography,
                 "pages": page_layouts,
                 "widgets": self._get_required_widgets(page_layouts),
-                "woocommerce_settings": await self._generate_woocommerce_config(
-                    brand_info
-                ),
+                "woocommerce_settings": await self._generate_woocommerce_config(brand_info),
                 "seo_settings": await self._generate_seo_config(brand_info),
                 "performance_optimizations": self._get_performance_config(),
             }
@@ -190,9 +185,7 @@ class ElementorThemeBuilder:
             logger.error(f"Theme generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_color_palette(
-        self, brand_info: Dict[str, Any], theme_type: str
-    ) -> Dict[str, str]:
+    async def _generate_color_palette(self, brand_info: Dict[str, Any], theme_type: str) -> Dict[str, str]:
         """Generate ML-optimized color palette"""
         try:
             # Base colors from brand or theme template
@@ -264,9 +257,7 @@ class ElementorThemeBuilder:
             logger.error(f"Color palette generation failed: {e}")
             return {}
 
-    async def _generate_typography(
-        self, brand_info: Dict[str, Any], theme_type: str
-    ) -> Dict[str, Any]:
+    async def _generate_typography(self, brand_info: Dict[str, Any], theme_type: str) -> Dict[str, Any]:
         """Generate optimized typography settings"""
         template = self.theme_templates.get(theme_type, {})
         style = template.get("style", "modern")
@@ -335,9 +326,7 @@ class ElementorThemeBuilder:
         """Generate page layout with Elementor sections"""
         try:
             if page_type == "home":
-                return await self._generate_homepage(
-                    brand_info, theme_type, colors, typography
-                )
+                return await self._generate_homepage(brand_info, theme_type, colors, typography)
             elif page_type == "shop":
                 return await self._generate_shop_page(brand_info, colors, typography)
             elif page_type == "product":
@@ -371,9 +360,7 @@ class ElementorThemeBuilder:
                     "background_type": "image",
                     "content": {
                         "heading": f"Welcome to {brand_info.get('name', 'Our Store')}",
-                        "subheading": brand_info.get(
-                            "tagline", "Discover Luxury Fashion"
-                        ),
+                        "subheading": brand_info.get("tagline", "Discover Luxury Fashion"),
                         "cta_button": {
                             "text": "Shop Now",
                             "link": "/shop",
@@ -407,9 +394,7 @@ class ElementorThemeBuilder:
                     "layout": "two-column",
                     "content": {
                         "heading": "Our Story",
-                        "text": brand_info.get(
-                            "description", "Crafting excellence since inception"
-                        ),
+                        "text": brand_info.get("description", "Crafting excellence since inception"),
                         "image_position": "right",
                     },
                     "styling": {
@@ -459,9 +444,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    async def _generate_shop_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_shop_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
         """Generate shop page layout"""
         return {
             "sections": [
@@ -495,9 +478,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_product_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_product_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
         """Generate product detail page layout"""
         return {
             "sections": [
@@ -544,9 +525,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_about_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_about_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
         """Generate about page layout"""
         return {
             "sections": [
@@ -575,9 +554,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_contact_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_contact_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
         """Generate contact page layout"""
         return {
             "sections": [
@@ -601,9 +578,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_blog_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_blog_page(self, brand_info: Dict, colors: Dict, typography: Dict) -> Dict[str, Any]:
         """Generate blog page layout"""
         return {
             "sections": [
@@ -778,17 +753,13 @@ class ElementorThemeBuilder:
             hex_color = hex_color.lstrip("#")
             rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
-            adjusted = tuple(
-                max(0, min(255, int(c + (c * percent / 100)))) for c in rgb
-            )
+            adjusted = tuple(max(0, min(255, int(c + (c * percent / 100)))) for c in rgb)
 
             return "#{:02x}{:02x}{:02x}".format(*adjusted)
         except Exception:
             return hex_color
 
-    async def export_theme(
-        self, theme: Dict[str, Any], format: str = "json"
-    ) -> Dict[str, Any]:
+    async def export_theme(self, theme: Dict[str, Any], format: str = "json") -> Dict[str, Any]:
         """
         Export theme in various formats
 

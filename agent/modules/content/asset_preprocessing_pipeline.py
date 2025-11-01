@@ -548,18 +548,18 @@ class AssetPreprocessingPipeline:
         if request.denoise:
             # Use PIL's median filter for basic noise reduction
             # For AI-powered denoising, integrate Real-ESRGAN or similar
-            from PIL import ImageFilter
+from PIL import ImageFilter
             logger.info("Applying basic denoising (median filter)")
             enhanced = enhanced.filter(ImageFilter.MedianFilter(size=3))
 
         # Sharpen
         if request.sharpen:
-            from PIL import ImageFilter
+from PIL import ImageFilter
             enhanced = enhanced.filter(ImageFilter.SHARPEN)
 
         # Color correction
         if request.color_correction:
-            from PIL import ImageEnhance
+from PIL import ImageEnhance
             enhancer = ImageEnhance.Color(enhanced)
             enhanced = enhancer.enhance(1.2)
 

@@ -420,7 +420,7 @@ gdpr_manager = GDPRManager()
 # @router.get("/audit-logs")
 
 if __name__ == "__main__":
-    import asyncio
+import asyncio
     
     async def demo():
         # Test data export

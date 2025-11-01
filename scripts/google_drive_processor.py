@@ -441,7 +441,7 @@ echo "🚀 After download, run: python ../scripts/google_drive_processor.py --pr
 
 # CLI interface
 if __name__ == "__main__":
-    import argparse
+import argparse
     
     parser = argparse.ArgumentParser(description="Process Skyy Rose Collection images from Google Drive")
     parser.add_argument("--drive-url", help="Google Drive folder URL")

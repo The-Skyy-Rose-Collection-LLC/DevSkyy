@@ -4,7 +4,7 @@ import time
 
 from fastapi import HTTPException, Request, status
 
-            import hmac
+import hmac
 from dataclasses import asdict, dataclass
 from enum import Enum
 from httpx import AsyncClient, RequestError, TimeoutException

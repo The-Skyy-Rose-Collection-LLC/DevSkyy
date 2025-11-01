@@ -14,9 +14,9 @@ def setup_logging(
 ) -> None:
     """
     Initialize logging for the application.
-    
+
     Ensures the log directory exists. If a readable logging configuration file is provided, loads configuration from it; otherwise applies a default configuration that sets the level from `log_level`, logs to stdout, and writes to `application.log` inside `log_dir`.
-    
+
     Parameters:
         config_file (Optional[Path]): Path to a logging configuration file to load (if it exists).
         log_level (str): Default logging level name used when no config file is loaded (e.g., "INFO", "DEBUG").
@@ -57,7 +57,7 @@ class AgentLogger:
     def __init__(self, agent_name: str, log_file: Optional[Path] = None):
         """
         Create an agent-scoped logger and optionally attach a file handler for agent-specific logs.
-        
+
         Parameters:
             agent_name (str): Identifier used as the agent's logger namespace (logger name will be "agents.<agent_name>").
             log_file (Optional[Path]): Path to a file where this agent's logs should be written. If provided, a FileHandler with a timestamped, leveled formatter is added to the agent logger.
@@ -76,7 +76,7 @@ class AgentLogger:
     def info(self, message: str, **kwargs) -> None:
         """
         Log an informational message prefixed with the agent name.
-        
+
         Parameters:
             message (str): The message to log.
             **kwargs: Additional context passed to the logger as the `extra` dictionary.
@@ -86,7 +86,7 @@ class AgentLogger:
     def error(self, message: str, **kwargs) -> None:
         """
         Log an error-level message for this agent including optional contextual fields.
-        
+
         Parameters:
             message (str): The message to log; it will be prefixed with the agent name.
             **kwargs: Additional contextual fields to attach to the log record via the logging `extra` parameter.
@@ -96,7 +96,7 @@ class AgentLogger:
     def warning(self, message: str, **kwargs) -> None:
         """
         Log a warning message for the agent, prefixed with the agent name.
-        
+
         Parameters:
             message (str): The warning message to log.
             **kwargs: Additional context passed to the logger via the `extra` parameter.
@@ -106,7 +106,7 @@ class AgentLogger:
     def debug(self, message: str, **kwargs) -> None:
         """
         Log a debug-level message for this agent, including optional structured context.
-        
+
         Parameters:
             message (str): The message to log; it is prefixed with the agent name.
             **kwargs: Additional key-value pairs attached to the log record via the logging `extra` parameter.

@@ -10,6 +10,7 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+
 async def communicate_with_site() -> Dict[str, Any]:
     """Main function to communicate with site and gather insights."""
     SiteCommunicationAgent()
@@ -21,6 +22,7 @@ async def communicate_with_site() -> Dict[str, Any]:
         "last_communication": datetime.now().isoformat(),
         "agent_status": "optimal",
     }
+
 
 class SiteCommunicationAgent:
     """Agent for communicating with website chatbots and gathering insights."""
@@ -34,9 +36,7 @@ class SiteCommunicationAgent:
         self.telemetry = Telemetry("site_communication")
         logger.info("💬 Site Communication Agent initialized")
 
-    async def connect_to_chatbot(
-        self, website_url: str, api_key: str = None
-    ) -> Dict[str, Any]:
+    async def connect_to_chatbot(self, website_url: str, api_key: str = None) -> Dict[str, Any]:
         """Connect to website chatbot for real-time insights."""
 
         try:
@@ -110,14 +110,10 @@ class SiteCommunicationAgent:
             health_data = {
                 "website": website_url,
                 "timestamp": datetime.now().isoformat(),
-                "uptime_status": (
-                    "online" if response.status_code == 200 else "issues_detected"
-                ),
+                "uptime_status": ("online" if response.status_code == 200 else "issues_detected"),
                 "response_time": round(response.elapsed.total_seconds() * 1000, 2),
                 "status_code": response.status_code,
-                "ssl_certificate": (
-                    "valid" if website_url.startswith("https") else "missing"
-                ),
+                "ssl_certificate": ("valid" if website_url.startswith("https") else "missing"),
                 "mobile_friendly": True,
                 "page_speed_score": random.randint(85, 98),
                 "seo_score": random.randint(88, 96),
@@ -180,18 +176,14 @@ class SiteCommunicationAgent:
                 "feedback_count": data["count"],
                 "average_rating": round(data["avg_rating"], 2),
                 "sentiment": (
-                    "positive"
-                    if data["avg_rating"] >= 4
-                    else "neutral" if data["avg_rating"] >= 3 else "negative"
+                    "positive" if data["avg_rating"] >= 4 else "neutral" if data["avg_rating"] >= 3 else "negative"
                 ),
             }
 
         # Generate action items
         for category, insights in sentiment_analysis["category_insights"].items():
             if insights["sentiment"] == "negative":
-                sentiment_analysis["action_items"].append(
-                    f"Address {category} concerns - low rating detected"
-                )
+                sentiment_analysis["action_items"].append(f"Address {category} concerns - low rating detected")
             elif insights["feedback_count"] > 2:
                 sentiment_analysis["trending_topics"].append(category)
 
@@ -271,19 +263,13 @@ class SiteCommunicationAgent:
         market_insights = self.get_target_market_insights(website_url)
 
         # Check for chatbot connection
-        chatbot_data = self.chatbot_connections.get(
-            website_url, {"status": "not_connected"}
-        )
+        chatbot_data = self.chatbot_connections.get(website_url, {"status": "not_connected"})
 
         comprehensive_report = {
             "website": website_url,
             "report_generated": datetime.now().isoformat(),
             "executive_summary": {
-                "overall_health": (
-                    "excellent"
-                    if site_health.get("uptime_status") == "online"
-                    else "needs_attention"
-                ),
+                "overall_health": ("excellent" if site_health.get("uptime_status") == "online" else "needs_attention"),
                 "customer_satisfaction": customer_feedback["sentiment_score"],
                 "market_position": "strong",
                 "technical_performance": site_health.get("page_speed_score", 0),
@@ -352,9 +338,7 @@ class SiteCommunicationAgent:
             "optimization_algorithms": "quantum_annealing",
         }
 
-    async def experimental_neural_communication_analysis(
-        self, website_url: str
-    ) -> Dict[str, Any]:
+    async def experimental_neural_communication_analysis(self, website_url: str) -> Dict[str, Any]:
         """EXPERIMENTAL: Neural-powered communication analysis."""
         try:
             logger.info(f"🧠 Analyzing communication patterns for {website_url}")
@@ -421,6 +405,7 @@ class SiteCommunicationAgent:
         except Exception as e:
             logger.error(f"Neural communication analysis failed: {str(e)}")
             return {"error": str(e), "status": "neural_overload"}
+
 
 # Main communication function
 async def communicate_with_site() -> Dict[str, Any]:

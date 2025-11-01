@@ -8,7 +8,6 @@ Implements cursor-based and offset-based pagination
 """
 
 
-
 T = TypeVar("T")
 
 
@@ -16,9 +15,7 @@ class PaginationParams(BaseModel):
     """Standard pagination parameters"""
 
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
-    page_size: int = Field(
-        default=20, ge=1, le=100, description="Items per page (max 100)"
-    )
+    page_size: int = Field(default=20, ge=1, le=100, description="Items per page (max 100)")
 
     @property
     def offset(self) -> int:
@@ -56,9 +53,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
         }
 
 
-def create_paginated_response(
-    items: List[T], total: int, page: int, page_size: int
-) -> PaginatedResponse[T]:
+def create_paginated_response(items: List[T], total: int, page: int, page_size: int) -> PaginatedResponse[T]:
     """
     Create paginated response from items and metadata
 

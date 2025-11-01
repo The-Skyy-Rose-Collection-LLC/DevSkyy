@@ -1,13 +1,13 @@
 from api_integration.core_engine import api_gateway
 from datetime import datetime, timedelta
 
-        from fashion.intelligence_engine import FashionCategory
-        from fashion.intelligence_engine import FashionCategory, FashionSeason
+from fashion.intelligence_engine import FashionCategory
+from fashion.intelligence_engine import FashionCategory, FashionSeason
 from api_integration.auth_manager import auth_manager, AuthenticationType
 from api_integration.discovery_engine import api_discovery_engine, APICategory
 from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
-    from fashion.intelligence_engine import fashion_intelligence
+from fashion.intelligence_engine import fashion_intelligence
 from typing import Any, Dict, List, Optional
 import asyncio
 import logging

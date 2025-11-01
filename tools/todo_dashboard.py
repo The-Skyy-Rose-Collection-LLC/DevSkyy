@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-    import uvicorn
+import uvicorn
 from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
 from typing import Dict, List, Optional
 
@@ -20,32 +20,33 @@ A web-based dashboard for managing TODO items, technical debt,
 and development tasks across the DevSkyy platform.
 """
 
+
 class TodoDashboard:
     """Web dashboard for TODO management"""
-    
+
     def __init__(self):
         self.app = FastAPI(title="DevSkyy TODO Dashboard", version="1.0.0")
         self.tracker = TodoTracker()
         self.setup_routes()
-    
+
     def setup_routes(self):
         """Setup FastAPI routes for the dashboard"""
-        
+
         @self.app.get("/", response_class=HTMLResponse)
         async def dashboard_home(request: Request):
             """Main dashboard page"""
             return self.render_dashboard()
-        
+
         @self.app.get("/api/todos")
         async def get_todos(
             status: Optional[str] = None,
             priority: Optional[str] = None,
             category: Optional[str] = None,
-            file_path: Optional[str] = None
+            file_path: Optional[str] = None,
         ):
             """Get TODO items with optional filters"""
             todos = list(self.tracker.todos.values())
-            
+
             # Apply filters
             if status:
                 todos = [t for t in todos if t.status.value == status]
@@ -55,65 +56,62 @@ class TodoDashboard:
                 todos = [t for t in todos if t.category.value == category]
             if file_path:
                 todos = [t for t in todos if file_path in t.file_path]
-            
-            return {
-                "todos": [self.todo_to_dict(todo) for todo in todos],
-                "total": len(todos)
-            }
-        
+
+            return {"todos": [self.todo_to_dict(todo) for todo in todos], "total": len(todos)}
+
         @self.app.get("/api/todos/{todo_id}")
         async def get_todo(todo_id: str):
             """Get a specific TODO item"""
             if todo_id not in self.tracker.todos:
                 raise HTTPException(status_code=404, detail="TODO not found")
-            
+
             return self.todo_to_dict(self.tracker.todos[todo_id])
-        
+
         @self.app.put("/api/todos/{todo_id}")
         async def update_todo(todo_id: str, update_data: dict):
             """Update a TODO item"""
             if todo_id not in self.tracker.todos:
                 raise HTTPException(status_code=404, detail="TODO not found")
-            
+
             # Convert string enums to enum objects
-            if 'status' in update_data:
-                update_data['status'] = Status(update_data['status'])
-            if 'priority' in update_data:
-                update_data['priority'] = Priority(update_data['priority'])
-            if 'category' in update_data:
-                update_data['category'] = Category(update_data['category'])
-            
+            if "status" in update_data:
+                update_data["status"] = Status(update_data["status"])
+            if "priority" in update_data:
+                update_data["priority"] = Priority(update_data["priority"])
+            if "category" in update_data:
+                update_data["category"] = Category(update_data["category"])
+
             success = self.tracker.update_todo(todo_id, **update_data)
             if not success:
                 raise HTTPException(status_code=400, detail="Failed to update TODO")
-            
+
             return self.todo_to_dict(self.tracker.todos[todo_id])
-        
+
         @self.app.delete("/api/todos/{todo_id}")
         async def delete_todo(todo_id: str):
             """Delete a TODO item"""
             success = self.tracker.delete_todo(todo_id)
             if not success:
                 raise HTTPException(status_code=404, detail="TODO not found")
-            
+
             return {"message": "TODO deleted successfully"}
-        
+
         @self.app.post("/api/sync")
         async def sync_todos():
             """Synchronize TODOs with codebase"""
             stats = self.tracker.sync_with_codebase()
             return stats
-        
+
         @self.app.get("/api/report")
         async def get_report():
             """Get comprehensive TODO report"""
             return self.tracker.generate_report()
-        
+
         @self.app.get("/api/stats")
         async def get_stats():
             """Get dashboard statistics"""
             return self.get_dashboard_stats()
-    
+
     def todo_to_dict(self, todo: TodoItem) -> Dict:
         """Convert TodoItem to dictionary for JSON serialization"""
         return {
@@ -130,13 +128,13 @@ class TodoDashboard:
             "assignee": todo.assignee,
             "estimated_hours": todo.estimated_hours,
             "tags": todo.tags,
-            "related_issues": todo.related_issues
+            "related_issues": todo.related_issues,
         }
-    
+
     def get_dashboard_stats(self) -> Dict:
         """Get statistics for dashboard display"""
         total_todos = len(self.tracker.todos)
-        
+
         if total_todos == 0:
             return {
                 "total": 0,
@@ -145,17 +143,17 @@ class TodoDashboard:
                 "completed": 0,
                 "critical": 0,
                 "high": 0,
-                "completion_rate": 0
+                "completion_rate": 0,
             }
-        
+
         open_todos = len(self.tracker.get_todos_by_status(Status.OPEN))
         in_progress = len(self.tracker.get_todos_by_status(Status.IN_PROGRESS))
         completed = len(self.tracker.get_todos_by_status(Status.COMPLETED))
         critical = len(self.tracker.get_todos_by_priority(Priority.CRITICAL))
         high = len(self.tracker.get_todos_by_priority(Priority.HIGH))
-        
+
         completion_rate = (completed / total_todos) * 100 if total_todos > 0 else 0
-        
+
         return {
             "total": total_todos,
             "open": open_todos,
@@ -163,13 +161,13 @@ class TodoDashboard:
             "completed": completed,
             "critical": critical,
             "high": high,
-            "completion_rate": round(completion_rate, 1)
+            "completion_rate": round(completion_rate, 1),
         }
-    
+
     def render_dashboard(self) -> str:
         """Render the main dashboard HTML"""
         stats = self.get_dashboard_stats()
-        
+
         html = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -401,22 +399,24 @@ class TodoDashboard:
         </body>
         </html>
         """
-        
+
         return html
+
 
 def main():
     """Run the TODO dashboard server"""
-    
+
     dashboard = TodoDashboard()
-    
+
     logger.info("🚀 Starting DevSkyy TODO Dashboard...")
     logger.info("📊 Dashboard will be available at: http://localhost:8001")
     logger.info("🔄 Auto-syncing with codebase...")
-    
+
     # Initial sync
     dashboard.tracker.sync_with_codebase()
-    
+
     uvicorn.run(dashboard.app, host="0.0.0.0", port=8001)
+
 
 if __name__ == "__main__":
     main()

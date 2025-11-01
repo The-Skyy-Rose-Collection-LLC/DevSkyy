@@ -1,5 +1,5 @@
         from agent.modules.wordpress_server_access import create_wordpress_server_access
-    from .wordpress_server_access import create_wordpress_server_access
+from .wordpress_server_access import create_wordpress_server_access
 from datetime import datetime
 
 from typing import Any, Dict, List

@@ -18,6 +18,7 @@ Implements secure session management with Redis backend and fashion industry fea
 
 logger = logging.getLogger(__name__)
 
+
 class SessionMiddleware(BaseHTTPMiddleware):
     """Enterprise session middleware with Redis backend"""
 
@@ -76,9 +77,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
                 if self.fashion_tracking_enabled and session_data.fashion_preferences:
                     request.state.fashion_preferences = session_data.fashion_preferences
 
-                logger.debug(
-                    f"Session loaded: {session_id} for user {session_data.user_id}"
-                )
+                logger.debug(f"Session loaded: {session_id} for user {session_data.user_id}")
             else:
                 # Invalid session ID
                 logger.warning(f"Invalid session ID: {session_id}")
@@ -91,10 +90,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         # Check if session is required for this path
         path = request.url.path
-        requires_session = any(
-            path.startswith(protected_path)
-            for protected_path in self.require_session_for_paths
-        )
+        requires_session = any(path.startswith(protected_path) for protected_path in self.require_session_for_paths)
 
         if requires_session and not session_data:
             return JSONResponse(
@@ -194,9 +190,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         return False
 
-    async def update_fashion_preferences(
-        self, request: Request, fashion_preferences: Dict[str, Any]
-    ) -> bool:
+    async def update_fashion_preferences(self, request: Request, fashion_preferences: Dict[str, Any]) -> bool:
         """Update fashion preferences in session"""
         session_id = getattr(request.state, "session_id", None)
         session_data = getattr(request.state, "session_data", None)
@@ -217,6 +211,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
             return success
 
         return False
+
 
 class SessionManager:
     """Session management utilities"""
@@ -291,32 +286,32 @@ class SessionManager:
             "fashion_tracking": self.middleware.fashion_tracking_enabled,
         }
 
+
 # Dependency for FastAPI routes
 async def get_current_session(request: Request) -> Optional[SessionData]:
     """FastAPI dependency to get current session"""
     return SessionManager.get_session_data(request)
+
 
 async def require_authentication(request: Request) -> SessionData:
     """FastAPI dependency that requires authentication"""
     session_data = SessionManager.get_session_data(request)
 
     if not session_data:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
     return session_data
+
 
 async def require_fashion_expert(request: Request) -> SessionData:
     """FastAPI dependency that requires fashion expert role"""
     session_data = await require_authentication(request)
 
     if not SessionManager.is_fashion_expert(request):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Fashion expert role required"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Fashion expert role required")
 
     return session_data
+
 
 # Global session manager instance
 session_middleware = SessionMiddleware(None)  # App will be set during initialization

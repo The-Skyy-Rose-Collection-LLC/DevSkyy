@@ -5,10 +5,10 @@ from infrastructure.redis_manager import redis_manager
 import json
 
 from api_integration.workflow_engine import (
-    from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
 from fashion.intelligence_engine import (
-    from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 import asyncio
 import logging
 

@@ -17,26 +17,26 @@ import shutil
 
 from agent.wordpress.theme_builder import ElementorThemeBuilder
 from agent.modules.frontend.wordpress_fullstack_theme_builder_agent import WordPressFullStackThemeBuilderAgent
-from agent.wordpress.automated_theme_uploader import (
-    AutomatedThemeUploader,
-    UploadMethod,
-    DeploymentResult
-)
+from agent.wordpress.automated_theme_uploader import AutomatedThemeUploader, UploadMethod, DeploymentResult
+
 try:
     from config.wordpress_credentials import (
         WordPressCredentials,
         wordpress_credentials_manager,
-        get_skyy_rose_credentials
+        get_skyy_rose_credentials,
     )
 except ImportError:
     # Fallback for testing
     from agent.wordpress.automated_theme_uploader import WordPressCredentials
+
     wordpress_credentials_manager = None
     get_skyy_rose_credentials = None
 from monitoring.enterprise_logging import enterprise_logger, LogCategory
 
+
 class ThemeType(Enum):
     """Supported theme types."""
+
     LUXURY_FASHION = "luxury_fashion"
     STREETWEAR = "streetwear"
     MINIMALIST = "minimalist"
@@ -45,8 +45,10 @@ class ThemeType(Enum):
     PORTFOLIO = "portfolio"
     CORPORATE = "corporate"
 
+
 class BuildStatus(Enum):
     """Theme build status."""
+
     PENDING = "pending"
     GENERATING = "generating"
     VALIDATING = "validating"
@@ -55,9 +57,11 @@ class BuildStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 @dataclass
 class ThemeBuildRequest:
     """Theme build request configuration."""
+
     theme_name: str
     theme_type: ThemeType
     brand_guidelines: Dict[str, Any]
@@ -68,9 +72,11 @@ class ThemeBuildRequest:
     activate_after_deploy: bool = False
     upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API
 
+
 @dataclass
 class ThemeBuildResult:
     """Theme build and deployment result."""
+
     build_id: str
     request: ThemeBuildRequest
     status: BuildStatus
@@ -81,6 +87,7 @@ class ThemeBuildResult:
     completed_at: Optional[datetime] = None
     error_message: Optional[str] = None
 
+
 class ThemeBuilderOrchestrator:
     """
     Complete WordPress theme builder orchestrator that handles:
@@ -90,21 +97,18 @@ class ThemeBuilderOrchestrator:
     - Automated deployment to WordPress sites
     - Rollback and version management
     """
-    
+
     def __init__(self):
         self.elementor_builder = ElementorThemeBuilder()
         self.fullstack_builder = WordPressFullStackThemeBuilderAgent()
         self.theme_uploader = AutomatedThemeUploader()
-        
+
         self.active_builds = {}
         self.build_history = []
         self.theme_templates = self._initialize_theme_templates()
-        
-        enterprise_logger.info(
-            "Theme builder orchestrator initialized",
-            category=LogCategory.SYSTEM
-        )
-    
+
+        enterprise_logger.info("Theme builder orchestrator initialized", category=LogCategory.SYSTEM)
+
     def _initialize_theme_templates(self) -> Dict[str, Any]:
         """Initialize theme templates for different types."""
         return {
@@ -114,16 +118,12 @@ class ThemeBuilderOrchestrator:
                     "secondary": "#d4af37",
                     "accent": "#8b7355",
                     "background": "#ffffff",
-                    "text": "#333333"
+                    "text": "#333333",
                 },
-                "typography": {
-                    "headings": "Playfair Display",
-                    "body": "Source Sans Pro",
-                    "accent": "Dancing Script"
-                },
+                "typography": {"headings": "Playfair Display", "body": "Source Sans Pro", "accent": "Dancing Script"},
                 "layout": "full-width",
                 "style": "elegant",
-                "features": ["woocommerce", "elementor", "custom-header"]
+                "features": ["woocommerce", "elementor", "custom-header"],
             },
             ThemeType.STREETWEAR: {
                 "colors": {
@@ -131,16 +131,12 @@ class ThemeBuilderOrchestrator:
                     "secondary": "#ff6b35",
                     "accent": "#f7931e",
                     "background": "#ffffff",
-                    "text": "#333333"
+                    "text": "#333333",
                 },
-                "typography": {
-                    "headings": "Oswald",
-                    "body": "Open Sans",
-                    "accent": "Bebas Neue"
-                },
+                "typography": {"headings": "Oswald", "body": "Open Sans", "accent": "Bebas Neue"},
                 "layout": "boxed",
                 "style": "bold",
-                "features": ["woocommerce", "social-media", "video-backgrounds"]
+                "features": ["woocommerce", "social-media", "video-backgrounds"],
             },
             ThemeType.MINIMALIST: {
                 "colors": {
@@ -148,16 +144,12 @@ class ThemeBuilderOrchestrator:
                     "secondary": "#ecf0f1",
                     "accent": "#3498db",
                     "background": "#ffffff",
-                    "text": "#2c3e50"
+                    "text": "#2c3e50",
                 },
-                "typography": {
-                    "headings": "Lato",
-                    "body": "Lato",
-                    "accent": "Lato"
-                },
+                "typography": {"headings": "Lato", "body": "Lato", "accent": "Lato"},
                 "layout": "centered",
                 "style": "clean",
-                "features": ["responsive", "fast-loading", "accessibility"]
+                "features": ["responsive", "fast-loading", "accessibility"],
             },
             ThemeType.ECOMMERCE: {
                 "colors": {
@@ -165,120 +157,109 @@ class ThemeBuilderOrchestrator:
                     "secondary": "#34495e",
                     "accent": "#f39c12",
                     "background": "#ffffff",
-                    "text": "#2c3e50"
+                    "text": "#2c3e50",
                 },
-                "typography": {
-                    "headings": "Roboto",
-                    "body": "Roboto",
-                    "accent": "Roboto Condensed"
-                },
+                "typography": {"headings": "Roboto", "body": "Roboto", "accent": "Roboto Condensed"},
                 "layout": "full-width",
                 "style": "commercial",
-                "features": ["woocommerce", "product-filters", "wishlist", "reviews"]
-            }
+                "features": ["woocommerce", "product-filters", "wishlist", "reviews"],
+            },
         }
-    
+
     async def build_and_deploy_theme(self, request: ThemeBuildRequest) -> ThemeBuildResult:
         """Build and deploy a complete WordPress theme."""
         build_id = f"build_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{request.theme_name}"
-        
-        result = ThemeBuildResult(
-            build_id=build_id,
-            request=request,
-            status=BuildStatus.PENDING
-        )
-        
+
+        result = ThemeBuildResult(build_id=build_id, request=request, status=BuildStatus.PENDING)
+
         try:
             # Add to active builds
             self.active_builds[build_id] = result
-            
+
             enterprise_logger.info(
                 f"Starting theme build: {request.theme_name}",
                 category=LogCategory.SYSTEM,
                 metadata={
                     "build_id": build_id,
                     "theme_type": request.theme_type.value,
-                    "target_site": request.target_site
-                }
+                    "target_site": request.target_site,
+                },
             )
-            
+
             # Step 1: Generate theme
             result.status = BuildStatus.GENERATING
             result.build_log.append(f"[{datetime.now()}] Starting theme generation")
-            
+
             theme_path = await self._generate_theme(request, result)
             if not theme_path:
                 raise Exception("Theme generation failed")
-            
+
             result.theme_path = theme_path
             result.build_log.append(f"[{datetime.now()}] Theme generated at: {theme_path}")
-            
+
             # Step 2: Validate theme
             result.status = BuildStatus.VALIDATING
             result.build_log.append(f"[{datetime.now()}] Validating theme structure")
-            
+
             validation_success = await self._validate_theme(theme_path, result)
             if not validation_success:
                 raise Exception("Theme validation failed")
-            
+
             # Step 3: Package theme
             result.status = BuildStatus.PACKAGING
             result.build_log.append(f"[{datetime.now()}] Creating theme package")
-            
+
             # Step 4: Deploy if requested
             if request.auto_deploy:
                 result.status = BuildStatus.DEPLOYING
                 result.build_log.append(f"[{datetime.now()}] Deploying theme to {request.target_site}")
-                
+
                 deployment_result = await self._deploy_theme(request, theme_path, result)
                 result.deployment_result = deployment_result
-                
+
                 if deployment_result.success:
                     result.build_log.append(f"[{datetime.now()}] Theme deployed successfully")
                 else:
                     raise Exception(f"Deployment failed: {deployment_result.error_message}")
-            
+
             # Success
             result.status = BuildStatus.COMPLETED
             result.completed_at = datetime.now()
             result.build_log.append(f"[{datetime.now()}] Theme build completed successfully")
-            
+
             enterprise_logger.info(
                 f"Theme build completed: {request.theme_name}",
                 category=LogCategory.SYSTEM,
                 metadata={
                     "build_id": build_id,
                     "deployed": request.auto_deploy,
-                    "duration": (result.completed_at - result.created_at).total_seconds()
-                }
+                    "duration": (result.completed_at - result.created_at).total_seconds(),
+                },
             )
-            
+
         except Exception as e:
             result.status = BuildStatus.FAILED
             result.error_message = str(e)
             result.completed_at = datetime.now()
             result.build_log.append(f"[{datetime.now()}] Build failed: {str(e)}")
-            
+
             enterprise_logger.error(
-                f"Theme build failed: {e}",
-                category=LogCategory.SYSTEM,
-                error=e,
-                metadata={"build_id": build_id}
+                f"Theme build failed: {e}", category=LogCategory.SYSTEM, error=e, metadata={"build_id": build_id}
             )
-        
+
         finally:
             # Move to history and remove from active
             self.build_history.append(result)
             self.active_builds.pop(build_id, None)
-        
+
         return result
-    
+
     async def _generate_theme(self, request: ThemeBuildRequest, result: ThemeBuildResult) -> Optional[str]:
         """Generate theme files based on request."""
         try:
             # Get template for theme type
             template = self.theme_templates.get(request.theme_type, {})
-            
+
             # Merge with brand guidelines and customizations
             theme_config = {
                 **template,
@@ -287,47 +268,43 @@ class ThemeBuilderOrchestrator:
                 "name": request.theme_name,
                 "description": f"Custom {request.theme_type.value} theme for {request.target_site}",
                 "version": "1.0.0",
-                "author": "DevSkyy Platform"
+                "author": "DevSkyy Platform",
             }
-            
+
             # Create temporary directory for theme
             theme_dir = Path(tempfile.mkdtemp(prefix=f"theme_{request.theme_name}_"))
-            
+
             # Generate theme files using fullstack builder
             await self._generate_theme_files(theme_dir, theme_config, result)
-            
+
             # Generate Elementor widgets if needed
             if "elementor" in theme_config.get("features", []):
                 await self._generate_elementor_widgets(theme_dir, theme_config, result)
-            
+
             return str(theme_dir)
-            
+
         except Exception as e:
             result.build_log.append(f"[{datetime.now()}] Generation error: {str(e)}")
-            enterprise_logger.error(
-                f"Theme generation error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Theme generation error: {e}", category=LogCategory.SYSTEM, error=e)
             return None
-    
+
     async def _generate_theme_files(self, theme_dir: Path, config: Dict[str, Any], result: ThemeBuildResult):
         """Generate core theme files."""
         # Generate style.css
         style_css = self._generate_style_css(config)
-        (theme_dir / "style.css").write_text(style_css, encoding='utf-8')
+        (theme_dir / "style.css").write_text(style_css, encoding="utf-8")
         result.build_log.append(f"[{datetime.now()}] Generated style.css")
-        
+
         # Generate functions.php
         functions_php = self._generate_functions_php(config)
-        (theme_dir / "functions.php").write_text(functions_php, encoding='utf-8')
+        (theme_dir / "functions.php").write_text(functions_php, encoding="utf-8")
         result.build_log.append(f"[{datetime.now()}] Generated functions.php")
-        
+
         # Generate index.php
         index_php = self._generate_index_php(config)
-        (theme_dir / "index.php").write_text(index_php, encoding='utf-8')
+        (theme_dir / "index.php").write_text(index_php, encoding="utf-8")
         result.build_log.append(f"[{datetime.now()}] Generated index.php")
-        
+
         # Generate other template files
         template_files = {
             "header.php": self._generate_header_php(config),
@@ -335,44 +312,44 @@ class ThemeBuilderOrchestrator:
             "single.php": self._generate_single_php(config),
             "page.php": self._generate_page_php(config),
             "archive.php": self._generate_archive_php(config),
-            "404.php": self._generate_404_php(config)
+            "404.php": self._generate_404_php(config),
         }
-        
+
         for filename, content in template_files.items():
-            (theme_dir / filename).write_text(content, encoding='utf-8')
+            (theme_dir / filename).write_text(content, encoding="utf-8")
             result.build_log.append(f"[{datetime.now()}] Generated {filename}")
-        
+
         # Create assets directory and basic CSS/JS
         assets_dir = theme_dir / "assets"
         assets_dir.mkdir(exist_ok=True)
-        
+
         css_dir = assets_dir / "css"
         css_dir.mkdir(exist_ok=True)
-        
+
         js_dir = assets_dir / "js"
         js_dir.mkdir(exist_ok=True)
-        
+
         # Generate main CSS file
         main_css = self._generate_main_css(config)
-        (css_dir / "main.css").write_text(main_css, encoding='utf-8')
-        
+        (css_dir / "main.css").write_text(main_css, encoding="utf-8")
+
         # Generate main JS file
         main_js = self._generate_main_js(config)
-        (js_dir / "main.js").write_text(main_js, encoding='utf-8')
-        
+        (js_dir / "main.js").write_text(main_js, encoding="utf-8")
+
         result.build_log.append(f"[{datetime.now()}] Generated assets")
-    
+
     async def _generate_elementor_widgets(self, theme_dir: Path, config: Dict[str, Any], result: ThemeBuildResult):
         """Generate custom Elementor widgets."""
         widgets_dir = theme_dir / "elementor-widgets"
         widgets_dir.mkdir(exist_ok=True)
-        
+
         # Generate fashion product widget
         product_widget = self._generate_product_widget(config)
-        (widgets_dir / "fashion-product-widget.php").write_text(product_widget, encoding='utf-8')
-        
+        (widgets_dir / "fashion-product-widget.php").write_text(product_widget, encoding="utf-8")
+
         result.build_log.append(f"[{datetime.now()}] Generated Elementor widgets")
-    
+
     def _generate_style_css(self, config: Dict[str, Any]) -> str:
         """Generate WordPress style.css header."""
         return f"""/*
@@ -385,11 +362,11 @@ Text Domain: {config.get('name', 'custom-theme').lower().replace(' ', '-')}
 
 /* Theme styles will be loaded from assets/css/main.css */
 """
-    
+
     def _generate_functions_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress functions.php."""
-        theme_name = config.get('name', 'custom-theme').lower().replace(' ', '_')
-        
+        theme_name = config.get("name", "custom-theme").lower().replace(" ", "_")
+
         return f"""<?php
 /**
  * {config.get('name', 'Custom Theme')} functions and definitions
@@ -435,7 +412,7 @@ function {theme_name}_customize_register($wp_customize) {{
 }}
 add_action('customize_register', '{theme_name}_customize_register');
 """
-    
+
     def _generate_index_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress index.php."""
         return """<?php get_header(); ?>
@@ -462,7 +439,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 
 <?php get_footer(); ?>
 """
-    
+
     def _generate_header_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress header.php."""
         return """<!DOCTYPE html>
@@ -489,7 +466,7 @@ add_action('customize_register', '{theme_name}_customize_register');
         </nav>
     </header>
 """
-    
+
     def _generate_footer_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress footer.php."""
         return """    <footer id="colophon" class="site-footer">
@@ -503,7 +480,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 </body>
 </html>
 """
-    
+
     def _generate_single_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress single.php."""
         return """<?php get_header(); ?>
@@ -535,7 +512,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 
 <?php get_footer(); ?>
 """
-    
+
     def _generate_page_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress page.php."""
         return """<?php get_header(); ?>
@@ -556,7 +533,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 
 <?php get_footer(); ?>
 """
-    
+
     def _generate_archive_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress archive.php."""
         return """<?php get_header(); ?>
@@ -588,7 +565,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 
 <?php get_footer(); ?>
 """
-    
+
     def _generate_404_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress 404.php."""
         return """<?php get_header(); ?>
@@ -608,12 +585,12 @@ add_action('customize_register', '{theme_name}_customize_register');
 
 <?php get_footer(); ?>
 """
-    
+
     def _generate_main_css(self, config: Dict[str, Any]) -> str:
         """Generate main CSS file."""
-        colors = config.get('colors', {})
-        typography = config.get('typography', {})
-        
+        colors = config.get("colors", {})
+        typography = config.get("typography", {})
+
         return f"""/* Main Theme Styles */
 
 :root {{
@@ -684,7 +661,7 @@ h1, h2, h3, h4, h5, h6 {{
     }}
 }}
 """
-    
+
     def _generate_main_js(self, config: Dict[str, Any]) -> str:
         """Generate main JavaScript file."""
         return """/* Main Theme JavaScript */
@@ -720,7 +697,7 @@ h1, h2, h3, h4, h5, h6 {{
     
 })(jQuery);
 """
-    
+
     def _generate_product_widget(self, config: Dict[str, Any]) -> str:
         """Generate custom Elementor product widget."""
         return """<?php
@@ -781,70 +758,67 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
     }
 }
 """
-    
+
     async def _validate_theme(self, theme_path: str, result: ThemeBuildResult) -> bool:
         """Validate generated theme."""
         try:
             theme_dir = Path(theme_path)
-            
+
             # Check required files exist
             required_files = ["style.css", "index.php", "functions.php"]
             for file in required_files:
                 if not (theme_dir / file).exists():
                     result.build_log.append(f"[{datetime.now()}] Missing required file: {file}")
                     return False
-            
+
             # Validate style.css header
             style_css = theme_dir / "style.css"
-            with open(style_css, 'r', encoding='utf-8') as f:
+            with open(style_css, "r", encoding="utf-8") as f:
                 content = f.read(500)
                 if "Theme Name:" not in content:
                     result.build_log.append(f"[{datetime.now()}] Invalid style.css header")
                     return False
-            
+
             result.build_log.append(f"[{datetime.now()}] Theme validation passed")
             return True
-            
+
         except Exception as e:
             result.build_log.append(f"[{datetime.now()}] Validation error: {str(e)}")
             return False
-    
+
     async def _deploy_theme(
-        self, 
-        request: ThemeBuildRequest, 
-        theme_path: str, 
-        result: ThemeBuildResult
+        self, request: ThemeBuildRequest, theme_path: str, result: ThemeBuildResult
     ) -> DeploymentResult:
         """Deploy theme to WordPress site."""
         theme_info = {
             "name": request.theme_name,
             "version": "1.0.0",
             "description": f"Custom {request.theme_type.value} theme",
-            "author": "DevSkyy Platform"
+            "author": "DevSkyy Platform",
         }
-        
+
         deployment_result = await self.theme_uploader.deploy_theme(
             await self.theme_uploader.create_theme_package(theme_path, theme_info),
             request.deployment_credentials,
             request.upload_method,
-            request.activate_after_deploy
+            request.activate_after_deploy,
         )
-        
+
         return deployment_result
-    
+
     def get_build_status(self, build_id: str) -> Optional[ThemeBuildResult]:
         """Get build status by ID."""
         # Check active builds
         if build_id in self.active_builds:
             return self.active_builds[build_id]
-        
+
         # Check history
         for result in self.build_history:
             if result.build_id == build_id:
                 return result
-        
+
         return None
-    
+
     def get_system_status(self) -> Dict[str, Any]:
         """Get orchestrator system status."""
         return {
@@ -853,7 +827,9 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             "successful_builds": len([r for r in self.build_history if r.status == BuildStatus.COMPLETED]),
             "supported_theme_types": [t.value for t in ThemeType],
             "uploader_status": self.theme_uploader.get_system_status(),
-            "available_sites": wordpress_credentials_manager.list_available_sites() if wordpress_credentials_manager else []
+            "available_sites": (
+                wordpress_credentials_manager.list_available_sites() if wordpress_credentials_manager else []
+            ),
         }
 
     def create_skyy_rose_build_request(
@@ -864,36 +840,29 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         auto_deploy: bool = True,
         activate_after_deploy: bool = False,
         upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
-        site_key: str = "skyy_rose"
+        site_key: str = "skyy_rose",
     ) -> Optional[ThemeBuildRequest]:
         """Create a theme build request for Skyy Rose Collection with default credentials."""
         credentials = wordpress_credentials_manager.get_credentials(site_key)
 
         if not credentials:
-            enterprise_logger.error(
-                f"No credentials found for site: {site_key}",
-                category=LogCategory.SYSTEM
-            )
+            enterprise_logger.error(f"No credentials found for site: {site_key}", category=LogCategory.SYSTEM)
             return None
 
         # Default Skyy Rose brand guidelines
         default_brand_guidelines = {
             "colors": {
-                "primary": "#1a1a1a",      # Sophisticated black
-                "secondary": "#d4af37",    # Luxury gold
-                "accent": "#8b7355",       # Warm bronze
-                "background": "#ffffff",   # Clean white
-                "text": "#333333"          # Dark gray
+                "primary": "#1a1a1a",  # Sophisticated black
+                "secondary": "#d4af37",  # Luxury gold
+                "accent": "#8b7355",  # Warm bronze
+                "background": "#ffffff",  # Clean white
+                "text": "#333333",  # Dark gray
             },
-            "typography": {
-                "headings": "Playfair Display",
-                "body": "Source Sans Pro",
-                "accent": "Dancing Script"
-            },
+            "typography": {"headings": "Playfair Display", "body": "Source Sans Pro", "accent": "Dancing Script"},
             "brand_name": "Skyy Rose Collection",
             "style_keywords": ["luxury", "elegant", "sophisticated", "modern", "fashion"],
             "target_audience": "luxury fashion enthusiasts",
-            "brand_personality": "sophisticated, elegant, exclusive"
+            "brand_personality": "sophisticated, elegant, exclusive",
         }
 
         return ThemeBuildRequest(
@@ -905,7 +874,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             customizations=customizations or {},
             auto_deploy=auto_deploy,
             activate_after_deploy=activate_after_deploy,
-            upload_method=upload_method
+            upload_method=upload_method,
         )
 
     async def build_skyy_rose_theme(
@@ -915,7 +884,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         customizations: Dict[str, Any] = None,
         auto_deploy: bool = True,
         activate_after_deploy: bool = False,
-        site_key: str = "skyy_rose"
+        site_key: str = "skyy_rose",
     ) -> Optional[ThemeBuildResult]:
         """Build and deploy a theme for Skyy Rose Collection with default settings."""
         build_request = self.create_skyy_rose_build_request(
@@ -924,13 +893,14 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             customizations=customizations,
             auto_deploy=auto_deploy,
             activate_after_deploy=activate_after_deploy,
-            site_key=site_key
+            site_key=site_key,
         )
 
         if not build_request:
             return None
 
         return await self.build_and_deploy_theme(build_request)
+
 
 # Global theme builder orchestrator
 theme_builder_orchestrator = ThemeBuilderOrchestrator()

@@ -1,16 +1,16 @@
         import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
-    from datetime import datetime
+from datetime import datetime
 from pathlib import Path
 
-        from sqlalchemy import text
-    from models_sqlalchemy import AgentLog, Product, User
-    import models_sqlalchemy
+from sqlalchemy import text
+from models_sqlalchemy import AgentLog, Product, User
+import models_sqlalchemy
 
-        from database import AsyncSessionLocal
-        from database import db_manager, init_db
-        from database_config import DATABASE_URL, DB_PROVIDER
-        import traceback
-    from database import AsyncSessionLocal
+from database import AsyncSessionLocal
+from database import db_manager, init_db
+from database_config import DATABASE_URL, DB_PROVIDER
+import traceback
+from database import AsyncSessionLocal
 from dotenv import load_dotenv
 import asyncio
 import logging

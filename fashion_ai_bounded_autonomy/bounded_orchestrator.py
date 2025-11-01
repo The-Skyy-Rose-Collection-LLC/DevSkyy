@@ -17,10 +17,7 @@ from typing import Any, Dict, List, Optional
 
 from agent.orchestrator import AgentOrchestrator, ExecutionPriority, AgentTask, TaskStatus
 from agent.modules.base_agent import BaseAgent
-from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import (
-    BoundedAutonomyWrapper,
-    ActionRiskLevel
-)
+from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import BoundedAutonomyWrapper, ActionRiskLevel
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
 
 logger = logging.getLogger(__name__)
@@ -38,12 +35,7 @@ class BoundedOrchestrator(AgentOrchestrator):
     - Complete audit logging
     """
 
-    def __init__(
-        self,
-        max_concurrent_tasks: int = 50,
-        local_only: bool = True,
-        auto_approve_low_risk: bool = True
-    ):
+    def __init__(self, max_concurrent_tasks: int = 50, local_only: bool = True, auto_approve_low_risk: bool = True):
         super().__init__(max_concurrent_tasks)
 
         self.local_only = local_only
@@ -89,9 +81,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
         # Wrap agent with bounded autonomy controls
         wrapped = BoundedAutonomyWrapper(
-            wrapped_agent=agent,
-            auto_approve_low_risk=self.auto_approve_low_risk,
-            local_only=self.local_only
+            wrapped_agent=agent, auto_approve_low_risk=self.auto_approve_low_risk, local_only=self.local_only
         )
 
         self.wrapped_agents[agent.agent_name] = wrapped
@@ -106,7 +96,7 @@ class BoundedOrchestrator(AgentOrchestrator):
         parameters: Dict[str, Any],
         required_capabilities: List[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
-        require_approval: Optional[bool] = None
+        require_approval: Optional[bool] = None,
     ) -> Dict[str, Any]:
         """
         Execute task with bounded autonomy controls.
@@ -124,27 +114,19 @@ class BoundedOrchestrator(AgentOrchestrator):
         # Check emergency stop
         if self.emergency_stop_active:
             logger.critical("🚨 Emergency stop active - task blocked")
-            return {
-                "error": "Emergency stop active",
-                "status": "blocked"
-            }
+            return {"error": "Emergency stop active", "status": "blocked"}
 
         # Check if system paused
         if self.system_paused:
             logger.warning("⏸️  System paused - task queued")
-            return {
-                "error": "System paused",
-                "status": "queued"
-            }
+            return {"error": "System paused", "status": "queued"}
 
         task_id = f"task_{datetime.now().timestamp()}_{task_type}"
 
         # Find agents with required capabilities
         capable_agents = self._find_agents_with_capabilities(required_capabilities)
         if not capable_agents:
-            return {
-                "error": f"No agents found with capabilities: {required_capabilities}"
-            }
+            return {"error": f"No agents found with capabilities: {required_capabilities}"}
 
         # Resolve execution order
         execution_order = self._resolve_dependencies(capable_agents)
@@ -164,8 +146,10 @@ class BoundedOrchestrator(AgentOrchestrator):
         task_risk = self._assess_task_risk(task_type, parameters, execution_order)
 
         # Check if approval needed
-        needs_approval = require_approval if require_approval is not None else (
-            task_risk in [ActionRiskLevel.HIGH, ActionRiskLevel.CRITICAL]
+        needs_approval = (
+            require_approval
+            if require_approval is not None
+            else (task_risk in [ActionRiskLevel.HIGH, ActionRiskLevel.CRITICAL])
         )
 
         if needs_approval:
@@ -176,7 +160,11 @@ class BoundedOrchestrator(AgentOrchestrator):
                 function_name=task_type,
                 parameters=parameters,
                 risk_level=task_risk.value,
-                workflow_type=ApprovalWorkflowType.HIGH_RISK if task_risk == ActionRiskLevel.CRITICAL else ApprovalWorkflowType.DEFAULT
+                workflow_type=(
+                    ApprovalWorkflowType.HIGH_RISK
+                    if task_risk == ActionRiskLevel.CRITICAL
+                    else ApprovalWorkflowType.DEFAULT
+                ),
             )
 
             logger.info(f"⏳ Task {task_id} submitted for approval (risk: {task_risk.value})")
@@ -186,7 +174,7 @@ class BoundedOrchestrator(AgentOrchestrator):
                 "task_id": task_id,
                 "risk_level": task_risk.value,
                 "message": "Task submitted for operator review",
-                "review_command": f"python -m fashion_ai_bounded_autonomy.approval_cli review {task_id}"
+                "review_command": f"python -m fashion_ai_bounded_autonomy.approval_cli review {task_id}",
             }
 
         # Execute immediately
@@ -248,7 +236,7 @@ class BoundedOrchestrator(AgentOrchestrator):
                     result = await wrapped_agent.execute(
                         function_name="execute_core_function",
                         parameters=agent_params,
-                        require_approval=False  # Already approved at task level
+                        require_approval=False,  # Already approved at task level
                     )
 
                     results[agent_name] = result
@@ -264,7 +252,11 @@ class BoundedOrchestrator(AgentOrchestrator):
                     else:
                         # Treat non-completed status as failure
                         status = result.get("status") if isinstance(result, dict) else "unknown"
-                        error_msg = result.get("error", "Non-completed status") if isinstance(result, dict) else "Invalid result"
+                        error_msg = (
+                            result.get("error", "Non-completed status")
+                            if isinstance(result, dict)
+                            else "Invalid result"
+                        )
                         errors.append(f"{agent_name}: status={status}, {error_msg}")
 
                         # Track failure
@@ -299,25 +291,16 @@ class BoundedOrchestrator(AgentOrchestrator):
             task.error = str(e)
             return {"error": str(e), "task_id": task.task_id}
 
-    def _assess_task_risk(
-        self,
-        task_type: str,
-        parameters: Dict[str, Any],
-        agents: List[str]
-    ) -> ActionRiskLevel:
+    def _assess_task_risk(self, task_type: str, parameters: Dict[str, Any], agents: List[str]) -> ActionRiskLevel:
         """Assess overall risk level of a task"""
         task_lower = task_type.lower()
 
         # Critical operations
-        if any(word in task_lower for word in [
-            "deploy", "delete", "drop", "modify", "publish"
-        ]):
+        if any(word in task_lower for word in ["deploy", "delete", "drop", "modify", "publish"]):
             return ActionRiskLevel.CRITICAL
 
         # High-risk operations
-        if any(word in task_lower for word in [
-            "create", "update", "insert", "write", "send", "post"
-        ]):
+        if any(word in task_lower for word in ["create", "update", "insert", "write", "send", "post"]):
             return ActionRiskLevel.HIGH
 
         # Check if multiple agents involved (higher risk)
@@ -325,9 +308,7 @@ class BoundedOrchestrator(AgentOrchestrator):
             return ActionRiskLevel.HIGH
 
         # Medium-risk operations
-        if any(word in task_lower for word in [
-            "analyze", "process", "calculate", "generate"
-        ]):
+        if any(word in task_lower for word in ["analyze", "process", "calculate", "generate"]):
             return ActionRiskLevel.MEDIUM
 
         return ActionRiskLevel.LOW
@@ -391,9 +372,9 @@ class BoundedOrchestrator(AgentOrchestrator):
                 "emergency_stop": self.emergency_stop_active,
                 "paused": self.system_paused,
                 "local_only": self.local_only,
-                "auto_approve_low_risk": self.auto_approve_low_risk
+                "auto_approve_low_risk": self.auto_approve_low_risk,
             },
-            "wrapped_agents": {}
+            "wrapped_agents": {},
         }
 
         for agent_name, wrapped_agent in self.wrapped_agents.items():
@@ -403,7 +384,4 @@ class BoundedOrchestrator(AgentOrchestrator):
         pending_actions = await self.approval_system.get_pending_actions()
         bounded_status["pending_approvals"] = len(pending_actions)
 
-        return {
-            **base_health,
-            "bounded_autonomy": bounded_status
-        }
+        return {**base_health, "bounded_autonomy": bounded_status}

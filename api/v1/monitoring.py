@@ -3,7 +3,7 @@ from security.jwt_auth import get_current_active_user, require_admin, TokenData
 from fastapi import APIRouter, Depends
 
 from monitoring.observability import (
-    import logging
+import logging
 
 """
 Monitoring & Observability API Endpoints

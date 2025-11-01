@@ -38,7 +38,7 @@ class ApprovalCLI:
             "MAGENTA": "\033[95m",
             "CYAN": "\033[96m",
             "BOLD": "\033[1m",
-            "END": "\033[0m"
+            "END": "\033[0m",
         }
 
     def colorize(self, text: str, color: str) -> str:
@@ -56,12 +56,9 @@ class ApprovalCLI:
             return
 
         for idx, action in enumerate(actions, 1):
-            risk_color = {
-                "low": "GREEN",
-                "medium": "YELLOW",
-                "high": "MAGENTA",
-                "critical": "RED"
-            }.get(action["risk_level"], "CYAN")
+            risk_color = {"low": "GREEN", "medium": "YELLOW", "high": "MAGENTA", "critical": "RED"}.get(
+                action["risk_level"], "CYAN"
+            )
 
             print(f"{self.colorize(f'[{idx}]', 'BOLD')} {self.colorize(action['action_id'], 'CYAN')}")
             print(f"    Agent: {action['agent_name']}")
@@ -92,19 +89,16 @@ class ApprovalCLI:
         print(f"  Function: {details['function_name']}")
 
         # Risk assessment
-        risk_color = {
-            "low": "GREEN",
-            "medium": "YELLOW",
-            "high": "MAGENTA",
-            "critical": "RED"
-        }.get(details['risk_level'], "CYAN")
+        risk_color = {"low": "GREEN", "medium": "YELLOW", "high": "MAGENTA", "critical": "RED"}.get(
+            details["risk_level"], "CYAN"
+        )
         print(f"\n{self.colorize('RISK ASSESSMENT', 'BOLD')}")
         print(f"  Risk Level: {self.colorize(details['risk_level'].upper(), risk_color)}")
         print(f"  Workflow: {details['workflow_type']}")
 
         # Parameters
         print(f"\n{self.colorize('PARAMETERS', 'BOLD')}")
-        for key, value in details['parameters'].items():
+        for key, value in details["parameters"].items():
             if isinstance(value, (dict, list)):
                 print(f"  {key}:")
                 print(f"    {json.dumps(value, indent=4)}")
@@ -117,39 +111,43 @@ class ApprovalCLI:
             "approved": "GREEN",
             "rejected": "RED",
             "expired": "MAGENTA",
-            "executed": "CYAN"
-        }.get(details['status'], "CYAN")
+            "executed": "CYAN",
+        }.get(details["status"], "CYAN")
         print(f"\n{self.colorize('STATUS', 'BOLD')}")
         print(f"  Current: {self.colorize(details['status'].upper(), status_color)}")
         print(f"  Created: {details['created_at']}")
         print(f"  Timeout: {details['timeout_at']}")
 
-        if details['approved_at']:
+        if details["approved_at"]:
             print(f"  Approved: {details['approved_at']} by {details['approved_by']}")
-        if details['rejection_reason']:
+        if details["rejection_reason"]:
             print(f"  Rejected: {details['rejection_reason']}")
 
         # History
-        if details['history']:
+        if details["history"]:
             print(f"\n{self.colorize('AUDIT TRAIL', 'BOLD')}")
-            for event in details['history']:
-                timestamp = event['timestamp']
-                event_type = event['event']
-                operator = event.get('operator', 'system')
+            for event in details["history"]:
+                timestamp = event["timestamp"]
+                event_type = event["event"]
+                operator = event.get("operator", "system")
                 print(f"  [{timestamp}] {event_type} by {operator}")
 
         # Execution result
-        if details['execution_result']:
+        if details["execution_result"]:
             print(f"\n{self.colorize('EXECUTION RESULT', 'BOLD')}")
             print(f"  {json.dumps(details['execution_result'], indent=2)}")
 
         print("=" * 70)
 
         # Actions
-        if details['status'] == 'pending':
+        if details["status"] == "pending":
             print(f"\n{self.colorize('AVAILABLE ACTIONS:', 'BOLD')}")
-            print(f"  Approve: python -m fashion_ai_bounded_autonomy.approval_cli approve {action_id} --operator <your_name>")
-            print(f"  Reject:  python -m fashion_ai_bounded_autonomy.approval_cli reject {action_id} --operator <your_name> --reason \"<reason>\"")
+            print(
+                f"  Approve: python -m fashion_ai_bounded_autonomy.approval_cli approve {action_id} --operator <your_name>"
+            )
+            print(
+                f'  Reject:  python -m fashion_ai_bounded_autonomy.approval_cli reject {action_id} --operator <your_name> --reason "<reason>"'
+            )
 
     async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
         """Approve an action"""
@@ -205,8 +203,7 @@ class ApprovalCLI:
 
 async def main():
     parser = argparse.ArgumentParser(
-        description="Bounded Autonomy Approval CLI",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="Bounded Autonomy Approval CLI", formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
@@ -261,6 +258,7 @@ async def main():
     except Exception as e:
         print(cli.colorize(f"\n❌ Error: {str(e)}", "RED"))
         import traceback
+
         traceback.print_exc()
 
 

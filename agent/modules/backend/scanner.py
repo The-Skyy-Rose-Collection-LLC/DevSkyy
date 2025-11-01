@@ -5,7 +5,7 @@ import re
 import requests
 import time
 
-    import importlib.util
+import importlib.util
 from . import http_client
 from .telemetry import Telemetry
 from typing import Any, Dict, List
@@ -14,6 +14,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def scan_site() -> Dict[str, Any]:
     """
@@ -79,6 +80,7 @@ def scan_site() -> Dict[str, Any]:
             "timestamp": datetime.now().isoformat(),
         }
 
+
 def _scan_project_files() -> List[str]:
     """Scan all project files for analysis."""
     files = []
@@ -90,10 +92,7 @@ def _scan_project_files() -> List[str]:
     for root, dirs, filenames in os.walk("."):
         # Skip common directories to ignore
         dirs[:] = [
-            d
-            for d in dirs
-            if not d.startswith(".")
-            and d not in {"node_modules", "__pycache__", "venv", ".git"}
+            d for d in dirs if not d.startswith(".") and d not in {"node_modules", "__pycache__", "venv", ".git"}
         ]
 
         for filename in filenames:
@@ -102,6 +101,7 @@ def _scan_project_files() -> List[str]:
                 files.append(file_path)
 
     return files
+
 
 def _analyze_file(file_path: str) -> Dict[str, Any]:
     """Analyze individual file for issues."""
@@ -132,6 +132,7 @@ def _analyze_file(file_path: str) -> Dict[str, Any]:
 
     return analysis
 
+
 def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze Python file for syntax and common issues."""
     errors = []
@@ -155,9 +156,7 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
 
             # Check for print statements (should use logging)
             if line.strip().startswith("logger.info(") and "logger" not in content:
-                optimizations.append(
-                    f"Line {i}: Consider using logging instead of print"
-                )
+                optimizations.append(f"Line {i}: Consider using logging instead of print")
 
         # Check for missing docstrings
         if "def " in content and '"""' not in content:
@@ -169,6 +168,7 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
         errors.append(f"Analysis error: {str(e)}")
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
+
 
 def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze JavaScript file for common issues."""
@@ -184,15 +184,14 @@ def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
 
         # Check for var usage
         if line.strip().startswith("var "):
-            optimizations.append(
-                f"Line {i}: Consider using 'let' or 'const' instead of 'var'"
-            )
+            optimizations.append(f"Line {i}: Consider using 'let' or 'const' instead of 'var'")
 
         # Check for missing semicolons
         if line.strip() and not line.strip().endswith((";", "{", "}")) and "=" in line:
             warnings.append(f"Line {i}: Possible missing semicolon")
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
+
 
 def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze HTML file for SEO and accessibility issues."""
@@ -217,6 +216,7 @@ def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
+
 def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
     """Analyze CSS file for performance and best practices."""
     errors = []
@@ -240,6 +240,7 @@ def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
             properties_in_rule.append(prop)
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
+
 
 def _check_site_health() -> Dict[str, Any]:
     """Check if the site is accessible and responsive."""
@@ -286,6 +287,7 @@ def _check_site_health() -> Dict[str, Any]:
 
     return health_check
 
+
 def _analyze_performance() -> Dict[str, Any]:
     """Analyze performance metrics."""
     return {
@@ -299,6 +301,7 @@ def _analyze_performance() -> Dict[str, Any]:
         "estimated_load_time": "< 3 seconds",
         "performance_score": 85,
     }
+
 
 def scan_agents_only() -> Dict[str, Any]:
     """
@@ -331,6 +334,7 @@ def scan_agents_only() -> Dict[str, Any]:
         f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working"  # noqa: E501
     )
     return result
+
 
 def _analyze_all_agents() -> Dict[str, Any]:
     """Analyze all agent modules in the system."""
@@ -401,6 +405,7 @@ def _analyze_all_agents() -> Dict[str, Any]:
         },
     }
 
+
 def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
     """Analyze a single agent file for issues."""
     performance_issues = []
@@ -414,14 +419,10 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
 
         # Check for performance issues
         if "while True:" in content and "time.sleep" not in content:
-            performance_issues.append(
-                {"agent": agent_name, "issue": "Potential infinite loop detected"}
-            )
+            performance_issues.append({"agent": agent_name, "issue": "Potential infinite loop detected"})
 
         if "requests.get" in content and "timeout" not in content:
-            performance_issues.append(
-                {"agent": agent_name, "issue": "HTTP requests without timeout"}
-            )
+            performance_issues.append({"agent": agent_name, "issue": "HTTP requests without timeout"})
 
         # Check for security concerns
         credential_patterns = [
@@ -444,9 +445,7 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
                 security_concerns.append({"agent": agent_name, "concern": message})
 
         if "ast.literal_eval(" in content:
-            security_concerns.append(
-                {"agent": agent_name, "concern": "Unsafe ast.literal_eval() usage detected"}
-            )
+            security_concerns.append({"agent": agent_name, "concern": "Unsafe ast.literal_eval() usage detected"})
 
     except Exception as e:
         logger.warning(f"Could not analyze {agent_file}: {e}")
@@ -455,6 +454,7 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
         "performance_issues": performance_issues,
         "security_concerns": security_concerns,
     }
+
 
 def _security_scan() -> List[str]:
     """Perform basic security scan."""
@@ -493,16 +493,12 @@ def _security_scan() -> List[str]:
                                     "FIXME",
                                 ]
                             ):
-                                security_issues.append(
-                                    f"{file_path}: Possible hardcoded credentials detected"
-                                )
+                                security_issues.append(f"{file_path}: Possible hardcoded credentials detected")
                                 break
 
                     # Check for SQL injection risks
                     if "execute(" in content and "%" in content:
-                        security_issues.append(
-                            f"{file_path}: Possible SQL injection risk"
-                        )
+                        security_issues.append(f"{file_path}: Possible SQL injection risk")
 
                 except Exception:
                     continue

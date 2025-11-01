@@ -8,8 +8,8 @@ from models_sqlalchemy import Base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-    from httpx import AsyncClient
-    from security.jwt_auth import User, user_manager, UserRole
+from httpx import AsyncClient
+from security.jwt_auth import User, user_manager, UserRole
 from main import app
 from typing import AsyncGenerator, Generator
 import asyncio
@@ -30,6 +30,7 @@ Provides reusable fixtures for unit, integration, and API tests
 # Pytest Configuration
 # ============================================================================
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create event loop for async tests"""
@@ -37,9 +38,11 @@ def event_loop():
     yield loop
     loop.close()
 
+
 # ============================================================================
 # Database Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_db_engine():
@@ -54,27 +57,29 @@ def test_db_engine():
     Base.metadata.drop_all(bind=engine)
     engine.dispose()
 
+
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine):
     """Create database session for testing"""
-    TestingSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=test_db_engine
-    )
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
     session = TestingSessionLocal()
     try:
         yield session
     finally:
         session.close()
 
+
 # ============================================================================
 # FastAPI Test Client Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_client() -> Generator[TestClient, None, None]:
     """Create FastAPI test client"""
     with TestClient(app) as client:
         yield client
+
 
 @pytest.fixture(scope="function")
 async def async_test_client() -> AsyncGenerator:
@@ -83,9 +88,11 @@ async def async_test_client() -> AsyncGenerator:
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
+
 # ============================================================================
 # Authentication Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_user_data():
@@ -98,6 +105,7 @@ def test_user_data():
         "role": "admin",
         "permissions": ["read", "write", "admin"],
     }
+
 
 @pytest.fixture(scope="function")
 def setup_test_user(test_user_data):
@@ -124,24 +132,29 @@ def setup_test_user(test_user_data):
     if test_user.email in user_manager.email_index:
         del user_manager.email_index[test_user.email]
 
+
 @pytest.fixture(scope="function")
 def test_access_token(test_user_data):
     """Generate test JWT access token"""
     return create_access_token(data=test_user_data)
+
 
 @pytest.fixture(scope="function")
 def test_refresh_token(test_user_data):
     """Generate test JWT refresh token"""
     return create_refresh_token(data=test_user_data)
 
+
 @pytest.fixture(scope="function")
 def auth_headers(test_access_token):
     """Generate authorization headers with test token"""
     return {"Authorization": f"Bearer {test_access_token}"}
 
+
 # ============================================================================
 # Mock Data Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def mock_ai_response():
@@ -151,6 +164,7 @@ def mock_ai_response():
         "model": "claude-3-5-sonnet-20241022",
         "usage": {"input_tokens": 10, "output_tokens": 25},
     }
+
 
 @pytest.fixture(scope="function")
 def mock_project_data():
@@ -163,6 +177,7 @@ def mock_project_data():
         "owner": "test_user_001",
     }
 
+
 @pytest.fixture(scope="function")
 def mock_agent_data():
     """Sample agent data"""
@@ -174,9 +189,11 @@ def mock_agent_data():
         "status": "active",
     }
 
+
 # ============================================================================
 # Environment Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_env_vars(monkeypatch):
@@ -188,9 +205,11 @@ def test_env_vars(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test_anthropic_key")
     monkeypatch.setenv("OPENAI_API_KEY", "test_openai_key")
 
+
 # ============================================================================
 # Cleanup Fixtures
 # ============================================================================
+
 
 @pytest.fixture(autouse=True)
 def cleanup_after_test():
@@ -198,9 +217,11 @@ def cleanup_after_test():
     yield
     # Add any cleanup logic here
 
+
 # ============================================================================
 # Performance Testing Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def performance_timer():
@@ -209,9 +230,11 @@ def performance_timer():
     start_time = time.time()
     yield lambda: time.time() - start_time
 
+
 # ============================================================================
 # Mocking Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def mock_external_api(monkeypatch):
@@ -239,9 +262,11 @@ def mock_external_api(monkeypatch):
     monkeypatch.setattr(requests, "get", mock_get)
     monkeypatch.setattr(requests, "post", mock_post)
 
+
 # ============================================================================
 # Test Data Generators
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def generate_test_users():
@@ -260,9 +285,11 @@ def generate_test_users():
 
     return _generate
 
+
 # ============================================================================
 # Pytest Hooks for Custom Behavior
 # ============================================================================
+
 
 def pytest_configure(config):
     """Configure pytest with custom markers"""
@@ -272,6 +299,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "e2e: End-to-end tests")
     config.addinivalue_line("markers", "slow: Slow running tests")
     config.addinivalue_line("markers", "security: Security tests")
+
 
 def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers automatically"""

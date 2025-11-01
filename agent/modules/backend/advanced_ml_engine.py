@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.ensemble import (
-    from typing import Any, Dict, List
+from typing import Any, Dict, List
 import asyncio
 import joblib
 import logging

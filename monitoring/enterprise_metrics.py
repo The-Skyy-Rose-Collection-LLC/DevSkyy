@@ -17,6 +17,7 @@ import statistics
 
 # Prometheus imports (optional)
 try:
+    pass
     from prometheus_client import Counter, Histogram, Gauge, Summary, CollectorRegistry, generate_latest
     PROMETHEUS_AVAILABLE = True
 except ImportError:

@@ -1,13 +1,13 @@
-    import os
-from fastapi.responses import JSONResponse
+import logging
+import os
+import traceback
+from typing import Any, Dict, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from logger_config import get_logger
-from typing import Any, Dict, Optional
-import logging
-import traceback
 
 logger = logging.getLogger(__name__)
 """
@@ -16,6 +16,7 @@ Enterprise-grade error handling with proper logging and user feedback
 """
 
 logger = get_logger(__name__)
+
 
 class DevSkyyException(Exception):
     """Base exception for DevSkyy platform."""
@@ -31,11 +32,13 @@ class DevSkyyException(Exception):
         self.details = details or {}
         super().__init__(self.message)
 
+
 class DatabaseException(DevSkyyException):
     """Database-related exceptions."""
 
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(message, status_code=500, details=details)
+
 
 class AuthenticationException(DevSkyyException):
     """Authentication-related exceptions."""
@@ -47,19 +50,20 @@ class AuthenticationException(DevSkyyException):
     ):
         super().__init__(message, status_code=401, details=details)
 
+
 class AuthorizationException(DevSkyyException):
     """Authorization-related exceptions."""
 
-    def __init__(
-        self, message: str = "Access denied", details: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self, message: str = "Access denied", details: Optional[Dict[str, Any]] = None):
         super().__init__(message, status_code=403, details=details)
+
 
 class ValidationException(DevSkyyException):
     """Validation-related exceptions."""
 
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         super().__init__(message, status_code=422, details=details)
+
 
 class ResourceNotFoundException(DevSkyyException):
     """Resource not found exceptions."""
@@ -68,6 +72,7 @@ class ResourceNotFoundException(DevSkyyException):
         message = f"{resource} not found: {identifier}"
         super().__init__(message, status_code=404)
 
+
 class RateLimitException(DevSkyyException):
     """Rate limiting exceptions."""
 
@@ -75,20 +80,18 @@ class RateLimitException(DevSkyyException):
         details = {"retry_after": retry_after}
         super().__init__(message, status_code=429, details=details)
 
+
 class ExternalServiceException(DevSkyyException):
     """External service integration exceptions."""
 
-    def __init__(
-        self, service: str, message: str, details: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self, service: str, message: str, details: Optional[Dict[str, Any]] = None):
         full_message = f"External service error ({service}): {message}"
         super().__init__(full_message, status_code=502, details=details)
 
+
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Handle standard HTTP exceptions."""
-    logger.warning(
-        f"HTTP Exception: {exc.status_code} - {exc.detail} - Path: {request.url.path}"
-    )
+    logger.warning(f"HTTP Exception: {exc.status_code} - {exc.detail} - Path: {request.url.path}")
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -102,9 +105,8 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
         },
     )
 
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Handle request validation errors."""
     errors = []
     for error in exc.errors():
@@ -130,13 +132,10 @@ async def validation_exception_handler(
         },
     )
 
-async def devskyy_exception_handler(
-    request: Request, exc: DevSkyyException
-) -> JSONResponse:
+
+async def devskyy_exception_handler(request: Request, exc: DevSkyyException) -> JSONResponse:
     """Handle custom DevSkyy exceptions."""
-    logger.error(
-        f"DevSkyy Exception: {exc.status_code} - {exc.message} - Path: {request.url.path}"
-    )
+    logger.error(f"DevSkyy Exception: {exc.status_code} - {exc.message} - Path: {request.url.path}")
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -150,6 +149,7 @@ async def devskyy_exception_handler(
             }
         },
     )
+
 
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle all other unhandled exceptions."""
@@ -191,6 +191,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
         },
     )
 
+
 def safe_execute(func, default_return=None, log_errors=True):
     """
     Safely execute a function with error handling.
@@ -210,6 +211,7 @@ def safe_execute(func, default_return=None, log_errors=True):
             logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
         return default_return
 
+
 async def safe_execute_async(func, default_return=None, log_errors=True):
     """
     Safely execute an async function with error handling.
@@ -228,6 +230,7 @@ async def safe_execute_async(func, default_return=None, log_errors=True):
         if log_errors:
             logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
         return default_return
+
 
 def register_error_handlers(app):
     """

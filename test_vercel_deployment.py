@@ -1,31 +1,31 @@
         from agent.registry import AgentRegistry
-        from fastapi.middleware.cors import CORSMiddleware
-        from fastapi.responses import JSONResponse
-        from ml.model_registry import ModelRegistry
-        from ml.recommendation_engine import RecommendationEngine
-        from sqlalchemy import create_engine
-        import secrets
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from ml.model_registry import ModelRegistry
+from ml.recommendation_engine import RecommendationEngine
+from sqlalchemy import create_engine
+import secrets
 import sys
 
-        from fastapi import FastAPI, HTTPException, Request
-        from pydantic import BaseModel, EmailStr
-        from pydantic import BaseModel, Field
-        import sqlalchemy
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
+import sqlalchemy
 
-        from agent.modules.backend.fixer_v2 import FixerAgentV2
-        from agent.modules.base_agent import BaseAgent
-        from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
-        from agent.orchestrator import AgentOrchestrator
-        from cryptography.fernet import Fernet
-        from fashion.intelligence_engine import FashionIntelligenceEngine
-        from typing import Optional
-        from vercel_startup import validate_email_dependencies, get_app_config
-        import anthropic
-        import email_validator
-        import hashlib
-        import main
-        import openai
-        import uvicorn
+from agent.modules.backend.fixer_v2 import FixerAgentV2
+from agent.modules.base_agent import BaseAgent
+from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
+from agent.orchestrator import AgentOrchestrator
+from cryptography.fernet import Fernet
+from fashion.intelligence_engine import FashionIntelligenceEngine
+from typing import Optional
+from vercel_startup import validate_email_dependencies, get_app_config
+import anthropic
+import email_validator
+import hashlib
+import main
+import openai
+import uvicorn
 from typing import Dict, List, Tuple
 import logging
 import traceback

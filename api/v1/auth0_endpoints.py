@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from authlib.common.security import generate_token
 from security.auth0_integration import (
-    from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any
 import logging
 
 """

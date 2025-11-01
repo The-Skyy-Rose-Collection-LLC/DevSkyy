@@ -1,4 +1,4 @@
-    import redis
+import redis
 import json
 import os
 
@@ -20,21 +20,17 @@ except ImportError:
     REDIS_AVAILABLE = False
     logger.warning("Redis not available - using in-memory cache")
 
+
 class RedisCache:
     """Distributed Redis cache with fallback to in-memory"""
 
-    def __init__(
-        self, host: str = None, port: int = None, db: int = 0, ttl: int = 3600
-    ):
+    def __init__(self, host: str = None, port: int = None, db: int = 0, ttl: int = 3600):
         self.ttl = ttl
         self.memory_cache = {}
 
         if REDIS_AVAILABLE and (host or os.getenv("REDIS_URL")):
             try:
-                redis_url = (
-                    os.getenv("REDIS_URL")
-                    or f"redis://{host or 'localhost'}:{port or 6379}/{db}"
-                )
+                redis_url = os.getenv("REDIS_URL") or f"redis://{host or 'localhost'}:{port or 6379}/{db}"
                 self.client = redis.from_url(redis_url, decode_responses=True)
                 self.client.ping()
                 self.mode = "redis"
@@ -163,5 +159,6 @@ class RedisCache:
             except Exception:
                 return {"mode": "redis", "status": "error"}
         return {"mode": "memory", "size": len(self.memory_cache)}
+
 
 redis_cache = RedisCache()

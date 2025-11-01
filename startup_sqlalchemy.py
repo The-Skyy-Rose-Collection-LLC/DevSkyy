@@ -1,5 +1,5 @@
             from agent.modules.wordpress_direct_service import (
-                import os
+import os
 from pathlib import Path
 import sys
 

@@ -258,7 +258,7 @@ async def upload_single_image(
         
         # Save metadata
         metadata_file = category_dir / f"{safe_filename}.json"
-        import json
+import json
         with open(metadata_file, "w") as f:
             json.dump(metadata, f, indent=2)
         
@@ -365,7 +365,7 @@ async def upload_batch_images(
                 
                 # Save metadata
                 metadata_file = category_dir / f"{safe_filename}.json"
-                import json
+import json
                 with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
                 
@@ -494,7 +494,7 @@ async def upload_zip_archive(
                     
                     # Save metadata
                     metadata_file = category_dir / f"{safe_filename}.json"
-                    import json
+import json
                     with open(metadata_file, "w") as f:
                         json.dump(metadata, f, indent=2)
                     
@@ -2198,5 +2198,5 @@ async def execute_bulk_undo(operation_id: str, original_operation: Dict[str, Any
 
 
 if __name__ == "__main__":
-    import uvicorn
+import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
