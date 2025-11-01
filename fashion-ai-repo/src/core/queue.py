@@ -63,7 +63,7 @@ class QueueManager:
             message (Message): Message object to publish.
         
         Returns:
-            `true` if the message was published successfully, `false` otherwise.
+            True if the message was published successfully, False otherwise.
         """
         try:
             channel_name = f"{self.prefix}:{channel}"
@@ -89,7 +89,7 @@ class QueueManager:
         Waits for the next message on currently subscribed channels.
         
         Returns:
-            Message parsed from the channel payload when a new message is received; `None` if no message arrives within the internal timeout or an error occurs.
+            Message parsed from the channel payload when a new message is received; None if no message arrives within the internal timeout or an error occurs.
         """
         try:
             message = self.pubsub.get_message(timeout=1.0)
@@ -110,7 +110,7 @@ class QueueManager:
             message (Message): Message object to enqueue.
         
         Returns:
-            bool: `True` if the message was successfully enqueued, `False` otherwise.
+            bool: True if the message was successfully enqueued, False otherwise.
         """
         try:
             queue_name = f"{self.prefix}:queue:{queue}"

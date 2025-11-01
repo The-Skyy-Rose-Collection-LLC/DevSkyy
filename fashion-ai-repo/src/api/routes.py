@@ -105,6 +105,9 @@ async def get_design(design_id: str) -> Dict[str, Any]:
     """
     Retrieve a design by its identifier.
     
+    Parameters:
+        design_id (str): Unique identifier for the design to retrieve.
+    
     Returns:
         A dictionary with keys 'status' (int), 'message' (str), and 'payload' (dict) containing the requested 'design_id'.
     """
