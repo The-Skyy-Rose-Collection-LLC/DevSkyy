@@ -1,14 +1,14 @@
-from datetime import datetime, timedelta
-import json
-
-from enum import Enum
-from typing import Any, Dict, List
 import base64
+import json
 import logging
 import uuid
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class IntegrationType(Enum):
     WEBSITE = "website"
@@ -20,12 +20,14 @@ class IntegrationType(Enum):
     ANALYTICS = "analytics"
     CRM = "crm"
 
+
 class IntegrationStatus(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PENDING = "pending"
     ERROR = "error"
     SUSPENDED = "suspended"
+
 
 class IntegrationManager:
     """Universal Integration Manager for connecting external services to agents."""
@@ -378,7 +380,7 @@ class IntegrationManager:
             return {
                 "agent_type": agent_type,
                 "total_integrations": len(integrations_data),
-                "active_integrations": len()
+                "active_integrations": len(
                     [i for i in integrations_data if i["status"] == "active"]
                 ),
                 "integrations": integrations_data,
@@ -526,7 +528,7 @@ class IntegrationManager:
 
         for service_type in compatible_services:
             if service_type in self.supported_services:
-                available[service_type] = list()
+                available[service_type] = list(
                     self.supported_services[service_type].keys()
                 )
 
@@ -601,6 +603,7 @@ class IntegrationManager:
             "credential_expiry_monitoring": "enabled",
             "oauth_token_refresh": "automatic",
         }
+
 
 def create_integration_manager() -> IntegrationManager:
     """Factory function to create integration manager."""

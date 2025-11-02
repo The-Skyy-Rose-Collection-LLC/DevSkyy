@@ -6,9 +6,11 @@ import json
 import time
 
 from aiohttp import ClientError, ClientTimeout
+from contextlib import asynccontextmanager
 from api_integration.auth_manager import auth_manager, rate_limit_manager
 from api_integration.discovery_engine import (
-    from contextlib import asynccontextmanager
+    discovery_engine,
+)
 from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
@@ -24,6 +26,7 @@ Microservices architecture with API gateway pattern, event-driven communication,
 data transformation pipelines, and circuit breaker patterns for fault tolerance
 """
 
+from api_integration.discovery_engine import (
     api_discovery_engine,
     APICategory,
     APIEndpoint,

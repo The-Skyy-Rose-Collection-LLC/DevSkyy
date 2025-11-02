@@ -1,24 +1,9 @@
-import json
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
-from pathlib import Path
-import os
-import re
-import requests
-import time
-
-from agent.modules.base_agent import AgentStatus, BaseAgent
-from typing import Any, Dict, List, Optional
-import asyncio
-import httpx
-import logging
-
 """
 Scanner Agent V2 - Enterprise Edition
 Comprehensive site scanning with self-healing, orchestration, and advanced security
 
 Features:
-    - Inherits from BaseAgent for enterprise capabilities
+- Inherits from BaseAgent for enterprise capabilities
 - Multi-threaded scanning for performance
 - Integration with orchestrator for multi-agent workflows
 - Security and compliance scanning
@@ -26,7 +11,22 @@ Features:
 - Automated remediation suggestions
 """
 
+import asyncio
+import logging
+import os
+import re
+import time
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import requests
+
+from agent.modules.base_agent import AgentStatus, BaseAgent
+
 logger = logging.getLogger(__name__)
+
 
 class ScannerAgentV2(BaseAgent):
     """
@@ -324,11 +324,11 @@ class ScannerAgentV2(BaseAgent):
         result = {"errors": [], "warnings": [], "optimizations": []}
 
         # Check for common issues
-        if "logger.info(" in content and "DEBUG" not in content:
+        if "print(" in content and "DEBUG" not in content:
             result["warnings"].append(
                 {
                     "type": "debug_print",
-                    "message": "Found logger.info() statement in production code",
+                    "message": "Found print() statement in production code",
                 }
             )
 
@@ -399,7 +399,7 @@ class ScannerAgentV2(BaseAgent):
 
             start_time = time.time()
             response = await asyncio.get_event_loop().run_in_executor(
-                self.thread_pool, lambda: httpx.get(url, timeout=10)
+                self.thread_pool, lambda: requests.get(url, timeout=10)
             )
             response_time = (time.time() - start_time) * 1000  # ms
 
@@ -428,6 +428,7 @@ class ScannerAgentV2(BaseAgent):
 
         # Check package.json
         if os.path.exists("package.json"):
+            import json
 
             with open("package.json", "r") as f:
                 pkg_data = json.load(f)
@@ -442,7 +443,7 @@ class ScannerAgentV2(BaseAgent):
 
         # Check for large node_modules
         if os.path.exists("node_modules"):
-            size = sum()
+            size = sum(
                 f.stat().st_size for f in Path("node_modules").rglob("*") if f.is_file()
             )
             if size > 500_000_000:  # 500MB
@@ -486,6 +487,7 @@ class ScannerAgentV2(BaseAgent):
     async def get_scan_history(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get recent scan history"""
         return self.scan_history[-limit:]
+
 
 # Create instance for export
 scanner_agent = ScannerAgentV2()

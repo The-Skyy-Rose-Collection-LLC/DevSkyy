@@ -80,7 +80,7 @@ class ModelType(Enum):
     POSE_CONTROL = "pose_control"
     FACE_SWAP = "face_swap"
     VIDEO_GENERATION = "video_generation"
-    3D_RENDERING = "3d_rendering"
+    RENDERING_3D = "3d_rendering"
     FASHION_DESIGN = "fashion_design"
     PRODUCT_PLACEMENT = "product_placement"
 

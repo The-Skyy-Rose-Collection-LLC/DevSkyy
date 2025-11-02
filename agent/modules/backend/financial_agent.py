@@ -1,15 +1,16 @@
+import hashlib
+import logging
+import uuid
 from datetime import datetime, timedelta
-
 from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, Optional
-import hashlib
-import logging
+
 import numpy as np
-import uuid
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class ChargebackReason(Enum):
     FRAUDULENT = "fraudulent"
@@ -21,6 +22,7 @@ class ChargebackReason(Enum):
     PRODUCT_NOT_RECEIVED = "product_not_received"
     SUBSCRIPTION_CANCELED = "subscription_canceled"
 
+
 class PaymentStatus(Enum):
     PENDING = "pending"
     AUTHORIZED = "authorized"
@@ -29,6 +31,7 @@ class PaymentStatus(Enum):
     REFUNDED = "refunded"
     DISPUTED = "disputed"
     CANCELED = "canceled"
+
 
 class FinancialAgent:
     """Production-level financial management with advanced fraud detection and compliance."""
@@ -532,7 +535,7 @@ class FinancialAgent:
         # Simulate processing with different success rates
         success_rate = 0.96 if gateway == "stripe" else 0.94
 
-        if np.secrets.SystemRandom().random() < success_rate:
+        if np.random.random() < success_rate:
             return {
                 "status": PaymentStatus.CAPTURED.value,
                 "gateway_transaction_id": f"{gateway}_{uuid.uuid4().hex[:10]}",
@@ -732,9 +735,7 @@ class FinancialAgent:
     def _calculate_fraud_metrics(self) -> Dict[str, Any]:
         """Calculate fraud detection metrics."""
         fraud_blocked = len(
-
             [t for t in self.transactions.values() if t.get("risk_level") == "HIGH"]
-
         )
 
         return {
@@ -828,13 +829,11 @@ class FinancialAgent:
     def _calculate_success_rate(self) -> float:
         """Calculate transaction success rate."""
         successful = len(
-
             [
                 t
                 for t in self.transactions.values()
                 if t["status"] == PaymentStatus.CAPTURED.value
             ]
-
         )
         return (successful / max(len(self.transactions), 1)) * 100
 
@@ -842,7 +841,7 @@ class FinancialAgent:
         """Calculate average transaction value."""
         if not self.transactions:
             return 0
-        return sum(float(t["amount"]) for t in self.transactions.values()) / len()
+        return sum(float(t["amount"]) for t in self.transactions.values()) / len(
             self.transactions
         )
 
@@ -1426,6 +1425,7 @@ class FinancialAgent:
             "accounting_sync": "real_time_financial_data_sync",
             "tax_software": "automated_tax_document_preparation",
         }
+
 
 def monitor_financial_health() -> Dict[str, Any]:
     """Main financial health monitoring function for compatibility."""

@@ -1,47 +1,26 @@
-from agent.modules.backend.wordpress_agent import agent as wp_agent
-from agent.wordpress.theme_builder import generate_theme
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
-
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
-
-from agent.modules.backend.advanced_code_generation_agent import (
-from agent.modules.backend.blockchain_nft_luxury_assets import (
-from agent.modules.backend.brand_intelligence_agent import agent as brand_agent
-from agent.modules.backend.claude_sonnet_intelligence_service import (
-from agent.modules.backend.customer_service_agent import agent as cs_agent
-from agent.modules.backend.ecommerce_agent import agent as ecom_agent
-from agent.modules.backend.email_sms_automation_agent import (
-from agent.modules.backend.financial_agent import agent as financial_agent
-from agent.modules.backend.fixer import fixer_agent
-from agent.modules.backend.fixer_v2 import fixer_agent
-from agent.modules.backend.inventory_agent import agent as inventory_agent
-from agent.modules.backend.multi_model_ai_orchestrator import agent as mm_agent
-from agent.modules.backend.openai_intelligence_service import (
-            from agent.modules.backend.performance_agent import agent as perf_agent
-        from agent.modules.backend.scanner import scanner_agent
-        from agent.modules.backend.scanner_v2 import scanner_agent
-        from agent.modules.backend.security_agent import agent as security_agent
-        from agent.modules.backend.seo_marketing_agent import agent as seo_agent
-        from agent.modules.backend.social_media_automation_agent import (
-            from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
-        from agent.modules.marketing_content_generation_agent import (
-            from api.validation_models import AgentExecutionRequest
-from typing import Any, Dict, List, Optional
-import logging
-
 """
 Complete Agent API Endpoints - All 54 Agents
 Organized by category with consistent interface
 """
 
+import logging
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+
+from api.validation_models import AgentExecutionRequest
+from security.jwt_auth import get_current_active_user, require_developer, TokenData
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
+
 # ============================================================================
 # REQUEST/RESPONSE MODELS
 # ============================================================================
+
 
 # Using enhanced AgentExecutionRequest from validation_models
 # Legacy model kept for backward compatibility
@@ -54,6 +33,7 @@ class LegacyAgentExecutionRequest(BaseModel):
     )
     priority: Optional[str] = Field(default="medium", description="Execution priority")
 
+
 class AgentExecuteResponse(BaseModel):
     """Generic agent execution response"""
 
@@ -63,6 +43,7 @@ class AgentExecuteResponse(BaseModel):
     execution_time_ms: float
     timestamp: str
 
+
 class BatchRequest(BaseModel):
     """Batch execution request"""
 
@@ -71,9 +52,11 @@ class BatchRequest(BaseModel):
     )
     parallel: bool = Field(default=True, description="Execute operations in parallel")
 
+
 # ============================================================================
 # SCANNER AGENTS
 # ============================================================================
+
 
 @router.post("/scanner/execute", response_model=AgentExecuteResponse)
 async def execute_scanner(
@@ -82,6 +65,7 @@ async def execute_scanner(
 ):
     """Execute Scanner Agent - Code and site analysis"""
     try:
+        from agent.modules.backend.scanner import scanner_agent
 
         result = await scanner_agent.execute_core_function(**request.parameters)
 
@@ -96,6 +80,7 @@ async def execute_scanner(
         logger.error(f"Scanner execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/scanner-v2/execute", response_model=AgentExecuteResponse)
 async def execute_scanner_v2(
     request: AgentExecutionRequest,
@@ -103,6 +88,7 @@ async def execute_scanner_v2(
 ):
     """Execute Scanner Agent V2 - Enhanced scanner with security scanning"""
     try:
+        from agent.modules.backend.scanner_v2 import scanner_agent
 
         result = await scanner_agent.execute_core_function(**request.parameters)
 
@@ -117,9 +103,11 @@ async def execute_scanner_v2(
         logger.error(f"Scanner V2 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # FIXER AGENTS
 # ============================================================================
+
 
 @router.post("/fixer/execute", response_model=AgentExecuteResponse)
 async def execute_fixer(
@@ -127,6 +115,7 @@ async def execute_fixer(
 ):
     """Execute Fixer Agent - Automated code fixing"""
     try:
+        from agent.modules.backend.fixer import fixer_agent
 
         result = await fixer_agent.execute_core_function(**request.parameters)
 
@@ -141,12 +130,14 @@ async def execute_fixer(
         logger.error(f"Fixer execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/fixer-v2/execute", response_model=AgentExecuteResponse)
 async def execute_fixer_v2(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Fixer Agent V2 - Enhanced auto-fixing with AI"""
     try:
+        from agent.modules.backend.fixer_v2 import fixer_agent
 
         result = await fixer_agent.execute_core_function(**request.parameters)
 
@@ -161,9 +152,11 @@ async def execute_fixer_v2(
         logger.error(f"Fixer V2 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # AI INTELLIGENCE SERVICES
 # ============================================================================
+
 
 @router.post("/claude-sonnet/execute", response_model=AgentExecuteResponse)
 async def execute_claude_sonnet(
@@ -172,6 +165,7 @@ async def execute_claude_sonnet(
 ):
     """Execute Claude Sonnet Intelligence Service"""
     try:
+        from agent.modules.backend.claude_sonnet_intelligence_service import (
             agent as claude_agent,
         )
 
@@ -188,6 +182,7 @@ async def execute_claude_sonnet(
         logger.error(f"Claude Sonnet execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/openai/execute", response_model=AgentExecuteResponse)
 async def execute_openai(
     request: AgentExecutionRequest,
@@ -195,6 +190,7 @@ async def execute_openai(
 ):
     """Execute OpenAI Intelligence Service"""
     try:
+        from agent.modules.backend.openai_intelligence_service import (
             agent as openai_agent,
         )
 
@@ -211,6 +207,7 @@ async def execute_openai(
         logger.error(f"OpenAI execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/multi-model-ai/execute", response_model=AgentExecuteResponse)
 async def execute_multi_model_ai(
     request: AgentExecutionRequest,
@@ -218,6 +215,7 @@ async def execute_multi_model_ai(
 ):
     """Execute Multi-Model AI Orchestrator - Routes to best model"""
     try:
+        from agent.modules.backend.multi_model_ai_orchestrator import agent as mm_agent
 
         result = await mm_agent.execute_core_function(**request.parameters)
 
@@ -232,9 +230,11 @@ async def execute_multi_model_ai(
         logger.error(f"Multi-Model AI execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # E-COMMERCE AGENTS
 # ============================================================================
+
 
 @router.post("/ecommerce/execute", response_model=AgentExecuteResponse)
 async def execute_ecommerce(
@@ -243,6 +243,7 @@ async def execute_ecommerce(
 ):
     """Execute E-commerce Agent - General e-commerce operations"""
     try:
+        from agent.modules.backend.ecommerce_agent import agent as ecom_agent
 
         result = await ecom_agent.execute_core_function(**request.parameters)
 
@@ -257,6 +258,7 @@ async def execute_ecommerce(
         logger.error(f"E-commerce execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/inventory/execute", response_model=AgentExecuteResponse)
 async def execute_inventory(
     request: AgentExecutionRequest,
@@ -264,6 +266,7 @@ async def execute_inventory(
 ):
     """Execute Inventory Agent - Inventory management and forecasting"""
     try:
+        from agent.modules.backend.inventory_agent import agent as inventory_agent
 
         result = await inventory_agent.execute_core_function(**request.parameters)
 
@@ -278,6 +281,7 @@ async def execute_inventory(
         logger.error(f"Inventory execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/financial/execute", response_model=AgentExecuteResponse)
 async def execute_financial(
     request: AgentExecutionRequest,
@@ -285,6 +289,7 @@ async def execute_financial(
 ):
     """Execute Financial Agent - Payment processing and analytics"""
     try:
+        from agent.modules.backend.financial_agent import agent as financial_agent
 
         result = await financial_agent.execute_core_function(**request.parameters)
 
@@ -299,9 +304,11 @@ async def execute_financial(
         logger.error(f"Financial execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # MARKETING & BRAND AGENTS
 # ============================================================================
+
 
 @router.post("/brand-intelligence/execute", response_model=AgentExecuteResponse)
 async def execute_brand_intelligence(
@@ -310,6 +317,7 @@ async def execute_brand_intelligence(
 ):
     """Execute Brand Intelligence Agent - Brand insights and analysis"""
     try:
+        from agent.modules.backend.brand_intelligence_agent import agent as brand_agent
 
         result = await brand_agent.execute_core_function(**request.parameters)
 
@@ -324,6 +332,7 @@ async def execute_brand_intelligence(
         logger.error(f"Brand Intelligence execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/seo-marketing/execute", response_model=AgentExecuteResponse)
 async def execute_seo_marketing(
     request: AgentExecutionRequest,
@@ -331,6 +340,7 @@ async def execute_seo_marketing(
 ):
     """Execute SEO Marketing Agent - SEO optimization and strategy"""
     try:
+        from agent.modules.backend.seo_marketing_agent import agent as seo_agent
 
         result = await seo_agent.execute_core_function(**request.parameters)
 
@@ -345,6 +355,7 @@ async def execute_seo_marketing(
         logger.error(f"SEO Marketing execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/social-media/execute", response_model=AgentExecuteResponse)
 async def execute_social_media(
     request: AgentExecutionRequest,
@@ -352,6 +363,7 @@ async def execute_social_media(
 ):
     """Execute Social Media Automation Agent"""
     try:
+        from agent.modules.backend.social_media_automation_agent import (
             agent as social_agent,
         )
 
@@ -368,6 +380,7 @@ async def execute_social_media(
         logger.error(f"Social Media execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/email-sms/execute", response_model=AgentExecuteResponse)
 async def execute_email_sms(
     request: AgentExecutionRequest,
@@ -375,6 +388,7 @@ async def execute_email_sms(
 ):
     """Execute Email/SMS Automation Agent"""
     try:
+        from agent.modules.backend.email_sms_automation_agent import (
             agent as email_agent,
         )
 
@@ -391,6 +405,7 @@ async def execute_email_sms(
         logger.error(f"Email/SMS execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/marketing-content/execute", response_model=AgentExecuteResponse)
 async def execute_marketing_content(
     request: AgentExecutionRequest,
@@ -398,6 +413,7 @@ async def execute_marketing_content(
 ):
     """Execute Marketing Content Generation Agent"""
     try:
+        from agent.modules.marketing_content_generation_agent import (
             agent as content_agent,
         )
 
@@ -414,9 +430,11 @@ async def execute_marketing_content(
         logger.error(f"Marketing Content execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # WORDPRESS & CMS AGENTS
 # ============================================================================
+
 
 @router.post("/wordpress/execute", response_model=AgentExecuteResponse)
 async def execute_wordpress(
@@ -425,6 +443,7 @@ async def execute_wordpress(
 ):
     """Execute WordPress Agent - WordPress integration"""
     try:
+        from agent.modules.backend.wordpress_agent import agent as wp_agent
 
         result = await wp_agent.execute_core_function(**request.parameters)
 
@@ -439,6 +458,7 @@ async def execute_wordpress(
         logger.error(f"WordPress execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/wordpress-theme-builder/execute", response_model=AgentExecuteResponse)
 async def execute_wordpress_theme_builder(
     request: AgentExecutionRequest,
@@ -446,6 +466,7 @@ async def execute_wordpress_theme_builder(
 ):
     """Execute WordPress Theme Builder - Generate complete themes"""
     try:
+        from agent.wordpress.theme_builder import generate_theme
 
         result = generate_theme(**request.parameters)
 
@@ -460,9 +481,11 @@ async def execute_wordpress_theme_builder(
         logger.error(f"WordPress Theme Builder execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # CUSTOMER SERVICE AGENTS
 # ============================================================================
+
 
 @router.post("/customer-service/execute", response_model=AgentExecuteResponse)
 async def execute_customer_service(
@@ -471,6 +494,7 @@ async def execute_customer_service(
 ):
     """Execute Customer Service Agent - AI customer support"""
     try:
+        from agent.modules.backend.customer_service_agent import agent as cs_agent
 
         result = await cs_agent.execute_core_function(**request.parameters)
 
@@ -485,6 +509,7 @@ async def execute_customer_service(
         logger.error(f"Customer Service execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/voice-audio/execute", response_model=AgentExecuteResponse)
 async def execute_voice_audio(
     request: AgentExecutionRequest,
@@ -492,6 +517,7 @@ async def execute_voice_audio(
 ):
     """Execute Voice/Audio Content Agent - Voice synthesis and processing"""
     try:
+        from agent.modules.backend.voice_audio_content_agent import agent as voice_agent
 
         result = await voice_agent.execute_core_function(**request.parameters)
 
@@ -506,9 +532,11 @@ async def execute_voice_audio(
         logger.error(f"Voice/Audio execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # ADVANCED AGENTS
 # ============================================================================
+
 
 @router.post("/blockchain-nft/execute", response_model=AgentExecuteResponse)
 async def execute_blockchain_nft(
@@ -517,6 +545,7 @@ async def execute_blockchain_nft(
 ):
     """Execute Blockchain/NFT Agent - NFT and blockchain operations"""
     try:
+        from agent.modules.backend.blockchain_nft_luxury_assets import (
             agent as nft_agent,
         )
 
@@ -533,12 +562,14 @@ async def execute_blockchain_nft(
         logger.error(f"Blockchain/NFT execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/code-generation/execute", response_model=AgentExecuteResponse)
 async def execute_code_generation(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Advanced Code Generation Agent - AI code generation"""
     try:
+        from agent.modules.backend.advanced_code_generation_agent import (
             agent as codegen_agent,
         )
 
@@ -555,12 +586,14 @@ async def execute_code_generation(
         logger.error(f"Code Generation execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/security/execute", response_model=AgentExecuteResponse)
 async def execute_security(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
     """Execute Security Agent - Security scanning and threat detection"""
     try:
+        from agent.modules.backend.security_agent import agent as security_agent
 
         result = await security_agent.execute_core_function(**request.parameters)
 
@@ -575,6 +608,7 @@ async def execute_security(
         logger.error(f"Security execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post("/performance/execute", response_model=AgentExecuteResponse)
 async def execute_performance(
     request: AgentExecutionRequest,
@@ -582,6 +616,7 @@ async def execute_performance(
 ):
     """Execute Performance Agent - Performance analysis and optimization"""
     try:
+        from agent.modules.backend.performance_agent import agent as perf_agent
 
         result = await perf_agent.execute_core_function(**request.parameters)
 
@@ -596,9 +631,11 @@ async def execute_performance(
         logger.error(f"Performance execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # BATCH OPERATIONS
 # ============================================================================
+
 
 @router.post("/batch", response_model=Dict[str, Any])
 async def batch_execute(
@@ -631,9 +668,11 @@ async def batch_execute(
         logger.error(f"Batch execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # AGENT DISCOVERY
 # ============================================================================
+
 
 @router.get("/list", response_model=Dict[str, Any])
 async def list_all_agents(current_user: TokenData = Depends(get_current_active_user)):
@@ -765,5 +804,6 @@ async def list_all_agents(current_user: TokenData = Depends(get_current_active_u
     total_count = sum(len(category) for category in agents.values())
 
     return {"agents": agents, "total_count": total_count, "api_version": "v1"}
+
 
 logger.info("✅ Agent API endpoints registered")

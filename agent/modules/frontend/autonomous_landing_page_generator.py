@@ -1,20 +1,9 @@
-import re
-from datetime import datetime
-
-from jinja2 import Template
-import jinja2
-from typing import Any, Dict, List, Optional, Tuple
-from uuid import uuid4
-import asyncio
-import logging
-import random
-
 """
 Autonomous Landing Page Generator with A/B Testing AI
 Generates high-converting landing pages with real-time optimization
 
 Features:
-    - AI-driven copywriting with Claude Sonnet 4.5
+- AI-driven copywriting with Claude Sonnet 4.5
 - Automated A/B/C/D testing with statistical significance
 - Real-time conversion tracking and optimization
 - Dynamic content personalization
@@ -26,7 +15,17 @@ Features:
 - Automatic winner selection
 """
 
+import asyncio
+import logging
+import random
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+from uuid import uuid4
+
+from jinja2 import Template
+
 logger = logging.getLogger(__name__)
+
 
 class AutonomousLandingPageGenerator:
     """
@@ -143,10 +142,10 @@ class AutonomousLandingPageGenerator:
     </script>
 </body>
 </html>
-""",
+            """,
         }
 
-async def generate_landing_page(
+    async def generate_landing_page(
         self,
         product_name: str,
         target_audience: str,
@@ -209,9 +208,9 @@ async def generate_landing_page(
         cta = self._generate_cta_section(goal, variant_label)
         styles = self._generate_styles(variant_label)
 
-        # Compile full HTML with safe template rendering
-        html = render_safe_template(
-            self.templates["luxury_fashion"],
+        # Compile full HTML
+        template = Template(self.templates["luxury_fashion"])
+        html = template.render(
             title=f"{product_name} - The Skyy Rose Collection",
             meta_description=f"Discover {product_name} - Luxury fashion redefined",
             custom_styles=styles,
@@ -882,6 +881,7 @@ async def generate_landing_page(
         """Remove testing code and prepare HTML for production."""
         # In a real implementation, would properly parse and clean HTML
         # For now, simple string replacement
+        import re
 
         # Remove A/B testing tracker script
         html = re.sub(
@@ -894,25 +894,28 @@ async def generate_landing_page(
 
         return html
 
+
 # Factory function
 def create_landing_page_generator() -> AutonomousLandingPageGenerator:
     """Create Autonomous Landing Page Generator."""
     return AutonomousLandingPageGenerator()
 
+
 # Example usage
 async def main():
     """Example: Generate and test landing pages."""
-    generator = create_landing_page_generator(
+    generator = create_landing_page_generator()
+
     # Generate landing page variants
     result = await generator.generate_landing_page(
         product_name="2024 Rose Gold Collection",
         target_audience="Affluent women 25-45 interested in luxury fashion",
         goal="email_signup",
         num_variants=4,
-)
+    )
 
-    logger.info(f"✅ Generated test: {result['test_id']}")
-    logger.info(f"📊 Created {len(result['variants'])} variants")
+    print(f"✅ Generated test: {result['test_id']}")
+    print(f"📊 Created {len(result['variants'])} variants")
 
     # Simulate some traffic and conversions
     test_id = result["test_id"]
@@ -930,94 +933,25 @@ async def main():
     # Analyze results
     analysis = await generator.analyze_test_performance(test_id)
 
-    logger.info("\n📊 Test Results:")
+    print("\n📊 Test Results:")
     for result in analysis["results"]:
-        logger.info(
+        print(
             f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)"
         )
 
     if analysis.get("winner"):
-        logger.info(f"\n🏆 Winner: {analysis['winner']['variant']}")
+        print(f"\n🏆 Winner: {analysis['winner']['variant']}")
 
     # Auto-optimize based on results
     optimization = await generator.auto_optimize(test_id)
     if optimization["status"] == "optimized":
-        logger.info(f"\n🚀 Created optimized test: {optimization['new_test_id']}")
+        print(f"\n🚀 Created optimized test: {optimization['new_test_id']}")
 
     # Export winner
     export = await generator.export_winner(test_id)
     if export["status"] == "exported":
-        logger.info(f"\n✅ Exported to: {export['filename']}")
+        print(f"\n✅ Exported to: {export['filename']}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-def create_safe_template(template_string: str) -> jinja2.Template:
-    """
-    Create a safe Jinja2 template with comprehensive XSS protection.
-
-    Security features:
-    - Automatic HTML escaping for html/xml templates
-    - Restricted template features to prevent code injection
-    - Safe finalization of undefined variables
-    """
-    # Create secure environment with restricted features
-    env = jinja2.Environment(
-        # Enable automatic escaping for HTML/XML content
-        autoescape=jinja2.select_autoescape(['html', 'xml']),
-        # Safely handle undefined variables
-        finalize=lambda x: x if x is not None else '',
-        # Disable potentially dangerous features
-        trim_blocks=True,
-        lstrip_blocks=True,
-        # Prevent access to private attributes
-        undefined=jinja2.StrictUndefined
-    )
-
-    # Remove potentially dangerous globals and filters
-    env.globals.pop('range', None)
-    env.globals.pop('lipsum', None)
-    env.globals.pop('cycler', None)
-
-    return env.from_string(template_string)
-
-def render_safe_template(template_string: str, **kwargs) -> str:
-    """
-    Safely render template with comprehensive input sanitization.
-
-    Security measures:
-    - HTML escaping of all string inputs
-    - Validation of template variables
-    - Protection against template injection
-    """
-    try:
-        template = create_safe_template(template_string)
-
-        # Sanitize all input variables
-        safe_kwargs = {}
-        for key, value in kwargs.items():
-            # Validate key name to prevent injection
-            if not key.replace('_', '').isalnum():
-                raise ValueError(f"Invalid template variable name: {key}")
-
-            if isinstance(value, str):
-                # Escape HTML characters and limit length
-                if len(value) > 10000:  # Prevent DoS via large strings
-                    value = value[:10000] + "..."
-                safe_kwargs[key] = jinja2.escape(value)
-            elif isinstance(value, (int, float, bool)):
-                safe_kwargs[key] = value
-            elif value is None:
-                safe_kwargs[key] = ""
-            else:
-                # Convert other types to safe strings
-                safe_kwargs[key] = jinja2.escape(str(value))
-
-        return template.render(**safe_kwargs)
-
-    except jinja2.TemplateError as e:
-        logger.error(f"Template rendering error: {e}")
-        return "<div>Template rendering error</div>"
-    except Exception as e:
-        logger.error(f"Unexpected error in template rendering: {e}")
-        return "<div>Content unavailable</div>"

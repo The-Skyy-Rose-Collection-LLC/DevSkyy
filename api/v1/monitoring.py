@@ -1,19 +1,16 @@
-from security.jwt_auth import get_current_active_user, require_admin, TokenData
-
-from fastapi import APIRouter, Depends
-
-from monitoring.observability import (
 import logging
+from fastapi import APIRouter, Depends
+from monitoring.observability import (
+    health_monitor,
+    metrics_collector,
+    performance_tracker,
+)
+from security.jwt_auth import get_current_active_user, require_admin, TokenData
 
 """
 Monitoring & Observability API Endpoints
 System metrics, health checks, and performance monitoring
 """
-
-    health_monitor,
-    metrics_collector,
-    performance_tracker,
-)
 
 logger = logging.getLogger(__name__)
 

@@ -1,17 +1,17 @@
+import logging
+from typing import Any
+
+import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-import requests
-
-import asyncio
-import httpx  # Optional for async usage
-from typing import Any
-import logging
 
 try:
-    except Exception:
+    import httpx  # Optional for async usage
+except Exception:
     httpx = None  # type: ignore
 
 logger = logging.getLogger(__name__)
+
 
 def _build_session(
     total_retries: int = 3, backoff_factor: float = 0.5, timeout: float = 5.0
@@ -31,6 +31,7 @@ def _build_session(
     session.request = _with_timeout(session.request, timeout)  # type: ignore
     return session
 
+
 def _with_timeout(request_fn, default_timeout: float):
     def _wrapped(method: str, url: str, **kwargs):
         if "timeout" not in kwargs or kwargs["timeout"] is None:
@@ -39,13 +40,17 @@ def _with_timeout(request_fn, default_timeout: float):
 
     return _wrapped
 
+
 _session = _build_session()
+
 
 def get(url: str, **kwargs) -> requests.Response:
     return _session.get(url, **kwargs)
 
+
 def post(url: str, **kwargs) -> requests.Response:
     return _session.post(url, **kwargs)
+
 
 async def async_get(url: str, **kwargs) -> Any:
     if httpx is None:
@@ -68,8 +73,10 @@ async def async_get(url: str, **kwargs) -> Any:
             )
             await _async_sleep(sleep_time)
 
+
 async def _async_sleep(seconds: float) -> None:
     if httpx is not None:
         # Simple async sleep without importing asyncio at module import for lightness
+        import asyncio
 
         await asyncio.sleep(seconds)

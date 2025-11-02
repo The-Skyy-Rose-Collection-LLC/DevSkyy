@@ -1,18 +1,16 @@
-import re
-import re
-from datetime import datetime, timedelta
-
-from decimal import Decimal
-from enum import Enum
-from typing import Any, Dict, List, Optional
 import logging
 import random
 import uuid
+from datetime import datetime, timedelta
+from decimal import Decimal
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 # Replaced numpy with random for lightweight operations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class ProductCategory(Enum):
     NECKLACES = "necklaces"
@@ -23,6 +21,7 @@ class ProductCategory(Enum):
     SETS = "sets"
     LIMITED_EDITION = "limited_edition"
 
+
 class OrderStatus(Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
@@ -32,6 +31,7 @@ class OrderStatus(Enum):
     RETURNED = "returned"
     REFUNDED = "refunded"
     CANCELED = "canceled"
+
 
 class EcommerceAgent:
     """Production-level ecommerce management with advanced analytics and automation."""
@@ -495,7 +495,7 @@ class EcommerceAgent:
         """Get real-time analytics for main dashboard."""
         return {
             "total_products": len(self.products),
-            "active_orders": len()
+            "active_orders": len(
                 [
                     o
                     for o in self.orders.values()
@@ -727,6 +727,7 @@ class EcommerceAgent:
 
     def _validate_email(self, email: str) -> bool:
         """Validate email format."""
+        import re
 
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
@@ -987,7 +988,7 @@ class EcommerceAgent:
     # Analytics calculation methods
     def _calculate_total_revenue(self) -> float:
         """Calculate total revenue from all orders."""
-        return sum()
+        return sum(
             float(order["pricing"]["total"])
             for order in self.orders.values()
             if order["status"] not in ["canceled", "refunded"]
@@ -1007,7 +1008,7 @@ class EcommerceAgent:
     def _count_new_customers(self) -> int:
         """Count new customers in current period."""
         thirty_days_ago = datetime.now() - timedelta(days=30)
-        return len()
+        return len(
             [
                 c
                 for c in self.customers.values()
@@ -1075,6 +1076,7 @@ class EcommerceAgent:
 
     def _generate_url_slug(self, name: str) -> str:
         """Generate SEO-friendly URL slug."""
+        import re
 
         slug = re.sub(r"[^a-zA-Z0-9\s-]", "", name.lower())
         slug = re.sub(r"\s+", "-", slug.strip())
@@ -1472,6 +1474,7 @@ class EcommerceAgent:
         except Exception as e:
             logger.error(f"Neural commerce session failed: {str(e)}")
             return {"error": str(e), "status": "neural_overload"}
+
 
 def optimize_marketing() -> Dict[str, Any]:
     """Main marketing optimization function for compatibility."""

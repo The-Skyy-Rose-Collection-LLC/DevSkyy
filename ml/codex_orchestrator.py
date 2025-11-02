@@ -1,34 +1,30 @@
-from datetime import datetime
-
-from agent.modules.backend.fixer import fix_code
-from agent.modules.backend.scanner import scan_site
-from agent.modules.backend.fixer_v2 import CodeFixer
-from agent.modules.backend.scanner_v2 import CodeScanner
-from agent.modules.backend.universal_self_healing_agent import (
-from ml.codex_integration import codex
-from typing import Any, Dict, List, Optional
-import logging
-
 """
 Codex-Powered Code Healing Orchestrator
 Uses GPT-4 to intelligently coordinate code analysis, fixing, and healing
 
 This orchestrator:
-    - Analyzes code issues using the scanner
+- Analyzes code issues using the scanner
 - Uses GPT-4 to understand context and generate optimal fixes
 - Coordinates multiple healing agents (fixer, self-healing, auto-fix)
 - Validates fixes before applying
 - Learns from successful fixes to improve future healing
 
 Architecture:
-    1. Scanner → Detect issues
+1. Scanner → Detect issues
 2. Codex → Analyze and generate fix strategy
 3. Healing Agents → Apply fixes
 4. Validation → Test fixes
 5. Learning → Store successful patterns
 """
 
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from ml.codex_integration import codex
+
 logger = logging.getLogger(__name__)
+
 
 class CodexOrchestrator:
     """
@@ -53,10 +49,12 @@ class CodexOrchestrator:
         """Lazy load scanner agent"""
         if self._scanner is None:
             try:
+                from agent.modules.backend.scanner_v2 import CodeScanner
 
                 self._scanner = CodeScanner()
             except ImportError:
                 try:
+                    from agent.modules.backend.scanner import scan_site
 
                     self._scanner = lambda path: {"issues": scan_site(path)}
                 except ImportError:
@@ -69,10 +67,12 @@ class CodexOrchestrator:
         """Lazy load fixer agent"""
         if self._fixer is None:
             try:
+                from agent.modules.backend.fixer_v2 import CodeFixer
 
                 self._fixer = CodeFixer()
             except ImportError:
                 try:
+                    from agent.modules.backend.fixer import fix_code
 
                     self._fixer = lambda code, issue: fix_code(code, issue)
                 except ImportError:
@@ -85,6 +85,7 @@ class CodexOrchestrator:
         """Lazy load self-healing agent"""
         if self._self_healing is None:
             try:
+                from agent.modules.backend.universal_self_healing_agent import (
                     UniversalSelfHealingAgent,
                 )
 
@@ -209,12 +210,12 @@ class CodexOrchestrator:
             prompt = f"""Analyze the following code issues and create an optimal healing strategy:
 
 ISSUES DETECTED:
-    {issues_summary}
+{issues_summary}
 
 LANGUAGE: {language}
 
 Create a healing strategy that:
-    1. Prioritizes critical security and correctness issues
+1. Prioritizes critical security and correctness issues
 2. Groups related issues for efficient fixing
 3. Identifies dependencies between fixes
 4. Suggests the optimal order of fixes
@@ -255,7 +256,7 @@ Respond with a structured healing strategy."""
                 "issue_groups": [issues],
             }
 
-async def _generate_fixes(
+    async def _generate_fixes(
         self, code: str, strategy: Dict, language: str
     ) -> List[Dict[str, Any]]:
         """Generate fixes for each issue using Codex"""
@@ -275,7 +276,7 @@ ISSUE: {issue.get('description', 'Unknown issue')}
 TYPE: {issue.get('type', 'general')}
 
 CODE:
-    ```{language}
+```{language}
 {code}
 ```
 
@@ -305,7 +306,7 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             logger.error(f"Fix generation failed: {e}")
             return []
 
-async def _validate_fixes(
+    async def _validate_fixes(
         self, original_code: str, fixes: List[Dict], language: str
     ) -> Dict[str, Any]:
         """Validate fixes before applying"""
@@ -319,14 +320,14 @@ async def _validate_fixes(
             validation_prompt = f"""Validate these code fixes for safety and correctness:
 
 ORIGINAL CODE:
-    ```{language}
+```{language}
 {original_code}
 ```
 
 NUMBER OF FIXES: {len(fixes)}
 
 Analyze:
-    1. Do fixes solve the stated issues?
+1. Do fixes solve the stated issues?
 2. Are there any new issues introduced?
 3. Is functionality preserved?
 4. Are there breaking changes?
@@ -363,7 +364,7 @@ Respond with validation analysis."""
             logger.error(f"Validation failed: {e}")
             return {"safe": False, "reason": str(e)}
 
-async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
+    async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
         """Apply validated fixes to code"""
         logger.info("🚀 Applying fixes...")
 
@@ -473,6 +474,7 @@ async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str
                 self.healing_history[-10:] if self.healing_history else []
             ),
         }
+
 
 # Global instance
 codex_orchestrator = CodexOrchestrator()

@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta
-
-from enum import Enum
-from typing import Any, Dict, List
 import asyncio
 import logging
 import uuid
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class AgentRole(Enum):
     FRONTEND_BEAUTY = "frontend_beauty"
@@ -22,6 +22,7 @@ class AgentRole(Enum):
     CONTENT_CREATION = "content_creation"
     BRAND_MANAGEMENT = "brand_management"
     CUSTOMER_EXPERIENCE = "customer_experience"
+
 
 class AgentAssignmentManager:
     """Elite Agent Assignment Manager for 24/7 Luxury Brand Operations and Executive-Level Decision Making."""
@@ -823,7 +824,7 @@ class AgentAssignmentManager:
 
             except Exception as e:
                 logger.error(f"❌ 24/7 monitoring error: {str(e)}")
-                await asyncio.sleep(60)  # TODO: Move to config  # Retry in 1 minute
+                await asyncio.sleep(60)  # Retry in 1 minute
 
     async def _monitor_performance_metrics(self):
         """Monitor and auto-fix performance issues."""
@@ -2428,7 +2429,7 @@ class AgentAssignmentManager:
 
         # Adjust for task complexity
         complex_keywords = ["optimization", "analysis", "implementation", "development"]
-        complexity_bonus = sum()
+        complexity_bonus = sum(
             1
             for task in tasks
             if any(keyword in task.lower() for keyword in complex_keywords)
@@ -3089,6 +3090,7 @@ class AgentAssignmentManager:
                 "final_approval": "project_manager_sign_off",
             },
         }
+
 
 def create_agent_assignment_manager() -> AgentAssignmentManager:
     """Factory function to create agent assignment manager."""

@@ -1,15 +1,15 @@
-from datetime import datetime
 import json
-import os
-
-from typing import Any, Dict, List
-import ast
 import logging
-import openai
+import os
 import uuid
+from datetime import datetime
+from typing import Any, Dict, List
+
+import openai
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class PerformanceAgent:
     """Universal Web Development Guru - Master of All Programming Languages & Web Technologies."""
@@ -581,7 +581,7 @@ class PerformanceAgent:
                         "fix": "Use f-strings or join() method for better performance",
                     }
                 )
-            if "range(len(" in code:)
+            if "range(len(" in code:
                 issues.append(
                     {
                         "type": "INEFFICIENT_ITERATION",
@@ -610,12 +610,12 @@ class PerformanceAgent:
         vulnerabilities = []
 
         if language in ["javascript", "typescript"]:
-            if "ast.literal_eval(" in code:
+            if "eval(" in code:
                 vulnerabilities.append(
                     {
                         "type": "CODE_INJECTION",
                         "severity": "CRITICAL",
-                        "description": "Use of ast.literal_eval() can lead to code injection",
+                        "description": "Use of eval() can lead to code injection",
                         "fix": "Use JSON.parse() or safer alternatives",
                     }
                 )
@@ -632,8 +632,7 @@ class PerformanceAgent:
                 )
 
         elif language == "python":
-            if "# SECURITY FIX: exec() removed for security
-# exec(" in code or "ast.literal_eval(" in code:
+            if "exec(" in code or "eval(" in code:
                 vulnerabilities.append(
                     {
                         "type": "CODE_EXECUTION",
@@ -666,7 +665,7 @@ class PerformanceAgent:
 
         return vulnerabilities
 
-def _generate_code_fixes(
+    def _generate_code_fixes(
         self, analysis: Dict, code: str, language: str
     ) -> Dict[str, Any]:
         """Generate automated fixes for detected issues."""
@@ -834,7 +833,7 @@ def _generate_code_fixes(
                     }
                 )
         elif language == "python":
-            if "list(" in code and "generator" not in code:)
+            if "list(" in code and "generator" not in code:
                 optimizations.append(
                     {
                         "type": "GENERATOR_OPTIMIZATION",
@@ -860,7 +859,7 @@ def _generate_code_fixes(
                     }
                 )
         elif language == "python":
-            if "except Exception:" in code:
+            if "except:" in code:
                 violations.append(
                     {
                         "type": "BARE_EXCEPT",
@@ -1026,6 +1025,7 @@ def _generate_code_fixes(
             )
 
         return improvements
+
 
 def optimize_site_performance() -> Dict[str, Any]:
     """Main function to optimize site performance."""

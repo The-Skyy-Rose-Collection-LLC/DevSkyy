@@ -1,10 +1,3 @@
-from datetime import datetime
-import json
-
-from typing import Any, Dict, List
-import asyncio
-import logging
-
 """
 Enterprise WordPress Agent with Divi 5 & Elementor Pro Mastery
 Revolutionary WordPress development capabilities with deep Divi 5 and Elementor Pro integration
@@ -19,7 +12,14 @@ This agent provides:
 - Enterprise-level security and maintenance
 """
 
+import asyncio
+import json
+import logging
+from datetime import datetime
+from typing import Any, Dict, List
+
 logger = logging.getLogger(__name__)
+
 
 class WordPressDiviElementorAgent:
     """Enterprise WordPress Agent with Divi 5 and Elementor Pro expertise."""
@@ -748,14 +748,14 @@ class WordPressDiviElementorAgent:
         margin-bottom: 20px;
     }
 }
-"""
+        """
         )
 
         return css_template
 
     # Helper methods for Elementor Pro operations
 
-async def _generate_elementor_template_structure(
+    async def _generate_elementor_template_structure(
         self, template_type: str, design_requirements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Generate Elementor Pro template structure."""
@@ -1329,18 +1329,22 @@ async def _generate_elementor_template_structure(
             "Document learnings for future tests",
         ]
 
+
 # Factory function for creating WordPress agent instances
 def create_wordpress_divi_elementor_agent() -> WordPressDiviElementorAgent:
     """Create and return a WordPress Divi Elementor Agent instance."""
     return WordPressDiviElementorAgent()
 
+
 # Global agent instance for the platform
 wordpress_agent = create_wordpress_divi_elementor_agent()
+
 
 # Convenience functions for easy access
 async def create_luxury_divi_layout(layout_spec: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury Divi 5 layout."""
     return await wordpress_agent.create_divi5_luxury_layout(layout_spec)
+
 
 async def create_professional_elementor_template(
     template_spec: Dict[str, Any]
@@ -1348,13 +1352,16 @@ async def create_professional_elementor_template(
     """Create professional Elementor Pro template."""
     return await wordpress_agent.create_elementor_pro_template(template_spec)
 
+
 async def optimize_wordpress_site(site_data: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize WordPress site performance."""
     return await wordpress_agent.optimize_wordpress_performance(site_data)
 
+
 async def optimize_seo_intelligently(content_data: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize SEO with AI."""
     return await wordpress_agent.intelligent_seo_optimization(content_data)
+
 
 async def run_automated_design_tests(variants: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Run automated A/B design tests."""

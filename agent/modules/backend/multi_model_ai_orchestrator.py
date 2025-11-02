@@ -1,13 +1,3 @@
-from datetime import datetime
-import os
-
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
-from typing import Any, Dict, List
-import asyncio
-import httpx
-import logging
-
 """
 Multi-Model AI Orchestrator
 Combines the best AI models from ALL platforms for phenomenal results
@@ -32,7 +22,18 @@ Features:
 - Auto-routing to best model
 """
 
+import asyncio
+import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List
+
+import httpx
+from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
+
 logger = logging.getLogger(__name__)
+
 
 class MultiModelAIOrchestrator:
     """
@@ -281,7 +282,7 @@ Create the optimal combined response that leverages the strengths of each."""
             "timestamp": datetime.now().isoformat(),
         }
 
-async def _call_claude(
+    async def _call_claude(
         self, model_name: str, prompt: str, max_tokens: int, temperature: float
     ) -> str:
         """Call Anthropic Claude model."""
@@ -472,13 +473,16 @@ async def _call_claude(
 
         return results
 
+
 # Factory function
 def create_multi_model_orchestrator() -> MultiModelAIOrchestrator:
     """Create Multi-Model AI Orchestrator."""
     return MultiModelAIOrchestrator()
 
+
 # Global instance
 ai_orchestrator = create_multi_model_orchestrator()
+
 
 # Convenience functions
 async def ai_generate(
@@ -489,6 +493,7 @@ async def ai_generate(
         prompt, task_type, use_ensemble=not use_best
     )
     return result.get("response", "")
+
 
 async def ai_ensemble(prompt: str, task_type: str = "general") -> Dict[str, Any]:
     """Generate using ensemble of top models."""

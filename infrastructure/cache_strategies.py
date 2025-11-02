@@ -388,21 +388,21 @@ class CacheInvalidationManager:
             > datetime.now() - timedelta(hours=24)
         ]
 
-        total_keys_invalidated = sum(
+        total_keys_invalidated = sum([
             inv["keys_invalidated"] for inv in recent_invalidations
-)
-        total_rules_executed = sum()
+])
+        total_rules_executed = sum([
             len(inv["rules_executed"]) for inv in recent_invalidations
-        )
+        ])
 
         return {
             "total_rules": len(self.invalidation_rules),
             "recent_invalidations_24h": len(recent_invalidations),
             "total_keys_invalidated_24h": total_keys_invalidated,
             "total_rules_executed_24h": total_rules_executed,
-            "fashion_specific_rules": len()
-                [r for r in self.invalidation_rules.values() if r.fashion_context]
-            ),
+            "fashion_specific_rules": len([
+                r for r in self.invalidation_rules.values() if r.fashion_context
+            ]),
             "dependency_graph_size": len(self.dependency_graph),
             "scheduled_invalidations": len(self.scheduled_invalidations),
         }

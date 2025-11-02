@@ -1,10 +1,3 @@
-from datetime import datetime
-import os
-
-from openai import AsyncOpenAI
-from typing import Any, Dict, List, Literal, Optional
-import logging
-
 """
 OpenAI Codex-Style Integration
 Modern code generation using GPT-4 and GPT-3.5-turbo
@@ -14,7 +7,7 @@ This integration uses GPT-4 and GPT-3.5-turbo as replacements,
 which provide superior code generation capabilities.
 
 Features:
-    - Code generation (functions, classes, full applications)
+- Code generation (functions, classes, full applications)
 - Code completion and suggestions
 - Code explanation and documentation
 - Code review and optimization
@@ -22,11 +15,18 @@ Features:
 - Context-aware generation with repository understanding
 """
 
+import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
+
 try:
-    except ImportError:
+    from openai import AsyncOpenAI
+except ImportError:
     AsyncOpenAI = None
 
 logger = logging.getLogger(__name__)
+
 
 class CodexIntegration:
     """
@@ -296,7 +296,7 @@ class CodexIntegration:
 
         try:
             system_message = """You are an expert code reviewer. Analyze code for:
-                - Bugs and logic errors
+- Bugs and logic errors
 - Security vulnerabilities
 - Performance issues
 - Code style and best practices
@@ -329,7 +329,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
-async def generate_documentation(
+    async def generate_documentation(
         self, code: str, language: str = "python"
     ) -> Dict[str, Any]:
         """
@@ -436,34 +436,27 @@ async def generate_documentation(
             )
 
         if context:
-            # Use list and join for string building
-message_list.append(...).join(context)
+            message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 
-def _build_code_generation_prompt(
+    def _build_code_generation_prompt(
         self, prompt: str, language: str, context: Optional[List[str]] = None
     ) -> str:
         """Build user prompt for code generation"""
         message = f"Generate {language} code for: {prompt}\n\n"
-        # Use list and join for string building
-message_list.append(...)
-        # Use list and join for string building
-message_list.append(...)
-        # Use list and join for string building
-message_list.append(...)
-        # Use list and join for string building
-message_list.append(...)
-        # Use list and join for string building
-message_list.append(...)
+        message += "Requirements:\n"
+        message += "- Include proper error handling\n"
+        message += "- Add type hints (if supported)\n"
+        message += "- Include docstrings/comments\n"
+        message += "- Follow best practices\n"
 
         if context:
-            # Use list and join for string building
-message_list.append(...).join(context)
+            message += "\nContext:\n" + "\n".join(context)
 
         return message
 
-def _extract_code_block(self, text: str, language: str) -> str:
+    def _extract_code_block(self, text: str, language: str) -> str:
         """Extract code from markdown code blocks"""
         # Try to find code block with language specifier
         markers = [f"```{language}", "```"]
@@ -492,6 +485,7 @@ def _extract_code_block(self, text: str, language: str) -> str:
     def get_supported_languages(self) -> List[str]:
         """Get list of supported programming languages"""
         return list(self.language_configs.keys())
+
 
 # Global instance
 codex = CodexIntegration()

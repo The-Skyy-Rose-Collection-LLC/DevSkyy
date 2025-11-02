@@ -1,23 +1,9 @@
-import re
-import re
-import re
-from datetime import datetime
-import json
-import os
-
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
-from typing import Any, Dict, List, Optional
-import httpx
-import logging
-import random
-
 """
 Meta Social Media Automation Agent
 Advanced Facebook & Instagram automation using Meta's Graph API
 
 Features:
-    - Meta Graph API v18.0 integration
+- Meta Graph API v18.0 integration
 - Instagram Business Account management
 - Facebook Page automation
 - Content scheduling and publishing
@@ -34,7 +20,19 @@ Features:
 - Ad campaign automation
 """
 
+import json
+import logging
+import os
+import random
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import httpx
+from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
+
 logger = logging.getLogger(__name__)
+
 
 class MetaSocialAutomationAgent:
     """
@@ -188,11 +186,11 @@ class MetaSocialAutomationAgent:
 Original Content: {content}
 
 Create optimized versions for:
-    1. Instagram: Focus on visual storytelling, luxury lifestyle, use emojis
+1. Instagram: Focus on visual storytelling, luxury lifestyle, use emojis
 2. Facebook: More detailed, community-focused, professional tone
 
 Requirements:
-    - Maintain luxury brand voice
+- Maintain luxury brand voice
 - Include clear CTAs
 - Optimize for engagement
 - Follow platform character limits
@@ -212,6 +210,7 @@ Return JSON with: instagram_content, facebook_content"""
             content_text = response.content[0].text
 
             # Extract JSON
+            import re
 
             json_match = re.search(r"\{.*\}", content_text, re.DOTALL)
             if json_match:
@@ -227,7 +226,7 @@ Return JSON with: instagram_content, facebook_content"""
             logger.error(f"Content optimization failed: {e}")
             return {"instagram": content, "facebook": content}
 
-async def _generate_hashtags(self, content: str) -> List[str]:
+    async def _generate_hashtags(self, content: str) -> List[str]:
         """
         Generate optimal hashtags using AI and trending data.
         """
@@ -237,7 +236,7 @@ async def _generate_hashtags(self, content: str) -> List[str]:
 Content: {content}
 
 Requirements:
-    1. Mix of broad and niche hashtags
+1. Mix of broad and niche hashtags
 2. Include branded hashtags (#TheSkyyRoseCollection)
 3. Target luxury fashion audience
 4. 10-15 hashtags total
@@ -255,6 +254,7 @@ Return as JSON array of hashtags."""
             content_text = response.content[0].text
 
             # Extract JSON array
+            import re
 
             json_match = re.search(r"\[.*\]", content_text, re.DOTALL)
             if json_match:
@@ -274,7 +274,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Hashtag generation failed: {e}")
             return ["#TheSkyyRoseCollection", "#LuxuryFashion"]
 
-async def _publish_to_instagram(
+    async def _publish_to_instagram(
         self,
         content: str,
         media_urls: Optional[List[str]],
@@ -645,7 +645,7 @@ Target: High-end fashion consumers
 Focus: The Skyy Rose Collection
 
 Create detailed personas including:
-    1. Name and demographics
+1. Name and demographics
 2. Lifestyle and interests
 3. Shopping behavior
 4. Social media usage
@@ -664,6 +664,7 @@ Return as JSON array."""
             content_text = response.content[0].text
 
             # Extract JSON
+            import re
 
             json_match = re.search(r"\[.*\]", content_text, re.DOTALL)
             if json_match:
@@ -675,7 +676,7 @@ Return as JSON array."""
             logger.error(f"Persona generation failed: {e}")
             return []
 
-async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
+    async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
         """
         Suggest lookalike audience configurations.
         """
@@ -724,7 +725,7 @@ Description: {product_info.get('description')}
 Price: ${product_info.get('price')}
 
 Generate:
-    1. Viral reel concept (15-30 seconds)
+1. Viral reel concept (15-30 seconds)
 2. Engaging story series (3-5 frames)
 3. Carousel post idea (5-10 slides)
 4. Caption with hook
@@ -732,7 +733,7 @@ Generate:
 6. Hashtag strategy
 
 Focus on:
-    - Luxury lifestyle aspiration
+- Luxury lifestyle aspiration
 - FOMO creation
 - User-generated content potential
 - Shareable moments
@@ -765,7 +766,7 @@ Return detailed content plan."""
             logger.error(f"❌ Viral content generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-async def _generate_visual_concepts(
+    async def _generate_visual_concepts(
         self, product_info: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """
@@ -899,23 +900,29 @@ async def _generate_visual_concepts(
         Send DM reply.
         """
 
+
 # Factory function
 def create_meta_automation_agent() -> MetaSocialAutomationAgent:
     """Create Meta Social Automation Agent."""
     return MetaSocialAutomationAgent()
 
+
 # Global instance
-meta_agent = create_meta_automation_agent(
-    # Convenience functions
+meta_agent = create_meta_automation_agent()
+
+
+# Convenience functions
 async def publish_to_meta(
     content: str, platforms: List[str] = ["instagram", "facebook"]
 ) -> Dict[str, Any]:
     """Publish content to Meta platforms."""
     return await meta_agent.publish_content(content, platforms=platforms)
 
+
 async def find_customers(interests: List[str]) -> Dict[str, Any]:
     """Find potential customers."""
     return await meta_agent.find_potential_customers(interests)
+
 
 async def generate_viral(product: Dict[str, Any]) -> Dict[str, Any]:
     """Generate viral content."""

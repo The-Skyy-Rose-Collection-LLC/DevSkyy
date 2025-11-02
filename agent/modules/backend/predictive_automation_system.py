@@ -1,15 +1,9 @@
-from datetime import datetime
-
-from typing import Any, Dict, List
-import asyncio
-import logging
-
 """
 Predictive Automation System
 Enterprise-grade system that anticipates and prevents issues before they occur
 
 This system provides:
-    - Predictive issue detection using advanced algorithms
+- Predictive issue detection using advanced algorithms
 - Proactive system healing and optimization
 - Intelligent resource allocation and scaling
 - Automated performance tuning and optimization
@@ -18,7 +12,13 @@ This system provides:
 - Executive-level alerting and reporting
 """
 
+import asyncio
+import logging
+from datetime import datetime
+from typing import Any, Dict, List
+
 logger = logging.getLogger(__name__)
+
 
 class PredictiveAutomationSystem:
     """Enterprise Predictive Automation System with intelligent issue prevention."""
@@ -491,7 +491,7 @@ class PredictiveAutomationSystem:
             }
 
         # Calculate overall risk
-        avg_risk = sum()
+        avg_risk = sum(
             pred.get("risk_score", 0.5) for pred in predictions.values()
         ) / len(predictions)
         if avg_risk >= self.thresholds["high"]:
@@ -574,7 +574,7 @@ class PredictiveAutomationSystem:
         total_measures = len(execution_results["measures_details"])
         successful_measures = sum(
             1 for detail in execution_results["measures_details"] if detail["success"]
-)
+        )
         execution_results["execution_success_rate"] = successful_measures / max(
             1, total_measures
         )
@@ -583,7 +583,7 @@ class PredictiveAutomationSystem:
 
     # Prediction helper methods
 
-async def _predict_system_performance(
+    async def _predict_system_performance(
         self, system_metrics: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Predict system performance issues."""
@@ -883,26 +883,32 @@ async def _predict_system_performance(
             "stability": "enhanced",
         }
 
+
 # Factory function for creating predictive automation system instances
 def create_predictive_automation_system() -> PredictiveAutomationSystem:
     """Create and return a Predictive Automation System instance."""
     return PredictiveAutomationSystem()
 
+
 # Global predictive system instance for the platform
 predictive_system = create_predictive_automation_system()
+
 
 # Convenience functions for easy access
 async def predict_and_prevent_issues(system_data: Dict[str, Any]) -> Dict[str, Any]:
     """Predict and prevent system issues."""
     return await predictive_system.predict_and_prevent_issues(system_data)
 
+
 async def intelligent_scale_resources(demand_data: Dict[str, Any]) -> Dict[str, Any]:
     """Intelligently scale resources."""
     return await predictive_system.intelligent_resource_scaling(demand_data)
 
+
 async def auto_tune_performance(performance_data: Dict[str, Any]) -> Dict[str, Any]:
     """Automatically tune performance."""
     return await predictive_system.automated_performance_tuning(performance_data)
+
 
 async def predictive_security_hardening(
     security_data: Dict[str, Any]
@@ -910,9 +916,11 @@ async def predictive_security_hardening(
     """Predictively harden security."""
     return await predictive_system.predictive_security_hardening(security_data)
 
+
 async def intelligent_capacity_planning(growth_data: Dict[str, Any]) -> Dict[str, Any]:
     """Plan capacity intelligently."""
     return await predictive_system.intelligent_capacity_planning(growth_data)
+
 
 async def optimize_user_experience_proactively(
     ux_data: Dict[str, Any]

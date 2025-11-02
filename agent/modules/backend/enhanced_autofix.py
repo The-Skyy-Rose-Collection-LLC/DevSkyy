@@ -1,19 +1,17 @@
-from datetime import datetime
-from pathlib import Path
-import os
-import re
-
-from typing import Any, Dict, List, Optional
-import importlib.util
-import logging
-import subprocess
-
 """
 Enhanced Auto-Fix Module for DevSkyy Platform (Simplified)
 Provides advanced code analysis, fixing, and branch management
 """
 
 # Import existing modules using importlib
+import importlib.util
+import logging
+import os
+import re
+import subprocess
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Get the current directory to import other modules
 current_dir = Path(__file__).parent
@@ -40,6 +38,7 @@ git_commit_spec.loader.exec_module(git_commit_module)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class EnhancedAutoFix:
     """Enhanced Auto-Fix System with branch management and advanced fixes"""
@@ -104,7 +103,7 @@ class EnhancedAutoFix:
             session_result["advanced_fixes"] = advanced_fixes
 
             # Calculate total fixes
-            total_fixes = len(fix_results.get("fixes_applied", [])) + len()
+            total_fixes = len(fix_results.get("fixes_applied", [])) + len(
                 advanced_fixes.get("fixes_applied", [])
             )
             session_result["total_fixes"] = total_fixes
@@ -404,6 +403,7 @@ class EnhancedAutoFix:
             logger.error(f"Failed to commit fixes: {e}")
             return {"status": "failed", "error": str(e)}
 
+
 # Convenience functions for easy usage
 def run_auto_fix_session(
     create_branch: bool = True,
@@ -411,10 +411,11 @@ def run_auto_fix_session(
     auto_commit: bool = True,
 ) -> Dict[str, Any]:
     """Run a complete auto-fix session"""
-    autofix = EnhancedAutoFix(
-        return autofix.run_enhanced_autofix(
-            create_branch=create_branch, branch_name=branch_name, auto_commit=auto_commit
-)
+    autofix = EnhancedAutoFix()
+    return autofix.run_enhanced_autofix(
+        create_branch=create_branch, branch_name=branch_name, auto_commit=auto_commit
+    )
+
 
 def quick_fix() -> Dict[str, Any]:
     """Quick fix without branch creation"""

@@ -14,17 +14,15 @@ Vercel serverless function entry point for DevSkyy Platform
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
-    
     # Export the FastAPI app for Vercel
     handler = app
     
 except Exception as e:
     # Fallback minimal app if main app fails to load
-    
     fallback_app = FastAPI(title="DevSkyy Fallback")
     
-@fallback_app.get("/")
-async def fallback_root():
+    @fallback_app.get("/")
+    async def fallback_root():
         return {
             "name": "DevSkyy Platform",
             "status": "fallback_mode",

@@ -1,17 +1,3 @@
-from datetime import datetime
-from pathlib import Path
-import json
-import os
-import re
-
-from anthropic import AsyncAnthropic
-from collections import defaultdict
-from openai import AsyncOpenAI
-from typing import Any, Dict, List, Optional
-import astroid
-import logging
-import subprocess
-
 """
 Universal Self-Healing Code Agent
 Advanced autonomous code repair system with hyper self-learning capabilities
@@ -29,7 +15,22 @@ Features:
 - Comprehensive code quality improvement
 """
 
+import json
+import logging
+import os
+import re
+import subprocess
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import astroid
+from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
+
 logger = logging.getLogger(__name__)
+
 
 class UniversalSelfHealingAgent:
     """
@@ -407,7 +408,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return []
 
-async def _check_learned_patterns(
+    async def _check_learned_patterns(
         self, content: str, language: str
     ) -> List[Dict[str, Any]]:
         """
@@ -572,7 +573,7 @@ Provide the complete fixed code. Ensure:
             logger.error(f"❌ Fix generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, Any]:
+    async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, Any]:
         """
         Validate that healed code is correct and doesn't introduce new issues.
         """
@@ -709,13 +710,16 @@ async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, A
             by_language[language] += 1
         return dict(by_language)
 
+
 # Factory function
 def create_self_healing_agent() -> UniversalSelfHealingAgent:
     """Create Universal Self-Healing Agent instance."""
     return UniversalSelfHealingAgent()
 
+
 # Global instance
 self_healing_agent = create_self_healing_agent()
+
 
 # Convenience functions
 async def auto_heal_codebase(

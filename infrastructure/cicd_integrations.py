@@ -3,9 +3,9 @@ import json
 import time
 
 from fastapi import HTTPException, Request, status
-
-            import hmac
 from dataclasses import asdict, dataclass
+
+import hmac
 from enum import Enum
 from httpx import AsyncClient, RequestError, TimeoutException
 from typing import Any, Callable, Dict, List, Optional, Union
@@ -861,9 +861,9 @@ class CICDIntegrationManager:
                 for event in self.event_history[-10:]  # Last 10 events
             ],
             "event_counts": {
-                platform.value: len()
-                    [e for e in self.event_history if e.platform == platform]
-                )
+                platform.value: len([
+                    e for e in self.event_history if e.platform == platform
+                ])
                 for platform in CICDPlatform
             },
         }
@@ -901,9 +901,9 @@ class CICDIntegrationManager:
                 "status": overall_health,
                 "connections": connection_health,
                 "total_connections": len(self.connections),
-                "active_connections": len()
-                    [c for c in self.connections.values() if c.enabled]
-                ),
+                "active_connections": len([
+                    c for c in self.connections.values() if c.enabled
+                ]),
                 "webhook_handlers": len(self.webhook_handlers),
                 "recent_events": len(self.event_history),
                 "metrics": await self.get_metrics(),

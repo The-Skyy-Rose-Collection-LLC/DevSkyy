@@ -1,21 +1,19 @@
-from datetime import datetime
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-
-from sklearn.metrics import (
-import joblib
-import joblib
-from abc import ABC, abstractmethod
-from sklearn.model_selection import train_test_split
-from typing import Any, Dict, Optional, Tuple
-import logging
-import numpy as np
-
 """
 Base ML Engine
 Foundational machine learning capabilities for all agents
 """
 
+import logging
+from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Any, Dict, Optional, Tuple
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 logger = logging.getLogger(__name__)
+
 
 class BaseMLEngine(ABC):
     """
@@ -93,6 +91,7 @@ class BaseMLEngine(ABC):
             predictions, confidence = await self.predict(X_test)
 
             # Calculate metrics
+            from sklearn.metrics import (
                 accuracy_score,
                 f1_score,
                 precision_score,
@@ -146,6 +145,7 @@ class BaseMLEngine(ABC):
     async def save_model(self, path: str) -> bool:
         """Save model to disk"""
         try:
+            import joblib
 
             model_data = {
                 "model": self.model,
@@ -168,6 +168,7 @@ class BaseMLEngine(ABC):
     async def load_model(self, path: str) -> bool:
         """Load model from disk"""
         try:
+            import joblib
 
             model_data = joblib.load(path)
 

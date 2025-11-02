@@ -1,15 +1,16 @@
-from datetime import datetime
+import logging
 import os
 import re
-import time
-
-from typing import Any, Dict, List
-import autopep8
-import logging
 import shutil
+import time
+from datetime import datetime
+from typing import Any, Dict, List
+
+import autopep8
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -55,16 +56,16 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
         fix_results["fixes_applied"].extend(config_fixes)
 
         # Update count
-        fix_results["files_fixed"] = len()
+        fix_results["files_fixed"] = len(
             set(fix["file"] for fix in fix_results["fixes_applied"])
         )
-        fix_results["errors_fixed"] = sum()
+        fix_results["errors_fixed"] = sum(
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "error"
         )
-        fix_results["warnings_fixed"] = sum()
+        fix_results["warnings_fixed"] = sum(
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning"
         )
-        fix_results["optimizations_applied"] = sum()
+        fix_results["optimizations_applied"] = sum(
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization"
         )
 
@@ -81,6 +82,7 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
         }
+
 
 def _create_backup():
     """Create backup of current codebase."""
@@ -126,6 +128,7 @@ def _create_backup():
     except Exception as e:
         logger.warning(f"⚠️ Backup creation failed: {str(e)}")
 
+
 def _fix_python_files() -> List[Dict[str, Any]]:
     """Fix Python files with comprehensive improvements."""
     fixes = []
@@ -144,6 +147,7 @@ def _fix_python_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual Python file."""
@@ -232,8 +236,8 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
                             "line": "all",
                         }
                     )
-            except Exception as e:
-    logger.warning(f"Handled exception: {e}")
+            except Exception:
+                pass
 
         # Write changes if any fixes were made
         if modified_content != original_content:
@@ -251,6 +255,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         )
 
     return fixes
+
 
 def _fix_javascript_files() -> List[Dict[str, Any]]:
     """Fix JavaScript files."""
@@ -270,6 +275,7 @@ def _fix_javascript_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual JavaScript file."""
@@ -330,6 +336,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_html_files() -> List[Dict[str, Any]]:
     """Fix HTML files for SEO and accessibility."""
     fixes = []
@@ -344,6 +351,7 @@ def _fix_html_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual HTML file."""
@@ -383,22 +391,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
         img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
 
         def add_alt(match):
-            """
-            Add alt attribute to img tags for accessibility compliance.
-
-            Automatically adds alt attributes to HTML img tags that don't have them,
-            ensuring the content meets WCAG accessibility standards and improves SEO.
-
-            Args:
-                match (re.Match): Regex match object containing the img tag
-
-            Returns:
-                str: The img tag with alt attribute added if it was missing
-
-            Note:
-                This is part of the automated HTML fixing process that ensures
-                all images have proper accessibility attributes.
-            """
+            """TODO: Add docstring for add_alt."""
             img_tag = match.group(0)
             if "alt=" not in img_tag:
                 return img_tag[:-1] + ' alt="Image">'
@@ -433,6 +426,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
 
     return fixes
 
+
 def _fix_css_files() -> List[Dict[str, Any]]:
     """Fix CSS files for better performance."""
     fixes = []
@@ -447,6 +441,7 @@ def _fix_css_files() -> List[Dict[str, Any]]:
                 fixes.extend(file_fixes)
 
     return fixes
+
 
 def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
     """Fix individual CSS file."""
@@ -520,6 +515,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
         )
 
     return fixes
+
 
 def _fix_configuration_files() -> List[Dict[str, Any]]:
     """Fix configuration files."""

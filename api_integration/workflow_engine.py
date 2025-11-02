@@ -856,9 +856,9 @@ class WorkflowEngine:
                 "running_workflows": len(self.running_workflows),
                 "success_rate": success_rate,
                 "average_execution_time": self.metrics["average_execution_time"],
-                "fashion_workflows": len()
-                    [w for w in self.workflows.values() if w.fashion_context]
-                ),
+                "fashion_workflows": len([
+                    w for w in self.workflows.values() if w.fashion_context
+                ]),
                 "metrics": metrics,
             }
 

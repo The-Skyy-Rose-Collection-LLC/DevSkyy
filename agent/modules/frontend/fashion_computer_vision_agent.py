@@ -1,49 +1,9 @@
-from datetime import datetime
-from pathlib import Path
-import os
-
-from sklearn.cluster import KMeans
-from PIL import Image
-from diffusers import (
-    StableDiffusionXLPipeline,
-    StableVideoDiffusionPipeline,
-    AnimateDiffPipeline,
-    MotionAdapter,
-    EulerDiscreteScheduler
-)
-from openai import AsyncOpenAI
-from transformers import (
-    CLIPModel,
-    CLIPProcessor,
-    ViTImageProcessor,
-    ViTModel,
-    Blip2Processor,
-    Blip2ForConditionalGeneration
-)
-from typing import Any, Dict, List, Optional, Tuple, Union
-import anthropic
-import base64
-import cv2
-import io
-import logging
-import numpy as np
-import torch
-import moviepy.editor as mp
-from moviepy.video.io.VideoFileClip import VideoFileClip
-import tempfile
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
-
 """
 Fashion Computer Vision Agent
 Advanced AI vision system specialized in luxury fashion analysis and generation
 
 Features:
 - High-quality fashion image generation (Stable Diffusion SDXL)
-- Advanced video generation (Stable Video Diffusion + AnimateDiff)
-- Fashion runway video creation (3-5 second luxury videos at 1024x576+)
-- Product 360° rotation animations (24-step smooth rotations)
-- Video upscaling to maximum quality (up to 2048x1152)
 - Detailed fabric and texture analysis
 - Stitch pattern recognition
 - Garment cut and construction analysis
@@ -55,11 +15,27 @@ Features:
 - Product photography optimization
 - Virtual try-on preparation
 - Defect detection for quality control
-- Custom brand model training with LoRA fine-tuning
-- Automatic image preprocessing and captioning
 """
 
+import base64
+import io
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import anthropic
+import cv2
+import numpy as np
+import torch
+from diffusers import StableDiffusionXLPipeline
+from openai import AsyncOpenAI
+from PIL import Image
+from transformers import CLIPModel, CLIPProcessor, ViTImageProcessor, ViTModel
+
 logger = logging.getLogger(__name__)
+
 
 class FashionComputerVisionAgent:
     """
@@ -76,38 +52,13 @@ class FashionComputerVisionAgent:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"🖥️ Using device: {self.device}")
 
-        # Thread pool for CPU-intensive operations
-        self.executor = ThreadPoolExecutor(max_workers=4)
-
-        # Model loading flags to manage GPU memory
-        self._models_loaded = {
-            "clip": False,
-            "vit": False,
-            "sdxl": False,
-            "svd": False,
-            "animatediff": False,
-            "blip2": False
-        }
-
-        # Storage paths
-        self.video_storage = Path("generated_videos")
-        self.video_storage.mkdir(exist_ok=True)
-        self.model_storage = Path("custom_models")
-        self.model_storage.mkdir(exist_ok=True)
-
-        # Load core models
-        self._load_core_models()
-
-        logger.info("🎨 Fashion Computer Vision Agent initialized with video generation capabilities")
-
-    def _load_core_models(self):
-        """Load core models for fashion analysis and generation."""
         # Load CLIP for fashion understanding
         try:
             self.clip_model = CLIPModel.from_pretrained("openai/clip-vit-large-patch14")
-            self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
+            self.clip_processor = CLIPProcessor.from_pretrained(
+                "openai/clip-vit-large-patch14"
+            )
             self.clip_model.to(self.device)
-            self._models_loaded["clip"] = True
             logger.info("✅ CLIP model loaded for fashion analysis")
         except Exception as e:
             logger.warning(f"⚠️ CLIP model not loaded: {e}")
@@ -115,34 +66,17 @@ class FashionComputerVisionAgent:
 
         # Load ViT for detailed image features
         try:
-            self.vit_processor = ViTImageProcessor.from_pretrained("google/vit-large-patch16-224")
+            self.vit_processor = ViTImageProcessor.from_pretrained(
+                "google/vit-large-patch16-224"
+            )
             self.vit_model = ViTModel.from_pretrained("google/vit-large-patch16-224")
             self.vit_model.to(self.device)
-            self._models_loaded["vit"] = True
             logger.info("✅ ViT model loaded for detailed analysis")
         except Exception as e:
             logger.warning(f"⚠️ ViT model not loaded: {e}")
             self.vit_model = None
 
-        # Load BLIP-2 for image captioning
-        try:
-            self.blip2_processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
-            self.blip2_model = Blip2ForConditionalGeneration.from_pretrained(
-                "Salesforce/blip2-opt-2.7b",
-                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
-            )
-            self.blip2_model.to(self.device)
-            self._models_loaded["blip2"] = True
-            logger.info("✅ BLIP-2 model loaded for image captioning")
-        except Exception as e:
-            logger.warning(f"⚠️ BLIP-2 model not loaded: {e}")
-            self.blip2_model = None
-
-    async def _load_image_generation_model(self):
-        """Load SDXL model for image generation."""
-        if self._models_loaded["sdxl"]:
-            return
-
+        # Stable Diffusion XL for high-quality generation
         try:
             self.sdxl_pipeline = StableDiffusionXLPipeline.from_pretrained(
                 "stabilityai/stable-diffusion-xl-base-1.0",
@@ -150,68 +84,10 @@ class FashionComputerVisionAgent:
                 use_safetensors=True,
             )
             self.sdxl_pipeline.to(self.device)
-            self._models_loaded["sdxl"] = True
             logger.info("✅ Stable Diffusion XL loaded for image generation")
         except Exception as e:
             logger.warning(f"⚠️ SDXL not loaded: {e}")
             self.sdxl_pipeline = None
-
-    async def _load_video_generation_models(self):
-        """Load video generation models (SVD and AnimateDiff)."""
-        # Load Stable Video Diffusion
-        if not self._models_loaded["svd"]:
-            try:
-                self.svd_pipeline = StableVideoDiffusionPipeline.from_pretrained(
-                    "stabilityai/stable-video-diffusion-img2vid-xt",
-                    torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
-                    variant="fp16" if self.device == "cuda" else None
-                )
-                self.svd_pipeline.to(self.device)
-                self._models_loaded["svd"] = True
-                logger.info("✅ Stable Video Diffusion loaded for video generation")
-            except Exception as e:
-                logger.warning(f"⚠️ SVD not loaded: {e}")
-                self.svd_pipeline = None
-
-        # Load AnimateDiff
-        if not self._models_loaded["animatediff"]:
-            try:
-                adapter = MotionAdapter.from_pretrained("guoyww/animatediff-motion-adapter-v1-5-2")
-                self.animatediff_pipeline = AnimateDiffPipeline.from_pretrained(
-                    "runwayml/stable-diffusion-v1-5",
-                    motion_adapter=adapter,
-                    torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
-                )
-                self.animatediff_pipeline.scheduler = EulerDiscreteScheduler.from_config(
-                    self.animatediff_pipeline.scheduler.config
-                )
-                self.animatediff_pipeline.to(self.device)
-                self._models_loaded["animatediff"] = True
-                logger.info("✅ AnimateDiff loaded for animation generation")
-            except Exception as e:
-                logger.warning(f"⚠️ AnimateDiff not loaded: {e}")
-                self.animatediff_pipeline = None
-
-    def _unload_model(self, model_name: str):
-        """Unload a specific model to free GPU memory."""
-        if model_name == "sdxl" and hasattr(self, 'sdxl_pipeline') and self.sdxl_pipeline:
-            del self.sdxl_pipeline
-            self.sdxl_pipeline = None
-            self._models_loaded["sdxl"] = False
-        elif model_name == "svd" and hasattr(self, 'svd_pipeline') and self.svd_pipeline:
-            del self.svd_pipeline
-            self.svd_pipeline = None
-            self._models_loaded["svd"] = False
-        elif model_name == "animatediff" and hasattr(self, 'animatediff_pipeline') and self.animatediff_pipeline:
-            del self.animatediff_pipeline
-            self.animatediff_pipeline = None
-            self._models_loaded["animatediff"] = False
-
-        # Clear GPU cache
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-
-        logger.info(f"🗑️ {model_name} model unloaded to free memory")
 
         # Fashion-specific knowledge base
         self.fabric_types = {
@@ -780,6 +656,7 @@ class FashionComputerVisionAgent:
             pixels = img_array.reshape(-1, 3)
 
             # Use k-means clustering to find dominant colors
+            from sklearn.cluster import KMeans
 
             n_colors = 5
             kmeans = KMeans(n_clusters=n_colors, random_state=42, n_init=10)
@@ -867,7 +744,7 @@ Provide detailed, expert fashion analysis.""",
             logger.error(f"❌ AI vision analysis failed: {e}")
             return {"error": str(e)}
 
-def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate comprehensive overall assessment.
         """
@@ -978,352 +855,23 @@ def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any
             logger.error(f"❌ Image generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def generate_fashion_runway_video(
-        self,
-        prompt: str,
-        duration: int = 4,
-        fps: int = 8,
-        width: int = 1024,
-        height: int = 576,
-        style: str = "luxury fashion runway",
-        upscale: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Generate luxury fashion runway videos using Stable Video Diffusion.
-
-        Args:
-            prompt: Description of the fashion scene
-            duration: Video duration in seconds (3-5 recommended)
-            fps: Frames per second (8-24)
-            width: Video width (minimum 1024)
-            height: Video height (minimum 576)
-            style: Video style description
-            upscale: Whether to upscale to maximum quality
-
-        Returns:
-            Dict with video file path and metadata
-        """
-        try:
-            logger.info(f"🎬 Generating fashion runway video: {prompt}")
-
-            # Load video generation models
-            await self._load_video_generation_models()
-
-            if not hasattr(self, 'svd_pipeline') or not self.svd_pipeline:
-                return {
-                    "error": "Video generation not available - SVD not loaded",
-                    "status": "failed"
-                }
-
-            # First generate a high-quality image as the starting frame
-            await self._load_image_generation_model()
-
-            enhanced_prompt = f"{prompt}, {style}, professional runway photography, high fashion, cinematic lighting, 8k uhd, luxury aesthetic, model walking"
-            negative_prompt = "low quality, blurry, distorted, amateur, bad anatomy, watermark, text, logo, static, still"
-
-            # Generate initial image
-            if self.sdxl_pipeline:
-                initial_image = self.sdxl_pipeline(
-                    prompt=enhanced_prompt,
-                    negative_prompt=negative_prompt,
-                    width=width,
-                    height=height,
-                    num_inference_steps=50,
-                    guidance_scale=7.5,
-                ).images[0]
-            else:
-                return {"error": "Image generation required for video creation", "status": "failed"}
-
-            # Generate video from image
-            num_frames = duration * fps
-            video_frames = self.svd_pipeline(
-                initial_image,
-                decode_chunk_size=8,
-                num_frames=num_frames,
-                motion_bucket_id=127,  # Higher motion
-                fps=fps,
-                noise_aug_strength=0.1
-            ).frames[0]
-
-            # Save video
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"runway_video_{timestamp}.mp4"
-            output_path = self.video_storage / filename
-
-            # Convert frames to video using moviepy
-            await self._frames_to_video(
-                video_frames,
-                output_path,
-                fps,
-                upscale_target=(2048, 1152) if upscale else None
-            )
-
-            # Unload video model to free memory
-            self._unload_model("svd")
-
-            return {
-                "success": True,
-                "video_path": str(output_path),
-                "prompt_used": enhanced_prompt,
-                "duration": duration,
-                "fps": fps,
-                "dimensions": {"width": width, "height": height},
-                "model": "stable-video-diffusion",
-                "timestamp": datetime.now().isoformat(),
-            }
-
-        except Exception as e:
-            logger.error(f"❌ Runway video generation failed: {e}")
-            return {"error": str(e), "status": "failed"}
-
-    async def generate_product_360_video(
-        self,
-        product_image_path: Union[str, Path],
-        rotation_steps: int = 24,
-        duration: int = 3,
-        upscale: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Generate 360° product rotation video using AnimateDiff.
-
-        Args:
-            product_image_path: Path to product image
-            rotation_steps: Number of rotation steps (24 = 15° per step)
-            duration: Video duration in seconds
-            upscale: Whether to upscale to maximum quality
-
-        Returns:
-            Dict with video file path and metadata
-        """
-        try:
-            logger.info(f"🔄 Generating 360° product video: {product_image_path}")
-
-            # Load video generation models
-            await self._load_video_generation_models()
-
-            if not hasattr(self, 'animatediff_pipeline') or not self.animatediff_pipeline:
-                return {
-                    "error": "Product animation not available - AnimateDiff not loaded",
-                    "status": "failed"
-                }
-
-            # Load and preprocess product image
-            product_image = Image.open(product_image_path).convert("RGB")
-
-            # Generate rotation prompt
-            rotation_prompt = f"luxury fashion product rotating 360 degrees, smooth rotation, professional product photography, studio lighting, white background, high quality, detailed texture"
-            negative_prompt = "blurry, distorted, multiple products, hands, people, low quality, amateur"
-
-            # Generate rotation video
-            video_frames = self.animatediff_pipeline(
-                prompt=rotation_prompt,
-                negative_prompt=negative_prompt,
-                num_frames=rotation_steps,
-                guidance_scale=7.5,
-                num_inference_steps=25,
-                generator=torch.Generator(device=self.device).manual_seed(42)
-            ).frames[0]
-
-            # Save video
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            filename = f"product_360_{timestamp}.mp4"
-            output_path = self.video_storage / filename
-
-            fps = rotation_steps // duration
-
-            # Convert frames to video
-            await self._frames_to_video(
-                video_frames,
-                output_path,
-                fps,
-                upscale_target=(2048, 2048) if upscale else None
-            )
-
-            # Unload animation model to free memory
-            self._unload_model("animatediff")
-
-            return {
-                "success": True,
-                "video_path": str(output_path),
-                "product_image": str(product_image_path),
-                "rotation_steps": rotation_steps,
-                "duration": duration,
-                "fps": fps,
-                "model": "animatediff",
-                "timestamp": datetime.now().isoformat(),
-            }
-
-        except Exception as e:
-            logger.error(f"❌ Product 360° video generation failed: {e}")
-            return {"error": str(e), "status": "failed"}
-
-    async def _frames_to_video(
-        self,
-        frames: List[Image.Image],
-        output_path: Path,
-        fps: int,
-        upscale_target: Optional[Tuple[int, int]] = None
-    ):
-        """
-        Convert frames to MP4 video with H.264 encoding.
-
-        Args:
-            frames: List of PIL Images
-            output_path: Output video file path
-            fps: Frames per second
-            upscale_target: Target resolution for upscaling (width, height)
-        """
-        def process_frames():
-            # Convert PIL images to numpy arrays
-            frame_arrays = []
-            for frame in frames:
-                if upscale_target:
-                    # Upscale frame using high-quality resampling
-                    frame = frame.resize(upscale_target, Image.Resampling.LANCZOS)
-
-                frame_array = np.array(frame)
-                frame_arrays.append(frame_array)
-
-            # Create video clip
-            clip = mp.ImageSequenceClip(frame_arrays, fps=fps)
-
-            # Write video with H.264 encoding
-            clip.write_videofile(
-                str(output_path),
-                codec='libx264',
-                audio=False,
-                verbose=False,
-                logger=None,
-                temp_audiofile_path=None,
-                remove_temp=True
-            )
-
-            clip.close()
-
-        # Run in thread pool to avoid blocking
-        await asyncio.get_event_loop().run_in_executor(
-            self.executor, process_frames
-        )
-
-        logger.info(f"✅ Video saved: {output_path}")
-
-    async def generate_image_caption(self, image: Union[str, Path, Image.Image]) -> str:
-        """
-        Generate automatic caption for image using BLIP-2.
-
-        Args:
-            image: Image path or PIL Image
-
-        Returns:
-            Generated caption string
-        """
-        try:
-            if not hasattr(self, 'blip2_model') or not self.blip2_model:
-                return "luxury fashion item"
-
-            # Load image
-            if isinstance(image, (str, Path)):
-                image = Image.open(image).convert("RGB")
-
-            # Generate caption
-            inputs = self.blip2_processor(image, return_tensors="pt").to(self.device)
-
-            with torch.no_grad():
-                generated_ids = self.blip2_model.generate(**inputs, max_length=50)
-                caption = self.blip2_processor.batch_decode(
-                    generated_ids, skip_special_tokens=True
-                )[0].strip()
-
-            return caption
-
-        except Exception as e:
-            logger.warning(f"Caption generation failed: {e}")
-            return "luxury fashion item"
-
-    async def upscale_video(
-        self,
-        video_path: Union[str, Path],
-        target_resolution: Tuple[int, int] = (2048, 1152)
-    ) -> Dict[str, Any]:
-        """
-        Upscale video to higher resolution using advanced interpolation.
-
-        Args:
-            video_path: Path to input video
-            target_resolution: Target (width, height)
-
-        Returns:
-            Dict with upscaled video path and metadata
-        """
-        try:
-            logger.info(f"⬆️ Upscaling video to {target_resolution}")
-
-            def upscale_process():
-                # Load video
-                clip = VideoFileClip(str(video_path))
-
-                # Upscale using high-quality resampling
-                upscaled_clip = clip.resize(target_resolution)
-
-                # Save upscaled video
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                upscaled_path = self.video_storage / f"upscaled_{timestamp}.mp4"
-
-                upscaled_clip.write_videofile(
-                    str(upscaled_path),
-                    codec='libx264',
-                    audio=False,
-                    verbose=False,
-                    logger=None
-                )
-
-                clip.close()
-                upscaled_clip.close()
-
-                return upscaled_path
-
-            # Run in thread pool
-            upscaled_path = await asyncio.get_event_loop().run_in_executor(
-                self.executor, upscale_process
-            )
-
-            return {
-                "success": True,
-                "upscaled_video_path": str(upscaled_path),
-                "original_video_path": str(video_path),
-                "target_resolution": target_resolution,
-                "timestamp": datetime.now().isoformat()
-            }
-
-        except Exception as e:
-            logger.error(f"❌ Video upscaling failed: {e}")
-            return {"error": str(e), "status": "failed"}
 
 # Factory function
 def create_fashion_vision_agent() -> FashionComputerVisionAgent:
     """Create Fashion Computer Vision Agent instance."""
     return FashionComputerVisionAgent()
 
+
 # Global instance
 fashion_vision_agent = create_fashion_vision_agent()
+
 
 # Convenience functions
 async def analyze_garment(image_path: Union[str, Path]) -> Dict[str, Any]:
     """Analyze fashion garment from image."""
     return await fashion_vision_agent.analyze_fashion_image(image_path)
 
+
 async def generate_fashion_photo(prompt: str, style: str = "luxury") -> Dict[str, Any]:
     """Generate fashion photography."""
     return await fashion_vision_agent.generate_fashion_image(prompt, style)
-
-async def generate_runway_video(prompt: str, duration: int = 4, fps: int = 8) -> Dict[str, Any]:
-    """Generate luxury fashion runway video."""
-    return await fashion_vision_agent.generate_fashion_runway_video(prompt, duration, fps)
-
-async def generate_product_rotation(product_image_path: Union[str, Path], rotation_steps: int = 24) -> Dict[str, Any]:
-    """Generate 360° product rotation video."""
-    return await fashion_vision_agent.generate_product_360_video(product_image_path, rotation_steps)
-
-async def caption_image(image_path: Union[str, Path]) -> str:
-    """Generate automatic caption for fashion image."""
-    return await fashion_vision_agent.generate_image_caption(image_path)

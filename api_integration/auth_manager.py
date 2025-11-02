@@ -620,13 +620,11 @@ class RateLimitManager:
             "api_id": api_id,
             "can_make_request": can_request,
             "rate_limit_info": rate_info,
-            "total_requests_today": len()
-                [
+            "total_requests_today": len([
                     t
                     for t in self.request_history.get(api_id, [])
                     if t > time.time() - 86400
-                ]
-            ),
+                ]),
         }
 
     async def get_all_rate_limit_status(self) -> Dict[str, Dict[str, Any]]:

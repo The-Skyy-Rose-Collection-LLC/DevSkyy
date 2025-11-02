@@ -386,7 +386,7 @@ Text Domain: {config.get('name', 'custom-theme').lower().replace(' ', '-')}
 /* Theme styles will be loaded from assets/css/main.css */
 """
     
-def _generate_functions_php(self, config: Dict[str, Any]) -> str:
+    def _generate_functions_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress functions.php."""
         theme_name = config.get('name', 'custom-theme').lower().replace(' ', '_')
         
@@ -436,7 +436,7 @@ function {theme_name}_customize_register($wp_customize) {{
 add_action('customize_register', '{theme_name}_customize_register');
 """
     
-def _generate_index_php(self, config: Dict[str, Any]) -> str:
+    def _generate_index_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress index.php."""
         return """<?php get_header(); ?>
 
@@ -463,7 +463,7 @@ def _generate_index_php(self, config: Dict[str, Any]) -> str:
 <?php get_footer(); ?>
 """
     
-def _generate_header_php(self, config: Dict[str, Any]) -> str:
+    def _generate_header_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress header.php."""
         return """<!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -490,7 +490,7 @@ def _generate_header_php(self, config: Dict[str, Any]) -> str:
     </header>
 """
     
-def _generate_footer_php(self, config: Dict[str, Any]) -> str:
+    def _generate_footer_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress footer.php."""
         return """    <footer id="colophon" class="site-footer">
         <div class="site-info">
@@ -504,7 +504,7 @@ def _generate_footer_php(self, config: Dict[str, Any]) -> str:
 </html>
 """
     
-def _generate_single_php(self, config: Dict[str, Any]) -> str:
+    def _generate_single_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress single.php."""
         return """<?php get_header(); ?>
 
@@ -536,7 +536,7 @@ def _generate_single_php(self, config: Dict[str, Any]) -> str:
 <?php get_footer(); ?>
 """
     
-def _generate_page_php(self, config: Dict[str, Any]) -> str:
+    def _generate_page_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress page.php."""
         return """<?php get_header(); ?>
 
@@ -557,7 +557,7 @@ def _generate_page_php(self, config: Dict[str, Any]) -> str:
 <?php get_footer(); ?>
 """
     
-def _generate_archive_php(self, config: Dict[str, Any]) -> str:
+    def _generate_archive_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress archive.php."""
         return """<?php get_header(); ?>
 
@@ -589,7 +589,7 @@ def _generate_archive_php(self, config: Dict[str, Any]) -> str:
 <?php get_footer(); ?>
 """
     
-def _generate_404_php(self, config: Dict[str, Any]) -> str:
+    def _generate_404_php(self, config: Dict[str, Any]) -> str:
         """Generate WordPress 404.php."""
         return """<?php get_header(); ?>
 
@@ -609,7 +609,7 @@ def _generate_404_php(self, config: Dict[str, Any]) -> str:
 <?php get_footer(); ?>
 """
     
-def _generate_main_css(self, config: Dict[str, Any]) -> str:
+    def _generate_main_css(self, config: Dict[str, Any]) -> str:
         """Generate main CSS file."""
         colors = config.get('colors', {})
         typography = config.get('typography', {})
@@ -685,7 +685,7 @@ h1, h2, h3, h4, h5, h6 {{
 }}
 """
     
-def _generate_main_js(self, config: Dict[str, Any]) -> str:
+    def _generate_main_js(self, config: Dict[str, Any]) -> str:
         """Generate main JavaScript file."""
         return """/* Main Theme JavaScript */
 
@@ -721,7 +721,7 @@ def _generate_main_js(self, config: Dict[str, Any]) -> str:
 })(jQuery);
 """
     
-def _generate_product_widget(self, config: Dict[str, Any]) -> str:
+    def _generate_product_widget(self, config: Dict[str, Any]) -> str:
         """Generate custom Elementor product widget."""
         return """<?php
 /**
@@ -781,7 +781,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
     }
 }
 """
-    
+
     async def _validate_theme(self, theme_path: str, result: ThemeBuildResult) -> bool:
         """Validate generated theme."""
         try:

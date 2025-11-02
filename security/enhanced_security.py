@@ -567,9 +567,9 @@ class EnhancedSecurityManager:
             **self.metrics,
             "blocked_ips_count": len(self.blocked_ips),
             "recent_events_24h": len(recent_events),
-            "active_policies": len()
-                [p for p in self.security_policies.values() if p.enabled]
-            ),
+            "active_policies": len([
+                p for p in self.security_policies.values() if p.enabled
+            ]),
             "threat_level_distribution": {
                 level.value: len([e for e in recent_events if e.threat_level == level])
                 for level in ThreatLevel

@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta
-
-import asyncio
-import logging
-
 """
 Automated Model Retraining System
 Continuous learning with scheduled retraining
 """
 
+import asyncio
+import logging
+from datetime import datetime, timedelta
+from typing import (  # noqa: F401 - Reserved for Phase 3 ML enhancements
     Any,
     Callable,
     Dict,
@@ -15,6 +14,7 @@ Continuous learning with scheduled retraining
 )
 
 logger = logging.getLogger(__name__)
+
 
 class AutoRetrainer:
     """Automated model retraining scheduler"""
@@ -69,11 +69,12 @@ class AutoRetrainer:
                     except Exception as e:
                         logger.error(f"❌ Retrain failed for {model_name}: {e}")
 
-            await asyncio.sleep(3600)  # TODO: Move to config  # Check every hour
+            await asyncio.sleep(3600)  # Check every hour
 
     def stop(self):
         """Stop the scheduler"""
         self.running = False
         logger.info("🛑 Auto-retraining scheduler stopped")
+
 
 auto_retrainer = AutoRetrainer()

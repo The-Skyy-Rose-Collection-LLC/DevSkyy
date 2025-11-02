@@ -77,12 +77,12 @@ class PostgreSQLManager:
     def __init__(self, config: DatabaseConfig):
         self.config = config
         self.pool = None
-        self.metrics = ConnectionMetrics(
-            self.is_connected = False
-
+        self.metrics = ConnectionMetrics()
+        self.is_connected = False
+        
         logger.info(
             f"PostgreSQL manager initialized - Host: {config.host}:{config.port}"
-)
+        )
 
     async def connect(self) -> bool:
         """Establish connection pool"""
@@ -449,12 +449,12 @@ class ClickHouseManager:
     def __init__(self, config: DatabaseConfig):
         self.config = config
         self.client = None
-        self.metrics = ConnectionMetrics(
-            self.is_connected = False
-
+        self.metrics = ConnectionMetrics()
+        self.is_connected = False
+        
         logger.info(
             f"ClickHouse manager initialized - Host: {config.host}:{config.port}"
-)
+        )
 
     async def connect(self) -> bool:
         """Establish ClickHouse connection"""
@@ -740,9 +740,9 @@ class DatabaseEcosystem:
             "overall_status": "healthy" if overall_healthy else "degraded",
             "databases": health_status,
             "total_databases": len(self.databases),
-            "healthy_databases": sum()
+            "healthy_databases": sum([
                 1 for db in health_status.values() if db.get("status") == "healthy"
-            ),
+            ]),
         }
 
     async def close_all(self):

@@ -1,27 +1,25 @@
-from datetime import datetime, timedelta
-from fastapi.responses import RedirectResponse, HTMLResponse
 import json
-import os
-
-from fastapi import APIRouter, Request, Response, HTTPException, status, Depends, Query
-from pydantic import BaseModel
-
-from authlib.common.security import generate_token
-from security.auth0_integration import (
-from typing import Optional, Dict, Any
 import logging
+import os
+from authlib.common.security import generate_token
+from datetime import datetime, timedelta
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi.responses import HTMLResponse, RedirectResponse
+from pydantic import BaseModel
+from security.auth0_integration import (
+    auth0_oauth_client,
+    create_devskyy_jwt_token,
+    create_devskyy_refresh_token,
+    get_user_info_from_token,
+    log_auth_event,
+    verify_devskyy_jwt_token,
+)
+from typing import Any, Dict, Optional
 
 """
 Auth0 Authentication Endpoints for DevSkyy FastAPI Platform
 Converted from Flask to FastAPI with JWT token integration
 """
-
-    auth0_oauth_client,
-    create_devskyy_jwt_token,
-    create_devskyy_refresh_token,
-    verify_devskyy_jwt_token,
-    log_auth_event
-)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -314,7 +312,7 @@ async def auth0_demo_home(request: Request):
                 "userinfo": payload  # For compatibility with original template
             }
         except Exception as e:
-    logger.warning(f"Handled exception: {e}")
+            logger.warning(f"Handled exception: {e}")
     
     # HTML template adapted from Flask version
     html_content = f"""

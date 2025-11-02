@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta
+import logging
 import os
-import requests
-
+from datetime import datetime, timedelta
 from typing import Any, Dict, List
 from urllib.parse import urlencode
-import httpx
-import logging
+
+import requests
 
 logger = logging.getLogger(__name__)
+
 
 class WordPressIntegrationService:
     """WordPress REST API integration service for luxury brand agent management."""
@@ -55,7 +55,7 @@ class WordPressIntegrationService:
                 "code": authorization_code,
             }
 
-            response = httpx.post(self.token_url, data=token_data)
+            response = requests.post(self.token_url, data=token_data)
             response.raise_for_status()
 
             token_info = response.json()
@@ -86,7 +86,7 @@ class WordPressIntegrationService:
         """Get WordPress site information."""
         try:
             headers = {"Authorization": f"Bearer {self.access_token}"}
-            response = httpx.get(f"{self.api_base}/sites/me", headers=headers)
+            response = requests.get(f"{self.api_base}/sites/me", headers=headers)
             response.raise_for_status()
 
             site_data = response.json()
@@ -173,7 +173,7 @@ class WordPressIntegrationService:
                 "fields": "ID,title,content,excerpt,date,modified,status,format,featured_image,categories,tags",
             }
 
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params,
@@ -199,7 +199,7 @@ class WordPressIntegrationService:
                 "fields": "ID,title,content,excerpt,date,modified,status,featured_image,parent",
             }
 
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params,
@@ -220,7 +220,7 @@ class WordPressIntegrationService:
 
             headers = {"Authorization": f"Bearer {self.access_token}"}
 
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/themes/mine", headers=headers
             )
             response.raise_for_status()
@@ -228,7 +228,7 @@ class WordPressIntegrationService:
             theme_data = response.json()
 
             # Also get site customization options
-            customizer_response = httpx.get(
+            customizer_response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/customizer", headers=headers
             )
 
@@ -262,7 +262,7 @@ class WordPressIntegrationService:
                 "Content-Type": "application/json",
             }
 
-            response = httpx.post(
+            response = requests.post(
                 f"{self.api_base}/sites/{self.site_id}/posts/{post_id}",
                 headers=headers,
                 json=content_updates,
@@ -321,7 +321,7 @@ class WordPressIntegrationService:
                 "Content-Type": "application/json",
             }
 
-            response = httpx.post(
+            response = requests.post(
                 f"{self.api_base}/sites/{self.site_id}/posts/new",
                 headers=headers,
                 json=page_data,
@@ -355,7 +355,7 @@ class WordPressIntegrationService:
             headers = {"Authorization": f"Bearer {self.access_token}"}
 
             # Get site stats
-            stats_response = httpx.get(
+            stats_response = requests.get(
                 f"{self.api_base}/sites/{self.site_id}/stats",
                 headers=headers,
                 params={"period": "day", "date": datetime.now().strftime("%Y-%m-%d")},
@@ -407,7 +407,7 @@ class WordPressIntegrationService:
                 "refresh_token": self.refresh_token,
             }
 
-            response = httpx.post(self.token_url, data=refresh_data)
+            response = requests.post(self.token_url, data=refresh_data)
             response.raise_for_status()
 
             token_info = response.json()
@@ -491,7 +491,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
 
         return content
 
-async def _analyze_luxury_opportunities(
+    async def _analyze_luxury_opportunities(
         self, theme_data: Dict[str, Any]
     ) -> List[str]:
         """Analyze opportunities for luxury brand improvements."""
@@ -612,7 +612,9 @@ async def _analyze_luxury_opportunities(
             "Mobile-first design approach",
         ]
 
+
 # Factory function
+
 
 def create_wordpress_integration_service() -> WordPressIntegrationService:
     """Create WordPress integration service instance."""

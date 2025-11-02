@@ -1,26 +1,9 @@
-from datetime import datetime, timedelta
-from web3.middleware import geth_poa_middleware
-import json
-import os
-
-from typing import Any, Dict, List
-from uuid import uuid4
-from web3 import Web3
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import asyncio
-import hashlib
-import logging
-
 """
 Blockchain & NFT Integration for Luxury Digital Assets
 Enables digital ownership, authenticity verification, and exclusive NFT collections
 
 Features:
-    - NFT minting for luxury fashion items
+- NFT minting for luxury fashion items
 - Digital certificates of authenticity
 - Blockchain-based ownership verification
 - Smart contract management
@@ -32,7 +15,20 @@ Features:
 - Secondary market integration
 """
 
+import asyncio
+import hashlib
+import json
+import logging
+import os
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
+from uuid import uuid4
+
+from web3 import Web3
+from web3.middleware import geth_poa_middleware
+
 logger = logging.getLogger(__name__)
+
 
 class BlockchainNFTLuxuryAssets:
     """
@@ -128,8 +124,8 @@ class BlockchainNFTLuxuryAssets:
                     "name": "Local Development",
                     "explorer": None,
                 }
-        except Exception as e:
-    logger.warning(f"Handled exception: {e}")
+        except Exception:
+            pass
 
         return networks
 
@@ -138,6 +134,11 @@ class BlockchainNFTLuxuryAssets:
         return """
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract SkyyRoseLuxuryNFT is ERC721, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
@@ -214,9 +215,9 @@ contract SkyyRoseLuxuryNFT is ERC721, ERC721URIStorage, Ownable {
         return vipHolders[addr];
     }
 }
-"""
+        """
 
-def _load_authenticity_contract(self) -> str:
+    def _load_authenticity_contract(self) -> str:
         """Load Solidity contract for authenticity verification."""
         return """
 // SPDX-License-Identifier: MIT
@@ -286,13 +287,15 @@ contract SkyyRoseAuthenticity {
         return certificates[itemId];
     }
 }
-"""
+        """
 
-def _load_membership_contract(self) -> str:
+    def _load_membership_contract(self) -> str:
         """Load Solidity contract for NFT-based membership."""
         return """
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract SkyyRoseMembership {
     IERC721 public nftContract;
@@ -360,9 +363,9 @@ contract SkyyRoseMembership {
         return tierBenefits[memberships[member].tier];
     }
 }
-"""
+        """
 
-def _get_erc721_metadata(self) -> Dict[str, Any]:
+    def _get_erc721_metadata(self) -> Dict[str, Any]:
         """Get ERC721 metadata standard."""
         return {
             "name": "",
@@ -922,10 +925,12 @@ def _get_erc721_metadata(self) -> Dict[str, Any]:
             logger.error(f"Royalty setup failed: {e}")
             return {"error": str(e), "status": "failed"}
 
+
 # Factory function
 def create_blockchain_nft_system() -> BlockchainNFTLuxuryAssets:
     """Create Blockchain NFT Luxury Assets system."""
     return BlockchainNFTLuxuryAssets()
+
 
 # Example usage
 async def main():
@@ -933,7 +938,7 @@ async def main():
     blockchain = create_blockchain_nft_system()
 
     # Mint luxury fashion NFT
-    logger.info("\n🎨 Minting Luxury NFT...")
+    print("\n🎨 Minting Luxury NFT...")
     nft_result = await blockchain.mint_luxury_nft(
         collection_type="genesis",
         item_data={
@@ -953,12 +958,12 @@ async def main():
     )
 
     if nft_result["status"] == "success":
-        logger.info(f"✅ NFT Minted: Token #{nft_result['nft']['token_id']}")
-        logger.info(f"📍 Contract: {nft_result['nft']['contract_address']}")
-        logger.info(f"🎁 Benefits: {', '.join(nft_result['nft']['benefits'])}")
+        print(f"✅ NFT Minted: Token #{nft_result['nft']['token_id']}")
+        print(f"📍 Contract: {nft_result['nft']['contract_address']}")
+        print(f"🎁 Benefits: {', '.join(nft_result['nft']['benefits'])}")
 
     # Create authenticity certificate
-    logger.info("\n📜 Creating Authenticity Certificate...")
+    print("\n📜 Creating Authenticity Certificate...")
     cert_result = await blockchain.create_authenticity_certificate(
         item_id="SRFW2024-001",
         item_details={
@@ -971,12 +976,12 @@ async def main():
     )
 
     if cert_result["status"] == "success":
-        logger.info("✅ Certificate Created")
-        logger.info(f"🔐 Fingerprint: {cert_result['certificate']['fingerprint'][:16]}...")
-        logger.info(f"🔗 Verify at: {cert_result['certificate']['verification_url']}")
+        print("✅ Certificate Created")
+        print(f"🔐 Fingerprint: {cert_result['certificate']['fingerprint'][:16]}...")
+        print(f"🔗 Verify at: {cert_result['certificate']['verification_url']}")
 
     # Create membership NFT
-    logger.info("\n👑 Creating Membership NFT...")
+    print("\n👑 Creating Membership NFT...")
     membership_result = await blockchain.create_membership_nft(
         member_data={
             "name": "VIP Customer",
@@ -987,12 +992,12 @@ async def main():
     )
 
     if membership_result["status"] == "success":
-        logger.info(f"✅ {membership_result['membership']['tier_name']} Membership Created")
-        logger.info(f"🎁 Benefits: {', '.join(membership_result['membership']['benefits'])}")
-        logger.info(f"💎 Points Balance: {membership_result['membership']['points_balance']}")
+        print(f"✅ {membership_result['membership']['tier_name']} Membership Created")
+        print(f"🎁 Benefits: {', '.join(membership_result['membership']['benefits'])}")
+        print(f"💎 Points Balance: {membership_result['membership']['points_balance']}")
 
     # Create digital wearable
-    logger.info("\n🎮 Creating Digital Wearable...")
+    print("\n🎮 Creating Digital Wearable...")
     wearable_result = await blockchain.create_digital_wearable(
         item_data={
             "name": "Skyy Rose Metaverse Dress",
@@ -1006,21 +1011,22 @@ async def main():
     )
 
     if wearable_result["status"] == "success":
-        logger.info(f"✅ Digital Wearable Created: {wearable_result['wearable']['name']}")
-        logger.info(f"🎮 Available on: {', '.join(wearable_result['platforms'])}")
-        logger.info(f"💎 Rarity: {wearable_result['wearable']['rarity']}")
+        print(f"✅ Digital Wearable Created: {wearable_result['wearable']['name']}")
+        print(f"🎮 Available on: {', '.join(wearable_result['platforms'])}")
+        print(f"💎 Rarity: {wearable_result['wearable']['rarity']}")
 
     # Check NFT holder benefits
-    logger.info("\n🎁 Checking NFT Holder Benefits...")
+    print("\n🎁 Checking NFT Holder Benefits...")
     benefits = await blockchain.get_nft_benefits(
         "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7"
     )
 
     if benefits["status"] == "success":
-        logger.info(f"✅ VIP Status: {benefits['vip_status']}")
-        logger.info(f"💰 Total Discount: {benefits['total_discount']}")
+        print(f"✅ VIP Status: {benefits['vip_status']}")
+        print(f"💰 Total Discount: {benefits['total_discount']}")
         if benefits["benefits"]["access"]:
-            logger.info(f"🔓 Access: {', '.join(benefits['benefits']['access'])}")
+            print(f"🔓 Access: {', '.join(benefits['benefits']['access'])}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

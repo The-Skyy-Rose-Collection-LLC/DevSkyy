@@ -1,20 +1,9 @@
-from datetime import datetime, timedelta
-import json
-import os
-
-from .base_agent import BaseAgent
-from anthropic import Anthropic, AsyncAnthropic
-from typing import Any, Dict, List, Optional
-import asyncio
-import hashlib
-import logging
-
 """
 Claude Sonnet 4.5 Advanced Intelligence Service V2
 Enterprise-grade AI reasoning with ML and self-healing capabilities
 
 UPGRADED FEATURES:
-    - Inherits from BaseAgent for self-healing and ML capabilities
+- Inherits from BaseAgent for self-healing and ML capabilities
 - Automatic error recovery and retry logic
 - Performance monitoring and anomaly detection
 - Circuit breaker protection for API calls
@@ -25,7 +14,20 @@ UPGRADED FEATURES:
 - Response quality scoring and improvement
 """
 
+import asyncio
+import hashlib
+import json
+import logging
+import os
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+from anthropic import Anthropic, AsyncAnthropic
+
+from .base_agent import BaseAgent
+
 logger = logging.getLogger(__name__)
+
 
 class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     """
@@ -250,7 +252,7 @@ Category: {product_data.get('category', 'Luxury Fashion')}
 Materials: {product_data.get('materials', 'Premium materials')}
 
 Requirements:
-    1. Use sophisticated, evocative language that speaks to affluent customers
+1. Use sophisticated, evocative language that speaks to affluent customers
 2. Emphasize exclusivity, craftsmanship, and prestige
 3. Create emotional resonance and desire
 4. Highlight the investment value and timeless appeal
@@ -313,7 +315,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-def _check_cache(
+    def _check_cache(
         self, key: str, context: Optional[Dict] = None
     ) -> Optional[Dict[str, Any]]:
         """Check if we have a cached response"""
@@ -354,8 +356,8 @@ def _check_cache(
         """Generate a unique cache key"""
         if context:
             context_str = json.dumps(context, sort_keys=True)
-            return hashlib.sha256(f"{key}:{context_str}".encode()).hexdigest()
-        return hashlib.sha256(key.encode()).hexdigest()
+            return hashlib.md5(f"{key}:{context_str}".encode()).hexdigest()
+        return hashlib.md5(key.encode()).hexdigest()
 
     async def _rate_limit_check(self):
         """Check and enforce rate limiting"""
@@ -416,7 +418,7 @@ def _check_cache(
             "therefore",
             "consequently",
         ]
-        quality_score = sum()
+        quality_score = sum(
             1
             for indicator in quality_indicators
             if indicator.lower() in response.lower()
@@ -466,12 +468,14 @@ def _check_cache(
             -100:
         ]  # Keep recent scores
 
+
 # Factory function
 def create_claude_service_v2() -> ClaudeSonnetIntelligenceServiceV2:
     """Create and return Claude Sonnet Intelligence Service V2 instance."""
     service = ClaudeSonnetIntelligenceServiceV2()
     asyncio.create_task(service.initialize())
     return service
+
 
 # Global instance
 claude_service_v2 = create_claude_service_v2()

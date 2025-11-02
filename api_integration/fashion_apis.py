@@ -1,15 +1,25 @@
 from api_integration.core_engine import api_gateway
-from datetime import datetime, timedelta
-from infrastructure.elasticsearch_manager import elasticsearch_manager
-from infrastructure.redis_manager import redis_manager
-import json
-
 from api_integration.workflow_engine import (
-    from dataclasses import asdict, dataclass
+    ActionType,
+    TriggerType,
+    Workflow,
+    workflow_engine as workflow_engine_inst,
+    WorkflowStep,
+    WorkflowTrigger,
+)
+from datetime import datetime, timedelta
+from dataclasses import asdict, dataclass
 from enum import Enum
 from fashion.intelligence_engine import (
-    from typing import Any, Dict, List, Optional, Union
+    fashion_intelligence,
+    FashionCategory,
+    FashionSeason,
+)
+from infrastructure.elasticsearch_manager import elasticsearch_manager
+from infrastructure.redis_manager import redis_manager
+from typing import Any, Dict, List, Optional, Union
 import asyncio
+import json
 import logging
 
 """
@@ -17,18 +27,6 @@ Fashion Domain API Integrations
 Specialized integrations for fashion trends, inventory management, product catalog,
 customer analytics, and personalization APIs with fashion industry intelligence
 """
-
-    ActionType,
-    TriggerType,
-    Workflow,
-    workflow_engine,
-    WorkflowStep,
-    WorkflowTrigger,
-)
-    fashion_intelligence,
-    FashionCategory,
-    FashionSeason,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -800,9 +798,9 @@ class FashionAPIIntegrator:
             metrics = await self.get_fashion_metrics()
             api_health = await self._check_fashion_api_health()
 
-            healthy_apis = sum()
+            healthy_apis = sum([
                 1 for status in api_health.values() if status == "healthy"
-            )
+            ])
             total_apis = len(api_health)
 
             overall_status = "healthy" if healthy_apis == total_apis else "degraded"

@@ -1,15 +1,13 @@
-from datetime import datetime
-from requests.auth import HTTPBasicAuth
-import os
-import requests
-
-from agent.modules.woocommerce_integration_service import (
-import xmlrpc.client
-from typing import Any, Dict, List
-import httpx
 import logging
+import os
+from datetime import datetime
+from typing import Any, Dict, List
+
+import requests
+from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
+
 
 class WordPressDirectService:
     """Direct WordPress connection using Application Password - No OAuth needed!"""
@@ -98,7 +96,7 @@ class WordPressDirectService:
         """Try REST API connection with user credentials."""
         try:
             # First, try to get user info with basic auth
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/users/me",
                 auth=self.auth,
                 headers=self.headers,
@@ -110,7 +108,7 @@ class WordPressDirectService:
                 user_info = response.json()
 
                 # Get site information
-                site_response = httpx.get(
+                site_response = requests.get(
                     f"{self.site_url.rstrip('/')}/wp-json",
                     headers=self.headers,
                     timeout=10,
@@ -149,6 +147,7 @@ class WordPressDirectService:
     async def _try_xmlrpc_connection(self) -> Dict[str, Any]:
         """Try XML-RPC connection (fallback method)."""
         try:
+            import xmlrpc.client
 
             # WordPress XML-RPC endpoint
             xmlrpc_url = f"{self.site_url.rstrip('/')}/xmlrpc.php"
@@ -215,6 +214,7 @@ class WordPressDirectService:
         """Setup WooCommerce integration with the connected site."""
         try:
             # Import WooCommerce service
+            from agent.modules.woocommerce_integration_service import (
                 woocommerce_service,
             )
 
@@ -232,7 +232,7 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/posts",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
@@ -257,7 +257,7 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = httpx.get(
+            response = requests.get(
                 f"{self.api_base}/pages",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
@@ -285,7 +285,7 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             # Create the page
-            response = httpx.post(
+            response = requests.post(
                 f"{self.api_base}/pages", auth=self.auth, json=page_data
             )
             response.raise_for_status()
@@ -315,7 +315,7 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = httpx.post(
+            response = requests.post(
                 f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates
             )
             response.raise_for_status()
@@ -486,7 +486,9 @@ class WordPressDirectService:
             },
         ]
 
+
 # Factory function
+
 
 def create_wordpress_direct_service() -> WordPressDirectService:
     """Create WordPress Direct Service instance."""

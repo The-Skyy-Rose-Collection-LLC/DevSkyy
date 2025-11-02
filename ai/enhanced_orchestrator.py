@@ -3,10 +3,10 @@ import json
 import time
 
 from pydantic import BaseModel, Field
-
-    import anthropic
-    import openai
 from enum import Enum
+
+import anthropic
+import openai
 from typing import Any, Dict, List, Optional, Union
 import asyncio
 import logging

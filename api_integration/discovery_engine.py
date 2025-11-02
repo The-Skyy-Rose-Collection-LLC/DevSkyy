@@ -283,9 +283,9 @@ class APIDiscoveryEngine:
         discovery_duration = time.time() - start_time
         self.discovery_metrics.update(
             {
-                "total_apis_discovered": sum()
+                "total_apis_discovered": sum([
                     len(apis) for apis in discovered_apis.values()
-                ),
+                ]),
                 "apis_by_category": {
                     cat: len(apis) for cat, apis in discovered_apis.items()
                 },
@@ -843,11 +843,11 @@ class APIDiscoveryEngine:
             "personalization",
             "analytics",
         ]
-        fashion_bonus = sum()
+        fashion_bonus = sum([
             0.1
             for feature in features
             if any(ff in feature.lower() for ff in fashion_features)
-        )
+        ])
 
         return min(base_score + fashion_bonus, 1.0)
 
@@ -946,13 +946,11 @@ class APIDiscoveryEngine:
             "discovery_metrics": self.discovery_metrics,
             "total_apis_in_registry": len(self.discovered_apis),
             "apis_by_category": {
-                category.value: len()
-                    [
+                category.value: len([
                         api
                         for api in self.discovered_apis.values()
                         if api.category == category
-                    ]
-                )
+                    ])
                 for category in APICategory
             },
             "top_providers": self._get_top_providers(),
@@ -1007,21 +1005,21 @@ class APIDiscoveryEngine:
         total_apis = len(self.discovered_apis)
 
         return {
-            "reliability": sum()
+            "reliability": sum([
                 api.reliability_score for api in self.discovered_apis.values()
-            )
+            ])
             / total_apis,
-            "performance": sum()
+            "performance": sum([
                 api.performance_score for api in self.discovered_apis.values()
-            )
+            ])
             / total_apis,
             "cost": sum(api.cost_score for api in self.discovered_apis.values())
             / total_apis,
             "features": sum(api.feature_score for api in self.discovered_apis.values())
             / total_apis,
-            "fashion_relevance": sum()
+            "fashion_relevance": sum([
                 api.fashion_relevance for api in self.discovered_apis.values()
-            )
+            ])
             / total_apis,
             "overall": sum(api.overall_score for api in self.discovered_apis.values())
             / total_apis,

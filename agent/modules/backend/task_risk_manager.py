@@ -1,12 +1,12 @@
-from datetime import datetime
-
-from enum import Enum
-from typing import Any, Dict, List
 import logging
 import uuid
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class RiskLevel(Enum):
     CRITICAL = "critical"
@@ -14,11 +14,13 @@ class RiskLevel(Enum):
     MEDIUM = "medium"
     LOW = "low"
 
+
 class TaskPriority(Enum):
     URGENT = "urgent"
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
+
 
 class TaskCategory(Enum):
     WEBSITE_STABILITY = "website_stability"
@@ -28,6 +30,7 @@ class TaskCategory(Enum):
     COMPLIANCE = "compliance"
     PERFORMANCE = "performance"
     BRAND_PROTECTION = "brand_protection"
+
 
 class TaskRiskManager:
     """Centralized task and risk management system for all agents."""
@@ -87,7 +90,7 @@ class TaskRiskManager:
             logger.error(f"❌ Task creation failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
-    async def get_prioritized_task_list()
+    async def get_prioritized_task_list(
         self, filters: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         """Get prioritized task list with risk-based sorting."""
@@ -102,10 +105,10 @@ class TaskRiskManager:
 
             return {
                 "total_tasks": len(sorted_tasks),
-                "high_risk_tasks": len()
+                "high_risk_tasks": len(
                     [t for t in sorted_tasks if t["risk_level"] in ["critical", "high"]]
                 ),
-                "urgent_tasks": len()
+                "urgent_tasks": len(
                     [t for t in sorted_tasks if t["priority"] == "urgent"]
                 ),
                 "tasks": sorted_tasks,
@@ -234,6 +237,7 @@ class TaskRiskManager:
                 },
             },
         }
+
 
 def manage_tasks_and_risks() -> Dict[str, Any]:
     """Main function to manage tasks and risks across all agents."""

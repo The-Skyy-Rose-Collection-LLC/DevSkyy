@@ -1,27 +1,9 @@
-import re
-import re
-import re
-from datetime import datetime, timedelta
-from pathlib import Path
-import json
-import os
-
-from anthropic import AsyncAnthropic
-from bs4 import BeautifulSoup
-from collections import defaultdict
-from openai import AsyncOpenAI
-from typing import Any, Dict, List, Optional
-import aiofiles
-import asyncio
-import httpx
-import logging
-
 """
 Continuous Learning Background Agent
 Autonomous 24/7 agent that learns new frontend/backend practices and auto-implements improvements
 
 Features:
-    - Monitors latest framework releases (React, FastAPI, Next.js, etc.)
+- Monitors latest framework releases (React, FastAPI, Next.js, etc.)
 - Tracks new best practices and patterns
 - Learns from official documentation updates
 - Analyzes GitHub trending repositories
@@ -36,7 +18,23 @@ Features:
 - Auto-generates migration guides
 """
 
+import asyncio
+import json
+import logging
+import os
+from collections import defaultdict
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import aiofiles
+import httpx
+from anthropic import AsyncAnthropic
+from bs4 import BeautifulSoup
+from openai import AsyncOpenAI
+
 logger = logging.getLogger(__name__)
+
 
 class ContinuousLearningBackgroundAgent:
     """
@@ -193,7 +191,7 @@ class ContinuousLearningBackgroundAgent:
             except Exception as e:
                 logger.error(f"❌ Learning daemon error: {e}")
                 # Continue running despite errors
-                await asyncio.sleep(60)  # TODO: Move to config
+                await asyncio.sleep(60)
 
     async def _learning_cycle(self) -> Dict[str, Any]:
         """
@@ -451,7 +449,7 @@ class ContinuousLearningBackgroundAgent:
 6. Breaking changes
 
 Documentation:
-    {doc_content[:3000]}
+{doc_content[:3000]}
 
 Provide JSON with: new_features, deprecated, best_practices, performance_tips, security_tips"""
 
@@ -465,6 +463,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
             content = response.content[0].text
 
             # Try to extract JSON
+            import re
 
             json_match = re.search(r"\{.*\}", content, re.DOTALL)
             if json_match:
@@ -478,7 +477,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
         return None
 
-async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
+    async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
         """
         Analyze GitHub trending repositories for new patterns.
         """
@@ -593,12 +592,12 @@ async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
 {json.dumps(all_learnings, indent=2)}
 
 Our stack:
-    - Frontend: React, Vite, TailwindCSS
+- Frontend: React, Vite, TailwindCSS
 - Backend: FastAPI, Python, SQLAlchemy
 - WordPress: Divi 5, Elementor Pro, WooCommerce
 
 Identify:
-    1. New patterns we should adopt
+1. New patterns we should adopt
 2. Deprecated patterns we should remove
 3. Performance optimizations
 4. Security improvements
@@ -616,6 +615,7 @@ Return JSON array of practices with: category, description, priority, implementa
             content = response.content[0].text
 
             # Extract JSON
+            import re
 
             json_match = re.search(r"\[.*\]", content, re.DOTALL)
             if json_match:
@@ -627,7 +627,7 @@ Return JSON array of practices with: category, description, priority, implementa
 
         return []
 
-async def _analyze_codebase(self) -> Dict[str, Any]:
+    async def _analyze_codebase(self) -> Dict[str, Any]:
         """
         Analyze current codebase to understand what can be improved.
         """
@@ -683,13 +683,13 @@ async def _analyze_codebase(self) -> Dict[str, Any]:
             prompt = f"""Generate specific code improvements based on:
 
 New Practices:
-    {json.dumps(new_practices[:5], indent=2)}
+{json.dumps(new_practices[:5], indent=2)}
 
 Current Codebase:
-    {json.dumps(codebase_analysis, indent=2)}
+{json.dumps(codebase_analysis, indent=2)}
 
 Generate actionable improvements with:
-    1. Specific file/location to change
+1. Specific file/location to change
 2. Before/after code examples
 3. Confidence score (0-1)
 4. Priority (low/medium/high/critical)
@@ -708,6 +708,7 @@ Return JSON array of improvements."""
             content = response.content[0].text
 
             # Extract JSON
+            import re
 
             json_match = re.search(r"\[.*\]", content, re.DOTALL)
             if json_match:
@@ -719,7 +720,7 @@ Return JSON array of improvements."""
 
         return []
 
-async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> int:
+    async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> int:
         """
         Apply high-confidence improvements to codebase.
         """
@@ -825,7 +826,7 @@ async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> in
         Get statistics about what the agent has learned.
         """
         return {
-            "total_practices_learned": sum()
+            "total_practices_learned": sum(
                 len(practices) for practices in self.learned_practices.values()
             ),
             "improvements_applied": len(self.applied_improvements),
@@ -835,18 +836,22 @@ async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> in
             "last_update": datetime.now().isoformat(),
         }
 
+
 # Factory function
 def create_learning_agent() -> ContinuousLearningBackgroundAgent:
     """Create Continuous Learning Background Agent."""
     return ContinuousLearningBackgroundAgent()
 
+
 # Global instance
 learning_agent = create_learning_agent()
+
 
 # Convenience functions
 async def start_background_learning() -> None:
     """Start the background learning daemon."""
     await learning_agent.start_learning_daemon()
+
 
 async def get_learning_stats() -> Dict[str, Any]:
     """Get learning statistics."""

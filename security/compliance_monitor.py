@@ -476,13 +476,11 @@ class ComplianceMonitor:
 
             status[standard.value] = {
                 "active_violations": len(recent_violations),
-                "critical_violations": len()
-                    [
+                "critical_violations": len([
                         v
                         for v in recent_violations
                         if v.severity == ViolationSeverity.CRITICAL
-                    ]
-                ),
+                    ]),
                 "last_assessment": "2024-10-24",  # Would be dynamic in real implementation
                 "next_assessment": "2024-11-24",
             }

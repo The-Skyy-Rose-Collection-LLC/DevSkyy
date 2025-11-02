@@ -455,7 +455,7 @@ class RecommendationEngine:
 
         return max(0.0, numerator / denominator)
 
-def _build_user_profile(self, user_interactions: List[Dict]) -> Dict[str, float]:
+    def _build_user_profile(self, user_interactions: List[Dict]) -> Dict[str, float]:
         """Build user profile from interactions."""
         profile = {}
 

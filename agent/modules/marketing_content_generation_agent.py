@@ -1,18 +1,9 @@
-from datetime import datetime, timedelta
-import os
-
-import asyncio
-from dataclasses import dataclass
-from typing import Any, Dict, List
-import logging
-import openai
-
 """
 Advanced Marketing Content Generation Agent
 AI-powered marketing automation and content creation
 
 This agent specializes in:
-    - Creating viral social media campaigns
+- Creating viral social media campaigns
 - Generating luxury brand content
 - Automated email marketing sequences
 - SEO-optimized blog content
@@ -20,7 +11,16 @@ This agent specializes in:
 - Performance tracking and optimization
 """
 
+import logging
+import os
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
+
+import openai
+
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class CampaignMetrics:
@@ -29,6 +29,7 @@ class CampaignMetrics:
     click_through_rate: float
     conversion_rate: float
     roi: float
+
 
 class MarketingContentGenerationAgent:
     """
@@ -427,7 +428,7 @@ Call-to-Action: {cta}
 Story Extension: {story_content}
 """
 
-def _get_tiktok_template(self) -> str:
+    def _get_tiktok_template(self) -> str:
         """Get TikTok content template."""
         return """
 Hook (0-3s): {hook}
@@ -445,7 +446,7 @@ Hashtags: {hashtags}
 Engagement Question: {engagement_question}
 """
 
-def _get_email_template(self) -> str:
+    def _get_email_template(self) -> str:
         """Get email campaign template."""
         return """
 Subject Line: {subject_line}
@@ -463,7 +464,7 @@ Footer: {footer_content}
 Personalization: {personalization_elements}
 """
 
-def _get_blog_template(self) -> str:
+    def _get_blog_template(self) -> str:
         """Get blog post template."""
         return """
 Title: {title}
@@ -473,7 +474,7 @@ Meta Description: {meta_description}
 Introduction: {introduction}
 
 Main Sections:
-    {main_sections}
+{main_sections}
 
 Conclusion: {conclusion}
 
@@ -484,7 +485,7 @@ SEO Keywords: {keywords}
 Internal Links: {internal_links}
 """
 
-def _get_ad_copy_template(self) -> str:
+    def _get_ad_copy_template(self) -> str:
         """Get advertising copy template."""
         return """
 Headline: {headline}
@@ -502,7 +503,7 @@ Visual Requirements: {visual_requirements}
 
     # Implementation methods (condensed for brevity)
 
-async def _develop_viral_strategy(
+    async def _develop_viral_strategy(
         self, campaign_spec: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Develop viral content strategy."""
@@ -710,6 +711,7 @@ async def _develop_viral_strategy(
             platform, f"Day {day + 1}: Luxury content for {platform}"
         )
 
+
 # Example usage
 async def main():
     """Example usage of the Marketing Content Generation Agent."""
@@ -726,7 +728,7 @@ async def main():
     }
 
     viral_campaign = await agent.create_viral_social_campaign(campaign_spec)
-    logger.info(f"Viral campaign creation: {viral_campaign['status']}")
+    print(f"Viral campaign creation: {viral_campaign['status']}")
 
     # Generate email sequence
     email_spec = {
@@ -737,8 +739,10 @@ async def main():
     }
 
     email_sequence = await agent.generate_luxury_email_sequence(email_spec)
-    logger.info(f"Email sequence generation: {email_sequence['status']}")
+    print(f"Email sequence generation: {email_sequence['status']}")
+
 
 if __name__ == "__main__":
+    import asyncio
 
     asyncio.run(main())

@@ -1,17 +1,9 @@
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-
-from sklearn.metrics import mean_squared_error, mean_absolute_error  # noqa: F401 - Reserved for Phase 3 model evaluation
-from typing import Any, Dict, List, Tuple
-import logging
-import numpy as np
-
 """
 Time Series Forecasting Engine
 Advanced forecasting for sales, demand, and trends
 
 Features:
-    - Time series prediction
+- Time series prediction
 - Demand forecasting
 - Trend analysis
 - Seasonality detection
@@ -19,12 +11,24 @@ Features:
 Reference: AGENTS.md Line 1571-1575
 """
 
+import logging
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluation
+    mean_absolute_error,
+    mean_squared_error,
+)
+
 # TensorFlow disabled due to system compatibility issues
 # Will be re-enabled in Phase 3 with proper system requirements
 TENSORFLOW_AVAILABLE = False
 tf = None
 
 logger = logging.getLogger(__name__)
+
 
 class ForecastingEngine:
     """
@@ -83,6 +87,7 @@ class ForecastingEngine:
             forecast, lower, upper = self._random_forest_forecast(
                 historical_data, periods
             )
+
         return {
             "forecast": forecast,
             "confidence_interval_lower": lower,
@@ -331,7 +336,7 @@ class ForecastingEngine:
                         order_forecast["confidence_interval_upper"],
                         aov_forecast["confidence_interval_upper"],
                     )
-                ]
+                ],
             },
         }
 
@@ -372,6 +377,8 @@ class ForecastingEngine:
                         "deviation": abs(data[i] - mean) / std if std > 0 else 0,
                         "type": "spike" if data[i] > threshold_upper else "drop",
                     }
+                )
+
         return {
             "anomalies": anomalies,
             "count": len(anomalies),

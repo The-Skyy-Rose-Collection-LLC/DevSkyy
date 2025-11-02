@@ -1,16 +1,3 @@
-from datetime import datetime
-from pathlib import Path
-import os
-
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
-from pydub import AudioSegment
-from pydub.effects import normalize
-from typing import Any, Dict, List, Optional, Union
-import httpx
-import io
-import logging
-
 """
 Voice & Audio Content Agent
 Advanced text-to-speech and speech analysis for luxury e-commerce
@@ -30,7 +17,21 @@ Features:
 - Customer service voice automation
 """
 
+import io
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import httpx
+from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
+from pydub import AudioSegment
+from pydub.effects import normalize
+
 logger = logging.getLogger(__name__)
+
 
 class VoiceAudioContentAgent:
     """
@@ -219,7 +220,7 @@ Return the enhanced text optimized for voice generation."""
             logger.warning(f"Text enhancement failed, using original: {e}")
             return text
 
-async def _generate_elevenlabs_speech(
+    async def _generate_elevenlabs_speech(
         self, text: str, voice_style: str
     ) -> Optional[bytes]:
         """
@@ -448,7 +449,7 @@ Consider this is for a luxury fashion brand customer interaction."""
             logger.error(f"❌ Voice sentiment analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-async def create_podcast_episode(
+    async def create_podcast_episode(
         self,
         script: str,
         episode_title: str,
@@ -623,26 +624,32 @@ Format: Write the exact script to be read."""
             logger.error(f"❌ Audio ad generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
+
 # Factory function
 def create_voice_audio_agent() -> VoiceAudioContentAgent:
     """Create Voice & Audio Content Agent."""
     return VoiceAudioContentAgent()
 
+
 # Global instance
 voice_audio_agent = create_voice_audio_agent()
+
 
 # Convenience functions
 async def generate_voice(text: str, style: str = "luxury") -> Dict[str, Any]:
     """Generate voice content from text."""
     return await voice_audio_agent.generate_voice_content(text, style)
 
+
 async def transcribe(audio_path: str) -> Dict[str, Any]:
     """Transcribe audio to text."""
     return await voice_audio_agent.transcribe_audio(audio_path)
 
+
 async def analyze_voice(audio_path: str) -> Dict[str, Any]:
     """Analyze voice sentiment."""
     return await voice_audio_agent.analyze_voice_sentiment(audio_path)
+
 
 async def create_audio_ad(product: str, description: str, cta: str) -> Dict[str, Any]:
     """Create audio advertisement."""

@@ -1,13 +1,12 @@
+#!/usr/bin/env python3
 from datetime import datetime
 from pathlib import Path
 import json
+import subprocess
 import sys
 import time
 
-            import main
-import subprocess
-
-#!/usr/bin/env python3
+import main
 """
 DevSkyy Vercel Build Performance Monitor
 

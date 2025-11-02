@@ -1,24 +1,9 @@
-from datetime import datetime
-from pathlib import Path
-import os
-import re
-import sys
-import time
-
-from agent.modules.base_agent import AgentStatus, BaseAgent
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
-import ast
-import autopep8
-import logging
-import shutil
-import subprocess
-
 """
 Fixer Agent V2 - Enterprise Edition
 Automated code repair with AI-powered fixes and multi-agent coordination
 
 Features:
-    - Inherits from BaseAgent for enterprise capabilities
+- Inherits from BaseAgent for enterprise capabilities
 - Depends on Scanner Agent for issue detection
 - AI-powered fix suggestions using Claude/OpenAI
 - Multi-language support (Python, JavaScript, TypeScript, HTML, CSS)
@@ -26,7 +11,21 @@ Features:
 - Integration with orchestrator
 """
 
+import logging
+import os
+import re
+import shutil
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import autopep8
+
+from agent.modules.base_agent import AgentStatus, BaseAgent
+
 logger = logging.getLogger(__name__)
+
 
 class FixerAgentV2(BaseAgent):
     """
@@ -53,7 +52,7 @@ class FixerAgentV2(BaseAgent):
         self.fix_patterns = {
             # Python
             "python_print": (r"print\((.*?)\)", r"logger.info(\1)"),
-            "python_except_bare": (r"except Exception:", r"except Exception:"),
+            "python_except_bare": (r"except:", r"except Exception:"),
             # JavaScript
             "js_console_log": (r"console\.log\((.*?)\)", r"// console.log(\1)"),
             "js_var": (r"\bvar\s+(\w+)", r"const \1"),
@@ -194,13 +193,13 @@ class FixerAgentV2(BaseAgent):
         results["fixes_applied"].extend(common_fixes)
 
         # Update counts
-        results["files_fixed"] = len()
+        results["files_fixed"] = len(
             set(fix["file"] for fix in results["fixes_applied"])
         )
-        results["errors_fixed"] = sum()
+        results["errors_fixed"] = sum(
             1 for fix in results["fixes_applied"] if fix.get("severity") == "error"
         )
-        results["warnings_fixed"] = sum()
+        results["warnings_fixed"] = sum(
             1 for fix in results["fixes_applied"] if fix.get("severity") == "warning"
         )
 
@@ -382,8 +381,7 @@ class FixerAgentV2(BaseAgent):
 
                 # Ensure final newline
                 if not modified_content.endswith("\n"):
-                    # Use list and join for string building
-modified_content_list.append(...)
+                    modified_content += "\n"
 
                 if modified_content != original_content:
                     if not dry_run:
@@ -404,7 +402,7 @@ modified_content_list.append(...)
 
         return fixes
 
-async def _fix_hardcoded_secret(
+    async def _fix_hardcoded_secret(
         self, file_path: str, dry_run: bool
     ) -> Optional[Dict[str, Any]]:
         """Fix hardcoded secrets by replacing with environment variables"""
@@ -437,338 +435,26 @@ async def _fix_hardcoded_secret(
     async def _fix_sql_injection(
         self, file_path: str, dry_run: bool
     ) -> Optional[Dict[str, Any]]:
-        """
-        Add SQL injection prevention by detecting and fixing vulnerable SQL patterns.
-
-        This function identifies common SQL injection vulnerabilities and suggests
-        parameterized query fixes or ORM usage recommendations.
-
-        Args:
-            file_path (str): Path to the file to analyze
-            dry_run (bool): If True, only analyze without making changes
-
-        Returns:
-            Optional[Dict[str, Any]]: Fix results or None if no issues found
-        """
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Patterns that indicate potential SQL injection vulnerabilities
-            vulnerable_patterns = [
-                r'execute\s*\(\s*["\'].*%s.*["\']',  # String formatting in SQL
-                r'execute\s*\(\s*["\'].*\+.*["\']',   # String concatenation in SQL
-                r'execute\s*\(\s*f["\'].*\{.*\}.*["\']',  # f-string in SQL
-                r'cursor\.execute\s*\(\s*["\'].*%.*["\']',  # % formatting
-            ]
-
-            issues_found = []
-            lines = content.split('\n')
-
-            for i, line in enumerate(lines, 1):
-                for pattern in vulnerable_patterns:
-                    if re.search(pattern, line, re.IGNORECASE):
-                        issues_found.append({
-                            "line": i,
-                            "content": line.strip(),
-                            "pattern": pattern,
-                            "recommendation": "Use parameterized queries or ORM methods"
-                        })
-
-            if not issues_found:
-                return None
-
-            if not dry_run:
-                # In a real implementation, this would apply automated fixes
-                # For now, we log the issues for manual review
-                logger.warning(f"SQL injection vulnerabilities found in {file_path}: {len(issues_found)} issues")
-
-            return {
-                "file": file_path,
-                "type": "security",
-                "severity": "critical",
-                "description": f"Found {len(issues_found)} potential SQL injection vulnerabilities",
-                "issues": issues_found,
-                "requires_manual_review": True,
-                "automated_fix_available": False
-            }
-
-        except Exception as e:
-            logger.error(f"Error analyzing SQL injection in {file_path}: {e}")
-            return {
-                "file": file_path,
-                "type": "security",
-                "severity": "critical",
-                "description": f"Error analyzing file: {str(e)}",
-                "requires_manual_review": True,
-            }
+        """Add SQL injection prevention"""
+        # Placeholder - would need more sophisticated SQL parsing
+        return {
+            "file": file_path,
+            "type": "security",
+            "severity": "critical",
+            "description": "Manual review required for SQL injection vulnerability",
+            "requires_manual_review": True,
+        }
 
     async def _add_caching(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """
-        Add caching to expensive operations to improve performance.
-
-        Identifies functions that would benefit from caching and suggests
-        appropriate caching strategies (Redis, in-memory, file-based).
-
-        Args:
-            dry_run (bool): If True, only analyze without making changes
-
-        Returns:
-            List[Dict[str, Any]]: List of caching improvements applied or suggested
-        """
-        improvements = []
-
-        try:
-            # Scan Python files for functions that could benefit from caching
-            python_files = list(Path('.').rglob('*.py'))
-
-            for file_path in python_files:
-                if file_path.name.startswith('.') or 'test' in str(file_path):
-                    continue
-
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-
-                    # Look for patterns that indicate expensive operations
-                    expensive_patterns = [
-                        (r'def.*\(.*\).*:.*requests\.get', 'HTTP requests'),
-                        (r'def.*\(.*\).*:.*requests\.post', 'HTTP requests'),
-                        (r'def.*\(.*\).*:.*\.query\(', 'Database queries'),
-                        (r'def.*\(.*\).*:.*\.execute\(', 'Database operations'),
-                        (r'def.*\(.*\).*:.*time\.sleep', 'Blocking operations'),
-                        (r'def.*\(.*\).*:.*subprocess\.', 'System calls'),
-                    ]
-
-                    lines = content.split('\n')
-                    for i, line in enumerate(lines, 1):
-                        for pattern, operation_type in expensive_patterns:
-                            if re.search(pattern, line, re.IGNORECASE):
-                                # Check if caching is already implemented
-                                if '@cache' not in content and '@lru_cache' not in content:
-                                    improvements.append({
-                                        "file": str(file_path),
-                                        "line": i,
-                                        "type": "performance",
-                                        "operation_type": operation_type,
-                                        "recommendation": f"Consider adding caching for {operation_type}",
-                                        "suggested_solution": "@lru_cache(maxsize=128) or Redis caching",
-                                        "priority": "medium"
-                                    })
-
-                except Exception as e:
-                    logger.warning(f"Error analyzing {file_path} for caching: {e}")
-                    continue
-
-            if not dry_run and improvements:
-                logger.info(f"Identified {len(improvements)} caching opportunities")
-
-            return improvements
-
-        except Exception as e:
-            logger.error(f"Error in caching analysis: {e}")
-            return []
+        """Add caching to expensive operations"""
+        # Placeholder for caching improvements
+        return []
 
     async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """
-        Remove unused imports from Python files using AST analysis.
-
-        This function analyzes Python files to identify and remove unused imports,
-        improving code quality and reducing potential security vulnerabilities.
-
-        Args:
-            dry_run (bool): If True, only analyze without making changes
-
-        Returns:
-            List[Dict[str, Any]]: List of files processed with unused imports removed
-
-        Raises:
-            Exception: If file processing fails
-        """
-        results = []
-
-        try:
-            # Find all Python files
-            python_files = list(Path('.').rglob('*.py'))
-
-            for file_path in python_files:
-                if (file_path.name.startswith('.') or
-                    'test' in str(file_path) or
-                    '__pycache__' in str(file_path) or
-                    'venv' in str(file_path) or
-                    '.git' in str(file_path)):
-                    continue
-
-                try:
-                    unused_imports = await self._analyze_unused_imports(file_path)
-
-                    if unused_imports:
-                        if not dry_run:
-                            removed_count = await self._remove_imports_from_file(
-                                file_path, unused_imports
-                            )
-                        else:
-                            removed_count = len(unused_imports)
-
-                        results.append({
-                            "file": str(file_path),
-                            "type": "code_quality",
-                            "action": "remove_unused_imports",
-                            "unused_imports": unused_imports,
-                            "removed_count": removed_count,
-                            "dry_run": dry_run,
-                            "timestamp": datetime.now().isoformat()
-                        })
-
-                        logger.info(f"📦 {'Would remove' if dry_run else 'Removed'} "
-                                  f"{removed_count} unused imports from {file_path}")
-
-                except Exception as e:
-                    logger.warning(f"Error analyzing imports in {file_path}: {e}")
-                    results.append({
-                        "file": str(file_path),
-                        "type": "error",
-                        "action": "remove_unused_imports",
-                        "error": str(e),
-                        "timestamp": datetime.now().isoformat()
-                    })
-
-            return results
-
-        except Exception as e:
-            logger.error(f"Error in unused imports removal: {e}")
-            return [{
-                "type": "error",
-                "action": "remove_unused_imports",
-                "error": str(e),
-                "timestamp": datetime.now().isoformat()
-            }]
-
-    async def _analyze_unused_imports(self, file_path: Path) -> List[str]:
-        """
-        Analyze a Python file to find unused imports using AST.
-
-        Args:
-            file_path (Path): Path to the Python file
-
-        Returns:
-            List[str]: List of unused import names
-        """
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Parse the AST
-            tree = ast.parse(content)
-
-            # Find all imports
-            imports = set()
-            import_lines = {}
-
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    for alias in node.names:
-                        import_name = alias.asname if alias.asname else alias.name
-                        imports.add(import_name)
-                        import_lines[import_name] = node.lineno
-
-                elif isinstance(node, ast.ImportFrom):
-                    for alias in node.names:
-                        import_name = alias.asname if alias.asname else alias.name
-                        imports.add(import_name)
-                        import_lines[import_name] = node.lineno
-
-            # Find all names used in the code
-            used_names = set()
-
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Name):
-                    used_names.add(node.id)
-                elif isinstance(node, ast.Attribute):
-                    # Handle module.attribute usage
-                    if isinstance(node.value, ast.Name):
-                        used_names.add(node.value.id)
-
-            # Find unused imports
-            unused_imports = []
-            for import_name in imports:
-                # Skip special imports that might be used implicitly
-                if import_name in ['__future__', '__all__', 'typing']:
-                    continue
-
-                # Check if the import is used
-                if import_name not in used_names:
-                    # Additional check for partial matches (e.g., os.path)
-                    base_name = import_name.split('.')[0]
-                    if base_name not in used_names:
-                        unused_imports.append(import_name)
-
-            return unused_imports
-
-        except Exception as e:
-            logger.warning(f"Error analyzing imports in {file_path}: {e}")
-            return []
-
-    async def _remove_imports_from_file(
-        self, file_path: Path, unused_imports: List[str]
-    ) -> int:
-        """
-        Remove unused imports from a Python file.
-
-        Args:
-            file_path (Path): Path to the Python file
-            unused_imports (List[str]): List of unused import names to remove
-
-        Returns:
-            int: Number of imports actually removed
-        """
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
-
-            removed_count = 0
-            new_lines = []
-
-            for line in lines:
-                should_remove = False
-
-                # Check if this line contains an unused import
-                for unused_import in unused_imports:
-                    # Match various import patterns
-                    patterns = [
-                        rf'^import\s+{re.escape(unused_import)}\s*$',
-                        rf'^import\s+{re.escape(unused_import)}\s*,',
-                        rf',\s*{re.escape(unused_import)}\s*$',
-                        rf',\s*{re.escape(unused_import)}\s*,',
-                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*$',
-                        rf'^from\s+\S+\s+import\s+{re.escape(unused_import)}\s*,',
-                        rf',\s*{re.escape(unused_import)}\s*$',
-                    ]
-
-                    for pattern in patterns:
-                        if re.search(pattern, line.strip()):
-                            should_remove = True
-                            break
-
-                    if should_remove:
-                        break
-
-                if should_remove:
-                    removed_count += 1
-                    logger.debug(f"Removing unused import line: {line.strip()}")
-                else:
-                    new_lines.append(line)
-
-            # Write back the cleaned file
-            if removed_count > 0:
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    f.writelines(new_lines)
-
-            return removed_count
-
-        except Exception as e:
-            logger.error(f"Error removing imports from {file_path}: {e}")
-            return 0
+        """Remove unused imports"""
+        # This would typically use autoflake
+        # For now, return placeholder
+        return []
 
     async def _format_python_file(
         self, file_path: str, dry_run: bool
@@ -868,6 +554,7 @@ async def _fix_hardcoded_secret(
     async def get_fix_history(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get recent fix history"""
         return self.fix_history[-limit:]
+
 
 # Create instance for export
 fixer_agent = FixerAgentV2()

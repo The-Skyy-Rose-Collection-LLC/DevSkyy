@@ -1,24 +1,9 @@
-import re
-from datetime import datetime
-from pathlib import Path
-import os
-from dotenv import load_dotenv
-
-from anthropic import AsyncAnthropic
-from openai import AsyncOpenAI
-from typing import Any, Dict, List
-import logging
-import zipfile
-
-# Load environment variables
-load_dotenv()
-
 """
 WordPress Full-Stack Theme Builder Agent
 Advanced autonomous theme builder for WordPress, Divi 5, and Elementor Pro
 
 Features:
-    - Complete theme generation from scratch
+- Complete theme generation from scratch
 - Divi 5 advanced module creation
 - Elementor Pro widget development
 - WooCommerce integration
@@ -35,7 +20,18 @@ Features:
 - Theme options panel generation
 """
 
+import logging
+import os
+import zipfile
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
+
 logger = logging.getLogger(__name__)
+
 
 class WordPressFullStackThemeBuilderAgent:
     """
@@ -200,7 +196,7 @@ Description: {description}
 Target Audience: {audience}
 
 Generate:
-    1. Theme architecture and file structure
+1. Theme architecture and file structure
 2. Core features and functionality
 3. Design system (colors, typography, spacing)
 4. Template hierarchy
@@ -233,7 +229,7 @@ Provide detailed, production-ready specifications."""
             logger.error(f"Foundation generation failed: {e}")
             return {}
 
-async def _create_style_css(
+    async def _create_style_css(
         self, theme_path: Path, foundation: Dict[str, Any]
     ) -> None:
         """
@@ -385,7 +381,7 @@ h1, h2, h3, h4, h5, h6 {{
         style_file.write_text(style_content)
         logger.info("✅ style.css created")
 
-async def _generate_functions_php(
+    async def _generate_functions_php(
         self, theme_path: Path, features: List[str]
     ) -> None:
         """
@@ -397,7 +393,7 @@ async def _generate_functions_php(
 Features to include: {', '.join(features)}
 
 Requirements:
-    1. Theme setup and support
+1. Theme setup and support
 2. Enqueue scripts and styles
 3. Widget areas registration
 4. Menu locations
@@ -422,6 +418,7 @@ Generate complete, production-ready PHP code."""
             functions_code = response.content[0].text
 
             # Extract PHP code
+            import re
 
             php_match = re.search(r"```php\n(.*?)```", functions_code, re.DOTALL)
             if php_match:
@@ -436,7 +433,7 @@ Generate complete, production-ready PHP code."""
         except Exception as e:
             logger.error(f"functions.php generation failed: {e}")
 
-async def _create_template_files(
+    async def _create_template_files(
         self, theme_path: Path, foundation: Dict[str, Any]
     ) -> None:
         """
@@ -473,7 +470,7 @@ async def _create_template_files(
 Theme: {foundation.get('theme_name')}
 
 Requirements:
-    1. Follow WordPress template hierarchy
+1. Follow WordPress template hierarchy
 2. Proper WordPress functions and hooks
 3. Accessibility (WCAG 2.1 AA)
 4. SEO optimization
@@ -494,6 +491,7 @@ Generate complete PHP template code."""
             template_code = response.content[0].text
 
             # Extract PHP code
+            import re
 
             php_match = re.search(r"```php\n(.*?)```", template_code, re.DOTALL)
             if php_match:
@@ -507,7 +505,7 @@ Generate complete PHP template code."""
             logger.error(f"Template {template_type} generation failed: {e}")
             return ""
 
-async def _generate_divi_modules(self, theme_path: Path) -> None:
+    async def _generate_divi_modules(self, theme_path: Path) -> None:
         """
         Generate custom Divi 5 modules for luxury e-commerce.
         """
@@ -539,7 +537,7 @@ Module Name: {module_name}
 Description: {description}
 
 Requirements:
-    1. Extend ET_Builder_Module
+1. Extend ET_Builder_Module
 2. Complete module configuration
 3. Advanced fields and controls
 4. Responsive design options
@@ -565,7 +563,7 @@ Generate complete PHP class code."""
             logger.error(f"Divi module {module_name} generation failed: {e}")
             return ""
 
-async def _generate_elementor_widgets(self, theme_path: Path) -> None:
+    async def _generate_elementor_widgets(self, theme_path: Path) -> None:
         """
         Generate custom Elementor Pro widgets.
         """
@@ -599,7 +597,7 @@ Widget Name: {widget_name}
 Description: {description}
 
 Requirements:
-    1. Extend \\Elementor\\Widget_Base
+1. Extend \\Elementor\\Widget_Base
 2. Complete widget configuration
 3. Register controls
 4. Responsive options
@@ -625,7 +623,7 @@ Generate complete PHP class code."""
             logger.error(f"Elementor widget {widget_name} generation failed: {e}")
             return ""
 
-async def _create_woocommerce_templates(self, theme_path: Path) -> None:
+    async def _create_woocommerce_templates(self, theme_path: Path) -> None:
         """
         Create WooCommerce template overrides for luxury styling.
         """
@@ -707,7 +705,7 @@ async def _create_woocommerce_templates(self, theme_path: Path) -> None:
         except Exception as e:
             logger.error(f"Asset generation failed: {e}")
 
-async def _create_theme_options(self, theme_path: Path) -> None:
+    async def _create_theme_options(self, theme_path: Path) -> None:
         """
         Create theme options panel using Customizer API.
         """
@@ -749,7 +747,7 @@ add_action( 'customize_register', 'luxury_theme_customize_register' );
         except Exception as e:
             logger.error(f"Theme options creation failed: {e}")
 
-async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
+    async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
         """
         Package theme as zip file.
         """
@@ -769,13 +767,16 @@ async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
             logger.error(f"Theme packaging failed: {e}")
             return theme_path
 
+
 # Factory function
 def create_theme_builder() -> WordPressFullStackThemeBuilderAgent:
     """Create WordPress Theme Builder Agent."""
     return WordPressFullStackThemeBuilderAgent()
 
+
 # Global instance
 theme_builder = create_theme_builder()
+
 
 # Convenience function
 async def build_wordpress_theme(

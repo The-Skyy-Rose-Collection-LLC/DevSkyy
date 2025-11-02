@@ -1,13 +1,17 @@
 from api_integration.core_engine import api_gateway
-from datetime import datetime, timedelta
-
-        from fashion.intelligence_engine import FashionCategory
-        from fashion.intelligence_engine import FashionCategory, FashionSeason
 from api_integration.auth_manager import auth_manager, AuthenticationType
 from api_integration.discovery_engine import api_discovery_engine, APICategory
 from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
-    from fashion.intelligence_engine import fashion_intelligence
+    workflow_engine,
+    WorkflowTrigger,
+)
+from datetime import datetime, timedelta
+from fashion.intelligence_engine import (
+    fashion_intelligence,
+    FashionCategory,
+    FashionSeason,
+)
 from typing import Any, Dict, List, Optional
 import asyncio
 import logging
@@ -17,15 +21,6 @@ API Integration Examples & Templates
 Comprehensive examples for fashion e-commerce API integrations
 with real-world use cases and implementation patterns
 """
-
-# Import our API integration components
-    ActionType,
-    TriggerType,
-    Workflow,
-    workflow_engine,
-    WorkflowStep,
-    WorkflowTrigger,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -534,9 +529,9 @@ class FashionAPIExamples:
         logger.info("\n📊 OVERALL SYSTEM HEALTH:")
         logger.info("=" * 30)
 
-        healthy_components = sum()
+        healthy_components = sum([
             1 for health in health_results.values() if health.get("status") == "healthy"
-        )
+        ])
         total_components = len(health_results)
 
         overall_health = (

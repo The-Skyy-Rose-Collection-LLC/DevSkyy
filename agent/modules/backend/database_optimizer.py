@@ -1,19 +1,15 @@
-import re
-import re
-import re
-import re
-from datetime import datetime
-import json
-import time
-
-from functools import wraps
-from typing import Any, Dict, List
 import asyncio
 import hashlib
+import json
 import logging
+import time
+from datetime import datetime
+from functools import wraps
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class QueryOptimizer:
     """Database query optimization and performance monitoring."""
@@ -35,7 +31,7 @@ class QueryOptimizer:
     ) -> Dict[str, Any]:
         """Analyze query performance and provide optimization suggestions."""
         analysis = {
-            "query_hash": hashlib.sha256(query.encode()).hexdigest()[:8],
+            "query_hash": hashlib.md5(query.encode()).hexdigest()[:8],
             "execution_time": execution_time,
             "is_slow": execution_time > self.slow_query_threshold,
             "optimization_suggestions": [],
@@ -102,6 +98,7 @@ class QueryOptimizer:
 
     def _extract_where_columns(self, query: str) -> List[str]:
         """Extract column names from WHERE clause."""
+        import re
 
         where_pattern = r"where\s+([^)]+)"
         match = re.search(where_pattern, query.lower())
@@ -148,6 +145,7 @@ class QueryOptimizer:
             "optimization_recommendations": len(self.index_recommendations),
         }
 
+
 class DatabaseConnectionPool:
     """Optimized database connection pool with query caching."""
 
@@ -163,11 +161,12 @@ class DatabaseConnectionPool:
             "timeouts": 0,
             "errors": 0,
         }
-        self.query_optimizer = QueryOptimizer(
-            async def execute_query(
-                self, query: str, params: Dict = None, use_cache: bool = True
-) -> Any:
-"""Execute query with optimization and caching."""
+        self.query_optimizer = QueryOptimizer()
+
+    async def execute_query(
+        self, query: str, params: Dict = None, use_cache: bool = True
+    ) -> Any:
+        """Execute query with optimization and caching."""
         start_time = time.time()
 
         # Check cache first
@@ -205,11 +204,11 @@ class DatabaseConnectionPool:
             logger.error(f"Query execution error: {e}")
             raise
 
-def _get_cache_key(self, query: str, params: Dict = None) -> str:
+    def _get_cache_key(self, query: str, params: Dict = None) -> str:
         """Generate cache key for query."""
         key_data = {"query": query, "params": params or {}}
         key_string = json.dumps(key_data, sort_keys=True)
-        return hashlib.sha256(key_string.encode()).hexdigest()
+        return hashlib.md5(key_string.encode()).hexdigest()
 
     async def _execute_with_connection(
         self, connection, query: str, params: Dict = None
@@ -271,7 +270,7 @@ def _get_cache_key(self, query: str, params: Dict = None) -> str:
 
         return MockConnection()
 
-def get_connection_stats(self) -> Dict[str, Any]:
+    def get_connection_stats(self) -> Dict[str, Any]:
         """Get connection pool statistics."""
         return {
             "max_connections": self.max_connections,
@@ -281,16 +280,18 @@ def get_connection_stats(self) -> Dict[str, Any]:
             "query_stats": self.query_optimizer.get_query_stats(),
         }
 
+
 class IndexOptimizer:
     """Database index optimization recommendations."""
 
     def __init__(self):
         self.index_recommendations = []
-        self.existing_indexes = set(
-            def analyze_table(
-                self, table_name: str, query_patterns: List[str]
-) -> List[Dict[str, Any]]:
-"""Analyze table and recommend indexes."""
+        self.existing_indexes = set()
+
+    def analyze_table(
+        self, table_name: str, query_patterns: List[str]
+    ) -> List[Dict[str, Any]]:
+        """Analyze table and recommend indexes."""
         recommendations = []
 
         # Analyze common query patterns
@@ -351,8 +352,9 @@ class IndexOptimizer:
 
         return unique_recommendations
 
-def _extract_where_columns(self, query: str) -> List[str]:
+    def _extract_where_columns(self, query: str) -> List[str]:
         """Extract columns from WHERE clause."""
+        import re
 
         where_pattern = r"where\s+([^)]+)"
         match = re.search(where_pattern, query.lower())
@@ -364,6 +366,7 @@ def _extract_where_columns(self, query: str) -> List[str]:
 
     def _extract_order_columns(self, query: str) -> List[str]:
         """Extract columns from ORDER BY clause."""
+        import re
 
         order_pattern = r"order\s+by\s+([^)]+)"
         match = re.search(order_pattern, query.lower())
@@ -375,6 +378,7 @@ def _extract_where_columns(self, query: str) -> List[str]:
 
     def _extract_join_columns(self, query: str) -> List[str]:
         """Extract columns from JOIN clauses."""
+        import re
 
         join_pattern = r"join\s+\w+\s+on\s+([^)]+)"
         matches = re.findall(join_pattern, query.lower())
@@ -385,9 +389,11 @@ def _extract_where_columns(self, query: str) -> List[str]:
             columns.extend(cols)
         return columns
 
+
 # Global instances
 db_connection_pool = DatabaseConnectionPool(max_connections=20)
 index_optimizer = IndexOptimizer()
+
 
 def optimize_query(func):
     """Decorator for query optimization."""
@@ -409,6 +415,7 @@ def optimize_query(func):
         return result
 
     return wrapper
+
 
 def get_database_stats() -> Dict[str, Any]:
     """Get comprehensive database statistics."""

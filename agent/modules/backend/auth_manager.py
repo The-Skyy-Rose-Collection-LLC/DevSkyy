@@ -1,20 +1,15 @@
-from datetime import datetime, timedelta
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import relationship, sessionmaker
+import logging
 import os
 import re
 import secrets
-
-from fastapi import Depends, HTTPException, status
-from sqlalchemy import (
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
-
+from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
+
 import bcrypt
 import jwt
-import logging
-
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import (
     Boolean,
     Column,
     create_engine,
@@ -24,9 +19,13 @@ import logging
     String,
     Text,
 )
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.sql import func
 
 logger = logging.getLogger(__name__)
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = "users"
@@ -51,6 +50,7 @@ class User(Base):
     sessions = relationship("UserSession", back_populates="user")
     preferences = relationship("UserPreference", back_populates="user", uselist=False)
 
+
 class UserSession(Base):
     __tablename__ = "user_sessions"
 
@@ -65,6 +65,7 @@ class UserSession(Base):
 
     user = relationship("User", back_populates="sessions")
 
+
 class UserPreference(Base):
     __tablename__ = "user_preferences"
 
@@ -77,6 +78,7 @@ class UserPreference(Base):
     language = Column(String, default="en")
 
     user = relationship("User", back_populates="preferences")
+
 
 class AuthManager:
     """Comprehensive authentication and user management system."""
@@ -444,8 +446,10 @@ class AuthManager:
         finally:
             db.close()
 
+
 # Global auth manager instance (lazy initialization)
 _auth_manager = None
+
 
 def get_auth_manager():
     """Get or create the global auth manager instance."""
@@ -453,6 +457,7 @@ def get_auth_manager():
     if _auth_manager is None:
         _auth_manager = AuthManager()
     return _auth_manager
+
 
 # For backward compatibility
 auth_manager = None  # Will be initialized when needed

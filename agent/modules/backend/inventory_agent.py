@@ -1,17 +1,16 @@
-import os
-from datetime import datetime, timedelta
-
-from typing import Any, Dict, List
 import hashlib
 import logging
 import random
 import uuid
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
 # Heavy imports removed - using random instead of numpy for mock data
 # If CV/ML features needed in future, lazy load: cv2, imagehash, PIL, sklearn
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class InventoryAgent:
     """Production-level inventory management with advanced analytics and AI-powered insights."""
@@ -111,13 +110,13 @@ class InventoryAgent:
             # Calculate potential space savings
             space_savings = self._calculate_space_savings(all_duplicates)
 
-            self.performance_metrics["duplicates_found"] = sum()
+            self.performance_metrics["duplicates_found"] = sum(
                 len(group) for group in all_duplicates.values()
             )
 
             return {
                 "duplicate_analysis": all_duplicates,
-                "total_duplicate_groups": len()
+                "total_duplicate_groups": len(
                     [g for groups in all_duplicates.values() for g in groups]
                 ),
                 "potential_space_savings_mb": space_savings,
@@ -231,6 +230,7 @@ class InventoryAgent:
     # Advanced AI-powered helper methods
     async def _scan_digital_assets(self) -> Dict[str, Any]:
         """Scan digital assets across directories."""
+        import os
 
         assets = []
         asset_types = {"images": 0, "documents": 0, "videos": 0, "other": 0}
@@ -338,7 +338,7 @@ class InventoryAgent:
     def _extract_metadata(self, index: int) -> Dict[str, Any]:
         """Extract metadata for asset."""
         return {
-            "checksum": hashlib.sha256(f"asset_{index}".encode()).hexdigest(),
+            "checksum": hashlib.md5(f"asset_{index}".encode()).hexdigest(),
             "dimensions": f"{random.randint(800, 2000)}x{random.randint(600, 1500)}",
             "color_profile": "sRGB",
             "camera_model": "Professional Camera" if index % 10 == 0 else None,
@@ -634,13 +634,13 @@ class InventoryAgent:
         quality_factors = []
 
         # Check for appropriate file sizes
-        oversized_files = sum()
+        oversized_files = sum(
             1 for asset in assets if asset.get("size", 0) > 5000000
         )  # 5MB
         quality_factors.append(max(0, 100 - (oversized_files / len(assets)) * 50))
 
         # Check for proper naming conventions
-        well_named = sum()
+        well_named = sum(
             1
             for asset in assets
             if "_" in asset.get("name", "") or "-" in asset.get("name", "")
@@ -765,6 +765,7 @@ class InventoryAgent:
         except Exception as e:
             logger.error(f"Quantum optimization failed: {str(e)}")
             return {"error": str(e), "status": "quantum_decoherence"}
+
 
 def manage_inventory() -> Dict[str, Any]:
     """Main inventory management function for compatibility."""

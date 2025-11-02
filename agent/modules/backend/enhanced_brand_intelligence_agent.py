@@ -1,21 +1,22 @@
-from agent.modules.wordpress_server_access import create_wordpress_server_access
-from .wordpress_server_access import create_wordpress_server_access
-from datetime import datetime
-
-from typing import Any, Dict, List
 import logging
+from datetime import datetime
+from typing import Any, Dict, List
 
 # Import the server access module
 try:
-    except ImportError:
+    from .wordpress_server_access import create_wordpress_server_access
+except ImportError:
     try:
+        from agent.modules.wordpress_server_access import create_wordpress_server_access
     except ImportError:
         # Fallback if module not available
-def create_wordpress_server_access():
+        def create_wordpress_server_access():
             logger.warning("WordPress server access not available")
             return None
 
+
 logger = logging.getLogger(__name__)
+
 
 class EnhancedBrandIntelligenceAgent:
     """
@@ -475,7 +476,9 @@ class EnhancedBrandIntelligenceAgent:
             logger.error(f"Strategy recommendations failed: {str(e)}")
             return {"error": str(e)}
 
+
 # Factory function
+
 
 def create_enhanced_brand_intelligence_agent() -> EnhancedBrandIntelligenceAgent:
     """Create Enhanced Brand Intelligence Agent instance."""

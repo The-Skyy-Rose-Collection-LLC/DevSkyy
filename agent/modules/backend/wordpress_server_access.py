@@ -1,13 +1,14 @@
-from datetime import datetime, timedelta
-import os
-
-from typing import Any, Dict
 import fnmatch
 import logging
-import paramiko
+import os
 import tempfile
+from datetime import datetime, timedelta
+from typing import Any, Dict
+
+import paramiko
 
 logger = logging.getLogger(__name__)
+
 
 class WordPressServerAccess:
     """
@@ -498,7 +499,7 @@ class WordPressServerAccess:
             logger.error(f"htaccess optimization failed: {str(e)}")
             return False
 
-async def _optimize_file_permissions(self) -> bool:
+    async def _optimize_file_permissions(self) -> bool:
         """Optimize file permissions for security and performance."""
         try:
             # WordPress.com handles most permissions, but we can check
@@ -582,7 +583,9 @@ async def _optimize_file_permissions(self) -> bool:
         except Exception as e:
             logger.error(f"Disconnect error: {str(e)}")
 
+
 # Factory function
+
 
 def create_wordpress_server_access() -> WordPressServerAccess:
     """Create WordPress Server Access instance."""

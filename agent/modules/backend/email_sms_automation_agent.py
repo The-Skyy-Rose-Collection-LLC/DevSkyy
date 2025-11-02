@@ -1,11 +1,11 @@
-from datetime import datetime
-
-from typing import Any, Dict, List
 import logging
 import uuid
+from datetime import datetime
+from typing import Any, Dict, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class EmailSMSAutomationAgent:
     """Email & SMS Marketing Automation Specialist for Luxury Fashion Brands."""
@@ -600,7 +600,7 @@ class EmailSMSAutomationAgent:
                 "variant": "A",
                 "message": f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]",
                 "tone": "professional",
-                "length": len()
+                "length": len(
                     f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]"
                 ),
             }
@@ -635,6 +635,7 @@ class EmailSMSAutomationAgent:
             "roi_maximization": "luxury_customer_lifetime_value_optimization",
             "deliverability_optimization": "premium_inbox_placement",
         }
+
 
 def optimize_email_sms_marketing() -> Dict[str, Any]:
     """Main function to optimize email and SMS marketing."""

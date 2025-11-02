@@ -600,7 +600,7 @@ async def auth0_health_check() -> Dict[str, Any]:
                 await auth0_client.get_management_token()
                 management_healthy = True
             except Exception as e:
-    logger.warning(f"Handled exception: {e}")
+                logger.warning(f"Handled exception: {e}")
         
         return {
             "status": "healthy" if jwks_healthy else "unhealthy",

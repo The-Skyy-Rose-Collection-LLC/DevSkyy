@@ -1,14 +1,17 @@
+import logging
 import re
+import uuid
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
-
-import uuid
 from security.jwt_auth import (
+    get_current_active_user,
+    require_admin,
+    TokenData,
+    user_manager,
+)
+from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
 from typing import Any, Dict, List, Optional
-import logging
 
 """
 GDPR Compliance API Endpoints
@@ -19,12 +22,6 @@ References:
 - GDPR Article 17: Right to erasure ('right to be forgotten')
 - NIST SP 800-53 Rev. 5: Privacy Controls
 """
-
-    get_current_active_user,
-    require_admin,
-    TokenData,
-    user_manager,
-)
 
 logger = logging.getLogger(__name__)
 
