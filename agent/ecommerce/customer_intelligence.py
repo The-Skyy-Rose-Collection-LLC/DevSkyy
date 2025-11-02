@@ -1,16 +1,9 @@
-from datetime import datetime, timedelta
-import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
-
-from typing import Any, Dict, List, Optional
-import logging
-import numpy as np
-
 """
 Customer Intelligence Module
 Advanced customer segmentation, behavior prediction, and personalization
 
 Features:
-    - ML-powered customer segmentation
+- ML-powered customer segmentation
 - Lifetime value prediction
 - Churn prediction and prevention
 - Purchase behavior analysis
@@ -18,12 +11,21 @@ Features:
 - Customer journey mapping
 """
 
+import logging
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
+import numpy as np
+from sklearn.cluster import (  # noqa: F401 - Reserved for future ML clustering features
     KMeans,
 )
+from sklearn.preprocessing import (  # noqa: F401 - Reserved for Phase 3 data preprocessing
     StandardScaler,
 )
 
 logger = logging.getLogger(__name__)
+
 
 class CustomerIntelligence:
     """

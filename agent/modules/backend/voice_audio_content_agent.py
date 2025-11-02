@@ -219,7 +219,7 @@ Return the enhanced text optimized for voice generation."""
             logger.warning(f"Text enhancement failed, using original: {e}")
             return text
 
-    async def _generate_elevenlabs_speech(
+async def _generate_elevenlabs_speech(
         self, text: str, voice_style: str
     ) -> Optional[bytes]:
         """
@@ -448,7 +448,7 @@ Consider this is for a luxury fashion brand customer interaction."""
             logger.error(f"❌ Voice sentiment analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def create_podcast_episode(
+async def create_podcast_episode(
         self,
         script: str,
         episode_title: str,

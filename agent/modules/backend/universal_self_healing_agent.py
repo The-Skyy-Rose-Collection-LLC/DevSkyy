@@ -407,7 +407,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return []
 
-    async def _check_learned_patterns(
+async def _check_learned_patterns(
         self, content: str, language: str
     ) -> List[Dict[str, Any]]:
         """
@@ -572,7 +572,7 @@ Provide the complete fixed code. Ensure:
             logger.error(f"❌ Fix generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, Any]:
+async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, Any]:
         """
         Validate that healed code is correct and doesn't introduce new issues.
         """

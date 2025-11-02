@@ -1,7 +1,7 @@
-    from agent.registry import AgentRegistry
-    from ml.model_registry import ModelRegistry
-    from monitoring.system_monitor import SystemMonitor
-    from security.jwt_auth import get_current_user
+from agent.registry import AgentRegistry
+from ml.model_registry import ModelRegistry
+from monitoring.system_monitor import SystemMonitor
+from security.jwt_auth import get_current_user
 from datetime import datetime, timedelta
 from fastapi.responses import HTMLResponse
 import time
@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
-    from agent.orchestrator import AgentOrchestrator
+from agent.orchestrator import AgentOrchestrator
 from typing import Any, Dict, List, Optional
 import asyncio
 

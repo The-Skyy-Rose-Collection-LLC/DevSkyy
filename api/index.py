@@ -1,10 +1,10 @@
-    from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse
 import os
 import sys
 
-    from fastapi import FastAPI
+from fastapi import FastAPI
 
-    from main import app
+from main import app
 
 """
 Vercel serverless function entry point for DevSkyy Platform
@@ -23,8 +23,8 @@ except Exception as e:
     
     fallback_app = FastAPI(title="DevSkyy Fallback")
     
-    @fallback_app.get("/")
-    async def fallback_root():
+@fallback_app.get("/")
+async def fallback_root():
         return {
             "name": "DevSkyy Platform",
             "status": "fallback_mode",

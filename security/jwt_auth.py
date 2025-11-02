@@ -1,74 +1,64 @@
 """
-JWT Authentication Module (RFC 7519 Compliant)
-Implements OAuth2 with access + refresh token rotation
-Author: DevSkyy Enterprise Team
-Date: October 26, 2025
+Enterprise JWT Authentication System
+Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 """
 
-import os
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, List, Any
-import jwt
-from jwt import PyJWTError
-from pydantic import BaseModel, Field, EmailStr, validator
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-import secrets
 import logging
+import os
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List, Optional
+
+import jwt
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+    OAuth2PasswordBearer,
+)
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr, Field
 
 logger = logging.getLogger(__name__)
 
-# ============================================================================
-# CONFIGURATION (RFC 7519 Section 4.1.4: Expiration Time)
-# ============================================================================
+# JWT Configuration - Enhanced Security
+JWT_SECRET_KEY = os.getenv(
+    "JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME")
+)
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+MAX_LOGIN_ATTEMPTS = 5  # Maximum failed login attempts
+LOCKOUT_DURATION_MINUTES = 15  # Account lockout duration
+TOKEN_BLACKLIST_EXPIRE_HOURS = 24  # How long to keep blacklisted tokens
 
-class JWTSettings:
-    """JWT configuration following RFC 7519 standards"""
-    
-    SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(32))
-    REFRESH_SECRET_KEY: str = os.getenv("JWT_REFRESH_SECRET_KEY", secrets.token_urlsafe(32))
-    ALGORITHM: str = "HS256"  # HMAC SHA-256 (RFC 7518)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30  # Short-lived access tokens
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7  # Longer-lived refresh tokens
-    
-    def __init__(self):
-        if len(self.SECRET_KEY) < 32:
-            raise ValueError("JWT_SECRET_KEY must be at least 32 characters (256 bits)")
-        if len(self.REFRESH_SECRET_KEY) < 32:
-            raise ValueError("JWT_REFRESH_SECRET_KEY must be at least 32 characters")
-
-settings = JWTSettings()
-
-# ============================================================================
-# PASSWORD HASHING (PBKDF2 via passlib/bcrypt)
-# ============================================================================
-
+# Password hashing - Enhanced
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto",
-    bcrypt__rounds=12  # NIST recommendation: 10-12 rounds
+    bcrypt__rounds=12,  # Increased rounds for better security
 )
 
+# Security schemes
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+security_bearer = HTTPBearer()
+
+# Security tracking
+
+# Track failed login attempts
+failed_login_attempts = defaultdict(list)
+locked_accounts = {}
+blacklisted_tokens = set()  # In production, use Redis or database
+
+
 # ============================================================================
-# RBAC ROLES (5-Role Hierarchy per CLAUDE.md)
+# MODELS
 # ============================================================================
 
-from enum import Enum
 
-class UserRole(str, Enum):
-    """
-    User roles for RBAC (Role-Based Access Control).
+class UserRole(str):
+    """User role enumeration"""
 
-    Hierarchy (highest to lowest):
-    - SUPER_ADMIN: Full system access, user management
-    - ADMIN: Brand management, workflow execution
-    - DEVELOPER: API access, code generation, content creation
-    - API_USER: Limited API access, read/write operations
-    - READ_ONLY: View-only access
-
-    Citation: CLAUDE.md Section 3 (RBAC Requirements)
-    """
     SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     DEVELOPER = "developer"
@@ -76,460 +66,582 @@ class UserRole(str, Enum):
     READ_ONLY = "read_only"
 
 
-ROLE_HIERARCHY = {
-    UserRole.SUPER_ADMIN: 5,
-    UserRole.ADMIN: 4,
-    UserRole.DEVELOPER: 3,
-    UserRole.API_USER: 2,
-    UserRole.READ_ONLY: 1,
-}
+class User(BaseModel):
+    """User model"""
 
+    user_id: str
+    email: EmailStr
+    username: str
+    password_hash: Optional[str] = None  # Hashed password
+    role: str = UserRole.API_USER
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.now)
+    last_login: Optional[datetime] = None
+    permissions: List[str] = Field(default_factory=list)
 
-def has_permission(user_role: UserRole, required_role: UserRole) -> bool:
-    """
-    Determine whether a user's role meets or exceeds a required role.
-    
-    Parameters:
-        user_role (UserRole): The user's current role.
-        required_role (UserRole): The minimum role required to perform an action.
-    
-    Returns:
-        True if `user_role` has equal or higher privilege than `required_role`, False otherwise.
-    """
-    return ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[required_role]
-
-
-# ============================================================================
-# PYDANTIC MODELS
-# ============================================================================
 
 class TokenData(BaseModel):
-    """Token payload (RFC 7519 Section 4: Claims)"""
-    sub: str  # Subject (user ID)
-    exp: datetime  # Expiration Time
-    iat: datetime  # Issued At
-    roles: List[str] = []  # User roles (RBAC)
-    scopes: List[str] = []  # OAuth2 scopes
-    jti: str = Field(default_factory=lambda: secrets.token_urlsafe(16))  # JWT ID (unique identifier)
+    """Token payload data"""
 
-class AccessToken(BaseModel):
-    """Access token response"""
+    user_id: str
+    email: str
+    username: str
+    role: str
+    token_type: str = "access"  # 'access' or 'refresh'
+    exp: datetime
+
+
+class TokenResponse(BaseModel):
+    """Token response"""
+
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
-    expires_in: int  # seconds
+    expires_in: int = ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
-class RefreshTokenRequest(BaseModel):
-    """Refresh token request payload"""
-    refresh_token: str
 
-class UserCredentials(BaseModel):
-    """User login credentials"""
-    username: str
+class LoginRequest(BaseModel):
+    """Login request"""
+
+    email: EmailStr
     password: str
 
-class UserResponse(BaseModel):
-    """User response (no password)"""
-    id: int
-    username: str
+
+class RegisterRequest(BaseModel):
+    """Registration request"""
+
     email: EmailStr
-    is_active: bool
-    roles: List[str]
+    username: str
+    password: str
+    role: str = UserRole.API_USER
+
 
 # ============================================================================
-# TOKEN OPERATIONS
+# PASSWORD UTILITIES
 # ============================================================================
+
 
 def hash_password(password: str) -> str:
-    """
-    Hash password using bcrypt (PBKDF2 via passlib)
-    
-    Args:
-        password: Plaintext password
-        
-    Returns:
-        Hashed password
-    """
+    """Hash a password using bcrypt"""
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verify password against hash
-    
-    Args:
-        plain_password: Plaintext password
-        hashed_password: Hashed password from DB
-        
-    Returns:
-        True if password matches
-    """
+    """Verify a password against its hash"""
     return pwd_context.verify(plain_password, hashed_password)
 
+
+# ============================================================================
+# ENHANCED SECURITY FUNCTIONS
+# ============================================================================
+
+
+def is_account_locked(email: str) -> bool:
+    """Check if account is locked due to failed login attempts"""
+    if email in locked_accounts:
+        lock_time = locked_accounts[email]
+        if datetime.now() < lock_time:
+            return True
+        else:
+            # Lock expired, remove from locked accounts
+            del locked_accounts[email]
+            if email in failed_login_attempts:
+                del failed_login_attempts[email]
+    return False
+
+
+def record_failed_login(email: str) -> bool:
+    """Record failed login attempt and lock account if necessary"""
+    now = datetime.now()
+
+    # Clean old attempts (older than 1 hour)
+    hour_ago = now - timedelta(hours=1)
+    failed_login_attempts[email] = [
+        attempt for attempt in failed_login_attempts[email] if attempt > hour_ago
+    ]
+
+    # Add current failed attempt
+    failed_login_attempts[email].append(now)
+
+    # Check if account should be locked
+    if len(failed_login_attempts[email]) >= MAX_LOGIN_ATTEMPTS:
+        locked_accounts[email] = now + timedelta(minutes=LOCKOUT_DURATION_MINUTES)
+        logger.warning(f"🔒 Account locked due to failed login attempts: {email}")
+        return True
+
+    return False
+
+
+def clear_failed_login_attempts(email: str):
+    """Clear failed login attempts for successful login"""
+    if email in failed_login_attempts:
+        del failed_login_attempts[email]
+    if email in locked_accounts:
+        del locked_accounts[email]
+
+
+def blacklist_token(token: str):
+    """Add token to blacklist (logout/security breach)"""
+    blacklisted_tokens.add(token)
+    logger.info("🚫 Token blacklisted for security")
+
+
+def is_token_blacklisted(token: str) -> bool:
+    """Check if token is blacklisted"""
+    return token in blacklisted_tokens
+
+
+def validate_token_security(token: str, token_data: TokenData) -> bool:
+    """Enhanced token security validation"""
+    # Check if token is blacklisted
+    if is_token_blacklisted(token):
+        logger.warning(f"⚠️ Blacklisted token used: {token_data.email}")
+        return False
+
+    # Check token age (additional security check)
+    token_age = (
+        datetime.now() - token_data.exp + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    if token_age > timedelta(hours=TOKEN_BLACKLIST_EXPIRE_HOURS):
+        logger.warning(f"⚠️ Suspiciously old token used: {token_data.email}")
+        return False
+
+    return True
+
+
+# ============================================================================
+# JWT TOKEN UTILITIES
+# ============================================================================
+
+
 def create_access_token(
-    user_id: str,
-    roles: List[str],
-    expires_delta: Optional[timedelta] = None
+    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
 ) -> str:
     """
-    Create JWT access token (RFC 7519)
-    
+    Create a new access token
+
     Args:
-        user_id: User ID (subject claim)
-        roles: User roles for RBAC
-        expires_delta: Custom expiration (defaults to ACCESS_TOKEN_EXPIRE_MINUTES)
-        
+        data: Token payload data
+        expires_delta: Custom expiration time
+
     Returns:
         Encoded JWT token
-        
-    Citation: RFC 7519 Section 3.1 (Header), Section 4.1 (Registered Claim Names)
     """
-    if expires_delta is None:
-        expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    now = datetime.now(timezone.utc)
-    exp = now + expires_delta
-    
-    payload = {
-        "sub": user_id,
-        "iat": now,
-        "exp": exp,
-        "roles": roles,
-        "type": "access",
-        "jti": secrets.token_urlsafe(16)
-    }
-    
-    token = jwt.encode(
-        payload,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
-    )
-    
-    logger.info(f"Access token created for user {user_id}, expires: {exp}")
-    return token
+    to_encode = data.copy()
 
-def create_refresh_token(user_id: str) -> str:
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(timezone.utc),
+            "token_type": "access",
+        }
+    )
+
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+
+def create_refresh_token(data: Dict[str, Any]) -> str:
     """
-    Create JWT refresh token (RFC 7519)
-    Refresh tokens are longer-lived and used to obtain new access tokens
-    
+    Create a new refresh token
+
     Args:
-        user_id: User ID (subject claim)
-        
-    Returns:
-        Encoded refresh token
-    """
-    now = datetime.now(timezone.utc)
-    exp = now + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    
-    payload = {
-        "sub": user_id,
-        "iat": now,
-        "exp": exp,
-        "type": "refresh",
-        "jti": secrets.token_urlsafe(16)
-    }
-    
-    token = jwt.encode(
-        payload,
-        settings.REFRESH_SECRET_KEY,
-        algorithm=settings.ALGORITHM
-    )
-    
-    logger.info(f"Refresh token created for user {user_id}, expires: {exp}")
-    return token
+        data: Token payload data
 
-def verify_access_token(token: str) -> Dict[str, Any]:
+    Returns:
+        Encoded JWT refresh token
     """
-    Verify and decode JWT access token
-    
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+
+    to_encode.update(
+        {
+            "exp": expire,
+            "iat": datetime.now(timezone.utc),
+            "token_type": "refresh",
+        }
+    )
+
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    return encoded_jwt
+
+
+def get_token_payload(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Get token payload without validation (for testing purposes)
+
+    Args:
+        token: JWT token to decode
+
+    Returns:
+        Token payload or None if invalid
+    """
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        return payload
+    except Exception:
+        return None
+
+
+def verify_token(token: str, token_type: str = "access") -> TokenData:
+    """
+    Verify and decode a JWT token
+
     Args:
         token: JWT token to verify
-        
+        token_type: Expected token type ('access' or 'refresh')
+
     Returns:
-        Decoded token payload
-        
+        Decoded token data
+
     Raises:
         HTTPException: If token is invalid or expired
     """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"Could not validate {token_type} token",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
     try:
-        payload = jwt.decode(
-            token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
-        )
-        
-        # Verify token type
-        if payload.get("type") != "access":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token type (expected 'access')"
-            )
-        
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token missing user ID (sub claim)"
-            )
-        
-        return payload
-    
-    except PyJWTError as e:
-        logger.warning(f"Token verification failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"}
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+
+        # Check token type
+        if payload.get("token_type") != token_type:
+            raise credentials_exception
+
+        # Extract data
+        user_id: str = payload.get("user_id")
+        email: str = payload.get("email")
+        username: str = payload.get("username")
+        role: str = payload.get("role")
+
+        if user_id is None or email is None:
+            raise credentials_exception
+
+        token_data = TokenData(
+            user_id=user_id,
+            email=email,
+            username=username,
+            role=role,
+            token_type=token_type,
+            exp=datetime.fromtimestamp(payload.get("exp")),
         )
 
-def verify_refresh_token(token: str) -> Dict[str, Any]:
+        # Enhanced security validation
+        if not validate_token_security(token, token_data):
+            logger.warning(f"🚨 Security validation failed for token: {email}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token security validation failed",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        return token_data
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"{token_type.capitalize()} token expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as e:
+        logger.error(f"JWT validation error: {e}")
+        raise credentials_exception
+
+
+# ============================================================================
+# AUTHENTICATION DEPENDENCIES
+# ============================================================================
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     """
-    Verify and decode JWT refresh token
-    
+    Get current authenticated user from token
+
     Args:
-        token: Refresh token to verify
-        
+        token: JWT access token
+
     Returns:
-        Decoded token payload
-        
-    Raises:
-        HTTPException: If token is invalid or expired
+        Token data with user information
     """
-    try:
-        payload = jwt.decode(
-            token,
-            settings.REFRESH_SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
-        )
-        
-        # Verify token type
-        if payload.get("type") != "refresh":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token type (expected 'refresh')"
-            )
-        
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token missing user ID"
-            )
-        
-        return payload
-    
-    except PyJWTError as e:
-        logger.warning(f"Refresh token verification failed: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token"
-        )
+    return verify_token(token, token_type="access")
 
-# ============================================================================
-# FASTAPI DEPENDENCIES
-# ============================================================================
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
-
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
+async def get_current_active_user(
+    current_user: TokenData = Depends(get_current_user),
+) -> TokenData:
     """
-    Resolve and validate the current user from the request's access token.
-    
+    Get current active user (additional checks can be added)
+
+    Args:
+        current_user: Current user token data
+
     Returns:
-        dict: Decoded JWT payload containing the authenticated user's claims (e.g., `sub`, `roles`, `exp`, `iat`, `jti`).
+        Token data if user is active
     """
-    return verify_access_token(token)
-
-def require_role(required_role: UserRole):
-    """
-    Create a FastAPI dependency that enforces a minimum user role according to the RBAC hierarchy.
-    
-    Parameters:
-        required_role (UserRole): Minimum role required to access the protected endpoint.
-    
-    Returns:
-        Callable: A FastAPI dependency function that resolves the current user (via get_current_user), determines the user's highest role (defaults to `UserRole.READ_ONLY` when no valid roles are present), and raises HTTPException(status_code=403) if the user's role level is lower than `required_role`. On success, the dependency returns the `current_user` dict.
-    """
-    async def role_checker(current_user: Dict = Depends(get_current_user)) -> Dict[str, Any]:
-        """
-        Enforces that the current user has at least the required role and returns the user's decoded payload.
-        
-        Parameters:
-        	current_user (Dict): Decoded user payload (JWT claims) — may include a "roles" list of role names.
-        
-        Returns:
-        	Dict[str, Any]: The same `current_user` payload when the user has sufficient permissions.
-        
-        Raises:
-        	HTTPException: 403 Forbidden if the user's highest role does not meet the required role.
-        """
-        user_roles = current_user.get("roles", [])
-
-        # If no roles, default to READ_ONLY
-        if not user_roles:
-            user_role = UserRole.READ_ONLY
-        else:
-            # Get highest role from user's roles
-            user_role_levels = [
-                ROLE_HIERARCHY.get(UserRole(role), 0)
-                for role in user_roles
-                if role in [r.value for r in UserRole]
-            ]
-
-            if not user_role_levels:
-                user_role = UserRole.READ_ONLY
-            else:
-                # Find role with highest level
-                max_level = max(user_role_levels)
-                user_role = next(
-                    role for role, level in ROLE_HIERARCHY.items()
-                    if level == max_level
-                )
-
-        # Check permission
-        if not has_permission(user_role, required_role):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions. Required: {required_role.value}, Current: {user_role.value}"
-            )
-
-        return current_user
-
-    return role_checker
-
-
-async def get_current_admin(
-    current_user: Dict = Depends(get_current_user)
-) -> Dict[str, Any]:
-    """
-    Dependency that enforces admin-level access for the resolved current user.
-    
-    Deprecated: Use require_role(UserRole.ADMIN) instead.
-    
-    Returns:
-        dict: The current user dictionary as returned by `get_current_user`.
-    
-    Raises:
-        fastapi.HTTPException: HTTP 403 if the current user does not have `admin` or `super_admin` role.
-    """
-    user_roles = current_user.get("roles", [])
-
-    # Check if user has admin or super_admin role
-    if not any(role in ["admin", "super_admin"] for role in user_roles):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin role required"
-        )
+    # In production, check if user is active in database
+    # For now, just return the user
     return current_user
 
-async def require_scope(required_scope: str):
-    """
-    FastAPI dependency factory for OAuth2 scope validation
-    
-    Usage:
-        @app.get("/api")
-        async def endpoint(
-            current_user: Dict = Depends(get_current_user),
-            _: None = Depends(require_scope("api:read"))
-        ):
-            pass
-    """
-    async def scope_checker(current_user: Dict = Depends(get_current_user)):
-        if required_scope not in current_user.get("scopes", []):
+
+# ============================================================================
+# ROLE-BASED ACCESS CONTROL
+# ============================================================================
+
+
+class RoleChecker:
+    """Role-based access control checker"""
+
+    def __init__(self, allowed_roles: List[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: TokenData = Depends(get_current_active_user)) -> TokenData:
+        if user.role not in self.allowed_roles:
+            logger.warning(
+                f"User {user.email} with role {user.role} denied access. Required: {self.allowed_roles}"
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Scope '{required_scope}' required"
+                detail=f"Access forbidden. Required role: {self.allowed_roles}",
             )
-        return current_user
-    
-    return scope_checker
+        return user
+
+
+# Predefined role checkers
+require_super_admin = RoleChecker([UserRole.SUPER_ADMIN])
+require_admin = RoleChecker([UserRole.SUPER_ADMIN, UserRole.ADMIN])
+require_developer = RoleChecker(
+    [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DEVELOPER]
+)
+require_authenticated = RoleChecker(
+    [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.DEVELOPER,
+        UserRole.API_USER,
+        UserRole.READ_ONLY,
+    ]
+)
+
 
 # ============================================================================
-# EXPORTED FUNCTIONS FOR API ENDPOINTS
+# API KEY AUTHENTICATION (Alternative to JWT)
 # ============================================================================
 
-async def authenticate_user(username: str, password: str) -> Optional[Dict[str, Any]]:
+
+class APIKeyAuth:
+    """API Key authentication for service-to-service communication"""
+
+    @staticmethod
+    def validate_api_key(
+        credentials: HTTPAuthorizationCredentials = Security(security_bearer),
+    ) -> Dict[str, Any]:
+        """
+        Validate API key from Authorization header
+
+        Args:
+            credentials: HTTP Bearer credentials
+
+        Returns:
+            API key information
+        """
+        api_key = credentials.credentials
+
+        # In production, validate against database
+        # For now, validate against security manager
+        try:
+            from agent.security_manager import security_manager
+
+            validation = security_manager.validate_api_key(api_key)
+
+            if not validation["valid"]:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid API key",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+            return validation
+
+        except Exception as e:
+            logger.error(f"API key validation error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="API key validation failed",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+
+def create_user_tokens(user: User) -> TokenResponse:
     """
-    Authenticate user credentials against the application's user store.
-    
-    This function is a placeholder and currently always returns None to fail closed; replace its body with a database-backed lookup that verifies the supplied password (e.g., using verify_password) and returns a user dictionary on success.
-    
+    Create access and refresh tokens for a user
+
     Args:
-        username (str): The username to authenticate.
-        password (str): The plaintext password to verify.
-    
-    Returns:
-        Optional[Dict[str, Any]]: A dictionary with user information (e.g., id, username, email, roles) if authentication succeeds, `None` otherwise.
-    """
-    logger.error(
-        "authenticate_user() not integrated with database. "
-        "See function docstring for implementation example. "
-        "Refusing authentication for security."
-    )
-    # Intentionally return None to fail closed (secure by default)
-    # Do not authenticate without proper database integration
-    return None
+        user: User object
 
-async def login(credentials: UserCredentials) -> AccessToken:
-    """
-    Authenticate user credentials and return new access and refresh tokens.
-    
-    Parameters:
-        credentials (UserCredentials): Login credentials containing `username` and `password`.
-    
     Returns:
-        AccessToken: Contains `access_token`, `refresh_token`, `token_type` ("bearer"), and `expires_in` (seconds until the access token expires).
-    
-    Raises:
-        HTTPException: If the provided credentials are invalid (401 Unauthorized).
+        Token response with access and refresh tokens
     """
-    user = await authenticate_user(credentials.username, credentials.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password"
-        )
-    
-    access_token = create_access_token(
-        user_id=user["id"],
-        roles=user.get("roles", [])
-    )
-    refresh_token = create_refresh_token(user_id=user["id"])
-    
-    return AccessToken(
+    token_data = {
+        "user_id": user.user_id,
+        "email": user.email,
+        "username": user.username,
+        "role": user.role,
+    }
+
+    access_token = create_access_token(token_data)
+    refresh_token = create_refresh_token(token_data)
+
+    return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60  # Convert to seconds
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
-async def refresh(request: RefreshTokenRequest) -> AccessToken:
-    """
-    Exchange a refresh token for a new access token and a rotated refresh token.
-    
-    Parameters:
-        request (RefreshTokenRequest): Payload containing the `refresh_token` to verify.
-    
-    Returns:
-        AccessToken: Model containing the new `access_token`, rotated `refresh_token`, and `expires_in` (seconds).
-    
-    Notes:
-        Roles are taken from the decoded refresh token payload; in production, the authoritative role set should be reloaded from the database if up-to-date role enforcement is required.
-    """
-    payload = verify_refresh_token(request.refresh_token)
-    user_id = payload["sub"]
 
-    # Retrieve roles from token payload (preserved from login)
-    # In production, consider querying database to get latest roles
-    roles = payload.get("roles", [UserRole.READ_ONLY.value])
+# ============================================================================
+# USER MANAGEMENT (In-memory for now, move to database in production)
+# ============================================================================
 
-    access_token = create_access_token(user_id=user_id, roles=roles)
-    # Issue new refresh token (rotating refresh token strategy)
-    new_refresh_token = create_refresh_token(user_id=user_id)
 
-    logger.info(f"Tokens refreshed for user {user_id}")
+class UserManager:
+    """Simple user management (replace with database in production)"""
 
-    return AccessToken(
-        access_token=access_token,
-        refresh_token=new_refresh_token,
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
-    )
+    def __init__(self):
+        self.users: Dict[str, User] = {}
+        self.email_index: Dict[str, str] = {}  # email -> user_id
+        self.username_index: Dict[str, str] = {}  # username -> user_id
+
+        # Create default admin user
+        self._create_default_users()
+
+    def hash_password(self, password: str) -> str:
+        """Hash a password using bcrypt"""
+        return pwd_context.hash(password)
+
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        """Verify a password against its hash"""
+        return pwd_context.verify(plain_password, hashed_password)
+
+    def authenticate_user(
+        self, username_or_email: str, password: str
+    ) -> Optional[User]:
+        """Authenticate a user by username/email and password"""
+        # Try to find user by email first
+        user = self.get_user_by_email(username_or_email)
+        if not user:
+            # Try to find by username
+            user = self.get_user_by_username(username_or_email)
+
+        if not user or not user.password_hash:
+            return None
+
+        if not self.verify_password(password, user.password_hash):
+            return None
+
+        # Update last login
+        user.last_login = datetime.now()
+        return user
+
+    def _create_default_users(self):
+        """Create default users for development"""
+        # Super admin
+        admin_user = User(
+            user_id="admin_001",
+            email="admin@devskyy.com",
+            username="admin",
+            role=UserRole.SUPER_ADMIN,
+            permissions=["*"],
+        )
+        self.users[admin_user.user_id] = admin_user
+        self.email_index[admin_user.email] = admin_user.user_id
+        self.username_index[admin_user.username] = admin_user.user_id
+
+        # API user
+        api_user = User(
+            user_id="api_001",
+            email="api@devskyy.com",
+            username="api_user",
+            role=UserRole.API_USER,
+            permissions=["read", "write", "execute"],
+        )
+        self.users[api_user.user_id] = api_user
+        self.email_index[api_user.email] = api_user.user_id
+        self.username_index[api_user.username] = api_user.user_id
+
+        logger.info(f"Created {len(self.users)} default users")
+
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Get user by ID"""
+        return self.users.get(user_id)
+
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Get user by email"""
+        user_id = self.email_index.get(email)
+        if user_id:
+            return self.users.get(user_id)
+        return None
+
+    def get_user_by_username(self, username: str) -> Optional[User]:
+        """Get user by username"""
+        user_id = self.username_index.get(username)
+        if user_id:
+            return self.users.get(user_id)
+        return None
+
+    def create_user(
+        self, email: str, username: str, password: str, role: str = UserRole.API_USER
+    ) -> User:
+        """Create a new user with hashed password"""
+        # Check if email already exists
+        if email in self.email_index:
+            raise ValueError(f"User with email {email} already exists")
+
+        # Check if username already exists
+        if username in self.username_index:
+            raise ValueError(f"User with username {username} already exists")
+
+        # Generate user ID
+        user_id = f"user_{len(self.users) + 1:06d}"
+
+        # Hash password
+        password_hash = self.hash_password(password)
+
+        # Create user
+        user = User(
+            user_id=user_id,
+            email=email,
+            username=username,
+            password_hash=password_hash,
+            role=role,
+        )
+
+        # Store user
+        self.users[user_id] = user
+        self.email_index[email] = user_id
+        self.username_index[username] = user_id
+
+        logger.info(
+            f"Created new user: {email} (username: {username}) with role {role}"
+        )
+
+        return user
+
+
+# Global user manager instance
+user_manager = UserManager()
+
+logger.info("🔐 Enterprise JWT Authentication System initialized")

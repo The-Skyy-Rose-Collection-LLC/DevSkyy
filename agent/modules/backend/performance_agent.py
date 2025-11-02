@@ -666,7 +666,7 @@ class PerformanceAgent:
 
         return vulnerabilities
 
-    def _generate_code_fixes(
+def _generate_code_fixes(
         self, analysis: Dict, code: str, language: str
     ) -> Dict[str, Any]:
         """Generate automated fixes for detected issues."""

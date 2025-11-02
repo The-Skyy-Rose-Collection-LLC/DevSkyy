@@ -867,7 +867,7 @@ Provide detailed, expert fashion analysis.""",
             logger.error(f"❌ AI vision analysis failed: {e}")
             return {"error": str(e)}
 
-    def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any]:
+def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Generate comprehensive overall assessment.
         """

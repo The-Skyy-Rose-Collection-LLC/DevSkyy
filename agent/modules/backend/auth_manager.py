@@ -7,7 +7,7 @@ import secrets
 
 from fastapi import Depends, HTTPException, status
 from sqlalchemy import (
-    from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
 from typing import Any, Dict, Optional

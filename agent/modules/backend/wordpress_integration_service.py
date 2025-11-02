@@ -491,7 +491,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
 
         return content
 
-    async def _analyze_luxury_opportunities(
+async def _analyze_luxury_opportunities(
         self, theme_data: Dict[str, Any]
     ) -> List[str]:
         """Analyze opportunities for luxury brand improvements."""

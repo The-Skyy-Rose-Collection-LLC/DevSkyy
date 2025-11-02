@@ -1,16 +1,9 @@
-from datetime import datetime, timedelta
-
-from enum import Enum
-from typing import Any, Dict, List
-import logging
-import numpy as np
-
 """
 Order Automation Module
 Automated order processing, fulfillment, and management
 
 Features:
-    - Automated order processing
+- Automated order processing
 - Intelligent order routing
 - Inventory allocation
 - Shipping optimization
@@ -19,7 +12,15 @@ Features:
 - Fraud detection
 """
 
+import logging
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any, Dict, List
+
+import numpy as np
+
 logger = logging.getLogger(__name__)
+
 
 class OrderStatus(str, Enum):
     """Order status enumeration"""
@@ -32,6 +33,7 @@ class OrderStatus(str, Enum):
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
     REFUNDED = "refunded"
+
 
 class OrderAutomation:
     """
@@ -287,7 +289,7 @@ class OrderAutomation:
             "success": all_available,
             "allocations": allocations,
             "fully_allocated": all_available,
-            "partial_shipment_available": len()
+            "partial_shipment_available": len(
                 [a for a in allocations if a.get("allocated", 0) > 0]
             )
             > 0,
@@ -308,7 +310,7 @@ class OrderAutomation:
 
         # Simulate payment processing
         success_rate = 0.95  # 95% success rate
-        success = np.secrets.SystemRandom().random() < success_rate
+        success = np.random.random() < success_rate
 
         if success:
             return {
@@ -352,17 +354,17 @@ class OrderAutomation:
             {
                 "id": "WH-EAST",
                 "location": "East Coast",
-                "distance_score": np.secrets.SystemRandom().random(),
+                "distance_score": np.random.random(),
             },
             {
                 "id": "WH-WEST",
                 "location": "West Coast",
-                "distance_score": np.secrets.SystemRandom().random(),
+                "distance_score": np.random.random(),
             },
             {
                 "id": "WH-CENTRAL",
                 "location": "Central",
-                "distance_score": np.secrets.SystemRandom().random(),
+                "distance_score": np.random.random(),
             },
         ]
 

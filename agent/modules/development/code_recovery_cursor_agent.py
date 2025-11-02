@@ -594,7 +594,7 @@ Please generate clean, production-ready code with:
 
         return prompt
 
-    def _extract_code_from_response(self, response: str) -> str:
+def _extract_code_from_response(self, response: str) -> str:
         """
         Extracts the first Markdown fenced code block from an AI response or returns the trimmed response if none is found.
         

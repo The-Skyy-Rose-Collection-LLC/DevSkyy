@@ -1,17 +1,16 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
-import os
-
-            from sqlalchemy import text
-from sqlalchemy.ext.declarative import declarative_base
-
-from database_config import CONNECTION_ARGS, DATABASE_URL
-from typing import AsyncGenerator
-import logging
-
 """
 Enterprise Database Configuration - SQLAlchemy Support
 Production-ready with Neon, Supabase, PlanetScale support
 """
+
+import logging
+import os
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+
+from database_config import CONNECTION_ARGS, DATABASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +32,7 @@ AsyncSessionLocal = async_sessionmaker(
 # Create base class for models
 Base = declarative_base()
 
+
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency function to get database session.
@@ -52,6 +52,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
+
 async def init_db():
     """
     Initialize database - create all tables.
@@ -60,12 +61,14 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+
 async def close_db():
     """
     Close database connections.
     Call this on application shutdown.
     """
     await engine.dispose()
+
 
 # For backward compatibility with MongoDB code
 class DatabaseManager:
@@ -104,6 +107,7 @@ class DatabaseManager:
     async def health_check(self):
         """Check database health"""
         try:
+            from sqlalchemy import text
 
             async with AsyncSessionLocal() as session:
                 await session.execute(text("SELECT 1"))
@@ -117,6 +121,7 @@ class DatabaseManager:
                 }
         except Exception as e:
             return {"status": "unhealthy", "connected": False, "error": str(e)}
+
 
 # Global database instance
 db_manager = DatabaseManager()

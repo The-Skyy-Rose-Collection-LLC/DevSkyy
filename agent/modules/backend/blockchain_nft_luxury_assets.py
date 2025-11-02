@@ -214,9 +214,9 @@ contract SkyyRoseLuxuryNFT is ERC721, ERC721URIStorage, Ownable {
         return vipHolders[addr];
     }
 }
-        """
+"""
 
-    def _load_authenticity_contract(self) -> str:
+def _load_authenticity_contract(self) -> str:
         """Load Solidity contract for authenticity verification."""
         return """
 // SPDX-License-Identifier: MIT
@@ -286,9 +286,9 @@ contract SkyyRoseAuthenticity {
         return certificates[itemId];
     }
 }
-        """
+"""
 
-    def _load_membership_contract(self) -> str:
+def _load_membership_contract(self) -> str:
         """Load Solidity contract for NFT-based membership."""
         return """
 // SPDX-License-Identifier: MIT
@@ -360,9 +360,9 @@ contract SkyyRoseMembership {
         return tierBenefits[memberships[member].tier];
     }
 }
-        """
+"""
 
-    def _get_erc721_metadata(self) -> Dict[str, Any]:
+def _get_erc721_metadata(self) -> Dict[str, Any]:
         """Get ERC721 metadata standard."""
         return {
             "name": "",

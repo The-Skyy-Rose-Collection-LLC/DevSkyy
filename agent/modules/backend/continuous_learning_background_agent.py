@@ -1,6 +1,6 @@
-            import re
-            import re
-            import re
+import re
+import re
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 import json
@@ -478,7 +478,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
         return None
 
-    async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
+async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
         """
         Analyze GitHub trending repositories for new patterns.
         """
@@ -627,7 +627,7 @@ Return JSON array of practices with: category, description, priority, implementa
 
         return []
 
-    async def _analyze_codebase(self) -> Dict[str, Any]:
+async def _analyze_codebase(self) -> Dict[str, Any]:
         """
         Analyze current codebase to understand what can be improved.
         """
@@ -719,7 +719,7 @@ Return JSON array of improvements."""
 
         return []
 
-    async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> int:
+async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> int:
         """
         Apply high-confidence improvements to codebase.
         """

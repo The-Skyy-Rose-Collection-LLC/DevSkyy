@@ -1,39 +1,24 @@
-                import sys
-                                    from ml.redis_cache import redis_cache
-            from security.jwt_auth import create_access_token, verify_token
-            from sqlalchemy import create_engine, text
-from pathlib import Path
-import os
-import sys
-
-            from sqlalchemy import inspect
-            from sqlalchemy.pool import NullPool
-
-                import io
-                import warnings
-            from dotenv import load_dotenv
-            from main import app
-            from ml.explainability import explainer  # noqa: F401 - Import verification
-            from security.encryption import aes_encryption
-        from dotenv import load_dotenv
-import importlib
-import logging
-
 #!/usr/bin/env python3
 """
 Deployment Verification Script
 Verifies all imports, endpoints, configurations, and system health
 """
+import importlib
+import logging
+import os
+import sys
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 # ANSI color codes
-GREEN =  "\033[92m"
-RED =  "\033[91m"
-YELLOW =  "\033[93m"
-BLUE =  "\033[94m"
-RESET =  "\033[0m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+BLUE = "\033[94m"
+RESET = "\033[0m"
+
 
 class DeploymentVerifier:
     """Comprehensive deployment verification"""
@@ -91,6 +76,9 @@ class DeploymentVerifier:
         for module_name, description in critical_modules:
             try:
                 # Suppress warnings and stderr during import
+                import io
+                import sys
+                import warnings
 
                 # Capture stderr to suppress NumPy warnings
                 old_stderr = sys.stderr
@@ -144,6 +132,8 @@ class DeploymentVerifier:
         """Verify environment variables"""
         self.section("Verifying Environment Variables")
 
+        from dotenv import load_dotenv
+
         load_dotenv()
 
         required_vars = [
@@ -180,6 +170,7 @@ class DeploymentVerifier:
         self.section("Verifying Database")
 
         try:
+            from dotenv import load_dotenv
 
             load_dotenv()
 
@@ -200,6 +191,8 @@ class DeploymentVerifier:
                 return True
 
             # For sync databases, test the connection
+            from sqlalchemy import create_engine, text
+            from sqlalchemy.pool import NullPool
 
             # Create engine with sync driver
             sync_url = db_url.replace("+asyncpg", "").replace(
@@ -213,6 +206,7 @@ class DeploymentVerifier:
                 self.check("Database connection", True)
 
             # Check tables
+            from sqlalchemy import inspect
 
             inspector = inspect(engine)
             tables = inspector.get_table_names()
@@ -243,10 +237,13 @@ class DeploymentVerifier:
         self.section("Verifying ML Infrastructure")
 
         try:
+            from ml.model_registry import (  # noqa: F401 - Import verification
                 model_registry,
             )
 
             self.check("Model registry import", True)
+
+            from ml.redis_cache import redis_cache
 
             self.check("Redis cache import", True)
 
@@ -263,8 +260,11 @@ class DeploymentVerifier:
             stats = redis_cache.stats()
             self.info(f"Cache mode: {stats['mode']}")
 
+            from ml.explainability import explainer  # noqa: F401 - Import verification
+
             self.check("Explainability import", True)
 
+            from ml.auto_retrain import (  # noqa: F401 - Import verification
                 auto_retrainer,
             )
 
@@ -281,6 +281,7 @@ class DeploymentVerifier:
         self.section("Verifying API Endpoints")
 
         try:
+            from main import app
 
             routes = []
             for route in app.routes:
@@ -316,6 +317,7 @@ class DeploymentVerifier:
         self.section("Verifying Security Configuration")
 
         try:
+            from security.jwt_auth import create_access_token, verify_token
 
             self.check("JWT authentication import", True)
 
@@ -347,6 +349,8 @@ class DeploymentVerifier:
                         raise verify_error
             except Exception as jwt_error:
                 self.check("JWT token generation", False, str(jwt_error))
+
+            from security.encryption import aes_encryption
 
             self.check("Encryption import", True)
 
@@ -421,6 +425,7 @@ class DeploymentVerifier:
             logger.error(f"{RED}{'=' * 70}{RESET}\n")
             return 1
 
+
 def main():
     """Run all verification checks"""
     verifier = DeploymentVerifier()
@@ -440,6 +445,7 @@ def main():
 
     # Print summary and exit
     return verifier.print_summary()
+
 
 if __name__ == "__main__":
     sys.exit(main())

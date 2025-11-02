@@ -281,7 +281,7 @@ Create the optimal combined response that leverages the strengths of each."""
             "timestamp": datetime.now().isoformat(),
         }
 
-    async def _call_claude(
+async def _call_claude(
         self, model_name: str, prompt: str, max_tokens: int, temperature: float
     ) -> str:
         """Call Anthropic Claude model."""

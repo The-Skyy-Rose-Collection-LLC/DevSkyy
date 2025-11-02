@@ -1,4 +1,4 @@
-    import redis_cache, RedisCache
+import redis_cache, RedisCache
 from .model_registry import model_registry, ModelRegistry, ModelStage
 from .redis_cache try:
 

@@ -1,21 +1,18 @@
-from security.jwt_auth import create_user_tokens
-
-from fastapi.testclient import TestClient
-
-    from database import get_db
-from httpx import AsyncClient
-from main import app
-import asyncio
-import pytest
-
 """
 Integration Tests for API Endpoints
 Tests for complete API workflows with database and external services
 """
 
-try:
-    except ImportError:
-    database = None  # Optional dependency
+import asyncio
+
+import pytest
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
+
+from database import get_db
+from main import app
+from security.jwt_auth import create_user_tokens
+
 
 class TestHealthEndpoints:
     """Test health and status endpoints"""
@@ -42,6 +39,7 @@ class TestHealthEndpoints:
         data = response.json()
         assert "status" in data
         assert "services" in data
+
 
 class TestAuthenticationFlow:
     """Test complete authentication flow"""
@@ -118,6 +116,7 @@ class TestAuthenticationFlow:
         user_data = response.json()
         assert user_data["email"] == "protected@test.com"
 
+
 class TestAgentEndpoints:
     """Test agent execution endpoints"""
 
@@ -187,6 +186,7 @@ class TestAgentEndpoints:
 
         assert response.status_code == 422  # Validation error
 
+
 class TestMLEndpoints:
     """Test ML model endpoints"""
 
@@ -234,6 +234,7 @@ class TestMLEndpoints:
 
         # Should accept the request (actual prediction might be mocked)
         assert response.status_code in [200, 404]  # 404 if model doesn't exist
+
 
 class TestGDPREndpoints:
     """Test GDPR compliance endpoints"""
@@ -292,6 +293,7 @@ class TestGDPREndpoints:
 
         assert response.status_code == 200
 
+
 @pytest.mark.asyncio
 class TestAsyncEndpoints:
     """Test asynchronous endpoint functionality"""
@@ -330,6 +332,7 @@ class TestAsyncEndpoints:
             tokens = login_response.json()
             assert "access_token" in tokens
 
+
 class TestErrorHandling:
     """Test error handling and recovery"""
 
@@ -365,6 +368,7 @@ class TestErrorHandling:
         data = response.json()
         assert "error" in data
 
+
 class TestRateLimiting:
     """Test rate limiting functionality"""
 
@@ -387,6 +391,7 @@ class TestRateLimiting:
         # Some might be rate limited (429) depending on configuration
         rate_limited = sum(1 for r in responses if r.status_code == 429)
         # This test depends on actual rate limiting configuration
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

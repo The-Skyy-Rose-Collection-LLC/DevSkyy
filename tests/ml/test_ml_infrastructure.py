@@ -1,22 +1,20 @@
-        import time
-from datetime import datetime
-from ml.model_registry import ModelRegistry, ModelStage
-from ml.redis_cache import RedisCache
-from pathlib import Path
-
-        from fastapi.testclient import TestClient
-
-        from main import app
-from ml.explainability import ModelExplainer
-import numpy as np
-import pytest
-import shutil
-import tempfile
-
 """
 Comprehensive ML Infrastructure Tests
 Tests for model registry, caching, explainability, and API endpoints
 """
+
+import shutil
+import tempfile
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pytest
+
+from ml.explainability import ModelExplainer
+from ml.model_registry import ModelRegistry, ModelStage
+from ml.redis_cache import RedisCache
+
 
 # Mock model for testing
 class MockModel:
@@ -28,9 +26,11 @@ class MockModel:
     def fit(self, X, y):
         return self
 
+
 # ============================================================================
 # MODEL REGISTRY TESTS
 # ============================================================================
+
 
 class TestModelRegistry:
     """Test model registry operations"""
@@ -45,16 +45,16 @@ class TestModelRegistry:
 
     def test_register_model(self, temp_registry):
         """Test model registration"""
-        model = MockModel(
-            metadata = temp_registry.register_model(
-                model=model,
+        model = MockModel()
+        metadata = temp_registry.register_model(
+            model=model,
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.95, "f1": 0.92},
             parameters={"n_estimators": 100},
             dataset_info={"samples": 1000},
-)
+        )
 
         assert metadata.model_name == "test_model"
         assert metadata.version == "1.0.0"
@@ -63,14 +63,14 @@ class TestModelRegistry:
 
     def test_load_model(self, temp_registry):
         """Test model loading"""
-        model = MockModel(
-            temp_registry.register_model(
-                model=model,
+        model = MockModel()
+        temp_registry.register_model(
+            model=model,
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.95},
-)
+        )
 
         loaded_model = temp_registry.load_model("test_model", version="1.0.0")
         assert loaded_model is not None
@@ -82,14 +82,14 @@ class TestModelRegistry:
 
     def test_promote_model(self, temp_registry):
         """Test model promotion"""
-        model = MockModel(
-            temp_registry.register_model(
-                model=model,
+        model = MockModel()
+        temp_registry.register_model(
+            model=model,
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.95},
-)
+        )
 
         # Promote to staging
         temp_registry.promote_model("test_model", "1.0.0", ModelStage.STAGING)
@@ -103,8 +103,9 @@ class TestModelRegistry:
 
     def test_list_versions(self, temp_registry):
         """Test listing model versions"""
-        model = MockModel(
-    # Register multiple versions
+        model = MockModel()
+
+        # Register multiple versions
         for version in ["1.0.0", "1.1.0", "2.0.0"]:
             temp_registry.register_model(
                 model=model,
@@ -112,7 +113,7 @@ class TestModelRegistry:
                 version=version,
                 model_type="classifier",
                 metrics={"accuracy": 0.95},
-)
+            )
 
         versions = temp_registry.list_versions("test_model")
         assert len(versions) == 3
@@ -121,14 +122,15 @@ class TestModelRegistry:
 
     def test_compare_models(self, temp_registry):
         """Test model comparison"""
-        model = MockModel(
-            temp_registry.register_model(
-                model=model,
+        model = MockModel()
+
+        temp_registry.register_model(
+            model=model,
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.90, "f1": 0.88},
-)
+        )
 
         temp_registry.register_model(
             model=model,
@@ -149,14 +151,15 @@ class TestModelRegistry:
 
     def test_registry_stats(self, temp_registry):
         """Test registry statistics"""
-        model = MockModel(
-            temp_registry.register_model(
-                model=model,
+        model = MockModel()
+
+        temp_registry.register_model(
+            model=model,
             model_name="model1",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.95},
-)
+        )
 
         temp_registry.register_model(
             model=model,
@@ -172,9 +175,11 @@ class TestModelRegistry:
         assert stats["total_versions"] == 2
         assert ModelStage.DEVELOPMENT in stats["models_by_stage"]
 
+
 # ============================================================================
 # REDIS CACHE TESTS
 # ============================================================================
+
 
 class TestRedisCache:
     """Test Redis cache with fallback"""
@@ -206,10 +211,11 @@ class TestRedisCache:
 
     def test_cache_ttl(self, cache):
         """Test TTL expiration"""
+        import time
 
         cache.set("test_key", "value", ttl=1)
         assert cache.get("test_key") == "value"
-        time.sleep(2)  # TODO: Move to config
+        time.sleep(2)
         # In-memory cache may not respect TTL perfectly
         # Just verify the API works
 
@@ -223,9 +229,11 @@ class TestRedisCache:
         assert "mode" in stats
         assert "total_keys" in stats
 
+
 # ============================================================================
 # MODEL EXPLAINABILITY TESTS
 # ============================================================================
+
 
 class TestModelExplainer:
     """Test SHAP-based explainability"""
@@ -258,9 +266,11 @@ class TestModelExplainer:
         with pytest.raises(ValueError, match="No explainer found"):
             explainer.explain_prediction("nonexistent_model", X)
 
+
 # ============================================================================
 # INTEGRATION TESTS
 # ============================================================================
+
 
 class TestMLIntegration:
     """Integration tests for ML infrastructure"""
@@ -319,15 +329,16 @@ class TestMLIntegration:
         """Test model versioning and comparison"""
         registry, cache, _ = setup_ml
 
-        model = MockModel(
-    # Register v1
+        model = MockModel()
+
+        # Register v1
         registry.register_model(
             model=model,
             model_name="versioned_model",
             version="1.0.0",
             model_type="classifier",
             metrics={"accuracy": 0.85, "f1": 0.82},
-)
+        )
 
         # Register v2 with better metrics
         registry.register_model(
@@ -353,9 +364,11 @@ class TestMLIntegration:
         prod_model = registry.load_model("versioned_model", stage=ModelStage.PRODUCTION)
         assert prod_model is not None
 
+
 # ============================================================================
 # API ENDPOINT TESTS (if FastAPI is available)
 # ============================================================================
+
 
 class TestMLAPI:
     """Test ML API endpoints"""
@@ -363,6 +376,9 @@ class TestMLAPI:
     @pytest.fixture
     def client(self):
         """Create test client"""
+        from fastapi.testclient import TestClient
+
+        from main import app
 
         return TestClient(app)
 

@@ -2,9 +2,9 @@ from datetime import datetime
 import threading
 import time
 
-        from ..git_commit import commit_fixes
-        from ..modules.fixer import fix_code
-        from ..modules.scanner import scan_site
+from ..git_commit import commit_fixes
+from ..modules.fixer import fix_code
+from ..modules.scanner import scan_site
 from typing import Any, Callable, Dict
 import logging
 import schedule

@@ -233,7 +233,7 @@ Provide detailed, production-ready specifications."""
             logger.error(f"Foundation generation failed: {e}")
             return {}
 
-    async def _create_style_css(
+async def _create_style_css(
         self, theme_path: Path, foundation: Dict[str, Any]
     ) -> None:
         """
@@ -385,7 +385,7 @@ h1, h2, h3, h4, h5, h6 {{
         style_file.write_text(style_content)
         logger.info("✅ style.css created")
 
-    async def _generate_functions_php(
+async def _generate_functions_php(
         self, theme_path: Path, features: List[str]
     ) -> None:
         """
@@ -436,7 +436,7 @@ Generate complete, production-ready PHP code."""
         except Exception as e:
             logger.error(f"functions.php generation failed: {e}")
 
-    async def _create_template_files(
+async def _create_template_files(
         self, theme_path: Path, foundation: Dict[str, Any]
     ) -> None:
         """
@@ -507,7 +507,7 @@ Generate complete PHP template code."""
             logger.error(f"Template {template_type} generation failed: {e}")
             return ""
 
-    async def _generate_divi_modules(self, theme_path: Path) -> None:
+async def _generate_divi_modules(self, theme_path: Path) -> None:
         """
         Generate custom Divi 5 modules for luxury e-commerce.
         """
@@ -565,7 +565,7 @@ Generate complete PHP class code."""
             logger.error(f"Divi module {module_name} generation failed: {e}")
             return ""
 
-    async def _generate_elementor_widgets(self, theme_path: Path) -> None:
+async def _generate_elementor_widgets(self, theme_path: Path) -> None:
         """
         Generate custom Elementor Pro widgets.
         """
@@ -625,7 +625,7 @@ Generate complete PHP class code."""
             logger.error(f"Elementor widget {widget_name} generation failed: {e}")
             return ""
 
-    async def _create_woocommerce_templates(self, theme_path: Path) -> None:
+async def _create_woocommerce_templates(self, theme_path: Path) -> None:
         """
         Create WooCommerce template overrides for luxury styling.
         """
@@ -707,7 +707,7 @@ Generate complete PHP class code."""
         except Exception as e:
             logger.error(f"Asset generation failed: {e}")
 
-    async def _create_theme_options(self, theme_path: Path) -> None:
+async def _create_theme_options(self, theme_path: Path) -> None:
         """
         Create theme options panel using Customizer API.
         """
@@ -749,7 +749,7 @@ add_action( 'customize_register', 'luxury_theme_customize_register' );
         except Exception as e:
             logger.error(f"Theme options creation failed: {e}")
 
-    async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
+async def _package_theme(self, theme_path: Path, theme_slug: str) -> Path:
         """
         Package theme as zip file.
         """

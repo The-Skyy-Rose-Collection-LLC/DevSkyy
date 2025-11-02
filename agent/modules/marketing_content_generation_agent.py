@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import os
 
-    import asyncio
+import asyncio
 from dataclasses import dataclass
 from typing import Any, Dict, List
 import logging
@@ -427,7 +427,7 @@ Call-to-Action: {cta}
 Story Extension: {story_content}
 """
 
-    def _get_tiktok_template(self) -> str:
+def _get_tiktok_template(self) -> str:
         """Get TikTok content template."""
         return """
 Hook (0-3s): {hook}
@@ -445,7 +445,7 @@ Hashtags: {hashtags}
 Engagement Question: {engagement_question}
 """
 
-    def _get_email_template(self) -> str:
+def _get_email_template(self) -> str:
         """Get email campaign template."""
         return """
 Subject Line: {subject_line}
@@ -463,7 +463,7 @@ Footer: {footer_content}
 Personalization: {personalization_elements}
 """
 
-    def _get_blog_template(self) -> str:
+def _get_blog_template(self) -> str:
         """Get blog post template."""
         return """
 Title: {title}
@@ -484,7 +484,7 @@ SEO Keywords: {keywords}
 Internal Links: {internal_links}
 """
 
-    def _get_ad_copy_template(self) -> str:
+def _get_ad_copy_template(self) -> str:
         """Get advertising copy template."""
         return """
 Headline: {headline}
@@ -502,7 +502,7 @@ Visual Requirements: {visual_requirements}
 
     # Implementation methods (condensed for brevity)
 
-    async def _develop_viral_strategy(
+async def _develop_viral_strategy(
         self, campaign_spec: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Develop viral content strategy."""

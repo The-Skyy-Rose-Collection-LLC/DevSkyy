@@ -583,7 +583,7 @@ class PredictiveAutomationSystem:
 
     # Prediction helper methods
 
-    async def _predict_system_performance(
+async def _predict_system_performance(
         self, system_metrics: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Predict system performance issues."""

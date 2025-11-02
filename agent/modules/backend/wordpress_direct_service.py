@@ -3,8 +3,8 @@ from requests.auth import HTTPBasicAuth
 import os
 import requests
 
-            from agent.modules.woocommerce_integration_service import (
-                import xmlrpc.client
+from agent.modules.woocommerce_integration_service import (
+import xmlrpc.client
 from typing import Any, Dict, List
 import httpx
 import logging

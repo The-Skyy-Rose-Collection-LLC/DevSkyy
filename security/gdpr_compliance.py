@@ -422,7 +422,7 @@ gdpr_manager = GDPRManager()
 if __name__ == "__main__":
     import asyncio
     
-    async def demo():
+async def demo():
         # Test data export
         export = await gdpr_manager.request_data_export("user123", format="json")
         print(f"Export created: {export.export_id}")

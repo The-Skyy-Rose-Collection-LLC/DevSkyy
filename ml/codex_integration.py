@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-    from openai import AsyncOpenAI
+from openai import AsyncOpenAI
 from typing import Any, Dict, List, Literal, Optional
 import logging
 
@@ -329,7 +329,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_documentation(
+async def generate_documentation(
         self, code: str, language: str = "python"
     ) -> Dict[str, Any]:
         """
@@ -441,7 +441,7 @@ message_list.append(...).join(context)
 
         return message
 
-    def _build_code_generation_prompt(
+def _build_code_generation_prompt(
         self, prompt: str, language: str, context: Optional[List[str]] = None
     ) -> str:
         """Build user prompt for code generation"""
@@ -463,7 +463,7 @@ message_list.append(...).join(context)
 
         return message
 
-    def _extract_code_block(self, text: str, language: str) -> str:
+def _extract_code_block(self, text: str, language: str) -> str:
         """Extract code from markdown code blocks"""
         # Try to find code block with language specifier
         markers = [f"```{language}", "```"]

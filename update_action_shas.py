@@ -1,29 +1,27 @@
-from pathlib import Path
-from urllib.request import Request, urlopen
-import json
-import os
-import re
-import sys
-
-    import argparse
-from typing import Dict, List, Optional, Tuple
-from urllib.error import HTTPError, URLError
-
 #!/usr/bin/env python3
 """
 GitHub Actions SHA Updater
 Converts GitHub Actions version tags to immutable commit SHAs for security compliance.
 
 This script:
-    1. Scans all workflow files in .github/workflows/
+1. Scans all workflow files in .github/workflows/
 2. Identifies actions using version tags (e.g., v4, v5)
 3. Fetches the corresponding commit SHA from GitHub API
 4. Updates workflow files with full commit SHAs
 5. Preserves comments and formatting
 """
 
+import json
+import os
+import re
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
 # GitHub API base URL
-GITHUB_API =  "https://api.github.com"
+GITHUB_API = "https://api.github.com"
 
 # Mapping of common actions to their repositories
 ACTION_REPOS = {
@@ -68,6 +66,7 @@ KNOWN_SHAS = {
     "anthropics/claude-code-action@v1": "52e5d0a84c4b2c19d9a650ab2c5d8c03c5e39c91",  # v1 latest
 }
 
+
 class ActionSHAUpdater:
     def __init__(self, dry_run: bool = False, verbose: bool = False):
         self.dry_run = dry_run
@@ -88,7 +87,7 @@ class ActionSHAUpdater:
         }
         color = colors.get(level, "")
         reset = "\033[0m"
-        logger.info(f"{color}[{level}] {message}{reset}")
+        print(f"{color}[{level}] {message}{reset}")
 
     def get_repo_from_action(self, action: str) -> Optional[str]:
         """Extract repository name from action string."""
@@ -313,7 +312,7 @@ class ActionSHAUpdater:
             "total_actions": 0,
         }
 
-        workflow_files = list(workflows_dir.glob("*.yml")) + list()
+        workflow_files = list(workflows_dir.glob("*.yml")) + list(
             workflows_dir.glob("*.yaml")
         )
 
@@ -332,8 +331,10 @@ class ActionSHAUpdater:
 
         return stats
 
+
 def main():
     """Main entry point."""
+    import argparse
 
     parser = argparse.ArgumentParser(
         description="Update GitHub Actions to use commit SHAs instead of tags"
@@ -360,47 +361,48 @@ def main():
     # Get workflows directory
     workflows_dir = Path(args.workflows_dir)
     if not workflows_dir.exists():
-        logger.info(f"❌ Error: Workflows directory not found: {workflows_dir}")
+        print(f"❌ Error: Workflows directory not found: {workflows_dir}")
         sys.exit(1)
 
     # Create updater
     updater = ActionSHAUpdater(dry_run=args.dry_run, verbose=args.verbose)
 
     # Show configuration
-    logger.info("\n🔒 GitHub Actions SHA Updater")
-    logger.info("=" * 60)
+    print("\n🔒 GitHub Actions SHA Updater")
+    print("=" * 60)
     if args.dry_run:
-        logger.info("🔍 DRY RUN MODE: No files will be modified")
+        print("🔍 DRY RUN MODE: No files will be modified")
     if not updater.github_token:
-        logger.info("⚠️  No GITHUB_TOKEN set - rate limiting may occur")
-    logger.info()
+        print("⚠️  No GITHUB_TOKEN set - rate limiting may occur")
+    print()
 
     # Update workflows
     stats = updater.update_all_workflows(workflows_dir)
 
     # Print summary
-    logger.info("\n" + "=" * 60)
-    logger.info("📊 Summary")
-    logger.info("=" * 60)
-    logger.info(f"Total workflow files: {stats['total_files']}")
-    logger.info(f"Files updated: {stats['updated_files']}")
-    logger.info(f"Files unchanged: {stats['total_files'] - stats['updated_files']}")
+    print("\n" + "=" * 60)
+    print("📊 Summary")
+    print("=" * 60)
+    print(f"Total workflow files: {stats['total_files']}")
+    print(f"Files updated: {stats['updated_files']}")
+    print(f"Files unchanged: {stats['total_files'] - stats['updated_files']}")
 
     if args.dry_run:
-        logger.info("\n💡 This was a dry run. Use without --dry-run to apply changes.")
+        print("\n💡 This was a dry run. Use without --dry-run to apply changes.")
     elif stats["updated_files"] > 0:
-        logger.info("\n✅ Workflow files updated successfully!")
-        logger.info("\n💡 Next steps:")
-        logger.info("  1. Review changes: git diff .github/workflows/")
-        logger.info("  2. Test workflows in a branch")
-        logger.info(
+        print("\n✅ Workflow files updated successfully!")
+        print("\n💡 Next steps:")
+        print("  1. Review changes: git diff .github/workflows/")
+        print("  2. Test workflows in a branch")
+        print(
             "  3. Commit: git add .github/workflows/ && git commit -m 'security: Update actions to use commit SHAs'"
         )
-        logger.info("  4. Push: git push")
+        print("  4. Push: git push")
     else:
-        logger.info("\n✅ All workflows already use commit SHAs!")
+        print("\n✅ All workflows already use commit SHAs!")
 
-    logger.info()
+    print()
+
 
 if __name__ == "__main__":
     main()

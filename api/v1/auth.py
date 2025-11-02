@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
 
-    from api.v1.auth0_endpoints import router as auth0_router
+from api.v1.auth0_endpoints import router as auth0_router
 from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
-    from typing import Dict
+from typing import Dict
 import logging
 
 """

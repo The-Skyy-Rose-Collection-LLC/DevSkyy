@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-    import uvicorn
+import uvicorn
 from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
 from typing import Dict, List, Optional
 

@@ -498,7 +498,7 @@ class WordPressServerAccess:
             logger.error(f"htaccess optimization failed: {str(e)}")
             return False
 
-    async def _optimize_file_permissions(self) -> bool:
+async def _optimize_file_permissions(self) -> bool:
         """Optimize file permissions for security and performance."""
         try:
             # WordPress.com handles most permissions, but we can check

@@ -2,8 +2,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import requests
 
-        import asyncio
-    import httpx  # Optional for async usage
+import asyncio
+import httpx  # Optional for async usage
 from typing import Any
 import logging
 

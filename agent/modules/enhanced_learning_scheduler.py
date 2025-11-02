@@ -1,13 +1,14 @@
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+import logging
 import threading
 import time
-
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 from typing import Any, Dict, List
-import logging
+
 import schedule
 
 logger = logging.getLogger(__name__)
+
 
 class EnhancedLearningScheduler:
     """
@@ -62,10 +63,10 @@ class EnhancedLearningScheduler:
         while self.learning_active:
             try:
                 schedule.run_pending()
-                time.sleep(60)  # TODO: Move to config  # Check every minute
+                time.sleep(60)  # Check every minute
             except Exception as e:
                 logger.error(f"❌ Scheduler error: {str(e)}")
-                time.sleep(300)  # TODO: Move to config  # Wait 5 minutes on error
+                time.sleep(300)  # Wait 5 minutes on error
 
     async def _hourly_learning_cycle(self):
         """Lightweight hourly learning cycle."""
@@ -228,7 +229,7 @@ class EnhancedLearningScheduler:
 
         # Simple improvement calculation based on recent learning cycles
         recent_cycles = self.learning_history[-5:]  # Last 5 cycles
-        improvement_sum = sum()
+        improvement_sum = sum(
             cycle.get("performance_improvement", 0) for cycle in recent_cycles
         )
 
@@ -245,7 +246,7 @@ class EnhancedLearningScheduler:
         recent_cycles = self.learning_history[-10:]
 
         # Analyze success rates
-        successful_cycles = sum()
+        successful_cycles = sum(
             1
             for cycle in recent_cycles
             if cycle.get("brand_updates", {}).get("learning_cycle_status")
@@ -307,7 +308,7 @@ class EnhancedLearningScheduler:
 
         # Factor in learning success rate
         if self.learning_history:
-            recent_success = sum()
+            recent_success = sum(
                 1
                 for cycle in self.learning_history[-5:]
                 if cycle.get("brand_updates", {}).get("learning_cycle_status")
@@ -448,10 +449,10 @@ class EnhancedLearningScheduler:
         if not earlier_cycles:
             return 0.05
 
-        recent_avg = sum()
+        recent_avg = sum(
             cycle.get("performance_improvement", 0) for cycle in recent_cycles
         ) / len(recent_cycles)
-        earlier_avg = sum()
+        earlier_avg = sum(
             cycle.get("performance_improvement", 0) for cycle in earlier_cycles
         ) / len(earlier_cycles)
 
@@ -506,8 +507,10 @@ class EnhancedLearningScheduler:
             "timestamp": datetime.now().isoformat(),
         }
 
+
 # Global scheduler instance
 _global_scheduler = None
+
 
 def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
     """Start the enhanced learning system globally."""
@@ -517,6 +520,7 @@ def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
         _global_scheduler = EnhancedLearningScheduler(brand_intelligence_agent)
 
     return _global_scheduler.start_learning_system()
+
 
 def get_learning_system_status() -> Dict[str, Any]:
     """Get the status of the global learning system."""
@@ -530,8 +534,10 @@ def get_learning_system_status() -> Dict[str, Any]:
 
     return _global_scheduler.get_learning_status()
 
+
 # Global scheduler instance
 _global_scheduler = None
+
 
 async def run_learning_cycle() -> Dict[str, Any]:
     """Run a learning cycle."""

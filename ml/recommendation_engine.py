@@ -4,7 +4,7 @@ import time
 
 from pydantic import BaseModel, Field
 
-        import random
+import random
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 import logging
@@ -455,7 +455,7 @@ class RecommendationEngine:
 
         return max(0.0, numerator / denominator)
 
-    def _build_user_profile(self, user_interactions: List[Dict]) -> Dict[str, float]:
+def _build_user_profile(self, user_interactions: List[Dict]) -> Dict[str, float]:
         """Build user profile from interactions."""
         profile = {}
 

@@ -448,7 +448,7 @@ const {component_name} = ({props}) => {{
 export default {component_name};
 """
 
-    def _get_fastapi_template(self) -> str:
+def _get_fastapi_template(self) -> str:
         """Get FastAPI endpoint template."""
         return """
 from fastapi import APIRouter, HTTPException, Depends
@@ -543,7 +543,7 @@ new {class_name}();
     # Implementation methods would be added here
     # For brevity, I'm including key method signatures
 
-    async def _generate_frontend_structure(
+async def _generate_frontend_structure(
         self, requirements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Generate frontend application structure."""

@@ -174,7 +174,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             logger.error(f"❌ Claude product enhancement failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def generate_strategic_marketing_plan(
+async def generate_strategic_marketing_plan(
         self, business_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
@@ -229,7 +229,7 @@ Make it actionable, specific, and focused on luxury market best practices."""
             logger.error(f"❌ Claude strategy generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_competitor_intelligence(
+async def analyze_competitor_intelligence(
         self, competitor_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
@@ -281,7 +281,7 @@ Provide actionable insights for luxury market domination."""
             logger.error(f"❌ Claude competitive analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_conversion_funnel(
+async def optimize_conversion_funnel(
         self, funnel_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
@@ -334,7 +334,7 @@ Focus on luxury customer behavior and premium positioning."""
             logger.error(f"❌ Claude funnel optimization failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def generate_advanced_code(
+async def generate_advanced_code(
         self,
         code_request: str,
         language: str = "python",
@@ -389,7 +389,7 @@ Provide complete, working code that can be deployed immediately."""
             logger.error(f"❌ Claude code generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def analyze_customer_sentiment(
+async def analyze_customer_sentiment(
         self, customer_data: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         """
@@ -441,7 +441,7 @@ Focus on insights that drive business value for a luxury brand."""
             logger.error(f"❌ Claude sentiment analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def create_viral_social_content(
+async def create_viral_social_content(
         self, campaign_brief: Dict[str, Any]
     ) -> Dict[str, Any]:
         """

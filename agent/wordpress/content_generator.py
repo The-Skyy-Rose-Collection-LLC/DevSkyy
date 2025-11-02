@@ -1,18 +1,9 @@
-        import re
-from datetime import datetime
-
-    import anthropic
-from PIL import Image  # noqa: F401 - Reserved for Phase 3 image processing
-from typing import Any, Dict, List, Optional
-import logging
-import nltk  # noqa: F401 - Reserved for Phase 3 NLP enhancements
-
 """
 WordPress Content Generator
 AI-powered content creation for WordPress sites
 
 Features:
-    - Blog post generation
+- Blog post generation
 - Page content creation
 - SEO-optimized content
 - Meta descriptions
@@ -20,11 +11,16 @@ Features:
 Reference: Based on AGENTS.md specifications
 """
 
-try:
-    except ImportError:
-    anthropic = None  # Optional dependency
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import anthropic
+import nltk  # noqa: F401 - Reserved for Phase 3 NLP enhancements
+from PIL import Image  # noqa: F401 - Reserved for Phase 3 image processing
 
 logger = logging.getLogger(__name__)
+
 
 class ContentGenerator:
     """
@@ -65,14 +61,14 @@ class ContentGenerator:
             prompt = f"""Write a {tone} blog post about {topic}.
 
 Requirements:
-    - Target length: {length} words
+- Target length: {length} words
 - Include keywords: {', '.join(keywords or [])}
 - Make it engaging and SEO-optimized
 - Include introduction, main content, and conclusion
 - Add subheadings for better readability
 
 Format the response as:
-    Title: [post title]
+Title: [post title]
 Meta Description: [150 chars]
 
 [Content with HTML formatting]"""
@@ -414,7 +410,7 @@ work together to bring you the best shopping experience.</p>
             "seo_score": (
                 min(
                     100,
-                    len()
+                    len(
                         [
                             s
                             for s in keyword_density.values()
@@ -472,6 +468,7 @@ Provide only the rewritten content."""
             Meta description
         """
         # Remove HTML tags
+        import re
 
         text = re.sub("<[^<]+?>", "", content)
 

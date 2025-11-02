@@ -404,7 +404,7 @@ modified_content_list.append(...)
 
         return fixes
 
-    async def _fix_hardcoded_secret(
+async def _fix_hardcoded_secret(
         self, file_path: str, dry_run: bool
     ) -> Optional[Dict[str, Any]]:
         """Fix hardcoded secrets by replacing with environment variables"""

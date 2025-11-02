@@ -1,28 +1,14 @@
-        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
-    from datetime import datetime
-from pathlib import Path
-
-        from sqlalchemy import text
-    from models_sqlalchemy import AgentLog, Product, User
-    import models_sqlalchemy
-
-        from database import AsyncSessionLocal
-        from database import db_manager, init_db
-        from database_config import DATABASE_URL, DB_PROVIDER
-        import traceback
-    from database import AsyncSessionLocal
-from security.jwt_auth import hash_password
-from dotenv import load_dotenv
-import asyncio
-import logging
-import os
-
 """
 Initialize DevSkyy Database
 Sets up database with all required tables using SQLAlchemy models
 """
 
+import asyncio
+import logging
+from pathlib import Path
+
 # Load environment variables FIRST before any other imports
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -32,10 +18,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
+        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
+        from database import db_manager, init_db
+        from database_config import DATABASE_URL, DB_PROVIDER
 
         logger.info(f"🗄️  Database Provider: {DB_PROVIDER}")
         logger.info(f"📍 Database URL: {DATABASE_URL}")
@@ -66,6 +56,9 @@ async def init_database():
             return False
 
         # List created tables using async query
+        from sqlalchemy import text
+
+        from database import AsyncSessionLocal
 
         async with AsyncSessionLocal() as session:
             if "sqlite" in DATABASE_URL:
@@ -94,12 +87,15 @@ async def init_database():
 
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {e}")
+        import traceback
 
         logger.error(traceback.format_exc())
         return False
 
+
 async def verify_models():
     """Verify all models are properly registered"""
+    import models_sqlalchemy
 
     logger.info("\n🔍 Verifying SQLAlchemy models...")
 
@@ -120,27 +116,24 @@ async def verify_models():
     logger.info(f"\n✅ {len(model_classes)} models registered")
     return True
 
+
 async def create_sample_data():
     """Create sample data for testing (optional)"""
+    from datetime import datetime
+
+    from database import AsyncSessionLocal
+    from models_sqlalchemy import AgentLog, Product, User
 
     logger.info("\n📝 Creating sample data...")
 
     async with AsyncSessionLocal() as session:
         try:
-            # Get admin password from environment or prompt
-            admin_password = os.environ.get("ADMIN_PASSWORD")
-            if not admin_password:
-                logger.warning("⚠️  ADMIN_PASSWORD not set. Generating temporary password for sample user.")
-                logger.warning("⚠️  User 'admin' will have an unusable password. Set ADMIN_PASSWORD env var for production.")
-                # Use a placeholder that will never work (security by default)
-                admin_password = "TEMP_PASSWORD_REQUIRES_ENV_VAR_ADMIN_PASSWORD"
-            
-            # Create sample user with properly hashed password
+            # Create sample user
             sample_user = User(
                 email="admin@devskyy.com",
                 username="admin",
                 full_name="DevSkyy Admin",
-                hashed_password=hash_password(admin_password),
+                hashed_password="<replace with hashed password>",
                 is_superuser=True,
             )
             session.add(sample_user)
@@ -185,6 +178,7 @@ async def create_sample_data():
             logger.error(f"❌ Failed to create sample data: {e}")
             return False
 
+
 async def main():
     """Main initialization function"""
     logger.info("=" * 60)
@@ -211,6 +205,7 @@ async def main():
     logger.info("=" * 60)
 
     return True
+
 
 if __name__ == "__main__":
     asyncio.run(main())

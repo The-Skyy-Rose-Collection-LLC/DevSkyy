@@ -1,26 +1,27 @@
-from datetime import datetime, timedelta
-import os
-import time
-
-from sqlalchemy import event, text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
-
-from collections import defaultdict, deque
-from contextlib import asynccontextmanager
-from cryptography.fernet import Fernet
-from typing import AsyncGenerator, Dict, Optional
-import logging
-
 """
 Enhanced Database Security for DevSkyy Enterprise Platform
 Connection pooling, credential management, and security monitoring
 """
 
+import logging
+import os
+import time
+from collections import defaultdict, deque
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from typing import AsyncGenerator, Dict, Optional
+
+from cryptography.fernet import Fernet
+from sqlalchemy import event, text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
 logger = logging.getLogger(__name__)
+
 
 # ============================================================================
 # CREDENTIAL ENCRYPTION
 # ============================================================================
+
 
 class CredentialManager:
     """Secure credential management with encryption"""
@@ -77,9 +78,11 @@ class CredentialManager:
         self._cache_ttl.clear()
         logger.info("🧹 Credential cache cleared")
 
+
 # ============================================================================
 # CONNECTION POOL SECURITY
 # ============================================================================
+
 
 class SecureConnectionPool:
     """Enhanced connection pool with security monitoring"""
@@ -205,7 +208,7 @@ class SecureConnectionPool:
         return {
             **self.connection_stats,
             "query_patterns": dict(self.query_patterns),
-            "recent_connections": len()
+            "recent_connections": len(
                 [
                     conn
                     for conn in self.connection_history
@@ -215,9 +218,11 @@ class SecureConnectionPool:
             "suspicious_ips": list(self.suspicious_ips),
         }
 
+
 # ============================================================================
 # SECURE SESSION MANAGER
 # ============================================================================
+
 
 class SecureSessionManager:
     """Enhanced session manager with security features"""
@@ -281,17 +286,9 @@ class SecureSessionManager:
             # Set session timeout (PostgreSQL)
             await session.execute(text("SET statement_timeout = '30s'"))
 
-            # Set row security (if using RLS) - using parameterized query to prevent SQL injection
+            # Set row security (if using RLS)
             if user_id:
-                # Validate user_id to ensure it's safe (alphanumeric and reasonable length)
-                if not user_id.replace('-', '').replace('_', '').isalnum() or len(user_id) > 100:
-                    raise ValueError("Invalid user_id format")
-
-                # Use parameterized query for safety
-                await session.execute(
-                    text("SET app.current_user_id = :user_id"),
-                    {"user_id": user_id}
-                )
+                await session.execute(text(f"SET app.current_user_id = '{user_id}'"))
 
             # Disable dangerous functions (PostgreSQL)
             await session.execute(text("SET default_transaction_read_only = false"))
@@ -318,9 +315,11 @@ class SecureSessionManager:
             ],
         }
 
+
 # ============================================================================
 # DATABASE SECURITY MANAGER
 # ============================================================================
+
 
 class DatabaseSecurityManager:
     """Comprehensive database security management"""
@@ -382,7 +381,7 @@ class DatabaseSecurityManager:
             "threat_level": self.threat_level,
             "connection_stats": self.connection_pool.get_security_stats(),
             "session_stats": self.session_manager.get_session_stats(),
-            "recent_security_events": len()
+            "recent_security_events": len(
                 [
                     event
                     for event in self.security_events
@@ -417,18 +416,3 @@ class DatabaseSecurityManager:
                 "timestamp": datetime.now().isoformat(),
                 "threat_level": "HIGH",  # Elevated due to connectivity issues
             }
-
-def _create_safe_query(self, query_template: str, params: dict = None):
-    """Create safe SQL query using parameterized statements."""
-    if params is None:
-        params = {}
-    
-    # Use SQLAlchemy's safe query building
-    from sqlalchemy import text
-    
-    # Validate that no direct string interpolation is used
-    if '{' in query_template or '%' in query_template:
-        raise ValueError("Direct string interpolation in SQL queries is not allowed")
-    
-    # Use parameterized query
-    return text(query_template).bindparam(**params)

@@ -313,7 +313,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-    def _check_cache(
+def _check_cache(
         self, key: str, context: Optional[Dict] = None
     ) -> Optional[Dict[str, Any]]:
         """Check if we have a cached response"""

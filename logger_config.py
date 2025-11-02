@@ -1,18 +1,15 @@
-        import json
-from datetime import datetime
-from pathlib import Path
-import os
-import sys
-import time
-
-from functools import wraps
-import logging
-import logging.handlers
-
 """
 Centralized Logging Configuration for DevSkyy Platform
 Enterprise-grade logging with structured output and multiple handlers
 """
+
+import logging
+import logging.handlers
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with color support for console output."""
@@ -36,6 +33,7 @@ class ColoredFormatter(logging.Formatter):
         record.levelname = f"{log_color}{record.levelname}{reset}"
 
         return super().format(record)
+
 
 class StructuredFormatter(logging.Formatter):
     """JSON-like structured formatter for production logs."""
@@ -61,7 +59,10 @@ class StructuredFormatter(logging.Formatter):
         if hasattr(record, "request_id"):
             log_data["request_id"] = record.request_id
 
+        import json
+
         return json.dumps(log_data)
+
 
 def setup_logging(
     log_level: str = None,
@@ -150,6 +151,7 @@ def setup_logging(
 
     return root_logger
 
+
 def get_logger(name: str) -> logging.Logger:
     """
     Get a logger instance for a specific module.
@@ -161,6 +163,7 @@ def get_logger(name: str) -> logging.Logger:
         Configured logger instance
     """
     return logging.getLogger(name)
+
 
 def log_execution_time(func):
     """Decorator to log function execution time."""
@@ -184,6 +187,7 @@ def log_execution_time(func):
 
     return wrapper
 
+
 def log_async_execution_time(func):
     """Decorator to log async function execution time."""
 
@@ -206,7 +210,11 @@ def log_async_execution_time(func):
 
     return wrapper
 
+
+import time
+
 # Import for decorator usage
+from functools import wraps
 
 # Initialize logging on module import
 if not logging.getLogger().handlers:

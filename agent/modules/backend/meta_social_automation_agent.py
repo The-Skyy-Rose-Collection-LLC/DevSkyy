@@ -1,6 +1,6 @@
-            import re
-            import re
-            import re
+import re
+import re
+import re
 from datetime import datetime
 import json
 import os
@@ -227,7 +227,7 @@ Return JSON with: instagram_content, facebook_content"""
             logger.error(f"Content optimization failed: {e}")
             return {"instagram": content, "facebook": content}
 
-    async def _generate_hashtags(self, content: str) -> List[str]:
+async def _generate_hashtags(self, content: str) -> List[str]:
         """
         Generate optimal hashtags using AI and trending data.
         """
@@ -274,7 +274,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Hashtag generation failed: {e}")
             return ["#TheSkyyRoseCollection", "#LuxuryFashion"]
 
-    async def _publish_to_instagram(
+async def _publish_to_instagram(
         self,
         content: str,
         media_urls: Optional[List[str]],
@@ -675,7 +675,7 @@ Return as JSON array."""
             logger.error(f"Persona generation failed: {e}")
             return []
 
-    async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
+async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
         """
         Suggest lookalike audience configurations.
         """
@@ -765,7 +765,7 @@ Return detailed content plan."""
             logger.error(f"❌ Viral content generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_visual_concepts(
+async def _generate_visual_concepts(
         self, product_info: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """

@@ -624,7 +624,7 @@ class DesignAutomationAgent:
     </footer>
 </body>
 </html>
-            """,
+""",
             "css_styles": """
 :root {
     --rose-gold: #E8B4B8;
@@ -682,7 +682,7 @@ class DesignAutomationAgent:
     transform: translateY(-8px);
     box-shadow: var(--shadow-luxury);
 }
-            """,
+""",
             "javascript_interactions": """
 // Luxury Frontend Interactions
 class LuxuryInteractions {
@@ -1024,9 +1024,9 @@ h1, h2, h3, h4, h5, h6 {{
     font-family: var(--luxury-heading-font);
     color: var(--luxury-primary);
 }}
-        """
+"""
 
-    def _configure_responsive_design(self, layout_id: str) -> Dict[str, Any]:
+def _configure_responsive_design(self, layout_id: str) -> Dict[str, Any]:
         """Configure responsive design settings."""
         return {
             "breakpoints": {"mobile": "768px", "tablet": "1024px", "desktop": "1200px"},
@@ -1121,7 +1121,7 @@ h1, h2, h3, h4, h5, h6 {{
         </div>
     </div>
 </section>
-            """,
+""",
             "css": """
 .luxury-section {
     padding: 80px 0;
@@ -1142,7 +1142,7 @@ h1, h2, h3, h4, h5, h6 {{
     text-align: center;
     margin-bottom: 3rem;
 }
-            """,
+""",
         }
 
 def optimize_design_automation() -> Dict[str, Any]:

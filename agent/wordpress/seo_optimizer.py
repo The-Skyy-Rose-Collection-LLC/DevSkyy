@@ -1,15 +1,9 @@
-from datetime import datetime
-import json  # noqa: F401 - Reserved for future JSON schema processing
-
-from typing import Any, Dict, List, Optional
-import logging
-
 """
 WordPress SEO Optimizer
 Comprehensive SEO optimization for WordPress sites
 
 Features:
-    - On-page SEO optimization
+- On-page SEO optimization
 - Technical SEO audits
 - Schema markup generation
 - Sitemap management
@@ -17,7 +11,13 @@ Features:
 Reference: Based on AGENTS.md Line 921-961
 """
 
+import json  # noqa: F401 - Reserved for future JSON schema processing
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 logger = logging.getLogger(__name__)
+
 
 class WordPressSEOOptimizer:
     """
@@ -267,7 +267,7 @@ class WordPressSEOOptimizer:
     def _calculate_seo_score(self, analysis: Dict[str, Any]) -> int:
         """Calculate overall SEO score (0-100)"""
         score = 0
-        max_score = sum()
+        max_score = sum(
             bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp
         )
 
@@ -440,8 +440,7 @@ class WordPressSEOOptimizer:
         logger.info(f"Generating sitemap for {len(pages)} pages")
 
         sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        # Use list and join for string building
-sitemap_list.append(...)
+        sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 
         for page in pages:
             url = page.get("url", "")
@@ -459,8 +458,7 @@ sitemap_list.append(...)
             sitemap += f"    <priority>{priority}</priority>\n"
             sitemap += f"  </url>\n"
 
-        # Use list and join for string building
-sitemap_list.append(...)
+        sitemap += "</urlset>"
 
         return sitemap
 
@@ -527,11 +525,9 @@ sitemap_list.append(...)
         robots = "User-agent: *\n"
 
         if allow_all:
-            # Use list and join for string building
-robots_list.append(...)
+            robots += "Allow: /\n"
         else:
-            # Use list and join for string building
-robots_list.append(...)
+            robots += "Disallow: /\n"
 
         if disallow_paths:
             for path in disallow_paths:

@@ -7,7 +7,7 @@ from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
 
 import uuid
 from security.jwt_auth import (
-    from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import logging
 
 """

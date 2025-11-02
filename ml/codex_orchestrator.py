@@ -1,11 +1,11 @@
 from datetime import datetime
 
-                    from agent.modules.backend.fixer import fix_code
-                    from agent.modules.backend.scanner import scan_site
-                from agent.modules.backend.fixer_v2 import CodeFixer
-                from agent.modules.backend.scanner_v2 import CodeScanner
-                from agent.modules.backend.universal_self_healing_agent import (
-                    from ml.codex_integration import codex
+from agent.modules.backend.fixer import fix_code
+from agent.modules.backend.scanner import scan_site
+from agent.modules.backend.fixer_v2 import CodeFixer
+from agent.modules.backend.scanner_v2 import CodeScanner
+from agent.modules.backend.universal_self_healing_agent import (
+from ml.codex_integration import codex
 from typing import Any, Dict, List, Optional
 import logging
 
@@ -255,7 +255,7 @@ Respond with a structured healing strategy."""
                 "issue_groups": [issues],
             }
 
-    async def _generate_fixes(
+async def _generate_fixes(
         self, code: str, strategy: Dict, language: str
     ) -> List[Dict[str, Any]]:
         """Generate fixes for each issue using Codex"""
@@ -305,7 +305,7 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             logger.error(f"Fix generation failed: {e}")
             return []
 
-    async def _validate_fixes(
+async def _validate_fixes(
         self, original_code: str, fixes: List[Dict], language: str
     ) -> Dict[str, Any]:
         """Validate fixes before applying"""
@@ -363,7 +363,7 @@ Respond with validation analysis."""
             logger.error(f"Validation failed: {e}")
             return {"safe": False, "reason": str(e)}
 
-    async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
+async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
         """Apply validated fixes to code"""
         logger.info("🚀 Applying fixes...")
 

@@ -748,14 +748,14 @@ class WordPressDiviElementorAgent:
         margin-bottom: 20px;
     }
 }
-        """
+"""
         )
 
         return css_template
 
     # Helper methods for Elementor Pro operations
 
-    async def _generate_elementor_template_structure(
+async def _generate_elementor_template_structure(
         self, template_type: str, design_requirements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Generate Elementor Pro template structure."""

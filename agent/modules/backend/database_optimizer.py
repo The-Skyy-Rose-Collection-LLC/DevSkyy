@@ -1,7 +1,7 @@
-        import re
-        import re
-        import re
-        import re
+import re
+import re
+import re
+import re
 from datetime import datetime
 import json
 import time
@@ -167,7 +167,7 @@ class DatabaseConnectionPool:
             async def execute_query(
                 self, query: str, params: Dict = None, use_cache: bool = True
 ) -> Any:
-        """Execute query with optimization and caching."""
+"""Execute query with optimization and caching."""
         start_time = time.time()
 
         # Check cache first
@@ -205,7 +205,7 @@ class DatabaseConnectionPool:
             logger.error(f"Query execution error: {e}")
             raise
 
-    def _get_cache_key(self, query: str, params: Dict = None) -> str:
+def _get_cache_key(self, query: str, params: Dict = None) -> str:
         """Generate cache key for query."""
         key_data = {"query": query, "params": params or {}}
         key_string = json.dumps(key_data, sort_keys=True)
@@ -271,7 +271,7 @@ class DatabaseConnectionPool:
 
         return MockConnection()
 
-    def get_connection_stats(self) -> Dict[str, Any]:
+def get_connection_stats(self) -> Dict[str, Any]:
         """Get connection pool statistics."""
         return {
             "max_connections": self.max_connections,
@@ -290,7 +290,7 @@ class IndexOptimizer:
             def analyze_table(
                 self, table_name: str, query_patterns: List[str]
 ) -> List[Dict[str, Any]]:
-        """Analyze table and recommend indexes."""
+"""Analyze table and recommend indexes."""
         recommendations = []
 
         # Analyze common query patterns
@@ -351,7 +351,7 @@ class IndexOptimizer:
 
         return unique_recommendations
 
-    def _extract_where_columns(self, query: str) -> List[str]:
+def _extract_where_columns(self, query: str) -> List[str]:
         """Extract columns from WHERE clause."""
 
         where_pattern = r"where\s+([^)]+)"

@@ -3,7 +3,7 @@ from security.jwt_auth import create_access_token, UserRole
 
 from fastapi.testclient import TestClient
 
-    from security.jwt_auth import User, user_manager
+from security.jwt_auth import User, user_manager
 from main import app
 import pytest
 

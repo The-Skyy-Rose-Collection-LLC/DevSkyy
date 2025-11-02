@@ -1,4 +1,4 @@
-        import re
+import re
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -96,7 +96,7 @@ class RateLimiter:
         client_requests.append(now)
         return True, None
 
-    def _record_violation(self, client_ip: str, violation_type: str):
+def _record_violation(self, client_ip: str, violation_type: str):
         """Record security violation and potentially block IP"""
         self.suspicious_patterns[client_ip] += 1
 

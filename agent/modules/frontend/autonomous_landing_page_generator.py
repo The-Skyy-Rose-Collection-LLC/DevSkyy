@@ -1,4 +1,4 @@
-        import re
+import re
 from datetime import datetime
 
 from jinja2 import Template
@@ -143,10 +143,10 @@ class AutonomousLandingPageGenerator:
     </script>
 </body>
 </html>
-            """,
+""",
         }
 
-    async def generate_landing_page(
+async def generate_landing_page(
         self,
         product_name: str,
         target_audience: str,

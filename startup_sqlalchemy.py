@@ -1,16 +1,14 @@
-            from agent.modules.wordpress_direct_service import (
-                import os
-from pathlib import Path
-import sys
-
-from database import db_manager, init_db
-import logging
-
 #!/usr/bin/env python3
 """
 Enterprise Startup Handler for DevSkyy Platform
 SQLAlchemy-based database initialization with zero MongoDB dependencies
 """
+
+import logging
+import sys
+from pathlib import Path
+
+from database import db_manager, init_db
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
@@ -21,6 +19,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class DevSkyStartup:
     """Startup handler for DevSkyy platform"""
@@ -58,6 +57,7 @@ class DevSkyStartup:
     async def initialize_wordpress_service(self):
         """Initialize WordPress service if configured."""
         try:
+            import os
 
             wordpress_url = os.getenv("WORDPRESS_URL")
             if not wordpress_url:
@@ -66,6 +66,7 @@ class DevSkyStartup:
                 )
                 return False
 
+            from agent.modules.wordpress_direct_service import (
                 create_wordpress_direct_service,
             )
 
@@ -105,12 +106,15 @@ class DevSkyStartup:
 
         logger.info("✅ Shutdown complete")
 
+
 # Global startup instance
 startup_handler = DevSkyStartup()
+
 
 async def on_startup():
     """FastAPI startup event handler"""
     await startup_handler.startup()
+
 
 async def on_shutdown():
     """FastAPI shutdown event handler"""
