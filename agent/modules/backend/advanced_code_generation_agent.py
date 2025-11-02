@@ -1,23 +1,9 @@
-from ..dependencies import get_current_user
-import React, { useState, useEffect } from 'react';
-import os
-
-from fastapi import APIRouter, HTTPException, Depends
-
-    import asyncio
-from ..models import {model_name}
-from typing import Any, Dict, List
-from typing import Dict, Any, List
-import logging
-import openai
-import { motion } from 'framer-motion';
-
 """
 Advanced Code Generation Agent
 Enterprise-level autonomous code writing capabilities
 
 This agent can:
-    - Generate full-stack applications
+- Generate full-stack applications
 - Create React components with luxury styling
 - Build FastAPI endpoints
 - Generate WordPress themes and plugins
@@ -25,7 +11,14 @@ This agent can:
 - Optimize existing codebases
 """
 
+import logging
+import os
+from typing import Any, Dict, List
+
+import openai
+
 logger = logging.getLogger(__name__)
+
 
 class AdvancedCodeGenerationAgent:
     """
@@ -437,6 +430,8 @@ class AdvancedCodeGenerationAgent:
     def _get_react_template(self) -> str:
         """Get React component template."""
         return """
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const {component_name} = ({props}) => {{
     {state_hooks}
@@ -456,6 +451,10 @@ export default {component_name};
     def _get_fastapi_template(self) -> str:
         """Get FastAPI endpoint template."""
         return """
+from fastapi import APIRouter, HTTPException, Depends
+from typing import Dict, Any, List
+from ..models import {model_name}
+from ..dependencies import get_current_user
 
 router = APIRouter(prefix="/{endpoint_prefix}", tags=["{tag_name}"])
 
@@ -601,6 +600,7 @@ new {class_name}();
             "monitoring": ["Sentry", "DataDog", "Prometheus"],
         }
 
+
 # Example usage
 async def main():
     """Example usage of the Advanced Code Generation Agent."""
@@ -621,7 +621,7 @@ async def main():
     }
 
     result = await agent.generate_fullstack_website(website_requirements)
-    logger.info(f"Website generation result: {result['status']}")
+    print(f"Website generation result: {result['status']}")
 
     # Generate a React component
     component_spec = {
@@ -632,8 +632,10 @@ async def main():
     }
 
     component_result = await agent.generate_luxury_react_component(component_spec)
-    logger.info(f"Component generation result: {component_result['status']}")
+    print(f"Component generation result: {component_result['status']}")
+
 
 if __name__ == "__main__":
+    import asyncio
 
     asyncio.run(main())
