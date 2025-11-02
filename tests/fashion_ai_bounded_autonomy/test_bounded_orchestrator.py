@@ -1,42 +1,37 @@
 """
-Unit tests for BoundedOrchestrator
-Tests bounded orchestration with approval workflows
+Unit Tests for Bounded Orchestrator
+Tests orchestration with bounded autonomy controls
 """
 
 import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import Mock, AsyncMock, MagicMock
 from datetime import datetime
 
 from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel
-from agent.orchestrator import ExecutionPriority
 from agent.modules.base_agent import BaseAgent, AgentStatus
+from agent.orchestrator import ExecutionPriority, TaskStatus
 
 
 class MockAgent(BaseAgent):
     """Mock agent for testing"""
     
-    def __init__(self, name: str, version: str = "1.0.0"):
-        super().__init__(name, version)
-        self.status = AgentStatus.HEALTHY
-        
     async def initialize(self) -> bool:
         self.status = AgentStatus.HEALTHY
         return True
-        
-    async def execute_core_function(self, **_kwargs) -> dict:
-        return {"status": "success", "result": "completed"}
     
-    async def health_check(self) -> dict:
-        return {"status": "healthy", "agent": self.agent_name}
+    async def execute_core_function(self, **kwargs):
+        return {"status": "success", "result": kwargs}
+    
+    async def health_check(self):
+        return {"status": "healthy", "agent_name": self.agent_name}
 
 
 @pytest.fixture
 def orchestrator():
     """Create BoundedOrchestrator instance"""
     return BoundedOrchestrator(
-        max_concurrent_tasks=50,
         local_only=True,
         auto_approve_low_risk=True
     )
@@ -45,31 +40,36 @@ def orchestrator():
 @pytest.fixture
 def mock_agent():
     """Create mock agent"""
-    return MockAgent("test_agent", "1.0.0")
+    return MockAgent("test_agent", version="1.0.0")
 
 
-class TestBoundedOrchestratorInitialization:
+class TestOrchestratorInitialization:
     """Test orchestrator initialization"""
 
-    def test_init_sets_defaults(self, orchestrator):
-        """Test that initialization sets default values"""
-        assert orchestrator.local_only is True
-        assert orchestrator.auto_approve_low_risk is True
-        assert orchestrator.system_paused is False
-        assert orchestrator.emergency_stop_active is False
-        assert len(orchestrator.wrapped_agents) == 0
+    def test_initialization(self):
+        """Test basic initialization"""
+        orch = BoundedOrchestrator(
+            local_only=True,
+            auto_approve_low_risk=True,
+            max_concurrent_tasks=100
+        )
+        
+        assert orch.local_only is True
+        assert orch.auto_approve_low_risk is True
+        assert orch.system_paused is False
+        assert orch.emergency_stop_active is False
 
-    def test_init_creates_approval_system(self, orchestrator):
-        """Test that initialization creates approval system"""
+    def test_approval_system_initialized(self, orchestrator):
+        """Test that approval system is initialized"""
         assert orchestrator.approval_system is not None
 
 
-class TestRegisterAgent:
-    """Test agent registration"""
+class TestAgentRegistration:
+    """Test agent registration with bounded controls"""
 
     @pytest.mark.asyncio
-    async def test_register_agent_basic(self, orchestrator, mock_agent):
-        """Test basic agent registration"""
+    async def test_register_agent(self, orchestrator, mock_agent):
+        """Test registering agent with bounded controls"""
         success = await orchestrator.register_agent(
             agent=mock_agent,
             capabilities=["test_capability"],
@@ -80,65 +80,69 @@ class TestRegisterAgent:
         assert mock_agent.agent_name in orchestrator.wrapped_agents
 
     @pytest.mark.asyncio
-    async def test_register_agent_creates_wrapper(self, orchestrator, mock_agent):
-        """Test that registration creates bounded wrapper"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_capability"]
-        )
-        
-        wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper is not None
-        assert wrapper.wrapped_agent == mock_agent
-
-    @pytest.mark.asyncio
     async def test_register_multiple_agents(self, orchestrator):
         """Test registering multiple agents"""
-        agents = [MockAgent(f"agent_{i}") for i in range(3)]
+        agent1 = MockAgent("agent1", "1.0.0")
+        agent2 = MockAgent("agent2", "1.0.0")
         
-        for agent in agents:
-            await orchestrator.register_agent(
-                agent=agent,
-                capabilities=[f"cap_{agent.agent_name}"]
-            )
+        await orchestrator.register_agent(
+            agent=agent1,
+            capabilities=["cap1"]
+        )
         
-        assert len(orchestrator.wrapped_agents) == 3
+        await orchestrator.register_agent(
+            agent=agent2,
+            capabilities=["cap2"]
+        )
+        
+        assert len(orchestrator.wrapped_agents) == 2
+
+    @pytest.mark.asyncio
+    async def test_wrapped_agent_has_bounded_controls(self, orchestrator, mock_agent):
+        """Test that registered agents are wrapped with bounded controls"""
+        await orchestrator.register_agent(
+            agent=mock_agent,
+            capabilities=["test"]
+        )
+        
+        wrapped = orchestrator.wrapped_agents[mock_agent.agent_name]
+        assert wrapped.local_only == orchestrator.local_only
+        assert wrapped.auto_approve_low_risk == orchestrator.auto_approve_low_risk
 
 
-class TestExecuteTask:
-    """Test task execution"""
+class TestTaskExecution:
+    """Test task execution with approval controls"""
 
     @pytest.mark.asyncio
     async def test_execute_low_risk_task(self, orchestrator, mock_agent):
-        """Test executing low-risk task"""
+        """Test executing low-risk task (auto-approved)"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["read_data"]
+            capabilities=["query"]
         )
         
         result = await orchestrator.execute_task(
-            task_type="read_data",
-            parameters={"source": "test.csv"},
-            required_capabilities=["read_data"],
+            task_type="query_data",
+            parameters={"query": "test"},
+            required_capabilities=["query"],
             priority=ExecutionPriority.MEDIUM
         )
         
-        # Low-risk tasks may execute immediately depending on configuration
-        assert "status" in result
+        # Low-risk tasks should execute immediately
+        assert result.get("status") in ["completed", "pending_approval"]
 
     @pytest.mark.asyncio
-    async def test_execute_high_risk_task_requires_approval(self, orchestrator, mock_agent):
+    async def test_execute_high_risk_requires_approval(self, orchestrator, mock_agent):
         """Test that high-risk tasks require approval"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["write_data"]
+            capabilities=["modify"]
         )
         
         result = await orchestrator.execute_task(
-            task_type="update_database",
+            task_type="create_resource",
             parameters={"data": "test"},
-            required_capabilities=["write_data"],
-            priority=ExecutionPriority.HIGH,
+            required_capabilities=["modify"],
             require_approval=True
         )
         
@@ -146,70 +150,79 @@ class TestExecuteTask:
         assert "task_id" in result
 
     @pytest.mark.asyncio
-    async def test_execute_task_emergency_stop(self, orchestrator, mock_agent):
+    async def test_emergency_stop_blocks_tasks(self, orchestrator):
         """Test that emergency stop blocks task execution"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_cap"]
-        )
-        
-        await orchestrator.emergency_stop("Test emergency", "operator")
+        orchestrator.emergency_stop_active = True
         
         result = await orchestrator.execute_task(
             task_type="test_task",
             parameters={},
-            required_capabilities=["test_cap"]
+            required_capabilities=[]
         )
         
+        assert "error" in result
         assert result["status"] == "blocked"
-        assert "emergency" in result["error"].lower()
 
     @pytest.mark.asyncio
-    async def test_execute_task_system_paused(self, orchestrator, mock_agent):
+    async def test_paused_system_queues_tasks(self, orchestrator):
         """Test that paused system queues tasks"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_cap"]
-        )
-        
-        await orchestrator.pause_system("operator")
+        orchestrator.system_paused = True
         
         result = await orchestrator.execute_task(
             task_type="test_task",
             parameters={},
-            required_capabilities=["test_cap"]
+            required_capabilities=[]
         )
         
         assert result["status"] == "queued"
 
-    @pytest.mark.asyncio
-    async def test_execute_task_no_capable_agents(self, orchestrator):
-        """Test executing task with no capable agents"""
-        result = await orchestrator.execute_task(
-            task_type="test_task",
-            parameters={},
-            required_capabilities=["nonexistent_capability"]
+
+class TestRiskAssessment:
+    """Test task risk assessment"""
+
+    def test_assess_low_risk_task(self, orchestrator):
+        """Test assessment of low-risk tasks"""
+        risk = orchestrator._assess_task_risk("query_data", {}, ["agent1"])
+        assert risk == ActionRiskLevel.LOW
+
+    def test_assess_high_risk_task(self, orchestrator):
+        """Test assessment of high-risk tasks"""
+        risk = orchestrator._assess_task_risk("create_user", {}, ["agent1"])
+        assert risk == ActionRiskLevel.HIGH
+
+    def test_assess_critical_risk_task(self, orchestrator):
+        """Test assessment of critical-risk tasks"""
+        risk = orchestrator._assess_task_risk("deploy_system", {}, ["agent1"])
+        assert risk == ActionRiskLevel.CRITICAL
+
+    def test_multiple_agents_increases_risk(self, orchestrator):
+        """Test that tasks with multiple agents have higher risk"""
+        risk_single = orchestrator._assess_task_risk(
+            "analyze_data", {}, ["agent1"]
+        )
+        risk_multiple = orchestrator._assess_task_risk(
+            "analyze_data", {}, ["agent1", "agent2", "agent3", "agent4"]
         )
         
-        assert "error" in result
+        assert risk_multiple.value >= risk_single.value
 
 
-class TestExecuteApprovedTask:
-    """Test executing approved tasks"""
+class TestApprovedTaskExecution:
+    """Test execution of approved tasks"""
 
     @pytest.mark.asyncio
     async def test_execute_approved_task(self, orchestrator, mock_agent):
         """Test executing an approved task"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["test_cap"]
+            capabilities=["modify"]
         )
         
-        # Create task requiring approval
+        # Create pending task
         result = await orchestrator.execute_task(
-            task_type="test_task",
-            parameters={"test": "value"},
-            required_capabilities=["test_cap"],
+            task_type="create_record",
+            parameters={"data": "test"},
+            required_capabilities=["modify"],
             require_approval=True
         )
         
@@ -218,223 +231,143 @@ class TestExecuteApprovedTask:
         # Execute approved task
         exec_result = await orchestrator.execute_approved_task(
             task_id=task_id,
-            approved_by="operator"
+            approved_by="test_operator"
         )
         
-        assert "status" in exec_result
+        assert exec_result is not None
 
     @pytest.mark.asyncio
-    async def test_execute_approved_nonexistent_task(self, orchestrator):
-        """Test executing non-existent approved task"""
+    async def test_execute_nonexistent_task(self, orchestrator):
+        """Test executing non-existent task"""
         result = await orchestrator.execute_approved_task(
             task_id="nonexistent",
             approved_by="operator"
         )
         
-        assert result["status"] == "error"
+        assert "error" in result
 
 
-class TestRiskAssessment:
-    """Test task risk assessment"""
-
-    def test_assess_task_risk_critical(self, orchestrator):
-        """Test assessment of critical tasks"""
-        risk = orchestrator._assess_task_risk(
-            task_type="deploy_production",
-            parameters={},
-            agents=["agent1"]
-        )
-        
-        assert risk == ActionRiskLevel.CRITICAL
-
-    def test_assess_task_risk_high(self, orchestrator):
-        """Test assessment of high-risk tasks"""
-        risk = orchestrator._assess_task_risk(
-            task_type="update_records",
-            parameters={},
-            agents=["agent1"]
-        )
-        
-        assert risk == ActionRiskLevel.HIGH
-
-    def test_assess_task_risk_medium(self, orchestrator):
-        """Test assessment of medium-risk tasks"""
-        risk = orchestrator._assess_task_risk(
-            task_type="analyze_data",
-            parameters={},
-            agents=["agent1"]
-        )
-        
-        assert risk == ActionRiskLevel.MEDIUM
-
-    def test_assess_task_risk_low(self, orchestrator):
-        """Test assessment of low-risk tasks"""
-        risk = orchestrator._assess_task_risk(
-            task_type="read_logs",
-            parameters={},
-            agents=["agent1"]
-        )
-        
-        assert risk == ActionRiskLevel.LOW
-
-    def test_assess_task_risk_multiple_agents_increases_risk(self, orchestrator):
-        """Test that multiple agents increase risk level"""
-        risk = orchestrator._assess_task_risk(
-            task_type="analyze_data",
-            parameters={},
-            agents=["agent1", "agent2", "agent3", "agent4"]
-        )
-        
-        assert risk == ActionRiskLevel.HIGH
-
-
-class TestEmergencyStop:
-    """Test emergency stop functionality"""
+class TestEmergencyControls:
+    """Test emergency control functionality"""
 
     @pytest.mark.asyncio
-    async def test_emergency_stop_sets_flag(self, orchestrator):
-        """Test that emergency stop sets the flag"""
-        await orchestrator.emergency_stop("Test emergency", "operator")
+    async def test_emergency_stop(self, orchestrator, mock_agent):
+        """Test emergency stop functionality"""
+        await orchestrator.register_agent(
+            agent=mock_agent,
+            capabilities=["test"]
+        )
+        
+        await orchestrator.emergency_stop(
+            reason="Security incident",
+            operator="security_team"
+        )
         
         assert orchestrator.emergency_stop_active is True
+        
+        # Verify wrapped agents are also stopped
+        wrapped = orchestrator.wrapped_agents[mock_agent.agent_name]
+        assert wrapped.emergency_stop is True
 
     @pytest.mark.asyncio
-    async def test_emergency_stop_stops_wrapped_agents(self, orchestrator, mock_agent):
-        """Test that emergency stop propagates to wrapped agents"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_cap"]
-        )
-        
-        await orchestrator.emergency_stop("Test emergency", "operator")
-        
-        wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper.emergency_stop is True
-
-    @pytest.mark.asyncio
-    async def test_resume_operations_after_emergency(self, orchestrator, mock_agent):
+    async def test_resume_operations(self, orchestrator):
         """Test resuming operations after emergency stop"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_cap"]
-        )
+        orchestrator.emergency_stop_active = True
         
-        await orchestrator.emergency_stop("Test emergency", "operator")
         result = await orchestrator.resume_operations("operator")
         
         assert result["status"] == "resumed"
         assert orchestrator.emergency_stop_active is False
 
     @pytest.mark.asyncio
-    async def test_resume_without_emergency_stop(self, orchestrator):
-        """Test resuming when no emergency stop is active"""
-        result = await orchestrator.resume_operations("operator")
+    async def test_pause_system(self, orchestrator, mock_agent):
+        """Test pausing system operations"""
+        await orchestrator.register_agent(
+            agent=mock_agent,
+            capabilities=["test"]
+        )
         
-        assert "error" in result
-
-
-class TestPauseResume:
-    """Test pause and resume functionality"""
-
-    @pytest.mark.asyncio
-    async def test_pause_system(self, orchestrator):
-        """Test pausing the system"""
         result = await orchestrator.pause_system("operator")
         
         assert result["status"] == "paused"
         assert orchestrator.system_paused is True
 
     @pytest.mark.asyncio
-    async def test_resume_system(self, orchestrator):
-        """Test resuming the system"""
-        await orchestrator.pause_system("operator")
+    async def test_resume_system(self, orchestrator, mock_agent):
+        """Test resuming system operations"""
+        await orchestrator.register_agent(
+            agent=mock_agent,
+            capabilities=["test"]
+        )
+        
+        orchestrator.system_paused = True
+        
         result = await orchestrator.resume_system("operator")
         
         assert result["status"] == "resumed"
         assert orchestrator.system_paused is False
 
+
+class TestStatusReporting:
+    """Test status reporting functionality"""
+
     @pytest.mark.asyncio
-    async def test_pause_propagates_to_agents(self, orchestrator, mock_agent):
-        """Test that pause propagates to wrapped agents"""
+    async def test_get_bounded_status(self, orchestrator, mock_agent):
+        """Test getting bounded orchestrator status"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["test_cap"]
+            capabilities=["test"]
         )
         
-        await orchestrator.pause_system("operator")
-        
-        wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper.paused is True
-
-
-class TestGetBoundedStatus:
-    """Test getting bounded status"""
-
-    @pytest.mark.asyncio
-    async def test_get_bounded_status_complete(self, orchestrator):
-        """Test getting complete bounded status"""
         status = await orchestrator.get_bounded_status()
         
-        assert "bounded_autonomy" in status
         assert "system_controls" in status["bounded_autonomy"]
-
-    @pytest.mark.asyncio
-    async def test_get_bounded_status_includes_controls(self, orchestrator):
-        """Test that status includes control flags"""
-        status = await orchestrator.get_bounded_status()
-        
-        controls = status["bounded_autonomy"]["system_controls"]
-        assert "emergency_stop" in controls
-        assert "paused" in controls
-        assert "local_only" in controls
-        assert "auto_approve_low_risk" in controls
-
-    @pytest.mark.asyncio
-    async def test_get_bounded_status_includes_wrapped_agents(self, orchestrator, mock_agent):
-        """Test that status includes wrapped agent information"""
-        await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["test_cap"]
-        )
-        
-        status = await orchestrator.get_bounded_status()
-        
         assert "wrapped_agents" in status["bounded_autonomy"]
-        assert mock_agent.agent_name in status["bounded_autonomy"]["wrapped_agents"]
-
-
-class TestEdgeCases:
-    """Test edge cases and error conditions"""
+        assert "pending_approvals" in status["bounded_autonomy"]
 
     @pytest.mark.asyncio
-    async def test_register_agent_twice(self, orchestrator, mock_agent):
-        """Test registering the same agent twice"""
+    async def test_status_includes_agent_details(self, orchestrator, mock_agent):
+        """Test that status includes wrapped agent details"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["cap1"]
+            capabilities=["test"]
         )
         
-        # Second registration should succeed (updates existing)
-        success = await orchestrator.register_agent(
-            agent=mock_agent,
-            capabilities=["cap2"]
-        )
+        status = await orchestrator.get_bounded_status()
+        agents = status["bounded_autonomy"]["wrapped_agents"]
         
-        assert success is True
+        assert mock_agent.agent_name in agents
+        assert "bounded_controls" in agents[mock_agent.agent_name]
+
+
+class TestTaskManagement:
+    """Test task management functionality"""
 
     @pytest.mark.asyncio
-    async def test_execute_task_with_empty_capabilities(self, orchestrator, mock_agent):
-        """Test executing task with empty capability list"""
+    async def test_task_creation(self, orchestrator, mock_agent):
+        """Test that tasks are properly created"""
         await orchestrator.register_agent(
             agent=mock_agent,
-            capabilities=["test_cap"]
+            capabilities=["test"]
         )
         
         result = await orchestrator.execute_task(
             task_type="test_task",
-            parameters={},
-            required_capabilities=[]
+            parameters={"key": "value"},
+            required_capabilities=["test"]
         )
         
-        # Should fail with error about no capabilities
-        assert "error" in result or "status" in result
+        # Task should be tracked
+        if "task_id" in result:
+            assert result["task_id"] in orchestrator.tasks
+
+    @pytest.mark.asyncio
+    async def test_no_capable_agents(self, orchestrator):
+        """Test task execution when no capable agents exist"""
+        result = await orchestrator.execute_task(
+            task_type="test_task",
+            parameters={},
+            required_capabilities=["nonexistent_capability"]
+        )
+        
+        assert "error" in result

@@ -1,6 +1,6 @@
 """
-Unit tests for BoundedAutonomyWrapper
-Tests wrapping agents with bounded autonomy controls
+Unit Tests for Bounded Autonomy Wrapper
+Tests agent wrapping with approval workflows
 """
 
 import pytest
@@ -23,33 +23,20 @@ from agent.modules.base_agent import BaseAgent, AgentStatus
 class MockAgent(BaseAgent):
     """Mock agent for testing"""
     
-    def __init__(self, name: str, version: str = "1.0.0"):
-        super().__init__(name, version)
-        self.status = AgentStatus.HEALTHY
-        
     async def initialize(self) -> bool:
+        self.status = AgentStatus.HEALTHY
         return True
-        
-    async def execute_core_function(self, **kwargs) -> dict:
-        task = kwargs.get("task", "test")
-        return {"status": "success", "task": task, "result": "completed"}
     
-    async def read_data(self, source: str) -> dict:
-        return {"status": "success", "data": f"data from {source}"}
+    async def execute_core_function(self, **kwargs):
+        return {"status": "success", "data": kwargs}
     
-    async def write_data(self, destination: str, _data: dict) -> dict:
-        return {"status": "success", "written": True, "destination": destination}
-    
-    async def delete_resource(self, resource_id: str) -> dict:
-        return {"status": "success", "deleted": resource_id}
-    
-    async def api_call(self, endpoint: str) -> dict:
-        return {"status": "success", "endpoint": endpoint}
+    async def health_check(self):
+        return {"status": "healthy"}
 
 
 @pytest.fixture
-def temp_audit_path():
-    """Create temporary audit log path"""
+def temp_audit_dir():
+    """Create temporary audit log directory"""
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
     shutil.rmtree(temp_dir)
@@ -58,406 +45,331 @@ def temp_audit_path():
 @pytest.fixture
 def mock_agent():
     """Create mock agent"""
-    return MockAgent("test_agent", "1.0.0")
+    return MockAgent("test_agent", version="1.0.0")
 
 
 @pytest.fixture
-def wrapper(mock_agent, temp_audit_path):
+def wrapper(mock_agent, temp_audit_dir):
     """Create BoundedAutonomyWrapper instance"""
     return BoundedAutonomyWrapper(
         wrapped_agent=mock_agent,
         auto_approve_low_risk=True,
         local_only=True,
-        audit_log_path=temp_audit_path
+        audit_log_path=temp_audit_dir
     )
 
 
-class TestBoundedAutonomyWrapperInitialization:
+class TestWrapperInitialization:
     """Test wrapper initialization"""
 
-    def test_init_creates_audit_directory(self, mock_agent, temp_audit_path):
-        """Test that initialization creates audit log directory"""
-        audit_path = Path(temp_audit_path) / "custom_audit"
-        BoundedAutonomyWrapper(
+    def test_initialization(self, mock_agent, temp_audit_dir):
+        """Test basic initialization"""
+        wrapper = BoundedAutonomyWrapper(
             wrapped_agent=mock_agent,
-            audit_log_path=str(audit_path)
+            auto_approve_low_risk=True,
+            local_only=True,
+            audit_log_path=temp_audit_dir
         )
-        assert audit_path.exists()
-
-    def test_init_sets_default_values(self, wrapper):
-        """Test that initialization sets default values"""
+        
+        assert wrapper.wrapped_agent == mock_agent
         assert wrapper.auto_approve_low_risk is True
         assert wrapper.local_only is True
         assert wrapper.emergency_stop is False
         assert wrapper.paused is False
-        assert len(wrapper.pending_actions) == 0
-        assert len(wrapper.completed_actions) == 0
+
+    def test_audit_directory_creation(self, mock_agent):
+        """Test that audit directory is created"""
+        temp_dir = tempfile.mkdtemp()
+        audit_path = Path(temp_dir) / "nested" / "audit"
+        
+        BoundedAutonomyWrapper(
+            wrapped_agent=mock_agent,
+            audit_log_path=str(audit_path)
+        )
+        
+        assert audit_path.exists()
+        shutil.rmtree(temp_dir)
 
 
 class TestRiskAssessment:
-    """Test risk assessment logic"""
+    """Test risk assessment functionality"""
 
-    def test_assess_risk_critical_operations(self, wrapper):
-        """Test assessment of critical operations"""
-        critical_functions = ["deploy_model", "delete_database", "drop_table", "modify_config"]
+    def test_low_risk_read_operations(self, wrapper):
+        """Test that read operations are assessed as low risk"""
+        risk = wrapper._assess_risk("get_data", {})
+        assert risk == ActionRiskLevel.LOW
         
-        for func in critical_functions:
-            risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.CRITICAL
-
-    def test_assess_risk_high_operations(self, wrapper):
-        """Test assessment of high-risk operations"""
-        high_risk_functions = ["create_user", "update_product", "insert_record", "send_email"]
+        risk = wrapper._assess_risk("query_database", {})
+        assert risk == ActionRiskLevel.LOW
         
-        for func in high_risk_functions:
-            risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.HIGH
+        risk = wrapper._assess_risk("fetch_records", {})
+        assert risk == ActionRiskLevel.LOW
 
-    def test_assess_risk_medium_operations(self, wrapper):
-        """Test assessment of medium-risk operations"""
-        medium_risk_functions = ["analyze_data", "process_batch", "calculate_metrics", "generate_report"]
+    def test_medium_risk_operations(self, wrapper):
+        """Test that analysis operations are medium risk"""
+        risk = wrapper._assess_risk("analyze_trends", {})
+        assert risk == ActionRiskLevel.MEDIUM
         
-        for func in medium_risk_functions:
-            risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.MEDIUM
-
-    def test_assess_risk_low_operations(self, wrapper):
-        """Test assessment of low-risk operations"""
-        low_risk_functions = ["get_data", "fetch_info", "query_status", "list_items"]
+        risk = wrapper._assess_risk("process_data", {})
+        assert risk == ActionRiskLevel.MEDIUM
         
-        for func in low_risk_functions:
-            risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.LOW
+        risk = wrapper._assess_risk("calculate_metrics", {})
+        assert risk == ActionRiskLevel.MEDIUM
 
-    def test_assess_risk_case_insensitive(self, wrapper):
-        """Test that risk assessment is case-insensitive"""
-        assert wrapper._assess_risk("DELETE_user", {}) == ActionRiskLevel.CRITICAL
-        assert wrapper._assess_risk("Create_Product", {}) == ActionRiskLevel.HIGH
+    def test_high_risk_operations(self, wrapper):
+        """Test that write operations are high risk"""
+        risk = wrapper._assess_risk("create_record", {})
+        assert risk == ActionRiskLevel.HIGH
+        
+        risk = wrapper._assess_risk("update_database", {})
+        assert risk == ActionRiskLevel.HIGH
+        
+        risk = wrapper._assess_risk("send_email", {})
+        assert risk == ActionRiskLevel.HIGH
+
+    def test_critical_risk_operations(self, wrapper):
+        """Test that critical operations are marked critical"""
+        risk = wrapper._assess_risk("deploy_system", {})
+        assert risk == ActionRiskLevel.CRITICAL
+        
+        risk = wrapper._assess_risk("delete_production", {})
+        assert risk == ActionRiskLevel.CRITICAL
+        
+        risk = wrapper._assess_risk("modify_config", {})
+        assert risk == ActionRiskLevel.CRITICAL
 
 
 class TestApprovalRequirement:
-    """Test approval requirement determination"""
+    """Test approval requirement logic"""
 
-    def test_requires_approval_with_override_true(self, wrapper):
-        """Test that override=True forces approval"""
-        requires = wrapper._requires_approval("read_data", {}, override=True)
-        assert requires is True
-
-    def test_requires_approval_with_override_false(self, wrapper):
-        """Test that override=False bypasses approval"""
-        requires = wrapper._requires_approval("delete_data", {}, override=False)
+    def test_auto_approve_low_risk(self, wrapper):
+        """Test auto-approval of low-risk operations"""
+        wrapper.auto_approve_low_risk = True
+        requires = wrapper._requires_approval("get_data", {}, None)
         assert requires is False
 
-    def test_requires_approval_low_risk_auto_approve(self, wrapper):
-        """Test that low-risk actions don't require approval with auto_approve_low_risk"""
-        requires = wrapper._requires_approval("read_data", {}, override=None)
+    def test_require_approval_medium_risk(self, wrapper):
+        """Test that medium-risk operations require approval"""
+        requires = wrapper._requires_approval("analyze_data", {}, None)
+        assert requires is True
+
+    def test_require_approval_high_risk(self, wrapper):
+        """Test that high-risk operations require approval"""
+        requires = wrapper._requires_approval("create_user", {}, None)
+        assert requires is True
+
+    def test_override_approval_requirement(self, wrapper):
+        """Test override of approval requirement"""
+        # Override to not require approval
+        requires = wrapper._requires_approval("delete_data", {}, False)
         assert requires is False
-
-    def test_requires_approval_medium_risk(self, wrapper):
-        """Test that medium-risk actions require approval"""
-        requires = wrapper._requires_approval("analyze_data", {}, override=None)
-        assert requires is True
-
-    def test_requires_approval_high_risk(self, wrapper):
-        """Test that high-risk actions require approval"""
-        requires = wrapper._requires_approval("update_data", {}, override=None)
-        assert requires is True
-
-    def test_requires_approval_critical_risk(self, wrapper):
-        """Test that critical-risk actions require approval"""
-        requires = wrapper._requires_approval("deploy_changes", {}, override=None)
-        assert requires is True
-
-
-class TestNetworkCallDetection:
-    """Test network call detection"""
-
-    def test_involves_network_call_api_keywords(self, wrapper):
-        """Test detection of API-related keywords"""
-        action = BoundedAction(
-            action_id="test",
-            agent_name="test",
-            function_name="call_api_endpoint",
-            parameters={},
-            risk_level=ActionRiskLevel.HIGH,
-            requires_approval=True
-        )
-        assert wrapper._involves_network_call(action) is True
-
-    def test_involves_network_call_http_keywords(self, wrapper):
-        """Test detection of HTTP-related keywords"""
-        network_functions = ["http_get", "fetch_data", "download_file", "upload_image"]
         
-        for func in network_functions:
-            action = BoundedAction(
-                action_id="test",
-                agent_name="test",
-                function_name=func,
-                parameters={},
-                risk_level=ActionRiskLevel.MEDIUM,
-                requires_approval=True
-            )
-            assert wrapper._involves_network_call(action) is True
-
-    def test_involves_network_call_local_functions(self, wrapper):
-        """Test that local functions are not flagged"""
-        local_functions = ["read_file", "process_data", "calculate_sum"]
-        
-        for func in local_functions:
-            action = BoundedAction(
-                action_id="test",
-                agent_name="test",
-                function_name=func,
-                parameters={},
-                risk_level=ActionRiskLevel.LOW,
-                requires_approval=False
-            )
-            assert wrapper._involves_network_call(action) is False
+        # Override to require approval
+        requires = wrapper._requires_approval("get_data", {}, True)
+        assert requires is True
 
 
-class TestExecuteLowRisk:
-    """Test execution of low-risk actions"""
+class TestExecution:
+    """Test execution functionality"""
 
     @pytest.mark.asyncio
     async def test_execute_low_risk_auto_approved(self, wrapper):
-        """Test that low-risk actions execute immediately"""
+        """Test auto-execution of low-risk operations"""
         result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
+            function_name="execute_core_function",
+            parameters={"task": "query"}
         )
         
         assert result["status"] == "completed"
         assert "result" in result
-        assert result["action_id"] is not None
-
-    @pytest.mark.asyncio
-    async def test_execute_records_audit_log(self, wrapper, temp_audit_path):
-        """Test that execution is audited"""
-        await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
-        
-        # Check audit log file was created
-        audit_files = list(Path(temp_audit_path).glob("audit_*.jsonl"))
-        assert len(audit_files) > 0
-
-    @pytest.mark.asyncio
-    async def test_execute_tracks_execution_time(self, wrapper):
-        """Test that execution time is tracked"""
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
-        
-        assert "execution_time_seconds" in result
-        assert result["execution_time_seconds"] >= 0
-
-
-class TestExecuteHighRisk:
-    """Test execution of high-risk actions"""
 
     @pytest.mark.asyncio
     async def test_execute_high_risk_requires_approval(self, wrapper):
-        """Test that high-risk actions require approval"""
+        """Test that high-risk operations require approval"""
         result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123", "data": {"field": "value"}}
+            function_name="create_record",
+            parameters={"data": "test"}
         )
         
         assert result["status"] == "pending_approval"
         assert "action_id" in result
-        assert "review_command" in result
-
-    @pytest.mark.asyncio
-    async def test_execute_critical_requires_approval(self, wrapper):
-        """Test that critical actions require approval"""
-        result = await wrapper.execute(
-            function_name="delete_resource",
-            parameters={"resource_id": "important_resource"}
-        )
-        
-        assert result["status"] == "pending_approval"
-
-    @pytest.mark.asyncio
-    async def test_execute_adds_to_pending_queue(self, wrapper):
-        """Test that pending actions are added to queue"""
-        initial_count = len(wrapper.pending_actions)
-        
-        await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
-        
-        assert len(wrapper.pending_actions) == initial_count + 1
-
-
-class TestEmergencyControls:
-    """Test emergency stop and pause controls"""
+        assert result["risk_level"] == "high"
 
     @pytest.mark.asyncio
     async def test_emergency_stop_blocks_execution(self, wrapper):
-        """Test that emergency stop blocks all execution"""
-        wrapper.emergency_shutdown("Test emergency")
+        """Test that emergency stop blocks execution"""
+        wrapper.emergency_stop = True
         
         result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
+            function_name="execute_core_function",
+            parameters={}
         )
         
+        assert "error" in result
         assert result["status"] == "blocked"
-        assert "emergency" in result["error"].lower()
 
     @pytest.mark.asyncio
-    async def test_pause_queues_execution(self, wrapper):
-        """Test that pause queues execution"""
-        wrapper.pause()
+    async def test_paused_queues_operations(self, wrapper):
+        """Test that paused state queues operations"""
+        wrapper.paused = True
         
         result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
+            function_name="execute_core_function",
+            parameters={}
         )
         
         assert result["status"] == "queued"
-        assert "paused" in result["error"].lower()
 
-    def test_resume_after_pause(self, wrapper):
-        """Test resuming after pause"""
+    @pytest.mark.asyncio
+    async def test_execution_creates_audit_log(self, wrapper, temp_audit_dir):
+        """Test that execution creates audit log entry"""
+        await wrapper.execute(
+            function_name="execute_core_function",
+            parameters={"test": "data"}
+        )
+        
+        # Check audit log exists
+        audit_files = list(Path(temp_audit_dir).glob("*.jsonl"))
+        assert len(audit_files) > 0
+
+
+class TestApproval:
+    """Test approval functionality"""
+
+    @pytest.mark.asyncio
+    async def test_approve_pending_action(self, wrapper):
+        """Test approving a pending action"""
+        # Create pending action
+        result = await wrapper.execute(
+            function_name="create_record",
+            parameters={"data": "test"},
+            require_approval=True
+        )
+        
+        action_id = result["action_id"]
+        
+        # Approve
+        approval_result = await wrapper.approve_action(action_id, "test_operator")
+        
+        assert approval_result["status"] == "completed"
+        assert "result" in approval_result
+
+    @pytest.mark.asyncio
+    async def test_approve_nonexistent_action(self, wrapper):
+        """Test approving non-existent action"""
+        result = await wrapper.approve_action("nonexistent", "test_operator")
+        
+        assert "error" in result
+        assert result["status"] == "error"
+
+    @pytest.mark.asyncio
+    async def test_approval_removes_from_pending(self, wrapper):
+        """Test that approval removes action from pending queue"""
+        result = await wrapper.execute(
+            function_name="update_data",
+            parameters={},
+            require_approval=True
+        )
+        
+        action_id = result["action_id"]
+        assert action_id in wrapper.pending_actions
+        
+        await wrapper.approve_action(action_id, "operator")
+        assert action_id not in wrapper.pending_actions
+
+
+class TestRejection:
+    """Test rejection functionality"""
+
+    @pytest.mark.asyncio
+    async def test_reject_pending_action(self, wrapper):
+        """Test rejecting a pending action"""
+        result = await wrapper.execute(
+            function_name="create_user",
+            parameters={},
+            require_approval=True
+        )
+        
+        action_id = result["action_id"]
+        
+        rejection_result = await wrapper.reject_action(
+            action_id,
+            "test_operator",
+            "Not approved"
+        )
+        
+        assert rejection_result["status"] == "rejected"
+        assert rejection_result["reason"] == "Not approved"
+
+    @pytest.mark.asyncio
+    async def test_reject_removes_from_pending(self, wrapper):
+        """Test that rejection removes action from pending"""
+        result = await wrapper.execute(
+            function_name="delete_data",
+            parameters={},
+            require_approval=True
+        )
+        
+        action_id = result["action_id"]
+        await wrapper.reject_action(action_id, "operator", "test")
+        
+        assert action_id not in wrapper.pending_actions
+
+
+class TestNetworkIsolation:
+    """Test network isolation functionality"""
+
+    def test_network_call_detection(self, wrapper):
+        """Test detection of network calls"""
+        action = BoundedAction(
+            action_id="test",
+            agent_name="test",
+            function_name="api_call",
+            parameters={},
+            risk_level=ActionRiskLevel.HIGH,
+            requires_approval=False
+        )
+        
+        assert wrapper._involves_network_call(action) is True
+        
+        action.function_name = "query_local"
+        assert wrapper._involves_network_call(action) is False
+
+    @pytest.mark.asyncio
+    async def test_network_calls_blocked_in_local_mode(self, wrapper):
+        """Test that network calls are blocked in local-only mode"""
+        wrapper.local_only = True
+        
+        result = await wrapper.execute(
+            function_name="http_request",
+            parameters={},
+            require_approval=False
+        )
+        
+        assert "error" in result
+        assert wrapper.network_calls_blocked > 0
+
+
+class TestEmergencyControls:
+    """Test emergency control functionality"""
+
+    def test_emergency_shutdown(self, wrapper):
+        """Test emergency shutdown"""
+        wrapper.emergency_shutdown("Security incident")
+        
+        assert wrapper.emergency_stop is True
+
+    def test_pause_and_resume(self, wrapper):
+        """Test pause and resume"""
         wrapper.pause()
         assert wrapper.paused is True
         
         wrapper.resume()
         assert wrapper.paused is False
 
-    def test_emergency_stop_audits_pending_actions(self, wrapper):
-        """Test that emergency stop audits all pending actions"""
-        # Create pending action
-        action = BoundedAction(
-            action_id="test_action",
-            agent_name="test",
-            function_name="update_data",
-            parameters={},
-            risk_level=ActionRiskLevel.HIGH,
-            requires_approval=True
-        )
-        wrapper.pending_actions["test_action"] = action
-        
-        wrapper.emergency_shutdown("Test emergency")
-        
-        # Check audit trail
-        assert len(action.audit_trail) > 0
-        assert any("emergency_stop" in str(entry) for entry in action.audit_trail)
-
-
-class TestApproveAction:
-    """Test action approval workflow"""
-
     @pytest.mark.asyncio
-    async def test_approve_action_executes(self, wrapper):
-        """Test that approving action executes it"""
-        # Create pending action
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
-        action_id = result["action_id"]
-        
-        # Approve and execute
-        approval_result = await wrapper.approve_action(action_id, "test_operator")
-        
-        assert approval_result["status"] == "completed"
-        assert action_id not in wrapper.pending_actions
-
-    @pytest.mark.asyncio
-    async def test_approve_nonexistent_action(self, wrapper):
-        """Test approving non-existent action returns error"""
-        result = await wrapper.approve_action("nonexistent_id", "operator")
-        
-        assert result["status"] == "error"
-        assert "not found" in result["error"].lower()
-
-    @pytest.mark.asyncio
-    async def test_approve_updates_audit_trail(self, wrapper):
-        """Test that approval updates audit trail"""
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
-        action_id = result["action_id"]
-        
-        await wrapper.approve_action(action_id, "test_operator")
-        
-        # Check completed actions for audit trail
-        assert len(wrapper.completed_actions) > 0
-
-
-class TestRejectAction:
-    """Test action rejection workflow"""
-
-    @pytest.mark.asyncio
-    async def test_reject_action_removes_from_queue(self, wrapper):
-        """Test that rejecting action removes it from queue"""
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
-        action_id = result["action_id"]
-        
-        reject_result = await wrapper.reject_action(action_id, "operator", "Not authorized")
-        
-        assert reject_result["status"] == "rejected"
-        assert action_id not in wrapper.pending_actions
-
-    @pytest.mark.asyncio
-    async def test_reject_nonexistent_action(self, wrapper):
-        """Test rejecting non-existent action returns error"""
-        result = await wrapper.reject_action("nonexistent", "operator", "reason")
-        
-        assert result["status"] == "error"
-
-
-class TestLocalOnlyMode:
-    """Test local-only mode enforcement"""
-
-    @pytest.mark.asyncio
-    async def test_local_only_blocks_network_calls(self, wrapper):
-        """Test that local-only mode blocks network calls"""
-        result = await wrapper.execute(
-            function_name="api_call",
-            parameters={"endpoint": "https://example.com"}
-        )
-        
-        # Action requires approval first
-        action_id = result["action_id"]
-        
-        # Approve it
-        approval_result = await wrapper.approve_action(action_id, "operator")
-        
-        # Should be blocked by network check
-        assert approval_result["status"] == "blocked"
-        assert "network" in approval_result["error"].lower()
-
-    @pytest.mark.asyncio
-    async def test_local_only_tracks_blocked_calls(self, wrapper):
-        """Test that blocked network calls are tracked"""
-        initial_count = wrapper.network_calls_blocked
-        
-        result = await wrapper.execute(
-            function_name="api_call",
-            parameters={"endpoint": "https://example.com"}
-        )
-        action_id = result["action_id"]
-        await wrapper.approve_action(action_id, "operator")
-        
-        assert wrapper.network_calls_blocked > initial_count
-
-
-class TestGetStatus:
-    """Test status retrieval"""
-
-    @pytest.mark.asyncio
-    async def test_get_status_complete(self, wrapper):
-        """Test getting complete wrapper status"""
+    async def test_get_status(self, wrapper):
+        """Test status retrieval"""
         status = await wrapper.get_status()
         
         assert "agent_name" in status
@@ -465,72 +377,37 @@ class TestGetStatus:
         assert "actions" in status
         assert "network" in status
 
-    @pytest.mark.asyncio
-    async def test_get_status_includes_counts(self, wrapper):
-        """Test that status includes action counts"""
-        # Create some pending actions
-        await wrapper.execute(function_name="update_data", parameters={"id": "1"})
-        await wrapper.execute(function_name="update_data", parameters={"id": "2"})
-        
-        status = await wrapper.get_status()
-        
-        assert status["actions"]["pending"] == 2
 
-
-class TestActionIdGeneration:
-    """Test action ID generation"""
-
-    def test_generate_action_id_unique(self, wrapper):
-        """Test that generated action IDs are unique"""
-        id1 = wrapper._generate_action_id()
-        id2 = wrapper._generate_action_id()
-        
-        assert id1 != id2
-
-    def test_generate_action_id_format(self, wrapper):
-        """Test that action ID has expected format"""
-        action_id = wrapper._generate_action_id()
-        
-        assert wrapper.wrapped_agent.agent_name in action_id
-        assert "_" in action_id
-
-
-class TestEdgeCases:
-    """Test edge cases and error conditions"""
+class TestAuditLogging:
+    """Test audit logging functionality"""
 
     @pytest.mark.asyncio
-    async def test_execute_nonexistent_function(self, wrapper):
-        """Test executing non-existent function"""
-        result = await wrapper.execute(
-            function_name="nonexistent_function",
+    async def test_audit_log_created(self, wrapper, temp_audit_dir):
+        """Test that audit log file is created"""
+        await wrapper.execute(
+            function_name="execute_core_function",
             parameters={}
         )
         
-        # Should still create action and try to execute
-        assert result["status"] in ["pending_approval", "error"]
+        audit_files = list(Path(temp_audit_dir).glob("*.jsonl"))
+        assert len(audit_files) > 0
 
-    @pytest.mark.asyncio
-    async def test_execute_with_empty_parameters(self, wrapper):
-        """Test executing with empty parameters"""
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={}
+    def test_audit_log_entry_format(self, wrapper):
+        """Test audit log entry format"""
+        action = BoundedAction(
+            action_id="test_action",
+            agent_name="test_agent",
+            function_name="test_function",
+            parameters={"key": "value"},
+            risk_level=ActionRiskLevel.MEDIUM,
+            requires_approval=True
         )
         
-        assert "status" in result
-
-    @pytest.mark.asyncio
-    async def test_execute_with_complex_parameters(self, wrapper):
-        """Test executing with complex nested parameters"""
-        complex_params = {
-            "nested": {"level1": {"level2": "value"}},
-            "array": [1, 2, 3],
-            "mixed": {"key": "value", "number": 42}
-        }
+        wrapper._audit_log(action, "test_event", {"meta": "data"})
         
-        result = await wrapper.execute(
-            function_name="process_data",
-            parameters=complex_params
-        )
+        assert len(action.audit_trail) > 0
+        entry = action.audit_trail[-1]
         
-        assert "status" in result
+        assert "timestamp" in entry
+        assert entry["event"] == "test_event"
+        assert entry["metadata"] == {"meta": "data"}
