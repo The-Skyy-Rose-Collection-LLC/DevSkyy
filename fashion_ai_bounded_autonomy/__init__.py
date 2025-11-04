@@ -62,6 +62,7 @@ __author__ = "The Skyy Rose Collection LLC"
 from .approval_system import ApprovalSystem, ApprovalWorkflowType
 from .bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
 from .bounded_orchestrator import BoundedOrchestrator
+from .celery_app import celery_app
 from .data_pipeline import DataPipeline
 from .performance_tracker import PerformanceTracker
 from .report_generator import ReportGenerator
@@ -78,4 +79,5 @@ __all__ = [
     "PerformanceTracker",
     "ReportGenerator",
     "Watchdog",
+    "celery_app",
 ]

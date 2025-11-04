@@ -157,6 +157,13 @@ class ApprovalSystem:
 
         logger.info(f"📝 Action {action_id} submitted for review (workflow: {workflow_type.value})")
 
+        # Send async notification to operator via Celery
+        try:
+            from fashion_ai_bounded_autonomy.tasks import send_approval_notification_task
+            send_approval_notification_task.delay(action_id, agent_name, risk_level)
+        except Exception as e:
+            logger.warning(f"Failed to send async notification: {e}")
+
         return {
             "action_id": action_id,
             "status": "submitted",

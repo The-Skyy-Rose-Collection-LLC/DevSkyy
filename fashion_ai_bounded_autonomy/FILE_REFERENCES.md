@@ -39,6 +39,16 @@ This document lists all file and directory references used by the bounded autono
 | `logs/incidents/` | watchdog.py:45 | Incident logs (*.jsonl) | N/A |
 | `logs/data_pipeline/` | data_pipeline.py:289 | Data pipeline logs (*.jsonl) | N/A |
 
+## Celery Async Task Processing
+
+| File Path | Purpose | Should Commit |
+|-----------|---------|---------------|
+| `fashion_ai_bounded_autonomy/celery_app.py` | Celery application configuration | ✅ YES |
+| `fashion_ai_bounded_autonomy/tasks.py` | All Celery task definitions | ✅ YES |
+| `fashion_ai_bounded_autonomy/start_celery_worker.sh` | Worker startup script | ✅ YES |
+| `fashion_ai_bounded_autonomy/stop_celery_worker.sh` | Worker shutdown script | ✅ YES |
+| `fashion_ai_bounded_autonomy/CELERY_INTEGRATION.md` | Celery integration documentation | ✅ YES |
+
 ## Configuration Files (Source Control)
 
 | File Path | Purpose | Should Commit |
