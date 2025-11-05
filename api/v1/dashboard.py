@@ -1,7 +1,14 @@
 from agent.registry import AgentRegistry
 from ml.model_registry import ModelRegistry
 from monitoring.system_monitor import SystemMonitor
-from security.jwt_auth import get_current_user
+from security.jwt_auth import get_current_user, require_role, UserRole
+
+# Security availability check
+try:
+    from security.jwt_auth import require_role, UserRole
+    SECURITY_AVAILABLE = True
+except ImportError:
+    SECURITY_AVAILABLE = False
 from datetime import datetime, timedelta
 from fastapi.responses import HTMLResponse
 import time
@@ -272,8 +279,16 @@ async def get_dashboard_page(request: Request):
     return templates.TemplateResponse("enterprise_dashboard.html", {"request": request})
 
 @router.get("/dashboard/data", response_model=DashboardDataModel)
-async def get_dashboard_data(request: Request):
-    """Get complete dashboard data including metrics, agents, and activities."""
+async def get_dashboard_data(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+):
+    """
+    Get complete dashboard data including metrics, agents, and activities.
+
+    **Authentication Required:** READ_ONLY role or higher
+    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     try:
         # Initialize dashboard service with app state if available
         if hasattr(request.app, 'state'):
@@ -303,16 +318,32 @@ async def get_dashboard_data(request: Request):
         )
 
 @router.get("/dashboard/metrics", response_model=SystemMetricsModel)
-async def get_system_metrics(request: Request):
-    """Get current system performance metrics."""
+async def get_system_metrics(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+):
+    """
+    Get current system performance metrics.
+
+    **Authentication Required:** READ_ONLY role or higher
+    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
     
     return await dashboard_service.get_system_metrics()
 
 @router.get("/dashboard/agents", response_model=List[AgentStatusModel])
-async def get_agent_status(request: Request):
-    """Get status of all registered agents."""
+async def get_agent_status(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+):
+    """
+    Get status of all registered agents.
+
+    **Authentication Required:** READ_ONLY role or higher
+    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
     
@@ -321,9 +352,15 @@ async def get_agent_status(request: Request):
 @router.get("/dashboard/activities", response_model=List[ActivityLogModel])
 async def get_recent_activities(
     request: Request,
-    limit: int = 10
+    limit: int = 10,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
-    """Get recent system activities."""
+    """
+    Get recent system activities.
+
+    **Authentication Required:** READ_ONLY role or higher
+    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
     
@@ -332,9 +369,15 @@ async def get_recent_activities(
 @router.get("/dashboard/performance", response_model=List[Dict[str, Any]])
 async def get_performance_history(
     request: Request,
-    hours: int = 24
+    hours: int = 24,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
-    """Get performance metrics history."""
+    """
+    Get performance metrics history.
+
+    **Authentication Required:** READ_ONLY role or higher
+    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
     

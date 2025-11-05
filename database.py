@@ -46,9 +46,10 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         try:
             yield session
             await session.commit()
-        except Exception:
+        except Exception as e:
             await session.rollback()
-            raise
+            from core.exceptions import DatabaseError
+            raise DatabaseError("Database session error", original_error=e)
         finally:
             await session.close()
 
@@ -89,6 +90,8 @@ class DatabaseManager:
             self.connected = True
             return {"status": "connected", "type": "SQLAlchemy", "url": DATABASE_URL}
         except Exception as e:
+            from core.exceptions import ConnectionError as DBConnectionError
+            logger.error(f"Database connection failed: {e}")
             return {"status": "failed", "error": str(e)}
 
     async def disconnect(self):
@@ -119,7 +122,9 @@ class DatabaseManager:
                         DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
                     ),
                 }
-        except Exception as e:
+        except (Exception,) as e:
+            from core.exceptions import DatabaseError
+            logger.warning(f"Database health check failed: {e}")
             return {"status": "unhealthy", "connected": False, "error": str(e)}
 
 
