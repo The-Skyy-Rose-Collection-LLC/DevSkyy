@@ -4,9 +4,10 @@ Enterprise-grade implementation patterns for HuggingFace models in production.
 
 ## Table of Contents
 1. [Model Loading and Caching](#model-loading-and-caching)
-2. [CLIP Image Embeddings](#clip-image-embeddings)
-3. [Validation and Error Handling](#validation-and-error-handling)
-4. [Performance Optimization](#performance-optimization)
+2. [Model Quantization (8-bit/4-bit)](#model-quantization-8-bit4-bit)
+3. [CLIP Image Embeddings](#clip-image-embeddings)
+4. [Validation and Error Handling](#validation-and-error-handling)
+5. [Performance Optimization](#performance-optimization)
 
 ---
 
@@ -35,6 +36,508 @@ os.environ["TRANSFORMERS_CACHE"] = "/app/.cache/transformers"
 model = CLIPVisionModel.from_pretrained("openai/clip-vit-base-patch32")
 processor = CLIPImageProcessor.from_pretrained("openai/clip-vit-base-patch32")
 ```
+
+
+---
+
+## Model Quantization (8-bit/4-bit)
+
+### Correct Quantization Patterns for Diffusers Pipelines
+
+**⚠️ IMPORTANT:** Do NOT pass `BitsAndBytesConfig` directly to pipeline `from_pretrained()`. Use one of the correct patterns below.
+
+---
+
+### ✅ Pattern 1: PipelineQuantizationConfig (Recommended - Diffusers 0.30+)
+
+Use `PipelineQuantizationConfig` with `quant_backend` set to `"bitsandbytes_8bit"` or `"bitsandbytes_4bit"`:
+
+```python
+"""
+Correct Stable Diffusion XL Quantization - Method 1
+Uses diffusers' PipelineQuantizationConfig
+"""
+
+import torch
+from diffusers import StableDiffusionXLPipeline, PipelineQuantizationConfig
+from core.exceptions import MLError
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def load_sdxl_pipeline_with_quantization_v1(
+    model_id: str = "stabilityai/stable-diffusion-xl-base-1.0",
+    use_4bit: bool = True,
+    device: str = "cuda"
+) -> StableDiffusionXLPipeline:
+    """
+    Load SDXL pipeline with proper quantization using PipelineQuantizationConfig.
+
+    Args:
+        model_id: HuggingFace model identifier
+        use_4bit: Use 4-bit quantization (True) or 8-bit (False)
+        device: Device to load on
+
+    Returns:
+        Quantized SDXL pipeline
+
+    Raises:
+        MLError: If pipeline loading fails
+    """
+    try:
+        # ✅ CORRECT: Create PipelineQuantizationConfig
+        quant_backend = "bitsandbytes_4bit" if use_4bit else "bitsandbytes_8bit"
+        
+        # Configure quantization parameters
+        quant_config = PipelineQuantizationConfig(
+            quant_backend=quant_backend,
+            quant_kwargs={
+                # BitsAndBytes parameters go in quant_kwargs
+                "load_in_4bit": use_4bit,
+                "load_in_8bit": not use_4bit,
+                "bnb_4bit_compute_dtype": torch.float16,
+                "bnb_4bit_quant_type": "nf4",
+                "bnb_4bit_use_double_quant": True,
+            }
+        )
+
+        # ✅ CORRECT: Pass quantization_config to from_pretrained
+        pipeline = StableDiffusionXLPipeline.from_pretrained(
+            model_id,
+            quantization_config=quant_config,  # ✅ Use quantization_config parameter
+            torch_dtype=torch.float16,         # Keep torch_dtype as before
+            use_safetensors=True,
+            variant="fp16"
+        )
+
+        pipeline = pipeline.to(device)
+        logger.info(f"✅ SDXL pipeline loaded with {quant_backend} quantization")
+        
+        return pipeline
+
+    except Exception as e:
+        raise MLError(
+            f"Failed to load SDXL pipeline with quantization",
+            details={
+                "model_id": model_id,
+                "quant_backend": quant_backend,
+                "device": device
+            },
+            original_error=e
+        )
+```
+
+---
+
+### ✅ Pattern 2: Component-Level Quantization
+
+Quantize individual pipeline components (UNet, VAE, text encoders) separately:
+
+```python
+"""
+Correct Stable Diffusion XL Quantization - Method 2
+Quantize components individually, then build pipeline
+"""
+
+import torch
+from diffusers import (
+    StableDiffusionXLPipeline,
+    UNet2DConditionModel,
+    AutoencoderKL,
+)
+from transformers import (
+    CLIPTextModel,
+    CLIPTextModelWithProjection,
+    CLIPTokenizer,
+    BitsAndBytesConfig  # ✅ Only for individual components
+)
+from core.exceptions import MLError
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def load_sdxl_pipeline_with_quantization_v2(
+    model_id: str = "stabilityai/stable-diffusion-xl-base-1.0",
+    quantize_unet: bool = True,
+    quantize_text_encoders: bool = True,
+    use_4bit: bool = True,
+    device: str = "cuda"
+) -> StableDiffusionXLPipeline:
+    """
+    Load SDXL pipeline with component-level quantization.
+
+    This approach gives fine-grained control over which components
+    are quantized and their settings.
+
+    Args:
+        model_id: HuggingFace model identifier
+        quantize_unet: Quantize the UNet model
+        quantize_text_encoders: Quantize CLIP text encoders
+        use_4bit: Use 4-bit (True) or 8-bit (False) quantization
+        device: Device to load on
+
+    Returns:
+        SDXL pipeline with quantized components
+
+    Raises:
+        MLError: If loading fails
+    """
+    try:
+        # ✅ CORRECT: Create BitsAndBytesConfig for individual components
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=use_4bit,
+            load_in_8bit=not use_4bit,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+        )
+
+        # Load components individually with quantization
+        components = {}
+
+        # 1. UNet (main diffusion model)
+        if quantize_unet:
+            logger.info("Loading quantized UNet...")
+            components["unet"] = UNet2DConditionModel.from_pretrained(
+                model_id,
+                subfolder="unet",
+                quantization_config=bnb_config,  # ✅ Per-component quantization
+                torch_dtype=torch.float16
+            )
+        else:
+            components["unet"] = UNet2DConditionModel.from_pretrained(
+                model_id,
+                subfolder="unet",
+                torch_dtype=torch.float16
+            ).to(device)
+
+        # 2. VAE (usually not quantized for quality)
+        logger.info("Loading VAE (not quantized)...")
+        components["vae"] = AutoencoderKL.from_pretrained(
+            model_id,
+            subfolder="vae",
+            torch_dtype=torch.float16
+        ).to(device)
+
+        # 3. Text Encoder 1
+        if quantize_text_encoders:
+            logger.info("Loading quantized Text Encoder 1...")
+            components["text_encoder"] = CLIPTextModel.from_pretrained(
+                model_id,
+                subfolder="text_encoder",
+                quantization_config=bnb_config,  # ✅ Per-component quantization
+                torch_dtype=torch.float16
+            )
+        else:
+            components["text_encoder"] = CLIPTextModel.from_pretrained(
+                model_id,
+                subfolder="text_encoder",
+                torch_dtype=torch.float16
+            ).to(device)
+
+        # 4. Text Encoder 2 (SDXL has two)
+        if quantize_text_encoders:
+            logger.info("Loading quantized Text Encoder 2...")
+            components["text_encoder_2"] = CLIPTextModelWithProjection.from_pretrained(
+                model_id,
+                subfolder="text_encoder_2",
+                quantization_config=bnb_config,  # ✅ Per-component quantization
+                torch_dtype=torch.float16
+            )
+        else:
+            components["text_encoder_2"] = CLIPTextModelWithProjection.from_pretrained(
+                model_id,
+                subfolder="text_encoder_2",
+                torch_dtype=torch.float16
+            ).to(device)
+
+        # 5. Tokenizers (never quantized)
+        logger.info("Loading tokenizers...")
+        components["tokenizer"] = CLIPTokenizer.from_pretrained(
+            model_id,
+            subfolder="tokenizer"
+        )
+        components["tokenizer_2"] = CLIPTokenizer.from_pretrained(
+            model_id,
+            subfolder="tokenizer_2"
+        )
+
+        # 6. Load scheduler config
+        from diffusers import DDIMScheduler
+        components["scheduler"] = DDIMScheduler.from_pretrained(
+            model_id,
+            subfolder="scheduler"
+        )
+
+        # ✅ CORRECT: Construct pipeline with quantized components
+        pipeline = StableDiffusionXLPipeline(**components)
+
+        logger.info(
+            f"✅ SDXL pipeline constructed with quantized components "
+            f"(UNet: {quantize_unet}, Text Encoders: {quantize_text_encoders})"
+        )
+
+        return pipeline
+
+    except Exception as e:
+        raise MLError(
+            f"Failed to load SDXL pipeline with component-level quantization",
+            details={
+                "model_id": model_id,
+                "quantize_unet": quantize_unet,
+                "quantize_text_encoders": quantize_text_encoders,
+                "use_4bit": use_4bit
+            },
+            original_error=e
+        )
+```
+
+---
+
+### ❌ WRONG: Direct BitsAndBytesConfig to Pipeline
+
+**DO NOT DO THIS - It will fail or be ignored:**
+
+```python
+# ❌ INCORRECT - This does NOT work
+from transformers import BitsAndBytesConfig
+from diffusers import StableDiffusionXLPipeline
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
+
+# ❌ WRONG: Cannot pass BitsAndBytesConfig directly
+pipeline = StableDiffusionXLPipeline.from_pretrained(
+    model_id,
+    quantization_config=bnb_config,  # ❌ Wrong! This is transformers config
+    torch_dtype=torch.float16
+)
+# This will either fail or silently ignore quantization
+```
+
+**Why this fails:**
+- `BitsAndBytesConfig` is from **transformers** library
+- `StableDiffusionXLPipeline` is from **diffusers** library
+- They use different quantization interfaces
+- Must use `PipelineQuantizationConfig` (Pattern 1) or component-level (Pattern 2)
+
+---
+
+### Memory Usage Comparison
+
+| Configuration | VRAM Usage (SDXL) | Quality | Speed |
+|---------------|-------------------|---------|-------|
+| FP32 (no quant) | ~24 GB | Best | Slowest |
+| FP16 (no quant) | ~12 GB | Excellent | Fast |
+| 8-bit quantization | ~8 GB | Very Good | Medium |
+| 4-bit quantization | ~6 GB | Good | Faster |
+| 4-bit + double quant | ~5 GB | Good | Fastest |
+
+**Recommendation:**
+- Use **Pattern 1** (PipelineQuantizationConfig) for simplicity
+- Use **Pattern 2** (component-level) for fine-grained control
+- 4-bit quantization is good for most use cases
+- Keep VAE unquantized for better image quality
+
+---
+
+### Complete Usage Example
+
+```python
+"""
+Production usage with error handling and validation
+"""
+
+from typing import Optional
+import torch
+from core.exceptions import MLError, ValidationError
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class QuantizedSDXLGenerator:
+    """Production SDXL generator with quantization support."""
+
+    def __init__(
+        self,
+        model_id: str = "stabilityai/stable-diffusion-xl-base-1.0",
+        use_quantization: bool = True,
+        use_4bit: bool = True,
+        device: Optional[str] = None
+    ):
+        """
+        Initialize SDXL generator with optional quantization.
+
+        Args:
+            model_id: HuggingFace model ID
+            use_quantization: Enable quantization to save VRAM
+            use_4bit: Use 4-bit (True) or 8-bit (False) quantization
+            device: Device to use (auto-detected if None)
+        """
+        self.model_id = model_id
+        self.device = device or self._detect_device()
+        self.use_quantization = use_quantization
+        self.use_4bit = use_4bit
+
+        # Load pipeline with appropriate method
+        if use_quantization:
+            logger.info(f"Loading SDXL with {'4-bit' if use_4bit else '8-bit'} quantization")
+            self.pipeline = load_sdxl_pipeline_with_quantization_v1(
+                model_id=model_id,
+                use_4bit=use_4bit,
+                device=self.device
+            )
+        else:
+            logger.info("Loading SDXL without quantization")
+            from diffusers import StableDiffusionXLPipeline
+            self.pipeline = StableDiffusionXLPipeline.from_pretrained(
+                model_id,
+                torch_dtype=torch.float16,
+                use_safetensors=True,
+                variant="fp16"
+            ).to(self.device)
+
+        self.pipeline.enable_attention_slicing()
+        logger.info(f"✅ SDXL pipeline ready on {self.device}")
+
+    def _detect_device(self) -> str:
+        """Detect best available device."""
+        if torch.cuda.is_available():
+            return "cuda"
+        elif torch.backends.mps.is_available():
+            return "mps"
+        else:
+            return "cpu"
+
+    def generate(
+        self,
+        prompt: str,
+        negative_prompt: Optional[str] = None,
+        num_inference_steps: int = 30,
+        guidance_scale: float = 7.5,
+        width: int = 1024,
+        height: int = 1024,
+        seed: Optional[int] = None
+    ) -> torch.Tensor:
+        """
+        Generate image with SDXL.
+
+        Args:
+            prompt: Text prompt
+            negative_prompt: Negative prompt
+            num_inference_steps: Number of denoising steps
+            guidance_scale: Guidance scale (higher = more faithful to prompt)
+            width: Image width (multiples of 64)
+            height: Image height (multiples of 64)
+            seed: Random seed for reproducibility
+
+        Returns:
+            Generated image tensor
+
+        Raises:
+            ValidationError: If inputs are invalid
+            MLError: If generation fails
+        """
+        # Validate inputs
+        if not prompt or not isinstance(prompt, str):
+            raise ValidationError(
+                "prompt must be a non-empty string",
+                details={"provided": type(prompt).__name__}
+            )
+
+        if width % 64 != 0 or height % 64 != 0:
+            raise ValidationError(
+                "width and height must be multiples of 64",
+                details={"width": width, "height": height}
+            )
+
+        try:
+            # Set seed for reproducibility
+            generator = None
+            if seed is not None:
+                generator = torch.Generator(device=self.device).manual_seed(seed)
+
+            # Generate image
+            with torch.inference_mode():
+                output = self.pipeline(
+                    prompt=prompt,
+                    negative_prompt=negative_prompt,
+                    num_inference_steps=num_inference_steps,
+                    guidance_scale=guidance_scale,
+                    width=width,
+                    height=height,
+                    generator=generator
+                )
+
+            return output.images[0]
+
+        except Exception as e:
+            raise MLError(
+                "Failed to generate image with SDXL",
+                details={
+                    "prompt": prompt[:100],  # Truncate for logging
+                    "width": width,
+                    "height": height,
+                    "quantization": self.use_quantization
+                },
+                original_error=e
+            )
+
+
+# Usage example
+if __name__ == "__main__":
+    # Initialize with 4-bit quantization (saves ~6GB VRAM)
+    generator = QuantizedSDXLGenerator(
+        use_quantization=True,
+        use_4bit=True
+    )
+
+    # Generate image
+    image = generator.generate(
+        prompt="A majestic mountain landscape at sunset, cinematic lighting",
+        negative_prompt="blurry, low quality, distorted",
+        num_inference_steps=30,
+        seed=42
+    )
+
+    # Save
+    image.save("output.png")
+```
+
+---
+
+### Production Checklist: Quantization
+
+✅ **Configuration:**
+- [ ] Use `PipelineQuantizationConfig` for simple quantization
+- [ ] OR use component-level quantization for fine control
+- [ ] Never pass `BitsAndBytesConfig` directly to pipeline
+- [ ] Keep `torch_dtype=torch.float16` for computation
+
+✅ **Components:**
+- [ ] Quantize UNet (largest component, biggest savings)
+- [ ] Quantize text encoders (moderate savings)
+- [ ] Keep VAE unquantized (quality preservation)
+- [ ] Never quantize tokenizers/schedulers
+
+✅ **Quality vs Performance:**
+- [ ] 4-bit for maximum VRAM savings (~6GB for SDXL)
+- [ ] 8-bit for better quality (~8GB for SDXL)
+- [ ] FP16 for best quality (~12GB for SDXL)
+- [ ] Test quality on your use case
+
+✅ **Error Handling:**
+- [ ] Wrap loading in try-except
+- [ ] Log quantization settings
+- [ ] Validate VRAM availability
+- [ ] Fallback to FP16 if quantization fails
+
+
 
 ---
 
