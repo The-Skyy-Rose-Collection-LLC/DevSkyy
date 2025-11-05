@@ -63,7 +63,18 @@ async def execute_scanner(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
 ):
-    """Execute Scanner Agent V1 - Code and site analysis"""
+    """
+    Run the Scanner V1 agent to analyze code and websites.
+    
+    Parameters:
+        request (AgentExecutionRequest): Execution parameters for the scanner agent.
+    
+    Returns:
+        AgentExecuteResponse: Response containing agent metadata (`agent_name`, `status`), the `result` dictionary produced by the scan, `execution_time_ms`, and a `timestamp`.
+    
+    Raises:
+        HTTPException: If the scanner encounters an error during execution.
+    """
     try:
         from agent.modules.backend.scanner import scan_site
 
@@ -113,7 +124,15 @@ async def execute_scanner_v2(
 async def execute_fixer(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
-    """Execute Fixer Agent V1 - Automated code fixing"""
+    """
+    Run the Fixer V1 agent to apply automated code fixes based on scan results.
+    
+    Parameters:
+        request (AgentExecutionRequest): Execution request whose `parameters` may include a `scan_results` dict; that dictionary is passed to the fixer.
+    
+    Returns:
+        AgentExecuteResponse: Response containing `agent_name` ("Fixer V1"), `status`, `result` (fixer output), `execution_time_ms`, and `timestamp`.
+    """
     try:
         from agent.modules.backend.fixer import fix_code
 

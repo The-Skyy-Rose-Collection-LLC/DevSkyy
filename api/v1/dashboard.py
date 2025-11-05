@@ -275,7 +275,12 @@ dashboard_service = DashboardService()
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def get_dashboard_page(request: Request):
-    """Serve the enterprise dashboard HTML page."""
+    """
+    Render the enterprise dashboard HTML page.
+    
+    Returns:
+        TemplateResponse: The response rendering the "enterprise_dashboard.html" template with the request context.
+    """
     return templates.TemplateResponse("enterprise_dashboard.html", {"request": request})
 
 @router.get("/dashboard/data", response_model=DashboardDataModel)
@@ -284,10 +289,15 @@ async def get_dashboard_data(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get complete dashboard data including metrics, agents, and activities.
-
-    **Authentication Required:** READ_ONLY role or higher
-    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Return the full dashboard payload containing system metrics, agent statuses, recent activity logs, and performance history.
+    
+    Requires a user with READ_ONLY role or higher.
+    
+    Returns:
+        DashboardDataModel: Combined dashboard data with fields `metrics`, `agents`, `recent_activities`, and `performance_history`.
+    
+    Raises:
+        HTTPException: If retrieval of any dashboard component fails (responds with status 500).
     """
     try:
         # Initialize dashboard service with app state if available
@@ -323,10 +333,12 @@ async def get_system_metrics(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get current system performance metrics.
-
-    **Authentication Required:** READ_ONLY role or higher
-    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Retrieve current system performance metrics for the dashboard.
+    
+    Requires READ_ONLY role or higher.
+    
+    Returns:
+        SystemMetricsModel: Snapshot of current system metrics including active agents, API requests per minute, average response time, CPU and memory usage, system health score, and error rate.
     """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
@@ -339,10 +351,12 @@ async def get_agent_status(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get status of all registered agents.
-
-    **Authentication Required:** READ_ONLY role or higher
-    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Return statuses for all registered agents.
+    
+    Requires a user with the READ_ONLY role or higher.
+    
+    Returns:
+        List[AgentStatusModel]: A list of agent status records containing agent_id, name, status, last_active, tasks_completed, tasks_pending, performance_score, and capabilities.
     """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
@@ -356,10 +370,15 @@ async def get_recent_activities(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get recent system activities.
-
-    **Authentication Required:** READ_ONLY role or higher
-    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Return recent system activity log entries for the dashboard.
+    
+    Requires a user with READ_ONLY role or higher; allowed roles: READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN.
+    
+    Parameters:
+        limit (int): Maximum number of activity entries to return.
+    
+    Returns:
+        activities (List[ActivityLogModel]): Recent activity log entries up to `limit`.
     """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
@@ -373,10 +392,17 @@ async def get_performance_history(
     current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
-    Get performance metrics history.
-
-    **Authentication Required:** READ_ONLY role or higher
-    **RBAC:** READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN
+    Return performance history datapoints for the specified past number of hours.
+    
+    Generates a list of time-series performance records covering the last `hours` hours.
+    Authentication: requires a user with the READ_ONLY role or higher.
+    
+    Parameters:
+        hours (int): Number of past hours to include in the history (default 24).
+    
+    Returns:
+        List[dict]: A list of performance datapoints. Each datapoint contains keys
+        `timestamp`, `response_time`, `cpu_usage`, `memory_usage`, and `requests_per_minute`.
     """
     if hasattr(request.app, 'state'):
         await dashboard_service.initialize(request.app.state)
