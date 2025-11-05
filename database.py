@@ -122,11 +122,10 @@ class DatabaseManager:
                         DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
                     ),
                 }
-        except (ConnectionError, DatabaseError, Exception) as e:
-
+        except (Exception,) as e:
             from core.exceptions import DatabaseError
-
-            return {\"status\": \"unhealthy\", "connected": False, "error": str(e)}
+            logger.warning(f"Database health check failed: {e}")
+            return {"status": "unhealthy", "connected": False, "error": str(e)}
 
 
 # Global database instance
