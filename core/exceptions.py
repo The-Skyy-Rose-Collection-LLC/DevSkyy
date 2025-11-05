@@ -27,6 +27,15 @@ class DevSkyyError(Exception):
         details: Optional[Dict[str, Any]] = None,
         original_error: Optional[Exception] = None
     ):
+        """
+        Initialize the exception with a human-readable message and optional metadata.
+        
+        Parameters:
+            message (str): Human-readable description of the error.
+            error_code (Optional[str]): Unique machine-friendly error code; defaults to the exception class name when omitted.
+            details (Optional[Dict[str, Any]]): Additional structured metadata about the error; defaults to an empty dict when omitted.
+            original_error (Optional[Exception]): An underlying exception instance that caused this error, if any.
+        """
         self.message = message
         self.error_code = error_code or self.__class__.__name__
         self.details = details or {}
@@ -34,7 +43,18 @@ class DevSkyyError(Exception):
         super().__init__(self.message)
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert exception to dictionary"""
+        """
+        Return a dictionary representation of the exception suitable for serialization.
+        
+        The returned dictionary includes:
+        - `error_type`: the exception class name,
+        - `error_code`: an optional machine-readable error code,
+        - `message`: the human-readable error message,
+        - `details`: additional context or metadata.
+        
+        Returns:
+            mapping (Dict[str, Any]): A dictionary with keys `error_type`, `error_code`, `message`, and `details`.
+        """
         return {
             "error_type": self.__class__.__name__,
             "error_code": self.error_code,
@@ -489,15 +509,17 @@ def exception_from_status_code(
     **kwargs
 ) -> DevSkyyError:
     """
-    Create exception from HTTP status code
-
-    Args:
-        status_code: HTTP status code
-        message: Error message
-        **kwargs: Additional exception parameters
-
+    Map an HTTP status code to a corresponding DevSkyyError subclass and instantiate it.
+    
+    Selects the exception type associated with the provided HTTP status code and returns a new exception instance constructed with the given message and any additional keyword arguments. If the status code is not mapped, a DevSkyyError instance is returned.
+    
+    Parameters:
+        status_code (int): HTTP status code to map to an exception class.
+        message (str): Human-readable error message for the exception.
+        **kwargs: Additional initialization parameters forwarded to the exception (e.g., `error_code`, `details`, `original_error`).
+    
     Returns:
-        DevSkyyError subclass instance
+        DevSkyyError: An instance of the mapped DevSkyyError subclass; `DevSkyyError` if no mapping exists.
     """
     exception_class = HTTP_STATUS_TO_EXCEPTION.get(status_code, DevSkyyError)
     return exception_class(message, **kwargs)
@@ -520,15 +542,15 @@ def map_database_error(
     original_error: Optional[Exception] = None
 ) -> DatabaseError:
     """
-    Map database error type to specific exception
-
-    Args:
-        error_type: Database error type
-        message: Error message
-        original_error: Original exception
-
+    Create an exception instance that represents a database error for a given error type.
+    
+    Parameters:
+        error_type (str): Key identifying the database error category (used to select a specific DatabaseError subclass).
+        message (str): Human-readable error message for the created exception.
+        original_error (Optional[Exception]): Original low-level exception to attach as context on the returned exception.
+    
     Returns:
-        DatabaseError subclass instance
+        DatabaseError: An instance of the DatabaseError subclass mapped from `error_type`, initialized with `message` and `original_error`.
     """
     exception_class = DATABASE_ERROR_MAPPING.get(error_type, DatabaseError)
     return exception_class(message, original_error=original_error)
