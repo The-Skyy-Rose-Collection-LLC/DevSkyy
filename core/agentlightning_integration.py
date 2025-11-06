@@ -144,7 +144,7 @@ class DevSkyyLightning:
                         span.set_attribute("status", "success")
 
                         # Emit reward for successful operation
-                        emit_reward(1.0, span_context=span.get_span_context())
+                        emit_reward(1.0)
 
                         return result
 
@@ -157,7 +157,7 @@ class DevSkyyLightning:
                         span.record_exception(e)
 
                         # Emit negative reward for failure
-                        emit_reward(-0.5, span_context=span.get_span_context())
+                        emit_reward(-0.5)
 
                         raise
 
