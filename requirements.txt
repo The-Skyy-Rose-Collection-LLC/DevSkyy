@@ -28,9 +28,9 @@ httpx==0.28.1
 # Authentication & Security (Enterprise)
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
-certifi==2024.12.14
-cryptography==46.0.2  # Latest for security (multiple CVEs fixed)
-PyJWT==2.10.1  # JWT tokens (replaces python-jose) - Latest stable version
+certifi==2024.12.14  # Security update
+cryptography==46.0.3  # Latest for security (multiple CVEs fixed)
+PyJWT==2.10.1  # Updated for security
 bcrypt==4.2.1  # Latest
 argon2-cffi==23.1.0  # Additional password hashing
 
@@ -59,7 +59,7 @@ lightgbm==4.6.0  # Updated to fix PYSEC-2024-231 vulnerability
 
 # Computer Vision & Image Processing
 opencv-python==4.11.0.86  # Updated
-Pillow==11.1.0  # Latest security fix
+pillow==11.1.0  # Latest security fix
 imagehash==4.3.2
 
 # Video Processing & Generation

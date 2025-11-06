@@ -1386,8 +1386,8 @@ class ImageQualityProcessor:
                 try:
                     with Image.open(image_path) as img:
                         result["final_size"] = img.size
-                except:
-                    pass
+                except (IOError, OSError) as e:
+                    logger.debug(f"Could not read final image info: {e}")
 
         except Exception as e:
             logger.error(f"Error processing image {image_path}: {e}")
@@ -1398,8 +1398,8 @@ class ImageQualityProcessor:
             if temp_file and temp_file.exists():
                 try:
                     temp_file.unlink()
-                except:
-                    pass
+                except (OSError, PermissionError) as e:
+                    logger.debug(f"Could not delete temp file: {e}")
 
             # Calculate processing time
             result["processing_time"] = (datetime.now() - start_time).total_seconds()

@@ -415,8 +415,9 @@ async def shutdown_event():
         if hasattr(app.state, "ml_cache"):
             try:
                 await app.state.ml_cache.close()
-            except:
-                pass
+            except Exception as e:
+
+                logger.warning(f"Error during cleanup: {e}")
 
         logger.info("✅ DevSkyy Platform shutdown complete")
 
