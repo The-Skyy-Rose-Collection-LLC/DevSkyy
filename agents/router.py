@@ -19,6 +19,7 @@ import re
 from difflib import SequenceMatcher
 
 from agents.loader import AgentConfigLoader, AgentConfig, LoaderError
+from core.agentlightning_integration import get_lightning, trace_agent
 
 
 class RoutingError(Exception):
@@ -229,6 +230,7 @@ class AgentRouter:
             TaskType.PRODUCT_MANAGEMENT: ["product", "catalog", "sku", "merchandise"],
         }
 
+    @trace_agent("route_task", agent_id="agent_router")
     def route_task(self, task: TaskRequest) -> RoutingResult:
         """
         Route a single task to the most appropriate agent
@@ -283,6 +285,7 @@ class AgentRouter:
             f"Description: {task.description}"
         )
 
+    @trace_agent("route_multiple_tasks", agent_id="agent_router")
     def route_multiple_tasks(self, tasks: List[TaskRequest]) -> List[RoutingResult]:
         """
         Route multiple tasks in batch (MCP efficiency pattern)
