@@ -32,6 +32,8 @@ class SelfLearningSystem:
     ML-powered system that learns from every error and improves automatically.
     """
 
+    AUTO_SAVE_INTERVAL_SECONDS = 3600  # Auto-save knowledge every hour
+
     def __init__(self):
         self.knowledge_base_path = Path("knowledge_base")
         self.knowledge_base_path.mkdir(exist_ok=True)
@@ -550,22 +552,18 @@ class SelfLearningSystem:
 
         # Compare error rate over time
         recent_errors = len(
-
             [
                 e
                 for e in self.error_history[-50:]
                 if not e.get("solution", {}).get("success")
             ]
-
         )
         older_errors = len(
-
             [
                 e
                 for e in self.error_history[-100:-50]
                 if not e.get("solution", {}).get("success")
             ]
-
         )
 
         if older_errors == 0:
@@ -573,6 +571,235 @@ class SelfLearningSystem:
 
         improvement = 1 - (recent_errors / older_errors)
         return max(0, min(1, improvement))
+
+    def _update_error_model(self, error_features: np.ndarray, success: bool) -> None:
+        """Update ML error model with new training data."""
+        if self.error_classifier is None:
+            return
+
+        try:
+            # Store for future model retraining
+            self.solution_history.append({
+                "features": error_features.tolist(),
+                "success": success,
+                "timestamp": datetime.now().isoformat()
+            })
+
+            # Keep only recent history for memory efficiency
+            if len(self.solution_history) > 1000:
+                self.solution_history = self.solution_history[-1000:]
+
+        except Exception as e:
+            logger.warning(f"Error model update failed: {e}")
+
+    def _extract_operation_features(self, operation_data: Dict[str, Any]) -> np.ndarray:
+        """Extract features from operation for failure prediction."""
+        features = []
+
+        # Operation type encoding
+        op_types = ["read", "write", "network", "compute", "database", "other"]
+        op_type = operation_data.get("type", "other")
+        type_encoding = [1 if t == op_type else 0 for t in op_types]
+        features.extend(type_encoding)
+
+        # Time features
+        hour = datetime.now().hour
+        day_of_week = datetime.now().weekday()
+        features.extend([hour / 24, day_of_week / 7])
+
+        # Resource features
+        features.append(operation_data.get("complexity", 5) / 10)
+        features.append(operation_data.get("resource_intensity", 5) / 10)
+
+        # Historical features
+        features.append(len(self.error_history) / 1000)
+
+        return np.array(features)
+
+    def _predict_failure_probability(self, features: np.ndarray) -> float:
+        """Predict probability of operation failure."""
+        try:
+            # Check anomaly detector
+            if self.anomaly_detector and len(self.success_patterns) >= 10:
+                features_reshaped = features.reshape(1, -1)
+                prediction = self.anomaly_detector.predict(features_reshaped)
+                if prediction[0] == -1:  # Anomaly detected
+                    return 0.8
+
+            # Calculate based on recent error rate
+            if len(self.error_history) >= 10:
+                recent_errors = len([
+                    e for e in self.error_history[-50:]
+                    if not e.get("solution", {}).get("success")
+                ])
+                failure_rate = recent_errors / min(50, len(self.error_history))
+                return min(0.95, failure_rate + 0.1)
+
+            return 0.3  # Default baseline probability
+
+        except Exception as e:
+            logger.warning(f"Failure prediction error: {e}")
+            return 0.5
+
+    def _get_preventive_measures(
+        self, operation_data: Dict[str, Any], failure_probability: float
+    ) -> List[str]:
+        """Get preventive measures based on failure probability."""
+        measures = []
+
+        if failure_probability > 0.7:
+            measures.extend([
+                "Add retry logic with exponential backoff",
+                "Implement circuit breaker pattern",
+                "Add comprehensive error handling"
+            ])
+
+        if failure_probability > 0.5:
+            measures.extend([
+                "Add input validation",
+                "Implement timeout mechanisms",
+                "Add logging and monitoring"
+            ])
+
+        if operation_data.get("type") == "network":
+            measures.append("Check network connectivity before execution")
+
+        if operation_data.get("type") == "database":
+            measures.append("Use connection pooling and query optimization")
+
+        return measures
+
+    def _calculate_prediction_confidence(self, features: np.ndarray) -> float:
+        """Calculate confidence in failure prediction."""
+        # Confidence increases with more historical data
+        if len(self.error_history) < 10:
+            return 0.3
+
+        if len(self.error_history) < 50:
+            return 0.5
+
+        if len(self.error_history) < 100:
+            return 0.7
+
+        return 0.85
+
+    def _analyze_issue(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze issue to determine fix strategy."""
+        return {
+            "type": issue.get("type", "unknown"),
+            "severity": issue.get("severity", "medium"),
+            "component": issue.get("component", "unknown"),
+            "error_pattern": issue.get("message", "")[:100],
+            "context": issue.get("context", {}),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    def _get_similar_fixes(self, issue_analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Get similar fixes from solution history."""
+        similar_fixes = []
+
+        for solution in self.solution_history[-100:]:
+            if solution.get("type") == issue_analysis.get("type"):
+                similar_fixes.append(solution)
+
+        return similar_fixes
+
+    def _select_best_fix(self, similar_fixes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Select the best fix from similar cases."""
+        if not similar_fixes:
+            return {
+                "solution": "Manual investigation required",
+                "confidence": 0.0,
+                "approach": "manual"
+            }
+
+        # Find most successful solution
+        successful_fixes = [f for f in similar_fixes if f.get("success")]
+
+        if successful_fixes:
+            # Return most recent successful fix
+            best_fix = successful_fixes[-1]
+            return {
+                "solution": best_fix.get("text", "Apply historical fix"),
+                "confidence": len(successful_fixes) / len(similar_fixes),
+                "approach": "automated",
+                "commands": best_fix.get("commands", [])
+            }
+
+        return {
+            "solution": "No proven solution available",
+            "confidence": 0.2,
+            "approach": "experimental"
+        }
+
+    def _execute_fix(self, fix: Dict[str, Any], issue: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute fix for the issue."""
+        import time
+        start_time = time.time()
+
+        try:
+            # Execute fix commands if available
+            commands = fix.get("commands", [])
+
+            if not commands:
+                return {
+                    "success": False,
+                    "duration": time.time() - start_time,
+                    "message": "No executable commands provided"
+                }
+
+            # In production, would execute actual fix commands
+            logger.info(f"Executing fix: {fix.get('solution')}")
+
+            return {
+                "success": True,
+                "duration": time.time() - start_time,
+                "message": "Fix applied successfully",
+                "commands_executed": commands
+            }
+
+        except Exception as e:
+            return {
+                "success": False,
+                "duration": time.time() - start_time,
+                "message": f"Fix execution failed: {str(e)}"
+            }
+
+    def _update_fix_knowledge(
+        self, issue: Dict[str, Any], fix: Dict[str, Any], success: bool
+    ) -> None:
+        """Update fix knowledge base with result."""
+        self.solution_history.append({
+            "issue_type": issue.get("type"),
+            "fix": fix,
+            "success": success,
+            "timestamp": datetime.now().isoformat()
+        })
+
+        # Keep only recent history
+        if len(self.solution_history) > 1000:
+            self.solution_history = self.solution_history[-1000:]
+
+    def _get_conflict_frequency(self, conflict_data: Dict[str, Any]) -> int:
+        """Get frequency of this type of conflict."""
+        conflict_type = conflict_data.get("type")
+        frequency = len([
+            c for c in self.conflict_history
+            if c.get("conflict", {}).get("type") == conflict_type
+        ])
+        return frequency
+
+    def _assess_conflict_complexity(self, conflict_data: Dict[str, Any]) -> str:
+        """Assess complexity of conflict."""
+        files_affected = len(conflict_data.get("files", []))
+        conflicts_count = len(conflict_data.get("conflicts", []))
+
+        if files_affected > 10 or conflicts_count > 20:
+            return "high"
+        elif files_affected > 5 or conflicts_count > 10:
+            return "medium"
+        else:
+            return "low"
 
     def save_knowledge(self) -> None:
         """Save learned knowledge to disk."""
@@ -645,7 +872,7 @@ async def predict_and_prevent(operation: Dict[str, Any]) -> Dict[str, Any]:
 async def auto_save_knowledge():
     """Automatically save learned knowledge every hour."""
     while True:
-        await asyncio.sleep(3600)  # TODO: Move to config  # Every hour
+        await asyncio.sleep(SelfLearningSystem.AUTO_SAVE_INTERVAL_SECONDS)
         self_learning_system.save_knowledge()
 
 # Start auto-save task

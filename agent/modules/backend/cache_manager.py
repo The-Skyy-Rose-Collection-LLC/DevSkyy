@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 class CacheManager:
     """High-performance caching system with TTL and memory management."""
 
+    CLEANUP_INTERVAL_SECONDS = 300  # Run cleanup every 5 minutes
+
     def __init__(self, max_size: int = 1000, default_ttl: int = 300):
         self.cache = {}
         self.max_size = max_size
@@ -275,7 +277,7 @@ async def cache_cleanup_task():
     """Background task to clean up expired cache entries."""
     while True:
         try:
-            await asyncio.sleep(300)  # TODO: Move to config  # Run every 5 minutes
+            await asyncio.sleep(CacheManager.CLEANUP_INTERVAL_SECONDS)
             cleaned = cache_manager.cleanup_expired()
             if cleaned > 0:
                 logger.info(f"Cache cleanup: removed {cleaned} expired entries")
