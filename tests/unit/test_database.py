@@ -141,7 +141,7 @@ class TestGetDbDependency:
             
             # Should still raise the original exception
             with pytest.raises(ValueError):
-                async for _session in get_db():
+                async for _ in get_db():
                     raise ValueError()
 
 
