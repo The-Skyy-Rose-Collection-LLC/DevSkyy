@@ -37,7 +37,7 @@ class TestGetDbDependency:
             
             mock_session_local.return_value = mock_session
             
-            async for _session in get_db():
+            async for _ in get_db():
                 pass  # Normal execution
             
             # Verify commit was called but rollback was not
@@ -61,7 +61,7 @@ class TestGetDbDependency:
             mock_session_local.return_value = mock_session
             
             try:
-                async for _session in get_db():
+                async for _ in get_db():
                     _raise_error()
             except ValueError:
                 pass
@@ -83,7 +83,7 @@ class TestGetDbDependency:
             
             mock_session_local.return_value = mock_session
             
-            async for _session in get_db():
+            async for _ in get_db():
                 pass
             
             # Verify close was called
