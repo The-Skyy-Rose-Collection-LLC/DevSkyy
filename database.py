@@ -35,20 +35,25 @@ Base = declarative_base()
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
-    Dependency function to get database session.
-
-    Usage in FastAPI:
-        @app.get("/items")
-        async def get_items(db: AsyncSession = Depends(get_db)):
-            # Use db here
+    Provide a transactional async SQLAlchemy session for use as a dependency.
+    
+    Yields:
+        AsyncSession: an active asynchronous SQLAlchemy session for database operations.
+    
+    Raises:
+        DatabaseError: when an error occurs while using the session; the original exception is attached as `original_error`.
+    
+    Notes:
+        The session is committed after normal use, rolled back on exception, and always closed when the generator exits.
     """
     async with AsyncSessionLocal() as session:
         try:
             yield session
             await session.commit()
-        except Exception:
+        except Exception as e:
             await session.rollback()
-            raise
+            from core.exceptions import DatabaseError
+            raise DatabaseError("Database session error", original_error=e)
         finally:
             await session.close()
 
@@ -83,16 +88,30 @@ class DatabaseManager:
         self.connected = False
 
     async def connect(self):
-        """Initialize database connection"""
+        """
+        Initialize the database schema and mark this manager as connected.
+        
+        Attempts to create all ORM tables via init_db(); on success sets `self.connected = True`
+        and returns a status dictionary. On failure logs the error and returns a failure status
+        dictionary containing the error message.
+        
+        Returns:
+            status (dict): On success: {"status": "connected", "type": "SQLAlchemy", "url": DATABASE_URL}.
+                           On failure: {"status": "failed", "error": "<error message>"}.
+        """
         try:
             await init_db()
             self.connected = True
             return {"status": "connected", "type": "SQLAlchemy", "url": DATABASE_URL}
         except Exception as e:
+            from core.exceptions import ConnectionError as DBConnectionError
+            logger.error(f"Database connection failed: {e}")
             return {"status": "failed", "error": str(e)}
 
     async def disconnect(self):
-        """Close database connection"""
+        """
+        Close and dispose the underlying database engine connections and mark the manager as disconnected.
+        """
         await close_db()
         self.connected = False
 
@@ -105,7 +124,17 @@ class DatabaseManager:
         return self
 
     async def health_check(self):
-        """Check database health"""
+        """
+        Perform a lightweight connectivity check against the configured database.
+        
+        Returns:
+            dict: A status dictionary with the following keys:
+                - status (str): "healthy" on success, "unhealthy" on failure.
+                - connected (bool): True if the check succeeded, False otherwise.
+                - type (str): Database backend type when healthy (e.g., "SQLAlchemy").
+                - url (str): Host portion of DATABASE_URL when healthy, or "sqlite" for local SQLite.
+                - error (str): Error message present only when the check failed.
+        """
         try:
             from sqlalchemy import text
 
@@ -119,7 +148,9 @@ class DatabaseManager:
                         DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
                     ),
                 }
-        except Exception as e:
+        except (Exception,) as e:
+            from core.exceptions import DatabaseError
+            logger.warning(f"Database health check failed: {e}")
             return {"status": "unhealthy", "connected": False, "error": str(e)}
 
 

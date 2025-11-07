@@ -768,13 +768,19 @@ async def sync_inventory(request: InventorySyncRequest):
 
 
 @router.post("/finance/transactions/record", tags=["Finance & Inventory"])
-async def record_transaction(request: FinancialTransactionRequest):
+async def record_transaction(
+    request: FinancialTransactionRequest,
+    current_user: Dict[str, Any] = Depends(require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user)
+):
     """
     Record a financial transaction and apply related inventory updates and tax calculations.
-    
+
+    **Authentication Required:** ADMIN role or higher
+    **RBAC:** ADMIN, SUPER_ADMIN
+
     Parameters:
         request (FinancialTransactionRequest): Transaction details (type, amount, currency, channel, order_id, customer_id, line_items, payment_method, etc.).
-    
+
     Returns:
         dict: {
             "success": True if recording succeeded, False otherwise,
@@ -785,7 +791,7 @@ async def record_transaction(request: FinancialTransactionRequest):
             "status": Payment status string,
             "created_at": ISO 8601 timestamp when the transaction was created
         }
-    
+
     Raises:
         HTTPException: 503 if the finance & inventory agent is unavailable.
         HTTPException: 500 if an error occurs while recording the transaction.

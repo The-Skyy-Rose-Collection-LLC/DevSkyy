@@ -1,0 +1,35 @@
+{
+  "agent_id": "fixer_v2",
+  "agent_name": "Automated Code Fixer V2",
+  "agent_type": "code_generator",
+  "capabilities": [
+    {
+      "name": "syntax_error_fixing",
+      "confidence": 0.92,
+      "keywords": ["fix", "syntax", "error", "bug"],
+      "dependencies": []
+    },
+    {
+      "name": "import_resolution",
+      "confidence": 0.88,
+      "keywords": ["import", "module", "dependency"],
+      "dependencies": []
+    },
+    {
+      "name": "code_refactoring",
+      "confidence": 0.85,
+      "keywords": ["refactor", "optimize", "improve"],
+      "dependencies": []
+    }
+  ],
+  "priority": 85,
+  "max_concurrent_tasks": 10,
+  "timeout_seconds": 300,
+  "retry_count": 3,
+  "enabled": true,
+  "metadata": {
+    "version": "2.0.0",
+    "ai_model": "claude-sonnet-4",
+    "last_updated": "2025-11-06"
+  }
+}

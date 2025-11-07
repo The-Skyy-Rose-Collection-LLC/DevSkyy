@@ -41,7 +41,23 @@ except ImportError:
 VERSION = "5.1.0-enterprise"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+
+# Security: SECRET_KEY must be set in environment variables
+# Per Truth Protocol Rule #5: No secrets in code
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY and ENVIRONMENT == "production":
+    raise ValueError(
+        "SECRET_KEY environment variable must be set in production. "
+        "Generate a secure key using: python -c 'import secrets; print(secrets.token_urlsafe(32))'"
+    )
+elif not SECRET_KEY:
+    # Development/testing only - log warning
+    SECRET_KEY = "dev-only-insecure-key-DO-NOT-USE-IN-PRODUCTION"
+    logging.warning(
+        "⚠️  Using default SECRET_KEY for development. "
+        "Set SECRET_KEY environment variable before deploying to production!"
+    )
+
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 # DevSkyy core imports with error handling
@@ -399,8 +415,9 @@ async def shutdown_event():
         if hasattr(app.state, "ml_cache"):
             try:
                 await app.state.ml_cache.close()
-            except:
-                pass
+            except Exception as e:
+
+                logger.warning(f"Error during cleanup: {e}")
 
         logger.info("✅ DevSkyy Platform shutdown complete")
 

@@ -63,21 +63,32 @@ async def execute_scanner(
     request: AgentExecutionRequest,
     current_user: TokenData = Depends(get_current_active_user),
 ):
-    """Execute Scanner Agent - Code and site analysis"""
+    """
+    Run the Scanner V1 agent to analyze code and websites.
+    
+    Parameters:
+        request (AgentExecutionRequest): Execution parameters for the scanner agent.
+    
+    Returns:
+        AgentExecuteResponse: Response containing agent metadata (`agent_name`, `status`), the `result` dictionary produced by the scan, `execution_time_ms`, and a `timestamp`.
+    
+    Raises:
+        HTTPException: If the scanner encounters an error during execution.
+    """
     try:
-        from agent.modules.backend.scanner import scanner_agent
+        from agent.modules.backend.scanner import scan_site
 
-        result = await scanner_agent.execute_core_function(**request.parameters)
+        result = scan_site()
 
         return AgentExecuteResponse(
-            agent_name="Scanner",
+            agent_name="Scanner V1",
             status="success",
             result=result,
             execution_time_ms=0,
             timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        logger.error(f"Scanner execution failed: {e}")
+        logger.error(f"Scanner V1 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -113,21 +124,31 @@ async def execute_scanner_v2(
 async def execute_fixer(
     request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
 ):
-    """Execute Fixer Agent - Automated code fixing"""
+    """
+    Run the Fixer V1 agent to apply automated code fixes based on scan results.
+    
+    Parameters:
+        request (AgentExecutionRequest): Execution request whose `parameters` may include a `scan_results` dict; that dictionary is passed to the fixer.
+    
+    Returns:
+        AgentExecuteResponse: Response containing `agent_name` ("Fixer V1"), `status`, `result` (fixer output), `execution_time_ms`, and `timestamp`.
+    """
     try:
-        from agent.modules.backend.fixer import fixer_agent
+        from agent.modules.backend.fixer import fix_code
 
-        result = await fixer_agent.execute_core_function(**request.parameters)
+        # V1 fixer expects scan_results parameter
+        scan_results = request.parameters.get("scan_results", {})
+        result = fix_code(scan_results)
 
         return AgentExecuteResponse(
-            agent_name="Fixer",
+            agent_name="Fixer V1",
             status="success",
             result=result,
             execution_time_ms=0,
             timestamp=str(__import__("datetime").datetime.now()),
         )
     except Exception as e:
-        logger.error(f"Fixer execution failed: {e}")
+        logger.error(f"Fixer V1 execution failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
