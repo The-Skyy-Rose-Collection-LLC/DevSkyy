@@ -289,9 +289,14 @@ class SkyRoseBrandTrainer:
         return output_path, caption
 
     def _simple_background_removal(self, image: Image.Image) -> Image.Image:
-        """Simple background removal (placeholder for more advanced methods)."""
-        # This is a simplified version - in production, you'd use more advanced
-        # background removal techniques like U2-Net, SAM, or commercial APIs
+        """
+        Background removal for product images.
+
+        Note: Production implementation requires advanced background removal
+        techniques such as U2-Net, Segment Anything Model (SAM), or commercial
+        APIs like remove.bg. Current implementation returns image unchanged
+        to maintain data integrity until advanced methods are integrated.
+        """
         return image
 
     async def _generate_brand_caption(self, image: Image.Image, category: str) -> str:

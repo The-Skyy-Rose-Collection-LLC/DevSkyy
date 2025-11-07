@@ -1,0 +1,29 @@
+{
+  "agent_id": "scanner_v2",
+  "agent_name": "Security Scanner V2",
+  "agent_type": "security_scanner",
+  "capabilities": [
+    {
+      "name": "vulnerability_scanning",
+      "confidence": 0.95,
+      "keywords": ["security", "vulnerability", "scan", "cve"],
+      "dependencies": []
+    },
+    {
+      "name": "dependency_analysis",
+      "confidence": 0.90,
+      "keywords": ["dependency", "packages", "audit"],
+      "dependencies": []
+    }
+  ],
+  "priority": 90,
+  "max_concurrent_tasks": 5,
+  "timeout_seconds": 600,
+  "retry_count": 3,
+  "enabled": true,
+  "metadata": {
+    "version": "2.0.0",
+    "engine": "bandit+safety+trivy",
+    "last_updated": "2025-11-06"
+  }
+}

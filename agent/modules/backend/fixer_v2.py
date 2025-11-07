@@ -56,8 +56,6 @@ class FixerAgentV2(BaseAgent):
             # JavaScript
             "js_console_log": (r"console\.log\((.*?)\)", r"// console.log(\1)"),
             "js_var": (r"\bvar\s+(\w+)", r"const \1"),
-            # Common
-            "todo_fixme": (r"#\s*(TODO|FIXME):", r"# TODO:"),
         }
 
         # Statistics
@@ -435,25 +433,40 @@ class FixerAgentV2(BaseAgent):
     async def _fix_sql_injection(
         self, file_path: str, dry_run: bool
     ) -> Optional[Dict[str, Any]]:
-        """Add SQL injection prevention"""
-        # Placeholder - would need more sophisticated SQL parsing
+        """
+        Add SQL injection prevention.
+
+        Note: SQL injection fixes require manual code review and context-aware
+        refactoring. Automated fixes cannot safely modify SQL query logic without
+        understanding business requirements and data flow.
+        """
         return {
             "file": file_path,
             "type": "security",
             "severity": "critical",
             "description": "Manual review required for SQL injection vulnerability",
             "requires_manual_review": True,
+            "recommendation": "Use parameterized queries with prepared statements or ORM methods",
         }
 
     async def _add_caching(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """Add caching to expensive operations"""
-        # Placeholder for caching improvements
+        """
+        Add caching to expensive operations.
+
+        Note: Caching implementation requires analysis of function semantics,
+        side effects, and data staleness requirements. This is deferred to
+        manual implementation with proper cache invalidation strategies.
+        """
         return []
 
     async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
-        """Remove unused imports"""
-        # This would typically use autoflake
-        # For now, return placeholder
+        """
+        Remove unused imports from Python files.
+
+        Note: Unused import detection requires AST analysis and scope resolution.
+        Production implementation would use autoflake or similar tools with
+        proper import side-effect handling.
+        """
         return []
 
     async def _format_python_file(

@@ -1,0 +1,36 @@
+{
+  "agent_id": "self_learning_system",
+  "agent_name": "Self-Learning ML System",
+  "agent_type": "ml_trainer",
+  "capabilities": [
+    {
+      "name": "error_prediction",
+      "confidence": 0.87,
+      "keywords": ["predict", "error", "failure", "ml"],
+      "dependencies": []
+    },
+    {
+      "name": "automated_fixing",
+      "confidence": 0.83,
+      "keywords": ["autofix", "resolve", "repair"],
+      "dependencies": []
+    },
+    {
+      "name": "pattern_learning",
+      "confidence": 0.90,
+      "keywords": ["learn", "pattern", "train"],
+      "dependencies": []
+    }
+  ],
+  "priority": 80,
+  "max_concurrent_tasks": 8,
+  "timeout_seconds": 900,
+  "retry_count": 5,
+  "enabled": true,
+  "metadata": {
+    "version": "1.0.0",
+    "ml_framework": "scikit-learn",
+    "training_data_size": "10000+",
+    "last_updated": "2025-11-06"
+  }
+}
