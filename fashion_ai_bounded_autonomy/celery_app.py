@@ -7,23 +7,28 @@ All tasks respect bounded autonomy principles:
 - High-risk operations still require human approval
 - Tasks can be monitored and controlled
 
-Redis Configuration:
-- Broker: redis://localhost:6379/0
-- Backend: redis://localhost:6379/1
+Redis Configuration (from environment):
+- REDIS_BROKER_URL: Redis broker URL (default: redis://localhost:6379/0)
+- REDIS_BACKEND_URL: Redis result backend URL (default: redis://localhost:6379/1)
 - Visibility timeout: 3600s (1 hour)
 """
 
+import os
 from celery import Celery
 from kombu import Queue
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Load configuration from environment
+REDIS_BROKER_URL = os.getenv('REDIS_BROKER_URL', 'redis://localhost:6379/0')
+REDIS_BACKEND_URL = os.getenv('REDIS_BACKEND_URL', 'redis://localhost:6379/1')
+
 # Create Celery app
 celery_app = Celery(
     'fashion_ai_bounded_autonomy',
-    broker='redis://localhost:6379/0',
-    backend='redis://localhost:6379/1'
+    broker=REDIS_BROKER_URL,
+    backend=REDIS_BACKEND_URL
 )
 
 # Celery Configuration
@@ -41,7 +46,7 @@ celery_app.conf.update(
     task_default_routing_key='default',
 
     # Task result backend
-    result_backend='redis://localhost:6379/1',
+    result_backend=REDIS_BACKEND_URL,
     result_expires=86400,  # Results expire after 24 hours
 
     # Worker configuration
