@@ -1,0 +1,453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The Skyy Rose Collection - Brand-Focused MCP Configuration",
+  "version": "1.0.0",
+  "description": "All agents work exclusively for The Skyy Rose Collection luxury fashion brand. Every action, output, and optimization must align with brand identity, values, and business objectives.",
+  
+  "brand_identity": {
+    "name": "The Skyy Rose Collection",
+    "tagline": "Where Luxury Meets Innovation",
+    "industry": "Luxury Fashion & E-Commerce",
+    "established": "2024",
+    "mission": "Redefine luxury fashion through AI-powered personalization and timeless elegance",
+    "values": [
+      "Uncompromising Quality",
+      "Timeless Elegance",
+      "Innovation & Technology",
+      "Sustainability & Ethics",
+      "Customer-Centric Excellence"
+    ],
+    "brand_voice": {
+      "tone": "Sophisticated, Confident, Aspirational",
+      "personality": "Modern luxury with timeless appeal",
+      "language": "Elegant, refined, yet accessible",
+      "avoid": ["Casual slang", "Overly technical jargon", "Fast fashion terminology"]
+    },
+    "visual_identity": {
+      "primary_colors": {
+        "skyy_blue": "#87CEEB",
+        "rose_gold": "#B76E79",
+        "ivory": "#FFFFF0",
+        "charcoal": "#36454F"
+      },
+      "secondary_colors": {
+        "champagne": "#F7E7CE",
+        "midnight": "#191970",
+        "pearl": "#E8E4C9"
+      },
+      "typography": {
+        "headings": "Playfair Display, Didot, Bodoni",
+        "body": "Montserrat, Futura, Avenir",
+        "accent": "Cormorant Garamond"
+      },
+      "photography_style": "Clean, minimalist, high-contrast with soft shadows",
+      "logo_usage": "Always include in hero sections, watermarks on images"
+    }
+  },
+
+  "brand_focused_agents": {
+    "orchestrator": {
+      "brand_role": "The Skyy Rose Collection Chief AI Officer",
+      "responsibilities": [
+        "Ensure all agent outputs align with brand identity",
+        "Prioritize tasks that drive revenue and brand awareness",
+        "Monitor brand consistency across all content",
+        "Optimize for luxury customer experience"
+      ],
+      "decision_criteria": {
+        "priority_1": "Brand alignment and luxury positioning",
+        "priority_2": "Revenue generation and conversion optimization",
+        "priority_3": "Customer experience and satisfaction",
+        "priority_4": "Operational efficiency and cost savings"
+      },
+      "brand_guidelines_enforcement": true
+    },
+
+    "professors_of_code": {
+      "brand_role": "The Skyy Rose Collection Technical Excellence Team",
+      "focus_areas": [
+        "E-commerce platform optimization for luxury shopping experience",
+        "Personalization engine for curated recommendations",
+        "Seamless checkout and payment processing",
+        "Inventory management for limited edition releases",
+        "Security for high-value transactions"
+      ],
+      "brand_specific_requirements": {
+        "performance": "Sub-second page loads for premium UX",
+        "security": "PCI DSS Level 1 compliance for luxury clientele",
+        "personalization": "AI-driven styling recommendations",
+        "mobile": "Luxury mobile app experience (iOS/Android)"
+      }
+    },
+
+    "growth_stack": {
+      "brand_role": "The Skyy Rose Collection Growth & Marketing Team",
+      "focus_areas": [
+        "Luxury brand storytelling and content marketing",
+        "High-value customer acquisition (ROAS > 3:1)",
+        "Email campaigns for VIP customer segments",
+        "Landing pages for seasonal collections",
+        "Influencer collaboration campaigns"
+      ],
+      "brand_campaigns": {
+        "seasonal_collections": "Spring/Summer, Fall/Winter launches",
+        "limited_editions": "Exclusive drops with scarcity marketing",
+        "vip_programs": "Early access for top customers",
+        "sustainability": "Eco-luxury storytelling",
+        "brand_collaborations": "Designer partnerships"
+      },
+      "target_audience": {
+        "primary": "Affluent women 25-45, HHI $150K+",
+        "secondary": "Fashion-forward professionals, luxury enthusiasts",
+        "psychographics": "Values quality, sustainability, exclusivity"
+      }
+    },
+
+    "data_reasoning": {
+      "brand_role": "The Skyy Rose Collection Business Intelligence Team",
+      "focus_areas": [
+        "Customer lifetime value (CLV) optimization",
+        "Inventory forecasting for luxury goods",
+        "Pricing strategy for premium positioning",
+        "Market trend analysis (fashion weeks, influencers)",
+        "Competitor analysis (luxury fashion brands)"
+      ],
+      "brand_kpis": {
+        "revenue": {
+          "monthly_revenue_target": 500000,
+          "average_order_value": 350,
+          "customer_lifetime_value": 2500
+        },
+        "customer": {
+          "acquisition_cost": 75,
+          "retention_rate": 0.65,
+          "nps_score": 70
+        },
+        "conversion": {
+          "site_conversion_rate": 0.035,
+          "email_conversion_rate": 0.08,
+          "cart_abandonment_rate": 0.55
+        }
+      },
+      "competitive_intelligence": {
+        "track_brands": [
+          "Reformation",
+          "Zimmermann",
+          "Self-Portrait",
+          "Cult Gaia",
+          "Staud"
+        ],
+        "monitor": ["Pricing", "Collections", "Marketing campaigns", "Social engagement"]
+      }
+    },
+
+    "visual_foundry": {
+      "brand_role": "The Skyy Rose Collection Creative Studio",
+      "focus_areas": [
+        "Product photography matching luxury standards",
+        "Lookbook and editorial content creation",
+        "Social media visual content (Instagram-first)",
+        "Brand campaign imagery",
+        "Seasonal collection launches"
+      ],
+      "brand_photography_standards": {
+        "product_shots": {
+          "background": "Pure white (#FFFFFF) or lifestyle settings",
+          "lighting": "Soft, natural light with minimal shadows",
+          "angles": "Front, 3/4 view, back, detail close-ups",
+          "resolution": "Minimum 3000x3000px for zoom",
+          "models": "Diverse representation, elegant posing"
+        },
+        "editorial_content": {
+          "style": "Editorial fashion magazine aesthetic",
+          "locations": "Luxury environments (urban chic, coastal elegance)",
+          "mood": "Aspirational yet attainable",
+          "color_grading": "Brand color palette (Skyy Blue, Rose Gold accents)"
+        },
+        "social_media": {
+          "instagram_feed": "Cohesive grid aesthetic, 3-column color story",
+          "stories": "Behind-the-scenes, styling tips, customer features",
+          "reels": "Fashion trends, outfit inspiration, unboxing luxury"
+        }
+      },
+      "brand_assets_required": {
+        "logo_variations": ["Full logo", "Icon only", "Wordmark", "Monogram"],
+        "watermarks": "Subtle placement on all product images",
+        "packaging": "Luxury unboxing experience visuals",
+        "patterns": "Custom brand patterns for backgrounds"
+      }
+    },
+
+    "voice_media_video_elite": {
+      "brand_role": "The Skyy Rose Collection Media Production House",
+      "focus_areas": [
+        "Brand voice development and consistency",
+        "Product videos for e-commerce listings",
+        "Runway/lookbook video content",
+        "Customer testimonial videos",
+        "Brand story documentaries"
+      ],
+      "brand_voice_guidelines": {
+        "tone": "Warm, sophisticated, inspiring",
+        "pacing": "Measured and elegant (not rushed)",
+        "music": "Sophisticated jazz, classical, ambient electronic",
+        "narration_style": "Clear, confident, with subtle emotion",
+        "avoid": "Loud, aggressive, or overly casual tones"
+      },
+      "video_content_types": {
+        "product_videos": {
+          "duration": "15-30 seconds",
+          "focus": "Fabric drape, movement, details",
+          "style": "Clean, minimalist, 360° views"
+        },
+        "collection_launches": {
+          "duration": "60-90 seconds",
+          "focus": "Seasonal theme, key pieces, lifestyle",
+          "style": "Cinematic, fashion film aesthetic"
+        },
+        "brand_story": {
+          "duration": "2-3 minutes",
+          "focus": "Founder story, craftsmanship, values",
+          "style": "Documentary-style with emotional arc"
+        },
+        "social_shorts": {
+          "duration": "7-15 seconds",
+          "focus": "Quick styling tips, arrivals, trends",
+          "style": "Fast-paced, engaging, on-trend"
+        }
+      }
+    }
+  },
+
+  "brand_focused_workflows": {
+    "new_collection_launch": {
+      "name": "The Skyy Rose Collection - Seasonal Collection Launch",
+      "trigger": "New collection ready",
+      "agents_involved": ["visual_foundry", "voice_media_video_elite", "growth_stack", "data_reasoning"],
+      "steps": [
+        {
+          "step": 1,
+          "agent": "data_reasoning",
+          "task": "Analyze market trends and competitor launches",
+          "output": "Market intelligence report with positioning strategy"
+        },
+        {
+          "step": 2,
+          "agent": "visual_foundry",
+          "task": "Generate lookbook photography (20+ images)",
+          "brand_requirements": {
+            "style": "Editorial luxury fashion",
+            "color_palette": "Brand colors with seasonal accents",
+            "models": "Diverse, ages 25-45",
+            "settings": "Luxury lifestyle environments"
+          },
+          "output": "Complete lookbook with product details"
+        },
+        {
+          "step": 3,
+          "agent": "voice_media_video_elite",
+          "task": "Create collection launch video",
+          "brand_requirements": {
+            "duration": "90 seconds",
+            "music": "Sophisticated instrumental",
+            "voiceover": "Brand voice, inspirational tone",
+            "b-roll": "Behind-the-scenes, craftsmanship"
+          },
+          "output": "Launch video in 4K, 1080p, vertical formats"
+        },
+        {
+          "step": 4,
+          "agent": "growth_stack",
+          "task": "Create omnichannel marketing campaign",
+          "brand_requirements": {
+            "email": "VIP early access, general launch announcement",
+            "social": "Instagram grid, stories, reels, TikTok, Pinterest",
+            "web": "Homepage takeover, collection landing page",
+            "paid_ads": "Meta, Google Shopping, Pinterest"
+          },
+          "output": "Complete campaign assets and schedule"
+        }
+      ],
+      "success_metrics": {
+        "week_1_revenue": 100000,
+        "email_open_rate": 0.35,
+        "social_engagement_rate": 0.08,
+        "website_traffic_increase": 2.5
+      }
+    },
+
+    "daily_social_content": {
+      "name": "The Skyy Rose Collection - Daily Social Media Content",
+      "trigger": "Daily at 6 AM",
+      "agents_involved": ["visual_foundry", "voice_media_video_elite", "growth_stack"],
+      "content_calendar": {
+        "monday": "New Arrivals Spotlight",
+        "tuesday": "Styling Tips & How-To",
+        "wednesday": "Customer Feature & Testimonial",
+        "thursday": "Behind-the-Scenes / Craftsmanship",
+        "friday": "Weekend Style Inspiration",
+        "saturday": "User-Generated Content Reshare",
+        "sunday": "Brand Values & Sustainability"
+      },
+      "brand_requirements": {
+        "instagram_feed": "1 post, brand aesthetic, cohesive grid",
+        "instagram_stories": "3-5 stories, interactive elements",
+        "tiktok": "1 trending sound video, brand-appropriate",
+        "pinterest": "3 pins to collection boards",
+        "facebook": "Repurpose top Instagram content"
+      }
+    },
+
+    "vip_customer_experience": {
+      "name": "The Skyy Rose Collection - VIP Customer Personalization",
+      "trigger": "Customer reaches $2,500 lifetime value",
+      "agents_involved": ["data_reasoning", "growth_stack", "visual_foundry"],
+      "steps": [
+        {
+          "step": 1,
+          "agent": "data_reasoning",
+          "task": "Analyze customer purchase history and preferences",
+          "output": "Personal style profile and product recommendations"
+        },
+        {
+          "step": 2,
+          "agent": "visual_foundry",
+          "task": "Create personalized lookbook PDF",
+          "brand_requirements": {
+            "customer_name": "Personalized greeting",
+            "recommendations": "Curated based on purchase history",
+            "styling_tips": "How to wear with existing pieces"
+          }
+        },
+        {
+          "step": 3,
+          "agent": "growth_stack",
+          "task": "Send VIP welcome email with exclusive perks",
+          "brand_requirements": {
+            "subject": "Welcome to The Skyy Rose Collection Inner Circle",
+            "perks": "Early access, birthday gift, free shipping, priority support",
+            "tone": "Warm, exclusive, appreciative"
+          }
+        }
+      ]
+    },
+
+    "product_page_optimization": {
+      "name": "The Skyy Rose Collection - Product Page Enhancement",
+      "trigger": "New product added or low conversion detected",
+      "agents_involved": ["visual_foundry", "voice_media_video_elite", "growth_stack", "professors_of_code"],
+      "brand_requirements": {
+        "images": "Minimum 6 high-res images (white bg + lifestyle)",
+        "video": "15-30s product video showing movement",
+        "copy": {
+          "headline": "Benefit-driven, aspirational",
+          "description": "Detailed fabric, fit, care instructions",
+          "styling_tips": "How to wear, outfit pairings",
+          "social_proof": "Customer reviews, Instagram photos"
+        },
+        "seo": {
+          "title": "Product name + 'Luxury' + Category",
+          "meta": "Under 160 chars, includes brand name",
+          "schema": "Product, Review, BreadcrumbList markup"
+        }
+      }
+    }
+  },
+
+  "brand_quality_gates": {
+    "visual_content": {
+      "must_include_brand_colors": true,
+      "must_match_photography_style": true,
+      "must_include_logo_watermark": true,
+      "minimum_resolution": 2000,
+      "color_accuracy_delta_e": 2.0
+    },
+    "written_content": {
+      "must_use_brand_voice": true,
+      "must_avoid_prohibited_terms": true,
+      "must_include_brand_name": true,
+      "tone_analysis_score": 0.85,
+      "readability_grade": "10-12"
+    },
+    "video_content": {
+      "must_match_brand_aesthetic": true,
+      "must_use_approved_music": true,
+      "minimum_resolution": "1080p",
+      "brand_logo_placement": "required",
+      "color_grading": "brand_palette"
+    }
+  },
+
+  "brand_competitive_positioning": {
+    "price_positioning": "Premium contemporary (mid-luxury)",
+    "quality_tier": "Designer-quality at accessible luxury prices",
+    "unique_selling_propositions": [
+      "AI-powered personalization for perfect fits",
+      "Sustainable luxury with ethical production",
+      "Timeless designs that transcend trends",
+      "Exceptional customer service and experience",
+      "Limited edition exclusivity"
+    ],
+    "competitive_advantages": [
+      "Technology-driven (AI styling, virtual try-on)",
+      "Direct-to-consumer pricing model",
+      "Faster trend-to-production cycle",
+      "Data-driven inventory (no overstock)",
+      "Omnichannel seamless experience"
+    ]
+  },
+
+  "brand_content_guidelines": {
+    "always_include": [
+      "The Skyy Rose Collection brand name",
+      "Premium quality and craftsmanship messaging",
+      "Sustainability and ethical production references",
+      "Customer-centric value propositions",
+      "Call-to-action with urgency (limited edition, exclusive)"
+    ],
+    "never_include": [
+      "Discounts over 30% (maintains luxury positioning)",
+      "Comparisons to fast fashion brands",
+      "Mass-market or budget terminology",
+      "Overly technical AI/tech jargon",
+      "Generic stock imagery without brand watermark"
+    ],
+    "tone_examples": {
+      "good": "Discover timeless elegance with The Skyy Rose Collection's new arrivals.",
+      "bad": "Check out our cheap dresses on sale now!"
+    }
+  },
+
+  "brand_monitoring": {
+    "track_metrics": {
+      "brand_mentions": "Monitor social media for #SkyyRoseCollection",
+      "sentiment_analysis": "Track brand sentiment across channels",
+      "share_of_voice": "Compare to competitors in luxury fashion",
+      "brand_consistency_score": "Audit all content for brand alignment"
+    },
+    "alerts": {
+      "negative_sentiment_spike": "Alert if sentiment drops below 0.7",
+      "brand_guideline_violation": "Flag content that doesn't match standards",
+      "competitor_activity": "Monitor competitive launches and campaigns",
+      "influencer_mentions": "Track influencer partnerships and UGC"
+    }
+  },
+
+  "implementation_instructions": {
+    "all_agents_must": [
+      "Reference brand_identity in every decision",
+      "Apply brand_quality_gates to all outputs",
+      "Follow brand_content_guidelines strictly",
+      "Optimize for brand KPIs defined in data_reasoning",
+      "Maintain luxury positioning in all communications",
+      "Ensure visual brand consistency across channels",
+      "Prioritize customer experience and brand reputation"
+    ],
+    "orchestrator_validation": {
+      "before_execution": "Validate task aligns with brand objectives",
+      "during_execution": "Monitor for brand guideline compliance",
+      "after_execution": "Quality gate check against brand standards",
+      "rejection_criteria": "Any output that doesn't meet brand quality gates"
+    }
+  }
+}
