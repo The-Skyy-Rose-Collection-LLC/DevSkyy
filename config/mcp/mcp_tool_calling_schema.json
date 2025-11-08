@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DevSkyy MCP Tool Calling Schema",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) tool calling configuration for DevSkyy multi-agent orchestration system. Implements code execution, on-demand loading, and secure sandboxing for Claude, Codex, HuggingFace, and OpenAI agents.",
+  
+  "system": {
+    "name": "DevSkyy MCP Orchestrator",
+    "version": "1.0.0",
+    "architecture": "orchestrator-worker",
+    "token_optimization": {
+      "enabled": true,
+      "target_reduction": 0.98,
+      "strategy": "on-demand-tool-loading",
+      "baseline_tokens": 150000,
+      "optimized_tokens": 2000
+    },
+    "security": {
+      "sandbox_execution": true,
+      "code_signing": true,
+      "rate_limiting": true,
+      "audit_logging": true
+    }
+  },
+
+  "mcp_primitives": {
+    "tools": {
+      "description": "Executable functions that agents can invoke",
+      "loading_strategy": "on-demand",
+      "categories": [
+        "code_execution",
+        "file_operations",
+        "api_interactions",
+        "data_processing",
+        "media_generation",
+        "voice_synthesis",
+        "video_processing"
+      ]
+    },
+    "resources": {
+      "description": "Structured data sources for context",
+      "types": [
+        "documentation",
+        "code_repositories",
+        "databases",
+        "file_systems",
+        "api_schemas"
+      ]
+    },
+    "prompts": {
+      "description": "Reusable templates for agent instructions",
+      "categories": [
+        "code_review",
+        "refactoring",
+        "testing",
+        "documentation",
+        "security_audit"
+      ]
+    }
+  },
+
+  "agents": {
+    "orchestrator": {
+      "name": "DevSkyy Master Orchestrator",
+      "model": "claude-opus-4-20250514",
+      "role": "coordinator",
+      "capabilities": [
+        "task_decomposition",
+        "agent_assignment",
+        "workflow_management",
+        "quality_assurance",
+        "error_recovery"
+      ],
+      "tools": [
+        "task_planner",
+        "agent_dispatcher",
+        "result_aggregator",
+        "quality_checker",
+        "rollback_manager"
+      ],
+      "max_parallel_tasks": 10,
+      "timeout_seconds": 300
+    },
+
+    "workers": {
+      "professors_of_code": {
+        "name": "Professors of Code",
+        "composition": ["claude-sonnet-4", "cursor-agent"],
+        "specialization": "backend_development",
+        "capabilities": [
+          "code_auditing",
+          "refactoring",
+          "security_enforcement",
+          "api_design",
+          "database_optimization"
+        ],
+        "tools": [
+          "python_executor",
+          "code_analyzer",
+          "security_scanner",
+          "test_generator",
+          "openapi_generator"
+        ],
+        "languages": ["python", "sql", "bash"],
+        "frameworks": ["fastapi", "sqlalchemy", "pydantic"],
+        "output_format": "code_pr_with_tests"
+      },
+
+      "growth_stack": {
+        "name": "Growth Stack",
+        "composition": ["claude-sonnet-4", "chatgpt-4"],
+        "specialization": "frontend_marketing",
+        "capabilities": [
+          "wordpress_themes",
+          "landing_pages",
+          "ab_testing",
+          "cx_automation",
+          "analytics_integration"
+        ],
+        "tools": [
+          "wordpress_builder",
+          "html_css_generator",
+          "analytics_mapper",
+          "ab_test_framework",
+          "conversion_optimizer"
+        ],
+        "languages": ["php", "javascript", "html", "css"],
+        "frameworks": ["wordpress", "react", "tailwind"],
+        "output_format": "deployable_theme_with_analytics"
+      },
+
+      "data_reasoning": {
+        "name": "Data & Reasoning",
+        "composition": ["claude-sonnet-4", "gemini-pro-1.5"],
+        "specialization": "data_analysis",
+        "capabilities": [
+          "data_retrieval",
+          "eval_harnesses",
+          "prompt_routing",
+          "kpi_analysis",
+          "ml_model_evaluation"
+        ],
+        "tools": [
+          "sql_executor",
+          "data_analyzer",
+          "prompt_router",
+          "eval_framework",
+          "kpi_dashboard"
+        ],
+        "languages": ["python", "sql", "r"],
+        "frameworks": ["pandas", "numpy", "scikit-learn"],
+        "output_format": "eval_report_with_routing_policy"
+      },
+
+      "visual_foundry": {
+        "name": "Visual Foundry",
+        "composition": ["huggingface", "claude-sonnet-4", "gemini-pro-1.5", "chatgpt-4"],
+        "specialization": "media_generation",
+        "capabilities": [
+          "image_upscaling",
+          "brand_asset_generation",
+          "video_automation",
+          "style_transfer",
+          "metadata_extraction"
+        ],
+        "tools": [
+          "stable_diffusion",
+          "real_esrgan",
+          "video_editor",
+          "style_transfer_engine",
+          "metadata_tagger"
+        ],
+        "languages": ["python"],
+        "frameworks": ["diffusers", "opencv", "ffmpeg"],
+        "output_format": "high_fidelity_assets_with_metadata"
+      },
+
+      "voice_media_video_elite": {
+        "name": "Voice, Media & Video Elite Team",
+        "composition": ["huggingface", "claude-sonnet-4", "openai-whisper", "openai-tts"],
+        "specialization": "multimedia_processing",
+        "capabilities": [
+          "voice_synthesis",
+          "speech_to_text",
+          "audio_processing",
+          "video_editing",
+          "subtitle_generation",
+          "voice_cloning"
+        ],
+        "tools": [
+          "whisper_transcriber",
+          "tts_synthesizer",
+          "audio_processor",
+          "video_compositor",
+          "subtitle_generator",
+          "voice_cloner"
+        ],
+        "models": {
+          "speech_to_text": "openai/whisper-large-v3",
+          "text_to_speech": "openai/tts-1-hd",
+          "voice_cloning": "huggingface/bark",
+          "audio_enhancement": "facebook/demucs"
+        },
+        "languages": ["python"],
+        "frameworks": ["whisper", "bark", "demucs", "ffmpeg"],
+        "output_format": "processed_multimedia_with_transcripts"
+      }
+    }
+  },
+
+  "tool_definitions": {
+    "code_execution": {
+      "python_executor": {
+        "name": "Python Code Executor",
+        "description": "Executes Python code in secure sandbox",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Python code to execute"
+            },
+            "timeout": {
+              "type": "integer",
+              "default": 30,
+              "description": "Execution timeout in seconds"
+            },
+            "environment": {
+              "type": "string",
+              "enum": ["sandbox", "venv", "docker"],
+              "default": "sandbox"
+            }
+          },
+          "required": ["code"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "stdout": {"type": "string"},
+            "stderr": {"type": "string"},
+            "return_value": {"type": "any"},
+            "execution_time": {"type": "number"},
+            "success": {"type": "boolean"}
+          }
+        },
+        "security": {
+          "sandboxed": true,
+          "network_access": false,
+          "file_system_access": "read-only",
+          "memory_limit_mb": 512,
+          "cpu_limit_percent": 50
+        }
+      },
+
+      "code_analyzer": {
+        "name": "Code Quality Analyzer",
+        "description": "Analyzes code for quality, security, and best practices",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "code": {"type": "string"},
+            "language": {
+              "type": "string",
+              "enum": ["python", "javascript", "typescript", "sql"]
+            },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["syntax", "security", "performance", "style", "complexity"]
+              }
+            }
+          },
+          "required": ["code", "language"]
+        },
+        "tools_used": ["ruff", "mypy", "bandit", "pylint"],
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+                  "category": {"type": "string"},
+                  "line": {"type": "integer"},
+                  "message": {"type": "string"},
+                  "suggestion": {"type": "string"}
+                }
+              }
+            },
+            "metrics": {
+              "type": "object",
+              "properties": {
+                "complexity": {"type": "number"},
+                "maintainability": {"type": "number"},
+                "security_score": {"type": "number"}
+              }
+            }
+          }
+        }
+      },
+
+      "test_generator": {
+        "name": "Automated Test Generator",
+        "description": "Generates unit and integration tests",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "source_code": {"type": "string"},
+            "test_framework": {
+              "type": "string",
+              "enum": ["pytest", "unittest", "jest", "mocha"],
+              "default": "pytest"
+            },
+            "coverage_target": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "default": 90
+            }
+          },
+          "required": ["source_code"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "test_code": {"type": "string"},
+            "test_count": {"type": "integer"},
+            "estimated_coverage": {"type": "number"}
+          }
+        }
+      }
+    },
+
+    "media_generation": {
+      "stable_diffusion": {
+        "name": "Stable Diffusion Image Generator",
+        "description": "Generates high-quality images from text prompts",
+        "model": "stabilityai/stable-diffusion-xl-base-1.0",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "prompt": {"type": "string"},
+            "negative_prompt": {"type": "string"},
+            "width": {"type": "integer", "default": 1024},
+            "height": {"type": "integer", "default": 1024},
+            "num_inference_steps": {"type": "integer", "default": 50},
+            "guidance_scale": {"type": "number", "default": 7.5},
+            "seed": {"type": "integer"}
+          },
+          "required": ["prompt"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "image_url": {"type": "string"},
+            "image_base64": {"type": "string"},
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "seed": {"type": "integer"},
+                "model": {"type": "string"},
+                "generation_time": {"type": "number"}
+              }
+            }
+          }
+        },
+        "hardware": {
+          "gpu_required": true,
+          "min_vram_gb": 8,
+          "preferred_gpu": "Apple M1/M2/M3 with Metal"
+        }
+      },
+
+      "real_esrgan": {
+        "name": "Real-ESRGAN Image Upscaler",
+        "description": "Upscales images with AI enhancement",
+        "model": "ai-forever/Real-ESRGAN",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "image_input": {"type": "string", "description": "Base64 or URL"},
+            "scale": {"type": "integer", "enum": [2, 4, 8], "default": 4},
+            "face_enhance": {"type": "boolean", "default": false}
+          },
+          "required": ["image_input"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "upscaled_image": {"type": "string"},
+            "original_resolution": {"type": "string"},
+            "new_resolution": {"type": "string"}
+          }
+        }
+      },
+
+      "video_editor": {
+        "name": "AI Video Editor",
+        "description": "Automated video editing and composition",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "video_inputs": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "editing_instructions": {"type": "string"},
+            "output_format": {
+              "type": "string",
+              "enum": ["mp4", "webm", "mov"],
+              "default": "mp4"
+            },
+            "resolution": {
+              "type": "string",
+              "enum": ["720p", "1080p", "4k"],
+              "default": "1080p"
+            }
+          },
+          "required": ["video_inputs", "editing_instructions"]
+        },
+        "frameworks": ["ffmpeg", "moviepy"],
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "video_url": {"type": "string"},
+            "duration": {"type": "number"},
+            "filesize_mb": {"type": "number"}
+          }
+        }
+      }
+    },
+
+    "voice_synthesis": {
+      "whisper_transcriber": {
+        "name": "Whisper Speech-to-Text",
+        "description": "Transcribes audio to text with high accuracy",
+        "model": "openai/whisper-large-v3",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "audio_input": {"type": "string", "description": "Audio file URL or base64"},
+            "language": {"type": "string", "default": "auto"},
+            "task": {
+              "type": "string",
+              "enum": ["transcribe", "translate"],
+              "default": "transcribe"
+            }
+          },
+          "required": ["audio_input"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "text": {"type": "string"},
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start": {"type": "number"},
+                  "end": {"type": "number"},
+                  "text": {"type": "string"}
+                }
+              }
+            },
+            "language": {"type": "string"}
+          }
+        }
+      },
+
+      "tts_synthesizer": {
+        "name": "Text-to-Speech Synthesizer",
+        "description": "Converts text to natural speech",
+        "model": "openai/tts-1-hd",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "text": {"type": "string"},
+            "voice": {
+              "type": "string",
+              "enum": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
+              "default": "alloy"
+            },
+            "speed": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 4.0,
+              "default": 1.0
+            },
+            "format": {
+              "type": "string",
+              "enum": ["mp3", "opus", "aac", "flac"],
+              "default": "mp3"
+            }
+          },
+          "required": ["text"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "audio_url": {"type": "string"},
+            "audio_base64": {"type": "string"},
+            "duration": {"type": "number"}
+          }
+        }
+      },
+
+      "voice_cloner": {
+        "name": "Voice Cloning System",
+        "description": "Clones voices from sample audio",
+        "model": "suno/bark",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "sample_audio": {"type": "string", "description": "Reference voice sample"},
+            "text": {"type": "string", "description": "Text to synthesize"},
+            "clone_quality": {
+              "type": "string",
+              "enum": ["fast", "balanced", "high"],
+              "default": "balanced"
+            }
+          },
+          "required": ["sample_audio", "text"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "cloned_audio": {"type": "string"},
+            "similarity_score": {"type": "number"}
+          }
+        }
+      }
+    },
+
+    "data_processing": {
+      "sql_executor": {
+        "name": "SQL Query Executor",
+        "description": "Executes SQL queries with security validation",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {"type": "string"},
+            "database": {"type": "string"},
+            "max_rows": {"type": "integer", "default": 1000}
+          },
+          "required": ["query"]
+        },
+        "security": {
+          "sql_injection_prevention": true,
+          "read_only": true,
+          "query_validation": true
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "rows": {"type": "array"},
+            "row_count": {"type": "integer"},
+            "execution_time_ms": {"type": "number"}
+          }
+        }
+      },
+
+      "data_analyzer": {
+        "name": "Data Analysis Engine",
+        "description": "Performs statistical and ML analysis on datasets",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "data_source": {"type": "string"},
+            "analysis_type": {
+              "type": "string",
+              "enum": ["descriptive", "predictive", "prescriptive"]
+            },
+            "metrics": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          },
+          "required": ["data_source", "analysis_type"]
+        },
+        "frameworks": ["pandas", "numpy", "scikit-learn", "statsmodels"],
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "summary_statistics": {"type": "object"},
+            "visualizations": {"type": "array"},
+            "insights": {"type": "array"},
+            "recommendations": {"type": "array"}
+          }
+        }
+      }
+    }
+  },
+
+  "orchestration_workflows": {
+    "code_review_workflow": {
+      "name": "Automated Code Review",
+      "trigger": "pull_request",
+      "steps": [
+        {
+          "step": 1,
+          "agent": "professors_of_code",
+          "tool": "code_analyzer",
+          "input": "${pr.changed_files}",
+          "output": "analysis_results"
+        },
+        {
+          "step": 2,
+          "agent": "professors_of_code",
+          "tool": "security_scanner",
+          "input": "${pr.changed_files}",
+          "output": "security_results"
+        },
+        {
+          "step": 3,
+          "agent": "professors_of_code",
+          "tool": "test_generator",
+          "input": "${pr.changed_files}",
+          "output": "test_suite"
+        },
+        {
+          "step": 4,
+          "agent": "orchestrator",
+          "tool": "result_aggregator",
+          "input": ["${analysis_results}", "${security_results}", "${test_suite}"],
+          "output": "pr_comment"
+        }
+      ]
+    },
+
+    "multimedia_content_pipeline": {
+      "name": "Multimedia Content Generation",
+      "trigger": "api_request",
+      "parallel": true,
+      "steps": [
+        {
+          "step": 1,
+          "agent": "visual_foundry",
+          "tool": "stable_diffusion",
+          "input": "${content.image_prompt}",
+          "output": "generated_images"
+        },
+        {
+          "step": 2,
+          "agent": "voice_media_video_elite",
+          "tool": "tts_synthesizer",
+          "input": "${content.script}",
+          "output": "voiceover_audio"
+        },
+        {
+          "step": 3,
+          "agent": "voice_media_video_elite",
+          "tool": "video_editor",
+          "input": ["${generated_images}", "${voiceover_audio}"],
+          "output": "final_video",
+          "depends_on": [1, 2]
+        }
+      ]
+    }
+  },
+
+  "integration_endpoints": {
+    "claude": {
+      "api_base": "https://api.anthropic.com/v1",
+      "models": ["claude-opus-4-20250514", "claude-sonnet-4-20250514"],
+      "authentication": "api_key",
+      "rate_limits": {
+        "requests_per_minute": 50,
+        "tokens_per_minute": 40000
+      }
+    },
+    "openai": {
+      "api_base": "https://api.openai.com/v1",
+      "models": ["gpt-4-turbo", "whisper-1", "tts-1-hd"],
+      "authentication": "api_key",
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "tokens_per_minute": 90000
+      }
+    },
+    "huggingface": {
+      "api_base": "https://api-inference.huggingface.co",
+      "inference_endpoints": true,
+      "authentication": "api_token",
+      "models": [
+        "stabilityai/stable-diffusion-xl-base-1.0",
+        "ai-forever/Real-ESRGAN",
+        "suno/bark",
+        "facebook/demucs"
+      ]
+    },
+    "gemini": {
+      "api_base": "https://generativelanguage.googleapis.com/v1",
+      "models": ["gemini-pro-1.5"],
+      "authentication": "api_key"
+    }
+  },
+
+  "monitoring": {
+    "metrics": {
+      "tool_invocations": {
+        "type": "counter",
+        "labels": ["tool_name", "agent", "status"]
+      },
+      "execution_duration": {
+        "type": "histogram",
+        "labels": ["tool_name", "agent"],
+        "buckets": [0.1, 0.5, 1, 2, 5, 10, 30]
+      },
+      "token_usage": {
+        "type": "gauge",
+        "labels": ["agent", "model"]
+      },
+      "error_rate": {
+        "type": "counter",
+        "labels": ["tool_name", "error_type"]
+      }
+    },
+    "logging": {
+      "level": "INFO",
+      "format": "json",
+      "include_traces": true,
+      "audit_trail": true
+    },
+    "alerting": {
+      "error_threshold": 0.05,
+      "latency_p95_threshold_seconds": 10,
+      "token_budget_alert": 0.8
+    }
+  },
+
+  "compliance": {
+    "truth_protocol": {
+      "enforced": true,
+      "rules": [
+        "never_guess_syntax",
+        "pin_all_versions",
+        "cite_standards",
+        "state_uncertainty",
+        "no_hardcoded_secrets",
+        "rbac_enforcement",
+        "input_validation",
+        "test_coverage_90_percent",
+        "document_everything",
+        "no_skip_rule"
+      ]
+    },
+    "security_baseline": {
+      "encryption": "AES-256-GCM",
+      "password_hashing": "Argon2id",
+      "authentication": "OAuth2+JWT",
+      "key_derivation": "PBKDF2"
+    },
+    "performance_slos": {
+      "p95_latency_ms": 200,
+      "error_rate_percent": 0.5,
+      "secrets_in_repo": 0
+    }
+  }
+}
