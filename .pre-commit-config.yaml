@@ -1,73 +1,53 @@
-# ============================================================================
-# DEVSKYY ENTERPRISE PLATFORM - SIMPLIFIED PRE-COMMIT CONFIGURATION
-# Stable Configuration for CI/CD Success
-# Version: 5.2.1
-# ============================================================================
+# Pre-commit hooks for DevSkyy Enterprise Platform
+# Install: pip install pre-commit && pre-commit install
 
 repos:
-  # ============================================================================
-  # BASIC FILE HYGIENE - ESSENTIAL ONLY
-  # ============================================================================
+  # Secret Detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package.lock.json
+
+  # Code Quality
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
-        args: [--allow-multiple-documents]
-      - id: check-json
       - id: check-added-large-files
-        args: [--maxkb=5120]  # 5MB limit
+        args: ['--maxkb=1000']
+      - id: check-json
       - id: check-merge-conflict
-      - id: debug-statements
+      - id: detect-private-key
 
-  # ============================================================================
-  # PYTHON CODE FORMATTING - SIMPLIFIED
-  # ============================================================================
+  # Python Code Quality
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 24.2.0
     hooks:
       - id: black
-        args: [--line-length=119]
+        language_version: python3.11
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
     hooks:
-      - id: isort
-        args: [--profile=black, --line-length=119]
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
 
-  # ============================================================================
-  # PYTHON LINTING - FLAKE8 (Uses .flake8 configuration file)
-  # ============================================================================
-  # Configuration details in .flake8 at repository root
-  # Aligned with Ruff (primary linter) and CLAUDE.md Truth Protocol
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+  # Security
+  - repo: https://github.com/PyCQA/bandit
+    rev: '1.7.7'
     hooks:
-      - id: flake8
-        # All configuration is in .flake8 file for consistency
-        # Key settings: max-line-length=119, max-complexity=12
-        additional_dependencies:
-          - flake8-bugbear
-          - flake8-comprehensions
-          - flake8-simplify
+      - id: bandit
+        args: ['-c', '.bandit.yml']
+        exclude: ^tests/
 
-# ============================================================================
-# GLOBAL CONFIGURATION - SIMPLIFIED
-# ============================================================================
-default_stages: [commit]
-fail_fast: false
-minimum_pre_commit_version: '3.0.0'
-
-# CI Configuration
-ci:
-  autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit.com hooks
-
-    for more information, see https://pre-commit.ci
-  autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-  autoupdate_schedule: weekly
-  skip: []
-  submodules: false
+  # Type Checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v1.8.0'
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        args: [--ignore-missing-imports, --no-strict-optional]
