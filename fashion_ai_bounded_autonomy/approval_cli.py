@@ -23,6 +23,7 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem
+from fashion_ai_bounded_autonomy.i18n_loader import t
 
 
 class ApprovalCLI:
@@ -47,12 +48,12 @@ class ApprovalCLI:
 
     async def list_pending(self):
         """List all pending actions"""
-        print(self.colorize("\n📋 PENDING ACTIONS FOR REVIEW\n", "BOLD"))
+        print(self.colorize(f"\n📋 {t('cli.list_pending')}\n", "BOLD"))
 
         actions = await self.approval_system.get_pending_actions()
 
         if not actions:
-            print(self.colorize("✓ No pending actions", "GREEN"))
+            print(self.colorize(f"✓ {t('cli.list_empty')}", "GREEN"))
             return
 
         for idx, action in enumerate(actions, 1):
@@ -79,7 +80,7 @@ class ApprovalCLI:
         details = await self.approval_system.get_action_details(action_id)
 
         if not details:
-            print(self.colorize(f"❌ Action {action_id} not found", "RED"))
+            print(self.colorize(f"❌ {t('approval.not_found', action_id=action_id)}", "RED"))
             return
 
         print(self.colorize("\n🔍 ACTION DETAILS\n", "BOLD"))
@@ -153,29 +154,29 @@ class ApprovalCLI:
 
     async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
         """Approve an action"""
-        print(f"\n🔄 Approving action {action_id}...")
+        print(f"\n🔄 {t('cli.review_action', action_id=action_id)}...")
 
         result = await self.approval_system.approve(action_id, operator, notes)
 
         if result.get("error"):
-            print(self.colorize(f"❌ Error: {result['error']}", "RED"))
+            print(self.colorize(f"❌ {t('cli.error', message=result['error'])}", "RED"))
             return
 
-        print(self.colorize(f"✅ Action {action_id} approved by {operator}", "GREEN"))
+        print(self.colorize(f"✅ {t('cli.approve_success')}", "GREEN"))
         print(f"Approved at: {result['approved_at']}")
         print("\n⚠️  Note: The action will be executed by the agent system automatically.")
 
     async def reject_action(self, action_id: str, operator: str, reason: str):
         """Reject an action"""
-        print(f"\n🔄 Rejecting action {action_id}...")
+        print(f"\n🔄 {t('cli.review_action', action_id=action_id)}...")
 
         result = await self.approval_system.reject(action_id, operator, reason)
 
         if result.get("error"):
-            print(self.colorize(f"❌ Error: {result['error']}", "RED"))
+            print(self.colorize(f"❌ {t('cli.error', message=result['error'])}", "RED"))
             return
 
-        print(self.colorize(f"⛔ Action {action_id} rejected by {operator}", "RED"))
+        print(self.colorize(f"⛔ {t('cli.reject_success')}", "RED"))
         print(f"Reason: {reason}")
 
     async def show_statistics(self, operator: Optional[str] = None):
@@ -200,7 +201,7 @@ class ApprovalCLI:
         """Clean up expired actions"""
         print("\n🧹 Cleaning up expired actions...")
         count = await self.approval_system.cleanup_expired()
-        print(self.colorize(f"✅ Cleaned up {count} expired actions", "GREEN"))
+        print(self.colorize(f"✅ {t('approval.cleanup_expired', count=count)}", "GREEN"))
 
 
 async def main():
@@ -259,7 +260,7 @@ async def main():
         elif args.command == "cleanup":
             await cli.cleanup_expired()
     except Exception as e:
-        print(cli.colorize(f"\n❌ Error: {e!s}", "RED"))
+        print(cli.colorize(f"\n❌ {t('cli.error', message=str(e))}", "RED"))
         import traceback
         traceback.print_exc()
 

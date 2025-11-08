@@ -20,6 +20,7 @@ from typing import Any, Dict
 from celery import Task
 
 from fashion_ai_bounded_autonomy.celery_app import celery_app
+from fashion_ai_bounded_autonomy.i18n_loader import t
 
 
 logger = logging.getLogger(__name__)
@@ -30,15 +31,15 @@ class BoundedAutonomyTask(Task):
 
     def on_success(self, retval, task_id, args, kwargs):
         """Log successful task execution"""
-        logger.info(f"✅ Task {self.name} [{task_id}] completed successfully")
+        logger.info(f"✅ {t('tasks.success', name=self.name, task_id=task_id)}")
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """Log failed task execution"""
-        logger.error(f"❌ Task {self.name} [{task_id}] failed: {exc}")
+        logger.error(f"❌ {t('tasks.failure', name=self.name, task_id=task_id, error=str(exc))}")
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
         """Log task retry"""
-        logger.warning(f"🔄 Task {self.name} [{task_id}] retrying: {exc}")
+        logger.warning(f"🔄 {t('tasks.retry', name=self.name, task_id=task_id, error=str(exc))}")
 
 
 # ============================================================================
@@ -71,11 +72,11 @@ def send_approval_notification_task(self, action_id: str, agent_name: str, risk_
         # Use asyncio to run async watchdog method
         asyncio.run(watchdog._send_notification("operator", "approval_required", notification))
 
-        logger.info(f"📬 Sent approval notification for action {action_id}")
+        logger.info(f"📬 {t('tasks.approval_notification_sent', action_id=action_id)}")
         return {"status": "sent", "action_id": action_id}
 
     except Exception as exc:
-        logger.error(f"Failed to send approval notification: {exc}")
+        logger.error(f"{t('approval.notification_failed', error=str(exc))}")
         raise self.retry(exc=exc, countdown=60)
 
 
@@ -88,11 +89,11 @@ def cleanup_expired_approvals_task():
         approval_system = ApprovalSystem()
         count = asyncio.run(approval_system.cleanup_expired())
 
-        logger.info(f"🧹 Cleaned up {count} expired approval requests")
+        logger.info(f"🧹 {t('approval.cleanup_expired', count=count)}")
         return {"status": "completed", "cleaned_count": count}
 
     except Exception as exc:
-        logger.error(f"Failed to cleanup expired approvals: {exc}")
+        logger.error(f"{t('errors.generic', error=str(exc))}")
         return {"status": "failed", "error": str(exc)}
 
 

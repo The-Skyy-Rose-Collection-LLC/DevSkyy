@@ -1,0 +1,109 @@
+{
+  "approval": {
+    "submitted": "操作 {action_id} 已提交审核（工作流: {workflow}）",
+    "approved": "操作 {action_id} 已被 {operator} 批准",
+    "rejected": "操作 {action_id} 已被 {operator} 拒绝",
+    "executed": "操作 {action_id} 已成功执行",
+    "timeout": "批准请求将在 {hours} 小时后过期",
+    "expired": "操作 {action_id} 已过期",
+    "not_found": "未找到操作 {action_id}",
+    "already_approved": "操作 {action_id} 已经被批准",
+    "already_rejected": "操作 {action_id} 已经被拒绝",
+    "invalid_status": "无法批准状态为 {status} 的操作 {action_id}",
+    "notification_sent": "已发送操作 {action_id} 的批准通知",
+    "notification_failed": "发送批准通知失败: {error}",
+    "cleanup_expired": "已清理 {count} 个过期的批准请求"
+  },
+  "cli": {
+    "welcome": "有界自主批准命令行界面",
+    "list_pending": "正在列出待处理的批准请求...",
+    "list_empty": "没有待处理的批准请求",
+    "review_action": "正在审核操作: {action_id}",
+    "approve_confirm": "您确定要批准此操作吗？(是/否): ",
+    "reject_confirm": "您确定要拒绝此操作吗？(是/否): ",
+    "approve_success": "✅ 操作已成功批准",
+    "reject_success": "❌ 操作已拒绝",
+    "approve_cancelled": "批准已取消",
+    "reject_cancelled": "拒绝已取消",
+    "invalid_action": "无效的操作ID",
+    "error": "错误: {message}"
+  },
+  "wrapper": {
+    "action_submitted": "操作 {function} 已提交审批（风险: {risk_level}）",
+    "action_approved": "操作 {action_id} 已批准，正在执行...",
+    "action_rejected": "操作 {action_id} 已被拒绝",
+    "action_timeout": "操作 {action_id} 批准超时",
+    "auto_approved": "自动批准 {function}（风险: {risk_level}）",
+    "execution_success": "成功执行 {function}",
+    "execution_failed": "执行 {function} 失败: {error}"
+  },
+  "orchestrator": {
+    "agent_registered": "已注册代理: {agent_name}",
+    "agent_deregistered": "已注销代理: {agent_name}",
+    "task_submitted": "任务 {task_id} 已提交给 {agent_name}",
+    "task_completed": "任务 {task_id} 已由 {agent_name} 完成",
+    "task_failed": "任务 {task_id} 失败: {error}",
+    "context_shared": "已与 {count} 个代理共享上下文",
+    "workflow_started": "已启动工作流: {workflow_id}",
+    "workflow_completed": "工作流已完成: {workflow_id}"
+  },
+  "tasks": {
+    "success": "✅ 任务 {name} [{task_id}] 已成功完成",
+    "failure": "❌ 任务 {name} [{task_id}] 失败: {error}",
+    "retry": "🔄 任务 {name} [{task_id}] 正在重试: {error}",
+    "approval_notification_sent": "📬 已发送操作 {action_id} 的批准通知",
+    "data_processed": "📊 已处理数据摄入: {file_path}",
+    "data_validated": "✅ 数据验证已完成",
+    "report_generated": "📈 已生成 {report_type} 报告",
+    "metrics_exported": "📤 指标已导出到 {file_path}",
+    "health_check": "✅ 所有代理健康",
+    "unhealthy_agents": "⚠️ 检测到不健康的代理: {agents}",
+    "performance_snapshot": "📸 已捕获性能快照",
+    "proposals_generated": "💡 已生成 {count} 个性能改进建议"
+  },
+  "watchdog": {
+    "agent_registered": "代理 {agent_name} 已注册到监视器",
+    "agent_healthy": "代理 {agent_name} 健康",
+    "agent_unhealthy": "代理 {agent_name} 不健康",
+    "notification_sent": "已向 {recipient} 发送 {notification_type} 通知",
+    "violation_detected": "检测到策略违规: {violation}",
+    "status_retrieved": "已检索系统状态: {agent_count} 个代理"
+  },
+  "performance": {
+    "kpi_summary": "KPI摘要: 批准率 {approval_rate}%，平均响应时间 {response_time}ms",
+    "proposal_created": "已创建性能改进建议: {title}",
+    "threshold_exceeded": "超过性能阈值: {metric} = {value}"
+  },
+  "data_pipeline": {
+    "ingestion_started": "已从 {source} 开始数据摄入",
+    "ingestion_completed": "数据摄入已完成: {records} 条记录",
+    "validation_started": "已开始数据验证",
+    "validation_completed": "数据验证已完成: {valid} 有效，{invalid} 无效",
+    "preprocessing_completed": "数据预处理已完成"
+  },
+  "report": {
+    "daily_summary": "每日摘要报告",
+    "weekly_summary": "每周摘要报告",
+    "validation_report": "数据验证报告",
+    "export_completed": "报告已导出到 {file_path}"
+  },
+  "errors": {
+    "generic": "发生错误: {error}",
+    "database": "数据库错误: {error}",
+    "validation": "验证错误: {error}",
+    "timeout": "操作在 {seconds} 秒后超时",
+    "unauthorized": "未授权的访问尝试",
+    "not_found": "未找到资源: {resource}",
+    "already_exists": "资源已存在: {resource}"
+  },
+  "system": {
+    "startup": "有界自主系统正在启动...",
+    "ready": "系统就绪",
+    "shutdown": "系统正在关闭...",
+    "shutdown_complete": "系统关闭完成",
+    "redis_connected": "✅ Redis正在运行",
+    "redis_error": "错误: Redis未运行！",
+    "celery_workers_started": "所有Celery工作进程已成功启动！",
+    "celery_workers_stopped": "所有Celery工作进程已成功停止！"
+  }
+}

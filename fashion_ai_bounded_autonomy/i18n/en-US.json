@@ -1,0 +1,109 @@
+{
+  "approval": {
+    "submitted": "Action {action_id} submitted for review (workflow: {workflow})",
+    "approved": "Action {action_id} approved by {operator}",
+    "rejected": "Action {action_id} rejected by {operator}",
+    "executed": "Action {action_id} executed successfully",
+    "timeout": "Approval request will expire in {hours} hours",
+    "expired": "Action {action_id} has expired",
+    "not_found": "Action {action_id} not found",
+    "already_approved": "Action {action_id} is already approved",
+    "already_rejected": "Action {action_id} is already rejected",
+    "invalid_status": "Cannot approve action {action_id} with status: {status}",
+    "notification_sent": "Sent approval notification for action {action_id}",
+    "notification_failed": "Failed to send approval notification: {error}",
+    "cleanup_expired": "Cleaned up {count} expired approval requests"
+  },
+  "cli": {
+    "welcome": "Bounded Autonomy Approval CLI",
+    "list_pending": "Listing pending approval requests...",
+    "list_empty": "No pending approval requests",
+    "review_action": "Reviewing action: {action_id}",
+    "approve_confirm": "Are you sure you want to approve this action? (yes/no): ",
+    "reject_confirm": "Are you sure you want to reject this action? (yes/no): ",
+    "approve_success": "✅ Action approved successfully",
+    "reject_success": "❌ Action rejected",
+    "approve_cancelled": "Approval cancelled",
+    "reject_cancelled": "Rejection cancelled",
+    "invalid_action": "Invalid action ID",
+    "error": "Error: {message}"
+  },
+  "wrapper": {
+    "action_submitted": "Action {function} submitted for approval (risk: {risk_level})",
+    "action_approved": "Action {action_id} approved, executing...",
+    "action_rejected": "Action {action_id} was rejected",
+    "action_timeout": "Action {action_id} approval timeout",
+    "auto_approved": "Auto-approved {function} (risk: {risk_level})",
+    "execution_success": "Executed {function} successfully",
+    "execution_failed": "Execution of {function} failed: {error}"
+  },
+  "orchestrator": {
+    "agent_registered": "Registered agent: {agent_name}",
+    "agent_deregistered": "Deregistered agent: {agent_name}",
+    "task_submitted": "Task {task_id} submitted to {agent_name}",
+    "task_completed": "Task {task_id} completed by {agent_name}",
+    "task_failed": "Task {task_id} failed: {error}",
+    "context_shared": "Shared context with {count} agents",
+    "workflow_started": "Started workflow: {workflow_id}",
+    "workflow_completed": "Completed workflow: {workflow_id}"
+  },
+  "tasks": {
+    "success": "✅ Task {name} [{task_id}] completed successfully",
+    "failure": "❌ Task {name} [{task_id}] failed: {error}",
+    "retry": "🔄 Task {name} [{task_id}] retrying: {error}",
+    "approval_notification_sent": "📬 Sent approval notification for action {action_id}",
+    "data_processed": "📊 Processed data ingestion: {file_path}",
+    "data_validated": "✅ Data validation completed",
+    "report_generated": "📈 Generated {report_type} report",
+    "metrics_exported": "📤 Exported metrics to {file_path}",
+    "health_check": "✅ All agents healthy",
+    "unhealthy_agents": "⚠️ Unhealthy agents detected: {agents}",
+    "performance_snapshot": "📸 Captured performance snapshot",
+    "proposals_generated": "💡 Generated {count} performance proposals"
+  },
+  "watchdog": {
+    "agent_registered": "Registered agent {agent_name} with watchdog",
+    "agent_healthy": "Agent {agent_name} is healthy",
+    "agent_unhealthy": "Agent {agent_name} is unhealthy",
+    "notification_sent": "Sent {notification_type} notification to {recipient}",
+    "violation_detected": "Policy violation detected: {violation}",
+    "status_retrieved": "Retrieved system status: {agent_count} agents"
+  },
+  "performance": {
+    "kpi_summary": "KPI Summary: Approval Rate {approval_rate}%, Avg Response Time {response_time}ms",
+    "proposal_created": "Created performance improvement proposal: {title}",
+    "threshold_exceeded": "Performance threshold exceeded: {metric} = {value}"
+  },
+  "data_pipeline": {
+    "ingestion_started": "Started data ingestion from {source}",
+    "ingestion_completed": "Data ingestion completed: {records} records",
+    "validation_started": "Started data validation",
+    "validation_completed": "Data validation completed: {valid} valid, {invalid} invalid",
+    "preprocessing_completed": "Data preprocessing completed"
+  },
+  "report": {
+    "daily_summary": "Daily Summary Report",
+    "weekly_summary": "Weekly Summary Report",
+    "validation_report": "Data Validation Report",
+    "export_completed": "Report exported to {file_path}"
+  },
+  "errors": {
+    "generic": "An error occurred: {error}",
+    "database": "Database error: {error}",
+    "validation": "Validation error: {error}",
+    "timeout": "Operation timed out after {seconds} seconds",
+    "unauthorized": "Unauthorized access attempt",
+    "not_found": "Resource not found: {resource}",
+    "already_exists": "Resource already exists: {resource}"
+  },
+  "system": {
+    "startup": "Bounded Autonomy System starting...",
+    "ready": "System ready",
+    "shutdown": "System shutting down...",
+    "shutdown_complete": "System shutdown complete",
+    "redis_connected": "✅ Redis is running",
+    "redis_error": "ERROR: Redis is not running!",
+    "celery_workers_started": "All Celery workers started successfully!",
+    "celery_workers_stopped": "All Celery workers stopped successfully!"
+  }
+}

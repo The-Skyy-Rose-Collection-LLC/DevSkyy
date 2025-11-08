@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from agent.modules.base_agent import BaseAgent
+from fashion_ai_bounded_autonomy.i18n_loader import t
 
 
 logger = logging.getLogger(__name__)

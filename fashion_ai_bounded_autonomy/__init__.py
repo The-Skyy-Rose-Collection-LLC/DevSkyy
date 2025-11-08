@@ -64,6 +64,7 @@ from .bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
 from .bounded_orchestrator import BoundedOrchestrator
 from .celery_app import celery_app
 from .data_pipeline import DataPipeline
+from .i18n_loader import get_available_languages, get_language, set_language, t
 from .performance_tracker import PerformanceTracker
 from .report_generator import ReportGenerator
 from .watchdog import Watchdog
@@ -80,4 +81,8 @@ __all__ = [
     "ReportGenerator",
     "Watchdog",
     "celery_app",
+    "get_available_languages",
+    "get_language",
+    "set_language",
+    "t",
 ]

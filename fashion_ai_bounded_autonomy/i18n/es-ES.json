@@ -1,0 +1,109 @@
+{
+  "approval": {
+    "submitted": "Acción {action_id} enviada para revisión (flujo de trabajo: {workflow})",
+    "approved": "Acción {action_id} aprobada por {operator}",
+    "rejected": "Acción {action_id} rechazada por {operator}",
+    "executed": "Acción {action_id} ejecutada exitosamente",
+    "timeout": "La solicitud de aprobación expirará en {hours} horas",
+    "expired": "Acción {action_id} ha expirado",
+    "not_found": "Acción {action_id} no encontrada",
+    "already_approved": "Acción {action_id} ya está aprobada",
+    "already_rejected": "Acción {action_id} ya está rechazada",
+    "invalid_status": "No se puede aprobar la acción {action_id} con estado: {status}",
+    "notification_sent": "Notificación de aprobación enviada para acción {action_id}",
+    "notification_failed": "Error al enviar notificación de aprobación: {error}",
+    "cleanup_expired": "Se limpiaron {count} solicitudes de aprobación expiradas"
+  },
+  "cli": {
+    "welcome": "CLI de Aprobación de Autonomía Limitada",
+    "list_pending": "Listando solicitudes de aprobación pendientes...",
+    "list_empty": "No hay solicitudes de aprobación pendientes",
+    "review_action": "Revisando acción: {action_id}",
+    "approve_confirm": "¿Está seguro de que desea aprobar esta acción? (si/no): ",
+    "reject_confirm": "¿Está seguro de que desea rechazar esta acción? (si/no): ",
+    "approve_success": "✅ Acción aprobada exitosamente",
+    "reject_success": "❌ Acción rechazada",
+    "approve_cancelled": "Aprobación cancelada",
+    "reject_cancelled": "Rechazo cancelado",
+    "invalid_action": "ID de acción inválido",
+    "error": "Error: {message}"
+  },
+  "wrapper": {
+    "action_submitted": "Acción {function} enviada para aprobación (riesgo: {risk_level})",
+    "action_approved": "Acción {action_id} aprobada, ejecutando...",
+    "action_rejected": "Acción {action_id} fue rechazada",
+    "action_timeout": "Tiempo de aprobación agotado para acción {action_id}",
+    "auto_approved": "Auto-aprobada {function} (riesgo: {risk_level})",
+    "execution_success": "Ejecutado {function} exitosamente",
+    "execution_failed": "Ejecución de {function} falló: {error}"
+  },
+  "orchestrator": {
+    "agent_registered": "Agente registrado: {agent_name}",
+    "agent_deregistered": "Agente dado de baja: {agent_name}",
+    "task_submitted": "Tarea {task_id} enviada a {agent_name}",
+    "task_completed": "Tarea {task_id} completada por {agent_name}",
+    "task_failed": "Tarea {task_id} falló: {error}",
+    "context_shared": "Contexto compartido con {count} agentes",
+    "workflow_started": "Flujo de trabajo iniciado: {workflow_id}",
+    "workflow_completed": "Flujo de trabajo completado: {workflow_id}"
+  },
+  "tasks": {
+    "success": "✅ Tarea {name} [{task_id}] completada exitosamente",
+    "failure": "❌ Tarea {name} [{task_id}] falló: {error}",
+    "retry": "🔄 Tarea {name} [{task_id}] reintentando: {error}",
+    "approval_notification_sent": "📬 Notificación de aprobación enviada para acción {action_id}",
+    "data_processed": "📊 Procesada ingestión de datos: {file_path}",
+    "data_validated": "✅ Validación de datos completada",
+    "report_generated": "📈 Generado informe {report_type}",
+    "metrics_exported": "📤 Métricas exportadas a {file_path}",
+    "health_check": "✅ Todos los agentes saludables",
+    "unhealthy_agents": "⚠️ Agentes no saludables detectados: {agents}",
+    "performance_snapshot": "📸 Capturada instantánea de rendimiento",
+    "proposals_generated": "💡 Generadas {count} propuestas de mejora de rendimiento"
+  },
+  "watchdog": {
+    "agent_registered": "Agente {agent_name} registrado con watchdog",
+    "agent_healthy": "Agente {agent_name} está saludable",
+    "agent_unhealthy": "Agente {agent_name} no está saludable",
+    "notification_sent": "Enviada notificación {notification_type} a {recipient}",
+    "violation_detected": "Violación de política detectada: {violation}",
+    "status_retrieved": "Estado del sistema recuperado: {agent_count} agentes"
+  },
+  "performance": {
+    "kpi_summary": "Resumen de KPI: Tasa de Aprobación {approval_rate}%, Tiempo de Respuesta Promedio {response_time}ms",
+    "proposal_created": "Propuesta de mejora de rendimiento creada: {title}",
+    "threshold_exceeded": "Umbral de rendimiento excedido: {metric} = {value}"
+  },
+  "data_pipeline": {
+    "ingestion_started": "Iniciada ingestión de datos desde {source}",
+    "ingestion_completed": "Ingestión de datos completada: {records} registros",
+    "validation_started": "Iniciada validación de datos",
+    "validation_completed": "Validación de datos completada: {valid} válidos, {invalid} inválidos",
+    "preprocessing_completed": "Preprocesamiento de datos completado"
+  },
+  "report": {
+    "daily_summary": "Informe Resumen Diario",
+    "weekly_summary": "Informe Resumen Semanal",
+    "validation_report": "Informe de Validación de Datos",
+    "export_completed": "Informe exportado a {file_path}"
+  },
+  "errors": {
+    "generic": "Ocurrió un error: {error}",
+    "database": "Error de base de datos: {error}",
+    "validation": "Error de validación: {error}",
+    "timeout": "Operación agotó tiempo después de {seconds} segundos",
+    "unauthorized": "Intento de acceso no autorizado",
+    "not_found": "Recurso no encontrado: {resource}",
+    "already_exists": "Recurso ya existe: {resource}"
+  },
+  "system": {
+    "startup": "Sistema de Autonomía Limitada iniciando...",
+    "ready": "Sistema listo",
+    "shutdown": "Sistema apagándose...",
+    "shutdown_complete": "Apagado del sistema completo",
+    "redis_connected": "✅ Redis está ejecutándose",
+    "redis_error": "ERROR: ¡Redis no está ejecutándose!",
+    "celery_workers_started": "¡Todos los workers de Celery iniciados exitosamente!",
+    "celery_workers_stopped": "¡Todos los workers de Celery detenidos exitosamente!"
+  }
+}
