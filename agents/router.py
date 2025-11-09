@@ -15,26 +15,22 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime
-import re
 from difflib import SequenceMatcher
 
 from agents.loader import AgentConfigLoader, AgentConfig, LoaderError
-from core.agentlightning_integration import get_lightning, trace_agent
+from core.agentlightning_integration import trace_agent
 
 
 class RoutingError(Exception):
     """Base exception for routing errors"""
-    pass
 
 
 class NoAgentFoundError(RoutingError):
     """Raised when no suitable agent is found for a task"""
-    pass
 
 
 class TaskValidationError(RoutingError):
     """Raised when task validation fails"""
-    pass
 
 
 class TaskType(str, Enum):

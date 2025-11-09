@@ -10,7 +10,6 @@ Version: 1.0.0
 import asyncio
 import logging
 import sys
-import os
 from datetime import datetime
 from typing import Dict, Any
 

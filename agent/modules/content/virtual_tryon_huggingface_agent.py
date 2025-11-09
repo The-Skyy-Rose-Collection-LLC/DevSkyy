@@ -44,28 +44,19 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 import uuid
-import json
 
 logger = logging.getLogger(__name__)
 
 try:
     from PIL import Image
-    import numpy as np
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
 
 try:
     import torch
-    from diffusers import (
-        StableDiffusionXLPipeline,
-        ControlNetModel,
-        StableDiffusionXLControlNetPipeline,
-        AutoPipelineForText2Image,
-        AutoPipelineForImage2Image,
-    )
     DIFFUSERS_AVAILABLE = True
 except ImportError:
     DIFFUSERS_AVAILABLE = False

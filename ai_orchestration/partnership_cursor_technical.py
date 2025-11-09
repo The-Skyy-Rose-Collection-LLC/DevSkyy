@@ -9,7 +9,6 @@ Cursor Role: Real-time Development & Deployment Automation
 
 import asyncio
 import logging
-from datetime import datetime
 from typing import Dict, List, Any
 from dataclasses import dataclass
 
@@ -258,7 +257,6 @@ class ClaudeCursorTechnicalEngine:
                 logger.warning("psutil not available, using default system metrics")
                 psutil = None
 
-            import time
             import sys
             import os
 

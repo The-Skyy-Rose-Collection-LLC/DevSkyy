@@ -4,8 +4,6 @@ Testing SECRET_KEY handling, environment configuration, and application setup
 """
 
 import pytest
-import os
-from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 import logging
 

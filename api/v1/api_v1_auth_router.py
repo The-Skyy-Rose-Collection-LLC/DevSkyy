@@ -10,17 +10,11 @@ Date: October 26, 2025
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
 import logging
 
 from jwt_auth import (
-    AccessToken,
     RefreshTokenRequest,
-    UserCredentials,
     get_current_user,
-    login as jwt_login,
-    refresh as jwt_refresh,
-    hash_password,
     create_access_token,
     create_refresh_token,
     settings

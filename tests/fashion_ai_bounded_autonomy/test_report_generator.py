@@ -6,8 +6,6 @@ Tests report generation and formatting
 import pytest
 import tempfile
 import shutil
-from pathlib import Path
-from datetime import datetime
 
 from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 

@@ -3,7 +3,6 @@ Approval System for Bounded Autonomy
 Manages human review queue and approval workflows
 """
 
-import asyncio
 import json
 import sqlite3
 from datetime import datetime, timedelta

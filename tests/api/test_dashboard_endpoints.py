@@ -6,7 +6,7 @@ Testing dashboard data retrieval, metrics, agent status, and activities
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, MagicMock, patch, PropertyMock
+from unittest.mock import AsyncMock, patch
 from datetime import datetime, timedelta
 
 from main import app
@@ -558,14 +558,12 @@ class TestWebSocketEndpoint:
         # WebSocket testing with TestClient requires special handling
         # This is a placeholder for WebSocket connection test
         # In production, use pytest-asyncio with WebSocket test client
-        pass
 
     @pytest.mark.api
     @pytest.mark.unit
     def test_websocket_data_streaming(self, client):
         """Test WebSocket streams dashboard updates"""
         # Placeholder for WebSocket data streaming test
-        pass
 
 
 class TestDashboardEdgeCases:

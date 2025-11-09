@@ -10,17 +10,15 @@ Citation: RFC 2104 (HMAC: Keyed-Hashing for Message Authentication)
 import asyncio
 import hashlib
 import hmac
-import json
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 import httpx
 from pydantic import BaseModel, HttpUrl, validator
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
 

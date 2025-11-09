@@ -4,13 +4,10 @@ Tests KPI tracking and improvement proposal generation
 """
 
 import pytest
-import asyncio
 import tempfile
 import shutil
 import sqlite3
-import json
 from pathlib import Path
-from datetime import datetime, timedelta
 
 from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 

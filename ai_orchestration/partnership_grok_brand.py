@@ -9,10 +9,9 @@ GROK Role: Viral Content Creation & Social Automation
 
 import asyncio
 import logging
-import json
 import hashlib
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from datetime import datetime
+from typing import Dict, List, Any
 from dataclasses import dataclass
 import sys
 import os

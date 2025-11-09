@@ -12,7 +12,7 @@ Python: >=3.11.0
 import pytest
 import os
 from datetime import datetime, timedelta
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 # Set test JWT secret before importing jwt_auth
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-min-length-required"

@@ -5,12 +5,10 @@ Tests the enhanced quality update functionality with comprehensive error handlin
 """
 
 import requests
-import json
 import time
 import sys
 from pathlib import Path
 from PIL import Image
-import tempfile
 import shutil
 
 # Test configuration

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from redis.asyncio import ConnectionPool
 from redis.exceptions import ConnectionError, RedisError, TimeoutError
 import json
@@ -6,8 +6,7 @@ import redis.asyncio as redis
 import time
 
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Optional, Union
-import asyncio
+from typing import Any, Dict, List, Optional
 import hashlib
 import logging
 import pickle

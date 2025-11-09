@@ -6,13 +6,12 @@ from api_integration.workflow_engine import (
     workflow_engine,
     WorkflowTrigger,
 )
-from datetime import datetime, timedelta
+from datetime import datetime
 from fashion.intelligence_engine import (
     fashion_intelligence,
     FashionCategory,
     FashionSeason,
 )
-from typing import Any, Dict, List, Optional
 import asyncio
 import logging
 

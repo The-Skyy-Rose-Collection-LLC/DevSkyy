@@ -22,11 +22,7 @@ from agentlightning import (
     OtelTracer,
     AgentOpsTracer,
     LitAgent,
-    Trainer,
-    Rollout,
-    RolloutConfig,
     emit_reward,
-    emit_message,
     LLMProxy,
 )
 from opentelemetry import trace

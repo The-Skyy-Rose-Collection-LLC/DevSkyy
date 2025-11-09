@@ -1,16 +1,14 @@
-from datetime import datetime
 from pathlib import Path
-import os
 import sys
 import time
 
-from models_sqlalchemy import User, Product, Customer, Order, AgentLog, BrandAsset, Campaign
-from sqlalchemy import select, text, func
+from models_sqlalchemy import User, Product, AgentLog, BrandAsset
+from sqlalchemy import select, text
 
-from database import init_db, db_manager, get_db, AsyncSessionLocal
+from database import init_db, db_manager, AsyncSessionLocal
 from database_config import DATABASE_URL, DB_PROVIDER
 from dotenv import load_dotenv
-from typing import Dict, List, Tuple
+from typing import Dict
 import asyncio
 import logging
 

@@ -8,7 +8,7 @@ import asyncio
 import tempfile
 import shutil
 from pathlib import Path
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import Mock, AsyncMock
 
 from fashion_ai_bounded_autonomy.watchdog import Watchdog
 

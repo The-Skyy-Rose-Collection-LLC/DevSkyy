@@ -5,14 +5,11 @@ Enterprise-grade incident detection, response, and recovery automation
 """
 
 import asyncio
-import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Callable
+from datetime import datetime
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 import uuid
-import threading
-import time
 
 from monitoring.enterprise_logging import enterprise_logger, LogCategory
 from monitoring.enterprise_metrics import Alert, AlertSeverity, metrics_collector

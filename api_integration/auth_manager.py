@@ -1,20 +1,16 @@
 from datetime import datetime, timedelta
 from infrastructure.redis_manager import redis_manager
-import json
 import secrets
 import time
 
-from api_integration.discovery_engine import APIEndpoint, AuthenticationType
+from api_integration.discovery_engine import AuthenticationType
 from cryptography.fernet import Fernet
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import parse_qs, urlencode
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlencode
 import aiohttp
-import asyncio
 import base64
-import hashlib
-import jwt
 import logging
 
 """

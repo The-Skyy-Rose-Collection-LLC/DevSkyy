@@ -4,10 +4,8 @@ Google Drive Image Processor for Skyy Rose Collection
 Downloads, categorizes, and processes images from Google Drive for AI training
 """
 
-import os
 import re
 import requests
-import zipfile
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 import asyncio

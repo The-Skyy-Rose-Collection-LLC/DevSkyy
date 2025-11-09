@@ -1,21 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from infrastructure.elasticsearch_manager import elasticsearch_manager
-from infrastructure.notification_manager import notification_manager
 from infrastructure.redis_manager import redis_manager
 import json
 import time
 
-from aiohttp import ClientError, ClientTimeout
-from contextlib import asynccontextmanager
+from aiohttp import ClientTimeout
 from api_integration.auth_manager import auth_manager, rate_limit_manager
-from api_integration.discovery_engine import (
-    discovery_engine,
-)
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, Optional
 import aiohttp
-import asyncio
 import hashlib
 import logging
 import uuid
@@ -28,8 +22,6 @@ data transformation pipelines, and circuit breaker patterns for fault tolerance
 
 from api_integration.discovery_engine import (
     api_discovery_engine,
-    APICategory,
-    APIEndpoint,
 )
 
 logger = logging.getLogger(__name__)

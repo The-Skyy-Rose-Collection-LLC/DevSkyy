@@ -16,12 +16,9 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import asyncio
 import json
 import os
-import sys
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import httpx

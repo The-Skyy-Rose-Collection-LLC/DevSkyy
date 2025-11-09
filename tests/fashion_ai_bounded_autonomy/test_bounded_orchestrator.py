@@ -4,9 +4,6 @@ Tests bounded orchestration with approval workflows
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
 
 from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel

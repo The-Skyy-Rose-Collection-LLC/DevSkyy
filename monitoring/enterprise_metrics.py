@@ -5,15 +5,12 @@ Comprehensive metrics collection, alerting, and dashboard integration
 """
 
 import time
-import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-import json
 import threading
 from collections import defaultdict, deque
-import statistics
 
 # Prometheus imports (optional)
 try:

@@ -4,7 +4,6 @@ Tests to ensure .gitignore patterns are valid and comprehensive
 """
 
 import os
-import tempfile
 from pathlib import Path
 import pytest
 

@@ -6,7 +6,6 @@ Specialized agents for multimedia processing using HuggingFace, Claude, OpenAI
 
 import asyncio
 import logging
-import base64
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from pathlib import Path

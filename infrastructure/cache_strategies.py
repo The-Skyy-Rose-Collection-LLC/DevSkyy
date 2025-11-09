@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from infrastructure.redis_manager import redis_manager
-import json
 
 from dataclasses import dataclass
 from enum import Enum

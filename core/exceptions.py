@@ -70,42 +70,34 @@ class DevSkyyError(Exception):
 
 class AuthenticationError(DevSkyyError):
     """Base authentication error"""
-    pass
 
 
 class InvalidCredentialsError(AuthenticationError):
     """Invalid username or password"""
-    pass
 
 
 class TokenExpiredError(AuthenticationError):
     """JWT token has expired"""
-    pass
 
 
 class TokenInvalidError(AuthenticationError):
     """JWT token is invalid or malformed"""
-    pass
 
 
 class TokenMissingError(AuthenticationError):
     """JWT token is missing from request"""
-    pass
 
 
 class AuthorizationError(DevSkyyError):
     """Base authorization error"""
-    pass
 
 
 class InsufficientPermissionsError(AuthorizationError):
     """User lacks required permissions"""
-    pass
 
 
 class RoleRequiredError(AuthorizationError):
     """Specific role required but not assigned"""
-    pass
 
 
 # ============================================================================
@@ -115,37 +107,30 @@ class RoleRequiredError(AuthorizationError):
 
 class DatabaseError(DevSkyyError):
     """Base database error"""
-    pass
 
 
 class ConnectionError(DatabaseError):
     """Database connection failed"""
-    pass
 
 
 class QueryError(DatabaseError):
     """Database query failed"""
-    pass
 
 
 class TransactionError(DatabaseError):
     """Database transaction failed"""
-    pass
 
 
 class RecordNotFoundError(DatabaseError):
     """Database record not found"""
-    pass
 
 
 class DuplicateRecordError(DatabaseError):
     """Duplicate record constraint violation"""
-    pass
 
 
 class IntegrityError(DatabaseError):
     """Database integrity constraint violation"""
-    pass
 
 
 # ============================================================================
@@ -155,27 +140,22 @@ class IntegrityError(DatabaseError):
 
 class ValidationError(DevSkyyError):
     """Base validation error"""
-    pass
 
 
 class InvalidInputError(ValidationError):
     """Input data is invalid"""
-    pass
 
 
 class MissingFieldError(ValidationError):
     """Required field is missing"""
-    pass
 
 
 class InvalidFormatError(ValidationError):
     """Data format is invalid"""
-    pass
 
 
 class SchemaValidationError(ValidationError):
     """Schema validation failed"""
-    pass
 
 
 # ============================================================================
@@ -185,27 +165,22 @@ class SchemaValidationError(ValidationError):
 
 class NetworkError(DevSkyyError):
     """Base network error"""
-    pass
 
 
 class RequestTimeoutError(NetworkError):
     """Request timed out"""
-    pass
 
 
 class RequestFailedError(NetworkError):
     """HTTP request failed"""
-    pass
 
 
 class ConnectionTimeoutError(NetworkError):
     """Connection timed out"""
-    pass
 
 
 class ServiceUnavailableError(NetworkError):
     """External service unavailable"""
-    pass
 
 
 # ============================================================================
@@ -215,27 +190,22 @@ class ServiceUnavailableError(NetworkError):
 
 class BusinessLogicError(DevSkyyError):
     """Base business logic error"""
-    pass
 
 
 class InvalidStateError(BusinessLogicError):
     """Invalid state for operation"""
-    pass
 
 
 class OperationNotAllowedError(BusinessLogicError):
     """Operation not allowed in current context"""
-    pass
 
 
 class QuotaExceededError(BusinessLogicError):
     """Quota or limit exceeded"""
-    pass
 
 
 class ResourceConflictError(BusinessLogicError):
     """Resource conflict detected"""
-    pass
 
 
 # ============================================================================
@@ -245,22 +215,18 @@ class ResourceConflictError(BusinessLogicError):
 
 class ConfigurationError(DevSkyyError):
     """Base configuration error"""
-    pass
 
 
 class MissingConfigurationError(ConfigurationError):
     """Required configuration missing"""
-    pass
 
 
 class InvalidConfigurationError(ConfigurationError):
     """Configuration value is invalid"""
-    pass
 
 
 class EnvironmentError(ConfigurationError):
     """Environment variable error"""
-    pass
 
 
 # ============================================================================
@@ -270,27 +236,22 @@ class EnvironmentError(ConfigurationError):
 
 class ExternalAPIError(DevSkyyError):
     """Base external API error"""
-    pass
 
 
 class APIKeyMissingError(ExternalAPIError):
     """API key is missing"""
-    pass
 
 
 class APIKeyInvalidError(ExternalAPIError):
     """API key is invalid"""
-    pass
 
 
 class APIRateLimitError(ExternalAPIError):
     """API rate limit exceeded"""
-    pass
 
 
 class APIResponseError(ExternalAPIError):
     """API returned error response"""
-    pass
 
 
 # ============================================================================
@@ -300,27 +261,22 @@ class APIResponseError(ExternalAPIError):
 
 class FileSystemError(DevSkyyError):
     """Base file system error"""
-    pass
 
 
 class FileNotFoundError(FileSystemError):
     """File not found"""
-    pass
 
 
 class FilePermissionError(FileSystemError):
     """Insufficient file permissions"""
-    pass
 
 
 class DiskSpaceError(FileSystemError):
     """Insufficient disk space"""
-    pass
 
 
 class FileCorruptedError(FileSystemError):
     """File is corrupted"""
-    pass
 
 
 # ============================================================================
@@ -330,32 +286,26 @@ class FileCorruptedError(FileSystemError):
 
 class AgentError(DevSkyyError):
     """Base agent error"""
-    pass
 
 
 class AgentNotFoundError(AgentError):
     """Agent not found"""
-    pass
 
 
 class AgentNotAvailableError(AgentError):
     """Agent not available"""
-    pass
 
 
 class AgentExecutionError(AgentError):
     """Agent execution failed"""
-    pass
 
 
 class AgentTimeoutError(AgentError):
     """Agent execution timed out"""
-    pass
 
 
 class AgentCircuitBreakerError(AgentError):
     """Agent circuit breaker is open"""
-    pass
 
 
 # ============================================================================
@@ -365,32 +315,26 @@ class AgentCircuitBreakerError(AgentError):
 
 class MLError(DevSkyyError):
     """Base ML/AI error"""
-    pass
 
 
 class ModelNotFoundError(MLError):
     """ML model not found"""
-    pass
 
 
 class ModelLoadError(MLError):
     """Failed to load ML model"""
-    pass
 
 
 class PredictionError(MLError):
     """Prediction failed"""
-    pass
 
 
 class TrainingError(MLError):
     """Model training failed"""
-    pass
 
 
 class InvalidModelError(MLError):
     """Model is invalid or corrupted"""
-    pass
 
 
 # ============================================================================
@@ -400,37 +344,30 @@ class InvalidModelError(MLError):
 
 class SecurityError(DevSkyyError):
     """Base security error"""
-    pass
 
 
 class EncryptionError(SecurityError):
     """Encryption operation failed"""
-    pass
 
 
 class DecryptionError(SecurityError):
     """Decryption operation failed"""
-    pass
 
 
 class HashingError(SecurityError):
     """Hashing operation failed"""
-    pass
 
 
 class SignatureError(SecurityError):
     """Signature verification failed"""
-    pass
 
 
 class SQLInjectionAttemptError(SecurityError):
     """SQL injection attempt detected"""
-    pass
 
 
 class XSSAttemptError(SecurityError):
     """XSS attempt detected"""
-    pass
 
 
 # ============================================================================
@@ -440,22 +377,18 @@ class XSSAttemptError(SecurityError):
 
 class PerformanceError(DevSkyyError):
     """Base performance error"""
-    pass
 
 
 class PerformanceThresholdError(PerformanceError):
     """Performance threshold exceeded"""
-    pass
 
 
 class MemoryError(PerformanceError):
     """Memory limit exceeded"""
-    pass
 
 
 class CPUError(PerformanceError):
     """CPU limit exceeded"""
-    pass
 
 
 # ============================================================================
@@ -465,22 +398,18 @@ class CPUError(PerformanceError):
 
 class ComplianceError(DevSkyyError):
     """Base compliance error"""
-    pass
 
 
 class GDPRViolationError(ComplianceError):
     """GDPR compliance violation"""
-    pass
 
 
 class DataRetentionError(ComplianceError):
     """Data retention policy violation"""
-    pass
 
 
 class ConsentError(ComplianceError):
     """User consent required but not given"""
-    pass
 
 
 # ============================================================================

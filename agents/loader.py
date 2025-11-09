@@ -8,7 +8,6 @@ Truth Protocol: Pydantic validation, no placeholders, explicit error handling.
 """
 
 import json
-import os
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
@@ -19,17 +18,14 @@ from pydantic import BaseModel, Field, validator, ValidationError
 
 class LoaderError(Exception):
     """Base exception for configuration loading errors"""
-    pass
 
 
 class ConfigValidationError(LoaderError):
     """Raised when configuration validation fails"""
-    pass
 
 
 class ConfigNotFoundError(LoaderError):
     """Raised when configuration file is not found"""
-    pass
 
 
 @dataclass

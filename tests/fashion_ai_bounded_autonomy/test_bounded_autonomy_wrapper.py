@@ -4,17 +4,13 @@ Tests wrapping agents with bounded autonomy controls
 """
 
 import pytest
-import asyncio
 import tempfile
 import shutil
 from pathlib import Path
-from datetime import datetime
-from unittest.mock import Mock, AsyncMock, patch
 
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import (
     BoundedAutonomyWrapper,
     ActionRiskLevel,
-    ApprovalStatus,
     BoundedAction
 )
 from agent.modules.base_agent import BaseAgent, AgentStatus

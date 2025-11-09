@@ -3,15 +3,12 @@ Integration Tests for API Endpoints
 Tests for complete API workflows with database and external services
 """
 
-import asyncio
 
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
-from database import get_db
 from main import app
-from security.jwt_auth import create_user_tokens
 
 
 class TestHealthEndpoints:

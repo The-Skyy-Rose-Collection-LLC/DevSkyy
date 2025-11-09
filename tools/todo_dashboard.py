@@ -1,16 +1,10 @@
-from datetime import datetime
-from fastapi.responses import HTMLResponse, JSONResponse
-from pathlib import Path
-import json
-import os
+from fastapi.responses import HTMLResponse
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 import uvicorn
 from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 #!/usr/bin/env python3
 """

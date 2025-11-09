@@ -6,7 +6,7 @@ Testing scanner and fixer agent execution endpoints with various scenarios
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 from datetime import datetime
 
 from main import app

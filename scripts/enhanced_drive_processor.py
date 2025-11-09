@@ -5,15 +5,13 @@ Handles shared Google Drive folders with direct download capabilities
 """
 
 import os
-import re
 import requests
 import json
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any
 import asyncio
 import logging
 from datetime import datetime
-from urllib.parse import urlparse, parse_qs
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

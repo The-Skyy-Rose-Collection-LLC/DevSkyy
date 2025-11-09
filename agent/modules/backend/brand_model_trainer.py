@@ -1,8 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-import os
 import json
-import shutil
 from typing import Any, Dict, List, Optional, Union, Tuple
 import asyncio
 import logging
@@ -10,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import torch
 from PIL import Image, ImageOps
-from diffusers import StableDiffusionXLPipeline, DiffusionPipeline
+from diffusers import StableDiffusionXLPipeline
 from transformers import Blip2Processor, Blip2ForConditionalGeneration
 from peft import LoraConfig, get_peft_model, TaskType
 import numpy as np

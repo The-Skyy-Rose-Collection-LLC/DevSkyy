@@ -8,7 +8,7 @@ References:
 - OWASP Top 10: Security best practices
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
 from fastapi.testclient import TestClient
@@ -20,7 +20,6 @@ from security.jwt_auth import (
     create_access_token,
     create_refresh_token,
     hash_password,
-    user_manager,
     UserRole,
     verify_password,
     verify_token,

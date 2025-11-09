@@ -8,24 +8,21 @@ Version: 5.1.0 Enterprise
 Python: >=3.11
 """
 
-import asyncio
-import json
 import logging
 import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 # Core FastAPI imports
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # Prometheus monitoring
@@ -62,7 +59,6 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 # DevSkyy core imports with error handling
 try:
-    from agent.enhanced_agent_manager import EnhancedAgentManager
     from agent.orchestrator import AgentOrchestrator
     from agent.registry import AgentRegistry
     from ml.model_registry import ModelRegistry
@@ -77,9 +73,8 @@ except ImportError as e:
 try:
     from security.encryption_v2 import EncryptionManager
     from security.gdpr_compliance import GDPRManager
-    from security.input_validation import input_sanitizer, validation_middleware
+    from security.input_validation import validation_middleware
     from security.jwt_auth import JWTManager
-    from security.secure_headers import security_headers_manager
 
     SECURITY_MODULES_AVAILABLE = True
 except ImportError as e:
@@ -88,7 +83,7 @@ except ImportError as e:
 
 # Webhook system
 try:
-    from webhooks.webhook_system import webhook_manager, WebhookManager
+    from webhooks.webhook_system import WebhookManager
 
     WEBHOOK_SYSTEM_AVAILABLE = True
 except ImportError as e:
