@@ -1,16 +1,15 @@
 from api_integration.core_engine import api_gateway
-from datetime import datetime, timedelta
+from datetime import datetime
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.notification_manager import notification_manager
 from infrastructure.redis_manager import redis_manager
-import json
 import time
 
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from fashion.intelligence_engine import fashion_intelligence
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 import ast
 import asyncio
 import logging
@@ -158,12 +157,10 @@ class WorkflowAction(ABC):
         self, step: WorkflowStep, context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Execute the workflow action"""
-        pass
 
     @abstractmethod
     async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
         """Rollback the workflow action"""
-        pass
 
 class APICallAction(WorkflowAction):
     """API call workflow action"""

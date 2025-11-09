@@ -16,7 +16,6 @@ import sys
 import argparse
 import json
 from pathlib import Path
-from datetime import datetime
 from typing import Optional
 
 # Add parent directory to path

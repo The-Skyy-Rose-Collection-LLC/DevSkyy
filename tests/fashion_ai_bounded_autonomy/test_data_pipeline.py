@@ -4,7 +4,6 @@ Tests data ingestion, validation, and processing
 """
 
 import pytest
-import asyncio
 import tempfile
 import shutil
 from pathlib import Path

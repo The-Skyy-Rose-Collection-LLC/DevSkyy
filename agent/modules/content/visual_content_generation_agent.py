@@ -23,13 +23,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 import hashlib
 import json
 
 # Third-party imports (with graceful fallbacks)
 try:
-    from PIL import Image
     import numpy as np
     PIL_AVAILABLE = True
 except ImportError:

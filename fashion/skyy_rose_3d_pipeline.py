@@ -4,16 +4,14 @@ Skyy Rose Collection 3D Model Pipeline
 Enterprise-grade 3D model processing and avatar system for luxury fashion
 """
 
-import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Union, Tuple
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 import json
 import hashlib
-import base64
 
 logger = logging.getLogger(__name__)
 

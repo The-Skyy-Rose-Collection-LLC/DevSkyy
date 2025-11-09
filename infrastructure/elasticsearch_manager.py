@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 import time
 
 from dataclasses import dataclass
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError
-from typing import Any, Dict, List, Optional, Union
-import asyncio
+from typing import Any, Dict, List, Optional
 import logging
 
 """

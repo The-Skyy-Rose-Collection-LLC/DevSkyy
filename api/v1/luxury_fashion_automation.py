@@ -57,7 +57,6 @@ except ImportError:
 
 # Input sanitization (OWASP compliance)
 try:
-    from security.input_validation import input_sanitizer
     INPUT_VALIDATION_AVAILABLE = True
 except ImportError:
     INPUT_VALIDATION_AVAILABLE = False
@@ -90,8 +89,6 @@ except ImportError:
 try:
     from agent.modules.marketing.marketing_campaign_orchestrator import (
         marketing_orchestrator,
-        CampaignType,
-        Channel as MarketingChannel,
     )
     MARKETING_AGENT_AVAILABLE = True
 except ImportError:
@@ -105,7 +102,6 @@ try:
         RecoveryStrategy,
         CodeGenerationRequest as CodeGenRequest,
         CodeRecoveryRequest,
-        WebScrapingRequest,
     )
     CODE_AGENT_AVAILABLE = True
 except ImportError:

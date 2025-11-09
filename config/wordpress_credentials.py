@@ -7,7 +7,6 @@ Secure credential handling with environment variables and validation
 import os
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
-from pathlib import Path
 import logging
 from dotenv import load_dotenv
 

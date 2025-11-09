@@ -2,15 +2,14 @@ import json
 import logging
 import os
 from authlib.common.security import generate_token
-from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from datetime import timedelta
+from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 from security.auth0_integration import (
     auth0_oauth_client,
     create_devskyy_jwt_token,
     create_devskyy_refresh_token,
-    get_user_info_from_token,
     log_auth_event,
     verify_devskyy_jwt_token,
 )

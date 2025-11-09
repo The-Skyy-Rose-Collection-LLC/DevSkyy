@@ -1,21 +1,16 @@
-from datetime import datetime, timedelta
-from infrastructure.elasticsearch_manager import elasticsearch_manager
+from datetime import datetime
 from infrastructure.redis_manager import redis_manager
-import json
 import os
-import re
 import time
 
 from dataclasses import asdict, dataclass
 from enum import Enum
 from fashion.intelligence_engine import fashion_intelligence
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urljoin, urlparse
+from typing import Any, Dict, List, Optional
 import aiohttp
 import asyncio
 import hashlib
 import logging
-import yaml
 
 """
 Automated API Discovery & Evaluation Framework

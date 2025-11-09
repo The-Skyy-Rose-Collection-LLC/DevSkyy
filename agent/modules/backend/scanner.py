@@ -9,7 +9,6 @@ import importlib.util
 from . import http_client
 from .telemetry import Telemetry
 from typing import Any, Dict, List
-import ast
 import logging
 
 logging.basicConfig(level=logging.INFO)

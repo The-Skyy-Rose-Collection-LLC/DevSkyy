@@ -9,7 +9,7 @@ import json
 import sys
 import traceback
 from datetime import datetime
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 import uuid

@@ -4,9 +4,7 @@ Tests human review queue and approval workflow management
 """
 
 import pytest
-import asyncio
 import sqlite3
-import json
 from datetime import datetime, timedelta
 from pathlib import Path
 import tempfile

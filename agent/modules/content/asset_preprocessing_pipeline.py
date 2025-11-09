@@ -30,8 +30,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import uuid
-import hashlib
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +42,6 @@ except ImportError:
     logger.warning("PIL not available")
 
 try:
-    import torch
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False

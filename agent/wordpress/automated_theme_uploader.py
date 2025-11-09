@@ -4,20 +4,16 @@ Automated WordPress Theme Uploader & Deployment System
 Enterprise-grade theme deployment with multiple upload methods and validation
 """
 
-import asyncio
 import ftplib
 import paramiko
 import requests
 import zipfile
 import tempfile
-import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum
-import json
-import logging
 import base64
 import hashlib
 

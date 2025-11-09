@@ -3,15 +3,13 @@ Unit Tests for Authentication System
 Tests for enhanced JWT authentication, validation, and security features
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from api.validation_models import EnhancedLoginRequest, EnhancedRegisterRequest
+from api.validation_models import EnhancedRegisterRequest
 from main import app
 from security.jwt_auth import (
     blacklist_token,

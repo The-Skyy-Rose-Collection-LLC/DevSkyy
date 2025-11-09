@@ -15,12 +15,9 @@ import logging
 
 from webhook_system import (
     webhook_manager,
-    WebhookEvent,
-    WebhookSubscription,
-    WebhookDelivery,
-    DeliveryStatus
+    WebhookEvent
 )
-from jwt_auth import get_current_user, get_current_admin
+from jwt_auth import get_current_user
 
 logger = logging.getLogger(__name__)
 

@@ -1,19 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import time
 
 from fastapi import HTTPException, Request, status
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 
 import hmac
 from enum import Enum
-from httpx import AsyncClient, RequestError, TimeoutException
-from typing import Any, Callable, Dict, List, Optional, Union
-from urllib.parse import urljoin
-import asyncio
+from httpx import AsyncClient
+from typing import Any, Callable, Dict, List, Optional
 import base64
-import hashlib
-import httpx
 import logging
 
 """

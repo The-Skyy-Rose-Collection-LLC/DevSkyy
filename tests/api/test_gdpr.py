@@ -1,4 +1,3 @@
-from datetime import datetime
 from security.jwt_auth import create_access_token, UserRole
 
 from fastapi.testclient import TestClient

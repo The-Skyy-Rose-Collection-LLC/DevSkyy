@@ -104,7 +104,6 @@ class DatabaseManager:
             self.connected = True
             return {"status": "connected", "type": "SQLAlchemy", "url": DATABASE_URL}
         except Exception as e:
-            from core.exceptions import ConnectionError as DBConnectionError
             logger.error(f"Database connection failed: {e}")
             return {"status": "failed", "error": str(e)}
 
@@ -149,7 +148,6 @@ class DatabaseManager:
                     ),
                 }
         except (Exception,) as e:
-            from core.exceptions import DatabaseError
             logger.warning(f"Database health check failed: {e}")
             return {"status": "unhealthy", "connected": False, "error": str(e)}
 

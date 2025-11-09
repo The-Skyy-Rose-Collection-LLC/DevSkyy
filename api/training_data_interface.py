@@ -1,25 +1,21 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks, Body
 from fastapi.responses import JSONResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 import shutil
 import zipfile
 from pathlib import Path
-import asyncio
 import logging
 from datetime import datetime
 import json
 import gc
 import tempfile
-import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import psutil
 
 # Production-grade image processing imports
 try:
-    from PIL import Image, ImageOps, ImageEnhance, ImageFilter
-    from PIL.ExifTags import TAGS
+    from PIL import Image, ImageOps, ImageEnhance
     PIL_AVAILABLE = True
 except ImportError:
     logger.error("PIL/Pillow not available - image processing will be limited")

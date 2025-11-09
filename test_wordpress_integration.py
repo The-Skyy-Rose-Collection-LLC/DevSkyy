@@ -6,11 +6,8 @@ Test all WordPress credential configurations and theme builder integration
 
 import asyncio
 import sys
-import os
 from pathlib import Path
-import json
 import tempfile
-import shutil
 
 # Add DevSkyy to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -22,10 +19,8 @@ async def test_credential_loading():
     
     try:
         from config.wordpress_credentials import (
-            wordpress_credentials_manager,
             get_skyy_rose_credentials,
-            validate_environment_setup,
-            list_configured_sites
+            validate_environment_setup
         )
         
         # Test environment validation

@@ -6,7 +6,7 @@ Monitors agent health, detects anomalies, and performs automatic recovery
 import asyncio
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 from pathlib import Path
 import json
 import yaml

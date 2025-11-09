@@ -1,16 +1,14 @@
 from datetime import datetime, timedelta
-from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from jose.backends import RSAKey
 import json
 import os
 
-from fastapi import HTTPException, status, Depends, Request, Response
+from fastapi import HTTPException, status, Depends, Request
 from pydantic import BaseModel
 from security.log_sanitizer import sanitize_for_log
 
-from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from dotenv import load_dotenv
 from functools import lru_cache

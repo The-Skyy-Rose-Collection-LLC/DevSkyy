@@ -1,11 +1,9 @@
 import logging
 import numpy as np
 import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
-from agent.modules.marketing_content_generation_agent import marketing_agent
 from fastapi import APIRouter, Depends, HTTPException
 from ml import explainer, model_registry, ModelStage, redis_cache
 from pydantic import BaseModel, Field
-from prometheus_client import Counter, Histogram
 from security.jwt_auth import get_current_active_user, require_developer, TokenData
 from typing import Any, Dict, List
 

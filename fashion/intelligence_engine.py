@@ -4,15 +4,12 @@ Comprehensive knowledge base and intelligence system for fashion industry contex
 Integrated into all agents for fashion-specific insights and decision making
 """
 
-import asyncio
-import json
 import logging
-import re
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

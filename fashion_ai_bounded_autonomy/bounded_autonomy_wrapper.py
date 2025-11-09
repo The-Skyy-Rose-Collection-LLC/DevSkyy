@@ -7,7 +7,6 @@ Wraps existing agents with bounded autonomy controls:
 - Deterministic execution tracking
 """
 
-import asyncio
 import json
 import logging
 from datetime import datetime
@@ -16,7 +15,7 @@ from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from agent.modules.base_agent import BaseAgent, AgentStatus
+from agent.modules.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
 

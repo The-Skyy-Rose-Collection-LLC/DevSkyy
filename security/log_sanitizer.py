@@ -4,7 +4,7 @@ Prevents log injection attacks by sanitizing user input before logging
 """
 
 import re
-from typing import Any, Optional
+from typing import Any
 
 
 def sanitize_for_log(value: Any, max_length: int = 200) -> str:

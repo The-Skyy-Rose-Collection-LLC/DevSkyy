@@ -3,23 +3,20 @@ from api_integration.workflow_engine import (
     ActionType,
     TriggerType,
     Workflow,
-    workflow_engine as workflow_engine_inst,
     WorkflowStep,
     WorkflowTrigger,
 )
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import asdict, dataclass
 from enum import Enum
 from fashion.intelligence_engine import (
     fashion_intelligence,
     FashionCategory,
-    FashionSeason,
 )
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List
 import asyncio
-import json
 import logging
 
 """

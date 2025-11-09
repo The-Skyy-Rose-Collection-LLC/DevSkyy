@@ -5,8 +5,6 @@ Tests for model registry, caching, explainability, and API endpoints
 
 import shutil
 import tempfile
-from datetime import datetime
-from pathlib import Path
 
 import numpy as np
 import pytest

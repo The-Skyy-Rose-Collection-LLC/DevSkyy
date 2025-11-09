@@ -15,7 +15,6 @@ from fashion_ai_bounded_autonomy import (
     BoundedOrchestrator,
     ApprovalSystem,
     DataPipeline,
-    Watchdog,
     PerformanceTracker,
     ReportGenerator
 )
