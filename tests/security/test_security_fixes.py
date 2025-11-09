@@ -71,7 +71,6 @@ class TestJWTSignatureVerification:
         
         # This should not raise an exception
         try:
-            pass
             # The function should work with proper key conversion
             assert True  # If we get here, the import worked
         except ImportError:
