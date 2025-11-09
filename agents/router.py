@@ -312,7 +312,7 @@ class AgentRouter:
 
         # Load all agent configs once (MCP efficiency)
         try:
-            all_agents = self.config_loader.get_enabled_agents()
+            self.config_loader.get_enabled_agents()
         except LoaderError as e:
             raise RoutingError(f"Failed to load agent configs: {str(e)}")
 
