@@ -26,7 +26,12 @@ except ImportError:
 
 @pytest.fixture
 def encryption_service():
-    """Create encryption service instance."""
+    """
+    Create an EncryptionService instance when the encryption module is available.
+    
+    Returns:
+        EncryptionService or None: An EncryptionService instance if the encryption module is available, `None` otherwise.
+    """
     if ENCRYPTION_AVAILABLE:
         return EncryptionService()
     return None
@@ -34,7 +39,12 @@ def encryption_service():
 
 @pytest.fixture
 def test_key():
-    """Generate a test encryption key."""
+    """
+    Create a 32-byte (256-bit) test encryption key.
+    
+    Returns:
+        bytes: A 32-byte encryption key suitable for AES-256 (randomly generated).
+    """
     if ENCRYPTION_AVAILABLE:
         return generate_encryption_key()
     return os.urandom(32)  # 256-bit key

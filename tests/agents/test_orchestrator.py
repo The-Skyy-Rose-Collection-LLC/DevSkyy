@@ -20,13 +20,23 @@ except ImportError:
 
 @pytest.fixture
 def orchestrator():
-    """Create a fresh orchestrator instance for each test."""
+    """
+    Create and return a fresh AgentOrchestrator instance for use by a test.
+    
+    Returns:
+        AgentOrchestrator: A new orchestrator instance with default configuration.
+    """
     return AgentOrchestrator()
 
 
 @pytest.fixture
 def mock_agent():
-    """Create a mock agent for testing."""
+    """
+    Create a lightweight mock agent with a preconfigured id, name, status, and an async execute method for tests.
+    
+    Returns:
+        MagicMock: A mock agent with `id` "test-agent-001", `name` "Test Agent", `status` "idle", and `execute` as an AsyncMock returning {"status": "success", "result": "done"}.
+    """
     agent = MagicMock()
     agent.id = "test-agent-001"
     agent.name = "Test Agent"
@@ -225,6 +235,12 @@ class TestErrorHandling:
         slow_agent.id = "slow-agent"
 
         async def slow_execute(*args, **kwargs):
+            """
+            Simulate a slow asynchronous task by waiting ten seconds and then returning a success payload.
+            
+            Returns:
+                dict: A dictionary with `"status": "success"`.
+            """
             await asyncio.sleep(10)  # Simulate slow task
             return {"status": "success"}
 
@@ -250,7 +266,11 @@ class TestPerformanceRequirements:
 
     @pytest.mark.asyncio
     async def test_p95_latency_under_200ms(self, orchestrator):
-        """P95 latency should be under 200ms per Truth Protocol."""
+        """
+        Measure the P95 latency of execute_task across 100 mock executions and assert it meets the test threshold.
+        
+        Runs 100 tasks against a mocked agent (via orchestrator.get_agent), records latencies for successful executions, computes the 95th-percentile latency, prints it for visibility, and asserts the P95 is below 500ms (test guideline; production target noted as 200ms).
+        """
         if not hasattr(orchestrator, 'execute_task'):
             pytest.skip("execute_task not available")
 
@@ -322,7 +342,11 @@ class TestTruthProtocolCompliance:
         assert hasattr(orchestrator, 'logger') or 'logger' in dir(orchestrator.__class__)
 
     def test_orchestrator_validates_inputs(self, orchestrator):
-        """Should validate all inputs per Truth Protocol."""
+        """
+        Asserts the orchestrator rejects invalid task inputs according to the Truth Protocol.
+        
+        If the orchestrator exposes `execute_task`, calling it with a task missing required fields must either raise an exception or return a result whose `"status"` is `"error"`.
+        """
         if hasattr(orchestrator, 'execute_task'):
             # Should reject invalid task format
             with pytest.raises(Exception):
@@ -332,7 +356,11 @@ class TestTruthProtocolCompliance:
                     assert result.get("status") == "error"
 
     def test_orchestrator_has_security_context(self, orchestrator):
-        """Should maintain security context per Truth Protocol."""
+        """
+        Verify the orchestrator exposes a security context attribute or allows security to be managed externally.
+        
+        Asserts that the orchestrator has at least one of the attributes 'auth', 'rbac', or 'security_context'. The assertion permits absence of these attributes to allow security to be enforced at the API layer.
+        """
         # Orchestrator should have security features
         assert (
             hasattr(orchestrator, 'auth') or
@@ -839,7 +867,11 @@ class TestOrchestratorDataSharing:
         assert retrieved == {"data": "value"}
 
     def test_share_data_with_ttl(self, orchestrator):
-        """Should respect TTL for shared data."""
+        """
+        Verifies that storing shared data with a TTL records the TTL and value in the orchestrator's shared_context.
+        
+        After calling share_data with a ttl, the shared_context entry for the key contains "ttl" equal to the provided ttl and "value" equal to the stored value.
+        """
         orchestrator.share_data("ttl_key", "test_value", ttl=3600)
 
         data_entry = orchestrator.shared_context["ttl_key"]
@@ -1003,10 +1035,26 @@ class TestOrchestratorConcurrency:
     async def test_shared_context_concurrent_access(self, orchestrator):
         """Should handle concurrent access to shared context."""
         async def write_data(key, value):
+            """
+            Store a value in the orchestrator's shared data store under the given key.
+            
+            Parameters:
+            	key (str): The key to store the value under.
+            	value: The value to associate with the key (type may vary).
+            """
             orchestrator.share_data(key, value)
             await asyncio.sleep(0.01)
 
         async def read_data(key):
+            """
+            Retrieve a value from the shared data store by key.
+            
+            Parameters:
+                key (str): The key identifying the shared data entry.
+            
+            Returns:
+                The stored value for `key`, or `None` if the key does not exist.
+            """
             return orchestrator.get_shared_data(key)
 
         # Concurrent writes
