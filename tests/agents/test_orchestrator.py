@@ -259,7 +259,7 @@ class TestErrorHandling:
 
             with patch.object(orchestrator, 'get_agent', return_value=slow_agent):
                 with pytest.raises(asyncio.TimeoutError):
-                    result = await asyncio.wait_for(
+                    await asyncio.wait_for(
                         orchestrator.execute_task(task),
                         timeout=2
                     )
