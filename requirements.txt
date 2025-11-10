@@ -10,10 +10,18 @@ setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
 
 # Core Framework (Latest Secure Versions)
 fastapi==0.119.0  # Includes starlette dependency - do not pin separately
-uvicorn[standard]==0.34.0
+flask==3.1.2  # Flask web framework (installed 2025-11-10)
+uvicorn[standard]==0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency
 pydantic[email]==2.10.4  # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)
 python-dotenv==1.0.1
 email-validator==2.1.0  # Required for Pydantic email validation
+blinker==1.9.0  # Flask signaling support (updated from system 1.7.0)
+werkzeug==3.1.3  # WSGI utility library for Flask
+itsdangerous==2.2.0  # Secure data signing for Flask
+
+# Agent Framework & MCP
+claude-agent-sdk==0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)
+mcp==1.21.0  # Model Context Protocol - official implementation
 
 # Agent Observability & Training
 logfire[fastapi]==4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)
@@ -51,15 +59,18 @@ safety==3.2.11  # Vulnerability scanning
 
 # AI & ML (Latest Stable)
 anthropic==0.69.0  # Latest version
-openai==2.3.0  # Latest version
-transformers==4.53.0  # Updated - Fixed all known CVEs (PYSEC-2024-227, 228, 229, 2025-40, GHSA-6rvg-6v2m-4j46, fpwr-67px-3qhx, q2wp-rjmx-x6x9, jjph-296x-mrcr, phhr-52qp-3mj4, 37mw-44qp-f5jm, 9356-575x-2w9m, 59p9-h35m-wg4g, rcv9-qm8p-9p6j, 4w7r-h757-3r74)
+openai==2.7.2  # Latest version - Updated 2025-11-10
+huggingface_hub==0.36.0  # Hugging Face model hub client - Updated 2025-11-10
+transformers==4.57.1  # Latest version - Updated 2025-11-10
+tokenizers==0.22.1  # Required by transformers - Updated 2025-11-10
 torch==2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes
 torchvision==0.20.0  # Compatible with torch 2.9.0
 # SECURITY: Updated to latest torch version to fix known vulnerabilities
-diffusers==0.31.0
+diffusers==0.35.2  # Latest version - Updated 2025-11-10
+safetensors==0.6.2  # Safe tensor serialization - Updated 2025-11-10
 sentence-transformers==3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
 scikit-learn==1.5.2
-numpy==1.26.4  # Compatible version
+numpy==2.3.4  # Updated 2025-11-10
 pandas==2.3.3  # Updated for security fixes
 # tensorflow==2.16.2  # Disabled due to system compatibility issues - will re-enable in Phase 3
 xgboost==2.1.3
@@ -67,7 +78,7 @@ lightgbm==4.6.0  # Updated to fix PYSEC-2024-231 vulnerability
 
 # Computer Vision & Image Processing
 opencv-python==4.11.0.86  # Updated
-pillow==11.1.0  # Latest security fix
+pillow==12.0.0  # Latest version - Updated 2025-11-10
 imagehash==4.3.2
 
 # Video Processing & Generation

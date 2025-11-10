@@ -29,6 +29,13 @@ from pydantic import BaseModel, Field
 
 from services.mcp_client import MCPToolClient, MCPToolError
 
+# Logfire for observability
+try:
+    import logfire
+    LOGFIRE_AVAILABLE = True
+except ImportError:
+    LOGFIRE_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -810,10 +817,36 @@ class ConsensusOrchestrator:
         Returns:
             WorkflowState ready for human approval
         """
+        # Create logfire span for entire workflow
+        span_attrs = {
+            "topic": topic,
+            "keywords": keywords,
+            "tone": tone,
+            "length": length,
+        }
+
+        if LOGFIRE_AVAILABLE:
+            with logfire.span("consensus_workflow", **span_attrs):
+                return await self._execute_workflow_internal(topic, keywords, tone, length)
+        else:
+            return await self._execute_workflow_internal(topic, keywords, tone, length)
+
+    async def _execute_workflow_internal(
+        self, topic: str, keywords: List[str], tone: str, length: int
+    ) -> WorkflowState:
+        """Internal workflow execution with instrumentation"""
+
         logger.info(f"Starting consensus workflow for: {topic}")
 
+        if LOGFIRE_AVAILABLE:
+            logfire.info("Consensus workflow started", topic=topic, keyword_count=len(keywords))
+
         # Step 1: Generate initial draft
-        current_draft = await self.generate_initial_draft(topic, keywords, tone, length)
+        if LOGFIRE_AVAILABLE:
+            with logfire.span("generate_initial_draft"):
+                current_draft = await self.generate_initial_draft(topic, keywords, tone, length)
+        else:
+            current_draft = await self.generate_initial_draft(topic, keywords, tone, length)
 
         # Initialize workflow state
         workflow = WorkflowState(
@@ -826,9 +859,26 @@ class ConsensusOrchestrator:
         for iteration in range(self.MAX_REDRAFT_ITERATIONS + 1):
             workflow.iteration_count = iteration
 
+            if LOGFIRE_AVAILABLE:
+                logfire.info("Starting review iteration", iteration=iteration, workflow_id=workflow.workflow_id)
+
             # Get consensus review
-            consensus = await self.review_draft(workflow.current_draft)
+            if LOGFIRE_AVAILABLE:
+                with logfire.span("review_draft", iteration=iteration):
+                    consensus = await self.review_draft(workflow.current_draft)
+            else:
+                consensus = await self.review_draft(workflow.current_draft)
+
             workflow.review_history.append(consensus)
+
+            if LOGFIRE_AVAILABLE:
+                logfire.info(
+                    "Review complete",
+                    iteration=iteration,
+                    requires_redraft=consensus.requires_redraft,
+                    approved_count=consensus.approved_count,
+                    major_issue_count=consensus.major_issue_count,
+                )
 
             if not consensus.requires_redraft:
                 logger.info("Consensus reached - no redraft needed")
@@ -838,15 +888,24 @@ class ConsensusOrchestrator:
                 logger.warning(
                     f"Max redraft iterations ({self.MAX_REDRAFT_ITERATIONS}) reached"
                 )
+                if LOGFIRE_AVAILABLE:
+                    logfire.warn("Max redraft iterations reached", iteration=iteration)
                 break
 
             # Redraft with feedback
             logger.info(
                 f"Redrafting (iteration {iteration + 1}/{self.MAX_REDRAFT_ITERATIONS})"
             )
-            new_draft = await self.redraft_content(
-                workflow.current_draft, consensus.consensus_feedback
-            )
+
+            if LOGFIRE_AVAILABLE:
+                with logfire.span("redraft_content", iteration=iteration):
+                    new_draft = await self.redraft_content(
+                        workflow.current_draft, consensus.consensus_feedback
+                    )
+            else:
+                new_draft = await self.redraft_content(
+                    workflow.current_draft, consensus.consensus_feedback
+                )
 
             workflow.current_draft = new_draft
             workflow.draft_history.append(new_draft)
@@ -862,6 +921,15 @@ class ConsensusOrchestrator:
         logger.info(
             f"Consensus workflow complete - ready for human approval: {workflow.workflow_id}"
         )
+
+        if LOGFIRE_AVAILABLE:
+            logfire.info(
+                "Consensus workflow complete",
+                workflow_id=workflow.workflow_id,
+                iterations=workflow.iteration_count,
+                draft_count=len(workflow.draft_history),
+                review_count=len(workflow.review_history),
+            )
 
         return workflow
 

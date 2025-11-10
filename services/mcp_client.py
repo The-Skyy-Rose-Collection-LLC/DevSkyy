@@ -23,6 +23,13 @@ from typing import Any, Dict, List, Optional
 from anthropic import Anthropic
 from pydantic import BaseModel, ValidationError
 
+# Logfire for observability
+try:
+    import logfire
+    LOGFIRE_AVAILABLE = True
+except ImportError:
+    LOGFIRE_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -187,18 +194,53 @@ class MCPToolClient:
         self.invocation_count += 1
         invocation_id = self.invocation_count
 
+        # Create logfire span for full observability
+        span_attrs = {
+            "tool_name": tool_name,
+            "category": category,
+            "invocation_id": invocation_id,
+            "model": model,
+            "max_tokens": max_tokens,
+        }
+
+        # Use logfire span if available
+        if LOGFIRE_AVAILABLE:
+            with logfire.span("mcp_tool_invocation", **span_attrs):
+                return await self._execute_tool_invocation(
+                    tool_name, category, inputs, model, max_tokens, invocation_id, tool_def=None
+                )
+        else:
+            return await self._execute_tool_invocation(
+                tool_name, category, inputs, model, max_tokens, invocation_id, tool_def=None
+            )
+
+    async def _execute_tool_invocation(
+        self,
+        tool_name: str,
+        category: str,
+        inputs: Dict[str, Any],
+        model: str,
+        max_tokens: int,
+        invocation_id: int,
+        tool_def: Optional[Dict] = None,
+    ) -> Dict[str, Any]:
+        """Internal method for executing tool invocation with instrumentation"""
+
         logger.info(
             f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}"
         )
 
-        # Load tool definition
-        tool_def = self.load_tool(tool_name, category)
+        # Load tool definition if not provided
+        if tool_def is None:
+            tool_def = self.load_tool(tool_name, category)
 
         # Validate inputs
         try:
             self._validate_inputs(inputs, tool_def.get("input_schema", {}))
         except MCPToolValidationError as e:
             logger.error(f"❌ Input validation failed: {e}")
+            if LOGFIRE_AVAILABLE:
+                logfire.error("MCP input validation failed", error=str(e))
             raise
 
         # Create prompt for AI
@@ -206,16 +248,36 @@ class MCPToolClient:
 
         # Invoke AI model
         if not self.anthropic_client:
-            raise MCPToolError(
-                "Anthropic API key not configured. Cannot invoke tool."
-            )
+            error_msg = "Anthropic API key not configured. Cannot invoke tool."
+            if LOGFIRE_AVAILABLE:
+                logfire.error("MCP client not configured", error=error_msg)
+            raise MCPToolError(error_msg)
 
         try:
+            # Log AI invocation start
+            if LOGFIRE_AVAILABLE:
+                logfire.info(
+                    "Invoking Anthropic Claude",
+                    model=model,
+                    max_tokens=max_tokens,
+                    tool=f"{category}.{tool_name}",
+                )
+
             response = self.anthropic_client.messages.create(
                 model=model,
                 max_tokens=max_tokens,
                 messages=[{"role": "user", "content": prompt}],
             )
+
+            # Log token usage
+            if LOGFIRE_AVAILABLE and hasattr(response, "usage"):
+                logfire.info(
+                    "AI response received",
+                    input_tokens=response.usage.input_tokens,
+                    output_tokens=response.usage.output_tokens,
+                    total_tokens=response.usage.input_tokens + response.usage.output_tokens,
+                    tool=f"{category}.{tool_name}",
+                )
 
             # Extract text response
             response_text = response.content[0].text
@@ -242,10 +304,31 @@ class MCPToolClient:
             logger.info(
                 f"✅ [Invocation #{invocation_id}] Tool executed successfully"
             )
+
+            # Log successful completion with result metadata
+            if LOGFIRE_AVAILABLE:
+                logfire.info(
+                    "MCP tool completed successfully",
+                    invocation_id=invocation_id,
+                    tool=f"{category}.{tool_name}",
+                    result_keys=list(result.keys()),
+                )
+
             return result
 
         except Exception as e:
             logger.error(f"❌ [Invocation #{invocation_id}] Tool execution failed: {e}")
+
+            # Log error with context
+            if LOGFIRE_AVAILABLE:
+                logfire.error(
+                    "MCP tool execution failed",
+                    invocation_id=invocation_id,
+                    tool=f"{category}.{tool_name}",
+                    error=str(e),
+                    error_type=type(e).__name__,
+                )
+
             raise
 
     def _validate_inputs(self, inputs: Dict, schema: Dict):
