@@ -555,16 +555,9 @@ try:
     @app.get("/mcp/sse")
     async def handle_mcp_sse(request: Request):
         """
-        MCP Server SSE endpoint
-
-        Exposes DevSkyy AI tools via Model Context Protocol:
-        - brand_intelligence_reviewer (content review)
-        - seo_marketing_reviewer (SEO analysis)
-        - security_compliance_reviewer (security scan)
-        - post_categorizer (WordPress automation)
-        - product_seo_optimizer (WooCommerce SEO)
-
-        External clients can connect via standard MCP protocol.
+        Serve an MCP Server SSE endpoint that exposes DevSkyy AI tools to MCP clients.
+        
+        Handles an incoming Server-Sent Events connection using the Model Context Protocol and delegates the session to the configured MCP server.
         """
         if LOGFIRE_AVAILABLE:
             logfire.info("MCP SSE connection requested", client_host=request.client.host)

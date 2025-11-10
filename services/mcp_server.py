@@ -44,10 +44,10 @@ class DevSkyyMCPServer:
 
     def __init__(self, mcp_client: Optional[MCPToolClient] = None):
         """
-        Initialize DevSkyy MCP Server
-
-        Args:
-            mcp_client: Optional custom MCP client (uses singleton if not provided)
+        Create a DevSkyy MCP server instance that exposes DevSkyy AI tools over the MCP protocol.
+        
+        Parameters:
+            mcp_client (Optional[MCPToolClient]): Optional custom MCP client to use. If not provided, the module singleton returned by `get_mcp_client()` will be used.
         """
         self.mcp_client = mcp_client or get_mcp_client()
         self.server = Server("devskyy-mcp-server")
@@ -56,19 +56,22 @@ class DevSkyyMCPServer:
         logger.info("✅ DevSkyy MCP Server initialized")
 
     def _register_handlers(self):
-        """Register MCP server handlers for initialization and tools"""
+        """
+        Register MCP handlers that expose available DevSkyy tools and handle tool invocations.
+        
+        This sets up two MCP endpoints on the server:
+        - A tool-listing handler that returns the Tool definitions for the available DevSkyy tools (brand_intelligence_reviewer, seo_marketing_reviewer, security_compliance_reviewer, post_categorizer, product_seo_optimizer).
+        - A call-tool handler that routes an invocation by tool name to the appropriate DevSkyy category, invokes the configured MCP tool client, and returns the tool result as a list containing a single TextContent with a JSON-formatted payload. For unknown tool names or execution errors the handler returns a TextContent containing a JSON-formatted error message.
+        """
 
         @self.server.list_tools()
         async def handle_list_tools() -> List[Tool]:
             """
-            List all available DevSkyy tools
-
-            Returns standard MCP Tool definitions for:
-            - brand_intelligence_reviewer
-            - seo_marketing_reviewer
-            - security_compliance_reviewer
-            - post_categorizer
-            - product_seo_optimizer
+            Provide Tool definitions for the DevSkyy MCP tools exposed by the server.
+            
+            Returns:
+                List[Tool]: Tool definitions for brand_intelligence_reviewer, seo_marketing_reviewer,
+                security_compliance_reviewer, post_categorizer, and product_seo_optimizer.
             """
             if LOGFIRE_AVAILABLE:
                 logfire.info("MCP Server: Listing tools")
@@ -204,19 +207,16 @@ class DevSkyyMCPServer:
         @self.server.call_tool()
         async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             """
-            Handle MCP tool invocation
-
-            Routes to appropriate DevSkyy tool based on name:
-            - Content review tools → content_review category
-            - post_categorizer → wordpress_automation category
-            - product_seo_optimizer → ecommerce_automation category
-
-            Args:
-                name: Tool name (e.g., "brand_intelligence_reviewer")
-                arguments: Tool input arguments
-
+            Handle invocation of a DevSkyy MCP tool and return its result as JSON text content.
+            
+            Routes the provided tool name to the appropriate internal category, invokes the configured MCP tool client with the given inputs, and returns the tool's output serialized as a single JSON-formatted TextContent. If the tool name is unknown or an error occurs during execution, returns a JSON-formatted error message as TextContent.
+            
+            Parameters:
+                name (str): The tool identifier (e.g., "brand_intelligence_reviewer", "post_categorizer", "product_seo_optimizer").
+                arguments (Dict[str, Any]): Inputs to pass to the tool; structure depends on the tool's input schema.
+            
             Returns:
-                List of TextContent with JSON result
+                List[TextContent]: A list containing one TextContent whose `text` is a JSON string of the tool result or an error object.
             """
             if LOGFIRE_AVAILABLE:
                 logfire.info("MCP Server: Tool invocation", tool_name=name)
@@ -262,10 +262,10 @@ class DevSkyyMCPServer:
 
     def get_server(self) -> Server:
         """
-        Get the MCP server instance
-
+        Return the configured MCP server instance.
+        
         Returns:
-            Configured MCP Server instance
+            Server: The configured MCP Server instance.
         """
         return self.server
 

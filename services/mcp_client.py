@@ -170,26 +170,25 @@ class MCPToolClient:
         max_tokens: int = 2000,
     ) -> Dict[str, Any]:
         """
-        Invoke MCP tool with AI execution
-
-        WHY: Standardized tool calling with schema validation
-        HOW: Load tool, validate inputs, invoke AI, validate outputs
-        IMPACT: Consistent behavior, proper error handling, audit trail
-
-        Args:
-            tool_name: Name of tool to invoke
-            category: Tool category
-            inputs: Tool inputs (must match input_schema)
-            model: Anthropic model to use
-            max_tokens: Maximum tokens for response
-
+        Invoke a named MCP tool via the configured AI model and return its validated output.
+        
+        Validates the provided inputs against the tool's input schema, sends a prompt to the Anthropic model, parses the model's JSON response, and validates the parsed output against the tool's output schema.
+        
+        Parameters:
+            tool_name (str): Name of the tool to invoke.
+            category (str): Category under which the tool is defined.
+            inputs (Dict[str, Any]): Input values for the tool; must satisfy the tool's input_schema.
+            model (str): Anthropic model identifier to use.
+            max_tokens (int): Maximum tokens allowed for the AI response.
+        
         Returns:
-            Tool output (matches output_schema)
-
+            Dict[str, Any]: The parsed tool output as a dictionary matching the tool's output_schema.
+        
         Raises:
-            MCPToolNotFoundError: If tool not found
-            MCPToolValidationError: If validation fails
-            Exception: If AI invocation fails
+            MCPToolNotFoundError: If the specified tool cannot be found in the schema.
+            MCPToolValidationError: If input validation fails or the AI-produced output does not meet output schema requirements.
+            MCPToolError: For client/configuration errors (for example, missing Anthropic client).
+            Exception: For other failures during AI invocation or response parsing.
         """
         self.invocation_count += 1
         invocation_id = self.invocation_count
@@ -224,7 +223,22 @@ class MCPToolClient:
         invocation_id: int,
         tool_def: Optional[Dict] = None,
     ) -> Dict[str, Any]:
-        """Internal method for executing tool invocation with instrumentation"""
+        """
+        Execute a single tool invocation with input validation, AI prompting, JSON parsing, and output validation, including optional observability logging.
+        
+        Validates inputs against the tool's input schema, constructs the prompt, calls the configured Anthropic client, extracts and parses a JSON response (including JSON inside Markdown code blocks), validates the parsed output against the tool's output schema, and returns the result dictionary. Logs invocation progress and errors; integrates with logfire when available.
+        
+        Parameters:
+            invocation_id (int): Numeric identifier used for logging and observability traces.
+            tool_def (Optional[Dict]): Optional preloaded tool definition (including `input_schema` and `output_schema`); if omitted the tool definition will be loaded from the schema store.
+        
+        Returns:
+            Dict[str, Any]: Parsed JSON result matching the tool's output schema.
+        
+        Raises:
+            MCPToolValidationError: If input validation fails.
+            MCPToolError: If the Anthropic client is not configured or other client-configuration errors occur.
+        """
 
         logger.info(
             f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}"
@@ -333,14 +347,16 @@ class MCPToolClient:
 
     def _validate_inputs(self, inputs: Dict, schema: Dict):
         """
-        Validate inputs against JSON schema
-
-        Args:
-            inputs: Input dictionary
-            schema: JSON schema definition
-
+        Validate that `inputs` conform to the provided JSON schema's required fields and basic types.
+        
+        This validation enforces presence of fields listed in `schema["required"]` and checks that values for fields declared in `schema["properties"]` match basic JSON Schema types: `string`, `integer`, `number`, `array`, and `object`. It does not perform full JSON Schema validation beyond these checks.
+        
+        Parameters:
+            inputs (Dict): Mapping of input names to values to validate.
+            schema (Dict): JSON schema fragment expected to contain optional `required` (list) and `properties` (mapping of field -> {"type": ...}).
+        
         Raises:
-            MCPToolValidationError: If validation fails
+            MCPToolValidationError: If a required field is missing or a field's value does not match the declared basic type.
         """
         required_fields = schema.get("required", [])
         properties = schema.get("properties", {})
