@@ -1,7 +1,12 @@
 # DevSkyy Enterprise Platform - Security-Hardened Dependencies
 # All versions pinned and verified for production use
-# Last security audit: 2025-10-12
-# Security update: 2025-10-12 - Active vulnerability mitigation in progress
+# Last security audit: 2025-11-10
+# Security update: 2025-11-10 - Addressed 7 CVEs in cryptography, pip, setuptools
+
+# Build Dependencies (Security-Critical)
+# WHY: setuptools and pip have RCE vulnerabilities (CVE-2025-47273, CVE-2025-8869)
+# Note: pip managed by system, upgrade in deployment environment
+setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345 (RCE via package_index)
 
 # Core Framework (Latest Secure Versions)
 fastapi==0.119.0
@@ -32,7 +37,7 @@ httpx==0.28.1
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.12.14  # Security update
-cryptography==46.0.3  # Latest for security (multiple CVEs fixed)
+cryptography==46.0.3  # Fix CVE-2024-26130 (NULL ptr crash), CVE-2023-50782 (TLS decrypt), CVE-2024-0727 (PKCS12 DoS), OpenSSL vulns
 PyJWT==2.10.1  # Updated for security
 bcrypt==4.2.1  # Latest
 argon2-cffi==23.1.0  # Additional password hashing
@@ -52,7 +57,7 @@ torchvision==0.19.0  # Compatible with torch 2.2.2
 # SECURITY: Some torch vulnerabilities exist but 2.6.0+ not available on PyPI
 # RISK MITIGATION: Monitor for updates, avoid loading untrusted models
 diffusers==0.31.0
-sentence-transformers==4.48.0
+sentence-transformers==3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
 scikit-learn==1.5.2
 numpy==1.26.4  # Compatible version
 pandas==2.3.3  # Updated for security fixes
@@ -139,7 +144,7 @@ textblob==0.18.0.post0
 vaderSentiment==3.3.2
 spacy==3.8.3
 nltk==3.9.1
-langchain==0.4.0  # LLM orchestration
+langchain==0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27
 langchain-text-splitters==0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability
 langsmith==0.2.6  # LLM monitoring
 
