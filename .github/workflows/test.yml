@@ -48,15 +48,14 @@ jobs:
       - name: Run unit tests for ${{ matrix.test-group }}
         run: |
           echo "Running unit tests for ${{ matrix.test-group }}..."
-          pytest tests/unit/${{ matrix.test-group }}/ \
+          pytest tests/${{ matrix.test-group }}/ \
             -v \
             --tb=short \
             --maxfail=10 \
             --cov=${{ matrix.test-group }} \
             --cov-report=xml:coverage-${{ matrix.test-group }}.xml \
             --cov-report=html:htmlcov-${{ matrix.test-group }} \
-            --junit-xml=junit-${{ matrix.test-group }}.xml \
-            || echo "::warning::Some tests failed in ${{ matrix.test-group }}"
+            --junit-xml=junit-${{ matrix.test-group }}.xml
 
       - name: Upload test results
         if: always()
@@ -65,6 +64,7 @@ jobs:
           name: unit-test-results-${{ matrix.test-group }}
           path: |
             coverage-${{ matrix.test-group }}.xml
+            .coverage
             htmlcov-${{ matrix.test-group }}/
             junit-${{ matrix.test-group }}.xml
           retention-days: 30
@@ -160,6 +160,7 @@ jobs:
           name: integration-test-results
           path: |
             coverage-integration.xml
+            .coverage
             htmlcov-integration/
             junit-integration.xml
           retention-days: 30
@@ -245,6 +246,7 @@ jobs:
           name: api-test-results
           path: |
             coverage-api.xml
+            .coverage
             htmlcov-api/
             junit-api.xml
           retention-days: 30
@@ -293,6 +295,7 @@ jobs:
           name: security-test-results
           path: |
             coverage-security.xml
+            .coverage
             htmlcov-security/
             junit-security.xml
           retention-days: 30
@@ -355,6 +358,7 @@ jobs:
           name: ml-test-results
           path: |
             coverage-ml.xml
+            .coverage
             htmlcov-ml/
             junit-ml.xml
           retention-days: 30
@@ -477,7 +481,14 @@ jobs:
       - name: Combine coverage reports
         run: |
           echo "Combining coverage reports..."
-          coverage combine coverage-reports/**/*.xml || true
+          # Find all .coverage files from downloaded artifacts
+          find coverage-reports -name ".coverage" -type f -exec echo "Found: {}" \;
+
+          # Combine all .coverage data files (not XML!)
+          # Each test job created a .coverage file that we now combine
+          coverage combine coverage-reports/**/.coverage
+
+          # Generate combined reports from the merged .coverage file
           coverage report --format=markdown > coverage-summary.md
           coverage html -d htmlcov-combined
           coverage json -o coverage.json

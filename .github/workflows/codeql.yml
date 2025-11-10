@@ -1,5 +1,30 @@
 name: CodeQL Security Analysis
 
+# ============================================================================
+# IMPORTANT: CodeQL Default Setup Conflict Resolution
+# ============================================================================
+#
+# This workflow may conflict with GitHub's default CodeQL setup.
+# If you see error: "CodeQL analyses from advanced configurations cannot be
+# processed when the default setup is enabled", follow these steps:
+#
+# OPTION 1: Disable Default CodeQL Setup (Recommended)
+#   1. Go to: Settings → Code security and analysis
+#   2. Find "Code scanning" section
+#   3. Click "Set up" → "Advanced" (or "Edit" if already configured)
+#   4. This will disable default setup and use this workflow instead
+#
+# OPTION 2: Disable This Workflow
+#   1. Delete or rename this file (.github/workflows/codeql.yml)
+#   2. Keep using GitHub's default CodeQL setup
+#
+# Why use this advanced workflow instead of default?
+# - Custom Semgrep rules integration
+# - Bandit SAST integration
+# - Custom security reporting
+# - Integration with other CI/CD workflows
+# ============================================================================
+
 on:
   push:
     branches: [main, develop]
@@ -108,11 +133,13 @@ jobs:
           echo "Running Bandit static analysis..."
           mkdir -p sast-results
 
+          # Allow Bandit to run and generate reports (don't fail on findings)
+          # Analysis step below will check for HIGH/CRITICAL issues
           bandit -r . \
             -f json \
             -o sast-results/bandit-sast.json \
             --exclude ./tests,./venv,./node_modules \
-            -ll
+            -ll || true
 
       - name: Run Semgrep SAST
         run: |
@@ -134,6 +161,7 @@ jobs:
         run: |
           python -c "
           import json
+          import os
 
           # Check Bandit results
           if os.path.exists('sast-results/bandit-sast.json'):

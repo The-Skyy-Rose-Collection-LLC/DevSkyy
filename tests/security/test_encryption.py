@@ -7,6 +7,8 @@ Validates AES-256-GCM implementation, key management, and NIST SP 800-38D compli
 
 import pytest
 import base64
+import binascii
+import logging
 import os
 from unittest.mock import patch, MagicMock
 
@@ -124,7 +126,15 @@ class TestAESGCMCompliance:
         # GCM produces: nonce + ciphertext + tag
         # Verify encrypted data is longer than plaintext (includes nonce + tag)
         if isinstance(encrypted, str):
-            encrypted_bytes = base64.b64decode(encrypted)
+            # Try base64 decode first, fall back to hex
+            try:
+                encrypted_bytes = base64.b64decode(encrypted, validate=True)
+            except (binascii.Error, ValueError):
+                # If not valid base64, try hex decoding
+                try:
+                    encrypted_bytes = bytes.fromhex(encrypted)
+                except ValueError:
+                    pytest.fail(f"Encrypted string is neither valid base64 nor hex: {encrypted[:50]}...")
         else:
             encrypted_bytes = encrypted
 
@@ -378,14 +388,19 @@ class TestTruthProtocolCompliance:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        encrypted = encryption_service.encrypt(sample_data, test_key)
-        decrypted = encryption_service.decrypt(encrypted, test_key)
+        # Capture ALL log levels (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        # Default caplog only captures WARNING+, but keys might leak at DEBUG/INFO
+        with caplog.at_level(logging.DEBUG):
+            encrypted = encryption_service.encrypt(sample_data, test_key)
+            decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        # Check logs don't contain key material
-        key_hex = test_key.hex() if isinstance(test_key, bytes) else str(test_key)
-        for record in caplog.records:
-            assert key_hex not in record.message
-            assert test_key not in str(record.args)
+            # Check logs don't contain key material at ANY level
+            key_hex = test_key.hex() if isinstance(test_key, bytes) else str(test_key)
+            for record in caplog.records:
+                assert key_hex not in record.message, \
+                    f"Key leaked in {record.levelname} log: {record.message}"
+                assert test_key not in str(record.args), \
+                    f"Key leaked in {record.levelname} log args: {record.args}"
 
 
 if __name__ == "__main__":

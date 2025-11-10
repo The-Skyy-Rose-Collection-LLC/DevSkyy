@@ -124,7 +124,7 @@ jobs:
           results = {
               'mean_latency_ms': statistics.mean(latencies),
               'median_latency_ms': statistics.median(latencies),
-              'p95_latency_ms': statistics.quantiles(latencies, n=20)[18],  # 95th percentile
+              'p95_latency_ms': statistics.quantiles(latencies, n=100)[94],  # 95th percentile (corrected)
               'p99_latency_ms': statistics.quantiles(latencies, n=100)[98],  # 99th percentile
               'min_latency_ms': min(latencies),
               'max_latency_ms': max(latencies),

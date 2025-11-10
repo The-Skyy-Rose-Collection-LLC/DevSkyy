@@ -97,16 +97,17 @@ jobs:
           echo "Running Bandit security linter..."
           mkdir -p security-reports
 
-          # Generate JSON report
+          # Generate JSON report (allow findings without failing)
           bandit -r . \
             -f json \
             -o security-reports/bandit-report.json \
             --exclude ./tests,./venv,./node_modules || true
 
-          # Generate human-readable report
+          # Generate human-readable report (allow findings without failing)
+          # Conditional check below will fail only on HIGH/CRITICAL issues
           bandit -r . \
             -f screen \
-            --exclude ./tests,./venv,./node_modules
+            --exclude ./tests,./venv,./node_modules || echo "::warning::Bandit found security issues (see report)"
 
       - name: Check for critical security issues
         run: |
