@@ -1,0 +1,140 @@
+{
+  "agent_id": "content_publisher",
+  "agent_name": "AI Content Publisher",
+  "agent_type": "content_automation",
+  "existing_services": {
+    "content_generation": "agent/wordpress/content_generator.py::ContentGenerator",
+    "wordpress_integration": "agent/modules/backend/wordpress_integration_service.py::WordPressIntegrationService",
+    "marketing_content": "agent/modules/marketing_content_generation_agent.py::MarketingContentGenerationAgent",
+    "credentials_manager": "config/wordpress_credentials.py::WordPressCredentialsManager"
+  },
+  "capabilities": [
+    {
+      "name": "ai_content_generation",
+      "confidence": 0.97,
+      "keywords": ["content", "article", "generate", "ai", "writing"],
+      "dependencies": ["anthropic"],
+      "service": "ContentGenerator",
+      "methods": ["generate_blog_post", "generate_page_content", "optimize_content"]
+    },
+    {
+      "name": "wordpress_publishing",
+      "confidence": 0.95,
+      "keywords": ["wordpress", "publish", "post", "blog"],
+      "dependencies": ["requests"],
+      "service": "WordPressIntegrationService",
+      "methods": ["create_luxury_collection_page", "update_site_content", "get_site_posts"]
+    },
+    {
+      "name": "image_search_retrieval",
+      "confidence": 0.92,
+      "keywords": ["image", "pexels", "stock", "photo"],
+      "dependencies": ["httpx"],
+      "service": "PexelsImageService",
+      "requires_api_key": "PEXELS_API_KEY"
+    },
+    {
+      "name": "content_scheduling",
+      "confidence": 0.90,
+      "keywords": ["schedule", "cron", "timer", "delay"],
+      "dependencies": ["celery"],
+      "service": "ContentScheduler",
+      "supports_random_delay": true
+    },
+    {
+      "name": "seo_optimization",
+      "confidence": 0.93,
+      "keywords": ["seo", "keywords", "meta", "optimization"],
+      "dependencies": [],
+      "service": "ContentGenerator",
+      "methods": ["optimize_content", "generate_meta_description"]
+    }
+  ],
+  "priority": 80,
+  "max_concurrent_tasks": 5,
+  "timeout_seconds": 900,
+  "retry_count": 2,
+  "enabled": true,
+  "metadata": {
+    "version": "1.0.0",
+    "engine": "openai-gpt4o+anthropic",
+    "source_workflow": "n8n_wordpress_content_automation",
+    "last_updated": "2025-11-10",
+    "description": "Automated content generation and publishing to WordPress with AI-generated articles, automatic image retrieval, and scheduled posting",
+    "workflow": {
+      "trigger_types": [
+        "schedule",
+        "manual",
+        "api_endpoint"
+      ],
+      "schedule": {
+        "days": ["tuesday", "thursday", "sunday"],
+        "time": "12:00",
+        "timezone": "UTC",
+        "random_delay": {
+          "enabled": true,
+          "min_hours": 0,
+          "max_hours": 6
+        }
+      },
+      "steps": [
+        "calculate_random_delay",
+        "wait_for_delay",
+        "generate_ai_content",
+        "save_to_google_sheets",
+        "fetch_pexels_image",
+        "publish_to_wordpress"
+      ]
+    },
+    "integrations": {
+      "openai": {
+        "required": true,
+        "preferred": true,
+        "model": "gpt-4o",
+        "json_output": true
+      },
+      "anthropic": {
+        "required": false,
+        "fallback": true,
+        "model": "claude-sonnet-4"
+      },
+      "wordpress": {
+        "required": true,
+        "auth_method": "xmlrpc",
+        "status": "publish"
+      },
+      "pexels": {
+        "required": true,
+        "auth_method": "api_key",
+        "orientation": "landscape",
+        "per_page": 1
+      },
+      "google_sheets": {
+        "required": false,
+        "optional": true,
+        "purpose": "content_logging"
+      }
+    },
+    "content_formatting": {
+      "output_format": "html",
+      "required_elements": ["h1", "h2", "h3", "p", "strong", "ul", "li"],
+      "seo_requirements": {
+        "title_unique": true,
+        "trend_driven": true,
+        "keywords_included": true,
+        "readability": "high"
+      },
+      "structure": {
+        "introduction": "hook_based",
+        "body_sections": 3,
+        "conclusion": "actionable_insights"
+      }
+    },
+    "anti_detection": {
+      "random_delay_enabled": true,
+      "min_delay_seconds": 0,
+      "max_delay_seconds": 21600,
+      "human_like_timing": true
+    }
+  }
+}

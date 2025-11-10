@@ -1,0 +1,93 @@
+{
+  "agent_id": "ecommerce_automation",
+  "agent_name": "E-Commerce Automation Agent",
+  "agent_type": "automation",
+  "capabilities": [
+    {
+      "name": "product_import_from_sheets",
+      "confidence": 0.95,
+      "keywords": ["import", "product", "sheets", "bulk", "woocommerce"],
+      "dependencies": ["google-api-python-client", "woocommerce"]
+    },
+    {
+      "name": "ai_seo_optimization",
+      "confidence": 0.96,
+      "keywords": ["seo", "meta", "optimization", "ai", "content"],
+      "dependencies": ["anthropic", "openai"]
+    },
+    {
+      "name": "category_mapping",
+      "confidence": 0.92,
+      "keywords": ["category", "taxonomy", "mapping"],
+      "dependencies": []
+    },
+    {
+      "name": "inventory_sync",
+      "confidence": 0.90,
+      "keywords": ["stock", "inventory", "sync"],
+      "dependencies": []
+    },
+    {
+      "name": "notification_dispatch",
+      "confidence": 0.88,
+      "keywords": ["notify", "telegram", "alert"],
+      "dependencies": ["httpx"]
+    }
+  ],
+  "priority": 85,
+  "max_concurrent_tasks": 10,
+  "timeout_seconds": 600,
+  "retry_count": 3,
+  "enabled": true,
+  "metadata": {
+    "version": "1.0.0",
+    "engine": "fastapi+anthropic+woocommerce",
+    "source_workflow": "n8n_ai_product_importer",
+    "last_updated": "2025-11-10",
+    "description": "Unified e-commerce automation: imports products from Google Sheets to WooCommerce with AI-powered SEO optimization",
+    "workflow": {
+      "trigger": "api_endpoint",
+      "steps": [
+        "fetch_products_from_google_sheets",
+        "validate_and_map_data",
+        "create_woocommerce_products",
+        "generate_ai_seo_tags",
+        "update_products_with_seo",
+        "sync_status_to_sheets",
+        "send_completion_notification"
+      ]
+    },
+    "integrations": {
+      "google_sheets": {
+        "required": true,
+        "auth_method": "oauth2",
+        "scopes": ["https://www.googleapis.com/auth/spreadsheets"]
+      },
+      "woocommerce": {
+        "required": true,
+        "auth_method": "consumer_key_secret",
+        "api_version": "wc/v3"
+      },
+      "anthropic": {
+        "required": false,
+        "preferred": true,
+        "model": "claude-sonnet-4-20250514"
+      },
+      "openai": {
+        "required": false,
+        "fallback": true,
+        "model": "gpt-4"
+      },
+      "telegram": {
+        "required": false,
+        "optional": true
+      }
+    },
+    "constraints": {
+      "meta_title_max": 60,
+      "meta_description_max": 160,
+      "batch_size": 10,
+      "max_retries": 3
+    }
+  }
+}
