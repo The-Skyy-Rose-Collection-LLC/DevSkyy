@@ -23,6 +23,7 @@ email-validator==2.1.0  # Required for Pydantic email validation
 SQLAlchemy==2.0.36
 aiosqlite==0.20.0  # Async SQLite driver
 asyncpg==0.30.0  # Async PostgreSQL driver (optional)
+psycopg2-binary==2.9.9  # PostgreSQL driver (for Neon database integration & consensus workflow)
 
 # MongoDB removed - using SQLAlchemy exclusively
 

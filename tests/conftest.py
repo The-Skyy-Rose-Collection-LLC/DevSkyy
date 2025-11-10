@@ -333,6 +333,11 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "e2e: End-to-end tests")
     config.addinivalue_line("markers", "slow: Slow running tests")
     config.addinivalue_line("markers", "security: Security tests")
+    config.addinivalue_line("markers", "consensus: Consensus workflow tests")
+    config.addinivalue_line("markers", "ecommerce: E-commerce automation tests")
+    config.addinivalue_line("markers", "content: Content publishing tests")
+    config.addinivalue_line("markers", "wordpress: WordPress integration tests")
+    config.addinivalue_line("markers", "infrastructure: Infrastructure tests (database, redis)")
 
 def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers automatically"""
