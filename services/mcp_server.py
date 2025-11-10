@@ -18,7 +18,6 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from mcp.server import Server
-from mcp.server.models import InitializationOptions
 from mcp.types import Tool, TextContent
 
 from services.mcp_client import MCPToolClient, get_mcp_client
