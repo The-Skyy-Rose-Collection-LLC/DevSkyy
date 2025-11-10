@@ -122,7 +122,6 @@ class TestAgentExecution:
         if hasattr(orchestrator, 'max_concurrent_tasks'):
             # Create more tasks than the limit
             max_limit = orchestrator.max_concurrent_tasks
-            tasks = [{"id": f"task-{i}", "type": "test"} for i in range(max_limit + 10)]
 
             # Verify orchestrator respects the limit
             # (Implementation depends on orchestrator design)
