@@ -34,7 +34,14 @@ def encryption_service():
 
 @pytest.fixture
 def test_key():
-    """Generate a test encryption key."""
+    """
+    Provide a 32-byte (256-bit) encryption key for tests.
+    
+    When the encryption implementation is unavailable, returns 32 cryptographically secure random bytes.
+    
+    Returns:
+        bytes: A 32-byte encryption key.
+    """
     if ENCRYPTION_AVAILABLE:
         return generate_encryption_key()
     return os.urandom(32)  # 256-bit key
@@ -42,7 +49,17 @@ def test_key():
 
 @pytest.fixture
 def sample_data():
-    """Sample data for encryption tests."""
+    """
+    Return a representative sample payload used by encryption tests.
+    
+    Returns:
+        dict: A sample data dictionary containing:
+            - "user_id" (str): Example user identifier.
+            - "email" (str): Example email address.
+            - "payment_info" (dict): Nested payment details with keys:
+                - "card_last_4" (str): Last four digits of a card.
+                - "expiry" (str): Card expiry in MM/YY format.
+    """
     return {
         "user_id": "user-12345",
         "email": "test@example.com",
@@ -72,7 +89,11 @@ class TestEncryptionBasics:
         assert decrypted == sample_data
 
     def test_encrypt_string_data(self, encryption_service, test_key):
-        """Should encrypt and decrypt string data."""
+        """
+        Verify that string data can be encrypted and then decrypted to its original value.
+        
+        Asserts that decrypting the ciphertext produced by the EncryptionService with the same key returns the original string and that the ciphertext is not identical to the plaintext.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -132,7 +153,11 @@ class TestAESGCMCompliance:
         assert len(encrypted_bytes) > len(str(sample_data))
 
     def test_tampered_data_fails_authentication(self, encryption_service, test_key, sample_data):
-        """Should detect tampered ciphertext via authentication tag."""
+        """
+        Verify that tampering with ciphertext causes authentication to fail and decryption to raise an exception.
+        
+        Encrypts sample data with the provided key, modifies the ciphertext bytes (or base64 payload), and asserts that attempting to decrypt the tampered ciphertext raises an exception indicating authentication failure.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -157,7 +182,11 @@ class TestKeyManagement:
     """Test encryption key generation and management."""
 
     def test_generate_secure_random_key(self):
-        """Should generate cryptographically secure random keys."""
+        """
+        Generate cryptographically secure random 32-byte encryption keys and verify uniqueness.
+        
+        Verifies that two independently generated keys are 32 bytes long and not identical.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -181,7 +210,9 @@ class TestKeyManagement:
         assert key is not None
 
     def test_key_rotation_support(self, encryption_service, sample_data):
-        """Should support key rotation for encrypted data."""
+        """
+        Verify that encrypted data can be migrated from one key to another by decrypting with the old key and re-encrypting with the new key, and that data decrypted with the new key matches the original.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -206,7 +237,9 @@ class TestErrorHandling:
     """Test error handling and edge cases."""
 
     def test_decrypt_with_wrong_key_fails(self, encryption_service, sample_data):
-        """Should fail to decrypt with incorrect key."""
+        """
+        Verifies that decrypting ciphertext with a different key than the one used for encryption raises an exception.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -252,7 +285,9 @@ class TestPIIEncryption:
     """Test encryption of Personally Identifiable Information (PII)."""
 
     def test_encrypt_email_address(self, encryption_service, test_key):
-        """Should encrypt email addresses."""
+        """
+        Encrypts a single email address, verifies it decrypts to the original, and ensures the plaintext email does not appear in the ciphertext.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -276,7 +311,11 @@ class TestPIIEncryption:
         assert phone not in str(encrypted)
 
     def test_encrypt_ssn(self, encryption_service, test_key):
-        """Should encrypt Social Security Numbers."""
+        """
+        Verify that an SSN can be encrypted and decrypted without leaking the plaintext.
+        
+        Encrypts a sample Social Security Number using the provided encryption service and key, asserts the decrypted result matches the original SSN, and asserts the plaintext SSN does not appear in the ciphertext's representation.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
@@ -304,7 +343,11 @@ class TestPerformance:
     """Test encryption performance requirements."""
 
     def test_encryption_performance(self, encryption_service, test_key):
-        """Encryption should complete within reasonable time."""
+        """
+        Measures average encryption latency by encrypting ~9KB of data repeatedly and asserts the per-operation average is under 50 ms.
+        
+        Skips the test if the encryption implementation is unavailable. Runs 100 iterations and reports the average encryption time.
+        """
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 

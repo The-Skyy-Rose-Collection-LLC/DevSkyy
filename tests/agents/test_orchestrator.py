@@ -26,7 +26,12 @@ def orchestrator():
 
 @pytest.fixture
 def mock_agent():
-    """Create a mock agent for testing."""
+    """
+    Create a mock agent populated with common test attributes for unit tests.
+    
+    Returns:
+        agent (MagicMock): A mock agent with attributes `id`, `name`, and `status`, and an `execute` AsyncMock that returns `{"status": "success", "result": "done"}`.
+    """
     agent = MagicMock()
     agent.id = "test-agent-001"
     agent.name = "Test Agent"
@@ -191,7 +196,11 @@ class TestMonitoring:
 
     @pytest.mark.asyncio
     async def test_health_check(self, orchestrator):
-        """Should perform health check successfully."""
+        """
+        Verify the orchestrator reports a healthy status.
+        
+        Checks that `health_check()` returns a non-empty mapping and that the `"status"` key is one of `"healthy"`, `"ok"`, or `"running"`.
+        """
         if hasattr(orchestrator, 'health_check'):
             health = await orchestrator.health_check()
             assert health is not None
@@ -203,7 +212,11 @@ class TestErrorHandling:
 
     @pytest.mark.asyncio
     async def test_handle_agent_failure(self, orchestrator):
-        """Should handle agent execution failures gracefully."""
+        """
+        Verify orchestrator handles agent execution failures by raising or returning an error status.
+        
+        If an agent's `execute` raises an exception, the orchestrator's `execute_task` should either propagate an exception or return a result whose `status` is `"error"` or `"failed"`.
+        """
         failing_agent = MagicMock()
         failing_agent.id = "failing-agent"
         failing_agent.execute = AsyncMock(side_effect=Exception("Agent crashed"))
@@ -225,6 +238,12 @@ class TestErrorHandling:
         slow_agent.id = "slow-agent"
 
         async def slow_execute(*args, **kwargs):
+            """
+            Simulates a slow task and completes with a success status.
+            
+            Returns:
+                dict: Result object with `"status": "success"`.
+            """
             await asyncio.sleep(10)  # Simulate slow task
             return {"status": "success"}
 
@@ -250,7 +269,14 @@ class TestPerformanceRequirements:
 
     @pytest.mark.asyncio
     async def test_p95_latency_under_200ms(self, orchestrator):
-        """P95 latency should be under 200ms per Truth Protocol."""
+        """
+        Measure per-task latency across 100 runs and assert the 95th percentile is below 500 ms.
+        
+        This test uses a mocked agent that returns success, patches the orchestrator's agent lookup, executes 100 tasks, records per-task latencies, computes the P95 latency, and asserts it is under 500 ms (test allowance; production target 200 ms).
+        
+        Parameters:
+            orchestrator: The AgentOrchestrator instance under test.
+        """
         if not hasattr(orchestrator, 'execute_task'):
             pytest.skip("execute_task not available")
 
@@ -317,7 +343,11 @@ class TestTruthProtocolCompliance:
     """Verify Truth Protocol compliance requirements."""
 
     def test_orchestrator_has_logging(self, orchestrator):
-        """Should have proper logging per Truth Protocol."""
+        """
+        Check that the orchestrator exposes a logger attribute for observability and Truth Protocol compliance.
+        
+        Asserts that the instance has a `logger` attribute or that the orchestrator class defines `logger`.
+        """
         # Orchestrator should use structured logging
         assert hasattr(orchestrator, 'logger') or 'logger' in dir(orchestrator.__class__)
 
