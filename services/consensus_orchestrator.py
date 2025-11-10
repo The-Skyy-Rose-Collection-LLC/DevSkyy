@@ -799,23 +799,18 @@ class ConsensusOrchestrator:
         length: int = 800,
     ) -> WorkflowState:
         """
-        Execute complete consensus workflow
-
-        Workflow steps:
-        1. Generate initial draft
-        2. Review with all agents
-        3. If 2+ flag issues, redraft (max 2 times)
-        4. Send to human for approval
-        5. Wait for human decision
-
-        Args:
-            topic: Content topic
-            keywords: SEO keywords
-            tone: Writing tone
-            length: Target word count
-
+        Run the end-to-end consensus review workflow for a generated draft.
+        
+        Generates an initial draft, runs parallel reviews by the configured agents, performs up to two redraft iterations if two or more reviewers flag major issues, and prepares the workflow for human approval (including webhook expiration and approval/rejection tokens).
+        
+        Parameters:
+            topic (str): Subject or title seed for the generated content.
+            keywords (List[str]): SEO keywords to include or evaluate in the draft.
+            tone (str): Desired writing tone (e.g., "professional", "casual"). Defaults to "professional".
+            length (int): Target word count for the draft. Defaults to 800.
+        
         Returns:
-            WorkflowState ready for human approval
+            WorkflowState: The created workflow state positioned for human review and approval.
         """
         # Create logfire span for entire workflow
         span_attrs = {
@@ -834,7 +829,20 @@ class ConsensusOrchestrator:
     async def _execute_workflow_internal(
         self, topic: str, keywords: List[str], tone: str, length: int
     ) -> WorkflowState:
-        """Internal workflow execution with instrumentation"""
+        """
+        Run the full consensus review and redraft workflow for a given topic and return the resulting workflow state.
+        
+        This executes: generating an initial draft, running the three reviewer agents in parallel to form a consensus vote, performing up to MAX_REDRAFT_ITERATIONS redrafts when the consensus requires it (two or more major issue votes), and preparing the workflow for human approval by setting an approval expiry and persisting the state in-memory.
+        
+        Parameters:
+            topic (str): The subject or headline for the draft to generate.
+            keywords (List[str]): Primary keywords to guide generation and reviews.
+            tone (str): Desired tone for the content (e.g., "professional", "casual").
+            length (int): Target word count for the generated draft.
+        
+        Returns:
+            WorkflowState: The completed workflow state containing the final draft, draft history, review history, iteration count, webhook expiration for human approval, and persisted in the orchestrator's in-memory store.
+        """
 
         logger.info(f"Starting consensus workflow for: {topic}")
 
@@ -937,15 +945,18 @@ class ConsensusOrchestrator:
         self, workflow_id: str, decision_token: str, feedback: Optional[str] = None
     ) -> WorkflowState:
         """
-        Submit human approval decision
-
+        Apply a human approval or rejection to a workflow using a decision token.
+        
         Args:
-            workflow_id: Workflow ID
-            decision_token: Approval or rejection token
-            feedback: Optional human feedback
-
+            workflow_id: The identifier of the workflow to update.
+            decision_token: A token that must match the workflow's approval or rejection token to record the corresponding decision.
+            feedback: Optional human-provided feedback to attach to the workflow.
+        
         Returns:
-            Updated WorkflowState
+            The updated WorkflowState with `human_decision`, `human_feedback`, and `updated_at` set.
+        
+        Raises:
+            ValueError: If the workflow is not found or the provided decision_token is invalid.
         """
         workflow = self.workflows.get(workflow_id)
         if not workflow:
