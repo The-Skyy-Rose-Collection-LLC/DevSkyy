@@ -16,6 +16,7 @@ python-dotenv==1.0.1
 email-validator==2.1.0  # Required for Pydantic email validation
 
 # Agent Observability & Training
+logfire[fastapi]==4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)
 # agentlightning==0.2.1  # DISABLED: May have pydantic version conflicts - needs verification
 
 # Database (Enterprise-Grade)
