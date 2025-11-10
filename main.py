@@ -25,6 +25,14 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
+# Observability: Logfire (OpenTelemetry-based monitoring)
+try:
+    import logfire
+
+    LOGFIRE_AVAILABLE = True
+except ImportError:
+    LOGFIRE_AVAILABLE = False
+
 # Prometheus monitoring
 try:
     from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest, Histogram
@@ -151,6 +159,23 @@ def setup_logging():
 logger = setup_logging()
 
 # ============================================================================
+# LOGFIRE OBSERVABILITY CONFIGURATION
+# ============================================================================
+
+if LOGFIRE_AVAILABLE:
+    try:
+        # Configure logfire
+        logfire.configure(
+            service_name="devskyy-platform",
+            service_version=VERSION,
+            environment=ENVIRONMENT,
+        )
+        logger.info("✅ Logfire observability configured - OpenTelemetry tracing enabled")
+    except Exception as e:
+        logger.warning(f"⚠️ Logfire configuration failed: {e}")
+        LOGFIRE_AVAILABLE = False
+
+# ============================================================================
 # PROMETHEUS METRICS
 # ============================================================================
 
@@ -188,6 +213,14 @@ app = FastAPI(
     redoc_url="/redoc" if ENVIRONMENT != "production" else None,
     openapi_url="/openapi.json" if ENVIRONMENT != "production" else None,
 )
+
+# Instrument FastAPI with Logfire for automatic tracing
+if LOGFIRE_AVAILABLE:
+    try:
+        logfire.instrument_fastapi(app)
+        logger.info("✅ FastAPI instrumented with Logfire - Auto-tracing all HTTP requests")
+    except Exception as e:
+        logger.warning(f"⚠️ Logfire FastAPI instrumentation failed: {e}")
 
 # ============================================================================
 # MIDDLEWARE CONFIGURATION
