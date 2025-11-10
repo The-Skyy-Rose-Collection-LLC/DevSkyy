@@ -537,6 +537,58 @@ if API_ROUTERS_AVAILABLE:
         logger.error(f"❌ Router registration failed: {e}")
 
 # ============================================================================
+# MCP SERVER ENDPOINT (Model Context Protocol)
+# ============================================================================
+
+# Register MCP Server for external tool access
+try:
+    from mcp.server.sse import SseServerTransport
+    from services.mcp_server import get_mcp_server
+
+    # Create MCP server instance
+    mcp_server_instance = get_mcp_server()
+    mcp_server = mcp_server_instance.get_server()
+
+    # Create SSE transport for MCP protocol
+    mcp_transport = SseServerTransport("/mcp/messages")
+
+    @app.get("/mcp/sse")
+    async def handle_mcp_sse(request: Request):
+        """
+        MCP Server SSE endpoint
+
+        Exposes DevSkyy AI tools via Model Context Protocol:
+        - brand_intelligence_reviewer (content review)
+        - seo_marketing_reviewer (SEO analysis)
+        - security_compliance_reviewer (security scan)
+        - post_categorizer (WordPress automation)
+        - product_seo_optimizer (WooCommerce SEO)
+
+        External clients can connect via standard MCP protocol.
+        """
+        if LOGFIRE_AVAILABLE:
+            logfire.info("MCP SSE connection requested", client_host=request.client.host)
+
+        async with mcp_transport.connect_sse(
+            request.scope,
+            request.receive,
+        ) as streams:
+            await mcp_server.run(
+                streams[0],
+                streams[1],
+                mcp_server.create_initialization_options()
+            )
+
+    logger.info("✅ MCP Server endpoint registered at /mcp/sse")
+    logger.info("   - 5 AI tools exposed via standard MCP protocol")
+    logger.info("   - External clients can connect for tool access")
+
+except ImportError as e:
+    logger.warning(f"⚠️ MCP Server not available: {e}")
+except Exception as e:
+    logger.error(f"❌ MCP Server registration failed: {e}")
+
+# ============================================================================
 # CORE ENDPOINTS
 # ============================================================================
 
