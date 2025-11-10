@@ -60,6 +60,7 @@ safety==3.2.11  # Vulnerability scanning
 # AI & ML (Latest Stable)
 anthropic==0.69.0  # Latest version
 openai==2.7.2  # Latest version - Updated 2025-11-10
+huggingface_hub==1.1.2  # Hugging Face model hub client - Updated 2025-11-10
 transformers==4.53.0  # Updated - Fixed all known CVEs (PYSEC-2024-227, 228, 229, 2025-40, GHSA-6rvg-6v2m-4j46, fpwr-67px-3qhx, q2wp-rjmx-x6x9, jjph-296x-mrcr, phhr-52qp-3mj4, 37mw-44qp-f5jm, 9356-575x-2w9m, 59p9-h35m-wg4g, rcv9-qm8p-9p6j, 4w7r-h757-3r74)
 torch==2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes
 torchvision==0.20.0  # Compatible with torch 2.9.0
