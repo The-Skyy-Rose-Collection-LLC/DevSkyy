@@ -255,7 +255,7 @@ prometheus-client>=0.22.0
 grafana-api>=1.0.3
 
 # Enterprise Security Testing
-cryptography>=46.0.2
+cryptography>=46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
 pycryptodome>=3.21.0
 
 # ============================================================================

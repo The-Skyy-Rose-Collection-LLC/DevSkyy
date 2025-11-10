@@ -1,6 +1,9 @@
 # DevSkyy Enterprise - Minimal Production Dependencies
 # Core essentials only for API to run
 
+# Build Dependencies (Security-Critical)
+setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
+
 # Core Framework
 fastapi==0.119.0
 uvicorn[standard]==0.34.0
@@ -20,7 +23,7 @@ aiofiles==24.1.0
 # Authentication & Security
 PyJWT==2.10.1
 bcrypt==4.2.1
-cryptography==46.0.2
+cryptography==46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
 passlib[bcrypt]==1.7.4
 
 # AI & ML (Core)

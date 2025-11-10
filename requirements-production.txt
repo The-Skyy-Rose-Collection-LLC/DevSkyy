@@ -2,6 +2,9 @@
 # Excludes heavy ML libraries (torch, tensorflow, transformers) to reduce image size
 # For ML features, use separate specialized containers
 
+# Build Dependencies (Security-Critical)
+setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
+
 # Core Framework
 fastapi==0.119.0
 uvicorn[standard]==0.34.0
@@ -24,7 +27,7 @@ httpx==0.28.1
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
 certifi==2024.12.14
-cryptography==46.0.2
+cryptography==46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
 PyJWT==2.10.1
 bcrypt==4.2.1
 argon2-cffi==23.1.0
