@@ -1,0 +1,124 @@
+version: 2
+
+updates:
+  # ============================================================================
+  # Python Dependencies
+  # ============================================================================
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "The-Skyy-Rose-Collection-LLC/DevSkyy-team"
+    assignees:
+      - "The-Skyy-Rose-Collection-LLC/DevSkyy-team"
+    labels:
+      - "dependencies"
+      - "python"
+      - "security"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Group dependency updates
+    groups:
+      fastapi-ecosystem:
+        patterns:
+          - "fastapi*"
+          - "starlette*"
+          - "uvicorn*"
+          - "pydantic*"
+      security-tools:
+        patterns:
+          - "cryptography*"
+          - "PyJWT*"
+          - "bcrypt*"
+          - "argon2*"
+      ai-ml-frameworks:
+        patterns:
+          - "anthropic*"
+          - "openai*"
+          - "transformers*"
+          - "torch*"
+          - "scikit-learn*"
+      database:
+        patterns:
+          - "SQLAlchemy*"
+          - "asyncpg*"
+          - "aiosqlite*"
+          - "redis*"
+      testing:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+          - "locust*"
+    # Security updates get priority
+    priority: 10
+
+  # ============================================================================
+  # GitHub Actions
+  # ============================================================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "The-Skyy-Rose-Collection-LLC/DevSkyy-team"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci-cd"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+  # ============================================================================
+  # Docker Dependencies
+  # ============================================================================
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "The-Skyy-Rose-Collection-LLC/DevSkyy-team"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "infrastructure"
+    commit-message:
+      prefix: "chore(docker)"
+      include: "scope"
+
+# Dependabot Configuration Notes:
+#
+# Security Updates:
+# - Dependabot automatically creates PRs for security vulnerabilities
+# - These are created even if open-pull-requests-limit is reached
+# - Security PRs have high priority and should be reviewed immediately
+#
+# Version Updates:
+# - Weekly schedule checks for new versions every Monday at 3 AM UTC
+# - Groups related packages together to reduce PR noise
+# - Maximum 10 Python PRs, 5 GitHub Actions PRs, 3 Docker PRs at a time
+#
+# Review Process:
+# - All PRs are automatically assigned to the DevSkyy team
+# - Labels are applied for easy filtering
+# - Commit messages follow conventional commit format
+#
+# Truth Protocol Alignment:
+# - Ensures dependencies stay current with security patches
+# - Automated testing via CI/CD validates updates before merge
+# - Reduces manual dependency management burden
+# - Maintains "Pin versions" and "No secrets in code" principles

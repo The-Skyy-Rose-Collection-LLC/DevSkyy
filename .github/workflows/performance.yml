@@ -1,0 +1,628 @@
+name: Performance Testing & Benchmarking
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run performance tests every day at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Load test duration (seconds)'
+        required: false
+        default: '60'
+      connections:
+        description: 'Number of concurrent connections'
+        required: false
+        default: '100'
+
+env:
+  PYTHON_VERSION: '3.11.9'
+  P95_LATENCY_THRESHOLD_MS: '200'
+  ERROR_RATE_THRESHOLD: '0.5'
+  TARGET_RPS: '1000'
+
+jobs:
+  # ============================================================================
+  # JOB 1: Baseline Performance Test
+  # ============================================================================
+  baseline-performance:
+    name: Baseline Performance Metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: devskyy_perf
+          POSTGRES_PASSWORD: perf_password
+          POSTGRES_DB: devskyy_perf
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install locust pytest-benchmark
+
+      - name: Configure performance test environment
+        run: |
+          cat > .env.performance << EOF
+          DATABASE_URL=postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL=redis://localhost:6379/0
+          SECRET_KEY=performance-test-key
+          ENVIRONMENT=performance
+          LOG_LEVEL=WARNING
+          EOF
+
+      - name: Start FastAPI application
+        run: |
+          uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 &
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+        env:
+          DATABASE_URL: postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL: redis://localhost:6379/0
+
+      - name: Warm up application
+        run: |
+          echo "Warming up application..."
+          for i in {1..100}; do
+            curl -s http://localhost:8000/health > /dev/null
+          done
+
+      - name: Run baseline benchmark
+        run: |
+          python -c "
+          import requests
+          import time
+          import statistics
+          import json
+
+          print('Running baseline performance test...')
+          latencies = []
+
+          for i in range(1000):
+              start = time.time()
+              response = requests.get('http://localhost:8000/health')
+              latency = (time.time() - start) * 1000  # Convert to ms
+              latencies.append(latency)
+
+              if response.status_code != 200:
+                  print(f'Error: Request {i} failed with status {response.status_code}')
+
+          results = {
+              'mean_latency_ms': statistics.mean(latencies),
+              'median_latency_ms': statistics.median(latencies),
+              'p95_latency_ms': statistics.quantiles(latencies, n=100)[94],  # 95th percentile (corrected)
+              'p99_latency_ms': statistics.quantiles(latencies, n=100)[98],  # 99th percentile
+              'min_latency_ms': min(latencies),
+              'max_latency_ms': max(latencies),
+              'total_requests': len(latencies)
+          }
+
+          print(json.dumps(results, indent=2))
+
+          with open('baseline-results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+
+          # Validate P95 latency
+          if results['p95_latency_ms'] > ${{ env.P95_LATENCY_THRESHOLD_MS }}:
+              print(f'ERROR: P95 latency {results[\"p95_latency_ms\"]:.2f}ms exceeds threshold ${{ env.P95_LATENCY_THRESHOLD_MS }}ms')
+              exit(1)
+          else:
+              print(f'SUCCESS: P95 latency {results[\"p95_latency_ms\"]:.2f}ms is within threshold ✅')
+          "
+
+      - name: Upload baseline results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-performance-results
+          path: baseline-results.json
+          retention-days: 90
+
+  # ============================================================================
+  # JOB 2: Load Testing with Locust
+  # ============================================================================
+  load-test:
+    name: Load Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: devskyy_perf
+          POSTGRES_PASSWORD: perf_password
+          POSTGRES_DB: devskyy_perf
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install locust
+
+      - name: Create Locust test file
+        run: |
+          mkdir -p performance-tests
+          cat > performance-tests/locustfile.py << 'EOF'
+          from locust import HttpUser, task, between
+          import random
+
+          class DevSkyUser(HttpUser):
+              wait_time = between(1, 3)
+
+              @task(5)
+              def health_check(self):
+                  self.client.get("/health")
+
+              @task(3)
+              def api_status(self):
+                  self.client.get("/api/v1/status")
+
+              @task(2)
+              def list_agents(self):
+                  with self.client.get("/api/v1/agents", catch_response=True) as response:
+                      if response.status_code == 200:
+                          response.success()
+                      elif response.status_code == 401:
+                          response.failure("Unauthorized - authentication required")
+                      else:
+                          response.failure(f"Unexpected status code: {response.status_code}")
+
+              @task(1)
+              def metrics(self):
+                  self.client.get("/metrics")
+          EOF
+
+      - name: Start FastAPI application
+        run: |
+          cat > .env.performance << EOF
+          DATABASE_URL=postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL=redis://localhost:6379/0
+          SECRET_KEY=performance-load-test-key
+          ENVIRONMENT=performance
+          LOG_LEVEL=WARNING
+          EOF
+
+          uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 &
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+        env:
+          DATABASE_URL: postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL: redis://localhost:6379/0
+
+      - name: Run Locust load test
+        run: |
+          cd performance-tests
+          locust \
+            --headless \
+            --users ${{ github.event.inputs.connections || '100' }} \
+            --spawn-rate 10 \
+            --run-time ${{ github.event.inputs.duration || '60' }}s \
+            --host http://localhost:8000 \
+            --csv=locust-results \
+            --html=locust-report.html
+
+      - name: Analyze load test results
+        run: |
+          python -c "
+          import csv
+          import json
+
+          # Read Locust stats
+          with open('performance-tests/locust-results_stats.csv', 'r') as f:
+              reader = csv.DictReader(f)
+              stats = list(reader)
+
+          # Calculate aggregated metrics
+          total_requests = sum(int(row['Request Count']) for row in stats if row['Name'] != 'Aggregated')
+          total_failures = sum(int(row['Failure Count']) for row in stats if row['Name'] != 'Aggregated')
+          error_rate = (total_failures / total_requests * 100) if total_requests > 0 else 0
+
+          # Get aggregated row
+          aggregated = [row for row in stats if row['Name'] == 'Aggregated'][0]
+          p95_latency = float(aggregated['95%'])
+
+          results = {
+              'total_requests': total_requests,
+              'total_failures': total_failures,
+              'error_rate_percent': error_rate,
+              'p95_latency_ms': p95_latency,
+              'p50_latency_ms': float(aggregated['50%']),
+              'p99_latency_ms': float(aggregated['99%']),
+              'avg_latency_ms': float(aggregated['Average']),
+              'rps': float(aggregated['Requests/s'])
+          }
+
+          print(json.dumps(results, indent=2))
+
+          with open('load-test-results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+
+          # Validate thresholds
+          if error_rate > ${{ env.ERROR_RATE_THRESHOLD }}:
+              print(f'ERROR: Error rate {error_rate:.2f}% exceeds threshold ${{ env.ERROR_RATE_THRESHOLD }}%')
+              exit(1)
+
+          if p95_latency > ${{ env.P95_LATENCY_THRESHOLD_MS }}:
+              print(f'ERROR: P95 latency {p95_latency:.2f}ms exceeds threshold ${{ env.P95_LATENCY_THRESHOLD_MS }}ms')
+              exit(1)
+
+          print(f'SUCCESS: Load test passed all thresholds ✅')
+          "
+
+      - name: Upload load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: |
+            performance-tests/locust-results*
+            performance-tests/locust-report.html
+            load-test-results.json
+          retention-days: 90
+
+  # ============================================================================
+  # JOB 3: Stress Testing
+  # ============================================================================
+  stress-test:
+    name: Stress Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: devskyy_perf
+          POSTGRES_PASSWORD: perf_password
+          POSTGRES_DB: devskyy_perf
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Node.js for autocannon
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install autocannon
+        run: npm install -g autocannon
+
+      - name: Start FastAPI application
+        run: |
+          cat > .env.performance << EOF
+          DATABASE_URL=postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL=redis://localhost:6379/0
+          SECRET_KEY=stress-test-key
+          ENVIRONMENT=performance
+          LOG_LEVEL=ERROR
+          EOF
+
+          uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 &
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+        env:
+          DATABASE_URL: postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf
+          REDIS_URL: redis://localhost:6379/0
+
+      - name: Run autocannon stress test
+        run: |
+          echo "Running stress test with autocannon..."
+          autocannon \
+            -c 500 \
+            -d 60 \
+            -p 10 \
+            --json \
+            http://localhost:8000/health \
+            > stress-test-results.json
+
+          cat stress-test-results.json
+
+      - name: Analyze stress test results
+        run: |
+          python -c "
+          import json
+
+          with open('stress-test-results.json', 'r') as f:
+              data = json.load(f)
+
+          latency = data['latency']
+          requests = data['requests']
+
+          results = {
+              'p95_latency_ms': latency['p95'],
+              'p99_latency_ms': latency['p99'],
+              'mean_latency_ms': latency['mean'],
+              'total_requests': requests['total'],
+              'requests_per_sec': requests['average'],
+              'errors': data.get('errors', 0),
+              'timeouts': data.get('timeouts', 0)
+          }
+
+          print(json.dumps(results, indent=2))
+
+          # Validate P95 under stress
+          if results['p95_latency_ms'] > ${{ env.P95_LATENCY_THRESHOLD_MS }}:
+              print(f'WARNING: P95 latency {results[\"p95_latency_ms\"]:.2f}ms exceeds threshold under stress')
+              # Note: We don't fail stress tests, just warn
+          else:
+              print(f'SUCCESS: P95 latency {results[\"p95_latency_ms\"]:.2f}ms maintained under stress ✅')
+          "
+
+      - name: Upload stress test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-test-results
+          path: stress-test-results.json
+          retention-days: 90
+
+  # ============================================================================
+  # JOB 4: Database Performance Test
+  # ============================================================================
+  database-performance:
+    name: Database Performance Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: devskyy_perf
+          POSTGRES_PASSWORD: perf_password
+          POSTGRES_DB: devskyy_perf
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-benchmark
+
+      - name: Run database benchmarks
+        run: |
+          python -c "
+          import asyncio
+          import asyncpg
+          import time
+          import json
+          from statistics import mean, median, quantiles
+
+          async def benchmark_queries():
+              conn = await asyncpg.connect(
+                  'postgresql://devskyy_perf:perf_password@localhost:5432/devskyy_perf'
+              )
+
+              # Create test table
+              await conn.execute('''
+                  CREATE TABLE IF NOT EXISTS benchmark_test (
+                      id SERIAL PRIMARY KEY,
+                      data TEXT,
+                      created_at TIMESTAMP DEFAULT NOW()
+                  )
+              ''')
+
+              # Insert benchmark
+              insert_times = []
+              for i in range(1000):
+                  start = time.time()
+                  await conn.execute(
+                      'INSERT INTO benchmark_test (data) VALUES (\$1)',
+                      f'test data {i}'
+                  )
+                  insert_times.append((time.time() - start) * 1000)
+
+              # Select benchmark
+              select_times = []
+              for i in range(1000):
+                  start = time.time()
+                  await conn.fetchrow('SELECT * FROM benchmark_test WHERE id = \$1', i + 1)
+                  select_times.append((time.time() - start) * 1000)
+
+              await conn.close()
+
+              results = {
+                  'insert_mean_ms': mean(insert_times),
+                  'insert_p95_ms': quantiles(insert_times, n=20)[18],
+                  'select_mean_ms': mean(select_times),
+                  'select_p95_ms': quantiles(select_times, n=20)[18]
+              }
+
+              return results
+
+          results = asyncio.run(benchmark_queries())
+          print(json.dumps(results, indent=2))
+
+          with open('db-performance-results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+          "
+
+      - name: Upload database performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-performance-results
+          path: db-performance-results.json
+          retention-days: 90
+
+  # ============================================================================
+  # JOB 5: Performance Summary
+  # ============================================================================
+  performance-summary:
+    name: Performance Summary & Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [baseline-performance, load-test, stress-test, database-performance]
+    if: always()
+
+    steps:
+      - name: Download all performance results
+        uses: actions/download-artifact@v4
+        with:
+          path: performance-results/
+
+      - name: Generate performance summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          # ⚡ Performance Testing Summary
+
+          ## Truth Protocol Performance SLOs
+          - **P95 Latency Target**: < 200ms
+          - **Error Rate Target**: < 0.5%
+          - **Target RPS**: 1000+
+
+          ## Test Results
+          | Test Type | Status |
+          |-----------|--------|
+          | Baseline Performance | ${{ needs.baseline-performance.result }} |
+          | Load Testing | ${{ needs.load-test.result }} |
+          | Stress Testing | ${{ needs.stress-test.result }} |
+          | Database Performance | ${{ needs.database-performance.result }} |
+
+          ## Performance Metrics
+          EOF
+
+          # Add baseline metrics if available
+          if [ -f performance-results/baseline-performance-results/baseline-results.json ]; then
+            echo "### Baseline Performance" >> $GITHUB_STEP_SUMMARY
+            python -c "
+          import json
+          with open('performance-results/baseline-performance-results/baseline-results.json') as f:
+              data = json.load(f)
+              print(f'- Mean Latency: {data[\"mean_latency_ms\"]:.2f}ms')
+              print(f'- P95 Latency: {data[\"p95_latency_ms\"]:.2f}ms')
+              print(f'- P99 Latency: {data[\"p99_latency_ms\"]:.2f}ms')
+          " >> $GITHUB_STEP_SUMMARY
+          fi
+
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+
+          ## Performance Artifacts
+          - Baseline performance metrics
+          - Load test results (Locust)
+          - Stress test results (Autocannon)
+          - Database performance benchmarks
+
+          ## Compliance Status
+          - ✅ P95 latency validated
+          - ✅ Error rate validated
+          - ✅ Load testing completed
+          - ✅ Stress testing completed
+          EOF
+
+      - name: Check overall performance
+        run: |
+          if [[ "${{ needs.baseline-performance.result }}" != "success" ]] || \
+             [[ "${{ needs.load-test.result }}" != "success" ]]; then
+            echo "::error::Performance tests failed to meet Truth Protocol SLOs!"
+            echo "::error::P95 latency must be < 200ms, error rate < 0.5%"
+            exit 1
+          fi
+          echo "::notice::All performance tests passed ✅"

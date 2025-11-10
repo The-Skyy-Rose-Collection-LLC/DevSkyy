@@ -441,6 +441,11 @@ try:
     from api.v1.orchestration import router as orchestration_router
     from api.v1.webhooks import router as webhooks_router
 
+    # DevSkyy Automation Routers (n8n replacements)
+    from api.v1.ecommerce import router as ecommerce_router
+    from api.v1.content import router as content_router
+    from api.v1.consensus import router as consensus_router
+
     API_ROUTERS_AVAILABLE = True
     logger.info("✅ All API routers loaded successfully")
 
@@ -461,6 +466,12 @@ if API_ROUTERS_AVAILABLE:
         app.include_router(codex_router, prefix="/api/v1/codex", tags=["v1-codex"])
         app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["v1-dashboard"])
         app.include_router(orchestration_router, prefix="/api/v1/orchestration", tags=["v1-orchestration"])
+
+        # DevSkyy Automation Routers (n8n workflow replacements)
+        app.include_router(ecommerce_router, prefix="/api/v1", tags=["automation-ecommerce"])
+        app.include_router(content_router, prefix="/api/v1", tags=["automation-content"])
+        app.include_router(consensus_router, prefix="/api/v1", tags=["automation-consensus"])
+        logger.info("✅ DevSkyy automation routers registered (ecommerce, content, consensus)")
 
         # Luxury Fashion Brand Automation Router
         try:
