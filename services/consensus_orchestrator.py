@@ -27,6 +27,8 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
+from services.mcp_client import MCPToolClient, MCPToolError
+
 logger = logging.getLogger(__name__)
 
 
@@ -115,7 +117,11 @@ class WorkflowState(BaseModel):
 
 class BrandIntelligenceReviewer:
     """
-    Uses existing DevSkyy Brand Intelligence Agent for review
+    MCP-based Brand Intelligence Reviewer
+
+    WHY: Use standardized MCP tool calling for AI-powered brand review
+    HOW: Invoke brand_intelligence_reviewer tool via MCP client
+    IMPACT: Token-optimized, AI-powered analysis vs. rule-based checks
 
     Checks:
     - Brand voice consistency
@@ -124,24 +130,80 @@ class BrandIntelligenceReviewer:
     - Target audience fit
     """
 
-    def __init__(self, brand_config: Dict[str, Any]):
+    def __init__(self, brand_config: Dict[str, Any], mcp_client: Optional[MCPToolClient] = None):
         self.brand_config = brand_config
         self.agent_name = "Brand Intelligence Agent"
+        self.mcp_client = mcp_client or MCPToolClient()
 
     async def review_content(self, draft: ContentDraft) -> AgentReview:
         """
-        Review content for brand consistency
+        Review content using MCP tool calling
+
+        WHY: AI-powered analysis provides better quality than rule-based checks
+        HOW: Invoke brand_intelligence_reviewer MCP tool with Claude
+        IMPACT: More nuanced feedback, better brand alignment detection
 
         Args:
             draft: Content draft to review
 
         Returns:
-            AgentReview with decision and feedback
-        """
-        logger.info(f"Brand Intelligence Agent reviewing: {draft.title}")
+            AgentReview with AI-generated decision and feedback
 
-        # Simulate brand intelligence checks
-        # In production, this would use the actual BrandIntelligenceAgent
+        Raises:
+            MCPToolError: If MCP invocation fails
+        """
+        logger.info(f"🔧 Brand Intelligence Agent (MCP) reviewing: {draft.title}")
+
+        try:
+            # Invoke MCP tool for AI-powered review
+            result = await self.mcp_client.invoke_tool(
+                tool_name="brand_intelligence_reviewer",
+                category="content_review",
+                inputs={
+                    "title": draft.title,
+                    "content": draft.content,
+                    "keywords": draft.keywords,
+                    "word_count": draft.word_count,
+                    "brand_config": self.brand_config,
+                },
+            )
+
+            # Map MCP result to AgentReview
+            return AgentReview(
+                agent_name=self.agent_name,
+                decision=ReviewDecision(result["decision"]),
+                confidence=result["confidence"],
+                feedback=result["feedback"],
+                issues_found=result.get("issues_found", []),
+                suggestions=result.get("suggestions", []),
+            )
+
+        except MCPToolError as e:
+            logger.error(f"❌ MCP tool invocation failed: {e}")
+            # Fallback to basic rule-based review
+            logger.warning("⚠️  Falling back to rule-based review")
+            return self._fallback_review(draft)
+
+        except Exception as e:
+            logger.error(f"❌ Unexpected error during MCP review: {e}")
+            return self._fallback_review(draft)
+
+    def _fallback_review(self, draft: ContentDraft) -> AgentReview:
+        """
+        Fallback to rule-based review if MCP fails
+
+        WHY: Ensure system continues to function even if MCP unavailable
+        HOW: Basic rule-based checks for brand keywords and length
+        IMPACT: Degraded quality but maintains functionality
+
+        Args:
+            draft: Content draft to review
+
+        Returns:
+            AgentReview with basic rule-based analysis
+        """
+        logger.info(f"⚙️  Fallback review for: {draft.title}")
+
         issues = []
         suggestions = []
         decision = ReviewDecision.APPROVED
@@ -150,14 +212,16 @@ class BrandIntelligenceReviewer:
         brand_keywords = self.brand_config.get("brand_keywords", [])
         content_lower = draft.content.lower()
 
-        if not any(keyword.lower() in content_lower for keyword in brand_keywords):
+        if brand_keywords and not any(
+            keyword.lower() in content_lower for keyword in brand_keywords
+        ):
             issues.append("Missing key brand terminology")
             suggestions.append(
                 f"Include brand keywords: {', '.join(brand_keywords[:3])}"
             )
             decision = ReviewDecision.MINOR_ISSUE
 
-        # Check tone
+        # Check tone for luxury brands
         if "luxury" in self.brand_config.get("values", []):
             casual_words = ["cheap", "discount", "basic"]
             if any(word in content_lower for word in casual_words):
@@ -166,17 +230,19 @@ class BrandIntelligenceReviewer:
                 decision = ReviewDecision.MAJOR_ISSUE
 
         # Check length
-        if draft.word_count < 500:
-            issues.append("Content too short for brand standards")
-            suggestions.append("Expand to at least 800 words for authority")
-            decision = ReviewDecision.MINOR_ISSUE
+        min_word_count = self.brand_config.get("min_word_count", 600)
+        if draft.word_count < min_word_count:
+            issues.append(f"Content too short for brand standards ({draft.word_count} < {min_word_count} words)")
+            suggestions.append(f"Expand to at least {min_word_count} words for authority")
+            if decision != ReviewDecision.MAJOR_ISSUE:
+                decision = ReviewDecision.MINOR_ISSUE
 
         feedback = self._generate_feedback(issues, suggestions, decision)
 
         return AgentReview(
-            agent_name=self.agent_name,
+            agent_name=f"{self.agent_name} (Fallback)",
             decision=decision,
-            confidence=0.92,
+            confidence=0.75,  # Lower confidence for fallback
             feedback=feedback,
             issues_found=issues,
             suggestions=suggestions,
@@ -185,7 +251,7 @@ class BrandIntelligenceReviewer:
     def _generate_feedback(
         self, issues: List[str], suggestions: List[str], decision: ReviewDecision
     ) -> str:
-        """Generate comprehensive feedback"""
+        """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
             return "Content aligns well with brand voice and values. No major concerns."
 
@@ -206,29 +272,90 @@ class BrandIntelligenceReviewer:
 
 class SEOMarketingReviewer:
     """
-    Uses existing DevSkyy SEO Marketing Agent for review
+    MCP-based SEO Marketing Reviewer
+
+    WHY: Use AI-powered SEO analysis via MCP instead of simple rules
+    HOW: Invoke seo_marketing_reviewer tool via MCP client
+    IMPACT: Deeper keyword analysis, better SEO recommendations
 
     Checks:
-    - Keyword optimization
+    - Keyword optimization & density
     - Meta description quality
-    - Readability
+    - Title optimization
+    - Readability & engagement
     - CTA effectiveness
     """
 
-    def __init__(self):
+    def __init__(self, mcp_client: Optional[MCPToolClient] = None):
         self.agent_name = "SEO Marketing Agent"
+        self.mcp_client = mcp_client or MCPToolClient()
 
     async def review_content(self, draft: ContentDraft) -> AgentReview:
         """
-        Review content for SEO and marketing effectiveness
+        Review content using MCP tool calling
+
+        WHY: AI provides more sophisticated SEO analysis than rule checks
+        HOW: Invoke seo_marketing_reviewer MCP tool with Claude
+        IMPACT: Better keyword density analysis, competitor awareness
 
         Args:
             draft: Content draft to review
 
         Returns:
-            AgentReview with decision and feedback
+            AgentReview with AI-generated SEO analysis
+
+        Raises:
+            MCPToolError: If MCP invocation fails
         """
-        logger.info(f"SEO Marketing Agent reviewing: {draft.title}")
+        logger.info(f"🔧 SEO Marketing Agent (MCP) reviewing: {draft.title}")
+
+        try:
+            # Invoke MCP tool for AI-powered SEO review
+            result = await self.mcp_client.invoke_tool(
+                tool_name="seo_marketing_reviewer",
+                category="content_review",
+                inputs={
+                    "title": draft.title,
+                    "content": draft.content,
+                    "meta_description": draft.meta_description,
+                    "keywords": draft.keywords,
+                },
+            )
+
+            # Map MCP result to AgentReview
+            return AgentReview(
+                agent_name=self.agent_name,
+                decision=ReviewDecision(result["decision"]),
+                confidence=result["confidence"],
+                feedback=result["feedback"],
+                issues_found=result.get("issues_found", []),
+                suggestions=result.get("suggestions", []),
+            )
+
+        except MCPToolError as e:
+            logger.error(f"❌ MCP tool invocation failed: {e}")
+            logger.warning("⚠️  Falling back to rule-based SEO review")
+            return self._fallback_review(draft)
+
+        except Exception as e:
+            logger.error(f"❌ Unexpected error during MCP review: {e}")
+            return self._fallback_review(draft)
+
+    def _fallback_review(self, draft: ContentDraft) -> AgentReview:
+        """
+        Fallback to rule-based SEO review if MCP fails
+
+        WHY: Ensure system continues even if MCP unavailable
+        HOW: Basic SEO checks (meta length, keyword presence, title length)
+        IMPACT: Degraded quality but maintains functionality
+
+        Args:
+            draft: Content draft to review
+
+        Returns:
+            AgentReview with basic SEO analysis
+        """
+        logger.info(f"⚙️  Fallback SEO review for: {draft.title}")
 
         issues = []
         suggestions = []
@@ -257,7 +384,8 @@ class SEOMarketingReviewer:
                 suggestions.append(
                     "Naturally incorporate all target keywords in content"
                 )
-                decision = ReviewDecision.MINOR_ISSUE
+                if decision != ReviewDecision.MAJOR_ISSUE:
+                    decision = ReviewDecision.MINOR_ISSUE
 
         # Check title optimization
         if len(draft.title) > 60:
@@ -277,14 +405,15 @@ class SEOMarketingReviewer:
         if not any(cta in draft.content.lower() for cta in cta_indicators):
             issues.append("No clear call-to-action found")
             suggestions.append("Add compelling CTA at end of content")
-            decision = ReviewDecision.MINOR_ISSUE
+            if decision != ReviewDecision.MAJOR_ISSUE:
+                decision = ReviewDecision.MINOR_ISSUE
 
         feedback = self._generate_feedback(issues, suggestions, decision)
 
         return AgentReview(
-            agent_name=self.agent_name,
+            agent_name=f"{self.agent_name} (Fallback)",
             decision=decision,
-            confidence=0.95,
+            confidence=0.80,  # Lower confidence for fallback
             feedback=feedback,
             issues_found=issues,
             suggestions=suggestions,
@@ -293,7 +422,7 @@ class SEOMarketingReviewer:
     def _generate_feedback(
         self, issues: List[str], suggestions: List[str], decision: ReviewDecision
     ) -> str:
-        """Generate comprehensive feedback"""
+        """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
             return "Content is well-optimized for SEO and marketing. Ready for publication."
 
@@ -314,29 +443,92 @@ class SEOMarketingReviewer:
 
 class SecurityComplianceReviewer:
     """
-    Uses existing DevSkyy Security Agent for review
+    MCP-based Security & Compliance Reviewer
+
+    WHY: Use AI-powered security analysis for better PII/compliance detection
+    HOW: Invoke security_compliance_reviewer tool via MCP client
+    IMPACT: More sophisticated pattern recognition, context-aware compliance checks
 
     Checks:
-    - No sensitive data exposure
-    - No misleading claims
-    - Appropriate disclaimers
-    - Legal compliance
+    - PII and sensitive data exposure
+    - Misleading or unsubstantiated claims
+    - Compliance violations (GDPR, CCPA, HIPAA, etc.)
+    - Legal disclaimers for regulated content
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        compliance_standards: List[str] = None,
+        mcp_client: Optional[MCPToolClient] = None
+    ):
         self.agent_name = "Security & Compliance Agent"
+        self.compliance_standards = compliance_standards or ["GDPR"]
+        self.mcp_client = mcp_client or MCPToolClient()
 
     async def review_content(self, draft: ContentDraft) -> AgentReview:
         """
-        Review content for security and compliance
+        Review content using MCP tool calling
+
+        WHY: AI provides context-aware security and compliance analysis
+        HOW: Invoke security_compliance_reviewer MCP tool with Claude
+        IMPACT: Better PII detection, nuanced compliance checking
 
         Args:
             draft: Content draft to review
 
         Returns:
-            AgentReview with decision and feedback
+            AgentReview with AI-generated security analysis
+
+        Raises:
+            MCPToolError: If MCP invocation fails
         """
-        logger.info(f"Security & Compliance Agent reviewing: {draft.title}")
+        logger.info(f"🔧 Security & Compliance Agent (MCP) reviewing: {draft.title}")
+
+        try:
+            # Invoke MCP tool for AI-powered security review
+            result = await self.mcp_client.invoke_tool(
+                tool_name="security_compliance_reviewer",
+                category="content_review",
+                inputs={
+                    "content": draft.content,
+                    "compliance_standards": self.compliance_standards,
+                },
+            )
+
+            # Map MCP result to AgentReview
+            return AgentReview(
+                agent_name=self.agent_name,
+                decision=ReviewDecision(result["decision"]),
+                confidence=result["confidence"],
+                feedback=result["feedback"],
+                issues_found=result.get("issues_found", []),
+                suggestions=result.get("suggestions", []),
+            )
+
+        except MCPToolError as e:
+            logger.error(f"❌ MCP tool invocation failed: {e}")
+            logger.warning("⚠️  Falling back to rule-based security review")
+            return self._fallback_review(draft)
+
+        except Exception as e:
+            logger.error(f"❌ Unexpected error during MCP review: {e}")
+            return self._fallback_review(draft)
+
+    def _fallback_review(self, draft: ContentDraft) -> AgentReview:
+        """
+        Fallback to rule-based security review if MCP fails
+
+        WHY: Ensure system continues even if MCP unavailable
+        HOW: Pattern matching for sensitive data, claims, regulated topics
+        IMPACT: Degraded quality but maintains security baseline
+
+        Args:
+            draft: Content draft to review
+
+        Returns:
+            AgentReview with basic security analysis
+        """
+        logger.info(f"⚙️  Fallback security review for: {draft.title}")
 
         issues = []
         suggestions = []
@@ -351,6 +543,8 @@ class SecurityComplianceReviewer:
             "secret",
             "token",
             "credit card",
+            "ssn",
+            "social security",
         ]
         found_sensitive = [p for p in sensitive_patterns if p in content_lower]
 
@@ -368,7 +562,8 @@ class SecurityComplianceReviewer:
             suggestions.append(
                 "Add appropriate disclaimer for claims or soften language"
             )
-            decision = ReviewDecision.MINOR_ISSUE
+            if decision != ReviewDecision.MAJOR_ISSUE:
+                decision = ReviewDecision.MINOR_ISSUE
 
         # Check for medical/financial advice
         regulated_topics = ["medical", "diagnosis", "investment", "financial advice"]
@@ -388,9 +583,9 @@ class SecurityComplianceReviewer:
         feedback = self._generate_feedback(issues, suggestions, decision)
 
         return AgentReview(
-            agent_name=self.agent_name,
+            agent_name=f"{self.agent_name} (Fallback)",
             decision=decision,
-            confidence=0.98,
+            confidence=0.85,  # Lower confidence for fallback
             feedback=feedback,
             issues_found=issues,
             suggestions=suggestions,
@@ -399,7 +594,7 @@ class SecurityComplianceReviewer:
     def _generate_feedback(
         self, issues: List[str], suggestions: List[str], decision: ReviewDecision
     ) -> str:
-        """Generate comprehensive feedback"""
+        """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
             return "Content passes security and compliance checks. No concerns."
 

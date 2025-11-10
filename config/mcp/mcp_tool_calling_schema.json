@@ -592,6 +592,361 @@
           }
         }
       }
+    },
+
+    "content_review": {
+      "brand_intelligence_reviewer": {
+        "name": "Brand Intelligence Content Reviewer",
+        "description": "Reviews content for brand consistency, tone, and quality standards using AI analysis",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Content title"
+            },
+            "content": {
+              "type": "string",
+              "description": "Full content text"
+            },
+            "keywords": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Target keywords"
+            },
+            "word_count": {
+              "type": "integer",
+              "description": "Content word count"
+            },
+            "brand_config": {
+              "type": "object",
+              "properties": {
+                "keywords": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "tone": {
+                  "type": "string",
+                  "enum": ["professional", "casual", "friendly", "formal", "conversational"]
+                },
+                "min_word_count": {"type": "integer", "default": 600}
+              }
+            }
+          },
+          "required": ["title", "content", "brand_config"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "type": "string",
+              "enum": ["approved", "minor_issue", "major_issue"],
+              "description": "Review decision"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Confidence score 0-1"
+            },
+            "feedback": {
+              "type": "string",
+              "description": "Detailed review feedback"
+            },
+            "issues_found": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List of issues identified"
+            },
+            "suggestions": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Improvement suggestions"
+            },
+            "brand_alignment_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Brand alignment score"
+            }
+          },
+          "required": ["decision", "confidence", "feedback", "issues_found", "suggestions"]
+        }
+      },
+
+      "seo_marketing_reviewer": {
+        "name": "SEO Marketing Content Reviewer",
+        "description": "Reviews content for SEO effectiveness, keyword optimization, and marketing impact",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Content title (checked for SEO length)"
+            },
+            "content": {
+              "type": "string",
+              "description": "Full content text"
+            },
+            "meta_description": {
+              "type": "string",
+              "description": "Meta description for search engines"
+            },
+            "keywords": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Target SEO keywords"
+            }
+          },
+          "required": ["title", "content", "meta_description"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "type": "string",
+              "enum": ["approved", "minor_issue", "major_issue"]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "feedback": {"type": "string"},
+            "issues_found": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "suggestions": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "seo_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Overall SEO quality score"
+            },
+            "keyword_density": {
+              "type": "object",
+              "description": "Keyword usage analysis"
+            }
+          },
+          "required": ["decision", "confidence", "feedback", "issues_found", "suggestions", "seo_score"]
+        }
+      },
+
+      "security_compliance_reviewer": {
+        "name": "Security & Compliance Content Reviewer",
+        "description": "Reviews content for security issues, PII exposure, and compliance violations",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string",
+              "description": "Full content text to scan"
+            },
+            "compliance_standards": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["GDPR", "CCPA", "HIPAA", "PCI-DSS", "SOC2"]
+              },
+              "default": ["GDPR"]
+            }
+          },
+          "required": ["content"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "decision": {
+              "type": "string",
+              "enum": ["approved", "minor_issue", "major_issue"]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "feedback": {"type": "string"},
+            "issues_found": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "suggestions": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "security_issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "enum": ["critical", "high", "medium", "low"]
+                  },
+                  "issue": {"type": "string"},
+                  "location": {"type": "string"}
+                }
+              }
+            },
+            "compliance_violations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "standard": {"type": "string"},
+                  "violation": {"type": "string"},
+                  "remediation": {"type": "string"}
+                }
+              }
+            }
+          },
+          "required": ["decision", "confidence", "feedback", "security_issues", "compliance_violations"]
+        }
+      }
+    },
+
+    "wordpress_automation": {
+      "post_categorizer": {
+        "name": "AI-Powered WordPress Post Categorizer",
+        "description": "Categorizes WordPress posts using AI with confidence scoring and reasoning",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "post_title": {
+              "type": "string",
+              "description": "WordPress post title"
+            },
+            "post_content": {
+              "type": "string",
+              "description": "WordPress post content (optional)"
+            },
+            "available_categories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "integer"},
+                  "name": {"type": "string"},
+                  "slug": {"type": "string"},
+                  "description": {"type": "string"}
+                }
+              },
+              "description": "Available WordPress categories"
+            }
+          },
+          "required": ["post_title", "available_categories"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "category_id": {
+              "type": "integer",
+              "description": "Selected category ID"
+            },
+            "category_name": {
+              "type": "string",
+              "description": "Category name"
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Confidence score for categorization"
+            },
+            "reasoning": {
+              "type": "string",
+              "description": "Explanation for category selection"
+            },
+            "alternative_categories": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "category_id": {"type": "integer"},
+                  "confidence": {"type": "number"}
+                }
+              },
+              "description": "Other potential categories with scores"
+            }
+          },
+          "required": ["category_id", "category_name", "confidence", "reasoning"]
+        }
+      }
+    },
+
+    "ecommerce_automation": {
+      "product_seo_optimizer": {
+        "name": "WooCommerce Product SEO Optimizer",
+        "description": "Optimizes WooCommerce product titles, descriptions, and metadata for SEO",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "integer",
+              "description": "WooCommerce product ID"
+            },
+            "product_data": {
+              "type": "object",
+              "properties": {
+                "title": {"type": "string"},
+                "description": {"type": "string"},
+                "short_description": {"type": "string"},
+                "categories": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "price": {"type": "number"},
+                "sku": {"type": "string"}
+              },
+              "required": ["title", "description"]
+            },
+            "target_keywords": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Target SEO keywords for product"
+            }
+          },
+          "required": ["product_id", "product_data"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "optimized_title": {
+              "type": "string",
+              "description": "SEO-optimized product title"
+            },
+            "optimized_description": {
+              "type": "string",
+              "description": "SEO-optimized long description"
+            },
+            "optimized_short_description": {
+              "type": "string",
+              "description": "SEO-optimized short description"
+            },
+            "meta_keywords": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Recommended meta keywords"
+            },
+            "seo_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Overall SEO quality score"
+            },
+            "improvements_made": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List of SEO improvements applied"
+            }
+          },
+          "required": ["optimized_title", "optimized_description", "seo_score", "improvements_made"]
+        }
+      }
     }
   },
 
