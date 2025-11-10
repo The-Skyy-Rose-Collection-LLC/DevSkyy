@@ -334,10 +334,8 @@ class TestPerformance:
         batch = [f"record-{i}" for i in range(1000)]
 
         start = time.time()
-        encrypted_batch = [
+        for record in batch:
             encryption_service.encrypt(record, test_key)
-            for record in batch
-        ]
         elapsed = time.time() - start
 
         print(f"Encrypted 1000 records in {elapsed:.2f}s ({elapsed/len(batch)*1000:.2f}ms per record)")
