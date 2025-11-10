@@ -10,10 +10,14 @@ setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
 
 # Core Framework (Latest Secure Versions)
 fastapi==0.119.0  # Includes starlette dependency - do not pin separately
-uvicorn[standard]==0.34.0
+uvicorn[standard]==0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency
 pydantic[email]==2.10.4  # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)
 python-dotenv==1.0.1
 email-validator==2.1.0  # Required for Pydantic email validation
+
+# Agent Framework & MCP
+claude-agent-sdk==0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)
+mcp==1.21.0  # Model Context Protocol - official implementation
 
 # Agent Observability & Training
 logfire[fastapi]==4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)
