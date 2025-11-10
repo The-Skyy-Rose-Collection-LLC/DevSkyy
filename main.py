@@ -16,14 +16,15 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 # Core FastAPI imports
-from fastapi import FastAPI, HTTPException, Request, Response, status
-from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from error_handlers import register_error_handlers
 
 # Prometheus monitoring
 try:
@@ -234,31 +235,7 @@ app.state.startup_time = datetime.now()
 # EXCEPTION HANDLERS
 # ============================================================================
 
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    logger.error(f"HTTP exception: {exc.detail} - {request.url}")
-    return JSONResponse(
-        status_code=exc.status_code, content={"error": True, "message": exc.detail, "status_code": exc.status_code}
-    )
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    logger.error(f"Validation error: {exc} - {request.url}")
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"error": True, "message": "Invalid request data", "details": exc.errors()},
-    )
-
-
-@app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"error": True, "message": "Internal server error", "timestamp": datetime.now().isoformat()},
-    )
+register_error_handlers(app)
 
 
 # ============================================================================
