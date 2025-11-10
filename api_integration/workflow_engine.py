@@ -1,4 +1,5 @@
 from api_integration.core_engine import api_gateway
+from api_integration.enums import WorkflowStatus
 from datetime import datetime
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.notification_manager import notification_manager
@@ -32,17 +33,6 @@ class TriggerType(Enum):
     API_RESPONSE = "api_response"
     THRESHOLD = "threshold"
     MANUAL = "manual"
-
-class WorkflowStatus(Enum):
-    """Workflow execution status"""
-
-    PENDING = "pending"
-    RUNNING = "running"
-    SUCCESS = "success"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-    PAUSED = "paused"
-    ROLLED_BACK = "rolled_back"
 
 class StepStatus(Enum):
     """Workflow step status"""
@@ -141,7 +131,7 @@ class Workflow:
         data = asdict(self)
         data["trigger"] = self.trigger.to_dict()
         data["steps"] = [step.to_dict() for step in self.steps]
-        data["status"] = self.status.value
+        data["status"] = self.status.to_json()
         data["created_at"] = self.created_at.isoformat()
         if self.started_at:
             data["started_at"] = self.started_at.isoformat()
@@ -767,7 +757,7 @@ class WorkflowEngine:
                 "workflow_name": workflow.name,
                 "execution_id": context["execution_id"],
                 "event_type": event_type,
-                "status": workflow.status.value,
+                "status": workflow.status.to_json(),
                 "timestamp": datetime.now().isoformat(),
                 "execution_time": workflow.execution_time,
                 "fashion_context": workflow.fashion_context,

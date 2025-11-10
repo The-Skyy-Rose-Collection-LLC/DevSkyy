@@ -1,0 +1,3 @@
+"""
+API Integration tests module
+"""
