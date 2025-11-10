@@ -1,24 +1,54 @@
-import requests
-import time
-from security.jwt_auth import create_access_token, create_refresh_token
-from sqlalchemy import create_engine
-
-from fastapi.testclient import TestClient
-from models_sqlalchemy import Base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from httpx import AsyncClient
-from security.jwt_auth import User, user_manager, UserRole
-from main import app
-from typing import AsyncGenerator, Generator
-import asyncio
-import pytest
-
 """
 DevSkyy Enterprise - Test Fixtures and Configuration
 Provides reusable fixtures for unit, integration, and API tests
+
+CRITICAL CI/CD FIXES:
+1. Python path configuration for imports to work
+2. Environment variable setup for CI/CD
+3. Database and Redis fixtures for integration tests
 """
+
+# =============================================================================
+# CRITICAL FIX #1: Python Path Configuration
+# =============================================================================
+# WHY: CI/CD runs from repo root, imports fail without this
+# This MUST be at the top before any local imports
+# =============================================================================
+
+import sys
+import os
+from pathlib import Path
+
+# Add project root to Python path for CI/CD
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+print(f"✅ Test configuration: Project root added to path: {project_root}")
+
+# =============================================================================
+# Standard Library and Third-Party Imports
+# =============================================================================
+
+import requests
+import time
+import asyncio
+import pytest
+from typing import AsyncGenerator, Generator
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+from httpx import AsyncClient
+
+# =============================================================================
+# Local Imports (now work because of sys.path fix above)
+# =============================================================================
+
+from security.jwt_auth import create_access_token, create_refresh_token
+from models_sqlalchemy import Base
+from security.jwt_auth import User, user_manager, UserRole
+from main import app
 
 # Import main app
 
@@ -178,9 +208,40 @@ def mock_agent_data():
 # Environment Fixtures
 # ============================================================================
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_environment():
+    """
+    Set up test environment variables for CI/CD.
+
+    WHY THIS FIXTURE:
+    - CI/CD doesn't have .env files
+    - Application code requires certain env vars
+    - Tests should have predictable environment
+    - Autouse=True means it runs automatically for all tests
+
+    This fixture sets safe defaults that work in CI/CD.
+    """
+    print("\n🔧 Setting up test environment variables for CI/CD...")
+
+    # Set defaults (only if not already set)
+    os.environ.setdefault("ENVIRONMENT", "test")
+    os.environ.setdefault("DATABASE_URL", "postgresql://devskyy_test:test_password@localhost:5432/devskyy_test")
+    os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+    os.environ.setdefault("SECRET_KEY", "test-secret-key-for-ci-cd-only")
+    os.environ.setdefault("JWT_SECRET_KEY", "test-jwt-secret-for-testing-only")
+    os.environ.setdefault("ENCRYPTION_MASTER_KEY", "test_encryption_key_32_bytes_!!")
+    os.environ.setdefault("ANTHROPIC_API_KEY", "test-anthropic-key")
+    os.environ.setdefault("OPENAI_API_KEY", "test-openai-key")
+    os.environ.setdefault("LOG_LEVEL", "DEBUG")
+    os.environ.setdefault("ENABLE_RATE_LIMITING", "false")
+
+    print("✅ Test environment configured successfully")
+
+    yield
+
 @pytest.fixture(scope="function")
 def test_env_vars(monkeypatch):
-    """Set test environment variables"""
+    """Set test environment variables (per-test override)"""
     monkeypatch.setenv("ENVIRONMENT", "test")
     monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
     monkeypatch.setenv("JWT_SECRET_KEY", "test_secret_key_for_testing_only")
