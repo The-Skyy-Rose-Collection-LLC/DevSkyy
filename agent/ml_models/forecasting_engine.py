@@ -312,14 +312,16 @@ class ForecastingEngine:
                     o * a
                     for o, a in zip(
                         order_forecast["confidence_interval_lower"],
-                        aov_forecast["confidence_interval_lower"], strict=False,
+                        aov_forecast["confidence_interval_lower"],
+                        strict=False,
                     )
                 ],
                 "upper": [
                     o * a
                     for o, a in zip(
                         order_forecast["confidence_interval_upper"],
-                        aov_forecast["confidence_interval_upper"], strict=False,
+                        aov_forecast["confidence_interval_upper"],
+                        strict=False,
                     )
                 ],
             },

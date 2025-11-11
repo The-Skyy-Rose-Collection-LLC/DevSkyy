@@ -286,7 +286,8 @@ class UniversalSelfHealingAgent:
                     [linter, str(file_path)],
                     capture_output=True,
                     text=True,
-                    timeout=30, check=False,
+                    timeout=30,
+                    check=False,
                 )
 
                 # Parse linter output
@@ -587,7 +588,8 @@ Provide the complete fixed code. Ensure:
             result = subprocess.run(
                 [test_framework, str(file_path)],
                 capture_output=True,
-                timeout=60, check=False,
+                timeout=60,
+                check=False,
             )
 
             return result.returncode == 0

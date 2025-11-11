@@ -135,7 +135,8 @@ class EnhancedAutoFix:
                 ["git", "branch", "--show-current"],
                 capture_output=True,
                 text=True,
-                timeout=10, check=False,
+                timeout=10,
+                check=False,
             )
             if result.returncode == 0:
                 return result.stdout.strip()
@@ -151,7 +152,8 @@ class EnhancedAutoFix:
                 ["git", "checkout", "-b", branch_name],
                 capture_output=True,
                 text=True,
-                timeout=30, check=False,
+                timeout=30,
+                check=False,
             )
             if result.returncode == 0:
                 logger.info(f"✅ Created fix branch: {branch_name}")
@@ -170,7 +172,8 @@ class EnhancedAutoFix:
                 ["git", "checkout", branch_name],
                 capture_output=True,
                 text=True,
-                timeout=30, check=False,
+                timeout=30,
+                check=False,
             )
             return result.returncode == 0
         except Exception as e:

@@ -186,16 +186,21 @@ def _configure_git() -> None:
     """Configure Git with default settings."""
     try:
         # Check if user.name is configured
-        result = subprocess.run(["git", "config", "user.name"], capture_output=True, text=True, timeout=10, check=False)
+        result = subprocess.run(
+            ["git", "config", "user.name"], capture_output=True, text=True, timeout=10, check=False
+        )
         if result.returncode != 0 or not result.stdout.strip():
             subprocess.run(["git", "config", "user.name", "DevSkyy Enhanced Platform"], timeout=10, check=False)
 
         # Check if user.email is configured
-        result = subprocess.run(["git", "config", "user.email"], capture_output=True, text=True, timeout=10, check=False)
+        result = subprocess.run(
+            ["git", "config", "user.email"], capture_output=True, text=True, timeout=10, check=False
+        )
         if result.returncode != 0 or not result.stdout.strip():
             subprocess.run(
                 ["git", "config", "user.email", "devskyy@theskyy-rose-collection.com"],
-                timeout=10, check=False,
+                timeout=10,
+                check=False,
             )
 
         logger.info("✅ Git configuration verified")
@@ -207,7 +212,9 @@ def _configure_git() -> None:
 def _git_status() -> dict[str, Any]:
     """Check Git repository status."""
     try:
-        result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10, check=False)
+        result = subprocess.run(
+            ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10, check=False
+        )
         if result.returncode != 0:
             return {"has_changes": False, "error": "Failed to get Git status"}
 
@@ -239,7 +246,8 @@ def _git_add_files() -> dict[str, Any]:
             ["git", "status", "--porcelain", "--cached"],
             capture_output=True,
             text=True,
-            timeout=10, check=False,
+            timeout=10,
+            check=False,
         )
 
         files_added = len([line for line in status_result.stdout.strip().split("\n") if line.strip()])
@@ -262,7 +270,8 @@ def _git_add_all() -> dict[str, Any]:
             ["git", "status", "--porcelain", "--cached"],
             capture_output=True,
             text=True,
-            timeout=10, check=False,
+            timeout=10,
+            check=False,
         )
 
         files_added = len([line for line in status_result.stdout.strip().split("\n") if line.strip()])
@@ -276,7 +285,9 @@ def _git_add_all() -> dict[str, Any]:
 def _git_commit(message: str) -> dict[str, Any]:
     """Commit staged changes with the provided message."""
     try:
-        result = subprocess.run(["git", "commit", "-m", message], capture_output=True, text=True, timeout=30, check=False)
+        result = subprocess.run(
+            ["git", "commit", "-m", message], capture_output=True, text=True, timeout=30, check=False
+        )
 
         if result.returncode != 0:
             # Check if there are no changes to commit
@@ -294,7 +305,9 @@ def _git_commit(message: str) -> dict[str, Any]:
         # Extract commit hash with comprehensive error handling
         commit_hash = None
         try:
-            hash_result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, check=False)
+            hash_result = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, check=False
+            )
             if hash_result.returncode == 0:
                 commit_hash = hash_result.stdout.strip()[:8]  # Short hash
                 logger.debug(f"📋 Extracted commit hash: {commit_hash}")
@@ -328,7 +341,8 @@ def _git_push() -> dict[str, Any]:
             ["git", "branch", "--show-current"],
             capture_output=True,
             text=True,
-            timeout=10, check=False,
+            timeout=10,
+            check=False,
         )
         if current_branch_result.returncode != 0:
             return {"success": False, "error": "Failed to get current branch name"}
@@ -342,7 +356,8 @@ def _git_push() -> dict[str, Any]:
             ["git", "push", "origin", current_branch],
             capture_output=True,
             text=True,
-            timeout=60, check=False,
+            timeout=60,
+            check=False,
         )
 
         if result.returncode == 0:

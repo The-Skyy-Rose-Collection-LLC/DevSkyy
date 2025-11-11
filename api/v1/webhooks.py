@@ -155,7 +155,6 @@ async def delete_webhook_subscription(subscription_id: str, current_user: TokenD
     logger.info(f"Webhook subscription deleted: {sanitize_for_log(subscription_id)}")
 
 
-
 # ============================================================================
 # WEBHOOK DELIVERIES
 # ============================================================================

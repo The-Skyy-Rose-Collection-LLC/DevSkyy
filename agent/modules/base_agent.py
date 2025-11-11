@@ -235,9 +235,7 @@ class BaseAgent(ABC):
                                 await asyncio.sleep(self.retry_delay)
                                 continue
 
-                        logger.warning(
-                            f"⚠️ Attempt {attempt + 1}/{self.max_retries} failed for {func.__name__}: {e!s}"
-                        )
+                        logger.warning(f"⚠️ Attempt {attempt + 1}/{self.max_retries} failed for {func.__name__}: {e!s}")
                         await asyncio.sleep(self.retry_delay * (attempt + 1))
                     else:
                         logger.error(f"❌ All retry attempts exhausted for {func.__name__}")

@@ -211,8 +211,12 @@ class SkyRoseBrandTrainer:
 
             # Create training manifest
             training_manifest = {
-                "train": [{"image": str(img), "caption": cap} for img, cap in zip(train_images, train_captions, strict=False)],
-                "validation": [{"image": str(img), "caption": cap} for img, cap in zip(val_images, val_captions, strict=False)],
+                "train": [
+                    {"image": str(img), "caption": cap} for img, cap in zip(train_images, train_captions, strict=False)
+                ],
+                "validation": [
+                    {"image": str(img), "caption": cap} for img, cap in zip(val_images, val_captions, strict=False)
+                ],
             }
 
             manifest_file = output_dir / "training_manifest.json"
