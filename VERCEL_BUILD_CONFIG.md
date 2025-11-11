@@ -39,7 +39,7 @@ This document outlines the optimal Vercel build configuration for the DevSkyy En
 ### **Runtime Settings**
 ```json
 {
-  "runtime": "python3.11",
+  "runtime": "python3.12",
   "maxLambdaSize": "50mb",
   "maxDuration": 30,
   "memory": 1024
@@ -116,7 +116,7 @@ PYTHONUNBUFFERED=1
 ```
 
 ### **3. Function Configuration**
-- **Runtime**: Python 3.11
+- **Runtime**: Python 3.12
 - **Memory**: 1024 MB
 - **Max Duration**: 30 seconds
 - **Max Lambda Size**: 50 MB

@@ -12,9 +12,9 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.11",
+        "runtime": "python3.12",
         "excludeFiles": "**/{__pycache__,*.pyc,tests,docs,htmlcov}/**",
-        "pythonBinPath": "python3.11"
+        "pythonBinPath": "python3.12"
       }
     }
   ],
@@ -39,7 +39,7 @@
     "main.py": {
       "maxDuration": 30,
       "memory": 1024,
-      "runtime": "python3.11",
+      "runtime": "python3.12",
       "includeFiles": "templates/**"
     }
   },

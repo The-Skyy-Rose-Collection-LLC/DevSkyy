@@ -126,7 +126,7 @@ graph TD
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.11"
+        "runtime": "python3.12"
       }
     }
   ],
@@ -156,7 +156,7 @@ graph TD
     "main.py": {
       "maxDuration": 30,
       "memory": 1024,
-      "runtime": "python3.11"
+      "runtime": "python3.12"
     }
   },
   "regions": ["iad1"],

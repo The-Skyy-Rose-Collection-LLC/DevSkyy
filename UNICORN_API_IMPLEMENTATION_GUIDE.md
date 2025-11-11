@@ -1154,7 +1154,7 @@ CLOUDINARY_API_SECRET=your-secret
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.11"
+        "runtime": "python3.12"
       }
     }
   ],
