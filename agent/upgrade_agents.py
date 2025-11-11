@@ -1,7 +1,6 @@
 from pathlib import Path
 import re
-
-from typing import List
+import logging
 from typing import List
 
 """
@@ -14,6 +13,8 @@ This script:
 3. Maintains backward compatibility
 4. Adds comprehensive error handling and ML features
 """
+
+logger = logging.getLogger(__name__)
 
 AGENT_MODULES_DIR = Path(__file__).parent / "modules"
 

@@ -13,6 +13,8 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import psutil
 
+logger = logging.getLogger(__name__)
+
 # Production-grade image processing imports
 try:
     from PIL import Image, ImageOps, ImageEnhance

@@ -5,6 +5,10 @@ from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
     workflow_engine,
     WorkflowTrigger,
+    TriggerType,
+    ActionType,
+    WorkflowStep,
+    Workflow,
 )
 from datetime import datetime
 from fashion.intelligence_engine import (

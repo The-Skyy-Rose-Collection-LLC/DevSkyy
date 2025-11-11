@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 import json
 import time
+import logging
 
 """
 DevSkyy Vercel Build Performance Monitor
@@ -10,6 +11,8 @@ DevSkyy Vercel Build Performance Monitor
 This script monitors and reports on Vercel build performance,
 helping optimize build times and identify potential issues.
 """
+
+logger = logging.getLogger(__name__)
 
 class VercelBuildMonitor:
     """Monitor Vercel build performance and health"""

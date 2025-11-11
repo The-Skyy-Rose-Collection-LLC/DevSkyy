@@ -5,6 +5,7 @@ from api_integration.workflow_engine import (
     Workflow,
     WorkflowStep,
     WorkflowTrigger,
+    workflow_engine,
 )
 from datetime import datetime
 from dataclasses import asdict, dataclass

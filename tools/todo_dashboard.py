@@ -1,11 +1,3 @@
-from fastapi.responses import HTMLResponse
-
-from fastapi import FastAPI, HTTPException, Request
-
-import uvicorn
-from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
-from typing import Dict, Optional
-
 #!/usr/bin/env python3
 """
 DevSkyy TODO Dashboard
@@ -13,6 +5,15 @@ DevSkyy TODO Dashboard
 A web-based dashboard for managing TODO items, technical debt,
 and development tasks across the DevSkyy platform.
 """
+
+from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request
+import uvicorn
+import logging
+from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
+from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 class TodoDashboard:
     """Web dashboard for TODO management"""

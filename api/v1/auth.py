@@ -8,6 +8,11 @@ from security.jwt_auth import (
     create_user_tokens,
     get_current_active_user,
     verify_token,
+    User,
+    UserRole,
+    TokenResponse,
+    TokenData,
+    user_manager,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
 from typing import Dict
