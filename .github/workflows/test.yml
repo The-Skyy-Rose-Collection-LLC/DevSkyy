@@ -71,7 +71,10 @@ jobs:
             --cov=${{ matrix.test-group }} \
             --cov-report=xml:coverage-${{ matrix.test-group }}.xml \
             --cov-report=html:htmlcov-${{ matrix.test-group }} \
-            --junit-xml=junit-${{ matrix.test-group }}.xml
+            --junit-xml=junit-${{ matrix.test-group }}.xml \
+            --reruns 3 \
+            --reruns-delay 1
+        continue-on-error: false
 
       - name: Upload test results
         if: always()

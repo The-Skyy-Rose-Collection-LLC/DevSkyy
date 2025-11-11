@@ -15,6 +15,22 @@ on:
       - '**.md'
       - 'docs/**'
   workflow_dispatch:
+    inputs:
+      skip-tests:
+        description: 'Skip test execution (for testing workflow changes)'
+        required: false
+        type: boolean
+        default: false
+      skip-docker:
+        description: 'Skip Docker build and scan'
+        required: false
+        type: boolean
+        default: false
+      debug-mode:
+        description: 'Enable debug logging'
+        required: false
+        type: boolean
+        default: false
 
 # Cancel in-progress runs for the same branch
 concurrency:
@@ -25,6 +41,7 @@ env:
   PYTHON_VERSION: '3.11.9'
   NODE_VERSION: '18'
   ERROR_LEDGER_PATH: artifacts/error-ledger-${{ github.run_id }}.json
+  DEBUG_MODE: ${{ inputs.debug-mode || 'false' }}
 
 jobs:
   # ============================================================================
@@ -206,6 +223,7 @@ jobs:
     name: Tests & Coverage
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    if: ${{ !inputs.skip-tests }}
 
     services:
       postgres:
@@ -309,6 +327,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [lint, type-check, security, test]
+    if: ${{ !inputs.skip-docker && (success() || failure()) }}
 
     steps:
       - name: Checkout repository
@@ -512,33 +531,88 @@ jobs:
     if: always()
 
     steps:
+      - name: Download error ledger
+        uses: actions/download-artifact@v4
+        with:
+          name: error-ledger
+          path: error-ledger/
+        continue-on-error: true
+
       - name: Generate build summary
         run: |
+          # Define status emoji helper
+          status_emoji() {
+            case "$1" in
+              success) echo "✅" ;;
+              failure) echo "❌" ;;
+              cancelled) echo "⚠️" ;;
+              skipped) echo "⏭️" ;;
+              *) echo "❓" ;;
+            esac
+          }
+
           echo "# DevSkyy CI/CD Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Information" >> $GITHUB_STEP_SUMMARY
           echo "- **Run ID**: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run Number**: ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Timestamp**: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow**: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          
           echo "## Job Results" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Type Check | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Error Ledger | ${{ needs.error-ledger.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| OpenAPI | ${{ needs.openapi-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | $(status_emoji ${{ needs.lint.result }}) | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | $(status_emoji ${{ needs.type-check.result }}) | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | $(status_emoji ${{ needs.security.result }}) | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | $(status_emoji ${{ needs.test.result }}) | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker | $(status_emoji ${{ needs.docker.result }}) | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Error Ledger | $(status_emoji ${{ needs.error-ledger.result }}) | ${{ needs.error-ledger.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| OpenAPI | $(status_emoji ${{ needs.openapi-validation.result }}) | ${{ needs.openapi-validation.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          
           echo "## Truth Protocol Compliance" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Test Coverage ≥90%" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ No HIGH/CRITICAL CVEs" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Error Ledger Generated" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ OpenAPI Spec Valid" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Docker Build & Scan Complete" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.test.result }}" == "success" ]]; then
+            echo "- ✅ Test Coverage ≥90%" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Test Coverage Check Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.security.result }}" == "success" ]]; then
+            echo "- ✅ No HIGH/CRITICAL CVEs" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Security Issues Found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.error-ledger.result }}" == "success" ]]; then
+            echo "- ✅ Error Ledger Generated" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⚠️ Error Ledger Generation Issues" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.openapi-validation.result }}" == "success" ]]; then
+            echo "- ✅ OpenAPI Spec Valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ OpenAPI Validation Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.docker.result }}" == "success" ]]; then
+            echo "- ✅ Docker Build & Scan Complete" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ❌ Docker Build/Scan Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Quick Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [View Commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "- [View Pull Request](https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }})" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Check overall build status
         run: |
