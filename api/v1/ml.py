@@ -1,11 +1,14 @@
 import logging
-import numpy as np
-import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
-from ml import explainer, model_registry, ModelStage, redis_cache
+import numpy as np
 from pydantic import BaseModel, Field
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
-from typing import Any, Dict, List
+import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
+
+from ml import ModelStage, explainer, model_registry, redis_cache
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
+
 
 """
 ML Infrastructure API Endpoints
@@ -29,9 +32,9 @@ class ModelRegistrationRequest(BaseModel):
     version: str
     model_type: str
     framework: str = "scikit-learn"
-    metrics: Dict[str, float]
-    parameters: Dict[str, Any] = Field(default_factory=dict)
-    dataset_info: Dict[str, Any] = Field(default_factory=dict)
+    metrics: dict[str, float]
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    dataset_info: dict[str, Any] = Field(default_factory=dict)
     stage: str = ModelStage.DEVELOPMENT
 
 class ModelPromotionRequest(BaseModel):
@@ -43,8 +46,8 @@ class ExplainRequest(BaseModel):
     """Request for model explanation"""
 
     model_name: str
-    input_data: List[List[float]]
-    feature_names: List[str] = Field(default_factory=list)
+    input_data: list[list[float]]
+    feature_names: list[str] = Field(default_factory=list)
 
 # ============================================================================
 # MODEL REGISTRY ENDPOINTS
@@ -70,7 +73,7 @@ async def list_model_versions(
         return {"model_name": model_name, "versions": versions}
     except Exception as e:
         raise HTTPException(
-            status_code=404, detail=f"Model not found: {model_name}. Error: {str(e)}"
+            status_code=404, detail=f"Model not found: {model_name}. Error: {e!s}"
         )
 
 @router.get("/registry/models/{model_name}/{version}")

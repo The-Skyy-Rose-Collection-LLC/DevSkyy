@@ -8,15 +8,15 @@ Author: DevSkyy Team
 Version: 1.0.0
 """
 
-import pytest
 from fastapi import HTTPException
+import pytest
 
 from security.input_validation import (
-    InputSanitizer,
+    AlphanumericValidator,
     ContentSecurityPolicy,
     EmailValidator,
+    InputSanitizer,
     URLValidator,
-    AlphanumericValidator,
 )
 
 
@@ -134,7 +134,7 @@ class TestCommandInjectionPrevention:
     def test_safe_command_input(self):
         """
         Verifies that a benign filename is unchanged by the command sanitizer.
-        
+
         Uses a simple safe filename ("myfile.txt") and asserts sanitize_command returns the same string.
         """
         safe_input = "myfile.txt"
@@ -368,7 +368,7 @@ class TestRealWorldScenarios:
         malicious_input = "file.txt\\x00.php"
 
         # Should handle null bytes safely
-        result = InputSanitizer.sanitize_path(malicious_input)
+        InputSanitizer.sanitize_path(malicious_input)
         # Null bytes should be removed or escaped
 
 

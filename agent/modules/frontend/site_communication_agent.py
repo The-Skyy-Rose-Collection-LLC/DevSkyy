@@ -1,16 +1,17 @@
+import asyncio
 from datetime import datetime
+import logging
+import random
+from typing import Any
+import uuid
 
 from . import http_client
 from .telemetry import Telemetry
-from typing import Any, Dict
-import asyncio
-import logging
-import random
-import uuid
+
 
 logger = logging.getLogger(__name__)
 
-async def communicate_with_site() -> Dict[str, Any]:
+async def communicate_with_site() -> dict[str, Any]:
     """Main function to communicate with site and gather insights."""
     SiteCommunicationAgent()
 
@@ -35,8 +36,8 @@ class SiteCommunicationAgent:
         logger.info("💬 Site Communication Agent initialized")
 
     async def connect_to_chatbot(
-        self, website_url: str, api_key: str = None
-    ) -> Dict[str, Any]:
+        self, website_url: str, api_key: str | None = None
+    ) -> dict[str, Any]:
         """Connect to website chatbot for real-time insights."""
 
         try:
@@ -72,7 +73,7 @@ class SiteCommunicationAgent:
                 "timestamp": datetime.now().isoformat(),
             }
 
-    async def _gather_chatbot_insights(self, website_url: str) -> Dict[str, Any]:
+    async def _gather_chatbot_insights(self, website_url: str) -> dict[str, Any]:
         """Gather insights from connected chatbot."""
 
         # Simulate real chatbot data gathering
@@ -99,7 +100,7 @@ class SiteCommunicationAgent:
 
         return insights
 
-    def gather_site_health_insights(self, website_url: str) -> Dict[str, Any]:
+    def gather_site_health_insights(self, website_url: str) -> dict[str, Any]:
         """Gather comprehensive site health insights."""
 
         try:
@@ -150,7 +151,7 @@ class SiteCommunicationAgent:
                 "recommendations": ["Check server connectivity", "Verify DNS settings"],
             }
 
-    def analyze_customer_feedback(self, website_url: str) -> Dict[str, Any]:
+    def analyze_customer_feedback(self, website_url: str) -> dict[str, Any]:
         """Analyze customer feedback and sentiment from various sources."""
 
         # Simulate customer feedback analysis
@@ -198,7 +199,7 @@ class SiteCommunicationAgent:
         self.customer_feedback_db.append(sentiment_analysis)
         return sentiment_analysis
 
-    def get_target_market_insights(self, website_url: str) -> Dict[str, Any]:
+    def get_target_market_insights(self, website_url: str) -> dict[str, Any]:
         """Gather insights about target market and customer behavior."""
 
         market_insights = {
@@ -262,7 +263,7 @@ class SiteCommunicationAgent:
         self.market_insights_cache[website_url] = market_insights
         return market_insights
 
-    def generate_comprehensive_report(self, website_url: str) -> Dict[str, Any]:
+    def generate_comprehensive_report(self, website_url: str) -> dict[str, Any]:
         """Generate comprehensive site insights report combining all data sources."""
 
         # Gather all available data
@@ -312,7 +313,7 @@ class SiteCommunicationAgent:
 
         return comprehensive_report
 
-    def _estimate_response_times(self) -> Dict[str, str]:
+    def _estimate_response_times(self) -> dict[str, str]:
         """Estimate response times for different communication channels."""
         return {
             "chatbot": "real_time",
@@ -322,7 +323,7 @@ class SiteCommunicationAgent:
         }
 
     # New experimental methods start here
-    def _initialize_neural_communication(self) -> Dict[str, Any]:
+    def _initialize_neural_communication(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize neural communication engine."""
         return {
             "language_model": "gpt4_turbo_instruct",
@@ -332,7 +333,7 @@ class SiteCommunicationAgent:
             "personality_adaptation": "myers_briggs_16_types",
         }
 
-    def _initialize_emotion_ai(self) -> Dict[str, Any]:
+    def _initialize_emotion_ai(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize emotion AI system."""
         return {
             "facial_recognition": "micro_expressions",
@@ -342,7 +343,7 @@ class SiteCommunicationAgent:
             "empathy_simulation": "human_level_response",
         }
 
-    def _initialize_quantum_analytics(self) -> Dict[str, Any]:
+    def _initialize_quantum_analytics(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize quantum analytics engine."""
         return {
             "user_behavior_modeling": "quantum_superposition",
@@ -354,7 +355,7 @@ class SiteCommunicationAgent:
 
     async def experimental_neural_communication_analysis(
         self, website_url: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """EXPERIMENTAL: Neural-powered communication analysis."""
         try:
             logger.info(f"🧠 Analyzing communication patterns for {website_url}")
@@ -419,13 +420,13 @@ class SiteCommunicationAgent:
             }
 
         except Exception as e:
-            logger.error(f"Neural communication analysis failed: {str(e)}")
+            logger.error(f"Neural communication analysis failed: {e!s}")
             return {"error": str(e), "status": "neural_overload"}
 
 # Main communication function
-async def communicate_with_site() -> Dict[str, Any]:
+async def communicate_with_site() -> dict[str, Any]:
     """Communicate with site and gather insights."""
-    agent = SiteCommunicationAgent()
+    SiteCommunicationAgent()
 
     return {
         "communication_status": "active",

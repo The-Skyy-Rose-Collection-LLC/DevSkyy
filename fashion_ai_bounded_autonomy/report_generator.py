@@ -3,12 +3,13 @@ LAYER 9 — OUTPUT AND REPORTING
 Generate organized, human-readable reports for operator review
 """
 
-import json
 import csv
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+import json
 import logging
+from pathlib import Path
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +42,9 @@ class ReportGenerator:
 
     async def generate_daily_summary(
         self,
-        orchestrator_status: Dict[str, Any],
-        performance_data: Dict[str, Any],
-        approval_stats: Dict[str, Any]
+        orchestrator_status: dict[str, Any],
+        performance_data: dict[str, Any],
+        approval_stats: dict[str, Any]
     ) -> Path:
         """Generate daily operations summary"""
         timestamp = datetime.now()
@@ -104,9 +105,9 @@ Generated: {timestamp.isoformat()}
 
     async def generate_weekly_report(
         self,
-        performance_data: Dict[str, Any],
-        incidents: List[Dict[str, Any]],
-        proposals: List[Dict[str, Any]]
+        performance_data: dict[str, Any],
+        incidents: list[dict[str, Any]],
+        proposals: list[dict[str, Any]]
     ) -> Path:
         """Generate weekly performance and improvement report"""
         timestamp = datetime.now()
@@ -129,8 +130,8 @@ Generated: {timestamp.isoformat()}
         # Agent performance
         for agent_name, metrics in performance_data.get('agent_performance', {}).items():
             report += f"### {agent_name}\n\n"
-            report += f"| Metric | Average | Min | Max | Samples |\n"
-            report += f"|--------|---------|-----|-----|\n"
+            report += "| Metric | Average | Min | Max | Samples |\n"
+            report += "|--------|---------|-----|-----|\n"
 
             for metric_name, stats in metrics.items():
                 report += f"| {metric_name} | {stats['average']:.2f} | {stats['min']:.2f} | {stats['max']:.2f} | {stats['samples']} |\n"
@@ -181,7 +182,7 @@ Generated: {timestamp.isoformat()}
 
     async def export_metrics_csv(
         self,
-        metrics_data: Dict[str, Any],
+        metrics_data: dict[str, Any],
         filename: Optional[str] = None
     ) -> Path:
         """Export metrics to CSV for analysis"""
@@ -215,7 +216,7 @@ Generated: {timestamp.isoformat()}
 
     async def generate_validation_report(
         self,
-        validation_results: List[Dict[str, Any]]
+        validation_results: list[dict[str, Any]]
     ) -> Path:
         """Generate data validation report"""
         timestamp = datetime.now()
@@ -237,7 +238,7 @@ Generated: {timestamp.isoformat()}
 
     async def generate_recommendations_report(
         self,
-        proposals: List[Dict[str, Any]]
+        proposals: list[dict[str, Any]]
     ) -> Path:
         """Generate formatted recommendations report"""
         timestamp = datetime.now()

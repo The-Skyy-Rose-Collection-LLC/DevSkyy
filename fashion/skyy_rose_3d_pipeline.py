@@ -4,14 +4,15 @@ Skyy Rose Collection 3D Model Pipeline
 Enterprise-grade 3D model processing and avatar system for luxury fashion
 """
 
-import logging
-from datetime import datetime
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-import json
 import hashlib
+import json
+import logging
+from pathlib import Path
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +43,8 @@ class AvatarType(Enum):
 class Material:
     """3D material definition."""
     name: str
-    textures: Dict[TextureType, str] = field(default_factory=dict)
-    properties: Dict[str, Any] = field(default_factory=dict)
+    textures: dict[TextureType, str] = field(default_factory=dict)
+    properties: dict[str, Any] = field(default_factory=dict)
     pbr_enabled: bool = True
 
 @dataclass
@@ -53,11 +54,11 @@ class Model3D:
     name: str
     format: ModelFormat
     file_path: str
-    materials: List[Material] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    materials: list[Material] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
     file_size: int = 0
     created_at: datetime = field(default_factory=datetime.now)
-    brand_tags: List[str] = field(default_factory=list)
+    brand_tags: list[str] = field(default_factory=list)
 
 @dataclass
 class Avatar:
@@ -66,14 +67,14 @@ class Avatar:
     name: str
     avatar_type: AvatarType
     model_path: str
-    animations: List[str] = field(default_factory=list)
-    customization_options: Dict[str, Any] = field(default_factory=dict)
-    voice_settings: Dict[str, Any] = field(default_factory=dict)
+    animations: list[str] = field(default_factory=list)
+    customization_options: dict[str, Any] = field(default_factory=dict)
+    voice_settings: dict[str, Any] = field(default_factory=dict)
 
 class SkyRose3DPipeline:
     """
     Enterprise-grade 3D model pipeline for Skyy Rose Collection.
-    
+
     Features:
     - 3D model loading and optimization
     - Brand matching and tagging
@@ -81,24 +82,24 @@ class SkyRose3DPipeline:
     - Real-time rendering optimization
     - Material and texture management
     """
-    
+
     def __init__(self, storage_path: str = "storage/3d_models"):
         self.storage_path = Path(storage_path)
         self.storage_path.mkdir(parents=True, exist_ok=True)
-        
+
         self.models_cache = {}
         self.avatars_cache = {}
         self.brand_database = self._initialize_brand_database()
-        
+
         # Create subdirectories
         (self.storage_path / "models").mkdir(exist_ok=True)
         (self.storage_path / "textures").mkdir(exist_ok=True)
         (self.storage_path / "avatars").mkdir(exist_ok=True)
         (self.storage_path / "animations").mkdir(exist_ok=True)
-        
+
         logger.info("✅ Skyy Rose 3D Pipeline initialized")
-    
-    def _initialize_brand_database(self) -> Dict[str, Any]:
+
+    def _initialize_brand_database(self) -> dict[str, Any]:
         """Initialize brand recognition database."""
         return {
             "skyy_rose": {
@@ -112,37 +113,37 @@ class SkyRose3DPipeline:
                 "style_attributes": ["refined", "opulent", "prestigious", "artisanal"]
             }
         }
-    
+
     async def load_3d_model(
-        self, 
-        file_path: str, 
+        self,
+        file_path: str,
         model_format: ModelFormat,
         brand_context: Optional[str] = None
     ) -> Model3D:
         """Load and process a 3D model file."""
         try:
             file_path_obj = Path(file_path)
-            
+
             if not file_path_obj.exists():
                 raise FileNotFoundError(f"3D model file not found: {file_path}")
-            
+
             # Generate unique model ID
             model_id = self._generate_model_id(file_path)
-            
+
             # Check cache first
             if model_id in self.models_cache:
                 logger.info(f"📦 Loading model from cache: {model_id}")
                 return self.models_cache[model_id]
-            
+
             # Load model metadata
             metadata = await self._extract_model_metadata(file_path_obj, model_format)
-            
+
             # Process materials and textures
             materials = await self._process_materials(file_path_obj, metadata)
-            
+
             # Apply brand matching
             brand_tags = self._match_brand_attributes(metadata, brand_context)
-            
+
             # Create model object
             model = Model3D(
                 id=model_id,
@@ -154,30 +155,30 @@ class SkyRose3DPipeline:
                 file_size=file_path_obj.stat().st_size,
                 brand_tags=brand_tags
             )
-            
+
             # Optimize for web rendering
             await self._optimize_for_web(model)
-            
+
             # Cache the model
             self.models_cache[model_id] = model
-            
+
             logger.info(f"✅ 3D model loaded successfully: {model.name}")
             return model
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to load 3D model {file_path}: {e}")
             raise
-    
+
     def _generate_model_id(self, file_path: str) -> str:
         """Generate unique ID for a model."""
         content_hash = hashlib.md5(str(file_path).encode()).hexdigest()
         return f"model_{content_hash[:12]}"
-    
+
     async def _extract_model_metadata(
-        self, 
-        file_path: Path, 
+        self,
+        file_path: Path,
         model_format: ModelFormat
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Extract metadata from 3D model file."""
         metadata = {
             "format": model_format.value,
@@ -189,7 +190,7 @@ class SkyRose3DPipeline:
             "textures": 0,
             "animations": 0
         }
-        
+
         # Format-specific metadata extraction would go here
         # For now, return basic metadata
         if model_format == ModelFormat.GLB:
@@ -198,10 +199,10 @@ class SkyRose3DPipeline:
             metadata.update(await self._extract_gltf_metadata(file_path))
         elif model_format == ModelFormat.FBX:
             metadata.update(await self._extract_fbx_metadata(file_path))
-        
+
         return metadata
-    
-    async def _extract_glb_metadata(self, file_path: Path) -> Dict[str, Any]:
+
+    async def _extract_glb_metadata(self, file_path: Path) -> dict[str, Any]:
         """Extract metadata from GLB file."""
         # Placeholder for GLB metadata extraction
         return {
@@ -210,8 +211,8 @@ class SkyRose3DPipeline:
             "supports_pbr": True,
             "supports_animations": True
         }
-    
-    async def _extract_gltf_metadata(self, file_path: Path) -> Dict[str, Any]:
+
+    async def _extract_gltf_metadata(self, file_path: Path) -> dict[str, Any]:
         """Extract metadata from GLTF file."""
         # Placeholder for GLTF metadata extraction
         return {
@@ -220,8 +221,8 @@ class SkyRose3DPipeline:
             "supports_pbr": True,
             "supports_animations": True
         }
-    
-    async def _extract_fbx_metadata(self, file_path: Path) -> Dict[str, Any]:
+
+    async def _extract_fbx_metadata(self, file_path: Path) -> dict[str, Any]:
         """Extract metadata from FBX file."""
         # Placeholder for FBX metadata extraction
         return {
@@ -229,18 +230,18 @@ class SkyRose3DPipeline:
             "generator": "DevSkyy 3D Pipeline",
             "supports_animations": True
         }
-    
+
     async def _process_materials(
-        self, 
-        file_path: Path, 
-        metadata: Dict[str, Any]
-    ) -> List[Material]:
+        self,
+        file_path: Path,
+        metadata: dict[str, Any]
+    ) -> list[Material]:
         """Process and optimize materials from 3D model."""
         materials = []
-        
+
         # Extract materials from model file
         # This would use actual 3D processing libraries like Open3D, trimesh, etc.
-        
+
         # For now, create sample materials
         base_material = Material(
             name="SkyRose_Base",
@@ -255,36 +256,36 @@ class SkyRose3DPipeline:
                 "emission_strength": 0.0
             }
         )
-        
+
         materials.append(base_material)
         return materials
-    
+
     def _match_brand_attributes(
-        self, 
-        metadata: Dict[str, Any], 
+        self,
+        metadata: dict[str, Any],
         brand_context: Optional[str]
-    ) -> List[str]:
+    ) -> list[str]:
         """Match model attributes with brand database."""
         brand_tags = []
-        
+
         # Check against Skyy Rose brand attributes
         skyy_rose_data = self.brand_database.get("skyy_rose", {})
-        
+
         # Simple keyword matching (would be more sophisticated in production)
         model_name = metadata.get("name", "").lower()
-        
+
         for keyword in skyy_rose_data.get("keywords", []):
             if keyword in model_name:
                 brand_tags.append(f"skyy_rose_{keyword}")
-        
+
         # Add luxury brand tags if applicable
         luxury_data = self.brand_database.get("luxury_brands", {})
         for keyword in luxury_data.get("keywords", []):
             if keyword in model_name:
                 brand_tags.append(f"luxury_{keyword}")
-        
+
         return brand_tags
-    
+
     async def _optimize_for_web(self, model: Model3D):
         """Optimize 3D model for web rendering."""
         # Optimization strategies:
@@ -292,28 +293,28 @@ class SkyRose3DPipeline:
         # 2. Compress textures
         # 3. Generate mipmaps
         # 4. Optimize material properties
-        
+
         logger.info(f"🔧 Optimizing model for web: {model.name}")
-        
+
         # Placeholder optimization
         model.metadata["optimized"] = True
         model.metadata["web_ready"] = True
         model.metadata["optimization_timestamp"] = datetime.now().isoformat()
-    
+
     async def create_avatar(
         self,
         avatar_type: AvatarType,
-        customization_options: Dict[str, Any],
-        voice_settings: Optional[Dict[str, Any]] = None
+        customization_options: dict[str, Any],
+        voice_settings: Optional[dict[str, Any]] = None
     ) -> Avatar:
         """Create a new avatar with customization options."""
         try:
             avatar_id = self._generate_avatar_id(customization_options)
-            
+
             # Check cache
             if avatar_id in self.avatars_cache:
                 return self.avatars_cache[avatar_id]
-            
+
             # Create avatar based on type
             if avatar_type == AvatarType.READY_PLAYER_ME:
                 avatar = await self._create_ready_player_me_avatar(
@@ -327,29 +328,29 @@ class SkyRose3DPipeline:
                 avatar = await self._create_custom_avatar(
                     avatar_id, customization_options, voice_settings
                 )
-            
+
             # Cache avatar
             self.avatars_cache[avatar_id] = avatar
-            
+
             logger.info(f"✅ Avatar created successfully: {avatar.name}")
             return avatar
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to create avatar: {e}")
             raise
-    
-    def _generate_avatar_id(self, customization_options: Dict[str, Any]) -> str:
+
+    def _generate_avatar_id(self, customization_options: dict[str, Any]) -> str:
         """Generate unique ID for an avatar."""
         options_hash = hashlib.md5(
             json.dumps(customization_options, sort_keys=True).encode()
         ).hexdigest()
         return f"avatar_{options_hash[:12]}"
-    
+
     async def _create_ready_player_me_avatar(
         self,
         avatar_id: str,
-        customization_options: Dict[str, Any],
-        voice_settings: Optional[Dict[str, Any]]
+        customization_options: dict[str, Any],
+        voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create Ready Player Me avatar."""
         return Avatar(
@@ -361,12 +362,12 @@ class SkyRose3DPipeline:
             customization_options=customization_options,
             voice_settings=voice_settings or {}
         )
-    
+
     async def _create_vroid_avatar(
         self,
         avatar_id: str,
-        customization_options: Dict[str, Any],
-        voice_settings: Optional[Dict[str, Any]]
+        customization_options: dict[str, Any],
+        voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create VRoid Studio avatar."""
         return Avatar(
@@ -378,12 +379,12 @@ class SkyRose3DPipeline:
             customization_options=customization_options,
             voice_settings=voice_settings or {}
         )
-    
+
     async def _create_custom_avatar(
         self,
         avatar_id: str,
-        customization_options: Dict[str, Any],
-        voice_settings: Optional[Dict[str, Any]]
+        customization_options: dict[str, Any],
+        voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create custom avatar."""
         return Avatar(
@@ -395,15 +396,15 @@ class SkyRose3DPipeline:
             customization_options=customization_options,
             voice_settings=voice_settings or {}
         )
-    
-    async def generate_360_view(self, model: Model3D, output_path: str) -> Dict[str, Any]:
+
+    async def generate_360_view(self, model: Model3D, output_path: str) -> dict[str, Any]:
         """Generate 360-degree view images for a 3D model."""
         try:
             logger.info(f"📸 Generating 360° view for model: {model.name}")
-            
+
             # This would use actual 3D rendering libraries
             # For now, return metadata about the generated views
-            
+
             views = []
             for angle in range(0, 360, 30):  # 12 views
                 view_path = f"{output_path}/view_{angle:03d}.jpg"
@@ -412,19 +413,19 @@ class SkyRose3DPipeline:
                     "image_path": view_path,
                     "thumbnail_path": f"{output_path}/thumb_{angle:03d}.jpg"
                 })
-            
+
             return {
                 "model_id": model.id,
                 "total_views": len(views),
                 "views": views,
                 "generated_at": datetime.now().isoformat()
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to generate 360° view: {e}")
             raise
-    
-    def get_pipeline_status(self) -> Dict[str, Any]:
+
+    def get_pipeline_status(self) -> dict[str, Any]:
         """Get comprehensive pipeline status."""
         return {
             "models_loaded": len(self.models_cache),

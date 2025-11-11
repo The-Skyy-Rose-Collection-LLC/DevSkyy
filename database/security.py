@@ -3,17 +3,19 @@ Enhanced Database Security for DevSkyy Enterprise Platform
 Connection pooling, credential management, and security monitoring
 """
 
+from collections import defaultdict, deque
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
 import logging
 import os
 import time
-from collections import defaultdict, deque
-from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
-from typing import AsyncGenerator, Dict, Optional
+from typing import Optional
 
 from cryptography.fernet import Fernet
 from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
 
 logger = logging.getLogger(__name__)
 
@@ -198,12 +200,9 @@ class SecureConnectionPool:
                 return True
 
         # Check for excessive wildcards (potential data exfiltration)
-        if statement_upper.count("SELECT *") > 1:
-            return True
+        return statement_upper.count("SELECT *") > 1
 
-        return False
-
-    def get_security_stats(self) -> Dict:
+    def get_security_stats(self) -> dict:
         """Get connection security statistics"""
         return {
             **self.connection_stats,
@@ -297,7 +296,7 @@ class SecureSessionManager:
             # Some databases might not support these settings
             logger.debug(f"Session security setup warning: {e}")
 
-    def get_session_stats(self) -> Dict:
+    def get_session_stats(self) -> dict:
         """Get session statistics"""
         return {
             **dict(self.session_stats),
@@ -344,7 +343,7 @@ class DatabaseSecurityManager:
         async with self.session_manager.get_secure_session(user_id) as session:
             yield session
 
-    def record_security_event(self, event_type: str, details: Dict):
+    def record_security_event(self, event_type: str, details: dict):
         """Record a security event"""
         event = {
             "timestamp": datetime.now(),
@@ -375,7 +374,7 @@ class DatabaseSecurityManager:
         else:
             self.threat_level = "LOW"
 
-    def get_security_report(self) -> Dict:
+    def get_security_report(self) -> dict:
         """Get comprehensive security report"""
         return {
             "threat_level": self.threat_level,
@@ -391,7 +390,7 @@ class DatabaseSecurityManager:
             "credential_cache_size": len(self.credential_manager._credential_cache),
         }
 
-    async def health_check(self) -> Dict:
+    async def health_check(self) -> dict:
         """Perform database security health check"""
         try:
             async with self.get_secure_session() as session:

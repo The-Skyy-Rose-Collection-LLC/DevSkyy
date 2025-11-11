@@ -1,20 +1,20 @@
-import re
+import base64
 from datetime import datetime, timedelta
+from enum import Enum
+import hashlib
+import hmac
 import json
+import logging
+import re
 import secrets
 import time
-
-from pydantic import BaseModel, Field
+from typing import Any, Optional
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
-import base64
-import hashlib
-import hmac
-import logging
+from pydantic import BaseModel, Field
+
 
 """
 DevSkyy Enhanced Security Module v2.0.0
@@ -70,7 +70,7 @@ class SecurityEvent(BaseModel):
     endpoint: Optional[str] = None
     user_agent: Optional[str] = None
     description: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     resolved: bool = False
     resolution_notes: Optional[str] = None
 
@@ -81,8 +81,8 @@ class SecurityPolicy(BaseModel):
     name: str
     description: str
     enabled: bool = True
-    rules: List[Dict[str, Any]] = Field(default_factory=list)
-    actions: List[str] = Field(default_factory=list)
+    rules: list[dict[str, Any]] = Field(default_factory=list)
+    actions: list[str] = Field(default_factory=list)
     severity: ThreatLevel = ThreatLevel.MEDIUM
 
 # ============================================================================
@@ -104,10 +104,10 @@ class EnhancedSecurityManager:
 
     def __init__(self, redis_client=None):
         self.redis_client = redis_client
-        self.security_events: List[SecurityEvent] = []
-        self.blocked_ips: Set[str] = set()
-        self.suspicious_patterns: Dict[str, int] = {}
-        self.security_policies: Dict[str, SecurityPolicy] = {}
+        self.security_events: list[SecurityEvent] = []
+        self.blocked_ips: set[str] = set()
+        self.suspicious_patterns: dict[str, int] = {}
+        self.security_policies: dict[str, SecurityPolicy] = {}
         self.encryption_key: Optional[bytes] = None
 
         # Security metrics
@@ -212,7 +212,7 @@ class EnhancedSecurityManager:
             logger.error(f"❌ Failed to initialize encryption: {e}")
             raise
 
-    async def analyze_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_request(self, request_data: dict[str, Any]) -> dict[str, Any]:
         """
         Analyze incoming request for security threats.
 
@@ -245,7 +245,7 @@ class EnhancedSecurityManager:
                 return analysis_result
 
             # Run security policy checks
-            for policy_id, policy in self.security_policies.items():
+            for policy in self.security_policies.values():
                 if not policy.enabled:
                     continue
 
@@ -290,8 +290,8 @@ class EnhancedSecurityManager:
             }
 
     async def _check_policy(
-        self, policy: SecurityPolicy, request_data: Dict[str, Any]
-    ) -> List[str]:
+        self, policy: SecurityPolicy, request_data: dict[str, Any]
+    ) -> list[str]:
         """Check if request violates security policy."""
         violations = []
 
@@ -320,7 +320,7 @@ class EnhancedSecurityManager:
         return violations
 
     async def _check_rate_limit(
-        self, request_data: Dict[str, Any], rule: Dict[str, Any]
+        self, request_data: dict[str, Any], rule: dict[str, Any]
     ) -> bool:
         """Check if request exceeds rate limits."""
         if not self.redis_client:
@@ -350,7 +350,7 @@ class EnhancedSecurityManager:
             return False
 
     def _check_pattern_match(
-        self, request_data: Dict[str, Any], rule: Dict[str, Any]
+        self, request_data: dict[str, Any], rule: dict[str, Any]
     ) -> bool:
         """Check if request matches suspicious patterns."""
 
@@ -367,18 +367,14 @@ class EnhancedSecurityManager:
                 request_data.get("headers", {}).get("user-agent", ""),
             ]
 
-            for field in check_fields:
-                if isinstance(field, str) and re.search(pattern, field):
-                    return True
-
-            return False
+            return any(isinstance(field, str) and re.search(pattern, field) for field in check_fields)
 
         except Exception as e:
             logger.error(f"❌ Pattern match check failed: {e}")
             return False
 
     def _check_data_access_compliance(
-        self, request_data: Dict[str, Any], rule: Dict[str, Any]
+        self, request_data: dict[str, Any], rule: dict[str, Any]
     ) -> bool:
         """Check GDPR data access compliance."""
         try:
@@ -410,9 +406,9 @@ class EnhancedSecurityManager:
     async def _execute_policy_actions(
         self,
         policy: SecurityPolicy,
-        request_data: Dict[str, Any],
-        violations: List[str],
-    ) -> List[str]:
+        request_data: dict[str, Any],
+        violations: list[str],
+    ) -> list[str]:
         """Execute actions defined in security policy."""
         actions_taken = []
 
@@ -450,7 +446,7 @@ class EnhancedSecurityManager:
         return actions_taken
 
     async def _log_security_event(
-        self, request_data: Dict[str, Any], analysis_result: Dict[str, Any]
+        self, request_data: dict[str, Any], analysis_result: dict[str, Any]
     ):
         """Log security event for audit and analysis."""
         try:
@@ -487,8 +483,8 @@ class EnhancedSecurityManager:
     async def _send_security_alert(
         self,
         policy: SecurityPolicy,
-        request_data: Dict[str, Any],
-        violations: List[str],
+        request_data: dict[str, Any],
+        violations: list[str],
     ):
         """Send security alert to administrators."""
         try:
@@ -554,7 +550,7 @@ class EnhancedSecurityManager:
             logger.error(f"❌ HMAC verification failed: {e}")
             return False
 
-    async def get_security_metrics(self) -> Dict[str, Any]:
+    async def get_security_metrics(self) -> dict[str, Any]:
         """Get current security metrics."""
         recent_events = [
             event
@@ -575,7 +571,7 @@ class EnhancedSecurityManager:
             },
         }
 
-    async def get_security_events(self, limit: int = 100) -> List[SecurityEvent]:
+    async def get_security_events(self, limit: int = 100) -> list[SecurityEvent]:
         """Get recent security events."""
         return sorted(
             self.security_events[-limit:], key=lambda x: x.timestamp, reverse=True

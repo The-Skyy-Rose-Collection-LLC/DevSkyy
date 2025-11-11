@@ -1,13 +1,13 @@
 from datetime import datetime
+from enum import Enum
 import json
+import logging
+import random
 import time
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-import random
-from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
-import logging
 
 """
 DevSkyy ML Recommendation Engine v1.0.0
@@ -42,8 +42,8 @@ class RecommendationRequest(BaseModel):
     item_type: str = "product"
     recommendation_type: RecommendationType = RecommendationType.HYBRID
     limit: int = Field(default=10, ge=1, le=100)
-    exclude_items: List[str] = Field(default_factory=list)
-    context: Dict[str, Any] = Field(default_factory=dict)
+    exclude_items: list[str] = Field(default_factory=list)
+    context: dict[str, Any] = Field(default_factory=dict)
 
 class RecommendationItem(BaseModel):
     """Recommended item model."""
@@ -54,13 +54,13 @@ class RecommendationItem(BaseModel):
     description: Optional[str] = None
     score: float = Field(ge=0.0, le=1.0)
     reason: str
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 class RecommendationResponse(BaseModel):
     """Recommendation response model."""
 
     user_id: str
-    recommendations: List[RecommendationItem]
+    recommendations: list[RecommendationItem]
     recommendation_type: RecommendationType
     generated_at: datetime = Field(default_factory=datetime.now)
     total_items: int
@@ -84,9 +84,9 @@ class RecommendationEngine:
 
     def __init__(self, redis_client=None):
         self.redis_client = redis_client
-        self.user_interactions: Dict[str, List[Dict]] = {}
-        self.item_features: Dict[str, Dict] = {}
-        self.similarity_cache: Dict[str, Dict] = {}
+        self.user_interactions: dict[str, list[dict]] = {}
+        self.item_features: dict[str, dict] = {}
+        self.similarity_cache: dict[str, dict] = {}
 
         # Initialize with sample data for demo
         self._initialize_sample_data()
@@ -191,7 +191,7 @@ class RecommendationEngine:
 
     async def _collaborative_filtering(
         self, request: RecommendationRequest
-    ) -> List[RecommendationItem]:
+    ) -> list[RecommendationItem]:
         """Generate collaborative filtering recommendations."""
         recommendations = []
 
@@ -245,7 +245,7 @@ class RecommendationEngine:
 
     async def _content_based_filtering(
         self, request: RecommendationRequest
-    ) -> List[RecommendationItem]:
+    ) -> list[RecommendationItem]:
         """Generate content-based recommendations."""
         recommendations = []
 
@@ -294,7 +294,7 @@ class RecommendationEngine:
 
     async def _trending_recommendations(
         self, request: RecommendationRequest
-    ) -> List[RecommendationItem]:
+    ) -> list[RecommendationItem]:
         """Generate trending recommendations."""
         recommendations = []
 
@@ -303,7 +303,7 @@ class RecommendationEngine:
             item_popularity = {}
             recent_cutoff = time.time() - (7 * 24 * 3600)  # Last 7 days
 
-            for user_id, interactions in self.user_interactions.items():
+            for interactions in self.user_interactions.values():
                 for interaction in interactions:
                     if interaction["timestamp"] > recent_cutoff:
                         item_id = interaction["item_id"]
@@ -349,7 +349,7 @@ class RecommendationEngine:
 
     async def _hybrid_recommendations(
         self, request: RecommendationRequest
-    ) -> List[RecommendationItem]:
+    ) -> list[RecommendationItem]:
         """Generate hybrid recommendations combining multiple approaches."""
         try:
             # Get recommendations from different approaches
@@ -403,7 +403,7 @@ class RecommendationEngine:
             logger.error(f"❌ Hybrid recommendations failed: {e}")
             return await self._fallback_recommendations(request)
 
-    def _find_similar_users(self, user_id: str) -> List[Tuple[str, float]]:
+    def _find_similar_users(self, user_id: str) -> list[tuple[str, float]]:
         """Find users similar to the given user."""
         similar_users = []
         user_interactions = self.user_interactions.get(user_id, [])
@@ -428,7 +428,7 @@ class RecommendationEngine:
             :5
         ]  # Top 5 similar users
 
-    def _calculate_user_similarity(self, user1_items: Dict, user2_items: Dict) -> float:
+    def _calculate_user_similarity(self, user1_items: dict, user2_items: dict) -> float:
         """Calculate similarity between two users based on their item ratings."""
         common_items = set(user1_items.keys()) & set(user2_items.keys())
 
@@ -455,7 +455,7 @@ class RecommendationEngine:
 
         return max(0.0, numerator / denominator)
 
-    def _build_user_profile(self, user_interactions: List[Dict]) -> Dict[str, float]:
+    def _build_user_profile(self, user_interactions: list[dict]) -> dict[str, float]:
         """Build user profile from interactions."""
         profile = {}
 
@@ -487,7 +487,7 @@ class RecommendationEngine:
         return profile
 
     def _calculate_content_similarity(
-        self, user_profile: Dict, item_data: Dict
+        self, user_profile: dict, item_data: dict
     ) -> float:
         """Calculate similarity between user profile and item."""
         similarity = 0.0
@@ -505,8 +505,8 @@ class RecommendationEngine:
         return min(similarity, 1.0)
 
     def _filter_recommendations(
-        self, recommendations: List[RecommendationItem], request: RecommendationRequest
-    ) -> List[RecommendationItem]:
+        self, recommendations: list[RecommendationItem], request: RecommendationRequest
+    ) -> list[RecommendationItem]:
         """Filter recommendations based on request criteria."""
         filtered = []
 

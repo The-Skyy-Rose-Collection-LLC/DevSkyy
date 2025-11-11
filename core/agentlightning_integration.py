@@ -13,22 +13,23 @@ Features:
 Truth Protocol Compliant: All implementations verified, no placeholders.
 """
 
-from typing import Optional, Dict, Any, Callable
+from collections.abc import Callable
 from datetime import datetime
-import os
 from functools import wraps
+import os
+from typing import Any, Optional
 
 from agentlightning import (
-    OtelTracer,
     AgentOpsTracer,
     LitAgent,
-    emit_reward,
     LLMProxy,
+    OtelTracer,
+    emit_reward,
 )
 from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
 
 class DevSkyyLightning:
@@ -67,7 +68,7 @@ class DevSkyyLightning:
         self.agentops_tracer = AgentOpsTracer()
 
         # Performance metrics
-        self.metrics: Dict[str, Any] = {
+        self.metrics: dict[str, Any] = {
             "total_operations": 0,
             "successful_operations": 0,
             "failed_operations": 0,
@@ -97,7 +98,7 @@ class DevSkyyLightning:
         self,
         operation_name: str,
         agent_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """
         Decorator to trace agent operations
@@ -177,7 +178,7 @@ class DevSkyyLightning:
         self,
         model: str,
         provider: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """
         Decorator to trace LLM API calls
@@ -206,12 +207,11 @@ class DevSkyyLightning:
                         span.set_attribute("llm.status", "success")
 
                         # Track token usage if available
-                        if isinstance(result, dict):
-                            if "usage" in result:
-                                usage = result["usage"]
-                                span.set_attribute("llm.tokens.prompt", usage.get("prompt_tokens", 0))
-                                span.set_attribute("llm.tokens.completion", usage.get("completion_tokens", 0))
-                                span.set_attribute("llm.tokens.total", usage.get("total_tokens", 0))
+                        if isinstance(result, dict) and "usage" in result:
+                            usage = result["usage"]
+                            span.set_attribute("llm.tokens.prompt", usage.get("prompt_tokens", 0))
+                            span.set_attribute("llm.tokens.completion", usage.get("completion_tokens", 0))
+                            span.set_attribute("llm.tokens.total", usage.get("total_tokens", 0))
 
                         return result
 
@@ -254,7 +254,7 @@ class DevSkyyLightning:
             description=description
         )
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get current performance metrics
 

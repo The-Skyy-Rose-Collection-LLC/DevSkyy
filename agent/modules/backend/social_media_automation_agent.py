@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-
-from typing import Any, Dict, List
 import logging
 import random
+from typing import Any
 import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -145,8 +145,8 @@ class SocialMediaAutomationAgent:
         )
 
     async def create_content_calendar(
-        self, calendar_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, calendar_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create AI-optimized content calendar for luxury fashion brand."""
         try:
             duration_weeks = calendar_data.get("duration_weeks", 4)
@@ -197,12 +197,12 @@ class SocialMediaAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Content calendar creation failed: {str(e)}")
+            logger.error(f"❌ Content calendar creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def automate_social_media_posting(
-        self, automation_config: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, automation_config: dict[str, Any]
+    ) -> dict[str, Any]:
         """Set up automated social media posting with AI optimization."""
         try:
             platforms = automation_config.get("platforms", [])
@@ -268,12 +268,12 @@ class SocialMediaAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Social media automation setup failed: {str(e)}")
+            logger.error(f"❌ Social media automation setup failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def analyze_social_media_performance(
-        self, analysis_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, analysis_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Comprehensive social media performance analysis and optimization."""
         try:
             platforms = analysis_request.get("platforms", [])
@@ -348,12 +348,12 @@ class SocialMediaAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Social media analysis failed: {str(e)}")
+            logger.error(f"❌ Social media analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_daily_content(
-        self, date: datetime, platforms: List[str], brand_focus: str
-    ) -> Dict[str, Any]:
+        self, date: datetime, platforms: list[str], brand_focus: str
+    ) -> dict[str, Any]:
         """Generate daily content suggestions for all platforms."""
         day_of_week = date.strftime("%A").lower()
 
@@ -392,7 +392,7 @@ class SocialMediaAutomationAgent:
 
         return content_suggestions
 
-    def _generate_seasonal_campaigns(self, duration_weeks: int) -> List[Dict[str, Any]]:
+    def _generate_seasonal_campaigns(self, duration_weeks: int) -> list[dict[str, Any]]:
         """Generate seasonal campaigns for the calendar period."""
         campaigns = [
             {
@@ -420,7 +420,7 @@ class SocialMediaAutomationAgent:
 
         return campaigns[: duration_weeks // 2]  # Scale campaigns to duration
 
-    def _optimize_posting_schedule(self, platforms: List[str]) -> Dict[str, Any]:
+    def _optimize_posting_schedule(self, platforms: list[str]) -> dict[str, Any]:
         """Optimize posting schedule based on platform best practices."""
         schedule = {}
 
@@ -443,7 +443,7 @@ class SocialMediaAutomationAgent:
 
         return schedule
 
-    def _generate_hashtag_strategy(self, brand_focus: str) -> Dict[str, Any]:
+    def _generate_hashtag_strategy(self, brand_focus: str) -> dict[str, Any]:
         """Generate comprehensive hashtag strategy."""
         luxury_fashion_hashtags = {
             "brand_hashtags": [
@@ -490,7 +490,7 @@ class SocialMediaAutomationAgent:
             "performance_tracking": "engagement_rate_by_hashtag",
         }
 
-    def _initialize_social_ai(self) -> Dict[str, Any]:
+    def _initialize_social_ai(self) -> dict[str, Any]:
         """Initialize AI-powered social media intelligence."""
         return {
             "content_generator": "luxury_fashion_content_ai",
@@ -500,7 +500,7 @@ class SocialMediaAutomationAgent:
             "competitor_monitor": "luxury_brand_competitive_intelligence",
         }
 
-    def _initialize_trend_predictor(self) -> Dict[str, Any]:
+    def _initialize_trend_predictor(self) -> dict[str, Any]:
         """Initialize fashion trend prediction system."""
         return {
             "trend_detection": "real_time_fashion_trend_scanner",
@@ -509,7 +509,7 @@ class SocialMediaAutomationAgent:
             "influencer_trends": "luxury_influencer_trend_tracker",
         }
 
-    def _initialize_engagement_optimizer(self) -> Dict[str, Any]:
+    def _initialize_engagement_optimizer(self) -> dict[str, Any]:
         """Initialize engagement optimization system."""
         return {
             "posting_time_optimizer": "audience_activity_analyzer",
@@ -519,8 +519,8 @@ class SocialMediaAutomationAgent:
         }
 
     async def create_luxury_campaign(
-        self, campaign_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, campaign_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create luxury social media campaign with AI optimization."""
         try:
             campaign_type = campaign_data.get("type", "social_media_luxury")
@@ -572,12 +572,12 @@ class SocialMediaAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Luxury campaign creation failed: {str(e)}")
+            logger.error(f"❌ Luxury campaign creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_luxury_campaign_content(
         self, campaign_type: str, platform: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate luxury campaign content."""
         content_templates = {
             "social_media_luxury": {
@@ -617,7 +617,7 @@ class SocialMediaAutomationAgent:
 
     def _create_luxury_targeting_strategy(
         self, audience: str, platform: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create luxury targeting strategy."""
         return {
             "demographics": {
@@ -645,7 +645,7 @@ class SocialMediaAutomationAgent:
 
     def _generate_creative_assets(
         self, campaign_type: str, platform: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate creative assets for campaign."""
         return {
             "image_assets": {
@@ -686,7 +686,7 @@ class SocialMediaAutomationAgent:
 
     def _setup_campaign_optimization(
         self, platform: str, budget: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Set up campaign optimization settings."""
         return {
             "bidding_strategy": "target_cost_with_luxury_focus",
@@ -708,7 +708,7 @@ class SocialMediaAutomationAgent:
             },
         }
 
-def optimize_social_media() -> Dict[str, Any]:
+def optimize_social_media() -> dict[str, Any]:
     """Main function to optimize social media operations."""
     agent = SocialMediaAutomationAgent()
     return {

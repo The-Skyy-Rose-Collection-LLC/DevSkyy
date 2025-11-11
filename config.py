@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
+
 """
 Production Configuration for The Skyy Rose Collection Platform
 """
@@ -69,7 +70,7 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     """Testing configuration.
-    
+
     NOTE: This configuration bypasses the production SECRET_KEY requirement
     to allow automated testing. NEVER use this configuration in production.
     """

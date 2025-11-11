@@ -8,16 +8,17 @@ IMPACT: Replaces n8n workflow with native DevSkyy automation
 Truth Protocol: Input validation, error handling, logging, no placeholders
 """
 
+from datetime import datetime
 import logging
 import os
-from typing import Optional, List
-from datetime import datetime
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from services.content_publishing_orchestrator import ContentPublishingOrchestrator
 from services.wordpress_categorization import WordPressCategorizationService
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/content", tags=["Content Publishing"])
@@ -27,7 +28,7 @@ class PublishContentRequest(BaseModel):
     """Request to publish AI-generated content"""
 
     topic: str = Field(..., min_length=1, max_length=200, description="Content topic")
-    keywords: List[str] = Field(
+    keywords: list[str] = Field(
         default_factory=list, description="SEO keywords for content"
     )
     tone: str = Field(
@@ -68,9 +69,9 @@ class PublishContentResponse(BaseModel):
 class ScheduledPublishRequest(BaseModel):
     """Request to schedule content publishing"""
 
-    topics: List[str] = Field(..., min_items=1, description="List of topics to publish")
-    keywords: List[str] = Field(default_factory=list, description="Common keywords")
-    schedule_days: List[str] = Field(
+    topics: list[str] = Field(..., min_items=1, description="List of topics to publish")
+    keywords: list[str] = Field(default_factory=list, description="Common keywords")
+    schedule_days: list[str] = Field(
         default=["tuesday", "thursday", "sunday"],
         description="Days to publish (lowercase)",
     )
@@ -200,13 +201,13 @@ async def publish_content(
 
     except Exception as e:
         logger.exception("Content publishing failed")
-        raise HTTPException(status_code=500, detail=f"Publishing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Publishing failed: {e!s}")
 
 
 @router.post("/publish-batch", response_model=dict)
 async def publish_content_batch(
-    topics: List[str],
-    keywords: List[str] = [],
+    topics: list[str],
+    keywords: list[str] | None = None,
     tone: str = "professional",
     length: int = 800,
     orchestrator: ContentPublishingOrchestrator = Depends(get_orchestrator_service),
@@ -234,6 +235,8 @@ async def publish_content_batch(
     }
     ```
     """
+    if keywords is None:
+        keywords = []
     try:
         logger.info(f"Batch publish requested for {len(topics)} topics")
 
@@ -289,7 +292,7 @@ async def publish_content_batch(
 
     except Exception as e:
         logger.exception("Batch publishing failed")
-        raise HTTPException(status_code=500, detail=f"Batch publishing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Batch publishing failed: {e!s}")
 
 
 @router.post("/schedule", response_model=ScheduledPublishResponse)
@@ -344,12 +347,12 @@ async def schedule_content_publishing(
 
     except Exception as e:
         logger.exception("Scheduling failed")
-        raise HTTPException(status_code=500, detail=f"Scheduling failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Scheduling failed: {e!s}")
 
 
 @router.post("/categorize", response_model=dict)
 async def categorize_wordpress_posts(
-    post_ids: Optional[List[int]] = None,
+    post_ids: Optional[list[int]] = None,
     wordpress_site_url: Optional[str] = None,
     use_ai: bool = True,
 ):
@@ -400,10 +403,7 @@ async def categorize_wordpress_posts(
         ]
 
         # If specific post IDs provided, filter
-        if post_ids:
-            posts_to_categorize = [p for p in mock_posts if p["id"] in post_ids]
-        else:
-            posts_to_categorize = mock_posts
+        posts_to_categorize = [p for p in mock_posts if p["id"] in post_ids] if post_ids else mock_posts
 
         # Categorize posts
         results = await categorization_service.categorize_posts_batch(
@@ -437,7 +437,7 @@ async def categorize_wordpress_posts(
     except Exception as e:
         logger.exception("WordPress categorization failed")
         raise HTTPException(
-            status_code=500, detail=f"Categorization failed: {str(e)}"
+            status_code=500, detail=f"Categorization failed: {e!s}"
         )
 
 

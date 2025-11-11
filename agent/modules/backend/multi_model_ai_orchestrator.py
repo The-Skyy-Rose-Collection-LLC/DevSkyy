@@ -23,14 +23,15 @@ Features:
 """
 
 import asyncio
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
-import httpx
 from anthropic import AsyncAnthropic
+import httpx
 from openai import AsyncOpenAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -120,8 +121,8 @@ class MultiModelAIOrchestrator:
             }
 
         # Model performance tracking
-        self.performance_history: Dict[str, List[float]] = {}
-        self.task_routing: Dict[str, str] = {
+        self.performance_history: dict[str, list[float]] = {}
+        self.task_routing: dict[str, str] = {
             "reasoning": "claude_sonnet",
             "creative_writing": "claude_sonnet",
             "code_generation": "claude_sonnet",
@@ -146,7 +147,7 @@ class MultiModelAIOrchestrator:
         use_ensemble: bool = False,
         max_tokens: int = 2000,
         temperature: float = 0.7,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate response using optimal model(s) for the task.
 
@@ -176,7 +177,7 @@ class MultiModelAIOrchestrator:
 
     async def _single_model_generate(
         self, prompt: str, task_type: str, max_tokens: int, temperature: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate response using single optimal model.
         """
@@ -222,7 +223,7 @@ class MultiModelAIOrchestrator:
 
     async def _ensemble_generate(
         self, prompt: str, task_type: str, max_tokens: int, temperature: float
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate responses from multiple models and combine them.
         """
@@ -434,7 +435,7 @@ Create the optimal combined response that leverages the strengths of each."""
         """
         return self.task_routing.get(task_type, "claude_sonnet")
 
-    async def benchmark_models(self, test_prompts: List[str]) -> Dict[str, Any]:
+    async def benchmark_models(self, test_prompts: list[str]) -> dict[str, Any]:
         """
         Benchmark all available models with test prompts.
         """
@@ -495,6 +496,6 @@ async def ai_generate(
     return result.get("response", "")
 
 
-async def ai_ensemble(prompt: str, task_type: str = "general") -> Dict[str, Any]:
+async def ai_ensemble(prompt: str, task_type: str = "general") -> dict[str, Any]:
     """Generate using ensemble of top models."""
     return await ai_orchestrator.generate(prompt, task_type, use_ensemble=True)

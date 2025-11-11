@@ -9,15 +9,15 @@ Truth Protocol: All operations validated, errors logged, no placeholders
 """
 
 import asyncio
-import logging
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
 from datetime import datetime
+import logging
+from typing import Any, Optional
 
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 from pydantic import BaseModel, Field, validator
 from woocommerce import API as WooCommerceAPI
-from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class ProductData(BaseModel):
     sku: str = Field(..., min_length=1, max_length=100)
     regular_price: float = Field(..., gt=0)
     sale_price: Optional[float] = Field(None, gt=0)
-    category: List[int] = Field(default_factory=list)
+    category: list[int] = Field(default_factory=list)
     image: Optional[str] = Field(None, max_length=500)
     short_description: str = Field(default="", max_length=1000)
     description: str = Field(default="", max_length=10000)
@@ -39,9 +39,8 @@ class ProductData(BaseModel):
     @validator('sale_price')
     def validate_sale_price(cls, v, values):
         """Ensure sale price is less than regular price"""
-        if v is not None and 'regular_price' in values:
-            if v >= values['regular_price']:
-                raise ValueError("Sale price must be less than regular price")
+        if v is not None and 'regular_price' in values and v >= values['regular_price']:
+            raise ValueError("Sale price must be less than regular price")
         return v
 
     @validator('category')
@@ -140,7 +139,7 @@ class WooCommerceImporterService:
         spreadsheet_id: str,
         sheet_name: str = "Foglio1",
         filter_done: bool = True
-    ) -> List[ProductData]:
+    ) -> list[ProductData]:
         """
         Fetch product data from Google Sheets
 
@@ -170,7 +169,7 @@ class WooCommerceImporterService:
             products = []
 
             for idx, row in enumerate(values[1:], start=2):  # Start at row 2 (skip header)
-                row_dict = dict(zip(headers, row + [''] * (len(headers) - len(row))))
+                row_dict = dict(zip(headers, row + [''] * (len(headers) - len(row)), strict=False))
 
                 # Skip if DONE and filter enabled
                 if filter_done and row_dict.get('DONE', '').strip().lower() == 'x':
@@ -215,7 +214,7 @@ class WooCommerceImporterService:
 
         except Exception as e:
             logger.exception("Failed to fetch products from Google Sheets")
-            raise GoogleSheetsError(f"Sheet read failed: {str(e)}")
+            raise GoogleSheetsError(f"Sheet read failed: {e!s}")
 
     async def create_woocommerce_product(
         self,
@@ -265,7 +264,7 @@ class WooCommerceImporterService:
                     response = self.woo_client.post("products", woo_product)
 
                     logger.info(
-                        f"Product created successfully",
+                        "Product created successfully",
                         extra={
                             "product_id": response.get('id'),
                             "sku": product.sku,
@@ -383,7 +382,7 @@ class WooCommerceImporterService:
             logger.info("Telegram notification sent", extra={"message": message})
             return True
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to send Telegram notification")
             return False
 
@@ -392,7 +391,7 @@ class WooCommerceImporterService:
         spreadsheet_id: str,
         sheet_name: str = "Foglio1",
         notify: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute complete product import workflow
 
@@ -468,7 +467,7 @@ class WooCommerceImporterService:
 
             if notify:
                 await self.send_telegram_notification(
-                    f"❌ Product Import Failed\n\nError: {str(e)}"
+                    f"❌ Product Import Failed\n\nError: {e!s}"
                 )
 
             return {

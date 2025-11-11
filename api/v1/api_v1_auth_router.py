@@ -7,18 +7,13 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
 import logging
 
-from jwt_auth import (
-    RefreshTokenRequest,
-    get_current_user,
-    create_access_token,
-    create_refresh_token,
-    settings
-)
+from fastapi import APIRouter, Depends, HTTPException, status
+from jwt_auth import RefreshTokenRequest, create_access_token, create_refresh_token, get_current_user, settings
+from pydantic import BaseModel, EmailStr
+
 
 logger = logging.getLogger(__name__)
 
@@ -64,15 +59,15 @@ class UserInfoResponse(BaseModel):
 async def login_endpoint(request: LoginRequest):
     """
     Login with username and password
-    
+
     Returns JWT access token and refresh token
-    
+
     Args:
         request: LoginRequest with username and password
-        
+
     Returns:
         TokenResponse with access_token, refresh_token, expires_in
-        
+
     Status Codes:
         200: Successfully authenticated
         401: Invalid credentials
@@ -107,7 +102,7 @@ async def login_endpoint(request: LoginRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Login error: {str(e)}")
+        logger.error(f"Login error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
@@ -117,15 +112,15 @@ async def login_endpoint(request: LoginRequest):
 async def refresh_endpoint(request: RefreshTokenRequest):
     """
     Refresh access token using refresh token
-    
+
     Implements RFC 6749 Section 6 (Refresh Token)
-    
+
     Args:
         request: RefreshTokenRequest with refresh_token
-        
+
     Returns:
         New TokenResponse pair (new access_token and refresh_token)
-        
+
     Status Codes:
         200: Successfully refreshed
         401: Invalid refresh token
@@ -151,7 +146,7 @@ async def refresh_endpoint(request: RefreshTokenRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Refresh error: {str(e)}")
+        logger.error(f"Refresh error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token"
@@ -161,13 +156,13 @@ async def refresh_endpoint(request: RefreshTokenRequest):
 async def logout_endpoint(current_user: dict = Depends(get_current_user)):
     """
     Logout current user
-    
+
     In stateless JWT architecture, logout is primarily a client-side operation
     (delete tokens from client). This endpoint can be used for audit logging.
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         Logout confirmation
     """
@@ -185,12 +180,12 @@ async def logout_endpoint(current_user: dict = Depends(get_current_user)):
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     """
     Get current user information
-    
+
     Returns information about the authenticated user
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         UserInfoResponse with user details
     """
@@ -208,13 +203,13 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 async def register_endpoint(request: RegisterRequest):
     """
     Register new user
-    
+
     Args:
         request: RegisterRequest with username, email, password
-        
+
     Returns:
         Registration confirmation with user_id
-        
+
     Status Codes:
         201: Successfully registered
         409: User already exists
@@ -244,7 +239,7 @@ async def register_endpoint(request: RegisterRequest):
 async def authenticate_user_from_db(username: str, password: str):
     """
     Authenticate user against database
-    
+
     TODO: Replace with actual database query
     """
     # STUB: Implement database lookup
@@ -254,4 +249,3 @@ async def authenticate_user_from_db(username: str, password: str):
     # return None
 
     logger.warning("authenticate_user_from_db() is a stub - implement database lookup")
-    return None

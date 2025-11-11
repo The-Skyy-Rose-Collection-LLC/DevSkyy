@@ -1,21 +1,22 @@
 from monitoring.system_monitor import SystemMonitor
-from security.jwt_auth import get_current_user, require_role, UserRole
+from security.jwt_auth import UserRole, get_current_user, require_role
+
 
 # Security availability check
 try:
-    from security.jwt_auth import require_role, UserRole
+    from security.jwt_auth import UserRole, require_role
     SECURITY_AVAILABLE = True
 except ImportError:
     SECURITY_AVAILABLE = False
+import asyncio
 from datetime import datetime, timedelta
-from fastapi.responses import HTMLResponse
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
-from typing import Any, Dict, List, Optional
-import asyncio
 
 """
 DevSkyy Enterprise Dashboard API v1.0.0
@@ -50,7 +51,7 @@ class AgentStatusModel(BaseModel):
     tasks_completed: int = Field(default=0, description="Number of completed tasks")
     tasks_pending: int = Field(default=0, description="Number of pending tasks")
     performance_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Performance score 0-1")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
+    capabilities: list[str] = Field(default_factory=list, description="Agent capabilities")
 
 class SystemMetricsModel(BaseModel):
     """System performance metrics model."""
@@ -71,14 +72,14 @@ class ActivityLogModel(BaseModel):
     description: str = Field(..., description="Event description")
     severity: str = Field(default="info", description="Event severity: info, warning, error")
     agent_id: Optional[str] = Field(None, description="Related agent ID")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional event data")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional event data")
 
 class DashboardDataModel(BaseModel):
     """Complete dashboard data model."""
     metrics: SystemMetricsModel
-    agents: List[AgentStatusModel]
-    recent_activities: List[ActivityLogModel]
-    performance_history: List[Dict[str, Any]]
+    agents: list[AgentStatusModel]
+    recent_activities: list[ActivityLogModel]
+    performance_history: list[dict[str, Any]]
 
 # ============================================================================
 # DASHBOARD SERVICE
@@ -121,7 +122,7 @@ class DashboardService:
 
             return SystemMetricsModel(**metrics_data)
 
-        except Exception as e:
+        except Exception:
             # Return default metrics on error
             return SystemMetricsModel(
                 active_agents=0,
@@ -133,7 +134,7 @@ class DashboardService:
                 error_rate=1.0
             )
 
-    async def get_agent_status(self) -> List[AgentStatusModel]:
+    async def get_agent_status(self) -> list[AgentStatusModel]:
         """Get status of all registered agents."""
         agents = []
 
@@ -180,13 +181,13 @@ class DashboardService:
                         capabilities=["ai_processing", "automation", "monitoring"]
                     ))
 
-        except Exception as e:
+        except Exception:
             # Return empty list on error
             pass
 
         return agents
 
-    async def get_recent_activities(self, limit: int = 10) -> List[ActivityLogModel]:
+    async def get_recent_activities(self, limit: int = 10) -> list[ActivityLogModel]:
         """Get recent system activities."""
         activities = [
             ActivityLogModel(
@@ -230,7 +231,7 @@ class DashboardService:
 
         return activities[:limit]
 
-    async def get_performance_history(self, hours: int = 24) -> List[Dict[str, Any]]:
+    async def get_performance_history(self, hours: int = 24) -> list[dict[str, Any]]:
         """Get performance metrics history."""
         # Generate sample performance data
         history = []
@@ -250,10 +251,7 @@ class DashboardService:
 
     def _map_health_status(self, health_status) -> str:
         """Map agent health status to dashboard status."""
-        if hasattr(health_status, 'value'):
-            status_value = health_status.value.lower()
-        else:
-            status_value = str(health_status).lower()
+        status_value = health_status.value.lower() if hasattr(health_status, 'value') else str(health_status).lower()
 
         if status_value in ['healthy', 'operational']:
             return 'healthy'
@@ -273,7 +271,7 @@ dashboard_service = DashboardService()
 async def get_dashboard_page(request: Request):
     """
     Render the enterprise dashboard HTML page.
-    
+
     Returns:
         TemplateResponse: The response rendering the "enterprise_dashboard.html" template with the request context.
     """
@@ -282,16 +280,16 @@ async def get_dashboard_page(request: Request):
 @router.get("/dashboard/data", response_model=DashboardDataModel)
 async def get_dashboard_data(
     request: Request,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Return the full dashboard payload containing system metrics, agent statuses, recent activity logs, and performance history.
-    
+
     Requires a user with READ_ONLY role or higher.
-    
+
     Returns:
         DashboardDataModel: Combined dashboard data with fields `metrics`, `agents`, `recent_activities`, and `performance_history`.
-    
+
     Raises:
         HTTPException: If retrieval of any dashboard component fails (responds with status 500).
     """
@@ -320,19 +318,19 @@ async def get_dashboard_data(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve dashboard data: {str(e)}"
+            detail=f"Failed to retrieve dashboard data: {e!s}"
         )
 
 @router.get("/dashboard/metrics", response_model=SystemMetricsModel)
 async def get_system_metrics(
     request: Request,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Retrieve current system performance metrics for the dashboard.
-    
+
     Requires READ_ONLY role or higher.
-    
+
     Returns:
         SystemMetricsModel: Snapshot of current system metrics including active agents, API requests per minute, average response time, CPU and memory usage, system health score, and error rate.
     """
@@ -341,16 +339,16 @@ async def get_system_metrics(
 
     return await dashboard_service.get_system_metrics()
 
-@router.get("/dashboard/agents", response_model=List[AgentStatusModel])
+@router.get("/dashboard/agents", response_model=list[AgentStatusModel])
 async def get_agent_status(
     request: Request,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Return statuses for all registered agents.
-    
+
     Requires a user with the READ_ONLY role or higher.
-    
+
     Returns:
         List[AgentStatusModel]: A list of agent status records containing agent_id, name, status, last_active, tasks_completed, tasks_pending, performance_score, and capabilities.
     """
@@ -359,20 +357,20 @@ async def get_agent_status(
 
     return await dashboard_service.get_agent_status()
 
-@router.get("/dashboard/activities", response_model=List[ActivityLogModel])
+@router.get("/dashboard/activities", response_model=list[ActivityLogModel])
 async def get_recent_activities(
     request: Request,
     limit: int = 10,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Return recent system activity log entries for the dashboard.
-    
+
     Requires a user with READ_ONLY role or higher; allowed roles: READ_ONLY, API_USER, DEVELOPER, ADMIN, SUPER_ADMIN.
-    
+
     Parameters:
         limit (int): Maximum number of activity entries to return.
-    
+
     Returns:
         activities (List[ActivityLogModel]): Recent activity log entries up to `limit`.
     """
@@ -381,21 +379,21 @@ async def get_recent_activities(
 
     return await dashboard_service.get_recent_activities(limit=limit)
 
-@router.get("/dashboard/performance", response_model=List[Dict[str, Any]])
+@router.get("/dashboard/performance", response_model=list[dict[str, Any]])
 async def get_performance_history(
     request: Request,
     hours: int = 24,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Return performance history datapoints for the specified past number of hours.
-    
+
     Generates a list of time-series performance records covering the last `hours` hours.
     Authentication: requires a user with the READ_ONLY role or higher.
-    
+
     Parameters:
         hours (int): Number of past hours to include in the history (default 24).
-    
+
     Returns:
         List[dict]: A list of performance datapoints. Each datapoint contains keys
         `timestamp`, `response_time`, `cpu_usage`, `memory_usage`, and `requests_per_minute`.
@@ -425,5 +423,5 @@ async def dashboard_websocket(websocket):
 
             await asyncio.sleep(5)  # TODO: Move to config
 
-    except Exception as e:
+    except Exception:
         await websocket.close(code=1000)

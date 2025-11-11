@@ -9,27 +9,29 @@ Truth Protocol: Uses existing verified services, environment variables, comprehe
 """
 
 import asyncio
+from datetime import datetime, timedelta
 import logging
 import random
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-import httpx
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+import httpx
 
-# Import existing DevSkyy agents
-from agent.wordpress.content_generator import ContentGenerator
 from agent.modules.backend.wordpress_integration_service import (
     WordPressIntegrationService,
 )
 from agent.modules.marketing_content_generation_agent import (
     MarketingContentGenerationAgent,
 )
+
+# Import existing DevSkyy agents
+from agent.wordpress.content_generator import ContentGenerator
 from config.wordpress_credentials import (
     WordPressCredentialsManager,
     get_skyy_rose_credentials,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +62,7 @@ class PexelsImageService:
         orientation: str = "landscape",
         size: str = "large",
         per_page: int = 1,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Search for images on Pexels
 
@@ -108,7 +110,7 @@ class PexelsImageService:
                 logger.warning(f"No images found for query: {query}")
                 return None
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Pexels image search failed for query '{query}'")
             return None
 
@@ -127,7 +129,7 @@ class PexelsImageService:
                 response = await client.get(image_url)
                 response.raise_for_status()
                 return response.content
-        except Exception as e:
+        except Exception:
             logger.exception(f"Image download failed: {image_url}")
             return None
 
@@ -154,7 +156,7 @@ class GoogleSheetsLogger:
         self.service = build("sheets", "v4", credentials=credentials)
 
     async def log_content_publish(
-        self, sheet_name: str, content_data: Dict[str, Any]
+        self, sheet_name: str, content_data: dict[str, Any]
     ) -> bool:
         """
         Log content publish event to Google Sheets
@@ -183,7 +185,7 @@ class GoogleSheetsLogger:
             # Append to sheet
             body = {"values": [row]}
 
-            result = (
+            (
                 self.service.spreadsheets()
                 .values()
                 .append(
@@ -200,7 +202,7 @@ class GoogleSheetsLogger:
             )
             return True
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to log content to Google Sheets")
             return False
 
@@ -245,7 +247,7 @@ class TelegramNotificationService:
                 response.raise_for_status()
                 logger.info("Telegram notification sent successfully")
                 return True
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to send Telegram notification")
             return False
 
@@ -330,10 +332,10 @@ class ContentPublishingOrchestrator:
     async def generate_content(
         self,
         topic: str,
-        keywords: List[str],
+        keywords: list[str],
         tone: str = "professional",
         length: int = 800,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate AI content using existing ContentGenerator
 
@@ -359,13 +361,13 @@ class ContentPublishingOrchestrator:
             )
             return content
 
-        except Exception as e:
+        except Exception:
             logger.exception("Content generation failed")
             raise
 
     async def fetch_featured_image(
-        self, keywords: List[str], orientation: str = "landscape"
-    ) -> Optional[Dict[str, Any]]:
+        self, keywords: list[str], orientation: str = "landscape"
+    ) -> Optional[dict[str, Any]]:
         """
         Fetch featured image from Pexels
 
@@ -395,16 +397,16 @@ class ContentPublishingOrchestrator:
                 logger.warning("No image found, will use placeholder")
                 return None
 
-        except Exception as e:
+        except Exception:
             logger.exception("Image fetch failed")
             return None
 
     async def publish_to_wordpress(
         self,
-        content: Dict[str, Any],
+        content: dict[str, Any],
         image_url: Optional[str] = None,
         status: str = "publish",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Publish content to WordPress using existing integration
 
@@ -425,7 +427,7 @@ class ContentPublishingOrchestrator:
                 raise Exception("WordPress credentials not found")
 
             # Prepare post data for WordPress REST API
-            post_data = {
+            {
                 "title": content["title"],
                 "content": content["content"],
                 "excerpt": content["meta_description"],
@@ -452,14 +454,14 @@ class ContentPublishingOrchestrator:
                 "title": content["title"],
             }
 
-        except Exception as e:
+        except Exception:
             logger.exception("WordPress publishing failed")
             raise
 
     async def execute_workflow(
         self,
         topic: str,
-        keywords: List[str],
+        keywords: list[str],
         tone: str = "professional",
         length: int = 800,
         apply_random_delay: bool = True,
@@ -468,7 +470,7 @@ class ContentPublishingOrchestrator:
         publish_status: str = "publish",
         notify: bool = True,
         log_to_sheets: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute complete content publishing workflow
 
@@ -582,7 +584,7 @@ class ContentPublishingOrchestrator:
                 error_message = (
                     f"<b>❌ Content Publishing Failed</b>\n\n"
                     f"<b>Topic:</b> {topic}\n"
-                    f"<b>Error:</b> {str(e)}"
+                    f"<b>Error:</b> {e!s}"
                 )
                 await self.telegram_service.send_notification(error_message)
 

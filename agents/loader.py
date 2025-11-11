@@ -7,13 +7,13 @@ Implements caching for performance (MCP efficiency pattern).
 Truth Protocol: Pydantic validation, no placeholders, explicit error handling.
 """
 
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
 from datetime import datetime
+import json
+from pathlib import Path
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field, validator, ValidationError
+from pydantic import BaseModel, Field, ValidationError, validator
 
 
 class LoaderError(Exception):
@@ -33,8 +33,8 @@ class AgentCapability:
     """Represents a capability of an agent"""
     name: str
     confidence: float
-    keywords: List[str] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list)
+    keywords: list[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
 
 
 class AgentConfig(BaseModel):
@@ -46,13 +46,13 @@ class AgentConfig(BaseModel):
     agent_id: str = Field(..., min_length=1, description="Unique agent identifier")
     agent_name: str = Field(..., min_length=1, description="Human-readable agent name")
     agent_type: str = Field(..., min_length=1, description="Agent type/category")
-    capabilities: List[Dict[str, Any]] = Field(default_factory=list, description="Agent capabilities")
+    capabilities: list[dict[str, Any]] = Field(default_factory=list, description="Agent capabilities")
     priority: int = Field(default=50, ge=0, le=100, description="Agent priority (0-100)")
     max_concurrent_tasks: int = Field(default=10, ge=1, le=1000, description="Max concurrent tasks")
     timeout_seconds: int = Field(default=300, ge=1, le=3600, description="Task timeout in seconds")
     retry_count: int = Field(default=3, ge=0, le=10, description="Number of retries on failure")
     enabled: bool = Field(default=True, description="Whether agent is enabled")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
     @validator('agent_type')
     def validate_agent_type(cls, v: str) -> str:
@@ -62,7 +62,7 @@ class AgentConfig(BaseModel):
         return v.lower()
 
     @validator('capabilities')
-    def validate_capabilities(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def validate_capabilities(cls, v: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Validate capabilities structure"""
         for cap in v:
             if 'name' not in cap:
@@ -73,7 +73,7 @@ class AgentConfig(BaseModel):
                     raise ValueError(f"Capability confidence must be between 0.0 and 1.0, got {conf}")
         return v
 
-    def to_capability_objects(self) -> List[AgentCapability]:
+    def to_capability_objects(self) -> list[AgentCapability]:
         """Convert capabilities dict to AgentCapability objects"""
         return [
             AgentCapability(
@@ -113,8 +113,8 @@ class AgentConfigLoader:
                        Defaults to ./config/agents/
         """
         self.config_dir = config_dir or Path.cwd() / "config" / "agents"
-        self._cache: Dict[str, AgentConfig] = {}
-        self._cache_timestamps: Dict[str, datetime] = {}
+        self._cache: dict[str, AgentConfig] = {}
+        self._cache_timestamps: dict[str, datetime] = {}
         self._cache_ttl_seconds = 300  # 5 minutes cache TTL
 
     def load_config(self, agent_id: str, force_reload: bool = False) -> AgentConfig:
@@ -150,11 +150,11 @@ class AgentConfigLoader:
                 config_data = json.load(f)
         except json.JSONDecodeError as e:
             raise ConfigValidationError(
-                f"Invalid JSON in {config_path}: {str(e)}"
+                f"Invalid JSON in {config_path}: {e!s}"
             )
-        except IOError as e:
+        except OSError as e:
             raise LoaderError(
-                f"Error reading config file {config_path}: {str(e)}"
+                f"Error reading config file {config_path}: {e!s}"
             )
 
         # Validate using Pydantic
@@ -162,7 +162,7 @@ class AgentConfigLoader:
             config = AgentConfig(**config_data)
         except ValidationError as e:
             raise ConfigValidationError(
-                f"Configuration validation failed for {agent_id}: {str(e)}"
+                f"Configuration validation failed for {agent_id}: {e!s}"
             )
 
         # Update cache
@@ -171,7 +171,7 @@ class AgentConfigLoader:
 
         return config
 
-    def load_all_configs(self, force_reload: bool = False) -> Dict[str, AgentConfig]:
+    def load_all_configs(self, force_reload: bool = False) -> dict[str, AgentConfig]:
         """
         Load all agent configurations from config directory
 
@@ -209,7 +209,7 @@ class AgentConfigLoader:
                 config = self.load_config(agent_id, force_reload=force_reload)
                 configs[agent_id] = config
             except (ConfigNotFoundError, ConfigValidationError) as e:
-                errors.append(f"{agent_id}: {str(e)}")
+                errors.append(f"{agent_id}: {e!s}")
 
         if errors:
             raise ConfigValidationError(
@@ -218,7 +218,7 @@ class AgentConfigLoader:
 
         return configs
 
-    def get_enabled_agents(self) -> List[AgentConfig]:
+    def get_enabled_agents(self) -> list[AgentConfig]:
         """
         Get all enabled agent configurations
 
@@ -228,7 +228,7 @@ class AgentConfigLoader:
         all_configs = self.load_all_configs()
         return [config for config in all_configs.values() if config.enabled]
 
-    def get_agents_by_type(self, agent_type: str) -> List[AgentConfig]:
+    def get_agents_by_type(self, agent_type: str) -> list[AgentConfig]:
         """
         Get all agents of a specific type
 
@@ -291,13 +291,13 @@ class AgentConfigLoader:
             return True, None
 
         except json.JSONDecodeError as e:
-            return False, f"Invalid JSON: {str(e)}"
+            return False, f"Invalid JSON: {e!s}"
         except ValidationError as e:
-            return False, f"Validation error: {str(e)}"
+            return False, f"Validation error: {e!s}"
         except Exception as e:
-            return False, f"Unexpected error: {str(e)}"
+            return False, f"Unexpected error: {e!s}"
 
-    def get_cache_stats(self) -> Dict[str, Any]:
+    def get_cache_stats(self) -> dict[str, Any]:
         """
         Get cache statistics
 

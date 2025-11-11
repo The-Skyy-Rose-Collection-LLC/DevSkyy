@@ -1,11 +1,11 @@
+import html
+import logging
 import re
+from typing import Union
 
 from fastapi import HTTPException, Request, status
 from pydantic import BaseModel, Field
 
-from typing import Dict, List, Union
-import html
-import logging
 
 """
 Enterprise Input Validation & Sanitization
@@ -219,8 +219,8 @@ class InputValidationMiddleware:
         self.sanitizer = InputSanitizer()
 
     async def validate_request_data(
-        self, data: Union[Dict, List, str]
-    ) -> Union[Dict, List, str]:
+        self, data: Union[dict, list, str]
+    ) -> Union[dict, list, str]:
         """
         Recursively validate and sanitize request data
 
@@ -343,7 +343,7 @@ class ContentSecurityPolicy:
     """Content Security Policy headers"""
 
     @staticmethod
-    def get_csp_header() -> Dict[str, str]:
+    def get_csp_header() -> dict[str, str]:
         """Get CSP header"""
         csp = "; ".join(
             [

@@ -10,12 +10,13 @@ Usage:
     DATABASE_URL=postgresql://user:pass@host/db python scripts/verify_database_schema.py
 """
 
+import logging
 import os
 import sys
-import logging
-from typing import Dict, List, Optional
+from typing import Optional
 
 import psycopg2
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ def get_database_url() -> Optional[str]:
     return os.getenv('DATABASE_URL') or os.getenv('NEON_DATABASE_URL')
 
 
-def check_tables(cursor) -> Dict[str, bool]:
+def check_tables(cursor) -> dict[str, bool]:
     """Check if all expected tables exist"""
     logger.info("Checking tables...")
 
@@ -89,7 +90,7 @@ def check_tables(cursor) -> Dict[str, bool]:
     existing_tables = {row[0] for row in cursor.fetchall()}
     results = {}
 
-    for table_name in EXPECTED_TABLES.keys():
+    for table_name in EXPECTED_TABLES:
         exists = table_name in existing_tables
         results[table_name] = exists
 
@@ -101,7 +102,7 @@ def check_tables(cursor) -> Dict[str, bool]:
     return results
 
 
-def check_columns(cursor, table_name: str, expected_columns: List[str]) -> Dict[str, bool]:
+def check_columns(cursor, table_name: str, expected_columns: list[str]) -> dict[str, bool]:
     """Check if all expected columns exist in table"""
     cursor.execute("""
         SELECT column_name
@@ -124,7 +125,7 @@ def check_columns(cursor, table_name: str, expected_columns: List[str]) -> Dict[
     return results
 
 
-def check_indexes(cursor) -> Dict[str, bool]:
+def check_indexes(cursor) -> dict[str, bool]:
     """Check if all expected indexes exist"""
     logger.info("Checking indexes...")
 
@@ -150,7 +151,7 @@ def check_indexes(cursor) -> Dict[str, bool]:
     return results
 
 
-def check_foreign_keys(cursor) -> Dict[str, bool]:
+def check_foreign_keys(cursor) -> dict[str, bool]:
     """Check foreign key constraints"""
     logger.info("Checking foreign key constraints...")
 
@@ -258,7 +259,7 @@ def verify_schema(database_url: str) -> bool:
 
         return tables_ok and columns_ok and indexes_ok
 
-    except Exception as e:
+    except Exception:
         logger.exception("❌ Schema verification failed")
         return False
 

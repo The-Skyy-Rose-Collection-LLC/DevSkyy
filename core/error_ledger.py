@@ -14,16 +14,17 @@ Features:
 - JSON format for machine readability
 """
 
-import json
-import logging
-import sys
-import traceback
-import uuid
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
+import json
+import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, asdict, field
+import sys
+import traceback
+from typing import Any, Optional
+import uuid
+
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ class ErrorEntry:
     error_type: str
     error_message: str
     stack_trace: Optional[str] = None
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
     correlation_id: Optional[str] = None
     user_id: Optional[str] = None
     endpoint: Optional[str] = None
@@ -75,10 +76,10 @@ class ErrorEntry:
     resolved: bool = False
     resolution_notes: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Return a dictionary representation of the ErrorEntry with enum fields converted to their string values.
-        
+
         Returns:
             dict: Mapping of all dataclass fields to their values; `severity` and `category` are returned as their string values.
         """
@@ -99,9 +100,9 @@ class ErrorLedger:
     def __init__(self, run_id: Optional[str] = None, artifacts_dir: str = "artifacts"):
         """
         Initialize the error ledger and create its on-disk ledger file.
-        
+
         Creates or uses the provided run identifier, ensures the artifacts directory exists, sets the ledger file path, initializes in-memory metadata and error list, and writes the initial ledger file.
-        
+
         Parameters:
             run_id (Optional[str]): Optional unique run identifier; a new run ID is generated if not provided.
             artifacts_dir (str): Filesystem directory where the ledger JSON file will be stored.
@@ -111,7 +112,7 @@ class ErrorLedger:
         self.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
         self.ledger_file = self.artifacts_dir / f"error-ledger-{self.run_id}.json"
-        self.errors: List[ErrorEntry] = []
+        self.errors: list[ErrorEntry] = []
 
         # Metadata
         self.metadata = {
@@ -130,7 +131,7 @@ class ErrorLedger:
     def _generate_run_id(self) -> str:
         """
         Create a compact unique run identifier composed of the current UTC timestamp and a short UUID suffix.
-        
+
         Returns:
             run_id (str): Identifier in the format `YYYYMMDD_HHMMSS_<8-char-uuid>`.
         """
@@ -141,7 +142,7 @@ class ErrorLedger:
     def _get_environment(self) -> str:
         """
         Return the configured runtime environment name.
-        
+
         Returns:
             env (str): The value of the `ENVIRONMENT` environment variable if set; otherwise `"development"`.
         """
@@ -151,7 +152,7 @@ class ErrorLedger:
     def _initialize_ledger(self):
         """
         Create the initial ledger file containing metadata, an empty errors list, and zeroed statistics.
-        
+
         Writes a JSON file at self.ledger_file with the current metadata, an empty "errors" array, and a "statistics" object initialized with zero counts.
         """
         initial_data = {
@@ -173,7 +174,7 @@ class ErrorLedger:
         error: Exception,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
         category: ErrorCategory = ErrorCategory.UNKNOWN,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
         user_id: Optional[str] = None,
         endpoint: Optional[str] = None,
@@ -181,7 +182,7 @@ class ErrorLedger:
     ) -> str:
         """
         Record an exception in the ledger and persist the corresponding error entry.
-        
+
         Parameters:
             error (Exception): The exception instance to record.
             severity (ErrorSeverity): Classification of the error's severity.
@@ -191,7 +192,7 @@ class ErrorLedger:
             user_id (Optional[str]): Identifier for the affected user, if applicable.
             endpoint (Optional[str]): API endpoint or operation name where the error occurred.
             method (Optional[str]): HTTP method or action associated with the endpoint.
-        
+
         Returns:
             error_id (str): The unique identifier assigned to the logged error.
         """
@@ -253,10 +254,10 @@ class ErrorLedger:
     def _persist_error(self, error_entry: ErrorEntry):
         """
         Append the given ErrorEntry to the ledger file and update the ledger's statistics on disk.
-        
+
         Parameters:
             error_entry (ErrorEntry): The error entry to persist. The entry will be serialized to JSON and added to the ledger's "errors" list; ledger statistics (total_errors, by_severity, by_category, resolved_count) will be recalculated and written back to the ledger file.
-        
+
         Notes:
             On failure the method logs an error and does not raise.
         """
@@ -296,7 +297,7 @@ class ErrorLedger:
     def mark_resolved(self, error_id: str, resolution_notes: str):
         """
         Mark the ledger entry with the given error_id as resolved and record resolution notes.
-        
+
         Parameters:
             error_id (str): Identifier of the error to mark resolved.
             resolution_notes (str): Description or notes explaining how the error was resolved.
@@ -332,10 +333,10 @@ class ErrorLedger:
         except Exception as e:
             logger.error(f"Failed to mark error as resolved: {e}")
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """
         Retrieve current ledger statistics from the persisted ledger file.
-        
+
         Returns:
             statistics (Dict[str, Any]): Dictionary containing ledger statistics (e.g., "total_errors", "by_severity", "by_category", "resolved_count"); returns an empty dict if the ledger file cannot be read or parsed.
         """
@@ -353,16 +354,16 @@ class ErrorLedger:
         category: Optional[ErrorCategory] = None,
         resolved: Optional[bool] = None,
         limit: Optional[int] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Retrieve persisted errors with optional filtering by severity, category, resolution status, and result limit.
-        
+
         Parameters:
             severity (Optional[ErrorSeverity]): If provided, include only errors whose severity matches this value.
             category (Optional[ErrorCategory]): If provided, include only errors whose category matches this value.
             resolved (Optional[bool]): If provided, include only errors whose `resolved` flag matches this value.
             limit (Optional[int]): If provided, return at most this many most-recent errors.
-        
+
         Returns:
             List[Dict[str, Any]]: A list of error records as dictionaries from the ledger, possibly filtered and limited.
         """
@@ -393,12 +394,12 @@ class ErrorLedger:
     def export_report(self, output_file: Optional[str] = None) -> str:
         """
         Generate a human-readable text report of the current error ledger and optionally write it to a file.
-        
+
         The report includes run metadata (run ID, start time, environment), aggregated statistics (total, resolved/unresolved, counts by severity and category), and detailed entries for each recorded error (ID, timestamp, severity, category, type, message, resolution status, optional resolution notes, and source file/line when available).
-        
+
         Parameters:
             output_file (Optional[str]): Path where the report should be saved. If omitted, the report is only returned.
-        
+
         Returns:
             str: The formatted report text on success, or an error message string if report generation or file writing fails.
         """
@@ -489,7 +490,7 @@ class ErrorLedger:
     def close(self):
         """
         Finalize the ledger by recording the completion time in the persisted ledger metadata.
-        
+
         Sets `metadata["completed_at"]` to the current UTC ISO‑8601 timestamp and writes the updated ledger file; failures are caught and logged.
         """
         try:
@@ -517,10 +518,10 @@ _error_ledger: Optional[ErrorLedger] = None
 def get_error_ledger(run_id: Optional[str] = None) -> ErrorLedger:
     """
     Get the module-level ErrorLedger singleton, creating it if necessary.
-    
+
     Parameters:
         run_id (Optional[str]): Optional run identifier to assign to the ledger; a new run ID is generated when omitted.
-    
+
     Returns:
         ErrorLedger: The global ErrorLedger instance.
     """
@@ -540,13 +541,13 @@ def log_error(
 ) -> str:
     """
     Log an exception to the global error ledger.
-    
+
     Parameters:
         error (Exception): The exception instance to record.
         severity (ErrorSeverity): Severity level for the error (default: ErrorSeverity.MEDIUM).
         category (ErrorCategory): Category for the error (default: ErrorCategory.UNKNOWN).
         **kwargs: Additional metadata forwarded to the ledger such as `context`, `correlation_id`, `user_id`, `endpoint`, and `method`.
-    
+
     Returns:
         error_id (str): The unique identifier assigned to the recorded error.
     """
@@ -556,10 +557,10 @@ def log_error(
 
 # Export main components
 __all__ = [
-    "ErrorLedger",
-    "ErrorSeverity",
     "ErrorCategory",
     "ErrorEntry",
+    "ErrorLedger",
+    "ErrorSeverity",
     "get_error_ledger",
     "log_error"
 ]

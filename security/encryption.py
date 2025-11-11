@@ -1,15 +1,16 @@
+import base64
+import hashlib
+import logging
 import os
 import secrets
+from typing import Any, Optional, Union
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from typing import Any, Dict, Optional, Union
-import base64
-import hashlib
-import logging
+
 
 """
 Enterprise-Grade Encryption System
@@ -36,8 +37,8 @@ class KeyManager:
         self.master_key = master_key or os.getenv(
             "ENCRYPTION_MASTER_KEY", self._generate_master_key()
         )
-        self.active_keys: Dict[str, bytes] = {}
-        self.key_versions: Dict[str, int] = {}
+        self.active_keys: dict[str, bytes] = {}
+        self.key_versions: dict[str, int] = {}
 
     @staticmethod
     def _generate_master_key() -> str:
@@ -228,7 +229,7 @@ class FieldEncryption:
         """
         self.engine = encryption_engine or AESEncryption()
 
-    def encrypt_field(self, value: Any, field_name: str) -> Dict[str, Any]:
+    def encrypt_field(self, value: Any, field_name: str) -> dict[str, Any]:
         """
         Encrypt a field value
 
@@ -255,7 +256,7 @@ class FieldEncryption:
             "encrypted_at": str(hash(field_name)),
         }
 
-    def decrypt_field(self, encrypted_data: Dict[str, Any]) -> Any:
+    def decrypt_field(self, encrypted_data: dict[str, Any]) -> Any:
         """
         Decrypt a field value
 

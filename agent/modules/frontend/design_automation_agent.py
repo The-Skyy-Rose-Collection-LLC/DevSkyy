@@ -1,7 +1,8 @@
-import logging
-import uuid
 from datetime import datetime
-from typing import Any, Dict
+import logging
+from typing import Any
+import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -171,8 +172,8 @@ class DesignAutomationAgent:
         )
 
     async def create_luxury_frontend_design(
-        self, design_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, design_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create comprehensive luxury frontend design with automated beauty optimization."""
         try:
             page_type = design_request.get("page_type", "product_showcase")
@@ -241,12 +242,12 @@ class DesignAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Luxury frontend design creation failed: {str(e)}")
+            logger.error(f"❌ Luxury frontend design creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def automate_design_system_updates(
-        self, update_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, update_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Automate design system updates and component refresh."""
         try:
             update_type = update_request.get("type", "seasonal_refresh")
@@ -310,12 +311,12 @@ class DesignAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Design system automation failed: {str(e)}")
+            logger.error(f"❌ Design system automation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def optimize_frontend_beauty(
-        self, optimization_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, optimization_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Optimize frontend beauty with AI-powered aesthetic enhancements."""
         try:
             target_pages = optimization_request.get(
@@ -381,12 +382,12 @@ class DesignAutomationAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Frontend beauty optimization failed: {str(e)}")
+            logger.error(f"❌ Frontend beauty optimization failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _create_luxury_design_system(
         self, style: str, personality: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create comprehensive luxury design system."""
         base_system = {
             "colors": self.luxury_design_principles["color_psychology"][
@@ -431,8 +432,8 @@ class DesignAutomationAgent:
         return base_system
 
     def _generate_luxury_components(
-        self, page_type: str, design_system: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, page_type: str, design_system: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate luxury component library for specific page type."""
         components = {
             "navigation": {
@@ -494,7 +495,7 @@ class DesignAutomationAgent:
 
     def _create_responsive_layout(
         self, page_type: str, audience: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create responsive layout structure."""
         layout_templates = {
             "product_showcase": {
@@ -566,8 +567,8 @@ class DesignAutomationAgent:
         return layout_templates.get(page_type, layout_templates["product_showcase"])
 
     def _design_luxury_interactions(
-        self, page_type: str, design_system: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, page_type: str, design_system: dict[str, Any]
+    ) -> dict[str, Any]:
         """Design luxury interactions and animations."""
         return {
             "hover_effects": {
@@ -596,8 +597,8 @@ class DesignAutomationAgent:
         }
 
     def _generate_frontend_code(
-        self, components: Dict[str, Any], layout: Dict[str, Any]
-    ) -> Dict[str, str]:
+        self, components: dict[str, Any], layout: dict[str, Any]
+    ) -> dict[str, str]:
         """Generate actual frontend code based on design specifications."""
         return {
             "html_structure": """
@@ -741,8 +742,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
     def _calculate_luxury_design_score(
-        self, design_system: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, design_system: dict[str, Any]
+    ) -> dict[str, Any]:
         """Calculate luxury design quality score."""
         score_factors = {
             "color_harmony": 95,
@@ -768,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "improvement_areas": [k for k, v in score_factors.items() if v < 90],
         }
 
-    def _initialize_design_ai(self) -> Dict[str, Any]:
+    def _initialize_design_ai(self) -> dict[str, Any]:
         """Initialize AI-powered design intelligence."""
         return {
             "aesthetic_analyzer": "luxury_brand_visual_analysis",
@@ -778,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "accessibility_enhancer": "automated_wcag_compliance_optimizer",
         }
 
-    def _initialize_aesthetic_analyzer(self) -> Dict[str, Any]:
+    def _initialize_aesthetic_analyzer(self) -> dict[str, Any]:
         """Initialize aesthetic analysis system."""
         return {
             "visual_balance": "golden_ratio_and_composition_analysis",
@@ -788,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "brand_alignment": "luxury_positioning_visual_consistency",
         }
 
-    def _initialize_design_trend_forecaster(self) -> Dict[str, Any]:
+    def _initialize_design_trend_forecaster(self) -> dict[str, Any]:
         """Initialize design trend forecasting system."""
         return {
             "fashion_trends": "runway_to_digital_design_translation",
@@ -798,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "technology_integration": "emerging_tech_in_luxury_design",
         }
 
-    async def deploy_luxury_theme(self, theme_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def deploy_luxury_theme(self, theme_data: dict[str, Any]) -> dict[str, Any]:
         """Deploy luxury WordPress theme with brand assets."""
         try:
             layout_id = theme_data.get("layout", "luxury_streetwear_homepage")
@@ -849,12 +850,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         except Exception as e:
-            logger.error(f"❌ Theme deployment failed: {str(e)}")
+            logger.error(f"❌ Theme deployment failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def create_custom_section(
-        self, section_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, section_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create custom WordPress section with luxury styling."""
         try:
             section_type = section_data.get("type", "hero_section")
@@ -906,12 +907,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         except Exception as e:
-            logger.error(f"❌ Custom section creation failed: {str(e)}")
+            logger.error(f"❌ Custom section creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_theme_configuration(
-        self, layout_id: str, style: str, brand_assets: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, layout_id: str, style: str, brand_assets: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate theme configuration."""
         return {
             "theme_name": f"Luxury {layout_id.replace('_', ' ').title()}",
@@ -949,7 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
         }
 
-    def _integrate_brand_assets(self, brand_assets: Dict[str, Any]) -> Dict[str, Any]:
+    def _integrate_brand_assets(self, brand_assets: dict[str, Any]) -> dict[str, Any]:
         """Integrate brand assets into theme."""
         return {
             "logo_integration": {
@@ -973,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
         }
 
-    def _generate_luxury_css(self, style: str, brand_assets: Dict[str, Any]) -> str:
+    def _generate_luxury_css(self, style: str, brand_assets: dict[str, Any]) -> str:
         """Generate custom CSS for luxury styling."""
         colors = brand_assets.get("colors", ["#E8B4B8", "#FFD700", "#C0C0C0"])
         fonts = brand_assets.get("fonts", ["Playfair Display", "Montserrat"])
@@ -1026,7 +1027,7 @@ h1, h2, h3, h4, h5, h6 {{
 }}
         """
 
-    def _configure_responsive_design(self, layout_id: str) -> Dict[str, Any]:
+    def _configure_responsive_design(self, layout_id: str) -> dict[str, Any]:
         """Configure responsive design settings."""
         return {
             "breakpoints": {"mobile": "768px", "tablet": "1024px", "desktop": "1200px"},
@@ -1037,7 +1038,7 @@ h1, h2, h3, h4, h5, h6 {{
             },
         }
 
-    def _optimize_theme_performance(self) -> Dict[str, Any]:
+    def _optimize_theme_performance(self) -> dict[str, Any]:
         """Optimize theme performance."""
         return {
             "css_optimization": "minified_and_compressed",
@@ -1047,8 +1048,8 @@ h1, h2, h3, h4, h5, h6 {{
         }
 
     def _generate_section_structure(
-        self, section_type: str, content: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, section_type: str, content: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate section structure."""
         structures = {
             "hero_section": {
@@ -1076,7 +1077,7 @@ h1, h2, h3, h4, h5, h6 {{
 
     def _apply_luxury_section_styling(
         self, section_type: str, brand_style: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Apply luxury styling to section."""
         return {
             "color_scheme": "luxury_gradient_backgrounds",
@@ -1088,7 +1089,7 @@ h1, h2, h3, h4, h5, h6 {{
             "brand_integration": f"{brand_style}_optimized_styling",
         }
 
-    def _create_section_responsive_design(self, section_type: str) -> Dict[str, Any]:
+    def _create_section_responsive_design(self, section_type: str) -> dict[str, Any]:
         """Create responsive design for section."""
         return {
             "mobile_layout": "single_column_optimized",
@@ -1096,7 +1097,7 @@ h1, h2, h3, h4, h5, h6 {{
             "desktop_layout": "full_width_luxury_experience",
         }
 
-    def _add_section_interactions(self, section_type: str) -> Dict[str, Any]:
+    def _add_section_interactions(self, section_type: str) -> dict[str, Any]:
         """Add interactive elements to section."""
         return {
             "hover_effects": "elegant_transitions",
@@ -1105,8 +1106,8 @@ h1, h2, h3, h4, h5, h6 {{
         }
 
     def _generate_section_code(
-        self, structure: Dict[str, Any], styling: Dict[str, Any]
-    ) -> Dict[str, str]:
+        self, structure: dict[str, Any], styling: dict[str, Any]
+    ) -> dict[str, str]:
         """Generate section code."""
         return {
             "html": f"""
@@ -1146,7 +1147,7 @@ h1, h2, h3, h4, h5, h6 {{
         }
 
 
-def optimize_design_automation() -> Dict[str, Any]:
+def optimize_design_automation() -> dict[str, Any]:
     """Main function to optimize design automation."""
     agent = DesignAutomationAgent()
     return {

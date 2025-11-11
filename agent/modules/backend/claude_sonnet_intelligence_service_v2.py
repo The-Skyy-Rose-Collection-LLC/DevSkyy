@@ -15,16 +15,17 @@ UPGRADED FEATURES:
 """
 
 import asyncio
+from datetime import datetime, timedelta
 import hashlib
 import json
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from anthropic import Anthropic, AsyncAnthropic
 
 from .base_agent import BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
         """
 
         # Response caching for efficiency (LRU cache)
-        self.response_cache: Dict[str, Dict[str, Any]] = {}
+        self.response_cache: dict[str, dict[str, Any]] = {}
         self.cache_max_size = 100
         self.cache_ttl = timedelta(hours=24)
 
@@ -76,7 +77,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
         }
 
         # Response quality tracking for ML
-        self.response_quality_scores: List[float] = []
+        self.response_quality_scores: list[float] = []
         self.low_quality_threshold = 0.6
 
         # Rate limiting
@@ -93,7 +94,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
                 return False
 
             # Test API connection
-            _test_response = await self.client.messages.create(  # noqa: F841
+            _test_response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=10,
                 messages=[{"role": "user", "content": "test"}],
@@ -108,7 +109,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             self.status = BaseAgent.AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Core function for health checks and basic operations.
         Delegates to specific methods for actual work.
@@ -119,10 +120,10 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     async def advanced_reasoning(
         self,
         task: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         max_tokens: int = 4096,
         use_cache: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use Claude's advanced reasoning with self-healing and optimization.
 
@@ -224,8 +225,8 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
 
     @BaseAgent.with_healing
     async def enhance_luxury_product_description(
-        self, product_data: Dict[str, Any], use_cache: bool = True
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any], use_cache: bool = True
+    ) -> dict[str, Any]:
         """
         Create ultra-premium product descriptions with self-healing.
         """
@@ -268,7 +269,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=1500,
-                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers.",  # noqa: E501
+                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.8,
             )
@@ -316,8 +317,8 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
     # === Helper Methods ===
 
     def _check_cache(
-        self, key: str, context: Optional[Dict] = None
-    ) -> Optional[Dict[str, Any]]:
+        self, key: str, context: Optional[dict] = None
+    ) -> Optional[dict[str, Any]]:
         """Check if we have a cached response"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -334,7 +335,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         return None
 
     def _cache_response(
-        self, key: str, context: Optional[Dict], response: Dict[str, Any]
+        self, key: str, context: Optional[dict], response: dict[str, Any]
     ):
         """Cache a response for future use"""
         cache_key = self._generate_cache_key(key, context)
@@ -352,7 +353,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "cached_at": datetime.now(),
         }
 
-    def _generate_cache_key(self, key: str, context: Optional[Dict]) -> str:
+    def _generate_cache_key(self, key: str, context: Optional[dict]) -> str:
         """Generate a unique cache key"""
         if context:
             context_str = json.dumps(context, sort_keys=True)
@@ -439,7 +440,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         else:
             return "low"
 
-    async def get_usage_statistics(self) -> Dict[str, Any]:
+    async def get_usage_statistics(self) -> dict[str, Any]:
         """Get comprehensive usage statistics"""
         return {
             "agent_name": self.agent_name,

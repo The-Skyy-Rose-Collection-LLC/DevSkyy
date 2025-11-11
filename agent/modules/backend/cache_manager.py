@@ -1,12 +1,13 @@
-import redis.asyncio as redis
-from datetime import datetime, timedelta
-import json
-
-from functools import wraps
-from typing import Any, Dict, Optional, Union
 import asyncio
+from datetime import datetime, timedelta
+from functools import wraps
 import hashlib
+import json
 import logging
+from typing import Any, Optional, Union
+
+import redis.asyncio as redis
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,12 +25,9 @@ class CacheManager:
         self.hit_count = 0
         self.miss_count = 0
 
-    def _generate_key(self, key: Union[str, Dict]) -> str:
+    def _generate_key(self, key: Union[str, dict]) -> str:
         """Generate a consistent cache key."""
-        if isinstance(key, dict):
-            key_str = json.dumps(key, sort_keys=True)
-        else:
-            key_str = str(key)
+        key_str = json.dumps(key, sort_keys=True) if isinstance(key, dict) else str(key)
         return hashlib.sha256(key_str.encode()).hexdigest()
 
     def _is_expired(self, timestamp: datetime, ttl: int) -> bool:
@@ -47,7 +45,7 @@ class CacheManager:
             del self.access_times[oldest_key]
             logger.info(f"Evicted LRU cache entry: {oldest_key}")
 
-    def get(self, key: Union[str, Dict], default: Any = None) -> Any:
+    def get(self, key: Union[str, dict], default: Any = None) -> Any:
         """Get value from cache."""
         cache_key = self._generate_key(key)
 
@@ -68,7 +66,7 @@ class CacheManager:
         logger.debug(f"Cache miss for key: {cache_key}")
         return default
 
-    def set(self, key: Union[str, Dict], value: Any, ttl: Optional[int] = None) -> None:
+    def set(self, key: Union[str, dict], value: Any, ttl: Optional[int] = None) -> None:
         """Set value in cache with TTL."""
         cache_key = self._generate_key(key)
         ttl = ttl or self.default_ttl
@@ -85,7 +83,7 @@ class CacheManager:
         self.access_times[cache_key] = datetime.now()
         logger.debug(f"Cached value for key: {cache_key}")
 
-    def delete(self, key: Union[str, Dict]) -> bool:
+    def delete(self, key: Union[str, dict]) -> bool:
         """Delete key from cache."""
         cache_key = self._generate_key(key)
         if cache_key in self.cache:
@@ -102,7 +100,7 @@ class CacheManager:
         self.access_times.clear()
         logger.info("Cache cleared")
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         total_requests = self.hit_count + self.miss_count
         hit_rate = (self.hit_count / total_requests * 100) if total_requests > 0 else 0
@@ -263,7 +261,7 @@ class ConnectionPool:
             logger.error(f"❌ Failed to create Redis connection: {e}")
             raise
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get connection pool statistics."""
         return {
             "max_connections": self.max_connections,

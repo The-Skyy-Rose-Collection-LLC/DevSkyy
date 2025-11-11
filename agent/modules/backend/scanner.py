@@ -1,20 +1,22 @@
 from datetime import datetime
-from pathlib import Path
-import os
-import re
-import requests
-import time
-
 import importlib.util
+import logging
+import os
+from pathlib import Path
+import re
+import time
+from typing import Any
+
+import requests
+
 from . import http_client
 from .telemetry import Telemetry
-from typing import Any, Dict, List
-import logging
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def scan_site() -> Dict[str, Any]:
+def scan_site() -> dict[str, Any]:
     """
     Comprehensive site scanning with advanced error detection and analysis.
     Production-level implementation with full error handling.
@@ -71,14 +73,14 @@ def scan_site() -> Dict[str, Any]:
         return scan_results
 
     except Exception as e:
-        logger.error(f"❌ Site scan failed: {str(e)}")
+        logger.error(f"❌ Site scan failed: {e!s}")
         return {
             "status": "failed",
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
         }
 
-def _scan_project_files() -> List[str]:
+def _scan_project_files() -> list[str]:
     """Scan all project files for analysis."""
     files = []
 
@@ -102,7 +104,7 @@ def _scan_project_files() -> List[str]:
 
     return files
 
-def _analyze_file(file_path: str) -> Dict[str, Any]:
+def _analyze_file(file_path: str) -> dict[str, Any]:
     """Analyze individual file for issues."""
     analysis = {"file": file_path, "errors": [], "warnings": [], "optimizations": []}
 
@@ -127,11 +129,11 @@ def _analyze_file(file_path: str) -> Dict[str, Any]:
             analysis.update(_analyze_css_file(content, file_path))
 
     except Exception as e:
-        analysis["errors"].append(f"File read error: {str(e)}")
+        analysis["errors"].append(f"File read error: {e!s}")
 
     return analysis
 
-def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
+def _analyze_python_file(content: str, file_path: str) -> dict[str, Any]:
     """Analyze Python file for syntax and common issues."""
     errors = []
     warnings = []
@@ -165,11 +167,11 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
     except SyntaxError as e:
         errors.append(f"Syntax error at line {e.lineno}: {e.msg}")
     except Exception as e:
-        errors.append(f"Analysis error: {str(e)}")
+        errors.append(f"Analysis error: {e!s}")
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
-def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
+def _analyze_javascript_file(content: str, file_path: str) -> dict[str, Any]:
     """Analyze JavaScript file for common issues."""
     errors = []
     warnings = []
@@ -193,7 +195,7 @@ def _analyze_javascript_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
-def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
+def _analyze_html_file(content: str, file_path: str) -> dict[str, Any]:
     """Analyze HTML file for SEO and accessibility issues."""
     errors = []
     warnings = []
@@ -216,7 +218,7 @@ def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
-def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
+def _analyze_css_file(content: str, file_path: str) -> dict[str, Any]:
     """Analyze CSS file for performance and best practices."""
     errors = []
     warnings = []
@@ -240,7 +242,7 @@ def _analyze_css_file(content: str, file_path: str) -> Dict[str, Any]:
 
     return {"errors": errors, "warnings": warnings, "optimizations": optimizations}
 
-def _check_site_health() -> Dict[str, Any]:
+def _check_site_health() -> dict[str, Any]:
     """Check if the site is accessible and responsive."""
     health_check = {
         "status": "unknown",
@@ -285,7 +287,7 @@ def _check_site_health() -> Dict[str, Any]:
 
     return health_check
 
-def _analyze_performance() -> Dict[str, Any]:
+def _analyze_performance() -> dict[str, Any]:
     """Analyze performance metrics."""
     return {
         "files_analyzed": True,
@@ -299,7 +301,7 @@ def _analyze_performance() -> Dict[str, Any]:
         "performance_score": 85,
     }
 
-def scan_agents_only() -> Dict[str, Any]:
+def scan_agents_only() -> dict[str, Any]:
     """
     Scan and analyze all agent modules specifically.
     Returns comprehensive health metrics for agents.
@@ -327,11 +329,11 @@ def scan_agents_only() -> Dict[str, Any]:
     result["agent_modules"].update(agents_analyzed)
 
     logger.info(
-        f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working"  # noqa: E501
+        f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working"
     )
     return result
 
-def _analyze_all_agents() -> Dict[str, Any]:
+def _analyze_all_agents() -> dict[str, Any]:
     """Analyze all agent modules in the system."""
 
     agents_dir = Path("agent/modules")
@@ -400,7 +402,7 @@ def _analyze_all_agents() -> Dict[str, Any]:
         },
     }
 
-def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
+def _analyze_single_agent(agent_file: Path) -> dict[str, Any]:
     """Analyze a single agent file for issues."""
     performance_issues = []
     security_concerns = []
@@ -455,12 +457,12 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
         "security_concerns": security_concerns,
     }
 
-def _security_scan() -> List[str]:
+def _security_scan() -> list[str]:
     """Perform basic security scan."""
     security_issues = []
 
     # Check for common security issues in Python files
-    for root, dirs, files in os.walk("."):
+    for root, _dirs, files in os.walk("."):
         for file in files:
             if file.endswith(".py"):
                 file_path = os.path.join(root, file)

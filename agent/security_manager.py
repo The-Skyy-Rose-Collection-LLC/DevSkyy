@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-import secrets
-
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
 import hashlib
 import hmac
 import logging
+import secrets
+from typing import Any, Optional
+
 
 """
 Enterprise Security Manager for Agent System
@@ -55,12 +55,12 @@ class SecurityManager:
 
     def __init__(self):
         # Authentication
-        self.api_keys: Dict[str, Dict[str, Any]] = {}  # key_id -> key_info
-        self.agent_credentials: Dict[str, str] = {}  # agent_name -> api_key_id
+        self.api_keys: dict[str, dict[str, Any]] = {}  # key_id -> key_info
+        self.agent_credentials: dict[str, str] = {}  # agent_name -> api_key_id
 
         # Authorization (RBAC)
-        self.agent_roles: Dict[str, SecurityRole] = {}
-        self.role_permissions: Dict[SecurityRole, Set[str]] = {
+        self.agent_roles: dict[str, SecurityRole] = {}
+        self.role_permissions: dict[SecurityRole, set[str]] = {
             SecurityRole.ADMIN: {"read", "write", "execute", "admin", "delete"},
             SecurityRole.OPERATOR: {"read", "write", "execute"},
             SecurityRole.ANALYST: {"read"},
@@ -69,20 +69,20 @@ class SecurityManager:
         }
 
         # Resource permissions
-        self.resource_acl: Dict[str, Set[str]] = {}  # resource -> set of allowed agents
+        self.resource_acl: dict[str, set[str]] = {}  # resource -> set of allowed agents
 
         # Audit logging
-        self.audit_log: List[Dict[str, Any]] = []
+        self.audit_log: list[dict[str, Any]] = []
 
         # Rate limiting
-        self.rate_limits: Dict[str, List[datetime]] = {}
+        self.rate_limits: dict[str, list[datetime]] = {}
 
         # Secrets management
-        self.secrets: Dict[str, str] = {}
+        self.secrets: dict[str, str] = {}
 
         # Threat detection
-        self.suspicious_activity: Dict[str, int] = {}
-        self.blocked_agents: Set[str] = set()
+        self.suspicious_activity: dict[str, int] = {}
+        self.blocked_agents: set[str] = set()
 
         logger.info("🔒 Enterprise Security Manager initialized")
 
@@ -132,7 +132,7 @@ class SecurityManager:
 
         return f"{key_id}.{api_key}"
 
-    def validate_api_key(self, api_key: str) -> Optional[Dict[str, Any]]:
+    def validate_api_key(self, api_key: str) -> Optional[dict[str, Any]]:
         """
         Validate an API key.
 
@@ -244,14 +244,13 @@ class SecurityManager:
             return False
 
         # Check resource ACL
-        if resource in self.resource_acl:
-            if agent_name not in self.resource_acl[resource]:
-                self._audit_log(
-                    "unauthorized_access",
-                    agent_name,
-                    {"resource": resource, "reason": "not_in_acl"},
-                )
-                return False
+        if resource in self.resource_acl and agent_name not in self.resource_acl[resource]:
+            self._audit_log(
+                "unauthorized_access",
+                agent_name,
+                {"resource": resource, "reason": "not_in_acl"},
+            )
+            return False
 
         self._audit_log(
             "authorized_access",
@@ -400,7 +399,7 @@ class SecurityManager:
     # AUDIT LOGGING
     # ============================================================================
 
-    def _audit_log(self, event_type: str, agent_name: str, details: Dict[str, Any]):
+    def _audit_log(self, event_type: str, agent_name: str, details: dict[str, Any]):
         """Log security events for audit trail"""
         log_entry = {
             "timestamp": datetime.now().isoformat(),
@@ -428,7 +427,7 @@ class SecurityManager:
         agent_name: Optional[str] = None,
         event_type: Optional[str] = None,
         limit: int = 100,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Get audit log entries.
 
@@ -454,7 +453,7 @@ class SecurityManager:
 
         return filtered_logs[-limit:]
 
-    def get_security_summary(self) -> Dict[str, Any]:
+    def get_security_summary(self) -> dict[str, Any]:
         """Get security summary statistics"""
         return {
             "total_api_keys": len(self.api_keys),

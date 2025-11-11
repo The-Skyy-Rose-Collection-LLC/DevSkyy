@@ -9,14 +9,14 @@ Truth Protocol: Validated category IDs, explicit error handling, no placeholders
 """
 
 import logging
-import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import anthropic
 from openai import OpenAI
 from pydantic import BaseModel, Field
 
 from services.mcp_client import MCPToolClient, MCPToolError
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class CategoryMapping(BaseModel):
     category_id: int = Field(..., description="WordPress category ID")
     category_name: str = Field(..., description="Category display name")
     description: str = Field(..., description="Category description for AI context")
-    keywords: List[str] = Field(default_factory=list, description="Relevant keywords")
+    keywords: list[str] = Field(default_factory=list, description="Relevant keywords")
 
 
 class CategorizationResult(BaseModel):
@@ -133,7 +133,7 @@ class WordPressCategorizationService:
         self,
         anthropic_api_key: Optional[str] = None,
         openai_api_key: Optional[str] = None,
-        categories: Optional[List[CategoryMapping]] = None,
+        categories: Optional[list[CategoryMapping]] = None,
         default_category_id: int = 13,
         use_mcp: bool = True,
         mcp_client: Optional[MCPToolClient] = None,
@@ -217,7 +217,7 @@ Output only valid JSON."""
 
     async def categorize_with_anthropic(
         self, post_title: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Categorize post using Anthropic Claude
 
@@ -272,10 +272,10 @@ Output only valid JSON."""
             return {
                 "category_id": self.default_category_id,
                 "confidence": 0.0,
-                "reasoning": f"Error: {str(e)}",
+                "reasoning": f"Error: {e!s}",
             }
 
-    async def categorize_with_openai(self, post_title: str) -> Dict[str, Any]:
+    async def categorize_with_openai(self, post_title: str) -> dict[str, Any]:
         """
         Categorize post using OpenAI
 
@@ -321,10 +321,10 @@ Output only valid JSON."""
             return {
                 "category_id": self.default_category_id,
                 "confidence": 0.0,
-                "reasoning": f"Error: {str(e)}",
+                "reasoning": f"Error: {e!s}",
             }
 
-    def categorize_with_keywords(self, post_title: str) -> Dict[str, Any]:
+    def categorize_with_keywords(self, post_title: str) -> dict[str, Any]:
         """
         Fallback keyword-based categorization
 
@@ -363,7 +363,7 @@ Output only valid JSON."""
                 "reasoning": "No keywords matched - using default category",
             }
 
-    async def categorize_with_mcp(self, post_title: str) -> Dict[str, Any]:
+    async def categorize_with_mcp(self, post_title: str) -> dict[str, Any]:
         """
         Categorize post using MCP tool calling
 
@@ -485,8 +485,8 @@ Output only valid JSON."""
             )
 
     async def categorize_posts_batch(
-        self, posts: List[Dict[str, Any]], use_ai: bool = True
-    ) -> List[CategorizationResult]:
+        self, posts: list[dict[str, Any]], use_ai: bool = True
+    ) -> list[CategorizationResult]:
         """
         Categorize multiple posts in batch
 
@@ -522,6 +522,6 @@ Output only valid JSON."""
         """Get category mapping by ID"""
         return next((c for c in self.categories if c.category_id == category_id), None)
 
-    def get_all_categories(self) -> List[CategoryMapping]:
+    def get_all_categories(self) -> list[CategoryMapping]:
         """Get all available categories"""
         return self.categories

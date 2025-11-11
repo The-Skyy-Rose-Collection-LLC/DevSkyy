@@ -3,12 +3,13 @@ Unit tests for DataPipeline
 Tests data ingestion, validation, and processing
 """
 
-import pytest
-import tempfile
-import shutil
-from pathlib import Path
 import json
+from pathlib import Path
+import shutil
+import tempfile
+
 import pandas as pd
+import pytest
 
 from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
 
@@ -50,12 +51,12 @@ def temp_config_path(temp_data_dir):
             }
         }
     }
-    
+
     config_path = temp_data_dir / "dataflow.yaml"
     import yaml
     with open(config_path, 'w') as f:
         yaml.dump(config, f)
-    
+
     return str(config_path)
 
 
@@ -90,9 +91,9 @@ class TestIngestCSV:
         csv_file = temp_data_dir / "test.csv"
         df = pd.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
         df.to_csv(csv_file, index=False)
-        
+
         result = await data_pipeline.ingest(str(csv_file), "csv")
-        
+
         assert result["status"] == "ingested"
         assert result["source_type"] == "csv"
         assert "file_hash" in result
@@ -103,11 +104,11 @@ class TestIngestCSV:
         # Mock a large file by patching stat
         csv_file = temp_data_dir / "large.csv"
         csv_file.write_text("header\ndata")
-        
+
         # Patch file size check
         import os
         original_stat = os.stat
-        
+
         def mock_stat(path):
             result = original_stat(path)
             if "large.csv" in str(path):
@@ -116,7 +117,7 @@ class TestIngestCSV:
                     st_size = 100 * 1024 * 1024
                 return MockStat()
             return result
-        
+
         with pytest.mock.patch('os.stat', side_effect=mock_stat):
             result = await data_pipeline.ingest(str(csv_file), "csv")
             assert result["status"] == "rejected"
@@ -133,9 +134,9 @@ class TestIngestJSON:
         data = {"items": [{"id": 1, "value": 100}]}
         with open(json_file, 'w') as f:
             json.dump(data, f)
-        
+
         result = await data_pipeline.ingest(str(json_file), "json")
-        
+
         assert result["status"] == "ingested"
         assert result["source_type"] == "json"
 
@@ -144,9 +145,9 @@ class TestIngestJSON:
         """Test ingesting invalid JSON file"""
         json_file = temp_data_dir / "invalid.json"
         json_file.write_text("not valid json {")
-        
+
         result = await data_pipeline.ingest(str(json_file), "json")
-        
+
         assert result["status"] == "error"
 
 
@@ -157,9 +158,9 @@ class TestPreprocessing:
     async def test_preprocess_valid_data(self, data_pipeline):
         """Test preprocessing valid data"""
         data = pd.DataFrame({"id": ["1", "2"], "value": [10, 20]})
-        
+
         result = await data_pipeline.preprocess(data, "test_schema")
-        
+
         assert result["status"] == "validated"
         assert "validated_file" in result
 
@@ -168,9 +169,9 @@ class TestPreprocessing:
         """Test that invalid data is quarantined"""
         # Missing required field 'value'
         data = pd.DataFrame({"id": ["1", "2"]})
-        
+
         result = await data_pipeline.preprocess(data, "test_schema")
-        
+
         assert result["status"] == "quarantined"
         assert "errors" in result
         assert "quarantine_file" in result
@@ -179,18 +180,18 @@ class TestPreprocessing:
     async def test_preprocess_empty_dataframe(self, data_pipeline):
         """Test preprocessing empty dataframe"""
         data = pd.DataFrame()
-        
+
         result = await data_pipeline.preprocess(data, "test_schema")
-        
+
         assert result["status"] == "quarantined"
 
     @pytest.mark.asyncio
     async def test_preprocess_dict_data(self, data_pipeline):
         """Test preprocessing dictionary data"""
         data = {"id": "1", "value": 10}
-        
+
         result = await data_pipeline.preprocess(data, "test_schema")
-        
+
         assert result["status"] == "validated"
 
 
@@ -201,9 +202,9 @@ class TestInference:
     async def test_inference_with_approved_model(self, data_pipeline):
         """Test inference with approved model"""
         data = pd.DataFrame({"id": [1, 2], "value": [10, 20]})
-        
+
         result = await data_pipeline.inference(data, "test_model")
-        
+
         assert result["status"] == "completed"
         assert result["model"] == "test_model"
         assert "predictions" in result
@@ -212,9 +213,9 @@ class TestInference:
     async def test_inference_with_unapproved_model(self, data_pipeline):
         """Test that unapproved model is rejected"""
         data = pd.DataFrame({"id": [1, 2], "value": [10, 20]})
-        
+
         result = await data_pipeline.inference(data, "unapproved_model")
-        
+
         assert result["status"] == "error"
         assert result["reason"] == "model_not_approved"
 
@@ -226,10 +227,10 @@ class TestFileHashing:
         """Test file hash calculation"""
         test_file = temp_data_dir / "test.txt"
         test_file.write_text("test content")
-        
+
         hash1 = data_pipeline._calculate_file_hash(test_file)
         hash2 = data_pipeline._calculate_file_hash(test_file)
-        
+
         assert hash1 == hash2
         assert len(hash1) == 64  # SHA-256 produces 64 hex characters
 
@@ -237,13 +238,13 @@ class TestFileHashing:
         """Test that different files produce different hashes"""
         file1 = temp_data_dir / "file1.txt"
         file2 = temp_data_dir / "file2.txt"
-        
+
         file1.write_text("content 1")
         file2.write_text("content 2")
-        
+
         hash1 = data_pipeline._calculate_file_hash(file1)
         hash2 = data_pipeline._calculate_file_hash(file2)
-        
+
         assert hash1 != hash2
 
 
@@ -253,27 +254,27 @@ class TestSchemaValidation:
     def test_validate_schema_valid_data(self, data_pipeline):
         """Test validating data against schema"""
         data = {"id": "123", "value": 456}
-        
+
         result = data_pipeline._validate_schema(data, "test_schema")
-        
+
         assert result["valid"] is True
         assert len(result["errors"]) == 0
 
     def test_validate_schema_missing_field(self, data_pipeline):
         """Test validation with missing required field"""
         data = {"id": "123"}  # Missing 'value'
-        
+
         result = data_pipeline._validate_schema(data, "test_schema")
-        
+
         assert result["valid"] is False
         assert any("value" in str(e) for e in result["errors"])
 
     def test_validate_schema_unknown_schema(self, data_pipeline):
         """Test validation with unknown schema"""
         data = {"id": "123", "value": 456}
-        
+
         result = data_pipeline._validate_schema(data, "nonexistent_schema")
-        
+
         assert result["valid"] is False
 
 
@@ -286,9 +287,9 @@ class TestOperationLogging:
         csv_file = temp_data_dir / "test.csv"
         df = pd.DataFrame({"id": [1], "value": [10]})
         df.to_csv(csv_file, index=False)
-        
+
         await data_pipeline.ingest(str(csv_file), "csv")
-        
+
         assert len(data_pipeline.processing_log) > 0
         assert data_pipeline.processing_log[0]["operation"] == "ingest"
 
@@ -307,16 +308,16 @@ class TestEdgeCases:
         """Test ingesting unsupported file type"""
         file_path = temp_data_dir / "test.txt"
         file_path.write_text("test")
-        
+
         result = await data_pipeline.ingest(str(file_path), "unsupported")
-        
+
         assert result["status"] == "error"
 
     @pytest.mark.asyncio
     async def test_preprocess_with_list_data(self, data_pipeline):
         """Test preprocessing list of dictionaries"""
         data = [{"id": "1", "value": 10}, {"id": "2", "value": 20}]
-        
+
         result = await data_pipeline.preprocess(data, "test_schema")
-        
+
         assert result["status"] == "validated"

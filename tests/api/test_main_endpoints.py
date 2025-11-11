@@ -1,8 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import status
-
 import pytest
+
 
 """
 DevSkyy Enterprise - Main API Endpoint Tests
@@ -257,7 +257,7 @@ class TestAPIPerformance:
 
     def test_health_endpoint_response_time(self, test_client, performance_timer):
         """Test that health endpoint responds quickly"""
-        _response = test_client.get("/api/v1/monitoring/health")  # noqa: F841
+        _response = test_client.get("/api/v1/monitoring/health")
 
         elapsed = performance_timer()
         assert elapsed < 0.1  # Should respond in under 100ms

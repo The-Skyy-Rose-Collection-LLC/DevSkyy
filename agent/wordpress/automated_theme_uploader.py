@@ -4,20 +4,23 @@ Automated WordPress Theme Uploader & Deployment System
 Enterprise-grade theme deployment with multiple upload methods and validation
 """
 
+import base64
+import contextlib
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
 import ftplib
+import hashlib
+from pathlib import Path
+import tempfile
+from typing import Any, Optional
+import zipfile
+
 import paramiko
 import requests
-import zipfile
-import tempfile
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, field
-from enum import Enum
-import base64
-import hashlib
 
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from monitoring.enterprise_logging import LogCategory, enterprise_logger
+
 
 class UploadMethod(Enum):
     """Supported upload methods."""
@@ -59,7 +62,7 @@ class ThemePackage:
     description: str
     author: str
     package_path: str
-    files: List[str] = field(default_factory=list)
+    files: list[str] = field(default_factory=list)
     size_bytes: int = 0
     checksum: str = ""
     created_at: datetime = field(default_factory=datetime.now)
@@ -75,7 +78,7 @@ class DeploymentResult:
     deployed_at: Optional[datetime] = None
     error_message: Optional[str] = None
     rollback_available: bool = False
-    validation_results: Dict[str, Any] = field(default_factory=dict)
+    validation_results: dict[str, Any] = field(default_factory=dict)
 
 class AutomatedThemeUploader:
     """
@@ -115,7 +118,7 @@ class AutomatedThemeUploader:
     async def create_theme_package(
         self,
         theme_path: str,
-        theme_info: Dict[str, Any]
+        theme_info: dict[str, Any]
     ) -> ThemePackage:
         """Create a deployable theme package."""
         try:
@@ -181,7 +184,7 @@ class AutomatedThemeUploader:
                 sha256_hash.update(chunk)
         return sha256_hash.hexdigest()
 
-    async def validate_theme_package(self, package: ThemePackage) -> Dict[str, Any]:
+    async def validate_theme_package(self, package: ThemePackage) -> dict[str, Any]:
         """Validate theme package before deployment."""
         validation_results = {
             "valid": True,
@@ -257,7 +260,7 @@ class AutomatedThemeUploader:
             return validation_results
 
         except Exception as e:
-            validation_results["errors"].append(f"Validation error: {str(e)}")
+            validation_results["errors"].append(f"Validation error: {e!s}")
             validation_results["valid"] = False
 
             enterprise_logger.error(
@@ -505,7 +508,7 @@ class AutomatedThemeUploader:
                 theme_path = f'/wp-content/themes/{package.name}'
                 try:
                     sftp.mkdir(theme_path)
-                except IOError:
+                except OSError:
                     pass  # Directory might already exist
 
                 # Upload files
@@ -517,10 +520,8 @@ class AutomatedThemeUploader:
 
                         # Create remote directories if needed
                         remote_dir = str(Path(remote_path).parent)
-                        try:
+                        with contextlib.suppress(OSError):
                             sftp.mkdir(remote_dir)
-                        except IOError:
-                            pass
 
                         sftp.put(str(file_path), remote_path)
 
@@ -617,7 +618,7 @@ class AutomatedThemeUploader:
 
         return None
 
-    def get_system_status(self) -> Dict[str, Any]:
+    def get_system_status(self) -> dict[str, Any]:
         """Get uploader system status."""
         return {
             "active_deployments": len(self.active_deployments),
@@ -633,7 +634,7 @@ automated_theme_uploader = AutomatedThemeUploader()
 # Convenience functions
 async def deploy_theme_package(
     theme_path: str,
-    theme_info: Dict[str, Any],
+    theme_info: dict[str, Any],
     credentials: WordPressCredentials,
     upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
     activate_theme: bool = False
@@ -647,7 +648,7 @@ async def quick_deploy_theme(
     site_url: str,
     username: str,
     password: str,
-    theme_name: str = None,
+    theme_name: str | None = None,
     activate: bool = False
 ) -> DeploymentResult:
     """Quick theme deployment with minimal configuration."""

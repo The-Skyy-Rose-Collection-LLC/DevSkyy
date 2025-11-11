@@ -1,9 +1,10 @@
 import asyncio
-import logging
-import uuid
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List
+import logging
+from typing import Any
+import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -823,7 +824,7 @@ class AgentAssignmentManager:
                 )
 
             except Exception as e:
-                logger.error(f"❌ 24/7 monitoring error: {str(e)}")
+                logger.error(f"❌ 24/7 monitoring error: {e!s}")
                 await asyncio.sleep(60)  # Retry in 1 minute
 
     async def _monitor_performance_metrics(self):
@@ -851,7 +852,7 @@ class AgentAssignmentManager:
                 await self._apply_auto_fixes("performance", issues_detected)
 
         except Exception as e:
-            logger.error(f"Performance monitoring failed: {str(e)}")
+            logger.error(f"Performance monitoring failed: {e!s}")
 
     async def _monitor_user_experience(self):
         """Monitor and optimize user experience in real-time."""
@@ -870,7 +871,7 @@ class AgentAssignmentManager:
                 )
 
         except Exception as e:
-            logger.error(f"UX monitoring failed: {str(e)}")
+            logger.error(f"UX monitoring failed: {e!s}")
 
     async def _monitor_revenue_metrics(self):
         """Monitor revenue-critical metrics and auto-optimize."""
@@ -892,7 +893,7 @@ class AgentAssignmentManager:
                 )
 
         except Exception as e:
-            logger.error(f"Revenue monitoring failed: {str(e)}")
+            logger.error(f"Revenue monitoring failed: {e!s}")
 
     async def _monitor_brand_reputation(self):
         """Monitor brand reputation and consistency across all touchpoints."""
@@ -911,7 +912,7 @@ class AgentAssignmentManager:
                 )
 
         except Exception as e:
-            logger.error(f"Brand monitoring failed: {str(e)}")
+            logger.error(f"Brand monitoring failed: {e!s}")
 
     async def _executive_decision_engine(self):
         """Executive-level AI decision making for strategic improvements."""
@@ -935,9 +936,9 @@ class AgentAssignmentManager:
                     await self._implement_strategic_change(decision)
 
         except Exception as e:
-            logger.error(f"Executive decision engine failed: {str(e)}")
+            logger.error(f"Executive decision engine failed: {e!s}")
 
-    async def _apply_auto_fixes(self, category: str, issues: List[str]):
+    async def _apply_auto_fixes(self, category: str, issues: list[str]):
         """Apply automatic fixes for detected issues."""
         try:
             logger.info(f"🔧 Applying auto-fixes for {category}: {issues}")
@@ -986,7 +987,7 @@ class AgentAssignmentManager:
                         logger.info(f"✅ Applied fix: {fix}")
 
         except Exception as e:
-            logger.error(f"Auto-fix failed: {str(e)}")
+            logger.error(f"Auto-fix failed: {e!s}")
 
     async def _execute_fix(self, fix_type: str):
         """Execute a specific type of fix."""
@@ -999,8 +1000,8 @@ class AgentAssignmentManager:
         }
 
     async def create_luxury_collection_page(
-        self, collection_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create a luxury collection page designed like top-selling landing pages."""
         try:
             collection_name = collection_data.get("collection_name")
@@ -1130,12 +1131,12 @@ class AgentAssignmentManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Collection page creation failed: {str(e)}")
+            logger.error(f"❌ Collection page creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def _generate_collection_content(
-        self, collection_spec: Dict, collection_data: Dict
-    ) -> Dict[str, Any]:
+        self, collection_spec: dict, collection_data: dict
+    ) -> dict[str, Any]:
         """Generate compelling content for the collection page."""
         return {
             "headlines": {
@@ -1161,7 +1162,7 @@ class AgentAssignmentManager:
 
     async def _setup_collection_ab_testing(
         self, collection_type: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Setup A/B testing for collection page optimization."""
         return {
             "tests": [
@@ -1185,7 +1186,7 @@ class AgentAssignmentManager:
 
     async def _configure_collection_analytics(
         self, collection_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Configure comprehensive analytics for collection pages."""
         return {
             "tracking_events": [
@@ -1215,7 +1216,7 @@ class AgentAssignmentManager:
             "revenue_attribution": "multi_touch_attribution_model",
         }
 
-    async def _analyze_market_trends(self) -> Dict[str, Any]:
+    async def _analyze_market_trends(self) -> dict[str, Any]:
         """Analyze current market trends for executive decisions."""
         return {
             "trending_styles": [
@@ -1236,7 +1237,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    async def _analyze_competitors(self) -> Dict[str, Any]:
+    async def _analyze_competitors(self) -> dict[str, Any]:
         """Analyze competitor strategies and positioning."""
         return {
             "competitive_landscape": "highly_competitive_luxury_market",
@@ -1253,7 +1254,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    async def _analyze_customer_behavior(self) -> Dict[str, Any]:
+    async def _analyze_customer_behavior(self) -> dict[str, Any]:
         """Analyze customer behavior patterns for strategic insights."""
         return {
             "customer_segments": [
@@ -1280,7 +1281,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    async def _identify_revenue_opportunities(self) -> Dict[str, Any]:
+    async def _identify_revenue_opportunities(self) -> dict[str, Any]:
         """Identify strategic revenue opportunities."""
         return {
             "immediate_opportunities": [
@@ -1306,8 +1307,8 @@ class AgentAssignmentManager:
         }
 
     async def _make_executive_decisions(
-        self, business_intelligence: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, business_intelligence: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Make executive-level strategic decisions based on business intelligence."""
         decisions = [
             {
@@ -1337,15 +1338,15 @@ class AgentAssignmentManager:
         ]
         return decisions
 
-    async def _implement_strategic_change(self, decision: Dict[str, Any]):
+    async def _implement_strategic_change(self, decision: dict[str, Any]):
         """Implement approved strategic changes."""
         logger.info(f"🎯 Implementing strategic decision: {decision['decision']}")
         # Implementation would be handled by specific agents based on decision type
         return {"decision": decision["decision"], "status": "implementation_started"}
 
     async def assign_frontend_agents(
-        self, frontend_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, frontend_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Assign agents specifically for frontend procedures with strict frontend-only focus."""
         try:
             procedure_type = frontend_request.get("procedure_type")
@@ -1394,12 +1395,12 @@ class AgentAssignmentManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Frontend agent assignment failed: {str(e)}")
+            logger.error(f"❌ Frontend agent assignment failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _determine_frontend_agent_assignments(
         self, procedure_type: str, priority_level: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Determine which frontend agents should handle specific procedures."""
 
         frontend_procedure_mapping = {
@@ -1508,8 +1509,8 @@ class AgentAssignmentManager:
         return assignments
 
     async def _setup_frontend_backend_communication(
-        self, frontend_assignments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, frontend_assignments: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Setup communication protocols between frontend agents and backend."""
 
         communication_channels = {}
@@ -1559,9 +1560,9 @@ class AgentAssignmentManager:
     async def _create_frontend_task_assignments(
         self,
         procedure_type: str,
-        frontend_assignments: List[Dict[str, Any]],
+        frontend_assignments: list[dict[str, Any]],
         priority_level: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create specific task assignments for frontend agents."""
 
         task_templates = {
@@ -1658,8 +1659,8 @@ class AgentAssignmentManager:
         }
 
     def _configure_frontend_monitoring(
-        self, frontend_assignments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, frontend_assignments: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Configure monitoring specifically for frontend agents."""
 
         monitoring_config = {
@@ -1746,7 +1747,7 @@ class AgentAssignmentManager:
             "reporting_schedule": self._setup_frontend_reporting_schedule(),
         }
 
-    def _get_backend_communication_rules(self) -> Dict[str, Any]:
+    def _get_backend_communication_rules(self) -> dict[str, Any]:
         """Get strict rules for frontend-backend communication."""
         return {
             "allowed_actions": [
@@ -1778,7 +1779,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    def _get_frontend_restrictions(self) -> Dict[str, Any]:
+    def _get_frontend_restrictions(self) -> dict[str, Any]:
         """Get restrictions that frontend agents must adhere to."""
         return {
             "technical_restrictions": [
@@ -1804,7 +1805,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    async def get_frontend_agent_status(self) -> Dict[str, Any]:
+    async def get_frontend_agent_status(self) -> dict[str, Any]:
         """Get comprehensive status of all frontend agents."""
         try:
             frontend_status = {}
@@ -1848,11 +1849,11 @@ class AgentAssignmentManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Frontend agent status check failed: {str(e)}")
+            logger.error(f"❌ Frontend agent status check failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     # Helper methods for frontend agent management
-    def _calculate_agent_rate_limits(self, agent_id: str) -> Dict[str, int]:
+    def _calculate_agent_rate_limits(self, agent_id: str) -> dict[str, int]:
         """Calculate appropriate rate limits for each agent."""
         base_limits = {
             "design_automation": {
@@ -1870,7 +1871,7 @@ class AgentAssignmentManager:
             agent_id, {"requests_per_minute": 60, "requests_per_hour": 2000}
         )
 
-    async def _get_agent_current_tasks(self, agent_id: str) -> List[Dict[str, Any]]:
+    async def _get_agent_current_tasks(self, agent_id: str) -> list[dict[str, Any]]:
         """Get current tasks for a specific frontend agent."""
         # Simulate current tasks based on agent specialization
         task_examples = {
@@ -1930,7 +1931,7 @@ class AgentAssignmentManager:
         }
         return task_examples.get(agent_id, [])
 
-    async def _calculate_overall_frontend_health(self) -> Dict[str, Any]:
+    async def _calculate_overall_frontend_health(self) -> dict[str, Any]:
         """Calculate overall health of the frontend agent system."""
         return {
             "health_score": 96.8,
@@ -1964,7 +1965,7 @@ class AgentAssignmentManager:
         except Exception as e:
             return {"error": str(e), "status": "monitoring_error"}
 
-    async def _get_recent_auto_fixes(self) -> List[Dict[str, Any]]:
+    async def _get_recent_auto_fixes(self) -> list[dict[str, Any]]:
         """Get recent auto-fixes applied by the system."""
         return [
             {
@@ -1983,7 +1984,7 @@ class AgentAssignmentManager:
             },
         ]
 
-    async def _get_executive_decisions_summary(self) -> Dict[str, Any]:
+    async def _get_executive_decisions_summary(self) -> dict[str, Any]:
         """Get summary of executive decisions made today."""
         return {
             "total_decisions": 8,
@@ -1997,8 +1998,8 @@ class AgentAssignmentManager:
         }
 
     async def assign_agents_to_role(
-        self, assignment_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, assignment_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Assign specific agents to handle a particular role."""
         try:
             role = assignment_data.get("role")
@@ -2050,10 +2051,10 @@ class AgentAssignmentManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Agent assignment failed: {str(e)}")
+            logger.error(f"❌ Agent assignment failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def get_role_assignments(self, role: str = None) -> Dict[str, Any]:
+    async def get_role_assignments(self, role: str | None = None) -> dict[str, Any]:
         """Get current agent assignments for specific role or all roles."""
         try:
             if role:
@@ -2092,12 +2093,12 @@ class AgentAssignmentManager:
                 }
 
         except Exception as e:
-            logger.error(f"❌ Get assignments failed: {str(e)}")
+            logger.error(f"❌ Get assignments failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def optimize_agent_workload(
-        self, optimization_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, optimization_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Optimize agent workload distribution across roles."""
         try:
             target_efficiency = optimization_request.get("target_efficiency", 90)
@@ -2160,12 +2161,12 @@ class AgentAssignmentManager:
                 }
 
         except Exception as e:
-            logger.error(f"❌ Workload optimization failed: {str(e)}")
+            logger.error(f"❌ Workload optimization failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _check_agent_suitability(
-        self, agent_ids: List[str], role: str
-    ) -> Dict[str, Any]:
+        self, agent_ids: list[str], role: str
+    ) -> dict[str, Any]:
         """Check how suitable agents are for the assigned role."""
         suitability_scores = {}
 
@@ -2225,8 +2226,8 @@ class AgentAssignmentManager:
         return suitability_scores
 
     def _generate_assignment_details(
-        self, role: str, agent_ids: List[str]
-    ) -> Dict[str, Any]:
+        self, role: str, agent_ids: list[str]
+    ) -> dict[str, Any]:
         """Generate detailed assignment information."""
         primary_agent = agent_ids[0] if agent_ids else None
         backup_agents = agent_ids[1:] if len(agent_ids) > 1 else []
@@ -2286,13 +2287,13 @@ class AgentAssignmentManager:
                 else "single_agent_ownership"
             ),
             "escalation_path": (
-                backup_agents + [primary_agent] if backup_agents else [primary_agent]
+                [*backup_agents, primary_agent] if backup_agents else [primary_agent]
             ),
         }
 
     def _create_coordination_strategy(
-        self, role: str, agent_ids: List[str]
-    ) -> Dict[str, Any]:
+        self, role: str, agent_ids: list[str]
+    ) -> dict[str, Any]:
         """Create coordination strategy for multiple agents in same role."""
         if len(agent_ids) == 1:
             return {
@@ -2323,8 +2324,8 @@ class AgentAssignmentManager:
         }
 
     def _predict_role_performance(
-        self, role: str, agent_ids: List[str]
-    ) -> Dict[str, Any]:
+        self, role: str, agent_ids: list[str]
+    ) -> dict[str, Any]:
         """Predict performance for the role assignment."""
         if not agent_ids:
             return {"predicted_performance": 0, "confidence": "low"}
@@ -2370,7 +2371,7 @@ class AgentAssignmentManager:
             },
         }
 
-    def _setup_role_automation(self, role: str, agent_ids: List[str]) -> Dict[str, Any]:
+    def _setup_role_automation(self, role: str, agent_ids: list[str]) -> dict[str, Any]:
         """Setup automation for the assigned role."""
         automation_configs = {
             "frontend_beauty": {
@@ -2420,7 +2421,7 @@ class AgentAssignmentManager:
         )
 
     # Missing helper methods that are called by other methods
-    def _calculate_task_hours(self, tasks: List[str], priority_level: str) -> int:
+    def _calculate_task_hours(self, tasks: list[str], priority_level: str) -> int:
         """Calculate estimated hours for tasks based on complexity and priority."""
         base_hours_per_task = {"high": 4, "medium": 6, "low": 8}
 
@@ -2438,8 +2439,8 @@ class AgentAssignmentManager:
         return total_hours + (complexity_bonus * 2)
 
     def _identify_task_dependencies(
-        self, agent_id: str, template: Dict[str, List[str]]
-    ) -> List[str]:
+        self, agent_id: str, template: dict[str, list[str]]
+    ) -> list[str]:
         """Identify task dependencies for an agent."""
         # Define common dependencies between agents
         dependency_map = {
@@ -2451,7 +2452,7 @@ class AgentAssignmentManager:
 
         return dependency_map.get(agent_id, [])
 
-    def _define_task_deliverables(self, agent_id: str, tasks: List[str]) -> List[str]:
+    def _define_task_deliverables(self, agent_id: str, tasks: list[str]) -> list[str]:
         """Define deliverables for agent tasks."""
         deliverable_templates = {
             "design_automation": [
@@ -2483,7 +2484,7 @@ class AgentAssignmentManager:
 
     def _define_quality_criteria(
         self, agent_id: str, procedure_type: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Define quality criteria for agent work."""
         return {
             "performance_standards": {
@@ -2507,8 +2508,8 @@ class AgentAssignmentManager:
         }
 
     def _create_coordination_schedule(
-        self, task_breakdown: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, task_breakdown: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create coordination schedule for tasks."""
         return {
             "daily_standups": "09:00_UTC",
@@ -2526,7 +2527,7 @@ class AgentAssignmentManager:
 
     def _define_milestone_checkpoints(
         self, procedure_type: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Define milestone checkpoints for procedures."""
         return [
             {
@@ -2556,7 +2557,7 @@ class AgentAssignmentManager:
             },
         ]
 
-    def _setup_quality_gates(self, task_breakdown: Dict[str, Any]) -> Dict[str, Any]:
+    def _setup_quality_gates(self, task_breakdown: dict[str, Any]) -> dict[str, Any]:
         """Setup quality gates for task execution."""
         return {
             "automated_checks": {
@@ -2579,7 +2580,7 @@ class AgentAssignmentManager:
             },
         }
 
-    async def _get_agent_performance_metrics(self, agent_id: str) -> Dict[str, Any]:
+    async def _get_agent_performance_metrics(self, agent_id: str) -> dict[str, Any]:
         """Get performance metrics for a specific agent."""
         # Simulate performance metrics based on agent type
         base_metrics = {
@@ -2623,7 +2624,7 @@ class AgentAssignmentManager:
             },
         )
 
-    async def _get_backend_comm_status(self, agent_id: str) -> Dict[str, Any]:
+    async def _get_backend_comm_status(self, agent_id: str) -> dict[str, Any]:
         """Get backend communication status for an agent."""
         return {
             "connection_status": "active",
@@ -2647,7 +2648,7 @@ class AgentAssignmentManager:
         weighted_score = (quality_score * 0.6) + (completion_rate * 0.4)
         return round(weighted_score, 1)
 
-    async def _get_user_impact_metrics(self, agent_id: str) -> Dict[str, Any]:
+    async def _get_user_impact_metrics(self, agent_id: str) -> dict[str, Any]:
         """Get user impact metrics for an agent."""
         impact_metrics = {
             "design_automation": {
@@ -2685,7 +2686,7 @@ class AgentAssignmentManager:
             },
         )
 
-    async def _get_next_scheduled_task(self, agent_id: str) -> Dict[str, Any]:
+    async def _get_next_scheduled_task(self, agent_id: str) -> dict[str, Any]:
         """Get next scheduled task for an agent."""
         next_tasks = {
             "design_automation": {
@@ -2738,7 +2739,7 @@ class AgentAssignmentManager:
         final_efficiency = base_efficiency - communication_overhead
         return round(max(80.0, final_efficiency), 1)
 
-    async def get_24_7_monitoring_status(self) -> Dict[str, Any]:
+    async def get_24_7_monitoring_status(self) -> dict[str, Any]:
         """Get current status of 24/7 monitoring system."""
         try:
             return {
@@ -2763,7 +2764,7 @@ class AgentAssignmentManager:
         except Exception as e:
             return {"error": str(e), "status": "monitoring_error"}
 
-    def _analyze_current_workload(self) -> Dict[str, Any]:
+    def _analyze_current_workload(self) -> dict[str, Any]:
         """Analyze current workload across all agents."""
         return {
             "total_active_tasks": 23,
@@ -2784,7 +2785,7 @@ class AgentAssignmentManager:
             "efficiency_score": 87.5,
         }
 
-    def _get_coordination_status(self, role: str = None) -> Dict[str, Any]:
+    def _get_coordination_status(self, role: str | None = None) -> dict[str, Any]:
         """Get coordination status for roles."""
         return {
             "coordination_health": "excellent",
@@ -2799,7 +2800,7 @@ class AgentAssignmentManager:
             },
         }
 
-    def _get_agent_primary_metrics(self, agent_id: str) -> List[str]:
+    def _get_agent_primary_metrics(self, agent_id: str) -> list[str]:
         """Get primary metrics for monitoring a specific agent."""
         agent_metrics = {
             "design_automation": [
@@ -2842,7 +2843,7 @@ class AgentAssignmentManager:
             ],
         )
 
-    def _get_agent_alert_thresholds(self, agent_id: str) -> Dict[str, Any]:
+    def _get_agent_alert_thresholds(self, agent_id: str) -> dict[str, Any]:
         """Get alert thresholds for a specific agent."""
         return {
             "performance_degradation": "below_90%",
@@ -2862,7 +2863,7 @@ class AgentAssignmentManager:
         }
         return frequency_map.get(agent_id, "hourly")
 
-    def _get_agent_auto_remediation_rules(self, agent_id: str) -> List[str]:
+    def _get_agent_auto_remediation_rules(self, agent_id: str) -> list[str]:
         """Get auto-remediation rules for a specific agent."""
         remediation_rules = {
             "design_automation": [
@@ -2888,7 +2889,7 @@ class AgentAssignmentManager:
         }
         return remediation_rules.get(agent_id, ["escalate_to_human_review"])
 
-    def _setup_frontend_alerting_rules(self) -> Dict[str, Any]:
+    def _setup_frontend_alerting_rules(self) -> dict[str, Any]:
         """Setup alerting rules for frontend monitoring."""
         return {
             "critical_alerts": {
@@ -2918,7 +2919,7 @@ class AgentAssignmentManager:
             ],
         }
 
-    def _setup_frontend_dashboard_config(self) -> Dict[str, Any]:
+    def _setup_frontend_dashboard_config(self) -> dict[str, Any]:
         """Setup frontend monitoring dashboard configuration."""
         return {
             "dashboard_layout": {
@@ -2953,7 +2954,7 @@ class AgentAssignmentManager:
             },
         }
 
-    def _setup_frontend_reporting_schedule(self) -> Dict[str, Any]:
+    def _setup_frontend_reporting_schedule(self) -> dict[str, Any]:
         """Setup frontend monitoring reporting schedule."""
         return {
             "daily_reports": {
@@ -3031,8 +3032,8 @@ class AgentAssignmentManager:
         return base_times.get(procedure_type, {}).get(priority_level, "5-7 days")
 
     def _setup_frontend_qa_process(
-        self, frontend_assignments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, frontend_assignments: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Setup quality assurance process for frontend assignments."""
         return {
             "qa_stages": [

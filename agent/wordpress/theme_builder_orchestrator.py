@@ -4,32 +4,31 @@ WordPress Theme Builder Orchestrator
 Complete end-to-end theme generation, validation, and deployment system
 """
 
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
+from pathlib import Path
 import tempfile
+from typing import Any, Optional
 
-from agent.wordpress.theme_builder import ElementorThemeBuilder
 from agent.modules.frontend.wordpress_fullstack_theme_builder_agent import WordPressFullStackThemeBuilderAgent
-from agent.wordpress.automated_theme_uploader import (
-    AutomatedThemeUploader,
-    UploadMethod,
-    DeploymentResult
-)
+from agent.wordpress.automated_theme_uploader import AutomatedThemeUploader, DeploymentResult, UploadMethod
+from agent.wordpress.theme_builder import ElementorThemeBuilder
+
+
 try:
     from config.wordpress_credentials import (
         WordPressCredentials,
+        get_skyy_rose_credentials,
         wordpress_credentials_manager,
-        get_skyy_rose_credentials
     )
 except ImportError:
     # Fallback for testing
     from agent.wordpress.automated_theme_uploader import WordPressCredentials
     wordpress_credentials_manager = None
     get_skyy_rose_credentials = None
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from monitoring.enterprise_logging import LogCategory, enterprise_logger
+
 
 class ThemeType(Enum):
     """Supported theme types."""
@@ -56,10 +55,10 @@ class ThemeBuildRequest:
     """Theme build request configuration."""
     theme_name: str
     theme_type: ThemeType
-    brand_guidelines: Dict[str, Any]
+    brand_guidelines: dict[str, Any]
     target_site: str
     deployment_credentials: WordPressCredentials
-    customizations: Dict[str, Any] = field(default_factory=dict)
+    customizations: dict[str, Any] = field(default_factory=dict)
     auto_deploy: bool = True
     activate_after_deploy: bool = False
     upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API
@@ -72,7 +71,7 @@ class ThemeBuildResult:
     status: BuildStatus
     theme_path: Optional[str] = None
     deployment_result: Optional[DeploymentResult] = None
-    build_log: List[str] = field(default_factory=list)
+    build_log: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
     completed_at: Optional[datetime] = None
     error_message: Optional[str] = None
@@ -101,7 +100,7 @@ class ThemeBuilderOrchestrator:
             category=LogCategory.SYSTEM
         )
 
-    def _initialize_theme_templates(self) -> Dict[str, Any]:
+    def _initialize_theme_templates(self) -> dict[str, Any]:
         """Initialize theme templates for different types."""
         return {
             ThemeType.LUXURY_FASHION: {
@@ -253,7 +252,7 @@ class ThemeBuilderOrchestrator:
             result.status = BuildStatus.FAILED
             result.error_message = str(e)
             result.completed_at = datetime.now()
-            result.build_log.append(f"[{datetime.now()}] Build failed: {str(e)}")
+            result.build_log.append(f"[{datetime.now()}] Build failed: {e!s}")
 
             enterprise_logger.error(
                 f"Theme build failed: {e}",
@@ -299,7 +298,7 @@ class ThemeBuilderOrchestrator:
             return str(theme_dir)
 
         except Exception as e:
-            result.build_log.append(f"[{datetime.now()}] Generation error: {str(e)}")
+            result.build_log.append(f"[{datetime.now()}] Generation error: {e!s}")
             enterprise_logger.error(
                 f"Theme generation error: {e}",
                 category=LogCategory.SYSTEM,
@@ -307,7 +306,7 @@ class ThemeBuilderOrchestrator:
             )
             return None
 
-    async def _generate_theme_files(self, theme_dir: Path, config: Dict[str, Any], result: ThemeBuildResult):
+    async def _generate_theme_files(self, theme_dir: Path, config: dict[str, Any], result: ThemeBuildResult):
         """Generate core theme files."""
         # Generate style.css
         style_css = self._generate_style_css(config)
@@ -358,7 +357,7 @@ class ThemeBuilderOrchestrator:
 
         result.build_log.append(f"[{datetime.now()}] Generated assets")
 
-    async def _generate_elementor_widgets(self, theme_dir: Path, config: Dict[str, Any], result: ThemeBuildResult):
+    async def _generate_elementor_widgets(self, theme_dir: Path, config: dict[str, Any], result: ThemeBuildResult):
         """Generate custom Elementor widgets."""
         widgets_dir = theme_dir / "elementor-widgets"
         widgets_dir.mkdir(exist_ok=True)
@@ -369,7 +368,7 @@ class ThemeBuilderOrchestrator:
 
         result.build_log.append(f"[{datetime.now()}] Generated Elementor widgets")
 
-    def _generate_style_css(self, config: Dict[str, Any]) -> str:
+    def _generate_style_css(self, config: dict[str, Any]) -> str:
         """Generate WordPress style.css header."""
         return f"""/*
 Theme Name: {config.get('name', 'Custom Theme')}
@@ -382,7 +381,7 @@ Text Domain: {config.get('name', 'custom-theme').lower().replace(' ', '-')}
 /* Theme styles will be loaded from assets/css/main.css */
 """
 
-    def _generate_functions_php(self, config: Dict[str, Any]) -> str:
+    def _generate_functions_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress functions.php."""
         theme_name = config.get('name', 'custom-theme').lower().replace(' ', '_')
 
@@ -403,13 +402,13 @@ function {theme_name}_setup() {{
     add_theme_support('title-tag');
     add_theme_support('custom-logo');
     add_theme_support('html5', array('search-form', 'comment-form', 'comment-list', 'gallery', 'caption'));
-    
+
     // WooCommerce support
     add_theme_support('woocommerce');
     add_theme_support('wc-product-gallery-zoom');
     add_theme_support('wc-product-gallery-lightbox');
     add_theme_support('wc-product-gallery-slider');
-    
+
     // Register navigation menus
     register_nav_menus(array(
         'primary' => __('Primary Menu', '{theme_name}'),
@@ -432,7 +431,7 @@ function {theme_name}_customize_register($wp_customize) {{
 add_action('customize_register', '{theme_name}_customize_register');
 """
 
-    def _generate_index_php(self, config: Dict[str, Any]) -> str:
+    def _generate_index_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress index.php."""
         return """<?php get_header(); ?>
 
@@ -443,13 +442,13 @@ add_action('customize_register', '{theme_name}_customize_register');
                 <header class="entry-header">
                     <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
                 </header>
-                
+
                 <div class="entry-content">
                     <?php the_content(); ?>
                 </div>
             </article>
         <?php endwhile; ?>
-        
+
         <?php the_posts_navigation(); ?>
     <?php else : ?>
         <p><?php _e('No posts found.'); ?></p>
@@ -459,7 +458,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 <?php get_footer(); ?>
 """
 
-    def _generate_header_php(self, config: Dict[str, Any]) -> str:
+    def _generate_header_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress header.php."""
         return """<!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -479,14 +478,14 @@ add_action('customize_register', '{theme_name}_customize_register');
             <h1 class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a></h1>
             <p class="site-description"><?php bloginfo('description'); ?></p>
         </div>
-        
+
         <nav id="site-navigation" class="main-navigation">
             <?php wp_nav_menu(array('theme_location' => 'primary')); ?>
         </nav>
     </header>
 """
 
-    def _generate_footer_php(self, config: Dict[str, Any]) -> str:
+    def _generate_footer_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress footer.php."""
         return """    <footer id="colophon" class="site-footer">
         <div class="site-info">
@@ -500,7 +499,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 </html>
 """
 
-    def _generate_single_php(self, config: Dict[str, Any]) -> str:
+    def _generate_single_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress single.php."""
         return """<?php get_header(); ?>
 
@@ -513,18 +512,18 @@ add_action('customize_register', '{theme_name}_customize_register');
                     <?php echo get_the_date(); ?> by <?php the_author(); ?>
                 </div>
             </header>
-            
+
             <?php if (has_post_thumbnail()) : ?>
                 <div class="post-thumbnail">
                     <?php the_post_thumbnail(); ?>
                 </div>
             <?php endif; ?>
-            
+
             <div class="entry-content">
                 <?php the_content(); ?>
             </div>
         </article>
-        
+
         <?php comments_template(); ?>
     <?php endwhile; ?>
 </main>
@@ -532,7 +531,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 <?php get_footer(); ?>
 """
 
-    def _generate_page_php(self, config: Dict[str, Any]) -> str:
+    def _generate_page_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress page.php."""
         return """<?php get_header(); ?>
 
@@ -542,7 +541,7 @@ add_action('customize_register', '{theme_name}_customize_register');
             <header class="entry-header">
                 <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
             </header>
-            
+
             <div class="entry-content">
                 <?php the_content(); ?>
             </div>
@@ -553,7 +552,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 <?php get_footer(); ?>
 """
 
-    def _generate_archive_php(self, config: Dict[str, Any]) -> str:
+    def _generate_archive_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress archive.php."""
         return """<?php get_header(); ?>
 
@@ -562,20 +561,20 @@ add_action('customize_register', '{theme_name}_customize_register');
         <?php the_archive_title('<h1 class="page-title">', '</h1>'); ?>
         <?php the_archive_description('<div class="archive-description">', '</div>'); ?>
     </header>
-    
+
     <?php if (have_posts()) : ?>
         <?php while (have_posts()) : the_post(); ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 <header class="entry-header">
                     <?php the_title('<h2 class="entry-title"><a href="' . esc_url(get_permalink()) . '">', '</a></h2>'); ?>
                 </header>
-                
+
                 <div class="entry-summary">
                     <?php the_excerpt(); ?>
                 </div>
             </article>
         <?php endwhile; ?>
-        
+
         <?php the_posts_navigation(); ?>
     <?php else : ?>
         <p><?php _e('No posts found.'); ?></p>
@@ -585,7 +584,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 <?php get_footer(); ?>
 """
 
-    def _generate_404_php(self, config: Dict[str, Any]) -> str:
+    def _generate_404_php(self, config: dict[str, Any]) -> str:
         """Generate WordPress 404.php."""
         return """<?php get_header(); ?>
 
@@ -594,7 +593,7 @@ add_action('customize_register', '{theme_name}_customize_register');
         <header class="page-header">
             <h1 class="page-title"><?php _e('Page Not Found'); ?></h1>
         </header>
-        
+
         <div class="page-content">
             <p><?php _e('The page you are looking for could not be found.'); ?></p>
             <?php get_search_form(); ?>
@@ -605,7 +604,7 @@ add_action('customize_register', '{theme_name}_customize_register');
 <?php get_footer(); ?>
 """
 
-    def _generate_main_css(self, config: Dict[str, Any]) -> str:
+    def _generate_main_css(self, config: dict[str, Any]) -> str:
         """Generate main CSS file."""
         colors = config.get('colors', {})
         typography = config.get('typography', {})
@@ -674,26 +673,26 @@ h1, h2, h3, h4, h5, h6 {{
         flex-direction: column;
         gap: 1rem;
     }}
-    
+
     .site-main {{
         padding: 1rem;
     }}
 }}
 """
 
-    def _generate_main_js(self, config: Dict[str, Any]) -> str:
+    def _generate_main_js(self, config: dict[str, Any]) -> str:
         """Generate main JavaScript file."""
         return """/* Main Theme JavaScript */
 
 (function($) {
     'use strict';
-    
+
     $(document).ready(function() {
         // Mobile menu toggle
         $('.menu-toggle').on('click', function() {
             $('.main-navigation').toggleClass('active');
         });
-        
+
         // Smooth scrolling for anchor links
         $('a[href^="#"]').on('click', function(e) {
             e.preventDefault();
@@ -704,20 +703,20 @@ h1, h2, h3, h4, h5, h6 {{
                 }, 1000);
             }
         });
-        
+
         // Initialize any theme-specific functionality
         initThemeFeatures();
     });
-    
+
     function initThemeFeatures() {
         // Add theme-specific JavaScript functionality here
         console.log('Theme features initialized');
     }
-    
+
 })(jQuery);
 """
 
-    def _generate_product_widget(self, config: Dict[str, Any]) -> str:
+    def _generate_product_widget(self, config: dict[str, Any]) -> str:
         """Generate custom Elementor product widget."""
         return """<?php
 /**
@@ -729,23 +728,23 @@ if (!defined('ABSPATH')) {
 }
 
 class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
-    
+
     public function get_name() {
         return 'fashion_product';
     }
-    
+
     public function get_title() {
         return __('Fashion Product', 'textdomain');
     }
-    
+
     public function get_icon() {
         return 'eicon-products';
     }
-    
+
     public function get_categories() {
         return ['general'];
     }
-    
+
     protected function _register_controls() {
         $this->start_controls_section(
             'content_section',
@@ -754,7 +753,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
                 'tab' => \\Elementor\\Controls_Manager::TAB_CONTENT,
             ]
         );
-        
+
         $this->add_control(
             'product_id',
             [
@@ -763,14 +762,14 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
                 'default' => 1,
             ]
         );
-        
+
         $this->end_controls_section();
     }
-    
+
     protected function render() {
         $settings = $this->get_settings_for_display();
         $product_id = $settings['product_id'];
-        
+
         if ($product_id) {
             echo do_shortcode("[product id='{$product_id}']");
         }
@@ -802,7 +801,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
             return True
 
         except Exception as e:
-            result.build_log.append(f"[{datetime.now()}] Validation error: {str(e)}")
+            result.build_log.append(f"[{datetime.now()}] Validation error: {e!s}")
             return False
 
     async def _deploy_theme(
@@ -841,7 +840,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
 
         return None
 
-    def get_system_status(self) -> Dict[str, Any]:
+    def get_system_status(self) -> dict[str, Any]:
         """Get orchestrator system status."""
         return {
             "active_builds": len(self.active_builds),
@@ -856,7 +855,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         self,
         theme_name: str,
         theme_type: ThemeType = ThemeType.LUXURY_FASHION,
-        customizations: Dict[str, Any] = None,
+        customizations: dict[str, Any] | None = None,
         auto_deploy: bool = True,
         activate_after_deploy: bool = False,
         upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
@@ -908,7 +907,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         self,
         theme_name: str,
         theme_type: ThemeType = ThemeType.LUXURY_FASHION,
-        customizations: Dict[str, Any] = None,
+        customizations: dict[str, Any] | None = None,
         auto_deploy: bool = True,
         activate_after_deploy: bool = False,
         site_key: str = "skyy_rose"

@@ -1,11 +1,11 @@
 from datetime import datetime
+from enum import Enum
 import re
+from typing import Any, Optional
 
 from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic.types import confloat, conint, constr
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
 
 """
 Enhanced Pydantic Validation Models for DevSkyy Enterprise Platform
@@ -168,7 +168,7 @@ class AgentExecutionRequest(BaseModel):
         ..., description="Task description (max 5000 chars)"
     )
 
-    parameters: Dict[str, Any] = Field(
+    parameters: dict[str, Any] = Field(
         default_factory=dict, description="Task parameters"
     )
 
@@ -206,7 +206,7 @@ class AgentExecutionRequest(BaseModel):
             raise ValueError("Parameters must be a dictionary")
 
         # Validate string values in parameters
-        for key, value in v.items():
+        for value in v.values():
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
@@ -224,7 +224,7 @@ class MLModelRequest(BaseModel):
         default="latest", description="Model version"
     )
 
-    input_data: Dict[str, Any] = Field(..., description="Input data for model")
+    input_data: dict[str, Any] = Field(..., description="Input data for model")
 
     confidence_threshold: confloat(ge=0.0, le=1.0) = Field(
         default=0.5, description="Confidence threshold (0.0-1.0)"
@@ -259,7 +259,7 @@ class MLModelRequest(BaseModel):
             raise ValueError("Input data must be a dictionary")
 
         # Validate string values
-        for key, value in v.items():
+        for value in v.values():
             if isinstance(value, str):
                 validate_no_sql_injection(value)
                 validate_no_xss(value)
@@ -318,7 +318,7 @@ class ValidationErrorResponse(BaseModel):
 
     error: str = "validation_error"
     message: str
-    details: List[Dict[str, Any]] = Field(default_factory=list)
+    details: list[dict[str, Any]] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: Optional[str] = None
 
@@ -336,8 +336,8 @@ class EnhancedSuccessResponse(BaseModel):
 
     success: bool = True
     message: str
-    data: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    data: Optional[dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: Optional[str] = None
 

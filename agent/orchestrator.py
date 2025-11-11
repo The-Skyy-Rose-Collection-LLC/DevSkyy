@@ -1,11 +1,12 @@
-from datetime import datetime
-
-from agent.modules.base_agent import AgentStatus, BaseAgent
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
 import logging
+from typing import Any, Optional
+
+from agent.modules.base_agent import AgentStatus, BaseAgent
+
 
 """
 Enterprise Multi-Agent Orchestration System
@@ -45,8 +46,8 @@ class AgentCapability:
     """Defines what an agent can do"""
 
     agent_name: str
-    capabilities: List[str]
-    required_agents: List[str] = field(default_factory=list)  # Dependencies
+    capabilities: list[str]
+    required_agents: list[str] = field(default_factory=list)  # Dependencies
     priority: ExecutionPriority = ExecutionPriority.MEDIUM
     max_concurrent: int = 5  # Max concurrent executions
     rate_limit: int = 100  # Requests per minute
@@ -57,11 +58,11 @@ class AgentTask:
 
     task_id: str
     task_type: str
-    parameters: Dict[str, Any]
-    required_agents: List[str]
+    parameters: dict[str, Any]
+    required_agents: list[str]
     priority: ExecutionPriority
     status: TaskStatus = TaskStatus.PENDING
-    result: Optional[Dict[str, Any]] = None
+    result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
     created_at: datetime = field(default_factory=datetime.now)
     started_at: Optional[datetime] = None
@@ -81,34 +82,34 @@ class AgentOrchestrator:
     """
 
     def __init__(self, max_concurrent_tasks: int = 50):
-        self.agents: Dict[str, BaseAgent] = {}
-        self.agent_capabilities: Dict[str, AgentCapability] = {}
-        self.dependency_graph: Dict[str, Set[str]] = defaultdict(set)
-        self.reverse_dependencies: Dict[str, Set[str]] = defaultdict(set)
+        self.agents: dict[str, BaseAgent] = {}
+        self.agent_capabilities: dict[str, AgentCapability] = {}
+        self.dependency_graph: dict[str, set[str]] = defaultdict(set)
+        self.reverse_dependencies: dict[str, set[str]] = defaultdict(set)
 
         # Task management
-        self.tasks: Dict[str, AgentTask] = {}
+        self.tasks: dict[str, AgentTask] = {}
         self.task_queue: deque = deque()
         self.max_concurrent_tasks = max_concurrent_tasks
-        self.active_tasks: Set[str] = set()
+        self.active_tasks: set[str] = set()
 
         # Performance tracking
-        self.execution_history: List[Dict[str, Any]] = []
-        self.agent_metrics: Dict[str, Dict[str, Any]] = defaultdict(
+        self.execution_history: list[dict[str, Any]] = []
+        self.agent_metrics: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"calls": 0, "errors": 0, "total_time": 0.0, "avg_time": 0.0}
         )
 
         # Circuit breaker for failing agents
-        self.circuit_breakers: Dict[str, Dict[str, Any]] = defaultdict(
+        self.circuit_breakers: dict[str, dict[str, Any]] = defaultdict(
             lambda: {"failures": 0, "opened_at": None, "state": "closed"}
         )
 
         # Security
-        self.access_control: Dict[str, Set[str]] = defaultdict(set)
-        self.api_keys: Dict[str, str] = {}
+        self.access_control: dict[str, set[str]] = defaultdict(set)
+        self.api_keys: dict[str, str] = {}
 
         # Inter-agent data sharing
-        self.shared_context: Dict[str, Any] = {}
+        self.shared_context: dict[str, Any] = {}
 
         logger.info("🎭 Enterprise Agent Orchestrator initialized")
 
@@ -119,8 +120,8 @@ class AgentOrchestrator:
     async def register_agent(
         self,
         agent: BaseAgent,
-        capabilities: List[str],
-        dependencies: List[str] = None,
+        capabilities: list[str],
+        dependencies: list[str] | None = None,
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
     ) -> bool:
         """
@@ -227,10 +228,10 @@ class AgentOrchestrator:
     async def execute_task(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
-        required_capabilities: List[str],
+        parameters: dict[str, Any],
+        required_capabilities: list[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a multi-agent task.
 
@@ -314,7 +315,7 @@ class AgentOrchestrator:
 
                 except Exception as e:
                     logger.error(f"Agent {agent_name} failed: {e}")
-                    errors.append(f"{agent_name}: {str(e)}")
+                    errors.append(f"{agent_name}: {e!s}")
                     results[agent_name] = {"error": str(e)}
 
                     # Track failure
@@ -344,8 +345,8 @@ class AgentOrchestrator:
             return {"error": str(e), "task_id": task_id}
 
     def _find_agents_with_capabilities(
-        self, required_capabilities: List[str]
-    ) -> List[str]:
+        self, required_capabilities: list[str]
+    ) -> list[str]:
         """Find all agents that have the required capabilities"""
         capable_agents = []
 
@@ -361,7 +362,7 @@ class AgentOrchestrator:
 
         return capable_agents
 
-    def _resolve_dependencies(self, agent_names: List[str]) -> List[str]:
+    def _resolve_dependencies(self, agent_names: list[str]) -> list[str]:
         """
         Resolve agent dependencies using topological sort.
         Returns agents in execution order.
@@ -470,7 +471,7 @@ class AgentOrchestrator:
         if len(self.execution_history) > 1000:
             self.execution_history = self.execution_history[-1000:]
 
-    async def get_orchestrator_health(self) -> Dict[str, Any]:
+    async def get_orchestrator_health(self) -> dict[str, Any]:
         """Get overall orchestrator health status"""
         agent_health = {}
 
@@ -495,13 +496,13 @@ class AgentOrchestrator:
             ),
         }
 
-    def get_agent_metrics(self, agent_name: Optional[str] = None) -> Dict[str, Any]:
+    def get_agent_metrics(self, agent_name: Optional[str] = None) -> dict[str, Any]:
         """Get performance metrics for agent(s)"""
         if agent_name:
             return self.agent_metrics.get(agent_name, {})
         return dict(self.agent_metrics)
 
-    def get_dependency_graph(self) -> Dict[str, List[str]]:
+    def get_dependency_graph(self) -> dict[str, list[str]]:
         """Get the complete dependency graph"""
         return {agent: list(deps) for agent, deps in self.dependency_graph.items()}
 
@@ -533,7 +534,7 @@ class AgentOrchestrator:
         return data.get("value")
 
     async def broadcast_to_agents(
-        self, message: Dict[str, Any], agent_names: Optional[List[str]] = None
+        self, message: dict[str, Any], agent_names: Optional[list[str]] = None
     ):
         """Broadcast a message to multiple agents"""
         target_agents = agent_names if agent_names else list(self.agents.keys())
@@ -550,7 +551,7 @@ class AgentOrchestrator:
     async def create_video_generation_task(
         self,
         task_type: str,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM
     ) -> str:
         """
@@ -591,7 +592,7 @@ class AgentOrchestrator:
 
         return task_id
 
-    async def execute_video_generation_task(self, task_id: str) -> Dict[str, Any]:
+    async def execute_video_generation_task(self, task_id: str) -> dict[str, Any]:
         """
         Execute a video generation task.
 
@@ -643,7 +644,7 @@ class AgentOrchestrator:
             logger.error(f"❌ Video generation task failed: {task_id} - {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _execute_runway_video_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_runway_video_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute runway video generation task."""
         if "fashion_vision_agent" not in self.agents:
             return {"error": "Fashion vision agent not available", "status": "failed"}
@@ -660,7 +661,7 @@ class AgentOrchestrator:
             upscale=task.parameters.get("upscale", True)
         )
 
-    async def _execute_product_360_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_product_360_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute product 360° video generation task."""
         if "fashion_vision_agent" not in self.agents:
             return {"error": "Fashion vision agent not available", "status": "failed"}
@@ -674,7 +675,7 @@ class AgentOrchestrator:
             upscale=task.parameters.get("upscale", True)
         )
 
-    async def _execute_brand_training_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_brand_training_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute brand model training task."""
         if "brand_trainer" not in self.agents:
             return {"error": "Brand trainer not available", "status": "failed"}
@@ -687,7 +688,7 @@ class AgentOrchestrator:
             resume_from_checkpoint=task.parameters.get("resume_from_checkpoint")
         )
 
-    async def _execute_custom_model_generation_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_custom_model_generation_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute custom model generation task."""
         if "brand_trainer" not in self.agents:
             return {"error": "Brand trainer not available", "status": "failed"}
@@ -702,7 +703,7 @@ class AgentOrchestrator:
             height=task.parameters.get("height", 1024)
         )
 
-    async def _execute_video_upscaling_task(self, task: AgentTask) -> Dict[str, Any]:
+    async def _execute_video_upscaling_task(self, task: AgentTask) -> dict[str, Any]:
         """Execute video upscaling task."""
         if "fashion_vision_agent" not in self.agents:
             return {"error": "Fashion vision agent not available", "status": "failed"}

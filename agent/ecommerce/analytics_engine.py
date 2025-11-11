@@ -1,11 +1,12 @@
-import json
-from datetime import datetime
-
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+import json
 import logging
+from typing import Any, Optional
+
 import numpy as np
 import pandas as pd  # noqa: F401 - Reserved for Phase 3 data analysis enhancements
+
 
 """
 E-commerce Analytics Engine
@@ -34,7 +35,7 @@ class EcommerceAnalytics:
 
     async def get_revenue_analytics(
         self, start_date: datetime, end_date: datetime, granularity: str = "daily"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calculate comprehensive revenue analytics
 
@@ -80,7 +81,7 @@ class EcommerceAnalytics:
 
     async def analyze_customer_behavior(
         self, customer_segment: Optional[str] = None, time_period: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze customer behavior patterns
 
@@ -131,8 +132,8 @@ class EcommerceAnalytics:
         return behavior
 
     async def analyze_product_performance(
-        self, product_ids: Optional[List[str]] = None, metric: str = "revenue"
-    ) -> Dict[str, Any]:
+        self, product_ids: Optional[list[str]] = None, metric: str = "revenue"
+    ) -> dict[str, Any]:
         """
         Analyze product performance metrics
 
@@ -176,8 +177,8 @@ class EcommerceAnalytics:
         return performance
 
     async def analyze_conversion_funnel(
-        self, funnel_stages: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, funnel_stages: Optional[list[str]] = None
+    ) -> dict[str, Any]:
         """
         Analyze conversion funnel and drop-off points
 
@@ -209,7 +210,7 @@ class EcommerceAnalytics:
 
         # Simulate funnel data
         visitors = 10000
-        for i, stage in enumerate(stages):
+        for _i, stage in enumerate(stages):
             conversion_rate = np.random.uniform(0.5, 0.9)
             visitors = int(visitors * conversion_rate)
 
@@ -225,7 +226,7 @@ class EcommerceAnalytics:
         funnel["overall_conversion_rate"] = visitors / 10000
 
         # Identify bottlenecks
-        for i, stage_data in enumerate(funnel["stages"]):
+        for _i, stage_data in enumerate(funnel["stages"]):
             if stage_data["conversion_rate"] < 0.6:
                 funnel["bottlenecks"].append(
                     {
@@ -239,7 +240,7 @@ class EcommerceAnalytics:
 
     async def calculate_marketing_roi(
         self, campaign_id: str, start_date: datetime, end_date: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calculate ROI for marketing campaigns
 
@@ -291,8 +292,8 @@ class EcommerceAnalytics:
         return roi_data
 
     async def get_predictive_insights(
-        self, forecast_days: int = 30, metrics: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, forecast_days: int = 30, metrics: Optional[list[str]] = None
+    ) -> dict[str, Any]:
         """
         Generate predictive insights and forecasts
 
@@ -348,7 +349,7 @@ class EcommerceAnalytics:
         return insights
 
     def export_analytics_report(
-        self, analytics_data: Dict[str, Any], format: str = "json"
+        self, analytics_data: dict[str, Any], format: str = "json"
     ) -> str:
         """
         Export analytics data in various formats

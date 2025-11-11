@@ -8,13 +8,14 @@ GROK Role: Viral Content Creation & Social Automation
 """
 
 import asyncio
-import logging
-import hashlib
-from datetime import datetime
-from typing import Dict, List, Any
 from dataclasses import dataclass
-import sys
+from datetime import datetime
+import hashlib
+import logging
 import os
+import sys
+from typing import Any
+
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,7 +29,7 @@ class BrandDeliverable:
     description: str
     claude_responsibility: str
     grok_responsibility: str
-    target_metric: Dict[str, Any]
+    target_metric: dict[str, Any]
     current_status: str
     completion_percentage: float
     last_updated: datetime
@@ -49,19 +50,19 @@ class ClaudeGrokBrandEngine:
     Partnership 2: Brand Amplification Engine
     Real implementation with actual metrics and content management
     """
-    
+
     def __init__(self):
         self.deliverables = self._initialize_deliverables()
         self.content_library = []
         self.influencer_network = {}
         self.brand_metrics = {}
         self.communication_protocol = self._setup_communication()
-        
+
         logger.info("🎯 Claude + GROK Brand Amplification Engine initialized")
-    
-    def _initialize_deliverables(self) -> List[BrandDeliverable]:
+
+    def _initialize_deliverables(self) -> list[BrandDeliverable]:
         """Initialize real brand amplification deliverables with current progress"""
-        
+
         return [
             BrandDeliverable(
                 name="Luxury Brand Positioning Framework",
@@ -78,7 +79,7 @@ class ClaudeGrokBrandEngine:
                 completion_percentage=85.0,
                 last_updated=datetime.now()
             ),
-            
+
             BrandDeliverable(
                 name="High-Engagement Content Library",
                 description="200+ viral-ready luxury content pieces",
@@ -94,7 +95,7 @@ class ClaudeGrokBrandEngine:
                 completion_percentage=95.0,
                 last_updated=datetime.now()
             ),
-            
+
             BrandDeliverable(
                 name="Verified Luxury Influencer Network",
                 description="100+ verified luxury lifestyle creators",
@@ -110,7 +111,7 @@ class ClaudeGrokBrandEngine:
                 completion_percentage=78.0,
                 last_updated=datetime.now()
             ),
-            
+
             BrandDeliverable(
                 name="Social Commerce Integration",
                 description="Seamless shopping across all social platforms",
@@ -127,10 +128,10 @@ class ClaudeGrokBrandEngine:
                 last_updated=datetime.now()
             )
         ]
-    
-    def _setup_communication(self) -> Dict[str, Any]:
+
+    def _setup_communication(self) -> dict[str, Any]:
         """Real communication protocols with actual scheduling"""
-        
+
         return {
             "daily_trend_analysis": {
                 "time": "08:00 UTC",
@@ -144,7 +145,7 @@ class ClaudeGrokBrandEngine:
                 ],
                 "deliverables": ["Trend report", "Content calendar update", "Performance metrics"]
             },
-            
+
             "weekly_campaign_review": {
                 "time": "Wednesday 15:00 UTC",
                 "duration_minutes": 45,
@@ -157,7 +158,7 @@ class ClaudeGrokBrandEngine:
                 ],
                 "deliverables": ["ROI report", "Influencer scorecard", "Strategy adjustments"]
             },
-            
+
             "monthly_brand_strategy": {
                 "time": "First Monday 10:00 UTC",
                 "duration_minutes": 120,
@@ -171,27 +172,27 @@ class ClaudeGrokBrandEngine:
                 "deliverables": ["Market analysis", "Competitive report", "Innovation roadmap"]
             }
         }
-    
-    async def get_real_time_brand_metrics(self) -> Dict[str, float]:
+
+    async def get_real_time_brand_metrics(self) -> dict[str, float]:
         """Get real-time brand performance metrics"""
-        
+
         try:
             # Calculate actual brand metrics from content performance
             total_engagement = sum(content.engagement_rate for content in self.content_library)
             avg_engagement = total_engagement / max(len(self.content_library), 1)
-            
+
             total_reach = sum(content.reach for content in self.content_library)
             total_conversions = sum(content.conversions for content in self.content_library)
-            
+
             # Calculate viral coefficient
             viral_coefficient = self._calculate_viral_coefficient()
-            
+
             # Get brand sentiment from recent content
             brand_sentiment = self._analyze_brand_sentiment()
-            
+
             # Calculate social revenue attribution
             social_revenue = self._calculate_social_revenue_attribution()
-            
+
             metrics = {
                 "social_engagement": avg_engagement,
                 "viral_coefficient": viral_coefficient,
@@ -202,63 +203,63 @@ class ClaudeGrokBrandEngine:
                 "content_count": float(len(self.content_library)),
                 "influencer_count": float(len(self.influencer_network))
             }
-            
+
             logger.info(f"📊 Brand metrics collected: {len(metrics)} metrics")
             return metrics
-            
+
         except Exception as e:
             logger.error(f"Error collecting brand metrics: {e}")
             return self._get_baseline_brand_metrics()
-    
+
     def _calculate_viral_coefficient(self) -> float:
         """Calculate actual viral coefficient from content data"""
-        
+
         if not self.content_library:
             return 1.0
-        
+
         # Calculate based on engagement patterns
         high_engagement_content = [c for c in self.content_library if c.engagement_rate > 5.0]
         viral_rate = len(high_engagement_content) / len(self.content_library)
-        
+
         # Viral coefficient based on engagement quality
         return 1.0 + (viral_rate * 2.0)  # Range: 1.0 to 3.0
-    
+
     def _analyze_brand_sentiment(self) -> float:
         """Analyze brand sentiment from content performance"""
-        
+
         if not self.content_library:
             return 70.0
-        
+
         # Calculate sentiment based on engagement vs reach ratio
         positive_indicators = 0
         total_content = len(self.content_library)
-        
+
         for content in self.content_library:
             engagement_ratio = content.engagement_rate / max(content.reach / 1000, 1)
             if engagement_ratio > 0.05:  # Good engagement ratio
                 positive_indicators += 1
-        
+
         sentiment_percentage = (positive_indicators / total_content) * 100
         return min(max(sentiment_percentage, 60.0), 95.0)  # Clamp between 60-95%
-    
+
     def _calculate_social_revenue_attribution(self) -> float:
         """Calculate revenue attribution from social channels"""
-        
+
         if not self.content_library:
             return 5.0
-        
+
         # Calculate based on conversion performance
         total_conversions = sum(content.conversions for content in self.content_library)
-        
+
         # Estimate revenue attribution (simplified model)
         if total_conversions > 1000:
             return min(25.0, 15.0 + (total_conversions / 1000) * 2)
         else:
             return 5.0 + (total_conversions / 100)
-    
-    def _get_baseline_brand_metrics(self) -> Dict[str, float]:
+
+    def _get_baseline_brand_metrics(self) -> dict[str, float]:
         """Get baseline brand metrics when real data unavailable"""
-        
+
         return {
             "social_engagement": 285.0,  # % increase
             "viral_coefficient": 2.3,    # Current coefficient
@@ -269,13 +270,13 @@ class ClaudeGrokBrandEngine:
             "content_count": 190.0,      # Content pieces
             "influencer_count": 78.0     # Active influencers
         }
-    
-    async def add_content_piece(self, platform: str, content_type: str, 
+
+    async def add_content_piece(self, platform: str, content_type: str,
                                engagement_rate: float, reach: int, conversions: int) -> str:
         """Add a new content piece to the library"""
-        
+
         content_id = hashlib.md5(f"{platform}_{content_type}_{datetime.now()}".encode()).hexdigest()[:8]
-        
+
         content = ContentPiece(
             id=content_id,
             platform=platform,
@@ -285,18 +286,18 @@ class ClaudeGrokBrandEngine:
             conversions=conversions,
             created_at=datetime.now()
         )
-        
+
         self.content_library.append(content)
         logger.info(f"📝 Added content piece {content_id} for {platform}")
-        
+
         return content_id
-    
-    async def add_influencer(self, name: str, platform: str, followers: int, 
+
+    async def add_influencer(self, name: str, platform: str, followers: int,
                            engagement_rate: float, tier: str) -> str:
         """Add an influencer to the network"""
-        
+
         influencer_id = hashlib.md5(f"{name}_{platform}".encode()).hexdigest()[:8]
-        
+
         self.influencer_network[influencer_id] = {
             "name": name,
             "platform": platform,
@@ -307,19 +308,19 @@ class ClaudeGrokBrandEngine:
             "verified": True,
             "active": True
         }
-        
+
         logger.info(f"👤 Added influencer {name} ({tier}) to network")
         return influencer_id
-    
-    async def generate_brand_performance_report(self) -> Dict[str, Any]:
+
+    async def generate_brand_performance_report(self) -> dict[str, Any]:
         """Generate comprehensive brand performance report"""
-        
+
         metrics = await self.get_real_time_brand_metrics()
-        
+
         # Calculate overall progress
         total_progress = sum(d.completion_percentage for d in self.deliverables)
         avg_progress = total_progress / len(self.deliverables)
-        
+
         # Determine partnership health
         health_score = (avg_progress + metrics["brand_sentiment"]) / 2
         if health_score >= 85:
@@ -330,12 +331,12 @@ class ClaudeGrokBrandEngine:
             health_status = "FAIR"
         else:
             health_status = "NEEDS_ATTENTION"
-        
+
         report = {
             "partnership_health": health_status,
             "overall_progress": f"{avg_progress:.1f}%",
             "health_score": health_score,
-            
+
             "key_achievements": [
                 f"Brand sentiment {metrics['brand_sentiment']:.1f}% positive",
                 f"Viral coefficient {metrics['viral_coefficient']:.1f}",
@@ -343,9 +344,9 @@ class ClaudeGrokBrandEngine:
                 f"{metrics['content_count']:.0f} content pieces created",
                 f"{metrics['influencer_count']:.0f} verified influencers"
             ],
-            
+
             "current_metrics": metrics,
-            
+
             "deliverable_status": [
                 {
                     "name": d.name,
@@ -355,24 +356,24 @@ class ClaudeGrokBrandEngine:
                 }
                 for d in self.deliverables
             ],
-            
+
             "strategic_priorities": [
                 "Expand tier-1 influencer partnerships",
                 "Increase viral content percentage to 20%",
                 "Launch celebrity collaboration campaign",
                 "Optimize social commerce conversion funnel"
             ],
-            
+
             "next_24_hours": [
                 "Claude: Analyze competitor campaign performance",
                 "GROK: Launch luxury sustainability content series",
                 "Joint: Review influencer partnership ROI",
                 "Joint: Optimize social commerce integration"
             ],
-            
+
             "generated_at": datetime.now().isoformat()
         }
-        
+
         return report
 
 # Initialize Brand Amplification Engine
@@ -381,22 +382,22 @@ brand_engine = ClaudeGrokBrandEngine()
 async def main():
     """Main execution for Brand Amplification Engine"""
     logger.info("🎯 Claude + GROK Brand Amplification Engine - ACTIVE")
-    
+
     # Add some sample content for demonstration
     await brand_engine.add_content_piece("instagram", "luxury_showcase", 8.5, 50000, 125)
     await brand_engine.add_content_piece("tiktok", "style_tutorial", 12.3, 75000, 200)
     await brand_engine.add_content_piece("pinterest", "fashion_inspiration", 6.8, 30000, 80)
-    
+
     # Add sample influencers
     await brand_engine.add_influencer("LuxuryLifestyle_Anna", "instagram", 2500000, 6.5, "tier_1")
     await brand_engine.add_influencer("FashionForward_Mike", "tiktok", 850000, 8.2, "tier_2")
-    
+
     # Generate performance report
     performance_report = await brand_engine.generate_brand_performance_report()
-    
+
     logger.info(f"📊 Partnership Health: {performance_report['partnership_health']}")
     logger.info(f"📈 Overall Progress: {performance_report['overall_progress']}")
-    
+
     return performance_report
 
 if __name__ == "__main__":

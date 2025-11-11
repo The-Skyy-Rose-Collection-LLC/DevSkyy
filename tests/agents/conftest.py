@@ -4,10 +4,12 @@ Test fixtures for agent routing system
 Provides reusable test fixtures for pytest
 """
 
-import sys
 import json
-import pytest
 from pathlib import Path
+import sys
+
+import pytest
+
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent

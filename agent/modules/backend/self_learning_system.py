@@ -1,16 +1,17 @@
-from datetime import datetime
-from pathlib import Path
-from sklearn.ensemble import IsolationForest
-import json
-import os
-import sys
-
-from collections import Counter
-from typing import Any, Dict, List
 import asyncio
+from collections import Counter
+from datetime import datetime
+import json
 import logging
-import numpy as np
+import os
+from pathlib import Path
 import pickle
+import sys
+from typing import Any
+
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
 
 """
 Self-Learning System with Machine Learning
@@ -60,7 +61,7 @@ class SelfLearningSystem:
 
         logger.info("🧠 Self-Learning System initialized with ML capabilities")
 
-    def learn_from_error(self, error_data: Dict[str, Any]) -> Dict[str, Any]:
+    def learn_from_error(self, error_data: dict[str, Any]) -> dict[str, Any]:
         """
         Learn from an error and prevent future occurrences.
 
@@ -108,7 +109,7 @@ class SelfLearningSystem:
             "learning_improvement": self.improvement_score,
         }
 
-    def learn_from_conflict(self, conflict_data: Dict[str, Any]) -> Dict[str, Any]:
+    def learn_from_conflict(self, conflict_data: dict[str, Any]) -> dict[str, Any]:
         """
         Learn from conflicts (git, dependency, etc.) to prevent them.
 
@@ -147,7 +148,7 @@ class SelfLearningSystem:
             "auto_resolve": resolution["confidence"] > 0.9,
         }
 
-    def learn_from_success(self, success_data: Dict[str, Any]) -> None:
+    def learn_from_success(self, success_data: dict[str, Any]) -> None:
         """
         Learn from successful operations to reinforce good patterns.
 
@@ -167,7 +168,7 @@ class SelfLearningSystem:
 
         logger.info(f"✅ Learned from success: {success_data.get('operation')}")
 
-    def predict_failure(self, operation_data: Dict[str, Any]) -> Dict[str, Any]:
+    def predict_failure(self, operation_data: dict[str, Any]) -> dict[str, Any]:
         """
         Predict if an operation will fail based on learned patterns.
 
@@ -199,7 +200,7 @@ class SelfLearningSystem:
             "confidence": self._calculate_prediction_confidence(features),
         }
 
-    def auto_fix(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    def auto_fix(self, issue: dict[str, Any]) -> dict[str, Any]:
         """
         Automatically fix issues based on learned patterns.
 
@@ -250,7 +251,7 @@ class SelfLearningSystem:
                 "fallback": "Manual intervention required",
             }
 
-    def _extract_error_features(self, error_data: Dict[str, Any]) -> np.ndarray:
+    def _extract_error_features(self, error_data: dict[str, Any]) -> np.ndarray:
         """Extract features from error for ML processing."""
         features = []
 
@@ -281,7 +282,7 @@ class SelfLearningSystem:
 
         return np.array(features)
 
-    def _find_similar_errors(self, error_features: np.ndarray) -> List[Dict[str, Any]]:
+    def _find_similar_errors(self, error_features: np.ndarray) -> list[dict[str, Any]]:
         """Find similar errors from history."""
         similar = []
 
@@ -300,8 +301,8 @@ class SelfLearningSystem:
         return similar
 
     def _generate_solution(
-        self, error_data: Dict[str, Any], similar_errors: List[Dict]
-    ) -> Dict[str, Any]:
+        self, error_data: dict[str, Any], similar_errors: list[dict]
+    ) -> dict[str, Any]:
         """Generate solution based on error and similar cases."""
         # If we have similar cases, use their solutions
         if similar_errors:
@@ -329,7 +330,7 @@ class SelfLearningSystem:
         # Generate new solution using ML
         return self._generate_ml_solution(error_data)
 
-    def _generate_ml_solution(self, error_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_ml_solution(self, error_data: dict[str, Any]) -> dict[str, Any]:
         """Generate solution using ML models."""
         error_type = error_data.get("type", "unknown")
 
@@ -369,8 +370,8 @@ class SelfLearningSystem:
         }
 
     def _analyze_conflict_pattern(
-        self, conflict_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, conflict_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze conflict to identify patterns."""
         pattern = {
             "type": conflict_data.get("type"),
@@ -387,8 +388,8 @@ class SelfLearningSystem:
         return pattern
 
     def _predict_conflict_resolution(
-        self, conflict_pattern: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, conflict_pattern: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predict best resolution for conflict."""
         conflict_type = conflict_pattern.get("type")
 
@@ -428,7 +429,7 @@ class SelfLearningSystem:
             },
         )
 
-    def _learn_git_patterns(self, conflict_data: Dict[str, Any]) -> None:
+    def _learn_git_patterns(self, conflict_data: dict[str, Any]) -> None:
         """Learn from git conflict patterns."""
         # Track which files commonly conflict
         conflicting_files = conflict_data.get("files", [])
@@ -444,7 +445,7 @@ class SelfLearningSystem:
             # Update or add to knowledge base
             self._update_git_knowledge(pattern)
 
-    def _update_git_knowledge(self, pattern: Dict[str, Any]) -> None:
+    def _update_git_knowledge(self, pattern: dict[str, Any]) -> None:
         """Update git conflict knowledge base."""
         git_knowledge_file = self.knowledge_base_path / "git_conflicts.json"
 
@@ -464,7 +465,7 @@ class SelfLearningSystem:
         with open(git_knowledge_file, "w") as f:
             json.dump(knowledge, f, indent=2)
 
-    def _get_prevention_tips(self, conflict_pattern: Dict[str, Any]) -> List[str]:
+    def _get_prevention_tips(self, conflict_pattern: dict[str, Any]) -> list[str]:
         """Get tips to prevent future conflicts."""
         tips = []
 
@@ -494,7 +495,7 @@ class SelfLearningSystem:
 
         return tips
 
-    def _reinforce_success_patterns(self, success_data: Dict[str, Any]) -> None:
+    def _reinforce_success_patterns(self, success_data: dict[str, Any]) -> None:
         """Reinforce patterns that lead to success."""
         # Update success weights
         operation = success_data.get("operation")
@@ -523,7 +524,7 @@ class SelfLearningSystem:
         with open(success_file, "w") as f:
             json.dump(patterns, f, indent=2)
 
-    def _get_environment_context(self) -> Dict[str, Any]:
+    def _get_environment_context(self) -> dict[str, Any]:
         """Get current environment context."""
         return {
             "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
@@ -592,7 +593,7 @@ class SelfLearningSystem:
         except Exception as e:
             logger.warning(f"Error model update failed: {e}")
 
-    def _extract_operation_features(self, operation_data: Dict[str, Any]) -> np.ndarray:
+    def _extract_operation_features(self, operation_data: dict[str, Any]) -> np.ndarray:
         """Extract features from operation for failure prediction."""
         features = []
 
@@ -642,8 +643,8 @@ class SelfLearningSystem:
             return 0.5
 
     def _get_preventive_measures(
-        self, operation_data: Dict[str, Any], failure_probability: float
-    ) -> List[str]:
+        self, operation_data: dict[str, Any], failure_probability: float
+    ) -> list[str]:
         """Get preventive measures based on failure probability."""
         measures = []
 
@@ -683,7 +684,7 @@ class SelfLearningSystem:
 
         return 0.85
 
-    def _analyze_issue(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_issue(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Analyze issue to determine fix strategy."""
         return {
             "type": issue.get("type", "unknown"),
@@ -694,7 +695,7 @@ class SelfLearningSystem:
             "timestamp": datetime.now().isoformat()
         }
 
-    def _get_similar_fixes(self, issue_analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _get_similar_fixes(self, issue_analysis: dict[str, Any]) -> list[dict[str, Any]]:
         """Get similar fixes from solution history."""
         similar_fixes = []
 
@@ -704,7 +705,7 @@ class SelfLearningSystem:
 
         return similar_fixes
 
-    def _select_best_fix(self, similar_fixes: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _select_best_fix(self, similar_fixes: list[dict[str, Any]]) -> dict[str, Any]:
         """Select the best fix from similar cases."""
         if not similar_fixes:
             return {
@@ -732,7 +733,7 @@ class SelfLearningSystem:
             "approach": "experimental"
         }
 
-    def _execute_fix(self, fix: Dict[str, Any], issue: Dict[str, Any]) -> Dict[str, Any]:
+    def _execute_fix(self, fix: dict[str, Any], issue: dict[str, Any]) -> dict[str, Any]:
         """Execute fix for the issue."""
         import time
         start_time = time.time()
@@ -762,11 +763,11 @@ class SelfLearningSystem:
             return {
                 "success": False,
                 "duration": time.time() - start_time,
-                "message": f"Fix execution failed: {str(e)}"
+                "message": f"Fix execution failed: {e!s}"
             }
 
     def _update_fix_knowledge(
-        self, issue: Dict[str, Any], fix: Dict[str, Any], success: bool
+        self, issue: dict[str, Any], fix: dict[str, Any], success: bool
     ) -> None:
         """Update fix knowledge base with result."""
         self.solution_history.append({
@@ -780,7 +781,7 @@ class SelfLearningSystem:
         if len(self.solution_history) > 1000:
             self.solution_history = self.solution_history[-1000:]
 
-    def _get_conflict_frequency(self, conflict_data: Dict[str, Any]) -> int:
+    def _get_conflict_frequency(self, conflict_data: dict[str, Any]) -> int:
         """Get frequency of this type of conflict."""
         conflict_type = conflict_data.get("type")
         frequency = len([
@@ -789,7 +790,7 @@ class SelfLearningSystem:
         ])
         return frequency
 
-    def _assess_conflict_complexity(self, conflict_data: Dict[str, Any]) -> str:
+    def _assess_conflict_complexity(self, conflict_data: dict[str, Any]) -> str:
         """Assess complexity of conflict."""
         files_affected = len(conflict_data.get("files", []))
         conflicts_count = len(conflict_data.get("conflicts", []))
@@ -846,7 +847,7 @@ class SelfLearningSystem:
 self_learning_system = SelfLearningSystem()
 
 # Integration functions
-async def learn_and_fix(error: Dict[str, Any]) -> Dict[str, Any]:
+async def learn_and_fix(error: dict[str, Any]) -> dict[str, Any]:
     """Learn from error and attempt auto-fix."""
     learning_result = self_learning_system.learn_from_error(error)
 
@@ -856,7 +857,7 @@ async def learn_and_fix(error: Dict[str, Any]) -> Dict[str, Any]:
 
     return learning_result
 
-async def predict_and_prevent(operation: Dict[str, Any]) -> Dict[str, Any]:
+async def predict_and_prevent(operation: dict[str, Any]) -> dict[str, Any]:
     """Predict failures and prevent them."""
     prediction = self_learning_system.predict_failure(operation)
 

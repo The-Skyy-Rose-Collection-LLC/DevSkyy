@@ -6,9 +6,11 @@ Ensures Truth Protocol compliance with ≥90% coverage requirement.
 """
 
 import asyncio
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
 
 # Import orchestrator (adjust import path as needed)
 try:
@@ -297,7 +299,6 @@ class TestPerformanceRequirements:
             p95_latency = latencies[p95_index]
 
             # Log for visibility
-            print(f"P95 Latency: {p95_latency:.2f}ms")
 
             # This is a guideline - actual performance depends on implementation
             assert p95_latency < 500  # Allow 500ms in tests (production: 200ms)
@@ -327,7 +328,6 @@ class TestPerformanceRequirements:
                     failures += 1
 
         error_rate = (failures / total_tasks) * 100
-        print(f"Error Rate: {error_rate:.2f}%")
 
         # Error rate should be under 0.5%
         assert error_rate < 1.0  # Allow 1% in tests
@@ -460,7 +460,7 @@ class TestOrchestratorAdvancedScenarios:
 
         # Simulate status change
         mock_agent.status = AgentStatus.HEALTHY
-        health = await orchestrator.get_orchestrator_health()
+        await orchestrator.get_orchestrator_health()
 
         assert "status_agent" in orchestrator.agents
 
@@ -470,7 +470,7 @@ class TestOrchestratorAdvancedScenarios:
         # Create more tasks than max_concurrent
         max_concurrent = orchestrator.max_concurrent_tasks
 
-        mock_agent = MagicMock(
+        MagicMock(
             agent_name="queue_agent",
             execute=AsyncMock(return_value={"status": "success"})
         )
@@ -546,7 +546,7 @@ class TestOrchestratorDependencyResolution:
         """Should resolve complex multi-level dependencies."""
         # Create chain: A -> B -> C -> D
         agents = []
-        for i, (name, deps) in enumerate([
+        for _i, (name, deps) in enumerate([
             ("agent_d", []),
             ("agent_c", ["agent_d"]),
             ("agent_b", ["agent_c"]),
@@ -745,7 +745,7 @@ class TestOrchestratorCircuitBreaker:
         orchestrator.agents["failing_agent"] = failing_agent
 
         # Simulate multiple failures
-        for i in range(6):
+        for _i in range(6):
             orchestrator._increment_circuit_breaker("failing_agent")
 
         # Circuit should be open
@@ -756,7 +756,7 @@ class TestOrchestratorCircuitBreaker:
     async def test_circuit_breaker_half_open_after_timeout(self, orchestrator):
         """Should transition to half-open state after timeout."""
         # Open circuit
-        for i in range(5):
+        for _i in range(5):
             orchestrator._increment_circuit_breaker("timeout_agent")
 
         assert orchestrator._is_circuit_open("timeout_agent")
@@ -889,7 +889,7 @@ class TestOrchestratorDataSharing:
         await orchestrator.broadcast_to_agents(message)
 
         # All agents should have message
-        for agent_name in orchestrator.agents.keys():
+        for agent_name in orchestrator.agents:
             msg = orchestrator.get_shared_data(f"message_{agent_name}")
             assert msg == message
 

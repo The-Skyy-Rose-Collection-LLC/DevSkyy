@@ -1,9 +1,10 @@
 from datetime import datetime
 import json
+import logging
+from typing import Any, Optional
 
 from anthropic import Anthropic
-from typing import Any, Dict, List, Optional
-import logging
+
 
 """
 Elementor Theme Builder
@@ -38,7 +39,7 @@ class ElementorThemeBuilder:
 
         logger.info("🎨 Elementor Theme Builder initialized")
 
-    def _load_theme_templates(self) -> Dict[str, Any]:
+    def _load_theme_templates(self) -> dict[str, Any]:
         """Load predefined theme templates"""
         return {
             "luxury_fashion": {
@@ -73,7 +74,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    def _initialize_widget_library(self) -> Dict[str, Dict]:
+    def _initialize_widget_library(self) -> dict[str, dict]:
         """Initialize Elementor widget configurations"""
         return {
             "hero": {
@@ -105,10 +106,10 @@ class ElementorThemeBuilder:
 
     async def generate_theme(
         self,
-        brand_info: Dict[str, Any],
+        brand_info: dict[str, Any],
         theme_type: str = "luxury_fashion",
-        pages: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        pages: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
         """
         Generate complete WordPress/Elementor theme
 
@@ -191,8 +192,8 @@ class ElementorThemeBuilder:
             return {"success": False, "error": str(e)}
 
     async def _generate_color_palette(
-        self, brand_info: Dict[str, Any], theme_type: str
-    ) -> Dict[str, str]:
+        self, brand_info: dict[str, Any], theme_type: str
+    ) -> dict[str, str]:
         """Generate ML-optimized color palette"""
         try:
             # Base colors from brand or theme template
@@ -265,8 +266,8 @@ class ElementorThemeBuilder:
             return {}
 
     async def _generate_typography(
-        self, brand_info: Dict[str, Any], theme_type: str
-    ) -> Dict[str, Any]:
+        self, brand_info: dict[str, Any], theme_type: str
+    ) -> dict[str, Any]:
         """Generate optimized typography settings"""
         template = self.theme_templates.get(theme_type, {})
         style = template.get("style", "modern")
@@ -327,11 +328,11 @@ class ElementorThemeBuilder:
     async def _generate_page_layout(
         self,
         page_type: str,
-        brand_info: Dict[str, Any],
+        brand_info: dict[str, Any],
         theme_type: str,
-        colors: Dict[str, str],
-        typography: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        colors: dict[str, str],
+        typography: dict[str, Any],
+    ) -> dict[str, Any]:
         """Generate page layout with Elementor sections"""
         try:
             if page_type == "home":
@@ -357,11 +358,11 @@ class ElementorThemeBuilder:
 
     async def _generate_homepage(
         self,
-        brand_info: Dict[str, Any],
+        brand_info: dict[str, Any],
         theme_type: str,
-        colors: Dict,
-        typography: Dict,
-    ) -> Dict[str, Any]:
+        colors: dict,
+        typography: dict,
+    ) -> dict[str, Any]:
         """Generate homepage layout"""
         return {
             "sections": [
@@ -460,8 +461,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_shop_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate shop page layout"""
         return {
             "sections": [
@@ -496,8 +497,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_product_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate product detail page layout"""
         return {
             "sections": [
@@ -545,8 +546,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_about_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate about page layout"""
         return {
             "sections": [
@@ -576,8 +577,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_contact_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate contact page layout"""
         return {
             "sections": [
@@ -602,8 +603,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_blog_page(
-        self, brand_info: Dict, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate blog page layout"""
         return {
             "sections": [
@@ -628,8 +629,8 @@ class ElementorThemeBuilder:
         }
 
     async def _generate_global_settings(
-        self, brand_info: Dict, theme_type: str, colors: Dict, typography: Dict
-    ) -> Dict[str, Any]:
+        self, brand_info: dict, theme_type: str, colors: dict, typography: dict
+    ) -> dict[str, Any]:
         """Generate global theme settings"""
         return {
             "site_identity": {
@@ -688,7 +689,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    async def _generate_woocommerce_config(self, brand_info: Dict) -> Dict[str, Any]:
+    async def _generate_woocommerce_config(self, brand_info: dict) -> dict[str, Any]:
         """Generate WooCommerce settings for fashion brands"""
         return {
             "shop_settings": {
@@ -711,7 +712,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    async def _generate_seo_config(self, brand_info: Dict) -> Dict[str, Any]:
+    async def _generate_seo_config(self, brand_info: dict) -> dict[str, Any]:
         """Generate SEO settings"""
         return {
             "meta_description": brand_info.get("description", ""),
@@ -729,7 +730,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    def _get_performance_config(self) -> Dict[str, Any]:
+    def _get_performance_config(self) -> dict[str, Any]:
         """Get performance optimization settings"""
         return {
             "lazy_loading": {"images": True, "videos": True, "iframes": True},
@@ -747,10 +748,10 @@ class ElementorThemeBuilder:
             "cdn": {"enabled": False, "provider": ""},
         }
 
-    def _get_required_widgets(self, page_layouts: Dict) -> List[str]:
+    def _get_required_widgets(self, page_layouts: dict) -> list[str]:
         """Extract required widgets from page layouts"""
         widgets = set()
-        for page, layout in page_layouts.items():
+        for layout in page_layouts.values():
             for section in layout.get("sections", []):
                 widgets.add(section.get("type", ""))
         return list(widgets)
@@ -787,8 +788,8 @@ class ElementorThemeBuilder:
             return hex_color
 
     async def export_theme(
-        self, theme: Dict[str, Any], format: str = "json"
-    ) -> Dict[str, Any]:
+        self, theme: dict[str, Any], format: str = "json"
+    ) -> dict[str, Any]:
         """
         Export theme in various formats
 
@@ -831,7 +832,7 @@ class ElementorThemeBuilder:
             logger.error(f"Theme export failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def _convert_to_elementor_format(self, theme: Dict) -> Dict:
+    def _convert_to_elementor_format(self, theme: dict) -> dict:
         """Convert theme to Elementor-compatible JSON format"""
         # This would convert our theme structure to Elementor's JSON format
         # Simplified version for now

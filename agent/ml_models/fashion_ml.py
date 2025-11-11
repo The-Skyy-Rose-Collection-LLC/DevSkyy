@@ -1,10 +1,12 @@
+import logging
+from typing import Any
+
+import numpy as np
+from sklearn.cluster import KMeans
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 
 from .base_ml_engine import BaseMLEngine
-from sklearn.cluster import KMeans
-from typing import Any, Dict, List, Tuple
-import logging
-import numpy as np
+
 
 """
 Fashion ML Engine
@@ -56,7 +58,7 @@ class FashionMLEngine(BaseMLEngine):
 
     async def train(
         self, X: np.ndarray, y: np.ndarray, task: str = "style"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Train fashion ML models
 
@@ -131,7 +133,7 @@ class FashionMLEngine(BaseMLEngine):
             logger.error(f"Fashion ML training failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def predict(self, X: np.ndarray, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
+    async def predict(self, X: np.ndarray, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence scores"""
         try:
             X_processed = await self.preprocess_data(X, fit=False)
@@ -152,8 +154,8 @@ class FashionMLEngine(BaseMLEngine):
             return np.array([]), np.array([])
 
     async def analyze_trend(
-        self, historical_data: Dict[str, List[float]], forecast_periods: int = 12
-    ) -> Dict[str, Any]:
+        self, historical_data: dict[str, list[float]], forecast_periods: int = 12
+    ) -> dict[str, Any]:
         """
         Analyze fashion trends and forecast future demand
 
@@ -223,8 +225,8 @@ class FashionMLEngine(BaseMLEngine):
             return {"success": False, "error": str(e)}
 
     async def optimize_pricing(
-        self, product_features: Dict[str, Any], market_data: Dict[str, float]
-    ) -> Dict[str, Any]:
+        self, product_features: dict[str, Any], market_data: dict[str, float]
+    ) -> dict[str, Any]:
         """
         Optimize product pricing using ML
 
@@ -275,8 +277,8 @@ class FashionMLEngine(BaseMLEngine):
             return {"success": False, "error": str(e)}
 
     async def segment_customers(
-        self, customer_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, customer_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Segment customers based on behavior and preferences
 
@@ -332,8 +334,8 @@ class FashionMLEngine(BaseMLEngine):
             return {"success": False, "error": str(e)}
 
     async def recommend_size(
-        self, measurements: Dict[str, float], brand_sizing: str = "standard"
-    ) -> Dict[str, Any]:
+        self, measurements: dict[str, float], brand_sizing: str = "standard"
+    ) -> dict[str, Any]:
         """
         Recommend optimal size based on measurements
 

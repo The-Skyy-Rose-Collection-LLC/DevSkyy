@@ -15,12 +15,13 @@ Truth Protocol: Standard MCP compliance, full observability, secure access
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from mcp.server import Server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 from services.mcp_client import MCPToolClient, get_mcp_client
+
 
 # Logfire for observability
 try:
@@ -59,7 +60,7 @@ class DevSkyyMCPServer:
         """Register MCP server handlers for initialization and tools"""
 
         @self.server.list_tools()
-        async def handle_list_tools() -> List[Tool]:
+        async def handle_list_tools() -> list[Tool]:
             """
             List all available DevSkyy tools
 
@@ -202,7 +203,7 @@ class DevSkyyMCPServer:
             return tools
 
         @self.server.call_tool()
-        async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+        async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             """
             Handle MCP tool invocation
 
@@ -252,7 +253,7 @@ class DevSkyyMCPServer:
                 return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
             except Exception as e:
-                error_msg = f"Tool execution failed: {str(e)}"
+                error_msg = f"Tool execution failed: {e!s}"
                 logger.error(f"❌ {error_msg}")
 
                 if LOGFIRE_AVAILABLE:

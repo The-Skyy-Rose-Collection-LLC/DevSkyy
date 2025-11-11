@@ -1,13 +1,14 @@
+import logging
 import re
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
-from webhooks.webhook_system import webhook_manager, WebhookEvent, WebhookSubscription
-from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, HttpUrl
 
-from typing import Dict, List, Optional
-import logging
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
+from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+from webhooks.webhook_system import WebhookEvent, WebhookSubscription, webhook_manager
+
 
 """
 Webhook API Endpoints
@@ -26,7 +27,7 @@ class CreateWebhookRequest(BaseModel):
     """Create webhook subscription request"""
 
     endpoint: HttpUrl
-    events: List[WebhookEvent]
+    events: list[WebhookEvent]
     secret: Optional[str] = None
     max_retries: int = 3
 
@@ -34,7 +35,7 @@ class UpdateWebhookRequest(BaseModel):
     """Update webhook subscription request"""
 
     endpoint: Optional[HttpUrl] = None
-    events: Optional[List[WebhookEvent]] = None
+    events: Optional[list[WebhookEvent]] = None
     active: Optional[bool] = None
     max_retries: Optional[int] = None
 
@@ -82,7 +83,7 @@ async def create_webhook_subscription(
             detail="Failed to create subscription",
         )
 
-@router.get("/subscriptions", response_model=List[WebhookSubscription])
+@router.get("/subscriptions", response_model=list[WebhookSubscription])
 async def list_webhook_subscriptions(
     active_only: bool = True, current_user: TokenData = Depends(get_current_active_user)
 ):
@@ -156,13 +157,12 @@ async def delete_webhook_subscription(
 
     logger.info(f"Webhook subscription deleted: {sanitize_for_log(subscription_id)}")
 
-    return None
 
 # ============================================================================
 # WEBHOOK DELIVERIES
 # ============================================================================
 
-@router.get("/deliveries", response_model=List[Dict])
+@router.get("/deliveries", response_model=list[dict])
 async def list_webhook_deliveries(
     subscription_id: Optional[str] = None,
     status_filter: Optional[str] = None,

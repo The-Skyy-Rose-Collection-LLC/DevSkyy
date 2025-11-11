@@ -4,13 +4,14 @@ Enterprise-grade error handling with proper logging and user feedback
 """
 
 import traceback
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from logger_config import get_logger
+
 
 logger = get_logger(__name__)
 
@@ -22,7 +23,7 @@ class DevSkyyException(Exception):
         self,
         message: str,
         status_code: int = 500,
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
     ):
         self.message = message
         self.status_code = status_code
@@ -33,7 +34,7 @@ class DevSkyyException(Exception):
 class DatabaseException(DevSkyyException):
     """Database-related exceptions."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
         super().__init__(message, status_code=500, details=details)
 
 
@@ -43,7 +44,7 @@ class AuthenticationException(DevSkyyException):
     def __init__(
         self,
         message: str = "Authentication failed",
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
     ):
         super().__init__(message, status_code=401, details=details)
 
@@ -52,7 +53,7 @@ class AuthorizationException(DevSkyyException):
     """Authorization-related exceptions."""
 
     def __init__(
-        self, message: str = "Access denied", details: Optional[Dict[str, Any]] = None
+        self, message: str = "Access denied", details: Optional[dict[str, Any]] = None
     ):
         super().__init__(message, status_code=403, details=details)
 
@@ -60,7 +61,7 @@ class AuthorizationException(DevSkyyException):
 class ValidationException(DevSkyyException):
     """Validation-related exceptions."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
         super().__init__(message, status_code=422, details=details)
 
 
@@ -84,7 +85,7 @@ class ExternalServiceException(DevSkyyException):
     """External service integration exceptions."""
 
     def __init__(
-        self, service: str, message: str, details: Optional[Dict[str, Any]] = None
+        self, service: str, message: str, details: Optional[dict[str, Any]] = None
     ):
         full_message = f"External service error ({service}): {message}"
         super().__init__(full_message, status_code=502, details=details)
@@ -218,7 +219,7 @@ def safe_execute(func, default_return=None, log_errors=True):
         return func()
     except Exception as e:
         if log_errors:
-            logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
+            logger.error(f"Error in {func.__name__}: {e!s}", exc_info=True)
         return default_return
 
 
@@ -238,7 +239,7 @@ async def safe_execute_async(func, default_return=None, log_errors=True):
         return await func()
     except Exception as e:
         if log_errors:
-            logger.error(f"Error in {func.__name__}: {str(e)}", exc_info=True)
+            logger.error(f"Error in {func.__name__}: {e!s}", exc_info=True)
         return default_return
 
 

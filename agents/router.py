@@ -11,13 +11,13 @@ Intelligent task routing system with:
 Truth Protocol Compliant: No placeholders, all implementations verified.
 """
 
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
-from enum import Enum
 from datetime import datetime
 from difflib import SequenceMatcher
+from enum import Enum
+from typing import Any, Optional
 
-from agents.loader import AgentConfigLoader, AgentConfig, LoaderError
+from agents.loader import AgentConfig, AgentConfigLoader, LoaderError
 from core.agentlightning_integration import trace_agent
 
 
@@ -97,10 +97,10 @@ class RoutingResult:
     task_type: TaskType
     confidence: float  # 0.0 to 1.0
     routing_method: str  # "exact", "fuzzy", "fallback"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization"""
         return {
             'agent_id': self.agent_id,
@@ -123,7 +123,7 @@ class TaskRequest:
     task_type: TaskType
     description: str
     priority: int = 50  # 0-100
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    parameters: dict[str, Any] = field(default_factory=dict)
     timeout_seconds: Optional[int] = None
 
     def __post_init__(self):
@@ -163,7 +163,7 @@ class AgentRouter:
             config_loader: AgentConfigLoader instance. If None, creates default loader
         """
         self.config_loader = config_loader or AgentConfigLoader()
-        self._routing_cache: Dict[str, RoutingResult] = {}
+        self._routing_cache: dict[str, RoutingResult] = {}
 
         # Task type to agent type mapping (explicit, no guessing)
         self._task_to_agent_mapping = {
@@ -282,7 +282,7 @@ class AgentRouter:
         )
 
     @trace_agent("route_multiple_tasks", agent_id="agent_router")
-    def route_multiple_tasks(self, tasks: List[TaskRequest]) -> List[RoutingResult]:
+    def route_multiple_tasks(self, tasks: list[TaskRequest]) -> list[RoutingResult]:
         """
         Route multiple tasks in batch (MCP efficiency pattern)
 
@@ -308,9 +308,9 @@ class AgentRouter:
 
         # Load all agent configs once (MCP efficiency)
         try:
-            all_agents = self.config_loader.get_enabled_agents()
+            self.config_loader.get_enabled_agents()
         except LoaderError as e:
-            raise RoutingError(f"Failed to load agent configs: {str(e)}")
+            raise RoutingError(f"Failed to load agent configs: {e!s}")
 
         # Batch route all tasks
         results = []
@@ -321,7 +321,7 @@ class AgentRouter:
                 result = self.route_task(task)
                 results.append(result)
             except NoAgentFoundError as e:
-                errors.append(f"Task {i} ({task.task_type.value}): {str(e)}")
+                errors.append(f"Task {i} ({task.task_type.value}): {e!s}")
                 # Add a fallback result
                 results.append(RoutingResult(
                     agent_id="unknown",
@@ -334,7 +334,7 @@ class AgentRouter:
 
         if errors:
             # Log errors but don't fail the entire batch
-            print(f"⚠️  Warning: {len(errors)} tasks could not be routed:\n" + "\n".join(errors))
+            pass
 
         return results
 
@@ -396,7 +396,7 @@ class AgentRouter:
         description_lower = task.description.lower()
 
         # Calculate similarity scores for each task type
-        best_match: Optional[Tuple[TaskType, float]] = None
+        best_match: Optional[tuple[TaskType, float]] = None
 
         for task_type, keywords in self._task_keywords.items():
             # Count keyword matches
@@ -406,10 +406,7 @@ class AgentRouter:
             keyword_confidence = keyword_matches / len(keywords) if keywords else 0.0
 
             # Calculate string similarity with first keyword
-            if keywords:
-                similarity = SequenceMatcher(None, description_lower, keywords[0]).ratio()
-            else:
-                similarity = 0.0
+            similarity = SequenceMatcher(None, description_lower, keywords[0]).ratio() if keywords else 0.0
 
             # Combined confidence
             confidence = (keyword_confidence * 0.7) + (similarity * 0.3)
@@ -464,7 +461,7 @@ class AgentRouter:
 
         return None
 
-    def _select_best_agent(self, agents: List[AgentConfig], task: TaskRequest) -> Optional[AgentConfig]:
+    def _select_best_agent(self, agents: list[AgentConfig], task: TaskRequest) -> Optional[AgentConfig]:
         """
         Select best agent from a list based on priority and capabilities
 
@@ -522,7 +519,7 @@ class AgentRouter:
 
         return min(score, 1.0)
 
-    def get_routing_stats(self) -> Dict[str, Any]:
+    def get_routing_stats(self) -> dict[str, Any]:
         """
         Get routing statistics
 

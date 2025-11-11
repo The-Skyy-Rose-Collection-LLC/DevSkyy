@@ -9,30 +9,33 @@ Version: 1.0.0
 Python: >=3.11.0
 """
 
-import pytest
-import os
 from datetime import datetime, timedelta
+import os
 from unittest.mock import patch
+
+import pytest
+
 
 # Set test JWT secret before importing jwt_auth
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-min-length-required"
 
+from fastapi import HTTPException
+
 from security.jwt_auth import (
-    UserRole,
+    ROLE_HIERARCHY,
+    TokenBlacklist,
     TokenType,
+    UserRole,
     create_access_token,
     create_refresh_token,
     create_token_pair,
-    verify_jwt_token,
-    revoke_token,
-    refresh_access_token,
     generate_secure_secret_key,
     has_permission,
+    refresh_access_token,
     require_role,
-    TokenBlacklist,
-    ROLE_HIERARCHY,
+    revoke_token,
+    verify_jwt_token,
 )
-from fastapi import HTTPException
 
 
 class TestUserRole:
@@ -316,13 +319,9 @@ class TestRBACEnforcement:
     async def test_require_role_success(self):
         """Test successful role check."""
         token = create_access_token("user123", UserRole.ADMIN)
-        payload = verify_jwt_token(token, TokenType.ACCESS)
+        verify_jwt_token(token, TokenType.ACCESS)
 
         # Mock current_user
-        mock_user = {
-            "sub": "user123",
-            "roles": [UserRole.ADMIN.value],
-        }
 
         # Admin trying to access DEVELOPER endpoint should succeed
         role_checker = require_role(UserRole.DEVELOPER)
@@ -334,7 +333,7 @@ class TestRBACEnforcement:
     async def test_require_role_insufficient_permissions(self):
         """Test that insufficient permissions raises error."""
         # Create API_USER token
-        token = create_access_token("user123", UserRole.API_USER)
+        create_access_token("user123", UserRole.API_USER)
 
         mock_user = {
             "sub": "user123",
@@ -342,11 +341,10 @@ class TestRBACEnforcement:
         }
 
         # API_USER trying to access ADMIN endpoint should fail
-        role_checker = require_role(UserRole.ADMIN)
+        require_role(UserRole.ADMIN)
 
         # Simulate the dependency execution
         with patch('security.jwt_auth.get_current_user', return_value=mock_user):
-            checker_func = role_checker
             # The actual check happens inside the returned function
             # This tests the has_permission logic
             assert has_permission(UserRole.API_USER, UserRole.ADMIN) is False
@@ -369,7 +367,7 @@ class TestEdgeCases:
 
         token = jwt_lib.encode(payload, os.environ["JWT_SECRET_KEY"], algorithm="HS256")
 
-        decoded = verify_jwt_token(token, TokenType.ACCESS)
+        verify_jwt_token(token, TokenType.ACCESS)
         # Should have role field even if not in original payload
         # This tests that the system is defensive
 

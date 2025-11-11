@@ -1,6 +1,7 @@
+from typing import Generic, Optional, TypeVar
+
 from pydantic import BaseModel, Field
 
-from typing import Generic, List, Optional, TypeVar
 
 """
 API Pagination Utilities for Grade A+ API Score
@@ -34,7 +35,7 @@ class PaginationParams(BaseModel):
 class PaginatedResponse(BaseModel, Generic[T]):
     """Paginated API response with metadata"""
 
-    items: List[T] = Field(description="List of items for current page")
+    items: list[T] = Field(description="List of items for current page")
     total: int = Field(description="Total number of items")
     page: int = Field(description="Current page number")
     page_size: int = Field(description="Number of items per page")
@@ -57,7 +58,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
 
 
 def create_paginated_response(
-    items: List[T], total: int, page: int, page_size: int
+    items: list[T], total: int, page: int, page_size: int
 ) -> PaginatedResponse[T]:
     """
     Create paginated response from items and metadata
@@ -94,7 +95,7 @@ class CursorPaginationParams(BaseModel):
 class CursorPaginatedResponse(BaseModel, Generic[T]):
     """Cursor-based paginated response"""
 
-    items: List[T] = Field(description="List of items for current page")
+    items: list[T] = Field(description="List of items for current page")
     next_cursor: Optional[str] = Field(default=None, description="Cursor for next page")
     has_more: bool = Field(description="Whether there are more items")
 

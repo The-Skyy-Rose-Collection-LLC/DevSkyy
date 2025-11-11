@@ -4,11 +4,13 @@ WordPress Credentials Management for DevSkyy Platform
 Secure credential handling with environment variables and validation
 """
 
-import os
-from typing import Optional, Dict, Any
 from dataclasses import dataclass
 import logging
+import os
+from typing import Any, Optional
+
 from dotenv import load_dotenv
+
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +33,7 @@ class WordPressCredentials:
     sftp_password: Optional[str] = None
     sftp_private_key_path: Optional[str] = None
     sftp_port: int = 22
-    
+
     def __post_init__(self):
         """Validate credentials after initialization."""
         if not self.site_url:
@@ -40,28 +42,28 @@ class WordPressCredentials:
             raise ValueError("WordPress username is required")
         if not self.password:
             raise ValueError("WordPress password is required")
-        
+
         # Ensure site URL has proper format
         if not self.site_url.startswith(('http://', 'https://')):
             self.site_url = f"https://{self.site_url}"
-        
+
         # Remove trailing slash
         self.site_url = self.site_url.rstrip('/')
-    
+
     def get_rest_api_url(self) -> str:
         """Get WordPress REST API base URL."""
         return f"{self.site_url}/wp-json/wp/v2"
-    
+
     def has_ftp_credentials(self) -> bool:
         """Check if FTP credentials are available."""
         return bool(self.ftp_host and self.ftp_username and self.ftp_password)
-    
+
     def has_sftp_credentials(self) -> bool:
         """Check if SFTP credentials are available."""
-        return bool(self.sftp_host and self.sftp_username and 
+        return bool(self.sftp_host and self.sftp_username and
                    (self.sftp_password or self.sftp_private_key_path))
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary (excluding sensitive data)."""
         return {
             "site_url": self.site_url,
@@ -80,11 +82,11 @@ class WordPressCredentialsManager:
     Manages WordPress credentials securely using environment variables.
     Supports multiple WordPress sites and credential types.
     """
-    
+
     def __init__(self):
         self._credentials_cache = {}
         self._load_default_credentials()
-    
+
     def _load_default_credentials(self):
         """Load default Skyy Rose Collection credentials from environment."""
         try:
@@ -93,25 +95,25 @@ class WordPressCredentialsManager:
             if skyy_rose_credentials:
                 self._credentials_cache["skyy_rose"] = skyy_rose_credentials
                 logger.info("✅ Skyy Rose Collection credentials loaded")
-            
+
             # Secondary/staging site if configured
             staging_credentials = self._load_credentials_from_env("SKYY_ROSE_STAGING")
             if staging_credentials:
                 self._credentials_cache["skyy_rose_staging"] = staging_credentials
                 logger.info("✅ Skyy Rose staging credentials loaded")
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to load default credentials: {e}")
-    
+
     def _load_credentials_from_env(self, prefix: str) -> Optional[WordPressCredentials]:
         """Load credentials from environment variables with given prefix."""
         site_url = os.getenv(f"{prefix}_SITE_URL")
         username = os.getenv(f"{prefix}_USERNAME")
         password = os.getenv(f"{prefix}_PASSWORD")
-        
+
         if not all([site_url, username, password]):
             return None
-        
+
         return WordPressCredentials(
             site_url=site_url,
             username=username,
@@ -127,26 +129,26 @@ class WordPressCredentialsManager:
             sftp_private_key_path=os.getenv(f"{prefix}_SFTP_PRIVATE_KEY"),
             sftp_port=int(os.getenv(f"{prefix}_SFTP_PORT", "22"))
         )
-    
+
     def get_credentials(self, site_key: str = "skyy_rose") -> Optional[WordPressCredentials]:
         """Get credentials for a specific site."""
         return self._credentials_cache.get(site_key)
-    
+
     def add_credentials(self, site_key: str, credentials: WordPressCredentials):
         """Add credentials for a site."""
         self._credentials_cache[site_key] = credentials
         logger.info(f"✅ Added credentials for site: {site_key}")
-    
+
     def list_available_sites(self) -> list:
         """List all available site keys."""
         return list(self._credentials_cache.keys())
-    
-    def validate_credentials(self, site_key: str) -> Dict[str, Any]:
+
+    def validate_credentials(self, site_key: str) -> dict[str, Any]:
         """Validate credentials for a site."""
         credentials = self.get_credentials(site_key)
         if not credentials:
             return {"valid": False, "error": "Credentials not found"}
-        
+
         validation_result = {
             "valid": True,
             "site_url": credentials.site_url,
@@ -156,9 +158,9 @@ class WordPressCredentialsManager:
             "has_sftp_credentials": credentials.has_sftp_credentials(),
             "rest_api_url": credentials.get_rest_api_url()
         }
-        
+
         return validation_result
-    
+
     def get_default_credentials(self) -> Optional[WordPressCredentials]:
         """Get default Skyy Rose Collection credentials."""
         return self.get_credentials("skyy_rose")
@@ -175,7 +177,7 @@ def get_credentials_for_site(site_key: str) -> Optional[WordPressCredentials]:
     """Get credentials for any configured site."""
     return wordpress_credentials_manager.get_credentials(site_key)
 
-def validate_site_credentials(site_key: str = "skyy_rose") -> Dict[str, Any]:
+def validate_site_credentials(site_key: str = "skyy_rose") -> dict[str, Any]:
     """Validate credentials for a site."""
     return wordpress_credentials_manager.validate_credentials(site_key)
 
@@ -184,14 +186,14 @@ def list_configured_sites() -> list:
     return wordpress_credentials_manager.list_available_sites()
 
 # Environment variable validation
-def validate_environment_setup() -> Dict[str, Any]:
+def validate_environment_setup() -> dict[str, Any]:
     """Validate that required environment variables are set."""
     required_vars = [
         "SKYY_ROSE_SITE_URL",
-        "SKYY_ROSE_USERNAME", 
+        "SKYY_ROSE_USERNAME",
         "SKYY_ROSE_PASSWORD"
     ]
-    
+
     optional_vars = [
         "SKYY_ROSE_APP_PASSWORD",
         "SKYY_ROSE_FTP_HOST",
@@ -202,14 +204,14 @@ def validate_environment_setup() -> Dict[str, Any]:
         "SKYY_ROSE_SFTP_PASSWORD",
         "SKYY_ROSE_SFTP_PRIVATE_KEY"
     ]
-    
+
     result = {
         "valid": True,
         "missing_required": [],
         "missing_optional": [],
         "configured_vars": []
     }
-    
+
     # Check required variables
     for var in required_vars:
         if not os.getenv(var):
@@ -217,14 +219,14 @@ def validate_environment_setup() -> Dict[str, Any]:
             result["valid"] = False
         else:
             result["configured_vars"].append(var)
-    
+
     # Check optional variables
     for var in optional_vars:
         if not os.getenv(var):
             result["missing_optional"].append(var)
         else:
             result["configured_vars"].append(var)
-    
+
     return result
 
 # Configuration templates for easy setup
@@ -292,30 +294,22 @@ def save_env_template(file_path: str = ".env.template"):
 
 if __name__ == "__main__":
     # Test credential loading
-    print("🔐 WordPress Credentials Manager Test")
-    print("=" * 50)
-    
+
     # Validate environment setup
     env_validation = validate_environment_setup()
-    print(f"Environment validation: {'✅ VALID' if env_validation['valid'] else '❌ INVALID'}")
-    
+
     if env_validation['missing_required']:
-        print(f"Missing required variables: {env_validation['missing_required']}")
-    
+        pass
+
     if env_validation['configured_vars']:
-        print(f"Configured variables: {len(env_validation['configured_vars'])}")
-    
+        pass
+
     # Test credential loading
     credentials = get_skyy_rose_credentials()
     if credentials:
-        print(f"✅ Skyy Rose credentials loaded: {credentials.site_url}")
-        print(f"   Username: {credentials.username}")
-        print(f"   Has app password: {bool(credentials.application_password)}")
-        print(f"   Has FTP: {credentials.has_ftp_credentials()}")
-        print(f"   Has SFTP: {credentials.has_sftp_credentials()}")
+        pass
     else:
-        print("❌ No Skyy Rose credentials found")
-    
+        pass
+
     # List all sites
     sites = list_configured_sites()
-    print(f"Configured sites: {sites}")

@@ -3,21 +3,22 @@ Enterprise JWT Authentication System
 Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 """
 
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 import logging
 import os
-from collections import defaultdict
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-import jwt
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
     OAuth2PasswordBearer,
 )
+import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
+
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class User(BaseModel):
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.now)
     last_login: Optional[datetime] = None
-    permissions: List[str] = Field(default_factory=list)
+    permissions: list[str] = Field(default_factory=list)
 
 
 class TokenData(BaseModel):
@@ -176,8 +177,7 @@ def clear_failed_login_attempts(email: str):
     """Clear failed login attempts for successful login"""
     if email in failed_login_attempts:
         del failed_login_attempts[email]
-    if email in locked_accounts:
-        del locked_accounts[email]
+    locked_accounts.pop(email, None)
 
 
 def blacklist_token(token: str):
@@ -215,7 +215,7 @@ def validate_token_security(token: str, token_data: TokenData) -> bool:
 
 
 def create_access_token(
-    data: Dict[str, Any], expires_delta: Optional[timedelta] = None
+    data: dict[str, Any], expires_delta: Optional[timedelta] = None
 ) -> str:
     """
     Create a new access token
@@ -230,16 +230,16 @@ def create_access_token(
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
+        expire = datetime.now(UTC) + timedelta(
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.now(timezone.utc),
+            "iat": datetime.now(UTC),
             "token_type": "access",
         }
     )
@@ -248,7 +248,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def create_refresh_token(data: Dict[str, Any]) -> str:
+def create_refresh_token(data: dict[str, Any]) -> str:
     """
     Create a new refresh token
 
@@ -259,12 +259,12 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
         Encoded JWT refresh token
     """
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(UTC) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.now(timezone.utc),
+            "iat": datetime.now(UTC),
             "token_type": "refresh",
         }
     )
@@ -273,7 +273,7 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
     return encoded_jwt
 
 
-def get_token_payload(token: str) -> Optional[Dict[str, Any]]:
+def get_token_payload(token: str) -> Optional[dict[str, Any]]:
     """
     Get token payload without validation (for testing purposes)
 
@@ -400,7 +400,7 @@ async def get_current_active_user(
 class RoleChecker:
     """Role-based access control checker"""
 
-    def __init__(self, allowed_roles: List[str]):
+    def __init__(self, allowed_roles: list[str]):
         self.allowed_roles = allowed_roles
 
     def __call__(self, user: TokenData = Depends(get_current_active_user)) -> TokenData:
@@ -443,7 +443,7 @@ class APIKeyAuth:
     @staticmethod
     def validate_api_key(
         credentials: HTTPAuthorizationCredentials = Security(security_bearer),
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Validate API key from Authorization header
 
@@ -521,9 +521,9 @@ class UserManager:
     """Simple user management (replace with database in production)"""
 
     def __init__(self):
-        self.users: Dict[str, User] = {}
-        self.email_index: Dict[str, str] = {}  # email -> user_id
-        self.username_index: Dict[str, str] = {}  # username -> user_id
+        self.users: dict[str, User] = {}
+        self.email_index: dict[str, str] = {}  # email -> user_id
+        self.username_index: dict[str, str] = {}  # username -> user_id
 
         # Create default admin user
         self._create_default_users()

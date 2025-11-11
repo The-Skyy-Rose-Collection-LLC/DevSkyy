@@ -18,21 +18,22 @@ Features:
 """
 
 import base64
+from datetime import datetime
 import io
 import logging
 import os
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import anthropic
 import cv2
-import numpy as np
-import torch
 from diffusers import StableDiffusionXLPipeline
+import numpy as np
 from openai import AsyncOpenAI
 from PIL import Image
+import torch
 from transformers import CLIPModel, CLIPProcessor, ViTImageProcessor, ViTModel
+
 
 logger = logging.getLogger(__name__)
 
@@ -161,7 +162,7 @@ class FashionComputerVisionAgent:
 
     async def analyze_fashion_image(
         self, image_path: Union[str, Path, Image.Image]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Comprehensive fashion image analysis including:
         - Fabric identification
@@ -176,10 +177,7 @@ class FashionComputerVisionAgent:
             logger.info("🔍 Analyzing fashion image...")
 
             # Load image
-            if isinstance(image_path, (str, Path)):
-                image = Image.open(image_path).convert("RGB")
-            else:
-                image = image_path
+            image = Image.open(image_path).convert("RGB") if isinstance(image_path, (str, Path)) else image_path
 
             # Multi-level analysis
             results = {}
@@ -218,7 +216,7 @@ class FashionComputerVisionAgent:
             logger.error(f"❌ Fashion image analysis failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _analyze_fabric(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_fabric(self, image: Image.Image) -> dict[str, Any]:
         """
         Detailed fabric and texture analysis using computer vision.
         """
@@ -261,7 +259,7 @@ class FashionComputerVisionAgent:
             logger.error(f"❌ Fabric analysis failed: {e}")
             return {"error": str(e)}
 
-    def _extract_texture_features(self, gray_image: np.ndarray) -> Dict[str, Any]:
+    def _extract_texture_features(self, gray_image: np.ndarray) -> dict[str, Any]:
         """
         Extract texture features using Gabor filters and statistical analysis.
         """
@@ -303,7 +301,7 @@ class FashionComputerVisionAgent:
 
         return float(sheen_level)
 
-    def _detect_weave_pattern(self, gray_image: np.ndarray) -> Dict[str, Any]:
+    def _detect_weave_pattern(self, gray_image: np.ndarray) -> dict[str, Any]:
         """
         Detect visible weave patterns in fabric.
         """
@@ -322,8 +320,8 @@ class FashionComputerVisionAgent:
         }
 
     def _predict_fabric_type(
-        self, texture_features: Dict, sheen_level: float, weave_pattern: Dict
-    ) -> List[Tuple[str, float]]:
+        self, texture_features: dict, sheen_level: float, weave_pattern: dict
+    ) -> list[tuple[str, float]]:
         """
         Predict fabric type based on visual features.
         """
@@ -341,19 +339,18 @@ class FashionComputerVisionAgent:
         elif sheen_level > 0.15:
             predictions.append(("leather", 0.70))
             predictions.append(("velvet", 0.60))
+        elif weave_pattern["visible"]:
+            predictions.append(("linen", 0.80))
+            predictions.append(("cotton", 0.70))
+        elif complexity > 150:
+            predictions.append(("wool", 0.75))
+            predictions.append(("cashmere", 0.65))
         else:
-            if weave_pattern["visible"]:
-                predictions.append(("linen", 0.80))
-                predictions.append(("cotton", 0.70))
-            elif complexity > 150:
-                predictions.append(("wool", 0.75))
-                predictions.append(("cashmere", 0.65))
-            else:
-                predictions.append(("cotton", 0.70))
+            predictions.append(("cotton", 0.70))
 
         return predictions
 
-    def _get_fabric_characteristics(self, fabric_type: str) -> Dict[str, Any]:
+    def _get_fabric_characteristics(self, fabric_type: str) -> dict[str, Any]:
         """
         Get characteristics of identified fabric.
         """
@@ -361,7 +358,7 @@ class FashionComputerVisionAgent:
             fabric_type, {"characteristics": [], "visual_cues": []}
         )
 
-    async def _analyze_stitching(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_stitching(self, image: Image.Image) -> dict[str, Any]:
         """
         Analyze stitching patterns and quality.
         """
@@ -426,7 +423,7 @@ class FashionComputerVisionAgent:
 
     def _detect_stitch_types(
         self, edges: np.ndarray, lines: Optional[np.ndarray]
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Detect types of stitches present.
         """
@@ -454,7 +451,7 @@ class FashionComputerVisionAgent:
 
         return stitch_types if stitch_types else ["standard"]
 
-    async def _analyze_garment_cut(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_garment_cut(self, image: Image.Image) -> dict[str, Any]:
         """
         Analyze garment cut and silhouette.
         """
@@ -522,7 +519,7 @@ class FashionComputerVisionAgent:
         cv2.approxPolyDP(contour, epsilon, True)
 
         # Get bounding rectangle
-        x, y, w, h = cv2.boundingRect(contour)
+        _x, _y, w, h = cv2.boundingRect(contour)
 
         # Aspect ratio
         aspect_ratio = h / w if w > 0 else 0
@@ -551,7 +548,7 @@ class FashionComputerVisionAgent:
 
         return "unknown"
 
-    async def _assess_quality(self, image: Image.Image) -> Dict[str, Any]:
+    async def _assess_quality(self, image: Image.Image) -> dict[str, Any]:
         """
         Assess garment quality from image.
         """
@@ -591,7 +588,7 @@ class FashionComputerVisionAgent:
             logger.error(f"❌ Quality assessment failed: {e}")
             return {"error": str(e)}
 
-    async def _classify_style(self, image: Image.Image) -> Dict[str, Any]:
+    async def _classify_style(self, image: Image.Image) -> dict[str, Any]:
         """
         Classify fashion style using CLIP model.
         """
@@ -630,7 +627,7 @@ class FashionComputerVisionAgent:
 
             predictions = [
                 {"style": style_categories[idx.item()], "confidence": prob.item()}
-                for prob, idx in zip(top_probs, top_indices)
+                for prob, idx in zip(top_probs, top_indices, strict=False)
             ]
 
             return {
@@ -643,7 +640,7 @@ class FashionComputerVisionAgent:
             logger.error(f"❌ Style classification failed: {e}")
             return {"error": str(e)}
 
-    async def _extract_color_palette(self, image: Image.Image) -> Dict[str, Any]:
+    async def _extract_color_palette(self, image: Image.Image) -> dict[str, Any]:
         """
         Extract dominant color palette from garment.
         """
@@ -688,7 +685,7 @@ class FashionComputerVisionAgent:
             logger.error(f"❌ Color extraction failed: {e}")
             return {"error": str(e)}
 
-    async def _ai_vision_analysis(self, image: Image.Image) -> Dict[str, Any]:
+    async def _ai_vision_analysis(self, image: Image.Image) -> dict[str, Any]:
         """
         Use Claude's vision capabilities for detailed analysis.
         """
@@ -744,7 +741,7 @@ Provide detailed, expert fashion analysis.""",
             logger.error(f"❌ AI vision analysis failed: {e}")
             return {"error": str(e)}
 
-    def _generate_overall_assessment(self, results: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_overall_assessment(self, results: dict[str, Any]) -> dict[str, Any]:
         """
         Generate comprehensive overall assessment.
         """
@@ -764,7 +761,7 @@ Provide detailed, expert fashion analysis.""",
 
         return assessment
 
-    def _determine_luxury_tier(self, fabric: Dict, quality: Dict) -> str:
+    def _determine_luxury_tier(self, fabric: dict, quality: dict) -> str:
         """
         Determine luxury tier of garment.
         """
@@ -782,7 +779,7 @@ Provide detailed, expert fashion analysis.""",
         else:
             return "standard"
 
-    def _estimate_value_range(self, fabric: Dict, quality: Dict, style: Dict) -> str:
+    def _estimate_value_range(self, fabric: dict, quality: dict, style: dict) -> str:
         """
         Estimate value range based on analysis.
         """
@@ -804,7 +801,7 @@ Provide detailed, expert fashion analysis.""",
         negative_prompt: Optional[str] = None,
         width: int = 1024,
         height: int = 1024,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate high-quality fashion imagery using Stable Diffusion XL.
         """
@@ -867,11 +864,11 @@ fashion_vision_agent = create_fashion_vision_agent()
 
 
 # Convenience functions
-async def analyze_garment(image_path: Union[str, Path]) -> Dict[str, Any]:
+async def analyze_garment(image_path: Union[str, Path]) -> dict[str, Any]:
     """Analyze fashion garment from image."""
     return await fashion_vision_agent.analyze_fashion_image(image_path)
 
 
-async def generate_fashion_photo(prompt: str, style: str = "luxury") -> Dict[str, Any]:
+async def generate_fashion_photo(prompt: str, style: str = "luxury") -> dict[str, Any]:
     """Generate fashion photography."""
     return await fashion_vision_agent.generate_fashion_image(prompt, style)

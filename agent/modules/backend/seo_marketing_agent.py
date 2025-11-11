@@ -1,8 +1,8 @@
 from datetime import datetime
-
-from typing import Any, Dict, List
 import logging
+from typing import Any
 import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class SEOMarketingAgent:
         self.fashion_ai = self._initialize_fashion_ai()
         logger.info("🎯 SEO Marketing Agent initialized with Fashion AI Intelligence")
 
-    async def analyze_seo_performance(self) -> Dict[str, Any]:
+    async def analyze_seo_performance(self) -> dict[str, Any]:
         """Comprehensive SEO analysis for luxury fashion e-commerce."""
         try:
             logger.info("🔍 Analyzing SEO performance for luxury fashion market...")
@@ -97,10 +97,10 @@ class SEOMarketingAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ SEO analysis failed: {str(e)}")
+            logger.error(f"❌ SEO analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_seo_recommendations(self, analysis: Dict) -> List[Dict[str, Any]]:
+    def _generate_seo_recommendations(self, analysis: dict) -> list[dict[str, Any]]:
         """Generate prioritized SEO recommendations with pros/cons."""
         recommendations = [
             {
@@ -126,7 +126,7 @@ class SEOMarketingAgent:
         ]
         return recommendations
 
-    def _assess_seo_risks(self, analysis: Dict) -> Dict[str, Any]:
+    def _assess_seo_risks(self, analysis: dict) -> dict[str, Any]:
         """Assess SEO risks and their potential impact."""
         return {
             "algorithm_changes": {
@@ -137,7 +137,7 @@ class SEOMarketingAgent:
             }
         }
 
-    def _identify_automation_opportunities(self) -> List[Dict[str, Any]]:
+    def _identify_automation_opportunities(self) -> list[dict[str, Any]]:
         """Identify opportunities for marketing automation."""
         return [
             {
@@ -148,7 +148,7 @@ class SEOMarketingAgent:
             }
         ]
 
-    def _initialize_trend_predictor(self) -> Dict[str, Any]:
+    def _initialize_trend_predictor(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize fashion trend prediction system."""
         return {
             "ai_model": "fashion_trend_transformer_v3",
@@ -161,14 +161,14 @@ class SEOMarketingAgent:
             "prediction_accuracy": "89.4%",
         }
 
-    def _initialize_fashion_ai(self) -> Dict[str, Any]:
+    def _initialize_fashion_ai(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize fashion-specific AI capabilities."""
         return {
             "style_analysis": "computer_vision_fashion_model",
             "trend_correlation": "multi_modal_ai",
         }
 
-def optimize_seo_marketing() -> Dict[str, Any]:
+def optimize_seo_marketing() -> dict[str, Any]:
     """Main function to optimize SEO and marketing efforts."""
     SEOMarketingAgent()
     return {

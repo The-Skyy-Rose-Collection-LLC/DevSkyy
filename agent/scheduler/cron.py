@@ -1,13 +1,16 @@
+from collections.abc import Callable
 from datetime import datetime
+import logging
 import threading
 import time
+from typing import Any
+
+import schedule
 
 from ..git_commit import commit_fixes
 from ..modules.fixer import fix_code
 from ..modules.scanner import scan_site
-from typing import Any, Callable, Dict
-import logging
-import schedule
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +59,7 @@ class CronScheduler:
             return job_id
 
         except Exception as e:
-            logger.error(f"❌ Failed to schedule job: {str(e)}")
+            logger.error(f"❌ Failed to schedule job: {e!s}")
             raise
 
     def start_scheduler(self):
@@ -80,7 +83,7 @@ class CronScheduler:
                 schedule.run_pending()
                 time.sleep(30)  # TODO: Move to config  # Check every 30 seconds
             except Exception as e:
-                logger.error(f"❌ Scheduler error: {str(e)}")
+                logger.error(f"❌ Scheduler error: {e!s}")
                 time.sleep(60)  # TODO: Move to config  # Wait longer on error
 
     def stop_scheduler(self):
@@ -93,7 +96,7 @@ class CronScheduler:
 
         logger.info("⏹️ Cron scheduler stopped")
 
-    def get_job_status(self, job_id: str) -> Dict[str, Any]:
+    def get_job_status(self, job_id: str) -> dict[str, Any]:
         """Get status of a specific job."""
         if job_id not in self.jobs:
             return {"error": "Job not found"}
@@ -111,7 +114,7 @@ class CronScheduler:
             ),
         }
 
-    def list_all_jobs(self) -> Dict[str, Any]:
+    def list_all_jobs(self) -> dict[str, Any]:
         """List all scheduled jobs."""
         return {
             "total_jobs": len(self.jobs),
@@ -122,7 +125,7 @@ class CronScheduler:
 # Global scheduler instance
 _global_scheduler = CronScheduler()
 
-def schedule_hourly_job() -> Dict[str, Any]:
+def schedule_hourly_job() -> dict[str, Any]:
     """
     Schedule the main DevSkyy agent workflow to run hourly.
     Production-level implementation with comprehensive monitoring.
@@ -168,7 +171,7 @@ def schedule_hourly_job() -> Dict[str, Any]:
                 logger.info("✅ Automated workflow completed successfully")
 
             except Exception as e:
-                logger.error(f"❌ Automated workflow failed: {str(e)}")
+                logger.error(f"❌ Automated workflow failed: {e!s}")
 
                 # Update error count
                 job_id = getattr(automated_workflow, "job_id", None)
@@ -195,10 +198,10 @@ def schedule_hourly_job() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"❌ Failed to schedule hourly job: {str(e)}")
+        logger.error(f"❌ Failed to schedule hourly job: {e!s}")
         return {"status": "failed", "error": str(e)}
 
-def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> Dict[str, Any]:
+def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> dict[str, Any]:
     """Schedule a custom job with specified interval."""
     try:
         job_id = _global_scheduler.schedule_job(job_func, interval, **kwargs)
@@ -211,11 +214,11 @@ def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> Dict[str
     except Exception as e:
         return {"status": "failed", "error": str(e)}
 
-def get_scheduler_status() -> Dict[str, Any]:
+def get_scheduler_status() -> dict[str, Any]:
     """Get comprehensive scheduler status."""
     return _global_scheduler.list_all_jobs()
 
-def stop_scheduler() -> Dict[str, Any]:
+def stop_scheduler() -> dict[str, Any]:
     """Stop the scheduler."""
     _global_scheduler.stop_scheduler()
     return {"status": "stopped"}

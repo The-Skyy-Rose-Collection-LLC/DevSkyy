@@ -1,11 +1,11 @@
+import importlib
 from pathlib import Path
 import sys
+import types
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from unittest.mock import patch
-import importlib
-import types
 
 def test_run_endpoint_calls_functions_in_sequence():
     """Test that the run endpoint calls functions in the correct sequence.

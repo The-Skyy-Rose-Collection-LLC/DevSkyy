@@ -4,22 +4,25 @@ Enterprise Metrics and Alerting System for DevSkyy Platform
 Comprehensive metrics collection, alerting, and dashboard integration
 """
 
-import time
-from datetime import datetime
-from typing import Dict, List, Any, Optional, Callable
+from collections import defaultdict, deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
 import threading
-from collections import defaultdict, deque
+import time
+from typing import Any, Optional
+
 
 # Prometheus imports (optional)
 try:
-    from prometheus_client import Counter, Histogram, Gauge, Summary, CollectorRegistry, generate_latest
+    from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, Summary, generate_latest
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from monitoring.enterprise_logging import LogCategory, enterprise_logger
+
 
 class MetricType(Enum):
     """Types of metrics."""
@@ -41,7 +44,7 @@ class MetricDefinition:
     name: str
     metric_type: MetricType
     description: str
-    labels: List[str] = field(default_factory=list)
+    labels: list[str] = field(default_factory=list)
     unit: str = ""
     help_text: str = ""
 
@@ -67,7 +70,7 @@ class Alert:
     severity: AlertSeverity
     triggered_at: datetime
     description: str
-    labels: Dict[str, str] = field(default_factory=dict)
+    labels: dict[str, str] = field(default_factory=dict)
     resolved_at: Optional[datetime] = None
 
 class MetricsCollector:
@@ -75,32 +78,32 @@ class MetricsCollector:
     Enterprise metrics collector with Prometheus integration,
     custom alerting, and dashboard support.
     """
-    
+
     def __init__(self):
         self.metrics = {}
         self.alert_rules = {}
         self.active_alerts = {}
         self.metric_history = defaultdict(lambda: deque(maxlen=1000))
         self.alert_callbacks = []
-        
+
         # Prometheus registry if available
         if PROMETHEUS_AVAILABLE:
             self.registry = CollectorRegistry()
             self.prometheus_metrics = {}
-        
+
         # Background monitoring
         self._monitoring_active = False
         self._monitoring_thread = None
-        
+
         self._initialize_core_metrics()
         self._initialize_alert_rules()
-        
+
         enterprise_logger.info(
             "Metrics collector initialized",
             category=LogCategory.SYSTEM,
             metadata={"prometheus_available": PROMETHEUS_AVAILABLE}
         )
-    
+
     def _initialize_core_metrics(self):
         """Initialize core application metrics."""
         core_metrics = [
@@ -175,10 +178,10 @@ class MetricsCollector:
                 help_text="Total security events detected"
             )
         ]
-        
+
         for metric_def in core_metrics:
             self.register_metric(metric_def)
-    
+
     def _initialize_alert_rules(self):
         """Initialize default alert rules."""
         default_rules = [
@@ -238,24 +241,24 @@ class MetricsCollector:
                 description="High number of security events detected"
             )
         ]
-        
+
         for rule in default_rules:
             self.add_alert_rule(rule)
-    
+
     def register_metric(self, metric_def: MetricDefinition):
         """Register a new metric."""
         self.metrics[metric_def.name] = metric_def
-        
+
         # Create Prometheus metric if available
         if PROMETHEUS_AVAILABLE:
             self._create_prometheus_metric(metric_def)
-        
+
         enterprise_logger.debug(
             f"Registered metric: {metric_def.name}",
             category=LogCategory.SYSTEM,
             metadata={"metric_type": metric_def.metric_type.value}
         )
-    
+
     def _create_prometheus_metric(self, metric_def: MetricDefinition):
         """Create Prometheus metric."""
         if metric_def.metric_type == MetricType.COUNTER:
@@ -286,73 +289,73 @@ class MetricsCollector:
                 metric_def.labels,
                 registry=self.registry
             )
-    
-    def increment_counter(self, metric_name: str, value: float = 1, labels: Optional[Dict[str, str]] = None):
+
+    def increment_counter(self, metric_name: str, value: float = 1, labels: Optional[dict[str, str]] = None):
         """Increment a counter metric."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)
             return
-        
+
         # Store in history
         self.metric_history[metric_name].append({
             "timestamp": datetime.utcnow(),
             "value": value,
             "labels": labels or {}
         })
-        
+
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
             if labels:
                 self.prometheus_metrics[metric_name].labels(**labels).inc(value)
             else:
                 self.prometheus_metrics[metric_name].inc(value)
-    
-    def set_gauge(self, metric_name: str, value: float, labels: Optional[Dict[str, str]] = None):
+
+    def set_gauge(self, metric_name: str, value: float, labels: Optional[dict[str, str]] = None):
         """Set a gauge metric value."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)
             return
-        
+
         # Store in history
         self.metric_history[metric_name].append({
             "timestamp": datetime.utcnow(),
             "value": value,
             "labels": labels or {}
         })
-        
+
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
             if labels:
                 self.prometheus_metrics[metric_name].labels(**labels).set(value)
             else:
                 self.prometheus_metrics[metric_name].set(value)
-        
+
         # Check alert rules
         self._check_alert_rules(metric_name, value, labels or {})
-    
-    def observe_histogram(self, metric_name: str, value: float, labels: Optional[Dict[str, str]] = None):
+
+    def observe_histogram(self, metric_name: str, value: float, labels: Optional[dict[str, str]] = None):
         """Observe a histogram metric."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)
             return
-        
+
         # Store in history
         self.metric_history[metric_name].append({
             "timestamp": datetime.utcnow(),
             "value": value,
             "labels": labels or {}
         })
-        
+
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
             if labels:
                 self.prometheus_metrics[metric_name].labels(**labels).observe(value)
             else:
                 self.prometheus_metrics[metric_name].observe(value)
-        
+
         # Check alert rules
         self._check_alert_rules(metric_name, value, labels or {})
-    
+
     def add_alert_rule(self, rule: AlertRule):
         """Add an alert rule."""
         self.alert_rules[rule.name] = rule
@@ -365,13 +368,13 @@ class MetricsCollector:
                 "severity": rule.severity.value
             }
         )
-    
-    def _check_alert_rules(self, metric_name: str, value: float, labels: Dict[str, str]):
+
+    def _check_alert_rules(self, metric_name: str, value: float, labels: dict[str, str]):
         """Check if any alert rules are triggered."""
         for rule_name, rule in self.alert_rules.items():
             if rule.metric_name != metric_name:
                 continue
-            
+
             # Simple condition checking (could be more sophisticated)
             triggered = False
             if rule.condition.startswith(">"):
@@ -382,16 +385,16 @@ class MetricsCollector:
                 triggered = value >= rule.threshold
             elif rule.condition.startswith("<="):
                 triggered = value <= rule.threshold
-            
+
             if triggered:
                 self._trigger_alert(rule, value, labels)
             else:
                 self._resolve_alert(rule_name)
-    
-    def _trigger_alert(self, rule: AlertRule, current_value: float, labels: Dict[str, str]):
+
+    def _trigger_alert(self, rule: AlertRule, current_value: float, labels: dict[str, str]):
         """Trigger an alert."""
         alert_key = f"{rule.name}_{hash(frozenset(labels.items()))}"
-        
+
         if alert_key not in self.active_alerts:
             alert = Alert(
                 rule_name=rule.name,
@@ -403,9 +406,9 @@ class MetricsCollector:
                 description=rule.description,
                 labels=labels
             )
-            
+
             self.active_alerts[alert_key] = alert
-            
+
             # Log alert
             enterprise_logger.error(
                 f"Alert triggered: {rule.name}",
@@ -418,7 +421,7 @@ class MetricsCollector:
                     "labels": labels
                 }
             )
-            
+
             # Notify callbacks
             for callback in self.alert_callbacks:
                 try:
@@ -429,18 +432,18 @@ class MetricsCollector:
                         category=LogCategory.SYSTEM,
                         error=e
                     )
-    
+
     def _resolve_alert(self, rule_name: str):
         """Resolve an alert."""
         alerts_to_resolve = [
-            key for key in self.active_alerts.keys()
+            key for key in self.active_alerts
             if self.active_alerts[key].rule_name == rule_name
         ]
-        
+
         for alert_key in alerts_to_resolve:
             alert = self.active_alerts[alert_key]
             alert.resolved_at = datetime.utcnow()
-            
+
             enterprise_logger.info(
                 f"Alert resolved: {rule_name}",
                 category=LogCategory.SYSTEM,
@@ -448,14 +451,14 @@ class MetricsCollector:
                     "duration": (alert.resolved_at - alert.triggered_at).total_seconds()
                 }
             )
-            
+
             del self.active_alerts[alert_key]
-    
+
     def add_alert_callback(self, callback: Callable[[Alert], None]):
         """Add alert notification callback."""
         self.alert_callbacks.append(callback)
-    
-    def get_metrics_summary(self) -> Dict[str, Any]:
+
+    def get_metrics_summary(self) -> dict[str, Any]:
         """Get metrics summary."""
         return {
             "registered_metrics": len(self.metrics),
@@ -465,32 +468,32 @@ class MetricsCollector:
             "metrics": list(self.metrics.keys()),
             "active_alert_names": [alert.rule_name for alert in self.active_alerts.values()]
         }
-    
+
     def get_prometheus_metrics(self) -> str:
         """Get Prometheus metrics in text format."""
         if PROMETHEUS_AVAILABLE:
             return generate_latest(self.registry).decode('utf-8')
         return "# Prometheus not available\n"
-    
+
     def start_monitoring(self):
         """Start background monitoring."""
         if self._monitoring_active:
             return
-        
+
         self._monitoring_active = True
         self._monitoring_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
         self._monitoring_thread.start()
-        
+
         enterprise_logger.info("Background monitoring started", category=LogCategory.SYSTEM)
-    
+
     def stop_monitoring(self):
         """Stop background monitoring."""
         self._monitoring_active = False
         if self._monitoring_thread:
             self._monitoring_thread.join(timeout=5)
-        
+
         enterprise_logger.info("Background monitoring stopped", category=LogCategory.SYSTEM)
-    
+
     def _monitoring_loop(self):
         """Background monitoring loop."""
         while self._monitoring_active:
@@ -505,20 +508,20 @@ class MetricsCollector:
                     error=e
                 )
                 time.sleep(60)  # Wait longer on error
-    
+
     def _collect_system_metrics(self):
         """Collect system metrics."""
         try:
             import psutil
-            
+
             # Memory usage
             memory = psutil.virtual_memory()
             self.set_gauge("memory_usage_bytes", memory.used)
-            
+
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
             self.set_gauge("cpu_usage_percent", cpu_percent)
-            
+
         except ImportError:
             # psutil not available
             pass

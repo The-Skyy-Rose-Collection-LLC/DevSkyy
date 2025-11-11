@@ -1,14 +1,15 @@
-from datetime import datetime
-import time
-
+import asyncio
 from collections import defaultdict, deque
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from httpx import AsyncClient
-from typing import Any, Dict, List, Optional
-import asyncio
 import hashlib
 import logging
+import time
+from typing import Any, Optional
+
+from httpx import AsyncClient
+
 
 """
 Enterprise Notification Manager - Multi-Channel Communication System
@@ -56,11 +57,11 @@ class NotificationTemplate:
     message_template: str
     color: Optional[str] = None
     emoji: Optional[str] = None
-    fields: List[Dict[str, str]] = None
-    attachments: List[Dict[str, Any]] = None
+    fields: list[dict[str, str]] = None
+    attachments: list[dict[str, Any]] = None
     fashion_context: bool = False
 
-    def render(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def render(self, context: dict[str, Any]) -> dict[str, Any]:
         """Render template with context data"""
         try:
             title = self.title_template.format(**context)
@@ -106,18 +107,18 @@ class NotificationMessage:
     message: str
     priority: NotificationPriority
     template_name: Optional[str] = None
-    context: Dict[str, Any] = None
+    context: dict[str, Any] = None
     color: Optional[str] = None
     emoji: Optional[str] = None
-    fields: List[Dict[str, str]] = None
-    attachments: List[Dict[str, Any]] = None
+    fields: list[dict[str, str]] = None
+    attachments: list[dict[str, Any]] = None
     retry_count: int = 0
     max_retries: int = 3
     created_at: datetime = None
     sent_at: Optional[datetime] = None
     status: NotificationStatus = NotificationStatus.PENDING
     error_message: Optional[str] = None
-    fashion_context: Dict[str, Any] = None
+    fashion_context: dict[str, Any] = None
 
     def __post_init__(self):
         if self.created_at is None:
@@ -186,13 +187,13 @@ class NotificationManager:
         self.retry_delay = retry_delay
 
         # Message queues and tracking
-        self.pending_messages: Dict[str, NotificationMessage] = {}
-        self.sent_messages: Dict[str, NotificationMessage] = {}
-        self.failed_messages: Dict[str, NotificationMessage] = {}
+        self.pending_messages: dict[str, NotificationMessage] = {}
+        self.sent_messages: dict[str, NotificationMessage] = {}
+        self.failed_messages: dict[str, NotificationMessage] = {}
         self.delivery_history = deque(maxlen=1000)
 
         # Templates
-        self.templates: Dict[str, NotificationTemplate] = {}
+        self.templates: dict[str, NotificationTemplate] = {}
 
         # HTTP client for webhook requests
         self.http_client = AsyncClient(timeout=request_timeout)
@@ -332,7 +333,7 @@ class NotificationManager:
         message: str,
         priority: NotificationPriority = NotificationPriority.NORMAL,
         template_name: Optional[str] = None,
-        context: Dict[str, Any] = None,
+        context: dict[str, Any] | None = None,
         **kwargs,
     ) -> str:
         """Send notification message"""
@@ -368,7 +369,7 @@ class NotificationManager:
         self,
         template_name: str,
         webhook_url: str,
-        context: Dict[str, Any],
+        context: dict[str, Any],
         priority: NotificationPriority = NotificationPriority.NORMAL,
     ) -> str:
         """Send notification using template"""
@@ -459,7 +460,7 @@ class NotificationManager:
 
     async def _prepare_payload(
         self, notification: NotificationMessage
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare webhook payload based on channel type"""
 
         if notification.channel == NotificationChannel.SLACK:
@@ -478,7 +479,7 @@ class NotificationManager:
 
     async def _prepare_slack_payload(
         self, notification: NotificationMessage
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare Slack webhook payload"""
 
         payload = {
@@ -512,7 +513,7 @@ class NotificationManager:
 
     async def _prepare_discord_payload(
         self, notification: NotificationMessage
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare Discord webhook payload"""
 
         embed = {
@@ -606,7 +607,7 @@ class NotificationManager:
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_message_status(self, message_id: str) -> Optional[Dict[str, Any]]:
+    async def get_message_status(self, message_id: str) -> Optional[dict[str, Any]]:
         """Get notification message status"""
 
         # Check all message stores
@@ -632,7 +633,7 @@ class NotificationManager:
 
         return None
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get notification system metrics"""
 
         return {
@@ -652,7 +653,7 @@ class NotificationManager:
             ],  # Last 10 deliveries
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check"""
 
         try:
