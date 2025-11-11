@@ -3,6 +3,7 @@ Unit tests for PerformanceTracker
 Tests KPI tracking and improvement proposal generation
 """
 
+import unittest
 import pytest
 import tempfile
 import shutil
@@ -27,13 +28,13 @@ def tracker(temp_db_path):
     return PerformanceTracker(db_path=temp_db_path)
 
 
-class TestPerformanceTrackerInitialization:
+class TestPerformanceTrackerInitialization(unittest.TestCase):
     """Test PerformanceTracker initialization"""
 
     def test_init_creates_database(self, temp_db_path):
         """Test that initialization creates database"""
         PerformanceTracker(db_path=temp_db_path)
-        assert Path(temp_db_path).exists()
+        self.assertTrue(Path(temp_db_path).exists())
 
     def test_init_creates_tables(self, temp_db_path):
         """Test that initialization creates required tables"""
@@ -41,15 +42,15 @@ class TestPerformanceTrackerInitialization:
         cursor = conn.cursor()
         
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='agent_metrics'")
-        assert cursor.fetchone() is not None
+        self.assertIsNotNone(cursor.fetchone())
         
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='system_metrics'")
-        assert cursor.fetchone() is not None
+        self.assertIsNotNone(cursor.fetchone())
         
         conn.close()
 
 
-class TestLogMetrics:
+class TestLogMetrics(unittest.TestCase):
     """Test metric logging"""
 
     def test_log_agent_metric(self, tracker, temp_db_path):
@@ -62,10 +63,10 @@ class TestLogMetrics:
         result = cursor.fetchone()
         conn.close()
         
-        assert result is not None
-        assert result[1] == "test_agent"
-        assert result[2] == "execution_time"
-        assert result[3] == 1.5
+        self.assertIsNotNone(result)
+        self.assertEqual(result[1], "test_agent")
+        self.assertEqual(result[2], "execution_time")
+        self.assertEqual(result[3], 1.5)
 
     def test_log_multiple_metrics(self, tracker):
         """Test logging multiple metrics"""
@@ -74,7 +75,7 @@ class TestLogMetrics:
         tracker.log_metric("agent2", "metric1", 15.0)
         
         # Metrics should be stored
-        assert True  # Implicit test via no exceptions
+        self.assertTrue(True  # Implicit test via no exceptions)
 
     def test_log_system_metric(self, tracker, temp_db_path):
         """Test logging system-wide metric"""
@@ -87,12 +88,12 @@ class TestLogMetrics:
         result = cursor.fetchone()
         conn.close()
         
-        assert result is not None
-        assert result[1] == "cpu_usage"
-        assert result[2] == 75.5
+        self.assertIsNotNone(result)
+        self.assertEqual(result[1], "cpu_usage")
+        self.assertEqual(result[2], 75.5)
 
 
-class TestWeeklyReport:
+class TestWeeklyReport(unittest.TestCase):
     """Test weekly report generation"""
 
     @pytest.mark.asyncio
@@ -100,10 +101,10 @@ class TestWeeklyReport:
         """Test computing weekly report with no data"""
         report = await tracker.compute_weekly_report()
         
-        assert "period" in report
-        assert report["period"] == "weekly"
-        assert "agent_performance" in report
-        assert "system_performance" in report
+        self.assertIn("period", report)
+        self.assertEqual(report["period"], "weekly")
+        self.assertIn("agent_performance", report)
+        self.assertIn("system_performance", report)
 
     @pytest.mark.asyncio
     async def test_compute_weekly_report_with_data(self, tracker):
@@ -115,8 +116,8 @@ class TestWeeklyReport:
         
         report = await tracker.compute_weekly_report()
         
-        assert "test_agent" in report["agent_performance"]
-        assert "execution_time" in report["agent_performance"]["test_agent"]
+        self.assertIn("test_agent", report["agent_performance"])
+        self.assertIn("execution_time", report["agent_performance"]["test_agent"])
 
     @pytest.mark.asyncio
     async def test_weekly_report_calculates_statistics(self, tracker):
@@ -128,14 +129,14 @@ class TestWeeklyReport:
         report = await tracker.compute_weekly_report()
         
         stats = report["agent_performance"]["test_agent"]["test_metric"]
-        assert "average" in stats
-        assert "min" in stats
-        assert "max" in stats
-        assert stats["min"] == 1.0
-        assert stats["max"] == 5.0
+        self.assertIn("average", stats)
+        self.assertIn("min", stats)
+        self.assertIn("max", stats)
+        self.assertEqual(stats["min"], 1.0)
+        self.assertEqual(stats["max"], 5.0)
 
 
-class TestProposalGeneration:
+class TestProposalGeneration(unittest.TestCase):
     """Test improvement proposal generation"""
 
     @pytest.mark.asyncio
@@ -145,7 +146,7 @@ class TestProposalGeneration:
         
         proposals = await tracker.generate_proposals(report)
         
-        assert isinstance(proposals, list)
+        self.assertIsInstance(proposals, list)
 
     @pytest.mark.asyncio
     async def test_generate_proposal_slow_execution(self, tracker):
@@ -165,8 +166,8 @@ class TestProposalGeneration:
         
         proposals = await tracker.generate_proposals(report)
         
-        assert len(proposals) > 0
-        assert any("slow_execution" in p.get("issue", "") for p in proposals)
+        self.assertGreater(len(proposals), 0)
+        self.assertIn(any("slow_execution", p.get("issue", "") for p in proposals))
 
     @pytest.mark.asyncio
     async def test_generate_proposal_high_error_rate(self, tracker):
@@ -186,8 +187,8 @@ class TestProposalGeneration:
         
         proposals = await tracker.generate_proposals(report)
         
-        assert len(proposals) > 0
-        assert any("error_rate" in p.get("issue", "") for p in proposals)
+        self.assertGreater(len(proposals), 0)
+        self.assertIn(any("error_rate", p.get("issue", "") for p in proposals))
 
     @pytest.mark.asyncio
     async def test_generate_proposal_high_cpu(self, tracker):
@@ -201,8 +202,8 @@ class TestProposalGeneration:
         
         proposals = await tracker.generate_proposals(report)
         
-        assert len(proposals) > 0
-        assert any("cpu" in p.get("issue", "").lower() for p in proposals)
+        self.assertGreater(len(proposals), 0)
+        self.assertIn(any("cpu", p.get("issue", "").lower() for p in proposals))
 
     @pytest.mark.asyncio
     async def test_proposals_saved_to_file(self, tracker):
@@ -218,10 +219,10 @@ class TestProposalGeneration:
         
         await tracker.generate_proposals(report)
         
-        assert tracker.proposals_path.exists()
+        self.assertTrue(tracker.proposals_path.exists())
 
 
-class TestGetProposals:
+class TestGetProposals(unittest.TestCase):
     """Test retrieving proposals"""
 
     @pytest.mark.asyncio
@@ -229,7 +230,7 @@ class TestGetProposals:
         """Test getting proposals when file doesn't exist"""
         proposals = await tracker.get_proposals()
         
-        assert proposals == []
+        self.assertEqual(proposals, [])
 
     @pytest.mark.asyncio
     async def test_get_proposals_all(self, tracker):
@@ -247,7 +248,7 @@ class TestGetProposals:
         
         proposals = await tracker.get_proposals()
         
-        assert len(proposals) > 0
+        self.assertGreater(len(proposals), 0)
 
     @pytest.mark.asyncio
     async def test_get_proposals_filtered_by_status(self, tracker):
@@ -258,10 +259,10 @@ class TestGetProposals:
         
         # No proposals match "implemented" status yet
         filtered = await tracker.get_proposals(status="implemented")
-        assert len(filtered) == 0
+        self.assertEqual(len(filtered), 0)
 
 
-class TestUpdateProposalStatus:
+class TestUpdateProposalStatus(unittest.TestCase):
     """Test updating proposal status"""
 
     @pytest.mark.asyncio
@@ -286,9 +287,9 @@ class TestUpdateProposalStatus:
             notes="Looks good"
         )
         
-        assert result["status"] == "updated"
-        assert result["proposal"]["status"] == "approved"
-        assert result["proposal"]["reviewed_by"] == "test_operator"
+        self.assertEqual(result["status"], "updated")
+        self.assertEqual(result["proposal"]["status"], "approved")
+        self.assertEqual(result["proposal"]["reviewed_by"], "test_operator")
 
     @pytest.mark.asyncio
     async def test_update_nonexistent_proposal(self, tracker):
@@ -299,10 +300,10 @@ class TestUpdateProposalStatus:
             operator="operator"
         )
         
-        assert "error" in result
+        self.assertIn("error", result)
 
 
-class TestKPISummary:
+class TestKPISummary(unittest.TestCase):
     """Test KPI summary generation"""
 
     @pytest.mark.asyncio
@@ -310,8 +311,8 @@ class TestKPISummary:
         """Test getting KPI summary with no data"""
         summary = await tracker.get_kpi_summary(days=7)
         
-        assert "period_days" in summary
-        assert "agent_kpis" in summary
+        self.assertIn("period_days", summary)
+        self.assertIn("agent_kpis", summary)
 
     @pytest.mark.asyncio
     async def test_get_kpi_summary_with_data(self, tracker):
@@ -322,7 +323,7 @@ class TestKPISummary:
         
         summary = await tracker.get_kpi_summary(days=7)
         
-        assert "test_agent" in summary["agent_kpis"]
+        self.assertIn("test_agent", summary["agent_kpis"])
 
     @pytest.mark.asyncio
     async def test_get_kpi_summary_custom_period(self, tracker):
@@ -331,23 +332,23 @@ class TestKPISummary:
         
         summary = await tracker.get_kpi_summary(days=30)
         
-        assert summary["period_days"] == 30
+        self.assertEqual(summary["period_days"], 30)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     def test_log_metric_with_zero_value(self, tracker):
         """Test logging metric with zero value"""
         tracker.log_metric("agent", "metric", 0.0)
         # Should not raise exception
-        assert True
+        self.assertTrue(True)
 
     def test_log_metric_with_negative_value(self, tracker):
         """Test logging metric with negative value"""
         tracker.log_metric("agent", "metric", -1.0)
         # Should not raise exception
-        assert True
+        self.assertTrue(True)
 
     @pytest.mark.asyncio
     async def test_generate_proposals_with_none_values(self, tracker):

@@ -3,6 +3,7 @@ Comprehensive Unit Tests for Dashboard API Endpoints (api/v1/dashboard.py)
 Testing dashboard data retrieval, metrics, agent status, and activities
 """
 
+import unittest
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -131,7 +132,7 @@ def mock_performance_history():
     ]
 
 
-class TestDashboardPageEndpoint:
+class TestDashboardPageEndpoint(unittest.TestCase):
     """Test suite for dashboard HTML page endpoint"""
 
     @pytest.mark.api
@@ -141,14 +142,14 @@ class TestDashboardPageEndpoint:
         response = client.get("/api/v1/dashboard/dashboard")
         
         # Should return HTML page or redirect
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_302_FOUND
         ]
         
         if response.status_code == status.HTTP_200_OK:
-            assert "text/html" in response.headers.get("content-type", "")
+            self.assertIn("text/html", response.headers.get("content-type", ""))
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -157,14 +158,14 @@ class TestDashboardPageEndpoint:
         response = client.get("/api/v1/dashboard/dashboard")
         
         # Page should be accessible without auth or require it
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_404_NOT_FOUND
         ]
 
 
-class TestDashboardDataEndpoint:
+class TestDashboardDataEndpoint(unittest.TestCase):
     """Test suite for complete dashboard data endpoint"""
 
     @pytest.mark.api
@@ -174,7 +175,7 @@ class TestDashboardDataEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/data")
         
         # No auth required after removal of role-based checks
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -184,7 +185,7 @@ class TestDashboardDataEndpoint:
             # Check for expected dashboard components
             expected_keys = {"metrics", "agents", "recent_activities", "performance_history"}
             # At least some keys should be present
-            assert len(set(data.keys()) & expected_keys) > 0
+            self.assertGreater(len(set(data.keys()) & expected_keys), 0)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -193,7 +194,7 @@ class TestDashboardDataEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/data")
         
         # After removing auth requirements, should work without auth
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -219,7 +220,7 @@ class TestDashboardDataEndpoint:
         
         response = client.get("/api/v1/dashboard/dashboard/data")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -232,13 +233,13 @@ class TestDashboardDataEndpoint:
                    side_effect=Exception("Service unavailable")):
             response = client.get("/api/v1/dashboard/dashboard/data")
             
-            assert response.status_code in [
+            self.assertIn(response.status_code, [)
                 status.HTTP_200_OK,
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             ]
 
 
-class TestSystemMetricsEndpoint:
+class TestSystemMetricsEndpoint(unittest.TestCase):
     """Test suite for system metrics endpoint"""
 
     @pytest.mark.api
@@ -247,7 +248,7 @@ class TestSystemMetricsEndpoint:
         """Test successful retrieval of system metrics"""
         response = client.get("/api/v1/dashboard/dashboard/metrics")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -260,7 +261,7 @@ class TestSystemMetricsEndpoint:
                 "average_response_time", "system_health_score",
                 "cpu_usage", "memory_usage", "error_rate"
             }
-            assert any(field in data for field in expected_fields)
+            self.assertIn(any(field, data for field in expected_fields))
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -269,7 +270,7 @@ class TestSystemMetricsEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/metrics")
         
         # Should work without authentication after changes
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -292,7 +293,7 @@ class TestSystemMetricsEndpoint:
         
         response = client.get("/api/v1/dashboard/dashboard/metrics")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -307,13 +308,13 @@ class TestSystemMetricsEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/metrics")
         
         # Should return fallback metrics or error
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
 
 
-class TestAgentStatusEndpoint:
+class TestAgentStatusEndpoint(unittest.TestCase):
     """Test suite for agent status endpoint"""
 
     @pytest.mark.api
@@ -322,14 +323,14 @@ class TestAgentStatusEndpoint:
         """Test successful retrieval of agent statuses"""
         response = client.get("/api/v1/dashboard/dashboard/agents")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
         
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert isinstance(data, list) or isinstance(data, dict)
+            self.assertIsInstance(data, list) or isinstance(data, dict)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -337,7 +338,7 @@ class TestAgentStatusEndpoint:
         """Test agent status endpoint doesn't require authentication"""
         response = client.get("/api/v1/dashboard/dashboard/agents")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -351,7 +352,7 @@ class TestAgentStatusEndpoint:
         
         response = client.get("/api/v1/dashboard/dashboard/agents")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -379,13 +380,13 @@ class TestAgentStatusEndpoint:
         
         response = client.get("/api/v1/dashboard/dashboard/agents")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
 
 
-class TestRecentActivitiesEndpoint:
+class TestRecentActivitiesEndpoint(unittest.TestCase):
     """Test suite for recent activities endpoint"""
 
     @pytest.mark.api
@@ -394,14 +395,14 @@ class TestRecentActivitiesEndpoint:
         """Test recent activities with default limit"""
         response = client.get("/api/v1/dashboard/dashboard/activities")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
         
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert isinstance(data, list) or isinstance(data, dict)
+            self.assertIsInstance(data, list) or isinstance(data, dict)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -409,7 +410,7 @@ class TestRecentActivitiesEndpoint:
         """Test recent activities with custom limit"""
         response = client.get("/api/v1/dashboard/dashboard/activities?limit=20")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -420,7 +421,7 @@ class TestRecentActivitiesEndpoint:
         """Test activities endpoint doesn't require authentication"""
         response = client.get("/api/v1/dashboard/dashboard/activities")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -432,7 +433,7 @@ class TestRecentActivitiesEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/activities?limit=0")
         
         # Should handle gracefully
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -444,7 +445,7 @@ class TestRecentActivitiesEndpoint:
         """Test recent activities with very large limit"""
         response = client.get("/api/v1/dashboard/dashboard/activities?limit=1000")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -455,13 +456,13 @@ class TestRecentActivitiesEndpoint:
         """Test recent activities with invalid limit parameter"""
         response = client.get("/api/v1/dashboard/dashboard/activities?limit=invalid")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
 
 
-class TestPerformanceHistoryEndpoint:
+class TestPerformanceHistoryEndpoint(unittest.TestCase):
     """Test suite for performance history endpoint"""
 
     @pytest.mark.api
@@ -470,14 +471,14 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history with default 24 hours"""
         response = client.get("/api/v1/dashboard/dashboard/performance")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
         
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert isinstance(data, list) or isinstance(data, dict)
+            self.assertIsInstance(data, list) or isinstance(data, dict)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -485,7 +486,7 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history with custom hours"""
         response = client.get("/api/v1/dashboard/dashboard/performance?hours=48")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -496,7 +497,7 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history doesn't require authentication"""
         response = client.get("/api/v1/dashboard/dashboard/performance")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -507,7 +508,7 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history for short period (1 hour)"""
         response = client.get("/api/v1/dashboard/dashboard/performance?hours=1")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -518,7 +519,7 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history for long period (7 days)"""
         response = client.get("/api/v1/dashboard/dashboard/performance?hours=168")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -529,7 +530,7 @@ class TestPerformanceHistoryEndpoint:
         """Test performance history with invalid hours parameter"""
         response = client.get("/api/v1/dashboard/dashboard/performance?hours=invalid")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -541,14 +542,14 @@ class TestPerformanceHistoryEndpoint:
         response = client.get("/api/v1/dashboard/dashboard/performance?hours=-10")
         
         # Should handle invalid input gracefully
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
 
 
-class TestWebSocketEndpoint:
+class TestWebSocketEndpoint(unittest.TestCase):
     """Test suite for dashboard WebSocket endpoint"""
 
     @pytest.mark.api
@@ -566,7 +567,7 @@ class TestWebSocketEndpoint:
         # Placeholder for WebSocket data streaming test
 
 
-class TestDashboardEdgeCases:
+class TestDashboardEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     @pytest.mark.api
@@ -576,7 +577,7 @@ class TestDashboardEdgeCases:
         response = client.get("/api/v1/dashboard/dashboard/data")
         
         # Should handle missing app state gracefully
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -590,7 +591,7 @@ class TestDashboardEdgeCases:
         
         response = client.get("/api/v1/dashboard/dashboard/data")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -608,9 +609,9 @@ class TestDashboardEdgeCases:
             futures = [executor.submit(make_request) for _ in range(10)]
             results = [f.result() for f in concurrent.futures.as_completed(futures)]
         
-        assert len(results) == 10
+        self.assertEqual(len(results), 10)
         for response in results:
-            assert response.status_code in [
+            self.assertIn(response.status_code, [)
                 status.HTTP_200_OK,
                 status.HTTP_500_INTERNAL_SERVER_ERROR
             ]
@@ -623,7 +624,7 @@ class TestDashboardEdgeCases:
         response = client.get(f"/api/v1/dashboard/dashboard/activities{malicious_query}")
         
         # Should handle safely
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -638,14 +639,14 @@ class TestDashboardEdgeCases:
         
         response = client.get("/api/v1/dashboard/dashboard/metrics")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             status.HTTP_504_GATEWAY_TIMEOUT
         ]
 
 
-class TestDashboardIntegration:
+class TestDashboardIntegration(unittest.TestCase):
     """Integration tests for dashboard functionality"""
 
     @pytest.mark.api
@@ -671,7 +672,7 @@ class TestDashboardIntegration:
         ]
         
         for resp in responses:
-            assert resp.status_code in [
+            self.assertIn(resp.status_code, [)
                 status.HTTP_200_OK,
                 status.HTTP_404_NOT_FOUND,
                 status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -1,3 +1,4 @@
+import unittest
 from security.jwt_auth import create_access_token, UserRole
 
 from fastapi.testclient import TestClient
@@ -54,7 +55,7 @@ def admin_headers():
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
 
-class TestGDPRExportEndpoint:
+class TestGDPRExportEndpoint(unittest.TestCase):
     """Test GDPR data export endpoint (Article 15)"""
 
     def test_export_user_data_success(self, client, auth_headers, setup_test_user):
@@ -69,34 +70,34 @@ class TestGDPRExportEndpoint:
             },
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify response structure
-        assert "request_id" in data
-        assert "user_id" in data
-        assert "email" in data
-        assert "export_timestamp" in data
-        assert "data" in data
-        assert "metadata" in data
+        self.assertIn("request_id", data)
+        self.assertIn("user_id", data)
+        self.assertIn("email", data)
+        self.assertIn("export_timestamp", data)
+        self.assertIn("data", data)
+        self.assertIn("metadata", data)
 
         # Verify user data structure
         user_data = data["data"]
-        assert "personal_information" in user_data
-        assert "account_data" in user_data
+        self.assertIn("personal_information", user_data)
+        self.assertIn("account_data", user_data)
 
         # Verify personal information
         personal_info = user_data["personal_information"]
-        assert "user_id" in personal_info
-        assert "email" in personal_info
-        assert "username" in personal_info
-        assert "role" in personal_info
+        self.assertIn("user_id", personal_info)
+        self.assertIn("email", personal_info)
+        self.assertIn("username", personal_info)
+        self.assertIn("role", personal_info)
 
         # Verify metadata
         metadata = data["metadata"]
-        assert metadata["export_format"] == "json"
-        assert "legal_basis" in metadata
-        assert "GDPR Article 15" in metadata["legal_basis"]
+        self.assertEqual(metadata["export_format"], "json")
+        self.assertIn("legal_basis", metadata)
+        self.assertIn("GDPR Article 15", metadata["legal_basis"])
 
     def test_export_without_audit_logs(self, client, auth_headers):
         """Test data export without audit logs"""
@@ -110,18 +111,18 @@ class TestGDPRExportEndpoint:
             },
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
         user_data = data["data"]
 
         # Audit logs should not be included
-        assert "audit_logs" not in user_data or user_data.get("audit_logs") is None
+        self.assertIn("audit_logs" not, user_data or user_data.get("audit_logs") is None)
 
     def test_export_requires_authentication(self, client):
         """Test that export endpoint requires authentication"""
         response = client.get("/api/v1/gdpr/export")
 
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)
 
     def test_export_different_formats(self, client, auth_headers):
         """Test export with different format options"""
@@ -132,11 +133,11 @@ class TestGDPRExportEndpoint:
                 params={"format": format_type},
             )
 
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
             data = response.json()
-            assert data["metadata"]["export_format"] == format_type
+            self.assertEqual(data["metadata"]["export_format"], format_type)
 
-class TestGDPRDeleteEndpoint:
+class TestGDPRDeleteEndpoint(unittest.TestCase):
     """Test GDPR data deletion endpoint (Article 17)"""
 
     def test_delete_user_data_success(self, client, auth_headers):
@@ -151,20 +152,20 @@ class TestGDPRDeleteEndpoint:
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify response structure
-        assert "request_id" in data
-        assert "user_id" in data
-        assert "email" in data
-        assert "deletion_timestamp" in data
-        assert "status" in data
-        assert "deleted_records" in data
+        self.assertIn("request_id", data)
+        self.assertIn("user_id", data)
+        self.assertIn("email", data)
+        self.assertIn("deletion_timestamp", data)
+        self.assertIn("status", data)
+        self.assertIn("deleted_records", data)
 
         # Verify deletion status
-        assert data["status"] in ["deleted", "anonymized"]
-        assert isinstance(data["deleted_records"], dict)
+        self.assertIn(data["status"], ["deleted", "anonymized"])
+        self.assertIsInstance(data["deleted_records"], dict)
 
     def test_delete_with_anonymization(self, client, auth_headers):
         """Test user data anonymization instead of deletion"""
@@ -178,13 +179,13 @@ class TestGDPRDeleteEndpoint:
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify anonymization status
-        assert data["status"] == "anonymized"
-        assert "retained_records" in data
-        assert data["retained_records"] is not None
+        self.assertEqual(data["status"], "anonymized")
+        self.assertIn("retained_records", data)
+        self.assertIsNotNone(data["retained_records"])
 
     def test_delete_requires_confirmation_code(self, client, auth_headers):
         """Test that deletion requires valid confirmation code"""
@@ -198,7 +199,7 @@ class TestGDPRDeleteEndpoint:
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
-        assert response.status_code == 400  # Bad request
+        self.assertEqual(response.status_code, 400  # Bad request)
 
     def test_delete_requires_authentication(self, client):
         """Test that delete endpoint requires authentication"""
@@ -210,43 +211,43 @@ class TestGDPRDeleteEndpoint:
 
         response = client.request("DELETE", "/api/v1/gdpr/delete", json=delete_request)
 
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)
 
-class TestDataRetentionPolicy:
+class TestDataRetentionPolicy(unittest.TestCase):
     """Test data retention policy endpoint"""
 
     def test_get_retention_policy(self, client):
         """Test retrieving data retention policy (public endpoint)"""
         response = client.get("/api/v1/gdpr/retention-policy")
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify response structure
-        assert "policy_version" in data
-        assert "last_updated" in data
-        assert "retention_periods" in data
-        assert "legal_basis" in data
+        self.assertIn("policy_version", data)
+        self.assertIn("last_updated", data)
+        self.assertIn("retention_periods", data)
+        self.assertIn("legal_basis", data)
 
         # Verify retention periods
         retention_periods = data["retention_periods"]
-        assert isinstance(retention_periods, dict)
-        assert "user_accounts" in retention_periods
-        assert "activity_logs" in retention_periods
-        assert "audit_logs" in retention_periods
+        self.assertIsInstance(retention_periods, dict)
+        self.assertIn("user_accounts", retention_periods)
+        self.assertIn("activity_logs", retention_periods)
+        self.assertIn("audit_logs", retention_periods)
 
         # Verify legal basis
         legal_basis = data["legal_basis"]
-        assert isinstance(legal_basis, list)
-        assert len(legal_basis) > 0
+        self.assertIsInstance(legal_basis, list)
+        self.assertGreater(len(legal_basis), 0)
 
     def test_retention_policy_no_auth_required(self, client):
         """Test that retention policy endpoint is public (no auth required)"""
         # Should work without authentication
         response = client.get("/api/v1/gdpr/retention-policy")
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
-class TestDataSubjectRequests:
+class TestDataSubjectRequests(unittest.TestCase):
     """Test admin endpoint for listing GDPR requests"""
 
     def test_list_requests_requires_admin(self, client, auth_headers):
@@ -255,49 +256,49 @@ class TestDataSubjectRequests:
         response = client.get("/api/v1/gdpr/requests", headers=auth_headers)
 
         # This might be 403 (Forbidden) depending on RBAC implementation
-        assert response.status_code in [401, 403]
+        self.assertIn(response.status_code, [401, 403])
 
     def test_list_requests_success(self, client, admin_headers):
         """Test successful listing of GDPR requests (admin only)"""
         response = client.get("/api/v1/gdpr/requests", headers=admin_headers)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify response structure
-        assert "export_requests" in data
-        assert "deletion_requests" in data
-        assert "total_requests" in data
+        self.assertIn("export_requests", data)
+        self.assertIn("deletion_requests", data)
+        self.assertIn("total_requests", data)
 
-class TestGDPRCompliance:
+class TestGDPRCompliance(unittest.TestCase):
     """Test overall GDPR compliance requirements"""
 
     def test_gdpr_endpoints_exist(self, client):
         """Test that all required GDPR endpoints exist"""
         # Test OpenAPI schema includes GDPR endpoints
         response = client.get("/openapi.json")
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         openapi_schema = response.json()
         paths = openapi_schema.get("paths", {})
 
         # Verify GDPR endpoints are documented
-        assert "/api/v1/gdpr/export" in paths
-        assert "/api/v1/gdpr/delete" in paths
-        assert "/api/v1/gdpr/retention-policy" in paths
-        assert "/api/v1/gdpr/requests" in paths
+        self.assertIn("/api/v1/gdpr/export", paths)
+        self.assertIn("/api/v1/gdpr/delete", paths)
+        self.assertIn("/api/v1/gdpr/retention-policy", paths)
+        self.assertIn("/api/v1/gdpr/requests", paths)
 
     def test_export_response_includes_legal_basis(self, client, auth_headers):
         """Test that export includes legal basis per GDPR Article 13"""
         response = client.get("/api/v1/gdpr/export", headers=auth_headers)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify legal basis is documented
-        assert "metadata" in data
-        assert "legal_basis" in data["metadata"]
-        assert len(data["metadata"]["legal_basis"]) > 0
+        self.assertIn("metadata", data)
+        self.assertIn("legal_basis", data["metadata"])
+        self.assertGreater(len(data["metadata"]["legal_basis"]), 0)
 
     def test_deletion_preserves_audit_trail(self, client, auth_headers):
         """Test that deletion preserves necessary audit trail"""
@@ -311,27 +312,27 @@ class TestGDPRCompliance:
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify audit trail is preserved
         if "retained_records" in data and data["retained_records"]:
             # Some records should be retained for legal compliance
-            assert "deletion_audit_log" in data["retained_records"]
+            self.assertIn("deletion_audit_log", data["retained_records"])
 
 @pytest.mark.integration
-class TestGDPRIntegration:
+class TestGDPRIntegration(unittest.TestCase):
     """Integration tests for GDPR workflows"""
 
     def test_full_export_delete_workflow(self, client, auth_headers):
         """Test complete workflow: export data, then delete"""
         # Step 1: Export user data
         export_response = client.get("/api/v1/gdpr/export", headers=auth_headers)
-        assert export_response.status_code == 200
+        self.assertEqual(export_response.status_code, 200)
         export_data = export_response.json()
 
         # Verify user has data
-        assert len(export_data["data"]) > 0
+        self.assertGreater(len(export_data["data"]), 0)
 
         # Step 2: Delete user data
         delete_request = {
@@ -343,12 +344,12 @@ class TestGDPRIntegration:
         delete_response = client.request(
             "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
         )
-        assert delete_response.status_code == 200
+        self.assertEqual(delete_response.status_code, 200)
         delete_data = delete_response.json()
 
         # Verify deletion occurred
-        assert delete_data["status"] == "deleted"
-        assert len(delete_data["deleted_records"]) > 0
+        self.assertEqual(delete_data["status"], "deleted")
+        self.assertGreater(len(delete_data["deleted_records"]), 0)
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

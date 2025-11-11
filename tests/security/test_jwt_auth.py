@@ -9,6 +9,7 @@ Version: 1.0.0
 Python: >=3.11.0
 """
 
+import unittest
 import pytest
 import os
 from datetime import datetime, timedelta
@@ -35,52 +36,52 @@ from security.jwt_auth import (
 from fastapi import HTTPException
 
 
-class TestUserRole:
+class TestUserRole(unittest.TestCase):
     """Test UserRole enum and hierarchy."""
 
     def test_role_values(self):
         """Test that all roles have correct string values."""
-        assert UserRole.SUPER_ADMIN.value == "super_admin"
-        assert UserRole.ADMIN.value == "admin"
-        assert UserRole.DEVELOPER.value == "developer"
-        assert UserRole.API_USER.value == "api_user"
-        assert UserRole.READ_ONLY.value == "read_only"
+        self.assertEqual(UserRole.SUPER_ADMIN.value, "super_admin")
+        self.assertEqual(UserRole.ADMIN.value, "admin")
+        self.assertEqual(UserRole.DEVELOPER.value, "developer")
+        self.assertEqual(UserRole.API_USER.value, "api_user")
+        self.assertEqual(UserRole.READ_ONLY.value, "read_only")
 
     def test_role_hierarchy(self):
         """Test role hierarchy values are correct."""
-        assert ROLE_HIERARCHY[UserRole.SUPER_ADMIN] == 5
-        assert ROLE_HIERARCHY[UserRole.ADMIN] == 4
-        assert ROLE_HIERARCHY[UserRole.DEVELOPER] == 3
-        assert ROLE_HIERARCHY[UserRole.API_USER] == 2
-        assert ROLE_HIERARCHY[UserRole.READ_ONLY] == 1
+        self.assertEqual(ROLE_HIERARCHY[UserRole.SUPER_ADMIN], 5)
+        self.assertEqual(ROLE_HIERARCHY[UserRole.ADMIN], 4)
+        self.assertEqual(ROLE_HIERARCHY[UserRole.DEVELOPER], 3)
+        self.assertEqual(ROLE_HIERARCHY[UserRole.API_USER], 2)
+        self.assertEqual(ROLE_HIERARCHY[UserRole.READ_ONLY], 1)
 
     def test_has_permission_higher_role(self):
         """Test that higher roles can access lower role endpoints."""
-        assert has_permission(UserRole.ADMIN, UserRole.DEVELOPER) is True
-        assert has_permission(UserRole.SUPER_ADMIN, UserRole.API_USER) is True
+        self.assertIs(has_permission(UserRole.ADMIN, UserRole.DEVELOPER), True)
+        self.assertIs(has_permission(UserRole.SUPER_ADMIN, UserRole.API_USER), True)
 
     def test_has_permission_equal_role(self):
         """Test that equal roles can access their own endpoints."""
-        assert has_permission(UserRole.DEVELOPER, UserRole.DEVELOPER) is True
-        assert has_permission(UserRole.READ_ONLY, UserRole.READ_ONLY) is True
+        self.assertIs(has_permission(UserRole.DEVELOPER, UserRole.DEVELOPER), True)
+        self.assertIs(has_permission(UserRole.READ_ONLY, UserRole.READ_ONLY), True)
 
     def test_has_permission_lower_role(self):
         """Test that lower roles cannot access higher role endpoints."""
-        assert has_permission(UserRole.API_USER, UserRole.ADMIN) is False
-        assert has_permission(UserRole.READ_ONLY, UserRole.DEVELOPER) is False
+        self.assertIs(has_permission(UserRole.API_USER, UserRole.ADMIN), False)
+        self.assertIs(has_permission(UserRole.READ_ONLY, UserRole.DEVELOPER), False)
 
 
-class TestTokenGeneration:
+class TestTokenGeneration(unittest.TestCase):
     """Test JWT token creation."""
 
     def test_create_access_token_basic(self):
         """Test basic access token creation."""
         token = create_access_token("user123", UserRole.DEVELOPER)
 
-        assert isinstance(token, str)
-        assert len(token) > 0
+        self.assertIsInstance(token, str)
+        self.assertGreater(len(token), 0)
         # JWT format: header.payload.signature
-        assert token.count(".") == 2
+        self.assertEqual(token.count("."), 2)
 
     def test_create_access_token_with_email(self):
         """Test access token with email."""
@@ -91,9 +92,9 @@ class TestTokenGeneration:
         )
 
         payload = verify_jwt_token(token, TokenType.ACCESS)
-        assert payload["sub"] == "user123"
-        assert payload["email"] == "admin@example.com"
-        assert payload["role"] == UserRole.ADMIN.value
+        self.assertEqual(payload["sub"], "user123")
+        self.assertEqual(payload["email"], "admin@example.com")
+        self.assertEqual(payload["role"], UserRole.ADMIN.value)
 
     def test_create_access_token_with_permissions(self):
         """Test access token with custom permissions."""
@@ -105,35 +106,35 @@ class TestTokenGeneration:
         )
 
         payload = verify_jwt_token(token, TokenType.ACCESS)
-        assert payload["permissions"] == permissions
+        self.assertEqual(payload["permissions"], permissions)
 
     def test_create_refresh_token(self):
         """Test refresh token creation."""
         token = create_refresh_token("user456", UserRole.API_USER)
 
-        assert isinstance(token, str)
+        self.assertIsInstance(token, str)
         payload = verify_jwt_token(token, TokenType.REFRESH)
-        assert payload["type"] == TokenType.REFRESH.value
-        assert payload["sub"] == "user456"
+        self.assertEqual(payload["type"], TokenType.REFRESH.value)
+        self.assertEqual(payload["sub"], "user456")
 
     def test_create_token_pair(self):
         """Test creating access and refresh token pair."""
         tokens = create_token_pair("user789", UserRole.SUPER_ADMIN, "super@example.com")
 
-        assert hasattr(tokens, "access_token")
-        assert hasattr(tokens, "refresh_token")
-        assert tokens.token_type == "bearer"
-        assert tokens.expires_in == 30 * 60  # 30 minutes in seconds
+        self.assertTrue(hasattr(tokens, "access_token"))
+        self.assertTrue(hasattr(tokens, "refresh_token"))
+        self.assertEqual(tokens.token_type, "bearer")
+        self.assertEqual(tokens.expires_in, 30 * 60  # 30 minutes in seconds)
 
         # Verify both tokens
         access_payload = verify_jwt_token(tokens.access_token, TokenType.ACCESS)
         refresh_payload = verify_jwt_token(tokens.refresh_token, TokenType.REFRESH)
 
-        assert access_payload["sub"] == "user789"
-        assert refresh_payload["sub"] == "user789"
+        self.assertEqual(access_payload["sub"], "user789")
+        self.assertEqual(refresh_payload["sub"], "user789")
 
 
-class TestTokenVerification:
+class TestTokenVerification(unittest.TestCase):
     """Test JWT token verification."""
 
     def test_verify_valid_access_token(self):
@@ -141,19 +142,19 @@ class TestTokenVerification:
         token = create_access_token("user123", UserRole.DEVELOPER)
         payload = verify_jwt_token(token, TokenType.ACCESS)
 
-        assert payload["sub"] == "user123"
-        assert payload["type"] == TokenType.ACCESS.value
-        assert payload["role"] == UserRole.DEVELOPER.value
-        assert "exp" in payload
-        assert "iat" in payload
+        self.assertEqual(payload["sub"], "user123")
+        self.assertEqual(payload["type"], TokenType.ACCESS.value)
+        self.assertEqual(payload["role"], UserRole.DEVELOPER.value)
+        self.assertIn("exp", payload)
+        self.assertIn("iat", payload)
 
     def test_verify_valid_refresh_token(self):
         """Test verifying a valid refresh token."""
         token = create_refresh_token("user123", UserRole.ADMIN)
         payload = verify_jwt_token(token, TokenType.REFRESH)
 
-        assert payload["sub"] == "user123"
-        assert payload["type"] == TokenType.REFRESH.value
+        self.assertEqual(payload["sub"], "user123")
+        self.assertEqual(payload["type"], TokenType.REFRESH.value)
 
     def test_verify_wrong_token_type(self):
         """Test that verifying wrong token type raises error."""
@@ -162,8 +163,8 @@ class TestTokenVerification:
         with pytest.raises(HTTPException) as exc_info:
             verify_jwt_token(access_token, TokenType.REFRESH)
 
-        assert exc_info.value.status_code == 401
-        assert "Invalid token type" in exc_info.value.detail
+        self.assertEqual(exc_info.value.status_code, 401)
+        self.assertIn("Invalid token type", exc_info.value.detail)
 
     def test_verify_expired_token(self):
         """Test that expired token raises error."""
@@ -179,8 +180,8 @@ class TestTokenVerification:
         with pytest.raises(HTTPException) as exc_info:
             verify_jwt_token(token, TokenType.ACCESS)
 
-        assert exc_info.value.status_code == 401
-        assert "expired" in exc_info.value.detail.lower()
+        self.assertEqual(exc_info.value.status_code, 401)
+        self.assertIn("expired", exc_info.value.detail.lower())
 
     def test_verify_invalid_token(self):
         """Test that invalid token raises error."""
@@ -189,7 +190,7 @@ class TestTokenVerification:
         with pytest.raises(HTTPException) as exc_info:
             verify_jwt_token(invalid_token)
 
-        assert exc_info.value.status_code == 401
+        self.assertEqual(exc_info.value.status_code, 401)
 
     def test_verify_blacklisted_token(self):
         """Test that blacklisted token raises error."""
@@ -201,14 +202,14 @@ class TestTokenVerification:
         with pytest.raises(HTTPException) as exc_info:
             verify_jwt_token(token, TokenType.ACCESS)
 
-        assert exc_info.value.status_code == 401
-        assert "revoked" in exc_info.value.detail.lower()
+        self.assertEqual(exc_info.value.status_code, 401)
+        self.assertIn("revoked", exc_info.value.detail.lower())
 
         # Clean up blacklist
         TokenBlacklist.clear()
 
 
-class TestTokenRefresh:
+class TestTokenRefresh(unittest.TestCase):
     """Test token refresh functionality."""
 
     def test_refresh_access_token_success(self):
@@ -219,13 +220,13 @@ class TestTokenRefresh:
         # Refresh using refresh token
         new_tokens = refresh_access_token(tokens.refresh_token)
 
-        assert new_tokens.access_token != tokens.access_token
-        assert new_tokens.refresh_token != tokens.refresh_token
+        self.assertNotEqual(new_tokens.access_token, tokens.access_token)
+        self.assertNotEqual(new_tokens.refresh_token, tokens.refresh_token)
 
         # Verify new tokens work
         new_payload = verify_jwt_token(new_tokens.access_token, TokenType.ACCESS)
-        assert new_payload["sub"] == "user123"
-        assert new_payload["role"] == UserRole.DEVELOPER.value
+        self.assertEqual(new_payload["sub"], "user123")
+        self.assertEqual(new_payload["role"], UserRole.DEVELOPER.value)
 
         # Old refresh token should be blacklisted
         with pytest.raises(HTTPException):
@@ -246,10 +247,10 @@ class TestTokenRefresh:
         with pytest.raises(HTTPException) as exc_info:
             refresh_access_token(access_token)
 
-        assert exc_info.value.status_code == 401
+        self.assertEqual(exc_info.value.status_code, 401)
 
 
-class TestTokenRevocation:
+class TestTokenRevocation(unittest.TestCase):
     """Test token revocation."""
 
     def test_revoke_token(self):
@@ -258,7 +259,7 @@ class TestTokenRevocation:
 
         # Token should work before revocation
         payload = verify_jwt_token(token, TokenType.ACCESS)
-        assert payload["sub"] == "user123"
+        self.assertEqual(payload["sub"], "user123")
 
         # Revoke token
         revoke_token(token)
@@ -267,8 +268,8 @@ class TestTokenRevocation:
         with pytest.raises(HTTPException) as exc_info:
             verify_jwt_token(token, TokenType.ACCESS)
 
-        assert exc_info.value.status_code == 401
-        assert "revoked" in exc_info.value.detail.lower()
+        self.assertEqual(exc_info.value.status_code, 401)
+        self.assertIn("revoked", exc_info.value.detail.lower())
 
         # Clean up
         TokenBlacklist.clear()
@@ -278,13 +279,13 @@ class TestTokenRevocation:
         token = create_access_token("user123", UserRole.DEVELOPER)
 
         revoke_token(token)
-        assert TokenBlacklist.is_blacklisted(token) is True
+        self.assertIs(TokenBlacklist.is_blacklisted(token), True)
 
         TokenBlacklist.clear()
-        assert TokenBlacklist.is_blacklisted(token) is False
+        self.assertIs(TokenBlacklist.is_blacklisted(token), False)
 
 
-class TestSecretKeyGeneration:
+class TestSecretKeyGeneration(unittest.TestCase):
     """Test secure secret key generation."""
 
     def test_generate_secure_secret_key(self):
@@ -293,23 +294,23 @@ class TestSecretKeyGeneration:
         key2 = generate_secure_secret_key()
 
         # Keys should be strings
-        assert isinstance(key1, str)
-        assert isinstance(key2, str)
+        self.assertIsInstance(key1, str)
+        self.assertIsInstance(key2, str)
 
         # Keys should be at least 32 characters
-        assert len(key1) >= 32
-        assert len(key2) >= 32
+        self.assertGreater(len(key1), = 32)
+        self.assertGreater(len(key2), = 32)
 
         # Keys should be unique
-        assert key1 != key2
+        self.assertNotEqual(key1, key2)
 
         # Keys should be URL-safe base64
         import string
         allowed_chars = string.ascii_letters + string.digits + "-_"
-        assert all(c in allowed_chars for c in key1)
+        self.assertIn(all(c, allowed_chars for c in key1))
 
 
-class TestRBACEnforcement:
+class TestRBACEnforcement(unittest.TestCase):
     """Test RBAC enforcement in API endpoints."""
 
     @pytest.mark.asyncio
@@ -328,7 +329,7 @@ class TestRBACEnforcement:
         role_checker = require_role(UserRole.DEVELOPER)
         # This would be called by FastAPI dependency injection
         # Just verify the function exists and is callable
-        assert callable(role_checker)
+        self.assertTrue(callable(role_checker))
 
     @pytest.mark.asyncio
     async def test_require_role_insufficient_permissions(self):
@@ -349,10 +350,10 @@ class TestRBACEnforcement:
             checker_func = role_checker
             # The actual check happens inside the returned function
             # This tests the has_permission logic
-            assert has_permission(UserRole.API_USER, UserRole.ADMIN) is False
+            self.assertIs(has_permission(UserRole.API_USER, UserRole.ADMIN), False)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions."""
 
     def test_token_without_role_defaults_to_readonly(self):
@@ -378,7 +379,7 @@ class TestEdgeCases:
         # Empty user ID should still create token but be identifiable
         token = create_access_token("", UserRole.READ_ONLY)
         payload = verify_jwt_token(token)
-        assert payload["sub"] == ""  # Empty but present
+        self.assertEqual(payload["sub"], ""  # Empty but present)
 
     def test_special_characters_in_user_id(self):
         """Test user IDs with special characters."""
@@ -386,7 +387,7 @@ class TestEdgeCases:
         token = create_access_token(user_id, UserRole.DEVELOPER)
 
         payload = verify_jwt_token(token)
-        assert payload["sub"] == user_id
+        self.assertEqual(payload["sub"], user_id)
 
 
 if __name__ == "__main__":

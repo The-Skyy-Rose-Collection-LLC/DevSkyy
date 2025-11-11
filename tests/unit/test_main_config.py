@@ -3,12 +3,13 @@ Comprehensive Unit Tests for Main Application Configuration (main.py)
 Testing SECRET_KEY handling, environment configuration, and application setup
 """
 
+import unittest
 import pytest
 from fastapi.testclient import TestClient
 import logging
 
 
-class TestSecretKeyConfiguration:
+class TestSecretKeyConfiguration(unittest.TestCase):
     """Test suite for SECRET_KEY configuration"""
 
     @pytest.mark.unit
@@ -22,7 +23,7 @@ class TestSecretKeyConfiguration:
         import main
         importlib.reload(main)
         
-        assert main.SECRET_KEY == test_key_value
+        self.assertEqual(main.SECRET_KEY, test_key_value)
 
     @pytest.mark.unit
     def test_secret_key_default_value(self, monkeypatch):
@@ -35,17 +36,17 @@ class TestSecretKeyConfiguration:
         importlib.reload(main)
         
         # Should have default development value
-        assert main.SECRET_KEY is not None
-        assert isinstance(main.SECRET_KEY, str)
-        assert len(main.SECRET_KEY) > 0
+        self.assertIsNotNone(main.SECRET_KEY)
+        self.assertIsInstance(main.SECRET_KEY, str)
+        self.assertGreater(len(main.SECRET_KEY), 0)
 
     @pytest.mark.unit
     def test_secret_key_not_empty(self):
         """Test SECRET_KEY is never empty"""
         from main import SECRET_KEY
         
-        assert SECRET_KEY is not None
-        assert len(SECRET_KEY) > 0
+        self.assertIsNotNone(SECRET_KEY)
+        self.assertGreater(len(SECRET_KEY), 0)
 
     @pytest.mark.unit
     def test_secret_key_warning_for_default(self, monkeypatch):
@@ -59,10 +60,10 @@ class TestSecretKeyConfiguration:
         importlib.reload(main)
         
         # In development, should use default without critical warnings
-        assert main.SECRET_KEY is not None
+        self.assertIsNotNone(main.SECRET_KEY)
 
 
-class TestEnvironmentConfiguration:
+class TestEnvironmentConfiguration(unittest.TestCase):
     """Test suite for environment configuration"""
 
     @pytest.mark.unit
@@ -70,10 +71,10 @@ class TestEnvironmentConfiguration:
         """Test VERSION is properly configured"""
         from main import VERSION
         
-        assert VERSION is not None
-        assert isinstance(VERSION, str)
+        self.assertIsNotNone(VERSION)
+        self.assertIsInstance(VERSION, str)
         # Version should follow semantic versioning or similar pattern
-        assert len(VERSION) > 0
+        self.assertGreater(len(VERSION), 0)
 
     @pytest.mark.unit
     def test_environment_configuration(self, monkeypatch):
@@ -85,7 +86,7 @@ class TestEnvironmentConfiguration:
         import main
         importlib.reload(main)
         
-        assert main.ENVIRONMENT == test_env
+        self.assertEqual(main.ENVIRONMENT, test_env)
 
     @pytest.mark.unit
     def test_environment_default_value(self, monkeypatch):
@@ -97,7 +98,7 @@ class TestEnvironmentConfiguration:
         importlib.reload(main)
         
         # Should default to development
-        assert main.ENVIRONMENT == "development"
+        self.assertEqual(main.ENVIRONMENT, "development")
 
     @pytest.mark.unit
     def test_log_level_configuration(self, monkeypatch):
@@ -109,7 +110,7 @@ class TestEnvironmentConfiguration:
         import main
         importlib.reload(main)
         
-        assert main.LOG_LEVEL == test_level
+        self.assertEqual(main.LOG_LEVEL, test_level)
 
     @pytest.mark.unit
     def test_log_level_default_value(self, monkeypatch):
@@ -120,10 +121,10 @@ class TestEnvironmentConfiguration:
         import main
         importlib.reload(main)
         
-        assert main.LOG_LEVEL == "INFO"
+        self.assertEqual(main.LOG_LEVEL, "INFO")
 
 
-class TestRedisConfiguration:
+class TestRedisConfiguration(unittest.TestCase):
     """Test suite for Redis configuration"""
 
     @pytest.mark.unit
@@ -136,7 +137,7 @@ class TestRedisConfiguration:
         import main
         importlib.reload(main)
         
-        assert main.REDIS_URL == test_redis_url
+        self.assertEqual(main.REDIS_URL, test_redis_url)
 
     @pytest.mark.unit
     def test_redis_url_default_value(self, monkeypatch):
@@ -148,11 +149,11 @@ class TestRedisConfiguration:
         importlib.reload(main)
         
         # Should default to localhost
-        assert "redis://" in main.REDIS_URL
-        assert "localhost" in main.REDIS_URL or "127.0.0.1" in main.REDIS_URL
+        self.assertIn("redis://", main.REDIS_URL)
+        self.assertIn("localhost", main.REDIS_URL or "127.0.0.1" in main.REDIS_URL)
 
 
-class TestApplicationInitialization:
+class TestApplicationInitialization(unittest.TestCase):
     """Test suite for FastAPI application initialization"""
 
     @pytest.mark.unit
@@ -160,26 +161,26 @@ class TestApplicationInitialization:
         """Test FastAPI app instance is created"""
         from main import app
         
-        assert app is not None
+        self.assertIsNotNone(app)
         from fastapi import FastAPI
-        assert isinstance(app, FastAPI)
+        self.assertIsInstance(app, FastAPI)
 
     @pytest.mark.unit
     def test_app_has_title(self):
         """Test app has proper title"""
         from main import app
         
-        assert hasattr(app, 'title')
-        assert app.title is not None
-        assert len(app.title) > 0
+        self.assertTrue(hasattr(app, 'title'))
+        self.assertIsNotNone(app.title)
+        self.assertGreater(len(app.title), 0)
 
     @pytest.mark.unit
     def test_app_has_version(self):
         """Test app has version information"""
         from main import app
         
-        assert hasattr(app, 'version')
-        assert app.version is not None
+        self.assertTrue(hasattr(app, 'version'))
+        self.assertIsNotNone(app.version)
 
     @pytest.mark.unit
     def test_app_cors_configured(self):
@@ -187,11 +188,11 @@ class TestApplicationInitialization:
         from main import app
         
         # Check middleware is configured
-        assert hasattr(app, 'middleware_stack')
+        self.assertTrue(hasattr(app, 'middleware_stack'))
         # CORS should be part of middleware
 
 
-class TestConfigurationValidation:
+class TestConfigurationValidation(unittest.TestCase):
     """Test configuration validation and safety"""
 
     @pytest.mark.unit
@@ -200,7 +201,7 @@ class TestConfigurationValidation:
         from main import SECRET_KEY
         
         # Should be at least reasonable length
-        assert len(SECRET_KEY) >= 16
+        self.assertGreater(len(SECRET_KEY), = 16)
 
     @pytest.mark.unit
     def test_no_hardcoded_credentials(self):
@@ -225,7 +226,7 @@ class TestConfigurationValidation:
                 # Skip lines that are just loading from environment
                 if 'os.getenv' not in line and 'os.environ' not in line:
                     # Should not have hardcoded values
-                    assert '"' not in line or "'" not in line or '=' in line
+                    self.assertIn('"' not, line or "'" not in line or '=' in line)
 
     @pytest.mark.unit
     def test_environment_variables_used(self):
@@ -236,10 +237,10 @@ class TestConfigurationValidation:
         source = inspect.getsource(main)
         
         # Should use os.getenv for configuration
-        assert "os.getenv" in source or "os.environ" in source
+        self.assertIn("os.getenv", source or "os.environ" in source)
 
 
-class TestSecurityBestPractices:
+class TestSecurityBestPractices(unittest.TestCase):
     """Test security best practices in configuration"""
 
     @pytest.mark.unit
@@ -257,7 +258,7 @@ class TestSecurityBestPractices:
         for line in secret_key_lines:
             # Should use environment variable loading
             if 'SECRET_KEY =' in line or 'SECRET_KEY=' in line:
-                assert 'os.getenv' in line or 'os.environ' in line
+                self.assertIn('os.getenv', line or 'os.environ' in line)
 
     @pytest.mark.unit
     @pytest.mark.security
@@ -266,7 +267,7 @@ class TestSecurityBestPractices:
         from main import ENVIRONMENT
         
         # Should be able to distinguish environments
-        assert ENVIRONMENT in ["development", "staging", "production", "test"]
+        self.assertIn(ENVIRONMENT, ["development", "staging", "production", "test"])
 
     @pytest.mark.unit
     @pytest.mark.security
@@ -279,10 +280,10 @@ class TestSecurityBestPractices:
         importlib.reload(main)
         
         # In production, should not use development defaults
-        assert main.ENVIRONMENT == "production"
+        self.assertEqual(main.ENVIRONMENT, "production")
 
 
-class TestConfigurationEdgeCases:
+class TestConfigurationEdgeCases(unittest.TestCase):
     """Test edge cases in configuration"""
 
     @pytest.mark.unit
@@ -295,8 +296,8 @@ class TestConfigurationEdgeCases:
         importlib.reload(main)
         
         # Should fall back to default
-        assert main.SECRET_KEY is not None
-        assert len(main.SECRET_KEY) > 0
+        self.assertIsNotNone(main.SECRET_KEY)
+        self.assertGreater(len(main.SECRET_KEY), 0)
 
     @pytest.mark.unit
     def test_whitespace_only_secret_key(self, monkeypatch):
@@ -308,7 +309,7 @@ class TestConfigurationEdgeCases:
         importlib.reload(main)
         
         # Should handle gracefully
-        assert main.SECRET_KEY is not None
+        self.assertIsNotNone(main.SECRET_KEY)
 
     @pytest.mark.unit
     def test_very_long_secret_key(self, monkeypatch):
@@ -321,7 +322,7 @@ class TestConfigurationEdgeCases:
         importlib.reload(main)
         
         # Should accept long keys
-        assert main.SECRET_KEY == long_key
+        self.assertEqual(main.SECRET_KEY, long_key)
 
     @pytest.mark.unit
     def test_special_characters_in_secret_key(self, monkeypatch):
@@ -333,7 +334,7 @@ class TestConfigurationEdgeCases:
         import main
         importlib.reload(main)
         
-        assert main.SECRET_KEY == special_key
+        self.assertEqual(main.SECRET_KEY, special_key)
 
     @pytest.mark.unit
     def test_unicode_in_secret_key(self, monkeypatch):
@@ -345,10 +346,10 @@ class TestConfigurationEdgeCases:
         import main
         importlib.reload(main)
         
-        assert main.SECRET_KEY == unicode_key
+        self.assertEqual(main.SECRET_KEY, unicode_key)
 
 
-class TestApplicationStartup:
+class TestApplicationStartup(unittest.TestCase):
     """Test application startup and initialization"""
 
     @pytest.mark.unit
@@ -356,7 +357,7 @@ class TestApplicationStartup:
         """Test main module can be imported without errors"""
         try:
             from main import app
-            assert app is not None
+            self.assertIsNotNone(app)
         except ImportError as e:
             pytest.fail(f"Failed to import main app: {e}")
 
@@ -367,7 +368,7 @@ class TestApplicationStartup:
         
         try:
             client = TestClient(app)
-            assert client is not None
+            self.assertIsNotNone(client)
         except TypeError as e:
             pytest.fail(f"Failed to create TestClient: {e}")
 
@@ -377,7 +378,7 @@ class TestApplicationStartup:
         from main import app
         
         # Should have at least some routes
-        assert len(app.routes) > 0
+        self.assertGreater(len(app.routes), 0)
 
     @pytest.mark.unit
     def test_app_has_lifespan_events(self):
@@ -386,10 +387,10 @@ class TestApplicationStartup:
         
         # Should have event handlers configured
         # This is framework-dependent but indicates proper setup
-        assert hasattr(app, 'router')
+        self.assertTrue(hasattr(app, 'router'))
 
 
-class TestConfigurationDocumentation:
+class TestConfigurationDocumentation(unittest.TestCase):
     """Test configuration is properly documented"""
 
     @pytest.mark.unit
@@ -401,10 +402,10 @@ class TestConfigurationDocumentation:
         source = inspect.getsource(main)
         
         # Should have comments explaining configuration
-        assert '#' in source or '"""' in source
+        self.assertIn('#', source or '"""' in source)
 
 
-class TestConfigurationReloading:
+class TestConfigurationReloading(unittest.TestCase):
     """Test configuration can be reloaded"""
 
     @pytest.mark.unit
@@ -423,10 +424,10 @@ class TestConfigurationReloading:
         secret2 = main.SECRET_KEY
         
         # Verify reload worked (if env var was respected)
-        assert secret2 is not None
+        self.assertIsNotNone(secret2)
 
 
-class TestIntegrationWithApplication:
+class TestIntegrationWithApplication(unittest.TestCase):
     """Integration tests with full application"""
 
     @pytest.mark.integration
@@ -441,7 +442,7 @@ class TestIntegrationWithApplication:
         try:
             response = client.get("/")
             # Should return some response
-            assert response is not None
+            self.assertIsNotNone(response)
         except Exception:
             # Test environment may not have all dependencies
             logging.exception("Exception occurred during test")
@@ -456,10 +457,10 @@ class TestIntegrationWithApplication:
         import main
         importlib.reload(main)
         
-        assert main.ENVIRONMENT == "test"
+        self.assertEqual(main.ENVIRONMENT, "test")
 
 
-class TestConfigurationConsistency:
+class TestConfigurationConsistency(unittest.TestCase):
     """Test configuration consistency across modules"""
 
     @pytest.mark.unit
@@ -471,7 +472,7 @@ class TestConfigurationConsistency:
         from main import SECRET_KEY as SECRET_KEY_2
         
         # Should be the same
-        assert SECRET_KEY == SECRET_KEY_2
+        self.assertEqual(SECRET_KEY, SECRET_KEY_2)
 
     @pytest.mark.unit
     def test_environment_consistency(self):
@@ -479,4 +480,4 @@ class TestConfigurationConsistency:
         from main import ENVIRONMENT
         from main import ENVIRONMENT as ENV_2
         
-        assert ENVIRONMENT == ENV_2
+        self.assertEqual(ENVIRONMENT, ENV_2)

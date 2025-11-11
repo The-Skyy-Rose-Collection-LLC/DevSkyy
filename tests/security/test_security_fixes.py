@@ -3,6 +3,7 @@ Test Security Fixes
 Comprehensive tests to verify all security vulnerabilities have been fixed
 """
 
+import unittest
 import pytest
 import re
 from pathlib import Path
@@ -15,7 +16,7 @@ from agent.modules.frontend.autonomous_landing_page_generator import render_safe
 from database.security import DatabaseSecurity
 
 
-class TestLogInjectionFixes:
+class TestLogInjectionFixes(unittest.TestCase):
     """Test that log injection vulnerabilities have been fixed"""
     
     def test_log_sanitizer_removes_newlines(self):
@@ -23,28 +24,28 @@ class TestLogInjectionFixes:
         malicious_input = "user@example.com\n[FAKE LOG ENTRY] Admin access granted"
         sanitized = sanitize_for_log(malicious_input)
         
-        assert '\n' not in sanitized
-        assert '\r' not in sanitized
-        assert '[FAKE LOG ENTRY]' in sanitized  # Content preserved but safe
+        self.assertIn('\n' not, sanitized)
+        self.assertIn('\r' not, sanitized)
+        self.assertIn('[FAKE LOG ENTRY]', sanitized  # Content preserved but safe)
     
     def test_log_sanitizer_limits_length(self):
         """Test that log sanitizer limits string length"""
         long_input = "A" * 1000
         sanitized = sanitize_for_log(long_input, max_length=100)
         
-        assert len(sanitized) <= 103  # 100 + "..."
-        assert sanitized.endswith('...')
+        self.assertLess(len(sanitized), = 103  # 100 + "...")
+        self.assertTrue(sanitized.endswith('...'))
     
     def test_user_identifier_sanitization(self):
         """Test user identifier sanitization"""
         malicious_email = "user@example.com\nADMIN_ACCESS=true"
         sanitized = sanitize_user_identifier(malicious_email)
         
-        assert '\n' not in sanitized
-        assert len(sanitized) <= 100
+        self.assertIn('\n' not, sanitized)
+        self.assertLess(len(sanitized), = 100)
 
 
-class TestJWTSignatureVerification:
+class TestJWTSignatureVerification(unittest.TestCase):
     """Test JWT signature verification fixes"""
     
     @patch('security.auth0_integration.get_auth0_public_key')
@@ -72,12 +73,12 @@ class TestJWTSignatureVerification:
         # This should not raise an exception
         try:
             # The function should work with proper key conversion
-            assert True  # If we get here, the import worked
+            self.assertTrue(True  # If we get here, the import worked)
         except ImportError:
             pytest.skip("Auth0 integration not available")
 
 
-class TestXSSProtection:
+class TestXSSProtection(unittest.TestCase):
     """Test XSS protection in Jinja2 templates"""
     
     def test_safe_template_rendering_escapes_html(self):
@@ -92,8 +93,8 @@ class TestXSSProtection:
         )
         
         # Script tags should be escaped
-        assert "<script>" not in result
-        assert "&lt;script&gt;" in result or "alert(&#x27;XSS&#x27;)" in result
+        self.assertGreater("<script, " not in result)
+        self.assertIn("&lt;script&gt;", result or "alert(&#x27;XSS&#x27;)" in result)
     
     def test_safe_template_preserves_safe_content(self):
         """Test that safe template rendering preserves safe content"""
@@ -102,11 +103,11 @@ class TestXSSProtection:
         
         result = render_safe_template(template_string, title=safe_title)
         
-        assert safe_title in result
-        assert "<h1>" in result
+        self.assertIn(safe_title, result)
+        self.assertGreater("<h1, " in result)
 
 
-class TestSQLInjectionProtection:
+class TestSQLInjectionProtection(unittest.TestCase):
     """Test SQL injection protection"""
     
     def test_database_security_validates_user_id(self):
@@ -132,10 +133,10 @@ class TestSQLInjectionProtection:
         
         # This should not raise an exception
         safe_query = db_security._create_safe_query(query_template, params)
-        assert safe_query is not None
+        self.assertIsNotNone(safe_query)
 
 
-class TestConditionalPatternFixes:
+class TestConditionalPatternFixes(unittest.TestCase):
     """Test that strange conditional patterns have been fixed"""
     
     def test_no_conditional_patterns_in_critical_files(self):
@@ -158,16 +159,16 @@ class TestConditionalPatternFixes:
                 
                 matches = pattern.findall(content)
                 # Allow some matches but ensure they're significantly reduced
-                assert len(matches) < 10, f"Too many conditional patterns in {file_path}: {len(matches)}"
+                self.assertLess(len(matches), 10, f"Too many conditional patterns in {file_path}: {len(matches)}")
 
 
-class TestSecurityConfiguration:
+class TestSecurityConfiguration(unittest.TestCase):
     """Test overall security configuration"""
     
     def test_security_imports_work(self):
         """Test that all security modules can be imported"""
         try:
-            assert True
+            self.assertTrue(True)
         except ImportError as e:
             pytest.fail(f"Security module import failed: {e}")
     
@@ -179,7 +180,7 @@ class TestSecurityConfiguration:
         try:
             logger.info("Test message")
             logger.error("Test error")
-            assert True
+            self.assertTrue(True)
         except Exception as e:
             pytest.fail(f"Logging failed: {e}")
 

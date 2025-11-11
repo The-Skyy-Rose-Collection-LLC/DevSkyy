@@ -3,6 +3,7 @@ Unit Tests for Authentication System
 Tests for enhanced JWT authentication, validation, and security features
 """
 
+import unittest
 from unittest.mock import Mock, patch
 
 import pytest
@@ -24,7 +25,7 @@ from security.jwt_auth import (
 )
 
 
-class TestPasswordSecurity:
+class TestPasswordSecurity(unittest.TestCase):
     """Test password hashing and verification"""
 
     def test_password_hashing(self):
@@ -32,9 +33,9 @@ class TestPasswordSecurity:
         password = "TestPassword123!"
         hashed = hash_password(password)
 
-        assert hashed != password
-        assert verify_password(password, hashed)
-        assert not verify_password("wrong_password", hashed)
+        self.assertNotEqual(hashed, password)
+        self.assertTrue(verify_password(password, hashed))
+        self.assertFalse(verify_password("wrong_password", hashed))
 
     def test_password_hash_uniqueness(self):
         """Test that same password produces different hashes"""
@@ -42,12 +43,12 @@ class TestPasswordSecurity:
         hash1 = hash_password(password)
         hash2 = hash_password(password)
 
-        assert hash1 != hash2
-        assert verify_password(password, hash1)
-        assert verify_password(password, hash2)
+        self.assertNotEqual(hash1, hash2)
+        self.assertTrue(verify_password(password, hash1))
+        self.assertTrue(verify_password(password, hash2))
 
 
-class TestAccountLockout:
+class TestAccountLockout(unittest.TestCase):
     """Test account lockout functionality"""
 
     def setup_method(self):
@@ -61,19 +62,19 @@ class TestAccountLockout:
 
     def test_account_not_locked_initially(self):
         """Test that account is not locked initially"""
-        assert not is_account_locked(self.test_email)
+        self.assertFalse(is_account_locked(self.test_email))
 
     def test_failed_login_tracking(self):
         """Test failed login attempt tracking"""
         # Record failed attempts
         for i in range(4):
             locked = record_failed_login(self.test_email)
-            assert not locked  # Should not be locked yet
+            self.assertFalse(locked  # Should not be locked yet)
 
         # 5th attempt should lock the account
         locked = record_failed_login(self.test_email)
-        assert locked
-        assert is_account_locked(self.test_email)
+        self.assertTrue(locked)
+        self.assertTrue(is_account_locked(self.test_email))
 
     def test_clear_failed_attempts(self):
         """Test clearing failed login attempts"""
@@ -85,10 +86,10 @@ class TestAccountLockout:
         clear_failed_login_attempts(self.test_email)
 
         # Should not be locked
-        assert not is_account_locked(self.test_email)
+        self.assertFalse(is_account_locked(self.test_email))
 
 
-class TestTokenBlacklist:
+class TestTokenBlacklist(unittest.TestCase):
     """Test token blacklisting functionality"""
 
     def setup_method(self):
@@ -101,14 +102,14 @@ class TestTokenBlacklist:
         """Test token blacklisting"""
         token = "test_token_123"
 
-        assert not is_token_blacklisted(token)
+        self.assertFalse(is_token_blacklisted(token))
 
         blacklist_token(token)
 
-        assert is_token_blacklisted(token)
+        self.assertTrue(is_token_blacklisted(token))
 
 
-class TestEnhancedValidation:
+class TestEnhancedValidation(unittest.TestCase):
     """Test enhanced validation models"""
 
     def test_valid_registration_request(self):
@@ -123,9 +124,9 @@ class TestEnhancedValidation:
         }
 
         request = EnhancedRegisterRequest(**request_data)
-        assert request.email == "test@example.com"
-        assert request.username == "testuser"
-        assert request.password == "TestPassword123!"
+        self.assertEqual(request.email, "test@example.com")
+        self.assertEqual(request.username, "testuser")
+        self.assertEqual(request.password, "TestPassword123!")
 
     def test_password_strength_validation(self):
         """Test password strength validation"""
@@ -188,7 +189,7 @@ class TestEnhancedValidation:
             )
 
 
-class TestJWTTokens:
+class TestJWTTokens(unittest.TestCase):
     """Test JWT token creation and verification"""
 
     @pytest.fixture
@@ -202,9 +203,9 @@ class TestJWTTokens:
         """Test JWT token creation"""
         tokens = create_user_tokens(mock_user)
 
-        assert "access_token" in tokens
-        assert "refresh_token" in tokens
-        assert tokens["token_type"] == "bearer"
+        self.assertIn("access_token", tokens)
+        self.assertIn("refresh_token", tokens)
+        self.assertEqual(tokens["token_type"], "bearer")
 
     def test_token_verification(self, mock_user):
         """Test JWT token verification"""
@@ -213,10 +214,10 @@ class TestJWTTokens:
 
         token_data = verify_token(access_token)
 
-        assert token_data.user_id == mock_user.id
-        assert token_data.email == mock_user.email
-        assert token_data.username == mock_user.username
-        assert token_data.role == mock_user.role
+        self.assertEqual(token_data.user_id, mock_user.id)
+        self.assertEqual(token_data.email, mock_user.email)
+        self.assertEqual(token_data.username, mock_user.username)
+        self.assertEqual(token_data.role, mock_user.role)
 
     def test_invalid_token_verification(self):
         """Test verification of invalid token"""
@@ -234,7 +235,7 @@ class TestJWTTokens:
             verify_token(access_token)
 
 
-class TestAuthenticationAPI:
+class TestAuthenticationAPI(unittest.TestCase):
     """Test authentication API endpoints"""
 
     def setup_method(self):
@@ -261,7 +262,7 @@ class TestAuthenticationAPI:
             mock_create.return_value = mock_user
 
             response = self.client.post("/api/v1/auth/register", json=valid_data)
-            assert response.status_code == 201
+            self.assertEqual(response.status_code, 201)
 
     def test_register_endpoint_weak_password(self):
         """Test registration with weak password"""
@@ -273,7 +274,7 @@ class TestAuthenticationAPI:
         }
 
         response = self.client.post("/api/v1/auth/register", json=invalid_data)
-        assert response.status_code == 422  # Validation error
+        self.assertEqual(response.status_code, 422  # Validation error)
 
     def test_login_endpoint_validation(self):
         """Test login endpoint with validation"""
@@ -289,15 +290,15 @@ class TestAuthenticationAPI:
             mock_auth.return_value = mock_user
 
             response = self.client.post("/api/v1/auth/login", json=login_data)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
 
             data = response.json()
-            assert "access_token" in data
-            assert "refresh_token" in data
+            self.assertIn("access_token", data)
+            self.assertIn("refresh_token", data)
 
 
 @pytest.mark.asyncio
-class TestAsyncAuthentication:
+class TestAsyncAuthentication(unittest.TestCase):
     """Test asynchronous authentication functionality"""
 
     async def test_async_token_verification(self):
@@ -314,11 +315,11 @@ class TestAsyncAuthentication:
         # Verify token (this should work synchronously)
         token_data = verify_token(access_token)
 
-        assert token_data.user_id == mock_user.id
-        assert token_data.email == mock_user.email
+        self.assertEqual(token_data.user_id, mock_user.id)
+        self.assertEqual(token_data.email, mock_user.email)
 
 
-class TestSecurityLogging:
+class TestSecurityLogging(unittest.TestCase):
     """Test security event logging"""
 
     def test_security_event_logging(self):
@@ -331,7 +332,7 @@ class TestSecurityLogging:
 
             # Verify logging was called (in actual implementation)
             # This would be tested with the actual security logger integration
-            assert True  # Placeholder for actual logging test
+            self.assertTrue(True  # Placeholder for actual logging test)
 
 
 if __name__ == "__main__":

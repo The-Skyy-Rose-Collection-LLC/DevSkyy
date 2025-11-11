@@ -1,3 +1,4 @@
+import unittest
 from agent.ml_models.forecasting_engine import ForecastingEngine
 from ml.model_registry import ModelRegistry
 from sklearn.ensemble import RandomForestRegressor
@@ -14,7 +15,7 @@ ML Model Validation Tests
 Tests for machine learning models, performance benchmarks, and validation
 """
 
-class TestModelPerformance:
+class TestModelPerformance(unittest.TestCase):
     """Test ML model performance and benchmarks"""
 
     def setup_method(self):
@@ -47,8 +48,8 @@ class TestModelPerformance:
         model = benchmark(train_model)
 
         # Verify model was trained
-        assert hasattr(model, "estimators_")
-        assert len(model.estimators_) == 100
+        self.assertTrue(hasattr(model, "estimators_"))
+        self.assertEqual(len(model.estimators_), 100)
 
     @pytest.mark.benchmark
     def test_model_prediction_performance(self, benchmark):
@@ -63,8 +64,8 @@ class TestModelPerformance:
         predictions = benchmark(predict)
 
         # Verify predictions
-        assert len(predictions) == len(self.X_test)
-        assert not np.isnan(predictions).any()
+        self.assertEqual(len(predictions), len(self.X_test))
+        self.assertFalse(np.isnan(predictions).any())
 
     def test_model_accuracy(self):
         """Test model accuracy meets minimum requirements"""
@@ -78,8 +79,8 @@ class TestModelPerformance:
         r2 = r2_score(self.y_test, predictions)
 
         # Assert minimum performance requirements
-        assert mse < 1.0, f"MSE too high: {mse}"
-        assert r2 > 0.8, f"R² too low: {r2}"
+        self.assertLess(mse, 1.0, f"MSE too high: {mse}")
+        self.assertGreater(r2, 0.8, f"R² too low: {r2}")
 
     def test_model_training_time(self):
         """Test that model training completes within time limit"""
@@ -91,7 +92,7 @@ class TestModelPerformance:
         training_time = time.time() - start_time
 
         # Assert training time is reasonable
-        assert training_time < 10.0, f"Training took too long: {training_time}s"
+        self.assertLess(training_time, 10.0, f"Training took too long: {training_time}s")
 
     def test_model_prediction_time(self):
         """Test that model prediction is fast enough"""
@@ -103,9 +104,9 @@ class TestModelPerformance:
         prediction_time = time.time() - start_time
 
         # Assert prediction time is reasonable
-        assert prediction_time < 1.0, f"Prediction took too long: {prediction_time}s"
+        self.assertLess(prediction_time, 1.0, f"Prediction took too long: {prediction_time}s")
 
-class TestForecastingEngine:
+class TestForecastingEngine(unittest.TestCase):
     """Test the forecasting engine"""
 
     def setup_method(self):
@@ -122,26 +123,26 @@ class TestForecastingEngine:
 
     def test_forecasting_engine_initialization(self):
         """Test forecasting engine initializes correctly"""
-        assert self.engine is not None
-        assert hasattr(self.engine, "models")
+        self.assertIsNotNone(self.engine)
+        self.assertTrue(hasattr(self.engine, "models"))
 
     def test_data_preprocessing(self):
         """Test data preprocessing functionality"""
         processed_data = self.engine._preprocess_data(self.data)
 
-        assert processed_data is not None
-        assert len(processed_data) > 0
-        assert not processed_data.isnull().any().any()
+        self.assertIsNotNone(processed_data)
+        self.assertGreater(len(processed_data), 0)
+        self.assertFalse(processed_data.isnull().any().any())
 
     def test_model_training(self):
         """Test model training functionality"""
         # This would test the actual training method
         # For now, we'll test that the method exists and can be called
-        assert hasattr(self.engine, "train_model")
+        self.assertTrue(hasattr(self.engine, "train_model"))
 
         # Mock training
         result = self.engine.train_model(self.data, model_type="linear")
-        assert result is not None
+        self.assertIsNotNone(result)
 
     def test_prediction_generation(self):
         """Test prediction generation"""
@@ -151,9 +152,9 @@ class TestForecastingEngine:
         # Generate predictions
         predictions = self.engine.predict(steps=30)
 
-        assert predictions is not None
-        assert len(predictions) == 30
-        assert not np.isnan(predictions).any()
+        self.assertIsNotNone(predictions)
+        self.assertEqual(len(predictions), 30)
+        self.assertFalse(np.isnan(predictions).any())
 
     def test_forecast_accuracy(self):
         """Test forecast accuracy on known data"""
@@ -172,9 +173,9 @@ class TestForecastingEngine:
         mse = mean_squared_error(actual, predictions)
 
         # Assert reasonable accuracy
-        assert mse < 100, f"Forecast MSE too high: {mse}"
+        self.assertLess(mse, 100, f"Forecast MSE too high: {mse}")
 
-class TestModelRegistry:
+class TestModelRegistry(unittest.TestCase):
     """Test the model registry functionality"""
 
     def setup_method(self):
@@ -197,8 +198,8 @@ class TestModelRegistry:
             metadata={"type": "regression", "features": 5},
         )
 
-        assert model_id is not None
-        assert isinstance(model_id, str)
+        self.assertIsNotNone(model_id)
+        self.assertIsInstance(model_id, str)
 
     def test_model_retrieval(self):
         """Test model retrieval from registry"""
@@ -215,8 +216,8 @@ class TestModelRegistry:
         # Retrieve the model
         retrieved_model = self.registry.get_model(model_id)
 
-        assert retrieved_model is not None
-        assert hasattr(retrieved_model, "predict")
+        self.assertIsNotNone(retrieved_model)
+        self.assertTrue(hasattr(retrieved_model, "predict"))
 
     def test_model_versioning(self):
         """Test model versioning functionality"""
@@ -231,13 +232,13 @@ class TestModelRegistry:
                 model=model, name="versioned_model", version=version
             )
 
-            assert model_id is not None
+            self.assertIsNotNone(model_id)
 
         # Test getting latest version
         latest_model = self.registry.get_model_by_name(
             "versioned_model", version="latest"
         )
-        assert latest_model is not None
+        self.assertIsNotNone(latest_model)
 
     def test_model_metadata(self):
         """Test model metadata storage and retrieval"""
@@ -260,12 +261,12 @@ class TestModelRegistry:
         # Retrieve metadata
         retrieved_metadata = self.registry.get_model_metadata(model_id)
 
-        assert retrieved_metadata is not None
-        assert retrieved_metadata["type"] == "regression"
-        assert retrieved_metadata["features"] == 5
-        assert retrieved_metadata["accuracy"] == 0.95
+        self.assertIsNotNone(retrieved_metadata)
+        self.assertEqual(retrieved_metadata["type"], "regression")
+        self.assertEqual(retrieved_metadata["features"], 5)
+        self.assertEqual(retrieved_metadata["accuracy"], 0.95)
 
-class TestModelValidation:
+class TestModelValidation(unittest.TestCase):
     """Test model validation and quality checks"""
 
     def test_model_input_validation(self):
@@ -278,7 +279,7 @@ class TestModelValidation:
         # Test valid input
         X_valid = np.random.randn(10, 5)
         predictions = model.predict(X_valid)
-        assert len(predictions) == 10
+        self.assertEqual(len(predictions), 10)
 
         # Test invalid input shape
         X_invalid = np.random.randn(10, 3)  # Wrong number of features
@@ -297,10 +298,10 @@ class TestModelValidation:
         predictions = model.predict(X_test)
 
         # Validate output
-        assert len(predictions) == 20
-        assert not np.isnan(predictions).any()
-        assert not np.isinf(predictions).any()
-        assert predictions.dtype == np.float64
+        self.assertEqual(len(predictions), 20)
+        self.assertFalse(np.isnan(predictions).any())
+        self.assertFalse(np.isinf(predictions).any())
+        self.assertEqual(predictions.dtype, np.float64)
 
     def test_model_robustness(self):
         """Test model robustness to edge cases"""
@@ -314,9 +315,9 @@ class TestModelValidation:
         predictions = model.predict(X_extreme)
 
         # Should still produce valid predictions
-        assert len(predictions) == 1
-        assert not np.isnan(predictions[0])
-        assert not np.isinf(predictions[0])
+        self.assertEqual(len(predictions), 1)
+        self.assertFalse(np.isnan(predictions[0]))
+        self.assertFalse(np.isinf(predictions[0]))
 
     def test_model_consistency(self):
         """Test model prediction consistency"""
@@ -333,7 +334,7 @@ class TestModelValidation:
         # Should be identical
         np.testing.assert_array_equal(predictions1, predictions2)
 
-class TestModelMonitoring:
+class TestModelMonitoring(unittest.TestCase):
     """Test model monitoring and drift detection"""
 
     def test_prediction_logging(self):
@@ -348,7 +349,7 @@ class TestModelMonitoring:
         predictions = model.predict(X_test)
 
         # In actual implementation, this would verify logging
-        assert len(predictions) == 5
+        self.assertEqual(len(predictions), 5)
 
     def test_model_performance_tracking(self):
         """Test model performance tracking over time"""
@@ -367,10 +368,10 @@ class TestModelMonitoring:
         r2 = r2_score(y_test, predictions)
 
         # Performance metrics should be reasonable
-        assert isinstance(mse, float)
-        assert isinstance(r2, float)
-        assert not np.isnan(mse)
-        assert not np.isnan(r2)
+        self.assertIsInstance(mse, float)
+        self.assertIsInstance(r2, float)
+        self.assertFalse(np.isnan(mse))
+        self.assertFalse(np.isnan(r2))
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--benchmark-only"])

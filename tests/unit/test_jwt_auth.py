@@ -3,6 +3,7 @@ DevSkyy Enterprise - JWT Authentication Unit Tests
 Comprehensive tests for JWT token creation, validation, and security
 """
 
+import unittest
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -18,22 +19,22 @@ from security.jwt_auth import (
 )
 
 
-class TestJWTTokenCreation:
+class TestJWTTokenCreation(unittest.TestCase):
     """Test JWT token creation functions"""
 
     def test_create_access_token_basic(self, test_user_data):
         """Test basic access token creation"""
         token = create_access_token(data=test_user_data)
 
-        assert token is not None
-        assert isinstance(token, str)
-        assert len(token) > 50  # JWT tokens are reasonably long
+        self.assertIsNotNone(token)
+        self.assertIsInstance(token, str)
+        self.assertGreater(len(token), 50  # JWT tokens are reasonably long)
 
         # Verify token can be decoded
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        assert payload["user_id"] == test_user_data["user_id"]
-        assert payload["email"] == test_user_data["email"]
-        assert payload["token_type"] == "access"
+        self.assertEqual(payload["user_id"], test_user_data["user_id"])
+        self.assertEqual(payload["email"], test_user_data["email"])
+        self.assertEqual(payload["token_type"], "access")
 
     def test_create_access_token_with_custom_expiry(self, test_user_data):
         """Test access token with custom expiration time"""
@@ -45,18 +46,18 @@ class TestJWTTokenCreation:
         iat_timestamp = payload["iat"]
 
         # Verify expiration is approximately 30 minutes from issued time
-        assert (exp_timestamp - iat_timestamp) == 30 * 60  # 30 minutes in seconds
+        self.assertEqual((exp_timestamp - iat_timestamp), 30 * 60  # 30 minutes in seconds)
 
     def test_create_refresh_token_basic(self, test_user_data):
         """Test basic refresh token creation"""
         token = create_refresh_token(data=test_user_data)
 
-        assert token is not None
-        assert isinstance(token, str)
+        self.assertIsNotNone(token)
+        self.assertIsInstance(token, str)
 
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        assert payload["user_id"] == test_user_data["user_id"]
-        assert payload["token_type"] == "refresh"
+        self.assertEqual(payload["user_id"], test_user_data["user_id"])
+        self.assertEqual(payload["token_type"], "refresh")
 
     def test_create_token_contains_all_user_data(self, test_user_data):
         """Test that token contains all provided user data"""
@@ -64,7 +65,7 @@ class TestJWTTokenCreation:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
         for key, value in test_user_data.items():
-            assert payload[key] == value
+            self.assertEqual(payload[key], value)
 
     def test_create_token_with_utc_timestamps(self, test_user_data):
         """Test that tokens use UTC timestamps (critical bug fix)"""
@@ -76,33 +77,33 @@ class TestJWTTokenCreation:
         iat_time = datetime.fromtimestamp(payload["iat"], tz=timezone.utc)
 
         # Issued time should be between before and after
-        assert before_time <= iat_time <= after_time
+        self.assertLess(before_time, = iat_time <= after_time)
 
 
-class TestJWTTokenVerification:
+class TestJWTTokenVerification(unittest.TestCase):
     """Test JWT token verification functions"""
 
     def test_verify_valid_access_token(self, test_access_token):
         """Test verification of valid access token"""
         result = verify_token(test_access_token, expected_type="access")
 
-        assert result is not None
-        assert result["user_id"] == "test_user_001"
-        assert result["token_type"] == "access"
+        self.assertIsNotNone(result)
+        self.assertEqual(result["user_id"], "test_user_001")
+        self.assertEqual(result["token_type"], "access")
 
     def test_verify_valid_refresh_token(self, test_refresh_token):
         """Test verification of valid refresh token"""
         result = verify_token(test_refresh_token, expected_type="refresh")
 
-        assert result is not None
-        assert result["user_id"] == "test_user_001"
-        assert result["token_type"] == "refresh"
+        self.assertIsNotNone(result)
+        self.assertEqual(result["user_id"], "test_user_001")
+        self.assertEqual(result["token_type"], "refresh")
 
     def test_verify_token_wrong_type(self, test_access_token):
         """Test that access token fails when expecting refresh token"""
         result = verify_token(test_access_token, expected_type="refresh")
 
-        assert result is None  # Should return None for wrong type
+        self.assertIs(result, None  # Should return None for wrong type)
 
     def test_verify_expired_token(self, test_user_data):
         """Test that expired tokens are rejected"""
@@ -113,14 +114,14 @@ class TestJWTTokenVerification:
         )
 
         result = verify_token(expired_token)
-        assert result is None  # Expired token should be rejected
+        self.assertIs(result, None  # Expired token should be rejected)
 
     def test_verify_invalid_token(self):
         """Test that invalid tokens are rejected"""
         invalid_token = "this.is.not.a.valid.jwt.token"
 
         result = verify_token(invalid_token)
-        assert result is None
+        self.assertIsNone(result)
 
     def test_verify_tampered_token(self, test_access_token):
         """Test that tampered tokens are rejected"""
@@ -128,7 +129,7 @@ class TestJWTTokenVerification:
         tampered_token = test_access_token[:-5] + "AAAAA"
 
         result = verify_token(tampered_token)
-        assert result is None
+        self.assertIsNone(result)
 
     def test_verify_token_with_wrong_secret(self, test_user_data):
         """Test that token signed with different secret is rejected"""
@@ -138,27 +139,27 @@ class TestJWTTokenVerification:
         )
 
         result = verify_token(wrong_secret_token)
-        assert result is None
+        self.assertIsNone(result)
 
 
-class TestJWTTokenPayload:
+class TestJWTTokenPayload(unittest.TestCase):
     """Test JWT token payload extraction"""
 
     def test_get_token_payload_success(self, test_access_token):
         """Test successful payload extraction"""
         payload = get_token_payload(test_access_token)
 
-        assert payload is not None
-        assert "user_id" in payload
-        assert "email" in payload
-        assert "exp" in payload
-        assert "iat" in payload
+        self.assertIsNotNone(payload)
+        self.assertIn("user_id", payload)
+        self.assertIn("email", payload)
+        self.assertIn("exp", payload)
+        self.assertIn("iat", payload)
 
     def test_get_token_payload_invalid_token(self):
         """Test payload extraction from invalid token"""
         payload = get_token_payload("invalid.token.here")
 
-        assert payload is None
+        self.assertIsNone(payload)
 
     def test_get_token_payload_expired_token(self, test_user_data):
         """Test payload extraction from expired token (should still work)"""
@@ -169,11 +170,11 @@ class TestJWTTokenPayload:
 
         # Payload extraction should work even for expired tokens
         payload = get_token_payload(expired_token)
-        assert payload is not None
-        assert payload["user_id"] == test_user_data["user_id"]
+        self.assertIsNotNone(payload)
+        self.assertEqual(payload["user_id"], test_user_data["user_id"])
 
 
-class TestJWTSecurity:
+class TestJWTSecurity(unittest.TestCase):
     """Test JWT security features"""
 
     def test_tokens_are_unique(self, test_user_data):
@@ -182,7 +183,7 @@ class TestJWTSecurity:
         token2 = create_access_token(data=test_user_data)
 
         # Tokens should be different due to different iat timestamps
-        assert token1 != token2
+        self.assertNotEqual(token1, token2)
 
     def test_token_contains_no_sensitive_data_in_clear(self, test_access_token):
         """Test that token doesn't contain clear passwords or secrets"""
@@ -190,8 +191,8 @@ class TestJWTSecurity:
         # Ensure we're not putting sensitive data in claims
         payload = get_token_payload(test_access_token)
 
-        assert "password" not in payload
-        assert "secret" not in payload.get("user_id", "").lower()
+        self.assertIn("password" not, payload)
+        self.assertIn("secret" not, payload.get("user_id", "").lower())
 
     def test_token_expiration_is_future_date(self, test_access_token):
         """Test that token expiration is in the future"""
@@ -199,7 +200,7 @@ class TestJWTSecurity:
         exp_timestamp = payload["exp"]
         current_timestamp = datetime.now(timezone.utc).timestamp()
 
-        assert exp_timestamp > current_timestamp
+        self.assertGreater(exp_timestamp, current_timestamp)
 
     def test_access_token_shorter_expiry_than_refresh(self, test_user_data):
         """Test that access tokens expire sooner than refresh tokens"""
@@ -210,20 +211,20 @@ class TestJWTSecurity:
         refresh_payload = get_token_payload(refresh_token)
 
         # Refresh token should expire later than access token
-        assert refresh_payload["exp"] > access_payload["exp"]
+        self.assertGreater(refresh_payload["exp"], access_payload["exp"])
 
 
-class TestJWTEdgeCases:
+class TestJWTEdgeCases(unittest.TestCase):
     """Test JWT edge cases and error handling"""
 
     def test_create_token_with_empty_data(self):
         """Test token creation with empty data"""
         token = create_access_token(data={})
 
-        assert token is not None
+        self.assertIsNotNone(token)
         payload = get_token_payload(token)
-        assert "exp" in payload
-        assert "iat" in payload
+        self.assertIn("exp", payload)
+        self.assertIn("iat", payload)
 
     def test_create_token_with_special_characters(self):
         """Test token creation with special characters in data"""
@@ -236,8 +237,8 @@ class TestJWTEdgeCases:
         token = create_access_token(data=data)
         payload = get_token_payload(token)
 
-        assert payload["user_id"] == data["user_id"]
-        assert payload["email"] == data["email"]
+        self.assertEqual(payload["user_id"], data["user_id"])
+        self.assertEqual(payload["email"], data["email"])
 
     def test_create_token_with_large_payload(self):
         """Test token creation with large data payload"""
@@ -249,18 +250,18 @@ class TestJWTEdgeCases:
 
         token = create_access_token(data=large_data)
 
-        assert token is not None
-        assert len(token) > 500  # Should be reasonably large
+        self.assertIsNotNone(token)
+        self.assertGreater(len(token), 500  # Should be reasonably large)
 
     def test_verify_token_none_input(self):
         """Test verification with None input"""
         result = verify_token(None)
-        assert result is None
+        self.assertIsNone(result)
 
     def test_verify_token_empty_string(self):
         """Test verification with empty string"""
         result = verify_token("")
-        assert result is None
+        self.assertIsNone(result)
 
 
 # ============================================================================
@@ -269,7 +270,7 @@ class TestJWTEdgeCases:
 
 
 @pytest.mark.slow
-class TestJWTPerformance:
+class TestJWTPerformance(unittest.TestCase):
     """Test JWT token performance"""
 
     def test_token_creation_performance(self, test_user_data, performance_timer):
@@ -278,7 +279,7 @@ class TestJWTPerformance:
             create_access_token(data=test_user_data)
 
         elapsed = performance_timer()
-        assert elapsed < 1.0  # Should create 100 tokens in under 1 second
+        self.assertLess(elapsed, 1.0  # Should create 100 tokens in under 1 second)
 
     def test_token_verification_performance(self, test_access_token, performance_timer):
         """Test that token verification is fast"""
@@ -286,4 +287,4 @@ class TestJWTPerformance:
             verify_token(test_access_token)
 
         elapsed = performance_timer()
-        assert elapsed < 1.0  # Should verify 100 tokens in under 1 second
+        self.assertLess(elapsed, 1.0  # Should verify 100 tokens in under 1 second)

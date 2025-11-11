@@ -3,6 +3,7 @@ Unit tests for BoundedAutonomyWrapper
 Tests wrapping agents with bounded autonomy controls
 """
 
+import unittest
 import pytest
 import tempfile
 import shutil
@@ -68,7 +69,7 @@ def wrapper(mock_agent, temp_audit_path):
     )
 
 
-class TestBoundedAutonomyWrapperInitialization:
+class TestBoundedAutonomyWrapperInitialization(unittest.TestCase):
     """Test wrapper initialization"""
 
     def test_init_creates_audit_directory(self, mock_agent, temp_audit_path):
@@ -78,19 +79,19 @@ class TestBoundedAutonomyWrapperInitialization:
             wrapped_agent=mock_agent,
             audit_log_path=str(audit_path)
         )
-        assert audit_path.exists()
+        self.assertTrue(audit_path.exists())
 
     def test_init_sets_default_values(self, wrapper):
         """Test that initialization sets default values"""
-        assert wrapper.auto_approve_low_risk is True
-        assert wrapper.local_only is True
-        assert wrapper.emergency_stop is False
-        assert wrapper.paused is False
-        assert len(wrapper.pending_actions) == 0
-        assert len(wrapper.completed_actions) == 0
+        self.assertIs(wrapper.auto_approve_low_risk, True)
+        self.assertIs(wrapper.local_only, True)
+        self.assertIs(wrapper.emergency_stop, False)
+        self.assertIs(wrapper.paused, False)
+        self.assertEqual(len(wrapper.pending_actions), 0)
+        self.assertEqual(len(wrapper.completed_actions), 0)
 
 
-class TestRiskAssessment:
+class TestRiskAssessment(unittest.TestCase):
     """Test risk assessment logic"""
 
     def test_assess_risk_critical_operations(self, wrapper):
@@ -99,7 +100,7 @@ class TestRiskAssessment:
         
         for func in critical_functions:
             risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.CRITICAL
+            self.assertEqual(risk, ActionRiskLevel.CRITICAL)
 
     def test_assess_risk_high_operations(self, wrapper):
         """Test assessment of high-risk operations"""
@@ -107,7 +108,7 @@ class TestRiskAssessment:
         
         for func in high_risk_functions:
             risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.HIGH
+            self.assertEqual(risk, ActionRiskLevel.HIGH)
 
     def test_assess_risk_medium_operations(self, wrapper):
         """Test assessment of medium-risk operations"""
@@ -115,7 +116,7 @@ class TestRiskAssessment:
         
         for func in medium_risk_functions:
             risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.MEDIUM
+            self.assertEqual(risk, ActionRiskLevel.MEDIUM)
 
     def test_assess_risk_low_operations(self, wrapper):
         """Test assessment of low-risk operations"""
@@ -123,49 +124,49 @@ class TestRiskAssessment:
         
         for func in low_risk_functions:
             risk = wrapper._assess_risk(func, {})
-            assert risk == ActionRiskLevel.LOW
+            self.assertEqual(risk, ActionRiskLevel.LOW)
 
     def test_assess_risk_case_insensitive(self, wrapper):
         """Test that risk assessment is case-insensitive"""
-        assert wrapper._assess_risk("DELETE_user", {}) == ActionRiskLevel.CRITICAL
-        assert wrapper._assess_risk("Create_Product", {}) == ActionRiskLevel.HIGH
+        self.assertEqual(wrapper._assess_risk("DELETE_user", {}), ActionRiskLevel.CRITICAL)
+        self.assertEqual(wrapper._assess_risk("Create_Product", {}), ActionRiskLevel.HIGH)
 
 
-class TestApprovalRequirement:
+class TestApprovalRequirement(unittest.TestCase):
     """Test approval requirement determination"""
 
     def test_requires_approval_with_override_true(self, wrapper):
         """Test that override=True forces approval"""
         requires = wrapper._requires_approval("read_data", {}, override=True)
-        assert requires is True
+        self.assertIs(requires, True)
 
     def test_requires_approval_with_override_false(self, wrapper):
         """Test that override=False bypasses approval"""
         requires = wrapper._requires_approval("delete_data", {}, override=False)
-        assert requires is False
+        self.assertIs(requires, False)
 
     def test_requires_approval_low_risk_auto_approve(self, wrapper):
         """Test that low-risk actions don't require approval with auto_approve_low_risk"""
         requires = wrapper._requires_approval("read_data", {}, override=None)
-        assert requires is False
+        self.assertIs(requires, False)
 
     def test_requires_approval_medium_risk(self, wrapper):
         """Test that medium-risk actions require approval"""
         requires = wrapper._requires_approval("analyze_data", {}, override=None)
-        assert requires is True
+        self.assertIs(requires, True)
 
     def test_requires_approval_high_risk(self, wrapper):
         """Test that high-risk actions require approval"""
         requires = wrapper._requires_approval("update_data", {}, override=None)
-        assert requires is True
+        self.assertIs(requires, True)
 
     def test_requires_approval_critical_risk(self, wrapper):
         """Test that critical-risk actions require approval"""
         requires = wrapper._requires_approval("deploy_changes", {}, override=None)
-        assert requires is True
+        self.assertIs(requires, True)
 
 
-class TestNetworkCallDetection:
+class TestNetworkCallDetection(unittest.TestCase):
     """Test network call detection"""
 
     def test_involves_network_call_api_keywords(self, wrapper):
@@ -178,7 +179,7 @@ class TestNetworkCallDetection:
             risk_level=ActionRiskLevel.HIGH,
             requires_approval=True
         )
-        assert wrapper._involves_network_call(action) is True
+        self.assertIs(wrapper._involves_network_call(action), True)
 
     def test_involves_network_call_http_keywords(self, wrapper):
         """Test detection of HTTP-related keywords"""
@@ -193,7 +194,7 @@ class TestNetworkCallDetection:
                 risk_level=ActionRiskLevel.MEDIUM,
                 requires_approval=True
             )
-            assert wrapper._involves_network_call(action) is True
+            self.assertIs(wrapper._involves_network_call(action), True)
 
     def test_involves_network_call_local_functions(self, wrapper):
         """Test that local functions are not flagged"""
@@ -208,10 +209,10 @@ class TestNetworkCallDetection:
                 risk_level=ActionRiskLevel.LOW,
                 requires_approval=False
             )
-            assert wrapper._involves_network_call(action) is False
+            self.assertIs(wrapper._involves_network_call(action), False)
 
 
-class TestExecuteLowRisk:
+class TestExecuteLowRisk(unittest.TestCase):
     """Test execution of low-risk actions"""
 
     @pytest.mark.asyncio
@@ -222,9 +223,9 @@ class TestExecuteLowRisk:
             parameters={"source": "test.csv"}
         )
         
-        assert result["status"] == "completed"
-        assert "result" in result
-        assert result["action_id"] is not None
+        self.assertEqual(result["status"], "completed")
+        self.assertIn("result", result)
+        self.assertIsNotNone(result["action_id"])
 
     @pytest.mark.asyncio
     async def test_execute_records_audit_log(self, wrapper, temp_audit_path):
@@ -236,7 +237,7 @@ class TestExecuteLowRisk:
         
         # Check audit log file was created
         audit_files = list(Path(temp_audit_path).glob("audit_*.jsonl"))
-        assert len(audit_files) > 0
+        self.assertGreater(len(audit_files), 0)
 
     @pytest.mark.asyncio
     async def test_execute_tracks_execution_time(self, wrapper):
@@ -246,11 +247,11 @@ class TestExecuteLowRisk:
             parameters={"source": "test.csv"}
         )
         
-        assert "execution_time_seconds" in result
-        assert result["execution_time_seconds"] >= 0
+        self.assertIn("execution_time_seconds", result)
+        self.assertGreater(result["execution_time_seconds"], = 0)
 
 
-class TestExecuteHighRisk:
+class TestExecuteHighRisk(unittest.TestCase):
     """Test execution of high-risk actions"""
 
     @pytest.mark.asyncio
@@ -261,9 +262,9 @@ class TestExecuteHighRisk:
             parameters={"id": "123", "data": {"field": "value"}}
         )
         
-        assert result["status"] == "pending_approval"
-        assert "action_id" in result
-        assert "review_command" in result
+        self.assertEqual(result["status"], "pending_approval")
+        self.assertIn("action_id", result)
+        self.assertIn("review_command", result)
 
     @pytest.mark.asyncio
     async def test_execute_critical_requires_approval(self, wrapper):
@@ -273,7 +274,7 @@ class TestExecuteHighRisk:
             parameters={"resource_id": "important_resource"}
         )
         
-        assert result["status"] == "pending_approval"
+        self.assertEqual(result["status"], "pending_approval")
 
     @pytest.mark.asyncio
     async def test_execute_adds_to_pending_queue(self, wrapper):
@@ -285,10 +286,10 @@ class TestExecuteHighRisk:
             parameters={"id": "123"}
         )
         
-        assert len(wrapper.pending_actions) == initial_count + 1
+        self.assertEqual(len(wrapper.pending_actions), initial_count + 1)
 
 
-class TestEmergencyControls:
+class TestEmergencyControls(unittest.TestCase):
     """Test emergency stop and pause controls"""
 
     @pytest.mark.asyncio
@@ -301,8 +302,8 @@ class TestEmergencyControls:
             parameters={"source": "test.csv"}
         )
         
-        assert result["status"] == "blocked"
-        assert "emergency" in result["error"].lower()
+        self.assertEqual(result["status"], "blocked")
+        self.assertIn("emergency", result["error"].lower())
 
     @pytest.mark.asyncio
     async def test_pause_queues_execution(self, wrapper):
@@ -314,16 +315,16 @@ class TestEmergencyControls:
             parameters={"source": "test.csv"}
         )
         
-        assert result["status"] == "queued"
-        assert "paused" in result["error"].lower()
+        self.assertEqual(result["status"], "queued")
+        self.assertIn("paused", result["error"].lower())
 
     def test_resume_after_pause(self, wrapper):
         """Test resuming after pause"""
         wrapper.pause()
-        assert wrapper.paused is True
+        self.assertIs(wrapper.paused, True)
         
         wrapper.resume()
-        assert wrapper.paused is False
+        self.assertIs(wrapper.paused, False)
 
     def test_emergency_stop_audits_pending_actions(self, wrapper):
         """Test that emergency stop audits all pending actions"""
@@ -341,11 +342,11 @@ class TestEmergencyControls:
         wrapper.emergency_shutdown("Test emergency")
         
         # Check audit trail
-        assert len(action.audit_trail) > 0
-        assert any("emergency_stop" in str(entry) for entry in action.audit_trail)
+        self.assertGreater(len(action.audit_trail), 0)
+        self.assertIn(any("emergency_stop", str(entry) for entry in action.audit_trail))
 
 
-class TestApproveAction:
+class TestApproveAction(unittest.TestCase):
     """Test action approval workflow"""
 
     @pytest.mark.asyncio
@@ -361,16 +362,16 @@ class TestApproveAction:
         # Approve and execute
         approval_result = await wrapper.approve_action(action_id, "test_operator")
         
-        assert approval_result["status"] == "completed"
-        assert action_id not in wrapper.pending_actions
+        self.assertEqual(approval_result["status"], "completed")
+        self.assertIn(action_id not, wrapper.pending_actions)
 
     @pytest.mark.asyncio
     async def test_approve_nonexistent_action(self, wrapper):
         """Test approving non-existent action returns error"""
         result = await wrapper.approve_action("nonexistent_id", "operator")
         
-        assert result["status"] == "error"
-        assert "not found" in result["error"].lower()
+        self.assertEqual(result["status"], "error")
+        self.assertIn("not found", result["error"].lower())
 
     @pytest.mark.asyncio
     async def test_approve_updates_audit_trail(self, wrapper):
@@ -384,10 +385,10 @@ class TestApproveAction:
         await wrapper.approve_action(action_id, "test_operator")
         
         # Check completed actions for audit trail
-        assert len(wrapper.completed_actions) > 0
+        self.assertGreater(len(wrapper.completed_actions), 0)
 
 
-class TestRejectAction:
+class TestRejectAction(unittest.TestCase):
     """Test action rejection workflow"""
 
     @pytest.mark.asyncio
@@ -401,18 +402,18 @@ class TestRejectAction:
         
         reject_result = await wrapper.reject_action(action_id, "operator", "Not authorized")
         
-        assert reject_result["status"] == "rejected"
-        assert action_id not in wrapper.pending_actions
+        self.assertEqual(reject_result["status"], "rejected")
+        self.assertIn(action_id not, wrapper.pending_actions)
 
     @pytest.mark.asyncio
     async def test_reject_nonexistent_action(self, wrapper):
         """Test rejecting non-existent action returns error"""
         result = await wrapper.reject_action("nonexistent", "operator", "reason")
         
-        assert result["status"] == "error"
+        self.assertEqual(result["status"], "error")
 
 
-class TestLocalOnlyMode:
+class TestLocalOnlyMode(unittest.TestCase):
     """Test local-only mode enforcement"""
 
     @pytest.mark.asyncio
@@ -430,8 +431,8 @@ class TestLocalOnlyMode:
         approval_result = await wrapper.approve_action(action_id, "operator")
         
         # Should be blocked by network check
-        assert approval_result["status"] == "blocked"
-        assert "network" in approval_result["error"].lower()
+        self.assertEqual(approval_result["status"], "blocked")
+        self.assertIn("network", approval_result["error"].lower())
 
     @pytest.mark.asyncio
     async def test_local_only_tracks_blocked_calls(self, wrapper):
@@ -445,10 +446,10 @@ class TestLocalOnlyMode:
         action_id = result["action_id"]
         await wrapper.approve_action(action_id, "operator")
         
-        assert wrapper.network_calls_blocked > initial_count
+        self.assertGreater(wrapper.network_calls_blocked, initial_count)
 
 
-class TestGetStatus:
+class TestGetStatus(unittest.TestCase):
     """Test status retrieval"""
 
     @pytest.mark.asyncio
@@ -456,10 +457,10 @@ class TestGetStatus:
         """Test getting complete wrapper status"""
         status = await wrapper.get_status()
         
-        assert "agent_name" in status
-        assert "bounded_controls" in status
-        assert "actions" in status
-        assert "network" in status
+        self.assertIn("agent_name", status)
+        self.assertIn("bounded_controls", status)
+        self.assertIn("actions", status)
+        self.assertIn("network", status)
 
     @pytest.mark.asyncio
     async def test_get_status_includes_counts(self, wrapper):
@@ -470,10 +471,10 @@ class TestGetStatus:
         
         status = await wrapper.get_status()
         
-        assert status["actions"]["pending"] == 2
+        self.assertEqual(status["actions"]["pending"], 2)
 
 
-class TestActionIdGeneration:
+class TestActionIdGeneration(unittest.TestCase):
     """Test action ID generation"""
 
     def test_generate_action_id_unique(self, wrapper):
@@ -481,17 +482,17 @@ class TestActionIdGeneration:
         id1 = wrapper._generate_action_id()
         id2 = wrapper._generate_action_id()
         
-        assert id1 != id2
+        self.assertNotEqual(id1, id2)
 
     def test_generate_action_id_format(self, wrapper):
         """Test that action ID has expected format"""
         action_id = wrapper._generate_action_id()
         
-        assert wrapper.wrapped_agent.agent_name in action_id
-        assert "_" in action_id
+        self.assertIn(wrapper.wrapped_agent.agent_name, action_id)
+        self.assertIn("_", action_id)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     @pytest.mark.asyncio
@@ -503,7 +504,7 @@ class TestEdgeCases:
         )
         
         # Should still create action and try to execute
-        assert result["status"] in ["pending_approval", "error"]
+        self.assertIn(result["status"], ["pending_approval", "error"])
 
     @pytest.mark.asyncio
     async def test_execute_with_empty_parameters(self, wrapper):
@@ -513,7 +514,7 @@ class TestEdgeCases:
             parameters={}
         )
         
-        assert "status" in result
+        self.assertIn("status", result)
 
     @pytest.mark.asyncio
     async def test_execute_with_complex_parameters(self, wrapper):
@@ -529,4 +530,4 @@ class TestEdgeCases:
             parameters=complex_params
         )
         
-        assert "status" in result
+        self.assertIn("status", result)

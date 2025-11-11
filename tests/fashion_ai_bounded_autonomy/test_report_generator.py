@@ -3,6 +3,7 @@ Unit tests for ReportGenerator
 Tests report generation and formatting
 """
 
+import unittest
 import pytest
 import tempfile
 import shutil
@@ -24,18 +25,18 @@ def report_gen(temp_output_path):
     return ReportGenerator(output_path=temp_output_path)
 
 
-class TestReportGeneratorInitialization:
+class TestReportGeneratorInitialization(unittest.TestCase):
     """Test ReportGenerator initialization"""
 
     def test_init_creates_directories(self, report_gen):
         """Test that initialization creates output directories"""
-        assert report_gen.summaries_path.exists()
-        assert report_gen.metrics_path.exists()
-        assert report_gen.validation_path.exists()
-        assert report_gen.recommendations_path.exists()
+        self.assertTrue(report_gen.summaries_path.exists())
+        self.assertTrue(report_gen.metrics_path.exists())
+        self.assertTrue(report_gen.validation_path.exists())
+        self.assertTrue(report_gen.recommendations_path.exists())
 
 
-class TestDailySummary:
+class TestDailySummary(unittest.TestCase):
     """Test daily summary generation"""
 
     @pytest.mark.asyncio
@@ -73,8 +74,8 @@ class TestDailySummary:
             orchestrator_status, performance_data, approval_stats
         )
         
-        assert report_file.exists()
-        assert report_file.suffix == ".md"
+        self.assertTrue(report_file.exists())
+        self.assertEqual(report_file.suffix, ".md")
 
     @pytest.mark.asyncio
     async def test_daily_summary_includes_key_sections(self, report_gen):
@@ -88,12 +89,12 @@ class TestDailySummary:
         )
         
         content = report_file.read_text()
-        assert "System Status" in content
-        assert "Bounded Autonomy Controls" in content
-        assert "Approval Queue" in content
+        self.assertIn("System Status", content)
+        self.assertIn("Bounded Autonomy Controls", content)
+        self.assertIn("Approval Queue", content)
 
 
-class TestWeeklyReport:
+class TestWeeklyReport(unittest.TestCase):
     """Test weekly report generation"""
 
     @pytest.mark.asyncio
@@ -121,8 +122,8 @@ class TestWeeklyReport:
             performance_data, incidents, proposals
         )
         
-        assert report_file.exists()
-        assert report_file.suffix == ".md"
+        self.assertTrue(report_file.exists())
+        self.assertEqual(report_file.suffix, ".md")
 
     @pytest.mark.asyncio
     async def test_weekly_report_with_no_incidents(self, report_gen):
@@ -136,10 +137,10 @@ class TestWeeklyReport:
         )
         
         content = report_file.read_text()
-        assert "No incidents" in content
+        self.assertIn("No incidents", content)
 
 
-class TestMetricsExport:
+class TestMetricsExport(unittest.TestCase):
     """Test metrics export to CSV"""
 
     @pytest.mark.asyncio
@@ -157,8 +158,8 @@ class TestMetricsExport:
         
         csv_file = await report_gen.export_metrics_csv(metrics_data)
         
-        assert csv_file.exists()
-        assert csv_file.suffix == ".csv"
+        self.assertTrue(csv_file.exists())
+        self.assertEqual(csv_file.suffix, ".csv")
 
     @pytest.mark.asyncio
     async def test_export_metrics_csv_empty_data(self, report_gen):
@@ -168,10 +169,10 @@ class TestMetricsExport:
         csv_file = await report_gen.export_metrics_csv(metrics_data)
         
         # Should handle empty data gracefully
-        assert csv_file.exists()
+        self.assertTrue(csv_file.exists())
 
 
-class TestValidationReport:
+class TestValidationReport(unittest.TestCase):
     """Test validation report generation"""
 
     @pytest.mark.asyncio
@@ -184,8 +185,8 @@ class TestValidationReport:
         
         report_file = await report_gen.generate_validation_report(validation_results)
         
-        assert report_file.exists()
-        assert report_file.suffix == ".json"
+        self.assertTrue(report_file.exists())
+        self.assertEqual(report_file.suffix, ".json")
 
     @pytest.mark.asyncio
     async def test_validation_report_calculates_summary(self, report_gen):
@@ -202,12 +203,12 @@ class TestValidationReport:
         with open(report_file) as f:
             report = json.load(f)
         
-        assert report["total_validations"] == 3
-        assert report["passed"] == 2
-        assert report["failed"] == 1
+        self.assertEqual(report["total_validations"], 3)
+        self.assertEqual(report["passed"], 2)
+        self.assertEqual(report["failed"], 1)
 
 
-class TestRecommendationsReport:
+class TestRecommendationsReport(unittest.TestCase):
     """Test recommendations report generation"""
 
     @pytest.mark.asyncio
@@ -220,8 +221,8 @@ class TestRecommendationsReport:
         
         report_file = await report_gen.generate_recommendations_report(proposals)
         
-        assert report_file.exists()
-        assert report_file.suffix == ".md"
+        self.assertTrue(report_file.exists())
+        self.assertEqual(report_file.suffix, ".md")
 
     @pytest.mark.asyncio
     async def test_recommendations_report_groups_by_priority(self, report_gen):
@@ -235,11 +236,11 @@ class TestRecommendationsReport:
         report_file = await report_gen.generate_recommendations_report(proposals)
         
         content = report_file.read_text()
-        assert "HIGH Priority" in content
-        assert "LOW Priority" in content
+        self.assertIn("HIGH Priority", content)
+        self.assertIn("LOW Priority", content)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases"""
 
     @pytest.mark.asyncio
@@ -254,7 +255,7 @@ class TestEdgeCases:
             orchestrator_status, performance_data, approval_stats
         )
         
-        assert report_file.exists()
+        self.assertTrue(report_file.exists())
 
     @pytest.mark.asyncio
     async def test_export_csv_with_custom_filename(self, report_gen):
@@ -263,4 +264,4 @@ class TestEdgeCases:
         
         csv_file = await report_gen.export_metrics_csv(metrics_data, "custom.csv")
         
-        assert csv_file.name == "custom.csv"
+        self.assertEqual(csv_file.name, "custom.csv")

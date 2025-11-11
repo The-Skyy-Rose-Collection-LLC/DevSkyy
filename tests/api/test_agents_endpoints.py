@@ -3,6 +3,7 @@ Comprehensive Unit Tests for Agent API Endpoints (api/v1/agents.py)
 Testing scanner and fixer agent execution endpoints with various scenarios
 """
 
+import unittest
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -130,7 +131,7 @@ def developer_headers():
         del user_manager.email_index[test_user.email]
 
 
-class TestScannerEndpoint:
+class TestScannerEndpoint(unittest.TestCase):
     """Test suite for Scanner Agent endpoint"""
 
     @pytest.mark.api
@@ -141,7 +142,7 @@ class TestScannerEndpoint:
         
         response = client.post("/api/v1/agents/scanner/execute", json=request_data)
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
         ]
@@ -168,13 +169,13 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        assert data["agent_name"] == "Scanner"
-        assert data["status"] == "success"
-        assert "result" in data
-        assert "execution_time_ms" in data
-        assert "timestamp" in data
+        self.assertEqual(data["agent_name"], "Scanner")
+        self.assertEqual(data["status"], "success")
+        self.assertIn("result", data)
+        self.assertIn("execution_time_ms", data)
+        self.assertIn("timestamp", data)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -189,7 +190,7 @@ class TestScannerEndpoint:
         )
         
         # Should accept empty parameters or return validation error
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -221,7 +222,7 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -241,9 +242,9 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         data = response.json()
-        assert "detail" in data
+        self.assertIn("detail", data)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -267,7 +268,7 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -292,9 +293,9 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        assert data["result"]["files_scanned"] == 1000
+        self.assertEqual(data["result"]["files_scanned"], 1000)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -306,10 +307,10 @@ class TestScannerEndpoint:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
-class TestFixerEndpoint:
+class TestFixerEndpoint(unittest.TestCase):
     """Test suite for Fixer Agent endpoint"""
 
     @pytest.mark.api
@@ -320,7 +321,7 @@ class TestFixerEndpoint:
         
         response = client.post("/api/v1/agents/fixer/execute", json=request_data)
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
         ]
@@ -338,7 +339,7 @@ class TestFixerEndpoint:
         )
         
         # Should be forbidden for non-developer users
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_403_FORBIDDEN,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -366,11 +367,11 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert data["agent_name"] == "Fixer"
-            assert data["status"] == "success"
+            self.assertEqual(data["agent_name"], "Fixer")
+            self.assertEqual(data["status"], "success")
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -392,7 +393,7 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -426,7 +427,7 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -445,9 +446,9 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         data = response.json()
-        assert "detail" in data
+        self.assertIn("detail", data)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -476,7 +477,7 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -504,7 +505,7 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -531,10 +532,10 @@ class TestFixerEndpoint:
             headers=developer_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
 
-class TestScannerV2Endpoint:
+class TestScannerV2Endpoint(unittest.TestCase):
     """Test suite for Scanner V2 Agent endpoint"""
 
     @pytest.mark.api
@@ -564,10 +565,10 @@ class TestScannerV2Endpoint:
             headers=auth_headers
         )
         
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR])
 
 
-class TestAgentListEndpoint:
+class TestAgentListEndpoint(unittest.TestCase):
     """Test suite for listing all agents"""
 
     @pytest.mark.api
@@ -576,7 +577,7 @@ class TestAgentListEndpoint:
         """Test listing agents requires authentication"""
         response = client.get("/api/v1/agents")
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
         ]
@@ -588,7 +589,7 @@ class TestAgentListEndpoint:
         response = client.get("/api/v1/agents", headers=auth_headers)
         
         # Endpoint might return list or might not be fully implemented
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -596,10 +597,10 @@ class TestAgentListEndpoint:
         
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert "agents" in data or isinstance(data, list)
+            self.assertIn("agents", data or isinstance(data, list))
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and boundary conditions"""
 
     @pytest.mark.api
@@ -616,7 +617,7 @@ class TestEdgeCases:
             headers=auth_headers
         )
         
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     @pytest.mark.api
     @pytest.mark.unit
@@ -630,7 +631,7 @@ class TestEdgeCases:
             headers=auth_headers
         )
         
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -652,7 +653,7 @@ class TestEdgeCases:
         )
         
         # Should handle null result gracefully
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
@@ -675,9 +676,9 @@ class TestEdgeCases:
             results = [f.result() for f in concurrent.futures.as_completed(futures)]
         
         # All requests should complete
-        assert len(results) == 5
+        self.assertEqual(len(results), 5)
         for response in results:
-            assert response.status_code in [
+            self.assertIn(response.status_code, [)
                 status.HTTP_200_OK,
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
                 status.HTTP_503_SERVICE_UNAVAILABLE

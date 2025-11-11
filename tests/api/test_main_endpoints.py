@@ -1,3 +1,4 @@
+import unittest
 from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import status
@@ -9,27 +10,27 @@ DevSkyy Enterprise - Main API Endpoint Tests
 Comprehensive tests for core API endpoints
 """
 
-class TestHealthEndpoints:
+class TestHealthEndpoints(unittest.TestCase):
     """Test health and monitoring endpoints"""
 
     def test_root_endpoint(self, test_client):
         """Test root endpoint returns welcome message"""
         response = test_client.get("/")
 
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        assert "message" in data or "name" in data
+        self.assertIn("message", data or "name" in data)
 
     @pytest.mark.api
     def test_health_endpoint(self, test_client):
         """Test health check endpoint"""
         response = test_client.get("/api/v1/monitoring/health")
 
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.json()
-        assert data["status"] == "healthy"
-        assert "timestamp" in data
-        assert "version" in data
+        self.assertEqual(data["status"], "healthy")
+        self.assertIn("timestamp", data)
+        self.assertIn("version", data)
 
     @pytest.mark.api
     def test_metrics_endpoint(self, test_client):
@@ -37,9 +38,9 @@ class TestHealthEndpoints:
         response = test_client.get("/metrics")
 
         # Metrics endpoint should return 200 or 404 if not configured
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND])
 
-class TestAuthenticationEndpoints:
+class TestAuthenticationEndpoints(unittest.TestCase):
     """Test authentication endpoints"""
 
     @pytest.mark.api
@@ -51,7 +52,7 @@ class TestAuthenticationEndpoints:
         response = test_client.post("/api/v1/auth/login", json=login_data)
 
         # Response might be 200 OK or 422 if endpoint expects different format
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_404_NOT_FOUND,
@@ -64,7 +65,7 @@ class TestAuthenticationEndpoints:
         response = test_client.get("/api/v1/agents")
 
         # Should return 401 Unauthorized or 404 if endpoint doesn't exist yet
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN,
             status.HTTP_404_NOT_FOUND,
@@ -77,9 +78,9 @@ class TestAuthenticationEndpoints:
         response = test_client.get("/api/v1/agents", headers=auth_headers)
 
         # Should return 200 OK or 404 if endpoint doesn't exist yet
-        assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
+        self.assertIn(response.status_code, [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND])
 
-class TestAgentEndpoints:
+class TestAgentEndpoints(unittest.TestCase):
     """Test AI agent endpoints"""
 
     @pytest.mark.api
@@ -88,7 +89,7 @@ class TestAgentEndpoints:
         response = test_client.get("/api/v1/agents", headers=auth_headers)
 
         # Endpoint might not exist yet or require auth
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_404_NOT_FOUND,
@@ -96,7 +97,7 @@ class TestAgentEndpoints:
 
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
-            assert isinstance(data, (list, dict))
+            self.assertIsInstance(data, (list, dict))
 
     @pytest.mark.api
     def test_create_agent(self, test_client, auth_headers, mock_agent_data):
@@ -106,7 +107,7 @@ class TestAgentEndpoints:
         )
 
         # Endpoint might not exist yet
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_201_CREATED,
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
@@ -120,13 +121,13 @@ class TestAgentEndpoints:
         response = test_client.get(f"/api/v1/agents/{agent_id}", headers=auth_headers)
 
         # Endpoint might not exist or agent might not be found
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_401_UNAUTHORIZED,
         ]
 
-class TestProjectEndpoints:
+class TestProjectEndpoints(unittest.TestCase):
     """Test project management endpoints"""
 
     @pytest.mark.api
@@ -134,7 +135,7 @@ class TestProjectEndpoints:
         """Test listing all projects"""
         response = test_client.get("/api/v1/projects", headers=auth_headers)
 
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_401_UNAUTHORIZED,
@@ -147,14 +148,14 @@ class TestProjectEndpoints:
             "/api/v1/projects", json=mock_project_data, headers=auth_headers
         )
 
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_201_CREATED,
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
         ]
 
-class TestAIEndpoints:
+class TestAIEndpoints(unittest.TestCase):
     """Test AI interaction endpoints"""
 
     @pytest.mark.api
@@ -171,14 +172,14 @@ class TestAIEndpoints:
         )
 
         # Endpoint might not exist or require external API
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_503_SERVICE_UNAVAILABLE,
         ]
 
-class TestErrorHandling:
+class TestErrorHandling(unittest.TestCase):
     """Test error handling and edge cases"""
 
     @pytest.mark.api
@@ -186,7 +187,7 @@ class TestErrorHandling:
         """Test that non-existent endpoints return 404"""
         response = test_client.get("/api/v1/nonexistent/endpoint")
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @pytest.mark.api
     def test_invalid_method(self, test_client):
@@ -194,7 +195,7 @@ class TestErrorHandling:
         response = test_client.patch("/api/v1/monitoring/health")
 
         # Should return 405 Method Not Allowed or 404
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_405_METHOD_NOT_ALLOWED,
             status.HTTP_404_NOT_FOUND,
         ]
@@ -208,13 +209,13 @@ class TestErrorHandling:
             headers={**auth_headers, "Content-Type": "application/json"},
         )
 
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_400_BAD_REQUEST,
             status.HTTP_404_NOT_FOUND,
         ]
 
-class TestCORS:
+class TestCORS(unittest.TestCase):
     """Test CORS configuration"""
 
     @pytest.mark.api
@@ -223,13 +224,13 @@ class TestCORS:
         response = test_client.options("/api/v1/monitoring/health")
 
         # CORS might be configured or not
-        assert response.status_code in [
+        self.assertIn(response.status_code, [)
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
         ]
 
-class TestRateLimiting:
+class TestRateLimiting(unittest.TestCase):
     """Test rate limiting (if configured)"""
 
     @pytest.mark.api
@@ -243,7 +244,7 @@ class TestRateLimiting:
             responses.append(response.status_code)
 
         # Should get mostly 200s, possibly some 429s if rate limited
-        assert status.HTTP_200_OK in responses
+        self.assertIn(status.HTTP_200_OK, responses)
         # Rate limiting might not be configured yet
         # assert status.HTTP_429_TOO_MANY_REQUESTS in responses
 
@@ -252,7 +253,7 @@ class TestRateLimiting:
 # ============================================================================
 
 @pytest.mark.slow
-class TestAPIPerformance:
+class TestAPIPerformance(unittest.TestCase):
     """Test API endpoint performance"""
 
     def test_health_endpoint_response_time(self, test_client, performance_timer):
@@ -260,7 +261,7 @@ class TestAPIPerformance:
         _response = test_client.get("/api/v1/monitoring/health")  # noqa: F841
 
         elapsed = performance_timer()
-        assert elapsed < 0.1  # Should respond in under 100ms
+        self.assertLess(elapsed, 0.1  # Should respond in under 100ms)
 
     def test_concurrent_requests(self, test_client):
         """Test handling of concurrent requests"""
@@ -273,4 +274,4 @@ class TestAPIPerformance:
             results = [f.result() for f in futures]
 
         # All requests should succeed
-        assert all(r.status_code == status.HTTP_200_OK for r in results)
+        self.assertEqual(all(r.status_code, status.HTTP_200_OK for r in results))
