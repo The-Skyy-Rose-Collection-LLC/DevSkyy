@@ -3,13 +3,14 @@
 
 # MCP Framework
 fastmcp>=0.1.0        # FastMCP framework for building MCP servers
-mcp>=1.0.0            # Model Context Protocol core
+mcp>=1.21.0           # Model Context Protocol - official implementation (requires pydantic>=2.11.0)
 
 # HTTP Client
 httpx>=0.27.0         # Async HTTP client for API calls
 
 # Data Validation
-pydantic>=2.7.0       # Data validation and settings management
+pydantic>=2.12.4,<3.0.0           # Data validation and settings management (align with mcp 1.21.0 requirement)
+pydantic-settings>=2.12.0,<3.0.0  # Settings management (required by mcp 1.21.0)
 
 # Async Support
 asyncio-throttle>=1.0.0  # Rate limiting for async operations

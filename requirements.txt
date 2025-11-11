@@ -12,7 +12,8 @@ setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
 fastapi==0.119.0  # Includes starlette dependency - do not pin separately
 flask==3.1.2  # Flask web framework (installed 2025-11-10)
 uvicorn[standard]==0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency
-pydantic[email]==2.10.4  # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)
+pydantic[email]>=2.12.4,<3.0.0  # Updated: mcp 1.21.0 requires >=2.11.0, using latest stable (fastapi 0.119 requires >=2.9)
+pydantic-settings>=2.12.0,<3.0.0  # Required by mcp 1.21.0
 python-dotenv==1.0.1
 email-validator==2.1.0  # Required for Pydantic email validation
 blinker==1.9.0  # Flask signaling support (updated from system 1.7.0)
@@ -64,13 +65,13 @@ huggingface_hub==0.36.0  # Hugging Face model hub client - Updated 2025-11-10
 transformers==4.57.1  # Latest version - Updated 2025-11-10
 tokenizers==0.22.1  # Required by transformers - Updated 2025-11-10
 torch==2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes
-torchvision==0.20.0  # Compatible with torch 2.9.0
+torchvision==0.24.0  # Compatible with torch 2.9.0 (0.20.0 requires torch 2.5.0)
 # SECURITY: Updated to latest torch version to fix known vulnerabilities
 diffusers==0.35.2  # Latest version - Updated 2025-11-10
 safetensors==0.6.2  # Safe tensor serialization - Updated 2025-11-10
 sentence-transformers==3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
 scikit-learn==1.5.2
-numpy==2.3.4  # Updated 2025-11-10
+numpy>=2.2.6,<2.3  # Compatible with scipy 1.14.1 (requires numpy<2.3), updated 2025-11-11
 pandas==2.3.3  # Updated for security fixes
 # tensorflow==2.16.2  # Disabled due to system compatibility issues - will re-enable in Phase 3
 xgboost==2.1.3
@@ -138,7 +139,7 @@ aiomysql==0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerabilit
 
 # Social Media & Marketing APIs (Verified)
 facebook-sdk==3.1.0
-# instagrapi==2.1.2  # Disabled: requires pydantic==2.7.1 exactly, conflicts with current pydantic 2.10.4
+# instagrapi==2.1.2  # Disabled: requires pydantic==2.7.1 exactly, conflicts with current pydantic>=2.12.4
 tweepy==4.14.0
 google-api-python-client==2.155.0  # Updated
 linkedin-api==2.3.0
@@ -157,7 +158,7 @@ spacy==3.8.3
 nltk==3.9.1
 langchain==0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27
 langchain-text-splitters==0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability
-langsmith==0.2.6  # LLM monitoring
+langsmith>=0.4.42,<1.0.0  # LLM monitoring - Updated: langchain-core requires >=0.3.45
 
 # Blockchain & Web3 (Security Verified)
 web3==7.7.0  # Updated
@@ -175,7 +176,7 @@ plotly==5.24.1  # Interactive plots
 
 # Machine Learning Extensions
 gym==0.26.2
-stable-baselines3==2.4.0
+stable-baselines3==2.7.0  # Updated: supports numpy<3.0 (2.4.0 required numpy<2.0)
 optuna==4.1.0  # Hyperparameter optimization
 mlflow==3.1.0  # ML lifecycle - Updated to fix GHSA-wf7f-8fxf-xfxc vulnerability
 shap==0.46.0  # Model explainability - SHAP values for interpretability
@@ -197,7 +198,7 @@ loguru==0.7.3  # Enhanced logging
 # Data Validation
 cerberus==1.3.6  # Schema validation
 marshmallow==3.23.2  # Serialization
-pydantic[email]==2.10.4  # Updated: langchain 0.3+ fully supports pydantic v2
+# pydantic[email] already specified above with pydantic-settings
 
 # Caching
 cachetools==5.5.0
