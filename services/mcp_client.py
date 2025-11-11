@@ -18,10 +18,10 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from anthropic import Anthropic
-from pydantic import BaseModel, ValidationError
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +78,7 @@ class MCPToolClient:
         """
         self.schema_path = Path(schema_path)
         self.schema = self._load_schema()
-        self.loaded_tools: Dict[str, Dict] = {}
+        self.loaded_tools: dict[str, dict] = {}
         self.invocation_count = 0
 
         # Initialize Anthropic client
@@ -87,11 +87,9 @@ class MCPToolClient:
             self.anthropic_client = Anthropic(api_key=api_key)
         else:
             self.anthropic_client = None
-            logger.warning(
-                "No Anthropic API key provided. Tool invocations will fail."
-            )
+            logger.warning("No Anthropic API key provided. Tool invocations will fail.")
 
-    def _load_schema(self) -> Dict[str, Any]:
+    def _load_schema(self) -> dict[str, Any]:
         """
         Load MCP tool schema from JSON file
 
@@ -114,7 +112,7 @@ class MCPToolClient:
             logger.error(f"❌ Invalid JSON in MCP schema: {e}")
             raise
 
-    def load_tool(self, tool_name: str, category: str) -> Dict[str, Any]:
+    def load_tool(self, tool_name: str, category: str) -> dict[str, Any]:
         """
         Load tool definition on-demand
 
@@ -158,10 +156,10 @@ class MCPToolClient:
         self,
         tool_name: str,
         category: str,
-        inputs: Dict[str, Any],
+        inputs: dict[str, Any],
         model: str = "claude-3-5-sonnet-20241022",
         max_tokens: int = 2000,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Invoke MCP tool with AI execution
 
@@ -187,9 +185,7 @@ class MCPToolClient:
         self.invocation_count += 1
         invocation_id = self.invocation_count
 
-        logger.info(
-            f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}"
-        )
+        logger.info(f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}")
 
         # Load tool definition
         tool_def = self.load_tool(tool_name, category)
@@ -206,9 +202,7 @@ class MCPToolClient:
 
         # Invoke AI model
         if not self.anthropic_client:
-            raise MCPToolError(
-                "Anthropic API key not configured. Cannot invoke tool."
-            )
+            raise MCPToolError("Anthropic API key not configured. Cannot invoke tool.")
 
         try:
             response = self.anthropic_client.messages.create(
@@ -239,16 +233,14 @@ class MCPToolClient:
             # Validate outputs
             self._validate_outputs(result, tool_def.get("output_schema", {}))
 
-            logger.info(
-                f"✅ [Invocation #{invocation_id}] Tool executed successfully"
-            )
+            logger.info(f"✅ [Invocation #{invocation_id}] Tool executed successfully")
             return result
 
         except Exception as e:
             logger.error(f"❌ [Invocation #{invocation_id}] Tool execution failed: {e}")
             raise
 
-    def _validate_inputs(self, inputs: Dict, schema: Dict):
+    def _validate_inputs(self, inputs: dict, schema: dict):
         """
         Validate inputs against JSON schema
 
@@ -265,36 +257,24 @@ class MCPToolClient:
         # Check required fields
         for field in required_fields:
             if field not in inputs:
-                raise MCPToolValidationError(
-                    f"Missing required field: '{field}'. Required fields: {required_fields}"
-                )
+                raise MCPToolValidationError(f"Missing required field: '{field}'. Required fields: {required_fields}")
 
         # Type checking for provided fields
         for field, value in inputs.items():
             if field in properties:
                 expected_type = properties[field].get("type")
                 if expected_type == "string" and not isinstance(value, str):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be a string, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be a string, got {type(value).__name__}")
                 elif expected_type == "integer" and not isinstance(value, int):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an integer, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an integer, got {type(value).__name__}")
                 elif expected_type == "number" and not isinstance(value, (int, float)):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be a number, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be a number, got {type(value).__name__}")
                 elif expected_type == "array" and not isinstance(value, list):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an array, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an array, got {type(value).__name__}")
                 elif expected_type == "object" and not isinstance(value, dict):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an object, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an object, got {type(value).__name__}")
 
-    def _validate_outputs(self, outputs: Dict, schema: Dict):
+    def _validate_outputs(self, outputs: dict, schema: dict):
         """
         Validate outputs against JSON schema
 
@@ -310,11 +290,9 @@ class MCPToolClient:
         # Check required fields
         for field in required_fields:
             if field not in outputs:
-                logger.warning(
-                    f"⚠️  Missing required output field: '{field}' (will continue anyway)"
-                )
+                logger.warning(f"⚠️  Missing required output field: '{field}' (will continue anyway)")
 
-    def _create_tool_prompt(self, tool_def: Dict, inputs: Dict) -> str:
+    def _create_tool_prompt(self, tool_def: dict, inputs: dict) -> str:
         """
         Create prompt for AI tool invocation
 
@@ -347,7 +325,7 @@ Provide ONLY the JSON response below:
 """
         return prompt
 
-    def _get_nested(self, data: Dict, path: str) -> Optional[Any]:
+    def _get_nested(self, data: dict, path: str) -> Optional[Any]:
         """
         Get nested dictionary value by dot-notation path
 
@@ -369,7 +347,7 @@ Provide ONLY the JSON response below:
                 return None
         return value
 
-    def get_loaded_tools(self) -> List[str]:
+    def get_loaded_tools(self) -> list[str]:
         """
         Get list of currently loaded tools
 
@@ -378,7 +356,7 @@ Provide ONLY the JSON response below:
         """
         return list(self.loaded_tools.keys())
 
-    def get_available_tools(self, category: Optional[str] = None) -> List[str]:
+    def get_available_tools(self, category: Optional[str] = None) -> list[str]:
         """
         Get list of available tools from schema
 

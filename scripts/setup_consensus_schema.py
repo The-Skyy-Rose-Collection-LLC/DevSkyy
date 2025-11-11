@@ -10,15 +10,16 @@ Usage:
     DATABASE_URL=postgresql://user:pass@host/db python scripts/setup_consensus_schema.py
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Optional
 
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 CONSENSUS_SCHEMA_SQL = """
@@ -161,7 +162,7 @@ CREATE TRIGGER update_consensus_workflows_updated_at
 
 def get_database_url() -> Optional[str]:
     """Get database URL from environment"""
-    return os.getenv('DATABASE_URL') or os.getenv('NEON_DATABASE_URL')
+    return os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
 
 
 def setup_schema(database_url: str) -> bool:
@@ -184,7 +185,8 @@ def setup_schema(database_url: str) -> bool:
         cursor.execute(CONSENSUS_SCHEMA_SQL)
 
         logger.info("Verifying tables created...")
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT table_name
             FROM information_schema.tables
             WHERE table_schema = 'public'
@@ -198,7 +200,8 @@ def setup_schema(database_url: str) -> bool:
                 'wordpress_categorization_cache'
             )
             ORDER BY table_name;
-        """)
+        """
+        )
 
         tables = cursor.fetchall()
         logger.info(f"Tables created: {len(tables)}")
@@ -211,7 +214,7 @@ def setup_schema(database_url: str) -> bool:
         logger.info("✅ Schema setup completed successfully!")
         return True
 
-    except Exception as e:
+    except Exception:
         logger.exception("❌ Schema setup failed")
         return False
 

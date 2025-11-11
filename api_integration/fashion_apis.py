@@ -1,3 +1,10 @@
+import asyncio
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
+import logging
+from typing import Any
+
 from api_integration.core_engine import api_gateway
 from api_integration.workflow_engine import (
     ActionType,
@@ -6,18 +13,13 @@ from api_integration.workflow_engine import (
     WorkflowStep,
     WorkflowTrigger,
 )
-from datetime import datetime
-from dataclasses import asdict, dataclass
-from enum import Enum
 from fashion.intelligence_engine import (
-    fashion_intelligence,
     FashionCategory,
+    fashion_intelligence,
 )
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
-from typing import Any, Dict, List
-import asyncio
-import logging
+
 
 """
 Fashion Domain API Integrations
@@ -26,6 +28,7 @@ customer analytics, and personalization APIs with fashion industry intelligence
 """
 
 logger = logging.getLogger(__name__)
+
 
 class FashionAPIType(Enum):
     """Fashion-specific API types"""
@@ -39,6 +42,7 @@ class FashionAPIType(Enum):
     SOCIAL_MEDIA = "social_media"
     PRICING_OPTIMIZATION = "pricing_optimization"
 
+
 @dataclass
 class FashionTrendData:
     """Fashion trend data structure"""
@@ -49,21 +53,22 @@ class FashionTrendData:
     category: str
     season: str
     popularity_score: float
-    color_palette: List[str]
-    materials: List[str]
-    target_demographics: List[str]
-    geographic_regions: List[str]
+    color_palette: list[str]
+    materials: list[str]
+    target_demographics: list[str]
+    geographic_regions: list[str]
     social_mentions: int
     runway_appearances: int
     retail_adoption: float
     sustainability_score: float
     created_at: datetime
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["created_at"] = self.created_at.isoformat()
         return data
+
 
 @dataclass
 class ProductData:
@@ -76,23 +81,24 @@ class ProductData:
     category: str
     price: float
     currency: str
-    sizes: List[str]
-    colors: List[str]
-    materials: List[str]
-    images: List[str]
+    sizes: list[str]
+    colors: list[str]
+    materials: list[str]
+    images: list[str]
     availability: bool
     stock_quantity: int
     sustainability_rating: float
-    fashion_trends: List[str]
+    fashion_trends: list[str]
     created_at: datetime
     updated_at: datetime
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["created_at"] = self.created_at.isoformat()
         data["updated_at"] = self.updated_at.isoformat()
         return data
+
 
 class FashionAPIIntegrator:
     """Main fashion API integration manager"""
@@ -549,8 +555,8 @@ class FashionAPIIntegrator:
         )
 
     async def sync_fashion_trends(
-        self, sources: List[str] = None, categories: List[FashionCategory] = None
-    ) -> Dict[str, Any]:
+        self, sources: list[str] = None, categories: list[FashionCategory] = None
+    ) -> dict[str, Any]:
         """Sync fashion trends from multiple sources"""
 
         sources = sources or ["pinterest", "instagram", "fashion_blogs"]
@@ -594,9 +600,7 @@ class FashionAPIIntegrator:
                     description=trend.get("description", ""),
                     category=trend.get("category", ""),
                     season=trend.get("season", ""),
-                    popularity_score=context_analysis.get(
-                        "fashion_relevance_score", 0.0
-                    ),
+                    popularity_score=context_analysis.get("fashion_relevance_score", 0.0),
                     color_palette=trend.get("colors", []),
                     materials=trend.get("materials", []),
                     target_demographics=trend.get("demographics", []),
@@ -624,13 +628,9 @@ class FashionAPIIntegrator:
 
         # Index in Elasticsearch
         for trend in enriched_trends:
-            await elasticsearch_manager.index_document(
-                "fashion_trends", trend.to_dict(), doc_id=trend.trend_id
-            )
+            await elasticsearch_manager.index_document("fashion_trends", trend.to_dict(), doc_id=trend.trend_id)
 
-        logger.info(
-            f"Synced {len(enriched_trends)} fashion trends from {len(sources)} sources"
-        )
+        logger.info(f"Synced {len(enriched_trends)} fashion trends from {len(sources)} sources")
 
         return {
             "success": True,
@@ -640,9 +640,7 @@ class FashionAPIIntegrator:
             "cache_key": cache_key,
         }
 
-    async def _fetch_pinterest_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+    async def _fetch_pinterest_trends(self, categories: list[FashionCategory]) -> list[dict[str, Any]]:
         """Fetch fashion trends from Pinterest"""
 
         trends = []
@@ -667,9 +665,7 @@ class FashionAPIIntegrator:
                             "description": pin.get("description", ""),
                             "category": category.value,
                             "source": "pinterest",
-                            "social_mentions": pin.get("pin_metrics", {}).get(
-                                "save", 0
-                            ),
+                            "social_mentions": pin.get("pin_metrics", {}).get("save", 0),
                             "created_at": pin.get("created_at"),
                         }
                         trends.append(trend)
@@ -679,9 +675,7 @@ class FashionAPIIntegrator:
 
         return trends
 
-    async def _fetch_instagram_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+    async def _fetch_instagram_trends(self, categories: list[FashionCategory]) -> list[dict[str, Any]]:
         """Fetch fashion trends from Instagram"""
 
         trends = []
@@ -726,9 +720,7 @@ class FashionAPIIntegrator:
 
         return trends
 
-    async def _fetch_fashion_blog_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+    async def _fetch_fashion_blog_trends(self, categories: list[FashionCategory]) -> list[dict[str, Any]]:
         """Fetch fashion trends from fashion blogs and websites"""
 
         # This would integrate with fashion blog APIs or RSS feeds
@@ -749,7 +741,7 @@ class FashionAPIIntegrator:
 
         return trends
 
-    async def get_fashion_metrics(self) -> Dict[str, Any]:
+    async def get_fashion_metrics(self) -> dict[str, Any]:
         """Get fashion API integration metrics"""
 
         return {
@@ -758,13 +750,11 @@ class FashionAPIIntegrator:
             "cached_products": len(self.product_cache),
             "customer_profiles": len(self.customer_profiles),
             "fashion_workflows": len(self.fashion_workflows),
-            "last_trend_sync": await redis_manager.get(
-                "last_trend_sync", prefix="fashion_cache"
-            ),
+            "last_trend_sync": await redis_manager.get("last_trend_sync", prefix="fashion_cache"),
             "api_health": await self._check_fashion_api_health(),
         }
 
-    async def _check_fashion_api_health(self) -> Dict[str, str]:
+    async def _check_fashion_api_health(self) -> dict[str, str]:
         """Check health of fashion APIs"""
 
         health_status = {}
@@ -779,25 +769,21 @@ class FashionAPIIntegrator:
                     timeout=5,
                 )
 
-                health_status[api_name] = (
-                    "healthy" if result.get("success") else "unhealthy"
-                )
+                health_status[api_name] = "healthy" if result.get("success") else "unhealthy"
 
             except Exception:
                 health_status[api_name] = "unhealthy"
 
         return health_status
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for fashion API integrator"""
 
         try:
             metrics = await self.get_fashion_metrics()
             api_health = await self._check_fashion_api_health()
 
-            healthy_apis = sum([
-                1 for status in api_health.values() if status == "healthy"
-            ])
+            healthy_apis = sum([1 for status in api_health.values() if status == "healthy"])
             total_apis = len(api_health)
 
             overall_status = "healthy" if healthy_apis == total_apis else "degraded"
@@ -813,6 +799,7 @@ class FashionAPIIntegrator:
 
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
+
 
 # Global fashion API integrator instance
 fashion_api_integrator = FashionAPIIntegrator()

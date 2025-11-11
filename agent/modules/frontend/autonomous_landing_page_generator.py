@@ -16,13 +16,14 @@ Features:
 """
 
 import asyncio
+from datetime import datetime
 import logging
 import random
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from uuid import uuid4
 
 from jinja2 import Template
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class AutonomousLandingPageGenerator:
 
         logger.info("🚀 Autonomous Landing Page Generator initialized")
 
-    def _load_templates(self) -> Dict[str, str]:
+    def _load_templates(self) -> dict[str, str]:
         """Load base templates for landing pages."""
         return {
             "luxury_fashion": """
@@ -151,7 +152,7 @@ class AutonomousLandingPageGenerator:
         target_audience: str,
         goal: str = "email_signup",
         num_variants: int = 4,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate multiple landing page variants for A/B testing.
 
@@ -167,14 +168,10 @@ class AutonomousLandingPageGenerator:
         test_id = str(uuid4())
         variants = []
 
-        logger.info(
-            f"🎨 Generating {num_variants} landing page variants for {product_name}"
-        )
+        logger.info(f"🎨 Generating {num_variants} landing page variants for {product_name}")
 
         for i in range(num_variants):
-            variant = await self._create_variant(
-                product_name, target_audience, goal, chr(65 + i)
-            )  # A, B, C, D
+            variant = await self._create_variant(product_name, target_audience, goal, chr(65 + i))  # A, B, C, D
             variants.append(variant)
 
         # Initialize A/B test
@@ -196,7 +193,7 @@ class AutonomousLandingPageGenerator:
 
     async def _create_variant(
         self, product_name: str, target_audience: str, goal: str, variant_label: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a single landing page variant."""
         variant_id = str(uuid4())
 
@@ -237,9 +234,7 @@ class AutonomousLandingPageGenerator:
 
     def _generate_hero_section(self, product_name: str, variant: str) -> str:
         """Generate hero section with variant-specific styling."""
-        hero_style = self.luxury_elements["hero_styles"][
-            ord(variant) - 65 % len(self.luxury_elements["hero_styles"])
-        ]
+        hero_style = self.luxury_elements["hero_styles"][ord(variant) - 65 % len(self.luxury_elements["hero_styles"])]
         cta_text = self.luxury_elements["cta_variations"][
             ord(variant) - 65 % len(self.luxury_elements["cta_variations"])
         ]
@@ -357,11 +352,11 @@ class AutonomousLandingPageGenerator:
                 <button data-conversion="purchase" class="cta-large">{cta_text}</button>
                 <p>Free worldwide shipping on orders over $500</p>
             """,
-            "demo_request": f"""
+            "demo_request": """
                 <button data-conversion="demo_request">Schedule Personal Consultation</button>
                 <p>Experience our collection with a style expert</p>
             """,
-            "download": f"""
+            "download": """
                 <button data-conversion="download">Download Lookbook</button>
                 <p>Get our exclusive 2024 collection catalog</p>
             """,
@@ -382,15 +377,11 @@ class AutonomousLandingPageGenerator:
         primary = self.luxury_elements["colors"]["primary"][
             color_index % len(self.luxury_elements["colors"]["primary"])
         ]
-        accent = self.luxury_elements["colors"]["accent"][
-            color_index % len(self.luxury_elements["colors"]["accent"])
-        ]
+        accent = self.luxury_elements["colors"]["accent"][color_index % len(self.luxury_elements["colors"]["accent"])]
         heading_font = self.luxury_elements["fonts"]["heading"][
             color_index % len(self.luxury_elements["fonts"]["heading"])
         ]
-        body_font = self.luxury_elements["fonts"]["body"][
-            color_index % len(self.luxury_elements["fonts"]["body"])
-        ]
+        body_font = self.luxury_elements["fonts"]["body"][color_index % len(self.luxury_elements["fonts"]["body"])]
 
         return f"""
         @import url('https://fonts.googleapis.com/css2?family={heading_font.replace(' ', '+')}:wght@400;700&family={body_font.replace(' ', '+')}:wght@300;400;700&display=swap');
@@ -542,20 +533,12 @@ class AutonomousLandingPageGenerator:
         index = ord(variant) - 65
 
         if element_type == "hero":
-            return self.luxury_elements["hero_styles"][
-                index % len(self.luxury_elements["hero_styles"])
-            ]
+            return self.luxury_elements["hero_styles"][index % len(self.luxury_elements["hero_styles"])]
         elif element_type == "cta":
-            return self.luxury_elements["cta_variations"][
-                index % len(self.luxury_elements["cta_variations"])
-            ]
+            return self.luxury_elements["cta_variations"][index % len(self.luxury_elements["cta_variations"])]
         elif element_type == "color":
-            primary = self.luxury_elements["colors"]["primary"][
-                index % len(self.luxury_elements["colors"]["primary"])
-            ]
-            accent = self.luxury_elements["colors"]["accent"][
-                index % len(self.luxury_elements["colors"]["accent"])
-            ]
+            primary = self.luxury_elements["colors"]["primary"][index % len(self.luxury_elements["colors"]["primary"])]
+            accent = self.luxury_elements["colors"]["accent"][index % len(self.luxury_elements["colors"]["accent"])]
             return f"{primary}/{accent}"
 
         return ""
@@ -565,7 +548,7 @@ class AutonomousLandingPageGenerator:
         test_id: str,
         variant_id: str,
         event_type: str,
-        data: Optional[Dict] = None,
+        data: Optional[dict] = None,
     ) -> bool:
         """
         Track user interaction event for A/B testing.
@@ -605,7 +588,7 @@ class AutonomousLandingPageGenerator:
 
         return True
 
-    async def analyze_test_performance(self, test_id: str) -> Dict[str, Any]:
+    async def analyze_test_performance(self, test_id: str) -> dict[str, Any]:
         """
         Analyze A/B test performance and determine winner.
 
@@ -622,9 +605,7 @@ class AutonomousLandingPageGenerator:
             perf = test["performance"][variant_id]
 
             # Calculate conversion rate
-            conversion_rate = (
-                perf["conversions"] / perf["views"] if perf["views"] > 0 else 0
-            )
+            conversion_rate = perf["conversions"] / perf["views"] if perf["views"] > 0 else 0
 
             # Calculate confidence interval
             confidence = self._calculate_confidence(perf["conversions"], perf["views"])
@@ -662,9 +643,7 @@ class AutonomousLandingPageGenerator:
             "recommendation": self._get_recommendation(results, winner),
         }
 
-    def _calculate_confidence(
-        self, conversions: int, views: int
-    ) -> Tuple[float, float]:
+    def _calculate_confidence(self, conversions: int, views: int) -> tuple[float, float]:
         """Calculate 95% confidence interval for conversion rate."""
         if views == 0:
             return (0, 0)
@@ -677,16 +656,12 @@ class AutonomousLandingPageGenerator:
         centre_adjusted_probability = p + z**2 / (2 * views)
         adjusted_standard_deviation = (p * (1 - p) + z**2 / (4 * views)) / views
 
-        lower = (
-            centre_adjusted_probability - z * (adjusted_standard_deviation**0.5)
-        ) / denominator
-        upper = (
-            centre_adjusted_probability + z * (adjusted_standard_deviation**0.5)
-        ) / denominator
+        lower = (centre_adjusted_probability - z * (adjusted_standard_deviation**0.5)) / denominator
+        upper = (centre_adjusted_probability + z * (adjusted_standard_deviation**0.5)) / denominator
 
         return (max(0, lower), min(1, upper))
 
-    def _get_recommendation(self, results: List[Dict], winner: Optional[Dict]) -> str:
+    def _get_recommendation(self, results: list[dict], winner: Optional[dict]) -> str:
         """Generate recommendation based on test results."""
         if winner:
             elements = winner["elements"]
@@ -717,7 +692,7 @@ class AutonomousLandingPageGenerator:
             3. Testing different page elements
             """
 
-    async def auto_optimize(self, test_id: str) -> Dict[str, Any]:
+    async def auto_optimize(self, test_id: str) -> dict[str, Any]:
         """
         Automatically optimize landing page based on test results.
         Generates new variants based on winning elements.
@@ -759,9 +734,7 @@ class AutonomousLandingPageGenerator:
             "goal": test["goal"],
             "variants": new_variants,
             "start_time": datetime.now(),
-            "performance": {
-                v["id"]: {"views": 0, "conversions": 0} for v in new_variants
-            },
+            "performance": {v["id"]: {"views": 0, "conversions": 0} for v in new_variants},
             "parent_test": test_id,
             "optimization_round": test.get("optimization_round", 0) + 1,
         }
@@ -779,14 +752,12 @@ class AutonomousLandingPageGenerator:
         product_name: str,
         target_audience: str,
         goal: str,
-        winning_elements: Dict,
+        winning_elements: dict,
         variant_label: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create optimized variant based on winning elements."""
         # Start with winning elements and make minor variations
-        variant = await self._create_variant(
-            product_name, target_audience, goal, variant_label
-        )
+        variant = await self._create_variant(product_name, target_audience, goal, variant_label)
 
         # Apply winning elements with slight modifications
         variant["elements"] = {
@@ -826,7 +797,7 @@ class AutonomousLandingPageGenerator:
         # In production, would use proper color theory
         return f"{colors[0]}/{colors[1]}"
 
-    async def export_winner(self, test_id: str) -> Dict[str, Any]:
+    async def export_winner(self, test_id: str) -> dict[str, Any]:
         """
         Export winning landing page variant for production deployment.
         """
@@ -842,9 +813,7 @@ class AutonomousLandingPageGenerator:
         test = self.active_tests[test_id]
 
         # Find winning variant HTML
-        winning_variant = next(
-            (v for v in test["variants"] if v["id"] == winner["variant_id"]), None
-        )
+        winning_variant = next((v for v in test["variants"] if v["id"] == winner["variant_id"]), None)
 
         if not winning_variant:
             return {"error": "Winner variant not found", "status": "failed"}
@@ -884,9 +853,7 @@ class AutonomousLandingPageGenerator:
         import re
 
         # Remove A/B testing tracker script
-        html = re.sub(
-            r"<!-- A/B Testing Tracker -->.*?</script>", "", html, flags=re.DOTALL
-        )
+        html = re.sub(r"<!-- A/B Testing Tracker -->.*?</script>", "", html, flags=re.DOTALL)
 
         # Remove data attributes used for testing
         html = re.sub(r'data-variant="[^"]*"', "", html)
@@ -935,9 +902,7 @@ async def main():
 
     print("\n📊 Test Results:")
     for result in analysis["results"]:
-        print(
-            f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)"
-        )
+        print(f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)")
 
     if analysis.get("winner"):
         print(f"\n🏆 Winner: {analysis['winner']['variant']}")

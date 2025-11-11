@@ -20,20 +20,20 @@ $unique_id = wp_unique_id('search-form-');
             <label for="<?php echo esc_attr($unique_id); ?>" class="screen-reader-text">
                 <?php esc_html_e('Search for:', 'skyy-rose-collection'); ?>
             </label>
-            
-            <input type="search" 
+
+            <input type="search"
                    id="<?php echo esc_attr($unique_id); ?>"
-                   class="search-field" 
-                   placeholder="<?php esc_attr_e('Search luxury fashion, brands, styles...', 'skyy-rose-collection'); ?>" 
-                   value="<?php echo get_search_query(); ?>" 
-                   name="s" 
+                   class="search-field"
+                   placeholder="<?php esc_attr_e('Search luxury fashion, brands, styles...', 'skyy-rose-collection'); ?>"
+                   value="<?php echo get_search_query(); ?>"
+                   name="s"
                    autocomplete="off"
                    data-live-search="true"
                    data-min-chars="2"
                    data-search-delay="300">
-            
+
             <div class="search-input-border"></div>
-            
+
             <button type="submit" class="search-submit" aria-label="<?php esc_attr_e('Search', 'skyy-rose-collection'); ?>">
                 <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,7 +45,7 @@ $unique_id = wp_unique_id('search-form-');
                     </circle>
                 </svg>
             </button>
-            
+
             <!-- Voice Search Button -->
             <button type="button" class="voice-search-btn" aria-label="<?php esc_attr_e('Voice Search', 'skyy-rose-collection'); ?>" data-voice-search="true">
                 <svg class="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -60,13 +60,13 @@ $unique_id = wp_unique_id('search-form-');
                 </svg>
             </button>
         </div>
-        
+
         <!-- Search Suggestions Dropdown -->
         <div class="search-suggestions" id="search-suggestions-<?php echo esc_attr($unique_id); ?>">
             <div class="suggestions-header">
                 <h4 class="suggestions-title"><?php esc_html_e('Suggestions', 'skyy-rose-collection'); ?></h4>
             </div>
-            
+
             <div class="suggestions-content">
                 <!-- Popular Searches -->
                 <div class="suggestions-section popular-searches">
@@ -78,20 +78,20 @@ $unique_id = wp_unique_id('search-form-');
                         <li><a href="<?php echo esc_url(home_url('/?s=designer+shoes')); ?>"><?php esc_html_e('Designer Shoes', 'skyy-rose-collection'); ?></a></li>
                     </ul>
                 </div>
-                
+
                 <!-- Recent Searches (populated by JavaScript) -->
                 <div class="suggestions-section recent-searches" style="display: none;">
                     <h5 class="section-title"><?php esc_html_e('Recent Searches', 'skyy-rose-collection'); ?></h5>
                     <ul class="recent-list"></ul>
                     <button class="clear-recent" type="button"><?php esc_html_e('Clear History', 'skyy-rose-collection'); ?></button>
                 </div>
-                
+
                 <!-- Live Search Results (populated by AJAX) -->
                 <div class="suggestions-section live-results">
                     <h5 class="section-title"><?php esc_html_e('Products', 'skyy-rose-collection'); ?></h5>
                     <div class="live-results-list"></div>
                 </div>
-                
+
                 <!-- Categories -->
                 <div class="suggestions-section categories">
                     <h5 class="section-title"><?php esc_html_e('Categories', 'skyy-rose-collection'); ?></h5>
@@ -104,7 +104,7 @@ $unique_id = wp_unique_id('search-form-');
                                 'number' => 6,
                                 'parent' => 0,
                             ));
-                            
+
                             if ($product_categories && !is_wp_error($product_categories)) {
                                 foreach ($product_categories as $category) {
                                     echo '<li><a href="' . esc_url(get_term_link($category)) . '">' . esc_html($category->name) . '</a></li>';
@@ -115,7 +115,7 @@ $unique_id = wp_unique_id('search-form-');
                     </ul>
                 </div>
             </div>
-            
+
             <div class="suggestions-footer">
                 <div class="search-tips">
                     <span class="tip-icon">💡</span>
@@ -123,7 +123,7 @@ $unique_id = wp_unique_id('search-form-');
                 </div>
             </div>
         </div>
-        
+
         <!-- Voice Search Status -->
         <div class="voice-search-status" style="display: none;">
             <div class="voice-status-content">
@@ -137,10 +137,10 @@ $unique_id = wp_unique_id('search-form-');
             </div>
         </div>
     </div>
-    
+
     <!-- Hidden fields for advanced search -->
     <input type="hidden" name="post_type" value="product" class="search-post-type">
-    
+
     <?php if (class_exists('WooCommerce')) : ?>
         <!-- WooCommerce specific search parameters -->
         <input type="hidden" name="product_cat" value="" class="search-category">

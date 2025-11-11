@@ -1,7 +1,7 @@
 # MCP Advanced Cost Optimization Guide
 ## Achieving 99.5% Token Reduction & Maximum Efficiency
 
-The current MCP implementation achieves **98% token reduction** (150K → 2K tokens).  
+The current MCP implementation achieves **98% token reduction** (150K → 2K tokens).
 This guide shows how to push to **99.5% reduction** (150K → 750 tokens) and maximize ROI.
 
 ---
@@ -24,7 +24,7 @@ Request → Cached Tool Index (200 tokens) → Stream Tool Schema → Execute �
 
 ### 1. Tool Schema Compression (Save 60% on Tool Loading)
 
-**Current**: Full JSON schemas loaded (avg 400 tokens per tool)  
+**Current**: Full JSON schemas loaded (avg 400 tokens per tool)
 **Optimized**: Compressed schemas with references (avg 150 tokens per tool)
 
 **Implementation**:
@@ -75,22 +75,22 @@ from datetime import datetime, timedelta
 
 class SmartCache:
     """Advanced caching with TTL and compression"""
-    
+
     def __init__(self, ttl_seconds=300):
         self.cache = {}
         self.ttl = ttl_seconds
-    
+
     def get_cache_key(self, tool_name, input_data):
         """Generate deterministic cache key"""
         key_str = f"{tool_name}:{json.dumps(input_data, sort_keys=True)}"
         return hashlib.sha256(key_str.encode()).hexdigest()[:16]
-    
+
     @lru_cache(maxsize=128)
     def get_tool_schema(self, tool_name):
         """Cache tool schemas in memory"""
         # Only load once, cache forever (schemas don't change)
         return self.tools[tool_name]
-    
+
     def cache_result(self, key, result, ttl=None):
         """Cache execution results"""
         ttl = ttl or self.ttl
@@ -98,7 +98,7 @@ class SmartCache:
             "result": result,
             "expires_at": datetime.utcnow() + timedelta(seconds=ttl)
         }
-    
+
     def get_cached_result(self, key):
         """Retrieve cached result if not expired"""
         if key in self.cache:
@@ -139,7 +139,7 @@ async def stream_tool_schema(tool_name, required_fields=None):
     Instead of sending full schema, send only what's needed
     """
     schema = await load_tool_schema(tool_name)
-    
+
     if required_fields:
         # Filter to only required fields
         filtered_schema = {
@@ -153,7 +153,7 @@ async def stream_tool_schema(tool_name, required_fields=None):
             }
         }
         return filtered_schema
-    
+
     return schema
 
 # Usage
@@ -178,49 +178,49 @@ schema = await stream_tool_schema(
 ```python
 class BatchProcessor:
     """Batch multiple requests to reduce overhead"""
-    
+
     def __init__(self, batch_size=10, max_wait_ms=50):
         self.batch_size = batch_size
         self.max_wait_ms = max_wait_ms
         self.pending = []
-    
+
     async def add_to_batch(self, tool_name, input_data):
         """Add task to batch queue"""
         self.pending.append((tool_name, input_data))
-        
+
         if len(self.pending) >= self.batch_size:
             return await self.process_batch()
-        
+
         # Wait for more tasks (up to max_wait_ms)
         await asyncio.sleep(self.max_wait_ms / 1000)
         return await self.process_batch()
-    
+
     async def process_batch(self):
         """Process all pending tasks in one API call"""
         if not self.pending:
             return []
-        
+
         # Group by tool
         by_tool = {}
         for tool_name, input_data in self.pending:
             if tool_name not in by_tool:
                 by_tool[tool_name] = []
             by_tool[tool_name].append(input_data)
-        
+
         results = []
         for tool_name, inputs in by_tool.items():
             # Single tool load for all inputs
             await self.load_tool(tool_name)  # Only 2K tokens once
-            
+
             # Execute all
             tool_results = await asyncio.gather(*[
                 self.execute_tool(tool_name, inp) for inp in inputs
             ])
             results.extend(tool_results)
-            
+
             # Unload once
             await self.unload_tool(tool_name)
-        
+
         self.pending = []
         return results
 ```
@@ -262,13 +262,13 @@ def select_optimal_model(task_complexity, priority):
     """
     if priority == "cost" and task_complexity < 0.3:
         return "gemini-1.5-flash"  # $0.075 per 1M tokens
-    
+
     if task_complexity < 0.5:
         return "claude-haiku"  # $0.25 per 1M tokens
-    
+
     if task_complexity < 0.8:
         return "claude-sonnet-4"  # $3.00 per 1M tokens
-    
+
     return "claude-opus-4"  # $15.00 per 1M tokens
 
 # Example usage
@@ -310,14 +310,14 @@ Strategy: Start with free API, upgrade to Endpoints when needed
 ```python
 class HuggingFaceRouter:
     """Route to cheapest available option"""
-    
+
     def __init__(self):
         self.free_quota_used = 0
         self.free_quota_limit = 30000
-    
+
     async def infer(self, model, input_data, priority="cost"):
         """Auto-route to cheapest option"""
-        
+
         # Try free API first
         if self.free_quota_used < self.free_quota_limit and priority == "cost":
             try:
@@ -326,7 +326,7 @@ class HuggingFaceRouter:
                 return result
             except RateLimitError:
                 pass  # Fall through to paid endpoint
-        
+
         # Use paid endpoint
         return await self.inference_endpoint(model, input_data)
 ```
@@ -341,10 +341,10 @@ class HuggingFaceRouter:
 
 **Before** (400 tokens):
 ```
-Please analyze this Python code for security vulnerabilities. 
-Check for SQL injection, XSS, CSRF, command injection, path traversal, 
-and insecure deserialization. Provide detailed findings with severity 
-ratings (critical, high, medium, low) and remediation recommendations 
+Please analyze this Python code for security vulnerabilities.
+Check for SQL injection, XSS, CSRF, command injection, path traversal,
+and insecure deserialization. Provide detailed findings with severity
+ratings (critical, high, medium, low) and remediation recommendations
 for each issue discovered.
 ```
 
@@ -435,11 +435,11 @@ class SmartCache:
         self.cache = {}
         self.ttl = ttl_seconds
         self.stats = {"hits": 0, "misses": 0}
-    
+
     def get_cache_key(self, tool_name, input_data):
         key_str = f"{tool_name}:{json.dumps(input_data, sort_keys=True)}"
         return hashlib.sha256(key_str.encode()).hexdigest()[:16]
-    
+
     def get(self, key):
         if key in self.cache:
             cached = self.cache[key]
@@ -449,7 +449,7 @@ class SmartCache:
             del self.cache[key]
         self.stats["misses"] += 1
         return None
-    
+
     def set(self, key, result, ttl=None):
         ttl = ttl or self.ttl
         self.cache[key] = {
@@ -473,16 +473,16 @@ async def execute_task(self, task: Task) -> Dict[str, Any]:
     # Check cache first
     cache_key = self.smart_cache.get_cache_key(task.tool_name, task.input_data)
     cached_result = self.smart_cache.get(cache_key)
-    
+
     if cached_result:
         logger.info(f"Cache HIT for {task.name}")
         task.status = TaskStatus.COMPLETED
         task.output = cached_result
         return cached_result
-    
+
     # Execute normally...
     # (existing code)
-    
+
     # Cache result before returning
     self.smart_cache.set(cache_key, result, ttl=300)
     return result
@@ -502,17 +502,17 @@ class BatchProcessor:
         self.batch_size = batch_size
         self.max_wait_ms = max_wait_ms
         self.pending = []
-    
+
     async def add_to_batch(self, tool_name, input_data):
         self.pending.append((tool_name, input_data))
-        
+
         if len(self.pending) >= self.batch_size:
             return await self.process_batch()
-        
+
         await asyncio.sleep(self.max_wait_ms / 1000)
         if self.pending:
             return await self.process_batch()
-    
+
     async def process_batch(self):
         # Group by tool
         by_tool = {}
@@ -520,12 +520,12 @@ class BatchProcessor:
             if tool_name not in by_tool:
                 by_tool[tool_name] = []
             by_tool[tool_name].append(input_data)
-        
+
         results = []
         for tool_name, inputs in by_tool.items():
             # Load tool once
             self.orchestrator.load_tool(tool_name)
-            
+
             # Execute all inputs
             tasks = [
                 self.orchestrator.create_task(
@@ -536,15 +536,15 @@ class BatchProcessor:
                 )
                 for i, inp in enumerate(inputs)
             ]
-            
+
             batch_results = await asyncio.gather(*[
                 self.orchestrator.execute_task(t) for t in tasks
             ])
             results.extend(batch_results)
-            
+
             # Unload once
             self.orchestrator.unload_tool(tool_name)
-        
+
         self.pending = []
         return results
 ```
@@ -556,7 +556,7 @@ Create: `agents/mcp/model_optimizer.py`
 ```python
 class ModelOptimizer:
     """Select cheapest model for task"""
-    
+
     COSTS = {
         "gemini-1.5-flash": 0.075,  # per 1M tokens
         "claude-haiku": 0.25,
@@ -564,32 +564,32 @@ class ModelOptimizer:
         "claude-sonnet-4": 3.00,
         "claude-opus-4": 15.00
     }
-    
+
     @staticmethod
     def calculate_complexity(task):
         """Estimate task complexity (0.0 - 1.0)"""
         complexity = 0.0
-        
+
         # Check input size
         input_str = str(task.input_data)
         if len(input_str) > 10000:
             complexity += 0.3
         elif len(input_str) > 1000:
             complexity += 0.1
-        
+
         # Check tool type
         if task.tool_name in ["code_analyzer", "security_scanner"]:
             complexity += 0.5
         elif task.tool_name in ["stable_diffusion", "voice_cloner"]:
             complexity += 0.3
-        
+
         return min(complexity, 1.0)
-    
+
     @staticmethod
     def select_model(task, priority="balanced"):
         """Select optimal model"""
         complexity = ModelOptimizer.calculate_complexity(task)
-        
+
         if priority == "cost":
             if complexity < 0.3:
                 return "gemini-1.5-flash"
@@ -597,13 +597,13 @@ class ModelOptimizer:
                 return "claude-haiku"
             else:
                 return "claude-sonnet-4"
-        
+
         elif priority == "quality":
             if complexity > 0.7:
                 return "claude-opus-4"
             else:
                 return "claude-sonnet-4"
-        
+
         else:  # balanced
             if complexity < 0.4:
                 return "claude-haiku"

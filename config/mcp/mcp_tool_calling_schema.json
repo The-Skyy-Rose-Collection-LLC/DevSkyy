@@ -3,7 +3,7 @@
   "title": "DevSkyy MCP Tool Calling Schema",
   "version": "1.0.0",
   "description": "Model Context Protocol (MCP) tool calling configuration for DevSkyy multi-agent orchestration system. Implements code execution, on-demand loading, and secure sandboxing for Claude, Codex, HuggingFace, and OpenAI agents.",
-  
+
   "system": {
     "name": "DevSkyy MCP Orchestrator",
     "version": "1.0.0",

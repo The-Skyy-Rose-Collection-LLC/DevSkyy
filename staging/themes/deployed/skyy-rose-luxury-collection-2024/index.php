@@ -6,7 +6,7 @@ get_header(); ?>
         <h1><?php bloginfo('name'); ?></h1>
         <p><?php bloginfo('description'); ?></p>
     </div>
-    
+
     <?php if (have_posts()) : ?>
         <?php while (have_posts()) : the_post(); ?>
             <article class="luxury-post">

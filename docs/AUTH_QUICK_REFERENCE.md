@@ -160,7 +160,7 @@ curl https://api.devskyy.com/api/v1/auth/auth0/login
 ### Password Requirements
 - ✅ Minimum 8 characters
 - ✅ At least one uppercase letter
-- ✅ At least one lowercase letter  
+- ✅ At least one lowercase letter
 - ✅ At least one digit
 - ✅ At least one special character
 - ✅ No common passwords
@@ -286,12 +286,12 @@ const registerUser = async (userData: RegisterRequest) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.detail);
   }
-  
+
   return response.json();
 };
 ```
@@ -302,22 +302,22 @@ const loginUser = async (email: string, password: string) => {
   const formData = new FormData();
   formData.append('username', email);
   formData.append('password', password);
-  
+
   const response = await fetch('/api/v1/auth/login', {
     method: 'POST',
     body: formData,
   });
-  
+
   if (!response.ok) {
     throw new Error('Login failed');
   }
-  
+
   const tokens = await response.json();
-  
+
   // Store tokens securely
   localStorage.setItem('access_token', tokens.access_token);
   localStorage.setItem('refresh_token', tokens.refresh_token);
-  
+
   return tokens;
 };
 ```
@@ -326,7 +326,7 @@ const loginUser = async (email: string, password: string) => {
 ```typescript
 const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('access_token');
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -334,14 +334,14 @@ const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) 
       'Authorization': `Bearer ${token}`,
     },
   });
-  
+
   if (response.status === 401) {
     // Token expired, try to refresh
     await refreshToken();
     // Retry request
     return makeAuthenticatedRequest(url, options);
   }
-  
+
   return response;
 };
 ```
@@ -350,13 +350,13 @@ const makeAuthenticatedRequest = async (url: string, options: RequestInit = {}) 
 ```typescript
 const refreshToken = async () => {
   const refreshToken = localStorage.getItem('refresh_token');
-  
+
   const response = await fetch('/api/v1/auth/refresh', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
-  
+
   if (!response.ok) {
     // Refresh failed, redirect to login
     localStorage.removeItem('access_token');
@@ -364,7 +364,7 @@ const refreshToken = async () => {
     window.location.href = '/login';
     return;
   }
-  
+
   const tokens = await response.json();
   localStorage.setItem('access_token', tokens.access_token);
   localStorage.setItem('refresh_token', tokens.refresh_token);
@@ -376,7 +376,7 @@ const refreshToken = async () => {
 const initiateAuth0Login = async () => {
   const response = await fetch('/api/v1/auth/auth0/login');
   const data = await response.json();
-  
+
   // Redirect to Auth0
   window.location.href = data.authorization_url;
 };
@@ -385,15 +385,15 @@ const handleAuth0Callback = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   const state = urlParams.get('state');
-  
+
   if (code && state) {
     const response = await fetch(`/api/v1/auth/auth0/callback?code=${code}&state=${state}`);
     const tokens = await response.json();
-    
+
     // Store DevSkyy JWT tokens
     localStorage.setItem('access_token', tokens.access_token);
     localStorage.setItem('refresh_token', tokens.refresh_token);
-    
+
     return tokens;
   }
 };
@@ -455,18 +455,18 @@ if (error) {
 const makeRequestWithRetry = async (url: string, options: RequestInit, maxRetries = 3) => {
   for (let i = 0; i < maxRetries; i++) {
     const response = await fetch(url, options);
-    
+
     if (response.status === 429) {
       const retryAfter = response.headers.get('Retry-After');
       const delay = retryAfter ? parseInt(retryAfter) * 1000 : Math.pow(2, i) * 1000;
-      
+
       await new Promise(resolve => setTimeout(resolve, delay));
       continue;
     }
-    
+
     return response;
   }
-  
+
   throw new Error('Max retries exceeded');
 };
 ```

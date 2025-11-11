@@ -1,17 +1,18 @@
-import re
+from collections import defaultdict, deque
 from datetime import datetime, timedelta
-from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
+import logging
+import re
 import time
+from typing import Optional
+import uuid
 
 from fastapi import Request, Response, status
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from api.validation_models import SecurityViolationResponse, ValidationErrorResponse
-from collections import defaultdict, deque
-from typing import Dict, List, Optional
-import logging
-import uuid
+
 
 """
 Security Middleware for DevSkyy Enterprise Platform
@@ -24,13 +25,14 @@ logger = logging.getLogger(__name__)
 # RATE LIMITING
 # ============================================================================
 
+
 class RateLimiter:
     """Advanced rate limiter with multiple strategies"""
 
     def __init__(self):
-        self.requests: Dict[str, deque] = defaultdict(deque)
-        self.blocked_ips: Dict[str, datetime] = {}
-        self.suspicious_patterns: Dict[str, int] = defaultdict(int)
+        self.requests: dict[str, deque] = defaultdict(deque)
+        self.blocked_ips: dict[str, datetime] = {}
+        self.suspicious_patterns: dict[str, int] = defaultdict(int)
 
         # Rate limits (requests per minute)
         self.limits = {
@@ -50,9 +52,7 @@ class RateLimiter:
             "admin": 30,
         }
 
-    def is_allowed(
-        self, client_ip: str, endpoint_category: str = "default"
-    ) -> tuple[bool, Optional[str]]:
+    def is_allowed(self, client_ip: str, endpoint_category: str = "default") -> tuple[bool, Optional[str]]:
         """Check if request is allowed based on rate limits"""
         now = datetime.now()
 
@@ -75,14 +75,10 @@ class RateLimiter:
 
         # Check rate limits
         requests_per_minute = len(client_requests)
-        requests_per_second = sum(
-            1 for req_time in client_requests if req_time > second_ago
-)
+        requests_per_second = sum(1 for req_time in client_requests if req_time > second_ago)
 
         minute_limit = self.limits.get(endpoint_category, self.limits["default"])
-        burst_limit = self.burst_limits.get(
-            endpoint_category, self.burst_limits["default"]
-        )
+        burst_limit = self.burst_limits.get(endpoint_category, self.burst_limits["default"])
 
         if requests_per_minute >= minute_limit:
             self._record_violation(client_ip, "rate_limit_exceeded")
@@ -96,20 +92,21 @@ class RateLimiter:
         client_requests.append(now)
         return True, None
 
-def _record_violation(self, client_ip: str, violation_type: str):
-        """Record security violation and potentially block IP"""
-        self.suspicious_patterns[client_ip] += 1
 
-        # Block IP if too many violations
-        if self.suspicious_patterns[client_ip] >= 5:
-            self.blocked_ips[client_ip] = datetime.now() + timedelta(minutes=15)
-            logger.warning(
-                f"🚨 IP {client_ip} blocked for 15 minutes due to {violation_type}"
-            )
+def _record_violation(self, client_ip: str, violation_type: str):
+    """Record security violation and potentially block IP"""
+    self.suspicious_patterns[client_ip] += 1
+
+    # Block IP if too many violations
+    if self.suspicious_patterns[client_ip] >= 5:
+        self.blocked_ips[client_ip] = datetime.now() + timedelta(minutes=15)
+        logger.warning(f"🚨 IP {client_ip} blocked for 15 minutes due to {violation_type}")
+
 
 # ============================================================================
 # SECURITY PATTERNS DETECTION
 # ============================================================================
+
 
 class ThreatDetector:
     """Advanced threat detection system"""
@@ -140,9 +137,7 @@ class ThreatDetector:
             "burpsuite",
         ]
 
-    def analyze_request(
-        self, request: Request
-    ) -> tuple[bool, Optional[str], Optional[str]]:
+    def analyze_request(self, request: Request) -> tuple[bool, Optional[str], Optional[str]]:
         """Analyze request for security threats"""
 
         # Check User-Agent
@@ -174,9 +169,11 @@ class ThreatDetector:
 
         return True, None, None
 
+
 # ============================================================================
 # SECURITY MIDDLEWARE
 # ============================================================================
+
 
 class SecurityMiddleware(BaseHTTPMiddleware):
     """Comprehensive security middleware"""
@@ -185,7 +182,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.rate_limiter = RateLimiter()
         self.threat_detector = ThreatDetector()
-        self.request_log: List[Dict] = deque(maxlen=1000)  # Keep last 1000 requests
+        self.request_log: list[dict] = deque(maxlen=1000)  # Keep last 1000 requests
 
     async def dispatch(self, request: Request, call_next):
         """Process request through security pipeline"""
@@ -198,32 +195,22 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
         try:
             # 1. Threat Detection
-            is_safe, threat_type, threat_message = self.threat_detector.analyze_request(
-                request
-            )
+            is_safe, threat_type, threat_message = self.threat_detector.analyze_request(request)
             if not is_safe:
-                return await self._security_violation_response(
-                    request_id, client_ip, threat_type, threat_message
-                )
+                return await self._security_violation_response(request_id, client_ip, threat_type, threat_message)
 
             # 2. Rate Limiting
             endpoint_category = self._get_endpoint_category(request.url.path)
-            is_allowed, rate_message = self.rate_limiter.is_allowed(
-                client_ip, endpoint_category
-            )
+            is_allowed, rate_message = self.rate_limiter.is_allowed(client_ip, endpoint_category)
             if not is_allowed:
-                return await self._rate_limit_response(
-                    request_id, client_ip, rate_message
-                )
+                return await self._rate_limit_response(request_id, client_ip, rate_message)
 
             # 3. Process request
             response = await call_next(request)
 
             # 4. Log successful request
             processing_time = time.time() - start_time
-            await self._log_request(
-                request, response, request_id, client_ip, processing_time
-            )
+            await self._log_request(request, response, request_id, client_ip, processing_time)
 
             # 5. Add security headers
             response = self._add_security_headers(response, request_id)
@@ -268,9 +255,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = (
-            "max-age=31536000; includeSubDomains"
-        )
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = "default-src 'self'"
 
@@ -280,21 +265,13 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         self, request_id: str, client_ip: str, threat_type: str, message: str
     ) -> JSONResponse:
         """Return security violation response"""
-        logger.warning(
-            f"🚨 Security violation: {threat_type} from {client_ip} - {message}"
-        )
+        logger.warning(f"🚨 Security violation: {threat_type} from {client_ip} - {message}")
 
-        response_data = SecurityViolationResponse(
-            violation_type=threat_type, message=message, request_id=request_id
-        )
+        response_data = SecurityViolationResponse(violation_type=threat_type, message=message, request_id=request_id)
 
-        return JSONResponse(
-            status_code=status.HTTP_403_FORBIDDEN, content=response_data.dict()
-        )
+        return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=response_data.dict())
 
-    async def _rate_limit_response(
-        self, request_id: str, client_ip: str, message: str
-    ) -> JSONResponse:
+    async def _rate_limit_response(self, request_id: str, client_ip: str, message: str) -> JSONResponse:
         """Return rate limit response"""
         logger.warning(f"⚠️ Rate limit exceeded: {client_ip} - {message}")
 
@@ -308,15 +285,11 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             },
         )
 
-    async def _validation_error_response(
-        self, request_id: str, error: ValidationError
-    ) -> JSONResponse:
+    async def _validation_error_response(self, request_id: str, error: ValidationError) -> JSONResponse:
         """Return validation error response"""
         response_data = ValidationErrorResponse(
             message="Request validation failed",
-            details=[
-                {"field": err["loc"], "message": err["msg"]} for err in error.errors()
-            ],
+            details=[{"field": err["loc"], "message": err["msg"]} for err in error.errors()],
             request_id=request_id,
         )
 

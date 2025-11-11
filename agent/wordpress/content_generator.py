@@ -11,13 +11,14 @@ Features:
 Reference: Based on AGENTS.md specifications
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
 import anthropic
 import nltk  # noqa: F401 - Reserved for Phase 3 NLP enhancements
 from PIL import Image  # noqa: F401 - Reserved for Phase 3 image processing
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +40,10 @@ class ContentGenerator:
     async def generate_blog_post(
         self,
         topic: str,
-        keywords: Optional[List[str]] = None,
+        keywords: Optional[list[str]] = None,
         tone: str = "professional",
         length: int = 800,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate complete blog post
 
@@ -124,9 +125,9 @@ Meta Description: [150 chars]
     async def generate_page_content(
         self,
         page_type: str,
-        brand_info: Dict[str, Any],
-        additional_context: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        brand_info: dict[str, Any],
+        additional_context: Optional[dict] = None,
+    ) -> dict[str, Any]:
         """
         Generate WordPress page content
 
@@ -151,9 +152,7 @@ Meta Description: [150 chars]
         generator = page_templates.get(page_type, self._generate_generic_page)
         return await generator(brand_info, additional_context or {})
 
-    async def _generate_about_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_about_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate About Us page"""
         brand_name = brand_info.get("name", "Our Brand")
         tagline = brand_info.get("tagline", "Excellence in Fashion")
@@ -192,9 +191,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": "about",
         }
 
-    async def _generate_contact_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_contact_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate Contact page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -227,9 +224,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": "contact",
         }
 
-    async def _generate_services_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_services_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate Services page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -263,9 +258,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": "services",
         }
 
-    async def _generate_faq_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_faq_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate FAQ page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -303,9 +296,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": "faq",
         }
 
-    async def _generate_privacy_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_privacy_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate Privacy Policy page"""
         brand_name = brand_info.get("name", "Our Brand")
 
@@ -351,9 +342,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": "privacy",
         }
 
-    async def _generate_generic_page(
-        self, brand_info: Dict[str, Any], context: Dict
-    ) -> Dict[str, Any]:
+    async def _generate_generic_page(self, brand_info: dict[str, Any], context: dict) -> dict[str, Any]:
         """Generate generic page"""
         page_type = context.get("page_type", "Page")
 
@@ -364,9 +353,7 @@ work together to bring you the best shopping experience.</p>
             "page_type": page_type,
         }
 
-    async def optimize_content(
-        self, content: str, target_keywords: List[str]
-    ) -> Dict[str, Any]:
+    async def optimize_content(self, content: str, target_keywords: list[str]) -> dict[str, Any]:
         """
         Optimize existing content for SEO
 
@@ -395,13 +382,9 @@ work together to bring you the best shopping experience.</p>
             if stats["count"] == 0:
                 suggestions.append(f"Add keyword '{keyword}' to content")
             elif stats["density"] < 1.0:
-                suggestions.append(
-                    f"Increase density of '{keyword}' (currently {stats['density']:.2f}%)"
-                )
+                suggestions.append(f"Increase density of '{keyword}' (currently {stats['density']:.2f}%)")
             elif stats["density"] > 3.0:
-                suggestions.append(
-                    f"Reduce density of '{keyword}' (currently {stats['density']:.2f}%)"
-                )
+                suggestions.append(f"Reduce density of '{keyword}' (currently {stats['density']:.2f}%)")
 
         return {
             "original_content": content,
@@ -410,13 +393,7 @@ work together to bring you the best shopping experience.</p>
             "seo_score": (
                 min(
                     100,
-                    len(
-                        [
-                            s
-                            for s in keyword_density.values()
-                            if s["density"] >= 1.0 and s["density"] <= 3.0
-                        ]
-                    )
+                    len([s for s in keyword_density.values() if s["density"] >= 1.0 and s["density"] <= 3.0])
                     / len(target_keywords)
                     * 100,
                 )

@@ -60,16 +60,16 @@ tenant:
   picture_url: "https://devskyy.com/logo.png"
   support_email: "support@devskyy.com"
   support_url: "https://devskyy.com/support"
-  
+
   # Security Settings
   default_audience: "https://api.devskyy.com"
   default_directory: "Username-Password-Authentication"
-  
+
   # Session Settings
   session_lifetime: 168  # 7 days in hours
   idle_session_lifetime: 72  # 3 days in hours
   session_cookie_timeout: 168
-  
+
   # Password Policy
   password_policy: "good"
   password_complexity_options:
@@ -102,14 +102,14 @@ application:
   web_origins:
     - "https://app.devskyy.com"
     - "http://localhost:3000"  # Development
-  
+
   # JWT Configuration
   jwt_configuration:
     lifetime_in_seconds: 36000
     secret_encoded: false
     scopes: {}
     alg: "RS256"
-  
+
   # Refresh Token Configuration
   refresh_token:
     rotation_type: "rotating"
@@ -130,22 +130,22 @@ The core OAuth2 client that handles Auth0 communication:
 ```python
 class Auth0OAuth2Client:
     """FastAPI-compatible Auth0 OAuth2 client."""
-    
+
     def __init__(self):
         self.domain = AUTH0_DOMAIN
         self.client_id = AUTH0_CLIENT_ID
         self.client_secret = AUTH0_CLIENT_SECRET
         self.audience = AUTH0_AUDIENCE
-    
+
     async def get_authorization_url(self, redirect_uri: str, state: str) -> str:
         """Generate Auth0 authorization URL."""
-        
+
     async def exchange_code_for_token(self, code: str, redirect_uri: str) -> Dict[str, Any]:
         """Exchange authorization code for tokens."""
-        
+
     async def get_user_info(self, access_token: str) -> Dict[str, Any]:
         """Get user information from Auth0."""
-        
+
     def get_logout_url(self, return_to: str) -> str:
         """Generate Auth0 logout URL."""
 ```
@@ -218,7 +218,7 @@ sequenceDiagram
     participant Frontend
     participant API
     participant Auth0
-    
+
     User->>Frontend: Click Login
     Frontend->>API: GET /api/v1/auth/auth0/login
     API->>API: Generate state parameter
@@ -235,7 +235,7 @@ sequenceDiagram
     participant Auth0
     participant API
     participant Frontend
-    
+
     User->>Auth0: Submit credentials
     Auth0->>Auth0: Validate credentials
     Auth0->>API: Redirect to callback with code
@@ -252,7 +252,7 @@ sequenceDiagram
     participant Frontend
     participant API
     participant Auth
-    
+
     Frontend->>API: Request with Bearer token
     API->>Auth: Verify DevSkyy JWT token
     Auth->>API: Return user data
@@ -310,15 +310,15 @@ State parameter validation prevents CSRF attacks:
 async def auth0_login(request: Request):
     # Generate cryptographically secure state
     state = generate_token(32)
-    
+
     # Store state in session or cache
     request.session["auth0_state"] = state
-    
+
     authorization_url = auth0_oauth_client.get_authorization_url(
         redirect_uri=redirect_uri,
         state=state
     )
-    
+
     return {"authorization_url": authorization_url, "state": state}
 
 @router.get("/callback")
@@ -355,7 +355,7 @@ async def auth0_callback(
             request=request,
             details={"error": error, "description": error_description}
         )
-        
+
         if error == "access_denied":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -416,7 +416,7 @@ connections:
       client_secret: "google-client-secret"
       allowed_audiences:
         - "https://api.devskyy.com"
-      
+
   - name: "samlp-enterprise"
     strategy: "samlp"
     enabled: true
@@ -437,31 +437,31 @@ Integration with existing user databases:
 // Custom Database Login Script
 function login(email, password, callback) {
   const { Client } = require('pg');
-  
+
   const client = new Client({
     connectionString: configuration.DATABASE_URL
   });
-  
+
   client.connect();
-  
+
   const query = 'SELECT id, email, password_hash FROM users WHERE email = $1 AND is_active = true';
   client.query(query, [email], (err, result) => {
     if (err) return callback(err);
     if (result.rows.length === 0) return callback(new WrongUsernameOrPasswordError(email));
-    
+
     const user = result.rows[0];
-    
+
     // Verify password using bcrypt
     bcrypt.compare(password, user.password_hash, (err, isValid) => {
       if (err) return callback(err);
       if (!isValid) return callback(new WrongUsernameOrPasswordError(email));
-      
+
       // Update last login
       const updateQuery = 'UPDATE users SET last_login = NOW() WHERE id = $1';
       client.query(updateQuery, [user.id], (err) => {
         client.end();
         if (err) return callback(err);
-        
+
         callback(null, {
           user_id: user.id,
           email: user.email
@@ -480,7 +480,7 @@ function login(email, password, callback) {
 
 **Error**: `invalid_request: The redirect_uri is not in the list of allowed callback URLs`
 
-**Solution**: 
+**Solution**:
 - Check Auth0 application settings
 - Ensure callback URL matches exactly
 - Include both production and development URLs
@@ -539,7 +539,7 @@ async def log_auth_event(
         "user_agent": request.headers.get("user-agent") if request else None,
         "details": details or {}
     }
-    
+
     logger.info(f"Auth Event: {json.dumps(log_data)}")
 ```
 
@@ -554,7 +554,7 @@ async def auth0_health_check():
     try:
         # Test Auth0 connectivity
         health_status = await auth0_oauth_client.health_check()
-        
+
         return {
             "status": "healthy",
             "auth0_status": health_status,

@@ -93,7 +93,7 @@ Quick start guide and platform introduction.
 
 ### URGENT (Week 1)
 - [ ] JWT/OAuth2 authentication - 4-6 hours
-- [ ] AES-256 encryption - 3-4 hours  
+- [ ] AES-256 encryption - 3-4 hours
 - [ ] HTTPS/TLS enforcement - 2 hours
 - [ ] Dependency vulnerabilities - 2 hours
 

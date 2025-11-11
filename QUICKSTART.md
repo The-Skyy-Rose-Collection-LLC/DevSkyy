@@ -64,7 +64,7 @@ python3 agents/mcp/voice_media_video_agent.py
 **Expected Output:**
 ```
 ✓ Speech-to-Text working
-✓ Text-to-Speech working  
+✓ Text-to-Speech working
 ✓ Voice Cloning: 92% similarity
 ✓ Complete workflow: 10s video generated
 ```
@@ -207,11 +207,11 @@ result = await orchestrator.execute_workflow(
 
 All agent outputs automatically validated for:
 
-✅ **Colors**: Skyy Blue (#87CEEB), Rose Gold (#B76E79)  
-✅ **Photography**: Luxury editorial style, soft lighting  
-✅ **Resolution**: Minimum 2000px for products  
-✅ **Brand Voice**: Sophisticated, aspirational, refined  
-✅ **Logo**: Watermark on all visual content  
+✅ **Colors**: Skyy Blue (#87CEEB), Rose Gold (#B76E79)
+✅ **Photography**: Luxury editorial style, soft lighting
+✅ **Resolution**: Minimum 2000px for products
+✅ **Brand Voice**: Sophisticated, aspirational, refined
+✅ **Logo**: Watermark on all visual content
 ✅ **Tone**: Elegant, no fast fashion terminology
 
 ---

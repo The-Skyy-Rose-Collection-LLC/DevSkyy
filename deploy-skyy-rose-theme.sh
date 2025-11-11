@@ -192,7 +192,7 @@ Package: ${THEME_NAME}-${TIMESTAMP}.zip
 Ready for immediate deployment!"
 
     echo -e "${GREEN}✅ Committed changes to Git${NC}"
-    
+
     # Push to remote
     echo -e "${BLUE}🚀 Pushing to remote repository...${NC}"
     git push origin main

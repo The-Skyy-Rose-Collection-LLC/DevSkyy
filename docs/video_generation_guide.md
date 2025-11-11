@@ -287,7 +287,7 @@ Configure brand-specific trigger words for consistent generation:
 brand_config = {
     "trigger_words": [
         "skyrose_dress",
-        "skyrose_collection", 
+        "skyrose_collection",
         "skyrose_luxury",
         "skyrose_evening"
     ]

@@ -39,7 +39,7 @@ get_header(); ?>
                     <h2 class="section-title"><?php esc_html_e('Shop by Category', 'skyy-rose-collection'); ?></h2>
                     <p class="section-subtitle"><?php esc_html_e('Discover our curated collections of luxury fashion', 'skyy-rose-collection'); ?></p>
                 </div>
-                
+
                 <div class="categories-grid">
                     <?php
                     $featured_categories = get_terms(array(
@@ -48,7 +48,7 @@ get_header(); ?>
                         'number' => 4,
                         'parent' => 0,
                     ));
-                    
+
                     if ($featured_categories && !is_wp_error($featured_categories)) :
                         foreach ($featured_categories as $category) :
                             $thumbnail_id = get_term_meta($category->term_id, 'thumbnail_id', true);
@@ -86,7 +86,7 @@ get_header(); ?>
                     <h2 class="section-title"><?php esc_html_e('Featured Products', 'skyy-rose-collection'); ?></h2>
                     <p class="section-subtitle"><?php esc_html_e('Handpicked pieces from our latest collection', 'skyy-rose-collection'); ?></p>
                 </div>
-                
+
                 <div class="products-grid">
                     <?php
                     $featured_products = wc_get_featured_product_ids();
@@ -97,9 +97,9 @@ get_header(); ?>
                             'post__in' => $featured_products,
                             'meta_query' => WC()->query->get_meta_query(),
                         );
-                        
+
                         $featured_query = new WP_Query($args);
-                        
+
                         if ($featured_query->have_posts()) :
                             while ($featured_query->have_posts()) : $featured_query->the_post();
                                 global $product;
@@ -114,12 +114,12 @@ get_header(); ?>
                                             <span><?php esc_html_e('No Image', 'skyy-rose-collection'); ?></span>
                                         </div>
                                     <?php endif; ?>
-                                    
+
                                     <?php if ($product->is_on_sale()) : ?>
                                         <span class="sale-badge"><?php esc_html_e('Sale', 'skyy-rose-collection'); ?></span>
                                     <?php endif; ?>
                                 </div>
-                                
+
                                 <div class="product-content">
                                     <h3 class="product-title"><?php the_title(); ?></h3>
                                     <div class="product-price">
@@ -135,7 +135,7 @@ get_header(); ?>
                     endif;
                     ?>
                 </div>
-                
+
                 <div class="section-footer">
                     <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn-outline">
                         <?php esc_html_e('View All Products', 'skyy-rose-collection'); ?>
@@ -180,7 +180,7 @@ get_header(); ?>
                 <p class="section-subtitle">
                     <?php esc_html_e('Subscribe to our newsletter for exclusive access to new collections, styling tips, and special offers.', 'skyy-rose-collection'); ?>
                 </p>
-                
+
                 <form class="newsletter-form" action="#" method="post">
                     <div class="form-group">
                         <input type="email" name="email" placeholder="<?php esc_attr_e('Enter your email address', 'skyy-rose-collection'); ?>" required>

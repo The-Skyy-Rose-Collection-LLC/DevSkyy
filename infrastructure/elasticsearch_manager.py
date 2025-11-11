@@ -1,11 +1,12 @@
-from datetime import datetime
-import time
-
 from dataclasses import dataclass
+from datetime import datetime
+import logging
+import time
+from typing import Any, Optional
+
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError
-from typing import Any, Dict, List, Optional
-import logging
+
 
 """
 Enterprise Elasticsearch Manager - Search & Analytics Engine
@@ -14,6 +15,7 @@ Target: <2-second query response times with relevance scoring
 """
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class SearchMetrics:
@@ -33,7 +35,7 @@ class SearchMetrics:
             return 0.0
         return self.successful_queries / self.total_queries
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return {
             "total_queries": self.total_queries,
@@ -41,17 +43,16 @@ class SearchMetrics:
             "failed_queries": self.failed_queries,
             "success_rate": self.success_rate,
             "avg_response_time": self.avg_response_time,
-            "last_updated": (
-                self.last_updated.isoformat() if self.last_updated else None
-            ),
+            "last_updated": (self.last_updated.isoformat() if self.last_updated else None),
         }
+
 
 class ElasticsearchManager:
     """Enterprise Elasticsearch manager with fashion industry optimization"""
 
     def __init__(
         self,
-        hosts: List[str] = None,
+        hosts: list[str] = None,
         username: str = None,
         password: str = None,
         use_ssl: bool = True,
@@ -104,7 +105,7 @@ class ElasticsearchManager:
 
         logger.info(f"Elasticsearch manager initialized - Hosts: {self.hosts}")
 
-    def _get_index_mappings(self) -> Dict[str, Dict]:
+    def _get_index_mappings(self) -> dict[str, dict]:
         """Get index mappings for fashion e-commerce"""
         return {
             "logs": {
@@ -223,7 +224,7 @@ class ElasticsearchManager:
             },
         }
 
-    def _get_ilm_policies(self) -> Dict[str, Dict]:
+    def _get_ilm_policies(self) -> dict[str, dict]:
         """Get Index Lifecycle Management policies"""
         return {
             "logs_policy": {
@@ -257,11 +258,7 @@ class ElasticsearchManager:
             "analytics_policy": {
                 "policy": {
                     "phases": {
-                        "hot": {
-                            "actions": {
-                                "rollover": {"max_size": "5GB", "max_age": "1d"}
-                            }
-                        },
+                        "hot": {"actions": {"rollover": {"max_size": "5GB", "max_age": "1d"}}},
                         "warm": {
                             "min_age": "1d",
                             "actions": {"forcemerge": {"max_num_segments": 1}},
@@ -277,11 +274,7 @@ class ElasticsearchManager:
             "fashion_trends_policy": {
                 "policy": {
                     "phases": {
-                        "hot": {
-                            "actions": {
-                                "rollover": {"max_size": "2GB", "max_age": "30d"}
-                            }
-                        },
+                        "hot": {"actions": {"rollover": {"max_size": "2GB", "max_age": "30d"}}},
                         "warm": {
                             "min_age": "30d",
                             "actions": {"forcemerge": {"max_num_segments": 1}},
@@ -332,9 +325,7 @@ class ElasticsearchManager:
 
                 if not exists:
                     # Create index with mapping
-                    await self.client.indices.create(
-                        index=full_index_name, body=index_config
-                    )
+                    await self.client.indices.create(index=full_index_name, body=index_config)
                     logger.info(f"Created index: {full_index_name}")
                 else:
                     logger.debug(f"Index already exists: {full_index_name}")
@@ -352,9 +343,7 @@ class ElasticsearchManager:
                     logger.debug(f"ILM policy already exists: {policy_name}")
                 except NotFoundError:
                     # Create policy
-                    await self.client.ilm.put_lifecycle(
-                        policy=policy_name, body=policy_config
-                    )
+                    await self.client.ilm.put_lifecycle(policy=policy_name, body=policy_config)
                     logger.info(f"Created ILM policy: {policy_name}")
 
             except RequestError as e:
@@ -370,14 +359,10 @@ class ElasticsearchManager:
         else:
             self.metrics.failed_queries += 1
 
-        self.metrics.avg_response_time = (
-            self.metrics.total_response_time / self.metrics.total_queries
-        )
+        self.metrics.avg_response_time = self.metrics.total_response_time / self.metrics.total_queries
         self.metrics.last_updated = datetime.now()
 
-    async def index_document(
-        self, index_type: str, document: Dict[str, Any], doc_id: Optional[str] = None
-    ) -> bool:
+    async def index_document(self, index_type: str, document: dict[str, Any], doc_id: Optional[str] = None) -> bool:
         """Index a document"""
         start_time = time.time()
 
@@ -391,9 +376,7 @@ class ElasticsearchManager:
                 document["timestamp"] = datetime.now().isoformat()
 
             # Index document
-            response = await self.client.index(
-                index=index_name, body=document, id=doc_id
-            )
+            response = await self.client.index(index=index_name, body=document, id=doc_id)
 
             response_time = (time.time() - start_time) * 1000
             await self._record_metrics(response_time, True)
@@ -410,11 +393,11 @@ class ElasticsearchManager:
     async def search(
         self,
         index_type: str,
-        query: Dict[str, Any],
+        query: dict[str, Any],
         size: int = 10,
         from_: int = 0,
-        sort: List[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        sort: list[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
         """Perform search query"""
         start_time = time.time()
 
@@ -435,9 +418,7 @@ class ElasticsearchManager:
 
             # Check if response time meets target (<2 seconds)
             if response_time > 2000:
-                logger.warning(
-                    f"Search query exceeded target response time: {response_time:.2f}ms"
-                )
+                logger.warning(f"Search query exceeded target response time: {response_time:.2f}ms")
 
             return {
                 "hits": response["hits"]["hits"],
@@ -463,10 +444,10 @@ class ElasticsearchManager:
         self,
         index_type: str,
         search_text: str,
-        fields: List[str] = None,
+        fields: list[str] = None,
         size: int = 10,
         min_score: float = 0.1,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Perform full-text search with relevance scoring"""
 
         # Default fields for fashion e-commerce
@@ -489,11 +470,7 @@ class ElasticsearchManager:
                             "fuzziness": "AUTO",
                         }
                     },
-                    {
-                        "match_phrase": {
-                            "description": {"query": search_text, "boost": 2}
-                        }
-                    },
+                    {"match_phrase": {"description": {"query": search_text, "boost": 2}}},
                 ],
                 "minimum_should_match": 1,
             }
@@ -517,7 +494,7 @@ class ElasticsearchManager:
         category: Optional[str] = None,
         year: Optional[int] = None,
         min_popularity: float = 0.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Fashion-specific trend search"""
 
         query = {
@@ -546,9 +523,7 @@ class ElasticsearchManager:
             query["bool"]["filter"].append({"term": {"year": year}})
 
         if min_popularity > 0:
-            query["bool"]["filter"].append(
-                {"range": {"popularity_score": {"gte": min_popularity}}}
-            )
+            query["bool"]["filter"].append({"range": {"popularity_score": {"gte": min_popularity}}})
 
         return await self.search(
             index_type="fashion_trends",
@@ -566,7 +541,7 @@ class ElasticsearchManager:
         end_date: datetime,
         aggregation: str = "avg",
         interval: str = "1h",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get analytics data with time-based aggregation"""
 
         query = {
@@ -618,7 +593,7 @@ class ElasticsearchManager:
             logger.error(f"Analytics query error: {e}")
             return {"error": str(e)}
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get search performance metrics"""
         cluster_health = None
         indices_stats = None
@@ -637,7 +612,7 @@ class ElasticsearchManager:
             "configured_indices": list(self.indices.keys()),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check"""
         start_time = time.time()
 
@@ -669,6 +644,7 @@ class ElasticsearchManager:
                 "error": str(e),
                 "response_time_ms": (time.time() - start_time) * 1000,
             }
+
 
 # Global Elasticsearch manager instance
 elasticsearch_manager = ElasticsearchManager()

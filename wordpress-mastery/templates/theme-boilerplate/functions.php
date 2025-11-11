@@ -256,17 +256,17 @@ add_filter('body_class', 'wp_mastery_boilerplate_body_classes');
 function wp_mastery_boilerplate_fallback_menu() {
 	echo '<ul class="fallback-menu">';
 	echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'wp-mastery-boilerplate') . '</a></li>';
-	
+
 	// Show pages in menu if no custom menu is set
 	$pages = get_pages(array(
 		'sort_column' => 'menu_order',
 		'number' => 5,
 	));
-	
+
 	foreach ($pages as $page) {
 		echo '<li><a href="' . esc_url(get_permalink($page->ID)) . '">' . esc_html($page->post_title) . '</a></li>';
 	}
-	
+
 	echo '</ul>';
 }
 
@@ -280,12 +280,12 @@ function wp_mastery_boilerplate_fallback_menu() {
  */
 function wp_mastery_boilerplate_get_option($option_name, $default = '') {
 	$option_value = get_theme_mod($option_name, $default);
-	
+
 	// Sanitize based on option type
 	if (is_string($option_value)) {
 		return sanitize_text_field($option_value);
 	}
-	
+
 	return $option_value;
 }
 
@@ -296,7 +296,7 @@ function wp_mastery_boilerplate_get_option($option_name, $default = '') {
  */
 function wp_mastery_boilerplate_posted_on() {
 	$time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
-	
+
 	if (get_the_time('U') !== get_the_modified_time('U')) {
 		$time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
 	}
@@ -344,7 +344,7 @@ function wp_mastery_boilerplate_nav_menu_css_class($classes, $item) {
 	if (strpos($item->url, home_url()) === false && strpos($item->url, 'http') === 0) {
 		$classes[] = 'external-link';
 	}
-	
+
 	return $classes;
 }
 add_filter('nav_menu_css_class', 'wp_mastery_boilerplate_nav_menu_css_class', 10, 2);
@@ -367,7 +367,7 @@ function wp_mastery_boilerplate_is_wpcom() {
 function wp_mastery_boilerplate_activation() {
 	// Flush rewrite rules
 	flush_rewrite_rules();
-	
+
 	// Set default theme options
 	if (!get_theme_mod('custom_logo')) {
 		// Set default customizer values if needed

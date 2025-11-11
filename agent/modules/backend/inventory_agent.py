@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 import hashlib
 import logging
 import random
+from typing import Any
 import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+
 
 # Heavy imports removed - using random instead of numpy for mock data
 # If CV/ML features needed in future, lazy load: cv2, imagehash, PIL, sklearn
@@ -30,11 +31,9 @@ class InventoryAgent:
         # EXPERIMENTAL: Quantum inventory optimization
         self.quantum_optimizer = self._initialize_quantum_optimizer()
         self.predictive_demand_engine = self._initialize_predictive_engine()
-        logger.info(
-            "🎯 Production Inventory Agent Initialized with Quantum Optimization"
-        )
+        logger.info("🎯 Production Inventory Agent Initialized with Quantum Optimization")
 
-    async def scan_assets(self) -> Dict[str, Any]:
+    async def scan_assets(self) -> dict[str, Any]:
         """Comprehensive asset scanning with AI-powered analysis."""
         try:
             start_time = datetime.now()
@@ -47,9 +46,7 @@ class InventoryAgent:
             product_analysis = await self._analyze_product_catalog()
 
             # Generate asset fingerprints for duplicate detection
-            fingerprints = await self._generate_asset_fingerprints(
-                scan_results["assets"]
-            )
+            fingerprints = await self._generate_asset_fingerprints(scan_results["assets"])
 
             # AI-powered categorization
             categories = await self._ai_categorize_assets(scan_results["assets"])
@@ -71,16 +68,14 @@ class InventoryAgent:
                 "recommendations": self._generate_scan_recommendations(scan_results),
             }
 
-            logger.info(
-                f"✅ Asset scan completed: {results['total_assets']} assets processed"
-            )
+            logger.info(f"✅ Asset scan completed: {results['total_assets']} assets processed")
             return results
 
         except Exception as e:
-            logger.error(f"❌ Asset scan failed: {str(e)}")
+            logger.error(f"❌ Asset scan failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def find_duplicates(self) -> Dict[str, Any]:
+    async def find_duplicates(self) -> dict[str, Any]:
         """Advanced duplicate detection using multiple algorithms."""
         try:
             logger.info("🔍 Starting advanced duplicate detection...")
@@ -110,27 +105,21 @@ class InventoryAgent:
             # Calculate potential space savings
             space_savings = self._calculate_space_savings(all_duplicates)
 
-            self.performance_metrics["duplicates_found"] = sum(
-                len(group) for group in all_duplicates.values()
-            )
+            self.performance_metrics["duplicates_found"] = sum(len(group) for group in all_duplicates.values())
 
             return {
                 "duplicate_analysis": all_duplicates,
-                "total_duplicate_groups": len(
-                    [g for groups in all_duplicates.values() for g in groups]
-                ),
+                "total_duplicate_groups": len([g for groups in all_duplicates.values() for g in groups]),
                 "potential_space_savings_mb": space_savings,
                 "confidence_scores": self._calculate_confidence_scores(all_duplicates),
-                "cleanup_recommendations": self._generate_cleanup_recommendations(
-                    all_duplicates
-                ),
+                "cleanup_recommendations": self._generate_cleanup_recommendations(all_duplicates),
             }
 
         except Exception as e:
-            logger.error(f"❌ Duplicate detection failed: {str(e)}")
+            logger.error(f"❌ Duplicate detection failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def remove_duplicates(self, keep_strategy: str = "latest") -> Dict[str, Any]:
+    async def remove_duplicates(self, keep_strategy: str = "latest") -> dict[str, Any]:
         """Intelligent duplicate removal with backup and rollback capabilities."""
         try:
             logger.info(f"🗑️ Starting duplicate removal with strategy: {keep_strategy}")
@@ -169,7 +158,7 @@ class InventoryAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Duplicate removal failed: {str(e)}")
+            logger.error(f"❌ Duplicate removal failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def visualize_similarities(self) -> str:
@@ -186,10 +175,10 @@ class InventoryAgent:
             return visualization
 
         except Exception as e:
-            logger.error(f"❌ Visualization generation failed: {str(e)}")
-            return f"Error generating visualization: {str(e)}"
+            logger.error(f"❌ Visualization generation failed: {e!s}")
+            return f"Error generating visualization: {e!s}"
 
-    def generate_report(self) -> Dict[str, Any]:
+    def generate_report(self) -> dict[str, Any]:
         """Comprehensive inventory analytics report."""
         try:
             logger.info("📋 Generating comprehensive inventory report...")
@@ -214,10 +203,10 @@ class InventoryAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Report generation failed: {str(e)}")
+            logger.error(f"❌ Report generation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Real-time inventory metrics for dashboard."""
         return {
             "total_assets": len(self.assets_db),
@@ -228,7 +217,7 @@ class InventoryAgent:
         }
 
     # Advanced AI-powered helper methods
-    async def _scan_digital_assets(self) -> Dict[str, Any]:
+    async def _scan_digital_assets(self) -> dict[str, Any]:
         """Scan digital assets across directories."""
         import os
 
@@ -249,15 +238,9 @@ class InventoryAgent:
                             "path": file_path,
                             "name": file,
                             "extension": file_ext,
-                            "size": (
-                                os.path.getsize(file_path)
-                                if os.path.exists(file_path)
-                                else 0
-                            ),
+                            "size": (os.path.getsize(file_path) if os.path.exists(file_path) else 0),
                             "modified": (
-                                datetime.fromtimestamp(
-                                    os.path.getmtime(file_path)
-                                ).isoformat()
+                                datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat()
                                 if os.path.exists(file_path)
                                 else None
                             ),
@@ -281,7 +264,7 @@ class InventoryAgent:
 
         return {"assets": assets, "types": asset_types}
 
-    async def _analyze_product_catalog(self) -> Dict[str, Any]:
+    async def _analyze_product_catalog(self) -> dict[str, Any]:
         """Analyze product catalog structure."""
         return {
             "total_products": 156,
@@ -293,7 +276,7 @@ class InventoryAgent:
             "bestsellers": ["burgundy_dress", "rose_gold_necklace", "cashmere_coat"],
         }
 
-    async def _generate_asset_fingerprints(self, assets: List[Dict]) -> List[str]:
+    async def _generate_asset_fingerprints(self, assets: list[dict]) -> list[str]:
         """Generate fingerprints for duplicate detection."""
         fingerprints = []
         for asset in assets:
@@ -302,7 +285,7 @@ class InventoryAgent:
             fingerprints.append(fingerprint)
         return fingerprints
 
-    async def _ai_categorize_assets(self, assets: List[Dict]) -> Dict[str, int]:
+    async def _ai_categorize_assets(self, assets: list[dict]) -> dict[str, int]:
         """AI-powered asset categorization."""
         categories = {
             "product_images": 0,
@@ -313,15 +296,9 @@ class InventoryAgent:
 
         for asset in assets:
             name_lower = asset.get("name", "").lower()
-            if any(
-                keyword in name_lower
-                for keyword in ["product", "item", "dress", "accessory"]
-            ):
+            if any(keyword in name_lower for keyword in ["product", "item", "dress", "accessory"]):
                 categories["product_images"] += 1
-            elif any(
-                keyword in name_lower
-                for keyword in ["banner", "promo", "ad", "marketing"]
-            ):
+            elif any(keyword in name_lower for keyword in ["banner", "promo", "ad", "marketing"]):
                 categories["marketing_materials"] += 1
             elif any(keyword in name_lower for keyword in ["doc", "readme", "guide"]):
                 categories["documentation"] += 1
@@ -335,7 +312,7 @@ class InventoryAgent:
         types = ["images", "documents", "videos", "audio", "other"]
         return types[index % len(types)]
 
-    def _extract_metadata(self, index: int) -> Dict[str, Any]:
+    def _extract_metadata(self, index: int) -> dict[str, Any]:
         """Extract metadata for asset."""
         return {
             "checksum": hashlib.md5(f"asset_{index}".encode()).hexdigest(),
@@ -345,7 +322,7 @@ class InventoryAgent:
             "location": "Studio" if index % 5 == 0 else None,
         }
 
-    def _classify_asset(self, asset: Dict) -> str:
+    def _classify_asset(self, asset: dict) -> str:
         """Classify asset into appropriate category."""
         # Simplified AI classification
         if "product" in asset["name"].lower():
@@ -357,7 +334,7 @@ class InventoryAgent:
         else:
             return "other"
 
-    async def _find_hash_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
+    async def _find_hash_duplicates(self, assets: list[dict]) -> list[list[dict]]:
         """Find exact duplicates using hash comparison."""
         hash_groups = {}
         for asset in assets:
@@ -368,7 +345,7 @@ class InventoryAgent:
 
         return [group for group in hash_groups.values() if len(group) > 1]
 
-    async def _find_perceptual_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
+    async def _find_perceptual_duplicates(self, assets: list[dict]) -> list[list[dict]]:
         """Find visually similar images using perceptual hashing."""
         # Simulate perceptual hash comparison
         similar_groups = []
@@ -382,7 +359,7 @@ class InventoryAgent:
 
         return similar_groups
 
-    async def _find_content_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
+    async def _find_content_duplicates(self, assets: list[dict]) -> list[list[dict]]:
         """Find content duplicates using text similarity."""
         # Simulate content similarity analysis
         content_groups = []
@@ -395,7 +372,7 @@ class InventoryAgent:
 
         return content_groups
 
-    async def _find_metadata_duplicates(self, assets: List[Dict]) -> List[List[Dict]]:
+    async def _find_metadata_duplicates(self, assets: list[dict]) -> list[list[dict]]:
         """Find duplicates based on metadata similarity."""
         # Simulate metadata-based duplicate detection
         metadata_groups = []
@@ -414,7 +391,7 @@ class InventoryAgent:
 
         return metadata_groups
 
-    def _calculate_space_savings(self, duplicates: Dict) -> float:
+    def _calculate_space_savings(self, duplicates: dict) -> float:
         """Calculate potential space savings from duplicate removal."""
         total_savings = 0
         for groups in duplicates.values():
@@ -427,7 +404,7 @@ class InventoryAgent:
 
         return total_savings / 1024  # Convert to MB
 
-    def _calculate_confidence_scores(self, duplicates: Dict) -> Dict[str, float]:
+    def _calculate_confidence_scores(self, duplicates: dict) -> dict[str, float]:
         """Calculate confidence scores for duplicate detection methods."""
         return {
             "exact_matches": 1.0,
@@ -436,15 +413,13 @@ class InventoryAgent:
             "metadata_similarity": 0.65,
         }
 
-    def _generate_cleanup_recommendations(self, duplicates: Dict) -> List[str]:
+    def _generate_cleanup_recommendations(self, duplicates: dict) -> list[str]:
         """Generate actionable cleanup recommendations."""
         recommendations = []
 
         for method, groups in duplicates.items():
             if groups:
-                recommendations.append(
-                    f"Review {len(groups)} duplicate groups found via {method}"
-                )
+                recommendations.append(f"Review {len(groups)} duplicate groups found via {method}")
 
         recommendations.extend(
             [
@@ -457,7 +432,7 @@ class InventoryAgent:
 
         return recommendations
 
-    def _select_keeper(self, group: List[Dict], strategy: str) -> Dict:
+    def _select_keeper(self, group: list[dict], strategy: str) -> dict:
         """Select which asset to keep based on strategy."""
         if strategy == "latest":
             # Use the existing 'modified' key recorded during scanning.
@@ -469,7 +444,7 @@ class InventoryAgent:
         else:  # first
             return group[0]
 
-    async def _safely_remove_asset(self, asset: Dict) -> Dict[str, Any]:
+    async def _safely_remove_asset(self, asset: dict) -> dict[str, Any]:
         """Safely remove asset with verification."""
         # Simulate safe removal process
         return {
@@ -485,7 +460,7 @@ class InventoryAgent:
         logger.info(f"📦 Created backup: {backup_id}")
         return backup_id
 
-    def _generate_cleanup_summary(self, removed_assets: List[Dict]) -> Dict[str, Any]:
+    def _generate_cleanup_summary(self, removed_assets: list[dict]) -> dict[str, Any]:
         """Generate summary of cleanup operation."""
         return {
             "total_removed": len(removed_assets),
@@ -494,7 +469,7 @@ class InventoryAgent:
             "average_age": "45 days",
         }
 
-    def _build_similarity_matrix(self) -> Dict[str, Any]:
+    def _build_similarity_matrix(self) -> dict[str, Any]:
         """Build similarity matrix for visualization."""
         return {
             "matrix_size": len(self.assets_db),
@@ -503,7 +478,7 @@ class InventoryAgent:
             "data_points": 1000,
         }
 
-    def _create_interactive_visualization(self, data: Dict) -> str:
+    def _create_interactive_visualization(self, data: dict) -> str:
         """Create interactive visualization markup."""
         return f"""
         <div class="similarity-visualization">
@@ -528,7 +503,7 @@ class InventoryAgent:
         """Calculate overall quality index."""
         return 0.91  # 91% quality
 
-    def _generate_asset_breakdown(self) -> Dict[str, Any]:
+    def _generate_asset_breakdown(self) -> dict[str, Any]:
         """Generate detailed asset breakdown."""
         return {
             "by_type": {
@@ -543,7 +518,7 @@ class InventoryAgent:
             "by_quality": {"excellent": 600, "good": 300, "poor": 100},
         }
 
-    def _identify_optimization_opportunities(self) -> List[str]:
+    def _identify_optimization_opportunities(self) -> list[str]:
         """Identify opportunities for optimization."""
         return [
             "Compress 150 oversized images (potential 2.3GB savings)",
@@ -553,7 +528,7 @@ class InventoryAgent:
             "Establish backup retention policy for 300+ archived files",
         ]
 
-    def _assess_brand_alignment(self) -> Dict[str, Any]:
+    def _assess_brand_alignment(self) -> dict[str, Any]:
         """Assess how well assets align with brand standards."""
         return {
             "brand_compliance_score": 0.89,
@@ -563,7 +538,7 @@ class InventoryAgent:
             "assets_needing_review": 67,
         }
 
-    def _generate_strategic_recommendations(self) -> List[str]:
+    def _generate_strategic_recommendations(self) -> list[str]:
         """Generate strategic recommendations for inventory management."""
         return [
             "Implement AI-powered auto-tagging for new uploads",
@@ -573,7 +548,7 @@ class InventoryAgent:
             "Develop asset performance tracking system",
         ]
 
-    def _analyze_inventory_trends(self) -> Dict[str, Any]:
+    def _analyze_inventory_trends(self) -> dict[str, Any]:
         """Analyze inventory trends over time."""
         return {
             "growth_rate": "15% monthly",
@@ -585,7 +560,7 @@ class InventoryAgent:
             "storage_trends": {"growth_projection": "2.1TB by year end"},
         }
 
-    def _calculate_cost_metrics(self) -> Dict[str, Any]:
+    def _calculate_cost_metrics(self) -> dict[str, Any]:
         """Calculate cost-related metrics."""
         return {
             "storage_cost_monthly": "$245.67",
@@ -595,7 +570,7 @@ class InventoryAgent:
             "roi_from_optimization": "185%",
         }
 
-    def _check_compliance_status(self) -> Dict[str, Any]:
+    def _check_compliance_status(self) -> dict[str, Any]:
         """Check compliance with various standards."""
         return {
             "gdpr_compliance": "Full",
@@ -609,7 +584,7 @@ class InventoryAgent:
         """Calculate overall inventory health score."""
         return 0.89
 
-    def _get_active_alerts(self) -> List[str]:
+    def _get_active_alerts(self) -> list[str]:
         """Get current active alerts."""
         return [
             "15 assets exceed size recommendations",
@@ -617,7 +592,7 @@ class InventoryAgent:
             "8 duplicate groups detected",
         ]
 
-    def _get_last_scan_info(self) -> Dict[str, Any]:
+    def _get_last_scan_info(self) -> dict[str, Any]:
         """Get information about the last scan."""
         return {
             "last_scan": (datetime.now() - timedelta(hours=2)).isoformat(),
@@ -626,7 +601,7 @@ class InventoryAgent:
             "status": "completed",
         }
 
-    def _calculate_quality_score(self, assets: List[Dict]) -> int:
+    def _calculate_quality_score(self, assets: list[dict]) -> int:
         """Calculate overall asset quality score."""
         if not assets:
             return 0
@@ -634,22 +609,16 @@ class InventoryAgent:
         quality_factors = []
 
         # Check for appropriate file sizes
-        oversized_files = sum(
-            1 for asset in assets if asset.get("size", 0) > 5000000
-        )  # 5MB
+        oversized_files = sum(1 for asset in assets if asset.get("size", 0) > 5000000)  # 5MB
         quality_factors.append(max(0, 100 - (oversized_files / len(assets)) * 50))
 
         # Check for proper naming conventions
-        well_named = sum(
-            1
-            for asset in assets
-            if "_" in asset.get("name", "") or "-" in asset.get("name", "")
-        )
+        well_named = sum(1 for asset in assets if "_" in asset.get("name", "") or "-" in asset.get("name", ""))
         quality_factors.append((well_named / len(assets)) * 100)
 
         return int(sum(quality_factors) / len(quality_factors))
 
-    def _generate_scan_recommendations(self, scan_results: Dict) -> List[str]:
+    def _generate_scan_recommendations(self, scan_results: dict) -> list[str]:
         """Generate recommendations based on scan results."""
         recommendations = []
 
@@ -660,9 +629,7 @@ class InventoryAgent:
         # Check for large files
         large_files = [a for a in assets if a.get("size", 0) > 5000000]
         if large_files:
-            recommendations.append(
-                f"Optimize {len(large_files)} large files for better performance"
-            )
+            recommendations.append(f"Optimize {len(large_files)} large files for better performance")
 
         # Check for duplicate-prone patterns
         similar_names = {}
@@ -672,9 +639,7 @@ class InventoryAgent:
 
         duplicates = [name for name, count in similar_names.items() if count > 1]
         if duplicates:
-            recommendations.append(
-                f"Review {len(duplicates)} potential duplicate file groups"
-            )
+            recommendations.append(f"Review {len(duplicates)} potential duplicate file groups")
 
         # EXPERIMENTAL: Quantum optimization recommendations
         quantum_recs = self._quantum_optimization_recommendations(assets)
@@ -690,7 +655,7 @@ class InventoryAgent:
 
         return recommendations
 
-    def _initialize_quantum_optimizer(self) -> Dict[str, Any]:
+    def _initialize_quantum_optimizer(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize quantum inventory optimizer."""
         return {
             "quantum_states": ["superposition", "entanglement", "coherence"],
@@ -700,7 +665,7 @@ class InventoryAgent:
             "decoherence_time": "100_microseconds",
         }
 
-    def _initialize_predictive_engine(self) -> Dict[str, Any]:
+    def _initialize_predictive_engine(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize predictive demand engine."""
         return {
             "neural_networks": 3,
@@ -710,16 +675,14 @@ class InventoryAgent:
             "confidence_intervals": [0.68, 0.95, 0.99],
         }
 
-    def _quantum_optimization_recommendations(self, assets: List[Dict]) -> List[str]:
+    def _quantum_optimization_recommendations(self, assets: list[dict]) -> list[str]:
         """EXPERIMENTAL: Generate quantum-optimized recommendations."""
         quantum_recs = []
 
         # Simulate quantum asset analysis
         asset_count = len(assets)
         if asset_count > 1000:
-            quantum_recs.append(
-                "QUANTUM: Implement superposition-based asset clustering"
-            )
+            quantum_recs.append("QUANTUM: Implement superposition-based asset clustering")
         if asset_count > 500:
             quantum_recs.append("QUANTUM: Enable entangled asset relationship mapping")
 
@@ -733,7 +696,7 @@ class InventoryAgent:
 
         return quantum_recs
 
-    async def quantum_asset_optimization(self) -> Dict[str, Any]:
+    async def quantum_asset_optimization(self) -> dict[str, Any]:
         """EXPERIMENTAL: Quantum-powered asset optimization."""
         try:
             logger.info("🔬 Initializing quantum asset optimization...")
@@ -763,11 +726,11 @@ class InventoryAgent:
             }
 
         except Exception as e:
-            logger.error(f"Quantum optimization failed: {str(e)}")
+            logger.error(f"Quantum optimization failed: {e!s}")
             return {"error": str(e), "status": "quantum_decoherence"}
 
 
-def manage_inventory() -> Dict[str, Any]:
+def manage_inventory() -> dict[str, Any]:
     """Main inventory management function for compatibility."""
     agent = InventoryAgent()
     return {

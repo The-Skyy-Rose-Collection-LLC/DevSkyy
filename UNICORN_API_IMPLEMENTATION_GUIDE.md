@@ -109,7 +109,7 @@ import uuid
 
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
@@ -128,7 +128,7 @@ class User(Base):
 
 class UserSession(Base):
     __tablename__ = "user_sessions"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     session_token = Column(String(255), nullable=False, index=True)
@@ -140,7 +140,7 @@ class UserSession(Base):
 
 class MFADevice(Base):
     __tablename__ = "mfa_devices"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     device_name = Column(String(100), nullable=False)
@@ -242,7 +242,7 @@ def test_user_login():
         "first_name": "Login",
         "last_name": "Test"
     })
-    
+
     # Then test login
     response = client.post("/api/v1/auth/login", json={
         "email": "login@example.com",
@@ -270,7 +270,7 @@ def test_protected_endpoint_access():
         "last_name": "Test"
     })
     token = register_response.json()["access_token"]
-    
+
     # Access protected endpoint
     response = client.get("/api/v1/auth/me", headers={
         "Authorization": f"Bearer {token}"
@@ -315,13 +315,13 @@ async def auth_health_check(db: Session = Depends(get_db)):
     try:
         # Test database connectivity
         db.execute("SELECT 1")
-        
+
         # Test JWT token creation
         test_token = create_access_token(data={"sub": "health-check"})
-        
+
         # Verify token
         verify_token(test_token)
-        
+
         return {
             "status": "healthy",
             "database": "connected",
@@ -353,9 +353,9 @@ async def log_security_event(event_type: str, user_id: str = None, ip_address: s
         "ip_address": ip_address,
         "details": details or {}
     }
-    
+
     security_logger.info(f"SECURITY_EVENT: {event}")
-    
+
     # Send to monitoring system (e.g., Sentry, DataDog)
     # await send_to_monitoring_system(event)
 
@@ -435,7 +435,7 @@ async def detailed_health(db: Session = Depends(get_db)):
         "timestamp": datetime.utcnow().isoformat(),
         "services": {}
     }
-    
+
     # Database health
     try:
         db.execute("SELECT 1")
@@ -443,7 +443,7 @@ async def detailed_health(db: Session = Depends(get_db)):
     except Exception as e:
         health_status["services"]["database"] = {"status": "unhealthy", "error": str(e)}
         health_status["status"] = "degraded"
-    
+
     # Redis health
     try:
         r = redis.Redis.from_url(settings.REDIS_URL)
@@ -452,7 +452,7 @@ async def detailed_health(db: Session = Depends(get_db)):
     except Exception as e:
         health_status["services"]["redis"] = {"status": "unhealthy", "error": str(e)}
         health_status["status"] = "degraded"
-    
+
     return health_status
 ```
 

@@ -21,7 +21,7 @@ DOCKER_REGISTRY=docker.io
 DOCKER_REGISTRY_USERNAME=skyyrosellc
 DOCKER_REGISTRY_TOKEN=<NEW_ROTATED_TOKEN>
 
-# Vercel Integration  
+# Vercel Integration
 VERCEL_TOKEN=<YOUR_VERCEL_TOKEN>
 VERCEL_ORG_ID=<YOUR_VERCEL_ORG_ID>
 VERCEL_PROJECT_ID=<YOUR_VERCEL_PROJECT_ID>
@@ -162,7 +162,7 @@ graph TD
 ```bash
 # CRITICAL: Rotate exposed credentials immediately
 1. Generate new Docker Hub Personal Access Token
-2. Generate new GitHub Personal Access Token  
+2. Generate new GitHub Personal Access Token
 3. Create new SSH key pair for WordPress hosting
 4. Update all GitHub repository secrets
 5. Test deployment pipeline with new credentials

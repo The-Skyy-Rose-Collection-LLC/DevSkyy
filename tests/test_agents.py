@@ -3,6 +3,7 @@ from agent.modules.backend.financial_agent import FinancialAgent
 from agent.modules.backend.inventory_agent import InventoryAgent
 from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 
+
 class TestFinancialAgent:
 
     def test_chargeback_monitoring(self):
@@ -30,6 +31,7 @@ class TestFinancialAgent:
         assert result["risk_level"] in ["HIGH", "LOW"]
         assert "indicators" in result
 
+
 class TestInventoryAgent:
 
     def test_stock_level_check(self):
@@ -48,6 +50,7 @@ class TestInventoryAgent:
         assert "predicted_weekly_demand" in result
         assert "confidence" in result
         assert "recommended_reorder_quantity" in result
+
 
 class TestCustomerServiceAgent:
 
@@ -68,6 +71,7 @@ class TestCustomerServiceAgent:
         assert "John Doe" in response
         assert "shipping" in response.lower()
         assert len(response) > 50
+
 
 class TestMarketingAgent:
 
@@ -93,6 +97,7 @@ class TestMarketingAgent:
         ]
         for segment in expected_segments:
             assert segment in result["segments"]
+
 
 class TestMainFunctions:
 

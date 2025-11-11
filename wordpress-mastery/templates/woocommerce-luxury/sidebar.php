@@ -18,17 +18,17 @@ if (!is_active_sidebar('sidebar-1')) {
 
 <aside id="secondary" class="widget-area luxury-sidebar" role="complementary">
     <div class="sidebar-inner">
-        
+
         <!-- Custom Search Widget -->
         <div class="widget luxury-search-widget" data-animate="fadeInUp">
             <div class="widget-content">
                 <form role="search" method="get" class="luxury-search-form" action="<?php echo esc_url(home_url('/')); ?>">
                     <div class="search-input-wrapper">
-                        <input type="search" 
-                               class="search-field" 
-                               placeholder="<?php esc_attr_e('Search luxury fashion...', 'skyy-rose-collection'); ?>" 
-                               value="<?php echo get_search_query(); ?>" 
-                               name="s" 
+                        <input type="search"
+                               class="search-field"
+                               placeholder="<?php esc_attr_e('Search luxury fashion...', 'skyy-rose-collection'); ?>"
+                               value="<?php echo get_search_query(); ?>"
+                               name="s"
                                autocomplete="off"
                                data-live-search="true">
                         <button type="submit" class="search-submit" aria-label="<?php esc_attr_e('Search', 'skyy-rose-collection'); ?>">
@@ -49,21 +49,21 @@ if (!is_active_sidebar('sidebar-1')) {
                     <h3 class="widget-title"><?php esc_html_e('Stay in Style', 'skyy-rose-collection'); ?></h3>
                     <p class="newsletter-subtitle"><?php esc_html_e('Get exclusive access to new collections and styling tips', 'skyy-rose-collection'); ?></p>
                 </div>
-                
+
                 <form class="newsletter-form" id="sidebar-newsletter-form" data-ajax="true">
                     <div class="floating-label-group">
-                        <input type="email" 
-                               id="newsletter-email" 
-                               name="email" 
-                               class="floating-input" 
-                               required 
+                        <input type="email"
+                               id="newsletter-email"
+                               name="email"
+                               class="floating-input"
+                               required
                                autocomplete="email">
                         <label for="newsletter-email" class="floating-label">
                             <?php esc_html_e('Your email address', 'skyy-rose-collection'); ?>
                         </label>
                         <div class="input-border"></div>
                     </div>
-                    
+
                     <button type="submit" class="newsletter-submit">
                         <span class="submit-text"><?php esc_html_e('Subscribe', 'skyy-rose-collection'); ?></span>
                         <span class="submit-loading">
@@ -80,16 +80,16 @@ if (!is_active_sidebar('sidebar-1')) {
                             </svg>
                         </span>
                     </button>
-                    
+
                     <div class="form-messages">
                         <div class="success-message"><?php esc_html_e('Thank you for subscribing!', 'skyy-rose-collection'); ?></div>
                         <div class="error-message"><?php esc_html_e('Please enter a valid email address.', 'skyy-rose-collection'); ?></div>
                     </div>
-                    
+
                     <p class="newsletter-privacy">
                         <?php esc_html_e('We respect your privacy. Unsubscribe at any time.', 'skyy-rose-collection'); ?>
                     </p>
-                    
+
                     <?php wp_nonce_field('newsletter_signup', 'newsletter_nonce'); ?>
                 </form>
             </div>
@@ -99,14 +99,14 @@ if (!is_active_sidebar('sidebar-1')) {
         <div class="widget luxury-recent-posts-widget" data-animate="fadeInUp" data-delay="400">
             <div class="widget-content">
                 <h3 class="widget-title"><?php esc_html_e('Latest Stories', 'skyy-rose-collection'); ?></h3>
-                
+
                 <div class="recent-posts-list">
                     <?php
                     $recent_posts = wp_get_recent_posts(array(
                         'numberposts' => 3,
                         'post_status' => 'publish'
                     ));
-                    
+
                     foreach ($recent_posts as $post) :
                         $post_id = $post['ID'];
                         $post_title = $post['post_title'];
@@ -122,7 +122,7 @@ if (!is_active_sidebar('sidebar-1')) {
                                         <?php echo wp_kses_post($post_thumbnail); ?>
                                     </div>
                                 <?php endif; ?>
-                                
+
                                 <div class="recent-post-content">
                                     <h4 class="recent-post-title"><?php echo esc_html($post_title); ?></h4>
                                     <p class="recent-post-excerpt"><?php echo esc_html($post_excerpt); ?></p>
@@ -134,7 +134,7 @@ if (!is_active_sidebar('sidebar-1')) {
                         </article>
                     <?php endforeach; ?>
                 </div>
-                
+
                 <div class="recent-posts-footer">
                     <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>" class="view-all-posts">
                         <?php esc_html_e('View All Stories', 'skyy-rose-collection'); ?>
@@ -148,6 +148,6 @@ if (!is_active_sidebar('sidebar-1')) {
 
         <!-- Standard WordPress Widgets -->
         <?php dynamic_sidebar('sidebar-1'); ?>
-        
+
     </div>
 </aside>

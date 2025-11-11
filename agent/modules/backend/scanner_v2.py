@@ -12,18 +12,19 @@ Features:
 """
 
 import asyncio
-import logging
-import os
-import re
-import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import logging
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+import re
+import time
+from typing import Any, Optional
 
 import requests
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -69,17 +70,13 @@ class ScannerAgentV2(BaseAgent):
 
         # Security patterns
         self.security_patterns = {
-            "hardcoded_secret": re.compile(
-                r"(password|secret|api_key)\s*=\s*['\"][^'\"]+['\"]", re.IGNORECASE
-            ),
+            "hardcoded_secret": re.compile(r"(password|secret|api_key)\s*=\s*['\"][^'\"]+['\"]", re.IGNORECASE),
             "sql_injection": re.compile(r"execute\([\"'].*\%s.*[\"']\)", re.IGNORECASE),
-            "xss_vulnerability": re.compile(
-                r"innerHTML\s*=|dangerouslySetInnerHTML", re.IGNORECASE
-            ),
+            "xss_vulnerability": re.compile(r"innerHTML\s*=|dangerouslySetInnerHTML", re.IGNORECASE),
         }
 
         # Performance tracking
-        self.scan_history: List[Dict[str, Any]] = []
+        self.scan_history: list[dict[str, Any]] = []
         self.thread_pool = ThreadPoolExecutor(max_workers=4)
 
     async def initialize(self) -> bool:
@@ -102,7 +99,7 @@ class ScannerAgentV2(BaseAgent):
             self.status = AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Execute core scanning functionality.
 
@@ -156,9 +153,7 @@ class ScannerAgentV2(BaseAgent):
             scan_results["error"] = str(e)
             return scan_results
 
-    async def _full_scan(
-        self, target_path: str, include_live_check: bool
-    ) -> Dict[str, Any]:
+    async def _full_scan(self, target_path: str, include_live_check: bool) -> dict[str, Any]:
         """Perform comprehensive full scan"""
         results = {
             "files_scanned": 0,
@@ -175,9 +170,7 @@ class ScannerAgentV2(BaseAgent):
         results["files_scanned"] = len(files)
 
         # Analyze files concurrently
-        file_results = await asyncio.gather(
-            *[self._analyze_file(f) for f in files], return_exceptions=True
-        )
+        file_results = await asyncio.gather(*[self._analyze_file(f) for f in files], return_exceptions=True)
 
         for file_result in file_results:
             if isinstance(file_result, Exception):
@@ -207,7 +200,7 @@ class ScannerAgentV2(BaseAgent):
 
         return results
 
-    async def _security_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _security_scan(self, target_path: str) -> dict[str, Any]:
         """Focused security vulnerability scan"""
         results = {"security_issues": [], "vulnerabilities": [], "risk_level": "low"}
 
@@ -237,16 +230,14 @@ class ScannerAgentV2(BaseAgent):
 
         return results
 
-    async def _performance_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _performance_scan(self, target_path: str) -> dict[str, Any]:
         """Focused performance analysis"""
         return {
             "performance_metrics": await self._analyze_site_performance(),
-            "optimization_suggestions": await self._generate_optimization_suggestions(
-                target_path
-            ),
+            "optimization_suggestions": await self._generate_optimization_suggestions(target_path),
         }
 
-    async def _quick_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _quick_scan(self, target_path: str) -> dict[str, Any]:
         """Quick health check scan"""
         files = await self._scan_project_files(target_path)
 
@@ -256,18 +247,14 @@ class ScannerAgentV2(BaseAgent):
             "last_modified": self._get_last_modified_time(files),
         }
 
-    async def _scan_project_files(self, target_path: str) -> List[str]:
+    async def _scan_project_files(self, target_path: str) -> list[str]:
         """Scan all project files for analysis"""
         files = []
 
         def scan_directory():
             for root, dirs, filenames in os.walk(target_path):
                 # Filter ignored directories
-                dirs[:] = [
-                    d
-                    for d in dirs
-                    if not d.startswith(".") and d not in self.ignore_dirs
-                ]
+                dirs[:] = [d for d in dirs if not d.startswith(".") and d not in self.ignore_dirs]
 
                 for filename in filenames:
                     if any(filename.endswith(ext) for ext in self.scan_extensions):
@@ -279,7 +266,7 @@ class ScannerAgentV2(BaseAgent):
 
         return files
 
-    async def _analyze_file(self, file_path: str) -> Dict[str, Any]:
+    async def _analyze_file(self, file_path: str) -> dict[str, Any]:
         """Analyze a single file for issues"""
         result = {"file": file_path, "errors": [], "warnings": [], "optimizations": []}
 
@@ -300,9 +287,7 @@ class ScannerAgentV2(BaseAgent):
             # Check line length
             for i, line in enumerate(lines, 1):
                 if len(line) > 200:
-                    result["warnings"].append(
-                        {"type": "long_line", "line": i, "length": len(line)}
-                    )
+                    result["warnings"].append({"type": "long_line", "line": i, "length": len(line)})
 
             # Python-specific checks
             if file_path.endswith(".py"):
@@ -317,9 +302,7 @@ class ScannerAgentV2(BaseAgent):
 
         return result
 
-    async def _analyze_python_file(
-        self, content: str, file_path: str
-    ) -> Dict[str, Any]:
+    async def _analyze_python_file(self, content: str, file_path: str) -> dict[str, Any]:
         """Python-specific analysis"""
         result = {"errors": [], "warnings": [], "optimizations": []}
 
@@ -333,15 +316,11 @@ class ScannerAgentV2(BaseAgent):
             )
 
         if "TODO" in content or "FIXME" in content:
-            result["optimizations"].append(
-                {"type": "todo", "message": "Found TODO/FIXME comments"}
-            )
+            result["optimizations"].append({"type": "todo", "message": "Found TODO/FIXME comments"})
 
         return result
 
-    async def _analyze_javascript_file(
-        self, content: str, file_path: str
-    ) -> Dict[str, Any]:
+    async def _analyze_javascript_file(self, content: str, file_path: str) -> dict[str, Any]:
         """JavaScript/TypeScript specific analysis"""
         result = {"errors": [], "warnings": [], "optimizations": []}
 
@@ -356,13 +335,11 @@ class ScannerAgentV2(BaseAgent):
 
         # Check for var usage (should use let/const)
         if re.search(r"\bvar\s+", content):
-            result["optimizations"].append(
-                {"type": "var_usage", "message": "Use let/const instead of var"}
-            )
+            result["optimizations"].append({"type": "var_usage", "message": "Use let/const instead of var"})
 
         return result
 
-    async def _detect_security_issues(self, files: List[str]) -> List[Dict[str, Any]]:
+    async def _detect_security_issues(self, files: list[str]) -> list[dict[str, Any]]:
         """Detect security vulnerabilities"""
         issues = []
 
@@ -379,9 +356,7 @@ class ScannerAgentV2(BaseAgent):
                             {
                                 "file": file_path,
                                 "type": pattern_name,
-                                "severity": (
-                                    "high" if "secret" in pattern_name else "medium"
-                                ),
+                                "severity": ("high" if "secret" in pattern_name else "medium"),
                                 "matches": len(matches),
                             }
                         )
@@ -391,7 +366,7 @@ class ScannerAgentV2(BaseAgent):
 
         return issues
 
-    async def _analyze_site_performance(self) -> Dict[str, Any]:
+    async def _analyze_site_performance(self) -> dict[str, Any]:
         """Analyze live site performance"""
         try:
             # Try to check localhost backend
@@ -413,18 +388,14 @@ class ScannerAgentV2(BaseAgent):
         except Exception as e:
             return {"health": "unavailable", "error": str(e)}
 
-    async def _analyze_dependencies(self) -> Dict[str, Any]:
+    async def _analyze_dependencies(self) -> dict[str, Any]:
         """Analyze project dependencies"""
         dependencies = {"python": [], "nodejs": [], "status": "unknown"}
 
         # Check requirements.txt
         if os.path.exists("requirements.txt"):
             with open("requirements.txt", "r") as f:
-                dependencies["python"] = [
-                    line.strip()
-                    for line in f
-                    if line.strip() and not line.startswith("#")
-                ]
+                dependencies["python"] = [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
         # Check package.json
         if os.path.exists("package.json"):
@@ -437,30 +408,24 @@ class ScannerAgentV2(BaseAgent):
         dependencies["status"] = "analyzed"
         return dependencies
 
-    async def _generate_optimization_suggestions(self, target_path: str) -> List[str]:
+    async def _generate_optimization_suggestions(self, target_path: str) -> list[str]:
         """Generate optimization suggestions"""
         suggestions = []
 
         # Check for large node_modules
         if os.path.exists("node_modules"):
-            size = sum(
-                f.stat().st_size for f in Path("node_modules").rglob("*") if f.is_file()
-            )
+            size = sum(f.stat().st_size for f in Path("node_modules").rglob("*") if f.is_file())
             if size > 500_000_000:  # 500MB
-                suggestions.append(
-                    "node_modules is large (>500MB). Consider using yarn PnP or pnpm"
-                )
+                suggestions.append("node_modules is large (>500MB). Consider using yarn PnP or pnpm")
 
         # Check for Python cache
         pycache_dirs = list(Path(target_path).rglob("__pycache__"))
         if len(pycache_dirs) > 100:
-            suggestions.append(
-                f"Found {len(pycache_dirs)} __pycache__ directories. Consider cleanup"
-            )
+            suggestions.append(f"Found {len(pycache_dirs)} __pycache__ directories. Consider cleanup")
 
         return suggestions
 
-    def _generate_summary(self, results: Dict[str, Any]) -> str:
+    def _generate_summary(self, results: dict[str, Any]) -> str:
         """Generate human-readable summary"""
         errors = len(results.get("errors_found", []))
         warnings = len(results.get("warnings", []))
@@ -473,7 +438,7 @@ class ScannerAgentV2(BaseAgent):
         else:
             return f"✅ Scan completed with {warnings} warnings, {security} security issues"
 
-    def _get_last_modified_time(self, files: List[str]) -> Optional[str]:
+    def _get_last_modified_time(self, files: list[str]) -> Optional[str]:
         """Get last modified time of most recent file"""
         if not files:
             return None
@@ -484,7 +449,7 @@ class ScannerAgentV2(BaseAgent):
         except Exception:
             return None
 
-    async def get_scan_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+    async def get_scan_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get recent scan history"""
         return self.scan_history[-limit:]
 

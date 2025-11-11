@@ -54,4 +54,5 @@ class TestRedisConnectivity:
 def test_redis_url():
     """Provide test Redis URL."""
     import os
+
     return os.getenv("REDIS_URL", "redis://localhost:6379/0")

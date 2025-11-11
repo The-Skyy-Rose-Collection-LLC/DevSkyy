@@ -1,18 +1,19 @@
-from datetime import datetime
-from pathlib import Path
-import json
-from typing import Any, Dict, List, Optional, Union, Tuple
 import asyncio
-import logging
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+import json
+import logging
+from pathlib import Path
+from typing import Any, Optional, Union
 
-import torch
-from PIL import Image, ImageOps
 from diffusers import StableDiffusionXLPipeline
-from transformers import Blip2Processor, Blip2ForConditionalGeneration
-from peft import LoraConfig, get_peft_model, TaskType
 import numpy as np
+from peft import LoraConfig, TaskType, get_peft_model
+from PIL import Image, ImageOps
 from sklearn.model_selection import train_test_split
+import torch
+from transformers import Blip2ForConditionalGeneration, Blip2Processor
+
 
 """
 Skyy Rose Collection Custom Brand Model Trainer
@@ -48,7 +49,7 @@ class SkyRoseBrandTrainer:
         self.training_data_path = Path("training_data")
         self.models_path = Path("custom_models/skyy_rose")
         self.processed_data_path = Path("processed_training_data")
-        
+
         # Create directories
         for path in [self.training_data_path, self.models_path, self.processed_data_path]:
             path.mkdir(parents=True, exist_ok=True)
@@ -61,20 +62,20 @@ class SkyRoseBrandTrainer:
             "brand_name": "Skyy Rose Collection",
             "trigger_words": [
                 "skyrose_dress",
-                "skyrose_collection", 
+                "skyrose_collection",
                 "skyrose_fashion",
                 "skyrose_luxury",
-                "skyrose_style"
+                "skyrose_style",
             ],
             "style_keywords": [
                 "luxury fashion",
                 "high-end design",
                 "elegant styling",
                 "premium quality",
-                "sophisticated aesthetic"
+                "sophisticated aesthetic",
             ],
             "target_resolution": (1024, 1024),
-            "supported_formats": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff"]
+            "supported_formats": [".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff"],
         }
 
         # LoRA configuration
@@ -110,8 +111,7 @@ class SkyRoseBrandTrainer:
             # Load BLIP-2 for automatic captioning
             self.blip2_processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
             self.blip2_model = Blip2ForConditionalGeneration.from_pretrained(
-                "Salesforce/blip2-opt-2.7b",
-                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
+                "Salesforce/blip2-opt-2.7b", torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
             )
             self.blip2_model.to(self.device)
             logger.info("✅ BLIP-2 model loaded for automatic captioning")
@@ -133,23 +133,23 @@ class SkyRoseBrandTrainer:
         input_directory: Union[str, Path],
         category: str = "general",
         remove_background: bool = False,
-        enhance_images: bool = True
-    ) -> Dict[str, Any]:
+        enhance_images: bool = True,
+    ) -> dict[str, Any]:
         """
         Prepare training dataset from input images.
-        
+
         Args:
             input_directory: Directory containing training images
             category: Category name (e.g., "dresses", "tops", "accessories")
             remove_background: Whether to remove image backgrounds
             enhance_images: Whether to enhance image quality
-            
+
         Returns:
             Dict with dataset preparation results
         """
         try:
             logger.info(f"📁 Preparing training dataset from: {input_directory}")
-            
+
             input_path = Path(input_directory)
             if not input_path.exists():
                 return {"error": f"Input directory not found: {input_directory}", "status": "failed"}
@@ -179,10 +179,10 @@ class SkyRoseBrandTrainer:
                     processed_image_path, caption = await self._process_single_image(
                         image_file, output_dir, i, remove_background, enhance_images, category
                     )
-                    
+
                     processed_images.append(processed_image_path)
                     captions.append(caption)
-                    
+
                     if (i + 1) % 10 == 0:
                         logger.info(f"Processed {i + 1}/{len(image_files)} images")
 
@@ -197,11 +197,11 @@ class SkyRoseBrandTrainer:
                 "brand_config": self.brand_config,
                 "processed_images": [str(p) for p in processed_images],
                 "captions": captions,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
             metadata_file = output_dir / "metadata.json"
-            with open(metadata_file, 'w') as f:
+            with open(metadata_file, "w") as f:
                 json.dump(metadata, f, indent=2)
 
             # Split into train/validation sets
@@ -211,18 +211,12 @@ class SkyRoseBrandTrainer:
 
             # Create training manifest
             training_manifest = {
-                "train": [
-                    {"image": str(img), "caption": cap} 
-                    for img, cap in zip(train_images, train_captions)
-                ],
-                "validation": [
-                    {"image": str(img), "caption": cap} 
-                    for img, cap in zip(val_images, val_captions)
-                ]
+                "train": [{"image": str(img), "caption": cap} for img, cap in zip(train_images, train_captions, strict=False)],
+                "validation": [{"image": str(img), "caption": cap} for img, cap in zip(val_images, val_captions, strict=False)],
             }
 
             manifest_file = output_dir / "training_manifest.json"
-            with open(manifest_file, 'w') as f:
+            with open(manifest_file, "w") as f:
                 json.dump(training_manifest, f, indent=2)
 
             return {
@@ -234,7 +228,7 @@ class SkyRoseBrandTrainer:
                 "output_directory": str(output_dir),
                 "metadata_file": str(metadata_file),
                 "manifest_file": str(manifest_file),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -248,38 +242,37 @@ class SkyRoseBrandTrainer:
         index: int,
         remove_background: bool,
         enhance_images: bool,
-        category: str
-    ) -> Tuple[Path, str]:
+        category: str,
+    ) -> tuple[Path, str]:
         """Process a single image for training."""
+
         def process_image():
             # Load image
             image = Image.open(image_path).convert("RGB")
-            
+
             # Enhance image if requested
             if enhance_images:
                 image = ImageOps.autocontrast(image)
                 image = ImageOps.equalize(image)
-            
+
             # Remove background if requested
             if remove_background:
                 # Simple background removal (would use more advanced methods in production)
                 image = self._simple_background_removal(image)
-            
+
             # Resize to target resolution
             target_size = self.brand_config["target_resolution"]
             image = image.resize(target_size, Image.Resampling.LANCZOS)
-            
+
             # Save processed image
             output_filename = f"{category}_{index:04d}.jpg"
             output_path = output_dir / output_filename
             image.save(output_path, "JPEG", quality=95)
-            
+
             return output_path, image
 
         # Run image processing in thread pool
-        output_path, processed_image = await asyncio.get_event_loop().run_in_executor(
-            self.executor, process_image
-        )
+        output_path, processed_image = await asyncio.get_event_loop().run_in_executor(self.executor, process_image)
 
         # Generate caption
         caption = await self._generate_brand_caption(processed_image, category)
@@ -302,12 +295,10 @@ class SkyRoseBrandTrainer:
         try:
             # Generate base caption using BLIP-2
             inputs = self.blip2_processor(image, return_tensors="pt").to(self.device)
-            
+
             with torch.no_grad():
                 generated_ids = self.blip2_model.generate(**inputs, max_length=50)
-                base_caption = self.blip2_processor.batch_decode(
-                    generated_ids, skip_special_tokens=True
-                )[0].strip()
+                base_caption = self.blip2_processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
 
             # Enhance caption with brand-specific terms
             trigger_word = f"skyrose_{category}" if category != "general" else "skyrose_collection"
@@ -325,8 +316,8 @@ class SkyRoseBrandTrainer:
         self,
         dataset_path: Union[str, Path],
         model_name: str = "skyy_rose_v1",
-        resume_from_checkpoint: Optional[str] = None
-    ) -> Dict[str, Any]:
+        resume_from_checkpoint: Optional[str] = None,
+    ) -> dict[str, Any]:
         """
         Train LoRA model for Skyy Rose Collection.
 
@@ -348,7 +339,7 @@ class SkyRoseBrandTrainer:
                 return {"error": "Training manifest not found", "status": "failed"}
 
             # Load training manifest
-            with open(manifest_file, 'r') as f:
+            with open(manifest_file, "r") as f:
                 manifest = json.load(f)
 
             train_data = manifest["train"]
@@ -380,10 +371,10 @@ class SkyRoseBrandTrainer:
                 "lora_config": self.lora_config.__dict__,
                 "training_config": self.training_config,
                 "training_results": training_results,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
-            with open(config_file, 'w') as f:
+            with open(config_file, "w") as f:
                 json.dump(training_config, f, indent=2)
 
             return {
@@ -392,7 +383,7 @@ class SkyRoseBrandTrainer:
                 "model_path": str(final_model_path),
                 "config_path": str(config_file),
                 "training_results": training_results,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -402,11 +393,11 @@ class SkyRoseBrandTrainer:
     async def _run_training_loop(
         self,
         model,
-        train_data: List[Dict],
-        val_data: List[Dict],
+        train_data: list[dict],
+        val_data: list[dict],
         output_dir: Path,
-        resume_checkpoint: Optional[str] = None
-    ) -> Dict[str, Any]:
+        resume_checkpoint: Optional[str] = None,
+    ) -> dict[str, Any]:
         """Run the actual training loop."""
         # This is a simplified training loop
         # In production, you'd use a proper training framework like Accelerate
@@ -436,17 +427,17 @@ class SkyRoseBrandTrainer:
             "validation_losses": validation_losses,
             "final_train_loss": training_losses[-1] if training_losses else 0,
             "final_val_loss": validation_losses[-1] if validation_losses else 0,
-            "epochs_completed": len(training_losses)
+            "epochs_completed": len(training_losses),
         }
 
-    async def _training_step(self, model, train_data: List[Dict]) -> float:
+    async def _training_step(self, model, train_data: list[dict]) -> float:
         """Perform one training step."""
         # Simplified training step - would implement proper loss calculation
         # and backpropagation in production
         await asyncio.sleep(0.1)  # Simulate training time
         return np.random.uniform(0.1, 0.5)  # Simulated loss
 
-    async def _validation_step(self, model, val_data: List[Dict]) -> float:
+    async def _validation_step(self, model, val_data: list[dict]) -> float:
         """Perform validation step."""
         # Simplified validation step
         await asyncio.sleep(0.05)  # Simulate validation time
@@ -458,8 +449,8 @@ class SkyRoseBrandTrainer:
         model_name: str = "skyy_rose_v1",
         trigger_word: str = "skyrose_collection",
         width: int = 1024,
-        height: int = 1024
-    ) -> Dict[str, Any]:
+        height: int = 1024,
+    ) -> dict[str, Any]:
         """
         Generate images using trained brand model.
 
@@ -486,15 +477,11 @@ class SkyRoseBrandTrainer:
 
             # Generate image (using base model for now - would use LoRA-enhanced model)
             image = self.base_model(
-                prompt=enhanced_prompt,
-                width=width,
-                height=height,
-                num_inference_steps=50,
-                guidance_scale=7.5
+                prompt=enhanced_prompt, width=width, height=height, num_inference_steps=50, guidance_scale=7.5
             ).images[0]
 
             # Save generated image
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"brand_generated_{model_name}_{timestamp}.png"
             output_path = self.models_path / model_name / filename
             image.save(output_path)
@@ -506,7 +493,7 @@ class SkyRoseBrandTrainer:
                 "prompt_used": enhanced_prompt,
                 "trigger_word": trigger_word,
                 "dimensions": {"width": width, "height": height},
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -514,10 +501,8 @@ class SkyRoseBrandTrainer:
             return {"error": str(e), "status": "failed"}
 
     async def validate_brand_consistency(
-        self,
-        generated_images: List[Union[str, Path]],
-        reference_images: List[Union[str, Path]]
-    ) -> Dict[str, Any]:
+        self, generated_images: list[Union[str, Path]], reference_images: list[Union[str, Path]]
+    ) -> dict[str, Any]:
         """
         Validate that generated images maintain brand consistency.
 
@@ -548,31 +533,27 @@ class SkyRoseBrandTrainer:
                 "individual_scores": consistency_scores,
                 "validation_status": "passed" if avg_consistency > 0.8 else "failed",
                 "recommendations": self._generate_consistency_recommendations(avg_consistency),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"❌ Brand consistency validation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_consistency_recommendations(self, consistency_score: float) -> List[str]:
+    def _generate_consistency_recommendations(self, consistency_score: float) -> list[str]:
         """Generate recommendations based on consistency score."""
         if consistency_score > 0.9:
             return ["Excellent brand consistency maintained"]
         elif consistency_score > 0.8:
             return ["Good brand consistency", "Consider minor prompt adjustments"]
         elif consistency_score > 0.7:
-            return [
-                "Moderate brand consistency",
-                "Review training data quality",
-                "Adjust LoRA parameters"
-            ]
+            return ["Moderate brand consistency", "Review training data quality", "Adjust LoRA parameters"]
         else:
             return [
                 "Low brand consistency detected",
                 "Retrain model with more diverse data",
                 "Review trigger word usage",
-                "Increase training epochs"
+                "Increase training epochs",
             ]
 
 
@@ -587,11 +568,11 @@ brand_trainer = create_brand_trainer()
 
 
 # Convenience functions
-async def prepare_dataset(input_dir: str, category: str = "general") -> Dict[str, Any]:
+async def prepare_dataset(input_dir: str, category: str = "general") -> dict[str, Any]:
     """Prepare training dataset from input directory."""
     return await brand_trainer.prepare_training_dataset(input_dir, category)
 
 
-async def train_brand_model(dataset_path: str, model_name: str = "skyy_rose_v1") -> Dict[str, Any]:
+async def train_brand_model(dataset_path: str, model_name: str = "skyy_rose_v1") -> dict[str, Any]:
     """Train custom brand model with LoRA."""
     return await brand_trainer.train_lora_model(dataset_path, model_name)

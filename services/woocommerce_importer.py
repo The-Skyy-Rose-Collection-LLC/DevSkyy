@@ -9,15 +9,15 @@ Truth Protocol: All operations validated, errors logged, no placeholders
 """
 
 import asyncio
-import logging
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
 from datetime import datetime
+import logging
+from typing import Any, Optional
 
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 from pydantic import BaseModel, Field, validator
 from woocommerce import API as WooCommerceAPI
-from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,22 +29,22 @@ class ProductData(BaseModel):
     sku: str = Field(..., min_length=1, max_length=100)
     regular_price: float = Field(..., gt=0)
     sale_price: Optional[float] = Field(None, gt=0)
-    category: List[int] = Field(default_factory=list)
+    category: list[int] = Field(default_factory=list)
     image: Optional[str] = Field(None, max_length=500)
     short_description: str = Field(default="", max_length=1000)
     description: str = Field(default="", max_length=10000)
     stock_qty: int = Field(default=0, ge=0)
     row_number: int = Field(..., gt=0)
 
-    @validator('sale_price')
+    @validator("sale_price")
     def validate_sale_price(cls, v, values):
         """Ensure sale price is less than regular price"""
-        if v is not None and 'regular_price' in values:
-            if v >= values['regular_price']:
+        if v is not None and "regular_price" in values:
+            if v >= values["regular_price"]:
                 raise ValueError("Sale price must be less than regular price")
         return v
 
-    @validator('category')
+    @validator("category")
     def validate_category(cls, v):
         """Ensure categories are valid integers"""
         if not all(isinstance(cat, int) and cat > 0 for cat in v):
@@ -97,7 +97,7 @@ class WooCommerceImporterService:
         telegram_bot_token: Optional[str] = None,
         telegram_chat_id: Optional[str] = None,
         batch_size: int = 10,
-        max_retries: int = 3
+        max_retries: int = 3,
     ):
         """
         Initialize WooCommerce importer service
@@ -117,10 +117,10 @@ class WooCommerceImporterService:
             consumer_key=woo_consumer_key,
             consumer_secret=woo_consumer_secret,
             version="wc/v3",
-            timeout=30
+            timeout=30,
         )
 
-        self.sheets_service = build('sheets', 'v4', credentials=google_credentials)
+        self.sheets_service = build("sheets", "v4", credentials=google_credentials)
         self.telegram_bot_token = telegram_bot_token
         self.telegram_chat_id = telegram_chat_id
         self.batch_size = batch_size
@@ -128,19 +128,12 @@ class WooCommerceImporterService:
 
         logger.info(
             "WooCommerceImporterService initialized",
-            extra={
-                "woo_url": woo_url,
-                "batch_size": batch_size,
-                "max_retries": max_retries
-            }
+            extra={"woo_url": woo_url, "batch_size": batch_size, "max_retries": max_retries},
         )
 
     async def fetch_products_from_sheets(
-        self,
-        spreadsheet_id: str,
-        sheet_name: str = "Foglio1",
-        filter_done: bool = True
-    ) -> List[ProductData]:
+        self, spreadsheet_id: str, sheet_name: str = "Foglio1", filter_done: bool = True
+    ) -> list[ProductData]:
         """
         Fetch product data from Google Sheets
 
@@ -156,12 +149,14 @@ class WooCommerceImporterService:
             GoogleSheetsError: If sheet read fails
         """
         try:
-            result = self.sheets_service.spreadsheets().values().get(
-                spreadsheetId=spreadsheet_id,
-                range=f"{sheet_name}!A:N"  # Adjust range as needed
-            ).execute()
+            result = (
+                self.sheets_service.spreadsheets()
+                .values()
+                .get(spreadsheetId=spreadsheet_id, range=f"{sheet_name}!A:N")  # Adjust range as needed
+                .execute()
+            )
 
-            values = result.get('values', [])
+            values = result.get("values", [])
             if not values:
                 logger.warning("No data found in sheet", extra={"spreadsheet_id": spreadsheet_id})
                 return []
@@ -170,57 +165,46 @@ class WooCommerceImporterService:
             products = []
 
             for idx, row in enumerate(values[1:], start=2):  # Start at row 2 (skip header)
-                row_dict = dict(zip(headers, row + [''] * (len(headers) - len(row))))
+                row_dict = dict(zip(headers, row + [""] * (len(headers) - len(row)), strict=False))
 
                 # Skip if DONE and filter enabled
-                if filter_done and row_dict.get('DONE', '').strip().lower() == 'x':
+                if filter_done and row_dict.get("DONE", "").strip().lower() == "x":
                     continue
 
                 try:
                     # Map categories from comma-separated string to list of ints
                     categories = []
-                    if row_dict.get('CATEGORY'):
+                    if row_dict.get("CATEGORY"):
                         categories = [
-                            int(cat.strip())
-                            for cat in row_dict['CATEGORY'].split(',')
-                            if cat.strip().isdigit()
+                            int(cat.strip()) for cat in row_dict["CATEGORY"].split(",") if cat.strip().isdigit()
                         ]
 
                     product = ProductData(
-                        title=row_dict.get('TITLE', ''),
-                        sku=row_dict.get('SKU', ''),
-                        regular_price=float(row_dict.get('REGULAR PRICE', 0)),
-                        sale_price=float(row_dict['SALE PRICE']) if row_dict.get('SALE PRICE') else None,
+                        title=row_dict.get("TITLE", ""),
+                        sku=row_dict.get("SKU", ""),
+                        regular_price=float(row_dict.get("REGULAR PRICE", 0)),
+                        sale_price=float(row_dict["SALE PRICE"]) if row_dict.get("SALE PRICE") else None,
                         category=categories,
-                        image=row_dict.get('IMAGE') or None,
-                        short_description=row_dict.get('SHORT DESCRIPTION', ''),
-                        description=row_dict.get('DESCRIPTION', ''),
-                        stock_qty=int(row_dict.get('STOCK QTY', 0)),
-                        row_number=idx
+                        image=row_dict.get("IMAGE") or None,
+                        short_description=row_dict.get("SHORT DESCRIPTION", ""),
+                        description=row_dict.get("DESCRIPTION", ""),
+                        stock_qty=int(row_dict.get("STOCK QTY", 0)),
+                        row_number=idx,
                     )
                     products.append(product)
 
                 except (ValueError, TypeError) as e:
-                    logger.error(
-                        f"Failed to parse row {idx}",
-                        extra={"error": str(e), "row": row_dict}
-                    )
+                    logger.error(f"Failed to parse row {idx}", extra={"error": str(e), "row": row_dict})
                     continue
 
-            logger.info(
-                f"Fetched {len(products)} products from sheet",
-                extra={"spreadsheet_id": spreadsheet_id}
-            )
+            logger.info(f"Fetched {len(products)} products from sheet", extra={"spreadsheet_id": spreadsheet_id})
             return products
 
         except Exception as e:
             logger.exception("Failed to fetch products from Google Sheets")
-            raise GoogleSheetsError(f"Sheet read failed: {str(e)}")
+            raise GoogleSheetsError(f"Sheet read failed: {e!s}")
 
-    async def create_woocommerce_product(
-        self,
-        product: ProductData
-    ) -> ProductImportResult:
+    async def create_woocommerce_product(self, product: ProductData) -> ProductImportResult:
         """
         Create product in WooCommerce
 
@@ -244,7 +228,7 @@ class WooCommerceImporterService:
                 "stock_quantity": product.stock_qty,
                 "stock_status": "instock" if product.stock_qty > 0 else "outofstock",
                 "catalog_visibility": "visible",
-                "tax_status": "taxable"
+                "tax_status": "taxable",
             }
 
             # Add sale price if present
@@ -253,11 +237,7 @@ class WooCommerceImporterService:
 
             # Add image if present
             if product.image:
-                woo_product["images"] = [{
-                    "src": product.image,
-                    "name": product.title,
-                    "alt": product.title
-                }]
+                woo_product["images"] = [{"src": product.image, "name": product.title, "alt": product.title}]
 
             # Create product with retry logic
             for attempt in range(self.max_retries):
@@ -265,47 +245,28 @@ class WooCommerceImporterService:
                     response = self.woo_client.post("products", woo_product)
 
                     logger.info(
-                        f"Product created successfully",
-                        extra={
-                            "product_id": response.get('id'),
-                            "sku": product.sku,
-                            "attempt": attempt + 1
-                        }
+                        "Product created successfully",
+                        extra={"product_id": response.get("id"), "sku": product.sku, "attempt": attempt + 1},
                     )
 
                     return ProductImportResult(
                         success=True,
-                        product_id=response.get('id'),
-                        permalink=response.get('permalink'),
-                        row_number=product.row_number
+                        product_id=response.get("id"),
+                        permalink=response.get("permalink"),
+                        row_number=product.row_number,
                     )
 
                 except Exception as e:
                     if attempt == self.max_retries - 1:
                         raise
-                    logger.warning(
-                        f"Retry attempt {attempt + 1}/{self.max_retries}",
-                        extra={"error": str(e)}
-                    )
-                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                    logger.warning(f"Retry attempt {attempt + 1}/{self.max_retries}", extra={"error": str(e)})
+                    await asyncio.sleep(2**attempt)  # Exponential backoff
 
         except Exception as e:
-            logger.exception(
-                "Failed to create WooCommerce product",
-                extra={"sku": product.sku}
-            )
-            return ProductImportResult(
-                success=False,
-                error=str(e),
-                row_number=product.row_number
-            )
+            logger.exception("Failed to create WooCommerce product", extra={"sku": product.sku})
+            return ProductImportResult(success=False, error=str(e), row_number=product.row_number)
 
-    async def update_sheet_status(
-        self,
-        spreadsheet_id: str,
-        sheet_name: str,
-        result: ProductImportResult
-    ) -> bool:
+    async def update_sheet_status(self, spreadsheet_id: str, sheet_name: str, result: ProductImportResult) -> bool:
         """
         Update Google Sheet with import result
 
@@ -319,40 +280,30 @@ class WooCommerceImporterService:
         """
         try:
             # Prepare update data
-            values = [[
-                result.product_id or '',
-                'x' if result.success else 'ERROR',
-                result.permalink or '',
-                result.error or ''
-            ]]
+            values = [
+                [
+                    result.product_id or "",
+                    "x" if result.success else "ERROR",
+                    result.permalink or "",
+                    result.error or "",
+                ]
+            ]
 
             # Update specific row
             range_name = f"{sheet_name}!K{result.row_number}:N{result.row_number}"
 
             self.sheets_service.spreadsheets().values().update(
-                spreadsheetId=spreadsheet_id,
-                range=range_name,
-                valueInputOption='RAW',
-                body={'values': values}
+                spreadsheetId=spreadsheet_id, range=range_name, valueInputOption="RAW", body={"values": values}
             ).execute()
 
-            logger.info(
-                f"Sheet updated for row {result.row_number}",
-                extra={"success": result.success}
-            )
+            logger.info(f"Sheet updated for row {result.row_number}", extra={"success": result.success})
             return True
 
         except Exception as e:
-            logger.exception(
-                f"Failed to update sheet for row {result.row_number}",
-                extra={"error": str(e)}
-            )
+            logger.exception(f"Failed to update sheet for row {result.row_number}", extra={"error": str(e)})
             return False
 
-    async def send_telegram_notification(
-        self,
-        message: str
-    ) -> bool:
+    async def send_telegram_notification(self, message: str) -> bool:
         """
         Send Telegram notification
 
@@ -371,28 +322,19 @@ class WooCommerceImporterService:
 
             url = f"https://api.telegram.org/bot{self.telegram_bot_token}/sendMessage"
             async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    url,
-                    json={
-                        "chat_id": self.telegram_chat_id,
-                        "text": message
-                    }
-                )
+                response = await client.post(url, json={"chat_id": self.telegram_chat_id, "text": message})
                 response.raise_for_status()
 
             logger.info("Telegram notification sent", extra={"message": message})
             return True
 
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to send Telegram notification")
             return False
 
     async def import_products_workflow(
-        self,
-        spreadsheet_id: str,
-        sheet_name: str = "Foglio1",
-        notify: bool = True
-    ) -> Dict[str, Any]:
+        self, spreadsheet_id: str, sheet_name: str = "Foglio1", notify: bool = True
+    ) -> dict[str, Any]:
         """
         Execute complete product import workflow
 
@@ -408,35 +350,22 @@ class WooCommerceImporterService:
 
         try:
             # Step 1: Fetch products
-            products = await self.fetch_products_from_sheets(
-                spreadsheet_id,
-                sheet_name
-            )
+            products = await self.fetch_products_from_sheets(spreadsheet_id, sheet_name)
 
             if not products:
-                return {
-                    "success": True,
-                    "message": "No products to import",
-                    "total": 0,
-                    "succeeded": 0,
-                    "failed": 0
-                }
+                return {"success": True, "message": "No products to import", "total": 0, "succeeded": 0, "failed": 0}
 
             # Step 2: Import products in batches
             results = []
             for i in range(0, len(products), self.batch_size):
-                batch = products[i:i + self.batch_size]
-                batch_results = await asyncio.gather(*[
-                    self.create_woocommerce_product(product)
-                    for product in batch
-                ])
+                batch = products[i : i + self.batch_size]
+                batch_results = await asyncio.gather(*[self.create_woocommerce_product(product) for product in batch])
                 results.extend(batch_results)
 
                 # Update sheet for each result
-                await asyncio.gather(*[
-                    self.update_sheet_status(spreadsheet_id, sheet_name, result)
-                    for result in batch_results
-                ])
+                await asyncio.gather(
+                    *[self.update_sheet_status(spreadsheet_id, sheet_name, result) for result in batch_results]
+                )
 
             # Calculate statistics
             succeeded = sum(1 for r in results if r.success)
@@ -460,21 +389,13 @@ class WooCommerceImporterService:
                 "succeeded": succeeded,
                 "failed": failed,
                 "duration_seconds": (datetime.utcnow() - start_time).total_seconds(),
-                "results": [r.dict() for r in results]
+                "results": [r.dict() for r in results],
             }
 
         except Exception as e:
             logger.exception("Product import workflow failed")
 
             if notify:
-                await self.send_telegram_notification(
-                    f"❌ Product Import Failed\n\nError: {str(e)}"
-                )
+                await self.send_telegram_notification(f"❌ Product Import Failed\n\nError: {e!s}")
 
-            return {
-                "success": False,
-                "error": str(e),
-                "total": 0,
-                "succeeded": 0,
-                "failed": 0
-            }
+            return {"success": False, "error": str(e), "total": 0, "succeeded": 0, "failed": 0}

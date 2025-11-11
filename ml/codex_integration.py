@@ -15,10 +15,11 @@ Features:
 - Context-aware generation with repository understanding
 """
 
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal, Optional
+
 
 try:
     from openai import AsyncOpenAI
@@ -51,9 +52,7 @@ class CodexIntegration:
             if not self.api_key:
                 logger.warning("⚠️  OpenAI API key not configured")
             if not AsyncOpenAI:
-                logger.warning(
-                    "⚠️  OpenAI library not installed - run: pip install openai"
-                )
+                logger.warning("⚠️  OpenAI library not installed - run: pip install openai")
 
         # Model configurations
         self.models = {
@@ -112,8 +111,8 @@ class CodexIntegration:
         model: Literal["gpt-4", "gpt-3.5"] = "gpt-4",
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
-        context: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        context: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
         """
         Generate code based on natural language description
 
@@ -182,7 +181,7 @@ class CodexIntegration:
         code_prefix: str,
         language: str = "python",
         model: Literal["gpt-4", "gpt-3.5"] = "gpt-3.5",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Complete partial code (like GitHub Copilot)
 
@@ -198,7 +197,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            system_message = (
+                f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            )
 
             user_message = f"```{language}\n{code_prefix}\n```\n\nComplete this code:"
 
@@ -218,9 +219,7 @@ class CodexIntegration:
             completions = []
             for choice in response.choices:
                 code = self._extract_code_block(choice.message.content, language)
-                completions.append(
-                    {"code": code, "finish_reason": choice.finish_reason}
-                )
+                completions.append({"code": code, "finish_reason": choice.finish_reason})
 
             return {
                 "status": "success",
@@ -234,7 +233,7 @@ class CodexIntegration:
             logger.error(f"Code completion failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def explain_code(self, code: str, language: str = "python") -> Dict[str, Any]:
+    async def explain_code(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Generate detailed explanation of code
 
@@ -249,13 +248,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = (
-                "You are an expert programmer who explains code clearly and thoroughly."
-            )
+            system_message = "You are an expert programmer who explains code clearly and thoroughly."
 
-            user_message = (
-                f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
-            )
+            user_message = f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
 
             response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
@@ -280,7 +275,7 @@ class CodexIntegration:
             logger.error(f"Code explanation failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def review_code(self, code: str, language: str = "python") -> Dict[str, Any]:
+    async def review_code(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Review code for issues, bugs, and improvements
 
@@ -329,9 +324,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_documentation(
-        self, code: str, language: str = "python"
-    ) -> Dict[str, Any]:
+    async def generate_documentation(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Generate documentation for code
 
@@ -373,9 +366,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Documentation generation failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def optimize_code(
-        self, code: str, language: str = "python"
-    ) -> Dict[str, Any]:
+    async def optimize_code(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Optimize code for performance and readability
 
@@ -420,29 +411,23 @@ Provide specific, actionable feedback."""
             logger.error(f"Code optimization failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    def _build_system_message(
-        self, language: str, context: Optional[List[str]] = None
-    ) -> str:
+    def _build_system_message(self, language: str, context: Optional[list[str]] = None) -> str:
         """Build system message with language-specific context"""
         lang_config = self.language_configs.get(language, {})
         frameworks = lang_config.get("framework_hints", [])
 
         message = f"You are an expert {language} programmer. "
-        message += f"Generate clean, well-documented, production-ready code. "
+        message += "Generate clean, well-documented, production-ready code. "
 
         if frameworks:
-            message += (
-                f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
-            )
+            message += f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
 
         if context:
             message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 
-    def _build_code_generation_prompt(
-        self, prompt: str, language: str, context: Optional[List[str]] = None
-    ) -> str:
+    def _build_code_generation_prompt(self, prompt: str, language: str, context: Optional[list[str]] = None) -> str:
         """Build user prompt for code generation"""
         message = f"Generate {language} code for: {prompt}\n\n"
         message += "Requirements:\n"
@@ -475,14 +460,14 @@ Provide specific, actionable feedback."""
         # If no code block found, return cleaned text
         return text.strip()
 
-    def get_available_models(self) -> Dict[str, Any]:
+    def get_available_models(self) -> dict[str, Any]:
         """Get information about available models"""
         return {
             "models": self.models,
             "note": "Original Codex API deprecated March 2023. Using GPT-4 and GPT-3.5-turbo as replacements.",
         }
 
-    def get_supported_languages(self) -> List[str]:
+    def get_supported_languages(self) -> list[str]:
         """Get list of supported programming languages"""
         return list(self.language_configs.keys())
 

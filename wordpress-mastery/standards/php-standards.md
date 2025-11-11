@@ -80,7 +80,7 @@ theme-name/
 <?php
 /**
  * Theme Name Functions
- * 
+ *
  * @package ThemeName
  * @version 1.0.0
  */
@@ -106,7 +106,7 @@ function theme_name_setup() {
         'style',
         'script',
     ));
-    
+
     // Register navigation menus
     register_nav_menus(array(
         'primary' => __('Primary Menu', 'theme-textdomain'),
@@ -126,7 +126,7 @@ function theme_name_scripts() {
         array(),
         wp_get_theme()->get('Version')
     );
-    
+
     // Enqueue scripts
     wp_enqueue_script(
         'theme-name-script',
@@ -227,21 +227,21 @@ function theme_safe_function($param) {
         if (empty($param)) {
             return new WP_Error('invalid_param', 'Parameter cannot be empty');
         }
-        
+
         // Sanitize input
         $param = sanitize_text_field($param);
-        
+
         // Execute function logic
         $result = some_operation($param);
-        
+
         // Validate result
         if (is_wp_error($result)) {
             error_log('Theme function error: ' . $result->get_error_message());
             return false;
         }
-        
+
         return $result;
-        
+
     } catch (Exception $e) {
         error_log('Theme exception: ' . $e->getMessage());
         return false;

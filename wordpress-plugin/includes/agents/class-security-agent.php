@@ -1,7 +1,7 @@
 <?php
 /**
  * Security Monitoring Agent
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */

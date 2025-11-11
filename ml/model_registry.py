@@ -1,11 +1,12 @@
 from datetime import datetime
-from pathlib import Path
-import json
-
 from enum import Enum
-from typing import Any, Dict, List, Optional
-import joblib
+import json
 import logging
+from pathlib import Path
+from typing import Any, Optional
+
+import joblib
+
 
 """
 ML Model Registry using MLflow
@@ -19,6 +20,7 @@ References:
 
 logger = logging.getLogger(__name__)
 
+
 class ModelStage(str, Enum):
     """Model lifecycle stages following MLflow convention"""
 
@@ -26,6 +28,7 @@ class ModelStage(str, Enum):
     STAGING = "staging"
     PRODUCTION = "production"
     ARCHIVED = "archived"
+
 
 class ModelMetadata:
     """Model metadata container"""
@@ -37,9 +40,9 @@ class ModelMetadata:
         model_type: str,
         framework: str,
         created_at: datetime,
-        metrics: Dict[str, float],
-        parameters: Dict[str, Any],
-        dataset_info: Dict[str, Any],
+        metrics: dict[str, float],
+        parameters: dict[str, Any],
+        dataset_info: dict[str, Any],
         stage: ModelStage = ModelStage.DEVELOPMENT,
     ):
         self.model_name = model_name
@@ -53,7 +56,7 @@ class ModelMetadata:
         self.stage = stage
         self.updated_at = created_at
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metadata to dictionary"""
         return {
             "model_name": self.model_name,
@@ -69,7 +72,7 @@ class ModelMetadata:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ModelMetadata":
+    def from_dict(cls, data: dict[str, Any]) -> "ModelMetadata":
         """Create metadata from dictionary"""
         return cls(
             model_name=data["model_name"],
@@ -82,6 +85,7 @@ class ModelMetadata:
             dataset_info=data["dataset_info"],
             stage=data.get("stage", ModelStage.DEVELOPMENT),
         )
+
 
 class ModelRegistry:
     """
@@ -135,9 +139,9 @@ class ModelRegistry:
         version: str,
         model_type: str,
         framework: str,
-        metrics: Dict[str, float],
-        parameters: Dict[str, Any],
-        dataset_info: Dict[str, Any],
+        metrics: dict[str, float],
+        parameters: dict[str, Any],
+        dataset_info: dict[str, Any],
         stage: ModelStage = ModelStage.DEVELOPMENT,
     ) -> ModelMetadata:
         """
@@ -230,9 +234,7 @@ class ModelRegistry:
             if stage:
                 version = self._get_latest_version_by_stage(model_name, stage)
             else:
-                version = (
-                    self.index["models"].get(model_name, {}).get("latest_production")
-                )
+                version = self.index["models"].get(model_name, {}).get("latest_production")
 
             if not version:
                 raise ValueError(f"No production version found for {model_name}")
@@ -260,11 +262,11 @@ class ModelRegistry:
 
         return ModelMetadata.from_dict(data)
 
-    def list_models(self) -> List[str]:
+    def list_models(self) -> list[str]:
         """List all registered model names"""
         return list(self.index["models"].keys())
 
-    def list_versions(self, model_name: str) -> List[Dict[str, Any]]:
+    def list_versions(self, model_name: str) -> list[dict[str, Any]]:
         """List all versions of a model"""
         if model_name not in self.index["models"]:
             return []
@@ -306,9 +308,7 @@ class ModelRegistry:
         """Archive a model version"""
         self.promote_model(model_name, version, ModelStage.ARCHIVED)
 
-    def compare_models(
-        self, model_name: str, version1: str, version2: str
-    ) -> Dict[str, Any]:
+    def compare_models(self, model_name: str, version1: str, version2: str) -> dict[str, Any]:
         """
         Compare two model versions
 
@@ -339,9 +339,7 @@ class ModelRegistry:
             "stage2": meta2.stage,
         }
 
-    def _get_latest_version_by_stage(
-        self, model_name: str, stage: ModelStage
-    ) -> Optional[str]:
+    def _get_latest_version_by_stage(self, model_name: str, stage: ModelStage) -> Optional[str]:
         """Get latest version in a specific stage"""
         if model_name not in self.index["models"]:
             return None
@@ -358,7 +356,7 @@ class ModelRegistry:
         latest = max(stage_versions, key=lambda x: x["created_at"])
         return latest["version"]
 
-    def get_registry_stats(self) -> Dict[str, Any]:
+    def get_registry_stats(self) -> dict[str, Any]:
         """Get registry statistics"""
         total_models = len(self.index["models"])
         total_versions = sum(len(m["versions"]) for m in self.index["models"].values())
@@ -376,8 +374,10 @@ class ModelRegistry:
             "models": list(self.index["models"].keys()),
         }
 
+
 # Global registry instance
 model_registry = ModelRegistry()
+
 
 def get_model_registry() -> ModelRegistry:
     """Get global model registry instance"""

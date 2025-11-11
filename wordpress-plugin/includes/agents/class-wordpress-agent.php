@@ -1,7 +1,7 @@
 <?php
 /**
  * WordPress Optimization Agent
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -225,7 +225,7 @@ class WordPressAgent
         // Check for common vulnerabilities
         $vulnerabilities = $this->scanVulnerabilities();
         $security_measures['vulnerabilities'] = $vulnerabilities;
-        
+
         if (empty($vulnerabilities)) {
             $security_measures['score'] += 30;
         } else {
@@ -279,7 +279,7 @@ class WordPressAgent
         // Check basic SEO settings
         $home_title = get_option('blogname');
         $home_description = get_option('blogdescription');
-        
+
         if (!empty($home_title) && !empty($home_description)) {
             $seo_optimization['meta_tags_configured'] = true;
             $seo_optimization['score'] += 20;
@@ -434,17 +434,17 @@ class WordPressAgent
     private function checkDatabaseHealth()
     {
         global $wpdb;
-        
+
         // Basic database health check
         $tables = $wpdb->get_results("SHOW TABLE STATUS");
         $health_score = 85; // Base score
-        
+
         foreach ($tables as $table) {
             if ($table->Data_free > 0) {
                 $health_score -= 5; // Deduct for fragmentation
             }
         }
-        
+
         return max($health_score, 0);
     }
 
@@ -459,45 +459,45 @@ class WordPressAgent
     {
         // Basic vulnerability scan
         $vulnerabilities = [];
-        
+
         // Check for common vulnerable files
         $vulnerable_files = [
             ABSPATH . 'wp-config.php.bak',
             ABSPATH . 'wp-config.txt',
             ABSPATH . '.htaccess.bak'
         ];
-        
+
         foreach ($vulnerable_files as $file) {
             if (file_exists($file)) {
                 $vulnerabilities[] = "Vulnerable file found: " . basename($file);
             }
         }
-        
+
         return $vulnerabilities;
     }
 
     private function checkForUpdates()
     {
         $updates = [];
-        
+
         // Check WordPress core updates
         $core_updates = get_core_updates();
         if (!empty($core_updates) && $core_updates[0]->response !== 'latest') {
             $updates[] = 'WordPress core update available';
         }
-        
+
         // Check plugin updates
         $plugin_updates = get_plugin_updates();
         if (!empty($plugin_updates)) {
             $updates[] = count($plugin_updates) . ' plugin updates available';
         }
-        
+
         // Check theme updates
         $theme_updates = get_theme_updates();
         if (!empty($theme_updates)) {
             $updates[] = count($theme_updates) . ' theme updates available';
         }
-        
+
         return $updates;
     }
 
@@ -509,14 +509,14 @@ class WordPressAgent
             home_url('/sitemap_index.xml'),
             home_url('/wp-sitemap.xml')
         ];
-        
+
         foreach ($sitemap_urls as $url) {
             $response = wp_remote_head($url);
             if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -553,23 +553,23 @@ class WordPressAgent
     private function getDatabaseSize()
     {
         global $wpdb;
-        
+
         $result = $wpdb->get_var("
-            SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 
-            FROM information_schema.tables 
+            SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1)
+            FROM information_schema.tables
             WHERE table_schema = '" . DB_NAME . "'
         ");
-        
+
         return floatval($result);
     }
 
     private function cleanupRevisions($keep = 3)
     {
         global $wpdb;
-        
+
         return $wpdb->query("
-            DELETE FROM {$wpdb->posts} 
-            WHERE post_type = 'revision' 
+            DELETE FROM {$wpdb->posts}
+            WHERE post_type = 'revision'
             AND post_date < DATE_SUB(NOW(), INTERVAL 30 DAY)
         ");
     }
@@ -577,10 +577,10 @@ class WordPressAgent
     private function cleanupSpamComments()
     {
         global $wpdb;
-        
+
         return $wpdb->query("
-            DELETE FROM {$wpdb->comments} 
-            WHERE comment_approved = 'spam' 
+            DELETE FROM {$wpdb->comments}
+            WHERE comment_approved = 'spam'
             AND comment_date < DATE_SUB(NOW(), INTERVAL 30 DAY)
         ");
     }
@@ -588,10 +588,10 @@ class WordPressAgent
     private function cleanupExpiredTransients()
     {
         global $wpdb;
-        
+
         return $wpdb->query("
-            DELETE FROM {$wpdb->options} 
-            WHERE option_name LIKE '_transient_timeout_%' 
+            DELETE FROM {$wpdb->options}
+            WHERE option_name LIKE '_transient_timeout_%'
             AND option_value < UNIX_TIMESTAMP()
         ");
     }
@@ -599,15 +599,15 @@ class WordPressAgent
     private function optimizeDatabaseTables()
     {
         global $wpdb;
-        
+
         $tables = $wpdb->get_col("SHOW TABLES");
         $count = 0;
-        
+
         foreach ($tables as $table) {
             $wpdb->query("OPTIMIZE TABLE $table");
             $count++;
         }
-        
+
         return $count;
     }
 
@@ -644,7 +644,7 @@ class WordPressAgent
             $results['security_hardening']['score'],
             $results['seo_optimization']['score']
         ];
-        
+
         return round(array_sum($scores) / count($scores), 2);
     }
 }

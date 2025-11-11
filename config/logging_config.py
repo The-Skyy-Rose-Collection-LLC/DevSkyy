@@ -28,13 +28,13 @@ USAGE:
     logger.info("task_started", task_id="123", user_id="user-456")
 """
 
-import logging
-import sys
-import json
-from typing import Dict, Any, Optional
 from datetime import datetime
-import traceback
+import json
+import logging
 import re
+import sys
+import traceback
+from typing import Any, Optional
 
 
 # =============================================================================
@@ -43,17 +43,17 @@ import re
 
 SENSITIVE_PATTERNS = [
     # API Keys
-    (re.compile(r'api[_-]?key["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-]{20,})', re.IGNORECASE), '***API_KEY***'),
+    (re.compile(r'api[_-]?key["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-]{20,})', re.IGNORECASE), "***API_KEY***"),
     # Passwords
-    (re.compile(r'password["\']?\s*[:=]\s*["\']?([^\s"\']+)', re.IGNORECASE), '***PASSWORD***'),
+    (re.compile(r'password["\']?\s*[:=]\s*["\']?([^\s"\']+)', re.IGNORECASE), "***PASSWORD***"),
     # Tokens
-    (re.compile(r'token["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-\.]{20,})', re.IGNORECASE), '***TOKEN***'),
+    (re.compile(r'token["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-\.]{20,})', re.IGNORECASE), "***TOKEN***"),
     # Email addresses (partial redaction)
-    (re.compile(r'([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'), r'\1***@\2'),
+    (re.compile(r"([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})"), r"\1***@\2"),
     # Credit card numbers
-    (re.compile(r'\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b'), '****-****-****-****'),
+    (re.compile(r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b"), "****-****-****-****"),
     # SSN
-    (re.compile(r'\b\d{3}-\d{2}-\d{4}\b'), '***-**-****'),
+    (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "***-**-****"),
 ]
 
 
@@ -88,6 +88,7 @@ def redact_sensitive_data(message: str) -> str:
 # =============================================================================
 # Structured Logging Formatter
 # =============================================================================
+
 
 class StructuredFormatter(logging.Formatter):
     """
@@ -147,15 +148,11 @@ class StructuredFormatter(logging.Formatter):
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__,
                 "message": str(record.exc_info[1]),
-                "traceback": traceback.format_exception(*record.exc_info)
+                "traceback": traceback.format_exception(*record.exc_info),
             }
 
         # Add file/line info for debugging
-        log_data["source"] = {
-            "file": record.filename,
-            "line": record.lineno,
-            "function": record.funcName
-        }
+        log_data["source"] = {"file": record.filename, "line": record.lineno, "function": record.funcName}
 
         # Redact sensitive data from entire JSON
         json_str = json.dumps(log_data, default=str)
@@ -167,6 +164,7 @@ class StructuredFormatter(logging.Formatter):
 # =============================================================================
 # Performance Tracking Logger
 # =============================================================================
+
 
 class PerformanceLogger:
     """
@@ -189,7 +187,7 @@ class PerformanceLogger:
 
     def __init__(self, name: str):
         self.logger = get_logger(name)
-        self.latencies: Dict[str, list] = {}
+        self.latencies: dict[str, list] = {}
 
     def track(self, operation: str):
         """
@@ -219,11 +217,7 @@ class PerformanceLogger:
                 # Log the operation
                 self.logger.info(
                     f"{operation}_completed",
-                    extra={
-                        "operation": operation,
-                        "duration_ms": elapsed,
-                        "status": "success"
-                    }
+                    extra={"operation": operation, "duration_ms": elapsed, "status": "success"},
                 )
 
                 # Alert if slow (P95 requirement: 200ms)
@@ -234,8 +228,8 @@ class PerformanceLogger:
                             "operation": operation,
                             "duration_ms": elapsed,
                             "threshold_ms": 200,
-                            "exceeded_by_ms": elapsed - 200
-                        }
+                            "exceeded_by_ms": elapsed - 200,
+                        },
                     )
 
         return _track()
@@ -261,11 +255,8 @@ class PerformanceLogger:
 # Logger Setup
 # =============================================================================
 
-def setup_logging(
-    environment: str = "production",
-    log_level: str = "INFO",
-    log_file: Optional[str] = None
-):
+
+def setup_logging(environment: str = "production", log_level: str = "INFO", log_file: Optional[str] = None):
     """
     Set up logging configuration.
 
@@ -312,8 +303,7 @@ def setup_logging(
     else:
         # Human-readable logging for development/test
         formatter = logging.Formatter(
-            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
         )
 
     console_handler.setFormatter(formatter)
@@ -334,11 +324,7 @@ def setup_logging(
 
     root_logger.info(
         "Logging configured",
-        extra={
-            "environment": environment,
-            "log_level": log_level,
-            "structured": environment == "production"
-        }
+        extra={"environment": environment, "log_level": log_level, "structured": environment == "production"},
     )
 
 
@@ -361,6 +347,7 @@ def get_logger(name: str) -> logging.Logger:
 # =============================================================================
 # Context-Aware Logger
 # =============================================================================
+
 
 class ContextLogger:
     """
@@ -407,11 +394,9 @@ class ContextLogger:
 # Error Ledger Integration
 # =============================================================================
 
+
 def log_to_error_ledger(
-    error_type: str,
-    error_message: str,
-    context: Dict[str, Any],
-    ledger_file: str = "artifacts/error-ledger.json"
+    error_type: str, error_message: str, context: dict[str, Any], ledger_file: str = "artifacts/error-ledger.json"
 ):
     """
     Log errors to Truth Protocol error ledger.
@@ -443,7 +428,7 @@ def log_to_error_ledger(
         "error_type": error_type,
         "error_message": error_message,
         "context": context,
-        "traceback": traceback.format_exc()
+        "traceback": traceback.format_exc(),
     }
 
     # Append to ledger (JSONL format - one JSON per line)
@@ -452,14 +437,7 @@ def log_to_error_ledger(
 
     # Also log normally
     logger = get_logger("error_ledger")
-    logger.error(
-        "error_recorded",
-        extra={
-            "error_type": error_type,
-            "error_message": error_message,
-            **context
-        }
-    )
+    logger.error("error_recorded", extra={"error_type": error_type, "error_message": error_message, **context})
 
 
 # =============================================================================
@@ -478,6 +456,7 @@ if __name__ == "__main__":
     perf_logger = PerformanceLogger("database")
     with perf_logger.track("user_query"):
         import time
+
         time.sleep(0.05)  # Simulate query
 
     print(f"P95 latency: {perf_logger.get_p95_latency('user_query')}ms")
@@ -490,8 +469,4 @@ if __name__ == "__main__":
     try:
         raise ValueError("Test error")
     except Exception as e:
-        log_to_error_ledger(
-            error_type=type(e).__name__,
-            error_message=str(e),
-            context={"operation": "test"}
-        )
+        log_to_error_ledger(error_type=type(e).__name__, error_message=str(e), context={"operation": "test"})

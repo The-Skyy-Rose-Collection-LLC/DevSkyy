@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
 			<div class="site-branding">
 				<?php
 				the_custom_logo();
-				
+
 				if (is_front_page() && is_home()) :
 					?>
 					<h1 class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></h1>
@@ -47,7 +47,7 @@ if (!defined('ABSPATH')) {
 					<p class="site-title"><a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a></p>
 					<?php
 				endif;
-				
+
 				$wp_mastery_boilerplate_description = get_bloginfo('description', 'display');
 				if ($wp_mastery_boilerplate_description || is_customize_preview()) :
 					?>

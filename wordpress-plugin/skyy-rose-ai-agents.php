@@ -14,7 +14,7 @@
  * Tested up to: 6.6
  * Requires PHP: 8.0
  * Network: false
- * 
+ *
  * @package SkyyRoseAIAgents
  * @author Skyy Rose Co
  * @copyright 2024 Skyy Rose Co
@@ -238,19 +238,19 @@ if (!class_exists('SkyyRoseAIAgents')) {
             switch ($action) {
                 case 'scan_inventory':
                     return InventoryAgent::getInstance()->scanAssets();
-                
+
                 case 'analyze_brand':
                     return BrandIntelligenceAgent::getInstance()->analyzeBrand($data);
-                
+
                 case 'optimize_wordpress':
                     return WordPressAgent::getInstance()->optimizeWordPress($data);
-                
+
                 case 'check_performance':
                     return PerformanceAgent::getInstance()->checkPerformance();
-                
+
                 case 'run_security_scan':
                     return SecurityAgent::getInstance()->runSecurityScan();
-                
+
                 default:
                     throw new Exception(__('Unknown agent action.', SKYY_ROSE_AI_TEXT_DOMAIN), 400);
             }
@@ -265,7 +265,7 @@ if (!class_exists('SkyyRoseAIAgents')) {
                 // Run light monitoring tasks
                 PerformanceAgent::getInstance()->quickHealthCheck();
                 SecurityAgent::getInstance()->basicSecurityCheck();
-                
+
                 // Log activity
                 error_log('Skyy Rose AI Agents: Hourly scan completed');
             } catch (Exception $e) {
@@ -283,7 +283,7 @@ if (!class_exists('SkyyRoseAIAgents')) {
                 InventoryAgent::getInstance()->optimizeAssets();
                 WordPressAgent::getInstance()->dailyOptimization();
                 BrandIntelligenceAgent::getInstance()->updateBrandInsights();
-                
+
                 // Log activity
                 error_log('Skyy Rose AI Agents: Daily optimization completed');
             } catch (Exception $e) {

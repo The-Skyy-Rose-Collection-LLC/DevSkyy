@@ -1,6 +1,6 @@
 /**
  * Skyy Rose AI Agents - Admin Styles
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -533,19 +533,19 @@
     .overview-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .agents-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .skyy-rose-agents-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .actions-grid {
         grid-template-columns: repeat(2, 1fr);
     }

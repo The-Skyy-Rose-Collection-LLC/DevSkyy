@@ -6,9 +6,10 @@ Author: DevSkyy Enterprise Team
 Date: 2025-11-10
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from services.auth_service import AuthService
 
@@ -153,7 +154,7 @@ class TestAuthService:
         mock_session.execute.return_value = mock_result
 
         # Mock user creation
-        with patch('services.auth_service.User') as mock_user_class:
+        with patch("services.auth_service.User") as mock_user_class:
             mock_new_user = MagicMock()
             mock_new_user.id = 1
             mock_new_user.username = "newuser"
@@ -170,7 +171,7 @@ class TestAuthService:
                 username="newuser",
                 email="new@example.com",
                 password="Password123!",
-                full_name="New User"
+                full_name="New User",
             )
 
             assert mock_session.add.called
@@ -192,10 +193,7 @@ class TestAuthService:
 
         # Test user creation
         user = await AuthService.create_user(
-            session=mock_session,
-            username="existinguser",
-            email="new@example.com",
-            password="Password123!"
+            session=mock_session, username="existinguser", email="new@example.com", password="Password123!"
         )
 
         assert user is None

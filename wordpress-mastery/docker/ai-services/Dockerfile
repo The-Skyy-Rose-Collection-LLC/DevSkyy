@@ -1,6 +1,6 @@
 # Luxury AI Services Docker Container
 # Advanced eCommerce AI capabilities for WordPress WooCommerce
-# 
+#
 # Registry: docker.io/skyyrosellc/devskyy
 # Version: 1.0.0
 

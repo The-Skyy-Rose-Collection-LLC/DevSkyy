@@ -1,7 +1,9 @@
-import shap
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Optional
+
 import numpy as np
+import shap
+
 
 """
 ML Model Explainability using SHAP
@@ -16,6 +18,7 @@ try:
 except ImportError:
     SHAP_AVAILABLE = False
     logger.warning("SHAP not installed - explainability features disabled")
+
 
 class ModelExplainer:
     """ML model explainability using SHAP values"""
@@ -45,8 +48,8 @@ class ModelExplainer:
             return None
 
     def explain_prediction(
-        self, model_name: str, X: np.ndarray, feature_names: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, model_name: str, X: np.ndarray, feature_names: Optional[list[str]] = None
+    ) -> dict[str, Any]:
         """
         Explain single prediction using SHAP values
 
@@ -60,26 +63,20 @@ class ModelExplainer:
 
         # Get feature importances
         if feature_names:
-            importance = dict(zip(feature_names, np.abs(shap_values[0])))
+            importance = dict(zip(feature_names, np.abs(shap_values[0]), strict=False))
         else:
-            importance = {
-                f"feature_{i}": val for i, val in enumerate(np.abs(shap_values[0]))
-            }
+            importance = {f"feature_{i}": val for i, val in enumerate(np.abs(shap_values[0]))}
 
         # Sort by importance
-        sorted_importance = dict(
-            sorted(importance.items(), key=lambda x: x[1], reverse=True)
-        )
+        sorted_importance = dict(sorted(importance.items(), key=lambda x: x[1], reverse=True))
 
         return {
-            "shap_values": (
-                shap_values.tolist() if hasattr(shap_values, "tolist") else shap_values
-            ),
+            "shap_values": (shap_values.tolist() if hasattr(shap_values, "tolist") else shap_values),
             "feature_importance": sorted_importance,
             "top_features": list(sorted_importance.keys())[:5],
         }
 
-    def explain_dataset(self, model_name: str, X: np.ndarray) -> Dict[str, Any]:
+    def explain_dataset(self, model_name: str, X: np.ndarray) -> dict[str, Any]:
         """Get global feature importance for dataset"""
         if model_name not in self.explainers:
             raise ValueError(f"No explainer found for {model_name}")
@@ -94,5 +91,6 @@ class ModelExplainer:
             "global_importance": mean_abs_shap.tolist(),
             "summary": "SHAP-based feature importance for entire dataset",
         }
+
 
 explainer = ModelExplainer()

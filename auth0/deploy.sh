@@ -77,9 +77,9 @@ echo -e "${GREEN}✅ Environment variables loaded${NC}"
 replace_placeholders() {
     local file="$1"
     local temp_file="${file}.tmp"
-    
+
     echo -e "${BLUE}🔄 Processing $file...${NC}"
-    
+
     # Replace placeholders with environment variables
     sed "s/@@DATABASE_URL@@/${DATABASE_URL//\//\\/}/g" "$file" > "$temp_file"
     sed -i '' "s/@@GOOGLE_CLIENT_ID@@/${GOOGLE_CLIENT_ID}/g" "$temp_file"
@@ -92,7 +92,7 @@ replace_placeholders() {
     sed -i '' "s/@@GITHUB_CLIENT_SECRET@@/${GITHUB_CLIENT_SECRET}/g" "$temp_file"
     sed -i '' "s/@@LINKEDIN_CLIENT_ID@@/${LINKEDIN_CLIENT_ID}/g" "$temp_file"
     sed -i '' "s/@@LINKEDIN_CLIENT_SECRET@@/${LINKEDIN_CLIENT_SECRET}/g" "$temp_file"
-    
+
     mv "$temp_file" "$file"
 }
 
@@ -120,7 +120,7 @@ export AUTH0_AUDIENCE
 if a0deploy import --config_file "$CONFIG_FILE" --input_file "${AUTH0_DIR}"; then
     echo -e "${GREEN}✅ Auth0 configuration deployed successfully!${NC}"
     echo -e "${GREEN}🎉 DevSkyy authentication system is ready${NC}"
-    
+
     # Display important information
     echo -e "${BLUE}📋 Important Information:${NC}"
     echo -e "${BLUE}========================${NC}"
@@ -134,7 +134,7 @@ if a0deploy import --config_file "$CONFIG_FILE" --input_file "${AUTH0_DIR}"; the
     echo -e "4. Set up custom domain (optional)"
     echo -e ""
     echo -e "${GREEN}🌐 Auth0 Dashboard: https://manage.auth0.com/dashboard/${NC}"
-    
+
 else
     echo -e "${RED}❌ Deployment failed!${NC}"
     echo -e "${RED}Please check the error messages above${NC}"

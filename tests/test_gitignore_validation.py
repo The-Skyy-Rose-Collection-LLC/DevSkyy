@@ -5,6 +5,7 @@ Tests to ensure .gitignore patterns are valid and comprehensive
 
 import os
 from pathlib import Path
+
 import pytest
 
 
@@ -138,7 +139,7 @@ class TestGitignorePatterns:
         gitignore_path = Path(__file__).parent.parent / ".gitignore"
         with open(gitignore_path, "r") as f:
             lines = f.readlines()
-        
+
         patterns = []
         for line in lines:
             line = line.strip()
@@ -239,7 +240,9 @@ class TestGitignoreEffectiveness:
         with open(gitignore_path, "r") as f:
             content = f.read()
         # .gitignore should not contain a pattern that would ignore itself
-        assert ".gitignore" not in [line.strip() for line in content.split("\n") if line.strip() and not line.startswith("#")]
+        assert ".gitignore" not in [
+            line.strip() for line in content.split("\n") if line.strip() and not line.startswith("#")
+        ]
 
     def test_cursor_ide_files_ignored(self):
         """Test that .cursor/ directory is properly ignored"""
@@ -319,7 +322,7 @@ class TestGitignoreIntegration:
         gitignore_path = Path(__file__).parent.parent / ".gitignore"
         with open(gitignore_path, "r") as f:
             content = f.read()
-        
+
         # Check for common format issues
         lines = content.split("\n")
         for i, line in enumerate(lines):
@@ -332,7 +335,7 @@ class TestGitignoreIntegration:
         gitignore_path = Path(__file__).parent.parent / ".gitignore"
         with open(gitignore_path, "r") as f:
             lines = [line.strip() for line in f.readlines()]
-        
+
         # main.py.* should be ignored, but !main.py should negate that
         assert "main.py.*" in lines, "main.py.* should be ignored"
         assert "!main.py" in lines, "main.py should be explicitly not ignored"

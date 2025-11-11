@@ -4,18 +4,19 @@ User Creation Utility for DevSkyy Enterprise Platform
 Creates new users with proper password hashing and authentication setup
 """
 
+from getpass import getpass
 import os
 import sys
-from getpass import getpass
+
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from security.jwt_auth import (
+    UserRole,
     create_access_token,
     create_refresh_token,
     user_manager,
-    UserRole,
 )
 
 
@@ -68,11 +69,9 @@ def create_user_interactive():
 
     try:
         # Create the user
-        user = user_manager.create_user(
-            email=email, username=username, password=password, role=role
-        )
+        user = user_manager.create_user(email=email, username=username, password=password, role=role)
 
-        print(f"\n✅ User created successfully!")
+        print("\n✅ User created successfully!")
         print(f"   User ID: {user.user_id}")
         print(f"   Username: {user.username}")
         print(f"   Email: {user.email}")
@@ -80,7 +79,7 @@ def create_user_interactive():
         print(f"   Created: {user.created_at}")
 
         # Test authentication
-        print(f"\n🔍 Testing authentication...")
+        print("\n🔍 Testing authentication...")
         auth_user = user_manager.authenticate_user(username, password)
         if auth_user:
             print("✅ Authentication test successful!")
@@ -105,9 +104,9 @@ def create_user_interactive():
             )
 
             print("✅ JWT tokens generated successfully!")
-            print(f"\n📋 Authentication Details:")
+            print("\n📋 Authentication Details:")
             print(f"   Username/Email: {username} or {email}")
-            print(f"   Password: [HIDDEN]")
+            print("   Password: [HIDDEN]")
             print(f"   Access Token: {access_token[:50]}...")
             print(f"   Refresh Token: {refresh_token[:50]}...")
 
@@ -125,14 +124,10 @@ def create_user_interactive():
         return False
 
 
-def create_user_programmatic(
-    username: str, email: str, password: str, role: str = UserRole.API_USER
-):
+def create_user_programmatic(username: str, email: str, password: str, role: str = UserRole.API_USER):
     """Create a user programmatically"""
     try:
-        user = user_manager.create_user(
-            email=email, username=username, password=password, role=role
-        )
+        user = user_manager.create_user(email=email, username=username, password=password, role=role)
 
         # Test authentication
         auth_user = user_manager.authenticate_user(username, password)

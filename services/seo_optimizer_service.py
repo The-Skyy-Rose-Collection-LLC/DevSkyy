@@ -7,8 +7,9 @@ Date: 2025-11-10
 """
 
 import logging
-from typing import Dict, List, Optional
 import re
+from typing import Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,9 @@ class SEOOptimizer:
         self.max_description_length = 160
         self.max_url_slug_length = 100
 
-    def generate_meta_title(self, product_name: str, category: Optional[str] = None, brand: str = "The Skyy Rose Collection") -> str:
+    def generate_meta_title(
+        self, product_name: str, category: Optional[str] = None, brand: str = "The Skyy Rose Collection"
+    ) -> str:
         """
         Generate SEO-optimized meta title
 
@@ -49,21 +52,17 @@ class SEOOptimizer:
             # Still too long? Truncate product name
             if len(title) > self.max_title_length:
                 max_product_length = self.max_title_length - len(f" | {brand}")
-                product_name = product_name[:max_product_length-3] + "..."
+                product_name = product_name[: max_product_length - 3] + "..."
                 title = f"{product_name} | {brand}"
 
             return title
 
         except Exception as e:
             logger.error(f"Generate meta title error: {e}")
-            return product_name[:self.max_title_length]
+            return product_name[: self.max_title_length]
 
     def generate_meta_description(
-        self,
-        product_name: str,
-        description: str,
-        price: Optional[float] = None,
-        features: Optional[List[str]] = None
+        self, product_name: str, description: str, price: Optional[float] = None, features: Optional[list[str]] = None
     ) -> str:
         """
         Generate SEO-optimized meta description
@@ -79,8 +78,8 @@ class SEOOptimizer:
         """
         try:
             # Clean description (remove HTML, extra spaces)
-            clean_desc = re.sub(r'<[^>]+>', '', description)
-            clean_desc = ' '.join(clean_desc.split())
+            clean_desc = re.sub(r"<[^>]+>", "", description)
+            clean_desc = " ".join(clean_desc.split())
 
             # Build description
             if price:
@@ -95,13 +94,13 @@ class SEOOptimizer:
 
             # Truncate if too long
             if len(desc) > self.max_description_length:
-                desc = desc[:self.max_description_length-3] + "..."
+                desc = desc[: self.max_description_length - 3] + "..."
 
             return desc
 
         except Exception as e:
             logger.error(f"Generate meta description error: {e}")
-            return description[:self.max_description_length]
+            return description[: self.max_description_length]
 
     def generate_url_slug(self, text: str) -> str:
         """
@@ -118,20 +117,20 @@ class SEOOptimizer:
             slug = text.lower()
 
             # Replace special characters with hyphens
-            slug = re.sub(r'[^a-z0-9\s-]', '', slug)
+            slug = re.sub(r"[^a-z0-9\s-]", "", slug)
 
             # Replace spaces with hyphens
-            slug = re.sub(r'\s+', '-', slug)
+            slug = re.sub(r"\s+", "-", slug)
 
             # Remove multiple hyphens
-            slug = re.sub(r'-+', '-', slug)
+            slug = re.sub(r"-+", "-", slug)
 
             # Remove leading/trailing hyphens
-            slug = slug.strip('-')
+            slug = slug.strip("-")
 
             # Truncate if too long
             if len(slug) > self.max_url_slug_length:
-                slug = slug[:self.max_url_slug_length].rsplit('-', 1)[0]
+                slug = slug[: self.max_url_slug_length].rsplit("-", 1)[0]
 
             return slug
 
@@ -139,7 +138,7 @@ class SEOOptimizer:
             logger.error(f"Generate URL slug error: {e}")
             return "product"
 
-    def generate_keywords(self, product_name: str, category: str, tags: List[str]) -> List[str]:
+    def generate_keywords(self, product_name: str, category: str, tags: list[str]) -> list[str]:
         """
         Generate SEO keywords
 
@@ -179,7 +178,7 @@ class SEOOptimizer:
             logger.error(f"Generate keywords error: {e}")
             return []
 
-    def optimize_product(self, product: Dict) -> Dict:
+    def optimize_product(self, product: dict) -> dict:
         """
         Generate complete SEO data for a product
 
@@ -219,7 +218,7 @@ class SEOOptimizer:
             logger.error(f"Optimize product error: {e}")
             return product
 
-    def generate_structured_data(self, product: Dict) -> Dict:
+    def generate_structured_data(self, product: dict) -> dict:
         """
         Generate JSON-LD structured data for product
 
@@ -237,18 +236,19 @@ class SEOOptimizer:
                 "description": product.get("description", ""),
                 "sku": product.get("sku", ""),
                 "image": product.get("images", [])[0] if product.get("images") else "",
-                "brand": {
-                    "@type": "Brand",
-                    "name": "The Skyy Rose Collection"
-                },
+                "brand": {"@type": "Brand", "name": "The Skyy Rose Collection"},
                 "offers": {
                     "@type": "Offer",
                     "url": f"https://skyyrose.co/products/{product.get('sku', '')}",
                     "priceCurrency": "USD",
                     "price": product.get("price", 0),
-                    "availability": "https://schema.org/InStock" if product.get("stock_quantity", 0) > 0 else "https://schema.org/OutOfStock",
-                    "itemCondition": "https://schema.org/NewCondition"
-                }
+                    "availability": (
+                        "https://schema.org/InStock"
+                        if product.get("stock_quantity", 0) > 0
+                        else "https://schema.org/OutOfStock"
+                    ),
+                    "itemCondition": "https://schema.org/NewCondition",
+                },
             }
 
             return structured_data

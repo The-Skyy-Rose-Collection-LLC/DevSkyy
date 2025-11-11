@@ -76,7 +76,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 - **Type**: Single Page Application
 - **Framework**: React/Next.js
 - **Authentication**: PKCE flow
-- **URLs**: 
+- **URLs**:
   - Production: `https://devskyy.com`
   - Staging: `https://devskyy.vercel.app`
   - Development: `http://localhost:3000`
@@ -150,7 +150,7 @@ async def verify_auth0_token(token: str = Depends(security)):
     try:
         # Get public key
         jwks = get_auth0_public_key()
-        
+
         # Decode and verify token
         payload = jwt.decode(
             token.credentials,
@@ -159,9 +159,9 @@ async def verify_auth0_token(token: str = Depends(security)):
             audience=AUTH0_AUDIENCE,
             issuer=f"https://{AUTH0_DOMAIN}/"
         )
-        
+
         return payload
-        
+
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -174,10 +174,10 @@ async def verify_auth0_token(token: str = Depends(security)):
 async def protected_endpoint(token_payload = Depends(verify_auth0_token)):
     user_id = token_payload.get("sub")
     scopes = token_payload.get("scope", "").split()
-    
+
     if "read:profile" not in scopes:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
+
     return {"user_id": user_id, "message": "Access granted"}
 ```
 
@@ -228,10 +228,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 export const useApiCall = () => {
   const { getAccessTokenSilently } = useAuth0();
-  
+
   const apiCall = async (endpoint, options = {}) => {
     const token = await getAccessTokenSilently();
-    
+
     return fetch(`https://api.devskyy.com${endpoint}`, {
       ...options,
       headers: {
@@ -241,7 +241,7 @@ export const useApiCall = () => {
       },
     });
   };
-  
+
   return { apiCall };
 };
 ```
@@ -293,12 +293,12 @@ auth_duration = Histogram('auth_request_duration_seconds', 'Auth request duratio
 @app.post("/webhooks/auth0")
 async def auth0_webhook(payload: dict):
     event_type = payload.get("type")
-    
+
     if event_type == "s":  # Success login
         auth_requests_total.labels(method='login', status='success').inc()
     elif event_type == "f":  # Failed login
         auth_requests_total.labels(method='login', status='failure').inc()
-    
+
     return {"status": "ok"}
 ```
 

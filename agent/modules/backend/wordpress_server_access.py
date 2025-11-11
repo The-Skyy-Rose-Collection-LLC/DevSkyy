@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
 import fnmatch
 import logging
 import os
 import tempfile
-from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any
 
 import paramiko
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +32,7 @@ class WordPressServerAccess:
 
         # Validate that either password or key is provided
         if not self.sftp_password and not self.ssh_key_path:
-            logger.warning(
-                "Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail."
-            )
+            logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
 
         # Connection objects
         self.sftp_client = None
@@ -51,7 +50,7 @@ class WordPressServerAccess:
 
         logger.info("🚀 WordPress Server Access initialized - GOD MODE LEVEL 2")
 
-    async def connect_server_access(self) -> Dict[str, Any]:
+    async def connect_server_access(self) -> dict[str, Any]:
         """Establish full server access via SFTP and SSH."""
         try:
             # Create SSH client
@@ -85,7 +84,7 @@ class WordPressServerAccess:
                     logger.info("✅ SSH connection established!")
                     ssh_available = True
                 except Exception as ssh_e:
-                    logger.warning(f"⚠️ SSH not available: {str(ssh_e)}")
+                    logger.warning(f"⚠️ SSH not available: {ssh_e!s}")
                     ssh_available = False
 
                 # Start brand learning process
@@ -119,14 +118,14 @@ class WordPressServerAccess:
                 }
 
         except Exception as e:
-            logger.error(f"❌ Server access failed: {str(e)}")
+            logger.error(f"❌ Server access failed: {e!s}")
             return {
                 "status": "error",
                 "error": str(e),
                 "fallback": "Will continue with REST API access",
             }
 
-    async def _test_sftp_access(self) -> Dict[str, Any]:
+    async def _test_sftp_access(self) -> dict[str, Any]:
         """Test SFTP access and permissions."""
         try:
             # List root directory
@@ -139,7 +138,7 @@ class WordPressServerAccess:
                     attrs = self.sftp_client.lstat(item)
                     if attrs.st_mode & 0o40000:  # Directory
                         wp_dirs.append(item)
-                except (OSError, IOError, FileNotFoundError):
+                except (OSError, FileNotFoundError):
                     continue
 
             return {
@@ -152,7 +151,7 @@ class WordPressServerAccess:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def _start_brand_learning(self) -> Dict[str, Any]:
+    async def _start_brand_learning(self) -> dict[str, Any]:
         """Start continuous brand learning from server files."""
         try:
             logger.info("🧠 Starting brand learning process...")
@@ -182,20 +181,16 @@ class WordPressServerAccess:
                 "brand_learning_active": True,
                 "analysis_complete": True,
                 "confidence_score": 95,
-                "insights_discovered": len(file_analysis)
-                + len(content_analysis)
-                + len(brand_assets),
-                "performance_baseline": performance_analysis.get(
-                    "overall_score", "analyzing"
-                ),
+                "insights_discovered": len(file_analysis) + len(content_analysis) + len(brand_assets),
+                "performance_baseline": performance_analysis.get("overall_score", "analyzing"),
                 "next_learning_cycle": "1 hour",
             }
 
         except Exception as e:
-            logger.error(f"Brand learning failed: {str(e)}")
+            logger.error(f"Brand learning failed: {e!s}")
             return {"brand_learning_active": False, "error": str(e)}
 
-    async def _analyze_file_structure(self) -> Dict[str, Any]:
+    async def _analyze_file_structure(self) -> dict[str, Any]:
         """Analyze WordPress file structure for brand insights."""
         try:
             structure_analysis = {
@@ -224,10 +219,7 @@ class WordPressServerAccess:
                     brand_files = [
                         f
                         for f in files
-                        if any(
-                            brand in f.lower()
-                            for brand in ["skyy", "rose", "love", "hurts", "signature"]
-                        )
+                        if any(brand in f.lower() for brand in ["skyy", "rose", "love", "hurts", "signature"])
                     ]
                     if brand_files:
                         structure_analysis["brand_directories"].append(
@@ -240,10 +232,10 @@ class WordPressServerAccess:
             return structure_analysis
 
         except Exception as e:
-            logger.error(f"File structure analysis failed: {str(e)}")
+            logger.error(f"File structure analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_content_patterns(self) -> Dict[str, Any]:
+    async def _analyze_content_patterns(self) -> dict[str, Any]:
         """Analyze content files for brand patterns and themes."""
         try:
             content_patterns = {
@@ -262,9 +254,7 @@ class WordPressServerAccess:
                     with tempfile.NamedTemporaryFile(mode="w+") as temp_file:
                         self.sftp_client.get(file_name, temp_file.name)
 
-                        with open(
-                            temp_file.name, "r", encoding="utf-8", errors="ignore"
-                        ) as f:
+                        with open(temp_file.name, "r", encoding="utf-8", errors="ignore") as f:
                             content = f.read()
 
                         # Analyze for luxury and streetwear terms
@@ -286,28 +276,18 @@ class WordPressServerAccess:
                         ]
 
                         for term in luxury_terms:
-                            content_patterns[
-                                "luxury_keywords"
-                            ] += content.lower().count(term)
+                            content_patterns["luxury_keywords"] += content.lower().count(term)
 
                         for term in streetwear_terms:
-                            content_patterns[
-                                "streetwear_terms"
-                            ] += content.lower().count(term)
+                            content_patterns["streetwear_terms"] += content.lower().count(term)
 
                 except Exception:
                     continue
 
             # Determine brand theme based on analysis
-            if (
-                content_patterns["luxury_keywords"]
-                > content_patterns["streetwear_terms"]
-            ):
+            if content_patterns["luxury_keywords"] > content_patterns["streetwear_terms"]:
                 content_patterns["primary_theme"] = "luxury-focused"
-            elif (
-                content_patterns["streetwear_terms"]
-                > content_patterns["luxury_keywords"]
-            ):
+            elif content_patterns["streetwear_terms"] > content_patterns["luxury_keywords"]:
                 content_patterns["primary_theme"] = "streetwear-focused"
             else:
                 content_patterns["primary_theme"] = "luxury-streetwear-fusion"
@@ -315,10 +295,10 @@ class WordPressServerAccess:
             return content_patterns
 
         except Exception as e:
-            logger.error(f"Content pattern analysis failed: {str(e)}")
+            logger.error(f"Content pattern analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_brand_assets(self) -> Dict[str, Any]:
+    async def _analyze_brand_assets(self) -> dict[str, Any]:
         """Analyze brand assets (images, logos, etc.) on server."""
         try:
             brand_assets = {
@@ -347,9 +327,7 @@ class WordPressServerAccess:
 
                 for file_name in uploads_files:
                     if any(file_name.lower().endswith(ext) for ext in image_extensions):
-                        if any(
-                            keyword in file_name.lower() for keyword in brand_keywords
-                        ):
+                        if any(keyword in file_name.lower() for keyword in brand_keywords):
                             brand_assets["logos_found"].append(file_name)
                         else:
                             brand_assets["brand_images"].append(file_name)
@@ -360,10 +338,10 @@ class WordPressServerAccess:
             return brand_assets
 
         except Exception as e:
-            logger.error(f"Brand asset analysis failed: {str(e)}")
+            logger.error(f"Brand asset analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_server_performance(self) -> Dict[str, Any]:
+    async def _analyze_server_performance(self) -> dict[str, Any]:
         """Analyze server performance metrics."""
         try:
             performance_metrics = {
@@ -395,9 +373,7 @@ class WordPressServerAccess:
 
                 if large_files:
                     performance_metrics["large_files"] = large_files
-                    performance_metrics["optimization_opportunities"].append(
-                        "optimize_large_files"
-                    )
+                    performance_metrics["optimization_opportunities"].append("optimize_large_files")
 
             except Exception:
                 performance_metrics["file_scan"] = "limited"
@@ -405,10 +381,10 @@ class WordPressServerAccess:
             return performance_metrics
 
         except Exception as e:
-            logger.error(f"Performance analysis failed: {str(e)}")
+            logger.error(f"Performance analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def apply_server_optimizations(self) -> Dict[str, Any]:
+    async def apply_server_optimizations(self) -> dict[str, Any]:
         """Apply server-level optimizations."""
         try:
             optimizations_applied = []
@@ -436,7 +412,7 @@ class WordPressServerAccess:
             }
 
         except Exception as e:
-            logger.error(f"Server optimization failed: {str(e)}")
+            logger.error(f"Server optimization failed: {e!s}")
             return {"error": str(e)}
 
     async def _generate_htaccess_optimizations(self) -> bool:
@@ -483,7 +459,7 @@ class WordPressServerAccess:
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as backup:
                     backup.write(existing_htaccess)
                     self.sftp_client.put(backup.name, ".htaccess.backup")
-            except (OSError, IOError, FileNotFoundError):
+            except (OSError, FileNotFoundError):
                 pass  # File doesn't exist, that's ok
 
             # Upload new .htaccess
@@ -496,7 +472,7 @@ class WordPressServerAccess:
             return True
 
         except Exception as e:
-            logger.error(f"htaccess optimization failed: {str(e)}")
+            logger.error(f"htaccess optimization failed: {e!s}")
             return False
 
     async def _optimize_file_permissions(self) -> bool:
@@ -510,16 +486,14 @@ class WordPressServerAccess:
                 try:
                     self.sftp_client.lstat(file_name)
                     permissions_checked += 1
-                except (OSError, IOError, FileNotFoundError):
+                except (OSError, FileNotFoundError):
                     continue
 
-            logger.info(
-                f"✅ Checked permissions on {permissions_checked} security files"
-            )
+            logger.info(f"✅ Checked permissions on {permissions_checked} security files")
             return permissions_checked > 0
 
         except Exception as e:
-            logger.error(f"Permission optimization failed: {str(e)}")
+            logger.error(f"Permission optimization failed: {e!s}")
             return False
 
     async def _cleanup_temporary_files(self) -> bool:
@@ -537,16 +511,16 @@ class WordPressServerAccess:
                             self.sftp_client.remove(file_name)
                             files_cleaned += 1
                             logger.info(f"🗑️ Cleaned temporary file: {file_name}")
-                        except (OSError, IOError, FileNotFoundError):
+                        except (OSError, FileNotFoundError):
                             continue
 
             return files_cleaned > 0
 
         except Exception as e:
-            logger.error(f"Cleanup failed: {str(e)}")
+            logger.error(f"Cleanup failed: {e!s}")
             return False
 
-    async def continuous_brand_learning(self) -> Dict[str, Any]:
+    async def continuous_brand_learning(self) -> dict[str, Any]:
         """Continuously learn about the brand from server files."""
         try:
             # Update brand intelligence every hour
@@ -568,7 +542,7 @@ class WordPressServerAccess:
             }
 
         except Exception as e:
-            logger.error(f"Continuous learning failed: {str(e)}")
+            logger.error(f"Continuous learning failed: {e!s}")
             return {"error": str(e)}
 
     def disconnect(self):
@@ -581,7 +555,7 @@ class WordPressServerAccess:
             self.connected = False
             logger.info("🔐 Server connections closed")
         except Exception as e:
-            logger.error(f"Disconnect error: {str(e)}")
+            logger.error(f"Disconnect error: {e!s}")
 
 
 # Factory function

@@ -8,17 +8,16 @@ IMPACT: Ensures reliability of bulk optimization operations
 Truth Protocol: Test all success/failure scenarios, verify partial failures
 """
 
-import pytest
-import asyncio
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from services.optimization_service import (
-    ProductOptimizationService,
+    JobState,
     JobStatus,
     OptimizationStepStatus,
-    JobState,
-    OptimizationStep
+    ProductOptimizationService,
 )
 
 
@@ -47,10 +46,7 @@ class TestProductOptimizationService:
 
     @pytest.mark.asyncio
     async def test_execute_optimization_job_success(
-        self,
-        optimization_service,
-        mock_importer_service,
-        mock_seo_service
+        self, optimization_service, mock_importer_service, mock_seo_service
     ):
         """Test successful optimization job execution"""
         job_id = "test-job-123"
@@ -65,7 +61,7 @@ class TestProductOptimizationService:
             update_metadata=True,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
 
         # Verify job was stored
@@ -73,17 +69,11 @@ class TestProductOptimizationService:
         assert job_status is not None
         assert job_status["job_id"] == job_id
         assert job_status["total_products"] == 3
-        assert job_status["status"] in [
-            JobStatus.COMPLETED,
-            JobStatus.PARTIALLY_COMPLETED
-        ]
+        assert job_status["status"] in [JobStatus.COMPLETED, JobStatus.PARTIALLY_COMPLETED]
 
     @pytest.mark.asyncio
     async def test_execute_optimization_job_partial_failure(
-        self,
-        optimization_service,
-        mock_importer_service,
-        mock_seo_service
+        self, optimization_service, mock_importer_service, mock_seo_service
     ):
         """Test optimization job with partial failures"""
         job_id = "test-job-456"
@@ -98,7 +88,7 @@ class TestProductOptimizationService:
             update_metadata=True,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
 
         # Verify job status reflects partial completion
@@ -109,17 +99,11 @@ class TestProductOptimizationService:
         # Verify steps were executed
         assert len(job_status["steps"]) > 0
         for step in job_status["steps"]:
-            assert step["status"] in [
-                OptimizationStepStatus.COMPLETED,
-                OptimizationStepStatus.FAILED
-            ]
+            assert step["status"] in [OptimizationStepStatus.COMPLETED, OptimizationStepStatus.FAILED]
 
     @pytest.mark.asyncio
     async def test_parallel_processing_faster_than_sequential(
-        self,
-        optimization_service,
-        mock_importer_service,
-        mock_seo_service
+        self, optimization_service, mock_importer_service, mock_seo_service
     ):
         """Verify parallel processing is faster than sequential"""
         product_ids = [1, 2, 3, 4, 5]
@@ -134,7 +118,7 @@ class TestProductOptimizationService:
             update_metadata=False,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
         parallel_duration = (datetime.utcnow() - start_time).total_seconds()
 
@@ -158,7 +142,7 @@ class TestProductOptimizationService:
             update_metadata=True,
             webhook_url=None,
             importer_service=MagicMock(),
-            seo_service=MagicMock()
+            seo_service=MagicMock(),
         )
 
         # Retrieve job status
@@ -187,7 +171,7 @@ class TestProductOptimizationService:
         product_ids = [1, 2]
         webhook_url = "https://example.com/webhook"
 
-        with patch('aiohttp.ClientSession') as mock_session:
+        with patch("aiohttp.ClientSession") as mock_session:
             # Mock successful webhook response
             mock_response = AsyncMock()
             mock_response.status = 200
@@ -202,7 +186,7 @@ class TestProductOptimizationService:
                 update_metadata=False,
                 webhook_url=webhook_url,
                 importer_service=MagicMock(),
-                seo_service=MagicMock()
+                seo_service=MagicMock(),
             )
 
             # Verify webhook was triggered
@@ -211,19 +195,13 @@ class TestProductOptimizationService:
             # In production with real aiohttp, this would be True
 
     @pytest.mark.asyncio
-    async def test_error_handling_for_exceptions(
-        self,
-        optimization_service,
-        mock_importer_service
-    ):
+    async def test_error_handling_for_exceptions(self, optimization_service, mock_importer_service):
         """Test proper error handling when services raise exceptions"""
         job_id = "error-test"
         product_ids = [1, 2, 3]
 
         # Configure mock to raise exception
-        mock_importer_service.sync_product = AsyncMock(
-            side_effect=Exception("Service unavailable")
-        )
+        mock_importer_service.sync_product = AsyncMock(side_effect=Exception("Service unavailable"))
 
         # Execute job (should not raise, but handle gracefully)
         await optimization_service.execute_optimization_job(
@@ -234,26 +212,17 @@ class TestProductOptimizationService:
             update_metadata=False,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=MagicMock()
+            seo_service=MagicMock(),
         )
 
         # Verify job completed with error status
         job_status = await optimization_service.get_job_status(job_id)
         assert job_status is not None
         # Job should complete even with errors
-        assert job_status["status"] in [
-            JobStatus.FAILED,
-            JobStatus.PARTIALLY_COMPLETED,
-            JobStatus.COMPLETED
-        ]
+        assert job_status["status"] in [JobStatus.FAILED, JobStatus.PARTIALLY_COMPLETED, JobStatus.COMPLETED]
 
     @pytest.mark.asyncio
-    async def test_step_execution_tracking(
-        self,
-        optimization_service,
-        mock_importer_service,
-        mock_seo_service
-    ):
+    async def test_step_execution_tracking(self, optimization_service, mock_importer_service, mock_seo_service):
         """Test that each step is properly tracked"""
         job_id = "step-tracking-test"
         product_ids = [1, 2, 3]
@@ -266,7 +235,7 @@ class TestProductOptimizationService:
             update_metadata=True,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
 
         job_status = await optimization_service.get_job_status(job_id)
@@ -287,11 +256,7 @@ class TestProductOptimizationService:
             assert "products_failed" in step
 
     @pytest.mark.asyncio
-    async def test_only_seo_optimization(
-        self,
-        optimization_service,
-        mock_seo_service
-    ):
+    async def test_only_seo_optimization(self, optimization_service, mock_seo_service):
         """Test optimization with only SEO (no WooCommerce sync)"""
         job_id = "seo-only-test"
         product_ids = [1, 2]
@@ -304,7 +269,7 @@ class TestProductOptimizationService:
             update_metadata=False,
             webhook_url=None,
             importer_service=MagicMock(),
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
 
         job_status = await optimization_service.get_job_status(job_id)
@@ -315,11 +280,7 @@ class TestProductOptimizationService:
         assert "woocommerce_sync" not in step_names
 
     @pytest.mark.asyncio
-    async def test_only_woocommerce_sync(
-        self,
-        optimization_service,
-        mock_importer_service
-    ):
+    async def test_only_woocommerce_sync(self, optimization_service, mock_importer_service):
         """Test optimization with only WooCommerce sync (no SEO)"""
         job_id = "woo-only-test"
         product_ids = [1, 2]
@@ -332,7 +293,7 @@ class TestProductOptimizationService:
             update_metadata=False,
             webhook_url=None,
             importer_service=mock_importer_service,
-            seo_service=MagicMock()
+            seo_service=MagicMock(),
         )
 
         job_status = await optimization_service.get_job_status(job_id)
@@ -358,7 +319,7 @@ class TestJobStateManagement:
             product_ids=[1, 2, 3],
             steps=[],
             started_at=datetime.utcnow(),
-            total_products=3
+            total_products=3,
         )
 
         await service._store_job_state(job_state)
@@ -382,7 +343,7 @@ class TestJobStateManagement:
                 product_ids=[i],
                 steps=[],
                 started_at=datetime.utcnow(),
-                total_products=1
+                total_products=1,
             )
             await service._store_job_state(job_state)
 

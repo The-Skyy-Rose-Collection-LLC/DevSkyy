@@ -1,7 +1,7 @@
 <?php
 /**
  * Performance Monitoring Agent
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -155,7 +155,7 @@ class PerformanceAgent
     private function measurePageLoadTime()
     {
         $start_time = microtime(true);
-        
+
         // Make request to home page
         $response = wp_remote_get(home_url(), [
             'timeout' => 30,
@@ -198,10 +198,10 @@ class PerformanceAgent
         global $wpdb;
 
         $start_time = microtime(true);
-        
+
         // Run a simple query to test database response
         $wpdb->get_results("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_status = 'publish'");
-        
+
         $end_time = microtime(true);
         $query_time = ($end_time - $start_time) * 1000;
 
@@ -242,7 +242,7 @@ class PerformanceAgent
 
         // Convert memory limit to bytes
         $memory_limit_bytes = $this->convertToBytes($memory_limit);
-        
+
         // Calculate usage percentage
         $usage_percentage = ($memory_usage / $memory_limit_bytes) * 100;
         $peak_percentage = ($memory_peak / $memory_limit_bytes) * 100;
@@ -273,7 +273,7 @@ class PerformanceAgent
     private function checkServerResponseTime()
     {
         $start_time = microtime(true);
-        
+
         // Make a simple request to admin-ajax.php
         $response = wp_remote_get(admin_url('admin-ajax.php?action=heartbeat'), [
             'timeout' => 10,
@@ -314,7 +314,7 @@ class PerformanceAgent
     {
         // This would integrate with real Core Web Vitals API
         // For now, providing estimated values based on other metrics
-        
+
         return [
             'largest_contentful_paint' => [
                 'value' => 2.1,
@@ -449,13 +449,13 @@ class PerformanceAgent
     private function getDatabaseSize()
     {
         global $wpdb;
-        
+
         $result = $wpdb->get_var("
-            SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 
-            FROM information_schema.tables 
+            SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1)
+            FROM information_schema.tables
             WHERE table_schema = '" . DB_NAME . "'
         ");
-        
+
         return floatval($result);
     }
 
@@ -463,7 +463,7 @@ class PerformanceAgent
     {
         $unit = strtolower(substr($size, -1));
         $value = intval($size);
-        
+
         switch ($unit) {
             case 'g':
                 $value *= 1024;
@@ -472,7 +472,7 @@ class PerformanceAgent
             case 'k':
                 $value *= 1024;
         }
-        
+
         return $value;
     }
 
@@ -480,12 +480,12 @@ class PerformanceAgent
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $unit_index = 0;
-        
+
         while ($bytes >= 1024 && $unit_index < count($units) - 1) {
             $bytes /= 1024;
             $unit_index++;
         }
-        
+
         return round($bytes, 2) . ' ' . $units[$unit_index];
     }
 }

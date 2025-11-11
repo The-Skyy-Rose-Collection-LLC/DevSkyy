@@ -1,7 +1,7 @@
 <?php
 /**
  * Admin interface management
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -225,7 +225,7 @@ class SkyyRoseAdmin
         ?>
         <div class="wrap">
             <h1><?php _e('AI Agents Management', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h1>
-            
+
             <div class="skyy-rose-agents-grid">
                 <?php $this->renderAgentCard('brand_intelligence', [
                     'title' => __('Brand Intelligence Agent', SKYY_ROSE_AI_TEXT_DOMAIN),
@@ -273,35 +273,35 @@ class SkyyRoseAdmin
     {
         $db = SkyyRoseDatabase::getInstance();
         $performance_metrics = $db->getPerformanceMetrics();
-        
+
         ?>
         <div class="wrap">
             <h1><?php _e('Analytics & Reports', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h1>
-            
+
             <div class="skyy-rose-analytics-grid">
                 <div class="analytics-card">
                     <h3><?php _e('Performance Metrics', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h3>
                     <canvas id="performance-chart"></canvas>
                 </div>
-                
+
                 <div class="analytics-card">
                     <h3><?php _e('Agent Activity', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h3>
                     <canvas id="activity-chart"></canvas>
                 </div>
-                
+
                 <div class="analytics-card">
                     <h3><?php _e('Recent Activities', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h3>
                     <?php $this->renderRecentActivities(); ?>
                 </div>
             </div>
         </div>
-        
+
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize charts
             const performanceData = <?php echo wp_json_encode($this->getPerformanceChartData()); ?>;
             const activityData = <?php echo wp_json_encode($this->getActivityChartData()); ?>;
-            
+
             // Render performance chart
             new Chart(document.getElementById('performance-chart'), {
                 type: 'line',
@@ -316,7 +316,7 @@ class SkyyRoseAdmin
                     }
                 }
             });
-            
+
             // Render activity chart
             new Chart(document.getElementById('activity-chart'), {
                 type: 'doughnut',
@@ -343,13 +343,13 @@ class SkyyRoseAdmin
     {
         if (isset($_POST['submit'])) {
             check_admin_referer('skyy_rose_ai_settings_nonce');
-            
+
             $settings = $_POST['skyy_rose_ai_settings'] ?? [];
             $sanitized_settings = $this->settings->sanitizeSettings($settings);
             update_option('skyy_rose_ai_settings', $sanitized_settings);
-            
-            echo '<div class="notice notice-success is-dismissible"><p>' . 
-                 __('Settings saved successfully.', SKYY_ROSE_AI_TEXT_DOMAIN) . 
+
+            echo '<div class="notice notice-success is-dismissible"><p>' .
+                 __('Settings saved successfully.', SKYY_ROSE_AI_TEXT_DOMAIN) .
                  '</p></div>';
         }
 
@@ -357,33 +357,33 @@ class SkyyRoseAdmin
         ?>
         <div class="wrap">
             <h1><?php _e('Skyy Rose AI Agents Settings', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h1>
-            
+
             <form method="post" action="">
                 <?php wp_nonce_field('skyy_rose_ai_settings_nonce'); ?>
-                
+
                 <nav class="nav-tab-wrapper">
                     <a href="#general" class="nav-tab nav-tab-active"><?php _e('General', SKYY_ROSE_AI_TEXT_DOMAIN); ?></a>
                     <a href="#agents" class="nav-tab"><?php _e('Agents', SKYY_ROSE_AI_TEXT_DOMAIN); ?></a>
                     <a href="#integrations" class="nav-tab"><?php _e('Integrations', SKYY_ROSE_AI_TEXT_DOMAIN); ?></a>
                     <a href="#notifications" class="nav-tab"><?php _e('Notifications', SKYY_ROSE_AI_TEXT_DOMAIN); ?></a>
                 </nav>
-                
+
                 <div id="general" class="tab-content">
                     <?php $this->renderGeneralSettings($current_settings); ?>
                 </div>
-                
+
                 <div id="agents" class="tab-content" style="display: none;">
                     <?php $this->renderAgentSettings($current_settings); ?>
                 </div>
-                
+
                 <div id="integrations" class="tab-content" style="display: none;">
                     <?php $this->renderIntegrationSettings($current_settings); ?>
                 </div>
-                
+
                 <div id="notifications" class="tab-content" style="display: none;">
                     <?php $this->renderNotificationSettings($current_settings); ?>
                 </div>
-                
+
                 <?php submit_button(); ?>
             </form>
         </div>
@@ -397,10 +397,10 @@ class SkyyRoseAdmin
     {
         $db = SkyyRoseDatabase::getInstance();
         $recent_activities = $db->getAgentActivities(null, 5);
-        
+
         echo '<div class="skyy-rose-widget">';
         echo '<p><strong>' . __('Recent Agent Activities:', SKYY_ROSE_AI_TEXT_DOMAIN) . '</strong></p>';
-        
+
         if (empty($recent_activities)) {
             echo '<p>' . __('No recent activities.', SKYY_ROSE_AI_TEXT_DOMAIN) . '</p>';
         } else {
@@ -415,8 +415,8 @@ class SkyyRoseAdmin
             }
             echo '</ul>';
         }
-        
-        echo '<p><a href="' . admin_url('admin.php?page=skyy-rose-ai-agents') . '" class="button button-primary">' . 
+
+        echo '<p><a href="' . admin_url('admin.php?page=skyy-rose-ai-agents') . '" class="button button-primary">' .
              __('View Full Dashboard', SKYY_ROSE_AI_TEXT_DOMAIN) . '</a></p>';
         echo '</div>';
     }
@@ -428,18 +428,18 @@ class SkyyRoseAdmin
     {
         $enabled = $this->settings->get("agents.{$agent_type}.enabled", true);
         $status_class = $enabled ? 'enabled' : 'disabled';
-        
+
         ?>
         <div class="agent-card <?php echo $status_class; ?>" data-agent="<?php echo esc_attr($agent_type); ?>">
             <div class="agent-icon"><?php echo $config['icon']; ?></div>
             <h3><?php echo esc_html($config['title']); ?></h3>
             <p><?php echo esc_html($config['description']); ?></p>
-            
+
             <div class="agent-status">
                 <span class="status-indicator"></span>
                 <?php echo $enabled ? __('Enabled', SKYY_ROSE_AI_TEXT_DOMAIN) : __('Disabled', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
             </div>
-            
+
             <?php if ($enabled && !empty($config['actions'])): ?>
             <div class="agent-actions">
                 <?php foreach ($config['actions'] as $action): ?>
@@ -457,12 +457,12 @@ class SkyyRoseAdmin
     {
         $db = SkyyRoseDatabase::getInstance();
         $activities = $db->getAgentActivities(null, 10);
-        
+
         if (empty($activities)) {
             echo '<p>' . __('No recent activities.', SKYY_ROSE_AI_TEXT_DOMAIN) . '</p>';
             return;
         }
-        
+
         echo '<table class="wp-list-table widefat">';
         echo '<thead><tr>';
         echo '<th>' . __('Agent', SKYY_ROSE_AI_TEXT_DOMAIN) . '</th>';
@@ -470,7 +470,7 @@ class SkyyRoseAdmin
         echo '<th>' . __('Status', SKYY_ROSE_AI_TEXT_DOMAIN) . '</th>';
         echo '<th>' . __('Date', SKYY_ROSE_AI_TEXT_DOMAIN) . '</th>';
         echo '</tr></thead><tbody>';
-        
+
         foreach ($activities as $activity) {
             echo '<tr>';
             echo '<td>' . esc_html(ucwords(str_replace('_', ' ', $activity->agent_type))) . '</td>';
@@ -479,7 +479,7 @@ class SkyyRoseAdmin
             echo '<td>' . esc_html(mysql2date('F j, Y g:i a', $activity->created_at)) . '</td>';
             echo '</tr>';
         }
-        
+
         echo '</tbody></table>';
     }
 

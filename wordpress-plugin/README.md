@@ -300,6 +300,6 @@ Contributions are welcome! Please read our contributing guidelines and submit pu
 
 ---
 
-**Transform your WordPress site with enterprise-level AI automation.** 
+**Transform your WordPress site with enterprise-level AI automation.**
 
 The Skyy Rose AI Agents plugin brings the power of artificial intelligence to WordPress, providing automated optimization, security monitoring, and brand intelligence that scales with your business needs.

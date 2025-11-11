@@ -4,20 +4,20 @@ DevSkyy API Server - Simplified Startup
 Bypasses complex initialization for quick MCP testing
 """
 
+from datetime import datetime
+import logging
 import os
 import sys
-import logging
-from datetime import datetime
+
 
 # Set up basic logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Load environment variables
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 # Basic configuration
@@ -48,14 +48,12 @@ try:
     from fastapi import FastAPI
     from fastapi.middleware.cors import CORSMiddleware
     import uvicorn
-    
+
     # Create FastAPI app
     app = FastAPI(
-        title="DevSkyy API Server",
-        description="Multi-Agent AI Platform - Simplified for MCP Testing",
-        version="1.1.0"
+        title="DevSkyy API Server", description="Multi-Agent AI Platform - Simplified for MCP Testing", version="1.1.0"
     )
-    
+
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
@@ -64,7 +62,7 @@ try:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     # Basic health check
     @app.get("/")
     async def root():
@@ -73,18 +71,18 @@ try:
             "version": "1.1.0",
             "status": "running",
             "timestamp": datetime.now().isoformat(),
-            "mcp_ready": True
+            "mcp_ready": True,
         }
-    
+
     @app.get("/health")
     async def health():
         return {
             "status": "healthy",
             "timestamp": datetime.now().isoformat(),
             "api_key_set": bool(API_KEY),
-            "mcp_integration": "ready"
+            "mcp_integration": "ready",
         }
-    
+
     # Mock endpoints for MCP testing
     @app.get("/api/v1/agents")
     async def list_agents():
@@ -94,12 +92,12 @@ try:
                 {"id": "scanner", "name": "Code Scanner", "category": "development"},
                 {"id": "fixer", "name": "Code Fixer", "category": "development"},
                 {"id": "security", "name": "Security Scanner", "category": "security"},
-                {"id": "analytics", "name": "Analytics Engine", "category": "analytics"}
+                {"id": "analytics", "name": "Analytics Engine", "category": "analytics"},
             ],
             "total": 4,
-            "status": "mock_data"
+            "status": "mock_data",
         }
-    
+
     @app.post("/api/v1/scan")
     async def scan_code(request: dict):
         """Mock endpoint for code scanning"""
@@ -108,9 +106,9 @@ try:
             "status": "completed",
             "issues_found": 0,
             "message": "Mock scan completed - no issues found",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-    
+
     @app.post("/api/v1/fix")
     async def fix_code(request: dict):
         """Mock endpoint for code fixing"""
@@ -119,44 +117,30 @@ try:
             "status": "completed",
             "fixes_applied": 0,
             "message": "Mock fix completed - no fixes needed",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-    
+
     @app.post("/api/v1/security/comprehensive-scan")
     async def security_scan(request: dict):
         """Mock endpoint for security scanning"""
         return {
             "security_score": 95,
             "security_grade": "A",
-            "vulnerabilities": {
-                "critical": 0,
-                "high": 0,
-                "medium": 1,
-                "low": 2
-            },
+            "vulnerabilities": {"critical": 0, "high": 0, "medium": 1, "low": 2},
             "status": "mock_scan_completed",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-    
+
     @app.get("/api/v1/analytics/dashboard")
     async def analytics_dashboard():
         """Mock endpoint for analytics dashboard"""
         return {
-            "key_metrics": {
-                "active_users": 150,
-                "api_requests": 1250,
-                "agent_executions": 89,
-                "revenue": 2500.00
-            },
-            "performance": {
-                "avg_response_time": 245.5,
-                "success_rate": 99.2,
-                "uptime": 99.8
-            },
+            "key_metrics": {"active_users": 150, "api_requests": 1250, "agent_executions": 89, "revenue": 2500.00},
+            "performance": {"avg_response_time": 245.5, "success_rate": 99.2, "uptime": 99.8},
             "status": "mock_analytics",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
-    
+
     print("🚀 Starting DevSkyy API Server...")
     print(f"📡 Server will be available at: {API_URL}")
     print("🔌 MCP tools can now connect to this server")
@@ -173,15 +157,10 @@ try:
     print("✅ Ready for MCP testing!")
     print("🔧 Test with: python3 devskyy_mcp.py")
     print()
-    
+
     # Start the server
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=PORT,
-        log_level="info"
-    )
-    
+    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="info")
+
 except ImportError as e:
     print(f"❌ Missing dependencies: {e}")
     print("Install with: pip install fastapi uvicorn python-dotenv")

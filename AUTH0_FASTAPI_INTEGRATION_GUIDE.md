@@ -94,7 +94,7 @@ def create_devskyy_jwt_token(user_data: Dict[str, Any], expires_delta: Optional[
         "token_type": "access",
         "auth_provider": "auth0"
     }
-    
+
     # Sign with DevSkyy secret key for compatibility
     return jwt.encode(payload, DEVSKYY_SECRET_KEY, algorithm=DEVSKYY_JWT_ALGORITHM)
 ```
@@ -118,16 +118,16 @@ def verify_devskyy_jwt_token(token: str) -> Dict[str, Any]:
 ```python
 class Auth0OAuth2Client:
     """Auth0 OAuth2 client for FastAPI integration."""
-    
+
     def get_authorization_url(self, redirect_uri: str, state: str = None) -> str:
         """Generate Auth0 authorization URL."""
-        
+
     async def exchange_code_for_token(self, code: str, redirect_uri: str) -> Dict[str, Any]:
         """Exchange authorization code for access token."""
-        
+
     async def get_user_info(self, access_token: str) -> Dict[str, Any]:
         """Get user information from Auth0."""
-        
+
     def get_logout_url(self, return_to: str) -> str:
         """Generate Auth0 logout URL."""
 ```
@@ -145,9 +145,9 @@ const loginWithAuth0 = async () => {
   const response = await fetch('/api/v1/auth/auth0/login', {
     headers: { 'Accept': 'application/json' }
   });
-  
+
   const data = await response.json();
-  
+
   // Redirect to Auth0
   window.location.href = data.authorization_url;
 };
@@ -157,18 +157,18 @@ const handleAuth0Callback = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   const state = urlParams.get('state');
-  
+
   if (code) {
     const response = await fetch(`/api/v1/auth/auth0/callback?code=${code}&state=${state}`, {
       headers: { 'Accept': 'application/json' }
     });
-    
+
     const tokenData = await response.json();
-    
+
     // Store tokens
     localStorage.setItem('access_token', tokenData.access_token);
     localStorage.setItem('refresh_token', tokenData.refresh_token);
-    
+
     // Redirect to dashboard
     window.location.href = '/dashboard';
   }
@@ -180,14 +180,14 @@ const handleAuth0Callback = async () => {
 // Make authenticated API calls
 const makeAuthenticatedRequest = async (endpoint) => {
   const token = localStorage.getItem('access_token');
-  
+
   const response = await fetch(endpoint, {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     }
   });
-  
+
   return response.json();
 };
 
@@ -207,7 +207,7 @@ async def protected_endpoint(
 ):
     # Verify token (works with both Auth0 and DevSkyy tokens)
     payload = verify_devskyy_jwt_token(token)
-    
+
     return {
         "message": "Access granted",
         "user_id": payload.get("sub"),

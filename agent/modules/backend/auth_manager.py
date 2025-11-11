@@ -1,27 +1,28 @@
+from datetime import datetime, timedelta
 import logging
 import os
 import re
 import secrets
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import bcrypt
-import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+import jwt
 from sqlalchemy import (
     Boolean,
     Column,
-    create_engine,
     DateTime,
     ForeignKey,
     Integer,
     String,
     Text,
+    create_engine,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import func
+
 
 logger = logging.getLogger(__name__)
 Base = declarative_base()
@@ -87,9 +88,7 @@ class AuthManager:
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
         self.database_url = os.getenv("DATABASE_URL")
         if not self.database_url:
-            raise ValueError(
-                "DATABASE_URL environment variable must be set for security"
-            )
+            raise ValueError("DATABASE_URL environment variable must be set for security")
         self.security = HTTPBearer()
         self.engine = None
         self.SessionLocal = None
@@ -97,9 +96,7 @@ class AuthManager:
         try:
             self.init_database()
         except Exception as e:
-            logger.warning(
-                f"Database initialization failed, will retry when needed: {str(e)}"
-            )
+            logger.warning(f"Database initialization failed, will retry when needed: {e!s}")
             self._db_initialized = False
 
     def init_database(self):
@@ -107,14 +104,12 @@ class AuthManager:
         try:
             if not self.engine:
                 self.engine = create_engine(self.database_url)
-                self.SessionLocal = sessionmaker(
-                    autocommit=False, autoflush=False, bind=self.engine
-                )
+                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
             self._db_initialized = True
         except Exception as e:
-            logger.error(f"Failed to initialize database: {str(e)}")
+            logger.error(f"Failed to initialize database: {e!s}")
             self._db_initialized = False
             raise
 
@@ -142,7 +137,7 @@ class AuthManager:
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
-    def validate_password(self, password: str) -> Dict[str, Any]:
+    def validate_password(self, password: str) -> dict[str, Any]:
         """Validate password strength."""
         errors = []
 
@@ -170,7 +165,7 @@ class AuthManager:
         password: str,
         first_name: str = "",
         last_name: str = "",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create new user account with validation."""
 
         # Validate input
@@ -185,11 +180,7 @@ class AuthManager:
 
         try:
             # Check if user already exists
-            existing_user = (
-                db.query(User)
-                .filter((User.email == email) | (User.username == username))
-                .first()
-            )
+            existing_user = db.query(User).filter((User.email == email) | (User.username == username)).first()
 
             if existing_user:
                 return {
@@ -228,14 +219,14 @@ class AuthManager:
 
         except Exception as e:
             db.rollback()
-            logger.error(f"Error creating user: {str(e)}")
+            logger.error(f"Error creating user: {e!s}")
             return {"success": False, "error": "Failed to create user"}
         finally:
             db.close()
 
     def authenticate_user(
         self, email: str, password: str, ip_address: str = "", user_agent: str = ""
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Authenticate user and create session."""
 
         db = self.SessionLocal()
@@ -314,12 +305,12 @@ class AuthManager:
             }
 
         except Exception as e:
-            logger.error(f"Authentication error: {str(e)}")
+            logger.error(f"Authentication error: {e!s}")
             return {"success": False, "error": "Authentication failed"}
         finally:
             db.close()
 
-    def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
+    def verify_token(self, token: str) -> Optional[dict[str, Any]]:
         """Verify JWT token and return user data."""
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
@@ -351,9 +342,7 @@ class AuthManager:
         except jwt.InvalidTokenError:
             return None
 
-    def get_current_user(
-        self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
-    ):
+    def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
         """Dependency to get current authenticated user."""
         token = credentials.credentials
         payload = self.verify_token(token)
@@ -367,7 +356,7 @@ class AuthManager:
 
         return payload
 
-    def get_user_profile(self, user_id: int) -> Dict[str, Any]:
+    def get_user_profile(self, user_id: int) -> dict[str, Any]:
         """Get complete user profile data."""
         db = self.SessionLocal()
 
@@ -418,12 +407,12 @@ class AuthManager:
             }
 
         except Exception as e:
-            logger.error(f"Error getting user profile: {str(e)}")
+            logger.error(f"Error getting user profile: {e!s}")
             return {"error": "Failed to retrieve profile"}
         finally:
             db.close()
 
-    def logout_user(self, token: str) -> Dict[str, Any]:
+    def logout_user(self, token: str) -> dict[str, Any]:
         """Logout user by invalidating session."""
         payload = self.verify_token(token)
         if not payload:
@@ -433,15 +422,15 @@ class AuthManager:
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"], UserSession.is_active
-            ).update({"is_active": False})
+            db.query(UserSession).filter(UserSession.user_id == payload["user_id"], UserSession.is_active).update(
+                {"is_active": False}
+            )
 
             db.commit()
             return {"success": True, "message": "Logged out successfully"}
 
         except Exception as e:
-            logger.error(f"Logout error: {str(e)}")
+            logger.error(f"Logout error: {e!s}")
             return {"success": False, "error": "Logout failed"}
         finally:
             db.close()

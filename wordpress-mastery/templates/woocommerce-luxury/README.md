@@ -206,10 +206,10 @@ woocommerce-luxury/
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2025-10-27  
-**Compatibility**: WordPress 5.0+, WooCommerce 5.0+, PHP 8.1+  
-**License**: GPL v2 or later  
+**Version**: 1.0.0
+**Last Updated**: 2025-10-27
+**Compatibility**: WordPress 5.0+, WooCommerce 5.0+, PHP 8.1+
+**License**: GPL v2 or later
 
-**Developed by**: DevSkyy WordPress Development Specialist  
+**Developed by**: DevSkyy WordPress Development Specialist
 **Registry**: docker.io/skyyrosellc/devskyy

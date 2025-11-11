@@ -157,7 +157,7 @@ Standardized instruction templates for common tasks:
 
 ### 1. Professors of Code (Claude + Cursor)
 
-**Composition**: Claude Sonnet 4 + Cursor Agent  
+**Composition**: Claude Sonnet 4 + Cursor Agent
 **Specialization**: Backend Development & Security
 
 **Capabilities**:
@@ -178,7 +178,7 @@ Standardized instruction templates for common tasks:
 
 ### 2. Growth Stack (Claude + ChatGPT)
 
-**Composition**: Claude Sonnet 4 + ChatGPT 4  
+**Composition**: Claude Sonnet 4 + ChatGPT 4
 **Specialization**: Frontend & Marketing
 
 **Capabilities**:
@@ -199,7 +199,7 @@ Standardized instruction templates for common tasks:
 
 ### 3. Data & Reasoning (Claude + Gemini)
 
-**Composition**: Claude Sonnet 4 + Gemini Pro 1.5  
+**Composition**: Claude Sonnet 4 + Gemini Pro 1.5
 **Specialization**: Data Analysis & ML
 
 **Capabilities**:
@@ -220,7 +220,7 @@ Standardized instruction templates for common tasks:
 
 ### 4. Visual Foundry (HuggingFace + Claude + Gemini + ChatGPT)
 
-**Composition**: Multi-model ensemble  
+**Composition**: Multi-model ensemble
 **Specialization**: Media Generation
 
 **Capabilities**:
@@ -240,7 +240,7 @@ Standardized instruction templates for common tasks:
 
 ### 5. Voice, Media & Video Elite (HuggingFace + Claude + OpenAI)
 
-**Composition**: HuggingFace + Claude Sonnet 4 + OpenAI (Whisper/TTS)  
+**Composition**: HuggingFace + Claude Sonnet 4 + OpenAI (Whisper/TTS)
 **Specialization**: Multimedia Processing
 
 **Capabilities**:
@@ -693,7 +693,7 @@ metrics = orchestrator.get_metrics()
 # Check tool exists
 if "tool_name" not in orchestrator.tools:
     print("Tool not found in configuration")
-    
+
 # Verify config
 orchestrator._load_config()
 ```

@@ -1,7 +1,7 @@
 <?php
 /**
  * Security management class
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -121,7 +121,7 @@ class SkyyRoseSecurity
     {
         $user_id = get_current_user_id();
         $key = "skyy_rose_rate_limit_{$action}_{$user_id}";
-        
+
         $count = get_transient($key);
         if ($count === false) {
             set_transient($key, 1, $window);

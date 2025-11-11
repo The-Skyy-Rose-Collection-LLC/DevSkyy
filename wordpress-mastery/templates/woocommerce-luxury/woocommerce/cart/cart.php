@@ -23,8 +23,8 @@ do_action('woocommerce_before_cart'); ?>
 			<div class="cart-brand-section">
 				<div class="brand-logo-area">
 					<div class="skyy-rose-logo">
-						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>" 
-							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>" 
+						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>"
+							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>"
 							 class="brand-logo">
 					</div>
 					<div class="brand-tagline">
@@ -32,7 +32,7 @@ do_action('woocommerce_before_cart'); ?>
 						<p class="brand-subtitle luxury-accent"><?php esc_html_e('Curated Fashion, Elevated Style', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
 				</div>
-				
+
 				<!-- AI-Powered Cart Intelligence -->
 				<div class="cart-ai-insights" id="cart-intelligence-panel">
 					<div class="ai-insight-card">
@@ -133,7 +133,7 @@ do_action('woocommerce_before_cart'); ?>
 														echo wp_kses_post(apply_filters('woocommerce_cart_item_backorder_notification', '<p class="backorder_notification">' . esc_html__('Available on backorder', 'wp-mastery-woocommerce-luxury') . '</p>', $product_id));
 													}
 													?>
-													
+
 													<!-- AI Product Insights -->
 													<div class="ai-product-insights" id="insights-<?php echo esc_attr($product_id); ?>">
 														<div class="insight-tags">

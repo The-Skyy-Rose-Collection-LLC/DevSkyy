@@ -1,10 +1,11 @@
-import logging
-import random
-import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+import logging
+import random
+from typing import Any, Optional
+import uuid
+
 
 # Replaced numpy with random for lightweight operations
 
@@ -64,20 +65,18 @@ class EcommerceAgent:
         cost: float,
         stock_quantity: int,
         sku: str,
-        sizes: List[str],
-        colors: List[str],
+        sizes: list[str],
+        colors: list[str],
         description: str,
-        images: List[str] = None,
-        tags: List[str] = None,
-    ) -> Dict[str, Any]:
+        images: list[str] = None,
+        tags: list[str] = None,
+    ) -> dict[str, Any]:
         """Add product with comprehensive validation and optimization."""
         try:
             product_id = str(uuid.uuid4())
 
             # Validate inputs
-            validation_result = self._validate_product_data(
-                name, price, cost, stock_quantity, sku, description
-            )
+            validation_result = self._validate_product_data(name, price, cost, stock_quantity, sku, description)
             if not validation_result["valid"]:
                 return {
                     "error": validation_result["error"],
@@ -85,17 +84,13 @@ class EcommerceAgent:
                 }
 
             # Generate SEO-optimized content
-            seo_data = self._generate_seo_content(
-                name, category, description, tags or []
-            )
+            seo_data = self._generate_seo_content(name, category, description, tags or [])
 
             # Calculate pricing recommendations
             pricing_analysis = self._analyze_pricing(price, cost, category)
 
             # Generate variants for sizes and colors
-            variants = self._generate_product_variants(
-                sizes, colors, price, stock_quantity
-            )
+            variants = self._generate_product_variants(sizes, colors, price, stock_quantity)
 
             product = {
                 "id": product_id,
@@ -154,10 +149,10 @@ class EcommerceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Product creation failed: {str(e)}")
+            logger.error(f"❌ Product creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def update_inventory(self, product_id: str, quantity_change: int) -> Dict[str, Any]:
+    def update_inventory(self, product_id: str, quantity_change: int) -> dict[str, Any]:
         """Update inventory with automated reorder suggestions."""
         try:
             if product_id not in self.products:
@@ -193,7 +188,7 @@ class EcommerceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Inventory update failed: {str(e)}")
+            logger.error(f"❌ Inventory update failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def create_customer(
@@ -202,9 +197,9 @@ class EcommerceAgent:
         first_name: str,
         last_name: str,
         phone: str = "",
-        address: Dict[str, str] = None,
-        preferences: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        address: dict[str, str] = None,
+        preferences: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Create customer with comprehensive profiling."""
         try:
             customer_id = str(uuid.uuid4())
@@ -222,9 +217,7 @@ class EcommerceAgent:
                 }
 
             # Generate customer profile
-            customer_profile = self._generate_customer_profile(
-                email, first_name, last_name
-            )
+            customer_profile = self._generate_customer_profile(email, first_name, last_name)
 
             customer = {
                 "id": customer_id,
@@ -272,22 +265,20 @@ class EcommerceAgent:
                 "status": "created",
                 "profile_score": customer_profile["score"],
                 "welcome_campaign": welcome_campaign,
-                "recommended_products": self._get_new_customer_recommendations(
-                    customer
-                ),
+                "recommended_products": self._get_new_customer_recommendations(customer),
             }
 
         except Exception as e:
-            logger.error(f"❌ Customer creation failed: {str(e)}")
+            logger.error(f"❌ Customer creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def create_order(
         self,
         customer_id: str,
-        items: List[Dict[str, Any]],
-        shipping_address: Dict[str, str],
-        billing_address: Dict[str, str] = None,
-    ) -> Dict[str, Any]:
+        items: list[dict[str, Any]],
+        shipping_address: dict[str, str],
+        billing_address: dict[str, str] = None,
+    ) -> dict[str, Any]:
         """Create order with comprehensive processing and validation."""
         try:
             order_id = str(uuid.uuid4())
@@ -312,9 +303,7 @@ class EcommerceAgent:
                 subtotal += processed_item["total_price"]
 
             # Calculate pricing
-            pricing = self._calculate_order_pricing(
-                subtotal, customer, shipping_address
-            )
+            pricing = self._calculate_order_pricing(subtotal, customer, shipping_address)
 
             # Check inventory availability
             inventory_check = self._check_order_inventory(order_items)
@@ -340,9 +329,7 @@ class EcommerceAgent:
                 "updated_at": datetime.now().isoformat(),
                 "fulfillment": {
                     "estimated_ship_date": self._calculate_ship_date(),
-                    "estimated_delivery_date": self._calculate_delivery_date(
-                        shipping_address
-                    ),
+                    "estimated_delivery_date": self._calculate_delivery_date(shipping_address),
                     "tracking_number": None,
                     "carrier": None,
                 },
@@ -377,12 +364,10 @@ class EcommerceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Order creation failed: {str(e)}")
+            logger.error(f"❌ Order creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_product_recommendations(
-        self, customer_id: str, limit: int = 5
-    ) -> List[Dict[str, Any]]:
+    def get_product_recommendations(self, customer_id: str, limit: int = 5) -> list[dict[str, Any]]:
         """Generate AI-powered product recommendations."""
         try:
             if customer_id not in self.customers:
@@ -413,26 +398,22 @@ class EcommerceAgent:
                             "price": float(product["base_price"]),
                             "category": product["category"],
                             "score": score,
-                            "reason": self._get_recommendation_reason(
-                                product, customer
-                            ),
+                            "reason": self._get_recommendation_reason(product, customer),
                             "images": product["images"][:1],  # First image only
                             "rating": product["reviews"]["average_rating"],
                         }
                     )
 
             # Sort by score and return top recommendations
-            recommendations = sorted(
-                all_recommendations, key=lambda x: x["score"], reverse=True
-            )[:limit]
+            recommendations = sorted(all_recommendations, key=lambda x: x["score"], reverse=True)[:limit]
 
             return recommendations
 
         except Exception as e:
-            logger.error(f"❌ Recommendation generation failed: {str(e)}")
+            logger.error(f"❌ Recommendation generation failed: {e!s}")
             return []
 
-    def generate_analytics_report(self) -> Dict[str, Any]:
+    def generate_analytics_report(self) -> dict[str, Any]:
         """Generate comprehensive analytics and business intelligence report."""
         try:
             return {
@@ -488,19 +469,15 @@ class EcommerceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Analytics report generation failed: {str(e)}")
+            logger.error(f"❌ Analytics report generation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_analytics_dashboard(self) -> Dict[str, Any]:
+    def get_analytics_dashboard(self) -> dict[str, Any]:
         """Get real-time analytics for main dashboard."""
         return {
             "total_products": len(self.products),
             "active_orders": len(
-                [
-                    o
-                    for o in self.orders.values()
-                    if o["status"] in ["pending", "confirmed", "processing"]
-                ]
+                [o for o in self.orders.values() if o["status"] in ["pending", "confirmed", "processing"]]
             ),
             "total_customers": len(self.customers),
             "monthly_revenue": self._calculate_monthly_revenue(),
@@ -516,7 +493,7 @@ class EcommerceAgent:
         stock: int,
         sku: str,
         description: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Comprehensive product data validation."""
         errors = []
 
@@ -545,23 +522,17 @@ class EcommerceAgent:
         }
 
     def _generate_seo_content(
-        self, name: str, category: ProductCategory, description: str, tags: List[str]
-    ) -> Dict[str, Any]:
+        self, name: str, category: ProductCategory, description: str, tags: list[str]
+    ) -> dict[str, Any]:
         """Generate SEO-optimized content."""
         # Generate SEO title
-        seo_title = (
-            f"{name} - Premium {category.value.title()} | The Skyy Rose Collection"
-        )
+        seo_title = f"{name} - Premium {category.value.title()} | The Skyy Rose Collection"
 
         # Generate meta description
-        meta_description = (
-            f"{description[:150]}... Shop now at The Skyy Rose Collection."
-        )
+        meta_description = f"{description[:150]}... Shop now at The Skyy Rose Collection."
 
         # Generate keywords
-        keywords = (
-            [name.lower(), category.value] + tags + ["jewelry", "skyy rose", "premium"]
-        )
+        keywords = [name.lower(), category.value] + tags + ["jewelry", "skyy rose", "premium"]
 
         # Calculate SEO score
         seo_score = self._calculate_seo_score(name, description, tags)
@@ -574,9 +545,7 @@ class EcommerceAgent:
             "url_slug": self._generate_url_slug(name),
         }
 
-    def _analyze_pricing(
-        self, price: float, cost: float, category: ProductCategory
-    ) -> Dict[str, Any]:
+    def _analyze_pricing(self, price: float, cost: float, category: ProductCategory) -> dict[str, Any]:
         """Analyze pricing strategy and provide recommendations."""
         margin = ((price - cost) / price) * 100
 
@@ -587,9 +556,7 @@ class EcommerceAgent:
             ProductCategory.EARRINGS: {"avg_price": 75.0, "avg_margin": 68.0},
         }
 
-        benchmark = category_data.get(
-            category, {"avg_price": 100.0, "avg_margin": 65.0}
-        )
+        benchmark = category_data.get(category, {"avg_price": 100.0, "avg_margin": 65.0})
 
         recommendation = "optimal"
         if margin < 50:
@@ -607,13 +574,11 @@ class EcommerceAgent:
         }
 
     def _generate_product_variants(
-        self, sizes: List[str], colors: List[str], base_price: float, stock: int
-    ) -> List[Dict[str, Any]]:
+        self, sizes: list[str], colors: list[str], base_price: float, stock: int
+    ) -> list[dict[str, Any]]:
         """Generate product variants for different sizes and colors."""
         variants = []
-        stock_per_variant = (
-            max(stock // (len(sizes) * len(colors)), 1) if sizes and colors else stock
-        )
+        stock_per_variant = max(stock // (len(sizes) * len(colors)), 1) if sizes and colors else stock
 
         for size in sizes:
             for color in colors:
@@ -632,7 +597,7 @@ class EcommerceAgent:
 
         return variants
 
-    def _generate_marketing_suggestions(self, product: Dict) -> List[str]:
+    def _generate_marketing_suggestions(self, product: dict) -> list[str]:
         """Generate marketing suggestions for new product."""
         suggestions = []
 
@@ -658,7 +623,7 @@ class EcommerceAgent:
 
         return suggestions
 
-    def _predict_demand(self, product: Dict) -> Dict[str, Any]:
+    def _predict_demand(self, product: dict) -> dict[str, Any]:
         """Predict demand for new product."""
         # Simplified demand prediction
         category_demand = {
@@ -667,9 +632,7 @@ class EcommerceAgent:
             "earrings": {"high": 0.35, "medium": 0.45, "low": 0.2},
         }
 
-        _base_demand = category_demand.get(
-            product["category"], {"high": 0.3, "medium": 0.5, "low": 0.2}
-        )  # noqa: F841
+        _base_demand = category_demand.get(product["category"], {"high": 0.3, "medium": 0.5, "low": 0.2})
 
         return {
             "expected_monthly_sales": random.randint(15, 44),
@@ -678,7 +641,7 @@ class EcommerceAgent:
             "confidence": 0.75,
         }
 
-    def _check_inventory_alerts(self, product_id: str, level: int) -> List[str]:
+    def _check_inventory_alerts(self, product_id: str, level: int) -> list[str]:
         """Check for inventory-related alerts."""
         alerts = []
 
@@ -691,7 +654,7 @@ class EcommerceAgent:
 
         return alerts
 
-    def _calculate_reorder_suggestion(self, product_id: str) -> Dict[str, Any]:
+    def _calculate_reorder_suggestion(self, product_id: str) -> dict[str, Any]:
         """Calculate intelligent reorder suggestions."""
         if product_id not in self.products:
             return {}
@@ -709,14 +672,11 @@ class EcommerceAgent:
             "current_level": current_level,
             "reorder_point": int(reorder_point),
             "suggested_quantity": int(reorder_quantity),
-            "estimated_cost": reorder_quantity
-            * float(self.products[product_id]["cost"]),
+            "estimated_cost": reorder_quantity * float(self.products[product_id]["cost"]),
             "urgency": "high" if current_level <= reorder_point else "low",
         }
 
-    def _update_demand_forecast(
-        self, product_id: str, quantity_change: int
-    ) -> Dict[str, Any]:
+    def _update_demand_forecast(self, product_id: str, quantity_change: int) -> dict[str, Any]:
         """Update demand forecasting based on inventory changes."""
         return {
             "forecast_updated": True,
@@ -732,16 +692,14 @@ class EcommerceAgent:
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
-    def _find_customer_by_email(self, email: str) -> Optional[Dict]:
+    def _find_customer_by_email(self, email: str) -> Optional[dict]:
         """Find existing customer by email."""
         for customer in self.customers.values():
             if customer["email"] == email:
                 return customer
         return None
 
-    def _generate_customer_profile(
-        self, email: str, first_name: str, last_name: str
-    ) -> Dict[str, Any]:
+    def _generate_customer_profile(self, email: str, first_name: str, last_name: str) -> dict[str, Any]:
         """Generate comprehensive customer profile."""
         # Analyze email domain for insights
         domain = email.split("@")[1] if "@" in email else ""
@@ -758,7 +716,7 @@ class EcommerceAgent:
             "acquisition_channel": "organic_search",
         }
 
-    def _create_welcome_campaign(self, customer: Dict) -> Dict[str, Any]:
+    def _create_welcome_campaign(self, customer: dict) -> dict[str, Any]:
         """Create personalized welcome campaign."""
         return {
             "campaign_id": str(uuid.uuid4()),
@@ -769,12 +727,12 @@ class EcommerceAgent:
             "expiry_date": (datetime.now() + timedelta(days=14)).isoformat(),
         }
 
-    def _get_new_customer_recommendations(self, customer: Dict) -> List[str]:
+    def _get_new_customer_recommendations(self, customer: dict) -> list[str]:
         """Get product recommendations for new customers."""
         # Return popular/bestseller product IDs
         return list(self.products.keys())[:3]
 
-    def _validate_order_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
+    def _validate_order_item(self, item: dict[str, Any]) -> dict[str, Any]:
         """Validate individual order item."""
         required_fields = ["product_id", "variant_id", "quantity"]
 
@@ -787,7 +745,7 @@ class EcommerceAgent:
 
         return {"valid": True, "error": None}
 
-    def _process_order_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
+    def _process_order_item(self, item: dict[str, Any]) -> dict[str, Any]:
         """Process and enrich order item."""
         product_id = item["product_id"]
         quantity = item["quantity"]
@@ -809,9 +767,7 @@ class EcommerceAgent:
             "sku": product["sku"],
         }
 
-    def _calculate_order_pricing(
-        self, subtotal: Decimal, customer: Dict, shipping_address: Dict
-    ) -> Dict[str, Any]:
+    def _calculate_order_pricing(self, subtotal: Decimal, customer: dict, shipping_address: dict) -> dict[str, Any]:
         """Calculate comprehensive order pricing."""
         # Calculate tax (simplified)
         tax_rate = 0.0875  # 8.75%
@@ -831,7 +787,7 @@ class EcommerceAgent:
             "total": total,
         }
 
-    def _check_order_inventory(self, items: List[Dict]) -> Dict[str, Any]:
+    def _check_order_inventory(self, items: list[dict]) -> dict[str, Any]:
         """Check inventory availability for order items."""
         unavailable = []
 
@@ -851,9 +807,7 @@ class EcommerceAgent:
 
         return {"available": len(unavailable) == 0, "unavailable": unavailable}
 
-    def _apply_discounts(
-        self, customer: Dict, items: List[Dict], subtotal: Decimal
-    ) -> Dict[str, Any]:
+    def _apply_discounts(self, customer: dict, items: list[dict], subtotal: Decimal) -> dict[str, Any]:
         """Apply applicable discounts and promotions."""
         discounts = []
         total_discount = Decimal("0")
@@ -861,9 +815,7 @@ class EcommerceAgent:
         # New customer discount
         if customer["loyalty"]["total_orders"] == 0:
             discount_amount = subtotal * Decimal("0.10")  # 10% off
-            discounts.append(
-                {"type": "new_customer", "amount": discount_amount, "code": "WELCOME10"}
-            )
+            discounts.append({"type": "new_customer", "amount": discount_amount, "code": "WELCOME10"})
             total_discount += discount_amount
 
         # Volume discount
@@ -890,7 +842,7 @@ class EcommerceAgent:
         ship_date = datetime.now() + timedelta(days=2)
         return ship_date.isoformat()
 
-    def _calculate_delivery_date(self, shipping_address: Dict) -> str:
+    def _calculate_delivery_date(self, shipping_address: dict) -> str:
         """Calculate estimated delivery date based on address."""
         # Simplified delivery calculation
         base_days = 5  # Standard shipping
@@ -903,7 +855,7 @@ class EcommerceAgent:
         delivery_date = datetime.now() + timedelta(days=base_days)
         return delivery_date.isoformat()
 
-    def _reserve_inventory(self, items: List[Dict]) -> None:
+    def _reserve_inventory(self, items: list[dict]) -> None:
         """Reserve inventory for order items."""
         for item in items:
             product_id = item["product_id"]
@@ -912,7 +864,7 @@ class EcommerceAgent:
             if product_id in self.inventory_levels:
                 self.inventory_levels[product_id] -= quantity
 
-    def _update_customer_analytics(self, customer_id: str, order: Dict) -> None:
+    def _update_customer_analytics(self, customer_id: str, order: dict) -> None:
         """Update customer analytics and behavior tracking."""
         customer = self.customers[customer_id]
 
@@ -929,7 +881,7 @@ class EcommerceAgent:
         elif customer["loyalty"]["lifetime_value"] > 500:
             customer["loyalty"]["tier"] = "silver"
 
-    def _trigger_fulfillment(self, order: Dict) -> Dict[str, Any]:
+    def _trigger_fulfillment(self, order: dict) -> dict[str, Any]:
         """Trigger order fulfillment workflow."""
         return {
             "status": "fulfillment_queued",
@@ -941,29 +893,27 @@ class EcommerceAgent:
         }
 
     # Recommendation engine methods
-    def _collaborative_filtering(self, customer: Dict) -> List[str]:
+    def _collaborative_filtering(self, customer: dict) -> list[str]:
         """Collaborative filtering recommendations."""
         # Simplified collaborative filtering
         return list(self.products.keys())[:5]
 
-    def _content_based_filtering(self, customer: Dict) -> List[str]:
+    def _content_based_filtering(self, customer: dict) -> list[str]:
         """Content-based filtering recommendations."""
         # Simplified content-based filtering
         return list(self.products.keys())[5:10]
 
-    def _get_trending_products(self) -> List[str]:
+    def _get_trending_products(self) -> list[str]:
         """Get currently trending products."""
         # Return products with high recent activity
         return list(self.products.keys())[:3]
 
-    def _calculate_recommendation_score(self, product: Dict, customer: Dict) -> float:
+    def _calculate_recommendation_score(self, product: dict, customer: dict) -> float:
         """Calculate personalized recommendation score."""
         base_score = 50.0
 
         # Boost score based on customer preferences
-        if product["category"] in customer.get("behavior", {}).get(
-            "preferred_categories", []
-        ):
+        if product["category"] in customer.get("behavior", {}).get("preferred_categories", []):
             base_score += 20.0
 
         # Boost score based on product popularity
@@ -974,7 +924,7 @@ class EcommerceAgent:
 
         return min(base_score, 100.0)
 
-    def _get_recommendation_reason(self, product: Dict, customer: Dict) -> str:
+    def _get_recommendation_reason(self, product: dict, customer: dict) -> str:
         """Get human-readable reason for recommendation."""
         reasons = [
             "Based on your browsing history",
@@ -1008,13 +958,7 @@ class EcommerceAgent:
     def _count_new_customers(self) -> int:
         """Count new customers in current period."""
         thirty_days_ago = datetime.now() - timedelta(days=30)
-        return len(
-            [
-                c
-                for c in self.customers.values()
-                if datetime.fromisoformat(c["created_at"]) >= thirty_days_ago
-            ]
-        )
+        return len([c for c in self.customers.values() if datetime.fromisoformat(c["created_at"]) >= thirty_days_ago])
 
     def _calculate_conversion_rate(self) -> float:
         """Calculate overall conversion rate."""
@@ -1037,7 +981,7 @@ class EcommerceAgent:
         total_clv = sum(c["loyalty"]["lifetime_value"] for c in self.customers.values())
         return total_clv / len(self.customers)
 
-    def _initialize_recommendation_engine(self) -> Dict[str, Any]:
+    def _initialize_recommendation_engine(self) -> dict[str, Any]:
         """Initialize recommendation engine configuration."""
         return {
             "algorithms": ["collaborative", "content_based", "trending"],
@@ -1046,7 +990,7 @@ class EcommerceAgent:
             "min_confidence": 0.3,
         }
 
-    def _initialize_pricing_engine(self) -> Dict[str, Any]:
+    def _initialize_pricing_engine(self) -> dict[str, Any]:
         """Initialize dynamic pricing engine."""
         return {
             "strategies": ["competitor_based", "demand_based", "cost_plus"],
@@ -1055,13 +999,13 @@ class EcommerceAgent:
         }
 
     # Additional helper methods for comprehensive functionality
-    def _calculate_shipping_cost(self, subtotal: Decimal, address: Dict) -> Decimal:
+    def _calculate_shipping_cost(self, subtotal: Decimal, address: dict) -> Decimal:
         """Calculate shipping cost based on order and location."""
         if subtotal >= Decimal("75"):
             return Decimal("0")  # Free shipping over $75
         return Decimal("9.99")  # Standard shipping
 
-    def _calculate_seo_score(self, name: str, description: str, tags: List[str]) -> int:
+    def _calculate_seo_score(self, name: str, description: str, tags: list[str]) -> int:
         """Calculate SEO optimization score."""
         score = 70  # Base score
 
@@ -1082,7 +1026,7 @@ class EcommerceAgent:
         slug = re.sub(r"\s+", "-", slug.strip())
         return slug
 
-    def _get_competitive_pricing(self, category: ProductCategory) -> Dict[str, float]:
+    def _get_competitive_pricing(self, category: ProductCategory) -> dict[str, float]:
         """Get competitive pricing analysis."""
         return {
             "market_min": 45.0,
@@ -1092,7 +1036,7 @@ class EcommerceAgent:
         }
 
     # Additional analytics methods
-    def _get_revenue_by_category(self) -> Dict[str, float]:
+    def _get_revenue_by_category(self) -> dict[str, float]:
         """Get revenue breakdown by product category."""
         return {
             "necklaces": 15420.50,
@@ -1101,7 +1045,7 @@ class EcommerceAgent:
             "bracelets": 8920.00,
         }
 
-    def _get_top_selling_products(self) -> List[Dict[str, Any]]:
+    def _get_top_selling_products(self) -> list[dict[str, Any]]:
         """Get top selling products."""
         return [
             {"name": "Rose Gold Elegance Necklace", "sales": 85, "revenue": 8500.0},
@@ -1109,7 +1053,7 @@ class EcommerceAgent:
             {"name": "Pearl Drop Earrings", "sales": 92, "revenue": 5520.0},
         ]
 
-    def _get_daily_sales(self) -> Dict[str, float]:
+    def _get_daily_sales(self) -> dict[str, float]:
         """Get daily sales data for charts."""
         # Return last 30 days of sales data
         sales_data = {}
@@ -1118,7 +1062,7 @@ class EcommerceAgent:
             sales_data[date] = random.uniform(800, 2500)
         return sales_data
 
-    def _analyze_seasonal_trends(self) -> Dict[str, Any]:
+    def _analyze_seasonal_trends(self) -> dict[str, Any]:
         """Analyze seasonal sales trends."""
         return {
             "peak_season": "Q4 (October-December)",
@@ -1127,7 +1071,7 @@ class EcommerceAgent:
             "off_season_strategies": ["Summer clearance", "Back-to-school promotions"],
         }
 
-    def _analyze_geographic_sales(self) -> Dict[str, Any]:
+    def _analyze_geographic_sales(self) -> dict[str, Any]:
         """Analyze sales by geographic region."""
         return {
             "top_states": {"CA": 25.5, "NY": 18.2, "TX": 12.8, "FL": 10.5},
@@ -1135,7 +1079,7 @@ class EcommerceAgent:
             "expansion_opportunities": ["Pacific Northwest", "Mountain States"],
         }
 
-    def _analyze_customer_acquisition(self) -> Dict[str, Any]:
+    def _analyze_customer_acquisition(self) -> dict[str, Any]:
         """Analyze customer acquisition metrics."""
         return {
             "acquisition_cost": 35.50,
@@ -1148,7 +1092,7 @@ class EcommerceAgent:
             "customer_acquisition_trend": "increasing",
         }
 
-    def _analyze_customer_retention(self) -> Dict[str, Any]:
+    def _analyze_customer_retention(self) -> dict[str, Any]:
         """Analyze customer retention metrics."""
         return {
             "retention_rate_30_days": 65.5,
@@ -1158,7 +1102,7 @@ class EcommerceAgent:
             "churn_risk_factors": ["low_engagement", "price_sensitivity"],
         }
 
-    def _analyze_customer_segments(self) -> Dict[str, Any]:
+    def _analyze_customer_segments(self) -> dict[str, Any]:
         """Analyze customer segmentation."""
         return {
             "segments": {
@@ -1170,7 +1114,7 @@ class EcommerceAgent:
             "segment_growth": "premium_buyers growing fastest",
         }
 
-    def _analyze_customer_behavior(self) -> Dict[str, Any]:
+    def _analyze_customer_behavior(self) -> dict[str, Any]:
         """Analyze customer behavior patterns."""
         return {
             "average_session_duration": "4:32",
@@ -1180,7 +1124,7 @@ class EcommerceAgent:
             "mobile_vs_desktop": {"mobile": 62.5, "desktop": 37.5},
         }
 
-    def _analyze_loyalty_program(self) -> Dict[str, Any]:
+    def _analyze_loyalty_program(self) -> dict[str, Any]:
         """Analyze loyalty program performance."""
         return {
             "total_members": 1245,
@@ -1190,7 +1134,7 @@ class EcommerceAgent:
             "tier_distribution": {"bronze": 70, "silver": 25, "gold": 5},
         }
 
-    def _calculate_inventory_turnover(self) -> Dict[str, Any]:
+    def _calculate_inventory_turnover(self) -> dict[str, Any]:
         """Calculate inventory turnover metrics."""
         return {
             "overall_turnover": 6.2,
@@ -1204,7 +1148,7 @@ class EcommerceAgent:
             "fast_moving_products": 45,
         }
 
-    def _analyze_product_performance(self) -> Dict[str, Any]:
+    def _analyze_product_performance(self) -> dict[str, Any]:
         """Analyze individual product performance."""
         return {
             "top_performers": ["SKY001", "SKY015", "SKY023"],
@@ -1213,7 +1157,7 @@ class EcommerceAgent:
             "product_lifecycle_analysis": "60% in growth phase",
         }
 
-    def _analyze_pricing_opportunities(self) -> Dict[str, Any]:
+    def _analyze_pricing_opportunities(self) -> dict[str, Any]:
         """Analyze pricing optimization opportunities."""
         return {
             "underpriced_products": 15,
@@ -1223,7 +1167,7 @@ class EcommerceAgent:
             "revenue_upside": 12.5,
         }
 
-    def _analyze_recommendation_performance(self) -> Dict[str, Any]:
+    def _analyze_recommendation_performance(self) -> dict[str, Any]:
         """Analyze recommendation engine performance."""
         return {
             "click_through_rate": 15.8,
@@ -1236,7 +1180,7 @@ class EcommerceAgent:
             },
         }
 
-    def _analyze_fulfillment(self) -> Dict[str, Any]:
+    def _analyze_fulfillment(self) -> dict[str, Any]:
         """Analyze fulfillment and shipping performance."""
         return {
             "average_processing_time": "1.2 days",
@@ -1246,7 +1190,7 @@ class EcommerceAgent:
             "carrier_performance": {"UPS": 96.5, "FedEx": 94.8, "USPS": 92.1},
         }
 
-    def _analyze_returns(self) -> Dict[str, Any]:
+    def _analyze_returns(self) -> dict[str, Any]:
         """Analyze return patterns and reasons."""
         return {
             "return_rate": 5.8,
@@ -1260,7 +1204,7 @@ class EcommerceAgent:
             "refund_rate": 78.5,
         }
 
-    def _analyze_customer_service(self) -> Dict[str, Any]:
+    def _analyze_customer_service(self) -> dict[str, Any]:
         """Analyze customer service metrics."""
         return {
             "response_time": "2.1 hours",
@@ -1270,7 +1214,7 @@ class EcommerceAgent:
             "common_issues": ["shipping_questions", "size_guidance", "return_requests"],
         }
 
-    def _analyze_shipping(self) -> Dict[str, Any]:
+    def _analyze_shipping(self) -> dict[str, Any]:
         """Analyze shipping performance and costs."""
         return {
             "average_shipping_cost": 6.85,
@@ -1279,7 +1223,7 @@ class EcommerceAgent:
             "shipping_cost_optimization": 15.2,
         }
 
-    def _analyze_marketing_campaigns(self) -> Dict[str, Any]:
+    def _analyze_marketing_campaigns(self) -> dict[str, Any]:
         """Analyze marketing campaign performance."""
         return {
             "active_campaigns": 8,
@@ -1289,7 +1233,7 @@ class EcommerceAgent:
             "social_media_engagement": 6.8,
         }
 
-    def _analyze_marketing_channels(self) -> Dict[str, Any]:
+    def _analyze_marketing_channels(self) -> dict[str, Any]:
         """Analyze marketing channel attribution."""
         return {
             "channel_performance": {
@@ -1302,7 +1246,7 @@ class EcommerceAgent:
             "cross_channel_impact": "email+social highest conversion",
         }
 
-    def _analyze_email_marketing(self) -> Dict[str, Any]:
+    def _analyze_email_marketing(self) -> dict[str, Any]:
         """Analyze email marketing performance."""
         return {
             "list_size": 12450,
@@ -1313,7 +1257,7 @@ class EcommerceAgent:
             "revenue_per_email": 2.45,
         }
 
-    def _analyze_social_media(self) -> Dict[str, Any]:
+    def _analyze_social_media(self) -> dict[str, Any]:
         """Analyze social media impact."""
         return {
             "follower_growth": 12.5,
@@ -1323,7 +1267,7 @@ class EcommerceAgent:
             "influencer_partnerships": 8,
         }
 
-    def _generate_business_recommendations(self) -> List[str]:
+    def _generate_business_recommendations(self) -> list[str]:
         """Generate strategic business recommendations."""
         return [
             "Expand product line in high-performing categories",
@@ -1336,7 +1280,7 @@ class EcommerceAgent:
             "Implement AI-powered size recommendations",
         ]
 
-    def _forecast_revenue(self) -> Dict[str, Any]:
+    def _forecast_revenue(self) -> dict[str, Any]:
         """Forecast future revenue trends."""
         return {
             "next_quarter": 185750.0,
@@ -1345,7 +1289,7 @@ class EcommerceAgent:
             "risk_factors": ["economic_conditions", "competition"],
         }
 
-    def _forecast_inventory_needs(self) -> Dict[str, Any]:
+    def _forecast_inventory_needs(self) -> dict[str, Any]:
         """Forecast inventory requirements."""
         return {
             "reorder_recommendations": {
@@ -1357,7 +1301,7 @@ class EcommerceAgent:
             "new_product_allocation": 2500,
         }
 
-    def _forecast_customer_growth(self) -> Dict[str, Any]:
+    def _forecast_customer_growth(self) -> dict[str, Any]:
         """Forecast customer growth."""
         return {
             "next_quarter_new_customers": 450,
@@ -1366,7 +1310,7 @@ class EcommerceAgent:
             "acquisition_cost_trend": "stable",
         }
 
-    def _initialize_neural_personalization(self) -> Dict[str, Any]:
+    def _initialize_neural_personalization(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize neural personalization engine."""
         return {
             "model_architecture": "multimodal_transformer",
@@ -1382,7 +1326,7 @@ class EcommerceAgent:
             ],
         }
 
-    def _initialize_metaverse_commerce(self) -> Dict[str, Any]:
+    def _initialize_metaverse_commerce(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize metaverse commerce capabilities."""
         return {
             "virtual_showroom": "3d_immersive",
@@ -1398,7 +1342,7 @@ class EcommerceAgent:
             ],
         }
 
-    def _initialize_ai_stylist(self) -> Dict[str, Any]:
+    def _initialize_ai_stylist(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize AI stylist system."""
         return {
             "fashion_knowledge_base": "100M_outfits",
@@ -1409,9 +1353,7 @@ class EcommerceAgent:
             "trend_forecasting": "fashion_week_ai",
         }
 
-    async def experimental_neural_commerce_session(
-        self, customer_id: str
-    ) -> Dict[str, Any]:
+    async def experimental_neural_commerce_session(self, customer_id: str) -> dict[str, Any]:
         """EXPERIMENTAL: Create neural-powered commerce experience."""
         try:
             logger.info(f"🧠 Initiating neural commerce session for {customer_id}")
@@ -1472,11 +1414,11 @@ class EcommerceAgent:
             }
 
         except Exception as e:
-            logger.error(f"Neural commerce session failed: {str(e)}")
+            logger.error(f"Neural commerce session failed: {e!s}")
             return {"error": str(e), "status": "neural_overload"}
 
 
-def optimize_marketing() -> Dict[str, Any]:
+def optimize_marketing() -> dict[str, Any]:
     """Main marketing optimization function for compatibility."""
     agent = EcommerceAgent()
     return {

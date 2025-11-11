@@ -39,4 +39,3 @@ app.include_router(webhooks_router_router, prefix="/api/v1/webhooks")
 ```python
 app.include_router(monitoring_router_router, prefix="/api/v1/monitoring")
 ```
-

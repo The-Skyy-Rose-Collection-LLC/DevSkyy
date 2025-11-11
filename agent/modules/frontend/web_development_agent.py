@@ -1,12 +1,14 @@
 from datetime import datetime
-import re
-
-from .telemetry import Telemetry
-from typing import Any, Dict
 import logging
+import re
+from typing import Any
 import uuid
 
+from .telemetry import Telemetry
+
+
 logger = logging.getLogger(__name__)
+
 
 class WebDevelopmentAgent:
     """Web Development Agent for code analysis and optimization."""
@@ -26,7 +28,7 @@ class WebDevelopmentAgent:
         self.ai_architecture = self._initialize_ai_architecture()
         logger.info("🛠️ Web Development Agent initialized with Neural Code Intelligence")
 
-    def analyze_code_quality(self, code: str, language: str) -> Dict[str, Any]:
+    def analyze_code_quality(self, code: str, language: str) -> dict[str, Any]:
         """Analyze code quality and identify issues."""
         issues = []
         suggestions = []
@@ -42,9 +44,7 @@ class WebDevelopmentAgent:
                     issues.append(f"Line {i}: Line too long ({len(line)} chars)")
                     score -= 2
                 if line.strip().startswith("logger.info("):
-                    suggestions.append(
-                        f"Line {i}: Consider using logging instead of print"
-                    )
+                    suggestions.append(f"Line {i}: Consider using logging instead of print")
 
         elif language.lower() == "javascript":
             if "var " in code:
@@ -61,18 +61,14 @@ class WebDevelopmentAgent:
             "suggestions": suggestions,
             "quality_score": max(score, 0),
             "recommendations": [
-                (
-                    "Follow PEP 8 standards"
-                    if language.lower() == "python"
-                    else "Follow ESLint standards"
-                ),
+                ("Follow PEP 8 standards" if language.lower() == "python" else "Follow ESLint standards"),
                 "Add proper documentation",
                 "Include error handling",
             ],
             "timestamp": datetime.now().isoformat(),
         }
 
-    def fix_code_issues(self, code: str, language: str) -> Dict[str, Any]:
+    def fix_code_issues(self, code: str, language: str) -> dict[str, Any]:
         """Automatically fix common code issues."""
         fixed_code = code
         fixes_applied = []
@@ -107,23 +103,19 @@ class WebDevelopmentAgent:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def optimize_page_structure(self, html_content: str) -> Dict[str, Any]:
+    def optimize_page_structure(self, html_content: str) -> dict[str, Any]:
         """Optimize HTML page structure for SEO and performance."""
         optimizations = []
         optimized_html = html_content
 
         # Add missing meta tags
         if "<meta charset=" not in optimized_html and "<head>" in optimized_html:
-            optimized_html = optimized_html.replace(
-                "<head>", '<head>\n    <meta charset="UTF-8">'
-            )
+            optimized_html = optimized_html.replace("<head>", '<head>\n    <meta charset="UTF-8">')
             optimizations.append("Added charset meta tag")
 
         if '<meta name="viewport"' not in optimized_html and "<head>" in optimized_html:
             viewport_tag = '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            optimized_html = optimized_html.replace(
-                "</head>", f"    {viewport_tag}\n</head>"
-            )
+            optimized_html = optimized_html.replace("</head>", f"    {viewport_tag}\n</head>")
             optimizations.append("Added viewport meta tag")
 
         # Add alt attributes to images
@@ -163,7 +155,7 @@ class WebDevelopmentAgent:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def _initialize_neural_code_engine(self) -> Dict[str, Any]:
+    def _initialize_neural_code_engine(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize neural code generation engine."""
         return {
             "model_architecture": "codex_4_turbo",
@@ -174,7 +166,7 @@ class WebDevelopmentAgent:
             "neural_refactoring": "enabled",
         }
 
-    def _initialize_quantum_debugging(self) -> Dict[str, Any]:
+    def _initialize_quantum_debugging(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize quantum debugging system."""
         return {
             "quantum_state_analysis": True,
@@ -184,7 +176,7 @@ class WebDevelopmentAgent:
             "quantum_breakpoints": "non_destructive",
         }
 
-    def _initialize_ai_architecture(self) -> Dict[str, Any]:
+    def _initialize_ai_architecture(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize AI architecture optimizer."""
         return {
             "pattern_recognition": "transformer_based",
@@ -194,9 +186,7 @@ class WebDevelopmentAgent:
             "security_hardening": "ai_powered",
         }
 
-    async def experimental_neural_code_generation(
-        self, requirements: str, language: str
-    ) -> Dict[str, Any]:
+    async def experimental_neural_code_generation(self, requirements: str, language: str) -> dict[str, Any]:
         """EXPERIMENTAL: Generate code using neural networks."""
         try:
             logger.info(f"🧠 Generating {language} code using neural networks...")
@@ -275,10 +265,11 @@ export default NeuralGeneratedSolution;
             }
 
         except Exception as e:
-            logger.error(f"Neural code generation failed: {str(e)}")
+            logger.error(f"Neural code generation failed: {e!s}")
             return {"error": str(e), "status": "neural_overload"}
 
-def fix_web_development_issues() -> Dict[str, Any]:
+
+def fix_web_development_issues() -> dict[str, Any]:
     """Fix web development issues across the project."""
     return {
         "status": "completed",

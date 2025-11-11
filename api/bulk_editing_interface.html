@@ -10,14 +10,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -26,24 +26,24 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
+
         .header {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        
+
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
             font-weight: 300;
         }
-        
+
         .content {
             padding: 40px;
         }
-        
+
         .toolbar {
             background: #f8f9fa;
             padding: 20px;
@@ -55,13 +55,13 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        
+
         .selection-info {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .selection-count {
             background: #667eea;
             color: white;
@@ -69,13 +69,13 @@
             border-radius: 20px;
             font-weight: 600;
         }
-        
+
         .bulk-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        
+
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -87,31 +87,31 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
-        
+
         .btn:disabled {
             background: #6c757d;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-        
+
         .btn-secondary {
             background: linear-gradient(135deg, #28a745, #20c997);
         }
-        
+
         .btn-warning {
             background: linear-gradient(135deg, #ffc107, #fd7e14);
         }
-        
+
         .btn-danger {
             background: linear-gradient(135deg, #dc3545, #c82333);
         }
-        
+
         .drop-zone {
             border: 3px dashed #ddd;
             border-radius: 20px;
@@ -127,20 +127,20 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .drop-zone.dragover {
             border-color: #667eea;
             background: #e8f4fd;
             transform: scale(1.02);
         }
-        
+
         .image-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
-        
+
         .image-item {
             background: white;
             border-radius: 15px;
@@ -150,18 +150,18 @@
             position: relative;
             cursor: pointer;
         }
-        
+
         .image-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
-        
+
         .image-item.selected {
             border: 3px solid #667eea;
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
-        
+
         .image-checkbox {
             position: absolute;
             top: 10px;
@@ -170,7 +170,7 @@
             height: 20px;
             z-index: 10;
         }
-        
+
         .image-preview {
             width: 100%;
             height: 150px;
@@ -182,18 +182,18 @@
             color: #666;
             font-size: 3em;
         }
-        
+
         .image-info {
             padding: 15px;
         }
-        
+
         .image-name {
             font-weight: 600;
             margin-bottom: 5px;
             font-size: 14px;
             color: #333;
         }
-        
+
         .image-category {
             background: #e9ecef;
             color: #495057;
@@ -203,12 +203,12 @@
             display: inline-block;
             margin-bottom: 5px;
         }
-        
+
         .image-size {
             color: #666;
             font-size: 12px;
         }
-        
+
         .bulk-panel {
             position: fixed;
             bottom: 0;
@@ -222,11 +222,11 @@
             transition: transform 0.3s ease;
             z-index: 1000;
         }
-        
+
         .bulk-panel.active {
             transform: translateY(0);
         }
-        
+
         .bulk-panel-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -236,19 +236,19 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-        
+
         .bulk-panel-info {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .bulk-panel-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        
+
         .modal {
             display: none;
             position: fixed;
@@ -259,7 +259,7 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
         }
-        
+
         .modal-content {
             background-color: white;
             margin: 5% auto;
@@ -270,7 +270,7 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -279,35 +279,35 @@
             padding-bottom: 15px;
             border-bottom: 1px solid #dee2e6;
         }
-        
+
         .modal-title {
             font-size: 1.5em;
             font-weight: 600;
             color: #333;
         }
-        
+
         .close {
             color: #aaa;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .close:hover {
             color: #000;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #555;
         }
-        
+
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -318,37 +318,37 @@
             font-size: 16px;
             transition: border-color 0.3s ease;
         }
-        
+
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         .preview-section {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
         }
-        
+
         .preview-title {
             font-weight: 600;
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .preview-content {
             color: #666;
             font-size: 14px;
         }
-        
+
         .progress-container {
             margin: 20px 0;
             display: none;
         }
-        
+
         .progress-bar {
             width: 100%;
             height: 20px;
@@ -356,20 +356,20 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(135deg, #28a745, #20c997);
             width: 0%;
             transition: width 0.3s ease;
         }
-        
+
         .progress-text {
             text-align: center;
             margin-top: 10px;
             color: #666;
         }
-        
+
         .notification {
             position: fixed;
             top: 20px;
@@ -382,23 +382,23 @@
             transform: translateX(400px);
             transition: transform 0.3s ease;
         }
-        
+
         .notification.show {
             transform: translateX(0);
         }
-        
+
         .notification.success {
             background: #28a745;
         }
-        
+
         .notification.error {
             background: #dc3545;
         }
-        
+
         .notification.info {
             background: #17a2b8;
         }
-        
+
         .tag-input {
             display: flex;
             flex-wrap: wrap;
@@ -409,7 +409,7 @@
             min-height: 40px;
             cursor: text;
         }
-        
+
         .tag {
             background: #667eea;
             color: white;
@@ -420,12 +420,12 @@
             align-items: center;
             gap: 5px;
         }
-        
+
         .tag-remove {
             cursor: pointer;
             font-weight: bold;
         }
-        
+
         .tag-input input {
             border: none;
             outline: none;
@@ -441,7 +441,7 @@
             <h1>🌹 Skyy Rose Collection</h1>
             <p>Bulk Editing Interface</p>
         </div>
-        
+
         <div class="content">
             <!-- Toolbar -->
             <div class="toolbar">
@@ -450,7 +450,7 @@
                     <button class="btn btn-secondary" onclick="selectAll()">Select All</button>
                     <button class="btn" onclick="clearSelection()">Clear Selection</button>
                 </div>
-                
+
                 <div class="bulk-actions">
                     <button class="btn" onclick="showBulkCategoryModal()" id="bulkCategoryBtn" disabled>
                         📁 Bulk Category
@@ -469,7 +469,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Drop Zone -->
             <div class="drop-zone" id="dropZone">
                 <div class="drop-zone-content">
@@ -483,12 +483,12 @@
                 </div>
                 <input type="file" id="fileInput" style="display: none;" multiple accept=".jpg,.jpeg,.png,.webp,.heic,.bmp,.tiff">
             </div>
-            
+
             <!-- Image Grid -->
             <div class="image-grid" id="imageGrid"></div>
         </div>
     </div>
-    
+
     <!-- Bulk Actions Panel -->
     <div class="bulk-panel" id="bulkPanel">
         <div class="bulk-panel-content">
@@ -498,7 +498,7 @@
                     👁️ Preview Changes
                 </button>
             </div>
-            
+
             <div class="bulk-panel-actions">
                 <button class="btn btn-secondary" onclick="applyBulkOperation()">
                     ✅ Apply to All
@@ -509,7 +509,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Bulk Category Modal -->
     <div id="bulkCategoryModal" class="modal">
         <div class="modal-content">
@@ -775,76 +775,76 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         const API_BASE = 'http://localhost:8001';
         let selectedFiles = [];
         let selectedImages = new Set();
         let currentBulkOperation = null;
         let operationHistory = [];
-        
+
         // Initialize drag and drop
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const imageGrid = document.getElementById('imageGrid');
-        
+
         // Drag and drop event listeners
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false);
         });
-        
+
         ['dragenter', 'dragover'].forEach(eventName => {
             dropZone.addEventListener(eventName, highlight, false);
         });
-        
+
         ['dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, unhighlight, false);
         });
-        
+
         dropZone.addEventListener('drop', handleDrop, false);
         fileInput.addEventListener('change', handleFileSelect, false);
-        
+
         function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
-        
+
         function highlight(e) {
             dropZone.classList.add('dragover');
         }
-        
+
         function unhighlight(e) {
             dropZone.classList.remove('dragover');
         }
-        
+
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
             handleFiles(files);
         }
-        
+
         function handleFileSelect(e) {
             const files = e.target.files;
             handleFiles(files);
         }
-        
+
         function handleFiles(files) {
             selectedFiles = Array.from(files);
             displayImages();
         }
-        
+
         function displayImages() {
             imageGrid.innerHTML = '';
-            
+
             selectedFiles.forEach((file, index) => {
                 const imageItem = document.createElement('div');
                 imageItem.className = 'image-item';
                 imageItem.dataset.index = index;
-                
+
                 const category = detectCategory(file.name);
                 const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-                
+
                 // Create image preview
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -852,7 +852,7 @@
                     img.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
                 };
                 reader.readAsDataURL(file);
-                
+
                 imageItem.innerHTML = `
                     <input type="checkbox" class="image-checkbox" onchange="toggleImageSelection(${index})">
                     <div class="image-preview">📸</div>
@@ -862,14 +862,14 @@
                         <div class="image-size">${fileSize} MB</div>
                     </div>
                 `;
-                
+
                 imageGrid.appendChild(imageItem);
             });
         }
-        
+
         function detectCategory(filename) {
             const name = filename.toLowerCase();
-            
+
             const patterns = {
                 'dresses': ['dress', 'gown', 'evening', 'cocktail', 'maxi', 'midi', 'mini'],
                 'tops': ['top', 'blouse', 'shirt', 'tee', 'tank', 'camisole', 'crop'],
@@ -878,20 +878,20 @@
                 'shoes': ['shoes', 'heels', 'boots', 'sandals', 'flats', 'sneakers'],
                 'outerwear': ['coat', 'jacket', 'blazer', 'cardigan', 'vest', 'poncho']
             };
-            
+
             for (const [category, keywords] of Object.entries(patterns)) {
                 if (keywords.some(keyword => name.includes(keyword))) {
                     return category;
                 }
             }
-            
+
             return 'general';
         }
-        
+
         function toggleImageSelection(index) {
             const checkbox = document.querySelector(`[data-index="${index}"] .image-checkbox`);
             const imageItem = document.querySelector(`[data-index="${index}"]`);
-            
+
             if (checkbox.checked) {
                 selectedImages.add(index);
                 imageItem.classList.add('selected');
@@ -899,48 +899,48 @@
                 selectedImages.delete(index);
                 imageItem.classList.remove('selected');
             }
-            
+
             updateSelectionUI();
         }
-        
+
         function selectAll() {
             selectedImages.clear();
             const checkboxes = document.querySelectorAll('.image-checkbox');
             const imageItems = document.querySelectorAll('.image-item');
-            
+
             checkboxes.forEach((checkbox, index) => {
                 checkbox.checked = true;
                 selectedImages.add(index);
                 imageItems[index].classList.add('selected');
             });
-            
+
             updateSelectionUI();
         }
-        
+
         function clearSelection() {
             selectedImages.clear();
             const checkboxes = document.querySelectorAll('.image-checkbox');
             const imageItems = document.querySelectorAll('.image-item');
-            
+
             checkboxes.forEach((checkbox, index) => {
                 checkbox.checked = false;
                 imageItems[index].classList.remove('selected');
             });
-            
+
             updateSelectionUI();
         }
-        
+
         function updateSelectionUI() {
             const count = selectedImages.size;
             document.getElementById('selectionCount').textContent = `${count} selected`;
             document.getElementById('bulkPanelCount').textContent = `${count} images selected`;
-            
+
             // Enable/disable bulk action buttons
             const bulkButtons = ['bulkCategoryBtn', 'bulkCaptionBtn', 'bulkTagBtn', 'bulkQualityBtn', 'bulkMetadataBtn'];
             bulkButtons.forEach(btnId => {
                 document.getElementById(btnId).disabled = count === 0;
             });
-            
+
             // Show/hide bulk panel
             const bulkPanel = document.getElementById('bulkPanel');
             if (count > 0) {
@@ -949,11 +949,11 @@
                 bulkPanel.classList.remove('active');
             }
         }
-        
+
         function closeBulkPanel() {
             clearSelection();
         }
-        
+
         // ============================================================================
         // BULK OPERATION FUNCTIONS
         // ============================================================================
@@ -1606,13 +1606,13 @@
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
-            
+
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
-            
+
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {

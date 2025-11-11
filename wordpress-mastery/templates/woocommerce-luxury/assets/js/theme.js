@@ -8,7 +8,7 @@
 
     // Theme object
     const SkyRoseTheme = {
-        
+
         // Initialize all functions
         init: function() {
             this.mobileMenu();
@@ -27,7 +27,7 @@
         mobileMenu: function() {
             const $menuToggle = $('.mobile-menu-toggle');
             const $navMenu = $('.nav-menu');
-            
+
             $menuToggle.on('click', function() {
                 $(this).toggleClass('active');
                 $navMenu.toggleClass('active');
@@ -49,7 +49,7 @@
             const $searchBtn = $('.header-search');
             const $searchModal = $('.search-modal');
             const $searchClose = $('.search-modal-close');
-            
+
             $searchBtn.on('click', function() {
                 $searchModal.addClass('active');
                 $searchModal.find('.search-field').focus();
@@ -76,9 +76,9 @@
                 const query = $input.val();
                 const minChars = parseInt($input.data('min-chars')) || 2;
                 const delay = parseInt($input.data('search-delay')) || 300;
-                
+
                 clearTimeout(searchTimeout);
-                
+
                 if (query.length >= minChars) {
                     searchTimeout = setTimeout(() => {
                         SkyRoseTheme.performLiveSearch(query, $input);
@@ -93,11 +93,11 @@
         performLiveSearch: function(query, $input) {
             const $suggestions = $input.siblings('.search-suggestions');
             const $liveResults = $suggestions.find('.live-results-list');
-            
+
             // Show loading state
             $liveResults.html('<div class="search-loading">Searching...</div>');
             $suggestions.show();
-            
+
             // Simulate AJAX search (replace with actual endpoint)
             setTimeout(() => {
                 const mockResults = [
@@ -105,7 +105,7 @@
                     { title: 'Designer Handbag', price: '$199', image: '/path/to/image2.jpg' },
                     { title: 'Luxury Scarf', price: '$89', image: '/path/to/image3.jpg' }
                 ];
-                
+
                 let resultsHtml = '';
                 mockResults.forEach(result => {
                     resultsHtml += `
@@ -118,7 +118,7 @@
                         </div>
                     `;
                 });
-                
+
                 $liveResults.html(resultsHtml);
             }, 500);
         },
@@ -126,7 +126,7 @@
         // Back to top functionality
         backToTop: function() {
             const $backToTop = $('.back-to-top');
-            
+
             $(window).on('scroll', function() {
                 if ($(this).scrollTop() > 300) {
                     $backToTop.addClass('visible');
@@ -147,16 +147,16 @@
         stickyHeader: function() {
             const $header = $('.site-header');
             let lastScrollTop = 0;
-            
+
             $(window).on('scroll', function() {
                 const scrollTop = $(this).scrollTop();
-                
+
                 if (scrollTop > 100) {
                     $header.addClass('scrolled');
                 } else {
                     $header.removeClass('scrolled');
                 }
-                
+
                 lastScrollTop = scrollTop;
             });
         },
@@ -166,18 +166,18 @@
             // Intersection Observer for scroll animations
             if ('IntersectionObserver' in window) {
                 const animateElements = document.querySelectorAll('[data-animate]');
-                
+
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const element = entry.target;
                             const animation = element.dataset.animate;
                             const delay = element.dataset.delay || 0;
-                            
+
                             setTimeout(() => {
                                 element.classList.add('animate-' + animation);
                             }, delay);
-                            
+
                             observer.unobserve(element);
                         }
                     });
@@ -185,7 +185,7 @@
                     threshold: 0.1,
                     rootMargin: '0px 0px -50px 0px'
                 });
-                
+
                 animateElements.forEach(el => observer.observe(el));
             }
         },
@@ -194,28 +194,28 @@
         newsletter: function() {
             $('.newsletter-form').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 const $form = $(this);
                 const $submitBtn = $form.find('button[type="submit"]');
                 const $email = $form.find('input[type="email"]');
                 const email = $email.val();
-                
+
                 // Basic email validation
                 if (!email || !email.includes('@')) {
                     $form.find('.error-message').show();
                     return;
                 }
-                
+
                 // Show loading state
                 $submitBtn.addClass('loading');
                 $form.find('.form-messages div').hide();
-                
+
                 // Simulate AJAX request (replace with actual endpoint)
                 setTimeout(() => {
                     $submitBtn.removeClass('loading').addClass('success');
                     $form.find('.success-message').show();
                     $email.val('');
-                    
+
                     // Reset after 3 seconds
                     setTimeout(() => {
                         $submitBtn.removeClass('success');
@@ -245,25 +245,25 @@
         wishlist: function() {
             $('.wishlist-btn').on('click', function(e) {
                 e.preventDefault();
-                
+
                 const $btn = $(this);
                 const productId = $btn.data('product-id');
                 const action = $btn.data('wishlist-action');
-                
+
                 // Toggle wishlist state
                 if (action === 'add') {
                     $btn.addClass('added').data('wishlist-action', 'remove');
                     $btn.find('.wishlist-text').text('Remove from Wishlist');
-                    
+
                     // Add bounce animation
                     $btn.addClass('bounce');
                     setTimeout(() => $btn.removeClass('bounce'), 600);
-                    
+
                 } else {
                     $btn.removeClass('added').data('wishlist-action', 'add');
                     $btn.find('.wishlist-text').text('Add to Wishlist');
                 }
-                
+
                 // Here you would make an AJAX call to save/remove from wishlist
                 console.log(`Wishlist ${action} for product ${productId}`);
             });
@@ -273,15 +273,15 @@
         quickView: function() {
             $('.quick-view-btn').on('click', function(e) {
                 e.preventDefault();
-                
+
                 const productId = $(this).data('product-id');
                 const $modal = $('#quick-view-modal');
-                
+
                 // Show modal with loading state
                 $modal.addClass('active');
                 $modal.find('.modal-content').html('<div class="loading">Loading...</div>');
                 $('body').addClass('modal-open');
-                
+
                 // Simulate AJAX load (replace with actual endpoint)
                 setTimeout(() => {
                     const mockContent = `
@@ -295,7 +295,7 @@
                     $modal.find('.modal-content').html(mockContent);
                 }, 1000);
             });
-            
+
             // Close modal
             $(document).on('click', '.modal-close, .modal-backdrop', function() {
                 $('.modal').removeClass('active');

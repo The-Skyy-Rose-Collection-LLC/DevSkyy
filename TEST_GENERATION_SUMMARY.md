@@ -262,7 +262,7 @@ pytest -m security tests/
 
 1. ✅ `api/v1/agents.py` - Scanner and Fixer endpoint simplification
 2. ✅ `api/v1/dashboard.py` - Removed role-based authentication
-3. ✅ `api/v1/luxury_fashion_automation.py` - Removed auth from one endpoint  
+3. ✅ `api/v1/luxury_fashion_automation.py` - Removed auth from one endpoint
 4. ✅ `database.py` - Simplified error handling
 5. ✅ `main.py` - Simplified SECRET_KEY handling
 6. ✅ `.gitignore` - Added .cursor/ entry

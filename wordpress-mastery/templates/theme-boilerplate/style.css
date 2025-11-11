@@ -271,20 +271,20 @@ a:focus {
 	html {
 		font-size: 14px;
 	}
-	
+
 	.container {
 		padding: 0 0.75rem;
 	}
-	
+
 	.main-navigation ul {
 		flex-direction: column;
 		gap: 1rem;
 	}
-	
+
 	.site-main {
 		padding: 1.5rem 0;
 	}
-	
+
 	h1 { font-size: 2rem; }
 	h2 { font-size: 1.75rem; }
 	h3 { font-size: 1.5rem; }
@@ -294,16 +294,16 @@ a:focus {
 	.container {
 		padding: 0 0.5rem;
 	}
-	
+
 	.site-header,
 	.site-footer {
 		padding: 1rem 0;
 	}
-	
+
 	.site-main {
 		padding: 1rem 0;
 	}
-	
+
 	.entry {
 		margin-bottom: 2rem;
 		padding-bottom: 1.5rem;
@@ -383,16 +383,16 @@ a:focus {
 		box-shadow: none !important;
 		text-shadow: none !important;
 	}
-	
+
 	a,
 	a:visited {
 		text-decoration: underline;
 	}
-	
+
 	a[href]::after {
 		content: " (" attr(href) ")";
 	}
-	
+
 	.site-header,
 	.site-footer,
 	.main-navigation {

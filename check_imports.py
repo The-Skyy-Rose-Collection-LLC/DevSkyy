@@ -6,9 +6,9 @@ without actually executing them
 """
 
 import ast
-import sys
 from pathlib import Path
-from typing import List, Tuple
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [
@@ -25,13 +25,14 @@ CRITICAL_FILES = [
     "api/training_data_interface.py",
 ]
 
-def extract_imports(file_path: Path) -> Tuple[bool, List[str], str]:
+
+def extract_imports(file_path: Path) -> tuple[bool, list[str], str]:
     """
     Extract and verify all import statements from a Python file.
     Returns (success, imports_list, error_message)
     """
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Parse the file into an AST
@@ -48,16 +49,19 @@ def extract_imports(file_path: Path) -> Tuple[bool, List[str], str]:
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ""
                 for alias in node.names:
-                    imports.append(f"from {module} import {alias.name}" + (f" as {alias.asname}" if alias.asname else ""))
+                    imports.append(
+                        f"from {module} import {alias.name}" + (f" as {alias.asname}" if alias.asname else "")
+                    )
 
         return True, imports, ""
 
     except SyntaxError as e:
         return False, [], f"Syntax error: Line {e.lineno}: {e.msg}"
     except Exception as e:
-        return False, [], f"Error: {str(e)}"
+        return False, [], f"Error: {e!s}"
 
-def check_common_issues(imports: List[str]) -> List[str]:
+
+def check_common_issues(imports: list[str]) -> list[str]:
     """Check for common import issues"""
     issues = []
 
@@ -76,6 +80,7 @@ def check_common_issues(imports: List[str]) -> List[str]:
         import_names.append(name)
 
     return issues
+
 
 def main():
     """Main verification function"""
@@ -122,6 +127,7 @@ def main():
     print("=" * 70)
 
     return 0 if failed == 0 else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

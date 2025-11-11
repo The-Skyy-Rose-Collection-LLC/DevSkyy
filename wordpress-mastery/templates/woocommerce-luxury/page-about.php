@@ -28,8 +28,8 @@ get_header();
 			<div class="brand-hero-content">
 				<div class="brand-logo-showcase">
 					<div class="skyy-rose-logo-large">
-						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>" 
-							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>" 
+						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>"
+							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>"
 							 class="brand-logo-hero">
 					</div>
 				</div>
@@ -55,25 +55,25 @@ get_header();
 				<h2 class="section-title"><?php esc_html_e('Our Story', 'wp-mastery-woocommerce-luxury'); ?></h2>
 				<div class="luxury-divider"></div>
 			</div>
-			
+
 			<div class="story-content-grid">
 				<div class="story-text">
 					<div class="story-chapter">
 						<h3 class="chapter-title"><?php esc_html_e('The Beginning', 'wp-mastery-woocommerce-luxury'); ?></h3>
 						<p><?php esc_html_e('Born from a vision to revolutionize luxury fashion, Skyy Rose Collection emerged as a beacon of innovation in the fashion industry. Our founder\'s passion for combining traditional craftsmanship with modern technology laid the foundation for what would become a transformative shopping experience.', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
-					
+
 					<div class="story-chapter">
 						<h3 class="chapter-title"><?php esc_html_e('Innovation Meets Tradition', 'wp-mastery-woocommerce-luxury'); ?></h3>
 						<p><?php esc_html_e('We believe that true luxury lies in the perfect harmony between time-honored techniques and cutting-edge innovation. Our AI-powered platform doesn\'t just sell fashion—it curates experiences, understands preferences, and creates personal style journeys that evolve with you.', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
-					
+
 					<div class="story-chapter">
 						<h3 class="chapter-title"><?php esc_html_e('Sustainable Luxury', 'wp-mastery-woocommerce-luxury'); ?></h3>
 						<p><?php esc_html_e('Sustainability is woven into the fabric of our brand. Every piece in our collection is carefully selected not just for its beauty and quality, but for its environmental and social impact. We partner with artisans and designers who share our commitment to responsible luxury.', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
 				</div>
-				
+
 				<div class="story-visuals">
 					<div class="visual-showcase">
 						<div class="showcase-item">
@@ -111,26 +111,26 @@ get_header();
 				<h2 class="section-title"><?php esc_html_e('Our Values', 'wp-mastery-woocommerce-luxury'); ?></h2>
 				<div class="luxury-divider"></div>
 			</div>
-			
+
 			<div class="values-grid">
 				<div class="value-card">
 					<div class="value-icon">✨</div>
 					<h3 class="value-title"><?php esc_html_e('Excellence', 'wp-mastery-woocommerce-luxury'); ?></h3>
 					<p class="value-description"><?php esc_html_e('We pursue perfection in every detail, from the finest materials to the most innovative technology, ensuring an unparalleled luxury experience.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="value-card">
 					<div class="value-icon">🤝</div>
 					<h3 class="value-title"><?php esc_html_e('Authenticity', 'wp-mastery-woocommerce-luxury'); ?></h3>
 					<p class="value-description"><?php esc_html_e('Every piece in our collection is authentic, carefully curated, and backed by our guarantee of quality and provenance.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="value-card">
 					<div class="value-icon">🌍</div>
 					<h3 class="value-title"><?php esc_html_e('Sustainability', 'wp-mastery-woocommerce-luxury'); ?></h3>
 					<p class="value-description"><?php esc_html_e('We are committed to responsible luxury, supporting sustainable practices and ethical sourcing throughout our supply chain.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="value-card">
 					<div class="value-icon">🚀</div>
 					<h3 class="value-title"><?php esc_html_e('Innovation', 'wp-mastery-woocommerce-luxury'); ?></h3>
@@ -145,20 +145,20 @@ get_header();
 				<h2 class="section-title"><?php esc_html_e('Revolutionary Technology', 'wp-mastery-woocommerce-luxury'); ?></h2>
 				<div class="luxury-divider"></div>
 			</div>
-			
+
 			<div class="technology-showcase">
 				<div class="tech-feature">
 					<div class="tech-icon">🧠</div>
 					<h3 class="tech-title"><?php esc_html_e('AI Style Analysis', 'wp-mastery-woocommerce-luxury'); ?></h3>
 					<p class="tech-description"><?php esc_html_e('Our proprietary AI algorithms analyze your style preferences, body type, and lifestyle to curate personalized collections that evolve with you.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="tech-feature">
 					<div class="tech-icon">📊</div>
 					<h3 class="tech-title"><?php esc_html_e('Dynamic Pricing', 'wp-mastery-woocommerce-luxury'); ?></h3>
 					<p class="tech-description"><?php esc_html_e('Real-time market analysis and customer behavior insights enable us to offer competitive pricing while maintaining the highest quality standards.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="tech-feature">
 					<div class="tech-icon">🎯</div>
 					<h3 class="tech-title"><?php esc_html_e('Predictive Recommendations', 'wp-mastery-woocommerce-luxury'); ?></h3>
@@ -173,7 +173,7 @@ get_header();
 				<h2 class="section-title"><?php esc_html_e('Meet Our Team', 'wp-mastery-woocommerce-luxury'); ?></h2>
 				<div class="luxury-divider"></div>
 			</div>
-			
+
 			<div class="team-grid">
 				<div class="team-member">
 					<div class="member-photo">
@@ -185,7 +185,7 @@ get_header();
 					<p class="member-title"><?php esc_html_e('Founder & Creative Director', 'wp-mastery-woocommerce-luxury'); ?></p>
 					<p class="member-bio"><?php esc_html_e('Visionary leader combining fashion expertise with technological innovation to create the future of luxury retail.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="team-member">
 					<div class="member-photo">
 						<div class="photo-placeholder">
@@ -196,7 +196,7 @@ get_header();
 					<p class="member-title"><?php esc_html_e('Technology Innovation', 'wp-mastery-woocommerce-luxury'); ?></p>
 					<p class="member-bio"><?php esc_html_e('Our world-class AI team develops cutting-edge algorithms that power personalized luxury shopping experiences.', 'wp-mastery-woocommerce-luxury'); ?></p>
 				</div>
-				
+
 				<div class="team-member">
 					<div class="member-photo">
 						<div class="photo-placeholder">

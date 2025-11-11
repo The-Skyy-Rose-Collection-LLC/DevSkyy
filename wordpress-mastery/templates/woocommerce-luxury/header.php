@@ -45,7 +45,7 @@ if (!defined('ABSPATH')) {
 								<?php get_search_form(); ?>
 							<?php endif; ?>
 						</div>
-						
+
 						<div class="header-account">
 							<?php if (is_user_logged_in()) : ?>
 								<a href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>" class="account-link">
@@ -59,7 +59,7 @@ if (!defined('ABSPATH')) {
 								</a>
 							<?php endif; ?>
 						</div>
-						
+
 						<div class="header-cart">
 							<a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="cart-link">
 								<span class="cart-icon" aria-hidden="true">🛍️</span>

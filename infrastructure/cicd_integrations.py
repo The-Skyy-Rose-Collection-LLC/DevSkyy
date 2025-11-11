@@ -1,16 +1,17 @@
+import base64
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
+import hmac
 import json
+import logging
 import time
+from typing import Any, Optional
 
 from fastapi import HTTPException, Request, status
-from dataclasses import dataclass
-
-import hmac
-from enum import Enum
 from httpx import AsyncClient
-from typing import Any, Callable, Dict, List, Optional
-import base64
-import logging
+
 
 """
 Enterprise CI/CD Platform Integrations
@@ -20,6 +21,7 @@ Bidirectional API communication with webhook listeners and pipeline management
 
 logger = logging.getLogger(__name__)
 
+
 class CICDPlatform(Enum):
     """Supported CI/CD platforms"""
 
@@ -28,6 +30,7 @@ class CICDPlatform(Enum):
     GITHUB_ACTIONS = "github_actions"
     AZURE_DEVOPS = "azure_devops"
     BITBUCKET_PIPELINES = "bitbucket_pipelines"
+
 
 class PipelineStatus(Enum):
     """Pipeline execution status"""
@@ -39,6 +42,7 @@ class PipelineStatus(Enum):
     CANCELLED = "cancelled"
     SKIPPED = "skipped"
     TIMEOUT = "timeout"
+
 
 class WebhookEventType(Enum):
     """Webhook event types"""
@@ -52,6 +56,7 @@ class WebhookEventType(Enum):
     DEPLOYMENT_COMPLETED = "deployment_completed"
     CODE_QUALITY_UPDATED = "code_quality_updated"
     SECURITY_SCAN_COMPLETED = "security_scan_completed"
+
 
 @dataclass
 class PipelineEvent:
@@ -71,13 +76,13 @@ class PipelineEvent:
     duration: Optional[int] = None
     build_number: Optional[int] = None
     environment: Optional[str] = None
-    artifacts: List[str] = None
-    test_results: Dict[str, Any] = None
-    code_quality_metrics: Dict[str, Any] = None
-    security_scan_results: Dict[str, Any] = None
+    artifacts: list[str] = None
+    test_results: dict[str, Any] = None
+    code_quality_metrics: dict[str, Any] = None
+    security_scan_results: dict[str, Any] = None
     deployment_url: Optional[str] = None
     logs_url: Optional[str] = None
-    raw_payload: Dict[str, Any] = None
+    raw_payload: dict[str, Any] = None
 
     def __post_init__(self):
         if self.artifacts is None:
@@ -90,6 +95,7 @@ class PipelineEvent:
             self.security_scan_results = {}
         if self.raw_payload is None:
             self.raw_payload = {}
+
 
 @dataclass
 class CICDConnection:
@@ -107,14 +113,15 @@ class CICDConnection:
     rate_limit_per_hour: int = 1000
     timeout: int = 30
 
+
 class CICDIntegrationManager:
     """Manages CI/CD platform integrations and webhook processing"""
 
     def __init__(self):
-        self.connections: Dict[str, CICDConnection] = {}
-        self.webhook_handlers: Dict[CICDPlatform, Callable] = {}
-        self.event_history: List[PipelineEvent] = []
-        self.pipeline_cache: Dict[str, Dict[str, Any]] = {}
+        self.connections: dict[str, CICDConnection] = {}
+        self.webhook_handlers: dict[CICDPlatform, Callable] = {}
+        self.event_history: list[PipelineEvent] = []
+        self.pipeline_cache: dict[str, dict[str, Any]] = {}
 
         # HTTP client for API requests
         self.http_client = AsyncClient(timeout=30)
@@ -147,9 +154,7 @@ class CICDIntegrationManager:
     def add_connection(self, connection: CICDConnection):
         """Add CI/CD platform connection"""
         self.connections[connection.name] = connection
-        logger.info(
-            f"Added CI/CD connection: {connection.name} ({connection.platform.value})"
-        )
+        logger.info(f"Added CI/CD connection: {connection.name} ({connection.platform.value})")
 
     def remove_connection(self, connection_name: str):
         """Remove CI/CD platform connection"""
@@ -162,7 +167,7 @@ class CICDIntegrationManager:
         platform: CICDPlatform,
         request: Request,
         connection_name: Optional[str] = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process incoming webhook from CI/CD platform"""
 
         try:
@@ -189,9 +194,7 @@ class CICDIntegrationManager:
 
             # Verify webhook signature if secret is configured
             if connection.webhook_secret:
-                await self._verify_webhook_signature(
-                    platform, headers, payload, connection.webhook_secret
-                )
+                await self._verify_webhook_signature(platform, headers, payload, connection.webhook_secret)
 
             # Process webhook with platform-specific handler
             handler = self.webhook_handlers.get(platform)
@@ -217,9 +220,7 @@ class CICDIntegrationManager:
             # Trigger event handlers
             await self._trigger_event_handlers(event)
 
-            logger.info(
-                f"Processed webhook: {event.event_type.value} from {platform.value}"
-            )
+            logger.info(f"Processed webhook: {event.event_type.value} from {platform.value}")
 
             return {
                 "status": "processed",
@@ -234,14 +235,14 @@ class CICDIntegrationManager:
             logger.error(f"Webhook processing error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Webhook processing failed: {str(e)}",
+                detail=f"Webhook processing failed: {e!s}",
             )
 
     async def _verify_webhook_signature(
         self,
         platform: CICDPlatform,
-        headers: Dict[str, str],
-        payload: Dict[str, Any],
+        headers: dict[str, str],
+        payload: dict[str, Any],
         secret: str,
     ):
         """Verify webhook signature for security"""
@@ -271,8 +272,8 @@ class CICDIntegrationManager:
 
     async def _handle_jenkins_webhook(
         self,
-        payload: Dict[str, Any],
-        headers: Dict[str, str],
+        payload: dict[str, Any],
+        headers: dict[str, str],
         connection: CICDConnection,
     ) -> PipelineEvent:
         """Handle Jenkins webhook"""
@@ -317,8 +318,8 @@ class CICDIntegrationManager:
 
     async def _handle_gitlab_webhook(
         self,
-        payload: Dict[str, Any],
-        headers: Dict[str, str],
+        payload: dict[str, Any],
+        headers: dict[str, str],
         connection: CICDConnection,
     ) -> PipelineEvent:
         """Handle GitLab CI webhook"""
@@ -365,9 +366,7 @@ class CICDIntegrationManager:
                 commit_hash=commit.get("id", "unknown"),
                 commit_message=commit.get("message", ""),
                 author=commit.get("author", {}).get("name", ""),
-                timestamp=datetime.fromisoformat(
-                    pipeline.get("created_at", datetime.now().isoformat())
-                ),
+                timestamp=datetime.fromisoformat(pipeline.get("created_at", datetime.now().isoformat())),
                 duration=pipeline.get("duration"),
                 raw_payload=payload,
             )
@@ -377,8 +376,8 @@ class CICDIntegrationManager:
 
     async def _handle_github_webhook(
         self,
-        payload: Dict[str, Any],
-        headers: Dict[str, str],
+        payload: dict[str, Any],
+        headers: dict[str, str],
         connection: CICDConnection,
     ) -> PipelineEvent:
         """Handle GitHub Actions webhook"""
@@ -390,18 +389,14 @@ class CICDIntegrationManager:
             # Map GitHub status to our enum
             status_mapping = {
                 "completed": (
-                    PipelineStatus.SUCCESS
-                    if workflow_run.get("conclusion") == "success"
-                    else PipelineStatus.FAILED
+                    PipelineStatus.SUCCESS if workflow_run.get("conclusion") == "success" else PipelineStatus.FAILED
                 ),
                 "in_progress": PipelineStatus.RUNNING,
                 "queued": PipelineStatus.PENDING,
                 "requested": PipelineStatus.PENDING,
             }
 
-            status = status_mapping.get(
-                workflow_run.get("status"), PipelineStatus.PENDING
-            )
+            status = status_mapping.get(workflow_run.get("status"), PipelineStatus.PENDING)
 
             # Determine event type
             if action == "requested" or workflow_run.get("status") == "in_progress":
@@ -424,9 +419,7 @@ class CICDIntegrationManager:
                 commit_hash=workflow_run.get("head_sha", "unknown"),
                 commit_message=head_commit.get("message", ""),
                 author=head_commit.get("author", {}).get("name", ""),
-                timestamp=datetime.fromisoformat(
-                    workflow_run.get("created_at", datetime.now().isoformat())
-                ),
+                timestamp=datetime.fromisoformat(workflow_run.get("created_at", datetime.now().isoformat())),
                 build_number=workflow_run.get("run_number"),
                 logs_url=workflow_run.get("logs_url"),
                 raw_payload=payload,
@@ -436,8 +429,8 @@ class CICDIntegrationManager:
 
     async def _handle_azure_webhook(
         self,
-        payload: Dict[str, Any],
-        headers: Dict[str, str],
+        payload: dict[str, Any],
+        headers: dict[str, str],
         connection: CICDConnection,
     ) -> PipelineEvent:
         """Handle Azure DevOps webhook"""
@@ -454,9 +447,7 @@ class CICDIntegrationManager:
             "notStarted": PipelineStatus.PENDING,
         }
 
-        status = status_mapping.get(
-            resource.get("result", resource.get("status")), PipelineStatus.PENDING
-        )
+        status = status_mapping.get(resource.get("result", resource.get("status")), PipelineStatus.PENDING)
 
         # Determine event type based on status
         if status == PipelineStatus.RUNNING:
@@ -481,9 +472,7 @@ class CICDIntegrationManager:
             commit_hash=resource.get("sourceVersion", "unknown"),
             commit_message="",
             author=resource.get("requestedFor", {}).get("displayName", ""),
-            timestamp=datetime.fromisoformat(
-                resource.get("startTime", datetime.now().isoformat())
-            ),
+            timestamp=datetime.fromisoformat(resource.get("startTime", datetime.now().isoformat())),
             build_number=resource.get("buildNumber"),
             logs_url=resource.get("_links", {}).get("web", {}).get("href"),
             raw_payload=payload,
@@ -491,8 +480,8 @@ class CICDIntegrationManager:
 
     async def _handle_bitbucket_webhook(
         self,
-        payload: Dict[str, Any],
-        headers: Dict[str, str],
+        payload: dict[str, Any],
+        headers: dict[str, str],
         connection: CICDConnection,
     ) -> PipelineEvent:
         """Handle Bitbucket Pipelines webhook"""
@@ -500,9 +489,7 @@ class CICDIntegrationManager:
         # Bitbucket webhook implementation
         return self._create_default_event(CICDPlatform.BITBUCKET_PIPELINES, payload)
 
-    def _create_default_event(
-        self, platform: CICDPlatform, payload: Dict[str, Any]
-    ) -> PipelineEvent:
+    def _create_default_event(self, platform: CICDPlatform, payload: dict[str, Any]) -> PipelineEvent:
         """Create default pipeline event for unknown webhook formats"""
 
         return PipelineEvent(
@@ -562,10 +549,7 @@ class CICDIntegrationManager:
         pipeline_name_lower = event.pipeline_name.lower()
         branch_lower = event.branch.lower()
 
-        return any(
-            keyword in pipeline_name_lower or keyword in branch_lower
-            for keyword in fashion_keywords
-        )
+        return any(keyword in pipeline_name_lower or keyword in branch_lower for keyword in fashion_keywords)
 
     async def _handle_fashion_pipeline_event(self, event: PipelineEvent):
         """Handle fashion industry specific pipeline events"""
@@ -585,9 +569,7 @@ class CICDIntegrationManager:
 
     async def _handle_successful_pipeline(self, event: PipelineEvent):
         """Handle successful pipeline completion"""
-        logger.info(
-            f"Pipeline succeeded: {event.pipeline_name} ({event.platform.value})"
-        )
+        logger.info(f"Pipeline succeeded: {event.pipeline_name} ({event.platform.value})")
 
         # Send success notification
         # Update deployment status
@@ -622,8 +604,8 @@ class CICDIntegrationManager:
         connection_name: str,
         pipeline_id: str,
         branch: str = "main",
-        parameters: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        parameters: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Trigger pipeline execution via API"""
 
         connection = self.connections.get(connection_name)
@@ -634,25 +616,15 @@ class CICDIntegrationManager:
 
         try:
             if connection.platform == CICDPlatform.JENKINS:
-                result = await self._trigger_jenkins_pipeline(
-                    connection, pipeline_id, parameters
-                )
+                result = await self._trigger_jenkins_pipeline(connection, pipeline_id, parameters)
             elif connection.platform == CICDPlatform.GITLAB_CI:
-                result = await self._trigger_gitlab_pipeline(
-                    connection, pipeline_id, branch, parameters
-                )
+                result = await self._trigger_gitlab_pipeline(connection, pipeline_id, branch, parameters)
             elif connection.platform == CICDPlatform.GITHUB_ACTIONS:
-                result = await self._trigger_github_workflow(
-                    connection, pipeline_id, branch, parameters
-                )
+                result = await self._trigger_github_workflow(connection, pipeline_id, branch, parameters)
             elif connection.platform == CICDPlatform.AZURE_DEVOPS:
-                result = await self._trigger_azure_pipeline(
-                    connection, pipeline_id, branch, parameters
-                )
+                result = await self._trigger_azure_pipeline(connection, pipeline_id, branch, parameters)
             else:
-                raise ValueError(
-                    f"Pipeline triggering not implemented for {connection.platform.value}"
-                )
+                raise ValueError(f"Pipeline triggering not implemented for {connection.platform.value}")
 
             # Update metrics
             response_time = (time.time() - start_time) * 1000
@@ -660,9 +632,7 @@ class CICDIntegrationManager:
             self.metrics["successful_api_calls"] += 1
             self._update_avg_response_time(response_time)
 
-            logger.info(
-                f"Pipeline triggered: {pipeline_id} on {connection.platform.value}"
-            )
+            logger.info(f"Pipeline triggered: {pipeline_id} on {connection.platform.value}")
             return result
 
         except Exception as e:
@@ -679,13 +649,11 @@ class CICDIntegrationManager:
         self,
         connection: CICDConnection,
         job_name: str,
-        parameters: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        parameters: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Trigger Jenkins pipeline"""
 
-        auth = (
-            (connection.username, connection.api_token) if connection.username else None
-        )
+        auth = (connection.username, connection.api_token) if connection.username else None
 
         if parameters:
             url = f"{connection.base_url}/job/{job_name}/buildWithParameters"
@@ -708,8 +676,8 @@ class CICDIntegrationManager:
         connection: CICDConnection,
         project_id: str,
         branch: str,
-        parameters: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        parameters: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Trigger GitLab CI pipeline"""
 
         url = f"{connection.base_url}/api/v4/projects/{project_id}/pipeline"
@@ -717,9 +685,7 @@ class CICDIntegrationManager:
         payload = {"ref": branch}
 
         if parameters:
-            payload["variables"] = [
-                {"key": k, "value": str(v)} for k, v in parameters.items()
-            ]
+            payload["variables"] = [{"key": k, "value": str(v)} for k, v in parameters.items()]
 
         headers = {"PRIVATE-TOKEN": connection.api_token}
 
@@ -740,8 +706,8 @@ class CICDIntegrationManager:
         connection: CICDConnection,
         workflow_id: str,
         branch: str,
-        parameters: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        parameters: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Trigger GitHub Actions workflow"""
 
         url = f"{connection.base_url}/repos/{connection.organization}/{connection.project_id}/actions/workflows/{workflow_id}/dispatches"
@@ -771,15 +737,13 @@ class CICDIntegrationManager:
         connection: CICDConnection,
         pipeline_id: str,
         branch: str,
-        parameters: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        parameters: dict[str, Any] = None,
+    ) -> dict[str, Any]:
         """Trigger Azure DevOps pipeline"""
 
         url = f"{connection.base_url}/{connection.organization}/{connection.project_id}/_apis/pipelines/{pipeline_id}/runs"
 
-        payload = {
-            "resources": {"repositories": {"self": {"refName": f"refs/heads/{branch}"}}}
-        }
+        payload = {"resources": {"repositories": {"self": {"refName": f"refs/heads/{branch}"}}}}
 
         if parameters:
             payload["variables"] = {k: {"value": str(v)} for k, v in parameters.items()}
@@ -808,15 +772,11 @@ class CICDIntegrationManager:
         else:
             # Exponential moving average
             alpha = 0.1
-            self.metrics["avg_response_time"] = (
-                alpha * response_time + (1 - alpha) * self.metrics["avg_response_time"]
-            )
+            self.metrics["avg_response_time"] = alpha * response_time + (1 - alpha) * self.metrics["avg_response_time"]
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_pipeline_status(
-        self, connection_name: str, pipeline_id: str
-    ) -> Dict[str, Any]:
+    async def get_pipeline_status(self, connection_name: str, pipeline_id: str) -> dict[str, Any]:
         """Get pipeline status via API"""
 
         connection = self.connections.get(connection_name)
@@ -832,7 +792,7 @@ class CICDIntegrationManager:
             "platform": connection.platform.value,
         }
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get CI/CD integration metrics"""
 
         return {
@@ -857,14 +817,12 @@ class CICDIntegrationManager:
                 for event in self.event_history[-10:]  # Last 10 events
             ],
             "event_counts": {
-                platform.value: len([
-                    e for e in self.event_history if e.platform == platform
-                ])
+                platform.value: len([e for e in self.event_history if e.platform == platform])
                 for platform in CICDPlatform
             },
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check"""
 
         try:
@@ -875,9 +833,7 @@ class CICDIntegrationManager:
                     try:
                         # Simple connectivity test
                         response = await self.http_client.get(conn.base_url, timeout=5)
-                        connection_health[name] = (
-                            "healthy" if response.status_code < 500 else "degraded"
-                        )
+                        connection_health[name] = "healthy" if response.status_code < 500 else "degraded"
                     except Exception as e:
                         logger.warning(f"Health check failed for {name}: {e}")
                         connection_health[name] = "unhealthy"
@@ -886,10 +842,7 @@ class CICDIntegrationManager:
 
             overall_health = (
                 "healthy"
-                if all(
-                    status in ["healthy", "disabled"]
-                    for status in connection_health.values()
-                )
+                if all(status in ["healthy", "disabled"] for status in connection_health.values())
                 else "degraded"
             )
 
@@ -897,9 +850,7 @@ class CICDIntegrationManager:
                 "status": overall_health,
                 "connections": connection_health,
                 "total_connections": len(self.connections),
-                "active_connections": len([
-                    c for c in self.connections.values() if c.enabled
-                ]),
+                "active_connections": len([c for c in self.connections.values() if c.enabled]),
                 "webhook_handlers": len(self.webhook_handlers),
                 "recent_events": len(self.event_history),
                 "metrics": await self.get_metrics(),
@@ -912,6 +863,7 @@ class CICDIntegrationManager:
         """Close HTTP client and cleanup"""
         await self.http_client.aclose()
         logger.info("CI/CD integration manager closed")
+
 
 # Global CI/CD integration manager instance
 cicd_manager = CICDIntegrationManager()

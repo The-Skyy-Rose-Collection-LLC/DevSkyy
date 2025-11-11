@@ -4,10 +4,10 @@ Database models using SQLAlchemy ORM
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, JSON, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
 
 from database import Base
 
@@ -196,8 +196,8 @@ class ProductRequest(BaseModel):
     category: Optional[str] = None
     sku: Optional[str] = None
     stock_quantity: Optional[int] = 0
-    tags: Optional[List[str]] = []
-    images: Optional[List[str]] = []
+    tags: Optional[list[str]] = []
+    images: Optional[list[str]] = []
 
 
 class PaymentRequest(BaseModel):
@@ -209,4 +209,4 @@ class PaymentRequest(BaseModel):
     customer_id: Optional[str] = None
     order_id: Optional[str] = None
     description: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = {}
+    metadata: Optional[dict[str, Any]] = {}

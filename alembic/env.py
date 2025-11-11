@@ -7,9 +7,9 @@ Date: 2025-11-10
 """
 
 import asyncio
+from logging.config import fileConfig
 import os
 import sys
-from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
@@ -17,20 +17,13 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
+
 # Add the project root to the path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import models for autogenerate support
 from database import Base
-from models_sqlalchemy import (
-    User,
-    Product,
-    Customer,
-    Order,
-    AgentLog,
-    BrandAsset,
-    Campaign,
-)
+
 
 # This is the Alembic Config object
 config = context.config

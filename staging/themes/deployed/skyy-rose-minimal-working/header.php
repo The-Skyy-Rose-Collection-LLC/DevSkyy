@@ -11,7 +11,7 @@
         <h1 class="site-title">
             <a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a>
         </h1>
-        <?php 
+        <?php
         $description = get_bloginfo('description', 'display');
         if ($description) : ?>
             <p><?php echo $description; ?></p>

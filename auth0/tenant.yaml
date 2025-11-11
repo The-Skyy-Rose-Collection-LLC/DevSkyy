@@ -7,16 +7,16 @@ tenant:
   picture_url: "https://devskyy.com/logo.png"
   support_email: "support@devskyy.com"
   support_url: "https://devskyy.com/support"
-  
+
   # Security Settings
   default_audience: "https://api.devskyy.com"
   default_directory: "Username-Password-Authentication"
-  
+
   # Session Settings
   session_lifetime: 168  # 7 days in hours
   idle_session_lifetime: 72  # 3 days in hours
   session_cookie_timeout: 168
-  
+
   # Password Policy
   password_policy: "good"
   password_complexity_options:
@@ -29,10 +29,10 @@ tenant:
   password_history:
     enable: true
     size: 5
-  
+
   # Brute Force Protection
   brute_force_protection: true
-  
+
   # Multi-Factor Authentication
   guardian_mfa_page:
     enabled: true
@@ -58,14 +58,14 @@ tenant:
         </script>
       </body>
       </html>
-  
+
   # Universal Login
   universal_login:
     colors:
       primary: "#667eea"
       page_background: "#ffffff"
     logo_url: "https://devskyy.com/logo.png"
-  
+
   # Error Pages
   error_page:
     html: |
@@ -93,7 +93,7 @@ tenant:
       </html>
     show_log_link: false
     url: "https://devskyy.com/auth/error"
-  
+
   # Flags
   flags:
     enable_client_connections: true
@@ -113,5 +113,3 @@ tenant:
     dashboard_log_streams_next: false
     dashboard_insights_view: false
     disable_fields_map_fix: false
-    enable_pipeline2: true
-    enable_dynamic_client_registration: false

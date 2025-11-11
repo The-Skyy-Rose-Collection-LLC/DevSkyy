@@ -1,7 +1,7 @@
 <?php
 /**
  * Settings management class
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -342,9 +342,9 @@ class SkyyRoseSettings
     {
         $value = $this->get($args['field'], false);
         $field_name = $this->getFieldName($args['field']);
-        
+
         echo "<input type='checkbox' name='{$field_name}' value='1' " . checked(1, $value, false) . " />";
-        
+
         if (!empty($args['description'])) {
             echo "<p class='description'>{$args['description']}</p>";
         }
@@ -354,13 +354,13 @@ class SkyyRoseSettings
     {
         $value = $this->get($args['field'], '');
         $field_name = $this->getFieldName($args['field']);
-        
+
         echo "<select name='{$field_name}'>";
         foreach ($args['options'] as $option_value => $option_label) {
             echo "<option value='{$option_value}' " . selected($option_value, $value, false) . ">{$option_label}</option>";
         }
         echo "</select>";
-        
+
         if (!empty($args['description'])) {
             echo "<p class='description'>{$args['description']}</p>";
         }
@@ -370,9 +370,9 @@ class SkyyRoseSettings
     {
         $value = $this->get($args['field'], '');
         $field_name = $this->getFieldName($args['field']);
-        
+
         echo "<input type='password' name='{$field_name}' value='{$value}' class='regular-text' />";
-        
+
         if (!empty($args['description'])) {
             echo "<p class='description'>{$args['description']}</p>";
         }
@@ -382,9 +382,9 @@ class SkyyRoseSettings
     {
         $value = $this->get($args['field'], '');
         $field_name = $this->getFieldName($args['field']);
-        
+
         echo "<input type='text' name='{$field_name}' value='{$value}' class='regular-text' />";
-        
+
         if (!empty($args['description'])) {
             echo "<p class='description'>{$args['description']}</p>";
         }
@@ -397,14 +397,14 @@ class SkyyRoseSettings
     {
         $keys = explode('.', $key);
         $value = $array;
-        
+
         foreach ($keys as $k) {
             if (!isset($value[$k])) {
                 return $default;
             }
             $value = $value[$k];
         }
-        
+
         return $value;
     }
 
@@ -412,14 +412,14 @@ class SkyyRoseSettings
     {
         $keys = explode('.', $key);
         $current = &$array;
-        
+
         foreach ($keys as $k) {
             if (!isset($current[$k])) {
                 $current[$k] = [];
             }
             $current = &$current[$k];
         }
-        
+
         $current = $value;
     }
 
@@ -427,11 +427,11 @@ class SkyyRoseSettings
     {
         $keys = explode('.', $field);
         $name = $this->option_name;
-        
+
         foreach ($keys as $key) {
             $name .= "[{$key}]";
         }
-        
+
         return $name;
     }
 }

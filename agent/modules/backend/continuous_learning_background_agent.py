@@ -19,19 +19,20 @@ Features:
 """
 
 import asyncio
+from collections import defaultdict
+from datetime import datetime, timedelta
 import json
 import logging
 import os
-from collections import defaultdict
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import aiofiles
-import httpx
 from anthropic import AsyncAnthropic
 from bs4 import BeautifulSoup
+import httpx
 from openai import AsyncOpenAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +49,10 @@ class ContinuousLearningBackgroundAgent:
         self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         # Knowledge base
-        self.learned_practices: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-        self.applied_improvements: List[Dict[str, Any]] = []
-        self.framework_versions: Dict[str, str] = {}
-        self.learning_history: List[Dict[str, Any]] = []
+        self.learned_practices: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.applied_improvements: list[dict[str, Any]] = []
+        self.framework_versions: dict[str, str] = {}
+        self.learning_history: list[dict[str, Any]] = []
 
         # Configuration
         self.config = {
@@ -175,17 +176,13 @@ class ContinuousLearningBackgroundAgent:
         while self.config["run_as_daemon"]:
             try:
                 iteration += 1
-                logger.info(
-                    f"📚 Learning iteration #{iteration} started at {datetime.now()}"
-                )
+                logger.info(f"📚 Learning iteration #{iteration} started at {datetime.now()}")
 
                 # Run learning cycle
                 await self._learning_cycle()
 
                 # Wait for next iteration
-                logger.info(
-                    f"⏰ Next learning cycle in {self.config['learning_interval']} seconds"
-                )
+                logger.info(f"⏰ Next learning cycle in {self.config['learning_interval']} seconds")
                 await asyncio.sleep(self.config["learning_interval"])
 
             except Exception as e:
@@ -193,7 +190,7 @@ class ContinuousLearningBackgroundAgent:
                 # Continue running despite errors
                 await asyncio.sleep(60)
 
-    async def _learning_cycle(self) -> Dict[str, Any]:
+    async def _learning_cycle(self) -> dict[str, Any]:
         """
         Execute one complete learning cycle.
         """
@@ -229,9 +226,7 @@ class ContinuousLearningBackgroundAgent:
 
             # 7. Generate improvement recommendations
             logger.info("7️⃣ Generating improvements...")
-            recommendations = await self._generate_improvements(
-                new_practices, codebase_analysis
-            )
+            recommendations = await self._generate_improvements(new_practices, codebase_analysis)
 
             # 8. Apply high-confidence improvements
             if self.config["apply_improvements"]:
@@ -253,17 +248,13 @@ class ContinuousLearningBackgroundAgent:
                 "recommendations_generated": len(recommendations),
                 "improvements_applied": improvements_applied,
                 "total_knowledge_base_size": len(self.learned_practices),
-                "next_cycle": (
-                    datetime.now() + timedelta(seconds=self.config["learning_interval"])
-                ).isoformat(),
+                "next_cycle": (datetime.now() + timedelta(seconds=self.config["learning_interval"])).isoformat(),
             }
 
             # Save report
             await self._save_learning_report(report)
 
-            logger.info(
-                f"✅ Learning cycle complete: {improvements_applied} improvements applied"
-            )
+            logger.info(f"✅ Learning cycle complete: {improvements_applied} improvements applied")
 
             return report
 
@@ -271,7 +262,7 @@ class ContinuousLearningBackgroundAgent:
             logger.error(f"❌ Learning cycle failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _check_framework_updates(self) -> List[Dict[str, Any]]:
+    async def _check_framework_updates(self) -> list[dict[str, Any]]:
         """
         Check for updates in monitored frameworks and packages.
         """
@@ -282,9 +273,7 @@ class ContinuousLearningBackgroundAgent:
                 try:
                     # Check npm packages
                     if "npm_package" in tech_info:
-                        npm_update = await self._check_npm_update(
-                            tech_info["npm_package"], client
-                        )
+                        npm_update = await self._check_npm_update(tech_info["npm_package"], client)
                         if npm_update:
                             updates.append(
                                 {
@@ -297,9 +286,7 @@ class ContinuousLearningBackgroundAgent:
 
                     # Check pip packages
                     if "pip_package" in tech_info:
-                        pip_update = await self._check_pip_update(
-                            tech_info["pip_package"], client
-                        )
+                        pip_update = await self._check_pip_update(tech_info["pip_package"], client)
                         if pip_update:
                             updates.append(
                                 {
@@ -312,9 +299,7 @@ class ContinuousLearningBackgroundAgent:
 
                     # Check GitHub releases
                     if "github" in tech_info:
-                        github_update = await self._check_github_releases(
-                            tech_info["github"], client
-                        )
+                        github_update = await self._check_github_releases(tech_info["github"], client)
                         if github_update:
                             updates.append(
                                 {
@@ -331,9 +316,7 @@ class ContinuousLearningBackgroundAgent:
         logger.info(f"Found {len(updates)} framework updates")
         return updates
 
-    async def _check_npm_update(
-        self, package_name: str, client: httpx.AsyncClient
-    ) -> Optional[Dict[str, Any]]:
+    async def _check_npm_update(self, package_name: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
         """
         Check for npm package updates.
         """
@@ -356,9 +339,7 @@ class ContinuousLearningBackgroundAgent:
 
         return None
 
-    async def _check_pip_update(
-        self, package_name: str, client: httpx.AsyncClient
-    ) -> Optional[Dict[str, Any]]:
+    async def _check_pip_update(self, package_name: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
         """
         Check for pip package updates.
         """
@@ -381,9 +362,7 @@ class ContinuousLearningBackgroundAgent:
 
         return None
 
-    async def _check_github_releases(
-        self, repo: str, client: httpx.AsyncClient
-    ) -> Optional[Dict[str, Any]]:
+    async def _check_github_releases(self, repo: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
         """
         Check for new GitHub releases.
         """
@@ -407,7 +386,7 @@ class ContinuousLearningBackgroundAgent:
 
         return None
 
-    async def _learn_from_documentation(self) -> List[Dict[str, Any]]:
+    async def _learn_from_documentation(self) -> list[dict[str, Any]]:
         """
         Learn from official documentation updates.
         """
@@ -432,9 +411,7 @@ class ContinuousLearningBackgroundAgent:
 
         return learnings
 
-    async def _extract_doc_insights(
-        self, technology: str, doc_content: str
-    ) -> Optional[Dict[str, Any]]:
+    async def _extract_doc_insights(self, technology: str, doc_content: str) -> Optional[dict[str, Any]]:
         """
         Use AI to extract insights from documentation.
         """
@@ -477,7 +454,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
         return None
 
-    async def _analyze_trending_repos(self) -> List[Dict[str, Any]]:
+    async def _analyze_trending_repos(self) -> list[dict[str, Any]]:
         """
         Analyze GitHub trending repositories for new patterns.
         """
@@ -497,25 +474,15 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
                         try:
                             h2 = repo.find("h2")
                             if h2:
-                                repo_name = (
-                                    h2.get_text(strip=True)
-                                    .replace(" ", "")
-                                    .replace("\n", "")
-                                )
+                                repo_name = h2.get_text(strip=True).replace(" ", "").replace("\n", "")
                                 description = repo.find("p")
-                                desc_text = (
-                                    description.get_text(strip=True)
-                                    if description
-                                    else ""
-                                )
+                                desc_text = description.get_text(strip=True) if description else ""
 
                                 insights.append(
                                     {
                                         "repo": repo_name,
                                         "description": desc_text,
-                                        "trending_date": datetime.now()
-                                        .date()
-                                        .isoformat(),
+                                        "trending_date": datetime.now().date().isoformat(),
                                     }
                                 )
                         except Exception as e:
@@ -526,7 +493,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
         return insights
 
-    async def _monitor_tech_news(self) -> List[Dict[str, Any]]:
+    async def _monitor_tech_news(self) -> list[dict[str, Any]]:
         """
         Monitor tech blogs and news for best practices.
         """
@@ -535,9 +502,7 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Check HackerNews
             try:
-                response = await client.get(
-                    "https://hacker-news.firebaseio.com/v0/topstories.json"
-                )
+                response = await client.get("https://hacker-news.firebaseio.com/v0/topstories.json")
                 if response.status_code == 200:
                     story_ids = response.json()[:10]  # Top 10
 
@@ -570,11 +535,11 @@ Provide JSON with: new_features, deprecated, best_practices, performance_tips, s
 
     async def _identify_new_practices(
         self,
-        framework_updates: List,
-        doc_learnings: List,
-        repo_insights: List,
-        news_insights: List,
-    ) -> List[Dict[str, Any]]:
+        framework_updates: list,
+        doc_learnings: list,
+        repo_insights: list,
+        news_insights: list,
+    ) -> list[dict[str, Any]]:
         """
         Use AI to identify new best practices from all sources.
         """
@@ -627,7 +592,7 @@ Return JSON array of practices with: category, description, priority, implementa
 
         return []
 
-    async def _analyze_codebase(self) -> Dict[str, Any]:
+    async def _analyze_codebase(self) -> dict[str, Any]:
         """
         Analyze current codebase to understand what can be improved.
         """
@@ -646,12 +611,8 @@ Return JSON array of practices with: category, description, priority, implementa
                     async with aiofiles.open(package_json, "r") as f:
                         content = await f.read()
                         data = json.loads(content)
-                        analysis["frontend"]["dependencies"] = data.get(
-                            "dependencies", {}
-                        )
-                        analysis["frontend"]["devDependencies"] = data.get(
-                            "devDependencies", {}
-                        )
+                        analysis["frontend"]["dependencies"] = data.get("dependencies", {})
+                        analysis["frontend"]["devDependencies"] = data.get("devDependencies", {})
 
             # Check backend
             backend_path = Path("backend")
@@ -673,9 +634,7 @@ Return JSON array of practices with: category, description, priority, implementa
             logger.error(f"Codebase analysis failed: {e}")
             return {}
 
-    async def _generate_improvements(
-        self, new_practices: List, codebase_analysis: Dict
-    ) -> List[Dict[str, Any]]:
+    async def _generate_improvements(self, new_practices: list, codebase_analysis: dict) -> list[dict[str, Any]]:
         """
         Generate specific improvements for our codebase.
         """
@@ -720,7 +679,7 @@ Return JSON array of improvements."""
 
         return []
 
-    async def _apply_improvements(self, recommendations: List[Dict[str, Any]]) -> int:
+    async def _apply_improvements(self, recommendations: list[dict[str, Any]]) -> int:
         """
         Apply high-confidence improvements to codebase.
         """
@@ -730,15 +689,12 @@ Return JSON array of improvements."""
         high_confidence = [
             r
             for r in recommendations
-            if r.get("confidence", 0) >= self.config["confidence_threshold"]
-            and r.get("risk", "high") == "low"
+            if r.get("confidence", 0) >= self.config["confidence_threshold"] and r.get("risk", "high") == "low"
         ]
 
         # Sort by priority
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-        high_confidence.sort(
-            key=lambda x: priority_order.get(x.get("priority", "low"), 3)
-        )
+        high_confidence.sort(key=lambda x: priority_order.get(x.get("priority", "low"), 3))
 
         # Apply improvements
         for improvement in high_confidence[: self.config["max_daily_improvements"]]:
@@ -759,15 +715,13 @@ Return JSON array of improvements."""
 
         return applied_count
 
-    async def _apply_single_improvement(self, improvement: Dict[str, Any]) -> bool:
+    async def _apply_single_improvement(self, improvement: dict[str, Any]) -> bool:
         """
         Apply a single improvement to the codebase.
         """
         # This would integrate with the self-healing agent
         # For now, just log what would be done
-        logger.info(
-            f"Would apply: {improvement.get('description', 'Unknown improvement')}"
-        )
+        logger.info(f"Would apply: {improvement.get('description', 'Unknown improvement')}")
 
         # In production, this would:
         # 1. Create backup
@@ -777,9 +731,7 @@ Return JSON array of improvements."""
 
         return True
 
-    async def _update_knowledge_base(
-        self, new_practices: List, recommendations: List
-    ) -> None:
+    async def _update_knowledge_base(self, new_practices: list, recommendations: list) -> None:
         """
         Update persistent knowledge base with new learnings.
         """
@@ -804,15 +756,12 @@ Return JSON array of improvements."""
         except Exception as e:
             logger.error(f"Knowledge base update failed: {e}")
 
-    async def _save_learning_report(self, report: Dict[str, Any]) -> None:
+    async def _save_learning_report(self, report: dict[str, Any]) -> None:
         """
         Save learning cycle report.
         """
         try:
-            report_file = (
-                self.storage_path
-                / f"learning_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            )
+            report_file = self.storage_path / f"learning_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             async with aiofiles.open(report_file, "w") as f:
                 await f.write(json.dumps(report, indent=2))
 
@@ -821,14 +770,12 @@ Return JSON array of improvements."""
         except Exception as e:
             logger.error(f"Report save failed: {e}")
 
-    async def get_learning_stats(self) -> Dict[str, Any]:
+    async def get_learning_stats(self) -> dict[str, Any]:
         """
         Get statistics about what the agent has learned.
         """
         return {
-            "total_practices_learned": sum(
-                len(practices) for practices in self.learned_practices.values()
-            ),
+            "total_practices_learned": sum(len(practices) for practices in self.learned_practices.values()),
             "improvements_applied": len(self.applied_improvements),
             "categories": list(self.learned_practices.keys()),
             "learning_history_size": len(self.learning_history),
@@ -853,6 +800,6 @@ async def start_background_learning() -> None:
     await learning_agent.start_learning_daemon()
 
 
-async def get_learning_stats() -> Dict[str, Any]:
+async def get_learning_stats() -> dict[str, Any]:
     """Get learning statistics."""
     return await learning_agent.get_learning_stats()

@@ -158,19 +158,19 @@ async def create_partnership(
     current_user: User = Depends(get_current_user)
 ) -> Partnership:
     """Create a new partnership in the orchestration system.
-    
+
     Args:
         partnership_data: Partnership creation data including name, type, and configuration
         current_user: Authenticated user making the request
-        
+
     Returns:
         Partnership: Created partnership object with generated ID and metadata
-        
+
     Raises:
         HTTPException: 400 if partnership data is invalid
         HTTPException: 403 if user lacks permission
         HTTPException: 409 if partnership already exists
-        
+
     Example:
         ```python
         partnership = await create_partnership(
@@ -233,7 +233,7 @@ DevSkyy/
 4. **Commit with descriptive messages**
    ```bash
    git commit -m "feat: add partnership metrics endpoint
-   
+
    - Implement GET /api/v1/orchestration/partnerships/{id}/metrics
    - Add comprehensive error handling and validation
    - Include unit and integration tests

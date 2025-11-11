@@ -9,7 +9,7 @@ This module provides a comprehensive exception hierarchy for the DevSkyy Platfor
 enabling precise error handling and better debugging.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 
 # ============================================================================
@@ -24,12 +24,12 @@ class DevSkyyError(Exception):
         self,
         message: str,
         error_code: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        original_error: Optional[Exception] = None
+        details: Optional[dict[str, Any]] = None,
+        original_error: Optional[Exception] = None,
     ):
         """
         Initialize the exception with a human-readable message and optional metadata.
-        
+
         Parameters:
             message (str): Human-readable description of the error.
             error_code (Optional[str]): Unique machine-friendly error code; defaults to the exception class name when omitted.
@@ -42,16 +42,16 @@ class DevSkyyError(Exception):
         self.original_error = original_error
         super().__init__(self.message)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Return a dictionary representation of the exception suitable for serialization.
-        
+
         The returned dictionary includes:
         - `error_type`: the exception class name,
         - `error_code`: an optional machine-readable error code,
         - `message`: the human-readable error message,
         - `details`: additional context or metadata.
-        
+
         Returns:
             mapping (Dict[str, Any]): A dictionary with keys `error_type`, `error_code`, `message`, and `details`.
         """
@@ -59,7 +59,7 @@ class DevSkyyError(Exception):
             "error_type": self.__class__.__name__,
             "error_code": self.error_code,
             "message": self.message,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -432,21 +432,17 @@ HTTP_STATUS_TO_EXCEPTION = {
 }
 
 
-def exception_from_status_code(
-    status_code: int,
-    message: str,
-    **kwargs
-) -> DevSkyyError:
+def exception_from_status_code(status_code: int, message: str, **kwargs) -> DevSkyyError:
     """
     Map an HTTP status code to a corresponding DevSkyyError subclass and instantiate it.
-    
+
     Selects the exception type associated with the provided HTTP status code and returns a new exception instance constructed with the given message and any additional keyword arguments. If the status code is not mapped, a DevSkyyError instance is returned.
-    
+
     Parameters:
         status_code (int): HTTP status code to map to an exception class.
         message (str): Human-readable error message for the exception.
         **kwargs: Additional initialization parameters forwarded to the exception (e.g., `error_code`, `details`, `original_error`).
-    
+
     Returns:
         DevSkyyError: An instance of the mapped DevSkyyError subclass; `DevSkyyError` if no mapping exists.
     """
@@ -465,19 +461,15 @@ DATABASE_ERROR_MAPPING = {
 }
 
 
-def map_database_error(
-    error_type: str,
-    message: str,
-    original_error: Optional[Exception] = None
-) -> DatabaseError:
+def map_database_error(error_type: str, message: str, original_error: Optional[Exception] = None) -> DatabaseError:
     """
     Create an exception instance that represents a database error for a given error type.
-    
+
     Parameters:
         error_type (str): Key identifying the database error category (used to select a specific DatabaseError subclass).
         message (str): Human-readable error message for the created exception.
         original_error (Optional[Exception]): Original low-level exception to attach as context on the returned exception.
-    
+
     Returns:
         DatabaseError: An instance of the DatabaseError subclass mapped from `error_type`, initialized with `message` and `original_error`.
     """
@@ -489,7 +481,6 @@ def map_database_error(
 __all__ = [
     # Base
     "DevSkyyError",
-
     # Authentication & Authorization
     "AuthenticationError",
     "InvalidCredentialsError",
@@ -499,7 +490,6 @@ __all__ = [
     "AuthorizationError",
     "InsufficientPermissionsError",
     "RoleRequiredError",
-
     # Database
     "DatabaseError",
     "ConnectionError",
@@ -508,48 +498,41 @@ __all__ = [
     "RecordNotFoundError",
     "DuplicateRecordError",
     "IntegrityError",
-
     # Validation
     "ValidationError",
     "InvalidInputError",
     "MissingFieldError",
     "InvalidFormatError",
     "SchemaValidationError",
-
     # Network
     "NetworkError",
     "RequestTimeoutError",
     "RequestFailedError",
     "ConnectionTimeoutError",
     "ServiceUnavailableError",
-
     # Business Logic
     "BusinessLogicError",
     "InvalidStateError",
     "OperationNotAllowedError",
     "QuotaExceededError",
     "ResourceConflictError",
-
     # Configuration
     "ConfigurationError",
     "MissingConfigurationError",
     "InvalidConfigurationError",
     "EnvironmentError",
-
     # External API
     "ExternalAPIError",
     "APIKeyMissingError",
     "APIKeyInvalidError",
     "APIRateLimitError",
     "APIResponseError",
-
     # File System
     "FileSystemError",
     "FileNotFoundError",
     "FilePermissionError",
     "DiskSpaceError",
     "FileCorruptedError",
-
     # Agent
     "AgentError",
     "AgentNotFoundError",
@@ -557,7 +540,6 @@ __all__ = [
     "AgentExecutionError",
     "AgentTimeoutError",
     "AgentCircuitBreakerError",
-
     # ML/AI
     "MLError",
     "ModelNotFoundError",
@@ -565,7 +547,6 @@ __all__ = [
     "PredictionError",
     "TrainingError",
     "InvalidModelError",
-
     # Security
     "SecurityError",
     "EncryptionError",
@@ -574,19 +555,16 @@ __all__ = [
     "SignatureError",
     "SQLInjectionAttemptError",
     "XSSAttemptError",
-
     # Performance
     "PerformanceError",
     "PerformanceThresholdError",
     "MemoryError",
     "CPUError",
-
     # GDPR/Compliance
     "ComplianceError",
     "GDPRViolationError",
     "DataRetentionError",
     "ConsentError",
-
     # Utilities
     "exception_from_status_code",
     "map_database_error",

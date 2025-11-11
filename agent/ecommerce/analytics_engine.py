@@ -1,11 +1,12 @@
-import json
-from datetime import datetime
-
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+import json
 import logging
+from typing import Any, Optional
+
 import numpy as np
 import pandas as pd  # noqa: F401 - Reserved for Phase 3 data analysis enhancements
+
 
 """
 E-commerce Analytics Engine
@@ -22,6 +23,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class EcommerceAnalytics:
     """
     Comprehensive e-commerce analytics and business intelligence engine.
@@ -34,7 +36,7 @@ class EcommerceAnalytics:
 
     async def get_revenue_analytics(
         self, start_date: datetime, end_date: datetime, granularity: str = "daily"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calculate comprehensive revenue analytics
 
@@ -80,7 +82,7 @@ class EcommerceAnalytics:
 
     async def analyze_customer_behavior(
         self, customer_segment: Optional[str] = None, time_period: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze customer behavior patterns
 
@@ -131,8 +133,8 @@ class EcommerceAnalytics:
         return behavior
 
     async def analyze_product_performance(
-        self, product_ids: Optional[List[str]] = None, metric: str = "revenue"
-    ) -> Dict[str, Any]:
+        self, product_ids: Optional[list[str]] = None, metric: str = "revenue"
+    ) -> dict[str, Any]:
         """
         Analyze product performance metrics
 
@@ -175,9 +177,7 @@ class EcommerceAnalytics:
 
         return performance
 
-    async def analyze_conversion_funnel(
-        self, funnel_stages: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+    async def analyze_conversion_funnel(self, funnel_stages: Optional[list[str]] = None) -> dict[str, Any]:
         """
         Analyze conversion funnel and drop-off points
 
@@ -239,7 +239,7 @@ class EcommerceAnalytics:
 
     async def calculate_marketing_roi(
         self, campaign_id: str, start_date: datetime, end_date: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Calculate ROI for marketing campaigns
 
@@ -271,15 +271,9 @@ class EcommerceAnalytics:
 
         # Calculate metrics
         roi_data["revenue_attributed"] = roi_data["spend"] * np.random.uniform(2, 8)
-        roi_data["roi_percentage"] = (
-            (roi_data["revenue_attributed"] - roi_data["spend"])
-            / roi_data["spend"]
-            * 100
-        )
+        roi_data["roi_percentage"] = (roi_data["revenue_attributed"] - roi_data["spend"]) / roi_data["spend"] * 100
         roi_data["customers_acquired"] = int(np.random.uniform(50, 300))
-        roi_data["customer_acquisition_cost"] = (
-            roi_data["spend"] / roi_data["customers_acquired"]
-        )
+        roi_data["customer_acquisition_cost"] = roi_data["spend"] / roi_data["customers_acquired"]
 
         roi_data["channel_breakdown"] = {
             "social_media": np.random.uniform(0.3, 0.5),
@@ -291,8 +285,8 @@ class EcommerceAnalytics:
         return roi_data
 
     async def get_predictive_insights(
-        self, forecast_days: int = 30, metrics: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, forecast_days: int = 30, metrics: Optional[list[str]] = None
+    ) -> dict[str, Any]:
         """
         Generate predictive insights and forecasts
 
@@ -306,9 +300,7 @@ class EcommerceAnalytics:
         default_metrics = ["revenue", "orders", "new_customers", "conversion_rate"]
         metrics_to_forecast = metrics or default_metrics
 
-        logger.info(
-            f"Generating {forecast_days}-day forecast for {len(metrics_to_forecast)} metrics"
-        )
+        logger.info(f"Generating {forecast_days}-day forecast for {len(metrics_to_forecast)} metrics")
 
         insights = {
             "forecast_period_days": forecast_days,
@@ -324,9 +316,7 @@ class EcommerceAnalytics:
             base_value = np.random.uniform(1000, 10000)
             trend = np.random.uniform(-0.02, 0.05)
 
-            forecast_values = [
-                base_value * (1 + trend) ** day for day in range(forecast_days)
-            ]
+            forecast_values = [base_value * (1 + trend) ** day for day in range(forecast_days)]
 
             insights["forecasts"][metric] = {
                 "current_value": base_value,
@@ -347,9 +337,7 @@ class EcommerceAnalytics:
 
         return insights
 
-    def export_analytics_report(
-        self, analytics_data: Dict[str, Any], format: str = "json"
-    ) -> str:
+    def export_analytics_report(self, analytics_data: dict[str, Any], format: str = "json") -> str:
         """
         Export analytics data in various formats
 

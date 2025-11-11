@@ -4,9 +4,10 @@ Import Verification Script
 Verifies that all critical files can import successfully
 """
 
-import sys
 import importlib.util
 from pathlib import Path
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [
@@ -21,6 +22,7 @@ CRITICAL_FILES = [
     "agent/modules/backend/self_learning_system.py",
 ]
 
+
 def verify_imports(file_path: str) -> tuple[bool, str]:
     """
     Verify that a file's imports work correctly.
@@ -33,20 +35,21 @@ def verify_imports(file_path: str) -> tuple[bool, str]:
             return False, f"Could not load spec for {file_path}"
 
         module = importlib.util.module_from_spec(spec)
-        sys.modules['temp_module'] = module
+        sys.modules["temp_module"] = module
 
         # This will execute imports but not the main code
         # (assuming code is properly guarded with if __name__ == "__main__")
         spec.loader.exec_module(module)
 
         # Clean up
-        del sys.modules['temp_module']
+        del sys.modules["temp_module"]
 
         return True, "OK"
     except ImportError as e:
-        return False, f"Import error: {str(e)}"
+        return False, f"Import error: {e!s}"
     except Exception as e:
-        return False, f"Error: {str(e)}"
+        return False, f"Error: {e!s}"
+
 
 def main():
     """Main verification function"""
@@ -82,6 +85,7 @@ def main():
     print("=" * 60)
 
     return 0 if failed == 0 else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

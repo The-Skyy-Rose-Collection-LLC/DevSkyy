@@ -9,20 +9,19 @@ Truth Protocol: Job state tracking, error handling for partial failures, no plac
 """
 
 import asyncio
-import logging
-import uuid
-from typing import Dict, List, Optional, Any
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
 from enum import Enum
+import logging
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 
 class JobStatus(str, Enum):
     """Job execution status"""
+
     QUEUED = "queued"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -32,6 +31,7 @@ class JobStatus(str, Enum):
 
 class OptimizationStepStatus(str, Enum):
     """Individual step status"""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -42,6 +42,7 @@ class OptimizationStepStatus(str, Enum):
 @dataclass
 class OptimizationStep:
     """Individual optimization step tracking"""
+
     step_name: str
     status: OptimizationStepStatus
     started_at: Optional[datetime] = None
@@ -50,7 +51,7 @@ class OptimizationStep:
     products_succeeded: int = 0
     products_failed: int = 0
     error_message: Optional[str] = None
-    details: Dict[str, Any] = None
+    details: dict[str, Any] = None
 
     def __post_init__(self):
         if self.details is None:
@@ -60,10 +61,11 @@ class OptimizationStep:
 @dataclass
 class JobState:
     """Complete job state for tracking"""
+
     job_id: str
     status: JobStatus
-    product_ids: List[int]
-    steps: List[OptimizationStep]
+    product_ids: list[int]
+    steps: list[OptimizationStep]
     started_at: datetime
     completed_at: Optional[datetime] = None
     total_products: int = 0
@@ -95,19 +97,19 @@ class ProductOptimizationService:
                          If None, uses in-memory dict with 24h cleanup
         """
         self.redis_client = redis_client
-        self.job_store: Dict[str, JobState] = {}  # In-memory fallback
+        self.job_store: dict[str, JobState] = {}  # In-memory fallback
         self._cleanup_task = None
 
     async def execute_optimization_job(
         self,
         job_id: str,
-        product_ids: List[int],
+        product_ids: list[int],
         woocommerce_sync: bool,
         seo_optimize: bool,
         update_metadata: bool,
         webhook_url: Optional[str],
         importer_service: Any,
-        seo_service: Any
+        seo_service: Any,
     ) -> None:
         """
         Execute optimization job with parallel processing
@@ -128,8 +130,8 @@ class ProductOptimizationService:
                 "job_id": job_id,
                 "product_count": len(product_ids),
                 "woocommerce_sync": woocommerce_sync,
-                "seo_optimize": seo_optimize
-            }
+                "seo_optimize": seo_optimize,
+            },
         )
 
         # Initialize job state
@@ -140,15 +142,13 @@ class ProductOptimizationService:
             steps=[],
             started_at=datetime.utcnow(),
             total_products=len(product_ids),
-            webhook_url=webhook_url
+            webhook_url=webhook_url,
         )
 
         try:
             # Step 1: WooCommerce sync (parallel)
             if woocommerce_sync:
-                sync_step = await self._execute_woocommerce_sync(
-                    product_ids, importer_service
-                )
+                sync_step = await self._execute_woocommerce_sync(product_ids, importer_service)
                 job_state.steps.append(sync_step)
                 job_state.succeeded_products += sync_step.products_succeeded
                 job_state.failed_products += sync_step.products_failed
@@ -156,17 +156,13 @@ class ProductOptimizationService:
             # Step 2: SEO optimization (parallel)
             seo_results = {}
             if seo_optimize:
-                seo_step = await self._execute_seo_optimization(
-                    product_ids, seo_service
-                )
+                seo_step = await self._execute_seo_optimization(product_ids, seo_service)
                 job_state.steps.append(seo_step)
                 seo_results = seo_step.details.get("results", {})
 
             # Step 3: Update WooCommerce metadata (if SEO was run)
             if update_metadata and seo_optimize and seo_results:
-                metadata_step = await self._execute_metadata_update(
-                    product_ids, seo_results, importer_service
-                )
+                metadata_step = await self._execute_metadata_update(product_ids, seo_results, importer_service)
                 job_state.steps.append(metadata_step)
 
             # Determine final status
@@ -185,8 +181,8 @@ class ProductOptimizationService:
                     "job_id": job_id,
                     "status": job_state.status,
                     "succeeded": job_state.succeeded_products,
-                    "failed": job_state.failed_products
-                }
+                    "failed": job_state.failed_products,
+                },
             )
 
         except Exception as e:
@@ -203,11 +199,7 @@ class ProductOptimizationService:
             if webhook_url:
                 await self._trigger_webhook(webhook_url, job_state)
 
-    async def _execute_woocommerce_sync(
-        self,
-        product_ids: List[int],
-        importer_service: Any
-    ) -> OptimizationStep:
+    async def _execute_woocommerce_sync(self, product_ids: list[int], importer_service: Any) -> OptimizationStep:
         """
         Execute WooCommerce sync in parallel
 
@@ -219,35 +211,27 @@ class ProductOptimizationService:
             OptimizationStep with sync results
         """
         step = OptimizationStep(
-            step_name="woocommerce_sync",
-            status=OptimizationStepStatus.IN_PROGRESS,
-            started_at=datetime.utcnow()
+            step_name="woocommerce_sync", status=OptimizationStepStatus.IN_PROGRESS, started_at=datetime.utcnow()
         )
 
         try:
             logger.info(f"Syncing {len(product_ids)} products with WooCommerce")
 
             # Execute sync in parallel with error handling
-            sync_tasks = [
-                self._sync_single_product(pid, importer_service)
-                for pid in product_ids
-            ]
+            sync_tasks = [self._sync_single_product(pid, importer_service) for pid in product_ids]
             results = await asyncio.gather(*sync_tasks, return_exceptions=True)
 
             # Count successes and failures
             step.products_processed = len(results)
             step.products_succeeded = sum(
-                1 for r in results
-                if not isinstance(r, Exception) and r.get("success", False)
+                1 for r in results if not isinstance(r, Exception) and r.get("success", False)
             )
             step.products_failed = step.products_processed - step.products_succeeded
 
             step.status = OptimizationStepStatus.COMPLETED
             step.completed_at = datetime.utcnow()
 
-            logger.info(
-                f"WooCommerce sync completed: {step.products_succeeded}/{step.products_processed} succeeded"
-            )
+            logger.info(f"WooCommerce sync completed: {step.products_succeeded}/{step.products_processed} succeeded")
 
         except Exception as e:
             logger.exception("WooCommerce sync failed")
@@ -257,11 +241,7 @@ class ProductOptimizationService:
 
         return step
 
-    async def _execute_seo_optimization(
-        self,
-        product_ids: List[int],
-        seo_service: Any
-    ) -> OptimizationStep:
+    async def _execute_seo_optimization(self, product_ids: list[int], seo_service: Any) -> OptimizationStep:
         """
         Execute SEO optimization in parallel
 
@@ -276,30 +256,26 @@ class ProductOptimizationService:
             step_name="seo_optimization",
             status=OptimizationStepStatus.IN_PROGRESS,
             started_at=datetime.utcnow(),
-            details={"results": {}}
+            details={"results": {}},
         )
 
         try:
             logger.info(f"Generating SEO metadata for {len(product_ids)} products")
 
             # Execute SEO generation in parallel with error handling
-            seo_tasks = [
-                self._generate_seo_for_product(pid, seo_service)
-                for pid in product_ids
-            ]
+            seo_tasks = [self._generate_seo_for_product(pid, seo_service) for pid in product_ids]
             results = await asyncio.gather(*seo_tasks, return_exceptions=True)
 
             # Store results and count successes
             seo_results = {}
-            for pid, result in zip(product_ids, results):
+            for pid, result in zip(product_ids, results, strict=False):
                 if not isinstance(result, Exception) and result:
                     seo_results[pid] = result
                     step.products_succeeded += 1
                 else:
                     step.products_failed += 1
                     logger.warning(
-                        f"SEO generation failed for product {pid}",
-                        extra={"product_id": pid, "error": str(result)}
+                        f"SEO generation failed for product {pid}", extra={"product_id": pid, "error": str(result)}
                     )
 
             step.products_processed = len(results)
@@ -307,9 +283,7 @@ class ProductOptimizationService:
             step.status = OptimizationStepStatus.COMPLETED
             step.completed_at = datetime.utcnow()
 
-            logger.info(
-                f"SEO optimization completed: {step.products_succeeded}/{step.products_processed} succeeded"
-            )
+            logger.info(f"SEO optimization completed: {step.products_succeeded}/{step.products_processed} succeeded")
 
         except Exception as e:
             logger.exception("SEO optimization failed")
@@ -320,10 +294,7 @@ class ProductOptimizationService:
         return step
 
     async def _execute_metadata_update(
-        self,
-        product_ids: List[int],
-        seo_results: Dict[int, Dict],
-        importer_service: Any
+        self, product_ids: list[int], seo_results: dict[int, dict], importer_service: Any
     ) -> OptimizationStep:
         """
         Update WooCommerce products with SEO metadata
@@ -337,9 +308,7 @@ class ProductOptimizationService:
             OptimizationStep with update results
         """
         step = OptimizationStep(
-            step_name="metadata_update",
-            status=OptimizationStepStatus.IN_PROGRESS,
-            started_at=datetime.utcnow()
+            step_name="metadata_update", status=OptimizationStepStatus.IN_PROGRESS, started_at=datetime.utcnow()
         )
 
         try:
@@ -355,17 +324,14 @@ class ProductOptimizationService:
 
             step.products_processed = len(results)
             step.products_succeeded = sum(
-                1 for r in results
-                if not isinstance(r, Exception) and r.get("success", False)
+                1 for r in results if not isinstance(r, Exception) and r.get("success", False)
             )
             step.products_failed = step.products_processed - step.products_succeeded
 
             step.status = OptimizationStepStatus.COMPLETED
             step.completed_at = datetime.utcnow()
 
-            logger.info(
-                f"Metadata update completed: {step.products_succeeded}/{step.products_processed} succeeded"
-            )
+            logger.info(f"Metadata update completed: {step.products_succeeded}/{step.products_processed} succeeded")
 
         except Exception as e:
             logger.exception("Metadata update failed")
@@ -375,11 +341,7 @@ class ProductOptimizationService:
 
         return step
 
-    async def _sync_single_product(
-        self,
-        product_id: int,
-        importer_service: Any
-    ) -> Dict[str, Any]:
+    async def _sync_single_product(self, product_id: int, importer_service: Any) -> dict[str, Any]:
         """
         Sync a single product with WooCommerce
 
@@ -400,11 +362,7 @@ class ProductOptimizationService:
             logger.error(f"Failed to sync product {product_id}: {e}")
             return {"success": False, "product_id": product_id, "error": str(e)}
 
-    async def _generate_seo_for_product(
-        self,
-        product_id: int,
-        seo_service: Any
-    ) -> Optional[Dict[str, Any]]:
+    async def _generate_seo_for_product(self, product_id: int, seo_service: Any) -> Optional[dict[str, Any]]:
         """
         Generate SEO metadata for a single product
 
@@ -423,18 +381,15 @@ class ProductOptimizationService:
             return {
                 "metatitle": f"Product {product_id} Title",
                 "metadescription": f"Product {product_id} Description",
-                "seo_score": 85
+                "seo_score": 85,
             }
         except Exception as e:
             logger.error(f"Failed to generate SEO for product {product_id}: {e}")
             return None
 
     async def _update_product_metadata(
-        self,
-        product_id: int,
-        seo_metadata: Dict[str, Any],
-        importer_service: Any
-    ) -> Dict[str, Any]:
+        self, product_id: int, seo_metadata: dict[str, Any], importer_service: Any
+    ) -> dict[str, Any]:
         """
         Update WooCommerce product with SEO metadata
 
@@ -455,11 +410,7 @@ class ProductOptimizationService:
             logger.error(f"Failed to update metadata for product {product_id}: {e}")
             return {"success": False, "product_id": product_id, "error": str(e)}
 
-    async def _trigger_webhook(
-        self,
-        webhook_url: str,
-        job_state: JobState
-    ) -> None:
+    async def _trigger_webhook(self, webhook_url: str, job_state: JobState) -> None:
         """
         Trigger webhook notification with job completion status
 
@@ -492,19 +443,17 @@ class ProductOptimizationService:
                         "step_name": step.step_name,
                         "status": step.status,
                         "products_succeeded": step.products_succeeded,
-                        "products_failed": step.products_failed
+                        "products_failed": step.products_failed,
                     }
                     for step in job_state.steps
                 ],
-                "error_message": job_state.error_message
+                "error_message": job_state.error_message,
             }
 
             # Send webhook (with timeout)
             async with aiohttp.ClientSession() as session:
                 async with session.post(
-                    webhook_url,
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=10)
+                    webhook_url, json=payload, timeout=aiohttp.ClientTimeout(total=10)
                 ) as response:
                     if response.status == 200:
                         job_state.webhook_triggered = True
@@ -512,10 +461,10 @@ class ProductOptimizationService:
                     else:
                         logger.warning(
                             f"Webhook returned non-200 status: {response.status}",
-                            extra={"webhook_url": webhook_url, "status": response.status}
+                            extra={"webhook_url": webhook_url, "status": response.status},
                         )
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to trigger webhook: {webhook_url}")
             # Don't fail the job if webhook fails
 
@@ -535,6 +484,7 @@ class ProductOptimizationService:
             if self.redis_client:
                 # Store in Redis with 24h TTL
                 import json
+
                 key = f"job:{job_state.job_id}"
                 value = self._serialize_job_state(job_state)
                 await self.redis_client.setex(key, 86400, json.dumps(value))
@@ -548,10 +498,10 @@ class ProductOptimizationService:
                 if self._cleanup_task is None or self._cleanup_task.done():
                     self._cleanup_task = asyncio.create_task(self._cleanup_old_jobs())
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to store job state: {job_state.job_id}")
 
-    def _serialize_job_state(self, job_state: JobState) -> Dict[str, Any]:
+    def _serialize_job_state(self, job_state: JobState) -> dict[str, Any]:
         """Convert JobState to JSON-serializable dict"""
         return {
             "job_id": job_state.job_id,
@@ -567,7 +517,7 @@ class ProductOptimizationService:
                     "products_succeeded": step.products_succeeded,
                     "products_failed": step.products_failed,
                     "error_message": step.error_message,
-                    "details": step.details
+                    "details": step.details,
                 }
                 for step in job_state.steps
             ],
@@ -578,10 +528,10 @@ class ProductOptimizationService:
             "failed_products": job_state.failed_products,
             "webhook_url": job_state.webhook_url,
             "webhook_triggered": job_state.webhook_triggered,
-            "error_message": job_state.error_message
+            "error_message": job_state.error_message,
         }
 
-    async def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
+    async def get_job_status(self, job_id: str) -> Optional[dict[str, Any]]:
         """
         Retrieve job status from storage
 
@@ -595,19 +545,18 @@ class ProductOptimizationService:
             if self.redis_client:
                 # Retrieve from Redis
                 import json
+
                 key = f"job:{job_id}"
                 value = await self.redis_client.get(key)
                 if value:
                     return json.loads(value)
-            else:
-                # Retrieve from memory
-                if job_id in self.job_store:
-                    return self._serialize_job_state(self.job_store[job_id])
+            elif job_id in self.job_store:
+                return self._serialize_job_state(self.job_store[job_id])
 
             logger.warning(f"Job not found: {job_id}")
             return None
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to retrieve job status: {job_id}")
             return None
 
@@ -624,9 +573,7 @@ class ProductOptimizationService:
 
                 # Remove jobs older than 24h
                 expired_jobs = [
-                    job_id
-                    for job_id, job_state in self.job_store.items()
-                    if job_state.started_at < cutoff_time
+                    job_id for job_id, job_state in self.job_store.items() if job_state.started_at < cutoff_time
                 ]
 
                 for job_id in expired_jobs:
@@ -635,6 +582,6 @@ class ProductOptimizationService:
                 if expired_jobs:
                     logger.info(f"Cleaned up {len(expired_jobs)} expired jobs")
 
-            except Exception as e:
+            except Exception:
                 logger.exception("Job cleanup task failed")
                 await asyncio.sleep(3600)  # Retry in 1 hour

@@ -1,11 +1,12 @@
+from datetime import datetime
 import json
 import logging
 import os
+from typing import Any
 import uuid
-from datetime import datetime
-from typing import Any, Dict, List
 
 import openai
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -140,11 +141,9 @@ class PerformanceAgent:
         else:
             self.openai_client = None
 
-        logger.info(
-            "🚀 Universal Web Development Guru initialized with Multi-Language Mastery"
-        )
+        logger.info("🚀 Universal Web Development Guru initialized with Multi-Language Mastery")
 
-    async def analyze_site_performance(self) -> Dict[str, Any]:
+    async def analyze_site_performance(self) -> dict[str, Any]:
         """Comprehensive site performance analysis."""
         try:
             logger.info("📊 Analyzing site performance metrics...")
@@ -187,19 +186,15 @@ class PerformanceAgent:
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
                 "performance_analysis": analysis,
-                "optimization_recommendations": self._generate_performance_recommendations(
-                    analysis
-                ),
+                "optimization_recommendations": self._generate_performance_recommendations(analysis),
                 "risk_assessment": self._assess_performance_risks(analysis),
             }
 
         except Exception as e:
-            logger.error(f"❌ Performance analysis failed: {str(e)}")
+            logger.error(f"❌ Performance analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_performance_recommendations(
-        self, analysis: Dict
-    ) -> List[Dict[str, Any]]:
+    def _generate_performance_recommendations(self, analysis: dict) -> list[dict[str, Any]]:
         """Generate prioritized performance recommendations."""
         recommendations = [
             {
@@ -248,7 +243,7 @@ class PerformanceAgent:
         ]
         return recommendations
 
-    def _assess_performance_risks(self, analysis: Dict) -> Dict[str, Any]:
+    def _assess_performance_risks(self, analysis: dict) -> dict[str, Any]:
         """Assess performance risks and their business impact."""
         return {
             "conversion_risk": {
@@ -269,7 +264,7 @@ class PerformanceAgent:
             },
         }
 
-    async def monitor_real_time_performance(self) -> Dict[str, Any]:
+    async def monitor_real_time_performance(self) -> dict[str, Any]:
         """Monitor real-time performance metrics."""
         try:
             real_time_metrics = {
@@ -293,10 +288,10 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Real-time monitoring failed: {str(e)}")
+            logger.error(f"❌ Real-time monitoring failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _check_performance_alerts(self, metrics: Dict) -> List[Dict[str, Any]]:
+    def _check_performance_alerts(self, metrics: dict) -> list[dict[str, Any]]:
         """Check for performance alerts based on current metrics."""
         alerts = []
 
@@ -324,7 +319,7 @@ class PerformanceAgent:
 
         return alerts
 
-    async def analyze_and_fix_code(self, code_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def analyze_and_fix_code(self, code_data: dict[str, Any]) -> dict[str, Any]:
         """Universal code analysis and optimization for any programming language."""
         try:
             language = code_data.get("language", "javascript").lower()
@@ -337,26 +332,14 @@ class PerformanceAgent:
             analysis = {
                 "language_detected": language,
                 "code_quality_score": 87.5,
-                "performance_issues": self._detect_performance_issues(
-                    code_content, language
-                ),
-                "security_vulnerabilities": self._detect_security_issues(
-                    code_content, language
-                ),
+                "performance_issues": self._detect_performance_issues(code_content, language),
+                "security_vulnerabilities": self._detect_security_issues(code_content, language),
                 "code_smells": self._detect_code_smells(code_content, language),
-                "optimization_opportunities": self._identify_optimizations(
-                    code_content, language
-                ),
-                "best_practices_violations": self._check_best_practices(
-                    code_content, language
-                ),
-                "dependency_analysis": self._analyze_dependencies(
-                    code_content, language
-                ),
+                "optimization_opportunities": self._identify_optimizations(code_content, language),
+                "best_practices_violations": self._check_best_practices(code_content, language),
+                "dependency_analysis": self._analyze_dependencies(code_content, language),
                 "memory_leaks": self._detect_memory_leaks(code_content, language),
-                "scalability_concerns": self._assess_scalability(
-                    code_content, language
-                ),
+                "scalability_concerns": self._assess_scalability(code_content, language),
             }
 
             # Generate fixes and improvements
@@ -369,23 +352,17 @@ class PerformanceAgent:
                 "file_path": file_path,
                 "analysis": analysis,
                 "generated_fixes": fixes,
-                "optimization_suggestions": self._generate_optimization_suggestions(
-                    language
-                ),
-                "performance_improvements": self._suggest_performance_improvements(
-                    analysis, language
-                ),
+                "optimization_suggestions": self._generate_optimization_suggestions(language),
+                "performance_improvements": self._suggest_performance_improvements(analysis, language),
                 "automated_fix_available": True,
                 "estimated_improvement": "25-40% performance boost",
             }
 
         except Exception as e:
-            logger.error(f"❌ Code analysis failed: {str(e)}")
+            logger.error(f"❌ Code analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_code_god_mode(
-        self, code_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_code_god_mode(self, code_analysis: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED CODE OPTIMIZATION WITH GOD MODE INTELLIGENCE."""
         try:
             prompt = f"""
@@ -417,7 +394,7 @@ class PerformanceAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's top performance optimization expert with deep knowledge of all programming languages, frameworks, and architectures. Your optimizations have improved site speeds by 10x and saved companies millions in infrastructure costs.",  # noqa: E501
+                        "content": "You are the world's top performance optimization expert with deep knowledge of all programming languages, frameworks, and architectures. Your optimizations have improved site speeds by 10x and saved companies millions in infrastructure costs.",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -440,12 +417,10 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"GOD MODE optimization failed: {str(e)}")
+            logger.error(f"GOD MODE optimization failed: {e!s}")
             return {"error": str(e), "fallback": "standard_optimization_available"}
 
-    async def debug_application_error(
-        self, error_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def debug_application_error(self, error_data: dict[str, Any]) -> dict[str, Any]:
         """Universal debugging for any web application error."""
         try:
             error_type = error_data.get("error_type", "runtime")
@@ -458,16 +433,10 @@ class PerformanceAgent:
             debugging_analysis = {
                 "error_classification": self._classify_error(stack_trace, language),
                 "root_cause_analysis": self._perform_root_cause_analysis(error_data),
-                "potential_causes": self._identify_potential_causes(
-                    error_type, language, framework
-                ),
+                "potential_causes": self._identify_potential_causes(error_type, language, framework),
                 "fix_suggestions": self._generate_fix_suggestions(error_data),
-                "prevention_strategies": self._suggest_prevention_strategies(
-                    error_type, language
-                ),
-                "testing_recommendations": self._recommend_testing_approaches(
-                    error_data
-                ),
+                "prevention_strategies": self._suggest_prevention_strategies(error_type, language),
+                "testing_recommendations": self._recommend_testing_approaches(error_data),
                 "monitoring_setup": self._setup_error_monitoring(language, framework),
             }
 
@@ -482,12 +451,10 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Debugging failed: {str(e)}")
+            logger.error(f"❌ Debugging failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_full_stack_performance(
-        self, stack_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_full_stack_performance(self, stack_data: dict[str, Any]) -> dict[str, Any]:
         """Comprehensive full-stack performance optimization."""
         try:
             logger.info("🚀 Performing full-stack performance optimization...")
@@ -537,21 +504,16 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Full-stack optimization failed: {str(e)}")
+            logger.error(f"❌ Full-stack optimization failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _detect_performance_issues(
-        self, code: str, language: str
-    ) -> List[Dict[str, Any]]:
+    def _detect_performance_issues(self, code: str, language: str) -> list[dict[str, Any]]:
         """Detect performance issues in code across different languages."""
         issues = []
 
         if language in ["javascript", "typescript"]:
             # JavaScript/TypeScript specific performance issues
-            if (
-                "document.getElementById" in code
-                and code.count("document.getElementById") > 5
-            ):
+            if "document.getElementById" in code and code.count("document.getElementById") > 5:
                 issues.append(
                     {
                         "type": "DOM_QUERY_OPTIMIZATION",
@@ -605,7 +567,7 @@ class PerformanceAgent:
 
         return issues
 
-    def _detect_security_issues(self, code: str, language: str) -> List[Dict[str, Any]]:
+    def _detect_security_issues(self, code: str, language: str) -> list[dict[str, Any]]:
         """Detect security vulnerabilities across different languages."""
         vulnerabilities = []
 
@@ -619,9 +581,7 @@ class PerformanceAgent:
                         "fix": "Use JSON.parse() or safer alternatives",
                     }
                 )
-            if "innerHTML" in code and (
-                "user" in code.lower() or "input" in code.lower()
-            ):
+            if "innerHTML" in code and ("user" in code.lower() or "input" in code.lower()):
                 vulnerabilities.append(
                     {
                         "type": "XSS_VULNERABILITY",
@@ -665,9 +625,7 @@ class PerformanceAgent:
 
         return vulnerabilities
 
-    def _generate_code_fixes(
-        self, analysis: Dict, code: str, language: str
-    ) -> Dict[str, Any]:
+    def _generate_code_fixes(self, analysis: dict, code: str, language: str) -> dict[str, Any]:
         """Generate automated fixes for detected issues."""
         fixes = {
             "performance_fixes": [],
@@ -724,7 +682,7 @@ class PerformanceAgent:
 
         return fixes
 
-    def _initialize_code_analyzer(self) -> Dict[str, Any]:
+    def _initialize_code_analyzer(self) -> dict[str, Any]:
         """Initialize advanced AI-powered code analysis system."""
         return {
             "static_analysis_engine": "multi_language_ast_parser",
@@ -735,7 +693,7 @@ class PerformanceAgent:
             "dependency_analyzer": "package_vulnerability_scanner",
         }
 
-    def _initialize_universal_debugger(self) -> Dict[str, Any]:
+    def _initialize_universal_debugger(self) -> dict[str, Any]:
         """Initialize universal debugging system for all languages."""
         return {
             "error_pattern_recognition": "stack_trace_analysis_ai",
@@ -745,7 +703,7 @@ class PerformanceAgent:
             "deployment_safety_checker": "rollback_risk_assessor",
         }
 
-    def _initialize_performance_optimizer(self) -> Dict[str, Any]:
+    def _initialize_performance_optimizer(self) -> dict[str, Any]:
         """Initialize comprehensive performance optimization system."""
         return {
             "frontend_optimizer": "bundle_analyzer_and_code_splitter",
@@ -755,7 +713,7 @@ class PerformanceAgent:
             "mobile_optimizer": "responsive_design_and_pwa_enhancer",
         }
 
-    def _measure_performance_improvements(self) -> Dict[str, Any]:
+    def _measure_performance_improvements(self) -> dict[str, Any]:
         """Measure performance improvements after optimization."""
         return {
             "page_load_time": {"before": 3.2, "after": 1.8, "improvement": "44%"},
@@ -792,7 +750,7 @@ class PerformanceAgent:
             },
         }
 
-    def _detect_code_smells(self, code: str, language: str) -> List[Dict[str, Any]]:
+    def _detect_code_smells(self, code: str, language: str) -> list[dict[str, Any]]:
         """Detect code smells and maintainability issues."""
         smells = []
 
@@ -819,7 +777,7 @@ class PerformanceAgent:
 
         return smells
 
-    def _identify_optimizations(self, code: str, language: str) -> List[Dict[str, Any]]:
+    def _identify_optimizations(self, code: str, language: str) -> list[dict[str, Any]]:
         """Identify optimization opportunities."""
         optimizations = []
 
@@ -844,7 +802,7 @@ class PerformanceAgent:
 
         return optimizations
 
-    def _check_best_practices(self, code: str, language: str) -> List[Dict[str, Any]]:
+    def _check_best_practices(self, code: str, language: str) -> list[dict[str, Any]]:
         """Check for best practice violations."""
         violations = []
 
@@ -871,7 +829,7 @@ class PerformanceAgent:
 
         return violations
 
-    def _analyze_dependencies(self, code: str, language: str) -> Dict[str, Any]:
+    def _analyze_dependencies(self, code: str, language: str) -> dict[str, Any]:
         """Analyze code dependencies."""
         if language in ["javascript", "typescript"]:
             imports = code.count("import ")
@@ -880,9 +838,7 @@ class PerformanceAgent:
                 "import_count": imports,
                 "require_count": requires,
                 "outdated_patterns": requires > 0,
-                "recommendations": (
-                    ["Use ES6 imports instead of require()"] if requires > 0 else []
-                ),
+                "recommendations": (["Use ES6 imports instead of require()"] if requires > 0 else []),
             }
         elif language == "python":
             imports = code.count("import ")
@@ -893,7 +849,7 @@ class PerformanceAgent:
             }
         return {"analysis": "No dependency analysis for this language"}
 
-    def _detect_memory_leaks(self, code: str, language: str) -> List[Dict[str, Any]]:
+    def _detect_memory_leaks(self, code: str, language: str) -> list[dict[str, Any]]:
         """Detect potential memory leaks."""
         leaks = []
 
@@ -919,7 +875,7 @@ class PerformanceAgent:
 
         return leaks
 
-    def _assess_scalability(self, code: str, language: str) -> Dict[str, Any]:
+    def _assess_scalability(self, code: str, language: str) -> dict[str, Any]:
         """Assess code scalability concerns."""
         concerns = []
 
@@ -943,7 +899,7 @@ class PerformanceAgent:
             ],
         }
 
-    def _generate_optimization_suggestions(self, language: str) -> List[Dict[str, Any]]:
+    def _generate_optimization_suggestions(self, language: str) -> list[dict[str, Any]]:
         """Generate language-specific optimization suggestions."""
         suggestions = []
 
@@ -996,9 +952,7 @@ class PerformanceAgent:
 
         return suggestions
 
-    def _suggest_performance_improvements(
-        self, analysis: Dict, language: str
-    ) -> List[Dict[str, Any]]:
+    def _suggest_performance_improvements(self, analysis: dict, language: str) -> list[dict[str, Any]]:
         """Suggest specific performance improvements based on analysis."""
         improvements = []
 
@@ -1027,7 +981,7 @@ class PerformanceAgent:
         return improvements
 
 
-def optimize_site_performance() -> Dict[str, Any]:
+def optimize_site_performance() -> dict[str, Any]:
     """Main function to optimize site performance."""
     PerformanceAgent()
     return {

@@ -11,8 +11,9 @@ This module provides intelligent agent routing with:
 Truth Protocol Compliant: All implementations verified, no placeholders.
 """
 
-from agents.router import AgentRouter, TaskType, RoutingResult, RoutingError
-from agents.loader import AgentConfigLoader, AgentConfig, LoaderError
+from agents.loader import AgentConfig, AgentConfigLoader, LoaderError
+from agents.router import AgentRouter, RoutingError, RoutingResult, TaskType
+
 
 __all__ = [
     "AgentRouter",

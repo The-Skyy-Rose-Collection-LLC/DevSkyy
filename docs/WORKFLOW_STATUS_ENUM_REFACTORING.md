@@ -63,7 +63,7 @@ restored = WorkflowStatus.from_string("pending")  # Returns WorkflowStatus.PENDI
 @dataclass
 class Workflow:
     status: WorkflowStatus = WorkflowStatus.PENDING
-    
+
     def to_dict(self):
         return {
             "status": self.status.to_json(),  # Use to_json() instead of .value
@@ -94,7 +94,7 @@ Replace direct `.value` usage:
 # Before
 data["status"] = workflow.status.value
 
-# After  
+# After
 data["status"] = workflow.status.to_json()
 ```
 

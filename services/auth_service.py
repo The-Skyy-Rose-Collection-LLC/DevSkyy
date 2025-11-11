@@ -7,16 +7,17 @@ Author: DevSkyy Enterprise Team
 Date: 2025-11-10
 """
 
-import logging
 from datetime import datetime
-from typing import Optional, Dict, List
+import logging
+from typing import Optional
 
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models_sqlalchemy import User
 from database import get_db
+from models_sqlalchemy import User
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +69,7 @@ class AuthService:
             return False
 
     @staticmethod
-    async def authenticate_user(
-        session: AsyncSession, username: str, password: str
-    ) -> Optional[Dict]:
+    async def authenticate_user(session: AsyncSession, username: str, password: str) -> Optional[dict]:
         """
         Authenticate user against database
 
@@ -89,30 +88,22 @@ class AuthService:
         """
         try:
             # Query user by username or email
-            stmt = select(User).where(
-                (User.username == username) | (User.email == username)
-            )
+            stmt = select(User).where((User.username == username) | (User.email == username))
             result = await session.execute(stmt)
             user = result.scalar_one_or_none()
 
             if not user:
-                logger.warning(
-                    f"Authentication failed: user not found - {username[:3]}***"
-                )
+                logger.warning(f"Authentication failed: user not found - {username[:3]}***")
                 return None
 
             # Check if user is active
             if not user.is_active:
-                logger.warning(
-                    f"Authentication failed: inactive user - {user.username}"
-                )
+                logger.warning(f"Authentication failed: inactive user - {user.username}")
                 return None
 
             # Verify password
             if not AuthService.verify_password(password, user.hashed_password):
-                logger.warning(
-                    f"Authentication failed: invalid password - {user.username}"
-                )
+                logger.warning(f"Authentication failed: invalid password - {user.username}")
                 return None
 
             logger.info(f"User authenticated successfully: {user.username}")
@@ -140,7 +131,7 @@ class AuthService:
         password: str,
         full_name: Optional[str] = None,
         is_superuser: bool = False,
-    ) -> Optional[Dict]:
+    ) -> Optional[dict]:
         """
         Create new user in database
 
@@ -162,18 +153,16 @@ class AuthService:
         """
         try:
             # Check if user exists
-            stmt = select(User).where(
-                (User.username == username) | (User.email == email)
-            )
+            stmt = select(User).where((User.username == username) | (User.email == email))
             result = await session.execute(stmt)
             existing_user = result.scalar_one_or_none()
 
             if existing_user:
                 if existing_user.username == username:
-                    logger.warning(f"User creation failed: username already exists")
+                    logger.warning("User creation failed: username already exists")
                     return None
                 if existing_user.email == email:
-                    logger.warning(f"User creation failed: email already exists")
+                    logger.warning("User creation failed: email already exists")
                     return None
 
             # Hash password
@@ -213,7 +202,7 @@ class AuthService:
             return None
 
     @staticmethod
-    async def get_user_by_id(session: AsyncSession, user_id: int) -> Optional[Dict]:
+    async def get_user_by_id(session: AsyncSession, user_id: int) -> Optional[dict]:
         """
         Get user by ID
 
@@ -249,9 +238,7 @@ class AuthService:
             return None
 
     @staticmethod
-    async def update_user_password(
-        session: AsyncSession, user_id: int, new_password: str
-    ) -> bool:
+    async def update_user_password(session: AsyncSession, user_id: int, new_password: str) -> bool:
         """
         Update user password
 
@@ -326,7 +313,7 @@ class AuthService:
 
 
 # Backward compatibility function
-async def authenticate_user_from_db(username: str, password: str) -> Optional[Dict]:
+async def authenticate_user_from_db(username: str, password: str) -> Optional[dict]:
     """
     Authenticate user against database (standalone function for backward compatibility)
 

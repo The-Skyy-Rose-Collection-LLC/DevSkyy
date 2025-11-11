@@ -1,9 +1,9 @@
 /**
  * Skyy Rose Collection Checkout Experience
- * 
+ *
  * Advanced multi-step checkout with AI-powered features
  * Authentic brand integration with luxury user experience
- * 
+ *
  * @package WP_Mastery_WooCommerce_Luxury
  * @version 1.0.0
  */
@@ -21,7 +21,7 @@
             this.checkoutData = {};
             this.aiInsights = {};
             this.validationRules = {};
-            
+
             this.init();
         }
 
@@ -30,22 +30,22 @@
          */
         init() {
             console.log('🌹 Initializing Skyy Rose Collection Checkout Experience...');
-            
+
             // Initialize multi-step functionality
             this.initMultiStepCheckout();
-            
+
             // Initialize AI features
             this.initAIFeatures();
-            
+
             // Initialize form validation
             this.initFormValidation();
-            
+
             // Initialize analytics tracking
             this.initAnalyticsTracking();
-            
+
             // Initialize cart features
             this.initCartFeatures();
-            
+
             console.log('✅ Skyy Rose Checkout Experience initialized');
         }
 
@@ -87,19 +87,19 @@
             $(`#checkout-step-${this.currentStep}`).fadeOut(300, () => {
                 // Show new step
                 $(`#checkout-step-${stepNumber}`).fadeIn(300);
-                
+
                 // Update current step
                 this.currentStep = stepNumber;
-                
+
                 // Update progress bar
                 this.updateProgressBar();
-                
+
                 // Track step change
                 this.trackStepChange(stepNumber);
-                
+
                 // Load step-specific AI features
                 this.loadStepAIFeatures(stepNumber);
-                
+
                 // Scroll to top
                 $('html, body').animate({
                     scrollTop: $('.checkout-progress-wrapper').offset().top - 100
@@ -114,9 +114,9 @@
             $('.progress-step').each((index, element) => {
                 const stepNum = index + 1;
                 const $step = $(element);
-                
+
                 $step.removeClass('active completed');
-                
+
                 if (stepNum < this.currentStep) {
                     $step.addClass('completed');
                 } else if (stepNum === this.currentStep) {
@@ -234,16 +234,16 @@
         initAIFeatures() {
             // Load cart analysis
             this.loadCartAnalysis();
-            
+
             // Initialize address validation
             this.initAddressValidation();
-            
+
             // Initialize shipping optimization
             this.initShippingOptimization();
-            
+
             // Initialize checkout recommendations
             this.initCheckoutRecommendations();
-            
+
             // Initialize dynamic pricing
             this.initDynamicPricing();
         }
@@ -254,13 +254,13 @@
         async loadCartAnalysis() {
             try {
                 const cartData = this.getCartData();
-                
+
                 const response = await this.makeAIRequest('luxury_ai_analyze_cart', {
                     cart_items: cartData.items,
                     cart_total: cartData.total,
                     customer_segment: luxuryEcommerce.customerSegment || 'new_visitor'
                 });
-                
+
                 if (response.success) {
                     this.displayCartAnalysis(response.data);
                 }
@@ -277,18 +277,18 @@
             if (analysis.style_category) {
                 $('#cart-style-analysis').text(`Your style: ${analysis.style_category}`);
             }
-            
+
             // Update value analysis
             if (analysis.luxury_index) {
                 $('#cart-value-analysis').text(`Luxury Index: ${analysis.luxury_index}/10`);
             }
-            
+
             // Update product insights
             if (analysis.product_insights) {
                 analysis.product_insights.forEach(insight => {
                     const $insightContainer = $(`#insights-${insight.product_id} .insight-tags`);
                     if ($insightContainer.length) {
-                        const tags = insight.tags.map(tag => 
+                        const tags = insight.tags.map(tag =>
                             `<span class="insight-tag">${tag}</span>`
                         ).join('');
                         $insightContainer.html(tags);
@@ -333,7 +333,7 @@
 
             try {
                 const response = await this.makeAIRequest('luxury_ai_validate_address', addressData);
-                
+
                 if (response.success) {
                     this.displayAddressValidation(response.data);
                 }
@@ -347,7 +347,7 @@
          */
         displayAddressValidation(validation) {
             const $statusPanel = $('#address-validation-status');
-            
+
             if (validation.is_valid) {
                 $statusPanel.html(`
                     <div class="validation-success">
@@ -379,13 +379,13 @@
         async loadLastMinuteRecommendations() {
             try {
                 const cartData = this.getCartData();
-                
+
                 const response = await this.makeAIRequest('luxury_ai_get_checkout_recommendations', {
                     cart_items: cartData.items,
                     customer_segment: luxuryEcommerce.customerSegment || 'new_visitor',
                     checkout_stage: 'pre_payment'
                 });
-                
+
                 if (response.success && response.data.length > 0) {
                     this.displayCheckoutRecommendations(response.data);
                 }
@@ -399,7 +399,7 @@
          */
         displayCheckoutRecommendations(recommendations) {
             const $container = $('#last-minute-suggestions');
-            
+
             const html = recommendations.map(product => `
                 <div class="checkout-recommendation-item" data-product-id="${product.id}">
                     <div class="recommendation-image">
@@ -414,9 +414,9 @@
                     </div>
                 </div>
             `).join('');
-            
+
             $container.html(html);
-            
+
             // Handle add to cart from checkout
             $('.add-to-cart-checkout').on('click', (e) => {
                 e.preventDefault();
@@ -450,10 +450,10 @@
                 cart_value: this.getCartTotal(),
                 item_count: this.getCartItemCount()
             });
-            
+
             // Track step completion
             this.trackStepCompletion();
-            
+
             // Track abandonment risk
             this.trackAbandonmentRisk();
         }
@@ -464,12 +464,12 @@
         initCartFeatures() {
             // Update cart totals dynamically
             this.initDynamicTotals();
-            
+
             // Handle quantity changes
             $('.luxury-quantity-selector input').on('change', (e) => {
                 this.updateCartQuantity(e.target);
             });
-            
+
             // Handle coupon application
             $('.coupon-section button').on('click', (e) => {
                 e.preventDefault();
@@ -518,16 +518,16 @@
             const formData = new FormData();
             formData.append('action', action);
             formData.append('nonce', luxuryEcommerce.nonce);
-            
+
             Object.keys(data).forEach(key => {
                 formData.append(key, typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key]);
             });
-            
+
             const response = await fetch(luxuryEcommerce.ajax_url, {
                 method: 'POST',
                 body: formData
             });
-            
+
             return await response.json();
         }
 
@@ -538,14 +538,14 @@
                 $errorContainer = $('<div class="checkout-errors"></div>');
                 $('.checkout-main-content').prepend($errorContainer);
             }
-            
+
             $errorContainer.html(`
                 <div class="error-message">
                     <span class="error-icon">⚠️</span>
                     <span class="error-text">${message}</span>
                 </div>
             `).show();
-            
+
             // Auto-hide after 5 seconds
             setTimeout(() => {
                 $errorContainer.fadeOut();
@@ -555,7 +555,7 @@
         trackEvent(eventName, data) {
             // Track events for analytics
             console.log(`📊 Tracking: ${eventName}`, data);
-            
+
             // Send to analytics service
             if (typeof gtag !== 'undefined') {
                 gtag('event', eventName, data);

@@ -11,10 +11,11 @@ Features:
 Reference: Based on AGENTS.md Line 921-961
 """
 
+from datetime import datetime
 import json  # noqa: F401 - Reserved for future JSON schema processing
 import logging
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class WordPressSEOOptimizer:
     def __init__(self):
         self.seo_best_practices = self._load_best_practices()
 
-    def _load_best_practices(self) -> Dict[str, Any]:
+    def _load_best_practices(self) -> dict[str, Any]:
         """Load SEO best practices and scoring criteria"""
         return {
             "title_length": {"min": 30, "max": 60, "weight": 10},
@@ -43,9 +44,7 @@ class WordPressSEOOptimizer:
             "mobile_friendly": {"required": True, "weight": 10},
         }
 
-    async def optimize_page(
-        self, url: str, target_keywords: List[str], content_type: str = "page"
-    ) -> Dict[str, Any]:
+    async def optimize_page(self, url: str, target_keywords: list[str], content_type: str = "page") -> dict[str, Any]:
         """
         Perform comprehensive SEO optimization on a page
 
@@ -66,9 +65,7 @@ class WordPressSEOOptimizer:
         recommendations = self._generate_recommendations(analysis)
 
         # Generate schema markup
-        schema = self.generate_schema_markup(
-            content_type, analysis.get("page_data", {})
-        )
+        schema = self.generate_schema_markup(content_type, analysis.get("page_data", {}))
 
         # Calculate SEO score
         seo_score = self._calculate_seo_score(analysis)
@@ -87,7 +84,7 @@ class WordPressSEOOptimizer:
             "analyzed_at": datetime.now().isoformat(),
         }
 
-    async def analyze_page(self, url: str, keywords: List[str]) -> Dict[str, Any]:
+    async def analyze_page(self, url: str, keywords: list[str]) -> dict[str, Any]:
         """
         Analyze page for SEO issues
 
@@ -133,9 +130,7 @@ class WordPressSEOOptimizer:
 
         return analysis
 
-    def _generate_recommendations(
-        self, analysis: Dict[str, Any]
-    ) -> List[Dict[str, str]]:
+    def _generate_recommendations(self, analysis: dict[str, Any]) -> list[dict[str, str]]:
         """Generate SEO recommendations based on analysis"""
         recommendations = []
 
@@ -264,12 +259,10 @@ class WordPressSEOOptimizer:
 
         return recommendations
 
-    def _calculate_seo_score(self, analysis: Dict[str, Any]) -> int:
+    def _calculate_seo_score(self, analysis: dict[str, Any]) -> int:
         """Calculate overall SEO score (0-100)"""
         score = 0
-        max_score = sum(
-            bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp
-        )
+        max_score = sum(bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp)
 
         # Title score
         title_len = analysis["title"]["length"]
@@ -298,24 +291,15 @@ class WordPressSEOOptimizer:
             score += self.seo_best_practices["image_alt_text"]["weight"]
 
         # Internal links score
-        if (
-            analysis["links"]["internal"]
-            >= self.seo_best_practices["internal_links"]["min"]
-        ):
+        if analysis["links"]["internal"] >= self.seo_best_practices["internal_links"]["min"]:
             score += self.seo_best_practices["internal_links"]["weight"]
 
         # External links score
-        if (
-            analysis["links"]["external"]
-            >= self.seo_best_practices["external_links"]["min"]
-        ):
+        if analysis["links"]["external"] >= self.seo_best_practices["external_links"]["min"]:
             score += self.seo_best_practices["external_links"]["weight"]
 
         # Content length score
-        if (
-            analysis["content"]["word_count"]
-            >= self.seo_best_practices["content_length"]["min"]
-        ):
+        if analysis["content"]["word_count"] >= self.seo_best_practices["content_length"]["min"]:
             score += self.seo_best_practices["content_length"]["weight"]
 
         # HTTPS score
@@ -328,9 +312,7 @@ class WordPressSEOOptimizer:
 
         return int((score / max_score) * 100)
 
-    def generate_schema_markup(
-        self, content_type: str, page_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def generate_schema_markup(self, content_type: str, page_data: dict[str, Any]) -> dict[str, Any]:
         """
         Generate schema.org markup
 
@@ -351,7 +333,7 @@ class WordPressSEOOptimizer:
         generator = schemas.get(content_type, self._generate_article_schema)
         return generator(page_data)
 
-    def _generate_article_schema(self, data: Dict) -> Dict:
+    def _generate_article_schema(self, data: dict) -> dict:
         """Generate Article schema"""
         return {
             "@context": "https://schema.org",
@@ -369,7 +351,7 @@ class WordPressSEOOptimizer:
             "description": data.get("description", ""),
         }
 
-    def _generate_product_schema(self, data: Dict) -> Dict:
+    def _generate_product_schema(self, data: dict) -> dict:
         """Generate Product schema"""
         return {
             "@context": "https://schema.org",
@@ -392,7 +374,7 @@ class WordPressSEOOptimizer:
             },
         }
 
-    def _generate_organization_schema(self, data: Dict) -> Dict:
+    def _generate_organization_schema(self, data: dict) -> dict:
         """Generate Organization schema"""
         return {
             "@context": "https://schema.org",
@@ -408,7 +390,7 @@ class WordPressSEOOptimizer:
             },
         }
 
-    def _generate_breadcrumb_schema(self, data: Dict) -> Dict:
+    def _generate_breadcrumb_schema(self, data: dict) -> dict:
         """Generate BreadcrumbList schema"""
         items = data.get("breadcrumbs", [])
 
@@ -426,7 +408,7 @@ class WordPressSEOOptimizer:
             ],
         }
 
-    async def generate_sitemap(self, pages: List[Dict[str, Any]], base_url: str) -> str:
+    async def generate_sitemap(self, pages: list[dict[str, Any]], base_url: str) -> str:
         """
         Generate XML sitemap
 
@@ -451,20 +433,18 @@ class WordPressSEOOptimizer:
             changefreq = page.get("changefreq", "weekly")
             lastmod = page.get("lastmod", datetime.now().strftime("%Y-%m-%d"))
 
-            sitemap += f"  <url>\n"
+            sitemap += "  <url>\n"
             sitemap += f"    <loc>{url}</loc>\n"
             sitemap += f"    <lastmod>{lastmod}</lastmod>\n"
             sitemap += f"    <changefreq>{changefreq}</changefreq>\n"
             sitemap += f"    <priority>{priority}</priority>\n"
-            sitemap += f"  </url>\n"
+            sitemap += "  </url>\n"
 
         sitemap += "</urlset>"
 
         return sitemap
 
-    def analyze_keywords(
-        self, content: str, target_keywords: List[str]
-    ) -> Dict[str, Any]:
+    def analyze_keywords(self, content: str, target_keywords: list[str]) -> dict[str, Any]:
         """
         Analyze keyword usage in content
 
@@ -486,20 +466,14 @@ class WordPressSEOOptimizer:
             analysis[keyword] = {
                 "count": count,
                 "density": round(density, 2),
-                "status": (
-                    "optimal"
-                    if 1.0 <= density <= 3.0
-                    else "low" if density < 1.0 else "high"
-                ),
+                "status": ("optimal" if 1.0 <= density <= 3.0 else "low" if density < 1.0 else "high"),
             }
 
         return {
             "keywords": analysis,
             "total_words": word_count,
             "overall_score": (
-                sum(1 for k in analysis.values() if k["status"] == "optimal")
-                / len(target_keywords)
-                * 100
+                sum(1 for k in analysis.values() if k["status"] == "optimal") / len(target_keywords) * 100
                 if target_keywords
                 else 0
             ),
@@ -508,7 +482,7 @@ class WordPressSEOOptimizer:
     def generate_robots_txt(
         self,
         allow_all: bool = True,
-        disallow_paths: Optional[List[str]] = None,
+        disallow_paths: Optional[list[str]] = None,
         sitemap_url: Optional[str] = None,
     ) -> str:
         """

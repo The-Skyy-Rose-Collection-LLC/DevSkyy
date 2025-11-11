@@ -38,7 +38,7 @@ get_header('shop');
 								<?php woocommerce_page_title(); ?>
 							</h1>
 						<?php endif; ?>
-						
+
 						<?php
 						/**
 						 * Hook: woocommerce_archive_description
@@ -54,7 +54,7 @@ get_header('shop');
 					<div class="luxury-product-filters" id="luxury-ai-filters">
 						<div class="filter-section">
 							<h3 class="filter-title"><?php esc_html_e('Smart Filters', 'wp-mastery-woocommerce-luxury'); ?></h3>
-							
+
 							<!-- Style Category Filter (AI-Generated) -->
 							<div class="filter-group" data-filter-type="style">
 								<label class="filter-label"><?php esc_html_e('Style Category', 'wp-mastery-woocommerce-luxury'); ?></label>

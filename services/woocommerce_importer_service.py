@@ -7,8 +7,9 @@ Date: 2025-11-10
 """
 
 import logging
-from typing import Dict, List, Optional
+
 import httpx
+
 
 logger = logging.getLogger(__name__)
 
@@ -40,21 +41,14 @@ class WooCommerceImporter:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{self.api_url}/system_status",
-                    auth=(self.consumer_key, self.consumer_secret),
-                    timeout=10.0
+                    f"{self.api_url}/system_status", auth=(self.consumer_key, self.consumer_secret), timeout=10.0
                 )
                 return response.status_code == 200
         except Exception as e:
             logger.error(f"WooCommerce connection test failed: {e}")
             return False
 
-    async def get_products(
-        self,
-        page: int = 1,
-        per_page: int = 100,
-        status: str = "publish"
-    ) -> List[Dict]:
+    async def get_products(self, page: int = 1, per_page: int = 100, status: str = "publish") -> list[dict]:
         """
         Get products from WooCommerce
 
@@ -74,12 +68,8 @@ class WooCommerceImporter:
                 response = await client.get(
                     f"{self.api_url}/products",
                     auth=(self.consumer_key, self.consumer_secret),
-                    params={
-                        "page": page,
-                        "per_page": min(per_page, 100),
-                        "status": status
-                    },
-                    timeout=30.0
+                    params={"page": page, "per_page": min(per_page, 100), "status": status},
+                    timeout=30.0,
                 )
                 response.raise_for_status()
                 return response.json()
@@ -90,7 +80,7 @@ class WooCommerceImporter:
             logger.error(f"WooCommerce get_products error: {e}")
             raise
 
-    async def import_product(self, wc_product: Dict) -> Dict:
+    async def import_product(self, wc_product: dict) -> dict:
         """
         Transform WooCommerce product to DevSkyy format
 
@@ -110,8 +100,12 @@ class WooCommerceImporter:
                 "price": float(wc_product.get("price", 0)),
                 "cost": 0.0,  # WooCommerce doesn't provide cost
                 "stock_quantity": wc_product.get("stock_quantity", 0),
-                "sizes": [attr.get("options", []) for attr in wc_product.get("attributes", []) if attr.get("name") == "Size"],
-                "colors": [attr.get("options", []) for attr in wc_product.get("attributes", []) if attr.get("name") == "Color"],
+                "sizes": [
+                    attr.get("options", []) for attr in wc_product.get("attributes", []) if attr.get("name") == "Size"
+                ],
+                "colors": [
+                    attr.get("options", []) for attr in wc_product.get("attributes", []) if attr.get("name") == "Color"
+                ],
                 "images": [img.get("src") for img in wc_product.get("images", [])],
                 "tags": [tag.get("name") for tag in wc_product.get("tags", [])],
                 "seo_data": {
@@ -128,19 +122,14 @@ class WooCommerceImporter:
             logger.error(f"Product import transformation error: {e}")
             raise
 
-    async def import_all_products(self) -> Dict:
+    async def import_all_products(self) -> dict:
         """
         Import all products from WooCommerce
 
         Returns:
             Dict with import statistics (success_count, error_count, products)
         """
-        stats = {
-            "success_count": 0,
-            "error_count": 0,
-            "total_pages": 0,
-            "products": []
-        }
+        stats = {"success_count": 0, "error_count": 0, "total_pages": 0, "products": []}
 
         try:
             page = 1
@@ -169,7 +158,9 @@ class WooCommerceImporter:
                 if len(wc_products) < 100:
                     has_more = False
 
-            logger.info(f"WooCommerce import complete: {stats['success_count']} success, {stats['error_count']} errors")
+            logger.info(
+                f"WooCommerce import complete: {stats['success_count']} success, {stats['error_count']} errors"
+            )
             return stats
 
         except Exception as e:

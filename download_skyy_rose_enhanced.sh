@@ -112,11 +112,11 @@ if [ $IMAGE_COUNT -gt 0 ]; then
     echo "1. 🌐 Open: http://localhost:8001/classic"
     echo "2. 📤 Use the form-based upload interface"
     echo ""
-    
+
     echo -e "${YELLOW}Would you like to start automatic processing now? (y/n)${NC}"
     read -p "" -n 1 -r
     echo ""
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo -e "${GREEN}🚀 Starting automatic processing...${NC}"
         cd ..

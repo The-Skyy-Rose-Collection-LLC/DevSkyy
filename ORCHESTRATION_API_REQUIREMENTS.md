@@ -1,9 +1,9 @@
 # DevSkyy Orchestration API Requirements
 ## Production-Ready REST API Endpoints Documentation
 
-**Date**: October 25, 2025  
-**Version**: 1.0.0  
-**Status**: ✅ PRODUCTION READY  
+**Date**: October 25, 2025
+**Version**: 1.0.0
+**Status**: ✅ PRODUCTION READY
 
 ---
 
@@ -180,13 +180,13 @@ The DevSkyy Orchestration API provides production-ready REST endpoints for manag
 import httpx
 
 # Authenticate
-auth_response = httpx.post("https://api.devskyy.com/api/v1/auth/login", 
+auth_response = httpx.post("https://api.devskyy.com/api/v1/auth/login",
                           json={"username": "admin", "password": "password"})
 token = auth_response.json()["access_token"]
 
 # Use orchestration API
 headers = {"Authorization": f"Bearer {token}"}
-health = httpx.get("https://api.devskyy.com/api/v1/orchestration/health", 
+health = httpx.get("https://api.devskyy.com/api/v1/orchestration/health",
                    headers=headers)
 print(health.json())
 ```

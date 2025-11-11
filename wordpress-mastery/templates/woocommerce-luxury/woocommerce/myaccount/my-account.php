@@ -24,13 +24,13 @@ do_action('woocommerce_before_account_navigation');
 			<div class="account-brand-section">
 				<div class="brand-logo-area">
 					<div class="skyy-rose-logo">
-						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>" 
-							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>" 
+						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>"
+							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>"
 							 class="brand-logo">
 					</div>
 					<div class="brand-welcome">
 						<h1 class="account-title">
-							<?php 
+							<?php
 							$current_user = wp_get_current_user();
 							if ($current_user->exists()) {
 								printf(
@@ -45,7 +45,7 @@ do_action('woocommerce_before_account_navigation');
 						<p class="brand-subtitle luxury-accent"><?php esc_html_e('Your Personal Style Sanctuary', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
 				</div>
-				
+
 				<!-- AI-Powered Account Insights -->
 				<div class="account-ai-insights" id="account-intelligence-panel">
 					<div class="ai-insight-card">
@@ -80,7 +80,7 @@ do_action('woocommerce_before_account_navigation');
 			<div class="account-navigation-section">
 				<div class="luxury-account-nav-wrapper">
 					<h3 class="nav-title"><?php esc_html_e('Account Menu', 'wp-mastery-woocommerce-luxury'); ?></h3>
-					
+
 					<nav class="woocommerce-MyAccount-navigation luxury-account-navigation">
 						<ul class="luxury-nav-menu">
 							<?php foreach (wc_get_account_menu_items() as $endpoint => $label) : ?>

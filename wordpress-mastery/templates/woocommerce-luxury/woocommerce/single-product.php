@@ -32,7 +32,7 @@ get_header('shop'); ?>
 	?>
 
 	<div id="product-<?php the_ID(); ?>" <?php wc_product_class('luxury-single-product', $product); ?>>
-		
+
 		<!-- AI-Powered Product Analysis Header -->
 		<div class="product-ai-header" id="ai-analysis-header">
 			<div class="container">
@@ -57,7 +57,7 @@ get_header('shop'); ?>
 
 		<div class="container">
 			<div class="product-layout-grid">
-				
+
 				<!-- Enhanced Product Images with Advanced Media Management -->
 				<div class="product-images-section">
 					<?php
@@ -147,7 +147,7 @@ get_header('shop'); ?>
 						<!-- AI-Enhanced Product Attributes -->
 						<div class="ai-enhanced-attributes" id="ai-product-attributes">
 							<h3 class="attributes-title"><?php esc_html_e('Product Intelligence', 'wp-mastery-woocommerce-luxury'); ?></h3>
-							
+
 							<div class="attribute-group" id="style-attributes">
 								<h4 class="attribute-title"><?php esc_html_e('Style Analysis', 'wp-mastery-woocommerce-luxury'); ?></h4>
 								<div class="attribute-values" id="ai-style-details">
@@ -214,7 +214,7 @@ get_header('shop'); ?>
 						<button class="tab-btn" data-tab="material-guide"><?php esc_html_e('Material Guide', 'wp-mastery-woocommerce-luxury'); ?></button>
 						<button class="tab-btn" data-tab="sustainability"><?php esc_html_e('Sustainability', 'wp-mastery-woocommerce-luxury'); ?></button>
 					</div>
-					
+
 					<div class="tab-content">
 						<div class="tab-panel active" id="styling-tips">
 							<div class="ai-generated-content" id="ai-styling-suggestions">

@@ -32,8 +32,8 @@ do_action('woocommerce_before_main_content');
 			<div class="shop-brand-section">
 				<div class="brand-hero-area">
 					<div class="skyy-rose-logo">
-						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>" 
-							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>" 
+						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>"
+							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>"
 							 class="brand-logo">
 					</div>
 					<div class="brand-messaging">
@@ -42,9 +42,9 @@ do_action('woocommerce_before_main_content');
 								<?php woocommerce_page_title(); ?>
 							</h1>
 						<?php endif; ?>
-						
+
 						<p class="shop-subtitle luxury-accent">
-							<?php 
+							<?php
 							if (is_product_category()) {
 								$category = get_queried_object();
 								if ($category && !empty($category->description)) {
@@ -59,7 +59,7 @@ do_action('woocommerce_before_main_content');
 						</p>
 					</div>
 				</div>
-				
+
 				<!-- AI-Powered Shop Intelligence -->
 				<div class="shop-ai-insights" id="shop-intelligence-panel">
 					<div class="ai-insight-card">
@@ -233,7 +233,7 @@ do_action('woocommerce_before_main_content');
 							?>
 						</div>
 					</div>
-					
+
 					<div class="toolbar-right">
 						<!-- View Mode Toggle -->
 						<div class="view-mode-toggle">
@@ -244,7 +244,7 @@ do_action('woocommerce_before_main_content');
 								<span class="view-icon">☰</span>
 							</button>
 						</div>
-						
+
 						<!-- Sort Options -->
 						<div class="sort-options">
 							<?php woocommerce_catalog_ordering(); ?>

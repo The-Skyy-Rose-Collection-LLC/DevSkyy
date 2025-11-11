@@ -8,19 +8,17 @@ IMPACT: 90%+ test coverage for Phase 3 implementation
 Truth Protocol: All edge cases tested, no placeholders
 """
 
-import pytest
 import json
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
+from unittest.mock import AsyncMock, Mock, patch
 
-from services.woocommerce_integration_service import (
-    WooCommerceIntegrationService,
-    ProductData,
-    ProductWithSEOResponse,
-    SEOCompliance,
-    get_integration_service
-)
+import pytest
+
 from services.seo_optimizer import SEOMetaTags, SEOOptimizerError
+from services.woocommerce_integration_service import (
+    ProductData,
+    WooCommerceIntegrationService,
+    get_integration_service,
+)
 
 
 @pytest.fixture
@@ -30,7 +28,7 @@ def mock_seo_service():
     service.generate_seo_tags = AsyncMock(
         return_value=SEOMetaTags(
             metatitle="Premium Leather Jacket - Luxury Style",
-            metadescription="Discover our premium leather jacket collection. High-quality craftsmanship, timeless design, and exceptional comfort. Shop now for exclusive deals."
+            metadescription="Discover our premium leather jacket collection. High-quality craftsmanship, timeless design, and exceptional comfort. Shop now for exclusive deals.",
         )
     )
     return service
@@ -43,7 +41,7 @@ def integration_service(mock_seo_service):
         store_url="https://shop.example.com",
         consumer_key="ck_test_key",
         consumer_secret="cs_test_secret",
-        seo_service=mock_seo_service
+        seo_service=mock_seo_service,
     )
 
 
@@ -60,7 +58,7 @@ def sample_product_data():
         sku="PLJ-001",
         stock_quantity=10,
         images=["https://example.com/jacket.jpg"],
-        keywords="leather jacket, premium outerwear, fashion"
+        keywords="leather jacket, premium outerwear, fashion",
     )
 
 
@@ -69,10 +67,7 @@ class TestSchemaMarkupGeneration:
 
     def test_generate_schema_markup(self, integration_service, sample_product_data):
         """Test basic schema markup generation"""
-        seo_tags = SEOMetaTags(
-            metatitle="Test Product",
-            metadescription="Test description"
-        )
+        seo_tags = SEOMetaTags(metatitle="Test Product", metadescription="Test description")
 
         schema = integration_service._generate_schema_markup(sample_product_data, seo_tags)
 
@@ -89,15 +84,9 @@ class TestSchemaMarkupGeneration:
     def test_schema_markup_without_optional_fields(self, integration_service):
         """Test schema markup with minimal product data"""
         product_data = ProductData(
-            name="Simple Product",
-            description="Simple description",
-            category="General",
-            price=99.99
+            name="Simple Product", description="Simple description", category="General", price=99.99
         )
-        seo_tags = SEOMetaTags(
-            metatitle="Simple Product",
-            metadescription="Simple description"
-        )
+        seo_tags = SEOMetaTags(metatitle="Simple Product", metadescription="Simple description")
 
         schema = integration_service._generate_schema_markup(product_data, seo_tags)
 
@@ -107,10 +96,7 @@ class TestSchemaMarkupGeneration:
 
     def test_schema_markup_json_serializable(self, integration_service, sample_product_data):
         """Test that schema markup is valid JSON"""
-        seo_tags = SEOMetaTags(
-            metatitle="Test",
-            metadescription="Test description"
-        )
+        seo_tags = SEOMetaTags(metatitle="Test", metadescription="Test description")
 
         schema = integration_service._generate_schema_markup(sample_product_data, seo_tags)
 
@@ -127,7 +113,7 @@ class TestSEOComplianceValidation:
         """Test validation of fully compliant SEO"""
         seo_tags = SEOMetaTags(
             metatitle="Premium Leather Jacket - Shop Now",  # 37 chars (30-60 OK)
-            metadescription="Discover our premium leather jacket collection. High-quality craftsmanship, timeless design, and exceptional comfort. Shop now for deals."  # 147 chars (120-160 OK)
+            metadescription="Discover our premium leather jacket collection. High-quality craftsmanship, timeless design, and exceptional comfort. Shop now for deals.",  # 147 chars (120-160 OK)
         )
         schema = {"@type": "Product", "name": "Test"}
         keywords = "leather jacket, fashion"
@@ -145,10 +131,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_title_too_short(self, integration_service):
         """Test validation with title too short"""
-        seo_tags = SEOMetaTags(
-            metatitle="Short Title",  # 11 chars (< 30)
-            metadescription="A" * 140  # Valid length
-        )
+        seo_tags = SEOMetaTags(metatitle="Short Title", metadescription="A" * 140)  # 11 chars (< 30)  # Valid length
         schema = {"@type": "Product"}
         keywords = "test"
 
@@ -161,10 +144,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_title_too_long(self, integration_service):
         """Test validation with title too long"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 61,  # 61 chars (> 60)
-            metadescription="A" * 140
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 61, metadescription="A" * 140)  # 61 chars (> 60)
         schema = {"@type": "Product"}
         keywords = "test"
 
@@ -176,10 +156,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_description_too_short(self, integration_service):
         """Test validation with description too short"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,  # Valid
-            metadescription="Short description"  # < 120 chars
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="Short description")  # Valid  # < 120 chars
         schema = {"@type": "Product"}
         keywords = "test"
 
@@ -191,10 +168,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_description_too_long(self, integration_service):
         """Test validation with description too long"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,
-            metadescription="A" * 161  # > 160 chars
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="A" * 161)  # > 160 chars
         schema = {"@type": "Product"}
         keywords = "test"
 
@@ -205,10 +179,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_missing_schema_markup(self, integration_service):
         """Test validation with missing schema markup"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,
-            metadescription="A" * 140
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="A" * 140)
         schema = {}
         keywords = "test"
 
@@ -220,10 +191,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_missing_keywords(self, integration_service):
         """Test validation with missing keywords"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,
-            metadescription="A" * 140
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="A" * 140)
         schema = {"@type": "Product"}
         keywords = None
 
@@ -235,10 +203,7 @@ class TestSEOComplianceValidation:
 
     def test_validate_empty_keywords(self, integration_service):
         """Test validation with empty keywords string"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,
-            metadescription="A" * 140
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="A" * 140)
         schema = {"@type": "Product"}
         keywords = "   "  # Whitespace only
 
@@ -248,10 +213,7 @@ class TestSEOComplianceValidation:
 
     def test_seo_score_calculation(self, integration_service):
         """Test SEO score calculation with various compliance levels"""
-        seo_tags = SEOMetaTags(
-            metatitle="A" * 40,  # Valid (30 points)
-            metadescription="Short"  # Invalid (0 points)
-        )
+        seo_tags = SEOMetaTags(metatitle="A" * 40, metadescription="Short")  # Valid (30 points)  # Invalid (0 points)
         schema = {"@type": "Product"}  # Valid (20 points)
         keywords = "test"  # Valid (20 points)
 
@@ -265,17 +227,12 @@ class TestYoastMetadataFormatting:
 
     def test_generate_yoast_metadata(self, integration_service):
         """Test Yoast metadata generation"""
-        seo_tags = SEOMetaTags(
-            metatitle="Test Product Title",
-            metadescription="Test product description"
-        )
+        seo_tags = SEOMetaTags(metatitle="Test Product Title", metadescription="Test product description")
         schema = {"@type": "Product", "name": "Test"}
         keywords = "test, product, keywords"
         seo_score = 85
 
-        yoast_data = integration_service._generate_yoast_metadata(
-            seo_tags, schema, keywords, seo_score
-        )
+        yoast_data = integration_service._generate_yoast_metadata(seo_tags, schema, keywords, seo_score)
 
         assert len(yoast_data) == 5
         assert yoast_data[0]["key"] == "_yoast_wpseo_title"
@@ -294,15 +251,10 @@ class TestYoastMetadataFormatting:
 
     def test_generate_yoast_metadata_without_keywords(self, integration_service):
         """Test Yoast metadata generation without keywords"""
-        seo_tags = SEOMetaTags(
-            metatitle="Test",
-            metadescription="Test description"
-        )
+        seo_tags = SEOMetaTags(metatitle="Test", metadescription="Test description")
         schema = {"@type": "Product"}
 
-        yoast_data = integration_service._generate_yoast_metadata(
-            seo_tags, schema, None, 50
-        )
+        yoast_data = integration_service._generate_yoast_metadata(seo_tags, schema, None, 50)
 
         focus_kw_field = next(f for f in yoast_data if f["key"] == "_yoast_wpseo_focuskw")
         assert focus_kw_field["value"] == ""
@@ -331,12 +283,7 @@ class TestFallbackMetadata:
     def test_fallback_title_truncation(self, integration_service):
         """Test fallback title truncation for long names"""
         long_name = "A" * 100
-        product_data = ProductData(
-            name=long_name,
-            description="Description",
-            category="Category",
-            price=99.99
-        )
+        product_data = ProductData(name=long_name, description="Description", category="Category", price=99.99)
 
         fallback = integration_service._generate_fallback_metadata(product_data)
 
@@ -345,11 +292,7 @@ class TestFallbackMetadata:
     def test_fallback_description_padding(self, integration_service):
         """Test fallback description padding for short descriptions"""
         product_data = ProductData(
-            name="Short Product",
-            description="Short",
-            short_description="Short",
-            category="Category",
-            price=99.99
+            name="Short Product", description="Short", short_description="Short", category="Category", price=99.99
         )
 
         fallback = integration_service._generate_fallback_metadata(product_data)
@@ -364,19 +307,14 @@ class TestCreateProductWithSEO:
     @pytest.mark.asyncio
     async def test_create_product_success(self, integration_service, sample_product_data):
         """Test successful product creation with SEO"""
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             # Mock WooCommerce API response
             mock_response = Mock()
             mock_response.status_code = 201
-            mock_response.json.return_value = {
-                "id": 123,
-                "permalink": "https://shop.example.com/product/test"
-            }
+            mock_response.json.return_value = {"id": 123, "permalink": "https://shop.example.com/product/test"}
             mock_response.raise_for_status = Mock()
 
-            mock_client.return_value.__aenter__.return_value.post = AsyncMock(
-                return_value=mock_response
-            )
+            mock_client.return_value.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
             result = await integration_service.create_product_with_seo(sample_product_data)
 
@@ -395,15 +333,13 @@ class TestCreateProductWithSEO:
         # Make SEO service fail
         mock_seo_service.generate_seo_tags.side_effect = SEOOptimizerError("AI service failed")
 
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             mock_response = Mock()
             mock_response.status_code = 201
             mock_response.json.return_value = {"id": 124, "permalink": "https://example.com"}
             mock_response.raise_for_status = Mock()
 
-            mock_client.return_value.__aenter__.return_value.post = AsyncMock(
-                return_value=mock_response
-            )
+            mock_client.return_value.__aenter__.return_value.post = AsyncMock(return_value=mock_response)
 
             result = await integration_service.create_product_with_seo(sample_product_data)
 
@@ -412,25 +348,17 @@ class TestCreateProductWithSEO:
             assert result.seo_metadata is not None
 
     @pytest.mark.asyncio
-    async def test_create_product_woocommerce_api_error(
-        self, integration_service, sample_product_data
-    ):
+    async def test_create_product_woocommerce_api_error(self, integration_service, sample_product_data):
         """Test product creation with WooCommerce API error"""
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             from httpx import HTTPStatusError, Request, Response
 
             mock_response = Response(
-                status_code=400,
-                content=b"Bad request",
-                request=Request("POST", "https://example.com")
+                status_code=400, content=b"Bad request", request=Request("POST", "https://example.com")
             )
 
             mock_client.return_value.__aenter__.return_value.post = AsyncMock(
-                side_effect=HTTPStatusError(
-                    "Bad request",
-                    request=mock_response.request,
-                    response=mock_response
-                )
+                side_effect=HTTPStatusError("Bad request", request=mock_response.request, response=mock_response)
             )
 
             result = await integration_service.create_product_with_seo(sample_product_data)
@@ -446,18 +374,13 @@ class TestUpdateProductSEO:
     @pytest.mark.asyncio
     async def test_update_product_seo_success(self, integration_service, sample_product_data):
         """Test successful SEO update"""
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "id": 123,
-                "permalink": "https://shop.example.com/product/test"
-            }
+            mock_response.json.return_value = {"id": 123, "permalink": "https://shop.example.com/product/test"}
             mock_response.raise_for_status = Mock()
 
-            mock_client.return_value.__aenter__.return_value.put = AsyncMock(
-                return_value=mock_response
-            )
+            mock_client.return_value.__aenter__.return_value.put = AsyncMock(return_value=mock_response)
 
             result = await integration_service.update_product_seo(123, sample_product_data)
 
@@ -467,21 +390,17 @@ class TestUpdateProductSEO:
             assert result.compliance is not None
 
     @pytest.mark.asyncio
-    async def test_update_product_seo_with_fallback(
-        self, integration_service, sample_product_data, mock_seo_service
-    ):
+    async def test_update_product_seo_with_fallback(self, integration_service, sample_product_data, mock_seo_service):
         """Test SEO update with fallback"""
         mock_seo_service.generate_seo_tags.side_effect = SEOOptimizerError("Failed")
 
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {"id": 123, "permalink": "https://example.com"}
             mock_response.raise_for_status = Mock()
 
-            mock_client.return_value.__aenter__.return_value.put = AsyncMock(
-                return_value=mock_response
-            )
+            mock_client.return_value.__aenter__.return_value.put = AsyncMock(return_value=mock_response)
 
             result = await integration_service.update_product_seo(123, sample_product_data)
 
@@ -498,7 +417,7 @@ class TestFactoryFunction:
             store_url="https://shop.example.com",
             consumer_key="ck_test",
             consumer_secret="cs_test",
-            seo_service=mock_seo_service
+            seo_service=mock_seo_service,
         )
 
         assert isinstance(service, WooCommerceIntegrationService)

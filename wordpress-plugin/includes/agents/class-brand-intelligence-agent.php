@@ -1,7 +1,7 @@
 <?php
 /**
  * Brand Intelligence Agent
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -186,14 +186,14 @@ class BrandIntelligenceAgent
         // Check active theme compatibility
         $theme = wp_get_theme();
         $theme_colors = $this->extractThemeColors();
-        
+
         $color_match_score = $this->calculateColorAlignment($theme_colors);
         $consistency_score = ($consistency_score + $color_match_score) / 2;
 
         // Check content alignment
         $recent_posts = get_posts(['numberposts' => 5]);
         $content_alignment = $this->checkContentAlignment($recent_posts);
-        
+
         if ($content_alignment < 70) {
             $issues[] = 'Recent content does not align with brand voice';
             $improvements[] = 'Review content strategy to better reflect brand values';
@@ -226,10 +226,10 @@ class BrandIntelligenceAgent
 
         // Extract colors from active theme
         $theme_colors = $this->extractThemeColors();
-        
+
         // Compare with brand colors
         $brand_colors = $this->brand_context['brand_colors'];
-        
+
         foreach ($brand_colors as $color_type => $brand_color) {
             $similarity = $this->findColorSimilarity($brand_color, $theme_colors);
             if ($similarity > 0.8) {
@@ -256,7 +256,7 @@ class BrandIntelligenceAgent
 
         // Analyze recent posts
         $recent_posts = get_posts(['numberposts' => 10]);
-        
+
         foreach ($recent_posts as $post) {
             $content_score = $this->scoreContentAlignment($post->post_content);
             $alignment_score = ($alignment_score + $content_score) / 2;

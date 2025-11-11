@@ -29,7 +29,7 @@ data:
 
 ---
 # Secret for sensitive data (create manually or via CI/CD)
-# 
+#
 # SECURITY WARNING: This Secret resource contains placeholder values.
 # NEVER commit real secrets to version control!
 #
@@ -423,7 +423,7 @@ spec:
 
 ---
 # Docker Cloud registry secret (create with kubectl)
-# 
+#
 # SECURITY WARNING: Replace with actual credentials before deploying!
 #
 # kubectl create secret docker-registry docker-cloud-credentials \

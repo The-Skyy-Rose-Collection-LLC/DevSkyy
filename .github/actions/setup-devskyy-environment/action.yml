@@ -46,14 +46,14 @@ runs:
         echo "Node.js version: ${{ inputs.node-version }}"
         echo "Install dependencies: ${{ inputs.install-dependencies }}"
         echo "Setup services: ${{ inputs.setup-services }}"
-    
+
     - name: 🐍 Setup Python
       id: python-setup
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
         cache: 'pip'
-    
+
     - name: 🟢 Setup Node.js
       id: node-setup
       if: inputs.node-version != ''
@@ -61,7 +61,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'npm'
-    
+
     - name: 📦 Cache Dependencies
       id: cache-deps
       if: inputs.install-dependencies == 'true'
@@ -76,31 +76,31 @@ runs:
           deps-${{ runner.os }}-py${{ inputs.python-version }}-node${{ inputs.node-version }}-
           deps-${{ runner.os }}-py${{ inputs.python-version }}-
           deps-${{ runner.os }}-
-    
+
     - name: 📦 Install Python Dependencies
       if: inputs.install-dependencies == 'true'
       shell: bash
       run: |
         echo "📦 Installing Python dependencies..."
         python -m pip install --upgrade pip setuptools wheel
-        
+
         # Install main dependencies
         if [ -f requirements.txt ]; then
           pip install -r requirements.txt
         fi
-        
+
         # Install test dependencies if available
         if [ -f requirements-test.txt ]; then
           pip install -r requirements-test.txt
         fi
-        
+
         # Install development dependencies if available
         if [ -f requirements-dev.txt ]; then
           pip install -r requirements-dev.txt
         fi
-        
+
         echo "✅ Python dependencies installed"
-    
+
     - name: 📦 Install Node.js Dependencies
       if: inputs.install-dependencies == 'true' && inputs.node-version != ''
       shell: bash
@@ -112,47 +112,47 @@ runs:
         else
           echo "ℹ️ No package.json found, skipping Node.js dependencies"
         fi
-    
+
     - name: 🔧 Setup Services
       if: inputs.setup-services == 'true'
       shell: bash
       run: |
         echo "🔧 Setting up development services..."
-        
+
         # Create necessary directories
         mkdir -p logs
         mkdir -p data/redis
         mkdir -p data/elasticsearch
-        
+
         # Set environment variables for development
         echo "ENVIRONMENT=development" >> $GITHUB_ENV
         echo "LOG_LEVEL=DEBUG" >> $GITHUB_ENV
         echo "REDIS_URL=redis://localhost:6379" >> $GITHUB_ENV
         echo "ELASTICSEARCH_URL=http://localhost:9200" >> $GITHUB_ENV
-        
+
         echo "✅ Development services configured"
-    
+
     - name: 🔍 Verify Installation
       shell: bash
       run: |
         echo "🔍 Verifying installation..."
-        
+
         # Check Python
         python --version
         pip --version
-        
+
         # Check Node.js if installed
         if command -v node &> /dev/null; then
           node --version
           npm --version
         fi
-        
+
         # List installed Python packages
         echo "📦 Installed Python packages:"
         pip list | head -20
-        
+
         echo "✅ Installation verified"
-    
+
     - name: 📊 Environment Summary
       shell: bash
       run: |

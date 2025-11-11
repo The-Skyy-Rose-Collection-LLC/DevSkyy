@@ -172,6 +172,6 @@ If you encounter any issues:
 
 ---
 
-*Account created on: 2025-10-21*  
-*Platform: DevSkyy Enterprise v5.1.0*  
+*Account created on: 2025-10-21*
+*Platform: DevSkyy Enterprise v5.1.0*
 *Authentication: JWT with bcrypt password hashing*

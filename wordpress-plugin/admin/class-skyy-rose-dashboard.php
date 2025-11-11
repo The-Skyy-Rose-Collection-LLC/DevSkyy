@@ -1,7 +1,7 @@
 <?php
 /**
  * Dashboard management class
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -48,7 +48,7 @@ class SkyyRoseDashboard
                 <?php _e('Skyy Rose AI Agents Dashboard', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
                 <span class="title-count theme-count"><?php echo $this->getEnabledAgentsCount(); ?></span>
             </h1>
-            
+
             <hr class="wp-header-end">
 
             <!-- Dashboard Overview -->
@@ -64,7 +64,7 @@ class SkyyRoseDashboard
                     <?php $this->renderAgentStatus(); ?>
                     <?php $this->renderRecentActivities(); ?>
                 </div>
-                
+
                 <div class="dashboard-right">
                     <?php $this->renderPerformanceWidget(); ?>
                     <?php $this->renderSecurityWidget(); ?>
@@ -162,7 +162,7 @@ class SkyyRoseDashboard
         ?>
         <div class="dashboard-widget agents-status">
             <h2><?php _e('Agent Status', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h2>
-            
+
             <div class="agents-grid">
                 <?php foreach ($agents as $agent_id => $agent): ?>
                 <div class="agent-status-card <?php echo $agent['enabled'] ? 'enabled' : 'disabled'; ?>" data-agent="<?php echo esc_attr($agent_id); ?>">
@@ -176,7 +176,7 @@ class SkyyRoseDashboard
                             </div>
                         </div>
                     </div>
-                    
+
                     <?php if ($agent['enabled']): ?>
                     <div class="agent-stats">
                         <div class="stat">
@@ -188,7 +188,7 @@ class SkyyRoseDashboard
                             <span class="stat-value"><?php echo $agent['success_rate']; ?>%</span>
                         </div>
                     </div>
-                    
+
                     <div class="agent-actions">
                         <button class="button button-small run-agent" data-agent="<?php echo esc_attr($agent_id); ?>" data-action="<?php echo esc_attr($agent['primary_action']); ?>">
                             <?php _e('Run Now', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
@@ -216,7 +216,7 @@ class SkyyRoseDashboard
                     <?php _e('View All', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
                 </a>
             </div>
-            
+
             <div class="activities-list">
                 <?php if (empty($activities)): ?>
                 <div class="no-activities">
@@ -267,7 +267,7 @@ class SkyyRoseDashboard
         ?>
         <div class="dashboard-widget performance-widget">
             <h2><?php _e('Performance Overview', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h2>
-            
+
             <div class="performance-metrics">
                 <div class="metric">
                     <div class="metric-label"><?php _e('Page Load Time', SKYY_ROSE_AI_TEXT_DOMAIN); ?></div>
@@ -282,7 +282,7 @@ class SkyyRoseDashboard
                     <div class="metric-value"><?php echo $performance_data['database_score']; ?><span class="unit">/100</span></div>
                 </div>
             </div>
-            
+
             <div class="widget-actions">
                 <button class="button button-primary run-performance-check" data-action="check_performance">
                     <?php _e('Run Performance Check', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
@@ -301,7 +301,7 @@ class SkyyRoseDashboard
         ?>
         <div class="dashboard-widget security-widget">
             <h2><?php _e('Security Overview', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h2>
-            
+
             <div class="security-status security-<?php echo esc_attr($security_data['risk_level']); ?>">
                 <div class="security-icon">🛡️</div>
                 <div class="security-info">
@@ -315,7 +315,7 @@ class SkyyRoseDashboard
                     </div>
                 </div>
             </div>
-            
+
             <div class="security-metrics">
                 <div class="metric">
                     <span class="metric-label"><?php _e('Last Scan', SKYY_ROSE_AI_TEXT_DOMAIN); ?></span>
@@ -326,7 +326,7 @@ class SkyyRoseDashboard
                     <span class="metric-value"><?php echo $security_data['vulnerabilities']; ?></span>
                 </div>
             </div>
-            
+
             <div class="widget-actions">
                 <button class="button button-primary run-security-scan" data-action="run_security_scan">
                     <?php _e('Run Security Scan', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
@@ -344,29 +344,29 @@ class SkyyRoseDashboard
         ?>
         <div class="dashboard-widget quick-actions">
             <h2><?php _e('Quick Actions', SKYY_ROSE_AI_TEXT_DOMAIN); ?></h2>
-            
+
             <div class="actions-grid">
                 <button class="action-button brand-action" data-agent="brand_intelligence" data-action="analyze_brand">
                     <div class="action-icon">🎨</div>
                     <div class="action-label"><?php _e('Analyze Brand', SKYY_ROSE_AI_TEXT_DOMAIN); ?></div>
                 </button>
-                
+
                 <button class="action-button inventory-action" data-agent="inventory" data-action="scan_assets">
                     <div class="action-icon">📦</div>
                     <div class="action-label"><?php _e('Scan Assets', SKYY_ROSE_AI_TEXT_DOMAIN); ?></div>
                 </button>
-                
+
                 <button class="action-button wordpress-action" data-agent="wordpress" data-action="optimize_wordpress">
                     <div class="action-icon">🌐</div>
                     <div class="action-label"><?php _e('Optimize Site', SKYY_ROSE_AI_TEXT_DOMAIN); ?></div>
                 </button>
-                
+
                 <button class="action-button performance-action" data-agent="performance" data-action="check_performance">
                     <div class="action-icon">⚡</div>
                     <div class="action-label"><?php _e('Check Performance', SKYY_ROSE_AI_TEXT_DOMAIN); ?></div>
                 </button>
             </div>
-            
+
             <div class="bulk-actions">
                 <button class="button button-secondary run-all-agents">
                     <?php _e('Run All Agents', SKYY_ROSE_AI_TEXT_DOMAIN); ?>
@@ -384,12 +384,12 @@ class SkyyRoseDashboard
         // Get latest performance metrics
         $performance_metrics = $this->db->getPerformanceMetrics('overall_score', 24);
         $performance_score = !empty($performance_metrics) ? end($performance_metrics)->metric_value : 85;
-        
+
         // Get security data
         $security_activities = $this->db->getAgentActivities('security', 5);
         $security_level = 'low';
         $last_scan = __('Never', SKYY_ROSE_AI_TEXT_DOMAIN);
-        
+
         foreach ($security_activities as $activity) {
             if ($activity->action === 'security_scan' && $activity->status === 'completed') {
                 $result = json_decode($activity->result, true);
@@ -398,7 +398,7 @@ class SkyyRoseDashboard
                 break;
             }
         }
-        
+
         // Get activity counts
         $all_activities = $this->db->getAgentActivities();
         $today_activities = array_filter($all_activities, function($activity) {
@@ -407,7 +407,7 @@ class SkyyRoseDashboard
         $week_activities = array_filter($all_activities, function($activity) {
             return strtotime($activity->created_at) >= strtotime('-7 days');
         });
-        
+
         return [
             'performance_score' => round($performance_score),
             'performance_trend' => 'up', // Simplified
@@ -468,11 +468,11 @@ class SkyyRoseDashboard
     private function getPerformanceData()
     {
         $metrics = $this->db->getPerformanceMetrics(null, 1);
-        
+
         $page_load_time = 1250; // Default values
         $memory_usage = 45;
         $database_score = 85;
-        
+
         foreach ($metrics as $metric) {
             switch ($metric->metric_type) {
                 case 'page_load_time':
@@ -486,7 +486,7 @@ class SkyyRoseDashboard
                     break;
             }
         }
-        
+
         return [
             'page_load_time' => $page_load_time,
             'memory_usage' => $memory_usage,
@@ -497,12 +497,12 @@ class SkyyRoseDashboard
     private function getSecurityData()
     {
         $activities = $this->db->getAgentActivities('security', 5);
-        
+
         $risk_level = 'low';
         $threats_detected = 0;
         $vulnerabilities = 0;
         $last_scan = __('Never', SKYY_ROSE_AI_TEXT_DOMAIN);
-        
+
         foreach ($activities as $activity) {
             if ($activity->action === 'security_scan' && $activity->status === 'completed') {
                 $result = json_decode($activity->result, true);
@@ -512,7 +512,7 @@ class SkyyRoseDashboard
                 break;
             }
         }
-        
+
         return [
             'risk_level' => $risk_level,
             'threats_detected' => $threats_detected,
@@ -525,39 +525,39 @@ class SkyyRoseDashboard
     {
         $agents = ['brand_intelligence', 'inventory', 'wordpress', 'performance', 'security'];
         $enabled_count = 0;
-        
+
         foreach ($agents as $agent) {
             if ($this->settings->get("agents.{$agent}.enabled", true)) {
                 $enabled_count++;
             }
         }
-        
+
         return $enabled_count;
     }
 
     private function getLastRunTime($agent_type)
     {
         $activities = $this->db->getAgentActivities($agent_type, 1);
-        
+
         if (empty($activities)) {
             return __('Never', SKYY_ROSE_AI_TEXT_DOMAIN);
         }
-        
+
         return human_time_diff(strtotime($activities[0]->created_at), current_time('timestamp')) . ' ' . __('ago', SKYY_ROSE_AI_TEXT_DOMAIN);
     }
 
     private function getSuccessRate($agent_type)
     {
         $activities = $this->db->getAgentActivities($agent_type, 10);
-        
+
         if (empty($activities)) {
             return 100;
         }
-        
+
         $successful = array_filter($activities, function($activity) {
             return $activity->status === 'completed';
         });
-        
+
         return round((count($successful) / count($activities)) * 100);
     }
 
@@ -570,7 +570,7 @@ class SkyyRoseDashboard
             'performance' => '⚡',
             'security' => '🛡️'
         ];
-        
+
         return $icons[$agent_type] ?? '🤖';
     }
 
@@ -583,7 +583,7 @@ class SkyyRoseDashboard
             'performance' => __('Performance', SKYY_ROSE_AI_TEXT_DOMAIN),
             'security' => __('Security', SKYY_ROSE_AI_TEXT_DOMAIN)
         ];
-        
+
         return $names[$agent_type] ?? ucwords(str_replace('_', ' ', $agent_type));
     }
 

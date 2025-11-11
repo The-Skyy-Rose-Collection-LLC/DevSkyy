@@ -43,12 +43,12 @@ Skyy Rose Collection is a luxury fashion WordPress theme with advanced eCommerce
 	--text-light: var(--skyy-rose-charcoal);
 	--border-color: #e1e1e1;
 	--border-light: #f0f0f0;
-	
+
 	/* Typography */
 	--font-primary: 'Playfair Display', Georgia, serif;
 	--font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	--font-accent: 'Dancing Script', cursive;
-	
+
 	/* Spacing */
 	--spacing-xs: 0.5rem;
 	--spacing-sm: 1rem;
@@ -56,13 +56,13 @@ Skyy Rose Collection is a luxury fashion WordPress theme with advanced eCommerce
 	--spacing-lg: 2rem;
 	--spacing-xl: 3rem;
 	--spacing-xxl: 4rem;
-	
+
 	/* Shadows */
 	--shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
 	--shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
 	--shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.2);
 	--shadow-luxury: 0 10px 30px rgba(26, 26, 26, 0.15);
-	
+
 	/* Transitions */
 	--transition-fast: 0.2s ease;
 	--transition-medium: 0.3s ease;
@@ -109,34 +109,34 @@ h1, h2, h3, h4, h5, h6 {
 	color: var(--primary-color);
 }
 
-h1 { 
+h1 {
 	font-size: clamp(2.5rem, 5vw, 4rem);
 	font-weight: 300;
 	letter-spacing: -0.02em;
 }
 
-h2 { 
+h2 {
 	font-size: clamp(2rem, 4vw, 3rem);
 	font-weight: 300;
 	letter-spacing: -0.01em;
 }
 
-h3 { 
+h3 {
 	font-size: clamp(1.5rem, 3vw, 2.25rem);
 	font-weight: 400;
 }
 
-h4 { 
+h4 {
 	font-size: clamp(1.25rem, 2.5vw, 1.75rem);
 	font-weight: 400;
 }
 
-h5 { 
+h5 {
 	font-size: 1.25rem;
 	font-weight: 500;
 }
 
-h6 { 
+h6 {
 	font-size: 1rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -509,17 +509,17 @@ a:focus {
 		--spacing-xl: 2rem;
 		--spacing-xxl: 2.5rem;
 	}
-	
+
 	.container,
 	.container-wide,
 	.container-narrow {
 		padding: 0 var(--spacing-sm);
 	}
-	
+
 	.site-header {
 		padding: var(--spacing-sm) 0;
 	}
-	
+
 	.site-branding {
 		margin-bottom: var(--spacing-sm);
 	}
@@ -548,11 +548,11 @@ a:focus {
 		flex-direction: column;
 		gap: var(--spacing-md);
 	}
-	
+
 	.main-navigation a::before {
 		display: none;
 	}
-	
+
 	.site-main {
 		padding: var(--spacing-lg) 0;
 	}
@@ -564,16 +564,16 @@ a:focus {
 	.container-narrow {
 		padding: 0 var(--spacing-xs);
 	}
-	
+
 	.site-header,
 	.site-footer {
 		padding: var(--spacing-sm) 0;
 	}
-	
+
 	.site-main {
 		padding: var(--spacing-md) 0;
 	}
-	
+
 	.main-navigation ul {
 		gap: var(--spacing-sm);
 	}

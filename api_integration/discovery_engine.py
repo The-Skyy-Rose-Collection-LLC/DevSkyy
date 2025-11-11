@@ -1,16 +1,17 @@
-from datetime import datetime
-from infrastructure.redis_manager import redis_manager
-import os
-import time
-
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
-from fashion.intelligence_engine import fashion_intelligence
-from typing import Any, Dict, List, Optional
-import aiohttp
-import asyncio
 import hashlib
 import logging
+import os
+import time
+from typing import Any, Optional
+
+import aiohttp
+
+from fashion.intelligence_engine import fashion_intelligence
+from infrastructure.redis_manager import redis_manager
+
 
 """
 Automated API Discovery & Evaluation Framework
@@ -19,6 +20,7 @@ Integrates with existing Redis, Elasticsearch, and Fashion Intelligence systems
 """
 
 logger = logging.getLogger(__name__)
+
 
 class APICategory(Enum):
     """API categories for fashion e-commerce"""
@@ -34,6 +36,7 @@ class APICategory(Enum):
     DEVOPS_AUTOMATION = "devops_automation"
     BUSINESS_INTELLIGENCE = "business_intelligence"
 
+
 class AuthenticationType(Enum):
     """API authentication types"""
 
@@ -44,6 +47,7 @@ class AuthenticationType(Enum):
     BEARER_TOKEN = "bearer_token"
     CUSTOM = "custom"
 
+
 class APIStatus(Enum):
     """API operational status"""
 
@@ -52,6 +56,7 @@ class APIStatus(Enum):
     BETA = "beta"
     MAINTENANCE = "maintenance"
     UNAVAILABLE = "unavailable"
+
 
 @dataclass
 class APIEndpoint:
@@ -65,10 +70,10 @@ class APIEndpoint:
     category: APICategory
     provider: str
     authentication: AuthenticationType
-    rate_limits: Dict[str, int]
-    pricing: Dict[str, Any]
-    features: List[str]
-    supported_formats: List[str]
+    rate_limits: dict[str, int]
+    pricing: dict[str, Any]
+    features: list[str]
+    supported_formats: list[str]
     documentation_url: str
     status: APIStatus
     reliability_score: float
@@ -80,7 +85,7 @@ class APIEndpoint:
     fashion_relevance: float
     sustainability_support: bool
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["category"] = self.category.value
@@ -88,6 +93,7 @@ class APIEndpoint:
         data["status"] = self.status.value
         data["last_evaluated"] = self.last_evaluated.isoformat()
         return data
+
 
 @dataclass
 class APIEvaluationCriteria:
@@ -115,12 +121,13 @@ class APIEvaluationCriteria:
         self.features_weight /= total
         self.fashion_relevance_weight /= total
 
+
 class APIDiscoveryEngine:
     """Automated API discovery and evaluation engine"""
 
     def __init__(self):
-        self.discovered_apis: Dict[str, APIEndpoint] = {}
-        self.api_registry: Dict[str, Dict[str, Any]] = {}
+        self.discovered_apis: dict[str, APIEndpoint] = {}
+        self.api_registry: dict[str, dict[str, Any]] = {}
         self.evaluation_criteria = APIEvaluationCriteria()
         self.discovery_sources = self._initialize_discovery_sources()
         self.fashion_api_patterns = self._initialize_fashion_patterns()
@@ -136,7 +143,7 @@ class APIDiscoveryEngine:
 
         logger.info("API Discovery Engine initialized")
 
-    def _initialize_discovery_sources(self) -> Dict[str, Dict[str, Any]]:
+    def _initialize_discovery_sources(self) -> dict[str, dict[str, Any]]:
         """Initialize API discovery sources"""
         return {
             "rapidapi": {
@@ -170,7 +177,7 @@ class APIDiscoveryEngine:
             },
         }
 
-    def _initialize_fashion_patterns(self) -> Dict[str, List[str]]:
+    def _initialize_fashion_patterns(self) -> dict[str, list[str]]:
         """Initialize fashion-specific API patterns"""
         return {
             "fashion_keywords": [
@@ -224,16 +231,14 @@ class APIDiscoveryEngine:
         }
 
     async def discover_apis(
-        self, categories: List[APICategory] = None, force_refresh: bool = False
-    ) -> Dict[str, List[APIEndpoint]]:
+        self, categories: list[APICategory] = None, force_refresh: bool = False
+    ) -> dict[str, list[APIEndpoint]]:
         """Discover APIs across multiple sources"""
 
         start_time = time.time()
         categories = categories or list(APICategory)
 
-        logger.info(
-            f"Starting API discovery for categories: {[c.value for c in categories]}"
-        )
+        logger.info(f"Starting API discovery for categories: {[c.value for c in categories]}")
 
         discovered_apis = {}
 
@@ -250,9 +255,7 @@ class APIDiscoveryEngine:
                 if source_name == "fashion_specific":
                     apis = await self._discover_fashion_specific_apis(source_config)
                 else:
-                    apis = await self._discover_from_source(
-                        source_name, source_config, categories
-                    )
+                    apis = await self._discover_from_source(source_name, source_config, categories)
 
                 for api in apis:
                     category_key = api.category.value
@@ -278,12 +281,8 @@ class APIDiscoveryEngine:
         discovery_duration = time.time() - start_time
         self.discovery_metrics.update(
             {
-                "total_apis_discovered": sum([
-                    len(apis) for apis in discovered_apis.values()
-                ]),
-                "apis_by_category": {
-                    cat: len(apis) for cat, apis in discovered_apis.items()
-                },
+                "total_apis_discovered": sum([len(apis) for apis in discovered_apis.values()]),
+                "apis_by_category": {cat: len(apis) for cat, apis in discovered_apis.items()},
                 "last_discovery_run": datetime.now().isoformat(),
                 "discovery_duration": discovery_duration,
             }
@@ -295,9 +294,9 @@ class APIDiscoveryEngine:
     async def _discover_from_source(
         self,
         source_name: str,
-        source_config: Dict[str, Any],
-        categories: List[APICategory],
-    ) -> List[APIEndpoint]:
+        source_config: dict[str, Any],
+        categories: list[APICategory],
+    ) -> list[APIEndpoint]:
         """Discover APIs from a specific source"""
 
         discovered_apis = []
@@ -307,15 +306,11 @@ class APIDiscoveryEngine:
         elif source_name == "apis_guru":
             discovered_apis = await self._discover_apis_guru(source_config, categories)
         elif source_name == "programmableweb":
-            discovered_apis = await self._discover_programmableweb(
-                source_config, categories
-            )
+            discovered_apis = await self._discover_programmableweb(source_config, categories)
 
         return discovered_apis
 
-    async def _discover_rapidapi(
-        self, config: Dict[str, Any], categories: List[APICategory]
-    ) -> List[APIEndpoint]:
+    async def _discover_rapidapi(self, config: dict[str, Any], categories: list[APICategory]) -> list[APIEndpoint]:
         """Discover APIs from RapidAPI"""
 
         apis = []
@@ -335,9 +330,7 @@ class APIDiscoveryEngine:
                         "X-RapidAPI-Host": "rapidapi.com",
                     }
 
-                    async with session.get(
-                        url, params=params, headers=headers
-                    ) as response:
+                    async with session.get(url, params=params, headers=headers) as response:
                         if response.status == 200:
                             data = await response.json()
 
@@ -351,9 +344,7 @@ class APIDiscoveryEngine:
 
         return apis
 
-    async def _discover_apis_guru(
-        self, config: Dict[str, Any], categories: List[APICategory]
-    ) -> List[APIEndpoint]:
+    async def _discover_apis_guru(self, config: dict[str, Any], categories: list[APICategory]) -> list[APIEndpoint]:
         """Discover APIs from APIs.guru"""
 
         apis = []
@@ -372,9 +363,7 @@ class APIDiscoveryEngine:
                                 latest_version = max(api_versions.keys())
                                 api_info = api_versions[latest_version]
 
-                                api = self._parse_apis_guru_result(
-                                    provider, api_name, api_info
-                                )
+                                api = self._parse_apis_guru_result(provider, api_name, api_info)
                                 if api and self._is_fashion_relevant(api):
                                     apis.append(api)
 
@@ -383,9 +372,7 @@ class APIDiscoveryEngine:
 
         return apis
 
-    async def _discover_fashion_specific_apis(
-        self, config: Dict[str, Any]
-    ) -> List[APIEndpoint]:
+    async def _discover_fashion_specific_apis(self, config: dict[str, Any]) -> list[APIEndpoint]:
         """Discover fashion-specific APIs from known sources"""
 
         apis = []
@@ -472,9 +459,7 @@ class APIDiscoveryEngine:
 
         for api_data in fashion_apis:
             api = APIEndpoint(
-                api_id=hashlib.sha256(
-                    f"{api_data['provider']}_{api_data['name']}".encode()
-                ).hexdigest(),
+                api_id=hashlib.sha256(f"{api_data['provider']}_{api_data['name']}".encode()).hexdigest(),
                 name=api_data["name"],
                 description=api_data["description"],
                 base_url=api_data["base_url"],
@@ -501,7 +486,7 @@ class APIDiscoveryEngine:
 
         return apis
 
-    def _parse_rapidapi_result(self, api_data: Dict[str, Any]) -> Optional[APIEndpoint]:
+    def _parse_rapidapi_result(self, api_data: dict[str, Any]) -> Optional[APIEndpoint]:
         """Parse RapidAPI search result"""
         try:
             return APIEndpoint(
@@ -532,9 +517,7 @@ class APIDiscoveryEngine:
             logger.error(f"Error parsing RapidAPI result: {e}")
             return None
 
-    def _parse_apis_guru_result(
-        self, provider: str, api_name: str, api_info: Dict[str, Any]
-    ) -> Optional[APIEndpoint]:
+    def _parse_apis_guru_result(self, provider: str, api_name: str, api_info: dict[str, Any]) -> Optional[APIEndpoint]:
         """Parse APIs.guru result"""
         try:
             swagger_url = api_info.get("swaggerUrl", "")
@@ -543,13 +526,9 @@ class APIDiscoveryEngine:
                 api_id=hashlib.sha256(f"{provider}_{api_name}".encode()).hexdigest(),
                 name=api_info.get("info", {}).get("title", api_name),
                 description=api_info.get("info", {}).get("description", ""),
-                base_url=(
-                    swagger_url.replace("/swagger.json", "") if swagger_url else ""
-                ),
+                base_url=(swagger_url.replace("/swagger.json", "") if swagger_url else ""),
                 version=api_info.get("info", {}).get("version", "v1"),
-                category=self._determine_category_from_text(
-                    api_info.get("info", {}).get("description", "")
-                ),
+                category=self._determine_category_from_text(api_info.get("info", {}).get("description", "")),
                 provider=provider,
                 authentication=AuthenticationType.API_KEY,  # Default assumption
                 rate_limits={},
@@ -571,7 +550,7 @@ class APIDiscoveryEngine:
             logger.error(f"Error parsing APIs.guru result: {e}")
             return None
 
-    def _determine_category(self, api_data: Dict[str, Any]) -> APICategory:
+    def _determine_category(self, api_data: dict[str, Any]) -> APICategory:
         """Determine API category from data"""
         name = api_data.get("name", "").lower()
         description = api_data.get("description", "").lower()
@@ -586,62 +565,44 @@ class APIDiscoveryEngine:
         text_lower = text.lower()
 
         # Fashion and trends
-        if any(
-            keyword in text_lower
-            for keyword in self.fashion_api_patterns["fashion_keywords"]
-        ):
+        if any(keyword in text_lower for keyword in self.fashion_api_patterns["fashion_keywords"]):
             return APICategory.FASHION_TRENDS
 
         # E-commerce and retail
-        if any(
-            keyword in text_lower for keyword in ["inventory", "stock", "warehouse"]
-        ):
+        if any(keyword in text_lower for keyword in ["inventory", "stock", "warehouse"]):
             return APICategory.INVENTORY_MANAGEMENT
 
         if any(keyword in text_lower for keyword in ["product", "catalog", "item"]):
             return APICategory.PRODUCT_CATALOG
 
-        if any(
-            keyword in text_lower for keyword in ["customer", "analytics", "behavior"]
-        ):
+        if any(keyword in text_lower for keyword in ["customer", "analytics", "behavior"]):
             return APICategory.CUSTOMER_ANALYTICS
 
-        if any(
-            keyword in text_lower for keyword in ["payment", "billing", "transaction"]
-        ):
+        if any(keyword in text_lower for keyword in ["payment", "billing", "transaction"]):
             return APICategory.PAYMENT_PROCESSING
 
         # Content and design
-        if any(
-            keyword in text_lower for keyword in ["image", "video", "content", "media"]
-        ):
+        if any(keyword in text_lower for keyword in ["image", "video", "content", "media"]):
             return APICategory.CONTENT_GENERATION
 
-        if any(
-            keyword in text_lower for keyword in ["design", "css", "theme", "template"]
-        ):
+        if any(keyword in text_lower for keyword in ["design", "css", "theme", "template"]):
             return APICategory.DESIGN_AUTOMATION
 
         # Infrastructure
         if any(keyword in text_lower for keyword in ["cloud", "aws", "azure", "gcp"]):
             return APICategory.CLOUD_INFRASTRUCTURE
 
-        if any(
-            keyword in text_lower for keyword in ["deploy", "ci/cd", "devops", "git"]
-        ):
+        if any(keyword in text_lower for keyword in ["deploy", "ci/cd", "devops", "git"]):
             return APICategory.DEVOPS_AUTOMATION
 
         # Business intelligence
-        if any(
-            keyword in text_lower
-            for keyword in self.fashion_api_patterns["business_keywords"]
-        ):
+        if any(keyword in text_lower for keyword in self.fashion_api_patterns["business_keywords"]):
             return APICategory.BUSINESS_INTELLIGENCE
 
         # Default to product catalog for e-commerce
         return APICategory.PRODUCT_CATALOG
 
-    def _determine_auth_type(self, api_data: Dict[str, Any]) -> AuthenticationType:
+    def _determine_auth_type(self, api_data: dict[str, Any]) -> AuthenticationType:
         """Determine authentication type from API data"""
         auth_info = api_data.get("authentication", {})
 
@@ -757,9 +718,7 @@ class APIDiscoveryEngine:
             async with aiohttp.ClientSession() as session:
                 try:
                     # Try to access API documentation or health endpoint
-                    async with session.get(
-                        api.documentation_url, timeout=5
-                    ) as response:
+                    async with session.get(api.documentation_url, timeout=5) as response:
                         response_time = time.time() - start_time
 
                         if response.status == 200:
@@ -775,7 +734,7 @@ class APIDiscoveryEngine:
                         else:
                             return 0.3
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     return 0.2
                 except Exception:
                     return 0.1
@@ -838,11 +797,7 @@ class APIDiscoveryEngine:
             "personalization",
             "analytics",
         ]
-        fashion_bonus = sum([
-            0.1
-            for feature in features
-            if any(ff in feature.lower() for ff in fashion_features)
-        ])
+        fashion_bonus = sum([0.1 for feature in features if any(ff in feature.lower() for ff in fashion_features)])
 
         return min(base_score + fashion_bonus, 1.0)
 
@@ -851,9 +806,7 @@ class APIDiscoveryEngine:
 
         # Use fashion intelligence engine for context analysis
         context_text = f"{api.name} {api.description} {' '.join(api.features)}"
-        fashion_context = await fashion_intelligence.analyze_fashion_context(
-            context_text
-        )
+        fashion_context = await fashion_intelligence.analyze_fashion_context(context_text)
 
         return fashion_context.get("fashion_relevance_score", 0.0)
 
@@ -877,8 +830,8 @@ class APIDiscoveryEngine:
         return any(keyword in text for keyword in sustainability_keywords)
 
     async def _get_cached_discovery_results(
-        self, categories: List[APICategory]
-    ) -> Optional[Dict[str, List[APIEndpoint]]]:
+        self, categories: list[APICategory]
+    ) -> Optional[dict[str, list[APIEndpoint]]]:
         """Get cached API discovery results"""
 
         cache_key = f"api_discovery:{':'.join(sorted(c.value for c in categories))}"
@@ -889,16 +842,14 @@ class APIDiscoveryEngine:
                 # Convert back to APIEndpoint objects
                 results = {}
                 for category, api_list in cached_data.items():
-                    results[category] = [
-                        APIEndpoint(**api_data) for api_data in api_list
-                    ]
+                    results[category] = [APIEndpoint(**api_data) for api_data in api_list]
                 return results
         except Exception as e:
             logger.error(f"Error getting cached discovery results: {e}")
 
         return None
 
-    async def _cache_discovery_results(self, results: Dict[str, List[APIEndpoint]]):
+    async def _cache_discovery_results(self, results: dict[str, list[APIEndpoint]]):
         """Cache API discovery results"""
 
         cache_key = f"api_discovery:{':'.join(sorted(results.keys()))}"
@@ -910,23 +861,19 @@ class APIDiscoveryEngine:
                 cache_data[category] = [api.to_dict() for api in api_list]
 
             # Cache for 24 hours
-            await redis_manager.set(
-                cache_key, cache_data, ttl=86400, prefix="api_cache"
-            )
+            await redis_manager.set(cache_key, cache_data, ttl=86400, prefix="api_cache")
 
         except Exception as e:
             logger.error(f"Error caching discovery results: {e}")
 
     async def get_recommended_apis(
         self, category: APICategory, limit: int = 5, min_score: float = 0.6
-    ) -> List[APIEndpoint]:
+    ) -> list[APIEndpoint]:
         """Get recommended APIs for a category"""
 
         # Filter APIs by category and minimum score
         category_apis = [
-            api
-            for api in self.discovered_apis.values()
-            if api.category == category and api.overall_score >= min_score
+            api for api in self.discovered_apis.values() if api.category == category and api.overall_score >= min_score
         ]
 
         # Sort by overall score
@@ -934,18 +881,14 @@ class APIDiscoveryEngine:
 
         return category_apis[:limit]
 
-    async def get_discovery_metrics(self) -> Dict[str, Any]:
+    async def get_discovery_metrics(self) -> dict[str, Any]:
         """Get API discovery metrics"""
 
         return {
             "discovery_metrics": self.discovery_metrics,
             "total_apis_in_registry": len(self.discovered_apis),
             "apis_by_category": {
-                category.value: len([
-                        api
-                        for api in self.discovered_apis.values()
-                        if api.category == category
-                    ])
+                category.value: len([api for api in self.discovered_apis.values() if api.category == category])
                 for category in APICategory
             },
             "top_providers": self._get_top_providers(),
@@ -953,7 +896,7 @@ class APIDiscoveryEngine:
             "average_scores": self._get_average_scores(),
         }
 
-    def _get_top_providers(self) -> List[Dict[str, Any]]:
+    def _get_top_providers(self) -> list[dict[str, Any]]:
         """Get top API providers by count and average score"""
 
         provider_stats = {}
@@ -977,11 +920,9 @@ class APIDiscoveryEngine:
                 }
             )
 
-        return sorted(top_providers, key=lambda x: x["average_score"], reverse=True)[
-            :10
-        ]
+        return sorted(top_providers, key=lambda x: x["average_score"], reverse=True)[:10]
 
-    def _get_auth_distribution(self) -> Dict[str, int]:
+    def _get_auth_distribution(self) -> dict[str, int]:
         """Get authentication type distribution"""
 
         auth_counts = {}
@@ -991,7 +932,7 @@ class APIDiscoveryEngine:
 
         return auth_counts
 
-    def _get_average_scores(self) -> Dict[str, float]:
+    def _get_average_scores(self) -> dict[str, float]:
         """Get average scores across all APIs"""
 
         if not self.discovered_apis:
@@ -1000,27 +941,15 @@ class APIDiscoveryEngine:
         total_apis = len(self.discovered_apis)
 
         return {
-            "reliability": sum([
-                api.reliability_score for api in self.discovered_apis.values()
-            ])
-            / total_apis,
-            "performance": sum([
-                api.performance_score for api in self.discovered_apis.values()
-            ])
-            / total_apis,
-            "cost": sum(api.cost_score for api in self.discovered_apis.values())
-            / total_apis,
-            "features": sum(api.feature_score for api in self.discovered_apis.values())
-            / total_apis,
-            "fashion_relevance": sum([
-                api.fashion_relevance for api in self.discovered_apis.values()
-            ])
-            / total_apis,
-            "overall": sum(api.overall_score for api in self.discovered_apis.values())
-            / total_apis,
+            "reliability": sum([api.reliability_score for api in self.discovered_apis.values()]) / total_apis,
+            "performance": sum([api.performance_score for api in self.discovered_apis.values()]) / total_apis,
+            "cost": sum(api.cost_score for api in self.discovered_apis.values()) / total_apis,
+            "features": sum(api.feature_score for api in self.discovered_apis.values()) / total_apis,
+            "fashion_relevance": sum([api.fashion_relevance for api in self.discovered_apis.values()]) / total_apis,
+            "overall": sum(api.overall_score for api in self.discovered_apis.values()) / total_apis,
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for API discovery engine"""
 
         try:
@@ -1039,6 +968,7 @@ class APIDiscoveryEngine:
 
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
+
 
 # Global API discovery engine instance
 api_discovery_engine = APIDiscoveryEngine()

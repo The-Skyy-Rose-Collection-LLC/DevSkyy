@@ -8,37 +8,27 @@ IMPACT: Enables automated product management workflows
 Truth Protocol: Input validation, error handling, logging, no placeholders
 """
 
+from datetime import datetime
 import logging
 import os
+from typing import Optional
 import uuid
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Header
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from google.oauth2.service_account import Credentials
+from pydantic import BaseModel, Field
 
 from config.settings import settings
-from services.woocommerce_importer import (
-    WooCommerceImporterService,
-    ProductImportResult
-)
-from services.seo_optimizer import (
-    SEOOptimizerService,
-    ProductInfo,
-    SEOMetaTags,
-    AIProvider
-)
-from services.optimization_service import (
-    ProductOptimizationService,
-    JobStatus
-)
+from services.optimization_service import JobStatus, ProductOptimizationService
+from services.seo_optimizer import AIProvider, ProductInfo, SEOOptimizerService
+from services.woocommerce_importer import WooCommerceImporterService
 from services.woocommerce_integration_service import (
-    WooCommerceIntegrationService,
     ProductData,
     ProductWithSEOResponse,
-    get_integration_service
+    WooCommerceIntegrationService,
+    get_integration_service,
 )
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ecommerce", tags=["E-Commerce Automation"])
@@ -103,8 +93,6 @@ class WorkflowResponse(BaseModel):
     duration_seconds: Optional[float] = None
 
 
-
-
 class CreateProductWithSEORequest(BaseModel):
     """Request to create product with auto-generated SEO (Phase 3)"""
 
@@ -116,7 +104,7 @@ class CreateProductWithSEORequest(BaseModel):
     regular_price: Optional[float] = Field(None, description="Regular price (before sale)")
     sku: Optional[str] = Field(None, description="Stock Keeping Unit")
     stock_quantity: Optional[int] = Field(None, ge=0, description="Stock quantity")
-    images: List[str] = Field(default_factory=list, description="Image URLs")
+    images: list[str] = Field(default_factory=list, description="Image URLs")
     keywords: Optional[str] = Field(None, description="Target keywords for SEO")
 
 
@@ -132,7 +120,7 @@ class UpdateProductSEORequest(BaseModel):
     regular_price: Optional[float] = Field(None, description="Regular price")
     sku: Optional[str] = Field(None, description="Stock Keeping Unit")
     stock_quantity: Optional[int] = Field(None, ge=0, description="Stock quantity")
-    images: List[str] = Field(default_factory=list, description="Image URLs")
+    images: list[str] = Field(default_factory=list, description="Image URLs")
     keywords: Optional[str] = Field(None, description="Target keywords for SEO")
 
 
@@ -152,7 +140,7 @@ class OptimizationStepData(BaseModel):
 class OptimizeProductsRequest(BaseModel):
     """Request for unified product optimization"""
 
-    product_ids: List[int] = Field(..., description="Product IDs to optimize", min_items=1)
+    product_ids: list[int] = Field(..., description="Product IDs to optimize", min_items=1)
     woocommerce_sync: bool = Field(True, description="Sync products with WooCommerce")
     seo_optimize: bool = Field(True, description="Generate SEO metadata for products")
     update_metadata: bool = Field(True, description="Update WooCommerce with SEO metadata")
@@ -164,7 +152,7 @@ class OptimizeProductsResponse(BaseModel):
 
     job_id: str = Field(..., description="Unique job identifier for status tracking")
     status: str = Field(..., description="Current job status (queued, processing, completed, failed)")
-    product_ids: List[int] = Field(..., description="List of product IDs being optimized")
+    product_ids: list[int] = Field(..., description="List of product IDs being optimized")
     total_products: int = Field(..., description="Total number of products in job")
     eta_seconds: Optional[int] = Field(None, description="Estimated time to completion in seconds")
     started_at: str = Field(..., description="ISO timestamp when job was queued")
@@ -176,11 +164,11 @@ class OptimizationStatusResponse(BaseModel):
 
     job_id: str = Field(..., description="Job identifier")
     status: str = Field(..., description="Current job status")
-    product_ids: List[int] = Field(..., description="Product IDs in this job")
+    product_ids: list[int] = Field(..., description="Product IDs in this job")
     total_products: int = Field(..., description="Total products")
     succeeded_products: int = Field(0, description="Successfully processed products")
     failed_products: int = Field(0, description="Failed products")
-    steps: List[OptimizationStepData] = Field(default_factory=list, description="Optimization steps")
+    steps: list[OptimizationStepData] = Field(default_factory=list, description="Optimization steps")
     started_at: str = Field(..., description="Job start timestamp")
     completed_at: Optional[str] = Field(None, description="Job completion timestamp")
     error_message: Optional[str] = Field(None, description="Error message if job failed")
@@ -208,13 +196,10 @@ def get_importer_service() -> WooCommerceImporterService:
 
         # Load Google credentials from service account file
         if not os.path.exists(settings.GOOGLE_CREDENTIALS_PATH):
-            raise FileNotFoundError(
-                f"Google credentials file not found: {settings.GOOGLE_CREDENTIALS_PATH}"
-            )
+            raise FileNotFoundError(f"Google credentials file not found: {settings.GOOGLE_CREDENTIALS_PATH}")
 
         google_credentials = Credentials.from_service_account_file(
-            settings.GOOGLE_CREDENTIALS_PATH,
-            scopes=['https://www.googleapis.com/auth/spreadsheets']
+            settings.GOOGLE_CREDENTIALS_PATH, scopes=["https://www.googleapis.com/auth/spreadsheets"]
         )
 
         # Initialize service
@@ -226,7 +211,7 @@ def get_importer_service() -> WooCommerceImporterService:
             telegram_bot_token=settings.TELEGRAM_BOT_TOKEN or None,
             telegram_chat_id=settings.TELEGRAM_CHAT_ID or None,
             batch_size=settings.WOOCOMMERCE_BATCH_SIZE,
-            max_retries=settings.WOOCOMMERCE_MAX_RETRIES
+            max_retries=settings.WOOCOMMERCE_MAX_RETRIES,
         )
 
         logger.info("WooCommerce importer service initialized successfully")
@@ -234,10 +219,7 @@ def get_importer_service() -> WooCommerceImporterService:
 
     except Exception as e:
         logger.exception("Failed to initialize WooCommerce importer service")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Service initialization failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Service initialization failed: {e!s}")
 
 
 def get_seo_service() -> SEOOptimizerService:
@@ -250,10 +232,7 @@ def get_seo_service() -> SEOOptimizerService:
     try:
         # Validate at least one AI provider is configured
         if not settings.ANTHROPIC_API_KEY and not settings.OPENAI_API_KEY:
-            raise ValueError(
-                "At least one AI provider API key is required "
-                "(ANTHROPIC_API_KEY or OPENAI_API_KEY)"
-            )
+            raise ValueError("At least one AI provider API key is required " "(ANTHROPIC_API_KEY or OPENAI_API_KEY)")
 
         # Determine primary provider based on which key is available
         primary_provider = AIProvider.ANTHROPIC
@@ -273,27 +252,21 @@ def get_seo_service() -> SEOOptimizerService:
             anthropic_model=settings.ANTHROPIC_MODEL,
             openai_model=settings.OPENAI_MODEL,
             temperature=settings.AI_TEMPERATURE,
-            max_tokens=settings.AI_MAX_TOKENS
+            max_tokens=settings.AI_MAX_TOKENS,
         )
 
         logger.info(
-            "SEO optimizer service initialized successfully",
-            extra={"primary_provider": primary_provider.value}
+            "SEO optimizer service initialized successfully", extra={"primary_provider": primary_provider.value}
         )
         return service
 
     except Exception as e:
         logger.exception("Failed to initialize SEO optimizer service")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Service initialization failed: {str(e)}"
-        )
-
-
+        raise HTTPException(status_code=500, detail=f"Service initialization failed: {e!s}")
 
 
 def get_integration_service_dependency(
-    seo_service: SEOOptimizerService = Depends(get_seo_service)
+    seo_service: SEOOptimizerService = Depends(get_seo_service),
 ) -> WooCommerceIntegrationService:
     """
     Get WooCommerce integration service instance (Phase 3)
@@ -314,7 +287,7 @@ def get_integration_service_dependency(
             store_url=settings.WOOCOMMERCE_URL,
             consumer_key=settings.WOOCOMMERCE_CONSUMER_KEY,
             consumer_secret=settings.WOOCOMMERCE_CONSUMER_SECRET,
-            seo_service=seo_service
+            seo_service=seo_service,
         )
 
         logger.info("WooCommerce integration service initialized successfully")
@@ -322,10 +295,7 @@ def get_integration_service_dependency(
 
     except Exception as e:
         logger.exception("Failed to initialize WooCommerce integration service")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Service initialization failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Service initialization failed: {e!s}")
 
 
 def get_optimization_service() -> ProductOptimizationService:
@@ -344,23 +314,20 @@ def get_optimization_service() -> ProductOptimizationService:
 
         logger.info(
             "Product optimization service initialized successfully",
-            extra={"storage": "redis" if redis_client else "in-memory"}
+            extra={"storage": "redis" if redis_client else "in-memory"},
         )
         return service
 
     except Exception as e:
         logger.exception("Failed to initialize product optimization service")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Service initialization failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Service initialization failed: {e!s}")
 
 
 @router.post("/import-products", response_model=ImportProductsResponse)
 async def import_products(
     request: ImportProductsRequest,
     background_tasks: BackgroundTasks,
-    importer: WooCommerceImporterService = Depends(get_importer_service)
+    importer: WooCommerceImporterService = Depends(get_importer_service),
 ):
     """
     Import products from Google Sheets to WooCommerce
@@ -375,16 +342,11 @@ async def import_products(
     Returns immediately with job ID for async processing.
     """
     try:
-        logger.info(
-            "Product import requested",
-            extra={"spreadsheet_id": request.spreadsheet_id}
-        )
+        logger.info("Product import requested", extra={"spreadsheet_id": request.spreadsheet_id})
 
         # Execute workflow in background
         result = await importer.import_products_workflow(
-            spreadsheet_id=request.spreadsheet_id,
-            sheet_name=request.sheet_name,
-            notify=request.notify_telegram
+            spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=request.notify_telegram
         )
 
         return ImportProductsResponse(
@@ -393,22 +355,16 @@ async def import_products(
             total=result["total"],
             succeeded=result["succeeded"],
             failed=result["failed"],
-            duration_seconds=result.get("duration_seconds")
+            duration_seconds=result.get("duration_seconds"),
         )
 
     except Exception as e:
         logger.exception("Product import failed")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Import failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Import failed: {e!s}")
 
 
 @router.post("/generate-seo", response_model=GenerateSEOResponse)
-async def generate_seo_tags(
-    request: GenerateSEORequest,
-    seo_service: SEOOptimizerService = Depends(get_seo_service)
-):
+async def generate_seo_tags(request: GenerateSEORequest, seo_service: SEOOptimizerService = Depends(get_seo_service)):
     """
     Generate AI-powered SEO meta tags for a product
 
@@ -421,36 +377,25 @@ async def generate_seo_tags(
     Uses Claude Sonnet 4 (primary) with GPT-4 fallback.
     """
     try:
-        logger.info(
-            "SEO generation requested",
-            extra={"product": request.title}
-        )
+        logger.info("SEO generation requested", extra={"product": request.title})
 
         product_info = ProductInfo(
             title=request.title,
             category=request.category,
             short_description=request.short_description,
             description=request.description,
-            keywords=request.keywords
+            keywords=request.keywords,
         )
 
-        seo_tags = await seo_service.generate_seo_tags(
-            product=product_info,
-            fallback=True
-        )
+        seo_tags = await seo_service.generate_seo_tags(product=product_info, fallback=True)
 
         return GenerateSEOResponse(
-            success=True,
-            metatitle=seo_tags.metatitle,
-            metadescription=seo_tags.metadescription
+            success=True, metatitle=seo_tags.metatitle, metadescription=seo_tags.metadescription
         )
 
     except Exception as e:
         logger.exception("SEO generation failed")
-        return GenerateSEOResponse(
-            success=False,
-            error=str(e)
-        )
+        return GenerateSEOResponse(success=False, error=str(e))
 
 
 @router.post("/workflow/complete", response_model=WorkflowResponse)
@@ -458,7 +403,7 @@ async def execute_complete_workflow(
     request: WorkflowRequest,
     background_tasks: BackgroundTasks,
     importer: WooCommerceImporterService = Depends(get_importer_service),
-    seo_service: SEOOptimizerService = Depends(get_seo_service)
+    seo_service: SEOOptimizerService = Depends(get_seo_service),
 ):
     """
     Execute complete e-commerce automation workflow
@@ -478,17 +423,12 @@ async def execute_complete_workflow(
     try:
         logger.info(
             "Complete workflow requested",
-            extra={
-                "spreadsheet_id": request.spreadsheet_id,
-                "generate_seo": request.generate_seo
-            }
+            extra={"spreadsheet_id": request.spreadsheet_id, "generate_seo": request.generate_seo},
         )
 
         # Step 1 & 2: Import products
         import_result = await importer.import_products_workflow(
-            spreadsheet_id=request.spreadsheet_id,
-            sheet_name=request.sheet_name,
-            notify=False  # Don't notify yet
+            spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=False  # Don't notify yet
         )
 
         if not import_result["success"]:
@@ -522,21 +462,16 @@ async def execute_complete_workflow(
             message="Workflow completed successfully",
             products_imported=products_imported,
             products_with_seo=products_with_seo,
-            duration_seconds=duration
+            duration_seconds=duration,
         )
 
     except Exception as e:
         logger.exception("Workflow execution failed")
 
         if request.notify_telegram:
-            await importer.send_telegram_notification(
-                f"❌ Workflow Failed\n\nError: {str(e)}"
-            )
+            await importer.send_telegram_notification(f"❌ Workflow Failed\n\nError: {e!s}")
 
-        raise HTTPException(
-            status_code=500,
-            detail=f"Workflow failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Workflow failed: {e!s}")
 
 
 @router.post("/products/optimize", response_model=OptimizeProductsResponse)
@@ -545,7 +480,7 @@ async def optimize_products(
     background_tasks: BackgroundTasks,
     importer: WooCommerceImporterService = Depends(get_importer_service),
     seo_service: SEOOptimizerService = Depends(get_seo_service),
-    optimization_service: ProductOptimizationService = Depends(get_optimization_service)
+    optimization_service: ProductOptimizationService = Depends(get_optimization_service),
 ):
     """
     Unified product optimization: WooCommerce sync + SEO optimization
@@ -578,15 +513,14 @@ async def optimize_products(
                 "job_id": job_id,
                 "product_count": len(request.product_ids),
                 "woocommerce_sync": request.woocommerce_sync,
-                "seo_optimize": request.seo_optimize
-            }
+                "seo_optimize": request.seo_optimize,
+            },
         )
 
         # Validate at least one operation is requested
         if not request.woocommerce_sync and not request.seo_optimize:
             raise HTTPException(
-                status_code=400,
-                detail="At least one operation (woocommerce_sync or seo_optimize) must be enabled"
+                status_code=400, detail="At least one operation (woocommerce_sync or seo_optimize) must be enabled"
             )
 
         # Queue optimization job in background
@@ -599,7 +533,7 @@ async def optimize_products(
             update_metadata=request.update_metadata,
             webhook_url=request.webhook_url,
             importer_service=importer,
-            seo_service=seo_service
+            seo_service=seo_service,
         )
 
         # Calculate ETA (5 seconds per product estimate)
@@ -612,23 +546,19 @@ async def optimize_products(
             total_products=len(request.product_ids),
             eta_seconds=eta_seconds,
             started_at=datetime.utcnow().isoformat(),
-            message=f"Optimization job queued for {len(request.product_ids)} products"
+            message=f"Optimization job queued for {len(request.product_ids)} products",
         )
 
     except HTTPException:
         raise
     except Exception as e:
         logger.exception("Failed to queue optimization job")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to queue optimization job: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to queue optimization job: {e!s}")
 
 
 @router.get("/products/optimize/{job_id}/status", response_model=OptimizationStatusResponse)
 async def get_optimization_status(
-    job_id: str,
-    optimization_service: ProductOptimizationService = Depends(get_optimization_service)
+    job_id: str, optimization_service: ProductOptimizationService = Depends(get_optimization_service)
 ):
     """
     Get detailed status of an optimization job
@@ -649,10 +579,7 @@ async def get_optimization_status(
         job_status = await optimization_service.get_job_status(job_id)
 
         if not job_status:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Job not found: {job_id} (jobs expire after 24 hours)"
-            )
+            raise HTTPException(status_code=404, detail=f"Job not found: {job_id} (jobs expire after 24 hours)")
 
         # Convert steps to response format
         steps = [
@@ -664,7 +591,7 @@ async def get_optimization_status(
                 products_processed=step.get("products_processed", 0),
                 products_succeeded=step.get("products_succeeded", 0),
                 products_failed=step.get("products_failed", 0),
-                error_message=step.get("error_message")
+                error_message=step.get("error_message"),
             )
             for step in job_status.get("steps", [])
         ]
@@ -680,25 +607,20 @@ async def get_optimization_status(
             started_at=job_status["started_at"],
             completed_at=job_status.get("completed_at"),
             error_message=job_status.get("error_message"),
-            webhook_triggered=job_status.get("webhook_triggered", False)
+            webhook_triggered=job_status.get("webhook_triggered", False),
         )
 
     except HTTPException:
         raise
     except Exception as e:
         logger.exception(f"Failed to retrieve job status: {job_id}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to retrieve job status: {str(e)}"
-        )
-
-
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve job status: {e!s}")
 
 
 @router.post("/products/create-with-seo", response_model=ProductWithSEOResponse)
 async def create_product_with_seo(
     request: CreateProductWithSEORequest,
-    integration_service: WooCommerceIntegrationService = Depends(get_integration_service_dependency)
+    integration_service: WooCommerceIntegrationService = Depends(get_integration_service_dependency),
 ):
     """
     Create WooCommerce product with auto-generated SEO metadata (Phase 3)
@@ -732,8 +654,7 @@ async def create_product_with_seo(
     """
     try:
         logger.info(
-            "Create product with SEO requested",
-            extra={"product_name": request.name, "category": request.category}
+            "Create product with SEO requested", extra={"product_name": request.name, "category": request.category}
         )
 
         # Convert request to ProductData
@@ -747,7 +668,7 @@ async def create_product_with_seo(
             sku=request.sku,
             stock_quantity=request.stock_quantity,
             images=request.images,
-            keywords=request.keywords
+            keywords=request.keywords,
         )
 
         # Create product with SEO
@@ -759,29 +680,23 @@ async def create_product_with_seo(
                 extra={
                     "product_id": result.product_id,
                     "seo_score": result.compliance.seo_score if result.compliance else None,
-                    "fallback_used": result.fallback_used
-                }
+                    "fallback_used": result.fallback_used,
+                },
             )
         else:
-            logger.error(
-                "Product creation failed",
-                extra={"error": result.error}
-            )
+            logger.error("Product creation failed", extra={"error": result.error})
 
         return result
 
     except Exception as e:
         logger.exception("Unexpected error in create_product_with_seo")
-        return ProductWithSEOResponse(
-            success=False,
-            error=f"Unexpected error: {str(e)}"
-        )
+        return ProductWithSEOResponse(success=False, error=f"Unexpected error: {e!s}")
 
 
 @router.put("/products/update-seo", response_model=ProductWithSEOResponse)
 async def update_product_seo(
     request: UpdateProductSEORequest,
-    integration_service: WooCommerceIntegrationService = Depends(get_integration_service_dependency)
+    integration_service: WooCommerceIntegrationService = Depends(get_integration_service_dependency),
 ):
     """
     Update existing WooCommerce product with regenerated SEO metadata (Phase 3)
@@ -807,8 +722,7 @@ async def update_product_seo(
     """
     try:
         logger.info(
-            "Update product SEO requested",
-            extra={"product_id": request.product_id, "product_name": request.name}
+            "Update product SEO requested", extra={"product_id": request.product_id, "product_name": request.name}
         )
 
         # Convert request to ProductData
@@ -822,14 +736,11 @@ async def update_product_seo(
             sku=request.sku,
             stock_quantity=request.stock_quantity,
             images=request.images,
-            keywords=request.keywords
+            keywords=request.keywords,
         )
 
         # Update product SEO
-        result = await integration_service.update_product_seo(
-            product_id=request.product_id,
-            product_data=product_data
-        )
+        result = await integration_service.update_product_seo(product_id=request.product_id, product_data=product_data)
 
         if result.success:
             logger.info(
@@ -837,30 +748,20 @@ async def update_product_seo(
                 extra={
                     "product_id": result.product_id,
                     "seo_score": result.compliance.seo_score if result.compliance else None,
-                    "fallback_used": result.fallback_used
-                }
+                    "fallback_used": result.fallback_used,
+                },
             )
         else:
-            logger.error(
-                "Product SEO update failed",
-                extra={"product_id": request.product_id, "error": result.error}
-            )
+            logger.error("Product SEO update failed", extra={"product_id": request.product_id, "error": result.error})
 
         return result
 
     except Exception as e:
         logger.exception("Unexpected error in update_product_seo")
-        return ProductWithSEOResponse(
-            success=False,
-            error=f"Unexpected error: {str(e)}"
-        )
+        return ProductWithSEOResponse(success=False, error=f"Unexpected error: {e!s}")
 
 
 @router.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "E-Commerce Automation",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "healthy", "service": "E-Commerce Automation", "timestamp": datetime.utcnow().isoformat()}

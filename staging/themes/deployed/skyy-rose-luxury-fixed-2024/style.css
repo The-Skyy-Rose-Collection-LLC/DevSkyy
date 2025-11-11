@@ -24,7 +24,7 @@ Tags: luxury, fashion, ecommerce, responsive, woocommerce, fixed, verified
     --heading-font: 'Playfair Display', serif;
     --body-font: 'Source Sans Pro', sans-serif;
     --accent-font: 'Dancing Script', cursive;
-    
+
     /* Additional luxury colors */
     --light-gold: rgba(212, 175, 55, 0.1);
     --dark-overlay: rgba(26, 26, 26, 0.8);
@@ -294,9 +294,9 @@ a:hover {
    ============================================================================ */
 
 .skyy-rose-hero {
-    background: linear-gradient(135deg, 
-        var(--background-color) 0%, 
-        var(--light-gold) 50%, 
+    background: linear-gradient(135deg,
+        var(--background-color) 0%,
+        var(--light-gold) 50%,
         var(--background-color) 100%);
     padding: 8rem 0;
     text-align: center;
@@ -586,33 +586,33 @@ a:hover {
     .container-narrow {
         padding: 0 1rem;
     }
-    
+
     .site-header {
         padding: 1rem 0;
     }
-    
+
     .site-branding {
         margin-bottom: 1rem;
     }
-    
+
     .main-navigation ul {
         flex-direction: column;
         gap: 1.5rem;
     }
-    
+
     .skyy-rose-hero {
         padding: 4rem 0;
     }
-    
+
     .site-main {
         padding: 3rem 0;
     }
-    
+
     .luxury-post {
         margin-bottom: 3rem;
         padding-bottom: 2rem;
     }
-    
+
     .woocommerce .products {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -623,11 +623,11 @@ a:hover {
     .main-navigation ul {
         gap: 1rem;
     }
-    
+
     .skyy-rose-hero {
         padding: 3rem 0;
     }
-    
+
     .site-main {
         padding: 2rem 0;
     }

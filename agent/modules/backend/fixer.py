@@ -1,18 +1,19 @@
+from datetime import datetime
 import logging
 import os
 import re
 import shutil
 import time
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import autopep8
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
+def fix_code(scan_results: dict[str, Any]) -> dict[str, Any]:
     """
     Comprehensive code fixing based on scan results.
     Production-level implementation with automatic code repair.
@@ -56,27 +57,19 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
         fix_results["fixes_applied"].extend(config_fixes)
 
         # Update count
-        fix_results["files_fixed"] = len(
-            set(fix["file"] for fix in fix_results["fixes_applied"])
-        )
-        fix_results["errors_fixed"] = sum(
-            1 for fix in fix_results["fixes_applied"] if fix["type"] == "error"
-        )
-        fix_results["warnings_fixed"] = sum(
-            1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning"
-        )
+        fix_results["files_fixed"] = len(set(fix["file"] for fix in fix_results["fixes_applied"]))
+        fix_results["errors_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "error")
+        fix_results["warnings_fixed"] = sum(1 for fix in fix_results["fixes_applied"] if fix["type"] == "warning")
         fix_results["optimizations_applied"] = sum(
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "optimization"
         )
 
-        logger.info(
-            f"✅ Code fixing completed: {fix_results['files_fixed']} files fixed"
-        )
+        logger.info(f"✅ Code fixing completed: {fix_results['files_fixed']} files fixed")
 
         return fix_results
 
     except Exception as e:
-        logger.error(f"❌ Code fixing failed: {str(e)}")
+        logger.error(f"❌ Code fixing failed: {e!s}")
         return {
             "status": "failed",
             "error": str(e),
@@ -95,10 +88,7 @@ def _create_backup():
         files_to_backup = []
         for root, dirs, files in os.walk("."):
             dirs[:] = [
-                d
-                for d in dirs
-                if not d.startswith(".")
-                and d not in {"__pycache__", "node_modules", "backup_*"}
+                d for d in dirs if not d.startswith(".") and d not in {"__pycache__", "node_modules", "backup_*"}
             ]
             for file in files:
                 if file.endswith(
@@ -121,24 +111,18 @@ def _create_backup():
             os.makedirs(os.path.dirname(backup_path), exist_ok=True)
             shutil.copy2(file_path, backup_path)
 
-        logger.info(
-            f"📦 Backup of {len(files_to_backup)} files created in {backup_dir}"
-        )
+        logger.info(f"📦 Backup of {len(files_to_backup)} files created in {backup_dir}")
 
     except Exception as e:
-        logger.warning(f"⚠️ Backup creation failed: {str(e)}")
+        logger.warning(f"⚠️ Backup creation failed: {e!s}")
 
 
-def _fix_python_files() -> List[Dict[str, Any]]:
+def _fix_python_files() -> list[dict[str, Any]]:
     """Fix Python files with comprehensive improvements."""
     fixes = []
 
     for root, dirs, files in os.walk("."):
-        dirs[:] = [
-            d
-            for d in dirs
-            if not d.startswith(".") and d not in {"__pycache__", "backup_*"}
-        ]
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"__pycache__", "backup_*"}]
 
         for file in files:
             if file.endswith(".py"):
@@ -149,7 +133,7 @@ def _fix_python_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_python_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual Python file."""
     fixes = []
 
@@ -162,10 +146,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # Fix common Python issues
 
         # 1. Fix import errors
-        if (
-            "from datetime import datetime" not in modified_content
-            and "datetime.now()" in modified_content
-        ):
+        if "from datetime import datetime" not in modified_content and "datetime.now()" in modified_content:
             modified_content = "from datetime import datetime\n" + modified_content
             fixes.append(
                 {
@@ -208,9 +189,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
 
         # 4. Add proper exception handling
         if "except Exception as e:" in modified_content:
-            modified_content = modified_content.replace(
-                "except Exception as e:", "except Exception as e:"
-            )
+            modified_content = modified_content.replace("except Exception as e:", "except Exception as e:")
             fixes.append(
                 {
                     "file": file_path,
@@ -223,9 +202,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
         # 5. Use autopep8 for formatting
         if autopep8:
             try:
-                formatted_content = autopep8.fix_code(
-                    modified_content, options={"max_line_length": 120}
-                )
+                formatted_content = autopep8.fix_code(modified_content, options={"max_line_length": 120})
                 if formatted_content != modified_content:
                     modified_content = formatted_content
                     fixes.append(
@@ -249,7 +226,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -257,16 +234,12 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_javascript_files() -> List[Dict[str, Any]]:
+def _fix_javascript_files() -> list[dict[str, Any]]:
     """Fix JavaScript files."""
     fixes = []
 
     for root, dirs, files in os.walk("."):
-        dirs[:] = [
-            d
-            for d in dirs
-            if not d.startswith(".") and d not in {"node_modules", "backup_*"}
-        ]
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"node_modules", "backup_*"}]
 
         for file in files:
             if file.endswith(".js"):
@@ -277,7 +250,7 @@ def _fix_javascript_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_javascript_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual JavaScript file."""
     fixes = []
 
@@ -329,7 +302,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -337,7 +310,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_html_files() -> List[Dict[str, Any]]:
+def _fix_html_files() -> list[dict[str, Any]]:
     """Fix HTML files for SEO and accessibility."""
     fixes = []
 
@@ -353,7 +326,7 @@ def _fix_html_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_html_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual HTML file."""
     fixes = []
 
@@ -419,7 +392,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -427,7 +400,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_css_files() -> List[Dict[str, Any]]:
+def _fix_css_files() -> list[dict[str, Any]]:
     """Fix CSS files for better performance."""
     fixes = []
 
@@ -443,7 +416,7 @@ def _fix_css_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_css_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual CSS file."""
     fixes = []
 
@@ -470,17 +443,11 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
                 in_rule = False
                 current_rule_props = {}
             # Process property within rule
-            elif (
-                in_rule and ":" in stripped_line and not stripped_line.startswith("/*")
-            ):
+            elif in_rule and ":" in stripped_line and not stripped_line.startswith("/*"):
                 # Extract property name (before colon)
                 prop_part = stripped_line.split(":")[0].strip()
                 # Only consider it a property if it's not a comment and has valid CSS property format
-                if (
-                    prop_part
-                    and not prop_part.startswith("/*")
-                    and not prop_part.startswith("*")
-                ):
+                if prop_part and not prop_part.startswith("/*") and not prop_part.startswith("*"):
                     # Check if this property already exists in current rule
                     if prop_part in current_rule_props:
                         # Remove the duplicate line
@@ -509,7 +476,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -517,17 +484,13 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_configuration_files() -> List[Dict[str, Any]]:
+def _fix_configuration_files() -> list[dict[str, Any]]:
     """Fix configuration files."""
     fixes = []
 
     # Fix missing __init__.py files
     for root, dirs, files in os.walk("."):
-        dirs[:] = [
-            d
-            for d in dirs
-            if not d.startswith(".") and d not in {"__pycache__", "backup_*"}
-        ]
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"__pycache__", "backup_*"}]
 
         # Check if directory needs __init__.py
         if any(f.endswith(".py") for f in files) and "__init__.py" not in files:
@@ -548,7 +511,7 @@ def _fix_configuration_files() -> List[Dict[str, Any]]:
                     {
                         "file": init_path,
                         "type": "error",
-                        "description": f"Failed to create __init__.py: {str(e)}",
+                        "description": f"Failed to create __init__.py: {e!s}",
                         "line": 1,
                     }
                 )

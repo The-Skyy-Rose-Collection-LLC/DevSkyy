@@ -1,15 +1,16 @@
+from contextvars import ContextVar
 from datetime import datetime
 import json
-import os
-import sys
-
-from contextvars import ContextVar
-from structlog.stdlib import LoggerFactory
-from typing import Any, Dict, Optional
 import logging
 import logging.config
-import structlog
+import os
+import sys
+from typing import Any, Optional
 import uuid
+
+import structlog
+from structlog.stdlib import LoggerFactory
+
 
 """
 Enterprise Structured Logging Configuration for DevSkyy Platform
@@ -23,6 +24,7 @@ Correlation IDs, centralized error handling, and security event logging
 # Context variable for correlation ID (thread-safe)
 correlation_id: ContextVar[Optional[str]] = ContextVar("correlation_id", default=None)
 
+
 def get_correlation_id() -> str:
     """Get current correlation ID or generate new one"""
     current_id = correlation_id.get()
@@ -31,27 +33,33 @@ def get_correlation_id() -> str:
         correlation_id.set(current_id)
     return current_id
 
+
 def set_correlation_id(request_id: str):
     """Set correlation ID for current context"""
     correlation_id.set(request_id)
+
 
 def clear_correlation_id():
     """Clear correlation ID from current context"""
     correlation_id.set(None)
 
+
 # ============================================================================
 # CUSTOM PROCESSORS
 # ============================================================================
+
 
 def add_correlation_id(logger, method_name, event_dict):
     """Add correlation ID to log entries"""
     event_dict["correlation_id"] = get_correlation_id()
     return event_dict
 
+
 def add_timestamp(logger, method_name, event_dict):
     """Add ISO timestamp to log entries"""
     event_dict["timestamp"] = datetime.utcnow().isoformat() + "Z"
     return event_dict
+
 
 def add_service_info(logger, method_name, event_dict):
     """Add service information to log entries"""
@@ -59,6 +67,7 @@ def add_service_info(logger, method_name, event_dict):
     event_dict["version"] = os.getenv("APP_VERSION", "5.1.0")
     event_dict["environment"] = os.getenv("ENVIRONMENT", "development")
     return event_dict
+
 
 def add_security_context(logger, method_name, event_dict):
     """Add security context to log entries"""
@@ -71,6 +80,7 @@ def add_security_context(logger, method_name, event_dict):
             event_dict["client_ip"] = request.state.client_ip
 
     return event_dict
+
 
 def sanitize_sensitive_data(logger, method_name, event_dict):
     """Sanitize sensitive data from log entries"""
@@ -94,16 +104,16 @@ def sanitize_sensitive_data(logger, method_name, event_dict):
     for key, value in event_dict.items():
         if isinstance(value, (dict, list)):
             event_dict[key] = sanitize_dict(value)
-        elif isinstance(value, str) and any(
-            field in key.lower() for field in sensitive_fields
-        ):
+        elif isinstance(value, str) and any(field in key.lower() for field in sensitive_fields):
             event_dict[key] = "***REDACTED***"
 
     return event_dict
 
+
 # ============================================================================
 # CUSTOM FORMATTERS
 # ============================================================================
+
 
 class JSONFormatter(logging.Formatter):
     """Custom JSON formatter for structured logging"""
@@ -154,6 +164,7 @@ class JSONFormatter(logging.Formatter):
 
         return json.dumps(log_entry, default=str)
 
+
 class SecurityFormatter(logging.Formatter):
     """Special formatter for security events"""
 
@@ -179,9 +190,11 @@ class SecurityFormatter(logging.Formatter):
 
         return json.dumps(log_entry, default=str)
 
+
 # ============================================================================
 # LOGGING CONFIGURATION
 # ============================================================================
+
 
 def setup_logging():
     """Setup enterprise structured logging"""
@@ -223,16 +236,12 @@ def setup_logging():
             "security": {
                 "()": SecurityFormatter,
             },
-            "console": {
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            },
+            "console": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
         },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "formatter": (
-                    "console" if os.getenv("ENVIRONMENT") == "development" else "json"
-                ),
+                "formatter": ("console" if os.getenv("ENVIRONMENT") == "development" else "json"),
                 "stream": sys.stdout,
             },
             "file": {
@@ -306,9 +315,11 @@ def setup_logging():
         environment=os.getenv("ENVIRONMENT", "development"),
     )
 
+
 # ============================================================================
 # SPECIALIZED LOGGERS
 # ============================================================================
+
 
 class SecurityLogger:
     """Specialized logger for security events"""
@@ -316,9 +327,7 @@ class SecurityLogger:
     def __init__(self):
         self.logger = logging.getLogger("devskyy.security")
 
-    def log_authentication_event(
-        self, event_type: str, user_id: str, client_ip: str, success: bool, **kwargs
-    ):
+    def log_authentication_event(self, event_type: str, user_id: str, client_ip: str, success: bool, **kwargs):
         """Log authentication events"""
         self.logger.info(
             f"Authentication {event_type}: {'SUCCESS' if success else 'FAILED'}",
@@ -333,9 +342,7 @@ class SecurityLogger:
             },
         )
 
-    def log_authorization_event(
-        self, user_id: str, resource: str, action: str, allowed: bool, **kwargs
-    ):
+    def log_authorization_event(self, user_id: str, resource: str, action: str, allowed: bool, **kwargs):
         """Log authorization events"""
         self.logger.info(
             f"Authorization: {action} on {resource} {'ALLOWED' if allowed else 'DENIED'}",
@@ -393,16 +400,17 @@ class SecurityLogger:
             },
         )
 
+
 class ErrorLogger:
     """Specialized logger for error tracking"""
 
     def __init__(self):
         self.logger = logging.getLogger("devskyy.error")
 
-    def log_application_error(self, error: Exception, context: Dict[str, Any] = None):
+    def log_application_error(self, error: Exception, context: dict[str, Any] = None):
         """Log application errors with context"""
         self.logger.error(
-            f"Application error: {str(error)}",
+            f"Application error: {error!s}",
             exc_info=error,
             extra={
                 "error_type": type(error).__name__,
@@ -434,9 +442,7 @@ class ErrorLogger:
             },
         )
 
-    def log_database_error(
-        self, operation: str, error: Exception, query: str = None, user_id: str = None
-    ):
+    def log_database_error(self, operation: str, error: Exception, query: str = None, user_id: str = None):
         """Log database errors"""
         self.logger.error(
             f"Database error: {operation}",
@@ -449,6 +455,7 @@ class ErrorLogger:
                 "error_type": type(error).__name__,
             },
         )
+
 
 # ============================================================================
 # GLOBAL LOGGER INSTANCES

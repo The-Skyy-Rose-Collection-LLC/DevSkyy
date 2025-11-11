@@ -1,7 +1,7 @@
 # GitHub Actions Setup Guide
 
-**Repository:** <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy>  
-**Status:** ✅ Main branch merged with enterprise refactor  
+**Repository:** <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy>
+**Status:** ✅ Main branch merged with enterprise refactor
 **Next Steps:** Configure secrets and deploy
 
 ---

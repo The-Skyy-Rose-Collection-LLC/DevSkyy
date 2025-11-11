@@ -60,11 +60,7 @@ class TestDatabasePerformance:
         HOW: Create multiple connections and verify pool behavior
         IMPACT: Ensures scalability under load
         """
-        engine = create_engine(
-            test_db_url,
-            pool_size=5,
-            max_overflow=10
-        )
+        engine = create_engine(test_db_url, pool_size=5, max_overflow=10)
 
         # Test pool can handle multiple connections
         connections = []
@@ -84,7 +80,5 @@ class TestDatabasePerformance:
 def test_db_url():
     """Provide test database URL."""
     import os
-    return os.getenv(
-        "DATABASE_URL",
-        "postgresql://devskyy_test:test_password@localhost:5432/devskyy_test"
-    )
+
+    return os.getenv("DATABASE_URL", "postgresql://devskyy_test:test_password@localhost:5432/devskyy_test")

@@ -319,7 +319,7 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -329,7 +329,7 @@
             .metrics-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .main-container {
                 padding: 1rem;
             }
@@ -458,7 +458,7 @@
 
         function initializeCharts() {
             const ctx = document.getElementById('performanceChart').getContext('2d');
-            
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -560,7 +560,7 @@
         function refreshDashboard() {
             const refreshBtn = document.querySelector('.control-btn');
             refreshBtn.style.transform = 'rotate(360deg)';
-            
+
             // Simulate data refresh
             setTimeout(() => {
                 loadAgentStatus();
@@ -587,7 +587,7 @@
         function toggleAutoRefresh() {
             autoRefreshEnabled = !autoRefreshEnabled;
             const icon = document.getElementById('auto-refresh-icon');
-            
+
             if (autoRefreshEnabled) {
                 icon.className = 'fas fa-pause';
                 startAutoRefresh();

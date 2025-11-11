@@ -16,16 +16,17 @@ Features:
 """
 
 import asyncio
+from datetime import datetime, timedelta
 import hashlib
 import json
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any
 from uuid import uuid4
 
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
+
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class BlockchainNFTLuxuryAssets:
 
         logger.info("🔗 Blockchain NFT Luxury Assets system initialized")
 
-    def _initialize_networks(self) -> Dict[str, Any]:
+    def _initialize_networks(self) -> dict[str, Any]:
         """Initialize connections to blockchain networks."""
         networks = {}
 
@@ -365,7 +366,7 @@ contract SkyyRoseMembership {
 }
         """
 
-    def _get_erc721_metadata(self) -> Dict[str, Any]:
+    def _get_erc721_metadata(self) -> dict[str, Any]:
         """Get ERC721 metadata standard."""
         return {
             "name": "",
@@ -378,7 +379,7 @@ contract SkyyRoseMembership {
             "youtube_url": "",
         }
 
-    def _get_erc1155_metadata(self) -> Dict[str, Any]:
+    def _get_erc1155_metadata(self) -> dict[str, Any]:
         """Get ERC1155 metadata standard."""
         return {
             "name": "",
@@ -393,10 +394,10 @@ contract SkyyRoseMembership {
     async def mint_luxury_nft(
         self,
         collection_type: str,
-        item_data: Dict[str, Any],
+        item_data: dict[str, Any],
         owner_address: str,
         network: str = "polygon",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Mint a luxury NFT for a fashion item.
 
@@ -438,9 +439,7 @@ contract SkyyRoseMembership {
                 "owner": owner_address,
                 "metadata_uri": f"ipfs://{ipfs_hash}",
                 "network": network,
-                "contract_address": self._get_contract_address(
-                    collection_type, network
-                ),
+                "contract_address": self._get_contract_address(collection_type, network),
                 "mint_date": datetime.now().isoformat(),
                 "benefits": collection["benefits"],
                 "transaction": {
@@ -458,18 +457,14 @@ contract SkyyRoseMembership {
                 "status": "success",
                 "nft": mint_result,
                 "message": f"Successfully minted {collection['name']} NFT #{token_id}",
-                "explorer_url": self._get_explorer_url(
-                    mint_result["transaction"]["hash"], network
-                ),
+                "explorer_url": self._get_explorer_url(mint_result["transaction"]["hash"], network),
             }
 
         except Exception as e:
             logger.error(f"NFT minting failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_nft_metadata(
-        self, item_data: Dict[str, Any], collection: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _generate_nft_metadata(self, item_data: dict[str, Any], collection: dict[str, Any]) -> dict[str, Any]:
         """Generate NFT metadata for luxury item."""
         metadata = {
             "name": f"{collection['name']} - {item_data['name']}",
@@ -498,14 +493,10 @@ contract SkyyRoseMembership {
 
         # Add luxury-specific attributes
         if item_data.get("material"):
-            metadata["attributes"].append(
-                {"trait_type": "Material", "value": item_data["material"]}
-            )
+            metadata["attributes"].append({"trait_type": "Material", "value": item_data["material"]})
 
         if item_data.get("craftsmanship"):
-            metadata["attributes"].append(
-                {"trait_type": "Craftsmanship", "value": item_data["craftsmanship"]}
-            )
+            metadata["attributes"].append({"trait_type": "Craftsmanship", "value": item_data["craftsmanship"]})
 
         if item_data.get("limited_edition"):
             metadata["attributes"].append(
@@ -517,7 +508,7 @@ contract SkyyRoseMembership {
 
         return metadata
 
-    async def _store_on_ipfs(self, metadata: Dict[str, Any]) -> str:
+    async def _store_on_ipfs(self, metadata: dict[str, Any]) -> str:
         """Store metadata on IPFS (simulated)."""
         # In production, would use actual IPFS service like Pinata or Infura
         metadata_json = json.dumps(metadata)
@@ -527,9 +518,7 @@ contract SkyyRoseMembership {
         logger.info(f"📦 Stored metadata on IPFS: {ipfs_hash}")
         return ipfs_hash
 
-    def _generate_token_id(
-        self, collection_type: str, item_data: Dict[str, Any]
-    ) -> int:
+    def _generate_token_id(self, collection_type: str, item_data: dict[str, Any]) -> int:
         """Generate unique token ID."""
         # In production, would be managed by smart contract
         base_id = {
@@ -558,11 +547,9 @@ contract SkyyRoseMembership {
             },
         }
 
-        return addresses.get(network, {}).get(
-            collection_type, "0x0000000000000000000000000000000000000000"
-        )
+        return addresses.get(network, {}).get(collection_type, "0x0000000000000000000000000000000000000000")
 
-    async def _store_nft_record(self, mint_result: Dict[str, Any]) -> None:
+    async def _store_nft_record(self, mint_result: dict[str, Any]) -> None:
         """Store NFT record in database."""
         # In production, would store in database
         logger.info(f"💾 Stored NFT record: Token #{mint_result['token_id']}")
@@ -579,9 +566,9 @@ contract SkyyRoseMembership {
     async def create_authenticity_certificate(
         self,
         item_id: str,
-        item_details: Dict[str, Any],
+        item_details: dict[str, Any],
         network: str = "polygon",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create blockchain-based authenticity certificate.
 
@@ -602,9 +589,7 @@ contract SkyyRoseMembership {
                 "item_id": item_id,
                 "item_name": item_details["name"],
                 "collection": item_details.get("collection", "Skyy Rose Collection"),
-                "manufacture_date": item_details.get(
-                    "manufacture_date", datetime.now().isoformat()
-                ),
+                "manufacture_date": item_details.get("manufacture_date", datetime.now().isoformat()),
                 "materials": item_details.get("materials", []),
                 "craftsman": item_details.get("craftsman", "Skyy Rose Atelier"),
                 "fingerprint": fingerprint,
@@ -626,14 +611,12 @@ contract SkyyRoseMembership {
             logger.error(f"Certificate creation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_fingerprint(self, item_id: str, item_details: Dict[str, Any]) -> str:
+    def _generate_fingerprint(self, item_id: str, item_details: dict[str, Any]) -> str:
         """Generate unique fingerprint for item."""
         data = f"{item_id}{item_details.get('name')}{datetime.now().isoformat()}"
         return hashlib.sha256(data.encode()).hexdigest()
 
-    async def verify_authenticity(
-        self, item_id: str, fingerprint: str
-    ) -> Dict[str, Any]:
+    async def verify_authenticity(self, item_id: str, fingerprint: str) -> dict[str, Any]:
         """
         Verify item authenticity using blockchain.
 
@@ -657,11 +640,7 @@ contract SkyyRoseMembership {
                 "is_authentic": is_authentic,
                 "fingerprint": fingerprint,
                 "verification_date": datetime.now().isoformat(),
-                "certificate_url": (
-                    f"https://verify.skyyrose.com/{fingerprint}"
-                    if is_authentic
-                    else None
-                ),
+                "certificate_url": (f"https://verify.skyyrose.com/{fingerprint}" if is_authentic else None),
             }
 
         except Exception as e:
@@ -670,9 +649,9 @@ contract SkyyRoseMembership {
 
     async def create_membership_nft(
         self,
-        member_data: Dict[str, Any],
+        member_data: dict[str, Any],
         tier: str = "silver",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create membership NFT with benefits.
 
@@ -724,9 +703,7 @@ contract SkyyRoseMembership {
                 "benefits": tier_data["benefits"],
                 "join_date": datetime.now().isoformat(),
                 "expiry_date": (datetime.now() + timedelta(days=365)).isoformat(),
-                "points_balance": (
-                    1000 if tier == "platinum" else 500 if tier == "gold" else 100
-                ),
+                "points_balance": (1000 if tier == "platinum" else 500 if tier == "gold" else 100),
                 "nft_metadata": {
                     "name": f"Skyy Rose {tier_data['name']} Card",
                     "description": "Exclusive membership to The Skyy Rose Collection",
@@ -753,9 +730,9 @@ contract SkyyRoseMembership {
 
     async def create_digital_wearable(
         self,
-        item_data: Dict[str, Any],
-        platforms: List[str] = ["decentraland", "sandbox"],
-    ) -> Dict[str, Any]:
+        item_data: dict[str, Any],
+        platforms: list[str] = ["decentraland", "sandbox"],
+    ) -> dict[str, Any]:
         """
         Create digital wearable NFT for metaverse platforms.
 
@@ -823,7 +800,7 @@ contract SkyyRoseMembership {
         }
         return mapping.get(category, "upper_body")
 
-    async def get_nft_benefits(self, wallet_address: str) -> Dict[str, Any]:
+    async def get_nft_benefits(self, wallet_address: str) -> dict[str, Any]:
         """
         Get benefits for NFT holder.
 
@@ -862,9 +839,7 @@ contract SkyyRoseMembership {
                             benefits["services"].append(benefit)
 
             # Calculate total benefits
-            total_discount = (
-                25 if len(owned_nfts) > 2 else 15 if len(owned_nfts) > 1 else 10
-            )
+            total_discount = 25 if len(owned_nfts) > 2 else 15 if len(owned_nfts) > 1 else 10
 
             return {
                 "status": "success",
@@ -883,7 +858,7 @@ contract SkyyRoseMembership {
         self,
         collection_type: str,
         royalty_percentage: float = 10.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Enable royalties for secondary sales.
 
@@ -911,9 +886,7 @@ contract SkyyRoseMembership {
                 "platforms": ["opensea", "rarible", "looksrare"],
             }
 
-            logger.info(
-                f"💰 Enabled {royalty_percentage}% royalties for {collection['name']}"
-            )
+            logger.info(f"💰 Enabled {royalty_percentage}% royalties for {collection['name']}")
 
             return {
                 "status": "success",
@@ -1017,9 +990,7 @@ async def main():
 
     # Check NFT holder benefits
     print("\n🎁 Checking NFT Holder Benefits...")
-    benefits = await blockchain.get_nft_benefits(
-        "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7"
-    )
+    benefits = await blockchain.get_nft_benefits("0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7")
 
     if benefits["status"] == "success":
         print(f"✅ VIP Status: {benefits['vip_status']}")

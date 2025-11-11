@@ -40,8 +40,8 @@ if (!defined('ABSPATH')) {
 					?>
 				</p>
 				<p>
-					&copy; <?php echo esc_html(date('Y')); ?> 
-					<a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a>. 
+					&copy; <?php echo esc_html(date('Y')); ?>
+					<a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a>.
 					<?php esc_html_e('All rights reserved.', 'wp-mastery-boilerplate'); ?>
 				</p>
 			</div><!-- .site-info -->

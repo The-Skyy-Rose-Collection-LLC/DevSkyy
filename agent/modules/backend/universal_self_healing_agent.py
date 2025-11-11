@@ -15,19 +15,20 @@ Features:
 - Comprehensive code quality improvement
 """
 
+from collections import defaultdict
+from datetime import datetime
 import json
 import logging
 import os
+from pathlib import Path
 import re
 import subprocess
-from collections import defaultdict
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-import astroid
 from anthropic import AsyncAnthropic
+import astroid
 from openai import AsyncOpenAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +45,10 @@ class UniversalSelfHealingAgent:
         self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         # Learning database
-        self.healing_history: List[Dict[str, Any]] = []
-        self.error_patterns: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-        self.fix_success_rate: Dict[str, float] = {}
-        self.learned_solutions: Dict[str, Dict[str, Any]] = {}
+        self.healing_history: list[dict[str, Any]] = []
+        self.error_patterns: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.fix_success_rate: dict[str, float] = {}
+        self.learned_solutions: dict[str, dict[str, Any]] = {}
 
         # Language support
         self.supported_languages = {
@@ -120,9 +121,9 @@ class UniversalSelfHealingAgent:
     async def scan_and_heal(
         self,
         codebase_path: str,
-        languages: Optional[List[str]] = None,
+        languages: Optional[list[str]] = None,
         auto_fix: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Scan entire codebase and automatically heal all detected issues.
         """
@@ -156,18 +157,14 @@ class UniversalSelfHealingAgent:
 
                             if auto_fix:
                                 # Auto-heal the file
-                                heal_result = await self._heal_file(
-                                    file_path, file_issues, lang
-                                )
+                                heal_result = await self._heal_file(file_path, file_issues, lang)
 
                                 if heal_result["success"]:
                                     files_healed += 1
                                     total_fixes += len(heal_result["fixes_applied"])
 
                                     # Learn from this healing
-                                    await self._learn_from_healing(
-                                        file_path, file_issues, heal_result
-                                    )
+                                    await self._learn_from_healing(file_path, file_issues, heal_result)
 
             # Generate comprehensive report
             report = {
@@ -178,16 +175,12 @@ class UniversalSelfHealingAgent:
                 "total_fixes_applied": total_fixes,
                 "issues_by_severity": self._categorize_issues(issues_found),
                 "issues_by_language": self._group_by_language(issues_found),
-                "healing_success_rate": (
-                    (files_healed / len(issues_found) * 100) if issues_found else 100
-                ),
+                "healing_success_rate": ((files_healed / len(issues_found) * 100) if issues_found else 100),
                 "learned_patterns": len(self.learned_solutions),
                 "timestamp": datetime.now().isoformat(),
             }
 
-            logger.info(
-                f"✅ Healing complete: {files_healed} files healed, {total_fixes} fixes applied"
-            )
+            logger.info(f"✅ Healing complete: {files_healed} files healed, {total_fixes} fixes applied")
 
             return report
 
@@ -195,9 +188,7 @@ class UniversalSelfHealingAgent:
             logger.error(f"❌ Scan and heal failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _detect_issues(
-        self, file_path: Path, language: str
-    ) -> List[Dict[str, Any]]:
+    async def _detect_issues(self, file_path: Path, language: str) -> list[dict[str, Any]]:
         """
         Detect code issues using multiple methods:
         1. Static analysis
@@ -231,9 +222,7 @@ class UniversalSelfHealingAgent:
             logger.error(f"❌ Issue detection failed for {file_path}: {e}")
             return []
 
-    async def _python_static_analysis(
-        self, content: str, file_path: Path
-    ) -> List[Dict[str, Any]]:
+    async def _python_static_analysis(self, content: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Perform Python-specific static analysis.
         """
@@ -282,9 +271,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    async def _run_linters(
-        self, file_path: Path, language: str
-    ) -> List[Dict[str, Any]]:
+    async def _run_linters(self, file_path: Path, language: str) -> list[dict[str, Any]]:
         """
         Run language-specific linters and parse output.
         """
@@ -299,14 +286,12 @@ class UniversalSelfHealingAgent:
                     [linter, str(file_path)],
                     capture_output=True,
                     text=True,
-                    timeout=30,
+                    timeout=30, check=False,
                 )
 
                 # Parse linter output
                 if result.stdout or result.stderr:
-                    linter_issues = self._parse_linter_output(
-                        result.stdout + result.stderr, linter, file_path
-                    )
+                    linter_issues = self._parse_linter_output(result.stdout + result.stderr, linter, file_path)
                     issues.extend(linter_issues)
 
             except subprocess.TimeoutExpired:
@@ -318,9 +303,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    def _parse_linter_output(
-        self, output: str, linter: str, file_path: Path
-    ) -> List[Dict[str, Any]]:
+    def _parse_linter_output(self, output: str, linter: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Parse linter output into standardized issue format.
         """
@@ -336,10 +319,7 @@ class UniversalSelfHealingAgent:
 
             # Determine severity from message
             severity = "medium"
-            if any(
-                word in message.lower()
-                for word in ["error", "critical", "security", "vulnerability"]
-            ):
+            if any(word in message.lower() for word in ["error", "critical", "security", "vulnerability"]):
                 severity = "critical"
             elif any(word in message.lower() for word in ["warning", "warn"]):
                 severity = "medium"
@@ -359,9 +339,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    async def _ai_detect_issues(
-        self, content: str, language: str, file_path: Path
-    ) -> List[Dict[str, Any]]:
+    async def _ai_detect_issues(self, content: str, language: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Use AI to detect subtle issues that linters might miss.
         """
@@ -408,9 +386,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return []
 
-    async def _check_learned_patterns(
-        self, content: str, language: str
-    ) -> List[Dict[str, Any]]:
+    async def _check_learned_patterns(self, content: str, language: str) -> list[dict[str, Any]]:
         """
         Check code against previously learned error patterns.
         """
@@ -435,9 +411,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return issues
 
-    async def _heal_file(
-        self, file_path: Path, issues: List[Dict[str, Any]], language: str
-    ) -> Dict[str, Any]:
+    async def _heal_file(self, file_path: Path, issues: list[dict[str, Any]], language: str) -> dict[str, Any]:
         """
         Automatically heal file by fixing all detected issues.
         """
@@ -455,19 +429,13 @@ Return JSON array of issues with: line, type, severity, message"""
 
             # Sort issues by severity (critical first)
             severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-            sorted_issues = sorted(
-                issues, key=lambda x: severity_order.get(x.get("severity", "medium"), 2)
-            )
+            sorted_issues = sorted(issues, key=lambda x: severity_order.get(x.get("severity", "medium"), 2))
 
             # Apply fixes
             for issue in sorted_issues:
                 fix_result = await self._generate_fix(content, issue, language)
 
-                if (
-                    fix_result["success"]
-                    and fix_result["confidence"]
-                    >= self.healing_config["confidence_threshold"]
-                ):
+                if fix_result["success"] and fix_result["confidence"] >= self.healing_config["confidence_threshold"]:
                     content = fix_result["fixed_code"]
                     fixes_applied.append(
                         {
@@ -486,9 +454,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
                 if not validation["valid"]:
                     # Rollback if validation fails
-                    logger.warning(
-                        f"⚠️ Healing validation failed, rolling back {file_path.name}"
-                    )
+                    logger.warning(f"⚠️ Healing validation failed, rolling back {file_path.name}")
                     file_path.write_text(original_content)
                     return {
                         "success": False,
@@ -509,9 +475,7 @@ Return JSON array of issues with: line, type, severity, message"""
             logger.error(f"❌ Healing failed for {file_path}: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_fix(
-        self, content: str, issue: Dict[str, Any], language: str
-    ) -> Dict[str, Any]:
+    async def _generate_fix(self, content: str, issue: dict[str, Any], language: str) -> dict[str, Any]:
         """
         Generate code fix using AI reasoning.
         """
@@ -554,9 +518,7 @@ Provide the complete fixed code. Ensure:
             fixed_code_text = response.content[0].text
 
             # Extract code from response
-            code_match = re.search(
-                rf"```{language}\n(.*?)```", fixed_code_text, re.DOTALL
-            )
+            code_match = re.search(rf"```{language}\n(.*?)```", fixed_code_text, re.DOTALL)
             if code_match:
                 fixed_code = code_match.group(1).strip()
 
@@ -573,7 +535,7 @@ Provide the complete fixed code. Ensure:
             logger.error(f"❌ Fix generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_healing(self, file_path: Path, language: str) -> Dict[str, Any]:
+    async def _validate_healing(self, file_path: Path, language: str) -> dict[str, Any]:
         """
         Validate that healed code is correct and doesn't introduce new issues.
         """
@@ -625,7 +587,7 @@ Provide the complete fixed code. Ensure:
             result = subprocess.run(
                 [test_framework, str(file_path)],
                 capture_output=True,
-                timeout=60,
+                timeout=60, check=False,
             )
 
             return result.returncode == 0
@@ -637,8 +599,8 @@ Provide the complete fixed code. Ensure:
     async def _learn_from_healing(
         self,
         file_path: Path,
-        issues: List[Dict[str, Any]],
-        heal_result: Dict[str, Any],
+        issues: list[dict[str, Any]],
+        heal_result: dict[str, Any],
     ) -> None:
         """
         Learn from successful healing to improve future performance.
@@ -656,19 +618,14 @@ Provide the complete fixed code. Ensure:
                     "description": issue.get("message"),
                     "fix": fix["fix"],
                     "confidence": fix["confidence"],
-                    "success_count": self.learned_solutions.get(pattern_key, {}).get(
-                        "success_count", 0
-                    )
-                    + 1,
+                    "success_count": self.learned_solutions.get(pattern_key, {}).get("success_count", 0) + 1,
                     "last_used": datetime.now().isoformat(),
                 }
 
             # Update success rates
             self._update_success_rates(heal_result)
 
-            logger.info(
-                f"🧠 Learned from healing: {len(heal_result.get('fixes_applied', []))} patterns stored"
-            )
+            logger.info(f"🧠 Learned from healing: {len(heal_result.get('fixes_applied', []))} patterns stored")
 
         except Exception as e:
             logger.error(f"❌ Learning failed: {e}")
@@ -683,13 +640,13 @@ Provide the complete fixed code. Ensure:
                 return lang
         return "unknown"
 
-    def _update_success_rates(self, heal_result: Dict[str, Any]) -> None:
+    def _update_success_rates(self, heal_result: dict[str, Any]) -> None:
         """
         Update success rate tracking for continuous improvement.
         """
         # Implementation for tracking success rates
 
-    def _categorize_issues(self, issues: List[Dict[str, Any]]) -> Dict[str, int]:
+    def _categorize_issues(self, issues: list[dict[str, Any]]) -> dict[str, int]:
         """
         Categorize issues by severity.
         """
@@ -699,7 +656,7 @@ Provide the complete fixed code. Ensure:
             categories[severity] = categories.get(severity, 0) + 1
         return categories
 
-    def _group_by_language(self, issues: List[Dict[str, Any]]) -> Dict[str, int]:
+    def _group_by_language(self, issues: list[dict[str, Any]]) -> dict[str, int]:
         """
         Group issues by programming language.
         """
@@ -722,8 +679,6 @@ self_healing_agent = create_self_healing_agent()
 
 
 # Convenience functions
-async def auto_heal_codebase(
-    path: str, languages: Optional[List[str]] = None
-) -> Dict[str, Any]:
+async def auto_heal_codebase(path: str, languages: Optional[list[str]] = None) -> dict[str, Any]:
     """Automatically scan and heal codebase."""
     return await self_healing_agent.scan_and_heal(path, languages)

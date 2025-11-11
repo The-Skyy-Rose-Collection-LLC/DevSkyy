@@ -2,7 +2,7 @@
 /**
  * Divi 5 Compatibility and Enhancement Module
  * Provides advanced Divi 5 integration for AI agents
- * 
+ *
  * @package SkyyRoseAIAgents
  * @subpackage Divi5
  * @since 1.0.0
@@ -39,10 +39,10 @@ class SkyyRose_Divi5_Integration
         // Add Divi 5 specific hooks
         add_action('et_builder_modules_loaded', [$this, 'load_custom_modules']);
         add_filter('et_builder_settings', [$this, 'enhance_builder_settings']);
-        
+
         // Add luxury brand styling
         add_action('wp_head', [$this, 'inject_luxury_styling']);
-        
+
         // Performance optimizations
         add_action('wp_enqueue_scripts', [$this, 'optimize_divi_performance'], 999);
     }
@@ -100,13 +100,13 @@ class SkyyRose_Divi5_Integration
     {
         // AI-Powered Collection Showcase Module
         $this->register_collection_module();
-        
+
         // Brand Intelligence Display Module
         $this->register_brand_intelligence_module();
-        
+
         // Luxury Performance Monitor Module
         $this->register_performance_module();
-        
+
         // AI Content Generator Module
         $this->register_ai_content_module();
     }
@@ -173,7 +173,7 @@ class SkyyRose_Divi5_Integration
     {
         // Custom module loading logic
         $modules_path = SKYY_ROSE_AI_PLUGIN_PATH . 'includes/divi-modules/';
-        
+
         $modules = [
             'class-collection-showcase.php',
             'class-brand-intelligence.php',
@@ -228,7 +228,7 @@ class SkyyRose_Divi5_Integration
         }
 
         $brand_config = $this->get_brand_configuration();
-        
+
         echo '<style id="skyy-rose-luxury-styling">';
         echo $this->generate_luxury_css($brand_config);
         echo '</style>';
@@ -248,7 +248,7 @@ class SkyyRose_Divi5_Integration
         .et_pb_module.skyy-rose-luxury {
             font-family: 'Playfair Display', serif !important;
         }
-        
+
         .skyy-rose-luxury .et_pb_button {
             background: linear-gradient(135deg, {$primary_color}, {$secondary_color}) !important;
             border: none !important;
@@ -258,30 +258,30 @@ class SkyyRose_Divi5_Integration
             font-weight: 600 !important;
             transition: all 0.3s ease !important;
         }
-        
+
         .skyy-rose-luxury .et_pb_button:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
         }
-        
+
         .skyy-rose-collection-item {
             border-radius: 15px !important;
             overflow: hidden !important;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
             transition: all 0.3s ease !important;
         }
-        
+
         .skyy-rose-collection-item:hover {
             transform: translateY(-5px) !important;
             box-shadow: 0 25px 50px rgba(0,0,0,0.15) !important;
         }
-        
+
         /* Performance optimizations */
         .et_pb_row .skyy-rose-optimized {
             will-change: transform !important;
             backface-visibility: hidden !important;
         }
-        
+
         /* Responsive luxury design */
         @media (max-width: 768px) {
             .skyy-rose-luxury .et_pb_button {
@@ -305,7 +305,7 @@ class SkyyRose_Divi5_Integration
 
         // Optimize images with AI-powered compression
         add_filter('wp_get_attachment_image_attributes', [$this, 'optimize_image_attributes'], 10, 3);
-        
+
         // Lazy load Divi modules
         add_filter('et_builder_render_layout', [$this, 'add_lazy_loading']);
     }
@@ -345,7 +345,7 @@ class SkyyRose_Divi5_Integration
                         }
                     });
                 });
-                
+
                 document.querySelectorAll(".et_pb_module").forEach(function(module) {
                     observer.observe(module);
                 });
@@ -382,7 +382,7 @@ class SkyyRose_Divi5_Integration
 
         // In production, this would fetch from the AI brand intelligence agent
         $stored_config = get_option('skyy_rose_brand_config', $default_config);
-        
+
         return wp_parse_args($stored_config, $default_config);
     }
 
@@ -393,7 +393,7 @@ class SkyyRose_Divi5_Integration
     {
         // This method handles automatic syncing with the main website
         $api_url = get_option('skyy_rose_api_url', 'https://devskyy.app/api');
-        
+
         $sync_data = [
             'products' => $this->get_product_data(),
             'collections' => $this->get_collection_data(),
@@ -506,7 +506,7 @@ class SkyyRose_Divi5_Integration
     {
         $images = [];
         $attachment_ids = $product->get_gallery_image_ids();
-        
+
         foreach ($attachment_ids as $attachment_id) {
             $images[] = wp_get_attachment_url($attachment_id);
         }

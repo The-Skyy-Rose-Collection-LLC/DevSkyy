@@ -1,10 +1,11 @@
-import re
 from datetime import datetime
+import logging
+import re
+from typing import Any, Optional
 
 from anthropic import Anthropic
-from typing import Any, Dict, List, Optional
-import logging
 import numpy as np
+
 
 """
 Product Manager
@@ -12,6 +13,7 @@ ML-powered product management for fashion ecommerce
 """
 
 logger = logging.getLogger(__name__)
+
 
 class ProductManager:
     """
@@ -36,7 +38,7 @@ class ProductManager:
 
         logger.info("📦 Product Manager initialized")
 
-    def _initialize_categories(self) -> Dict[str, List[str]]:
+    def _initialize_categories(self) -> dict[str, list[str]]:
         """Initialize fashion product categories"""
         return {
             "clothing": {
@@ -71,7 +73,7 @@ class ProductManager:
             "seasonal": ["spring-summer", "fall-winter", "resort", "holiday"],
         }
 
-    def _initialize_attributes(self) -> Dict[str, List]:
+    def _initialize_attributes(self) -> dict[str, list]:
         """Initialize product attributes"""
         return {
             "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
@@ -115,9 +117,7 @@ class ProductManager:
             "fits": ["slim", "regular", "relaxed", "oversized", "tailored"],
         }
 
-    async def create_product(
-        self, product_data: Dict[str, Any], auto_generate: bool = True
-    ) -> Dict[str, Any]:
+    async def create_product(self, product_data: dict[str, Any], auto_generate: bool = True) -> dict[str, Any]:
         """
         Create a new product with ML enhancements
 
@@ -136,9 +136,7 @@ class ProductManager:
 
             # Auto-generate description if not provided
             if auto_generate and not product_data.get("description"):
-                product_data["description"] = await self._generate_description(
-                    product_data
-                )
+                product_data["description"] = await self._generate_description(product_data)
 
             # Generate SEO metadata
             if auto_generate:
@@ -201,7 +199,7 @@ class ProductManager:
             logger.error(f"Product creation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_description(self, product_data: Dict) -> str:
+    async def _generate_description(self, product_data: dict) -> str:
         """Generate AI-powered product description"""
         try:
             if self.anthropic:
@@ -229,7 +227,7 @@ class ProductManager:
             logger.error(f"Description generation failed: {e}")
             return f"High-quality {product_data.get('name')}"
 
-    async def _generate_seo_metadata(self, product_data: Dict) -> Dict[str, str]:
+    async def _generate_seo_metadata(self, product_data: dict) -> dict[str, str]:
         """Generate SEO-optimized metadata"""
         name = product_data.get("name", "")
         category = product_data.get("category", "fashion")
@@ -249,14 +247,10 @@ class ProductManager:
             ),
             "og_title": name,
             "og_description": product_data.get("description", "")[:200],
-            "og_image": (
-                product_data.get("images", [None])[0]
-                if product_data.get("images")
-                else None
-            ),
+            "og_image": (product_data.get("images", [None])[0] if product_data.get("images") else None),
         }
 
-    async def _auto_categorize(self, product_data: Dict) -> str:
+    async def _auto_categorize(self, product_data: dict) -> str:
         """Auto-categorize product using ML"""
         # Simple keyword-based categorization
         # In production, this would use actual ML classification
@@ -277,17 +271,13 @@ class ProductManager:
         else:
             return "clothing/unisex"
 
-    async def _generate_variants(self, product_data: Dict) -> List[Dict]:
+    async def _generate_variants(self, product_data: dict) -> list[dict]:
         """Generate product variants"""
         variants = []
 
         # Get available sizes and colors
-        sizes = product_data.get(
-            "sizes", self.attributes["sizes"][:5]
-        )  # Default to first 5 sizes
-        colors = product_data.get(
-            "colors", ["black", "white", "navy"]
-        )  # Default colors
+        sizes = product_data.get("sizes", self.attributes["sizes"][:5])  # Default to first 5 sizes
+        colors = product_data.get("colors", ["black", "white", "navy"])  # Default colors
 
         base_price = product_data.get("price", 100)
         base_sku = product_data.get("sku", "ITEM")
@@ -307,7 +297,7 @@ class ProductManager:
 
         return variants
 
-    async def _recommend_price(self, product_data: Dict) -> float:
+    async def _recommend_price(self, product_data: dict) -> float:
         """Recommend product price using ML"""
         # Simplified pricing algorithm
         # In production, this would use the DynamicPricingEngine
@@ -329,7 +319,7 @@ class ProductManager:
 
         return round(recommended_price, 2)
 
-    async def _generate_tags(self, product_data: Dict) -> List[str]:
+    async def _generate_tags(self, product_data: dict) -> list[str]:
         """Generate product tags"""
         tags = []
 
@@ -367,9 +357,7 @@ class ProductManager:
         slug = slug.strip("-")
         return slug
 
-    async def bulk_import_products(
-        self, products: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def bulk_import_products(self, products: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Bulk import products with ML enhancements
 
@@ -397,9 +385,7 @@ class ProductManager:
                         }
                     )
 
-            logger.info(
-                f"✅ Imported {len(results['success'])}/{len(products)} products"
-            )
+            logger.info(f"✅ Imported {len(results['success'])}/{len(products)} products")
 
             return {
                 "success": True,
@@ -412,9 +398,7 @@ class ProductManager:
             logger.error(f"Bulk import failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def optimize_product_images(
-        self, product_id: str, images: List[str]
-    ) -> Dict[str, Any]:
+    async def optimize_product_images(self, product_id: str, images: list[str]) -> dict[str, Any]:
         """
         Optimize product images using ML
 
@@ -435,9 +419,7 @@ class ProductManager:
                         "optimized": image_url,  # Would process through image optimization service
                         "size_reduction": "35%",
                         "format": "webp",
-                        "alt_text": await self._generate_image_alt_text(
-                            product_id, image_url
-                        ),
+                        "alt_text": await self._generate_image_alt_text(product_id, image_url),
                     }
                 )
 
@@ -455,22 +437,18 @@ class ProductManager:
     async def _generate_image_alt_text(self, product_id: str, image_url: str) -> str:
         """Generate SEO-optimized alt text for product images"""
         # Find product
-        product = next(
-            (p for p in self.products_database if p["id"] == product_id), None
-        )
+        product = next((p for p in self.products_database if p["id"] == product_id), None)
 
         if product:
             return f"{product['name']} - {product.get('category', 'fashion item')}"
         else:
             return "Product image"
 
-    async def get_product_analytics(self, product_id: str) -> Dict[str, Any]:
+    async def get_product_analytics(self, product_id: str) -> dict[str, Any]:
         """Get ML-powered analytics for a product"""
         try:
             # Find product
-            product = next(
-                (p for p in self.products_database if p["id"] == product_id), None
-            )
+            product = next((p for p in self.products_database if p["id"] == product_id), None)
 
             if not product:
                 return {"success": False, "error": "Product not found"}

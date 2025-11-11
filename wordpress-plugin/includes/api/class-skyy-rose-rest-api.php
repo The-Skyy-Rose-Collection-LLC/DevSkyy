@@ -1,7 +1,7 @@
 <?php
 /**
  * REST API endpoints
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -235,7 +235,7 @@ class SkyyRoseRestAPI
     public static function getDashboardData($request)
     {
         $db = SkyyRoseDatabase::getInstance();
-        
+
         $dashboard_data = [
             'agents_status' => self::getAgentsStatus(),
             'recent_activities' => $db->getAgentActivities(null, 10),
@@ -253,7 +253,7 @@ class SkyyRoseRestAPI
     public static function getActivities($request)
     {
         $db = SkyyRoseDatabase::getInstance();
-        
+
         $agent_type = $request->get_param('agent_type');
         $limit = $request->get_param('limit');
         $offset = $request->get_param('offset');
@@ -315,7 +315,7 @@ class SkyyRoseRestAPI
 
         // Validate and sanitize settings
         $sanitized_settings = $settings->sanitizeSettings($new_settings);
-        
+
         // Update settings
         update_option('skyy_rose_ai_settings', $sanitized_settings);
 
@@ -419,7 +419,7 @@ class SkyyRoseRestAPI
     private static function getAgentsStatus()
     {
         $settings = SkyyRoseSettings::getInstance();
-        
+
         return [
             'brand_intelligence' => $settings->get('agents.brand_intelligence.enabled', true),
             'inventory' => $settings->get('agents.inventory.enabled', true),
@@ -433,14 +433,14 @@ class SkyyRoseRestAPI
     {
         $db = SkyyRoseDatabase::getInstance();
         $recent_metrics = $db->getPerformanceMetrics('overall_score', 24);
-        
+
         if (empty($recent_metrics)) {
             return ['score' => 0, 'trend' => 'neutral'];
         }
 
         $latest_score = end($recent_metrics)->metric_value;
-        $trend = count($recent_metrics) > 1 ? 
-            ($latest_score > $recent_metrics[0]->metric_value ? 'up' : 'down') : 
+        $trend = count($recent_metrics) > 1 ?
+            ($latest_score > $recent_metrics[0]->metric_value ? 'up' : 'down') :
             'neutral';
 
         return [
@@ -453,10 +453,10 @@ class SkyyRoseRestAPI
     {
         $db = SkyyRoseDatabase::getInstance();
         $recent_activities = $db->getAgentActivities('security', 5);
-        
+
         $last_scan = null;
         $threat_level = 'low';
-        
+
         foreach ($recent_activities as $activity) {
             if ($activity->action === 'security_scan' && $activity->status === 'completed') {
                 $last_scan = $activity;
@@ -478,7 +478,7 @@ class SkyyRoseRestAPI
     private static function getQuickStats()
     {
         $db = SkyyRoseDatabase::getInstance();
-        
+
         return [
             'total_activities' => count($db->getAgentActivities()),
             'activities_today' => count($db->getAgentActivities(null, 100)), // Simplified
@@ -497,7 +497,7 @@ class SkyyRoseRestAPI
     {
         $db = SkyyRoseDatabase::getInstance();
         $activities = $db->getAgentActivities(null, 1);
-        
+
         return !empty($activities) ? $activities[0]->created_at : null;
     }
 
@@ -505,13 +505,13 @@ class SkyyRoseRestAPI
     {
         $db = SkyyRoseDatabase::getInstance();
         $activities = $db->getAgentActivities('wordpress', 10);
-        
+
         foreach ($activities as $activity) {
             if (strpos($activity->action, 'optimize') !== false) {
                 return $activity->created_at;
             }
         }
-        
+
         return null;
     }
 }

@@ -3,11 +3,12 @@ Unit tests for PerformanceTracker
 Tests KPI tracking and improvement proposal generation
 """
 
-import pytest
-import tempfile
+from pathlib import Path
 import shutil
 import sqlite3
-from pathlib import Path
+import tempfile
+
+import pytest
 
 from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 
@@ -39,13 +40,13 @@ class TestPerformanceTrackerInitialization:
         """Test that initialization creates required tables"""
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
-        
+
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='agent_metrics'")
         assert cursor.fetchone() is not None
-        
+
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='system_metrics'")
         assert cursor.fetchone() is not None
-        
+
         conn.close()
 
 
@@ -55,13 +56,13 @@ class TestLogMetrics:
     def test_log_agent_metric(self, tracker, temp_db_path):
         """Test logging agent metric"""
         tracker.log_metric("test_agent", "execution_time", 1.5)
-        
+
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM agent_metrics WHERE agent_name = ?", ("test_agent",))
         result = cursor.fetchone()
         conn.close()
-        
+
         assert result is not None
         assert result[1] == "test_agent"
         assert result[2] == "execution_time"
@@ -72,7 +73,7 @@ class TestLogMetrics:
         tracker.log_metric("agent1", "metric1", 10.0)
         tracker.log_metric("agent1", "metric2", 20.0)
         tracker.log_metric("agent2", "metric1", 15.0)
-        
+
         # Metrics should be stored
         assert True  # Implicit test via no exceptions
 
@@ -80,13 +81,13 @@ class TestLogMetrics:
         """Test logging system-wide metric"""
         metadata = {"server": "prod", "region": "us-east"}
         tracker.log_system_metric("cpu_usage", 75.5, metadata)
-        
+
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM system_metrics WHERE metric_name = ?", ("cpu_usage",))
         result = cursor.fetchone()
         conn.close()
-        
+
         assert result is not None
         assert result[1] == "cpu_usage"
         assert result[2] == 75.5
@@ -99,7 +100,7 @@ class TestWeeklyReport:
     async def test_compute_weekly_report_empty(self, tracker):
         """Test computing weekly report with no data"""
         report = await tracker.compute_weekly_report()
-        
+
         assert "period" in report
         assert report["period"] == "weekly"
         assert "agent_performance" in report
@@ -112,9 +113,9 @@ class TestWeeklyReport:
         tracker.log_metric("test_agent", "execution_time", 1.0)
         tracker.log_metric("test_agent", "execution_time", 2.0)
         tracker.log_metric("test_agent", "execution_time", 3.0)
-        
+
         report = await tracker.compute_weekly_report()
-        
+
         assert "test_agent" in report["agent_performance"]
         assert "execution_time" in report["agent_performance"]["test_agent"]
 
@@ -124,9 +125,9 @@ class TestWeeklyReport:
         # Log metrics
         for value in [1.0, 2.0, 3.0, 4.0, 5.0]:
             tracker.log_metric("test_agent", "test_metric", value)
-        
+
         report = await tracker.compute_weekly_report()
-        
+
         stats = report["agent_performance"]["test_agent"]["test_metric"]
         assert "average" in stats
         assert "min" in stats
@@ -142,29 +143,21 @@ class TestProposalGeneration:
     async def test_generate_proposals_empty_report(self, tracker):
         """Test generating proposals from empty report"""
         report = {"agent_performance": {}, "system_performance": {}}
-        
+
         proposals = await tracker.generate_proposals(report)
-        
+
         assert isinstance(proposals, list)
 
     @pytest.mark.asyncio
     async def test_generate_proposal_slow_execution(self, tracker):
         """Test proposal for slow execution time"""
         report = {
-            "agent_performance": {
-                "slow_agent": {
-                    "execution_time": {
-                        "average": 10.0,
-                        "min": 8.0,
-                        "max": 12.0
-                    }
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"slow_agent": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
-        
+
         proposals = await tracker.generate_proposals(report)
-        
+
         assert len(proposals) > 0
         assert any("slow_execution" in p.get("issue", "") for p in proposals)
 
@@ -173,34 +166,23 @@ class TestProposalGeneration:
         """Test proposal for high error rate"""
         report = {
             "agent_performance": {
-                "error_agent": {
-                    "error_rate": {
-                        "average": 0.10,  # 10% error rate
-                        "min": 0.05,
-                        "max": 0.15
-                    }
-                }
+                "error_agent": {"error_rate": {"average": 0.10, "min": 0.05, "max": 0.15}}  # 10% error rate
             },
-            "system_performance": {}
+            "system_performance": {},
         }
-        
+
         proposals = await tracker.generate_proposals(report)
-        
+
         assert len(proposals) > 0
         assert any("error_rate" in p.get("issue", "") for p in proposals)
 
     @pytest.mark.asyncio
     async def test_generate_proposal_high_cpu(self, tracker):
         """Test proposal for high CPU usage"""
-        report = {
-            "agent_performance": {},
-            "system_performance": {
-                "cpu_usage": 85.0
-            }
-        }
-        
+        report = {"agent_performance": {}, "system_performance": {"cpu_usage": 85.0}}
+
         proposals = await tracker.generate_proposals(report)
-        
+
         assert len(proposals) > 0
         assert any("cpu" in p.get("issue", "").lower() for p in proposals)
 
@@ -208,16 +190,12 @@ class TestProposalGeneration:
     async def test_proposals_saved_to_file(self, tracker):
         """Test that proposals are saved to file"""
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
-        
+
         await tracker.generate_proposals(report)
-        
+
         assert tracker.proposals_path.exists()
 
 
@@ -228,7 +206,7 @@ class TestGetProposals:
     async def test_get_proposals_empty(self, tracker):
         """Test getting proposals when file doesn't exist"""
         proposals = await tracker.get_proposals()
-        
+
         assert proposals == []
 
     @pytest.mark.asyncio
@@ -236,17 +214,13 @@ class TestGetProposals:
         """Test getting all proposals"""
         # Generate some proposals
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
         await tracker.generate_proposals(report)
-        
+
         proposals = await tracker.get_proposals()
-        
+
         assert len(proposals) > 0
 
     @pytest.mark.asyncio
@@ -255,7 +229,7 @@ class TestGetProposals:
         # Create proposal with specific status
         report = {"agent_performance": {}, "system_performance": {}}
         await tracker.generate_proposals(report)
-        
+
         # No proposals match "implemented" status yet
         filtered = await tracker.get_proposals(status="implemented")
         assert len(filtered) == 0
@@ -269,23 +243,16 @@ class TestUpdateProposalStatus:
         """Test updating proposal status"""
         # Create proposal
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
         proposals = await tracker.generate_proposals(report)
         proposal_id = proposals[0]["id"]
-        
+
         result = await tracker.update_proposal_status(
-            proposal_id=proposal_id,
-            status="approved",
-            operator="test_operator",
-            notes="Looks good"
+            proposal_id=proposal_id, status="approved", operator="test_operator", notes="Looks good"
         )
-        
+
         assert result["status"] == "updated"
         assert result["proposal"]["status"] == "approved"
         assert result["proposal"]["reviewed_by"] == "test_operator"
@@ -294,11 +261,9 @@ class TestUpdateProposalStatus:
     async def test_update_nonexistent_proposal(self, tracker):
         """Test updating non-existent proposal"""
         result = await tracker.update_proposal_status(
-            proposal_id="nonexistent",
-            status="approved",
-            operator="operator"
+            proposal_id="nonexistent", status="approved", operator="operator"
         )
-        
+
         assert "error" in result
 
 
@@ -309,7 +274,7 @@ class TestKPISummary:
     async def test_get_kpi_summary_empty(self, tracker):
         """Test getting KPI summary with no data"""
         summary = await tracker.get_kpi_summary(days=7)
-        
+
         assert "period_days" in summary
         assert "agent_kpis" in summary
 
@@ -319,18 +284,18 @@ class TestKPISummary:
         # Log some metrics
         for i in range(5):
             tracker.log_metric("test_agent", "execution_time", 1.0 + i * 0.1)
-        
+
         summary = await tracker.get_kpi_summary(days=7)
-        
+
         assert "test_agent" in summary["agent_kpis"]
 
     @pytest.mark.asyncio
     async def test_get_kpi_summary_custom_period(self, tracker):
         """Test getting KPI summary for custom period"""
         tracker.log_metric("agent1", "execution_time", 1.0)
-        
+
         summary = await tracker.get_kpi_summary(days=30)
-        
+
         assert summary["period_days"] == 30
 
 
@@ -352,11 +317,8 @@ class TestEdgeCases:
     @pytest.mark.asyncio
     async def test_generate_proposals_with_none_values(self, tracker):
         """Test generating proposals with None values in report"""
-        report = {
-            "agent_performance": None,
-            "system_performance": None
-        }
-        
+        report = {"agent_performance": None, "system_performance": None}
+
         # Should handle gracefully
         with pytest.raises((TypeError, AttributeError)):
             await tracker.generate_proposals(report)

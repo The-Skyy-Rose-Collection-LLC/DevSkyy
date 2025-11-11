@@ -1,18 +1,21 @@
+from collections.abc import Awaitable, Callable
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from enum import Enum
+import hashlib
+import json
+import logging
+import time
+from typing import Any, Optional
+import uuid
+
+import aiohttp
+from aiohttp import ClientTimeout
+
+from api_integration.auth_manager import auth_manager, rate_limit_manager
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
-import json
-import time
 
-from aiohttp import ClientTimeout
-from api_integration.auth_manager import auth_manager, rate_limit_manager
-from dataclasses import asdict, dataclass
-from enum import Enum
-from typing import Any, Awaitable, Callable, Dict, Optional
-import aiohttp
-import hashlib
-import logging
-import uuid
 
 """
 Core API Integration Engine
@@ -24,7 +27,9 @@ from api_integration.discovery_engine import (
     api_discovery_engine,
 )
 
+
 logger = logging.getLogger(__name__)
+
 
 class RequestStatus(Enum):
     """API request status"""
@@ -37,12 +42,14 @@ class RequestStatus(Enum):
     RATE_LIMITED = "rate_limited"
     CIRCUIT_OPEN = "circuit_open"
 
+
 class CircuitState(Enum):
     """Circuit breaker states"""
 
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
+
 
 @dataclass
 class APIRequest:
@@ -52,8 +59,8 @@ class APIRequest:
     api_id: str
     endpoint: str
     method: str
-    headers: Dict[str, str]
-    params: Dict[str, Any]
+    headers: dict[str, str]
+    params: dict[str, Any]
     data: Any
     timeout: int
     retry_count: int
@@ -64,12 +71,13 @@ class APIRequest:
     error_message: str = None
     execution_time: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["status"] = self.status.value
         data["created_at"] = self.created_at.isoformat()
         return data
+
 
 @dataclass
 class CircuitBreakerConfig:
@@ -79,6 +87,7 @@ class CircuitBreakerConfig:
     recovery_timeout: int = 60
     expected_exception: type = Exception
     name: str = "default"
+
 
 class CircuitBreaker:
     """Circuit breaker implementation for API fault tolerance"""
@@ -109,10 +118,7 @@ class CircuitBreaker:
 
     def _should_attempt_reset(self) -> bool:
         """Check if circuit breaker should attempt reset"""
-        return (
-            self.last_failure_time
-            and time.time() - self.last_failure_time >= self.config.recovery_timeout
-        )
+        return self.last_failure_time and time.time() - self.last_failure_time >= self.config.recovery_timeout
 
     def _on_success(self):
         """Handle successful request"""
@@ -127,14 +133,15 @@ class CircuitBreaker:
         if self.failure_count >= self.config.failure_threshold:
             self.state = CircuitState.OPEN
 
+
 class DataTransformer:
     """Data transformation pipeline for API responses"""
 
     def __init__(self):
-        self.transformers: Dict[str, Callable] = {}
+        self.transformers: dict[str, Callable] = {}
         self.fashion_transformers = self._setup_fashion_transformers()
 
-    def _setup_fashion_transformers(self) -> Dict[str, Callable]:
+    def _setup_fashion_transformers(self) -> dict[str, Callable]:
         """Setup fashion-specific data transformers"""
         return {
             "product_catalog": self._transform_product_data,
@@ -144,9 +151,7 @@ class DataTransformer:
             "payment_data": self._transform_payment_data,
         }
 
-    async def transform(
-        self, data: Any, source_api: str, target_format: str = "standard"
-    ) -> Dict[str, Any]:
+    async def transform(self, data: Any, source_api: str, target_format: str = "standard") -> dict[str, Any]:
         """Transform API response data to standard format"""
 
         if not data:
@@ -164,9 +169,7 @@ class DataTransformer:
         # Default transformation
         return await self._default_transform(data)
 
-    async def _transform_product_data(
-        self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    async def _transform_product_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform product catalog data"""
 
         if isinstance(data, list):
@@ -185,13 +188,11 @@ class DataTransformer:
 
         return {"raw_data": data, "source_api": source_api}
 
-    async def _normalize_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _normalize_product(self, product_data: dict[str, Any]) -> dict[str, Any]:
         """Normalize product data to standard format"""
 
         return {
-            "id": product_data.get("id")
-            or product_data.get("product_id")
-            or product_data.get("sku"),
+            "id": product_data.get("id") or product_data.get("product_id") or product_data.get("sku"),
             "name": product_data.get("name") or product_data.get("title"),
             "description": product_data.get("description"),
             "price": product_data.get("price") or product_data.get("cost"),
@@ -199,8 +200,7 @@ class DataTransformer:
             "category": product_data.get("category") or product_data.get("type"),
             "brand": product_data.get("brand") or product_data.get("vendor"),
             "images": product_data.get("images") or product_data.get("image_urls", []),
-            "availability": product_data.get("available")
-            or product_data.get("in_stock", True),
+            "availability": product_data.get("available") or product_data.get("in_stock", True),
             "sizes": product_data.get("sizes") or product_data.get("variants", []),
             "colors": product_data.get("colors") or [],
             "materials": product_data.get("materials") or [],
@@ -210,7 +210,7 @@ class DataTransformer:
             "updated_at": product_data.get("updated_at"),
         }
 
-    async def _transform_trend_data(self, data: Any, source_api: str) -> Dict[str, Any]:
+    async def _transform_trend_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform fashion trend data"""
 
         if isinstance(data, list):
@@ -229,7 +229,7 @@ class DataTransformer:
 
         return {"raw_data": data, "source_api": source_api}
 
-    async def _normalize_trend(self, trend_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _normalize_trend(self, trend_data: dict[str, Any]) -> dict[str, Any]:
         """Normalize trend data to standard format"""
 
         return {
@@ -239,8 +239,7 @@ class DataTransformer:
             "category": trend_data.get("category"),
             "season": trend_data.get("season"),
             "year": trend_data.get("year", datetime.now().year),
-            "popularity_score": trend_data.get("popularity")
-            or trend_data.get("score", 0.0),
+            "popularity_score": trend_data.get("popularity") or trend_data.get("score", 0.0),
             "colors": trend_data.get("colors") or trend_data.get("color_palette", []),
             "materials": trend_data.get("materials") or [],
             "target_demographics": trend_data.get("demographics") or [],
@@ -250,9 +249,7 @@ class DataTransformer:
             "updated_at": trend_data.get("updated_at"),
         }
 
-    async def _transform_inventory_data(
-        self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    async def _transform_inventory_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform inventory data"""
 
         return {
@@ -261,9 +258,7 @@ class DataTransformer:
             "transformed_at": datetime.now().isoformat(),
         }
 
-    async def _transform_analytics_data(
-        self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    async def _transform_analytics_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform customer analytics data"""
 
         return {
@@ -272,9 +267,7 @@ class DataTransformer:
             "transformed_at": datetime.now().isoformat(),
         }
 
-    async def _transform_payment_data(
-        self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    async def _transform_payment_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform payment data"""
 
         return {
@@ -283,18 +276,19 @@ class DataTransformer:
             "transformed_at": datetime.now().isoformat(),
         }
 
-    async def _default_transform(self, data: Any) -> Dict[str, Any]:
+    async def _default_transform(self, data: Any) -> dict[str, Any]:
         """Default data transformation"""
 
         return {"data": data, "transformed_at": datetime.now().isoformat()}
+
 
 class APIGateway:
     """API Gateway for managing all external API communications"""
 
     def __init__(self):
-        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
+        self.circuit_breakers: dict[str, CircuitBreaker] = {}
         self.data_transformer = DataTransformer()
-        self.request_cache: Dict[str, Any] = {}
+        self.request_cache: dict[str, Any] = {}
 
         # Performance metrics
         self.metrics = {
@@ -326,13 +320,13 @@ class APIGateway:
         api_id: str,
         endpoint: str,
         method: str = "GET",
-        params: Dict[str, Any] = None,
+        params: dict[str, Any] = None,
         data: Any = None,
-        headers: Dict[str, str] = None,
+        headers: dict[str, str] = None,
         timeout: int = 30,
         use_cache: bool = True,
         transform_response: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Make API request with full integration features"""
 
         request_id = str(uuid.uuid4())
@@ -375,18 +369,14 @@ class APIGateway:
             circuit_breaker = self._get_circuit_breaker(api_id)
 
             # Make request with circuit breaker protection
-            response_data = await circuit_breaker.call(
-                self._execute_request, api_request
-            )
+            response_data = await circuit_breaker.call(self._execute_request, api_request)
 
             # Record successful request
             await rate_limit_manager.record_request(api_id)
 
             # Transform response data
             if transform_response:
-                response_data = await self.data_transformer.transform(
-                    response_data, api_id
-                )
+                response_data = await self.data_transformer.transform(response_data, api_id)
 
             # Cache response
             if use_cache and method.upper() == "GET":
@@ -402,9 +392,7 @@ class APIGateway:
             api_request.execution_time = execution_time
             await self._log_request(api_request)
 
-            logger.info(
-                f"API request {request_id} completed successfully in {execution_time:.2f}s"
-            )
+            logger.info(f"API request {request_id} completed successfully in {execution_time:.2f}s")
 
             return {
                 "success": True,
@@ -465,11 +453,7 @@ class APIGateway:
                 method=api_request.method,
                 url=full_url,
                 params=api_request.params,
-                json=(
-                    api_request.data
-                    if api_request.method in ["POST", "PUT", "PATCH"]
-                    else None
-                ),
+                json=(api_request.data if api_request.method in ["POST", "PUT", "PATCH"] else None),
                 headers=headers,
             ) as response:
 
@@ -487,9 +471,7 @@ class APIGateway:
                 else:
                     return await response.read()
 
-    async def _get_cached_response(
-        self, api_request: APIRequest
-    ) -> Optional[Dict[str, Any]]:
+    async def _get_cached_response(self, api_request: APIRequest) -> Optional[dict[str, Any]]:
         """Get cached API response"""
 
         cache_key = self._generate_cache_key(api_request)
@@ -510,9 +492,7 @@ class APIGateway:
 
         try:
             # Cache for 1 hour by default
-            await redis_manager.set(
-                cache_key, response_data, ttl=3600, prefix="api_cache"
-            )
+            await redis_manager.set(cache_key, response_data, ttl=3600, prefix="api_cache")
         except Exception as e:
             logger.error(f"Error caching response: {e}")
 
@@ -529,9 +509,7 @@ class APIGateway:
             log_data = api_request.to_dict()
             log_data["@timestamp"] = datetime.now().isoformat()
 
-            await elasticsearch_manager.index_document(
-                "logs", log_data, doc_id=api_request.request_id
-            )
+            await elasticsearch_manager.index_document("logs", log_data, doc_id=api_request.request_id)
         except Exception as e:
             logger.error(f"Error logging request: {e}")
 
@@ -552,8 +530,7 @@ class APIGateway:
             # Exponential moving average
             alpha = 0.1
             self.metrics["average_response_time"] = (
-                alpha * execution_time
-                + (1 - alpha) * self.metrics["average_response_time"]
+                alpha * execution_time + (1 - alpha) * self.metrics["average_response_time"]
             )
 
         # Update per-API metrics
@@ -577,13 +554,11 @@ class APIGateway:
         if api_metrics["avg_response_time"] == 0:
             api_metrics["avg_response_time"] = execution_time
         else:
-            api_metrics["avg_response_time"] = (
-                0.1 * execution_time + 0.9 * api_metrics["avg_response_time"]
-            )
+            api_metrics["avg_response_time"] = 0.1 * execution_time + 0.9 * api_metrics["avg_response_time"]
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get API gateway metrics"""
 
         return {
@@ -600,31 +575,21 @@ class APIGateway:
             "rate_limit_status": await rate_limit_manager.get_all_rate_limit_status(),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for API gateway"""
 
         try:
             metrics = await self.get_metrics()
 
             # Check if any circuit breakers are open
-            open_circuits = [
-                api_id
-                for api_id, cb in self.circuit_breakers.items()
-                if cb.state == CircuitState.OPEN
-            ]
+            open_circuits = [api_id for api_id, cb in self.circuit_breakers.items() if cb.state == CircuitState.OPEN]
 
             # Calculate success rate
             total_requests = self.metrics["total_requests"]
-            success_rate = (
-                self.metrics["successful_requests"] / total_requests
-                if total_requests > 0
-                else 1.0
-            )
+            success_rate = self.metrics["successful_requests"] / total_requests if total_requests > 0 else 1.0
 
             status = "healthy"
-            if open_circuits:
-                status = "degraded"
-            elif success_rate < 0.9:
+            if open_circuits or success_rate < 0.9:
                 status = "degraded"
 
             return {
@@ -641,6 +606,7 @@ class APIGateway:
 
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
+
 
 # Global API gateway instance
 api_gateway = APIGateway()

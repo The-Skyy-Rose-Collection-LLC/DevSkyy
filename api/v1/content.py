@@ -8,16 +8,17 @@ IMPACT: Replaces n8n workflow with native DevSkyy automation
 Truth Protocol: Input validation, error handling, logging, no placeholders
 """
 
+from datetime import datetime
 import logging
 import os
-from typing import Optional, List
-from datetime import datetime
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from services.content_publishing_orchestrator import ContentPublishingOrchestrator
-from services.wordpress_categorization import WordPressCategorizationService, CategorizationResult
+from services.wordpress_categorization import WordPressCategorizationService
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/content", tags=["Content Publishing"])
@@ -27,26 +28,16 @@ class PublishContentRequest(BaseModel):
     """Request to publish AI-generated content"""
 
     topic: str = Field(..., min_length=1, max_length=200, description="Content topic")
-    keywords: List[str] = Field(
-        default_factory=list, description="SEO keywords for content"
-    )
+    keywords: list[str] = Field(default_factory=list, description="SEO keywords for content")
     tone: str = Field(
         default="professional",
         description="Writing tone (professional, casual, luxury, friendly)",
     )
     length: int = Field(default=800, ge=200, le=3000, description="Target word count")
-    apply_random_delay: bool = Field(
-        default=False, description="Apply random delay before publishing"
-    )
-    min_delay_hours: float = Field(
-        default=0, ge=0, le=24, description="Minimum delay in hours"
-    )
-    max_delay_hours: float = Field(
-        default=6, ge=0, le=24, description="Maximum delay in hours"
-    )
-    publish_status: str = Field(
-        default="publish", description="WordPress status (publish, draft)"
-    )
+    apply_random_delay: bool = Field(default=False, description="Apply random delay before publishing")
+    min_delay_hours: float = Field(default=0, ge=0, le=24, description="Minimum delay in hours")
+    max_delay_hours: float = Field(default=6, ge=0, le=24, description="Maximum delay in hours")
+    publish_status: str = Field(default="publish", description="WordPress status (publish, draft)")
     notify_telegram: bool = Field(default=True, description="Send Telegram notification")
     log_to_sheets: bool = Field(default=True, description="Log to Google Sheets")
 
@@ -68,20 +59,16 @@ class PublishContentResponse(BaseModel):
 class ScheduledPublishRequest(BaseModel):
     """Request to schedule content publishing"""
 
-    topics: List[str] = Field(..., min_items=1, description="List of topics to publish")
-    keywords: List[str] = Field(default_factory=list, description="Common keywords")
-    schedule_days: List[str] = Field(
+    topics: list[str] = Field(..., min_items=1, description="List of topics to publish")
+    keywords: list[str] = Field(default_factory=list, description="Common keywords")
+    schedule_days: list[str] = Field(
         default=["tuesday", "thursday", "sunday"],
         description="Days to publish (lowercase)",
     )
     schedule_time: str = Field(default="12:00", description="Time to publish (HH:MM)")
     timezone: str = Field(default="UTC", description="Timezone")
-    random_delay_enabled: bool = Field(
-        default=True, description="Enable random delay per n8n workflow"
-    )
-    max_delay_hours: int = Field(
-        default=6, description="Maximum random delay in hours"
-    )
+    random_delay_enabled: bool = Field(default=True, description="Enable random delay per n8n workflow")
+    max_delay_hours: int = Field(default=6, description="Maximum random delay in hours")
 
 
 class ScheduledPublishResponse(BaseModel):
@@ -112,9 +99,7 @@ def get_orchestrator_service() -> ContentPublishingOrchestrator:
     telegram_chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
     if not anthropic_api_key:
-        raise HTTPException(
-            status_code=500, detail="ANTHROPIC_API_KEY not configured"
-        )
+        raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not configured")
 
     if not pexels_api_key:
         raise HTTPException(status_code=500, detail="PEXELS_API_KEY not configured")
@@ -194,19 +179,17 @@ async def publish_content(
                 delay_applied_seconds=result.get("delay_applied", 0),
             )
         else:
-            raise HTTPException(
-                status_code=500, detail=result.get("error", "Publishing failed")
-            )
+            raise HTTPException(status_code=500, detail=result.get("error", "Publishing failed"))
 
     except Exception as e:
         logger.exception("Content publishing failed")
-        raise HTTPException(status_code=500, detail=f"Publishing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Publishing failed: {e!s}")
 
 
 @router.post("/publish-batch", response_model=dict)
 async def publish_content_batch(
-    topics: List[str],
-    keywords: List[str] = [],
+    topics: list[str],
+    keywords: list[str] = [],
     tone: str = "professional",
     length: int = 800,
     orchestrator: ContentPublishingOrchestrator = Depends(get_orchestrator_service),
@@ -255,11 +238,7 @@ async def publish_content_batch(
                         "topic": topic,
                         "success": result["success"],
                         "title": result["content"]["title"] if result["success"] else None,
-                        "url": (
-                            result["wordpress_post"]["url"]
-                            if result["success"]
-                            else None
-                        ),
+                        "url": (result["wordpress_post"]["url"] if result["success"] else None),
                     }
                 )
             except Exception as e:
@@ -289,7 +268,7 @@ async def publish_content_batch(
 
     except Exception as e:
         logger.exception("Batch publishing failed")
-        raise HTTPException(status_code=500, detail=f"Batch publishing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Batch publishing failed: {e!s}")
 
 
 @router.post("/schedule", response_model=ScheduledPublishResponse)
@@ -324,9 +303,7 @@ async def schedule_content_publishing(
     See documentation for Celery setup.
     """
     try:
-        logger.info(
-            f"Schedule requested for {len(request.topics)} topics on {request.schedule_days}"
-        )
+        logger.info(f"Schedule requested for {len(request.topics)} topics on {request.schedule_days}")
 
         # TODO: Implement Celery Beat scheduling
         # This would create a periodic task that:
@@ -344,12 +321,12 @@ async def schedule_content_publishing(
 
     except Exception as e:
         logger.exception("Scheduling failed")
-        raise HTTPException(status_code=500, detail=f"Scheduling failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Scheduling failed: {e!s}")
 
 
 @router.post("/categorize", response_model=dict)
 async def categorize_wordpress_posts(
-    post_ids: Optional[List[int]] = None,
+    post_ids: Optional[list[int]] = None,
     wordpress_site_url: Optional[str] = None,
     use_ai: bool = True,
 ):
@@ -406,9 +383,7 @@ async def categorize_wordpress_posts(
             posts_to_categorize = mock_posts
 
         # Categorize posts
-        results = await categorization_service.categorize_posts_batch(
-            posts_to_categorize, use_ai=use_ai
-        )
+        results = await categorization_service.categorize_posts_batch(posts_to_categorize, use_ai=use_ai)
 
         # Prepare response
         succeeded = [r for r in results if not r.error]
@@ -436,9 +411,7 @@ async def categorize_wordpress_posts(
 
     except Exception as e:
         logger.exception("WordPress categorization failed")
-        raise HTTPException(
-            status_code=500, detail=f"Categorization failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Categorization failed: {e!s}")
 
 
 @router.get("/categories", response_model=dict)
@@ -486,9 +459,7 @@ async def get_configuration():
         "anthropic_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "pexels_configured": bool(os.getenv("PEXELS_API_KEY")),
-        "telegram_configured": bool(
-            os.getenv("TELEGRAM_BOT_TOKEN") and os.getenv("TELEGRAM_CHAT_ID")
-        ),
+        "telegram_configured": bool(os.getenv("TELEGRAM_BOT_TOKEN") and os.getenv("TELEGRAM_CHAT_ID")),
         "google_sheets_configured": bool(os.getenv("GOOGLE_SHEETS_ID")),
         "wordpress_credentials_configured": bool(os.getenv("SKYY_ROSE_SITE_URL")),
     }

@@ -3,14 +3,16 @@ LAYER 3 — Data Pipeline
 Manages ingestion, preprocessing, inference, and storage with validation
 """
 
+from datetime import datetime
+import hashlib
 import json
-import yaml
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
-from datetime import datetime
+from typing import Any
+
 import pandas as pd
-import hashlib
+import yaml
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,16 +39,16 @@ class DataPipeline:
         self.validated_path.mkdir(parents=True, exist_ok=True)
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-        self.processing_log: List[Dict[str, Any]] = []
+        self.processing_log: list[dict[str, Any]] = []
 
         logger.info("📊 Data pipeline initialized")
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load pipeline configuration"""
         with open(self.config_path) as f:
             return yaml.safe_load(f)["data_pipeline"]
 
-    async def ingest(self, file_path: str, source_type: str) -> Dict[str, Any]:
+    async def ingest(self, file_path: str, source_type: str) -> dict[str, Any]:
         """
         Ingest data from approved source.
 
@@ -100,7 +102,7 @@ class DataPipeline:
                 "file_hash": file_hash,
                 "size_mb": file_size_mb,
                 "ingestion_time_seconds": ingestion_time,
-                "data": data
+                "data": data,
             }
 
             self._log_operation("ingest", result)
@@ -109,10 +111,10 @@ class DataPipeline:
             return result
 
         except Exception as e:
-            logger.error(f"❌ Ingestion failed: {str(e)}")
+            logger.error(f"❌ Ingestion failed: {e!s}")
             return {"status": "error", "reason": str(e)}
 
-    async def preprocess(self, data: Any, schema_name: str) -> Dict[str, Any]:
+    async def preprocess(self, data: Any, schema_name: str) -> dict[str, Any]:
         """
         Preprocess and validate data.
 
@@ -132,17 +134,25 @@ class DataPipeline:
             # Quarantine invalid data
             quarantine_file = self.quarantine_path / f"quarantine_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             with open(quarantine_file, "w") as f:
-                json.dump({
-                    "data": data if isinstance(data, dict) else data.to_dict() if hasattr(data, "to_dict") else str(data),
-                    "validation_errors": validation_result["errors"],
-                    "timestamp": datetime.now().isoformat()
-                }, f, indent=2)
+                json.dump(
+                    {
+                        "data": (
+                            data
+                            if isinstance(data, dict)
+                            else data.to_dict() if hasattr(data, "to_dict") else str(data)
+                        ),
+                        "validation_errors": validation_result["errors"],
+                        "timestamp": datetime.now().isoformat(),
+                    },
+                    f,
+                    indent=2,
+                )
 
             logger.warning(f"⚠️  Data quarantined: {validation_result['errors']}")
             return {
                 "status": "quarantined",
                 "errors": validation_result["errors"],
-                "quarantine_file": str(quarantine_file)
+                "quarantine_file": str(quarantine_file),
             }
 
         # Clean and normalize data
@@ -165,15 +175,15 @@ class DataPipeline:
             "schema": schema_name,
             "validated_file": str(validated_file),
             "processing_time_seconds": processing_time,
-            "data": cleaned_data
+            "data": cleaned_data,
         }
 
         self._log_operation("preprocess", result)
-        logger.info(f"✅ Data preprocessed and validated")
+        logger.info("✅ Data preprocessed and validated")
 
         return result
 
-    async def inference(self, data: Any, model_name: str) -> Dict[str, Any]:
+    async def inference(self, data: Any, model_name: str) -> dict[str, Any]:
         """
         Run model inference on validated data.
 
@@ -196,12 +206,7 @@ class DataPipeline:
         logger.info(f"🔮 Running inference with {model_name}")
 
         # Simulate inference
-        predictions = {
-            "model": model_name,
-            "predictions": [],
-            "confidence_scores": [],
-            "metadata": model_config
-        }
+        predictions = {"model": model_name, "predictions": [], "confidence_scores": [], "metadata": model_config}
 
         inference_time = (datetime.now() - start_time).total_seconds()
 
@@ -209,7 +214,7 @@ class DataPipeline:
             "status": "completed",
             "model": model_name,
             "predictions": predictions,
-            "inference_time_seconds": inference_time
+            "inference_time_seconds": inference_time,
         }
 
         self._log_operation("inference", result)
@@ -240,7 +245,7 @@ class DataPipeline:
                 sha256.update(block)
         return sha256.hexdigest()
 
-    def _validate_schema(self, data: Any, schema_name: str) -> Dict[str, Any]:
+    def _validate_schema(self, data: Any, schema_name: str) -> dict[str, Any]:
         """Validate data against schema"""
         if schema_name not in self.config["schemas"]:
             return {"valid": False, "errors": ["unknown_schema"]}
@@ -270,13 +275,13 @@ class DataPipeline:
         # Placeholder for data cleaning logic
         return data
 
-    def _log_operation(self, operation: str, result: Dict[str, Any]):
+    def _log_operation(self, operation: str, result: dict[str, Any]):
         """Log pipeline operation"""
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "operation": operation,
             "status": result.get("status"),
-            "details": {k: v for k, v in result.items() if k not in ["data", "predictions"]}
+            "details": {k: v for k, v in result.items() if k not in ["data", "predictions"]},
         }
         self.processing_log.append(log_entry)
 

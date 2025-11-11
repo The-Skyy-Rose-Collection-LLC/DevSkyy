@@ -1,6 +1,6 @@
 /**
  * Skyy Rose AI Agents - Admin JavaScript
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -10,7 +10,7 @@
 
     // Main Dashboard object
     window.SkyyRoseDashboard = {
-        
+
         /**
          * Initialize dashboard
          */
@@ -31,13 +31,13 @@
             $(document).on('click', '.action-button', this.runAgentAction);
             $(document).on('click', '.run-performance-check', this.runAgentAction);
             $(document).on('click', '.run-security-scan', this.runAgentAction);
-            
+
             // Bulk actions
             $(document).on('click', '.run-all-agents', this.runAllAgents);
-            
+
             // Settings tabs
             $(document).on('click', '.nav-tab', this.switchTab);
-            
+
             // Auto-refresh toggle
             $(document).on('change', '#auto-refresh', this.toggleAutoRefresh);
         },
@@ -49,17 +49,17 @@
             // Show first tab by default
             $('.tab-content').hide();
             $('.tab-content:first').show();
-            
+
             // Handle tab switching
             $('.nav-tab').click(function(e) {
                 e.preventDefault();
-                
+
                 var target = $(this).attr('href');
-                
+
                 // Update tab states
                 $('.nav-tab').removeClass('nav-tab-active');
                 $(this).addClass('nav-tab-active');
-                
+
                 // Show target content
                 $('.tab-content').hide();
                 $(target).show();
@@ -82,11 +82,11 @@
          */
         runAgentAction: function(e) {
             e.preventDefault();
-            
+
             var $button = $(this);
             var agent = $button.data('agent');
             var action = $button.data('action');
-            
+
             if (!agent || !action) {
                 SkyyRoseDashboard.showNotification('error', skyyRoseAI.strings.error);
                 return;
@@ -107,7 +107,7 @@
          */
         runAllAgents: function(e) {
             e.preventDefault();
-            
+
             if (!confirm('Are you sure you want to run all agents? This may take several minutes.')) {
                 return;
             }
@@ -131,7 +131,7 @@
          */
         executeAgentAction: function(agent, action, $button) {
             var originalText = $button.text();
-            
+
             $button.prop('disabled', true)
                    .addClass('loading')
                    .text(skyyRoseAI.strings.loading);
@@ -177,7 +177,7 @@
             }
 
             var currentAgent = agents[index];
-            
+
             $.ajax({
                 url: '/wp-json/skyy-rose-ai/v1/agents/' + currentAgent.agent + '/' + currentAgent.action,
                 method: 'POST',
@@ -209,15 +209,15 @@
                 success: function(response) {
                     // Update overview cards
                     SkyyRoseDashboard.updateOverviewCards(response.quick_stats);
-                    
+
                     // Update recent activities
                     SkyyRoseDashboard.updateRecentActivities(response.recent_activities);
-                    
+
                     // Update performance data
                     if (response.performance_overview) {
                         SkyyRoseDashboard.updatePerformanceWidget(response.performance_overview);
                     }
-                    
+
                     // Update security data
                     if (response.security_overview) {
                         SkyyRoseDashboard.updateSecurityWidget(response.security_overview);
@@ -268,7 +268,7 @@
             var agentName = SkyyRoseDashboard.getAgentDisplayName(activity.agent_type);
             var actionName = SkyyRoseDashboard.formatActionName(activity.action);
             var timeAgo = SkyyRoseDashboard.timeAgo(activity.created_at);
-            
+
             return '<div class="activity-item status-' + activity.status + '">' +
                    '<div class="activity-icon">' + icon + '</div>' +
                    '<div class="activity-content">' +
@@ -276,7 +276,7 @@
                    '<strong>' + agentName + '</strong> ' + actionName +
                    '</div>' +
                    '<div class="activity-meta">' +
-                   '<span class="activity-status status-' + activity.status + '">' + 
+                   '<span class="activity-status status-' + activity.status + '">' +
                    activity.status.charAt(0).toUpperCase() + activity.status.slice(1) + '</span>' +
                    '<span class="activity-time">' + timeAgo + '</span>' +
                    '</div>' +
@@ -290,7 +290,7 @@
         updatePerformanceWidget: function(performance) {
             if (performance.score !== undefined) {
                 $('.performance-card .card-value').html(performance.score + '<span class="unit">%</span>');
-                
+
                 // Update trend
                 var $trend = $('.performance-card .card-trend');
                 $trend.removeClass('up down').addClass(performance.trend);
@@ -305,8 +305,8 @@
                 var $securityStatus = $('.security-status');
                 $securityStatus.removeClass('security-low security-medium security-high security-critical')
                               .addClass('security-' + security.threat_level);
-                
-                $('.security-level').text(security.threat_level.charAt(0).toUpperCase() + 
+
+                $('.security-level').text(security.threat_level.charAt(0).toUpperCase() +
                                          security.threat_level.slice(1) + ' Risk');
             }
         },
@@ -322,14 +322,14 @@
                            '<span class="screen-reader-text">Dismiss this notice.</span>' +
                            '</button>' +
                            '</div>');
-            
+
             $('.wrap h1').after($notice);
-            
+
             // Auto-dismiss after 5 seconds
             setTimeout(function() {
                 $notice.fadeOut();
             }, 5000);
-            
+
             // Handle manual dismiss
             $notice.find('.notice-dismiss').click(function() {
                 $notice.fadeOut();

@@ -362,7 +362,7 @@ class UserRole:
 {
   "user_id": "string",
   "email": "string",
-  "username": "string", 
+  "username": "string",
   "role": "string",
   "token_type": "access|refresh",
   "exp": "timestamp",
@@ -546,11 +546,11 @@ const registerUser = async (userData: {
     },
     body: JSON.stringify(userData),
   });
-  
+
   if (!response.ok) {
     throw new Error('Registration failed');
   }
-  
+
   return response.json();
 };
 ```
@@ -561,22 +561,22 @@ const loginUser = async (email: string, password: string) => {
   const formData = new FormData();
   formData.append('username', email);
   formData.append('password', password);
-  
+
   const response = await fetch('/api/v1/auth/login', {
     method: 'POST',
     body: formData,
   });
-  
+
   if (!response.ok) {
     throw new Error('Login failed');
   }
-  
+
   const tokens = await response.json();
-  
+
   // Store tokens securely
   localStorage.setItem('access_token', tokens.access_token);
   localStorage.setItem('refresh_token', tokens.refresh_token);
-  
+
   return tokens;
 };
 ```
@@ -586,7 +586,7 @@ const loginUser = async (email: string, password: string) => {
 const initiateAuth0Login = async () => {
   const response = await fetch('/api/v1/auth/auth0/login');
   const data = await response.json();
-  
+
   // Redirect to Auth0
   window.location.href = data.authorization_url;
 };
@@ -595,15 +595,15 @@ const handleAuth0Callback = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get('code');
   const state = urlParams.get('state');
-  
+
   if (code && state) {
     const response = await fetch(`/api/v1/auth/auth0/callback?code=${code}&state=${state}`);
     const tokens = await response.json();
-    
+
     // Store DevSkyy JWT tokens
     localStorage.setItem('access_token', tokens.access_token);
     localStorage.setItem('refresh_token', tokens.refresh_token);
-    
+
     return tokens;
   }
 };

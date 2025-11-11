@@ -1,7 +1,7 @@
 <?php
 /**
  * Database management class
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -118,9 +118,9 @@ class SkyyRoseDatabase
             $prepare_values[] = $agent_type;
         }
 
-        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_agent_activities 
-                  {$where} 
-                  ORDER BY created_at DESC 
+        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_agent_activities
+                  {$where}
+                  ORDER BY created_at DESC
                   LIMIT %d OFFSET %d";
 
         $prepare_values[] = $limit;
@@ -161,7 +161,7 @@ class SkyyRoseDatabase
         global $wpdb;
 
         $result = $wpdb->get_row($wpdb->prepare(
-            "SELECT setting_value, is_encrypted FROM {$wpdb->prefix}skyy_rose_agent_settings 
+            "SELECT setting_value, is_encrypted FROM {$wpdb->prefix}skyy_rose_agent_settings
              WHERE agent_type = %s AND setting_key = %s",
             $agent_type,
             $setting_key
@@ -222,8 +222,8 @@ class SkyyRoseDatabase
 
         $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
 
-        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_brand_data 
-                  {$where_clause} 
+        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_brand_data
+                  {$where_clause}
                   ORDER BY confidence_score DESC, updated_at DESC";
 
         if (!empty($prepare_values)) {
@@ -270,8 +270,8 @@ class SkyyRoseDatabase
             $where = 'WHERE';
         }
 
-        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_performance_metrics 
-                  {$where} recorded_at >= %s 
+        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_performance_metrics
+                  {$where} recorded_at >= %s
                   ORDER BY recorded_at DESC";
 
         $prepare_values[] = date('Y-m-d H:i:s', strtotime("-{$hours} hours"));
@@ -317,8 +317,8 @@ class SkyyRoseDatabase
 
         $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
 
-        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_inventory_assets 
-                  {$where_clause} 
+        $query = "SELECT * FROM {$wpdb->prefix}skyy_rose_inventory_assets
+                  {$where_clause}
                   ORDER BY updated_at DESC";
 
         return $wpdb->get_results($wpdb->prepare($query, $prepare_values));
@@ -336,7 +336,7 @@ class SkyyRoseDatabase
         $key = $this->getEncryptionKey();
         $iv = openssl_random_pseudo_bytes(16);
         $encrypted = openssl_encrypt($value, 'AES-256-CBC', $key, 0, $iv);
-        
+
         return base64_encode($iv . $encrypted);
     }
 
@@ -353,7 +353,7 @@ class SkyyRoseDatabase
         $data = base64_decode($encrypted_value);
         $iv = substr($data, 0, 16);
         $encrypted = substr($data, 16);
-        
+
         return openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
     }
 

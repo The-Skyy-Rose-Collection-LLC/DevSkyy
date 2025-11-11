@@ -22,15 +22,15 @@ if (!defined('ABSPATH')) {
 				<div class="footer-section footer-about">
 					<h3 class="footer-title"><?php bloginfo('name'); ?></h3>
 					<p class="footer-description">
-						<?php 
+						<?php
 						$footer_description = get_theme_mod('footer_description', get_bloginfo('description'));
 						echo esc_html($footer_description);
 						?>
 					</p>
-					
+
 					<?php if (wp_mastery_woocommerce_luxury_is_woocommerce_active()) : ?>
 						<div class="footer-contact">
-							<?php 
+							<?php
 							$contact_info = get_theme_mod('footer_contact_info', '');
 							if ($contact_info) :
 								echo '<p>' . esc_html($contact_info) . '</p>';
@@ -52,7 +52,7 @@ if (!defined('ABSPATH')) {
 								'hide_empty' => true,
 								'number' => 4,
 							));
-							
+
 							if (!is_wp_error($product_categories) && !empty($product_categories)) :
 								foreach ($product_categories as $category) :
 									?>
@@ -110,7 +110,7 @@ if (!defined('ABSPATH')) {
 						'twitter' => get_theme_mod('social_twitter', ''),
 						'pinterest' => get_theme_mod('social_pinterest', ''),
 					);
-					
+
 					$has_social = array_filter($social_links);
 					if (!empty($has_social)) :
 						?>
@@ -151,8 +151,8 @@ if (!defined('ABSPATH')) {
 			<div class="footer-bottom">
 				<div class="site-info">
 					<p>
-						&copy; <?php echo esc_html(date('Y')); ?> 
-						<a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a>. 
+						&copy; <?php echo esc_html(date('Y')); ?>
+						<a href="<?php echo esc_url(home_url('/')); ?>"><?php bloginfo('name'); ?></a>.
 						<?php esc_html_e('All rights reserved.', 'wp-mastery-woocommerce-luxury'); ?>
 					</p>
 					<p class="luxury-accent">

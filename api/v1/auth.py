@@ -1,16 +1,18 @@
 import logging
 import re
-from api.v1.auth0_endpoints import router as auth0_router
-from api.validation_models import EnhancedRegisterRequest
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+
+from api.v1.auth0_endpoints import router as auth0_router
+from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
     create_user_tokens,
     get_current_active_user,
     verify_token,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
-from typing import Dict
+
 
 """
 Authentication API Endpoints
@@ -36,6 +38,7 @@ except Exception as e:
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
+
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
 async def register(request: EnhancedRegisterRequest):
@@ -80,6 +83,7 @@ async def register(request: EnhancedRegisterRequest):
             detail="Registration failed",
         )
 
+
 @router.post("/login", response_model=TokenResponse)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
@@ -106,7 +110,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        logger.info(f"User logged in: {sanitize_user_identifier(user.email)} (username: {sanitize_user_identifier(user.username)})")
+        logger.info(
+            f"User logged in: {sanitize_user_identifier(user.email)} (username: {sanitize_user_identifier(user.username)})"
+        )
 
         # Create tokens
         tokens = create_user_tokens(user)
@@ -121,6 +127,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed",
         )
+
 
 @router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(refresh_token: str):
@@ -137,9 +144,7 @@ async def refresh_token(refresh_token: str):
         user = user_manager.get_user_by_id(token_data.user_id)
 
         if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
         # Create new tokens
         tokens = create_user_tokens(user)
@@ -150,9 +155,8 @@ async def refresh_token(refresh_token: str):
         raise
     except Exception as e:
         logger.error(f"Token refresh failed: {sanitize_for_log(str(e))}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+
 
 @router.get("/me", response_model=User)
 async def get_current_user_info(
@@ -166,11 +170,10 @@ async def get_current_user_info(
     user = user_manager.get_user_by_id(current_user.user_id)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return user
+
 
 @router.post("/logout")
 async def logout(current_user: TokenData = Depends(get_current_active_user)):
@@ -184,11 +187,13 @@ async def logout(current_user: TokenData = Depends(get_current_active_user)):
 
     return {"message": "Successfully logged out", "user": current_user.email}
 
+
 # ============================================================================
 # USER MANAGEMENT
 # ============================================================================
 
-@router.get("/users", response_model=Dict[str, list])
+
+@router.get("/users", response_model=dict[str, list])
 async def list_users(current_user: TokenData = Depends(get_current_active_user)):
     """
     List all users (admin only in production)
@@ -197,24 +202,24 @@ async def list_users(current_user: TokenData = Depends(get_current_active_user))
     """
     # In production, check if user is admin
     if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
 
     users = list(user_manager.users.values())
 
     return {"users": [user.model_dump() for user in users], "count": len(users)}
 
+
 logger.info("✅ Authentication API endpoints registered")
+
 
 def _sanitize_log_input(self, user_input):
     """Sanitize user input for safe logging."""
     if not isinstance(user_input, str):
         user_input = str(user_input)
-    
+
     # Remove control characters and potential log injection
-    sanitized = re.sub(r'[\r\n\t]', ' ', user_input)
-    sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', sanitized)
-    
+    sanitized = re.sub(r"[\r\n\t]", " ", user_input)
+    sanitized = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", sanitized)
+
     # Limit length to prevent log flooding
     return sanitized[:500] + "..." if len(sanitized) > 500 else sanitized

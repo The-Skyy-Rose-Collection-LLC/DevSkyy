@@ -178,7 +178,7 @@ rotation_result = await generate_product_rotation(
 **Solution**: The brand trainer module is optional for upload. Images will still be processed and stored correctly.
 
 ### Issue: "Google Drive folder not accessible"
-**Solution**: 
+**Solution**:
 1. Ensure the folder is shared publicly or you have access
 2. Try downloading manually via web interface
 3. Use rclone with proper authentication

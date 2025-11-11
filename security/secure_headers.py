@@ -1,10 +1,9 @@
-from typing import Dict
+
 
 """
 Enhanced Security Headers for Grade A+ Security
 Implements comprehensive security headers for production deployment
 """
-
 
 
 class SecurityHeaders:
@@ -14,7 +13,7 @@ class SecurityHeaders:
     """
 
     @staticmethod
-    def get_all_headers() -> Dict[str, str]:
+    def get_all_headers() -> dict[str, str]:
         """
         Get comprehensive security headers
 
@@ -55,7 +54,7 @@ class SecurityHeaders:
         }
 
     @staticmethod
-    def get_api_headers() -> Dict[str, str]:
+    def get_api_headers() -> dict[str, str]:
         """
         Get security headers specifically for API endpoints
 

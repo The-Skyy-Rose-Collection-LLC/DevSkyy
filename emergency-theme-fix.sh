@@ -46,14 +46,14 @@ echo -e "${BLUE}🔍 Step 2: Checking for undefined functions and constants...${
 # Check functions.php specifically
 if [ -f "$THEME_DIR/functions.php" ]; then
     echo -e "${YELLOW}Analyzing functions.php for common errors...${NC}"
-    
+
     # Check for function name mismatches
     if grep -q "wp_mastery_woocommerce_luxury" "$THEME_DIR/functions.php"; then
         echo -e "${RED}❌ Found old function names in functions.php${NC}"
     else
         echo -e "${GREEN}✅ Function names appear consistent${NC}"
     fi
-    
+
     # Check for undefined constants
     if grep -q "WP_MASTERY_WOOCOMMERCE_LUXURY_VERSION" "$THEME_DIR/functions.php"; then
         echo -e "${RED}❌ Found undefined constant references${NC}"
@@ -236,7 +236,7 @@ Package: skyy-rose-collection-EMERGENCY-FIX-${TIMESTAMP}.zip
 Status: READY FOR IMMEDIATE DEPLOYMENT"
 
     echo -e "${GREEN}✅ Emergency fixes committed to Git${NC}"
-    
+
     # Push to remote
     git push origin main
     echo -e "${GREEN}✅ Emergency fixes pushed to remote repository${NC}"

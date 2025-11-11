@@ -1,8 +1,9 @@
-import logging
-import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List
+import logging
+from typing import Any
+import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,9 +45,7 @@ class TaskRiskManager:
         self.agent_styling = self._initialize_agent_styling()
         logger.info("📋 Task Risk Manager initialized with Fashion Guru Styling")
 
-    async def create_task(
-        self, agent_type: str, task_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def create_task(self, agent_type: str, task_data: dict[str, Any]) -> dict[str, Any]:
         """Create a new task with comprehensive risk assessment."""
         try:
             task_id = str(uuid.uuid4())
@@ -87,12 +86,10 @@ class TaskRiskManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Task creation failed: {str(e)}")
+            logger.error(f"❌ Task creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def get_prioritized_task_list(
-        self, filters: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+    async def get_prioritized_task_list(self, filters: dict[str, Any] = None) -> dict[str, Any]:
         """Get prioritized task list with risk-based sorting."""
         try:
             logger.info("📊 Generating prioritized task list...")
@@ -105,23 +102,17 @@ class TaskRiskManager:
 
             return {
                 "total_tasks": len(sorted_tasks),
-                "high_risk_tasks": len(
-                    [t for t in sorted_tasks if t["risk_level"] in ["critical", "high"]]
-                ),
-                "urgent_tasks": len(
-                    [t for t in sorted_tasks if t["priority"] == "urgent"]
-                ),
+                "high_risk_tasks": len([t for t in sorted_tasks if t["risk_level"] in ["critical", "high"]]),
+                "urgent_tasks": len([t for t in sorted_tasks if t["priority"] == "urgent"]),
                 "tasks": sorted_tasks,
                 "generated_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
-            logger.error(f"❌ Task list generation failed: {str(e)}")
+            logger.error(f"❌ Task list generation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def _assess_task_risk(
-        self, task_data: Dict[str, Any], agent_type: str
-    ) -> Dict[str, Any]:
+    async def _assess_task_risk(self, task_data: dict[str, Any], agent_type: str) -> dict[str, Any]:
         """Comprehensive task risk assessment."""
         risk_factors = []
         impact_score = 50  # Base score
@@ -155,9 +146,7 @@ class TaskRiskManager:
             "mitigation_strategies": [],
         }
 
-    def _calculate_task_priority(
-        self, risk_assessment: Dict, task_data: Dict
-    ) -> TaskPriority:
+    def _calculate_task_priority(self, risk_assessment: dict, task_data: dict) -> TaskPriority:
         """Calculate task priority based on risk and business impact."""
         impact_score = risk_assessment["impact_score"]
 
@@ -170,7 +159,7 @@ class TaskRiskManager:
         else:
             return TaskPriority.LOW
 
-    def _apply_task_filters(self, tasks: Dict, filters: Dict) -> List[Dict]:
+    def _apply_task_filters(self, tasks: dict, filters: dict) -> list[dict]:
         """Apply filters to task list."""
         filtered_tasks = []
 
@@ -184,17 +173,14 @@ class TaskRiskManager:
                 continue
 
             # Filter by risk level
-            if (
-                filters.get("risk_level")
-                and task["risk_level"] not in filters["risk_level"]
-            ):
+            if filters.get("risk_level") and task["risk_level"] not in filters["risk_level"]:
                 continue
 
             filtered_tasks.append(task)
 
         return filtered_tasks
 
-    def _sort_tasks_by_priority_risk(self, tasks: List[Dict]) -> List[Dict]:
+    def _sort_tasks_by_priority_risk(self, tasks: list[dict]) -> list[dict]:
         """Sort tasks by priority and risk level."""
         priority_order = {"urgent": 4, "high": 3, "medium": 2, "low": 1}
         risk_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
@@ -209,7 +195,7 @@ class TaskRiskManager:
             reverse=True,
         )
 
-    def _initialize_agent_styling(self) -> Dict[str, Any]:
+    def _initialize_agent_styling(self) -> dict[str, Any]:
         """Initialize fashion guru styling configuration for agents."""
         return {
             "color_palette": {
@@ -239,7 +225,7 @@ class TaskRiskManager:
         }
 
 
-def manage_tasks_and_risks() -> Dict[str, Any]:
+def manage_tasks_and_risks() -> dict[str, Any]:
     """Main function to manage tasks and risks across all agents."""
     manager = TaskRiskManager()
     return {

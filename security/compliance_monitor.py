@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
+from enum import Enum
 import json
+import logging
 import time
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
-import logging
 
 """
 DevSkyy Compliance Monitor v1.0.0
@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 # COMPLIANCE ENUMS AND MODELS
 # ============================================================================
 
+
 class ComplianceStandard(str, Enum):
     """Supported compliance standards."""
 
@@ -34,6 +35,7 @@ class ComplianceStandard(str, Enum):
     HIPAA = "hipaa"
     ISO27001 = "iso27001"
 
+
 class ComplianceStatus(str, Enum):
     """Compliance status levels."""
 
@@ -42,6 +44,7 @@ class ComplianceStatus(str, Enum):
     PARTIALLY_COMPLIANT = "partially_compliant"
     UNKNOWN = "unknown"
 
+
 class ViolationSeverity(str, Enum):
     """Compliance violation severity levels."""
 
@@ -49,6 +52,7 @@ class ViolationSeverity(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 class ComplianceViolation(BaseModel):
     """Compliance violation model."""
@@ -59,11 +63,12 @@ class ComplianceViolation(BaseModel):
     severity: ViolationSeverity
     timestamp: datetime = Field(default_factory=datetime.now)
     description: str
-    evidence: Dict[str, Any] = Field(default_factory=dict)
-    remediation_steps: List[str] = Field(default_factory=list)
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    remediation_steps: list[str] = Field(default_factory=list)
     resolved: bool = False
     resolution_date: Optional[datetime] = None
     resolution_notes: Optional[str] = None
+
 
 class ComplianceControl(BaseModel):
     """Compliance control definition."""
@@ -72,11 +77,12 @@ class ComplianceControl(BaseModel):
     standard: ComplianceStandard
     title: str
     description: str
-    requirements: List[str]
-    automated_checks: List[str] = Field(default_factory=list)
-    manual_checks: List[str] = Field(default_factory=list)
-    evidence_required: List[str] = Field(default_factory=list)
+    requirements: list[str]
+    automated_checks: list[str] = Field(default_factory=list)
+    manual_checks: list[str] = Field(default_factory=list)
+    evidence_required: list[str] = Field(default_factory=list)
     frequency: str = "daily"  # daily, weekly, monthly, quarterly, annually
+
 
 class ComplianceReport(BaseModel):
     """Compliance assessment report."""
@@ -88,13 +94,15 @@ class ComplianceReport(BaseModel):
     controls_assessed: int
     controls_compliant: int
     controls_non_compliant: int
-    violations: List[ComplianceViolation]
-    recommendations: List[str] = Field(default_factory=list)
+    violations: list[ComplianceViolation]
+    recommendations: list[str] = Field(default_factory=list)
     next_assessment_date: datetime
+
 
 # ============================================================================
 # COMPLIANCE MONITOR
 # ============================================================================
+
 
 class ComplianceMonitor:
     """
@@ -110,9 +118,9 @@ class ComplianceMonitor:
 
     def __init__(self, redis_client=None):
         self.redis_client = redis_client
-        self.controls: Dict[str, ComplianceControl] = {}
-        self.violations: List[ComplianceViolation] = []
-        self.audit_logs: List[Dict[str, Any]] = []
+        self.controls: dict[str, ComplianceControl] = {}
+        self.violations: list[ComplianceViolation] = []
+        self.audit_logs: list[dict[str, Any]] = []
 
         # Initialize compliance controls
         self._initialize_controls()
@@ -206,19 +214,13 @@ class ComplianceMonitor:
             frequency="daily",
         )
 
-    async def run_compliance_assessment(
-        self, standard: ComplianceStandard
-    ) -> ComplianceReport:
+    async def run_compliance_assessment(self, standard: ComplianceStandard) -> ComplianceReport:
         """Run comprehensive compliance assessment for a standard."""
         try:
             logger.info(f"🔍 Starting compliance assessment for {standard.value}")
 
             # Get controls for the standard
-            standard_controls = [
-                control
-                for control in self.controls.values()
-                if control.standard == standard
-            ]
+            standard_controls = [control for control in self.controls.values() if control.standard == standard]
 
             violations = []
             compliant_count = 0
@@ -233,9 +235,7 @@ class ComplianceMonitor:
 
             # Determine overall status
             total_controls = len(standard_controls)
-            compliance_percentage = (
-                compliant_count / total_controls if total_controls > 0 else 0
-            )
+            compliance_percentage = compliant_count / total_controls if total_controls > 0 else 0
 
             if compliance_percentage >= 0.95:
                 overall_status = ComplianceStatus.COMPLIANT
@@ -272,18 +272,14 @@ class ComplianceMonitor:
                 },
             )
 
-            logger.info(
-                f"✅ Compliance assessment completed for {standard.value}: {overall_status.value}"
-            )
+            logger.info(f"✅ Compliance assessment completed for {standard.value}: {overall_status.value}")
             return report
 
         except Exception as e:
             logger.error(f"❌ Compliance assessment failed for {standard.value}: {e}")
             raise
 
-    async def _assess_control(
-        self, control: ComplianceControl
-    ) -> List[ComplianceViolation]:
+    async def _assess_control(self, control: ComplianceControl) -> list[ComplianceViolation]:
         """Assess a specific compliance control."""
         violations = []
 
@@ -311,14 +307,12 @@ class ComplianceMonitor:
                 standard=control.standard,
                 control_id=control.control_id,
                 severity=ViolationSeverity.MEDIUM,
-                description=f"Control assessment failed: {str(e)}",
+                description=f"Control assessment failed: {e!s}",
                 evidence={"error": str(e)},
             )
             return [violation]
 
-    async def _run_automated_check(
-        self, check_name: str, control: ComplianceControl
-    ) -> Dict[str, Any]:
+    async def _run_automated_check(self, check_name: str, control: ComplianceControl) -> dict[str, Any]:
         """Run an automated compliance check."""
         try:
             if check_name == "check_security_policies":
@@ -347,7 +341,7 @@ class ComplianceMonitor:
                 "remediation_steps": ["Fix automated check implementation"],
             }
 
-    async def _check_security_policies(self) -> Dict[str, Any]:
+    async def _check_security_policies(self) -> dict[str, Any]:
         """Check if security policies are in place."""
         # In a real implementation, this would check:
         # - Policy documents exist
@@ -355,13 +349,11 @@ class ComplianceMonitor:
         # - Policies are communicated to staff
         return {
             "compliant": True,
-            "evidence": {
-                "policies_found": ["security_policy.pdf", "privacy_policy.pdf"]
-            },
+            "evidence": {"policies_found": ["security_policy.pdf", "privacy_policy.pdf"]},
             "details": "Security policies are documented and current",
         }
 
-    async def _check_access_controls(self) -> Dict[str, Any]:
+    async def _check_access_controls(self) -> dict[str, Any]:
         """Check access control implementation."""
         # Check for proper access controls
         return {
@@ -370,7 +362,7 @@ class ComplianceMonitor:
             "details": "Access controls are properly implemented",
         }
 
-    async def _check_mfa_enforcement(self) -> Dict[str, Any]:
+    async def _check_mfa_enforcement(self) -> dict[str, Any]:
         """Check multi-factor authentication enforcement."""
         # In a real implementation, check MFA configuration
         return {
@@ -383,7 +375,7 @@ class ComplianceMonitor:
             ],
         }
 
-    async def _check_consent_management(self) -> Dict[str, Any]:
+    async def _check_consent_management(self) -> dict[str, Any]:
         """Check GDPR consent management."""
         return {
             "compliant": True,
@@ -391,7 +383,7 @@ class ComplianceMonitor:
             "details": "Consent management system is operational",
         }
 
-    async def _check_data_retention(self) -> Dict[str, Any]:
+    async def _check_data_retention(self) -> dict[str, Any]:
         """Check data retention policies."""
         return {
             "compliant": True,
@@ -399,7 +391,7 @@ class ComplianceMonitor:
             "details": "Data retention policies are enforced",
         }
 
-    async def _check_data_encryption(self) -> Dict[str, Any]:
+    async def _check_data_encryption(self) -> dict[str, Any]:
         """Check data encryption implementation."""
         return {
             "compliant": True,
@@ -407,7 +399,7 @@ class ComplianceMonitor:
             "details": "Data encryption is properly implemented",
         }
 
-    def _determine_severity(self, check_result: Dict[str, Any]) -> ViolationSeverity:
+    def _determine_severity(self, check_result: dict[str, Any]) -> ViolationSeverity:
         """Determine violation severity based on check result."""
         # Simple severity determination logic
         if "critical" in check_result.get("details", "").lower():
@@ -419,19 +411,13 @@ class ComplianceMonitor:
         else:
             return ViolationSeverity.LOW
 
-    def _generate_recommendations(
-        self, violations: List[ComplianceViolation]
-    ) -> List[str]:
+    def _generate_recommendations(self, violations: list[ComplianceViolation]) -> list[str]:
         """Generate compliance recommendations based on violations."""
         recommendations = []
 
         # Group violations by severity
-        critical_violations = [
-            v for v in violations if v.severity == ViolationSeverity.CRITICAL
-        ]
-        high_violations = [
-            v for v in violations if v.severity == ViolationSeverity.HIGH
-        ]
+        critical_violations = [v for v in violations if v.severity == ViolationSeverity.CRITICAL]
+        high_violations = [v for v in violations if v.severity == ViolationSeverity.HIGH]
 
         if critical_violations:
             recommendations.append("Address critical compliance violations immediately")
@@ -446,7 +432,7 @@ class ComplianceMonitor:
 
         return recommendations
 
-    async def _log_audit_event(self, event_type: str, details: Dict[str, Any]):
+    async def _log_audit_event(self, event_type: str, details: dict[str, Any]):
         """Log audit event for compliance tracking."""
         audit_event = {
             "timestamp": datetime.now().isoformat(),
@@ -459,27 +445,19 @@ class ComplianceMonitor:
 
         # Store in Redis for persistence
         if self.redis_client:
-            await self.redis_client.lpush(
-                "compliance_audit_log", json.dumps(audit_event)
-            )
+            await self.redis_client.lpush("compliance_audit_log", json.dumps(audit_event))
             await self.redis_client.ltrim("compliance_audit_log", 0, 9999)
 
-    async def get_compliance_status(self) -> Dict[str, Any]:
+    async def get_compliance_status(self) -> dict[str, Any]:
         """Get current compliance status across all standards."""
         status = {}
 
         for standard in ComplianceStandard:
-            recent_violations = [
-                v for v in self.violations if v.standard == standard and not v.resolved
-            ]
+            recent_violations = [v for v in self.violations if v.standard == standard and not v.resolved]
 
             status[standard.value] = {
                 "active_violations": len(recent_violations),
-                "critical_violations": len([
-                        v
-                        for v in recent_violations
-                        if v.severity == ViolationSeverity.CRITICAL
-                    ]),
+                "critical_violations": len([v for v in recent_violations if v.severity == ViolationSeverity.CRITICAL]),
                 "last_assessment": "2024-10-24",  # Would be dynamic in real implementation
                 "next_assessment": "2024-11-24",
             }
@@ -504,6 +482,7 @@ class ComplianceMonitor:
 
                 logger.info(f"✅ Compliance violation resolved: {violation_id}")
                 break
+
 
 # Global compliance monitor instance
 compliance_monitor = ComplianceMonitor()

@@ -3,7 +3,7 @@
   "title": "The Skyy Rose Collection - Brand-Focused MCP Configuration",
   "version": "1.0.0",
   "description": "All agents work exclusively for The Skyy Rose Collection luxury fashion brand. Every action, output, and optimization must align with brand identity, values, and business objectives.",
-  
+
   "brand_identity": {
     "name": "The Skyy Rose Collection",
     "tagline": "Where Luxury Meets Innovation",

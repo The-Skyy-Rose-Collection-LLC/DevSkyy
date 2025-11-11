@@ -344,7 +344,6 @@ For issues with MCP configuration:
 
 ---
 
-**Last Updated:** 2025-01-XX  
-**Version:** 5.2 Enterprise  
+**Last Updated:** 2025-01-XX
+**Version:** 5.2 Enterprise
 **Status:** ✅ Ready for Production
-

@@ -8,20 +8,22 @@ IMPACT: Increases organic traffic by 30-50% through optimized meta tags
 Truth Protocol: Validated output, character limits enforced, no placeholders
 """
 
-import logging
-import json
-from typing import Dict, Optional
 from enum import Enum
+import json
+import logging
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator
 import anthropic
 from openai import OpenAI
+from pydantic import BaseModel, Field, validator
+
 
 logger = logging.getLogger(__name__)
 
 
 class AIProvider(str, Enum):
     """Supported AI providers"""
+
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
 
@@ -32,20 +34,20 @@ class SEOMetaTags(BaseModel):
     metatitle: str = Field(..., min_length=10, max_length=60)
     metadescription: str = Field(..., min_length=50, max_length=160)
 
-    @validator('metatitle')
+    @validator("metatitle")
     def validate_metatitle(cls, v):
         """Validate meta title doesn't exceed 60 characters"""
         if len(v) > 60:
             logger.warning(f"Meta title truncated from {len(v)} to 60 characters")
-            return v[:60].rsplit(' ', 1)[0]  # Truncate at word boundary
+            return v[:60].rsplit(" ", 1)[0]  # Truncate at word boundary
         return v
 
-    @validator('metadescription')
+    @validator("metadescription")
     def validate_metadescription(cls, v):
         """Validate meta description doesn't exceed 160 characters"""
         if len(v) > 160:
             logger.warning(f"Meta description truncated from {len(v)} to 160 characters")
-            return v[:160].rsplit(' ', 1)[0]  # Truncate at word boundary
+            return v[:160].rsplit(" ", 1)[0]  # Truncate at word boundary
         return v
 
 
@@ -140,7 +142,7 @@ Output ONLY valid JSON with this exact structure:
         anthropic_model: str = "claude-sonnet-4-20250514",
         openai_model: str = "gpt-4",
         temperature: float = 0.7,
-        max_tokens: int = 500
+        max_tokens: int = 500,
     ):
         """
         Initialize SEO optimizer service
@@ -178,15 +180,13 @@ Output ONLY valid JSON with this exact structure:
             extra={
                 "primary_provider": primary_provider,
                 "anthropic_model": anthropic_model,
-                "openai_model": openai_model
-            }
+                "openai_model": openai_model,
+            },
         )
 
     def _build_user_prompt(self, product: ProductInfo) -> str:
         """Build user prompt from product information"""
-        prompt_parts = [
-            f"Create metatitle and metadescription for the following product:\n"
-        ]
+        prompt_parts = ["Create metatitle and metadescription for the following product:\n"]
 
         prompt_parts.append(f"- Title: {product.title}")
 
@@ -217,10 +217,7 @@ Output ONLY valid JSON with this exact structure:
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
                 system=self.SYSTEM_PROMPT,
-                messages=[{
-                    "role": "user",
-                    "content": user_prompt
-                }]
+                messages=[{"role": "user", "content": user_prompt}],
             )
 
             # Extract JSON from response
@@ -237,18 +234,14 @@ Output ONLY valid JSON with this exact structure:
             parsed = json.loads(json_str)
 
             logger.info(
-                "SEO tags generated with Anthropic",
-                extra={
-                    "model": self.anthropic_model,
-                    "product": product.title
-                }
+                "SEO tags generated with Anthropic", extra={"model": self.anthropic_model, "product": product.title}
             )
 
             return SEOMetaTags(**parsed)
 
         except Exception as e:
             logger.exception("Anthropic generation failed")
-            raise AIProviderError(f"Anthropic error: {str(e)}")
+            raise AIProviderError(f"Anthropic error: {e!s}")
 
     async def _generate_with_openai(self, product: ProductInfo) -> SEOMetaTags:
         """Generate SEO tags using OpenAI"""
@@ -260,37 +253,24 @@ Output ONLY valid JSON with this exact structure:
 
             response = self.openai_client.chat.completions.create(
                 model=self.openai_model,
-                messages=[
-                    {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt}
-                ],
+                messages=[{"role": "system", "content": self.SYSTEM_PROMPT}, {"role": "user", "content": user_prompt}],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                response_format={"type": "json_object"}  # Force JSON output
+                response_format={"type": "json_object"},  # Force JSON output
             )
 
             content = response.choices[0].message.content
             parsed = json.loads(content)
 
-            logger.info(
-                "SEO tags generated with OpenAI",
-                extra={
-                    "model": self.openai_model,
-                    "product": product.title
-                }
-            )
+            logger.info("SEO tags generated with OpenAI", extra={"model": self.openai_model, "product": product.title})
 
             return SEOMetaTags(**parsed)
 
         except Exception as e:
             logger.exception("OpenAI generation failed")
-            raise AIProviderError(f"OpenAI error: {str(e)}")
+            raise AIProviderError(f"OpenAI error: {e!s}")
 
-    async def generate_seo_tags(
-        self,
-        product: ProductInfo,
-        fallback: bool = True
-    ) -> SEOMetaTags:
+    async def generate_seo_tags(self, product: ProductInfo, fallback: bool = True) -> SEOMetaTags:
         """
         Generate SEO meta tags for product
 
@@ -316,8 +296,7 @@ Output ONLY valid JSON with this exact structure:
                 raise
 
             logger.warning(
-                f"Primary provider ({self.primary_provider}) failed, trying fallback",
-                extra={"error": str(e)}
+                f"Primary provider ({self.primary_provider}) failed, trying fallback", extra={"error": str(e)}
             )
 
             # Try fallback provider
@@ -328,18 +307,11 @@ Output ONLY valid JSON with this exact structure:
                     return await self._generate_with_anthropic(product)
             except AIProviderError as fallback_error:
                 logger.exception("Fallback provider also failed")
-                raise SEOOptimizerError(
-                    f"Both providers failed. Primary: {str(e)}, Fallback: {str(fallback_error)}"
-                )
+                raise SEOOptimizerError(f"Both providers failed. Primary: {e!s}, Fallback: {fallback_error!s}")
 
         raise SEOOptimizerError("No AI provider available")
 
-    async def update_woocommerce_seo(
-        self,
-        woo_client,
-        product_id: int,
-        seo_tags: SEOMetaTags
-    ) -> bool:
+    async def update_woocommerce_seo(self, woo_client, product_id: int, seo_tags: SEOMetaTags) -> bool:
         """
         Update WooCommerce product with SEO meta tags (Yoast SEO format)
 
@@ -353,28 +325,25 @@ Output ONLY valid JSON with this exact structure:
         """
         try:
             # Update product with Yoast SEO meta fields
-            woo_client.put(f"products/{product_id}", {
-                "meta_data": [
-                    {
-                        "key": "_yoast_wpseo_title",
-                        "value": seo_tags.metatitle
-                    },
-                    {
-                        "key": "_yoast_wpseo_metadesc",
-                        "value": seo_tags.metadescription
-                    }
-                ]
-            })
+            woo_client.put(
+                f"products/{product_id}",
+                {
+                    "meta_data": [
+                        {"key": "_yoast_wpseo_title", "value": seo_tags.metatitle},
+                        {"key": "_yoast_wpseo_metadesc", "value": seo_tags.metadescription},
+                    ]
+                },
+            )
 
             logger.info(
                 f"SEO meta tags updated for product {product_id}",
                 extra={
                     "metatitle_length": len(seo_tags.metatitle),
-                    "metadescription_length": len(seo_tags.metadescription)
-                }
+                    "metadescription_length": len(seo_tags.metadescription),
+                },
             )
             return True
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to update SEO for product {product_id}")
             return False

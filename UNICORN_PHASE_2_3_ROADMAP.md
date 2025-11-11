@@ -74,7 +74,7 @@ POST   /api/v1/agents/workflows               # Create agent workflows
 ```python
 class AgentExecution(Base):
     __tablename__ = "agent_executions"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     agent_id = Column(String(100), nullable=False)
     task_type = Column(String(100), nullable=False)

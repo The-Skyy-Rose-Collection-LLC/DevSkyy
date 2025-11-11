@@ -12,10 +12,10 @@ This engine provides:
 """
 
 import asyncio
-import logging
 from datetime import datetime
+import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import joblib
 import numpy as np
@@ -28,6 +28,7 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,15 +57,9 @@ class AdvancedMLEngine:
         """Initialize core machine learning models."""
         self.models = {
             "anomaly_detector": IsolationForest(contamination=0.1, random_state=42),
-            "performance_predictor": RandomForestRegressor(
-                n_estimators=100, random_state=42
-            ),
-            "user_behavior_classifier": GradientBoostingClassifier(
-                n_estimators=100, random_state=42
-            ),
-            "resource_optimizer": MLPRegressor(
-                hidden_layer_sizes=(100, 50), random_state=42
-            ),
+            "performance_predictor": RandomForestRegressor(n_estimators=100, random_state=42),
+            "user_behavior_classifier": GradientBoostingClassifier(n_estimators=100, random_state=42),
+            "resource_optimizer": MLPRegressor(hidden_layer_sizes=(100, 50), random_state=42),
             "demand_forecaster": LinearRegression(),
             "risk_assessor": LogisticRegression(random_state=42),
             "trend_analyzer": KMeans(n_clusters=5, random_state=42),
@@ -74,7 +69,7 @@ class AdvancedMLEngine:
         self.scalers = {name: StandardScaler() for name in self.models.keys()}
         self.encoders = {name: LabelEncoder() for name in self.models.keys()}
 
-    async def predictive_analytics(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def predictive_analytics(self, data: dict[str, Any]) -> dict[str, Any]:
         """Advanced predictive analytics with multiple algorithms."""
         try:
             logger.info("🔮 Running predictive analytics...")
@@ -87,30 +82,22 @@ class AdvancedMLEngine:
 
             # Performance prediction
             if "performance_metrics" in processed_data:
-                perf_prediction = await self._predict_performance(
-                    processed_data["performance_metrics"]
-                )
+                perf_prediction = await self._predict_performance(processed_data["performance_metrics"])
                 predictions["performance"] = perf_prediction
 
             # User behavior prediction
             if "user_data" in processed_data:
-                behavior_prediction = await self._predict_user_behavior(
-                    processed_data["user_data"]
-                )
+                behavior_prediction = await self._predict_user_behavior(processed_data["user_data"])
                 predictions["user_behavior"] = behavior_prediction
 
             # Resource optimization prediction
             if "resource_data" in processed_data:
-                resource_prediction = await self._predict_resource_needs(
-                    processed_data["resource_data"]
-                )
+                resource_prediction = await self._predict_resource_needs(processed_data["resource_data"])
                 predictions["resource_optimization"] = resource_prediction
 
             # Business trend prediction
             if "business_data" in processed_data:
-                trend_prediction = await self._predict_business_trends(
-                    processed_data["business_data"]
-                )
+                trend_prediction = await self._predict_business_trends(processed_data["business_data"])
                 predictions["business_trends"] = trend_prediction
 
             # Anomaly detection
@@ -133,9 +120,7 @@ class AdvancedMLEngine:
             logger.error(f"❌ Predictive analytics failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def self_healing_automation(
-        self, system_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def self_healing_automation(self, system_state: dict[str, Any]) -> dict[str, Any]:
         """Self-healing system that prevents and fixes issues automatically."""
         try:
             logger.info("🔧 Initiating self-healing automation...")
@@ -167,8 +152,7 @@ class AdvancedMLEngine:
                 "healing_status": "completed",
                 "issues_detected": len(potential_issues),
                 "actions_executed": len(healing_actions),
-                "health_improvement": post_healing_health["score"]
-                - health_analysis["score"],
+                "health_improvement": post_healing_health["score"] - health_analysis["score"],
                 "execution_results": execution_results,
                 "system_stability": "enhanced",
                 "preventive_measures_active": True,
@@ -179,14 +163,10 @@ class AdvancedMLEngine:
             logger.error(f"❌ Self-healing automation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def intelligent_optimization(
-        self, optimization_target: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def intelligent_optimization(self, optimization_target: str, data: dict[str, Any]) -> dict[str, Any]:
         """Intelligent optimization using advanced ML algorithms."""
         try:
-            logger.info(
-                f"⚡ Running intelligent optimization for {optimization_target}..."
-            )
+            logger.info(f"⚡ Running intelligent optimization for {optimization_target}...")
 
             # Select optimization strategy based on target
             if optimization_target == "performance":
@@ -217,9 +197,7 @@ class AdvancedMLEngine:
             logger.error(f"❌ Intelligent optimization failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def pattern_recognition(
-        self, data_stream: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def pattern_recognition(self, data_stream: list[dict[str, Any]]) -> dict[str, Any]:
         """Advanced pattern recognition with neural network analysis."""
         try:
             logger.info("🔍 Running advanced pattern recognition...")
@@ -262,9 +240,7 @@ class AdvancedMLEngine:
             logger.error(f"❌ Pattern recognition failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def continuous_learning(
-        self, feedback_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def continuous_learning(self, feedback_data: dict[str, Any]) -> dict[str, Any]:
         """Continuous learning system that improves models over time."""
         try:
             logger.info("📚 Executing continuous learning cycle...")
@@ -279,9 +255,7 @@ class AdvancedMLEngine:
             retrain_results = {}
             for model_name, model in self.models.items():
                 if self._should_retrain_model(model_name, learning_data):
-                    retrain_result = await self._retrain_model(
-                        model_name, learning_data
-                    )
+                    retrain_result = await self._retrain_model(model_name, learning_data)
                     retrain_results[model_name] = retrain_result
 
             # Update model weights and parameters
@@ -291,9 +265,7 @@ class AdvancedMLEngine:
             await self._save_models()
 
             # Generate learning report
-            learning_report = self._generate_learning_report(
-                retrain_results, weight_updates
-            )
+            learning_report = self._generate_learning_report(retrain_results, weight_updates)
 
             return {
                 "learning_status": "completed",
@@ -311,7 +283,7 @@ class AdvancedMLEngine:
 
     # Helper methods for data processing and model operations
 
-    async def _preprocess_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _preprocess_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """Preprocess data for ML algorithms."""
         processed = {}
 
@@ -330,7 +302,7 @@ class AdvancedMLEngine:
 
         return processed
 
-    async def _predict_performance(self, metrics: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_performance(self, metrics: dict[str, Any]) -> dict[str, Any]:
         """Predict system performance using ML models."""
         # Convert metrics to feature vector
         features = np.array(
@@ -356,7 +328,7 @@ class AdvancedMLEngine:
             "confidence": 0.92,
         }
 
-    async def _predict_user_behavior(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_user_behavior(self, user_data: dict[str, Any]) -> dict[str, Any]:
         """Predict user behavior patterns."""
         # Simplified prediction logic
         return {
@@ -367,9 +339,7 @@ class AdvancedMLEngine:
             "confidence": 0.88,
         }
 
-    async def _predict_resource_needs(
-        self, resource_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _predict_resource_needs(self, resource_data: dict[str, Any]) -> dict[str, Any]:
         """Predict future resource requirements."""
         return {
             "cpu_requirement": "increase_20_percent",
@@ -380,9 +350,7 @@ class AdvancedMLEngine:
             "confidence": 0.91,
         }
 
-    async def _predict_business_trends(
-        self, business_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _predict_business_trends(self, business_data: dict[str, Any]) -> dict[str, Any]:
         """Predict business trends and opportunities."""
         return {
             "revenue_forecast": "growth_trajectory",
@@ -393,7 +361,7 @@ class AdvancedMLEngine:
             "confidence": 0.87,
         }
 
-    async def _detect_anomalies(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _detect_anomalies(self, data: dict[str, Any]) -> dict[str, Any]:
         """Detect anomalies in system behavior."""
         return {
             "anomalies_detected": 2,
@@ -403,9 +371,7 @@ class AdvancedMLEngine:
             "confidence": 0.94,
         }
 
-    def _generate_executive_summary(
-        self, predictions: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _generate_executive_summary(self, predictions: dict[str, Any]) -> dict[str, Any]:
         """Generate executive summary of predictions."""
         return {
             "overall_system_health": "excellent",
@@ -423,9 +389,7 @@ class AdvancedMLEngine:
             "risk_level": "low",
         }
 
-    def _calculate_confidence_scores(
-        self, predictions: Dict[str, Any]
-    ) -> Dict[str, float]:
+    def _calculate_confidence_scores(self, predictions: dict[str, Any]) -> dict[str, float]:
         """Calculate confidence scores for predictions."""
         return {
             "overall_confidence": 0.91,
@@ -435,9 +399,7 @@ class AdvancedMLEngine:
             "business_confidence": 0.87,
         }
 
-    async def _generate_recommendations(
-        self, predictions: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    async def _generate_recommendations(self, predictions: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate actionable recommendations based on predictions."""
         return [
             {
@@ -460,9 +422,7 @@ class AdvancedMLEngine:
             },
         ]
 
-    async def _analyze_system_health(
-        self, system_state: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _analyze_system_health(self, system_state: dict[str, Any]) -> dict[str, Any]:
         """Analyze overall system health."""
         return {
             "score": 0.89,
@@ -475,9 +435,7 @@ class AdvancedMLEngine:
             "status": "healthy",
         }
 
-    async def _predict_potential_issues(
-        self, system_state: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    async def _predict_potential_issues(self, system_state: dict[str, Any]) -> list[dict[str, Any]]:
         """Predict potential system issues."""
         return [
             {
@@ -496,7 +454,7 @@ class AdvancedMLEngine:
             },
         ]
 
-    async def _generate_healing_action(self, issue: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_healing_action(self, issue: dict[str, Any]) -> dict[str, Any]:
         """Generate healing action for detected issue."""
         return {
             "action_type": issue["prevention_action"],
@@ -506,7 +464,7 @@ class AdvancedMLEngine:
             "rollback_plan": "available",
         }
 
-    async def _execute_healing_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute_healing_action(self, action: dict[str, Any]) -> dict[str, Any]:
         """Execute healing action."""
         # Simulate action execution
         await asyncio.sleep(0.1)
@@ -519,7 +477,7 @@ class AdvancedMLEngine:
             "impact": "issue_prevented",
         }
 
-    async def _optimize_performance(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _optimize_performance(self, data: dict[str, Any]) -> dict[str, Any]:
         """Optimize system performance."""
         return {
             "optimization_type": "performance",
@@ -537,7 +495,7 @@ class AdvancedMLEngine:
             "estimated_impact": "significant",
         }
 
-    async def _optimize_resources(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _optimize_resources(self, data: dict[str, Any]) -> dict[str, Any]:
         """Optimize resource utilization."""
         return {
             "optimization_type": "resources",
@@ -555,7 +513,7 @@ class AdvancedMLEngine:
             "estimated_impact": "significant",
         }
 
-    async def _optimize_user_experience(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _optimize_user_experience(self, data: dict[str, Any]) -> dict[str, Any]:
         """Optimize user experience."""
         return {
             "optimization_type": "user_experience",
@@ -573,7 +531,7 @@ class AdvancedMLEngine:
             "estimated_impact": "high",
         }
 
-    async def _optimize_business_metrics(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _optimize_business_metrics(self, data: dict[str, Any]) -> dict[str, Any]:
         """Optimize business metrics."""
         return {
             "optimization_type": "business_metrics",
@@ -599,16 +557,12 @@ class AdvancedMLEngine:
 
         logger.info("💾 Models saved successfully")
 
-    def _should_retrain_model(
-        self, model_name: str, learning_data: Dict[str, Any]
-    ) -> bool:
+    def _should_retrain_model(self, model_name: str, learning_data: dict[str, Any]) -> bool:
         """Determine if model should be retrained."""
         # Simplified logic - retrain if performance drops or new data is available
         return True  # Always retrain for continuous improvement
 
-    async def _retrain_model(
-        self, model_name: str, learning_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _retrain_model(self, model_name: str, learning_data: dict[str, Any]) -> dict[str, Any]:
         """Retrain a specific model."""
         # Simplified retraining simulation
         return {
@@ -618,22 +572,17 @@ class AdvancedMLEngine:
             "status": "completed",
         }
 
-    def _generate_learning_report(
-        self, retrain_results: Dict, weight_updates: Dict
-    ) -> Dict[str, Any]:
+    def _generate_learning_report(self, retrain_results: dict, weight_updates: dict) -> dict[str, Any]:
         """Generate learning cycle report."""
         return {
-            "improvements": {
-                model: result["improvement"]
-                for model, result in retrain_results.items()
-            },
+            "improvements": {model: result["improvement"] for model, result in retrain_results.items()},
             "efficiency": "high",
             "evolution": "continuous_adaptation_active",
         }
 
     # Additional helper methods for pattern recognition and feature extraction
 
-    async def _extract_features(self, data_stream: List[Dict[str, Any]]) -> np.ndarray:
+    async def _extract_features(self, data_stream: list[dict[str, Any]]) -> np.ndarray:
         """Extract feature matrix from data stream."""
         # Simplified feature extraction
         features = []
@@ -647,9 +596,7 @@ class AdvancedMLEngine:
             features.append(feature_vector)
         return np.array(features)
 
-    async def _identify_cluster_patterns(
-        self, feature_matrix: np.ndarray
-    ) -> Dict[str, Any]:
+    async def _identify_cluster_patterns(self, feature_matrix: np.ndarray) -> dict[str, Any]:
         """Identify clustering patterns."""
         if feature_matrix.shape[0] < 5:
             return {"clusters": 0, "patterns": []}
@@ -663,9 +610,7 @@ class AdvancedMLEngine:
             "insights": "Clear user behavior segments identified",
         }
 
-    async def _identify_sequence_patterns(
-        self, data_stream: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def _identify_sequence_patterns(self, data_stream: list[dict[str, Any]]) -> dict[str, Any]:
         """Identify sequential patterns."""
         return {
             "sequences": ["login_purchase", "browse_compare_buy"],
@@ -673,9 +618,7 @@ class AdvancedMLEngine:
             "support": 0.12,
         }
 
-    async def _identify_anomaly_patterns(
-        self, feature_matrix: np.ndarray
-    ) -> Dict[str, Any]:
+    async def _identify_anomaly_patterns(self, feature_matrix: np.ndarray) -> dict[str, Any]:
         """Identify anomalous patterns."""
         return {
             "anomalies": 3,
@@ -683,9 +626,7 @@ class AdvancedMLEngine:
             "severity": "medium",
         }
 
-    async def _identify_trend_patterns(
-        self, data_stream: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def _identify_trend_patterns(self, data_stream: list[dict[str, Any]]) -> dict[str, Any]:
         """Identify trend patterns."""
         return {
             "trends": ["increasing_engagement", "seasonal_variation"],
@@ -693,9 +634,7 @@ class AdvancedMLEngine:
             "strength": "strong",
         }
 
-    def _calculate_pattern_significance(
-        self, patterns: Dict[str, Any]
-    ) -> Dict[str, float]:
+    def _calculate_pattern_significance(self, patterns: dict[str, Any]) -> dict[str, float]:
         """Calculate significance of detected patterns."""
         return {
             "cluster_significance": 0.89,
@@ -704,7 +643,7 @@ class AdvancedMLEngine:
             "trend_significance": 0.92,
         }
 
-    async def _generate_pattern_insights(self, patterns: Dict[str, Any]) -> List[str]:
+    async def _generate_pattern_insights(self, patterns: dict[str, Any]) -> list[str]:
         """Generate insights from detected patterns."""
         return [
             "User behavior shows clear segmentation opportunities",
@@ -713,9 +652,7 @@ class AdvancedMLEngine:
             "Positive trends indicate successful optimization efforts",
         ]
 
-    async def _patterns_to_actions(
-        self, patterns: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+    async def _patterns_to_actions(self, patterns: dict[str, Any]) -> list[dict[str, Any]]:
         """Convert patterns to actionable recommendations."""
         return [
             {
@@ -732,9 +669,7 @@ class AdvancedMLEngine:
             },
         ]
 
-    def _calculate_pattern_confidence(
-        self, patterns: Dict[str, Any]
-    ) -> Dict[str, float]:
+    def _calculate_pattern_confidence(self, patterns: dict[str, Any]) -> dict[str, float]:
         """Calculate confidence levels for patterns."""
         return {
             "overall_confidence": 0.87,
@@ -744,9 +679,7 @@ class AdvancedMLEngine:
             "trend_confidence": 0.84,
         }
 
-    async def _collect_learning_data(
-        self, feedback_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _collect_learning_data(self, feedback_data: dict[str, Any]) -> dict[str, Any]:
         """Collect data for continuous learning."""
         return {
             "feedback_scores": feedback_data.get("scores", []),
@@ -755,7 +688,7 @@ class AdvancedMLEngine:
             "system_performance": feedback_data.get("performance", {}),
         }
 
-    async def _update_performance_metrics(self, learning_data: Dict[str, Any]):
+    async def _update_performance_metrics(self, learning_data: dict[str, Any]):
         """Update model performance tracking."""
         self.performance_history.append(
             {
@@ -766,9 +699,7 @@ class AdvancedMLEngine:
             }
         )
 
-    async def _update_model_weights(
-        self, learning_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _update_model_weights(self, learning_data: dict[str, Any]) -> dict[str, Any]:
         """Update model weights based on learning data."""
         return {
             "weight_adjustments": "applied",
@@ -776,15 +707,11 @@ class AdvancedMLEngine:
             "convergence": "improving",
         }
 
-    async def _update_optimization_models(
-        self, target: str, data: Dict[str, Any], result: Dict[str, Any]
-    ):
+    async def _update_optimization_models(self, target: str, data: dict[str, Any], result: dict[str, Any]):
         """Update optimization models with new data."""
         # Store optimization results for future learning
 
-    async def _generic_optimization(
-        self, target: str, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _generic_optimization(self, target: str, data: dict[str, Any]) -> dict[str, Any]:
         """Generic optimization for custom targets."""
         return {
             "optimization_type": target,
@@ -806,26 +733,26 @@ ml_engine = create_ml_engine()
 
 
 # Convenience functions for easy access
-async def predict_system_performance(data: Dict[str, Any]) -> Dict[str, Any]:
+async def predict_system_performance(data: dict[str, Any]) -> dict[str, Any]:
     """Predict system performance using ML."""
     return await ml_engine.predictive_analytics(data)
 
 
-async def auto_heal_system(system_state: Dict[str, Any]) -> Dict[str, Any]:
+async def auto_heal_system(system_state: dict[str, Any]) -> dict[str, Any]:
     """Automatically heal system issues."""
     return await ml_engine.self_healing_automation(system_state)
 
 
-async def optimize_intelligently(target: str, data: Dict[str, Any]) -> Dict[str, Any]:
+async def optimize_intelligently(target: str, data: dict[str, Any]) -> dict[str, Any]:
     """Intelligently optimize target metrics."""
     return await ml_engine.intelligent_optimization(target, data)
 
 
-async def recognize_patterns(data_stream: List[Dict[str, Any]]) -> Dict[str, Any]:
+async def recognize_patterns(data_stream: list[dict[str, Any]]) -> dict[str, Any]:
     """Recognize patterns in data stream."""
     return await ml_engine.pattern_recognition(data_stream)
 
 
-async def continuous_learn(feedback_data: Dict[str, Any]) -> Dict[str, Any]:
+async def continuous_learn(feedback_data: dict[str, Any]) -> dict[str, Any]:
     """Execute continuous learning cycle."""
     return await ml_engine.continuous_learning(feedback_data)

@@ -357,27 +357,27 @@ add_filter('body_class', 'wp_mastery_woocommerce_luxury_body_classes');
 function wp_mastery_woocommerce_luxury_fallback_menu() {
 	echo '<ul class="fallback-menu">';
 	echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'wp-mastery-woocommerce-luxury') . '</a></li>';
-	
+
 	// Add shop link if WooCommerce is active
 	if (class_exists('WooCommerce')) {
 		echo '<li><a href="' . esc_url(wc_get_page_permalink('shop')) . '">' . esc_html__('Shop', 'wp-mastery-woocommerce-luxury') . '</a></li>';
 	}
-	
+
 	// Show pages in menu if no custom menu is set
 	$pages = get_pages(array(
 		'sort_column' => 'menu_order',
 		'number' => 4,
 	));
-	
+
 	foreach ($pages as $page) {
 		echo '<li><a href="' . esc_url(get_permalink($page->ID)) . '">' . esc_html($page->post_title) . '</a></li>';
 	}
-	
+
 	// Add account link if WooCommerce is active
 	if (class_exists('WooCommerce')) {
 		echo '<li><a href="' . esc_url(wc_get_page_permalink('myaccount')) . '">' . esc_html__('Account', 'wp-mastery-woocommerce-luxury') . '</a></li>';
 	}
-	
+
 	echo '</ul>';
 }
 
@@ -391,12 +391,12 @@ function wp_mastery_woocommerce_luxury_fallback_menu() {
  */
 function wp_mastery_woocommerce_luxury_get_option($option_name, $default = '') {
 	$option_value = get_theme_mod($option_name, $default);
-	
+
 	// Sanitize based on option type
 	if (is_string($option_value)) {
 		return sanitize_text_field($option_value);
 	}
-	
+
 	return $option_value;
 }
 
@@ -428,7 +428,7 @@ function wp_mastery_woocommerce_luxury_is_woocommerce_active() {
 function wp_mastery_woocommerce_luxury_activation() {
 	// Flush rewrite rules
 	flush_rewrite_rules();
-	
+
 	// Set default theme options for luxury eCommerce
 	if (!get_theme_mod('custom_logo')) {
 		// Set default customizer values if needed

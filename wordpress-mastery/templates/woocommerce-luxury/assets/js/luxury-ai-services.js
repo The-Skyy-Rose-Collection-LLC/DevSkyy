@@ -1,9 +1,9 @@
 /**
  * Luxury AI Services Integration
- * 
+ *
  * JavaScript module for integrating with Docker-containerized AI services
  * Handles product analysis, recommendations, and dynamic pricing
- * 
+ *
  * @package WP_Mastery_WooCommerce_Luxury
  * @version 1.0.0
  */
@@ -25,7 +25,7 @@
                 interactions: [],
                 startTime: Date.now()
             };
-            
+
             this.init();
         }
 
@@ -34,21 +34,21 @@
          */
         init() {
             console.log('🤖 Initializing Luxury AI Services...');
-            
+
             // Start behavior tracking
             this.initBehaviorTracking();
-            
+
             // Initialize based on page type
             if (this.config.isShop) {
                 this.initShopPage();
             } else if (this.config.currentProduct) {
                 this.initProductPage();
             }
-            
+
             // Initialize common features
             this.initDynamicPricing();
             this.initRecommendationEngine();
-            
+
             console.log('✅ Luxury AI Services initialized');
         }
 
@@ -58,13 +58,13 @@
         initBehaviorTracking() {
             // Track page views
             this.trackProductView();
-            
+
             // Track time on page
             this.trackTimeOnPage();
-            
+
             // Track interactions
             this.trackInteractions();
-            
+
             // Update customer segment periodically
             setInterval(() => {
                 this.updateCustomerSegment();
@@ -76,13 +76,13 @@
          */
         initShopPage() {
             console.log('🛍️ Initializing shop page AI features...');
-            
+
             // Initialize AI filters
             this.initAIFilters();
-            
+
             // Initialize A/B testing
             this.initABTesting();
-            
+
             // Load product analysis for visible products
             this.analyzeVisibleProducts();
         }
@@ -92,16 +92,16 @@
          */
         initProductPage() {
             console.log('📦 Initializing product page AI features...');
-            
+
             // Analyze current product
             this.analyzeCurrentProduct();
-            
+
             // Initialize advanced gallery
             this.initAdvancedGallery();
-            
+
             // Load recommendations
             this.loadProductRecommendations();
-            
+
             // Initialize dynamic bundles
             this.initDynamicBundles();
         }
@@ -111,19 +111,19 @@
          */
         async analyzeCurrentProduct() {
             const productId = this.config.currentProduct;
-            
+
             if (!productId || this.processingQueue.has(`analyze_${productId}`)) {
                 return;
             }
-            
+
             this.processingQueue.add(`analyze_${productId}`);
             this.showProcessingIndicator('Analyzing product...');
-            
+
             try {
                 const response = await this.makeAIRequest('luxury_ai_analyze_product', {
                     product_id: productId
                 });
-                
+
                 if (response.success) {
                     this.displayProductAnalysis(response.data);
                     this.cache.set(`analysis_${productId}`, response.data);
@@ -148,23 +148,23 @@
                 styleElement.textContent = analysis.style_category;
                 styleElement.classList.add('ai-detected');
             }
-            
+
             // Update materials
             const materialsElement = document.getElementById('detected-materials');
             if (materialsElement && analysis.materials) {
                 materialsElement.textContent = analysis.materials.join(', ');
                 materialsElement.classList.add('ai-detected');
             }
-            
+
             // Update quality score
             const qualityElement = document.getElementById('ai-quality-stars');
             if (qualityElement && analysis.quality_score) {
                 this.displayQualityStars(qualityElement, analysis.quality_score);
             }
-            
+
             // Update detailed attributes
             this.updateAIAttributes(analysis);
-            
+
             // Generate AI content
             this.generateAIContent(analysis);
         }
@@ -176,7 +176,7 @@
             const maxStars = 5;
             const filledStars = Math.round(score);
             let starsHTML = '';
-            
+
             for (let i = 1; i <= maxStars; i++) {
                 if (i <= filledStars) {
                     starsHTML += '<span class="star filled">⭐</span>';
@@ -184,7 +184,7 @@
                     starsHTML += '<span class="star empty">☆</span>';
                 }
             }
-            
+
             element.innerHTML = starsHTML;
             element.setAttribute('data-score', score);
         }
@@ -198,13 +198,13 @@
             if (styleDetails && analysis.style_details) {
                 styleDetails.innerHTML = this.formatAttributeList(analysis.style_details);
             }
-            
+
             // Material details
             const materialDetails = document.getElementById('ai-material-details');
             if (materialDetails && analysis.material_details) {
                 materialDetails.innerHTML = this.formatAttributeList(analysis.material_details);
             }
-            
+
             // Care instructions
             const careGuide = document.getElementById('ai-care-guide');
             if (careGuide && analysis.care_instructions) {
@@ -216,7 +216,7 @@
          * Format attribute list for display
          */
         formatAttributeList(attributes) {
-            return attributes.map(attr => 
+            return attributes.map(attr =>
                 `<span class="attribute-tag">${attr}</span>`
             ).join('');
         }
@@ -225,7 +225,7 @@
          * Format care instructions
          */
         formatCareInstructions(instructions) {
-            return instructions.map(instruction => 
+            return instructions.map(instruction =>
                 `<div class="care-instruction">
                     <span class="care-icon">${this.getCareIcon(instruction.type)}</span>
                     <span class="care-text">${instruction.text}</span>
@@ -253,20 +253,20 @@
         async loadProductRecommendations() {
             const productId = this.config.currentProduct;
             const customerSegment = this.config.customerSegment;
-            
+
             if (!productId) return;
-            
+
             try {
                 // Load different types of recommendations
                 const recommendationTypes = ['related', 'cross_sell', 'upsell'];
-                
+
                 for (const type of recommendationTypes) {
                     const response = await this.makeAIRequest('luxury_ai_get_recommendations', {
                         product_id: productId,
                         customer_segment: customerSegment,
                         type: type
                     });
-                    
+
                     if (response.success) {
                         this.displayRecommendations(type, response.data);
                     }
@@ -285,13 +285,13 @@
                 'cross_sell': 'ai-complementary-items',
                 'upsell': 'ai-premium-alternatives'
             };
-            
+
             const container = document.getElementById(containers[type]);
             if (!container || !recommendations.length) return;
-            
+
             const html = recommendations.map(product => this.formatProductCard(product)).join('');
             container.innerHTML = html;
-            
+
             // Add interaction tracking
             container.querySelectorAll('.product-card').forEach(card => {
                 card.addEventListener('click', () => {
@@ -330,7 +330,7 @@
          */
         initDynamicPricing() {
             if (!this.config.currentProduct) return;
-            
+
             // Load dynamic pricing every 5 minutes
             this.loadDynamicPricing();
             setInterval(() => {
@@ -347,7 +347,7 @@
                     product_id: this.config.currentProduct,
                     customer_segment: this.config.customerSegment
                 });
-                
+
                 if (response.success) {
                     this.displayDynamicPricing(response.data);
                 }
@@ -362,9 +362,9 @@
         displayDynamicPricing(pricingData) {
             const container = document.getElementById('dynamic-pricing');
             if (!container) return;
-            
+
             let html = '';
-            
+
             // Price trend
             if (pricingData.trend) {
                 html += `<div class="price-trend ${pricingData.trend.direction}">
@@ -372,7 +372,7 @@
                     <span class="trend-text">${pricingData.trend.message}</span>
                 </div>`;
             }
-            
+
             // Personalized offers
             if (pricingData.offers && pricingData.offers.length > 0) {
                 html += '<div class="personalized-offers">';
@@ -384,7 +384,7 @@
                 });
                 html += '</div>';
             }
-            
+
             container.innerHTML = html;
         }
 
@@ -397,7 +397,7 @@
                     product_id: this.config.currentProduct,
                     timestamp: Date.now()
                 });
-                
+
                 // Update view count on server
                 this.updateProductViewCount(this.config.currentProduct);
             }
@@ -425,7 +425,7 @@
                     });
                 }
             });
-            
+
             // Track scroll depth
             let maxScroll = 0;
             window.addEventListener('scroll', () => {
@@ -459,11 +459,11 @@
                     interactions: JSON.stringify(this.customerBehavior.interactions),
                     price_range: this.detectPriceRangeInterest()
                 });
-                
+
                 if (response.success && response.data.segment !== this.config.customerSegment) {
                     this.config.customerSegment = response.data.segment;
                     console.log('🎯 Customer segment updated:', response.data.segment);
-                    
+
                     // Refresh recommendations with new segment
                     if (this.config.currentProduct) {
                         this.loadProductRecommendations();
@@ -490,16 +490,16 @@
             const formData = new FormData();
             formData.append('action', action);
             formData.append('nonce', this.config.nonce);
-            
+
             Object.keys(data).forEach(key => {
                 formData.append(key, data[key]);
             });
-            
+
             const response = await fetch(this.config.ajaxUrl || luxuryEcommerce.ajax_url, {
                 method: 'POST',
                 body: formData
             });
-            
+
             return await response.json();
         }
 

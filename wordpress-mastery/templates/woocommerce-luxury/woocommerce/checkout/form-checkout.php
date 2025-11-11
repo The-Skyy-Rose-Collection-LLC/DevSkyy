@@ -31,8 +31,8 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 			<div class="checkout-brand-section">
 				<div class="brand-logo-area">
 					<div class="skyy-rose-logo">
-						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>" 
-							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>" 
+						<img src="<?php echo esc_url(get_template_directory_uri() . '/assets/images/skyy-rose-logo-luxury.svg'); ?>"
+							 alt="<?php esc_attr_e('Skyy Rose Collection', 'wp-mastery-woocommerce-luxury'); ?>"
 							 class="brand-logo">
 					</div>
 					<div class="brand-tagline">
@@ -40,7 +40,7 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 						<p class="brand-subtitle luxury-accent"><?php esc_html_e('Complete Your Luxury Experience', 'wp-mastery-woocommerce-luxury'); ?></p>
 					</div>
 				</div>
-				
+
 				<!-- AI-Powered Checkout Intelligence -->
 				<div class="checkout-ai-insights" id="checkout-intelligence-panel">
 					<div class="ai-insight-card">
@@ -92,7 +92,7 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 			<div class="luxury-checkout-layout">
 				<!-- Main Checkout Content -->
 				<div class="checkout-main-content">
-					
+
 					<!-- Step 1: Customer Information -->
 					<div class="checkout-step" id="checkout-step-1" data-step="1">
 						<div class="step-header">
@@ -266,7 +266,7 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 
 						<div class="order-review-section">
 							<?php do_action('woocommerce_checkout_before_order_review_heading'); ?>
-							
+
 							<div id="order_review" class="woocommerce-checkout-review-order luxury-order-review">
 								<?php do_action('woocommerce_checkout_before_order_review'); ?>
 

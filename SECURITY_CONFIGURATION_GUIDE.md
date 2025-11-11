@@ -52,7 +52,7 @@ ENVIRONMENT=development
 DEBUG=true
 RATE_LIMIT_ENABLED=false
 
-# Production Environment  
+# Production Environment
 ENVIRONMENT=production
 DEBUG=false
 RATE_LIMIT_ENABLED=true
@@ -134,7 +134,7 @@ SECRET_KEY = "my-secret-key"  # Never do this!
 # Development
 SECRET_KEY=61ea33869516bd6dbf4fd68ed512a2431efbee31fab9af03fd72dbf2ac306cbc
 
-# Staging  
+# Staging
 SECRET_KEY=<different-staging-key>
 
 # Production
@@ -187,7 +187,7 @@ async def log_security_event(event_type: str, details: dict):
         "details": details,
         "severity": "HIGH" if event_type in ["auth_failure", "rate_limit"] else "INFO"
     }
-    
+
     security_logger.warning(f"SECURITY_EVENT: {json.dumps(event)}")
 ```
 
@@ -220,7 +220,7 @@ def test_expired_token_rejection():
 def test_security_headers():
     """Test security headers are present."""
     response = client.get("/api/v1/health")
-    
+
     assert "X-Content-Type-Options" in response.headers
     assert "X-Frame-Options" in response.headers
     assert "Strict-Transport-Security" in response.headers

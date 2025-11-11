@@ -6,14 +6,15 @@ Author: DevSkyy Enterprise Team
 Date: 2025-11-10
 """
 
-import logging
 import asyncio
 from datetime import datetime
-from typing import Dict, Optional
-import httpx
+import logging
+from typing import Optional
 
+import httpx
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class HealthCheckService:
     """Health check service for monitoring system dependencies"""
 
     @staticmethod
-    async def check_database(session: AsyncSession) -> Dict:
+    async def check_database(session: AsyncSession) -> dict:
         """
         Check database connectivity and responsiveness
 
@@ -47,14 +48,14 @@ class HealthCheckService:
                     "status": "healthy",
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
-                    "details": "Database connection successful"
+                    "details": "Database connection successful",
                 }
             else:
                 return {
                     "status": "unhealthy",
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
-                    "details": "Unexpected query result"
+                    "details": "Unexpected query result",
                 }
 
         except Exception as e:
@@ -64,11 +65,11 @@ class HealthCheckService:
                 "response_time_ms": 0,
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": str(e),
-                "details": "Database connection failed"
+                "details": "Database connection failed",
             }
 
     @staticmethod
-    async def check_redis(redis_url: str) -> Dict:
+    async def check_redis(redis_url: str) -> dict:
         """
         Check Redis connectivity and responsiveness
 
@@ -99,14 +100,14 @@ class HealthCheckService:
                     "status": "healthy",
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
-                    "details": "Redis connection successful"
+                    "details": "Redis connection successful",
                 }
             else:
                 return {
                     "status": "unhealthy",
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
-                    "details": "Redis ping failed"
+                    "details": "Redis ping failed",
                 }
 
         except ImportError:
@@ -115,7 +116,7 @@ class HealthCheckService:
                 "status": "unknown",
                 "response_time_ms": 0,
                 "timestamp": datetime.utcnow().isoformat(),
-                "details": "Redis client not available"
+                "details": "Redis client not available",
             }
         except Exception as e:
             logger.error(f"Redis health check failed: {e}")
@@ -124,11 +125,11 @@ class HealthCheckService:
                 "response_time_ms": 0,
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": str(e),
-                "details": "Redis connection failed"
+                "details": "Redis connection failed",
             }
 
     @staticmethod
-    async def check_api(api_name: str, api_key: Optional[str], test_url: Optional[str] = None) -> Dict:
+    async def check_api(api_name: str, api_key: Optional[str], test_url: Optional[str] = None) -> dict:
         """
         Check external API connectivity
 
@@ -145,14 +146,14 @@ class HealthCheckService:
                 "status": "unknown",
                 "response_time_ms": 0,
                 "timestamp": datetime.utcnow().isoformat(),
-                "details": f"{api_name} API key not configured"
+                "details": f"{api_name} API key not configured",
             }
 
         try:
             # Default test URLs
             test_urls = {
                 "Anthropic": "https://api.anthropic.com/v1/messages",
-                "OpenAI": "https://api.openai.com/v1/models"
+                "OpenAI": "https://api.openai.com/v1/models",
             }
 
             url = test_url or test_urls.get(api_name)
@@ -161,21 +162,14 @@ class HealthCheckService:
                     "status": "unknown",
                     "response_time_ms": 0,
                     "timestamp": datetime.utcnow().isoformat(),
-                    "details": f"No test URL configured for {api_name}"
+                    "details": f"No test URL configured for {api_name}",
                 }
 
             headers = {}
             if api_name == "Anthropic":
-                headers = {
-                    "x-api-key": api_key,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json"
-                }
+                headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
             elif api_name == "OpenAI":
-                headers = {
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json"
-                }
+                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
             start_time = asyncio.get_event_loop().time()
 
@@ -199,7 +193,7 @@ class HealthCheckService:
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
                     "status_code": response.status_code,
-                    "details": f"{api_name} API accessible"
+                    "details": f"{api_name} API accessible",
                 }
             elif response.status_code == 401:
                 return {
@@ -207,7 +201,7 @@ class HealthCheckService:
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
                     "status_code": response.status_code,
-                    "details": f"{api_name} API key invalid or expired"
+                    "details": f"{api_name} API key invalid or expired",
                 }
             else:
                 return {
@@ -215,7 +209,7 @@ class HealthCheckService:
                     "response_time_ms": round(response_time_ms, 2),
                     "timestamp": datetime.utcnow().isoformat(),
                     "status_code": response.status_code,
-                    "details": f"{api_name} API returned unexpected status"
+                    "details": f"{api_name} API returned unexpected status",
                 }
 
         except httpx.TimeoutException:
@@ -224,7 +218,7 @@ class HealthCheckService:
                 "response_time_ms": 10000,  # Timeout threshold
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": "Request timeout",
-                "details": f"{api_name} API not responding"
+                "details": f"{api_name} API not responding",
             }
         except Exception as e:
             logger.error(f"{api_name} API health check failed: {e}")
@@ -233,7 +227,7 @@ class HealthCheckService:
                 "response_time_ms": 0,
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": str(e),
-                "details": f"{api_name} API connection failed"
+                "details": f"{api_name} API connection failed",
             }
 
     @staticmethod
@@ -241,8 +235,8 @@ class HealthCheckService:
         session: AsyncSession,
         redis_url: Optional[str] = None,
         anthropic_api_key: Optional[str] = None,
-        openai_api_key: Optional[str] = None
-    ) -> Dict:
+        openai_api_key: Optional[str] = None,
+    ) -> dict:
         """
         Perform comprehensive health check of all system dependencies
 
@@ -255,11 +249,7 @@ class HealthCheckService:
         Returns:
             Dict with overall status and individual component statuses
         """
-        results = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "overall_status": "healthy",
-            "components": {}
-        }
+        results = {"timestamp": datetime.utcnow().isoformat(), "overall_status": "healthy", "components": {}}
 
         # Check database
         db_health = await HealthCheckService.check_database(session)
@@ -282,12 +272,10 @@ class HealthCheckService:
 
         # Determine overall status
         unhealthy_count = sum(
-            1 for component in results["components"].values()
-            if component.get("status") == "unhealthy"
+            1 for component in results["components"].values() if component.get("status") == "unhealthy"
         )
         degraded_count = sum(
-            1 for component in results["components"].values()
-            if component.get("status") == "degraded"
+            1 for component in results["components"].values() if component.get("status") == "degraded"
         )
 
         if unhealthy_count > 0:

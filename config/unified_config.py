@@ -15,13 +15,14 @@ Per Truth Protocol Rule #11: Verified languages - Python 3.11.* only
 
 import logging
 import os
-import secrets
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+import secrets
+from typing import Any, Optional
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -66,13 +67,13 @@ class SecurityConfig(BaseModel):
     def validate_secret_key(cls, v):
         """
         Ensure the provided SECRET_KEY is at least 32 characters long.
-        
+
         Parameters:
             v (str): The secret key to validate.
-        
+
         Returns:
             str: The validated secret key.
-        
+
         Raises:
             ValueError: If the secret key is shorter than 32 characters.
         """
@@ -118,10 +119,10 @@ class RedisConfig(BaseModel):
 class CORSConfig(BaseModel):
     """CORS configuration with validation"""
 
-    origins: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     allow_credentials: bool = Field(default=True)
-    allow_methods: List[str] = Field(default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "OPTIONS"])
-    allow_headers: List[str] = Field(default_factory=lambda: ["Content-Type", "Authorization", "X-Requested-With"])
+    allow_methods: list[str] = Field(default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    allow_headers: list[str] = Field(default_factory=lambda: ["Content-Type", "Authorization", "X-Requested-With"])
     max_age: int = Field(default=600, ge=0, le=86400)
 
     class Config:
@@ -179,15 +180,15 @@ class UnifiedConfig:
     def __init__(self, environment: Optional[str] = None):
         """
         Initialize the unified configuration for the application.
-        
+
         Parameters:
             environment (Optional[str]): Optional override for the runtime environment. If omitted,
                 the ENVIRONMENT environment variable is used; defaults to "development". Accepted
                 values are "development", "production", and "testing".
-        
+
         Raises:
             ValueError: If `environment` (after resolution) is not one of the accepted values.
-        
+
         Notes:
             This initializer loads all sub-configurations (database, security, logging, Redis,
             CORS, performance, and AI), sets the configuration version, and emits an informational
@@ -210,15 +211,12 @@ class UnifiedConfig:
         self._load_ai_config()
 
         # Log configuration loaded
-        logger.info(
-            f"✅ Unified configuration loaded - Environment: {self.environment}, "
-            f"Version: {self.version}"
-        )
+        logger.info(f"✅ Unified configuration loaded - Environment: {self.environment}, " f"Version: {self.version}")
 
     def _load_database_config(self):
         """
         Initialize the DatabaseConfig for this UnifiedConfig instance using the resolved database URL and environment overrides.
-        
+
         Resolves the effective database URL according to the module's precedence rules and constructs a DatabaseConfig populated from environment variables (with sensible defaults for pool size, overflow, timeouts, and flags). The resulting DatabaseConfig is assigned to self.database.
         """
         # Build database URL with precedence
@@ -231,13 +229,13 @@ class UnifiedConfig:
             pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", 30)),
             pool_recycle=int(os.getenv("DB_POOL_RECYCLE", 3600)),
             pool_pre_ping=os.getenv("DB_POOL_PRE_PING", "true").lower() == "true",
-            echo=os.getenv("DB_ECHO", "false").lower() == "true"
+            echo=os.getenv("DB_ECHO", "false").lower() == "true",
         )
 
     def _get_database_url(self) -> str:
         """
         Resolve the effective database connection URL using environment-variable precedence.
-        
+
         Precedence (highest to lowest):
         1. DATABASE_URL
         2. NEON_DATABASE_URL
@@ -245,7 +243,7 @@ class UnifiedConfig:
         4. PLANETSCALE_DATABASE_URL
         5. Individual DB credentials (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
         6. SQLite fallback (sqlite+aiosqlite:///./devskyy.db)
-        
+
         Returns:
             database_url (str): Normalized database URL suitable for async drivers.
         """
@@ -266,12 +264,7 @@ class UnifiedConfig:
             return self._normalize_database_url(planetscale_url)
 
         # Check for individual PostgreSQL credentials
-        if all([
-            os.getenv("DB_HOST"),
-            os.getenv("DB_USER"),
-            os.getenv("DB_PASSWORD"),
-            os.getenv("DB_NAME")
-        ]):
+        if all([os.getenv("DB_HOST"), os.getenv("DB_USER"), os.getenv("DB_PASSWORD"), os.getenv("DB_NAME")]):
             return self._build_postgres_url()
 
         # Default: SQLite (development/testing)
@@ -280,15 +273,15 @@ class UnifiedConfig:
     def _normalize_database_url(self, url: str) -> str:
         """
         Convert common database URL schemes to their async-driver equivalents.
-        
+
         Rewrites scheme prefixes so async-compatible SQLAlchemy URLs are produced:
         - "postgres://" or "postgresql://" -> "postgresql+asyncpg://"
         - "mysql://" -> "mysql+aiomysql://"
         - "sqlite://" -> "sqlite+aiosqlite://"
-        
+
         Parameters:
             url (str): The database URL to normalize.
-        
+
         Returns:
             str: The normalized URL using an async driver scheme when applicable; otherwise the original URL.
         """
@@ -307,9 +300,9 @@ class UnifiedConfig:
     def _build_postgres_url(self) -> str:
         """
         Constructs a PostgreSQL connection URL from individual database environment variables.
-        
+
         Reads DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, and DB_NAME from the environment and URL-encodes the password before composing the connection string.
-        
+
         Returns:
             str: A PostgreSQL connection URL using the asyncpg driver (scheme `postgresql+asyncpg`) with the password URL-encoded.
         """
@@ -327,10 +320,10 @@ class UnifiedConfig:
     def _load_security_config(self):
         """
         Load and set the SecurityConfig from environment variables, enforcing production requirements.
-        
+
         Raises:
             ValueError: If SECRET_KEY is not provided when running in production.
-        
+
         Description:
             - Ensures a SECRET_KEY is present; raises in production or generates a development-only key and logs a warning in non-production environments.
             - Builds a SecurityConfig using environment-provided values with sensible defaults for JWT algorithm, token expiry, password policy, and lockout settings.
@@ -362,13 +355,13 @@ class UnifiedConfig:
             min_password_length=int(os.getenv("MIN_PASSWORD_LENGTH", 12)),
             require_special_chars=os.getenv("REQUIRE_SPECIAL_CHARS", "true").lower() == "true",
             max_login_attempts=int(os.getenv("MAX_LOGIN_ATTEMPTS", 5)),
-            lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", 30))
+            lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", 30)),
         )
 
     def _load_logging_config(self):
         """
         Populate the instance's `logging` attribute with a LoggingConfig constructed from environment variables and sensible defaults.
-        
+
         Reads logging-related environment variables (e.g., LOG_LEVEL, LOG_FORMAT, LOG_ENABLE_CONSOLE, LOG_ENABLE_FILE, LOG_DIR, LOG_MAX_FILE_SIZE_MB, LOG_BACKUP_COUNT, LOG_ENABLE_CORRELATION_ID, LOG_SANITIZE_SENSITIVE) and applies type/coercion rules to produce an immutable LoggingConfig assigned to `self.logging`.
         """
         self.logging = LoggingConfig(
@@ -380,13 +373,13 @@ class UnifiedConfig:
             max_file_size_mb=int(os.getenv("LOG_MAX_FILE_SIZE_MB", 10)),
             backup_count=int(os.getenv("LOG_BACKUP_COUNT", 5)),
             enable_correlation_id=os.getenv("LOG_ENABLE_CORRELATION_ID", "true").lower() == "true",
-            sanitize_sensitive_data=os.getenv("LOG_SANITIZE_SENSITIVE", "true").lower() == "true"
+            sanitize_sensitive_data=os.getenv("LOG_SANITIZE_SENSITIVE", "true").lower() == "true",
         )
 
     def _load_redis_config(self):
         """
         Load Redis configuration from environment and assign a validated RedisConfig to self.redis.
-        
+
         Reads REDIS_URL, REDIS_MAX_CONNECTIONS, REDIS_SOCKET_TIMEOUT, REDIS_SOCKET_CONNECT_TIMEOUT, REDIS_RETRY_ON_TIMEOUT, and REDIS_DEFAULT_TTL (with sensible defaults), constructs a RedisConfig instance, and stores it on self.redis. Raises pydantic.ValidationError if the resulting configuration fails validation.
         """
         self.redis = RedisConfig(
@@ -395,13 +388,13 @@ class UnifiedConfig:
             socket_timeout=int(os.getenv("REDIS_SOCKET_TIMEOUT", 5)),
             socket_connect_timeout=int(os.getenv("REDIS_SOCKET_CONNECT_TIMEOUT", 5)),
             retry_on_timeout=os.getenv("REDIS_RETRY_ON_TIMEOUT", "true").lower() == "true",
-            default_ttl=int(os.getenv("REDIS_DEFAULT_TTL", 3600))
+            default_ttl=int(os.getenv("REDIS_DEFAULT_TTL", 3600)),
         )
 
     def _load_cors_config(self):
         """
         Load CORS settings from environment variables and assign a CORSConfig instance to self.cors.
-        
+
         Reads these environment variables (with defaults) and maps them to CORSConfig fields:
         - CORS_ORIGINS: comma-separated origins (default: "http://localhost:3000,http://localhost:5173")
         - CORS_METHODS: comma-separated HTTP methods (default: "GET,POST,PUT,DELETE,OPTIONS")
@@ -423,13 +416,13 @@ class UnifiedConfig:
             allow_credentials=os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true",
             allow_methods=methods,
             allow_headers=headers,
-            max_age=int(os.getenv("CORS_MAX_AGE", 600))
+            max_age=int(os.getenv("CORS_MAX_AGE", 600)),
         )
 
     def _load_performance_config(self):
         """
         Load performance-related settings from environment and assign a PerformanceConfig to self.performance.
-        
+
         Reads the following environment variables (with defaults) and constructs the configuration:
         - MAX_CONTENT_LENGTH_MB (default: 16)
         - REQUEST_TIMEOUT_SECONDS (default: 300)
@@ -442,13 +435,13 @@ class UnifiedConfig:
             request_timeout_seconds=int(os.getenv("REQUEST_TIMEOUT_SECONDS", 300)),
             worker_count=int(os.getenv("WORKER_COUNT", 4)),
             enable_gzip=os.getenv("ENABLE_GZIP", "true").lower() == "true",
-            gzip_minimum_size=int(os.getenv("GZIP_MINIMUM_SIZE", 1000))
+            gzip_minimum_size=int(os.getenv("GZIP_MINIMUM_SIZE", 1000)),
         )
 
     def _load_ai_config(self):
         """
         Populate the UnifiedConfig.ai attribute from environment variables.
-        
+
         Constructs an AIConfig using values read from environment variables and assigns it to self.ai. Environment variables used and defaults:
         - OPENAI_API_KEY: no default
         - ANTHROPIC_API_KEY: no default
@@ -463,13 +456,13 @@ class UnifiedConfig:
             default_model=os.getenv("AI_DEFAULT_MODEL", "claude-sonnet-4-5"),
             max_tokens=int(os.getenv("AI_MAX_TOKENS", 4096)),
             temperature=float(os.getenv("AI_TEMPERATURE", 0.7)),
-            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120))
+            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120)),
         )
 
     def is_production(self) -> bool:
         """
         Return whether the unified configuration is for the production environment.
-        
+
         Returns:
             True if the configuration's environment is "production", False otherwise.
         """
@@ -482,18 +475,18 @@ class UnifiedConfig:
     def is_testing(self) -> bool:
         """
         Return whether the configuration's environment is testing.
-        
+
         Returns:
             `true` if the environment equals "testing", `false` otherwise.
         """
         return self.environment == "testing"
 
-    def get_trusted_hosts(self) -> List[str]:
+    def get_trusted_hosts(self) -> list[str]:
         """
         Provide trusted hostnames appropriate for the current environment.
-        
+
         Reads the `TRUSTED_HOSTS` environment variable and parses it into a list of hostnames; when not set, a production default and a non-production default are used.
-        
+
         Returns:
             List[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
         """
@@ -504,12 +497,12 @@ class UnifiedConfig:
 
         return [host.strip() for host in hosts_str.split(",")]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Return a sanitized dictionary summary of the unified configuration.
-        
+
         Sensitive fields (for example: secret keys, full database URLs, and API keys) are omitted; each top-level key contains a concise, non-sensitive subset of settings for that area.
-        
+
         Returns:
             dict: A dictionary mapping top-level config areas (environment, version, database, security, logging, redis, performance) to their non-sensitive summary values.
         """
@@ -519,32 +512,29 @@ class UnifiedConfig:
             "database": {
                 "provider": self._detect_database_provider(),
                 "pool_size": self.database.pool_size,
-                "echo": self.database.echo
+                "echo": self.database.echo,
             },
             "security": {
                 "algorithm": self.security.algorithm,
                 "access_token_expire_minutes": self.security.access_token_expire_minutes,
-                "password_hash_algorithm": self.security.password_hash_algorithm
+                "password_hash_algorithm": self.security.password_hash_algorithm,
             },
             "logging": {
                 "level": self.logging.level,
                 "format": self.logging.format,
-                "enable_correlation_id": self.logging.enable_correlation_id
+                "enable_correlation_id": self.logging.enable_correlation_id,
             },
-            "redis": {
-                "max_connections": self.redis.max_connections,
-                "default_ttl": self.redis.default_ttl
-            },
+            "redis": {"max_connections": self.redis.max_connections, "default_ttl": self.redis.default_ttl},
             "performance": {
                 "worker_count": self.performance.worker_count,
-                "enable_gzip": self.performance.enable_gzip
-            }
+                "enable_gzip": self.performance.enable_gzip,
+            },
         }
 
     def _detect_database_provider(self) -> str:
         """
         Identify the database provider based on the configured database URL.
-        
+
         @returns: The provider name: one of "Neon (Serverless PostgreSQL)", "Supabase (PostgreSQL)",
         "PlanetScale (MySQL)", "PostgreSQL", "MySQL", "SQLite", or "Unknown".
         """
@@ -577,15 +567,15 @@ _config: Optional[UnifiedConfig] = None
 def get_config(environment: Optional[str] = None) -> UnifiedConfig:
     """
     Return the module-level singleton UnifiedConfig, creating it if necessary.
-    
+
     If the singleton does not exist, initializes a new UnifiedConfig using the provided
     environment name.
-    
+
     Parameters:
         environment (Optional[str]): Optional environment name to initialize the configuration
             (for example "development", "production", or "testing"). If omitted, the
             UnifiedConfig will determine the environment from environment variables or defaults.
-    
+
     Returns:
         The module-level singleton UnifiedConfig instance.
     """
@@ -600,10 +590,10 @@ def get_config(environment: Optional[str] = None) -> UnifiedConfig:
 def reload_config(environment: Optional[str] = None) -> UnifiedConfig:
     """
     Reinitialize the module-level UnifiedConfig singleton and return the new instance for the specified environment.
-    
+
     Parameters:
         environment (Optional[str]): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
-    
+
     Returns:
         UnifiedConfig: The newly created UnifiedConfig singleton.
     """
@@ -617,13 +607,13 @@ def reload_config(environment: Optional[str] = None) -> UnifiedConfig:
 # ============================================================================
 
 
-def validate_production_config(config: UnifiedConfig) -> List[str]:
+def validate_production_config(config: UnifiedConfig) -> list[str]:
     """
     Validate that a UnifiedConfig is suitable for production deployment.
-    
+
     Parameters:
         config (UnifiedConfig): The configuration to validate.
-    
+
     Returns:
         errors (List[str]): A list of validation error messages; empty if the configuration passes all production checks.
     """
@@ -663,5 +653,5 @@ __all__ = [
     "RedisConfig",
     "CORSConfig",
     "PerformanceConfig",
-    "AIConfig"
+    "AIConfig",
 ]

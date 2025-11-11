@@ -1,7 +1,7 @@
 <?php
 /**
  * Uninstall script
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */

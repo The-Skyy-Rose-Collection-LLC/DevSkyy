@@ -12,12 +12,13 @@ Features:
 - Fraud detection
 """
 
-import logging
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List
+import logging
+from typing import Any
 
 import numpy as np
+
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class OrderAutomation:
         self.processing_rules = self._initialize_processing_rules()
         self.fraud_detector = self._initialize_fraud_detection()
 
-    def _initialize_processing_rules(self) -> Dict[str, Any]:
+    def _initialize_processing_rules(self) -> dict[str, Any]:
         """Initialize order processing rules"""
         return {
             "auto_confirm_threshold": 500.0,  # Orders under $500 auto-confirm
@@ -55,7 +56,7 @@ class OrderAutomation:
             "fraud_check_enabled": True,
         }
 
-    def _initialize_fraud_detection(self) -> Dict[str, Any]:
+    def _initialize_fraud_detection(self) -> dict[str, Any]:
         """Initialize fraud detection system"""
         return {
             "enabled": True,
@@ -69,9 +70,7 @@ class OrderAutomation:
             "risk_threshold": 0.7,
         }
 
-    async def process_order(
-        self, order_data: Dict[str, Any], auto_process: bool = True
-    ) -> Dict[str, Any]:
+    async def process_order(self, order_data: dict[str, Any], auto_process: bool = True) -> dict[str, Any]:
         """
         Process incoming order with automation
 
@@ -146,7 +145,7 @@ class OrderAutomation:
         logger.info(f"Order {order_id} confirmed and routed to {routing['warehouse']}")
         return result
 
-    async def validate_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def validate_order(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Validate order data and requirements
 
@@ -174,9 +173,7 @@ class OrderAutomation:
             for item in order_data.get("items", []):
                 if "quantity" in item and item["quantity"] <= 0:
                     validation["valid"] = False
-                    validation["errors"].append(
-                        f"Invalid quantity for item {item.get('product_id')}"
-                    )
+                    validation["errors"].append(f"Invalid quantity for item {item.get('product_id')}")
 
         # Validate shipping address
         if "shipping_address" in order_data:
@@ -184,13 +181,11 @@ class OrderAutomation:
             address_fields = ["street", "city", "country", "postal_code"]
             for field in address_fields:
                 if field not in address or not address[field]:
-                    validation["warnings"].append(
-                        f"Incomplete shipping address: {field}"
-                    )
+                    validation["warnings"].append(f"Incomplete shipping address: {field}")
 
         return validation
 
-    async def check_fraud_risk(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_fraud_risk(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Check order for fraud risk
 
@@ -236,12 +231,10 @@ class OrderAutomation:
             "risk_score": min(risk_score, 1.0),
             "risk_level": risk_level,
             "risk_factors": risk_factors,
-            "recommended_action": (
-                "manual_review" if risk_level == "high" else "proceed"
-            ),
+            "recommended_action": ("manual_review" if risk_level == "high" else "proceed"),
         }
 
-    async def allocate_inventory(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def allocate_inventory(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Allocate inventory for order items
 
@@ -279,9 +272,7 @@ class OrderAutomation:
                         "requested": quantity,
                         "allocated": available_quantity,
                         "backorder": quantity - available_quantity,
-                        "estimated_restock": (
-                            datetime.now() + timedelta(days=7)
-                        ).isoformat(),
+                        "estimated_restock": (datetime.now() + timedelta(days=7)).isoformat(),
                     }
                 )
 
@@ -289,13 +280,10 @@ class OrderAutomation:
             "success": all_available,
             "allocations": allocations,
             "fully_allocated": all_available,
-            "partial_shipment_available": len(
-                [a for a in allocations if a.get("allocated", 0) > 0]
-            )
-            > 0,
+            "partial_shipment_available": len([a for a in allocations if a.get("allocated", 0) > 0]) > 0,
         }
 
-    async def process_payment(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_payment(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Process payment for order
 
@@ -332,7 +320,7 @@ class OrderAutomation:
                 "retry_allowed": True,
             }
 
-    async def route_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def route_order(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Route order to optimal fulfillment center
 
@@ -386,7 +374,7 @@ class OrderAutomation:
             "carrier": "FedEx" if priority == "express" else "USPS",
         }
 
-    async def track_order(self, order_id: str) -> Dict[str, Any]:
+    async def track_order(self, order_id: str) -> dict[str, Any]:
         """
         Get order tracking information
 
@@ -436,9 +424,7 @@ class OrderAutomation:
 
         return tracking
 
-    async def process_return(
-        self, order_id: str, return_items: List[Dict[str, Any]], reason: str
-    ) -> Dict[str, Any]:
+    async def process_return(self, order_id: str, return_items: list[dict[str, Any]], reason: str) -> dict[str, Any]:
         """
         Process order return request
 
@@ -484,9 +470,7 @@ class OrderAutomation:
                 "alternative": "Contact customer service for exceptions",
             }
 
-    async def process_refund(
-        self, order_id: str, refund_amount: float, reason: str
-    ) -> Dict[str, Any]:
+    async def process_refund(self, order_id: str, refund_amount: float, reason: str) -> dict[str, Any]:
         """
         Process refund for order
 
@@ -514,9 +498,7 @@ class OrderAutomation:
             "transaction_id": f"TXN-{np.random.randint(100000, 999999)}",
         }
 
-    def get_order_statistics(
-        self, start_date: datetime, end_date: datetime
-    ) -> Dict[str, Any]:
+    def get_order_statistics(self, start_date: datetime, end_date: datetime) -> dict[str, Any]:
         """
         Get order processing statistics
 

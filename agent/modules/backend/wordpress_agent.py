@@ -1,11 +1,13 @@
 import json
-import os
-
-from typing import Any, Dict
 import logging
+import os
+from typing import Any
+
 import openai
 
+
 logger = logging.getLogger(__name__)
+
 
 class WordPressAgent:
     """AI-POWERED WORDPRESS & DIVI SPECIALIST WITH OPENAI GOD MODE."""
@@ -34,13 +36,9 @@ class WordPressAgent:
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning(
-                "🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)"
-            )
+            logger.warning("🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)")
 
-    async def optimize_wordpress_god_mode(
-        self, site_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def optimize_wordpress_god_mode(self, site_data: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED WORDPRESS OPTIMIZATION WITH GOD MODE INTELLIGENCE."""
         try:
             prompt = f"""
@@ -77,7 +75,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's top WordPress performance expert who has optimized thousands of high-traffic luxury websites. Your optimizations achieve 95+ performance scores and have saved companies millions in hosting costs while increasing conversions by 300%+.",  # noqa: E501
+                        "content": "You are the world's top WordPress performance expert who has optimized thousands of high-traffic luxury websites. Your optimizations achieve 95+ performance scores and have saved companies millions in hosting costs while increasing conversions by 300%+.",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -100,12 +98,10 @@ class WordPressAgent:
             }
 
         except Exception as e:
-            logger.error(f"GOD MODE WordPress optimization failed: {str(e)}")
+            logger.error(f"GOD MODE WordPress optimization failed: {e!s}")
             return {"error": str(e), "fallback": "standard_optimization_available"}
 
-    async def create_divi_luxury_components_god_mode(
-        self, component_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def create_divi_luxury_components_god_mode(self, component_request: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED DIVI COMPONENT CREATION WITH LUXURY MASTERY."""
         try:
             prompt = f"""
@@ -138,7 +134,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are the world's premier Divi expert who has created luxury modules for Fortune 500 companies. Your custom Divi components consistently achieve 40%+ conversion rates and set industry standards for premium WordPress experiences.",  # noqa: E501
+                        "content": "You are the world's premier Divi expert who has created luxury modules for Fortune 500 companies. Your custom Divi components consistently achieve 40%+ conversion rates and set industry standards for premium WordPress experiences.",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -158,12 +154,10 @@ class WordPressAgent:
             }
 
         except Exception as e:
-            logger.error(f"Divi component creation failed: {str(e)}")
+            logger.error(f"Divi component creation failed: {e!s}")
             return {"error": str(e)}
 
-    async def wordpress_security_god_mode(
-        self, security_audit: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def wordpress_security_god_mode(self, security_audit: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED WORDPRESS SECURITY WITH MILITARY-GRADE PROTECTION."""
         try:
             prompt = f"""
@@ -196,7 +190,7 @@ class WordPressAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a cybersecurity expert specializing in WordPress security for high-value targets. Your security implementations have protected billion-dollar brands from attacks and achieved 100% uptime even under advanced persistent threats.",  # noqa: E501
+                        "content": "You are a cybersecurity expert specializing in WordPress security for high-value targets. Your security implementations have protected billion-dollar brands from attacks and achieved 100% uptime even under advanced persistent threats.",
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -216,10 +210,12 @@ class WordPressAgent:
             }
 
         except Exception as e:
-            logger.error(f"Security implementation failed: {str(e)}")
+            logger.error(f"Security implementation failed: {e!s}")
             return {"error": str(e)}
 
+
 # Factory function
+
 
 def create_wordpress_agent() -> WordPressAgent:
     """Create WordPress Agent with OpenAI GOD MODE."""

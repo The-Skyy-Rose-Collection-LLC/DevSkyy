@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin deactivation handler
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -52,14 +52,14 @@ class SkyyRoseDeactivator
 
         // Clear expired activities (older than 30 days)
         $wpdb->query($wpdb->prepare(
-            "DELETE FROM {$wpdb->prefix}skyy_rose_agent_activities 
+            "DELETE FROM {$wpdb->prefix}skyy_rose_agent_activities
              WHERE created_at < %s",
             date('Y-m-d H:i:s', strtotime('-30 days'))
         ));
 
         // Clear expired performance metrics (older than 7 days)
         $wpdb->query($wpdb->prepare(
-            "DELETE FROM {$wpdb->prefix}skyy_rose_performance_metrics 
+            "DELETE FROM {$wpdb->prefix}skyy_rose_performance_metrics
              WHERE recorded_at < %s",
             date('Y-m-d H:i:s', strtotime('-7 days'))
         ));
@@ -141,7 +141,7 @@ class SkyyRoseDeactivator
         global $wpdb;
 
         $wpdb->query(
-            "DELETE FROM {$wpdb->usermeta} 
+            "DELETE FROM {$wpdb->usermeta}
              WHERE meta_key LIKE 'skyy_rose_%'"
         );
     }
@@ -154,8 +154,8 @@ class SkyyRoseDeactivator
         global $wpdb;
 
         $wpdb->query(
-            "DELETE FROM {$wpdb->options} 
-             WHERE option_name LIKE '_transient_skyy_rose_%' 
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE '_transient_skyy_rose_%'
              OR option_name LIKE '_transient_timeout_skyy_rose_%'"
         );
     }

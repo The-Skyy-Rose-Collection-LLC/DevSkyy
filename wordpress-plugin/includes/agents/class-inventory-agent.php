@@ -1,7 +1,7 @@
 <?php
 /**
  * Inventory Management Agent
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */
@@ -112,14 +112,14 @@ class InventoryAgent
             // Scan WordPress uploads directory
             $uploads_dir = wp_upload_dir();
             $scan_result['scanned_directories'][] = $uploads_dir['basedir'];
-            
+
             $upload_scan = $this->scanDirectory($uploads_dir['basedir']);
             $scan_result = array_merge_recursive($scan_result, $upload_scan);
 
             // Scan theme assets
             $theme_dir = get_template_directory();
             $scan_result['scanned_directories'][] = $theme_dir;
-            
+
             $theme_scan = $this->scanDirectory($theme_dir . '/assets', ['recursive' => false]);
             $scan_result = array_merge_recursive($scan_result, $theme_scan);
 
@@ -198,7 +198,7 @@ class InventoryAgent
             } elseif (is_file($file_path)) {
                 $asset_result = $this->processAsset($file_path);
                 $scan_result['total_assets']++;
-                
+
                 if ($asset_result['is_new']) {
                     $scan_result['new_assets']++;
                 } elseif ($asset_result['is_updated']) {
@@ -227,7 +227,7 @@ class InventoryAgent
 
         // Get file information
         $file_info = $this->getFileInfo($file_path);
-        
+
         if (!$file_info) {
             $result['issues'][] = "Unable to process file: $file_path";
             return $result;
@@ -235,7 +235,7 @@ class InventoryAgent
 
         // Check if asset exists in database
         $existing_asset = $this->getExistingAsset($file_path);
-        
+
         if (!$existing_asset) {
             // New asset
             $this->storeAsset($file_info);
@@ -286,7 +286,7 @@ class InventoryAgent
                     $metadata['dimensions'] = $image_data[0] . 'x' . $image_data[1];
                 }
                 break;
-            
+
             case 'video':
                 // Would add video metadata extraction here
                 break;
@@ -320,7 +320,7 @@ class InventoryAgent
     private function getExistingAsset($file_path)
     {
         global $wpdb;
-        
+
         return $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}skyy_rose_inventory_assets WHERE asset_path = %s",
             $file_path
@@ -347,7 +347,7 @@ class InventoryAgent
     private function updateAsset($asset_id, $file_info)
     {
         global $wpdb;
-        
+
         return $wpdb->update(
             $wpdb->prefix . 'skyy_rose_inventory_assets',
             [
@@ -444,7 +444,7 @@ class InventoryAgent
 
         foreach ($assets as $asset) {
             $metadata = json_decode($asset->metadata, true);
-            
+
             if ($asset->asset_type === 'image') {
                 $optimized = $this->optimizeImage($asset->asset_path);
                 if ($optimized) {
@@ -467,11 +467,11 @@ class InventoryAgent
     private function getAssetsNeedingOptimization()
     {
         global $wpdb;
-        
+
         return $wpdb->get_results("
-            SELECT * FROM {$wpdb->prefix}skyy_rose_inventory_assets 
-            WHERE asset_type = 'image' 
-            AND file_size > 500000 
+            SELECT * FROM {$wpdb->prefix}skyy_rose_inventory_assets
+            WHERE asset_type = 'image'
+            AND file_size > 500000
             AND status = 'active'
             ORDER BY file_size DESC
             LIMIT 50
@@ -503,7 +503,7 @@ class InventoryAgent
             // Keep the first file, mark others as duplicates
             for ($i = 1; $i < count($group); $i++) {
                 global $wpdb;
-                
+
                 $wpdb->update(
                     $wpdb->prefix . 'skyy_rose_inventory_assets',
                     ['status' => 'duplicate'],
@@ -533,7 +533,7 @@ class InventoryAgent
             $large_files = array_filter($scan_result['issues_detected'], function($issue) {
                 return strpos($issue, 'Large file size') !== false;
             });
-            
+
             if (count($large_files) > 0) {
                 $recommendations[] = "Optimize " . count($large_files) . " large files for better performance";
             }
@@ -553,12 +553,12 @@ class InventoryAgent
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $unit_index = 0;
-        
+
         while ($size >= 1024 && $unit_index < count($units) - 1) {
             $size /= 1024;
             $unit_index++;
         }
-        
+
         return round($size, 2) . ' ' . $units[$unit_index];
     }
 }

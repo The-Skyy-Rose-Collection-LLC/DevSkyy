@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin activation handler
- * 
+ *
  * @package SkyyRoseAIAgents
  * @since 1.0.0
  */

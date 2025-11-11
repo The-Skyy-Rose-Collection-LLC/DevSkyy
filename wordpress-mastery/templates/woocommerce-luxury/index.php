@@ -28,13 +28,13 @@ get_header();
 			<section class="luxury-hero">
 				<div class="luxury-hero-content">
 					<h1 class="luxury-hero-title">
-						<?php 
+						<?php
 						$hero_title = get_theme_mod('luxury_hero_title', get_bloginfo('name'));
 						echo esc_html($hero_title);
 						?>
 					</h1>
 					<p class="luxury-hero-subtitle">
-						<?php 
+						<?php
 						$hero_subtitle = get_theme_mod('luxury_hero_subtitle', get_bloginfo('description'));
 						echo esc_html($hero_subtitle);
 						?>
@@ -55,12 +55,12 @@ get_header();
 							<h2 class="section-title"><?php esc_html_e('Featured Collection', 'wp-mastery-woocommerce-luxury'); ?></h2>
 							<hr class="luxury-divider">
 						</header>
-						
+
 						<?php
 						// Display featured products
 						echo do_shortcode('[featured_products limit="4" columns="2"]');
 						?>
-						
+
 						<div class="section-footer text-center">
 							<a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn-luxury">
 								<?php esc_html_e('View All Products', 'wp-mastery-woocommerce-luxury'); ?>

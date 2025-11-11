@@ -340,7 +340,7 @@ spec:
 # Terraform configuration for cloud deployment
 resource "aws_ecs_cluster" "devskyy_api_cluster" {
   name = "devskyy-api-integration"
-  
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -352,7 +352,7 @@ resource "aws_ecs_service" "api_gateway" {
   cluster         = aws_ecs_cluster.devskyy_api_cluster.id
   task_definition = aws_ecs_task_definition.api_gateway.arn
   desired_count   = 3
-  
+
   load_balancer {
     target_group_arn = aws_lb_target_group.api_gateway.arn
     container_name   = "api-gateway"

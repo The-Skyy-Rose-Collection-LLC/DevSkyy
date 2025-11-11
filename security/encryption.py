@@ -1,15 +1,16 @@
+import base64
+import hashlib
+import logging
 import os
 import secrets
+from typing import Any, Optional, Union
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from typing import Any, Dict, Optional, Union
-import base64
-import hashlib
-import logging
+
 
 """
 Enterprise-Grade Encryption System
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 # KEY MANAGEMENT
 # ============================================================================
 
+
 class KeyManager:
     """Secure key management with key rotation support"""
 
@@ -33,11 +35,9 @@ class KeyManager:
         Args:
             master_key: Master encryption key (from environment or generated)
         """
-        self.master_key = master_key or os.getenv(
-            "ENCRYPTION_MASTER_KEY", self._generate_master_key()
-        )
-        self.active_keys: Dict[str, bytes] = {}
-        self.key_versions: Dict[str, int] = {}
+        self.master_key = master_key or os.getenv("ENCRYPTION_MASTER_KEY", self._generate_master_key())
+        self.active_keys: dict[str, bytes] = {}
+        self.key_versions: dict[str, int] = {}
 
     @staticmethod
     def _generate_master_key() -> str:
@@ -47,9 +47,7 @@ class KeyManager:
         logger.warning(f"ENCRYPTION_MASTER_KEY={key.decode()}")
         return key.decode()
 
-    def derive_key(
-        self, password: str, salt: Optional[bytes] = None, key_size: int = 32
-    ) -> tuple[bytes, bytes]:
+    def derive_key(self, password: str, salt: Optional[bytes] = None, key_size: int = 32) -> tuple[bytes, bytes]:
         """
         Derive an encryption key from a password using PBKDF2
 
@@ -85,9 +83,11 @@ class KeyManager:
 
         return self.active_keys[key_id]
 
+
 # ============================================================================
 # AES-256-GCM ENCRYPTION
 # ============================================================================
+
 
 class AESEncryption:
     """AES-256-GCM encryption (Authenticated Encryption with Associated Data)"""
@@ -163,9 +163,7 @@ class AESEncryption:
             key = self.key_manager.get_key(key_id)
 
             # Create cipher
-            cipher = Cipher(
-                algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend()
-            )
+            cipher = Cipher(algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend())
             decryptor = cipher.decryptor()
 
             # Decrypt
@@ -175,13 +173,13 @@ class AESEncryption:
 
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
-            raise ValueError(
-                "Decryption failed - data may be corrupted or key is incorrect"
-            )
+            raise ValueError("Decryption failed - data may be corrupted or key is incorrect")
+
 
 # ============================================================================
 # FERNET ENCRYPTION (Simpler alternative)
 # ============================================================================
+
 
 class FernetEncryption:
     """Fernet encryption (simpler, built-in authentication)"""
@@ -212,9 +210,11 @@ class FernetEncryption:
         decrypted = self.cipher.decrypt(encrypted_data.encode())
         return decrypted.decode()
 
+
 # ============================================================================
 # FIELD-LEVEL ENCRYPTION
 # ============================================================================
+
 
 class FieldEncryption:
     """Field-level encryption for sensitive database fields"""
@@ -228,7 +228,7 @@ class FieldEncryption:
         """
         self.engine = encryption_engine or AESEncryption()
 
-    def encrypt_field(self, value: Any, field_name: str) -> Dict[str, Any]:
+    def encrypt_field(self, value: Any, field_name: str) -> dict[str, Any]:
         """
         Encrypt a field value
 
@@ -255,7 +255,7 @@ class FieldEncryption:
             "encrypted_at": str(hash(field_name)),
         }
 
-    def decrypt_field(self, encrypted_data: Dict[str, Any]) -> Any:
+    def decrypt_field(self, encrypted_data: dict[str, Any]) -> Any:
         """
         Decrypt a field value
 
@@ -276,9 +276,11 @@ class FieldEncryption:
 
         return decrypted
 
+
 # ============================================================================
 # PASSWORD HASHING (One-way)
 # ============================================================================
+
 
 class PasswordHasher:
     """Secure password hashing using bcrypt or argon2"""
@@ -299,9 +301,7 @@ class PasswordHasher:
         salt = secrets.token_bytes(32)
 
         # Hash password
-        key = hashlib.pbkdf2_hmac(
-            "sha256", password.encode(), salt, 100000 + salt_rounds * 10000
-        )
+        key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000 + salt_rounds * 10000)
 
         # Combine salt and hash
         storage = salt + key
@@ -337,9 +337,11 @@ class PasswordHasher:
         except Exception:
             return False
 
+
 # ============================================================================
 # SECURE RANDOM GENERATION
 # ============================================================================
+
 
 class SecureRandom:
     """Cryptographically secure random generation"""
@@ -360,6 +362,7 @@ class SecureRandom:
     def generate_secret_key(length: int = 64) -> str:
         """Generate a secret key"""
         return secrets.token_hex(length)
+
 
 # ============================================================================
 # GLOBAL INSTANCES

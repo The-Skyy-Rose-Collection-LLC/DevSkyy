@@ -89,7 +89,7 @@ This WordPress theme includes a fully integrated GIF logo system with responsive
 
 ## Logo Files Included
 - `TSRC-logo-40h.gif` - Extra small mobile (40x40px)
-- `TSRC-logo-50h.gif` - Small mobile (50x50px) 
+- `TSRC-logo-50h.gif` - Small mobile (50x50px)
 - `TSRC-logo-60h.gif` - Desktop/tablet (60x60px)
 - `TSRC-logo-80h.gif` - Large desktop (80x80px)
 
@@ -156,7 +156,7 @@ cat > "$PACKAGE_DIR/LOGO-CUSTOMIZATION-GUIDE.css" << 'EOF'
    SKYY ROSE COLLECTION - LOGO CUSTOMIZATION GUIDE
    ========================================================================== */
 
-/* 
+/*
    This file contains examples of how to customize the logo appearance.
    Copy the desired styles to your theme's style.css or child theme.
 */
@@ -285,7 +285,7 @@ Logo files: TSRC-logo-40h.gif, TSRC-logo-50h.gif, TSRC-logo-60h.gif, TSRC-logo-8
 Package: skyy-rose-collection-with-logo-${TIMESTAMP}.zip"
 
     echo -e "${GREEN}✅ Changes committed to Git${NC}"
-    
+
     # Push to remote
     git push origin main
     echo -e "${GREEN}✅ Changes pushed to remote repository${NC}"

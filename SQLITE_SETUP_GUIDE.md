@@ -279,12 +279,12 @@ When ready to scale, migrate to PostgreSQL:
    from database import db_manager
    from sqlalchemy import select
    from models_sqlalchemy import User, Product, Customer
-   
+
    async def export_data():
        async with db_manager.get_session() as db:
            # Export logic here
            pass
-   
+
    asyncio.run(export_data())
    "
    ```
@@ -377,6 +377,6 @@ asyncio.run(init_db())
 *The database automatically initializes on application startup.*
 *No manual setup required for basic usage.*
 
-**Last Updated:** 2024-10-24  
-**Version:** 2.0.0  
+**Last Updated:** 2024-10-24
+**Version:** 2.0.0
 **Status:** ✅ PRODUCTION READY

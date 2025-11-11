@@ -3,17 +3,15 @@ Unit tests for ApprovalSystem
 Tests human review queue and approval workflow management
 """
 
-import pytest
-import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-import tempfile
 import shutil
+import sqlite3
+import tempfile
 
-from fashion_ai_bounded_autonomy.approval_system import (
-    ApprovalSystem,
-    ApprovalWorkflowType
-)
+import pytest
+
+from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
 
 
 @pytest.fixture
@@ -44,19 +42,19 @@ class TestApprovalSystemInitialization:
         ApprovalSystem(db_path=temp_db_path)
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
-        
+
         # Check review_queue table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='review_queue'")
         assert cursor.fetchone() is not None
-        
+
         # Check approval_history table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='approval_history'")
         assert cursor.fetchone() is not None
-        
+
         # Check operator_activity table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='operator_activity'")
         assert cursor.fetchone() is not None
-        
+
         conn.close()
 
     def test_init_creates_parent_directory(self, temp_db_path):
@@ -77,9 +75,9 @@ class TestSubmitForReview:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         assert result["action_id"] == "test_action_001"
         assert result["status"] == "submitted"
         assert result["workflow"] == "default"
@@ -94,9 +92,9 @@ class TestSubmitForReview:
             function_name="test_function",
             parameters={"param1": "value1"},
             risk_level="critical",
-            workflow_type=ApprovalWorkflowType.HIGH_RISK
+            workflow_type=ApprovalWorkflowType.HIGH_RISK,
         )
-        
+
         assert result["workflow"] == "high_risk"
 
     @pytest.mark.asyncio
@@ -108,13 +106,13 @@ class TestSubmitForReview:
             function_name="test_function",
             parameters={"param1": "value1"},
             risk_level="low",
-            timeout_hours=48
+            timeout_hours=48,
         )
-        
+
         timeout_at = datetime.fromisoformat(result["timeout_at"])
         created_at = datetime.now()
         time_diff = (timeout_at - created_at).total_seconds() / 3600
-        
+
         assert 47 <= time_diff <= 49  # Allow for timing variations
 
     @pytest.mark.asyncio
@@ -125,9 +123,9 @@ class TestSubmitForReview:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         details = await approval_system.get_action_details("test_action_004")
         assert len(details["history"]) == 1
         assert details["history"][0]["event"] == "submitted"
@@ -145,16 +143,14 @@ class TestApproveAction:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         # Approve action
         result = await approval_system.approve(
-            action_id="test_action_005",
-            operator="test_operator",
-            notes="Test approval"
+            action_id="test_action_005", operator="test_operator", notes="Test approval"
         )
-        
+
         assert result["action_id"] == "test_action_005"
         assert result["status"] == "approved"
         assert result["approved_by"] == "test_operator"
@@ -163,11 +159,8 @@ class TestApproveAction:
     @pytest.mark.asyncio
     async def test_approve_nonexistent_action(self, approval_system):
         """Test approving non-existent action returns error"""
-        result = await approval_system.approve(
-            action_id="nonexistent_action",
-            operator="test_operator"
-        )
-        
+        result = await approval_system.approve(action_id="nonexistent_action", operator="test_operator")
+
         assert "error" in result
         assert result["status"] == "error"
 
@@ -180,19 +173,13 @@ class TestApproveAction:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        await approval_system.approve(
-            action_id="test_action_006",
-            operator="test_operator"
-        )
-        
+        await approval_system.approve(action_id="test_action_006", operator="test_operator")
+
         # Try to approve again
-        result = await approval_system.approve(
-            action_id="test_action_006",
-            operator="test_operator"
-        )
-        
+        result = await approval_system.approve(action_id="test_action_006", operator="test_operator")
+
         assert "error" in result
         assert "approved" in result["error"].lower()
 
@@ -206,26 +193,20 @@ class TestApproveAction:
             function_name="test_function",
             parameters={"param1": "value1"},
             risk_level="medium",
-            timeout_hours=0  # Immediate expiry
+            timeout_hours=0,  # Immediate expiry
         )
-        
+
         # Manually set timeout to past
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
         past_time = (datetime.now() - timedelta(hours=1)).isoformat()
-        cursor.execute(
-            "UPDATE review_queue SET timeout_at = ? WHERE action_id = ?",
-            (past_time, "test_action_007")
-        )
+        cursor.execute("UPDATE review_queue SET timeout_at = ? WHERE action_id = ?", (past_time, "test_action_007"))
         conn.commit()
         conn.close()
-        
+
         # Try to approve
-        result = await approval_system.approve(
-            action_id="test_action_007",
-            operator="test_operator"
-        )
-        
+        result = await approval_system.approve(action_id="test_action_007", operator="test_operator")
+
         assert result["status"] == "expired"
 
     @pytest.mark.asyncio
@@ -236,24 +217,18 @@ class TestApproveAction:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
-        await approval_system.approve(
-            action_id="test_action_008",
-            operator="test_operator"
-        )
-        
+
+        await approval_system.approve(action_id="test_action_008", operator="test_operator")
+
         # Check operator activity
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT * FROM operator_activity WHERE action_id = ?",
-            ("test_action_008",)
-        )
+        cursor.execute("SELECT * FROM operator_activity WHERE action_id = ?", ("test_action_008",))
         activity = cursor.fetchone()
         conn.close()
-        
+
         assert activity is not None
 
 
@@ -268,15 +243,13 @@ class TestRejectAction:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         result = await approval_system.reject(
-            action_id="test_action_009",
-            operator="test_operator",
-            reason="Security concerns"
+            action_id="test_action_009", operator="test_operator", reason="Security concerns"
         )
-        
+
         assert result["action_id"] == "test_action_009"
         assert result["status"] == "rejected"
         assert result["rejected_by"] == "test_operator"
@@ -285,12 +258,8 @@ class TestRejectAction:
     @pytest.mark.asyncio
     async def test_reject_nonexistent_action(self, approval_system):
         """Test rejecting non-existent action returns error"""
-        result = await approval_system.reject(
-            action_id="nonexistent_action",
-            operator="test_operator",
-            reason="Test"
-        )
-        
+        result = await approval_system.reject(action_id="nonexistent_action", operator="test_operator", reason="Test")
+
         assert "error" in result
 
     @pytest.mark.asyncio
@@ -301,15 +270,11 @@ class TestRejectAction:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
-        await approval_system.reject(
-            action_id="test_action_010",
-            operator="test_operator",
-            reason="Test rejection"
-        )
-        
+
+        await approval_system.reject(action_id="test_action_010", operator="test_operator", reason="Test rejection")
+
         details = await approval_system.get_action_details("test_action_010")
         history_events = [h["event"] for h in details["history"]]
         assert "rejected" in history_events
@@ -332,9 +297,9 @@ class TestGetPendingActions:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         actions = await approval_system.get_pending_actions()
         assert len(actions) == 1
         assert actions[0]["action_id"] == "test_action_011"
@@ -348,9 +313,9 @@ class TestGetPendingActions:
                 agent_name="test_agent",
                 function_name="test_function",
                 parameters={"param1": "value1"},
-                risk_level="medium"
+                risk_level="medium",
             )
-        
+
         actions = await approval_system.get_pending_actions()
         assert len(actions) == 5
 
@@ -362,18 +327,18 @@ class TestGetPendingActions:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
         await approval_system.submit_for_review(
             action_id="test_action_013",
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         await approval_system.approve("test_action_012", "operator")
-        
+
         actions = await approval_system.get_pending_actions()
         action_ids = [a["action_id"] for a in actions]
         assert "test_action_012" not in action_ids
@@ -391,11 +356,11 @@ class TestGetActionDetails:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1", "param2": 42},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         details = await approval_system.get_action_details("test_action_014")
-        
+
         assert details["action_id"] == "test_action_014"
         assert details["agent_name"] == "test_agent"
         assert details["function_name"] == "test_function"
@@ -423,15 +388,12 @@ class TestMarkExecuted:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
         await approval_system.approve("test_action_015", "operator")
-        
-        result = await approval_system.mark_executed(
-            "test_action_015",
-            {"output": "success", "duration": 1.5}
-        )
-        
+
+        result = await approval_system.mark_executed("test_action_015", {"output": "success", "duration": 1.5})
+
         assert result is True
 
     @pytest.mark.asyncio
@@ -442,14 +404,11 @@ class TestMarkExecuted:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
-        result = await approval_system.mark_executed(
-            "test_action_016",
-            {"output": "success"}
-        )
-        
+
+        result = await approval_system.mark_executed("test_action_016", {"output": "success"})
+
         assert result is False
 
 
@@ -465,20 +424,17 @@ class TestCleanupExpired:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         # Manually expire the action
         conn = sqlite3.connect(temp_db_path)
         cursor = conn.cursor()
         past_time = (datetime.now() - timedelta(hours=1)).isoformat()
-        cursor.execute(
-            "UPDATE review_queue SET timeout_at = ? WHERE action_id = ?",
-            (past_time, "test_action_017")
-        )
+        cursor.execute("UPDATE review_queue SET timeout_at = ? WHERE action_id = ?", (past_time, "test_action_017"))
         conn.commit()
         conn.close()
-        
+
         count = await approval_system.cleanup_expired()
         assert count == 1
 
@@ -491,9 +447,9 @@ class TestCleanupExpired:
             function_name="test_function",
             parameters={"param1": "value1"},
             risk_level="medium",
-            timeout_hours=24
+            timeout_hours=24,
         )
-        
+
         count = await approval_system.cleanup_expired()
         assert count == 0
 
@@ -511,10 +467,10 @@ class TestOperatorStatistics:
                 agent_name="test_agent",
                 function_name="test_function",
                 parameters={"param1": "value1"},
-                risk_level="medium"
+                risk_level="medium",
             )
             await approval_system.approve(f"test_action_{i}", "operator1")
-        
+
         stats = await approval_system.get_operator_statistics("operator1")
         assert stats["approve"] == 3
 
@@ -527,19 +483,19 @@ class TestOperatorStatistics:
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
         await approval_system.approve("test_action_019", "operator1")
-        
+
         await approval_system.submit_for_review(
             action_id="test_action_020",
             agent_name="test_agent",
             function_name="test_function",
             parameters={"param1": "value1"},
-            risk_level="medium"
+            risk_level="medium",
         )
         await approval_system.reject("test_action_020", "operator2", "Test")
-        
+
         stats = await approval_system.get_operator_statistics()
         assert "operator1" in stats
         assert "operator2" in stats
@@ -556,31 +512,27 @@ class TestEdgeCases:
             agent_name="test_agent",
             function_name="test_function",
             parameters={},
-            risk_level="low"
+            risk_level="low",
         )
-        
+
         assert result["status"] == "submitted"
 
     @pytest.mark.asyncio
     async def test_submit_with_complex_parameters(self, approval_system):
         """Test submitting action with complex nested parameters"""
         complex_params = {
-            "nested": {
-                "level1": {
-                    "level2": ["item1", "item2"]
-                }
-            },
+            "nested": {"level1": {"level2": ["item1", "item2"]}},
             "array": [1, 2, 3, 4, 5],
-            "mixed": {"key": "value", "number": 42}
+            "mixed": {"key": "value", "number": 42},
         }
-        
+
         await approval_system.submit_for_review(
             action_id="test_action_022",
             agent_name="test_agent",
             function_name="test_function",
             parameters=complex_params,
-            risk_level="medium"
+            risk_level="medium",
         )
-        
+
         details = await approval_system.get_action_details("test_action_022")
         assert details["parameters"] == complex_params

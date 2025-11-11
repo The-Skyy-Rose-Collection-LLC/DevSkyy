@@ -297,24 +297,24 @@ Brand Story:
 All agent outputs must pass these quality gates:
 
 ### Visual Content
-✅ Includes brand colors  
-✅ Matches photography style guidelines  
-✅ Includes logo watermark  
-✅ Minimum 2000px resolution  
+✅ Includes brand colors
+✅ Matches photography style guidelines
+✅ Includes logo watermark
+✅ Minimum 2000px resolution
 ✅ Color accuracy (Delta E < 2.0)
 
 ### Written Content
-✅ Uses brand voice and tone  
-✅ Avoids prohibited terms  
-✅ Includes "The Skyy Rose Collection" brand name  
-✅ Tone analysis score > 85%  
+✅ Uses brand voice and tone
+✅ Avoids prohibited terms
+✅ Includes "The Skyy Rose Collection" brand name
+✅ Tone analysis score > 85%
 ✅ Readability grade: 10-12
 
 ### Video Content
-✅ Matches brand aesthetic  
-✅ Uses approved music  
-✅ Minimum 1080p resolution  
-✅ Brand logo placement  
+✅ Matches brand aesthetic
+✅ Uses approved music
+✅ Minimum 1080p resolution
+✅ Brand logo placement
 ✅ Color grading with brand palette
 
 ---

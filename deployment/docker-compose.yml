@@ -4,7 +4,7 @@ services:
   # ============================================================================
   # API INTEGRATION CORE SERVICES
   # ============================================================================
-  
+
   api-gateway:
     build:
       context: ..
@@ -32,7 +32,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-  
+
   workflow-engine:
     build:
       context: ..
@@ -59,7 +59,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-  
+
   fashion-api-integrator:
     build:
       context: ..
@@ -83,7 +83,7 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   fashion-intelligence:
     build:
       context: ..
@@ -102,11 +102,11 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   # ============================================================================
   # INFRASTRUCTURE SERVICES
   # ============================================================================
-  
+
   redis:
     image: redis:7-alpine
     container_name: devskyy-redis
@@ -124,7 +124,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   elasticsearch:
     image: elasticsearch:8.11.0
     container_name: devskyy-elasticsearch
@@ -151,11 +151,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-  
+
   # ============================================================================
   # MONITORING & OBSERVABILITY
   # ============================================================================
-  
+
   prometheus:
     image: prom/prometheus:latest
     container_name: devskyy-prometheus
@@ -174,7 +174,7 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   grafana:
     image: grafana/grafana:latest
     container_name: devskyy-grafana
@@ -193,7 +193,7 @@ services:
     restart: unless-stopped
     depends_on:
       - prometheus
-  
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: devskyy-jaeger
@@ -205,11 +205,11 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   # ============================================================================
   # LOAD BALANCER & REVERSE PROXY
   # ============================================================================
-  
+
   nginx:
     image: nginx:alpine
     container_name: devskyy-nginx
@@ -233,11 +233,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-  
+
   # ============================================================================
   # FASHION INDUSTRY SPECIFIC SERVICES
   # ============================================================================
-  
+
   trend-analyzer:
     build:
       context: ..
@@ -258,7 +258,7 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   sustainability-tracker:
     build:
       context: ..
@@ -278,11 +278,11 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-  
+
   # ============================================================================
   # BACKUP & MAINTENANCE
   # ============================================================================
-  
+
   backup-service:
     image: alpine:latest
     container_name: devskyy-backup

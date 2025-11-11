@@ -71,7 +71,7 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             audience="devskyy-api",
             issuer="devskyy-platform"
         )
-        
+
         # Extract token data
         token_data = TokenData(
             user_id=payload.get("user_id"),
@@ -81,16 +81,16 @@ def verify_token(token: str, token_type: str = "access") -> TokenData:
             token_type=payload.get("token_type", "access"),
             exp=datetime.fromtimestamp(payload.get("exp"))
         )
-        
+
         # Enhanced security validation
         if not validate_token_security(token, token_data):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token security validation failed"
             )
-        
+
         return token_data
-        
+
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -112,21 +112,21 @@ def verify_auth0_token(token: str) -> TokenPayload:
     try:
         # Get Auth0 public keys
         jwks = get_auth0_public_key()
-        
+
         # Decode token header
         unverified_header = jwt.get_unverified_header(token)
         key_id = unverified_header.get("kid")
-        
+
         # Find correct key
         key = None
         for jwk in jwks["keys"]:
             if jwk["kid"] == key_id:
                 key = jwk
                 break
-        
+
         if not key:
             raise JWTError("Unable to find appropriate key")
-        
+
         # Verify and decode token
         payload = jwt.decode(
             token,
@@ -135,9 +135,9 @@ def verify_auth0_token(token: str) -> TokenPayload:
             audience=AUTH0_AUDIENCE,
             issuer=f"https://{AUTH0_DOMAIN}/"
         )
-        
+
         return TokenPayload(**payload)
-        
+
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -160,26 +160,26 @@ def require_permissions(required_permissions: List[str]):
         current_user: TokenData = Depends(get_current_active_user)
     ):
         user = user_manager.get_user_by_id(current_user.user_id)
-        
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
-        
+
         # Check if user has required permissions
         user_permissions = set(user.permissions)
         required_permissions_set = set(required_permissions)
-        
+
         if not required_permissions_set.issubset(user_permissions):
             missing_permissions = required_permissions_set - user_permissions
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Missing permissions: {', '.join(missing_permissions)}"
             )
-        
+
         return current_user
-    
+
     return permission_checker
 
 # Usage example
@@ -223,32 +223,32 @@ def validate_password_strength(cls, v):
     """Validate password strength with enterprise requirements."""
     if len(v) < 8:
         raise ValueError("Password must be at least 8 characters long")
-    
+
     if len(v) > 128:
         raise ValueError("Password must not exceed 128 characters")
-    
+
     # Check for character requirements
     if not re.search(r"[A-Z]", v):
         raise ValueError("Password must contain at least one uppercase letter")
-    
+
     if not re.search(r"[a-z]", v):
         raise ValueError("Password must contain at least one lowercase letter")
-    
+
     if not re.search(r"\d", v):
         raise ValueError("Password must contain at least one digit")
-    
+
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
         raise ValueError("Password must contain at least one special character")
-    
+
     # Check for common patterns
     if re.search(r"(.)\1{2,}", v):
         raise ValueError("Password cannot contain repeated characters")
-    
+
     # Check against common passwords (simplified)
     common_passwords = ["password", "123456", "qwerty", "admin"]
     if v.lower() in common_passwords:
         raise ValueError("Password is too common")
-    
+
     return v
 ```
 
@@ -258,7 +258,7 @@ def validate_password_strength(cls, v):
 # Password history tracking
 class PasswordHistory(Base):
     __tablename__ = "password_history"
-    
+
     id = Column(Integer, primary_key=True)
     user_id = Column(String, ForeignKey("users.user_id"))
     password_hash = Column(String, nullable=False)
@@ -273,13 +273,13 @@ def check_password_history(user_id: str, new_password: str, history_size: int = 
             .order_by(PasswordHistory.created_at.desc())\
             .limit(history_size)\
             .all()
-        
+
         for old_password in recent_passwords:
             if verify_password(new_password, old_password.password_hash):
                 return False  # Password was used recently
-        
+
         return True  # Password is new
-        
+
     finally:
         db.close()
 ```
@@ -306,7 +306,7 @@ def blacklist_token(token: str, reason: str = "logout"):
         # Decode token to get expiration
         payload = jwt.decode(token, SECRET_KEY, algorithms=[JWT_ALGORITHM])
         exp = payload.get("exp")
-        
+
         # Store in Redis with expiration
         redis_client.setex(
             f"blacklist:{token}",
@@ -316,9 +316,9 @@ def blacklist_token(token: str, reason: str = "logout"):
                 "blacklisted_at": datetime.utcnow().isoformat()
             })
         )
-        
+
         logger.info(f"Token blacklisted: {reason}")
-        
+
     except Exception as e:
         logger.error(f"Failed to blacklist token: {e}")
 
@@ -337,23 +337,23 @@ def is_token_blacklisted(token: str) -> bool:
 ```python
 def validate_token_security(token: str, token_data: TokenData) -> bool:
     """Enhanced token security validation."""
-    
+
     # Check if token is blacklisted
     if is_token_blacklisted(token):
         logger.warning(f"Blacklisted token used: {token_data.email}")
         return False
-    
+
     # Check token age
     token_age = datetime.utcnow() - (token_data.exp - timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     if token_age > timedelta(hours=24):
         logger.warning(f"Old token used: {token_data.email}, age: {token_age}")
         return False
-    
+
     # Check for suspicious patterns
     if token_data.token_type != "access":
         logger.warning(f"Wrong token type used for access: {token_data.email}")
         return False
-    
+
     return True
 ```
 
@@ -369,23 +369,23 @@ LOCKOUT_DURATION_MINUTES = 15
 def record_failed_login(email: str, ip_address: str = ""):
     """Record failed login attempt."""
     key = f"failed_login:{email}"
-    
+
     try:
         # Get current count
         current_count = redis_client.get(key)
         count = int(current_count) if current_count else 0
-        
+
         # Increment count
         count += 1
-        
+
         # Set with expiration
         redis_client.setex(key, LOCKOUT_DURATION_MINUTES * 60, count)
-        
+
         # Log security event
         logger.warning(f"Failed login attempt {count}/{MAX_LOGIN_ATTEMPTS} for {email} from {ip_address}")
-        
+
         return count
-        
+
     except Exception as e:
         logger.error(f"Failed to record login attempt: {e}")
         return 0
@@ -395,12 +395,12 @@ def is_account_locked(email: str) -> bool:
     try:
         key = f"failed_login:{email}"
         count = redis_client.get(key)
-        
+
         if count and int(count) >= MAX_LOGIN_ATTEMPTS:
             return True
-        
+
         return False
-        
+
     except Exception:
         return False  # Fail open if Redis unavailable
 
@@ -419,7 +419,7 @@ def clear_failed_login_attempts(email: str):
 # Secure session management
 class UserSession(Base):
     __tablename__ = "user_sessions"
-    
+
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.user_id"))
     token_hash = Column(String, nullable=False)  # Hash of the token
@@ -436,7 +436,7 @@ def create_user_session(user: User, token: str, request: Request) -> UserSession
     try:
         # Hash token for storage
         token_hash = hashlib.sha256(token.encode()).hexdigest()
-        
+
         session = UserSession(
             user_id=user.user_id,
             token_hash=token_hash,
@@ -444,12 +444,12 @@ def create_user_session(user: User, token: str, request: Request) -> UserSession
             user_agent=request.headers.get("user-agent", ""),
             expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         )
-        
+
         db.add(session)
         db.commit()
-        
+
         return session
-        
+
     finally:
         db.close()
 ```
@@ -464,7 +464,7 @@ def validate_no_sql_injection(value: str) -> str:
     """Validate input for SQL injection patterns."""
     if not value:
         return value
-    
+
     # SQL injection patterns
     sql_patterns = [
         r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)",
@@ -473,11 +473,11 @@ def validate_no_sql_injection(value: str) -> str:
         r"(\b(OR|AND)\s+['\"]?\w+['\"]?\s*=\s*['\"]?\w+['\"]?)",
         r"(;|\||&)",
     ]
-    
+
     for pattern in sql_patterns:
         if re.search(pattern, value, re.IGNORECASE):
             raise ValueError(f"Input contains potentially malicious content: {pattern}")
-    
+
     return value
 ```
 
@@ -492,7 +492,7 @@ def validate_no_xss(value: str) -> str:
     """Validate input for XSS patterns."""
     if not value:
         return value
-    
+
     # XSS patterns
     xss_patterns = [
         r"<script[^>]*>.*?</script>",
@@ -502,22 +502,22 @@ def validate_no_xss(value: str) -> str:
         r"<object[^>]*>.*?</object>",
         r"<embed[^>]*>.*?</embed>",
     ]
-    
+
     for pattern in xss_patterns:
         if re.search(pattern, value, re.IGNORECASE):
             raise ValueError(f"Input contains potentially malicious content: {pattern}")
-    
+
     return value
 
 def sanitize_html_input(value: str) -> str:
     """Sanitize HTML input using bleach."""
     if not value:
         return value
-    
+
     # Allow only safe tags and attributes
     allowed_tags = ['b', 'i', 'u', 'em', 'strong', 'p', 'br']
     allowed_attributes = {}
-    
+
     # Clean the input
     cleaned = bleach.clean(
         value,
@@ -525,7 +525,7 @@ def sanitize_html_input(value: str) -> str:
         attributes=allowed_attributes,
         strip=True
     )
-    
+
     # HTML escape for extra safety
     return html.escape(cleaned)
 ```
@@ -539,7 +539,7 @@ def sanitize_html_input(value: str) -> str:
 class RateLimiter:
     def __init__(self, redis_client):
         self.redis = redis_client
-    
+
     async def check_rate_limit(
         self,
         key: str,
@@ -548,31 +548,31 @@ class RateLimiter:
         identifier: str = "ip"
     ) -> Tuple[bool, Dict[str, int]]:
         """Check if request is within rate limit."""
-        
+
         current_time = int(time.time())
         window_start = current_time - window
-        
+
         # Use sliding window log
         pipe = self.redis.pipeline()
-        
+
         # Remove old entries
         pipe.zremrangebyscore(key, 0, window_start)
-        
+
         # Count current requests
         pipe.zcard(key)
-        
+
         # Add current request
         pipe.zadd(key, {str(current_time): current_time})
-        
+
         # Set expiration
         pipe.expire(key, window)
-        
+
         results = pipe.execute()
         current_requests = results[1]
-        
+
         # Check if limit exceeded
         allowed = current_requests < limit
-        
+
         return allowed, {
             "limit": limit,
             "remaining": max(0, limit - current_requests - 1),
@@ -584,14 +584,14 @@ class RateLimiter:
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
     """Rate limiting middleware."""
-    
+
     # Get client identifier
     client_ip = request.client.host
     user_agent = request.headers.get("user-agent", "")
-    
+
     # Different limits for different endpoints
     endpoint = request.url.path
-    
+
     if endpoint.startswith("/api/v1/auth/login"):
         limit, window = 10, 900  # 10 requests per 15 minutes
     elif endpoint.startswith("/api/v1/auth/register"):
@@ -600,7 +600,7 @@ async def rate_limit_middleware(request: Request, call_next):
         limit, window = 100, 3600  # 100 requests per hour
     else:
         limit, window = 1000, 3600  # 1000 requests per hour
-    
+
     # Check rate limit
     rate_limiter = RateLimiter(redis_client)
     allowed, info = await rate_limiter.check_rate_limit(
@@ -608,7 +608,7 @@ async def rate_limit_middleware(request: Request, call_next):
         limit,
         window
     )
-    
+
     if not allowed:
         return JSONResponse(
             status_code=429,
@@ -620,13 +620,13 @@ async def rate_limit_middleware(request: Request, call_next):
                 "Retry-After": str(window)
             }
         )
-    
+
     # Add rate limit headers
     response = await call_next(request)
     response.headers["X-RateLimit-Limit"] = str(info["limit"])
     response.headers["X-RateLimit-Remaining"] = str(info["remaining"])
     response.headers["X-RateLimit-Reset"] = str(info["reset"])
-    
+
     return response
 ```
 
@@ -639,7 +639,7 @@ async def rate_limit_middleware(request: Request, call_next):
 class SecurityLogger:
     def __init__(self):
         self.logger = logging.getLogger("security")
-        
+
     def log_auth_event(
         self,
         event_type: str,
@@ -651,7 +651,7 @@ class SecurityLogger:
         severity: str = "INFO"
     ):
         """Log security authentication event."""
-        
+
         event_data = {
             "timestamp": datetime.utcnow().isoformat(),
             "event_type": event_type,
@@ -662,7 +662,7 @@ class SecurityLogger:
             "details": details or {},
             "severity": severity
         }
-        
+
         # Log to file/database
         if severity == "ERROR":
             self.logger.error(f"Security Event: {json.dumps(event_data)}")
@@ -670,10 +670,10 @@ class SecurityLogger:
             self.logger.warning(f"Security Event: {json.dumps(event_data)}")
         else:
             self.logger.info(f"Security Event: {json.dumps(event_data)}")
-        
+
         # Send to monitoring system (e.g., Datadog, New Relic)
         self._send_to_monitoring(event_data)
-    
+
     def _send_to_monitoring(self, event_data: Dict[str, Any]):
         """Send security event to monitoring system."""
         # Implementation depends on monitoring system
@@ -719,7 +719,7 @@ security_logger.log_auth_event(
 class SecurityMonitor:
     def __init__(self):
         self.redis = redis_client
-        
+
     async def detect_suspicious_activity(
         self,
         user_id: str,
@@ -727,30 +727,30 @@ class SecurityMonitor:
         event_type: str
     ) -> bool:
         """Detect suspicious authentication activity."""
-        
+
         # Check for multiple IPs
         ip_key = f"user_ips:{user_id}"
         self.redis.sadd(ip_key, ip_address)
         self.redis.expire(ip_key, 3600)  # 1 hour
-        
+
         ip_count = self.redis.scard(ip_key)
         if ip_count > 5:  # More than 5 IPs in 1 hour
             return True
-        
+
         # Check for rapid requests
         request_key = f"user_requests:{user_id}"
         current_time = int(time.time())
-        
+
         self.redis.zadd(request_key, {str(current_time): current_time})
         self.redis.zremrangebyscore(request_key, 0, current_time - 300)  # 5 minutes
         self.redis.expire(request_key, 300)
-        
+
         request_count = self.redis.zcard(request_key)
         if request_count > 50:  # More than 50 requests in 5 minutes
             return True
-        
+
         return False
-    
+
     async def check_geolocation_anomaly(
         self,
         user_id: str,
@@ -767,14 +767,14 @@ security_monitor = SecurityMonitor()
 @router.post("/login")
 async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     # ... authentication logic ...
-    
+
     # Check for suspicious activity
     is_suspicious = await security_monitor.detect_suspicious_activity(
         user.user_id,
         request.client.host,
         "login"
     )
-    
+
     if is_suspicious:
         security_logger.log_auth_event(
             event_type="suspicious_activity_detected",
@@ -784,7 +784,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
             details={"activity_type": "multiple_ips_or_rapid_requests"},
             severity="WARNING"
         )
-        
+
         # Optional: Require additional verification
         # or temporarily lock account
 ```
@@ -798,19 +798,19 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
     """Add comprehensive security headers."""
-    
+
     response = await call_next(request)
-    
+
     # Security headers
     security_headers = {
         # Prevent XSS attacks
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
         "X-XSS-Protection": "1; mode=block",
-        
+
         # HTTPS enforcement
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-        
+
         # Content Security Policy
         "Content-Security-Policy": (
             "default-src 'self'; "
@@ -822,10 +822,10 @@ async def security_headers_middleware(request: Request, call_next):
             "base-uri 'self'; "
             "form-action 'self'"
         ),
-        
+
         # Referrer Policy
         "Referrer-Policy": "strict-origin-when-cross-origin",
-        
+
         # Permissions Policy
         "Permissions-Policy": (
             "geolocation=(), "
@@ -837,15 +837,15 @@ async def security_headers_middleware(request: Request, call_next):
             "gyroscope=(), "
             "speaker=()"
         ),
-        
+
         # Remove server information
         "Server": "DevSkyy-API"
     }
-    
+
     # Add headers to response
     for header, value in security_headers.items():
         response.headers[header] = value
-    
+
     return response
 ```
 

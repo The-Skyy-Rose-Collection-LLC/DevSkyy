@@ -20,15 +20,16 @@ Features:
 - Theme options panel generation
 """
 
+from datetime import datetime
 import logging
 import os
-import zipfile
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
+import zipfile
 
 from anthropic import AsyncAnthropic
 from openai import AsyncOpenAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -110,9 +111,9 @@ class WordPressFullStackThemeBuilderAgent:
         self,
         theme_name: str,
         theme_description: str,
-        features: List[str],
+        features: list[str],
         target_audience: str = "luxury fashion customers",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate a complete WordPress theme with all files and features.
         """
@@ -184,7 +185,7 @@ class WordPressFullStackThemeBuilderAgent:
 
     async def _generate_theme_foundation(
         self, name: str, slug: str, description: str, audience: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate theme foundation using AI reasoning.
         """
@@ -229,9 +230,7 @@ Provide detailed, production-ready specifications."""
             logger.error(f"Foundation generation failed: {e}")
             return {}
 
-    async def _create_style_css(
-        self, theme_path: Path, foundation: Dict[str, Any]
-    ) -> None:
+    async def _create_style_css(self, theme_path: Path, foundation: dict[str, Any]) -> None:
         """
         Create style.css with theme header.
         """
@@ -381,9 +380,7 @@ h1, h2, h3, h4, h5, h6 {{
         style_file.write_text(style_content)
         logger.info("✅ style.css created")
 
-    async def _generate_functions_php(
-        self, theme_path: Path, features: List[str]
-    ) -> None:
+    async def _generate_functions_php(self, theme_path: Path, features: list[str]) -> None:
         """
         Generate functions.php with all theme functionality.
         """
@@ -433,9 +430,7 @@ Generate complete, production-ready PHP code."""
         except Exception as e:
             logger.error(f"functions.php generation failed: {e}")
 
-    async def _create_template_files(
-        self, theme_path: Path, foundation: Dict[str, Any]
-    ) -> None:
+    async def _create_template_files(self, theme_path: Path, foundation: dict[str, Any]) -> None:
         """
         Create all WordPress template files.
         """
@@ -458,9 +453,7 @@ Generate complete, production-ready PHP code."""
 
         logger.info(f"✅ Created {len(templates)} template files")
 
-    async def _generate_template(
-        self, template_type: str, foundation: Dict[str, Any]
-    ) -> str:
+    async def _generate_template(self, template_type: str, foundation: dict[str, Any]) -> str:
         """
         Generate individual template file using AI.
         """
@@ -584,9 +577,7 @@ Generate complete PHP class code."""
         except Exception as e:
             logger.error(f"Elementor widget generation failed: {e}")
 
-    async def _generate_elementor_widget(
-        self, widget_name: str, description: str
-    ) -> str:
+    async def _generate_elementor_widget(self, widget_name: str, description: str) -> str:
         """
         Generate individual Elementor Pro widget.
         """
@@ -779,8 +770,6 @@ theme_builder = create_theme_builder()
 
 
 # Convenience function
-async def build_wordpress_theme(
-    name: str, description: str, features: List[str]
-) -> Dict[str, Any]:
+async def build_wordpress_theme(name: str, description: str, features: list[str]) -> dict[str, Any]:
     """Build complete WordPress theme."""
     return await theme_builder.generate_complete_theme(name, description, features)
