@@ -45,6 +45,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import uuid
 
+from fastapi import HTTPException
+
 logger = logging.getLogger(__name__)
 
 
