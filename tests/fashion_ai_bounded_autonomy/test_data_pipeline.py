@@ -16,14 +16,11 @@ from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
 @pytest.fixture
 def temp_dirs():
     """
-    Provide a temporary dataflow.yaml path with a minimal pipeline configuration for tests.
+    Create a temporary dataflow.yaml file with a minimal data pipeline configuration and yield its path for tests.
     
-    The created YAML contains a minimal `data_pipeline` configuration including
-    `approved_sources`, `schemas`, and `inference_config`. The fixture yields the
-    path to the generated `dataflow.yaml` and removes the temporary directory and
-    file after the test completes.
+    The fixture writes a config containing approved sources ("csv" and "json"), a simple "test_schema", and an "inference_config" with a "test_model". After the test completes, the temporary directory and generated file are removed.
     
-    Returns:
+    Yields:
         str: Filesystem path to the generated `dataflow.yaml`.
     """
     temp_dir = tempfile.mkdtemp()
@@ -68,10 +65,10 @@ def temp_dirs():
 @pytest.fixture
 def pipeline(temp_dirs):
     """
-    Create a DataPipeline configured from the provided temporary config path.
+    Create a DataPipeline using the provided dataflow.yaml configuration path.
     
     Parameters:
-        temp_dirs (str | pathlib.Path): Path to the generated dataflow.yaml configuration file used to initialize the pipeline.
+        temp_dirs (str | pathlib.Path): Path to the directory or file containing the generated dataflow.yaml configuration used to initialize the pipeline.
     
     Returns:
         DataPipeline: An instance of DataPipeline initialized with the given config_path.
@@ -83,7 +80,11 @@ class TestDataPipelineInitialization:
     """Test data pipeline initialization"""
 
     def test_initialization(self, temp_dirs):
-        """Test basic initialization"""
+        """
+        Verify DataPipeline creates required directory paths on initialization.
+        
+        Asserts that `quarantine_path`, `validated_path`, and `output_path` exist after constructing a DataPipeline with the provided configuration path.
+        """
         pipeline = DataPipeline(config_path=temp_dirs)
         
         assert pipeline.quarantine_path.exists()

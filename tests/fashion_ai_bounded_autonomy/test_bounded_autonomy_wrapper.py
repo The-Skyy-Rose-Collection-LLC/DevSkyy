@@ -25,22 +25,24 @@ class MockAgent(BaseAgent):
 
     async def initialize(self) -> bool:
         """
-        Mark the agent as healthy and indicate successful initialization.
+        Set the agent's status to AgentStatus.HEALTHY and indicate successful initialization.
+        
+        Sets the agent's status attribute to AgentStatus.HEALTHY as a visible side effect.
         
         Returns:
-            bool: True if initialization succeeded.
+            True if initialization succeeded.
         """
         self.status = AgentStatus.HEALTHY
         return True
 
     async def execute_core_function(self, **kwargs):
         """
-        Execute the agent's core function and produce a result dictionary.
+        Execute the agent's core function and return a standardized success result.
         
         Returns:
-            result (dict): A dictionary with keys:
+            dict: A result mapping with:
                 - "status": the string "success".
-                - "data": a mapping of the keyword arguments passed to the function.
+                - "data": a dict containing the keyword arguments passed to the call.
         """
         return {"status": "success", "data": kwargs}
 
@@ -49,7 +51,7 @@ class MockAgent(BaseAgent):
         Report the agent's health status.
         
         Returns:
-            dict: A dictionary with key "status" set to "healthy".
+            dict: A dictionary with key "status" whose value is "healthy".
         """
         return {"status": "healthy"}
 
@@ -69,12 +71,10 @@ class MockAgent(BaseAgent):
         # Return an async function that simulates successful execution
         async def dynamic_method(**kwargs):
             """
-            Simulated dynamic agent method that echoes provided keyword arguments.
-            
-            This function represents a generic, dynamically created agent method used in tests. It returns a dictionary containing a success status, the name of the simulated function, and the keyword arguments passed to it under the `data` key.
+            Echoes received keyword arguments in a standardized success response for a simulated dynamic agent method.
             
             Parameters:
-                **kwargs: Arbitrary keyword arguments to be echoed back in the response.
+                **kwargs: Arbitrary keyword arguments to include in the response.
             
             Returns:
                 dict: A mapping with keys:
@@ -89,10 +89,10 @@ class MockAgent(BaseAgent):
 @pytest.fixture
 def temp_audit_dir():
     """
-    Provide a temporary directory path for audit logs and remove it after the test completes.
+    Create a temporary directory for audit logs and remove it during fixture teardown.
     
     Returns:
-        temp_dir (str): Path to the temporary directory created for audit logs. The directory is deleted during fixture teardown.
+        temp_dir (str): Path to the temporary directory created for audit logs; removed after the test finishes.
     """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir

@@ -65,10 +65,10 @@ def orchestrator():
 @pytest.fixture
 def mock_agent():
     """
-    Create a MockAgent instance configured for tests.
+    Create a MockAgent preconfigured for tests.
     
     Returns:
-        MockAgent: A MockAgent named "test_agent" with version "1.0.0".
+        MockAgent: Instance named "test_agent" with version "1.0.0".
     """
     return MockAgent("test_agent", version="1.0.0")
 

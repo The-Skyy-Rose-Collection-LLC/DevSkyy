@@ -95,7 +95,17 @@ class PerformanceTracker:
         metric_value: float,
         metadata: Optional[dict] = None
     ):
-        """Log system-wide metric"""
+        """
+        Record a system-level metric entry to the configured SQLite database.
+        
+        Parameters:
+            metric_name (str): Identifier for the metric (e.g., "cpu_usage", "memory_mb").
+            metric_value (float): Numeric value of the metric.
+            metadata (Optional[dict]): Optional additional context stored as JSON alongside the metric.
+        
+        Notes:
+            The metric is persisted to the instance's database file with an ISO 8601 timestamp.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -113,7 +123,21 @@ class PerformanceTracker:
         conn.close()
 
     async def compute_weekly_report(self) -> dict[str, Any]:
-        """Compute weekly performance summary"""
+        """
+        Produce a weekly performance report for agents and system metrics.
+        
+        Returns:
+            report (dict[str, Any]): Summary containing:
+                - period (str): Report period identifier, e.g., "weekly".
+                - start_date (str): ISO timestamp for the start of the reporting window.
+                - end_date (str): ISO timestamp for the end of the reporting window.
+                - agent_performance (dict[str, dict[str, Any]]): Mapping from agent name to metrics, where each metric maps to a stats dict with keys:
+                    - "average" (float): Average metric value over the period.
+                    - "min" (float): Minimum recorded value over the period.
+                    - "max" (float): Maximum recorded value over the period.
+                    - "samples" (int): Number of samples used to compute the stats.
+                - system_performance (dict[str, float]): Mapping from system metric name to its average value over the period.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -170,10 +194,15 @@ class PerformanceTracker:
 
     async def generate_proposals(self, report: dict[str, Any]) -> list[dict[str, Any]]:
         """
-        Generate improvement proposals based on performance data.
-
-        IMPORTANT: These are proposals only, never executed automatically.
-        Operator must review and manually implement approved changes.
+        Create improvement proposals from a weekly performance report and persist them for operator review.
+        
+        Analyzes agent and system performance metrics in `report` to produce actionable proposals (for example: slow execution time, high error rate, or high CPU usage). Each proposal is a suggestion only and is not executed automatically; proposals are saved for manual operator review and possible implementation.
+        
+        Parameters:
+            report (dict[str, Any]): Weekly performance report containing keys like `agent_performance` (mapping agent names to metric stats) and `system_performance` (system-level aggregated metrics).
+        
+        Returns:
+            list[dict[str, Any]]: A list of proposal objects. Each proposal contains metadata such as `id`, `type`, target scope (`agent` or `scope`), `issue`, `current_value`, `threshold`, `recommendation`, `priority`, `requires_testing`, and `created_at`.
         """
         proposals = []
 
@@ -237,7 +266,14 @@ class PerformanceTracker:
         return proposals
 
     async def _save_proposals(self, new_proposals: list[dict[str, Any]]):
-        """Save proposals to file"""
+        """
+        Append new proposal objects to the instance proposals file, creating or updating the JSON list on disk.
+        
+        Appends the provided list of proposal dictionaries to any existing proposals stored at self.proposals_path, writes the combined list back to disk with indentation, and ensures the proposals file is created if it did not exist.
+        
+        Parameters:
+            new_proposals (list[dict[str, Any]]): Proposals to append; each item is a proposal dictionary matching the stored proposal schema.
+        """
         existing_proposals = []
 
         if self.proposals_path.exists():
@@ -253,7 +289,15 @@ class PerformanceTracker:
         logger.info(f"📝 Saved {len(new_proposals)} proposals to {self.proposals_path}")
 
     async def get_proposals(self, status: Optional[str] = None) -> list[dict[str, Any]]:
-        """Get all proposals, optionally filtered by status"""
+        """
+        Return the list of saved proposals, optionally filtered by proposal `status`.
+        
+        Parameters:
+            status (Optional[str]): If provided, only proposals whose `"status"` field equals this value are returned.
+        
+        Returns:
+            list[dict[str, Any]]: A list of proposal objects; returns an empty list if the proposals file does not exist.
+        """
         if not self.proposals_path.exists():
             return []
 
@@ -272,7 +316,19 @@ class PerformanceTracker:
         operator: str,
         notes: Optional[str] = None
     ) -> dict[str, Any]:
-        """Update proposal status (approved/rejected/implemented)"""
+        """
+        Update the review status and metadata for a stored proposal.
+        
+        Parameters:
+            proposal_id (str): Unique identifier of the proposal to update.
+            status (str): New status to set (e.g., "approved", "rejected", "implemented").
+            operator (str): Name or identifier of the operator performing the update.
+            notes (Optional[str]): Optional review notes to attach to the proposal.
+        
+        Returns:
+            result (dict): If successful, returns {"status": "updated", "proposal": <updated proposal dict>}.
+                           If the proposals store is missing or the proposal id is not found, returns {"error": <message>}.
+        """
         if not self.proposals_path.exists():
             return {"error": "No proposals found"}
 
@@ -297,7 +353,23 @@ class PerformanceTracker:
         return {"error": "Proposal not found"}
 
     async def get_kpi_summary(self, days: int = 7) -> dict[str, Any]:
-        """Get KPI summary for specified period"""
+        """
+        Summarize per-agent KPIs over the most recent time window.
+        
+        Produces per-agent statistics computed from the 'execution_time' entries in the agent_metrics table for the past `days` days. The agent KPIs include:
+        - `active_days`: number of distinct days the agent reported execution_time,
+        - `total_operations`: total execution_time samples,
+        - `avg_execution_time`: average execution_time for the period.
+        
+        Parameters:
+        	days (int): Number of days to include in the summary window (default 7).
+        
+        Returns:
+        	summary (dict): A dictionary with keys:
+        		- "period_days" (int): the requested window size,
+        		- "agent_kpis" (dict[str, dict]): mapping agent names to their KPI dicts,
+        		- "generated_at" (str): ISO8601 timestamp when the summary was produced.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 

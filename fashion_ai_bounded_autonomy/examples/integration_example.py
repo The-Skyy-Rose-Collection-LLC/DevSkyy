@@ -55,7 +55,11 @@ class SimpleFashionAgent(BaseAgent):
 
 
 async def main():
-    """Main integration example"""
+    """
+    Run a demonstration that exercises SimpleFashionAgent instances with the bounded autonomy components.
+    
+    This coroutine performs an end-to-end integration example: it creates a BoundedOrchestrator, initializes supporting systems (approval, data pipeline, performance tracking, reporting), registers example agents with capabilities and priorities, executes a low-risk auto-approved task and a high-risk task that follows an approval workflow, logs performance metrics and generates a weekly report, retrieves and prints system status, generates a daily summary report, and prints next-step instructions for inspecting approvals, logs, and reports.
+    """
     print("=" * 70)
     print("FASHION AI BOUNDED AUTONOMY - INTEGRATION EXAMPLE")
     print("=" * 70)

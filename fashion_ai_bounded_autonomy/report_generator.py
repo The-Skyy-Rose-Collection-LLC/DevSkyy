@@ -46,7 +46,23 @@ class ReportGenerator:
         performance_data: dict[str, Any],
         approval_stats: dict[str, Any]
     ) -> Path:
-        """Generate daily operations summary"""
+        """
+        Generate the daily human-readable operations summary markdown file for the current date.
+        
+        Parameters:
+            orchestrator_status (dict[str, Any]): Orchestrator state including keys like
+                'system_status' (str), 'registered_agents' (int), 'active_tasks' (int),
+                'total_tasks' (int), and nested 'bounded_autonomy' -> 'system_controls'
+                with boolean flags 'emergency_stop', 'paused', and 'local_only'.
+            performance_data (dict[str, Any]): Performance metrics keyed by agent name under
+                'agent_performance', where each agent maps metric names to stat dicts
+                containing 'average', 'min', and 'max' numeric values.
+            approval_stats (dict[str, Any]): Approval queue statistics with keys such as
+                'pending', 'approved_today', and 'rejected_today' (integer counts).
+        
+        Returns:
+            Path: Filesystem path to the written daily summary markdown file.
+        """
         timestamp = datetime.now()
         report_date = timestamp.strftime("%Y-%m-%d")
         report_file = self.summaries_path / f"daily_summary_{report_date}.md"
@@ -109,7 +125,22 @@ Generated: {timestamp.isoformat()}
         incidents: list[dict[str, Any]],
         proposals: list[dict[str, Any]]
     ) -> Path:
-        """Generate weekly performance and improvement report"""
+        """
+        Generate a human-readable weekly markdown report summarizing performance, incidents, and improvement proposals.
+        
+        Parameters:
+            performance_data (dict[str, Any]): Report data including keys:
+                - 'start_date' / 'end_date' (str): reporting period boundaries
+                - 'agent_performance' (dict): mapping agent name -> metrics dict, where each metric entry contains
+                  'average', 'min', 'max', and 'samples'.
+            incidents (list[dict[str, Any]]): List of incident records; each record may include 'type', 'agent_name',
+                'timestamp', and 'status'.
+            proposals (list[dict[str, Any]]): List of improvement proposal records; each record may include 'id',
+                'type', 'priority', 'agent', 'recommendation', and 'status'.
+        
+        Returns:
+            Path: Path to the written weekly markdown report file.
+        """
         timestamp = datetime.now()
         report_date = timestamp.strftime("%Y-W%W")  # Year-Week number
         report_file = self.summaries_path / f"weekly_report_{report_date}.md"
@@ -185,7 +216,16 @@ Generated: {timestamp.isoformat()}
         metrics_data: dict[str, Any],
         filename: Optional[str] = None
     ) -> Path:
-        """Export metrics to CSV for analysis"""
+        """
+        Write flattened agent KPI metrics to a CSV file for external analysis.
+        
+        Parameters:
+            metrics_data: Mapping that must contain an 'agent_kpis' key whose value maps agent names to dicts of metric-name → metric-value pairs. Only entries under 'agent_kpis' are exported.
+            filename: Optional filename to use for the output CSV. If omitted, a timestamped filename is generated.
+        
+        Returns:
+            Path to the CSV file that was (or would be) written. If no metrics were present, no file is created but the target Path is still returned.
+        """
         if not filename:
             filename = f"metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
@@ -218,7 +258,17 @@ Generated: {timestamp.isoformat()}
         self,
         validation_results: list[dict[str, Any]]
     ) -> Path:
-        """Generate data validation report"""
+        """
+        Create a JSON validation report summarizing the provided validation results.
+        
+        The report includes a timestamp, total_validations, passed (count of entries with status == 'validated'), failed (count of entries with status == 'quarantined'), and details (the original validation_results). The file is written to the report generator's validation directory using the pattern validation_YYYYMMDD_HHMMSS.json.
+        
+        Parameters:
+            validation_results (list[dict[str, Any]]): List of individual validation result dictionaries; each entry is expected to include a `status` key when applicable.
+        
+        Returns:
+            Path: Path to the written JSON report file.
+        """
         timestamp = datetime.now()
         report_file = self.validation_path / f"validation_{timestamp.strftime('%Y%m%d_%H%M%S')}.json"
 
@@ -240,7 +290,22 @@ Generated: {timestamp.isoformat()}
         self,
         proposals: list[dict[str, Any]]
     ) -> Path:
-        """Generate formatted recommendations report"""
+        """
+        Generate a human-readable markdown report summarizing system improvement proposals.
+        
+        The report includes counts (total, pending, approved, implemented), groups proposals by priority (high, medium, low), and lists each proposal with an icon representing its status and its recommendation text. The file is written to the recommendations output directory with a timestamped filename.
+        
+        Parameters:
+            proposals (list[dict[str, Any]]): List of proposal records. Each proposal dict may contain:
+                - id (str): Proposal identifier.
+                - type (str): Proposal category or type.
+                - priority (str): One of 'high', 'medium', or 'low' (defaults to 'medium' if missing).
+                - status (str): One of 'pending', 'approved', 'rejected', 'implemented' (used to select a status icon).
+                - recommendation (str): Human-readable recommendation or description.
+        
+        Returns:
+            Path: Path to the generated recommendations markdown file.
+        """
         timestamp = datetime.now()
         report_file = self.recommendations_path / f"recommendations_{timestamp.strftime('%Y%m%d')}.md"
 

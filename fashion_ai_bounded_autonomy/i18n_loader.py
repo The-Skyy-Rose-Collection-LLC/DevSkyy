@@ -29,10 +29,10 @@ class TranslationLoader:
 
     def __init__(self, default_language: str = "en-US"):
         """
-        Initialize translation loader.
-
-        Args:
-            default_language: Default language code (e.g., 'en-US')
+        Create a TranslationLoader configured with a default language and load available translations.
+        
+        Parameters:
+            default_language (str): Language code to use when a translation is missing in the current language (e.g., "en-US"). Defaults to "en-US".
         """
         self.default_language = default_language
         self.current_language = default_language
@@ -43,7 +43,12 @@ class TranslationLoader:
         self._load_translations()
 
     def _load_translations(self) -> None:
-        """Load all translation files from i18n directory."""
+        """
+        Load JSON translation files from the module's i18n directory into the translations mapping.
+        
+        If the i18n directory does not exist the function logs a warning and returns without modifying translations.
+        For each `*.json` file found, the file stem is used as the language code (e.g., `en-US` from `en-US.json`), the file is read using UTF-8, and the parsed JSON is stored under `self.translations[lang_code]`. Successful loads are logged at info level; failures for individual files are logged as errors and do not stop processing other files.
+        """
         if not self.i18n_dir.exists():
             logger.warning(f"i18n directory not found: {self.i18n_dir}")
             return
@@ -59,13 +64,13 @@ class TranslationLoader:
 
     def set_language(self, language_code: str) -> bool:
         """
-        Set the current language.
-
-        Args:
-            language_code: Language code (e.g., 'es-ES', 'fr-FR')
-
+        Change the loader's current language to a loaded language code.
+        
+        Parameters:
+            language_code (str): Language code to select (e.g., "es-ES", "fr-FR").
+        
         Returns:
-            True if language was set successfully, False otherwise
+            bool: `True` if the language was set successfully, `False` otherwise.
         """
         if language_code not in self.translations:
             logger.warning(f"Language {language_code} not available. Available: {list(self.translations.keys())}")
@@ -80,23 +85,26 @@ class TranslationLoader:
         return self.current_language
 
     def get_available_languages(self) -> list[str]:
-        """Get list of available language codes."""
+        """
+        Return the list of language codes for which translations have been loaded.
+        
+        Returns:
+            list[str]: Language code strings currently available (keys of the translations mapping).
+        """
         return list(self.translations.keys())
 
     def translate(self, key: str, **kwargs) -> str:
         """
-        Get translation for a key in the current language.
-
-        Args:
-            key: Translation key in dot notation (e.g., 'approval.submitted')
-            **kwargs: Variables to substitute in the translation string
-
+        Retrieve a translated string for a dot-notated key using the current language with fallback to the default language.
+        
+        If the key is not found in the current language, the default language is consulted. If the key cannot be found in either, the key itself is returned. When `kwargs` are provided, the found translation is formatted with those variables; if a required variable is missing during formatting, the unformatted translation is returned.
+        
+        Parameters:
+            key (str): Dot-notated translation key (e.g., "approval.submitted").
+            **kwargs: Values to substitute into the translation string via `str.format`.
+        
         Returns:
-            Translated string, or key if translation not found
-
-        Example:
-            t('approval.timeout', hours=24)
-            # Returns: "Approval request will expire in 24 hours"
+            str: The translated and formatted string if found, otherwise the original `key`.
         """
         # Try current language
         translation = self._get_nested_value(self.translations.get(self.current_language, {}), key)
@@ -124,14 +132,16 @@ class TranslationLoader:
 
     def _get_nested_value(self, data: Dict[str, Any], key: str) -> Optional[str]:
         """
-        Get value from nested dictionary using dot notation.
-
-        Args:
-            data: Dictionary to search
-            key: Dot-separated key (e.g., 'approval.submitted')
-
+        Retrieve a nested string value from a dictionary using a dot-separated key.
+        
+        If the key path exists and resolves to a string, returns that string. If any segment is missing, an intermediate value is not a mapping, or the final value is not a string, returns None.
+        
+        Parameters:
+            data: Dictionary to search.
+            key: Dot-separated path (e.g., "approval.submitted").
+        
         Returns:
-            Value if found, None otherwise
+            The string value found at the path, or None if not found or not a string.
         """
         keys = key.split('.')
         current = data
@@ -168,32 +178,36 @@ def get_language() -> str:
 
 
 def get_available_languages() -> list[str]:
-    """Get list of available language codes."""
+    """
+    Return the list of loaded language codes available for translations.
+    
+    Returns:
+        list[str]: Available language codes (e.g., "en-US", "es-ES").
+    """
     return _loader.get_available_languages()
 
 
 def t(key: str, **kwargs) -> str:
     """
-    Translate a key to the current language.
-
-    Shorthand for translate function.
-
-    Args:
-        key: Translation key in dot notation
-        **kwargs: Variables to substitute
-
+    Translate a dot-notated key into the currently selected language.
+    
+    If the key is missing in the current language, the default language is used as a fallback; if still not found, the key itself is returned. Provided keyword arguments are used to format the resulting translation string.
+    
+    Parameters:
+        key (str): Translation key using dot notation (e.g., "errors.not_found").
+        **kwargs: Values to substitute into the translation string via Python formatting.
+    
     Returns:
-        Translated string
+        str: The translated and formatted string, or the original key if no translation is available.
     """
     return _loader.translate(key, **kwargs)
 
 
 def init_i18n_from_env() -> None:
     """
-    Initialize i18n from environment variable.
-
-    Reads LANGUAGE or LANG environment variable and sets it.
-    Examples: LANGUAGE=es-ES, LANG=fr-FR
+    Initialize the module language from environment variables.
+    
+    Reads the LANGUAGE or LANG environment variable, extracts the language code before any dot (for example, "es-ES" from "es-ES.UTF-8"), and attempts to set that language; logs whether initialization succeeded or failed.
     """
     env_lang = os.getenv('LANGUAGE') or os.getenv('LANG')
 

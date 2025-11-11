@@ -47,7 +47,11 @@ class ApprovalCLI:
         return f"{self.colors.get(color, '')}{text}{self.colors['END']}"
 
     async def list_pending(self):
-        """List all pending actions"""
+        """
+        Prints a formatted, colorized list of pending approval actions to the console.
+        
+        If there are pending actions, each entry shows an index, action ID, agent, function, risk level, creation time, and expiry time; the function also prints a total count and a short hint for how to review an action. If no actions are pending, prints an empty-state confirmation.
+        """
         print(self.colorize(f"\n📋 {t('cli.list_pending')}\n", "BOLD"))
 
         actions = await self.approval_system.get_pending_actions()
@@ -76,7 +80,14 @@ class ApprovalCLI:
         print("\nTo review: python -m fashion_ai_bounded_autonomy.approval_cli review <action_id>")
 
     async def review_action(self, action_id: str):
-        """Show detailed information about an action"""
+        """
+        Prints a detailed, human-readable view of the specified approval action to stdout.
+        
+        Displays identification, risk assessment, parameters, status (including approval or rejection metadata), audit trail, and execution result for the action identified by action_id. If the action is pending, also prints suggested CLI commands to approve or reject it. If no action matches action_id, prints a not-found message.
+         
+        Parameters:
+            action_id (str): The identifier of the action to display.
+        """
         details = await self.approval_system.get_action_details(action_id)
 
         if not details:
@@ -153,7 +164,16 @@ class ApprovalCLI:
             print(f"  Reject:  python -m fashion_ai_bounded_autonomy.approval_cli reject {action_id} --operator <your_name> --reason \"<reason>\"")
 
     async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
-        """Approve an action"""
+        """
+        Approve a pending action and display the outcome to the CLI.
+        
+        Approves the action identified by `action_id` on behalf of `operator`, optionally attaching `notes`. Prints a success message and the approval timestamp on success; prints an error message and returns if the approval fails.
+        
+        Parameters:
+            action_id (str): Identifier of the action to approve.
+            operator (str): Name or identifier of the operator performing the approval.
+            notes (Optional[str]): Optional free-text notes to attach to the approval.
+        """
         print(f"\n🔄 {t('cli.review_action', action_id=action_id)}...")
 
         result = await self.approval_system.approve(action_id, operator, notes)
@@ -167,7 +187,14 @@ class ApprovalCLI:
         print("\n⚠️  Note: The action will be executed by the agent system automatically.")
 
     async def reject_action(self, action_id: str, operator: str, reason: str):
-        """Reject an action"""
+        """
+        Rejects a pending approval action and records the rejection.
+        
+        Parameters:
+            action_id (str): Identifier of the action to reject.
+            operator (str): Name or identifier of the operator performing the rejection.
+            reason (str): Short explanation recorded with the rejection.
+        """
         print(f"\n🔄 {t('cli.review_action', action_id=action_id)}...")
 
         result = await self.approval_system.reject(action_id, operator, reason)
@@ -180,7 +207,15 @@ class ApprovalCLI:
         print(f"Reason: {reason}")
 
     async def show_statistics(self, operator: Optional[str] = None):
-        """Show approval statistics"""
+        """
+        Print formatted approval statistics to the terminal.
+        
+        When `operator` is provided, display a flat list of action counts for that operator.
+        When `operator` is omitted, display per-operator blocks with their action counts.
+        
+        Parameters:
+            operator (Optional[str]): If given, limit statistics to this operator's actions; otherwise show statistics for all operators.
+        """
         print(self.colorize("\n📊 APPROVAL STATISTICS\n", "BOLD"))
 
         stats = await self.approval_system.get_operator_statistics(operator)
@@ -198,13 +233,22 @@ class ApprovalCLI:
                 print()
 
     async def cleanup_expired(self):
-        """Clean up expired actions"""
+        """
+        Remove expired approval actions and print a localized summary.
+        
+        Invokes the approval system's cleanup routine to delete actions past their timeout, prints a cleanup header, and outputs a translated confirmation message that includes the number of actions removed.
+        """
         print("\n🧹 Cleaning up expired actions...")
         count = await self.approval_system.cleanup_expired()
         print(self.colorize(f"✅ {t('approval.cleanup_expired', count=count)}", "GREEN"))
 
 
 async def main():
+    """
+    Entry point for the CLI that parses command-line arguments and dispatches to ApprovalCLI commands.
+    
+    Parses subcommands (list, review, approve, reject, stats, cleanup), validates required options, invokes the corresponding async ApprovalCLI method, and prints localized error information with a traceback if an unhandled exception occurs.
+    """
     parser = argparse.ArgumentParser(
         description="Bounded Autonomy Approval CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter

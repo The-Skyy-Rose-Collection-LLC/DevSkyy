@@ -41,6 +41,14 @@ class BoundedOrchestrator(AgentOrchestrator):
         local_only: bool = True,
         auto_approve_low_risk: bool = True
     ):
+        """
+        Initialize a BoundedOrchestrator with bounded autonomy controls, approval system, and emergency controls.
+        
+        Parameters:
+            max_concurrent_tasks (int): Maximum number of tasks the orchestrator will run concurrently.
+            local_only (bool): When True, restrict agent actions to local-only execution modes where supported.
+            auto_approve_low_risk (bool): When True, automatically approve tasks assessed as low risk without human review.
+        """
         super().__init__(max_concurrent_tasks)
 
         self.local_only = local_only
@@ -67,16 +75,16 @@ class BoundedOrchestrator(AgentOrchestrator):
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
     ) -> bool:
         """
-        Register agent with bounded autonomy wrapper.
-
-        Args:
-            agent: BaseAgent instance
-            capabilities: List of capabilities
-            dependencies: Agent dependencies
-            priority: Execution priority
-
+        Register an agent with the orchestrator and wrap it with bounded-autonomy controls.
+        
+        Parameters:
+            agent (BaseAgent): The agent instance to register.
+            capabilities (list[str]): Capability names exposed by the agent.
+            dependencies (list[str], optional): Names of agents this agent depends on; may be None.
+            priority (ExecutionPriority): Execution priority to assign to the agent.
+        
         Returns:
-            True if registration successful
+            bool: `True` if the agent was registered with the base orchestrator and wrapped for bounded autonomy; `False` if base registration failed.
         """
         # Register with parent orchestrator
         success = await super().register_agent(agent, capabilities, dependencies, priority)
@@ -106,17 +114,28 @@ class BoundedOrchestrator(AgentOrchestrator):
         require_approval: Optional[bool] = None
     ) -> dict[str, Any]:
         """
-        Execute task with bounded autonomy controls.
-
-        Args:
-            task_type: Task type
-            parameters: Task parameters
-            required_capabilities: Required capabilities
-            priority: Task priority
-            require_approval: Override approval requirement
-
+        Queue or execute a task under bounded-autonomy controls, performing risk assessment and submitting for human approval when required.
+        
+        Parameters:
+            task_type (str): Identifier of the action to perform.
+            parameters (dict[str, Any]): Parameters passed to the task's execution.
+            required_capabilities (list[str]): Capabilities an agent must have to be considered for execution.
+            priority (ExecutionPriority): Execution priority for scheduling.
+            require_approval (Optional[bool]): If provided, overrides automatic approval decision for this task.
+        
         Returns:
-            Task result or approval pending message
+            dict[str, Any]: One of:
+                - When an emergency stop is active: {"error": "Emergency stop active", "status": "blocked"}.
+                - When the system is paused: {"error": "System paused", "status": "queued"}.
+                - When no capable agents are found: {"error": "No agents found with capabilities: [...]"}.
+                - When approval is required: {
+                    "status": "pending_approval",
+                    "task_id": <task_id>,
+                    "risk_level": <risk string>,
+                    "message": "Task submitted for operator review",
+                    "review_command": <string>
+                  }.
+                - When executed immediately: the task execution result dictionary (contains keys such as "task_id", "status", "results", "errors", "execution_time").
         """
         # Check emergency stop
         if self.emergency_stop_active:
@@ -217,7 +236,25 @@ class BoundedOrchestrator(AgentOrchestrator):
         return result
 
     async def _execute_bounded_task(self, task: AgentTask) -> dict[str, Any]:
-        """Execute task through bounded agents"""
+        """
+        Execute an AgentTask by invoking each required wrapped agent in dependency order under bounded-autonomy controls.
+        
+        This method updates the provided Task's lifecycle fields (status, started_at, completed_at, result, and error), merges per-agent shared data into the orchestrator's shared_context for successful agent completions, and records per-agent execution outcomes and timings. Each required agent is executed through its BoundedAutonomyWrapper; agent-level failures are collected and do not abort execution of subsequent agents. On unexpected global errors the task is marked failed and an error dict is returned.
+        
+        Parameters:
+            task (AgentTask): The task to execute. The task object is mutated in-place with status, timestamps, result, and error information.
+        
+        Returns:
+            dict[str, Any]: On normal completion returns a dictionary with:
+                - "task_id": the task's identifier.
+                - "status": the final task status string ("completed" or "failed").
+                - "results": mapping of agent_name to each agent's raw result.
+                - "errors": list of error messages or `None` if there were no agent errors.
+                - "execution_time": total execution time in seconds (completed_at - started_at).
+            On a global execution failure returns a dictionary containing:
+                - "error": error message string.
+                - "task_id": the task's identifier.
+        """
         task.status = TaskStatus.RUNNING
         task.started_at = datetime.now()
 
@@ -304,7 +341,17 @@ class BoundedOrchestrator(AgentOrchestrator):
         parameters: dict[str, Any],
         agents: list[str]
     ) -> ActionRiskLevel:
-        """Assess overall risk level of a task"""
+        """
+        Assess the overall risk level for a task.
+        
+        Parameters:
+            task_type (str): Identifier or name of the action to be performed (e.g., "deploy_service", "analyze_data").
+            parameters (dict[str, Any]): Additional task parameters used to inform risk heuristics.
+            agents (list[str]): Names of agents that will participate in the task; the number of agents influences risk.
+        
+        Returns:
+            ActionRiskLevel: The assessed risk level (`CRITICAL`, `HIGH`, `MEDIUM`, or `LOW`) for the given task.
+        """
         task_lower = task_type.lower()
 
         # Critical operations
@@ -371,7 +418,15 @@ class BoundedOrchestrator(AgentOrchestrator):
         return {"status": "paused", "operator": operator}
 
     async def resume_system(self, operator: str):
-        """Resume system operations"""
+        """
+        Resume system-wide operations and instruct all wrapped agents to resume.
+        
+        Parameters:
+            operator (str): Name or identifier of the operator performing the resume action.
+        
+        Returns:
+            dict: A dictionary with keys "status" (value "resumed") and "operator" (the provided operator).
+        """
         self.system_paused = False
         logger.info(f"▶️  System resumed by {operator}")
 
@@ -381,7 +436,17 @@ class BoundedOrchestrator(AgentOrchestrator):
         return {"status": "resumed", "operator": operator}
 
     async def get_bounded_status(self) -> dict[str, Any]:
-        """Get bounded orchestrator status"""
+        """
+        Retrieve health and bounded-autonomy status for the orchestrator.
+        
+        The returned mapping merges the base orchestrator health with additional bounded-autonomy details:
+        - `bounded_autonomy.system_controls`: current control flags (`emergency_stop`, `paused`, `local_only`, `auto_approve_low_risk`).
+        - `bounded_autonomy.wrapped_agents`: per-agent status mappings for every registered wrapped agent.
+        - `bounded_autonomy.pending_approvals`: number of approval actions currently pending.
+        
+        Returns:
+            dict[str, Any]: A dictionary containing the base health keys plus a `bounded_autonomy` key with the structure described above.
+        """
         base_health = await self.get_orchestrator_health()
 
         # Add bounded autonomy status
@@ -409,12 +474,12 @@ class BoundedOrchestrator(AgentOrchestrator):
 
     def _sanitize_for_json(self, data: Any) -> Any:
         """
-        Produce a JSON-serializable copy of `data` by removing internal circular-reference keys and converting non-serializable values to strings.
+        Produce a JSON-serializable representation of `data` by removing internal reference keys and converting non-serializable values to strings.
         
-        Recursively processes dictionaries, lists, and tuples. For dictionaries, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other non-serializable or unknown types are converted to their string representation.
+        Recursively processes dicts, lists, and tuples. For dicts, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other values are converted to strings.
         
         Parameters:
-            data (Any): The input value to sanitize for JSON serialization.
+            data (Any): Input value to sanitize for JSON serialization.
         
         Returns:
             Any: A sanitized, JSON-serializable representation of `data` with internal reference keys removed and non-serializable values converted to strings.

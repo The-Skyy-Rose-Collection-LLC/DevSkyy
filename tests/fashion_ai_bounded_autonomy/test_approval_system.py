@@ -170,7 +170,11 @@ class TestApproveAction:
 
     @pytest.mark.asyncio
     async def test_approve_pending_action(self, approval_system):
-        """Test approving a pending action"""
+        """
+        Verifies that approving a submitted action marks it as approved and records the approver and timestamp.
+        
+        Submits a pending action, approves it with a given operator and notes, and asserts the approval result has status "approved", the same action_id, the provided operator as approved_by, and an approved_at timestamp.
+        """
         # Submit action
         await approval_system.submit_for_review(
             action_id="test_action_005",
@@ -412,7 +416,11 @@ class TestGetActionDetails:
 
     @pytest.mark.asyncio
     async def test_get_details_with_history(self, approval_system):
-        """Test getting action details including history"""
+        """
+        Verifies that retrieving an action's details returns the submitted metadata and a non-empty history.
+        
+        Submits an action and then asserts that get_action_details returns an object containing the action ID, agent name, function name, parameters, risk level, and at least one history entry.
+        """
         await approval_system.submit_for_review(
             action_id="test_action_011",
             agent_name="test_agent",
@@ -615,7 +623,11 @@ class TestWorkflowTypes:
 
     @pytest.mark.asyncio
     async def test_default_workflow(self, approval_system):
-        """Test default workflow type"""
+        """
+        Verifies that submitting an action with ApprovalWorkflowType.DEFAULT assigns the "default" workflow.
+        
+        Submits a review request and asserts the returned result's "workflow" field is "default".
+        """
         result = await approval_system.submit_for_review(
             action_id="workflow_test_1",
             agent_name="test_agent",
