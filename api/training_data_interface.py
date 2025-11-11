@@ -210,37 +210,37 @@ async def upload_single_image(
         # Validate file
         if not file.filename:
             raise HTTPException(status_code=400, detail="No file provided")
-        
+
         file_ext = Path(file.filename).suffix.lower()
         if file_ext not in ALLOWED_EXTENSIONS:
             raise HTTPException(
-                status_code=400, 
+                status_code=400,
                 detail=f"Unsupported file format. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
             )
-        
+
         # Check file size
         file_size = 0
         content = await file.read()
         file_size = len(content)
-        
+
         if file_size > MAX_FILE_SIZE:
             raise HTTPException(
-                status_code=400, 
-                detail=f"File too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
+                status_code=400,
+                detail =f"File too large. Maximum size: {MAX_FILE_SIZE // (1024 * 1024)}MB"
             )
-        
+
         # Create category directory
         category_dir = UPLOAD_DIR / category
         category_dir.mkdir(exist_ok=True)
-        
+
         # Save file with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         safe_filename = f"{timestamp}_{file.filename}"
         file_path = category_dir / safe_filename
-        
+
         with open(file_path, "wb") as f:
             f.write(content)
-        
+
         # Create metadata
         metadata = {
             "filename": safe_filename,
@@ -251,22 +251,22 @@ async def upload_single_image(
             "upload_timestamp": datetime.now().isoformat(),
             "processed": False
         }
-        
+
         # Save metadata
         metadata_file = category_dir / f"{safe_filename}.json"
         import json
         with open(metadata_file, "w") as f:
             json.dump(metadata, f, indent=2)
-        
+
         # Schedule processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE:
             background_tasks.add_task(
-                process_single_image, 
-                str(file_path), 
-                category, 
+                process_single_image,
+                str(file_path),
+                category,
                 metadata
             )
-        
+
         return JSONResponse({
             "success": True,
             "message": "Image uploaded successfully",
@@ -276,7 +276,7 @@ async def upload_single_image(
             "auto_process": auto_process,
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Single image upload failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -303,52 +303,52 @@ async def upload_batch_images(
     try:
         if len(files) > MAX_BATCH_SIZE:
             raise HTTPException(
-                status_code=400, 
+                status_code=400,
                 detail=f"Too many files. Maximum batch size: {MAX_BATCH_SIZE}"
             )
-        
+
         uploaded_files = []
         failed_files = []
         total_size = 0
-        
+
         # Create category directory
         category_dir = UPLOAD_DIR / category
         category_dir.mkdir(exist_ok=True)
-        
+
         for file in files:
             try:
                 # Validate file
                 if not file.filename:
                     failed_files.append({"filename": "unknown", "error": "No filename"})
                     continue
-                
+
                 file_ext = Path(file.filename).suffix.lower()
                 if file_ext not in ALLOWED_EXTENSIONS:
                     failed_files.append({
-                        "filename": file.filename, 
+                        "filename": file.filename,
                         "error": f"Unsupported format: {file_ext}"
                     })
                     continue
-                
+
                 # Read and validate file size
                 content = await file.read()
                 file_size = len(content)
-                
+
                 if file_size > MAX_FILE_SIZE:
                     failed_files.append({
-                        "filename": file.filename, 
-                        "error": f"File too large: {file_size // (1024*1024)}MB"
+                        "filename": file.filename,
+                        "error": f"File too large: {file_size // (1024 * 1024)}MB"
                     })
                     continue
-                
+
                 # Save file
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                 safe_filename = f"{timestamp}_{file.filename}"
                 file_path = category_dir / safe_filename
-                
+
                 with open(file_path, "wb") as f:
                     f.write(content)
-                
+
                 # Create metadata
                 metadata = {
                     "filename": safe_filename,
@@ -358,36 +358,36 @@ async def upload_batch_images(
                     "upload_timestamp": datetime.now().isoformat(),
                     "processed": False
                 }
-                
+
                 # Save metadata
                 metadata_file = category_dir / f"{safe_filename}.json"
                 import json
                 with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
-                
+
                 uploaded_files.append({
                     "filename": safe_filename,
                     "original_filename": file.filename,
                     "file_path": str(file_path),
                     "file_size": file_size
                 })
-                
+
                 total_size += file_size
-                
+
             except Exception as e:
                 failed_files.append({
                     "filename": file.filename if file.filename else "unknown",
                     "error": str(e)
                 })
-        
+
         # Schedule batch processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE and uploaded_files:
             background_tasks.add_task(
-                process_batch_images, 
-                str(category_dir), 
+                process_batch_images,
+                str(category_dir),
                 category
             )
-        
+
         return JSONResponse({
             "success": True,
             "message": f"Batch upload completed",
@@ -400,7 +400,7 @@ async def upload_batch_images(
             "auto_process": auto_process,
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Batch upload failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -427,28 +427,28 @@ async def upload_zip_archive(
     try:
         if not file.filename or not file.filename.endswith('.zip'):
             raise HTTPException(status_code=400, detail="File must be a ZIP archive")
-        
+
         # Save uploaded ZIP file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         zip_path = UPLOAD_DIR / f"archive_{timestamp}.zip"
-        
+
         content = await file.read()
         with open(zip_path, "wb") as f:
             f.write(content)
-        
+
         # Extract ZIP file
         extract_dir = UPLOAD_DIR / f"extracted_{timestamp}"
         extract_dir.mkdir(exist_ok=True)
-        
+
         extracted_files = []
         failed_files = []
-        
+
         try:
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 for file_info in zip_ref.filelist:
                     if file_info.is_dir():
                         continue
-                    
+
                     file_ext = Path(file_info.filename).suffix.lower()
                     if file_ext not in ALLOWED_EXTENSIONS:
                         failed_files.append({
@@ -456,27 +456,27 @@ async def upload_zip_archive(
                             "error": f"Unsupported format: {file_ext}"
                         })
                         continue
-                    
+
                     if file_info.file_size > MAX_FILE_SIZE:
                         failed_files.append({
                             "filename": file_info.filename,
-                            "error": f"File too large: {file_info.file_size // (1024*1024)}MB"
+                            "error": f"File too large: {file_info.file_size // (1024 * 1024)}MB"
                         })
                         continue
-                    
+
                     # Extract file
                     zip_ref.extract(file_info, extract_dir)
-                    
+
                     # Move to category directory
                     category_dir = UPLOAD_DIR / category
                     category_dir.mkdir(exist_ok=True)
-                    
+
                     source_path = extract_dir / file_info.filename
                     safe_filename = f"{timestamp}_{Path(file_info.filename).name}"
                     dest_path = category_dir / safe_filename
-                    
+
                     shutil.move(str(source_path), str(dest_path))
-                    
+
                     # Create metadata
                     metadata = {
                         "filename": safe_filename,
@@ -487,33 +487,33 @@ async def upload_zip_archive(
                         "source": "zip_archive",
                         "processed": False
                     }
-                    
+
                     # Save metadata
                     metadata_file = category_dir / f"{safe_filename}.json"
                     import json
                     with open(metadata_file, "w") as f:
                         json.dump(metadata, f, indent=2)
-                    
+
                     extracted_files.append({
                         "filename": safe_filename,
                         "original_filename": file_info.filename,
                         "file_path": str(dest_path),
                         "file_size": file_info.file_size
                     })
-        
+
         finally:
             # Cleanup
             shutil.rmtree(extract_dir, ignore_errors=True)
             zip_path.unlink(missing_ok=True)
-        
+
         # Schedule processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE and extracted_files:
             background_tasks.add_task(
-                process_batch_images, 
-                str(UPLOAD_DIR / category), 
+                process_batch_images,
+                str(UPLOAD_DIR / category),
                 category
             )
-        
+
         return JSONResponse({
             "success": True,
             "message": "ZIP archive processed successfully",
@@ -525,7 +525,7 @@ async def upload_zip_archive(
             "auto_process": auto_process,
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"ZIP archive upload failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -536,45 +536,45 @@ async def get_upload_status():
     """Get status of all uploaded training data."""
     try:
         categories = {}
-        
+
         for category_dir in UPLOAD_DIR.iterdir():
             if not category_dir.is_dir():
                 continue
-            
+
             category_name = category_dir.name
             image_files = []
-            
+
             for file_path in category_dir.iterdir():
                 if file_path.suffix.lower() in ALLOWED_EXTENSIONS:
                     metadata_file = category_dir / f"{file_path.name}.json"
-                    
+
                     metadata = {"processed": False}
                     if metadata_file.exists():
                         import json
                         with open(metadata_file, "r") as f:
                             metadata = json.load(f)
-                    
+
                     image_files.append({
                         "filename": file_path.name,
                         "file_size": file_path.stat().st_size,
                         "processed": metadata.get("processed", False),
                         "upload_timestamp": metadata.get("upload_timestamp")
                     })
-            
+
             categories[category_name] = {
                 "total_images": len(image_files),
                 "processed_images": sum(1 for f in image_files if f["processed"]),
                 "total_size": sum(f["file_size"] for f in image_files),
                 "images": image_files
             }
-        
+
         return JSONResponse({
             "success": True,
             "categories": categories,
             "total_categories": len(categories),
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Failed to get upload status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -601,17 +601,17 @@ async def process_category(
     try:
         if not BRAND_TRAINER_AVAILABLE:
             raise HTTPException(
-                status_code=503, 
+                status_code=503,
                 detail="Brand trainer not available"
             )
-        
+
         category_dir = UPLOAD_DIR / category
         if not category_dir.exists():
             raise HTTPException(
-                status_code=404, 
+                status_code=404,
                 detail=f"Category '{category}' not found"
             )
-        
+
         # Schedule processing
         background_tasks.add_task(
             process_category_for_training,
@@ -620,7 +620,7 @@ async def process_category(
             remove_background,
             enhance_images
         )
-        
+
         return JSONResponse({
             "success": True,
             "message": f"Processing initiated for category '{category}'",
@@ -629,7 +629,7 @@ async def process_category(
             "enhance_images": enhance_images,
             "timestamp": datetime.now().isoformat()
         })
-        
+
     except Exception as e:
         logger.error(f"Failed to initiate category processing: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -1125,24 +1125,24 @@ async def process_single_image(file_path: str, category: str, metadata: Dict[str
     """Background task to process a single uploaded image."""
     try:
         logger.info(f"Processing single image: {file_path}")
-        
+
         # Generate caption for the image
         if BRAND_TRAINER_AVAILABLE:
             caption = await brand_trainer.generate_image_caption(file_path)
-            
+
             # Update metadata
             metadata["processed"] = True
             metadata["caption"] = caption
             metadata["processing_timestamp"] = datetime.now().isoformat()
-            
+
             # Save updated metadata
             metadata_file = Path(file_path).with_suffix(Path(file_path).suffix + ".json")
             import json
             with open(metadata_file, "w") as f:
                 json.dump(metadata, f, indent=2)
-        
+
         logger.info(f"Single image processed: {file_path}")
-        
+
     except Exception as e:
         logger.error(f"Failed to process single image {file_path}: {e}")
 
@@ -1151,7 +1151,7 @@ async def process_batch_images(category_dir: str, category: str):
     """Background task to process batch uploaded images."""
     try:
         logger.info(f"Processing batch images in category: {category}")
-        
+
         if BRAND_TRAINER_AVAILABLE:
             # Use the brand trainer's dataset preparation
             result = await brand_trainer.prepare_training_dataset(
@@ -1160,23 +1160,23 @@ async def process_batch_images(category_dir: str, category: str):
                 remove_background=False,
                 enhance_images=True
             )
-            
+
             logger.info(f"Batch processing completed for {category}: {result}")
-        
+
     except Exception as e:
         logger.error(f"Failed to process batch images for {category}: {e}")
 
 
 async def process_category_for_training(
-    category_dir: str, 
-    category: str, 
-    remove_background: bool, 
+    category_dir: str,
+    category: str,
+    remove_background: bool,
     enhance_images: bool
 ):
     """Background task to process category for training."""
     try:
         logger.info(f"Processing category for training: {category}")
-        
+
         if BRAND_TRAINER_AVAILABLE:
             result = await brand_trainer.prepare_training_dataset(
                 input_directory=category_dir,
@@ -1184,9 +1184,9 @@ async def process_category_for_training(
                 remove_background=remove_background,
                 enhance_images=enhance_images
             )
-            
+
             logger.info(f"Category processing completed: {result}")
-        
+
     except Exception as e:
         logger.error(f"Failed to process category {category}: {e}")
 
@@ -1265,7 +1265,7 @@ class ImageQualityProcessor:
             # Check file size
             file_size = image_path.stat().st_size
             if file_size > self.config["max_file_size"]:
-                validation_result["errors"].append(f"File too large: {file_size / (1024*1024):.1f}MB > {self.config['max_file_size'] / (1024*1024)}MB")
+                validation_result["errors"].append(f"File too large: {file_size / (1024 * 1024):.1f}MB > {self.config['max_file_size'] / (1024 * 1024)}MB")
                 validation_result["valid"] = False
 
             # Check file format
@@ -1974,7 +1974,7 @@ async def execute_bulk_quality_update(
             batch = valid_paths[i:i + batch_size]
             batch_start_time = datetime.now()
 
-            logger.info(f"Processing batch {i//batch_size + 1}/{(len(valid_paths) + batch_size - 1)//batch_size} ({len(batch)} images)")
+            logger.info(f"Processing batch {i // batch_size + 1}/{(len(valid_paths) + batch_size - 1) // batch_size} ({len(batch)} images)")
 
             # Process batch with thread pool
             batch_futures = []
@@ -2046,7 +2046,7 @@ async def execute_bulk_quality_update(
             f"   Skipped: {processing_results['skipped_updates']}\n"
             f"   Success rate: {success_rate:.1f}%\n"
             f"   Total time: {total_time:.2f} seconds\n"
-            f"   Average time per image: {total_time/len(image_paths):.2f} seconds"
+            f"   Average time per image: {total_time / len(image_paths):.2f} seconds"
         )
 
     except Exception as e:

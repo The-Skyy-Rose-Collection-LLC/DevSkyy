@@ -12,17 +12,15 @@ import logging
 from typing import Optional
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Header
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel, Field
 
 from services.woocommerce_importer import (
-    WooCommerceImporterService,
-    ProductImportResult
+    WooCommerceImporterService
 )
 from services.seo_optimizer import (
     SEOOptimizerService,
-    ProductInfo,
-    SEOMetaTags
+    ProductInfo
 )
 
 logger = logging.getLogger(__name__)

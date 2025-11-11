@@ -845,7 +845,7 @@ class AgentAssignmentManager:
                     if metric == "response_time" and value > threshold:
                         issues_detected.append(f"High response time: {value}s")
                     elif metric == "error_rate" and value > threshold:
-                        issues_detected.append(f"High error rate: {value*100:.2f}%")
+                        issues_detected.append(f"High error rate: {value * 100:.2f}%")
 
             if issues_detected and self.auto_fix_enabled:
                 await self._apply_auto_fixes("performance", issues_detected)
