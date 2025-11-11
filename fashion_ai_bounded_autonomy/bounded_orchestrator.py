@@ -10,15 +10,14 @@ Features:
 - Emergency controls
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, Optional
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import AgentOrchestrator, AgentTask, ExecutionPriority, TaskStatus
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
-
 
 logger = logging.getLogger(__name__)
 
@@ -35,15 +34,10 @@ class BoundedOrchestrator(AgentOrchestrator):
     - Complete audit logging
     """
 
-    def __init__(
-        self,
-        max_concurrent_tasks: int = 50,
-        local_only: bool = True,
-        auto_approve_low_risk: bool = True
-    ):
+    def __init__(self, max_concurrent_tasks: int = 50, local_only: bool = True, auto_approve_low_risk: bool = True):
         """
         Initialize a BoundedOrchestrator with bounded autonomy controls, approval system, and emergency controls.
-        
+
         Parameters:
             max_concurrent_tasks (int): Maximum number of tasks the orchestrator will run concurrently.
             local_only (bool): When True, restrict agent actions to local-only execution modes where supported.
@@ -76,13 +70,13 @@ class BoundedOrchestrator(AgentOrchestrator):
     ) -> bool:
         """
         Register an agent with the orchestrator and wrap it with bounded-autonomy controls.
-        
+
         Parameters:
             agent (BaseAgent): The agent instance to register.
             capabilities (list[str]): Capability names exposed by the agent.
             dependencies (list[str], optional): Names of agents this agent depends on; may be None.
             priority (ExecutionPriority): Execution priority to assign to the agent.
-        
+
         Returns:
             bool: `True` if the agent was registered with the base orchestrator and wrapped for bounded autonomy; `False` if base registration failed.
         """
@@ -94,9 +88,7 @@ class BoundedOrchestrator(AgentOrchestrator):
 
         # Wrap agent with bounded autonomy controls
         wrapped = BoundedAutonomyWrapper(
-            wrapped_agent=agent,
-            auto_approve_low_risk=self.auto_approve_low_risk,
-            local_only=self.local_only
+            wrapped_agent=agent, auto_approve_low_risk=self.auto_approve_low_risk, local_only=self.local_only
         )
 
         self.wrapped_agents[agent.agent_name] = wrapped
@@ -111,18 +103,18 @@ class BoundedOrchestrator(AgentOrchestrator):
         parameters: dict[str, Any],
         required_capabilities: list[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
-        require_approval: Optional[bool] = None
+        require_approval: Optional[bool] = None,
     ) -> dict[str, Any]:
         """
         Queue or execute a task under bounded-autonomy controls, performing risk assessment and submitting for human approval when required.
-        
+
         Parameters:
             task_type (str): Identifier of the action to perform.
             parameters (dict[str, Any]): Parameters passed to the task's execution.
             required_capabilities (list[str]): Capabilities an agent must have to be considered for execution.
             priority (ExecutionPriority): Execution priority for scheduling.
             require_approval (Optional[bool]): If provided, overrides automatic approval decision for this task.
-        
+
         Returns:
             dict[str, Any]: One of:
                 - When an emergency stop is active: {"error": "Emergency stop active", "status": "blocked"}.
@@ -140,27 +132,19 @@ class BoundedOrchestrator(AgentOrchestrator):
         # Check emergency stop
         if self.emergency_stop_active:
             logger.critical("🚨 Emergency stop active - task blocked")
-            return {
-                "error": "Emergency stop active",
-                "status": "blocked"
-            }
+            return {"error": "Emergency stop active", "status": "blocked"}
 
         # Check if system paused
         if self.system_paused:
             logger.warning("⏸️  System paused - task queued")
-            return {
-                "error": "System paused",
-                "status": "queued"
-            }
+            return {"error": "System paused", "status": "queued"}
 
         task_id = f"task_{datetime.now().timestamp()}_{task_type}"
 
         # Find agents with required capabilities
         capable_agents = self._find_agents_with_capabilities(required_capabilities)
         if not capable_agents:
-            return {
-                "error": f"No agents found with capabilities: {required_capabilities}"
-            }
+            return {"error": f"No agents found with capabilities: {required_capabilities}"}
 
         # Resolve execution order
         execution_order = self._resolve_dependencies(capable_agents)
@@ -180,8 +164,10 @@ class BoundedOrchestrator(AgentOrchestrator):
         task_risk = self._assess_task_risk(task_type, parameters, execution_order)
 
         # Check if approval needed
-        needs_approval = require_approval if require_approval is not None else (
-            task_risk in [ActionRiskLevel.HIGH, ActionRiskLevel.CRITICAL]
+        needs_approval = (
+            require_approval
+            if require_approval is not None
+            else (task_risk in [ActionRiskLevel.HIGH, ActionRiskLevel.CRITICAL])
         )
 
         if needs_approval:
@@ -192,7 +178,11 @@ class BoundedOrchestrator(AgentOrchestrator):
                 function_name=task_type,
                 parameters=parameters,
                 risk_level=task_risk.value,
-                workflow_type=ApprovalWorkflowType.HIGH_RISK if task_risk == ActionRiskLevel.CRITICAL else ApprovalWorkflowType.DEFAULT
+                workflow_type=(
+                    ApprovalWorkflowType.HIGH_RISK
+                    if task_risk == ActionRiskLevel.CRITICAL
+                    else ApprovalWorkflowType.DEFAULT
+                ),
             )
 
             logger.info(f"⏳ Task {task_id} submitted for approval (risk: {task_risk.value})")
@@ -202,7 +192,7 @@ class BoundedOrchestrator(AgentOrchestrator):
                 "task_id": task_id,
                 "risk_level": task_risk.value,
                 "message": "Task submitted for operator review",
-                "review_command": f"python -m fashion_ai_bounded_autonomy.approval_cli review {task_id}"
+                "review_command": f"python -m fashion_ai_bounded_autonomy.approval_cli review {task_id}",
             }
 
         # Execute immediately
@@ -211,11 +201,11 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def execute_approved_task(self, task_id: str, approved_by: str) -> dict[str, Any]:
         """
         Execute a previously approved task and record its execution with the approval system.
-        
+
         Parameters:
             task_id (str): Identifier of the approved task to execute.
             approved_by (str): Operator who approved the task.
-        
+
         Returns:
             dict: Execution outcome containing at least `task_id`, `status`, `results`, and `execution_time`; includes `errors` when failures occurred or an `error` key with `status: "error"` if the task was not found.
         """
@@ -238,12 +228,12 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def _execute_bounded_task(self, task: AgentTask) -> dict[str, Any]:
         """
         Execute an AgentTask by invoking each required wrapped agent in dependency order under bounded-autonomy controls.
-        
+
         This method updates the provided Task's lifecycle fields (status, started_at, completed_at, result, and error), merges per-agent shared data into the orchestrator's shared_context for successful agent completions, and records per-agent execution outcomes and timings. Each required agent is executed through its BoundedAutonomyWrapper; agent-level failures are collected and do not abort execution of subsequent agents. On unexpected global errors the task is marked failed and an error dict is returned.
-        
+
         Parameters:
             task (AgentTask): The task to execute. The task object is mutated in-place with status, timestamps, result, and error information.
-        
+
         Returns:
             dict[str, Any]: On normal completion returns a dictionary with:
                 - "task_id": the task's identifier.
@@ -284,7 +274,7 @@ class BoundedOrchestrator(AgentOrchestrator):
                     result = await wrapped_agent.execute(
                         function_name="execute_core_function",
                         parameters=agent_params,
-                        require_approval=False  # Already approved at task level
+                        require_approval=False,  # Already approved at task level
                     )
 
                     results[agent_name] = result
@@ -300,7 +290,11 @@ class BoundedOrchestrator(AgentOrchestrator):
                     else:
                         # Treat non-completed status as failure
                         status = result.get("status") if isinstance(result, dict) else "unknown"
-                        error_msg = result.get("error", "Non-completed status") if isinstance(result, dict) else "Invalid result"
+                        error_msg = (
+                            result.get("error", "Non-completed status")
+                            if isinstance(result, dict)
+                            else "Invalid result"
+                        )
                         errors.append(f"{agent_name}: status={status}, {error_msg}")
 
                         # Track failure
@@ -335,35 +329,26 @@ class BoundedOrchestrator(AgentOrchestrator):
             task.error = str(e)
             return {"error": str(e), "task_id": task.task_id}
 
-    def _assess_task_risk(
-        self,
-        task_type: str,
-        parameters: dict[str, Any],
-        agents: list[str]
-    ) -> ActionRiskLevel:
+    def _assess_task_risk(self, task_type: str, parameters: dict[str, Any], agents: list[str]) -> ActionRiskLevel:
         """
         Assess the overall risk level for a task.
-        
+
         Parameters:
             task_type (str): Identifier or name of the action to be performed (e.g., "deploy_service", "analyze_data").
             parameters (dict[str, Any]): Additional task parameters used to inform risk heuristics.
             agents (list[str]): Names of agents that will participate in the task; the number of agents influences risk.
-        
+
         Returns:
             ActionRiskLevel: The assessed risk level (`CRITICAL`, `HIGH`, `MEDIUM`, or `LOW`) for the given task.
         """
         task_lower = task_type.lower()
 
         # Critical operations
-        if any(word in task_lower for word in [
-            "deploy", "delete", "drop", "modify", "publish"
-        ]):
+        if any(word in task_lower for word in ["deploy", "delete", "drop", "modify", "publish"]):
             return ActionRiskLevel.CRITICAL
 
         # High-risk operations
-        if any(word in task_lower for word in [
-            "create", "update", "insert", "write", "send", "post"
-        ]):
+        if any(word in task_lower for word in ["create", "update", "insert", "write", "send", "post"]):
             return ActionRiskLevel.HIGH
 
         # Check if multiple agents involved (higher risk)
@@ -371,9 +356,7 @@ class BoundedOrchestrator(AgentOrchestrator):
             return ActionRiskLevel.HIGH
 
         # Medium-risk operations
-        if any(word in task_lower for word in [
-            "analyze", "process", "calculate", "generate"
-        ]):
+        if any(word in task_lower for word in ["analyze", "process", "calculate", "generate"]):
             return ActionRiskLevel.MEDIUM
 
         return ActionRiskLevel.LOW
@@ -420,10 +403,10 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def resume_system(self, operator: str):
         """
         Resume system-wide operations and instruct all wrapped agents to resume.
-        
+
         Parameters:
             operator (str): Name or identifier of the operator performing the resume action.
-        
+
         Returns:
             dict: A dictionary with keys "status" (value "resumed") and "operator" (the provided operator).
         """
@@ -438,12 +421,12 @@ class BoundedOrchestrator(AgentOrchestrator):
     async def get_bounded_status(self) -> dict[str, Any]:
         """
         Retrieve health and bounded-autonomy status for the orchestrator.
-        
+
         The returned mapping merges the base orchestrator health with additional bounded-autonomy details:
         - `bounded_autonomy.system_controls`: current control flags (`emergency_stop`, `paused`, `local_only`, `auto_approve_low_risk`).
         - `bounded_autonomy.wrapped_agents`: per-agent status mappings for every registered wrapped agent.
         - `bounded_autonomy.pending_approvals`: number of approval actions currently pending.
-        
+
         Returns:
             dict[str, Any]: A dictionary containing the base health keys plus a `bounded_autonomy` key with the structure described above.
         """
@@ -455,9 +438,9 @@ class BoundedOrchestrator(AgentOrchestrator):
                 "emergency_stop": self.emergency_stop_active,
                 "paused": self.system_paused,
                 "local_only": self.local_only,
-                "auto_approve_low_risk": self.auto_approve_low_risk
+                "auto_approve_low_risk": self.auto_approve_low_risk,
             },
-            "wrapped_agents": {}
+            "wrapped_agents": {},
         }
 
         for agent_name, wrapped_agent in self.wrapped_agents.items():
@@ -467,40 +450,76 @@ class BoundedOrchestrator(AgentOrchestrator):
         pending_actions = await self.approval_system.get_pending_actions()
         bounded_status["pending_approvals"] = len(pending_actions)
 
-        return {
-            **base_health,
-            "bounded_autonomy": bounded_status
-        }
+        return {**base_health, "bounded_autonomy": bounded_status}
 
-    def _sanitize_for_json(self, data: Any) -> Any:
+    def _sanitize_for_json(
+        self, data: Any, max_depth: int = 100, _current_depth: int = 0, _visited: Optional[set] = None
+    ) -> Any:
         """
         Produce a JSON-serializable representation of `data` by removing internal reference keys and converting non-serializable values to strings.
-        
-        Recursively processes dicts, lists, and tuples. For dicts, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other values are converted to strings.
-        
+
+        Recursively processes dicts, lists, and tuples with protection against stack overflow and circular references.
+        For dicts, keys "_previous_results" and "_shared_context" are omitted; primitive values (str, int, float, bool, None) are preserved; other values are converted to strings.
+
         Parameters:
             data (Any): Input value to sanitize for JSON serialization.
-        
+            max_depth (int): Maximum recursion depth to prevent stack overflow. Default is 100.
+            _current_depth (int): Internal parameter tracking current recursion depth.
+            _visited (Optional[set]): Internal parameter tracking visited objects to detect circular references.
+
         Returns:
             Any: A sanitized, JSON-serializable representation of `data` with internal reference keys removed and non-serializable values converted to strings.
+
+        Raises:
+            RecursionError: If max_depth is exceeded, indicating deeply nested or circular structures.
         """
-        if isinstance(data, dict):
-            sanitized = {}
-            for key, value in data.items():
-                # Skip internal circular reference keys
-                if key in ("_previous_results", "_shared_context"):
-                    continue
-                try:
-                    # Recursively sanitize nested structures
-                    sanitized[key] = self._sanitize_for_json(value)
-                except (TypeError, ValueError):
-                    # Skip non-serializable values
-                    sanitized[key] = str(value)
-            return sanitized
-        elif isinstance(data, (list, tuple)):
-            return [self._sanitize_for_json(item) for item in data]
-        elif isinstance(data, (str, int, float, bool, type(None))):
-            return data
-        else:
-            # Convert other types to string
-            return str(data)
+        # Initialize visited set on first call
+        if _visited is None:
+            _visited = set()
+
+        # Check depth limit to prevent stack overflow
+        if _current_depth >= max_depth:
+            logger.warning(f"Max depth ({max_depth}) reached during JSON sanitization")
+            return f"<max_depth_exceeded at level {_current_depth}>"
+
+        # Check for circular references using object id for mutable types
+        if isinstance(data, (dict, list)):
+            obj_id = id(data)
+            if obj_id in _visited:
+                logger.warning(f"Circular reference detected for {type(data).__name__}")
+                return "<circular_reference>"
+            _visited.add(obj_id)
+
+        try:
+            if isinstance(data, dict):
+                sanitized = {}
+                for key, value in data.items():
+                    # Skip internal circular reference keys
+                    if key in ("_previous_results", "_shared_context"):
+                        continue
+                    try:
+                        # Recursively sanitize nested structures
+                        sanitized[key] = self._sanitize_for_json(
+                            value, max_depth=max_depth, _current_depth=_current_depth + 1, _visited=_visited
+                        )
+                    except (TypeError, ValueError):
+                        # Skip non-serializable values
+                        sanitized[key] = str(value)
+                return sanitized
+            elif isinstance(data, (list, tuple)):
+                result = [
+                    self._sanitize_for_json(
+                        item, max_depth=max_depth, _current_depth=_current_depth + 1, _visited=_visited
+                    )
+                    for item in data
+                ]
+                return result
+            elif isinstance(data, (str, int, float, bool, type(None))):
+                return data
+            else:
+                # Convert other types to string
+                return str(data)
+        finally:
+            # Clean up visited set for current level (allow same object at different branches)
+            if isinstance(data, (dict, list)):
+                _visited.discard(id(data))
