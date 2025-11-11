@@ -19,6 +19,11 @@ on:
         required: false
         default: '100'
 
+# Cancel in-progress runs for the same branch (not for scheduled runs)
+concurrency:
+  group: performance-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
 env:
   PYTHON_VERSION: '3.11.9'
   P95_LATENCY_THRESHOLD_MS: '200'
@@ -121,11 +126,16 @@ jobs:
               if response.status_code != 200:
                   print(f'Error: Request {i} failed with status {response.status_code}')
 
+          # Calculate percentiles properly using sorted list
+          sorted_latencies = sorted(latencies)
+          p95_index = int(len(sorted_latencies) * 0.95)
+          p99_index = int(len(sorted_latencies) * 0.99)
+
           results = {
               'mean_latency_ms': statistics.mean(latencies),
               'median_latency_ms': statistics.median(latencies),
-              'p95_latency_ms': statistics.quantiles(latencies, n=100)[94],  # 95th percentile (corrected)
-              'p99_latency_ms': statistics.quantiles(latencies, n=100)[98],  # 99th percentile
+              'p95_latency_ms': sorted_latencies[p95_index],  # 95th percentile
+              'p99_latency_ms': sorted_latencies[p99_index],  # 99th percentile
               'min_latency_ms': min(latencies),
               'max_latency_ms': max(latencies),
               'total_requests': len(latencies)
@@ -493,7 +503,7 @@ jobs:
           import asyncpg
           import time
           import json
-          from statistics import mean, median, quantiles
+          from statistics import mean
 
           async def benchmark_queries():
               conn = await asyncpg.connect(
@@ -528,11 +538,17 @@ jobs:
 
               await conn.close()
 
+              # Calculate percentiles properly
+              sorted_insert = sorted(insert_times)
+              sorted_select = sorted(select_times)
+              insert_p95_index = int(len(sorted_insert) * 0.95)
+              select_p95_index = int(len(sorted_select) * 0.95)
+
               results = {
                   'insert_mean_ms': mean(insert_times),
-                  'insert_p95_ms': quantiles(insert_times, n=20)[18],
+                  'insert_p95_ms': sorted_insert[insert_p95_index],
                   'select_mean_ms': mean(select_times),
-                  'select_p95_ms': quantiles(select_times, n=20)[18]
+                  'select_p95_ms': sorted_select[select_p95_index]
               }
 
               return results

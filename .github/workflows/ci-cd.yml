@@ -3,9 +3,23 @@ name: DevSkyy CI/CD Pipeline
 on:
   push:
     branches: ['**']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.txt'  # Ignore changes to documentation files
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   workflow_dispatch:
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PYTHON_VERSION: '3.11.9'
@@ -37,6 +51,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ruff==0.8.4 black==24.10.0 isort==5.13.2
+
+      - name: Cache linting tools
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-lint-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-lint-
+            ${{ runner.os }}-pip-
 
       - name: Run Ruff linter
         run: |
@@ -294,6 +317,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
@@ -301,9 +332,19 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: devskyy:${{ github.sha }},devskyy:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=local,src=/tmp/.buildx-cache
+            type=gha
+          cache-to: |
+            type=local,dest=/tmp/.buildx-cache-new,mode=max
+            type=gha,mode=max
           load: true
+
+      # Move cache to avoid growing cache indefinitely
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master

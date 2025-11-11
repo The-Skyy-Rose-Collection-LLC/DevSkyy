@@ -10,6 +10,11 @@ on:
     - cron: '0 2 * * 0'
   workflow_dispatch:
 
+# Cancel in-progress runs for the same branch (not for scheduled runs)
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
 env:
   PYTHON_VERSION: '3.11.9'
 
