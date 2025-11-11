@@ -1,0 +1,59 @@
+{
+  "schema_version": "v1alpha",
+  "name": "Python Test Smoke Runner",
+  "description": "Run a lean smoke suite (database bootstrap + API health checks) after dependency fixes to guard against regressions.",
+  "labels": ["tests", "quality"],
+  "triggers": {
+    "issue_comment": ["/agent run python-test-smoke"],
+    "pull_request_labeled": ["run-python-smoke"],
+    "workflow_dispatch": {
+      "inputs": {
+        "extra_pytest_args": {
+          "description": "Additional pytest arguments to pass to the smoke suite.",
+          "type": "string",
+          "required": false
+        }
+      }
+    }
+  },
+  "environment": {
+    "language": "python",
+    "python_version": "3.11",
+    "package_managers": ["pip"],
+    "pre_checks": [
+      "python -m pip install --upgrade pip",
+      "python -m pip install -r requirements-dev.txt"
+    ]
+  },
+  "playbook": [
+    {
+      "title": "Prepare runtime",
+      "instructions": [
+        "Seed the SQLite fixtures using scripts/startup_sqlalchemy.py if the database directory is missing.",
+        "Export TESTING=1 to enable lightweight configuration paths."
+      ]
+    },
+    {
+      "title": "Execute smoke tests",
+      "instructions": [
+        "Run pytest with the fast smoke markers: tests/test_sqlite_setup.py and tests/test_quality_processing.py.",
+        "Append any extra args provided through workflow_dispatch inputs."
+      ],
+      "checks": [
+        "pytest tests/test_sqlite_setup.py tests/test_quality_processing.py ${extra_pytest_args}" 
+      ]
+    },
+    {
+      "title": "Summarize results",
+      "instructions": [
+        "Collect the pytest summary table and attach it to the PR comment thread that triggered the agent.",
+        "If failures occur, include the stack traces and annotate likely owners (database, ML, API)."
+      ]
+    }
+  ],
+  "success_criteria": [
+    "Smoke suites exit with status code 0.",
+    "Results are posted back to the originating issue or PR.",
+    "Environment preparation commands complete without error."
+  ]
+}
