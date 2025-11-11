@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class WordPressServerAccess:
     """
-    GOD MODE LEVEL 2: Direct server access to WordPress.com via SFTP/SSH
+    GOD MODE LEVEL 2: Direct server access to WordPress.com via SFTP / SSH
     Full server control for deep optimization and brand learning
     """
 
@@ -24,17 +24,17 @@ class WordPressServerAccess:
         self.sftp_port = int(os.getenv('SFTP_PORT', '22'))
         self.sftp_username = os.getenv('SFTP_USERNAME', 'skyyrose.wordpress.com')
         self.sftp_password = os.getenv('SFTP_PASSWORD')  # No default for security
-        
+
         # SSH Access
         self.ssh_host = os.getenv('SSH_HOST', 'ssh.wp.com')
         self.ssh_username = os.getenv('SSH_USERNAME', 'skyyrose.wordpress.com')
-        self.ssh_key_name = os.getenv('SSH_KEY_NAME', 'skyyroseco-default')
+        self.ssh_key_name = os.getenv('SSH_KEY_NAME', 'skyyroseco - default')
         self.ssh_key_path = os.getenv('SSH_PRIVATE_KEY_PATH')
-        
+
         # Validate that either password or key is provided
         if not self.sftp_password and not self.ssh_key_path:
             logger.warning("Neither SFTP_PASSWORD nor SSH_PRIVATE_KEY_PATH provided. Server access may fail.")
-        
+
         # Connection objects
         self.sftp_client = None
         self.ssh_client = None
@@ -67,7 +67,7 @@ class WordPressServerAccess:
             logger.info("🔐 Connecting to WordPress.com server via SFTP...")
 
             transport = paramiko.Transport((self.sftp_host, self.sftp_port))
-            transport.connect(username=self.sftp_username, password=self.sftp_password)
+            transport.connect(username = self.sftp_username, password = self.sftp_password)
 
             self.sftp_client = paramiko.SFTPClient.from_transport(transport)
 
@@ -82,10 +82,10 @@ class WordPressServerAccess:
                 try:
                     logger.info("🔐 Attempting SSH connection...")
                     self.ssh_client.connect(
-                        hostname=self.ssh_host,
-                        username=self.ssh_username,
+                        hostname = self.ssh_host,
+                        username = self.ssh_username,
                         password=self.sftp_password,  # Try same password
-                        timeout=10
+                        timeout = 10
                     )
                     logger.info("✅ SSH connection established!")
                     ssh_available = True
@@ -106,9 +106,9 @@ class WordPressServerAccess:
                     'analysis_results': brand_analysis,
                     'capabilities': [
                         '🔧 Direct file system access',
-                        '📊 Real-time server monitoring',
+                        '📊 Real - time server monitoring',
                         '🎨 Deep brand analysis',
-                        '⚡ Server-level optimizations',
+                        '⚡ Server - level optimizations',
                         '🔒 Security hardening',
                         '📈 Performance tuning',
                         '🧠 Continuous brand learning',
@@ -213,7 +213,7 @@ class WordPressServerAccess:
             }
 
             # Check for common WordPress directories
-            wp_directories = ['wp-content', 'wp-admin', 'wp-includes', 'themes', 'plugins', 'uploads']
+            wp_directories = ['wp - content', 'wp - admin', 'wp - includes', 'themes', 'plugins', 'uploads']
 
             for directory in wp_directories:
                 try:
@@ -254,10 +254,10 @@ class WordPressServerAccess:
             for file_name in content_files:
                 try:
                     # Download and analyze file content
-                    with tempfile.NamedTemporaryFile(mode='w+') as temp_file:
+                    with tempfile.NamedTemporaryFile(mode = 'w + ') as temp_file:
                         self.sftp_client.get(file_name, temp_file.name)
 
-                        with open(temp_file.name, 'r', encoding='utf-8', errors='ignore') as f:
+                        with open(temp_file.name, 'r', encoding = 'utf - 8', errors = 'ignore') as f:
                             content = f.read()
 
                         # Analyze for luxury and streetwear terms
@@ -275,11 +275,11 @@ class WordPressServerAccess:
 
             # Determine brand theme based on analysis
             if content_patterns['luxury_keywords'] > content_patterns['streetwear_terms']:
-                content_patterns['primary_theme'] = 'luxury-focused'
+                content_patterns['primary_theme'] = 'luxury - focused'
             elif content_patterns['streetwear_terms'] > content_patterns['luxury_keywords']:
-                content_patterns['primary_theme'] = 'streetwear-focused'
+                content_patterns['primary_theme'] = 'streetwear - focused'
             else:
-                content_patterns['primary_theme'] = 'luxury-streetwear-fusion'
+                content_patterns['primary_theme'] = 'luxury - streetwear - fusion'
 
             return content_patterns
 
@@ -299,7 +299,7 @@ class WordPressServerAccess:
 
             # Check uploads directory for brand assets
             try:
-                uploads_path = 'wp-content/uploads'
+                uploads_path = 'wp - content / uploads'
                 uploads_files = self.sftp_client.listdir(uploads_path)
 
                 # Look for logo and brand image files
@@ -401,48 +401,48 @@ class WordPressServerAccess:
 # Skyy Rose Performance Optimizations - Auto-Generated by AI Agent
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/jpg "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-</IfModule>
+    ExpiresByType text / css "access plus 1 year"
+    ExpiresByType application / javascript "access plus 1 year"
+    ExpiresByType image / png "access plus 1 year"
+    ExpiresByType image / jpg "access plus 1 year"
+    ExpiresByType image / jpeg "access plus 1 year"
+    ExpiresByType image / gif "access plus 1 year"
+    ExpiresByType image / svg + xml "access plus 1 year"
+< / IfModule>
 
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-</IfModule>
+    AddOutputFilterByType DEFLATE text / plain
+    AddOutputFilterByType DEFLATE text / html
+    AddOutputFilterByType DEFLATE text / xml
+    AddOutputFilterByType DEFLATE text / css
+    AddOutputFilterByType DEFLATE application / xml
+    AddOutputFilterByType DEFLATE application / xhtml + xml
+    AddOutputFilterByType DEFLATE application / rss + xml
+    AddOutputFilterByType DEFLATE application / javascript
+    AddOutputFilterByType DEFLATE application / x - javascript
+< / IfModule>
 
 # Security Headers for Luxury Brand Protection
 <IfModule mod_headers.c>
-    Header always set X-Content-Type-Options nosniff
-    Header always set X-Frame-Options DENY
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
+    Header always set X - Content - Type - Options nosniff
+    Header always set X - Frame - Options DENY
+    Header always set X - XSS - Protection "1; mode = block"
+    Header always set Referrer - Policy "strict - origin - when - cross - origin"
+< / IfModule>
 """
 
             # Check if .htaccess exists and backup if needed
             try:
                 existing_htaccess = self.sftp_client.open('.htaccess', 'r').read()
                 # Backup existing file
-                with tempfile.NamedTemporaryFile(mode='w', delete=False) as backup:
+                with tempfile.NamedTemporaryFile(mode = 'w', delete = False) as backup:
                     backup.write(existing_htaccess)
                     self.sftp_client.put(backup.name, '.htaccess.backup')
             except:
                 pass  # File doesn't exist, that's ok
 
             # Upload new .htaccess
-            with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(mode = 'w', delete = False) as temp_file:
                 temp_file.write(htaccess_content)
                 temp_file.flush()
                 self.sftp_client.put(temp_file.name, '.htaccess')
@@ -458,7 +458,7 @@ class WordPressServerAccess:
         """Optimize file permissions for security and performance."""
         try:
             # WordPress.com handles most permissions, but we can check
-            security_files = ['.htaccess', 'wp-config.php', 'functions.php']
+            security_files = ['.htaccess', 'wp - config.php', 'functions.php']
 
             permissions_checked = 0
             for file_name in security_files:
@@ -517,7 +517,7 @@ class WordPressServerAccess:
                 'continuous_learning': True,
                 'brand_evolution': brand_evolution,
                 'intelligence_level': 'GOD_MODE_LEVEL_2',
-                'next_learning_cycle': datetime.now() + timedelta(hours=1)
+                'next_learning_cycle': datetime.now() + timedelta(hours = 1)
             }
 
         except Exception as e:

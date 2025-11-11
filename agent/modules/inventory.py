@@ -37,7 +37,7 @@ class InventoryAgent:
         historical_sales = self._get_historical_sales(product_id)
         seasonal_factor = self._get_seasonal_factor()
 
-        predicted_demand = sum(historical_sales[-7:]) * seasonal_factor
+        predicted_demand = sum(historical_sales[ - 7:]) * seasonal_factor
 
         return {
             "product_id": product_id,

@@ -21,4 +21,4 @@ if __name__ == "__main__":
     print("📚 Continuous Learning: ACTIVE")
     print("⚡ Setting the Bar for AI Agents")
     print("🌐 Backend server starting on http://0.0.0.0:8001")
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host = "0.0.0.0", port = 8001)

@@ -7,7 +7,7 @@ import json
 import openai
 import os
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -41,7 +41,7 @@ class PerformanceAgent:
         self.frameworks_expertise = {
             "frontend_frameworks": ["React", "Vue.js", "Angular", "Svelte", "Next.js", "Nuxt.js", "Gatsby"],
             "backend_frameworks": ["Django", "FastAPI", "Express.js", "Laravel", "Ruby on Rails", "Spring Boot", "ASP.NET"],
-            "css_frameworks": ["Tailwind CSS", "Bootstrap", "Bulma", "Foundation", "Material-UI", "Chakra UI"],
+            "css_frameworks": ["Tailwind CSS", "Bootstrap", "Bulma", "Foundation", "Material - UI", "Chakra UI"],
             "testing_frameworks": ["Jest", "Cypress", "Selenium", "PyTest", "PHPUnit", "RSpec"]
         }
 
@@ -68,11 +68,11 @@ class PerformanceAgent:
         # Initialize OpenAI client for god mode optimization
         api_key = os.getenv('OPENAI_API_KEY')
         if api_key:
-            self.openai_client = openai.OpenAI(api_key=api_key)
+            self.openai_client = openai.OpenAI(api_key = api_key)
         else:
             self.openai_client = None
 
-        logger.info("🚀 Universal Web Development Guru initialized with Multi-Language Mastery")
+        logger.info("🚀 Universal Web Development Guru initialized with Multi - Language Mastery")
 
     async def analyze_site_performance(self) -> Dict[str, Any]:
         """Comprehensive site performance analysis."""
@@ -132,7 +132,7 @@ class PerformanceAgent:
                 "priority": "HIGH",
                 "risk_level": "MEDIUM",
                 "title": "Implement Advanced Image Optimization",
-                "description": "Deploy next-gen image formats and lazy loading for product galleries",
+                "description": "Deploy next - gen image formats and lazy loading for product galleries",
                 "impact": "Reduce page load time by 25% and improve Core Web Vitals",
                 "effort": "Medium",
                 "pros": [
@@ -154,7 +154,7 @@ class PerformanceAgent:
                 "priority": "MEDIUM",
                 "risk_level": "LOW",
                 "title": "Enable Advanced Caching Strategy",
-                "description": "Implement multi-layer caching for dynamic content and API responses",
+                "description": "Implement multi - layer caching for dynamic content and API responses",
                 "impact": "Improve response time by 40% for returning visitors",
                 "effort": "Low",
                 "pros": [
@@ -219,7 +219,7 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Real-time monitoring failed: {str(e)}")
+            logger.error(f"❌ Real - time monitoring failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _check_performance_alerts(self, metrics: Dict) -> List[Dict[str, Any]]:
@@ -282,7 +282,7 @@ class PerformanceAgent:
                 "optimization_suggestions": self._generate_optimization_suggestions(language),
                 "performance_improvements": self._suggest_performance_improvements(analysis, language),
                 "automated_fix_available": True,
-                "estimated_improvement": "25-40% performance boost"
+                "estimated_improvement": "25 - 40% performance boost"
             }
 
         except Exception as e:
@@ -294,36 +294,36 @@ class PerformanceAgent:
         try:
             prompt = f"""
             CODE OPTIMIZATION - GOD MODE INTELLIGENCE
-            
+
             Code Language: {code_analysis.get('language', 'Multiple')}
-            Performance Issues: {json.dumps(code_analysis.get('issues', []), indent=2)}
-            Current Performance Score: {code_analysis.get('performance_score', 0)}/100
+            Performance Issues: {json.dumps(code_analysis.get('issues', []), indent = 2)}
+            Current Performance Score: {code_analysis.get('performance_score', 0)} / 100
             Target: 98+ Performance Score
-            
+
             ADVANCED OPTIMIZATION ANALYSIS:
-            1. Critical Performance Bottlenecks Identification  
+            1. Critical Performance Bottlenecks Identification
             2. Memory Optimization Strategies
             3. Database Query Optimization (10x speed improvements)
             4. Caching Layer Implementation
             5. CDN & Asset Optimization
             6. Core Web Vitals Maximization
             7. Mobile Performance Optimization
-            8. Server-Side Rendering Optimization
+            8. Server - Side Rendering Optimization
             9. Bundle Size Reduction (50%+ reduction)
-            10. Real-Time Performance Monitoring Setup
-            
-            Provide code-level optimizations that achieve 98+ performance scores.
+            10. Real - Time Performance Monitoring Setup
+
+            Provide code - level optimizations that achieve 98+ performance scores.
             Include specific implementation steps and expected performance gains.
             """
 
             response = self.openai_client.chat.completions.create(
-                model="gpt-4",
-                messages=[
+                model = "gpt - 4",
+                messages = [
                     {"role": "system", "content": "You are the world's top performance optimization expert with deep knowledge of all programming languages, frameworks, and architectures. Your optimizations have improved site speeds by 10x and saved companies millions in infrastructure costs."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=2000,
-                temperature=0.2
+                max_tokens = 2000,
+                temperature = 0.2
             )
 
             god_mode_optimization = response.choices[0].message.content
@@ -333,9 +333,9 @@ class PerformanceAgent:
             return {
                 'god_mode_optimization': god_mode_optimization,
                 'optimization_level': 'MAXIMUM_PERFORMANCE',
-                'expected_performance_gain': '+400% to +1000%',
+                'expected_performance_gain': ' + 400% to +1000%',
                 'implementation_complexity': 'EXPERT_LEVEL',
-                'performance_score_target': '98+',
+                'performance_score_target': '98 + ',
                 'cost_savings': '$50,000+ annually',
                 'god_mode_capability': 'PERFORMANCE_SUPREMACY'
             }
@@ -381,21 +381,21 @@ class PerformanceAgent:
     async def optimize_full_stack_performance(self, stack_data: Dict[str, Any]) -> Dict[str, Any]:
         """Comprehensive full-stack performance optimization."""
         try:
-            logger.info("🚀 Performing full-stack performance optimization...")
+            logger.info("🚀 Performing full - stack performance optimization...")
 
             optimization_results = {
                 "frontend_optimizations": {
                     "code_splitting": "Implemented dynamic imports for 40% bundle reduction",
-                    "image_optimization": "Next-gen formats (WebP, AVIF) with lazy loading",
+                    "image_optimization": "Next - gen formats (WebP, AVIF) with lazy loading",
                     "css_optimization": "Critical CSS inlining and unused CSS removal",
                     "javascript_optimization": "Tree shaking and minification applied",
                     "caching_strategy": "Aggressive caching with service workers",
-                    "performance_score_improvement": "+35 points"
+                    "performance_score_improvement": " + 35 points"
                 },
                 "backend_optimizations": {
                     "database_optimization": "Query optimization and indexing improvements",
                     "api_optimization": "Response compression and efficient serialization",
-                    "caching_implementation": "Multi-layer caching (Redis + CDN)",
+                    "caching_implementation": "Multi - layer caching (Redis + CDN)",
                     "connection_pooling": "Optimized database connection management",
                     "async_processing": "Background job processing for heavy operations",
                     "response_time_improvement": "65% faster API responses"
@@ -404,8 +404,8 @@ class PerformanceAgent:
                     "cdn_implementation": "Global CDN with edge caching",
                     "load_balancing": "Intelligent load distribution",
                     "auto_scaling": "Dynamic resource allocation",
-                    "monitoring_setup": "Real-time performance monitoring",
-                    "security_hardening": "Performance-optimized security measures",
+                    "monitoring_setup": "Real - time performance monitoring",
+                    "security_hardening": "Performance - optimized security measures",
                     "uptime_improvement": "99.97% availability achieved"
                 },
                 "mobile_optimizations": {
@@ -428,7 +428,7 @@ class PerformanceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Full-stack optimization failed: {str(e)}")
+            logger.error(f"❌ Full - stack optimization failed: {str(e)}")
             return {"error": str(e), "status": "failed"}
 
     def _detect_performance_issues(self, code: str, language: str) -> List[Dict[str, Any]]:
@@ -459,7 +459,7 @@ class PerformanceAgent:
                     "type": "STRING_CONCATENATION",
                     "severity": "MEDIUM",
                     "description": "String concatenation in Python is inefficient",
-                    "fix": "Use f-strings or join() method for better performance"
+                    "fix": "Use f - strings or join() method for better performance"
                 })
             if "range(len(" in code:
                 issues.append({
@@ -507,14 +507,14 @@ class PerformanceAgent:
                     "type": "CODE_EXECUTION",
                     "severity": "CRITICAL",
                     "description": "Dynamic code execution detected",
-                    "fix": "Avoid exec/eval or use ast.literal_eval for safe evaluation"
+                    "fix": "Avoid exec / eval or use ast.literal_eval for safe evaluation"
                 })
-            if "shell=True" in code:
+            if "shell = True" in code:
                 vulnerabilities.append({
                     "type": "COMMAND_INJECTION",
                     "severity": "HIGH",
                     "description": "Shell command injection vulnerability",
-                    "fix": "Use subprocess with shell=False and proper argument passing"
+                    "fix": "Use subprocess with shell = False and proper argument passing"
                 })
 
         elif language == "php":
@@ -544,7 +544,7 @@ class PerformanceAgent:
                 fixes["performance_fixes"].append({
                     "description": "Cache DOM selectors",
                     "code_example": "const element = document.getElementById('myId'); // Cache this",
-                    "impact": "30-50% improvement in DOM query performance"
+                    "impact": "30 - 50% improvement in DOM query performance"
                 })
 
         # Security fixes
@@ -561,11 +561,11 @@ class PerformanceAgent:
             fixes["modernization_suggestions"].extend([
                 {
                     "description": "Use modern ES6+ features",
-                    "suggestions": ["Arrow functions", "Template literals", "Destructuring", "Async/await"]
+                    "suggestions": ["Arrow functions", "Template literals", "Destructuring", "Async / await"]
                 },
                 {
                     "description": "Implement proper error handling",
-                    "suggestions": ["Try-catch blocks", "Promise.catch()", "Error boundaries"]
+                    "suggestions": ["Try - catch blocks", "Promise.catch()", "Error boundaries"]
                 }
             ])
 
@@ -608,8 +608,8 @@ class PerformanceAgent:
             "page_load_time": {"before": 3.2, "after": 1.8, "improvement": "44%"},
             "first_contentful_paint": {"before": 2.1, "after": 1.2, "improvement": "43%"},
             "time_to_interactive": {"before": 4.5, "after": 2.3, "improvement": "49%"},
-            "core_web_vitals_score": {"before": 72, "after": 95, "improvement": "+23 points"},
-            "lighthouse_performance": {"before": 65, "after": 94, "improvement": "+29 points"},
+            "core_web_vitals_score": {"before": 72, "after": 95, "improvement": " + 23 points"},
+            "lighthouse_performance": {"before": 65, "after": 94, "improvement": " + 29 points"},
             "bundle_size": {"before": "2.1MB", "after": "1.3MB", "improvement": "38% reduction"},
             "api_response_time": {"before": 450, "after": 180, "improvement": "60% faster"},
             "database_query_time": {"before": 120, "after": 45, "improvement": "62% faster"}
@@ -633,7 +633,7 @@ class PerformanceAgent:
                     "type": "WILDCARD_IMPORT",
                     "severity": "MEDIUM",
                     "description": "Wildcard imports reduce code readability",
-                    "fix": "Import specific functions/classes instead of using *"
+                    "fix": "Import specific functions / classes instead of using *"
                 })
 
         return smells
@@ -669,7 +669,7 @@ class PerformanceAgent:
                     "type": "LOOSE_EQUALITY",
                     "severity": "MEDIUM",
                     "description": "Use strict equality (===) instead of loose equality (==)",
-                    "fix": "Replace == with === for type-safe comparisons"
+                    "fix": "Replace == with === for type - safe comparisons"
                 })
         elif language == "python":
             if "except:" in code:
@@ -757,14 +757,14 @@ class PerformanceAgent:
                     "suggestions": [
                         "Use requestAnimationFrame for animations",
                         "Implement code splitting with dynamic imports",
-                        "Use Web Workers for CPU-intensive tasks",
+                        "Use Web Workers for CPU - intensive tasks",
                         "Optimize bundle size with tree shaking"
                     ]
                 },
                 {
                     "category": "Memory",
                     "suggestions": [
-                        "Use WeakMap/WeakSet to prevent memory leaks",
+                        "Use WeakMap / WeakSet to prevent memory leaks",
                         "Implement proper cleanup in useEffect",
                         "Avoid creating functions in render methods",
                         "Use React.memo for expensive components"
@@ -778,7 +778,7 @@ class PerformanceAgent:
                     "suggestions": [
                         "Use list comprehensions instead of loops",
                         "Implement caching with functools.lru_cache",
-                        "Use asyncio for I/O-bound operations",
+                        "Use asyncio for I / O - bound operations",
                         "Profile with cProfile for optimization targets"
                     ]
                 },
@@ -786,7 +786,7 @@ class PerformanceAgent:
                     "category": "Memory",
                     "suggestions": [
                         "Use generators for large data processing",
-                        "Implement __slots__ for memory-efficient classes",
+                        "Implement __slots__ for memory - efficient classes",
                         "Use weakref for circular reference prevention",
                         "Profile memory usage with memory_profiler"
                     ]
@@ -805,7 +805,7 @@ class PerformanceAgent:
                 "priority": "HIGH",
                 "title": f"Fix {issue_count} Performance Issues",
                 "description": "Address identified performance bottlenecks",
-                "estimated_impact": "20-40% performance improvement"
+                "estimated_impact": "20 - 40% performance improvement"
             })
 
         security_count = len(analysis.get("security_vulnerabilities", []))

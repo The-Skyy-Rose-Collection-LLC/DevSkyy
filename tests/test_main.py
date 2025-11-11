@@ -38,14 +38,14 @@ def test_run_endpoint_calls_functions_in_sequence():
     def schedule_side_effect():
         call_order.append("schedule")
 
-    with patch("agent.modules.scanner.scan_site", side_effect=scan_side_effect, create=True) as mock_scan, \
-            patch("agent.modules.fixer.fix_code", side_effect=fix_side_effect, create=True) as mock_fix, \
-            patch("agent.git_commit.commit_fixes", side_effect=commit_side_effect, create=True) as mock_commit, \
-            patch("agent.scheduler.cron.schedule_hourly_job", side_effect=schedule_side_effect, create=True) as mock_schedule:
+    with patch("agent.modules.scanner.scan_site", side_effect = scan_side_effect, create = True) as mock_scan, \
+            patch("agent.modules.fixer.fix_code", side_effect = fix_side_effect, create = True) as mock_fix, \
+            patch("agent.git_commit.commit_fixes", side_effect = commit_side_effect, create = True) as mock_commit, \
+            patch("agent.scheduler.cron.schedule_hourly_job", side_effect = schedule_side_effect, create = True) as mock_schedule:
         main = importlib.import_module("main")
         importlib.reload(main)
         client = TestClient(main.app)
-        response = client.post("/run")
+        response = client.post(" / run")
 
     assert response.json() == {"status": "completed"}
     assert call_order == ["scan", "fix", "commit", "schedule"]

@@ -7,7 +7,7 @@ import hashlib
 import secrets
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -46,8 +46,8 @@ class SecurityAgent:
                     "last_scan": datetime.now().isoformat()
                 },
                 "compliance_status": {
-                    "pci_dss": {"status": "compliant", "score": 98, "expiry": "2025-12-31"},
-                    "gdpr": {"status": "compliant", "score": 96, "last_audit": "2024-11-15"}
+                    "pci_dss": {"status": "compliant", "score": 98, "expiry": "2025 - 12 - 31"},
+                    "gdpr": {"status": "compliant", "score": 96, "last_audit": "2024 - 11 - 15"}
                 },
                 "threat_landscape": {
                     "active_threats": 2,
@@ -81,7 +81,7 @@ class SecurityAgent:
                 "priority": "CRITICAL",
                 "risk_level": "HIGH",
                 "title": "Implement Advanced Bot Protection",
-                "description": "Deploy AI-powered bot detection to protect against automated attacks and scraping",
+                "description": "Deploy AI - powered bot detection to protect against automated attacks and scraping",
                 "impact": "Prevent credential stuffing and inventory hoarding attacks",
                 "effort": "Medium",
                 "pros": [
@@ -123,7 +123,7 @@ class SecurityAgent:
                 "mitigation": risk_data.get("mitigation", "")
             })
 
-        return sorted(risks, key=lambda x: x["score"], reverse=True)
+        return sorted(risks, key = lambda x: x["score"], reverse = True)
 
 
 def secure_luxury_platform() -> Dict[str, Any]:

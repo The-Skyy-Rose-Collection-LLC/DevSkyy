@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import requests
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -92,7 +92,7 @@ class SEOMarketingAgent:
                 "priority": "HIGH",
                 "risk_level": "HIGH",
                 "title": "Optimize for Fashion Week Keywords",
-                "description": "Target high-volume fashion week related keywords during seasonal periods",
+                "description": "Target high - volume fashion week related keywords during seasonal periods",
                 "impact": "Could increase organic traffic by 35%",
                 "effort": "Medium",
                 "pros": [
@@ -127,7 +127,7 @@ class SEOMarketingAgent:
         return [
             {
                 "area": "Content Optimization",
-                "description": "Auto-optimize meta descriptions and titles based on performance",
+                "description": "Auto - optimize meta descriptions and titles based on performance",
                 "impact": "HIGH",
                 "complexity": "MEDIUM"
             }

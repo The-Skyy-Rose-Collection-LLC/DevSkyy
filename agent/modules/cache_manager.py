@@ -8,13 +8,13 @@ import pickle
 import os
 from functools import wraps
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class CacheManager:
     """High-performance caching system with TTL and memory management."""
-    
+
     def __init__(self, max_size: int = 1000, default_ttl: int = 300):
         self.cache = {}
         self.max_size = max_size
@@ -22,32 +22,32 @@ class CacheManager:
         self.access_times = {}
         self.hit_count = 0
         self.miss_count = 0
-        
+
     def _generate_key(self, key: Union[str, Dict]) -> str:
         """Generate a consistent cache key."""
         if isinstance(key, dict):
-            key_str = json.dumps(key, sort_keys=True)
+            key_str = json.dumps(key, sort_keys = True)
         else:
             key_str = str(key)
         return hashlib.md5(key_str.encode()).hexdigest()
-    
+
     def _is_expired(self, timestamp: datetime, ttl: int) -> bool:
         """Check if cache entry is expired."""
-        return datetime.now() - timestamp > timedelta(seconds=ttl)
-    
+        return datetime.now() - timestamp > timedelta(seconds = ttl)
+
     def _evict_lru(self):
         """Evict least recently used items when cache is full."""
         if len(self.cache) >= self.max_size:
             # Remove oldest accessed item
-            oldest_key = min(self.access_times.keys(), key=lambda k: self.access_times[k])
+            oldest_key = min(self.access_times.keys(), key = lambda k: self.access_times[k])
             del self.cache[oldest_key]
             del self.access_times[oldest_key]
             logger.info(f"Evicted LRU cache entry: {oldest_key}")
-    
+
     def get(self, key: Union[str, Dict], default: Any = None) -> Any:
         """Get value from cache."""
         cache_key = self._generate_key(key)
-        
+
         if cache_key in self.cache:
             entry = self.cache[cache_key]
             if not self._is_expired(entry['timestamp'], entry['ttl']):
@@ -60,20 +60,20 @@ class CacheManager:
                 del self.cache[cache_key]
                 if cache_key in self.access_times:
                     del self.access_times[cache_key]
-        
+
         self.miss_count += 1
         logger.debug(f"Cache miss for key: {cache_key}")
         return default
-    
+
     def set(self, key: Union[str, Dict], value: Any, ttl: Optional[int] = None) -> None:
         """Set value in cache with TTL."""
         cache_key = self._generate_key(key)
         ttl = ttl or self.default_ttl
-        
+
         # Evict if necessary
         if len(self.cache) >= self.max_size and cache_key not in self.cache:
             self._evict_lru()
-        
+
         self.cache[cache_key] = {
             'value': value,
             'timestamp': datetime.now(),
@@ -81,7 +81,7 @@ class CacheManager:
         }
         self.access_times[cache_key] = datetime.now()
         logger.debug(f"Cached value for key: {cache_key}")
-    
+
     def delete(self, key: Union[str, Dict]) -> bool:
         """Delete key from cache."""
         cache_key = self._generate_key(key)
@@ -92,18 +92,18 @@ class CacheManager:
             logger.debug(f"Deleted cache entry: {cache_key}")
             return True
         return False
-    
+
     def clear(self) -> None:
         """Clear all cache entries."""
         self.cache.clear()
         self.access_times.clear()
         logger.info("Cache cleared")
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics."""
         total_requests = self.hit_count + self.miss_count
         hit_rate = (self.hit_count / total_requests * 100) if total_requests > 0 else 0
-        
+
         return {
             'size': len(self.cache),
             'max_size': self.max_size,
@@ -112,24 +112,24 @@ class CacheManager:
             'hit_rate': round(hit_rate, 2),
             'total_requests': total_requests
         }
-    
+
     def cleanup_expired(self) -> int:
         """Remove expired entries and return count of removed items."""
         expired_keys = []
         current_time = datetime.now()
-        
+
         for key, entry in self.cache.items():
             if self._is_expired(entry['timestamp'], entry['ttl']):
                 expired_keys.append(key)
-        
+
         for key in expired_keys:
             del self.cache[key]
             if key in self.access_times:
                 del self.access_times[key]
-        
+
         if expired_keys:
             logger.info(f"Cleaned up {len(expired_keys)} expired cache entries")
-        
+
         return len(expired_keys)
 
 
@@ -141,7 +141,7 @@ def cached(ttl: int = 300, key_prefix: str = ""):
     """Decorator for caching function results."""
     def decorator(func):
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper( * args, **kwargs):
             # Generate cache key
             cache_key = {
                 'func': func.__name__,
@@ -149,23 +149,23 @@ def cached(ttl: int = 300, key_prefix: str = ""):
                 'kwargs': kwargs,
                 'prefix': key_prefix
             }
-            
+
             # Try to get from cache
             result = cache_manager.get(cache_key)
             if result is not None:
                 return result
-            
+
             # Execute function and cache result
             if asyncio.iscoroutinefunction(func):
-                result = await func(*args, **kwargs)
+                result = await func( * args, **kwargs)
             else:
-                result = func(*args, **kwargs)
-            
+                result = func( * args, **kwargs)
+
             cache_manager.set(cache_key, result, ttl)
             return result
-        
+
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper( * args, **kwargs):
             # Generate cache key
             cache_key = {
                 'func': func.__name__,
@@ -173,27 +173,27 @@ def cached(ttl: int = 300, key_prefix: str = ""):
                 'kwargs': kwargs,
                 'prefix': key_prefix
             }
-            
+
             # Try to get from cache
             result = cache_manager.get(cache_key)
             if result is not None:
                 return result
-            
+
             # Execute function and cache result
-            result = func(*args, **kwargs)
+            result = func( * args, **kwargs)
             cache_manager.set(cache_key, result, ttl)
             return result
-        
+
         return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
     return decorator
 
 
 class ConnectionPool:
     """Connection pooling for database and external services."""
-    
+
     def __init__(self, max_connections: int = 10):
         self.max_connections = max_connections
-        self.connections = asyncio.Queue(maxsize=max_connections)
+        self.connections = asyncio.Queue(maxsize = max_connections)
         self.active_connections = 0
         self.connection_stats = {
             'created': 0,
@@ -201,7 +201,7 @@ class ConnectionPool:
             'closed': 0,
             'errors': 0
         }
-    
+
     async def get_connection(self):
         """Get a connection from the pool."""
         try:
@@ -227,7 +227,7 @@ class ConnectionPool:
             self.connection_stats['errors'] += 1
             logger.error(f"Error getting connection: {e}")
             raise
-    
+
     async def return_connection(self, connection):
         """Return a connection to the pool."""
         try:
@@ -241,11 +241,11 @@ class ConnectionPool:
         except Exception as e:
             self.connection_stats['errors'] += 1
             logger.error(f"Error returning connection: {e}")
-    
+
     async def _create_connection(self):
         """Create a new connection (to be implemented by subclasses)."""
         raise NotImplementedError("Subclasses must implement _create_connection")
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get connection pool statistics."""
         return {

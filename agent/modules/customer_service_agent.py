@@ -7,7 +7,7 @@ import json
 import openai
 import os
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +32,7 @@ class CustomerServiceAgent:
         # OpenAI GOD MODE Integration
         api_key = os.getenv('OPENAI_API_KEY')
         if api_key:
-            self.openai_client = openai.OpenAI(api_key=api_key)
+            self.openai_client = openai.OpenAI(api_key = api_key)
             self.god_mode_active = True
             logger.info("💎 Customer Service Agent initialized with OpenAI GOD MODE")
         else:
@@ -85,12 +85,12 @@ class CustomerServiceAgent:
             {
                 "priority": "HIGH",
                 "risk_level": "MEDIUM",
-                "title": "Implement AI-Powered Styling Chatbot",
-                "description": "Deploy 24/7 AI styling assistant for instant fashion advice",
+                "title": "Implement AI - Powered Styling Chatbot",
+                "description": "Deploy 24 / 7 AI styling assistant for instant fashion advice",
                 "impact": "Reduce response time by 70% and increase satisfaction",
                 "effort": "High",
                 "pros": [
-                    "24/7 availability for global customers",
+                    "24 / 7 availability for global customers",
                     "Consistent brand voice and recommendations",
                     "Scalable without increasing headcount",
                     "Personalized styling based on purchase history"

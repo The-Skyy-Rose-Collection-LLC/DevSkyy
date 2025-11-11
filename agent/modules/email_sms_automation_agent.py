@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import json
 import re
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -145,7 +145,7 @@ class EmailSMSAutomationAgent:
         try:
             campaign_type = campaign_data.get("type", "promotional")
             target_audience = campaign_data.get("audience", "all_customers")
-            launch_date = campaign_data.get("launch_date", datetime.now().strftime("%Y-%m-%d"))
+            launch_date = campaign_data.get("launch_date", datetime.now().strftime("%Y - %m - %d"))
 
             logger.info(f"📧 Creating {campaign_type} email campaign for {target_audience}...")
 

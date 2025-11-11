@@ -11,7 +11,7 @@ load_dotenv()
 
 class Config:
     """Base configuration."""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev - secret - key - change - in - production'
     DEBUG = False
     TESTING = False
 
@@ -24,14 +24,14 @@ class Config:
 
     # Brand Settings
     BRAND_NAME = "The Skyy Rose Collection"
-    BRAND_DOMAIN = "theskyy-rose-collection.com"
+    BRAND_DOMAIN = "theskyy - rose - collection.com"
 
     # Performance
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
 
     # Security
     CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
-    TRUSTED_HOSTS = ["theskyy-rose-collection.com", "*.replit.app"]
+    TRUSTED_HOSTS = ["theskyy - rose - collection.com", "*.replit.app"]
 
 
 class DevelopmentConfig(Config):

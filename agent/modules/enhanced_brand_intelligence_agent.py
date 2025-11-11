@@ -395,7 +395,7 @@ class EnhancedBrandIntelligenceAgent:
                 },
                 {
                     'recommendation': 'Develop signature collection storytelling',
-                    'rationale': 'Strong brand assets suggest collection-based strategy',
+                    'rationale': 'Strong brand assets suggest collection - based strategy',
                     'implementation': 'Create narrative around Love Hurts and Signature collections',
                     'priority': 'high'
                 }
@@ -406,7 +406,7 @@ class EnhancedBrandIntelligenceAgent:
                 {
                     'recommendation': 'Amplify visual storytelling capabilities',
                     'rationale': 'Strong visual content foundation detected',
-                    'implementation': 'Increase video content and behind-the-scenes storytelling',
+                    'implementation': 'Increase video content and behind - the - scenes storytelling',
                     'priority': 'medium'
                 },
                 {

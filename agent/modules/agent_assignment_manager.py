@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -48,7 +48,7 @@ class AgentAssignmentManager:
                 "name": "Chief Brand Strategist & Senior Luxury Market Intelligence Director",
                 "job_title": "Senior Director of Brand Intelligence & Luxury Market Analytics",
                 "department": "Executive Brand Strategy & Market Research Division",
-                "seniority_level": "C-Suite Executive (VP/Director)",
+                "seniority_level": "C - Suite Executive (VP / Director)",
                 "icon": "👑",
                 "specialties": ["brand_strategy", "market_analysis", "trend_forecasting", "competitive_intelligence", "executive_decisions", "luxury_fashion_intelligence"],
                 "suitable_roles": ["brand_management", "content_creation", "social_media", "executive_oversight"],
@@ -64,7 +64,7 @@ class AgentAssignmentManager:
                 "name": "Creative Director & Senior Luxury Design Automation Specialist",
                 "job_title": "Creative Director & Senior Director of Luxury Design Automation",
                 "department": "Creative Design & Visual Brand Innovation Division",
-                "seniority_level": "Director Level (Creative Lead/Principal Designer)",
+                "seniority_level": "Director Level (Creative Lead / Principal Designer)",
                 "icon": "🎨",
                 "specialties": ["ui_design", "ux_optimization", "visual_systems", "frontend_development", "luxury_aesthetics", "collection_pages", "animation_design", "motion_graphics"],
                 "suitable_roles": ["frontend_beauty", "design_automation", "customer_experience", "collection_design", "animation_creation"],
@@ -82,7 +82,7 @@ class AgentAssignmentManager:
                 "name": "Chief Marketing Officer & Senior Social Media Strategy Director",
                 "job_title": "Chief Marketing Officer (CMO) & Senior Director of Social Media Strategy",
                 "department": "Digital Marketing & Viral Content Creation Division",
-                "seniority_level": "C-Suite Executive (CMO/VP Marketing)",
+                "seniority_level": "C - Suite Executive (CMO / VP Marketing)",
                 "icon": "📱",
                 "specialties": ["content_strategy", "engagement_optimization", "trend_analysis", "influencer_relations", "brand_storytelling", "executive_content", "viral_content_creation", "luxury_fashion_marketing"],
                 "suitable_roles": ["social_media", "content_creation", "brand_management", "viral_marketing"],
@@ -106,10 +106,10 @@ class AgentAssignmentManager:
                 "vip_customer_focus": True
             },
             "performance": {
-                "name": "Senior Performance Engineering Lead & Frontend Optimization Specialist", 
+                "name": "Senior Performance Engineering Lead & Frontend Optimization Specialist",
                 "job_title": "Senior Performance Engineering Lead & Principal Frontend Performance Architect",
                 "department": "Performance Engineering & Site Optimization Division",
-                "seniority_level": "Senior/Principal Engineer Level (Performance Tech Lead)",
+                "seniority_level": "Senior / Principal Engineer Level (Performance Tech Lead)",
                 "icon": "⚡",
                 "specialties": ["code_optimization", "speed_enhancement", "security_analysis", "debugging", "24_7_monitoring", "auto_fixes", "core_web_vitals", "animation_performance"],
                 "suitable_roles": ["performance_optimization", "frontend_beauty", "design_automation", "system_monitoring", "animation_optimization"],
@@ -142,10 +142,10 @@ class AgentAssignmentManager:
                 "luxury_expertise": 87
             },
             "wordpress": {
-                "name": "Senior WordPress Architect & Production-Level Divi 5 Specialist",
+                "name": "Senior WordPress Architect & Production - Level Divi 5 Specialist",
                 "job_title": "Senior WordPress Architect & Lead Divi 5 Component Developer",
                 "department": "WordPress Development & Production Operations Division",
-                "seniority_level": "Senior Level (Principal Engineer/Lead Developer)",
+                "seniority_level": "Senior Level (Principal Engineer / Lead Developer)",
                 "icon": "🌐",
                 "specialties": ["wordpress_optimization", "divi_customization", "plugin_management", "theme_development", "divi_5_components", "animation_integration", "production_deployment"],
                 "suitable_roles": ["frontend_beauty", "design_automation", "performance_optimization", "animation_implementation"],
@@ -160,7 +160,7 @@ class AgentAssignmentManager:
                 "name": "Senior Frontend Animation Director & Visual Experience Architect",
                 "job_title": "Senior Frontend Animation Director & Principal Visual Experience Architect",
                 "department": "Frontend Excellence & Animation Production Division",
-                "seniority_level": "Principal Engineer Level (Frontend Lead/Animation Specialist)",
+                "seniority_level": "Principal Engineer Level (Frontend Lead / Animation Specialist)",
                 "icon": "✨",
                 "specialties": ["production_ready_animations", "luxury_ui_ux", "visual_effects", "interactive_experiences", "css3_animations", "javascript_transitions", "gsap_expertise", "framer_motion"],
                 "suitable_roles": ["frontend_beauty", "design_automation", "animation_implementation", "visual_optimization"],
@@ -180,7 +180,7 @@ class AgentAssignmentManager:
                 "icon": "🔧",
                 "specialties": ["react_components", "divi_5_integration", "animation_components", "production_systems", "reusable_modules", "scalable_architecture"],
                 "suitable_roles": ["frontend_components", "design_automation", "performance_optimization", "component_development"],
-                "certifications": ["Component Architecture Expert", "React/Divi Specialist", "Animation Component Lead", "Production Systems Engineer"],
+                "certifications": ["Component Architecture Expert", "React / Divi Specialist", "Animation Component Lead", "Production Systems Engineer"],
                 "component_mastery": ["reusable_animation_components", "divi_5_custom_components", "production_ready_modules", "scalable_architecture"],
                 "luxury_expertise": 93,
                 "production_ready": True,
@@ -192,7 +192,7 @@ class AgentAssignmentManager:
                 "name": "Senior Performance Engineering Lead & Frontend Optimization Specialist",
                 "job_title": "Senior Performance Engineering Lead & Principal Frontend Performance Architect",
                 "department": "Performance Engineering & Site Optimization Division",
-                "seniority_level": "Senior/Principal Engineer Level (Performance Tech Lead)",
+                "seniority_level": "Senior / Principal Engineer Level (Performance Tech Lead)",
                 "icon": "🚀",
                 "specialties": ["core_web_vitals", "animation_performance", "real_time_monitoring", "bundle_optimization", "gpu_acceleration", "performance_analytics"],
                 "suitable_roles": ["frontend_performance", "performance_optimization", "animation_optimization", "monitoring"],
@@ -235,7 +235,7 @@ class AgentAssignmentManager:
         # Frontend Agent Specializations and Responsibilities
         self.frontend_agent_assignments = {
             "design_automation": {
-                "role": "Lead Frontend Beauty & UI/UX Specialist",
+                "role": "Lead Frontend Beauty & UI / UX Specialist",
                 "frontend_responsibilities": [
                     "luxury_ui_design_implementation",
                     "visual_hierarchy_optimization",
@@ -250,7 +250,7 @@ class AgentAssignmentManager:
                 ],
                 "backend_communication": {
                     "data_requirements": ["user_preferences", "product_data", "analytics_metrics"],
-                    "api_endpoints_used": ["/api/products", "/api/users", "/api/analytics", "/api/collections"],
+                    "api_endpoints_used": [" / api / products", " / api / users", " / api / analytics", " / api / collections"],
                     "real_time_sync": ["user_interactions", "conversion_data", "a_b_test_results"],
                     "communication_frequency": "real_time_for_user_data_every_5min_for_analytics"
                 },
@@ -274,7 +274,7 @@ class AgentAssignmentManager:
                 ],
                 "backend_communication": {
                     "data_requirements": ["performance_metrics", "error_logs", "user_behavior_data"],
-                    "api_endpoints_used": ["/api/performance", "/api/metrics", "/api/errors"],
+                    "api_endpoints_used": [" / api / performance", " / api / metrics", " / api / errors"],
                     "real_time_sync": ["performance_alerts", "error_notifications", "metric_thresholds"],
                     "communication_frequency": "continuous_monitoring_every_30_seconds"
                 },
@@ -298,7 +298,7 @@ class AgentAssignmentManager:
                 ],
                 "backend_communication": {
                     "data_requirements": ["content_data", "product_information", "user_roles", "site_settings"],
-                    "api_endpoints_used": ["/api/content", "/api/products", "/api/settings", "/api/users"],
+                    "api_endpoints_used": [" / api / content", " / api / products", " / api / settings", " / api / users"],
                     "real_time_sync": ["content_updates", "product_changes", "user_permissions"],
                     "communication_frequency": "every_10_minutes_for_content_real_time_for_user_actions"
                 },
@@ -322,7 +322,7 @@ class AgentAssignmentManager:
                 ],
                 "backend_communication": {
                     "data_requirements": ["brand_analytics", "market_trends", "competitor_data", "customer_insights"],
-                    "api_endpoints_used": ["/api/brand", "/api/analytics", "/api/trends", "/api/insights"],
+                    "api_endpoints_used": [" / api / brand", " / api / analytics", " / api / trends", " / api / insights"],
                     "real_time_sync": ["brand_performance_metrics", "trend_alerts", "competitive_updates"],
                     "communication_frequency": "hourly_for_trends_daily_for_deep_analysis"
                 },
@@ -442,11 +442,11 @@ class AgentAssignmentManager:
         # Flag for monitoring start
         self.monitoring_started = False
 
-        logger.info("👥 Elite Agent Assignment Manager initialized with 24/7 luxury operations")
+        logger.info("👥 Elite Agent Assignment Manager initialized with 24 / 7 luxury operations")
 
     async def _start_24_7_monitoring(self):
         """Start the 24/7 monitoring and auto-fix system."""
-        logger.info("🔄 Starting 24/7 luxury brand monitoring system...")
+        logger.info("🔄 Starting 24 / 7 luxury brand monitoring system...")
 
         while self.monitoring_active:
             try:
@@ -469,7 +469,7 @@ class AgentAssignmentManager:
                 await asyncio.sleep(self.monitoring_config["check_intervals"]["performance"])
 
             except Exception as e:
-                logger.error(f"❌ 24/7 monitoring error: {str(e)}")
+                logger.error(f"❌ 24 / 7 monitoring error: {str(e)}")
                 await asyncio.sleep(60)  # Retry in 1 minute
 
     async def _monitor_performance_metrics(self):
@@ -491,7 +491,7 @@ class AgentAssignmentManager:
                     if metric == "response_time" and value > threshold:
                         issues_detected.append(f"High response time: {value}s")
                     elif metric == "error_rate" and value > threshold:
-                        issues_detected.append(f"High error rate: {value*100:.2f}%")
+                        issues_detected.append(f"High error rate: {value * 100:.2f}%")
 
             if issues_detected and self.auto_fix_enabled:
                 await self._apply_auto_fixes("performance", issues_detected)
@@ -575,7 +575,7 @@ class AgentAssignmentManager:
     async def _apply_auto_fixes(self, category: str, issues: List[str]):
         """Apply automatic fixes for detected issues."""
         try:
-            logger.info(f"🔧 Applying auto-fixes for {category}: {issues}")
+            logger.info(f"🔧 Applying auto - fixes for {category}: {issues}")
 
             fix_strategies = {
                 "performance": {
@@ -601,7 +601,7 @@ class AgentAssignmentManager:
                         logger.info(f"✅ Applied fix: {fix}")
 
         except Exception as e:
-            logger.error(f"Auto-fix failed: {str(e)}")
+            logger.error(f"Auto - fix failed: {str(e)}")
 
     async def _execute_fix(self, fix_type: str):
         """Execute a specific type of fix."""
@@ -700,7 +700,7 @@ class AgentAssignmentManager:
                 "content": page_content,
                 "ab_testing": ab_testing_config,
                 "analytics": analytics_config,
-                "estimated_conversion_rate": "8-15%",
+                "estimated_conversion_rate": "8 - 15%",
                 "luxury_score": 98,
                 "brand_consistency": "maximum",
                 "revenue_potential": "high",
@@ -789,7 +789,7 @@ class AgentAssignmentManager:
             "immediate_opportunities": ["upsell_optimization", "cart_abandonment_recovery", "personalized_recommendations"],
             "medium_term_opportunities": ["subscription_services", "vip_memberships", "limited_editions"],
             "long_term_opportunities": ["market_expansion", "brand_partnerships", "technology_licensing"],
-            "revenue_potential": {"immediate": "15-25%", "medium_term": "30-50%", "long_term": "100%+"}
+            "revenue_potential": {"immediate": "15 - 25%", "medium_term": "30 - 50%", "long_term": "100%+"}
         }
 
     async def _make_executive_decisions(self, business_intelligence: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -813,7 +813,7 @@ class AgentAssignmentManager:
             },
             {
                 "decision": "enhance_mobile_experience",
-                "rationale": "Mobile-first shopping behavior dominates luxury segment",
+                "rationale": "Mobile - first shopping behavior dominates luxury segment",
                 "confidence_score": 95,
                 "expected_roi": "320%",
                 "implementation_priority": "critical",
@@ -1222,7 +1222,7 @@ class AgentAssignmentManager:
                 "overall_frontend_health": await self._calculate_overall_frontend_health(),
                 "coordination_efficiency": await self._calculate_coordination_efficiency(),
                 "user_satisfaction_impact": "97.5%",
-                "revenue_impact_from_frontend": "+18.3%",
+                "revenue_impact_from_frontend": " + 18.3%",
                 "brand_consistency_score": "98.2%",
                 "frontend_backend_sync_status": "optimal",
                 "last_updated": datetime.now().isoformat()
@@ -1305,14 +1305,14 @@ class AgentAssignmentManager:
         """Get recent auto-fixes applied by the system."""
         return [
             {
-                "timestamp": (datetime.now() - timedelta(minutes=15)).isoformat(),
+                "timestamp": (datetime.now() - timedelta(minutes = 15)).isoformat(),
                 "category": "performance",
                 "issue": "response_time_spike",
                 "fix_applied": "database_query_optimization",
                 "result": "response_time_improved_by_40%"
             },
             {
-                "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+                "timestamp": (datetime.now() - timedelta(hours = 2)).isoformat(),
                 "category": "user_experience",
                 "issue": "mobile_layout_inconsistency",
                 "fix_applied": "responsive_design_adjustment",
@@ -1780,7 +1780,7 @@ class AgentAssignmentManager:
             "performance": {
                 "task_completion_rate": 97.1,
                 "quality_score": 95.8,
-                "optimization_impact": "+23%_performance_improvement",
+                "optimization_impact": " + 23%_performance_improvement",
                 "issue_resolution_time": "0.8_hours_avg",
                 "uptime_contribution": "99.9%"
             },
@@ -1835,27 +1835,27 @@ class AgentAssignmentManager:
         """Get user impact metrics for an agent."""
         impact_metrics = {
             "design_automation": {
-                "user_satisfaction_improvement": "+12.5%",
-                "conversion_rate_impact": "+8.3%",
-                "bounce_rate_reduction": "-15.2%",
-                "engagement_increase": "+22.1%"
+                "user_satisfaction_improvement": " + 12.5%",
+                "conversion_rate_impact": " + 8.3%",
+                "bounce_rate_reduction": " - 15.2%",
+                "engagement_increase": " + 22.1%"
             },
             "performance": {
-                "page_load_improvement": "+45%",
-                "core_web_vitals_score": "98/100",
-                "user_retention_impact": "+18.7%",
-                "seo_ranking_improvement": "+23_positions"
+                "page_load_improvement": " + 45%",
+                "core_web_vitals_score": "98 / 100",
+                "user_retention_impact": " + 18.7%",
+                "seo_ranking_improvement": " + 23_positions"
             },
             "wordpress": {
-                "content_management_efficiency": "+35%",
+                "content_management_efficiency": " + 35%",
                 "editor_satisfaction": "96%",
-                "site_maintenance_reduction": "-40%",
+                "site_maintenance_reduction": " - 40%",
                 "feature_adoption_rate": "87%"
             },
             "brand_intelligence": {
                 "brand_consistency_score": "98.5%",
-                "market_positioning_strength": "+15%",
-                "customer_brand_perception": "+20%",
+                "market_positioning_strength": " + 15%",
+                "customer_brand_perception": " + 20%",
                 "competitive_advantage_score": "high"
             }
         }
@@ -1863,7 +1863,7 @@ class AgentAssignmentManager:
         return impact_metrics.get(agent_id, {
             "general_user_impact": "positive",
             "satisfaction_score": "85%",
-            "efficiency_improvement": "+10%"
+            "efficiency_improvement": " + 10%"
         })
 
     async def _get_next_scheduled_task(self, agent_id: str) -> Dict[str, Any]:
@@ -1871,25 +1871,25 @@ class AgentAssignmentManager:
         next_tasks = {
             "design_automation": {
                 "task": "Mobile responsive optimization for collection pages",
-                "scheduled_time": (datetime.now() + timedelta(hours=2)).isoformat(),
+                "scheduled_time": (datetime.now() + timedelta(hours = 2)).isoformat(),
                 "priority": "high",
                 "estimated_duration": "4_hours"
             },
             "performance": {
                 "task": "Core Web Vitals optimization review",
-                "scheduled_time": (datetime.now() + timedelta(hours=1)).isoformat(),
+                "scheduled_time": (datetime.now() + timedelta(hours = 1)).isoformat(),
                 "priority": "critical",
                 "estimated_duration": "2_hours"
             },
             "wordpress": {
                 "task": "Custom Divi component development",
-                "scheduled_time": (datetime.now() + timedelta(hours=3)).isoformat(),
+                "scheduled_time": (datetime.now() + timedelta(hours = 3)).isoformat(),
                 "priority": "medium",
                 "estimated_duration": "6_hours"
             },
             "brand_intelligence": {
                 "task": "Weekly brand consistency audit",
-                "scheduled_time": (datetime.now() + timedelta(hours=4)).isoformat(),
+                "scheduled_time": (datetime.now() + timedelta(hours = 4)).isoformat(),
                 "priority": "high",
                 "estimated_duration": "3_hours"
             }
@@ -1897,7 +1897,7 @@ class AgentAssignmentManager:
 
         return next_tasks.get(agent_id, {
             "task": "General maintenance and optimization",
-            "scheduled_time": (datetime.now() + timedelta(hours=6)).isoformat(),
+            "scheduled_time": (datetime.now() + timedelta(hours = 6)).isoformat(),
             "priority": "low",
             "estimated_duration": "2_hours"
         })
@@ -2002,7 +2002,7 @@ class AgentAssignmentManager:
                         "task_redistribution": ["delegate_monitoring_tasks_to_automated_systems"]
                     }
                 ],
-                "efficiency_improvement": "+7.5%",
+                "efficiency_improvement": " + 7.5%",
                 "estimated_completion_time_reduction": "15%",
                 "resource_optimization": {
                     "cpu_usage_reduction": "12%",
@@ -2235,17 +2235,17 @@ class AgentAssignmentManager:
     def _calculate_frontend_delivery_time(self, procedure_type: str, priority_level: str) -> str:
         """Calculate estimated delivery time for frontend procedures."""
         base_times = {
-            "luxury_ui_design": {"high": "3-5 days", "medium": "5-7 days", "low": "7-10 days"},
-            "collection_page_creation": {"high": "5-7 days", "medium": "7-10 days", "low": "10-14 days"},
-            "frontend_performance_optimization": {"high": "2-3 days", "medium": "3-5 days", "low": "5-7 days"},
-            "responsive_design_implementation": {"high": "4-6 days", "medium": "6-8 days", "low": "8-12 days"},
-            "component_development": {"high": "3-4 days", "medium": "4-6 days", "low": "6-8 days"},
-            "brand_consistency_enforcement": {"high": "2-3 days", "medium": "3-4 days", "low": "4-6 days"},
-            "user_experience_optimization": {"high": "4-5 days", "medium": "5-7 days", "low": "7-10 days"},
-            "frontend_testing_and_qa": {"high": "2-3 days", "medium": "3-4 days", "low": "4-5 days"}
+            "luxury_ui_design": {"high": "3 - 5 days", "medium": "5 - 7 days", "low": "7 - 10 days"},
+            "collection_page_creation": {"high": "5 - 7 days", "medium": "7 - 10 days", "low": "10 - 14 days"},
+            "frontend_performance_optimization": {"high": "2 - 3 days", "medium": "3 - 5 days", "low": "5 - 7 days"},
+            "responsive_design_implementation": {"high": "4 - 6 days", "medium": "6 - 8 days", "low": "8 - 12 days"},
+            "component_development": {"high": "3 - 4 days", "medium": "4 - 6 days", "low": "6 - 8 days"},
+            "brand_consistency_enforcement": {"high": "2 - 3 days", "medium": "3 - 4 days", "low": "4 - 6 days"},
+            "user_experience_optimization": {"high": "4 - 5 days", "medium": "5 - 7 days", "low": "7 - 10 days"},
+            "frontend_testing_and_qa": {"high": "2 - 3 days", "medium": "3 - 4 days", "low": "4 - 5 days"}
         }
 
-        return base_times.get(procedure_type, {}).get(priority_level, "5-7 days")
+        return base_times.get(procedure_type, {}).get(priority_level, "5 - 7 days")
 
     def _setup_frontend_qa_process(self, frontend_assignments: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Setup quality assurance process for frontend assignments."""

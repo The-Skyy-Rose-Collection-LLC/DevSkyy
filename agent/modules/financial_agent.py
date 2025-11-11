@@ -10,7 +10,7 @@ from decimal import Decimal, ROUND_HALF_UP
 import hashlib
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -210,7 +210,7 @@ class FinancialAgent:
                 "amount": Decimal(str(chargeback_amount)),
                 "status": "received",
                 "created_at": datetime.now().isoformat(),
-                "due_date": (datetime.now() + timedelta(days=7)).isoformat(),
+                "due_date": (datetime.now() + timedelta(days = 7)).isoformat(),
                 "evidence_submitted": False,
                 "auto_response": self._generate_auto_response(reason, transaction),
                 "likelihood_of_winning": self._calculate_win_probability(reason, transaction)
@@ -448,7 +448,7 @@ class FinancialAgent:
 
     def _calculate_settlement_date(self) -> str:
         """Calculate estimated settlement date."""
-        return (datetime.now() + timedelta(days=2)).isoformat()
+        return (datetime.now() + timedelta(days = 2)).isoformat()
 
     def _generate_auto_response(self, reason: ChargebackReason, transaction: Dict) -> str:
         """Generate automated chargeback response."""
@@ -541,7 +541,7 @@ class FinancialAgent:
         return {
             "tracking_id": f"CB_{uuid.uuid4().hex[:8].upper()}",
             "submission_status": "accepted",
-            "estimated_response": "7-10 business days"
+            "estimated_response": "7 - 10 business days"
         }
 
     def _recalculate_win_probability(self, chargeback: Dict, evidence: Dict) -> float:
@@ -566,7 +566,7 @@ class FinancialAgent:
 
     def _estimate_resolution_date(self) -> str:
         """Estimate chargeback resolution date."""
-        return (datetime.now() + timedelta(days=14)).isoformat()
+        return (datetime.now() + timedelta(days = 14)).isoformat()
 
     # Financial calculation methods
     def _calculate_total_revenue(self) -> float:
@@ -579,7 +579,7 @@ class FinancialAgent:
 
     def _calculate_monthly_revenue(self) -> float:
         """Calculate current month revenue."""
-        current_month = datetime.now().replace(day=1)
+        current_month = datetime.now().replace(day = 1)
         monthly_transactions = [
             t for t in self.transactions.values()
             if datetime.fromisoformat(t["created_at"]) >= current_month
@@ -651,7 +651,7 @@ class FinancialAgent:
 
     def _get_recent_transactions(self, customer_id: str) -> List[Dict]:
         """Get recent transactions for customer."""
-        cutoff_time = datetime.now() - timedelta(hours=1)
+        cutoff_time = datetime.now() - timedelta(hours = 1)
         return [
             t for t in self.transactions.values()
             if t["customer_id"] == customer_id
@@ -748,7 +748,7 @@ class FinancialAgent:
             "net_cash_flow": 44285.75,
             "operating_cash_flow": 46850.50,
             "pending_settlements": 2850.00,
-            "next_settlement_date": (datetime.now() + timedelta(days=2)).isoformat()
+            "next_settlement_date": (datetime.now() + timedelta(days = 2)).isoformat()
         }
 
     def _get_compliance_status(self) -> Dict[str, str]:
@@ -765,14 +765,14 @@ class FinancialAgent:
         """Get current financial alerts."""
         return [
             "Chargeback rate above 0.5% threshold",
-            "3 high-risk transactions flagged for review",
+            "3 high - risk transactions flagged for review",
             "Monthly fee analysis suggests gateway optimization"
         ]
 
     def _get_financial_recommendations(self) -> List[str]:
         """Get financial optimization recommendations."""
         return [
-            "Consider switching high-volume transactions to Stripe for better rates",
+            "Consider switching high - volume transactions to Stripe for better rates",
             "Implement 3D Secure for transactions over $500 to reduce chargebacks",
             "Set up automated evidence collection for faster dispute resolution",
             "Review and update fraud detection rules based on recent patterns"
@@ -849,9 +849,9 @@ class FinancialAgent:
                     "security_score": 98.7,
                     "vulnerabilities_found": 0,
                     "upgrade_recommendations": [
-                        "Implement EIP-1559 fee structure",
+                        "Implement EIP - 1559 fee structure",
                         "Add circuit breaker for high volume",
-                        "Enable cross-chain bridge auditing"
+                        "Enable cross - chain bridge auditing"
                     ]
                 },
                 "defi_insights": {
@@ -867,10 +867,10 @@ class FinancialAgent:
                     "real_time_blocks": 0
                 },
                 "experimental_features": [
-                    "Zero-knowledge transaction privacy",
-                    "Quantum-resistant signatures",
-                    "MEV-protected transactions",
-                    "Cross-chain atomic swaps"
+                    "Zero - knowledge transaction privacy",
+                    "Quantum - resistant signatures",
+                    "MEV - protected transactions",
+                    "Cross - chain atomic swaps"
                 ],
                 "status": "blockchain_verified",
                 "timestamp": datetime.now().isoformat()
@@ -919,7 +919,7 @@ class FinancialAgent:
                 "optimization_strategies": optimization_recommendations,
                 "filing_deadlines": self._get_filing_deadlines(tax_year, business_type),
                 "required_forms": self._get_required_tax_forms(business_type),
-                "estimated_preparation_time": "2-3 business days",
+                "estimated_preparation_time": "2 - 3 business days",
                 "irs_audit_risk_assessment": self._assess_audit_risk(tax_analysis),
                 "timestamp": datetime.now().isoformat()
             }
@@ -967,7 +967,7 @@ class FinancialAgent:
                 "risk_assessment": credit_risks,
                 "recommended_actions": self._prioritize_credit_actions(credit_analysis),
                 "monitoring_setup": self._setup_credit_monitoring(),
-                "estimated_improvement_timeline": "3-6 months",
+                "estimated_improvement_timeline": "3 - 6 months",
                 "potential_score_increase": self._calculate_potential_score_increase(credit_analysis),
                 "timestamp": datetime.now().isoformat()
             }
@@ -1055,7 +1055,7 @@ class FinancialAgent:
             "q3_estimate": estimated_tax / 4,
             "q4_estimate": estimated_tax / 4,
             "annual_estimate": estimated_tax,
-            "due_dates": ["2025-01-15", "2025-04-15", "2025-06-17", "2025-09-16"]
+            "due_dates": ["2025 - 01 - 15", "2025 - 04 - 15", "2025 - 06 - 17", "2025 - 09 - 16"]
         }
 
     def _identify_tax_credits(self, tax_data: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -1086,7 +1086,7 @@ class FinancialAgent:
             return net_income * 0.15  # Simplified 15% rate
         elif business_type == "Corporation":
             return net_income * 0.21  # Corporate tax rate
-        elif business_type == "S-Corp":
+        elif business_type == "S - Corp":
             return net_income * 0.12  # Pass-through rate
         else:
             return net_income * 0.15  # Default rate
@@ -1096,7 +1096,7 @@ class FinancialAgent:
         strategies = [
             {
                 "strategy": "Maximize Equipment Purchases",
-                "description": "Purchase equipment before year-end for Section 179 deduction",
+                "description": "Purchase equipment before year - end for Section 179 deduction",
                 "potential_savings": 5000,
                 "implementation_difficulty": "Easy"
             },
@@ -1108,7 +1108,7 @@ class FinancialAgent:
             },
             {
                 "strategy": "Retirement Plan Contributions",
-                "description": "Maximize SEP-IRA or Solo 401(k) contributions",
+                "description": "Maximize SEP - IRA or Solo 401(k) contributions",
                 "potential_savings": 8000,
                 "implementation_difficulty": "Easy"
             }
@@ -1118,27 +1118,27 @@ class FinancialAgent:
     def _get_filing_deadlines(self, tax_year: int, business_type: str) -> Dict[str, str]:
         """Get tax filing deadlines."""
         deadlines = {
-            "LLC": f"{tax_year + 1}-03-15",
-            "Corporation": f"{tax_year + 1}-04-15",
-            "S-Corp": f"{tax_year + 1}-03-15",
-            "Partnership": f"{tax_year + 1}-03-15"
+            "LLC": f"{tax_year + 1} - 03 - 15",
+            "Corporation": f"{tax_year + 1} - 04 - 15",
+            "S - Corp": f"{tax_year + 1} - 03 - 15",
+            "Partnership": f"{tax_year + 1} - 03 - 15"
         }
 
         return {
-            "federal_deadline": deadlines.get(business_type, f"{tax_year + 1}-04-15"),
-            "extension_deadline": f"{tax_year + 1}-10-15",
+            "federal_deadline": deadlines.get(business_type, f"{tax_year + 1} - 04 - 15"),
+            "extension_deadline": f"{tax_year + 1} - 10 - 15",
             "quarterly_estimates": [
-                f"{tax_year}-04-15", f"{tax_year}-06-17",
-                f"{tax_year}-09-16", f"{tax_year + 1}-01-15"
+                f"{tax_year} - 04 - 15", f"{tax_year} - 06 - 17",
+                f"{tax_year} - 09 - 16", f"{tax_year + 1} - 01 - 15"
             ]
         }
 
     def _get_required_tax_forms(self, business_type: str) -> List[str]:
         """Get required tax forms by business type."""
         forms = {
-            "LLC": ["1065", "Schedule K-1", "1040", "Schedule E"],
+            "LLC": ["1065", "Schedule K - 1", "1040", "Schedule E"],
             "Corporation": ["1120", "1040", "Schedule D"],
-            "S-Corp": ["1120S", "Schedule K-1", "1040", "Schedule E"],
+            "S - Corp": ["1120S", "Schedule K - 1", "1040", "Schedule E"],
             "Sole Proprietorship": ["1040", "Schedule C", "Schedule SE"]
         }
         return forms.get(business_type, ["1040"])
@@ -1160,7 +1160,7 @@ class FinancialAgent:
             risk_score += 20
 
         # Cash business
-        risk_factors.append("Cash-intensive business")
+        risk_factors.append("Cash - intensive business")
         risk_score += 10
 
         risk_level = "LOW" if risk_score < 30 else "MEDIUM" if risk_score < 50 else "HIGH"
@@ -1189,7 +1189,7 @@ class FinancialAgent:
                 "action": "Reduce Credit Utilization",
                 "priority": "HIGH",
                 "timeline": "30 days",
-                "impact": "+15-30 points",
+                "impact": " + 15 - 30 points",
                 "description": f"Reduce utilization from {utilization}% to under 10%"
             })
 
@@ -1198,7 +1198,7 @@ class FinancialAgent:
                 "action": "Limit Credit Inquiries",
                 "priority": "MEDIUM",
                 "timeline": "6 months",
-                "impact": "+5-10 points",
+                "impact": " + 5 - 10 points",
                 "description": "Avoid new credit applications for 6 months"
             })
 
@@ -1206,8 +1206,8 @@ class FinancialAgent:
             plan.append({
                 "action": "Dispute Negative Items",
                 "priority": "HIGH",
-                "timeline": "60-90 days",
-                "impact": "+20-50 points",
+                "timeline": "60 - 90 days",
+                "impact": " + 20 - 50 points",
                 "description": "Challenge inaccurate negative marks with credit bureaus"
             })
 

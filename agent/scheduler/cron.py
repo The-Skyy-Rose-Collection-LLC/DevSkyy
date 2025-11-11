@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class CronScheduler:
     """
-    Production-level cron scheduler for automated tasks.
+    Production - level cron scheduler for automated tasks.
     Manages recurring jobs with error handling and monitoring.
     """
 
@@ -65,7 +65,7 @@ class CronScheduler:
             return
 
         self.running = True
-        self.scheduler_thread = threading.Thread(target=self._run_scheduler, daemon=True)
+        self.scheduler_thread = threading.Thread(target = self._run_scheduler, daemon = True)
         self.scheduler_thread.start()
 
         logger.info("🚀 Cron scheduler started")
@@ -86,7 +86,7 @@ class CronScheduler:
         schedule.clear()
 
         if self.scheduler_thread and self.scheduler_thread.is_alive():
-            self.scheduler_thread.join(timeout=5)
+            self.scheduler_thread.join(timeout = 5)
 
         logger.info("⏹️ Cron scheduler stopped")
 
@@ -122,7 +122,7 @@ _global_scheduler = CronScheduler()
 def schedule_hourly_job() -> Dict[str, Any]:
     """
     Schedule the main DevSkyy agent workflow to run hourly.
-    Production-level implementation with comprehensive monitoring.
+    Production - level implementation with comprehensive monitoring.
     """
     try:
         logger.info("⏰ Setting up hourly DevSkyy agent workflow...")

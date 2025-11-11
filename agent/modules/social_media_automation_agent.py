@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import json
 import random
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -37,7 +37,7 @@ class SocialMediaAutomationAgent:
                 "best_practices": ["community_engagement", "brand_storytelling", "customer_testimonials"]
             },
             "twitter": {
-                "name": "Twitter/X",
+                "name": "Twitter / X",
                 "icon": "🐦",
                 "optimal_times": ["09:00", "12:00", "18:00"],
                 "content_types": ["tweet", "thread", "space"],
@@ -49,7 +49,7 @@ class SocialMediaAutomationAgent:
                 "icon": "📱",
                 "optimal_times": ["06:00", "10:00", "19:00", "22:00"],
                 "content_types": ["video", "duet", "trend_participation"],
-                "video_length": "15-60 seconds",
+                "video_length": "15 - 60 seconds",
                 "best_practices": ["trending_sounds", "fashion_transformations", "behind_the_scenes"]
             },
             "pinterest": {
@@ -116,7 +116,7 @@ class SocialMediaAutomationAgent:
             platforms = calendar_data.get("platforms", ["instagram", "facebook", "twitter"])
             brand_focus = calendar_data.get("brand_focus", "luxury_fashion")
 
-            logger.info(f"📅 Creating {duration_weeks}-week content calendar for {len(platforms)} platforms...")
+            logger.info(f"📅 Creating {duration_weeks} - week content calendar for {len(platforms)} platforms...")
 
             # Generate content calendar
             calendar = {}
@@ -127,8 +127,8 @@ class SocialMediaAutomationAgent:
                 calendar[week_key] = {}
 
                 for day in range(7):
-                    current_date = start_date + timedelta(weeks=week, days=day)
-                    day_key = current_date.strftime("%Y-%m-%d")
+                    current_date = start_date + timedelta(weeks = week, days = day)
+                    day_key = current_date.strftime("%Y - %m - %d")
 
                     calendar[week_key][day_key] = self._generate_daily_content(
                         current_date, platforms, brand_focus
@@ -184,7 +184,7 @@ class SocialMediaAutomationAgent:
                             "auto_like": automation_config.get("auto_like", True),
                             "auto_comment": automation_config.get("auto_comment", False),
                             "auto_follow": automation_config.get("auto_follow", False),
-                            "engagement_rate_target": "3-5%"
+                            "engagement_rate_target": "3 - 5%"
                         },
                         "analytics_tracking": {
                             "reach": True,
@@ -214,7 +214,7 @@ class SocialMediaAutomationAgent:
                     "competitor_monitoring": "daily"
                 },
                 "estimated_reach": self._calculate_estimated_reach(platforms),
-                "expected_engagement_lift": "25-40%",
+                "expected_engagement_lift": "25 - 40%",
                 "setup_completed_at": datetime.now().isoformat()
             }
 
@@ -455,8 +455,8 @@ class SocialMediaAutomationAgent:
                 },
                 "expected_performance": {
                     "reach": f"{budget * 10}+",
-                    "engagement_rate": "8-12%",
-                    "click_through_rate": "2.5-4%"
+                    "engagement_rate": "8 - 12%",
+                    "click_through_rate": "2.5 - 4%"
                 },
                 "created_at": datetime.now().isoformat()
             }
@@ -498,7 +498,7 @@ class SocialMediaAutomationAgent:
         """Create luxury targeting strategy."""
         return {
             "demographics": {
-                "age_range": "25-55",
+                "age_range": "25 - 55",
                 "income_level": "high_disposable_income",
                 "interests": ["luxury_fashion", "high_end_brands", "premium_lifestyle"]
             },
