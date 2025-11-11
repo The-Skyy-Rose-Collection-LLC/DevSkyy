@@ -642,7 +642,7 @@ class EcommerceAgent:
     def _validate_email(self, email: str) -> bool:
         """Validate email format."""
         import re
-        pattern = r'^[a - zA - Z0 - 9._%+-]+@[a - zA - Z0 - 9.-]+\.[a - zA - Z]{2,}$'
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(pattern, email) is not None
 
     def _find_customer_by_email(self, email: str) -> Optional[Dict]:
@@ -980,8 +980,8 @@ class EcommerceAgent:
     def _generate_url_slug(self, name: str) -> str:
         """Generate SEO-friendly URL slug."""
         import re
-        slug = re.sub(r'[^a - zA - Z0 - 9\s - ]', '', name.lower())
-        slug = re.sub(r'\s + ', '-', slug.strip())
+        slug = re.sub(r'[^a-zA-Z0-9\s-]', '', name.lower())
+        slug = re.sub(r'\s+', '-', slug.strip())
         return slug
 
     def _get_competitive_pricing(self, category: ProductCategory) -> Dict[str, float]:
