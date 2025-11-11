@@ -536,7 +536,7 @@ class SkyRoseBrandTrainer:
             # using CLIP embeddings, style transfer metrics, etc.
 
             consistency_scores = []
-            for _gen_img in generated_images:
+            for _ in generated_images:
                 # Simplified consistency check
                 score = np.random.uniform(0.7, 0.95)  # Simulated consistency score
                 consistency_scores.append(score)
