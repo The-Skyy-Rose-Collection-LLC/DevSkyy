@@ -3,6 +3,7 @@ Unit tests for ApprovalSystem
 Tests human review queue and approval workflow management
 """
 
+import unittest
 import pytest
 import sqlite3
 from datetime import datetime, timedelta
@@ -31,13 +32,13 @@ def approval_system(temp_db_path):
     return ApprovalSystem(db_path=temp_db_path)
 
 
-class TestApprovalSystemInitialization:
+class TestApprovalSystemInitialization(unittest.TestCase):
     """Test ApprovalSystem initialization"""
 
     def test_init_creates_database(self, temp_db_path):
         """Test that initialization creates database file"""
         ApprovalSystem(db_path=temp_db_path)
-        assert Path(temp_db_path).exists()
+        self.assertTrue(Path(temp_db_path).exists())
 
     def test_init_creates_tables(self, temp_db_path):
         """Test that initialization creates required tables"""
@@ -47,15 +48,15 @@ class TestApprovalSystemInitialization:
         
         # Check review_queue table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='review_queue'")
-        assert cursor.fetchone() is not None
+        self.assertIsNotNone(cursor.fetchone())
         
         # Check approval_history table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='approval_history'")
-        assert cursor.fetchone() is not None
+        self.assertIsNotNone(cursor.fetchone())
         
         # Check operator_activity table
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='operator_activity'")
-        assert cursor.fetchone() is not None
+        self.assertIsNotNone(cursor.fetchone())
         
         conn.close()
 
@@ -63,10 +64,10 @@ class TestApprovalSystemInitialization:
         """Test that initialization creates parent directories"""
         nested_path = str(Path(temp_db_path).parent / "nested" / "path" / "review_queue.db")
         ApprovalSystem(db_path=nested_path)
-        assert Path(nested_path).parent.exists()
+        self.assertTrue(Path(nested_path).parent.exists())
 
 
-class TestSubmitForReview:
+class TestSubmitForReview(unittest.TestCase):
     """Test submitting actions for review"""
 
     @pytest.mark.asyncio
@@ -80,10 +81,10 @@ class TestSubmitForReview:
             risk_level="medium"
         )
         
-        assert result["action_id"] == "test_action_001"
-        assert result["status"] == "submitted"
-        assert result["workflow"] == "default"
-        assert "timeout_at" in result
+        self.assertEqual(result["action_id"], "test_action_001")
+        self.assertEqual(result["status"], "submitted")
+        self.assertEqual(result["workflow"], "default")
+        self.assertIn("timeout_at", result)
 
     @pytest.mark.asyncio
     async def test_submit_action_with_custom_workflow(self, approval_system):
@@ -97,7 +98,7 @@ class TestSubmitForReview:
             workflow_type=ApprovalWorkflowType.HIGH_RISK
         )
         
-        assert result["workflow"] == "high_risk"
+        self.assertEqual(result["workflow"], "high_risk")
 
     @pytest.mark.asyncio
     async def test_submit_action_with_custom_timeout(self, approval_system):
@@ -115,7 +116,7 @@ class TestSubmitForReview:
         created_at = datetime.now()
         time_diff = (timeout_at - created_at).total_seconds() / 3600
         
-        assert 47 <= time_diff <= 49  # Allow for timing variations
+        self.assertLess(47, = time_diff <= 49  # Allow for timing variations)
 
     @pytest.mark.asyncio
     async def test_submit_action_creates_history_entry(self, approval_system):
@@ -129,11 +130,11 @@ class TestSubmitForReview:
         )
         
         details = await approval_system.get_action_details("test_action_004")
-        assert len(details["history"]) == 1
-        assert details["history"][0]["event"] == "submitted"
+        self.assertEqual(len(details["history"]), 1)
+        self.assertEqual(details["history"][0]["event"], "submitted")
 
 
-class TestApproveAction:
+class TestApproveAction(unittest.TestCase):
     """Test approving actions"""
 
     @pytest.mark.asyncio
@@ -155,10 +156,10 @@ class TestApproveAction:
             notes="Test approval"
         )
         
-        assert result["action_id"] == "test_action_005"
-        assert result["status"] == "approved"
-        assert result["approved_by"] == "test_operator"
-        assert "approved_at" in result
+        self.assertEqual(result["action_id"], "test_action_005")
+        self.assertEqual(result["status"], "approved")
+        self.assertEqual(result["approved_by"], "test_operator")
+        self.assertIn("approved_at", result)
 
     @pytest.mark.asyncio
     async def test_approve_nonexistent_action(self, approval_system):
@@ -168,8 +169,8 @@ class TestApproveAction:
             operator="test_operator"
         )
         
-        assert "error" in result
-        assert result["status"] == "error"
+        self.assertIn("error", result)
+        self.assertEqual(result["status"], "error")
 
     @pytest.mark.asyncio
     async def test_approve_already_approved_action(self, approval_system):
@@ -193,8 +194,8 @@ class TestApproveAction:
             operator="test_operator"
         )
         
-        assert "error" in result
-        assert "approved" in result["error"].lower()
+        self.assertIn("error", result)
+        self.assertIn("approved", result["error"].lower())
 
     @pytest.mark.asyncio
     async def test_approve_expired_action(self, approval_system, temp_db_path):
@@ -226,7 +227,7 @@ class TestApproveAction:
             operator="test_operator"
         )
         
-        assert result["status"] == "expired"
+        self.assertEqual(result["status"], "expired")
 
     @pytest.mark.asyncio
     async def test_approve_creates_operator_activity(self, approval_system, temp_db_path):
@@ -254,10 +255,10 @@ class TestApproveAction:
         activity = cursor.fetchone()
         conn.close()
         
-        assert activity is not None
+        self.assertIsNotNone(activity)
 
 
-class TestRejectAction:
+class TestRejectAction(unittest.TestCase):
     """Test rejecting actions"""
 
     @pytest.mark.asyncio
@@ -277,10 +278,10 @@ class TestRejectAction:
             reason="Security concerns"
         )
         
-        assert result["action_id"] == "test_action_009"
-        assert result["status"] == "rejected"
-        assert result["rejected_by"] == "test_operator"
-        assert result["reason"] == "Security concerns"
+        self.assertEqual(result["action_id"], "test_action_009")
+        self.assertEqual(result["status"], "rejected")
+        self.assertEqual(result["rejected_by"], "test_operator")
+        self.assertEqual(result["reason"], "Security concerns")
 
     @pytest.mark.asyncio
     async def test_reject_nonexistent_action(self, approval_system):
@@ -291,7 +292,7 @@ class TestRejectAction:
             reason="Test"
         )
         
-        assert "error" in result
+        self.assertIn("error", result)
 
     @pytest.mark.asyncio
     async def test_reject_creates_history_entry(self, approval_system):
@@ -312,17 +313,17 @@ class TestRejectAction:
         
         details = await approval_system.get_action_details("test_action_010")
         history_events = [h["event"] for h in details["history"]]
-        assert "rejected" in history_events
+        self.assertIn("rejected", history_events)
 
 
-class TestGetPendingActions:
+class TestGetPendingActions(unittest.TestCase):
     """Test retrieving pending actions"""
 
     @pytest.mark.asyncio
     async def test_get_pending_actions_empty(self, approval_system):
         """Test getting pending actions when queue is empty"""
         actions = await approval_system.get_pending_actions()
-        assert actions == []
+        self.assertEqual(actions, [])
 
     @pytest.mark.asyncio
     async def test_get_pending_actions_single(self, approval_system):
@@ -336,8 +337,8 @@ class TestGetPendingActions:
         )
         
         actions = await approval_system.get_pending_actions()
-        assert len(actions) == 1
-        assert actions[0]["action_id"] == "test_action_011"
+        self.assertEqual(len(actions), 1)
+        self.assertEqual(actions[0]["action_id"], "test_action_011")
 
     @pytest.mark.asyncio
     async def test_get_pending_actions_multiple(self, approval_system):
@@ -352,7 +353,7 @@ class TestGetPendingActions:
             )
         
         actions = await approval_system.get_pending_actions()
-        assert len(actions) == 5
+        self.assertEqual(len(actions), 5)
 
     @pytest.mark.asyncio
     async def test_get_pending_actions_excludes_approved(self, approval_system):
@@ -376,11 +377,11 @@ class TestGetPendingActions:
         
         actions = await approval_system.get_pending_actions()
         action_ids = [a["action_id"] for a in actions]
-        assert "test_action_012" not in action_ids
-        assert "test_action_013" in action_ids
+        self.assertIn("test_action_012" not, action_ids)
+        self.assertIn("test_action_013", action_ids)
 
 
-class TestGetActionDetails:
+class TestGetActionDetails(unittest.TestCase):
     """Test retrieving action details"""
 
     @pytest.mark.asyncio
@@ -396,23 +397,23 @@ class TestGetActionDetails:
         
         details = await approval_system.get_action_details("test_action_014")
         
-        assert details["action_id"] == "test_action_014"
-        assert details["agent_name"] == "test_agent"
-        assert details["function_name"] == "test_function"
-        assert details["parameters"]["param1"] == "value1"
-        assert details["parameters"]["param2"] == 42
-        assert details["risk_level"] == "medium"
-        assert details["status"] == "pending"
-        assert "history" in details
+        self.assertEqual(details["action_id"], "test_action_014")
+        self.assertEqual(details["agent_name"], "test_agent")
+        self.assertEqual(details["function_name"], "test_function")
+        self.assertEqual(details["parameters"]["param1"], "value1")
+        self.assertEqual(details["parameters"]["param2"], 42)
+        self.assertEqual(details["risk_level"], "medium")
+        self.assertEqual(details["status"], "pending")
+        self.assertIn("history", details)
 
     @pytest.mark.asyncio
     async def test_get_action_details_nonexistent(self, approval_system):
         """Test getting details for non-existent action"""
         details = await approval_system.get_action_details("nonexistent")
-        assert details is None
+        self.assertIsNone(details)
 
 
-class TestMarkExecuted:
+class TestMarkExecuted(unittest.TestCase):
     """Test marking actions as executed"""
 
     @pytest.mark.asyncio
@@ -432,7 +433,7 @@ class TestMarkExecuted:
             {"output": "success", "duration": 1.5}
         )
         
-        assert result is True
+        self.assertIs(result, True)
 
     @pytest.mark.asyncio
     async def test_mark_executed_pending_action_fails(self, approval_system):
@@ -450,10 +451,10 @@ class TestMarkExecuted:
             {"output": "success"}
         )
         
-        assert result is False
+        self.assertIs(result, False)
 
 
-class TestCleanupExpired:
+class TestCleanupExpired(unittest.TestCase):
     """Test cleaning up expired actions"""
 
     @pytest.mark.asyncio
@@ -480,7 +481,7 @@ class TestCleanupExpired:
         conn.close()
         
         count = await approval_system.cleanup_expired()
-        assert count == 1
+        self.assertEqual(count, 1)
 
     @pytest.mark.asyncio
     async def test_cleanup_no_expired_actions(self, approval_system):
@@ -495,10 +496,10 @@ class TestCleanupExpired:
         )
         
         count = await approval_system.cleanup_expired()
-        assert count == 0
+        self.assertEqual(count, 0)
 
 
-class TestOperatorStatistics:
+class TestOperatorStatistics(unittest.TestCase):
     """Test operator statistics tracking"""
 
     @pytest.mark.asyncio
@@ -516,7 +517,7 @@ class TestOperatorStatistics:
             await approval_system.approve(f"test_action_{i}", "operator1")
         
         stats = await approval_system.get_operator_statistics("operator1")
-        assert stats["approve"] == 3
+        self.assertEqual(stats["approve"], 3)
 
     @pytest.mark.asyncio
     async def test_get_operator_statistics_all_operators(self, approval_system):
@@ -541,11 +542,11 @@ class TestOperatorStatistics:
         await approval_system.reject("test_action_020", "operator2", "Test")
         
         stats = await approval_system.get_operator_statistics()
-        assert "operator1" in stats
-        assert "operator2" in stats
+        self.assertIn("operator1", stats)
+        self.assertIn("operator2", stats)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     @pytest.mark.asyncio
@@ -559,7 +560,7 @@ class TestEdgeCases:
             risk_level="low"
         )
         
-        assert result["status"] == "submitted"
+        self.assertEqual(result["status"], "submitted")
 
     @pytest.mark.asyncio
     async def test_submit_with_complex_parameters(self, approval_system):
@@ -583,4 +584,4 @@ class TestEdgeCases:
         )
         
         details = await approval_system.get_action_details("test_action_022")
-        assert details["parameters"] == complex_params
+        self.assertEqual(details["parameters"], complex_params)

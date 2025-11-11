@@ -3,6 +3,7 @@ Comprehensive Unit Tests for Database Module (database.py)
 Testing database session management, connection handling, and health checks
 """
 
+import unittest
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from database import get_db, DatabaseManager, db_manager
 
 
-class TestGetDbDependency:
+class TestGetDbDependency(unittest.TestCase):
     """Test suite for get_db dependency function"""
 
     @pytest.mark.asyncio
@@ -19,9 +20,9 @@ class TestGetDbDependency:
     async def test_get_db_yields_session(self):
         """Test get_db yields a valid session"""
         async for session in get_db():
-            assert isinstance(session, AsyncSession)
+            self.assertIsInstance(session, AsyncSession)
             # Session should be usable
-            assert session is not None
+            self.assertIsNotNone(session)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -145,7 +146,7 @@ class TestGetDbDependency:
                     raise ValueError()
 
 
-class TestDatabaseManager:
+class TestDatabaseManager(unittest.TestCase):
     """Test suite for DatabaseManager class"""
 
     @pytest.mark.unit
@@ -153,8 +154,8 @@ class TestDatabaseManager:
         """Test DatabaseManager initializes with correct defaults"""
         manager = DatabaseManager()
         
-        assert manager.connected is False
-        assert manager.session is None
+        self.assertIs(manager.connected, False)
+        self.assertIsNone(manager.session)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -165,10 +166,10 @@ class TestDatabaseManager:
         with patch('database.init_db', new_callable=AsyncMock):
             result = await manager.connect()
             
-            assert result["status"] == "connected"
-            assert result["type"] == "SQLAlchemy"
-            assert "url" in result
-            assert manager.connected is True
+            self.assertEqual(result["status"], "connected")
+            self.assertEqual(result["type"], "SQLAlchemy")
+            self.assertIn("url", result)
+            self.assertIs(manager.connected, True)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -180,9 +181,9 @@ class TestDatabaseManager:
                    side_effect=OperationalError("Connection refused", None, None)):
             result = await manager.connect()
             
-            assert result["status"] == "failed"
-            assert "error" in result
-            assert manager.connected is False
+            self.assertEqual(result["status"], "failed")
+            self.assertIn("error", result)
+            self.assertIs(manager.connected, False)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -200,8 +201,8 @@ class TestDatabaseManager:
             with patch('database.init_db', new_callable=AsyncMock, side_effect=exc):
                 result = await manager.connect()
                 
-                assert result["status"] == "failed"
-                assert "error" in result
+                self.assertEqual(result["status"], "failed")
+                self.assertIn("error", result)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -213,20 +214,20 @@ class TestDatabaseManager:
         with patch('database.close_db', new_callable=AsyncMock):
             await manager.disconnect()
             
-            assert manager.connected is False
+            self.assertIs(manager.connected, False)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
     async def test_disconnect_when_not_connected(self):
         """Test disconnecting when not connected"""
         manager = DatabaseManager()
-        assert manager.connected is False
+        self.assertIs(manager.connected, False)
         
         with patch('database.close_db', new_callable=AsyncMock) as mock_close:
             await manager.disconnect()
             
             mock_close.assert_called_once()
-            assert manager.connected is False
+            self.assertIs(manager.connected, False)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -243,10 +244,10 @@ class TestDatabaseManager:
             
             result = await manager.health_check()
             
-            assert result["status"] == "healthy"
-            assert result["connected"] is True
-            assert result["type"] == "SQLAlchemy"
-            assert "url" in result
+            self.assertEqual(result["status"], "healthy")
+            self.assertIs(result["connected"], True)
+            self.assertEqual(result["type"], "SQLAlchemy")
+            self.assertIn("url", result)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -263,9 +264,9 @@ class TestDatabaseManager:
             
             result = await manager.health_check()
             
-            assert result["status"] == "unhealthy"
-            assert result["connected"] is False
-            assert "error" in result
+            self.assertEqual(result["status"], "unhealthy")
+            self.assertIs(result["connected"], False)
+            self.assertIn("error", result)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -282,8 +283,8 @@ class TestDatabaseManager:
             
             result = await manager.health_check()
             
-            assert result["status"] == "unhealthy"
-            assert result["connected"] is False
+            self.assertEqual(result["status"], "unhealthy")
+            self.assertIs(result["connected"], False)
 
     @pytest.mark.unit
     def test_database_manager_context_enter(self):
@@ -292,7 +293,7 @@ class TestDatabaseManager:
         
         result = manager.__enter__()
         
-        assert result is manager
+        self.assertIs(result, manager)
 
     @pytest.mark.unit
     def test_database_manager_context_exit(self):
@@ -311,13 +312,13 @@ class TestDatabaseManager:
         with patch('database.init_db', new_callable=AsyncMock):
             # First connection
             result1 = await manager.connect()
-            assert result1["status"] == "connected"
-            assert manager.connected is True
+            self.assertEqual(result1["status"], "connected")
+            self.assertIs(manager.connected, True)
             
             # Second connection attempt
             result2 = await manager.connect()
-            assert result2["status"] == "connected"
-            assert manager.connected is True
+            self.assertEqual(result2["status"], "connected")
+            self.assertIs(manager.connected, True)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -330,37 +331,37 @@ class TestDatabaseManager:
             
             # Connect
             result = await manager.connect()
-            assert result["status"] == "connected"
-            assert manager.connected is True
+            self.assertEqual(result["status"], "connected")
+            self.assertIs(manager.connected, True)
             
             # Disconnect
             await manager.disconnect()
-            assert manager.connected is False
+            self.assertIs(manager.connected, False)
             
             # Reconnect
             result = await manager.connect()
-            assert result["status"] == "connected"
-            assert manager.connected is True
+            self.assertEqual(result["status"], "connected")
+            self.assertIs(manager.connected, True)
 
 
-class TestDatabaseManagerInstance:
+class TestDatabaseManagerInstance(unittest.TestCase):
     """Test the global db_manager instance"""
 
     @pytest.mark.unit
     def test_global_db_manager_exists(self):
         """Test global db_manager instance exists"""
-        assert db_manager is not None
-        assert isinstance(db_manager, DatabaseManager)
+        self.assertIsNotNone(db_manager)
+        self.assertIsInstance(db_manager, DatabaseManager)
 
     @pytest.mark.unit
     def test_global_db_manager_not_connected_initially(self):
         """Test global db_manager starts disconnected"""
         # Create fresh instance to test
         manager = DatabaseManager()
-        assert manager.connected is False
+        self.assertIs(manager.connected, False)
 
 
-class TestDatabaseEdgeCases:
+class TestDatabaseEdgeCases(unittest.TestCase):
     """Test edge cases and boundary conditions"""
 
     @pytest.mark.asyncio
@@ -396,8 +397,8 @@ class TestDatabaseEdgeCases:
             
             result = await manager.health_check()
             
-            assert result["status"] == "unhealthy"
-            assert "error" in result
+            self.assertEqual(result["status"], "unhealthy")
+            self.assertIn("error", result)
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -421,9 +422,9 @@ class TestDatabaseEdgeCases:
                 manager.health_check()
             )
             
-            assert len(results) == 3
+            self.assertEqual(len(results), 3)
             for result in results:
-                assert result["status"] == "healthy"
+                self.assertEqual(result["status"], "healthy")
 
     @pytest.mark.asyncio
     @pytest.mark.unit
@@ -444,7 +445,7 @@ class TestDatabaseEdgeCases:
                 pass
 
 
-class TestDatabaseIntegration:
+class TestDatabaseIntegration(unittest.TestCase):
     """Integration tests for database functionality"""
 
     @pytest.mark.asyncio
@@ -465,15 +466,15 @@ class TestDatabaseIntegration:
             
             # Connect
             connect_result = await manager.connect()
-            assert connect_result["status"] == "connected"
+            self.assertEqual(connect_result["status"], "connected")
             
             # Health check
             health_result = await manager.health_check()
-            assert health_result["status"] == "healthy"
+            self.assertEqual(health_result["status"], "healthy")
             
             # Disconnect
             await manager.disconnect()
-            assert manager.connected is False
+            self.assertIs(manager.connected, False)
 
     @pytest.mark.asyncio
     @pytest.mark.integration

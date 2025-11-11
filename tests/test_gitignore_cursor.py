@@ -3,17 +3,18 @@ Unit Tests for .gitignore Cursor Directory Entry
 Testing that .cursor/ directory is properly ignored
 """
 
+import unittest
 import pytest
 import os
 
 
-class TestGitignoreCursorEntry:
+class TestGitignoreCursorEntry(unittest.TestCase):
     """Test .gitignore has .cursor/ entry"""
 
     @pytest.mark.unit
     def test_gitignore_file_exists(self):
         """Test .gitignore file exists"""
-        assert os.path.exists(".gitignore")
+        self.assertTrue(os.path.exists(".gitignore"))
 
     @pytest.mark.unit
     def test_gitignore_contains_cursor_entry(self):
@@ -22,7 +23,7 @@ class TestGitignoreCursorEntry:
             content = f.read()
         
         # Should have .cursor/ entry
-        assert ".cursor/" in content
+        self.assertIn(".cursor/", content)
 
     @pytest.mark.unit
     def test_cursor_directory_pattern_format(self):
@@ -33,10 +34,10 @@ class TestGitignoreCursorEntry:
         cursor_lines = [line.strip() for line in lines if ".cursor" in line]
         
         # Should have at least one .cursor entry
-        assert len(cursor_lines) > 0
+        self.assertGreater(len(cursor_lines), 0)
         
         # Should be properly formatted (with trailing slash for directory)
-        assert any(line == ".cursor/" for line in cursor_lines)
+        self.assertEqual(any(line, ".cursor/" for line in cursor_lines))
 
     @pytest.mark.unit
     def test_gitignore_not_empty(self):
@@ -44,7 +45,7 @@ class TestGitignoreCursorEntry:
         with open(".gitignore", "r") as f:
             content = f.read()
         
-        assert len(content) > 0
+        self.assertGreater(len(content), 0)
 
     @pytest.mark.unit
     def test_gitignore_has_proper_structure(self):
@@ -54,4 +55,4 @@ class TestGitignoreCursorEntry:
         
         # Should have multiple entries
         non_empty_lines = [line for line in lines if line.strip() and not line.strip().startswith("#")]
-        assert len(non_empty_lines) > 5
+        self.assertGreater(len(non_empty_lines), 5)

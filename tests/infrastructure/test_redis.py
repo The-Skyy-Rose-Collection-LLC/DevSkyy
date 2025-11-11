@@ -6,11 +6,12 @@ HOW: Test Redis connections, pub/sub, and cache operations
 IMPACT: Ensures caching layer reliability
 """
 
+import unittest
 import pytest
 
 
 @pytest.mark.infrastructure
-class TestRedisConnectivity:
+class TestRedisConnectivity(unittest.TestCase):
     """Test Redis connection and basic operations."""
 
     def test_redis_connection(self, test_redis_url):
@@ -24,7 +25,7 @@ class TestRedisConnectivity:
         import redis
 
         client = redis.from_url(test_redis_url)
-        assert client.ping() is True
+        self.assertIs(client.ping(), True)
 
     def test_redis_set_get(self, test_redis_url):
         """
@@ -43,7 +44,7 @@ class TestRedisConnectivity:
 
         # Get value
         value = client.get("test_key")
-        assert value.decode("utf-8") == "test_value"
+        self.assertEqual(value.decode("utf-8"), "test_value")
 
         # Cleanup
         client.delete("test_key")

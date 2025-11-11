@@ -5,6 +5,7 @@ Tests encryption, decryption, and security per Truth Protocol requirements.
 Validates AES-256-GCM implementation, key management, and NIST SP 800-38D compliance.
 """
 
+import unittest
 import pytest
 import base64
 import binascii
@@ -55,7 +56,7 @@ def sample_data():
     }
 
 
-class TestEncryptionBasics:
+class TestEncryptionBasics(unittest.TestCase):
     """Test basic encryption and decryption operations."""
 
     def test_encrypt_decrypt_cycle(self, encryption_service, test_key, sample_data):
@@ -65,13 +66,13 @@ class TestEncryptionBasics:
 
         # Encrypt
         encrypted = encryption_service.encrypt(sample_data, test_key)
-        assert encrypted is not None
-        assert encrypted != sample_data
-        assert isinstance(encrypted, (str, bytes))
+        self.assertIsNotNone(encrypted)
+        self.assertNotEqual(encrypted, sample_data)
+        self.assertIsInstance(encrypted, (str, bytes))
 
         # Decrypt
         decrypted = encryption_service.decrypt(encrypted, test_key)
-        assert decrypted == sample_data
+        self.assertEqual(decrypted, sample_data)
 
     def test_encrypt_string_data(self, encryption_service, test_key):
         """Should encrypt and decrypt string data."""
@@ -82,8 +83,8 @@ class TestEncryptionBasics:
         encrypted = encryption_service.encrypt(original, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == original
-        assert encrypted != original
+        self.assertEqual(decrypted, original)
+        self.assertNotEqual(encrypted, original)
 
     def test_encrypt_binary_data(self, encryption_service, test_key):
         """Should encrypt and decrypt binary data."""
@@ -94,16 +95,16 @@ class TestEncryptionBasics:
         encrypted = encryption_service.encrypt(original, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == original
-        assert encrypted != original
+        self.assertEqual(decrypted, original)
+        self.assertNotEqual(encrypted, original)
 
 
-class TestAESGCMCompliance:
+class TestAESGCMCompliance(unittest.TestCase):
     """Test AES-256-GCM compliance (NIST SP 800-38D)."""
 
     def test_uses_256_bit_key(self, encryption_service, test_key):
         """Should use 256-bit (32-byte) encryption keys."""
-        assert len(test_key) == 32, "Key must be 256 bits (32 bytes)"
+        self.assertEqual(len(test_key), 32, "Key must be 256 bits (32 bytes)")
 
     def test_unique_nonce_per_encryption(self, encryption_service, test_key, sample_data):
         """Should use unique nonce/IV for each encryption."""
@@ -114,7 +115,7 @@ class TestAESGCMCompliance:
         encrypted2 = encryption_service.encrypt(sample_data, test_key)
 
         # Same plaintext should produce different ciphertext due to unique nonce
-        assert encrypted1 != encrypted2
+        self.assertNotEqual(encrypted1, encrypted2)
 
     def test_includes_authentication_tag(self, encryption_service, test_key, sample_data):
         """Should include GCM authentication tag."""
@@ -139,7 +140,7 @@ class TestAESGCMCompliance:
             encrypted_bytes = encrypted
 
         # Should include 12-byte nonce + 16-byte tag (minimum)
-        assert len(encrypted_bytes) > len(str(sample_data))
+        self.assertGreater(len(encrypted_bytes), len(str(sample_data)))
 
     def test_tampered_data_fails_authentication(self, encryption_service, test_key, sample_data):
         """Should detect tampered ciphertext via authentication tag."""
@@ -163,7 +164,7 @@ class TestAESGCMCompliance:
             encryption_service.decrypt(tampered, test_key)
 
 
-class TestKeyManagement:
+class TestKeyManagement(unittest.TestCase):
     """Test encryption key generation and management."""
 
     def test_generate_secure_random_key(self):
@@ -174,9 +175,9 @@ class TestKeyManagement:
         key1 = generate_encryption_key()
         key2 = generate_encryption_key()
 
-        assert len(key1) == 32
-        assert len(key2) == 32
-        assert key1 != key2  # Should be unique
+        self.assertEqual(len(key1), 32)
+        self.assertEqual(len(key2), 32)
+        self.assertNotEqual(key1, key2  # Should be unique)
 
     def test_key_derivation_from_password(self, encryption_service):
         """Should derive keys from passwords using PBKDF2."""
@@ -187,8 +188,8 @@ class TestKeyManagement:
         salt = os.urandom(16)
 
         key = encryption_service.derive_key_from_password(password, salt)
-        assert len(key) == 32
-        assert key is not None
+        self.assertEqual(len(key), 32)
+        self.assertIsNotNone(key)
 
     def test_key_rotation_support(self, encryption_service, sample_data):
         """Should support key rotation for encrypted data."""
@@ -209,10 +210,10 @@ class TestKeyManagement:
 
         # Verify can decrypt with new key
         final_decrypted = encryption_service.decrypt(re_encrypted, new_key)
-        assert final_decrypted == sample_data
+        self.assertEqual(final_decrypted, sample_data)
 
 
-class TestErrorHandling:
+class TestErrorHandling(unittest.TestCase):
     """Test error handling and edge cases."""
 
     def test_decrypt_with_wrong_key_fails(self, encryption_service, sample_data):
@@ -237,7 +238,7 @@ class TestErrorHandling:
         encrypted = encryption_service.encrypt(empty_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == empty_data
+        self.assertEqual(decrypted, empty_data)
 
     def test_encrypt_none_data_fails(self, encryption_service, test_key):
         """Should reject None as input data."""
@@ -258,7 +259,7 @@ class TestErrorHandling:
             encryption_service.encrypt(sample_data, invalid_key)
 
 
-class TestPIIEncryption:
+class TestPIIEncryption(unittest.TestCase):
     """Test encryption of Personally Identifiable Information (PII)."""
 
     def test_encrypt_email_address(self, encryption_service, test_key):
@@ -270,8 +271,8 @@ class TestPIIEncryption:
         encrypted = encryption_service.encrypt(email, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == email
-        assert email not in str(encrypted)
+        self.assertEqual(decrypted, email)
+        self.assertIn(email not, str(encrypted))
 
     def test_encrypt_phone_number(self, encryption_service, test_key):
         """Should encrypt phone numbers."""
@@ -282,8 +283,8 @@ class TestPIIEncryption:
         encrypted = encryption_service.encrypt(phone, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == phone
-        assert phone not in str(encrypted)
+        self.assertEqual(decrypted, phone)
+        self.assertIn(phone not, str(encrypted))
 
     def test_encrypt_ssn(self, encryption_service, test_key):
         """Should encrypt Social Security Numbers."""
@@ -294,8 +295,8 @@ class TestPIIEncryption:
         encrypted = encryption_service.encrypt(ssn, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == ssn
-        assert ssn not in str(encrypted)
+        self.assertEqual(decrypted, ssn)
+        self.assertIn(ssn not, str(encrypted))
 
     def test_encrypt_credit_card(self, encryption_service, test_key):
         """Should encrypt credit card numbers."""
@@ -306,11 +307,11 @@ class TestPIIEncryption:
         encrypted = encryption_service.encrypt(cc, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == cc
-        assert "4532" not in str(encrypted)
+        self.assertEqual(decrypted, cc)
+        self.assertIn("4532" not, str(encrypted))
 
 
-class TestPerformance:
+class TestPerformance(unittest.TestCase):
     """Test encryption performance requirements."""
 
     def test_encryption_performance(self, encryption_service, test_key):
@@ -332,7 +333,7 @@ class TestPerformance:
         print(f"Average encryption time: {avg_time_ms:.2f}ms")
 
         # Should be fast (< 10ms per operation for small data)
-        assert avg_time_ms < 50
+        self.assertLess(avg_time_ms, 50)
 
     def test_batch_encryption_performance(self, encryption_service, test_key):
         """Should handle batch encryption efficiently."""
@@ -351,10 +352,10 @@ class TestPerformance:
         print(f"Encrypted 1000 records in {elapsed:.2f}s ({elapsed/len(batch)*1000:.2f}ms per record)")
 
         # Should complete in reasonable time
-        assert elapsed < 5.0  # 5 seconds for 1000 records
+        self.assertLess(elapsed, 5.0  # 5 seconds for 1000 records)
 
 
-class TestTruthProtocolCompliance:
+class TestTruthProtocolCompliance(unittest.TestCase):
     """Verify Truth Protocol security requirements."""
 
     def test_no_hardcoded_keys(self):
@@ -370,8 +371,8 @@ class TestTruthProtocolCompliance:
             content = f.read()
 
         # Should not contain suspicious hardcoded keys
-        assert "b'\\x" not in content[:1000]  # No hardcoded bytes in beginning
-        assert "SECRET_KEY =" not in content
+        self.assertIn("b'\\x" not, content[:1000]  # No hardcoded bytes in beginning)
+        self.assertIn("SECRET_KEY =" not, content)
 
     def test_uses_approved_algorithm(self, encryption_service):
         """Should use approved AES-256-GCM algorithm."""
@@ -380,8 +381,8 @@ class TestTruthProtocolCompliance:
 
         # Verify uses AES-256-GCM (check cipher name or algorithm)
         if hasattr(encryption_service, 'algorithm'):
-            assert 'AES' in str(encryption_service.algorithm).upper()
-            assert '256' in str(encryption_service.algorithm) or 'GCM' in str(encryption_service.algorithm)
+            self.assertIn('AES', str(encryption_service.algorithm).upper())
+            self.assertIn('256', str(encryption_service.algorithm) or 'GCM' in str(encryption_service.algorithm))
 
     def test_logging_does_not_leak_keys(self, encryption_service, test_key, sample_data, caplog):
         """Logging should never expose encryption keys."""
@@ -397,9 +398,9 @@ class TestTruthProtocolCompliance:
             # Check logs don't contain key material at ANY level
             key_hex = test_key.hex() if isinstance(test_key, bytes) else str(test_key)
             for record in caplog.records:
-                assert key_hex not in record.message, \
+                self.assertIn(key_hex not, record.message, \)
                     f"Key leaked in {record.levelname} log: {record.message}"
-                assert test_key not in str(record.args), \
+                self.assertIn(test_key not, str(record.args), \)
                     f"Key leaked in {record.levelname} log args: {record.args}"
 
 
@@ -412,7 +413,7 @@ if __name__ == "__main__":
 # ============================================================================
 
 
-class TestEncryptionAdvancedScenarios:
+class TestEncryptionAdvancedScenarios(unittest.TestCase):
     """Advanced encryption scenarios and edge cases."""
 
     def test_encrypt_large_data(self, encryption_service, test_key):
@@ -425,8 +426,8 @@ class TestEncryptionAdvancedScenarios:
         encrypted = encryption_service.encrypt(large_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == large_data
-        assert len(encrypted) > len(large_data)
+        self.assertEqual(decrypted, large_data)
+        self.assertGreater(len(encrypted), len(large_data))
 
     def test_encrypt_unicode_characters(self, encryption_service, test_key):
         """Should handle Unicode characters correctly."""
@@ -437,7 +438,7 @@ class TestEncryptionAdvancedScenarios:
         encrypted = encryption_service.encrypt(unicode_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == unicode_data
+        self.assertEqual(decrypted, unicode_data)
 
     def test_encrypt_special_characters(self, encryption_service, test_key):
         """Should handle special characters and symbols."""
@@ -448,7 +449,7 @@ class TestEncryptionAdvancedScenarios:
         encrypted = encryption_service.encrypt(special_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == special_data
+        self.assertEqual(decrypted, special_data)
 
     def test_encrypt_json_data(self, encryption_service, test_key):
         """Should encrypt and decrypt JSON data."""
@@ -465,7 +466,7 @@ class TestEncryptionAdvancedScenarios:
         encrypted = encryption_service.encrypt(json_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert json.loads(decrypted) == json.loads(json_data)
+        self.assertEqual(json.loads(decrypted), json.loads(json_data))
 
     def test_encrypt_numerical_data(self, encryption_service, test_key):
         """Should handle numerical data as strings."""
@@ -477,7 +478,7 @@ class TestEncryptionAdvancedScenarios:
         for num in numbers:
             encrypted = encryption_service.encrypt(num, test_key)
             decrypted = encryption_service.decrypt(encrypted, test_key)
-            assert decrypted == num
+            self.assertEqual(decrypted, num)
 
     def test_encrypt_whitespace_data(self, encryption_service, test_key):
         """Should handle various whitespace correctly."""
@@ -488,7 +489,7 @@ class TestEncryptionAdvancedScenarios:
         encrypted = encryption_service.encrypt(whitespace_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
 
-        assert decrypted == whitespace_data
+        self.assertEqual(decrypted, whitespace_data)
 
     def test_multiple_encryption_cycles(self, encryption_service, test_key):
         """Should handle multiple encryption/decryption cycles."""
@@ -503,12 +504,12 @@ class TestEncryptionAdvancedScenarios:
         encrypted2 = encryption_service.encrypt(decrypted1, test_key)
         decrypted2 = encryption_service.decrypt(encrypted2, test_key)
 
-        assert decrypted2 == original
+        self.assertEqual(decrypted2, original)
         # Each encryption should be different due to unique nonce
-        assert encrypted1 != encrypted2
+        self.assertNotEqual(encrypted1, encrypted2)
 
 
-class TestEncryptionDictOperations:
+class TestEncryptionDictOperations(unittest.TestCase):
     """Test dictionary encryption operations."""
 
     def test_encrypt_dict_all_fields(self, encryption_service, test_key, sample_data):
@@ -522,15 +523,15 @@ class TestEncryptionDictOperations:
         encrypted = encrypt_dict(sample_data, fields_to_encrypt)
 
         # Fields should be encrypted
-        assert encrypted["user_id"] != sample_data["user_id"]
-        assert encrypted["email"] != sample_data["email"]
+        self.assertNotEqual(encrypted["user_id"], sample_data["user_id"])
+        self.assertNotEqual(encrypted["email"], sample_data["email"])
         # Nested fields should remain unchanged
-        assert encrypted["payment_info"] == sample_data["payment_info"]
+        self.assertEqual(encrypted["payment_info"], sample_data["payment_info"])
 
         # Decrypt and verify
         decrypted = decrypt_dict(encrypted, fields_to_encrypt)
-        assert decrypted["user_id"] == sample_data["user_id"]
-        assert decrypted["email"] == sample_data["email"]
+        self.assertEqual(decrypted["user_id"], sample_data["user_id"])
+        self.assertEqual(decrypted["email"], sample_data["email"])
 
     def test_encrypt_dict_nested_fields(self, encryption_service, test_key):
         """Should handle nested dictionary fields."""
@@ -546,8 +547,8 @@ class TestEncryptionDictOperations:
         }
 
         encrypted = encrypt_dict(nested_data, ["secret"])
-        assert encrypted["secret"] != nested_data["secret"]
-        assert encrypted["public"] == nested_data["public"]
+        self.assertNotEqual(encrypted["secret"], nested_data["secret"])
+        self.assertEqual(encrypted["public"], nested_data["public"])
 
     def test_encrypt_dict_nonexistent_field(self, encryption_service, test_key, sample_data):
         """Should handle encryption of non-existent fields gracefully."""
@@ -558,7 +559,7 @@ class TestEncryptionDictOperations:
 
         encrypted = encrypt_dict(sample_data, ["nonexistent_field"])
         # Should not raise error, just skip the field
-        assert encrypted == sample_data
+        self.assertEqual(encrypted, sample_data)
 
     def test_encrypt_dict_empty_fields_list(self, encryption_service, test_key, sample_data):
         """Should handle empty fields list."""
@@ -569,7 +570,7 @@ class TestEncryptionDictOperations:
 
         encrypted = encrypt_dict(sample_data, [])
         # Nothing should be encrypted
-        assert encrypted == sample_data
+        self.assertEqual(encrypted, sample_data)
 
     def test_decrypt_dict_partial_fields(self, encryption_service, test_key, sample_data):
         """Should decrypt only specified fields."""
@@ -584,11 +585,11 @@ class TestEncryptionDictOperations:
         # Decrypt only one field
         partially_decrypted = decrypt_dict(encrypted, ["user_id"])
         
-        assert partially_decrypted["user_id"] == sample_data["user_id"]
-        assert partially_decrypted["email"] != sample_data["email"]  # Still encrypted
+        self.assertEqual(partially_decrypted["user_id"], sample_data["user_id"])
+        self.assertNotEqual(partially_decrypted["email"], sample_data["email"]  # Still encrypted)
 
 
-class TestKeyDerivation:
+class TestKeyDerivation(unittest.TestCase):
     """Test PBKDF2 key derivation."""
 
     def test_derive_key_without_salt(self):
@@ -602,10 +603,10 @@ class TestKeyDerivation:
         key2, salt2 = derive_key("password123")
 
         # Keys should be different due to different salts
-        assert key1 != key2
-        assert salt1 != salt2
-        assert len(key1) == 32
-        assert len(salt1) == 16
+        self.assertNotEqual(key1, key2)
+        self.assertNotEqual(salt1, salt2)
+        self.assertEqual(len(key1), 32)
+        self.assertEqual(len(salt1), 16)
 
     def test_derive_key_with_same_salt(self):
         """Should produce same key with same password and salt."""
@@ -618,7 +619,7 @@ class TestKeyDerivation:
         key1, _ = derive_key("password123", salt)
         key2, _ = derive_key("password123", salt)
 
-        assert key1 == key2
+        self.assertEqual(key1, key2)
 
     def test_derive_key_different_passwords(self):
         """Should produce different keys for different passwords."""
@@ -631,7 +632,7 @@ class TestKeyDerivation:
         key1, _ = derive_key("password1", salt)
         key2, _ = derive_key("password2", salt)
 
-        assert key1 != key2
+        self.assertNotEqual(key1, key2)
 
     def test_derive_key_weak_password(self):
         """Should handle weak passwords (PBKDF2 provides protection)."""
@@ -644,11 +645,11 @@ class TestKeyDerivation:
         
         for pwd in weak_passwords:
             key, salt = derive_key(pwd)
-            assert len(key) == 32  # Still produces valid key
-            assert len(salt) == 16
+            self.assertEqual(len(key), 32  # Still produces valid key)
+            self.assertEqual(len(salt), 16)
 
 
-class TestKeyRotation:
+class TestKeyRotation(unittest.TestCase):
     """Test key rotation functionality."""
 
     def test_rotate_keys_generates_new_key(self):
@@ -661,9 +662,9 @@ class TestKeyRotation:
         old_key = settings.MASTER_KEY
         new_key_b64 = rotate_keys()
 
-        assert settings.MASTER_KEY != old_key
-        assert len(settings.MASTER_KEY) == 32
-        assert new_key_b64 is not None
+        self.assertNotEqual(settings.MASTER_KEY, old_key)
+        self.assertEqual(len(settings.MASTER_KEY), 32)
+        self.assertIsNotNone(new_key_b64)
 
     def test_rotate_keys_archives_old_key(self):
         """Should archive old key in legacy keys."""
@@ -678,7 +679,7 @@ class TestKeyRotation:
         rotate_keys()
 
         # Legacy keys should have increased
-        assert len(settings.LEGACY_KEYS) > initial_legacy_count
+        self.assertGreater(len(settings.LEGACY_KEYS), initial_legacy_count)
 
     def test_decrypt_with_rotated_key(self, encryption_service, test_key):
         """Should decrypt old data after key rotation."""
@@ -696,13 +697,13 @@ class TestKeyRotation:
 
         # Should still be able to decrypt with original key
         decrypted = encryption_service.decrypt(encrypted, test_key)
-        assert decrypted == original
+        self.assertEqual(decrypted, original)
 
         # Restore
         settings.MASTER_KEY = old_master
 
 
-class TestPIIMasking:
+class TestPIIMasking(unittest.TestCase):
     """Test PII masking for logging."""
 
     def test_mask_pii_basic(self):
@@ -713,9 +714,9 @@ class TestPIIMasking:
         from security.encryption_v2 import mask_pii
 
         masked = mask_pii("sensitive_data", show_chars=3)
-        assert masked.startswith("sen")
-        assert "*" in masked
-        assert "sensitive_data" != masked
+        self.assertTrue(masked.startswith("sen"))
+        self.assertIn("*", masked)
+        self.assertNotEqual("sensitive_data", masked)
 
     def test_mask_pii_short_string(self):
         """Should handle strings shorter than show_chars."""
@@ -725,7 +726,7 @@ class TestPIIMasking:
         from security.encryption_v2 import mask_pii
 
         masked = mask_pii("ab", show_chars=5)
-        assert masked == "**"
+        self.assertEqual(masked, "**")
 
     def test_mask_email_format(self):
         """Should mask email in logging-safe format."""
@@ -735,9 +736,9 @@ class TestPIIMasking:
         from security.encryption_v2 import mask_email
 
         masked = mask_email("user@example.com")
-        assert "@" in masked
-        assert "*" in masked
-        assert "user" not in masked or masked.startswith("u")
+        self.assertIn("@", masked)
+        self.assertIn("*", masked)
+        self.assertIn("user" not, masked or masked.startswith("u"))
 
     def test_mask_phone_format(self):
         """Should mask phone showing only last 4 digits."""
@@ -747,8 +748,8 @@ class TestPIIMasking:
         from security.encryption_v2 import mask_phone
 
         masked = mask_phone("555-123-4567")
-        assert masked.endswith("4567")
-        assert "*" in masked
+        self.assertTrue(masked.endswith("4567"))
+        self.assertIn("*", masked)
 
     def test_mask_phone_short(self):
         """Should handle short phone numbers."""
@@ -758,10 +759,10 @@ class TestPIIMasking:
         from security.encryption_v2 import mask_phone
 
         masked = mask_phone("123")
-        assert "*" in masked or len(masked) <= 4
+        self.assertLess("*" in masked or len(masked), = 4)
 
 
-class TestEncryptionFieldFunctions:
+class TestEncryptionFieldFunctions(unittest.TestCase):
     """Test standalone field encryption functions."""
 
     def test_encrypt_field_function(self):
@@ -778,8 +779,8 @@ class TestEncryptionFieldFunctions:
         encrypted = encrypt_field(plaintext, key_bytes)
         decrypted = decrypt_field(encrypted, key_bytes)
 
-        assert decrypted == plaintext
-        assert encrypted != plaintext
+        self.assertEqual(decrypted, plaintext)
+        self.assertNotEqual(encrypted, plaintext)
 
     def test_encrypt_field_default_key(self):
         """Should use default master key when not specified."""
@@ -792,7 +793,7 @@ class TestEncryptionFieldFunctions:
         encrypted = encrypt_field(plaintext)
         decrypted = decrypt_field(encrypted)
 
-        assert decrypted == plaintext
+        self.assertEqual(decrypted, plaintext)
 
     def test_encrypt_field_no_key_raises_error(self):
         """Should raise error when no key available."""
@@ -837,7 +838,7 @@ class TestEncryptionFieldFunctions:
             decrypt_field("not!valid@base64#", key_bytes)
 
 
-class TestEncryptionSettings:
+class TestEncryptionSettings(unittest.TestCase):
     """Test encryption settings and configuration."""
 
     def test_encryption_settings_initialization(self):
@@ -847,11 +848,11 @@ class TestEncryptionSettings:
 
         from security.encryption_v2 import settings
 
-        assert settings.MASTER_KEY is not None
-        assert len(settings.MASTER_KEY) == 32
-        assert settings.PBKDF2_ITERATIONS >= 100000
-        assert settings.GCM_NONCE_LENGTH == 12
-        assert settings.GCM_TAG_LENGTH == 16
+        self.assertIsNotNone(settings.MASTER_KEY)
+        self.assertEqual(len(settings.MASTER_KEY), 32)
+        self.assertGreater(settings.PBKDF2_ITERATIONS, = 100000)
+        self.assertEqual(settings.GCM_NONCE_LENGTH, 12)
+        self.assertEqual(settings.GCM_TAG_LENGTH, 16)
 
     def test_encryption_settings_nist_compliance(self):
         """Should use NIST-compliant parameters."""
@@ -861,9 +862,9 @@ class TestEncryptionSettings:
         from security.encryption_v2 import settings
 
         # NIST SP 800-38D recommendations
-        assert settings.GCM_NONCE_LENGTH == 12  # 96 bits (recommended)
-        assert settings.GCM_TAG_LENGTH == 16    # 128 bits (full tag)
-        assert settings.PBKDF2_ITERATIONS >= 100000  # NIST SP 800-132
+        self.assertEqual(settings.GCM_NONCE_LENGTH, 12  # 96 bits (recommended))
+        self.assertEqual(settings.GCM_TAG_LENGTH, 16    # 128 bits (full tag))
+        self.assertGreater(settings.PBKDF2_ITERATIONS, = 100000  # NIST SP 800-132)
 
     def test_generate_master_key_format(self):
         """Should generate properly formatted master key."""
@@ -875,10 +876,10 @@ class TestEncryptionSettings:
         key = generate_master_key()
 
         # Should be base64 encoded
-        assert isinstance(key, str)
+        self.assertIsInstance(key, str)
         # Should decode to 32 bytes
         decoded = base64.b64decode(key)
-        assert len(decoded) == 32
+        self.assertEqual(len(decoded), 32)
 
     def test_generate_master_key_uniqueness(self):
         """Should generate unique keys each time."""
@@ -890,10 +891,10 @@ class TestEncryptionSettings:
         keys = [generate_master_key() for _ in range(10)]
         
         # All should be unique
-        assert len(set(keys)) == 10
+        self.assertEqual(len(set(keys)), 10)
 
 
-class TestEncryptionConcurrency:
+class TestEncryptionConcurrency(unittest.TestCase):
     """Test concurrent encryption operations."""
 
     def test_concurrent_encryption(self, encryption_service, test_key):
@@ -912,8 +913,8 @@ class TestEncryptionConcurrency:
             ))
 
         # All should be encrypted and unique (due to nonces)
-        assert len(encrypted) == 100
-        assert len(set(encrypted)) == 100
+        self.assertEqual(len(encrypted), 100)
+        self.assertEqual(len(set(encrypted)), 100)
 
     def test_concurrent_decryption(self, encryption_service, test_key):
         """Should handle concurrent decryption safely."""
@@ -934,10 +935,10 @@ class TestEncryptionConcurrency:
             ))
 
         # All should match original
-        assert decrypted == data_items
+        self.assertEqual(decrypted, data_items)
 
 
-class TestEncryptionMemory:
+class TestEncryptionMemory(unittest.TestCase):
     """Test memory handling and cleanup."""
 
     def test_large_batch_encryption_memory(self, encryption_service, test_key):
@@ -954,15 +955,15 @@ class TestEncryptionMemory:
             encrypted_batch.append(encrypted)
 
         # All should be encrypted
-        assert len(encrypted_batch) == 1000
+        self.assertEqual(len(encrypted_batch), 1000)
 
         # Decrypt to verify
         for i, encrypted in enumerate(encrypted_batch[:10]):
             decrypted = encryption_service.decrypt(encrypted, test_key)
-            assert batch[i] in decrypted
+            self.assertIn(batch[i], decrypted)
 
 
-class TestEncryptionGDPRCompliance:
+class TestEncryptionGDPRCompliance(unittest.TestCase):
     """Test GDPR compliance features."""
 
     def test_encrypt_gdpr_sensitive_data(self, encryption_service, test_key):
@@ -983,8 +984,8 @@ class TestEncryptionGDPRCompliance:
             encrypted = encryption_service.encrypt(value, test_key)
             decrypted = encryption_service.decrypt(encrypted, test_key)
             
-            assert decrypted == value
-            assert encrypted != value
+            self.assertEqual(decrypted, value)
+            self.assertNotEqual(encrypted, value)
 
     def test_right_to_erasure_simulation(self, encryption_service, test_key):
         """Should support right to erasure by key destruction."""
@@ -1003,7 +1004,7 @@ class TestEncryptionGDPRCompliance:
             encryption_service.decrypt(encrypted, destroyed_key)
 
 
-class TestEncryptionDocumentation:
+class TestEncryptionDocumentation(unittest.TestCase):
     """Test that encryption module has proper documentation."""
 
     def test_module_has_docstring(self):
@@ -1013,9 +1014,9 @@ class TestEncryptionDocumentation:
 
         import security.encryption_v2 as enc_module
 
-        assert enc_module.__doc__ is not None
-        assert "AES-256-GCM" in enc_module.__doc__
-        assert "NIST" in enc_module.__doc__
+        self.assertIsNotNone(enc_module.__doc__)
+        self.assertIn("AES-256-GCM", enc_module.__doc__)
+        self.assertIn("NIST", enc_module.__doc__)
 
     def test_functions_have_docstrings(self):
         """All public functions should have docstrings."""
@@ -1027,11 +1028,11 @@ class TestEncryptionDocumentation:
             encrypt_dict, decrypt_dict
         )
 
-        assert encrypt_field.__doc__ is not None
-        assert decrypt_field.__doc__ is not None
-        assert derive_key.__doc__ is not None
-        assert encrypt_dict.__doc__ is not None
-        assert decrypt_dict.__doc__ is not None
+        self.assertIsNotNone(encrypt_field.__doc__)
+        self.assertIsNotNone(decrypt_field.__doc__)
+        self.assertIsNotNone(derive_key.__doc__)
+        self.assertIsNotNone(encrypt_dict.__doc__)
+        self.assertIsNotNone(decrypt_dict.__doc__)
 
 
 # Run all tests

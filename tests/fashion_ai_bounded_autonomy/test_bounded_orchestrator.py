@@ -3,6 +3,7 @@ Unit tests for BoundedOrchestrator
 Tests bounded orchestration with approval workflows
 """
 
+import unittest
 import pytest
 
 from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
@@ -45,23 +46,23 @@ def mock_agent():
     return MockAgent("test_agent", "1.0.0")
 
 
-class TestBoundedOrchestratorInitialization:
+class TestBoundedOrchestratorInitialization(unittest.TestCase):
     """Test orchestrator initialization"""
 
     def test_init_sets_defaults(self, orchestrator):
         """Test that initialization sets default values"""
-        assert orchestrator.local_only is True
-        assert orchestrator.auto_approve_low_risk is True
-        assert orchestrator.system_paused is False
-        assert orchestrator.emergency_stop_active is False
-        assert len(orchestrator.wrapped_agents) == 0
+        self.assertIs(orchestrator.local_only, True)
+        self.assertIs(orchestrator.auto_approve_low_risk, True)
+        self.assertIs(orchestrator.system_paused, False)
+        self.assertIs(orchestrator.emergency_stop_active, False)
+        self.assertEqual(len(orchestrator.wrapped_agents), 0)
 
     def test_init_creates_approval_system(self, orchestrator):
         """Test that initialization creates approval system"""
-        assert orchestrator.approval_system is not None
+        self.assertIsNotNone(orchestrator.approval_system)
 
 
-class TestRegisterAgent:
+class TestRegisterAgent(unittest.TestCase):
     """Test agent registration"""
 
     @pytest.mark.asyncio
@@ -73,8 +74,8 @@ class TestRegisterAgent:
             priority=ExecutionPriority.MEDIUM
         )
         
-        assert success is True
-        assert mock_agent.agent_name in orchestrator.wrapped_agents
+        self.assertIs(success, True)
+        self.assertIn(mock_agent.agent_name, orchestrator.wrapped_agents)
 
     @pytest.mark.asyncio
     async def test_register_agent_creates_wrapper(self, orchestrator, mock_agent):
@@ -85,8 +86,8 @@ class TestRegisterAgent:
         )
         
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper is not None
-        assert wrapper.wrapped_agent == mock_agent
+        self.assertIsNotNone(wrapper)
+        self.assertEqual(wrapper.wrapped_agent, mock_agent)
 
     @pytest.mark.asyncio
     async def test_register_multiple_agents(self, orchestrator):
@@ -99,10 +100,10 @@ class TestRegisterAgent:
                 capabilities=[f"cap_{agent.agent_name}"]
             )
         
-        assert len(orchestrator.wrapped_agents) == 3
+        self.assertEqual(len(orchestrator.wrapped_agents), 3)
 
 
-class TestExecuteTask:
+class TestExecuteTask(unittest.TestCase):
     """Test task execution"""
 
     @pytest.mark.asyncio
@@ -121,7 +122,7 @@ class TestExecuteTask:
         )
         
         # Low-risk tasks may execute immediately depending on configuration
-        assert "status" in result
+        self.assertIn("status", result)
 
     @pytest.mark.asyncio
     async def test_execute_high_risk_task_requires_approval(self, orchestrator, mock_agent):
@@ -139,8 +140,8 @@ class TestExecuteTask:
             require_approval=True
         )
         
-        assert result["status"] == "pending_approval"
-        assert "task_id" in result
+        self.assertEqual(result["status"], "pending_approval")
+        self.assertIn("task_id", result)
 
     @pytest.mark.asyncio
     async def test_execute_task_emergency_stop(self, orchestrator, mock_agent):
@@ -158,8 +159,8 @@ class TestExecuteTask:
             required_capabilities=["test_cap"]
         )
         
-        assert result["status"] == "blocked"
-        assert "emergency" in result["error"].lower()
+        self.assertEqual(result["status"], "blocked")
+        self.assertIn("emergency", result["error"].lower())
 
     @pytest.mark.asyncio
     async def test_execute_task_system_paused(self, orchestrator, mock_agent):
@@ -177,7 +178,7 @@ class TestExecuteTask:
             required_capabilities=["test_cap"]
         )
         
-        assert result["status"] == "queued"
+        self.assertEqual(result["status"], "queued")
 
     @pytest.mark.asyncio
     async def test_execute_task_no_capable_agents(self, orchestrator):
@@ -188,10 +189,10 @@ class TestExecuteTask:
             required_capabilities=["nonexistent_capability"]
         )
         
-        assert "error" in result
+        self.assertIn("error", result)
 
 
-class TestExecuteApprovedTask:
+class TestExecuteApprovedTask(unittest.TestCase):
     """Test executing approved tasks"""
 
     @pytest.mark.asyncio
@@ -218,7 +219,7 @@ class TestExecuteApprovedTask:
             approved_by="operator"
         )
         
-        assert "status" in exec_result
+        self.assertIn("status", exec_result)
 
     @pytest.mark.asyncio
     async def test_execute_approved_nonexistent_task(self, orchestrator):
@@ -228,10 +229,10 @@ class TestExecuteApprovedTask:
             approved_by="operator"
         )
         
-        assert result["status"] == "error"
+        self.assertEqual(result["status"], "error")
 
 
-class TestRiskAssessment:
+class TestRiskAssessment(unittest.TestCase):
     """Test task risk assessment"""
 
     def test_assess_task_risk_critical(self, orchestrator):
@@ -242,7 +243,7 @@ class TestRiskAssessment:
             agents=["agent1"]
         )
         
-        assert risk == ActionRiskLevel.CRITICAL
+        self.assertEqual(risk, ActionRiskLevel.CRITICAL)
 
     def test_assess_task_risk_high(self, orchestrator):
         """Test assessment of high-risk tasks"""
@@ -252,7 +253,7 @@ class TestRiskAssessment:
             agents=["agent1"]
         )
         
-        assert risk == ActionRiskLevel.HIGH
+        self.assertEqual(risk, ActionRiskLevel.HIGH)
 
     def test_assess_task_risk_medium(self, orchestrator):
         """Test assessment of medium-risk tasks"""
@@ -262,7 +263,7 @@ class TestRiskAssessment:
             agents=["agent1"]
         )
         
-        assert risk == ActionRiskLevel.MEDIUM
+        self.assertEqual(risk, ActionRiskLevel.MEDIUM)
 
     def test_assess_task_risk_low(self, orchestrator):
         """Test assessment of low-risk tasks"""
@@ -272,7 +273,7 @@ class TestRiskAssessment:
             agents=["agent1"]
         )
         
-        assert risk == ActionRiskLevel.LOW
+        self.assertEqual(risk, ActionRiskLevel.LOW)
 
     def test_assess_task_risk_multiple_agents_increases_risk(self, orchestrator):
         """Test that multiple agents increase risk level"""
@@ -282,10 +283,10 @@ class TestRiskAssessment:
             agents=["agent1", "agent2", "agent3", "agent4"]
         )
         
-        assert risk == ActionRiskLevel.HIGH
+        self.assertEqual(risk, ActionRiskLevel.HIGH)
 
 
-class TestEmergencyStop:
+class TestEmergencyStop(unittest.TestCase):
     """Test emergency stop functionality"""
 
     @pytest.mark.asyncio
@@ -293,7 +294,7 @@ class TestEmergencyStop:
         """Test that emergency stop sets the flag"""
         await orchestrator.emergency_stop("Test emergency", "operator")
         
-        assert orchestrator.emergency_stop_active is True
+        self.assertIs(orchestrator.emergency_stop_active, True)
 
     @pytest.mark.asyncio
     async def test_emergency_stop_stops_wrapped_agents(self, orchestrator, mock_agent):
@@ -306,7 +307,7 @@ class TestEmergencyStop:
         await orchestrator.emergency_stop("Test emergency", "operator")
         
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper.emergency_stop is True
+        self.assertIs(wrapper.emergency_stop, True)
 
     @pytest.mark.asyncio
     async def test_resume_operations_after_emergency(self, orchestrator, mock_agent):
@@ -319,18 +320,18 @@ class TestEmergencyStop:
         await orchestrator.emergency_stop("Test emergency", "operator")
         result = await orchestrator.resume_operations("operator")
         
-        assert result["status"] == "resumed"
-        assert orchestrator.emergency_stop_active is False
+        self.assertEqual(result["status"], "resumed")
+        self.assertIs(orchestrator.emergency_stop_active, False)
 
     @pytest.mark.asyncio
     async def test_resume_without_emergency_stop(self, orchestrator):
         """Test resuming when no emergency stop is active"""
         result = await orchestrator.resume_operations("operator")
         
-        assert "error" in result
+        self.assertIn("error", result)
 
 
-class TestPauseResume:
+class TestPauseResume(unittest.TestCase):
     """Test pause and resume functionality"""
 
     @pytest.mark.asyncio
@@ -338,8 +339,8 @@ class TestPauseResume:
         """Test pausing the system"""
         result = await orchestrator.pause_system("operator")
         
-        assert result["status"] == "paused"
-        assert orchestrator.system_paused is True
+        self.assertEqual(result["status"], "paused")
+        self.assertIs(orchestrator.system_paused, True)
 
     @pytest.mark.asyncio
     async def test_resume_system(self, orchestrator):
@@ -347,8 +348,8 @@ class TestPauseResume:
         await orchestrator.pause_system("operator")
         result = await orchestrator.resume_system("operator")
         
-        assert result["status"] == "resumed"
-        assert orchestrator.system_paused is False
+        self.assertEqual(result["status"], "resumed")
+        self.assertIs(orchestrator.system_paused, False)
 
     @pytest.mark.asyncio
     async def test_pause_propagates_to_agents(self, orchestrator, mock_agent):
@@ -361,10 +362,10 @@ class TestPauseResume:
         await orchestrator.pause_system("operator")
         
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
-        assert wrapper.paused is True
+        self.assertIs(wrapper.paused, True)
 
 
-class TestGetBoundedStatus:
+class TestGetBoundedStatus(unittest.TestCase):
     """Test getting bounded status"""
 
     @pytest.mark.asyncio
@@ -372,8 +373,8 @@ class TestGetBoundedStatus:
         """Test getting complete bounded status"""
         status = await orchestrator.get_bounded_status()
         
-        assert "bounded_autonomy" in status
-        assert "system_controls" in status["bounded_autonomy"]
+        self.assertIn("bounded_autonomy", status)
+        self.assertIn("system_controls", status["bounded_autonomy"])
 
     @pytest.mark.asyncio
     async def test_get_bounded_status_includes_controls(self, orchestrator):
@@ -381,10 +382,10 @@ class TestGetBoundedStatus:
         status = await orchestrator.get_bounded_status()
         
         controls = status["bounded_autonomy"]["system_controls"]
-        assert "emergency_stop" in controls
-        assert "paused" in controls
-        assert "local_only" in controls
-        assert "auto_approve_low_risk" in controls
+        self.assertIn("emergency_stop", controls)
+        self.assertIn("paused", controls)
+        self.assertIn("local_only", controls)
+        self.assertIn("auto_approve_low_risk", controls)
 
     @pytest.mark.asyncio
     async def test_get_bounded_status_includes_wrapped_agents(self, orchestrator, mock_agent):
@@ -396,11 +397,11 @@ class TestGetBoundedStatus:
         
         status = await orchestrator.get_bounded_status()
         
-        assert "wrapped_agents" in status["bounded_autonomy"]
-        assert mock_agent.agent_name in status["bounded_autonomy"]["wrapped_agents"]
+        self.assertIn("wrapped_agents", status["bounded_autonomy"])
+        self.assertIn(mock_agent.agent_name, status["bounded_autonomy"]["wrapped_agents"])
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     @pytest.mark.asyncio
@@ -417,7 +418,7 @@ class TestEdgeCases:
             capabilities=["cap2"]
         )
         
-        assert success is True
+        self.assertIs(success, True)
 
     @pytest.mark.asyncio
     async def test_execute_task_with_empty_capabilities(self, orchestrator, mock_agent):
@@ -434,4 +435,4 @@ class TestEdgeCases:
         )
         
         # Should fail with error about no capabilities
-        assert "error" in result or "status" in result
+        self.assertIn("error", result or "status" in result)

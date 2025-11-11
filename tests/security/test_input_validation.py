@@ -8,6 +8,7 @@ Author: DevSkyy Team
 Version: 1.0.0
 """
 
+import unittest
 import pytest
 from fastapi import HTTPException
 
@@ -20,7 +21,7 @@ from security.input_validation import (
 )
 
 
-class TestSQLInjectionPrevention:
+class TestSQLInjectionPrevention(unittest.TestCase):
     """Test SQL injection attack prevention."""
 
     def test_detect_union_select(self):
@@ -30,8 +31,8 @@ class TestSQLInjectionPrevention:
         with pytest.raises(HTTPException) as exc_info:
             InputSanitizer.sanitize_sql(malicious_input)
 
-        assert exc_info.value.status_code == 400
-        assert "SQL injection" in exc_info.value.detail
+        self.assertEqual(exc_info.value.status_code, 400)
+        self.assertIn("SQL injection", exc_info.value.detail)
 
     def test_detect_or_equals(self):
         """Test detection of OR 1=1 attacks."""
@@ -40,7 +41,7 @@ class TestSQLInjectionPrevention:
         with pytest.raises(HTTPException) as exc_info:
             InputSanitizer.sanitize_sql(malicious_input)
 
-        assert exc_info.value.status_code == 400
+        self.assertEqual(exc_info.value.status_code, 400)
 
     def test_detect_drop_table(self):
         """Test detection of DROP TABLE attacks."""
@@ -49,19 +50,19 @@ class TestSQLInjectionPrevention:
         with pytest.raises(HTTPException) as exc_info:
             InputSanitizer.sanitize_sql(malicious_input)
 
-        assert exc_info.value.status_code == 400
+        self.assertEqual(exc_info.value.status_code, 400)
 
     def test_safe_sql_input(self):
         """Test that safe input passes validation."""
         safe_input = "John Doe"
         result = InputSanitizer.sanitize_sql(safe_input)
 
-        assert result is not None
+        self.assertIsNotNone(result)
         # Single quotes should be escaped for SQL safety
-        assert "''" in InputSanitizer.sanitize_sql("O'Brien")
+        self.assertIn("''", InputSanitizer.sanitize_sql("O'Brien"))
 
 
-class TestXSSPrevention:
+class TestXSSPrevention(unittest.TestCase):
     """Test XSS (Cross-Site Scripting) prevention."""
 
     def test_detect_script_tag(self):
@@ -70,7 +71,7 @@ class TestXSSPrevention:
         result = InputSanitizer.sanitize_html(malicious_input)
 
         # Script tag should be removed or escaped
-        assert "<script>" not in result.lower() or "&lt;script&gt;" in result
+        self.assertGreater("<script, " not in result.lower() or "&lt;script&gt;" in result)
 
     def test_detect_javascript_protocol(self):
         """Test detection of javascript: protocol."""
@@ -78,7 +79,7 @@ class TestXSSPrevention:
         result = InputSanitizer.sanitize_html(malicious_input)
 
         # Should be sanitized
-        assert "javascript:" not in result.lower() or result != malicious_input
+        self.assertNotEqual("javascript:" not in result.lower() or result, malicious_input)
 
     def test_detect_event_handlers(self):
         """Test detection of event handler attributes."""
@@ -91,7 +92,7 @@ class TestXSSPrevention:
         for malicious_input in malicious_inputs:
             result = InputSanitizer.sanitize_html(malicious_input)
             # Event handlers should be removed or escaped
-            assert result != malicious_input or "onerror" not in result.lower()
+            self.assertNotEqual(result, malicious_input or "onerror" not in result.lower())
 
     def test_safe_html_input(self):
         """Test that safe input is properly escaped."""
@@ -99,10 +100,10 @@ class TestXSSPrevention:
         result = InputSanitizer.sanitize_html(safe_input)
 
         # HTML entities should be escaped
-        assert "&lt;" in result or result == safe_input
+        self.assertEqual("&lt;" in result or result, safe_input)
 
 
-class TestCommandInjectionPrevention:
+class TestCommandInjectionPrevention(unittest.TestCase):
     """Test command injection prevention."""
 
     def test_detect_pipe_commands(self):
@@ -117,8 +118,8 @@ class TestCommandInjectionPrevention:
             with pytest.raises(HTTPException) as exc_info:
                 InputSanitizer.sanitize_command(malicious_input)
 
-            assert exc_info.value.status_code == 400
-            assert "command injection" in exc_info.value.detail.lower()
+            self.assertEqual(exc_info.value.status_code, 400)
+            self.assertIn("command injection", exc_info.value.detail.lower())
 
     def test_detect_command_substitution(self):
         """Test detection of command substitution."""
@@ -140,10 +141,10 @@ class TestCommandInjectionPrevention:
         safe_input = "myfile.txt"
         result = InputSanitizer.sanitize_command(safe_input)
 
-        assert result == safe_input
+        self.assertEqual(result, safe_input)
 
 
-class TestPathTraversalPrevention:
+class TestPathTraversalPrevention(unittest.TestCase):
     """Test path traversal attack prevention."""
 
     def test_detect_dot_dot_slash(self):
@@ -158,8 +159,8 @@ class TestPathTraversalPrevention:
             with pytest.raises(HTTPException) as exc_info:
                 InputSanitizer.sanitize_path(malicious_input)
 
-            assert exc_info.value.status_code == 400
-            assert "path traversal" in exc_info.value.detail.lower()
+            self.assertEqual(exc_info.value.status_code, 400)
+            self.assertIn("path traversal", exc_info.value.detail.lower())
 
     def test_detect_encoded_traversal(self):
         """Test detection of URL-encoded traversal."""
@@ -178,10 +179,10 @@ class TestPathTraversalPrevention:
 
         for safe_path in safe_paths:
             result = InputSanitizer.sanitize_path(safe_path)
-            assert result is not None
+            self.assertIsNotNone(result)
 
 
-class TestValidationModels:
+class TestValidationModels(unittest.TestCase):
     """Test Pydantic validation models."""
 
     def test_email_validator_valid(self):
@@ -194,7 +195,7 @@ class TestValidationModels:
 
         for email in valid_emails:
             validator = EmailValidator(email=email)
-            assert validator.email == email
+            self.assertEqual(validator.email, email)
 
     def test_email_validator_invalid(self):
         """Test invalid email addresses."""
@@ -219,7 +220,7 @@ class TestValidationModels:
 
         for url in valid_urls:
             validator = URLValidator(url=url)
-            assert validator.url == url
+            self.assertEqual(validator.url, url)
 
     def test_url_validator_invalid(self):
         """Test invalid URLs."""
@@ -243,7 +244,7 @@ class TestValidationModels:
 
         for value in valid_values:
             validator = AlphanumericValidator(value=value)
-            assert validator.value == value
+            self.assertEqual(validator.value, value)
 
     def test_alphanumeric_validator_invalid(self):
         """Test invalid alphanumeric values."""
@@ -258,7 +259,7 @@ class TestValidationModels:
                 AlphanumericValidator(value=value)
 
 
-class TestContentSecurityPolicy:
+class TestContentSecurityPolicy(unittest.TestCase):
     """Test Content Security Policy headers."""
 
     def test_csp_headers_present(self):
@@ -274,20 +275,20 @@ class TestContentSecurityPolicy:
         ]
 
         for header in required_headers:
-            assert header in headers
+            self.assertIn(header, headers)
 
     def test_csp_header_values(self):
         """Test CSP header values are secure."""
         headers = ContentSecurityPolicy.get_csp_header()
 
         # Check critical values
-        assert "default-src 'self'" in headers["Content-Security-Policy"]
-        assert headers["X-Frame-Options"] == "DENY"
-        assert headers["X-Content-Type-Options"] == "nosniff"
-        assert "max-age" in headers["Strict-Transport-Security"]
+        self.assertIn("default-src 'self'", headers["Content-Security-Policy"])
+        self.assertEqual(headers["X-Frame-Options"], "DENY")
+        self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
+        self.assertIn("max-age", headers["Strict-Transport-Security"])
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and boundary conditions."""
 
     def test_empty_string_input(self):
@@ -300,10 +301,10 @@ class TestEdgeCases:
         cmd_result = InputSanitizer.sanitize_command(empty)
         path_result = InputSanitizer.sanitize_path(empty)
 
-        assert sql_result == empty
-        assert html_result == empty
-        assert cmd_result == empty
-        assert path_result == empty
+        self.assertEqual(sql_result, empty)
+        self.assertEqual(html_result, empty)
+        self.assertEqual(cmd_result, empty)
+        self.assertEqual(path_result, empty)
 
     def test_non_string_input(self):
         """Test handling of non-string input."""
@@ -311,10 +312,10 @@ class TestEdgeCases:
 
         for value in non_strings:
             # Should return value unchanged
-            assert InputSanitizer.sanitize_sql(value) == value
-            assert InputSanitizer.sanitize_html(value) == value
-            assert InputSanitizer.sanitize_command(value) == value
-            assert InputSanitizer.sanitize_path(value) == value
+            self.assertEqual(InputSanitizer.sanitize_sql(value), value)
+            self.assertEqual(InputSanitizer.sanitize_html(value), value)
+            self.assertEqual(InputSanitizer.sanitize_command(value), value)
+            self.assertEqual(InputSanitizer.sanitize_path(value), value)
 
     def test_very_long_input(self):
         """Test handling of very long input strings."""
@@ -322,7 +323,7 @@ class TestEdgeCases:
 
         # Should not raise errors
         result = InputSanitizer.sanitize_html(long_input)
-        assert len(result) >= len(long_input)
+        self.assertGreater(len(result), = len(long_input))
 
     def test_unicode_input(self):
         """Test handling of Unicode characters."""
@@ -336,10 +337,10 @@ class TestEdgeCases:
         for unicode_input in unicode_inputs:
             # Should handle Unicode gracefully
             result = InputSanitizer.sanitize_html(unicode_input)
-            assert result is not None
+            self.assertIsNotNone(result)
 
 
-class TestRealWorldScenarios:
+class TestRealWorldScenarios(unittest.TestCase):
     """Test real-world attack scenarios."""
 
     def test_combined_sql_xss_attack(self):
@@ -352,7 +353,7 @@ class TestRealWorldScenarios:
 
         # Should sanitize XSS
         html_result = InputSanitizer.sanitize_html(malicious_input)
-        assert "<script>" not in html_result or "&lt;" in html_result
+        self.assertGreater("<script, " not in html_result or "&lt;" in html_result)
 
     def test_polyglot_attack(self):
         """Test polyglot attack (valid in multiple contexts)."""
@@ -361,7 +362,7 @@ class TestRealWorldScenarios:
 
         # Should be caught by XSS detection
         html_result = InputSanitizer.sanitize_html(polyglot)
-        assert html_result != polyglot  # Should be modified
+        self.assertNotEqual(html_result, polyglot  # Should be modified)
 
     def test_null_byte_injection(self):
         """Test null byte injection attacks."""

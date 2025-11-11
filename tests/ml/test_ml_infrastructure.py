@@ -3,6 +3,7 @@ Comprehensive ML Infrastructure Tests
 Tests for model registry, caching, explainability, and API endpoints
 """
 
+import unittest
 import shutil
 import tempfile
 
@@ -30,7 +31,7 @@ class MockModel:
 # ============================================================================
 
 
-class TestModelRegistry:
+class TestModelRegistry(unittest.TestCase):
     """Test model registry operations"""
 
     @pytest.fixture
@@ -54,10 +55,10 @@ class TestModelRegistry:
             dataset_info={"samples": 1000},
         )
 
-        assert metadata.model_name == "test_model"
-        assert metadata.version == "1.0.0"
-        assert metadata.stage == ModelStage.DEVELOPMENT
-        assert metadata.metrics["accuracy"] == 0.95
+        self.assertEqual(metadata.model_name, "test_model")
+        self.assertEqual(metadata.version, "1.0.0")
+        self.assertEqual(metadata.stage, ModelStage.DEVELOPMENT)
+        self.assertEqual(metadata.metrics["accuracy"], 0.95)
 
     def test_load_model(self, temp_registry):
         """Test model loading"""
@@ -71,12 +72,12 @@ class TestModelRegistry:
         )
 
         loaded_model = temp_registry.load_model("test_model", version="1.0.0")
-        assert loaded_model is not None
+        self.assertIsNotNone(loaded_model)
 
         # Test prediction
         X = np.array([[1, 2], [3, 4]])
         result = loaded_model.predict(X)
-        assert len(result) == 2
+        self.assertEqual(len(result), 2)
 
     def test_promote_model(self, temp_registry):
         """Test model promotion"""
@@ -92,12 +93,12 @@ class TestModelRegistry:
         # Promote to staging
         temp_registry.promote_model("test_model", "1.0.0", ModelStage.STAGING)
         metadata = temp_registry.get_metadata("test_model", "1.0.0")
-        assert metadata.stage == ModelStage.STAGING
+        self.assertEqual(metadata.stage, ModelStage.STAGING)
 
         # Promote to production
         temp_registry.promote_model("test_model", "1.0.0", ModelStage.PRODUCTION)
         metadata = temp_registry.get_metadata("test_model", "1.0.0")
-        assert metadata.stage == ModelStage.PRODUCTION
+        self.assertEqual(metadata.stage, ModelStage.PRODUCTION)
 
     def test_list_versions(self, temp_registry):
         """Test listing model versions"""
@@ -114,9 +115,9 @@ class TestModelRegistry:
             )
 
         versions = temp_registry.list_versions("test_model")
-        assert len(versions) == 3
-        assert "1.0.0" in versions
-        assert "2.0.0" in versions
+        self.assertEqual(len(versions), 3)
+        self.assertIn("1.0.0", versions)
+        self.assertIn("2.0.0", versions)
 
     def test_compare_models(self, temp_registry):
         """Test model comparison"""
@@ -140,9 +141,9 @@ class TestModelRegistry:
 
         comparison = temp_registry.compare_models("test_model", "1.0.0", "2.0.0")
 
-        assert comparison["model_name"] == "test_model"
-        assert "metrics_comparison" in comparison
-        assert (
+        self.assertEqual(comparison["model_name"], "test_model")
+        self.assertIn("metrics_comparison", comparison)
+        self.assertTrue(()
             comparison["metrics_comparison"]["accuracy"]["v2.0.0"]
             > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
         )
@@ -169,9 +170,9 @@ class TestModelRegistry:
 
         stats = temp_registry.get_registry_stats()
 
-        assert stats["total_models"] == 2
-        assert stats["total_versions"] == 2
-        assert ModelStage.DEVELOPMENT in stats["models_by_stage"]
+        self.assertEqual(stats["total_models"], 2)
+        self.assertEqual(stats["total_versions"], 2)
+        self.assertIn(ModelStage.DEVELOPMENT, stats["models_by_stage"])
 
 
 # ============================================================================
@@ -179,7 +180,7 @@ class TestModelRegistry:
 # ============================================================================
 
 
-class TestRedisCache:
+class TestRedisCache(unittest.TestCase):
     """Test Redis cache with fallback"""
 
     @pytest.fixture
@@ -191,28 +192,28 @@ class TestRedisCache:
         """Test basic cache operations"""
         cache.set("test_key", {"data": "value"})
         result = cache.get("test_key")
-        assert result == {"data": "value"}
+        self.assertEqual(result, {"data": "value"})
 
     def test_cache_delete(self, cache):
         """Test cache deletion"""
         cache.set("test_key", "value")
         cache.delete("test_key")
-        assert cache.get("test_key") is None
+        self.assertIsNone(cache.get("test_key"))
 
     def test_cache_clear(self, cache):
         """Test cache clearing"""
         cache.set("key1", "value1")
         cache.set("key2", "value2")
         cache.clear()
-        assert cache.get("key1") is None
-        assert cache.get("key2") is None
+        self.assertIsNone(cache.get("key1"))
+        self.assertIsNone(cache.get("key2"))
 
     def test_cache_ttl(self, cache):
         """Test TTL expiration"""
         import time
 
         cache.set("test_key", "value", ttl=1)
-        assert cache.get("test_key") == "value"
+        self.assertEqual(cache.get("test_key"), "value")
         time.sleep(2)
         # In-memory cache may not respect TTL perfectly
         # Just verify the API works
@@ -224,8 +225,8 @@ class TestRedisCache:
         cache.get("nonexistent")  # Miss
 
         stats = cache.stats()
-        assert "mode" in stats
-        assert "total_keys" in stats
+        self.assertIn("mode", stats)
+        self.assertIn("total_keys", stats)
 
 
 # ============================================================================
@@ -233,7 +234,7 @@ class TestRedisCache:
 # ============================================================================
 
 
-class TestModelExplainer:
+class TestModelExplainer(unittest.TestCase):
     """Test SHAP-based explainability"""
 
     @pytest.fixture
@@ -243,8 +244,8 @@ class TestModelExplainer:
 
     def test_explainer_initialization(self, explainer):
         """Test explainer initialization"""
-        assert explainer is not None
-        assert isinstance(explainer.explainers, dict)
+        self.assertIsNotNone(explainer)
+        self.assertIsInstance(explainer.explainers, dict)
 
     def test_create_explainer_without_shap(self, explainer):
         """Test explainer creation when SHAP not available"""
@@ -255,7 +256,7 @@ class TestModelExplainer:
             # If SHAP is installed, this should work
             # If not, it should raise ImportError
         except ImportError as e:
-            assert "SHAP not installed" in str(e)
+            self.assertIn("SHAP not installed", str(e))
 
     def test_explain_prediction_without_explainer(self, explainer):
         """Test prediction explanation without explainer"""
@@ -270,7 +271,7 @@ class TestModelExplainer:
 # ============================================================================
 
 
-class TestMLIntegration:
+class TestMLIntegration(unittest.TestCase):
     """Integration tests for ML infrastructure"""
 
     @pytest.fixture
@@ -305,7 +306,7 @@ class TestMLIntegration:
             parameters={"trained": True},
         )
 
-        assert metadata.model_name == "workflow_model"
+        self.assertEqual(metadata.model_name, "workflow_model")
 
         # 2. Load model and cache predictions
         loaded_model = registry.load_model("workflow_model", version="1.0.0")
@@ -316,12 +317,12 @@ class TestMLIntegration:
         cache.set(cache_key, prediction.tolist())
 
         cached_prediction = cache.get(cache_key)
-        assert cached_prediction is not None
+        self.assertIsNotNone(cached_prediction)
 
         # 3. Promote model
         registry.promote_model("workflow_model", "1.0.0", ModelStage.PRODUCTION)
         metadata = registry.get_metadata("workflow_model", "1.0.0")
-        assert metadata.stage == ModelStage.PRODUCTION
+        self.assertEqual(metadata.stage, ModelStage.PRODUCTION)
 
     def test_model_versioning_workflow(self, setup_ml):
         """Test model versioning and comparison"""
@@ -350,7 +351,7 @@ class TestMLIntegration:
         # Compare versions
         comparison = registry.compare_models("versioned_model", "1.0.0", "2.0.0")
 
-        assert (
+        self.assertTrue(()
             comparison["metrics_comparison"]["accuracy"]["v2.0.0"]
             > comparison["metrics_comparison"]["accuracy"]["v1.0.0"]
         )
@@ -360,7 +361,7 @@ class TestMLIntegration:
 
         # Load production model
         prod_model = registry.load_model("versioned_model", stage=ModelStage.PRODUCTION)
-        assert prod_model is not None
+        self.assertIsNotNone(prod_model)
 
 
 # ============================================================================
@@ -368,7 +369,7 @@ class TestMLIntegration:
 # ============================================================================
 
 
-class TestMLAPI:
+class TestMLAPI(unittest.TestCase):
     """Test ML API endpoints"""
 
     @pytest.fixture
@@ -383,17 +384,17 @@ class TestMLAPI:
     def test_ml_health_check(self, client):
         """Test ML health endpoint"""
         response = client.get("/api/v1/ml/health")
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
-        assert "registry" in data
-        assert "cache_mode" in data
+        self.assertIn("registry", data)
+        self.assertIn("cache_mode", data)
 
     def test_registry_stats_requires_auth(self, client):
         """Test registry stats requires authentication"""
         response = client.get("/api/v1/ml/registry/stats")
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)
 
     def test_cache_stats_requires_auth(self, client):
         """Test cache stats requires authentication"""
         response = client.get("/api/v1/ml/cache/stats")
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)

@@ -98,16 +98,19 @@ jobs:
           mkdir -p security-reports
 
           # Generate JSON report (allow findings without failing)
+          # Use --configfile to respect pyproject.toml settings (skips B101 in tests)
           bandit -r . \
             -f json \
             -o security-reports/bandit-report.json \
-            --exclude ./tests,./venv,./node_modules || true
+            --configfile pyproject.toml \
+            --exclude ./venv,./node_modules,./.venv || true
 
           # Generate human-readable report (allow findings without failing)
           # Conditional check below will fail only on HIGH/CRITICAL issues
           bandit -r . \
             -f screen \
-            --exclude ./tests,./venv,./node_modules || echo "::warning::Bandit found security issues (see report)"
+            --configfile pyproject.toml \
+            --exclude ./venv,./node_modules,./.venv || echo "::warning::Bandit found security issues (see report)"
 
       - name: Check for critical security issues
         run: |

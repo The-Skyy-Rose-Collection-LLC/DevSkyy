@@ -3,6 +3,7 @@ Unit tests for Watchdog
 Tests health monitoring and recovery
 """
 
+import unittest
 import pytest
 import asyncio
 import tempfile
@@ -77,26 +78,26 @@ def mock_orchestrator():
     return MockOrchestrator()
 
 
-class TestWatchdogInitialization:
+class TestWatchdogInitialization(unittest.TestCase):
     """Test Watchdog initialization"""
 
     def test_init_loads_config(self, watchdog):
         """Test that initialization loads configuration"""
-        assert watchdog.config is not None
-        assert "check_interval_seconds" in watchdog.config
+        self.assertIsNotNone(watchdog.config)
+        self.assertIn("check_interval_seconds", watchdog.config)
 
     def test_init_creates_incident_log_dir(self, watchdog):
         """Test that initialization creates incident log directory"""
-        assert watchdog.incident_log_path.exists()
+        self.assertTrue(watchdog.incident_log_path.exists())
 
     def test_init_sets_defaults(self, watchdog):
         """Test that initialization sets default values"""
-        assert watchdog.max_restart_attempts == 3
-        assert watchdog.running is False
-        assert len(watchdog.agent_error_counts) == 0
+        self.assertEqual(watchdog.max_restart_attempts, 3)
+        self.assertIs(watchdog.running, False)
+        self.assertEqual(len(watchdog.agent_error_counts), 0)
 
 
-class TestStartStop:
+class TestStartStop(unittest.TestCase):
     """Test starting and stopping watchdog"""
 
     @pytest.mark.asyncio
@@ -105,7 +106,7 @@ class TestStartStop:
         task = asyncio.create_task(watchdog.start(mock_orchestrator))
         await asyncio.sleep(0.1)
         
-        assert watchdog.running is True
+        self.assertIs(watchdog.running, True)
         
         await watchdog.stop()
         await task
@@ -119,10 +120,10 @@ class TestStartStop:
         await watchdog.stop()
         await task
         
-        assert watchdog.running is False
+        self.assertIs(watchdog.running, False)
 
 
-class TestHealthChecking:
+class TestHealthChecking(unittest.TestCase):
     """Test agent health checking"""
 
     @pytest.mark.asyncio
@@ -133,7 +134,7 @@ class TestHealthChecking:
         await watchdog._check_agent("test_agent", agent)
         
         # No errors should be recorded
-        assert "test_agent" not in watchdog.agent_error_counts
+        self.assertIn("test_agent" not, watchdog.agent_error_counts)
 
     @pytest.mark.asyncio
     async def test_check_failed_agent(self, watchdog):
@@ -143,10 +144,10 @@ class TestHealthChecking:
         await watchdog._check_agent("test_agent", agent)
         
         # Error should be recorded
-        assert "test_agent" in watchdog.agent_error_counts
+        self.assertIn("test_agent", watchdog.agent_error_counts)
 
 
-class TestAgentFailureHandling:
+class TestAgentFailureHandling(unittest.TestCase):
     """Test handling agent failures"""
 
     @pytest.mark.asyncio
@@ -156,7 +157,7 @@ class TestAgentFailureHandling:
         
         await watchdog._handle_agent_failure("test_agent", agent)
         
-        assert watchdog.agent_error_counts["test_agent"] == 1
+        self.assertEqual(watchdog.agent_error_counts["test_agent"], 1)
 
     @pytest.mark.asyncio
     async def test_handle_repeated_failures_halts_agent(self, watchdog):
@@ -167,10 +168,10 @@ class TestAgentFailureHandling:
         for _i in range(5):
             await watchdog._handle_agent_failure("test_agent", agent)
         
-        assert "test_agent" in watchdog.halted_agents
+        self.assertIn("test_agent", watchdog.halted_agents)
 
 
-class TestAgentRestart:
+class TestAgentRestart(unittest.TestCase):
     """Test agent restart functionality"""
 
     @pytest.mark.asyncio
@@ -180,8 +181,8 @@ class TestAgentRestart:
         
         await watchdog._restart_agent("test_agent", agent)
         
-        assert agent.initialize_called is True
-        assert watchdog.agent_restart_counts["test_agent"] == 1
+        self.assertIs(agent.initialize_called, True)
+        self.assertEqual(watchdog.agent_restart_counts["test_agent"], 1)
 
     @pytest.mark.asyncio
     async def test_restart_agent_max_attempts_exceeded(self, watchdog):
@@ -192,10 +193,10 @@ class TestAgentRestart:
         for _i in range(5):
             await watchdog._restart_agent("test_agent", agent)
         
-        assert "test_agent" in watchdog.halted_agents
+        self.assertIn("test_agent", watchdog.halted_agents)
 
 
-class TestAgentHalt:
+class TestAgentHalt(unittest.TestCase):
     """Test agent halting"""
 
     @pytest.mark.asyncio
@@ -203,19 +204,19 @@ class TestAgentHalt:
         """Test that halting records agent details"""
         await watchdog._halt_agent("test_agent", "test reason")
         
-        assert "test_agent" in watchdog.halted_agents
-        assert watchdog.halted_agents["test_agent"]["reason"] == "test reason"
+        self.assertIn("test_agent", watchdog.halted_agents)
+        self.assertEqual(watchdog.halted_agents["test_agent"]["reason"], "test reason")
 
     @pytest.mark.asyncio
     async def test_halt_agent_creates_incident(self, watchdog):
         """Test that halting creates incident report"""
         await watchdog._halt_agent("test_agent", "test reason")
         
-        assert len(watchdog.incidents) > 0
-        assert watchdog.incidents[-1]["type"] == "agent_halted"
+        self.assertGreater(len(watchdog.incidents), 0)
+        self.assertEqual(watchdog.incidents[-1]["type"], "agent_halted")
 
 
-class TestAgentRecovery:
+class TestAgentRecovery(unittest.TestCase):
     """Test agent recovery handling"""
 
     @pytest.mark.asyncio
@@ -226,11 +227,11 @@ class TestAgentRecovery:
         
         await watchdog._handle_agent_recovery("test_agent")
         
-        assert "test_agent" not in watchdog.agent_error_counts
-        assert "test_agent" not in watchdog.agent_restart_counts
+        self.assertIn("test_agent" not, watchdog.agent_error_counts)
+        self.assertIn("test_agent" not, watchdog.agent_restart_counts)
 
 
-class TestIncidentLogging:
+class TestIncidentLogging(unittest.TestCase):
     """Test incident logging"""
 
     def test_log_incident(self, watchdog):
@@ -243,11 +244,11 @@ class TestIncidentLogging:
         
         watchdog._log_incident(incident)
         
-        assert len(watchdog.incidents) == 1
-        assert watchdog.incidents[0]["type"] == "test_incident"
+        self.assertEqual(len(watchdog.incidents), 1)
+        self.assertEqual(watchdog.incidents[0]["type"], "test_incident")
 
 
-class TestOperatorNotification:
+class TestOperatorNotification(unittest.TestCase):
     """Test operator notification"""
 
     @pytest.mark.asyncio
@@ -261,10 +262,10 @@ class TestOperatorNotification:
         await watchdog._notify_operator(incident)
         
         notification_file = Path("fashion_ai_bounded_autonomy/notifications.json")
-        assert notification_file.exists()
+        self.assertTrue(notification_file.exists())
 
 
-class TestGetStatus:
+class TestGetStatus(unittest.TestCase):
     """Test getting watchdog status"""
 
     @pytest.mark.asyncio
@@ -272,9 +273,9 @@ class TestGetStatus:
         """Test getting complete status"""
         status = await watchdog.get_status()
         
-        assert "running" in status
-        assert "total_incidents" in status
-        assert "halted_agents" in status
+        self.assertIn("running", status)
+        self.assertIn("total_incidents", status)
+        self.assertIn("halted_agents", status)
 
     @pytest.mark.asyncio
     async def test_get_status_includes_error_counts(self, watchdog):
@@ -283,11 +284,11 @@ class TestGetStatus:
         
         status = await watchdog.get_status()
         
-        assert "agent1" in status["agents_with_errors"]
-        assert status["agents_with_errors"]["agent1"] == 2
+        self.assertIn("agent1", status["agents_with_errors"])
+        self.assertEqual(status["agents_with_errors"]["agent1"], 2)
 
 
-class TestClearAgentHalt:
+class TestClearAgentHalt(unittest.TestCase):
     """Test clearing agent halt status"""
 
     @pytest.mark.asyncio
@@ -297,18 +298,18 @@ class TestClearAgentHalt:
         
         result = await watchdog.clear_agent_halt("test_agent", "operator")
         
-        assert result["status"] == "cleared"
-        assert "test_agent" not in watchdog.halted_agents
+        self.assertEqual(result["status"], "cleared")
+        self.assertIn("test_agent" not, watchdog.halted_agents)
 
     @pytest.mark.asyncio
     async def test_clear_nonhalted_agent_returns_error(self, watchdog):
         """Test clearing non-halted agent returns error"""
         result = await watchdog.clear_agent_halt("nonexistent", "operator")
         
-        assert "error" in result
+        self.assertIn("error", result)
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases"""
 
     @pytest.mark.asyncio
@@ -320,4 +321,4 @@ class TestEdgeCases:
         await watchdog._check_agent("test_agent", agent)
         
         # Should log incident without crashing
-        assert len(watchdog.incidents) > 0
+        self.assertGreater(len(watchdog.incidents), 0)

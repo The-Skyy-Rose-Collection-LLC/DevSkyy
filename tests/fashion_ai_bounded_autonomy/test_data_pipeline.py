@@ -3,6 +3,7 @@ Unit tests for DataPipeline
 Tests data ingestion, validation, and processing
 """
 
+import unittest
 import pytest
 import tempfile
 import shutil
@@ -65,22 +66,22 @@ def data_pipeline(temp_config_path):
     return DataPipeline(config_path=temp_config_path)
 
 
-class TestDataPipelineInitialization:
+class TestDataPipelineInitialization(unittest.TestCase):
     """Test DataPipeline initialization"""
 
     def test_init_creates_directories(self, data_pipeline):
         """Test that initialization creates required directories"""
-        assert data_pipeline.quarantine_path.exists()
-        assert data_pipeline.validated_path.exists()
-        assert data_pipeline.output_path.exists()
+        self.assertTrue(data_pipeline.quarantine_path.exists())
+        self.assertTrue(data_pipeline.validated_path.exists())
+        self.assertTrue(data_pipeline.output_path.exists())
 
     def test_init_loads_config(self, data_pipeline):
         """Test that initialization loads configuration"""
-        assert data_pipeline.config is not None
-        assert "approved_sources" in data_pipeline.config
+        self.assertIsNotNone(data_pipeline.config)
+        self.assertIn("approved_sources", data_pipeline.config)
 
 
-class TestIngestCSV:
+class TestIngestCSV(unittest.TestCase):
     """Test CSV data ingestion"""
 
     @pytest.mark.asyncio
@@ -93,9 +94,9 @@ class TestIngestCSV:
         
         result = await data_pipeline.ingest(str(csv_file), "csv")
         
-        assert result["status"] == "ingested"
-        assert result["source_type"] == "csv"
-        assert "file_hash" in result
+        self.assertEqual(result["status"], "ingested")
+        self.assertEqual(result["source_type"], "csv")
+        self.assertIn("file_hash", result)
 
     @pytest.mark.asyncio
     async def test_ingest_csv_with_large_file(self, data_pipeline, temp_data_dir):
@@ -119,11 +120,11 @@ class TestIngestCSV:
         
         with pytest.mock.patch('os.stat', side_effect=mock_stat):
             result = await data_pipeline.ingest(str(csv_file), "csv")
-            assert result["status"] == "rejected"
-            assert result["reason"] == "file_too_large"
+            self.assertEqual(result["status"], "rejected")
+            self.assertEqual(result["reason"], "file_too_large")
 
 
-class TestIngestJSON:
+class TestIngestJSON(unittest.TestCase):
     """Test JSON data ingestion"""
 
     @pytest.mark.asyncio
@@ -136,8 +137,8 @@ class TestIngestJSON:
         
         result = await data_pipeline.ingest(str(json_file), "json")
         
-        assert result["status"] == "ingested"
-        assert result["source_type"] == "json"
+        self.assertEqual(result["status"], "ingested")
+        self.assertEqual(result["source_type"], "json")
 
     @pytest.mark.asyncio
     async def test_ingest_invalid_json(self, data_pipeline, temp_data_dir):
@@ -147,10 +148,10 @@ class TestIngestJSON:
         
         result = await data_pipeline.ingest(str(json_file), "json")
         
-        assert result["status"] == "error"
+        self.assertEqual(result["status"], "error")
 
 
-class TestPreprocessing:
+class TestPreprocessing(unittest.TestCase):
     """Test data preprocessing and validation"""
 
     @pytest.mark.asyncio
@@ -160,8 +161,8 @@ class TestPreprocessing:
         
         result = await data_pipeline.preprocess(data, "test_schema")
         
-        assert result["status"] == "validated"
-        assert "validated_file" in result
+        self.assertEqual(result["status"], "validated")
+        self.assertIn("validated_file", result)
 
     @pytest.mark.asyncio
     async def test_preprocess_invalid_data_quarantined(self, data_pipeline):
@@ -171,9 +172,9 @@ class TestPreprocessing:
         
         result = await data_pipeline.preprocess(data, "test_schema")
         
-        assert result["status"] == "quarantined"
-        assert "errors" in result
-        assert "quarantine_file" in result
+        self.assertEqual(result["status"], "quarantined")
+        self.assertIn("errors", result)
+        self.assertIn("quarantine_file", result)
 
     @pytest.mark.asyncio
     async def test_preprocess_empty_dataframe(self, data_pipeline):
@@ -182,7 +183,7 @@ class TestPreprocessing:
         
         result = await data_pipeline.preprocess(data, "test_schema")
         
-        assert result["status"] == "quarantined"
+        self.assertEqual(result["status"], "quarantined")
 
     @pytest.mark.asyncio
     async def test_preprocess_dict_data(self, data_pipeline):
@@ -191,10 +192,10 @@ class TestPreprocessing:
         
         result = await data_pipeline.preprocess(data, "test_schema")
         
-        assert result["status"] == "validated"
+        self.assertEqual(result["status"], "validated")
 
 
-class TestInference:
+class TestInference(unittest.TestCase):
     """Test model inference"""
 
     @pytest.mark.asyncio
@@ -204,9 +205,9 @@ class TestInference:
         
         result = await data_pipeline.inference(data, "test_model")
         
-        assert result["status"] == "completed"
-        assert result["model"] == "test_model"
-        assert "predictions" in result
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["model"], "test_model")
+        self.assertIn("predictions", result)
 
     @pytest.mark.asyncio
     async def test_inference_with_unapproved_model(self, data_pipeline):
@@ -215,11 +216,11 @@ class TestInference:
         
         result = await data_pipeline.inference(data, "unapproved_model")
         
-        assert result["status"] == "error"
-        assert result["reason"] == "model_not_approved"
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["reason"], "model_not_approved")
 
 
-class TestFileHashing:
+class TestFileHashing(unittest.TestCase):
     """Test file integrity hashing"""
 
     def test_calculate_file_hash(self, data_pipeline, temp_data_dir):
@@ -230,8 +231,8 @@ class TestFileHashing:
         hash1 = data_pipeline._calculate_file_hash(test_file)
         hash2 = data_pipeline._calculate_file_hash(test_file)
         
-        assert hash1 == hash2
-        assert len(hash1) == 64  # SHA-256 produces 64 hex characters
+        self.assertEqual(hash1, hash2)
+        self.assertEqual(len(hash1), 64  # SHA-256 produces 64 hex characters)
 
     def test_different_files_different_hashes(self, data_pipeline, temp_data_dir):
         """Test that different files produce different hashes"""
@@ -244,10 +245,10 @@ class TestFileHashing:
         hash1 = data_pipeline._calculate_file_hash(file1)
         hash2 = data_pipeline._calculate_file_hash(file2)
         
-        assert hash1 != hash2
+        self.assertNotEqual(hash1, hash2)
 
 
-class TestSchemaValidation:
+class TestSchemaValidation(unittest.TestCase):
     """Test schema validation logic"""
 
     def test_validate_schema_valid_data(self, data_pipeline):
@@ -256,8 +257,8 @@ class TestSchemaValidation:
         
         result = data_pipeline._validate_schema(data, "test_schema")
         
-        assert result["valid"] is True
-        assert len(result["errors"]) == 0
+        self.assertIs(result["valid"], True)
+        self.assertEqual(len(result["errors"]), 0)
 
     def test_validate_schema_missing_field(self, data_pipeline):
         """Test validation with missing required field"""
@@ -265,8 +266,8 @@ class TestSchemaValidation:
         
         result = data_pipeline._validate_schema(data, "test_schema")
         
-        assert result["valid"] is False
-        assert any("value" in str(e) for e in result["errors"])
+        self.assertIs(result["valid"], False)
+        self.assertIn(any("value", str(e) for e in result["errors"]))
 
     def test_validate_schema_unknown_schema(self, data_pipeline):
         """Test validation with unknown schema"""
@@ -274,10 +275,10 @@ class TestSchemaValidation:
         
         result = data_pipeline._validate_schema(data, "nonexistent_schema")
         
-        assert result["valid"] is False
+        self.assertIs(result["valid"], False)
 
 
-class TestOperationLogging:
+class TestOperationLogging(unittest.TestCase):
     """Test operation logging"""
 
     @pytest.mark.asyncio
@@ -289,11 +290,11 @@ class TestOperationLogging:
         
         await data_pipeline.ingest(str(csv_file), "csv")
         
-        assert len(data_pipeline.processing_log) > 0
-        assert data_pipeline.processing_log[0]["operation"] == "ingest"
+        self.assertGreater(len(data_pipeline.processing_log), 0)
+        self.assertEqual(data_pipeline.processing_log[0]["operation"], "ingest")
 
 
-class TestEdgeCases:
+class TestEdgeCases(unittest.TestCase):
     """Test edge cases and error conditions"""
 
     @pytest.mark.asyncio
@@ -310,7 +311,7 @@ class TestEdgeCases:
         
         result = await data_pipeline.ingest(str(file_path), "unsupported")
         
-        assert result["status"] == "error"
+        self.assertEqual(result["status"], "error")
 
     @pytest.mark.asyncio
     async def test_preprocess_with_list_data(self, data_pipeline):
@@ -319,4 +320,4 @@ class TestEdgeCases:
         
         result = await data_pipeline.preprocess(data, "test_schema")
         
-        assert result["status"] == "validated"
+        self.assertEqual(result["status"], "validated")

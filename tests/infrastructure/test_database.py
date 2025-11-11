@@ -6,13 +6,14 @@ HOW: Test SQLAlchemy connections, transaction handling, connection pooling
 IMPACT: Ensures database layer reliability and prevents production failures
 """
 
+import unittest
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 
 @pytest.mark.infrastructure
-class TestDatabaseConnectivity:
+class TestDatabaseConnectivity(unittest.TestCase):
     """Test database connection and basic operations."""
 
     def test_database_connection(self, test_db_url):
@@ -26,7 +27,7 @@ class TestDatabaseConnectivity:
         engine = create_engine(test_db_url)
         with engine.connect() as conn:
             result = conn.execute(text("SELECT 1"))
-            assert result.scalar() == 1
+            self.assertEqual(result.scalar(), 1)
 
     def test_database_transaction(self, test_db_url):
         """
@@ -45,11 +46,11 @@ class TestDatabaseConnectivity:
             session.commit()
 
         # Verify session closed cleanly
-        assert session.is_active is False
+        self.assertIs(session.is_active, False)
 
 
 @pytest.mark.infrastructure
-class TestDatabasePerformance:
+class TestDatabasePerformance(unittest.TestCase):
     """Test database performance and connection pooling."""
 
     def test_connection_pool(self, test_db_url):
@@ -76,7 +77,7 @@ class TestDatabasePerformance:
         for conn in connections:
             conn.close()
 
-        assert len(connections) == 5
+        self.assertEqual(len(connections), 5)
 
 
 # Pytest fixtures

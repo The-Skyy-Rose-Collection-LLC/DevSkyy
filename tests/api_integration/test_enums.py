@@ -2,65 +2,66 @@
 Tests for api_integration.enums module
 Tests the SerializableEnum base class and WorkflowStatus enum
 """
+import unittest
 import pytest
 from api_integration.enums import SerializableEnum, WorkflowStatus
 
 
-class TestSerializableEnum:
+class TestSerializableEnum(unittest.TestCase):
     """Test cases for SerializableEnum base class"""
     
     def test_to_json_returns_string_value(self):
         """Test that to_json() returns the string value of the enum"""
         status = WorkflowStatus.PENDING
-        assert status.to_json() == "pending"
+        self.assertEqual(status.to_json(), "pending")
         
         status = WorkflowStatus.RUNNING
-        assert status.to_json() == "running"
+        self.assertEqual(status.to_json(), "running")
     
     def test_to_json_for_all_workflow_statuses(self):
         """Test to_json() for all WorkflowStatus values"""
-        assert WorkflowStatus.PENDING.to_json() == "pending"
-        assert WorkflowStatus.RUNNING.to_json() == "running"
-        assert WorkflowStatus.SUCCESS.to_json() == "success"
-        assert WorkflowStatus.FAILED.to_json() == "failed"
-        assert WorkflowStatus.CANCELLED.to_json() == "cancelled"
-        assert WorkflowStatus.PAUSED.to_json() == "paused"
-        assert WorkflowStatus.ROLLED_BACK.to_json() == "rolled_back"
+        self.assertEqual(WorkflowStatus.PENDING.to_json(), "pending")
+        self.assertEqual(WorkflowStatus.RUNNING.to_json(), "running")
+        self.assertEqual(WorkflowStatus.SUCCESS.to_json(), "success")
+        self.assertEqual(WorkflowStatus.FAILED.to_json(), "failed")
+        self.assertEqual(WorkflowStatus.CANCELLED.to_json(), "cancelled")
+        self.assertEqual(WorkflowStatus.PAUSED.to_json(), "paused")
+        self.assertEqual(WorkflowStatus.ROLLED_BACK.to_json(), "rolled_back")
     
     def test_from_string_creates_correct_enum(self):
         """Test that from_string() creates the correct enum member"""
         status = WorkflowStatus.from_string("pending")
-        assert status == WorkflowStatus.PENDING
+        self.assertEqual(status, WorkflowStatus.PENDING)
         
         status = WorkflowStatus.from_string("running")
-        assert status == WorkflowStatus.RUNNING
+        self.assertEqual(status, WorkflowStatus.RUNNING)
     
     def test_from_string_for_all_workflow_statuses(self):
         """Test from_string() for all WorkflowStatus values"""
-        assert WorkflowStatus.from_string("pending") == WorkflowStatus.PENDING
-        assert WorkflowStatus.from_string("running") == WorkflowStatus.RUNNING
-        assert WorkflowStatus.from_string("success") == WorkflowStatus.SUCCESS
-        assert WorkflowStatus.from_string("failed") == WorkflowStatus.FAILED
-        assert WorkflowStatus.from_string("cancelled") == WorkflowStatus.CANCELLED
-        assert WorkflowStatus.from_string("paused") == WorkflowStatus.PAUSED
-        assert WorkflowStatus.from_string("rolled_back") == WorkflowStatus.ROLLED_BACK
+        self.assertEqual(WorkflowStatus.from_string("pending"), WorkflowStatus.PENDING)
+        self.assertEqual(WorkflowStatus.from_string("running"), WorkflowStatus.RUNNING)
+        self.assertEqual(WorkflowStatus.from_string("success"), WorkflowStatus.SUCCESS)
+        self.assertEqual(WorkflowStatus.from_string("failed"), WorkflowStatus.FAILED)
+        self.assertEqual(WorkflowStatus.from_string("cancelled"), WorkflowStatus.CANCELLED)
+        self.assertEqual(WorkflowStatus.from_string("paused"), WorkflowStatus.PAUSED)
+        self.assertEqual(WorkflowStatus.from_string("rolled_back"), WorkflowStatus.ROLLED_BACK)
     
     def test_from_string_raises_value_error_for_invalid_value(self):
         """Test that from_string() raises ValueError for invalid values"""
         with pytest.raises(ValueError) as exc_info:
             WorkflowStatus.from_string("invalid_status")
         
-        assert "No WorkflowStatus member with value 'invalid_status'" in str(exc_info.value)
+        self.assertIn("No WorkflowStatus member with value 'invalid_status'", str(exc_info.value))
     
     def test_enum_members_have_correct_values(self):
         """Test that enum members have the expected string values"""
-        assert WorkflowStatus.PENDING.value == "pending"
-        assert WorkflowStatus.RUNNING.value == "running"
-        assert WorkflowStatus.SUCCESS.value == "success"
-        assert WorkflowStatus.FAILED.value == "failed"
-        assert WorkflowStatus.CANCELLED.value == "cancelled"
-        assert WorkflowStatus.PAUSED.value == "paused"
-        assert WorkflowStatus.ROLLED_BACK.value == "rolled_back"
+        self.assertEqual(WorkflowStatus.PENDING.value, "pending")
+        self.assertEqual(WorkflowStatus.RUNNING.value, "running")
+        self.assertEqual(WorkflowStatus.SUCCESS.value, "success")
+        self.assertEqual(WorkflowStatus.FAILED.value, "failed")
+        self.assertEqual(WorkflowStatus.CANCELLED.value, "cancelled")
+        self.assertEqual(WorkflowStatus.PAUSED.value, "paused")
+        self.assertEqual(WorkflowStatus.ROLLED_BACK.value, "rolled_back")
     
     def test_enum_comparison(self):
         """Test that enum members can be compared correctly"""
@@ -68,22 +69,22 @@ class TestSerializableEnum:
         status2 = WorkflowStatus.PENDING
         status3 = WorkflowStatus.RUNNING
         
-        assert status1 == status2
-        assert status1 != status3
-        assert status1 is status2  # Same instance
+        self.assertEqual(status1, status2)
+        self.assertNotEqual(status1, status3)
+        self.assertIs(status1, status2  # Same instance)
     
     def test_enum_iteration(self):
         """Test that we can iterate over all enum members"""
         all_statuses = list(WorkflowStatus)
         
-        assert len(all_statuses) == 7
-        assert WorkflowStatus.PENDING in all_statuses
-        assert WorkflowStatus.RUNNING in all_statuses
-        assert WorkflowStatus.SUCCESS in all_statuses
-        assert WorkflowStatus.FAILED in all_statuses
-        assert WorkflowStatus.CANCELLED in all_statuses
-        assert WorkflowStatus.PAUSED in all_statuses
-        assert WorkflowStatus.ROLLED_BACK in all_statuses
+        self.assertEqual(len(all_statuses), 7)
+        self.assertIn(WorkflowStatus.PENDING, all_statuses)
+        self.assertIn(WorkflowStatus.RUNNING, all_statuses)
+        self.assertIn(WorkflowStatus.SUCCESS, all_statuses)
+        self.assertIn(WorkflowStatus.FAILED, all_statuses)
+        self.assertIn(WorkflowStatus.CANCELLED, all_statuses)
+        self.assertIn(WorkflowStatus.PAUSED, all_statuses)
+        self.assertIn(WorkflowStatus.ROLLED_BACK, all_statuses)
     
     def test_enum_in_dict_serialization(self):
         """Test that enum serializes correctly in dictionaries"""
@@ -92,8 +93,8 @@ class TestSerializableEnum:
             "message": "Workflow is pending"
         }
         
-        assert data["status"] == "pending"
-        assert isinstance(data["status"], str)
+        self.assertEqual(data["status"], "pending")
+        self.assertIsInstance(data["status"], str)
     
     def test_enum_roundtrip_serialization(self):
         """Test roundtrip serialization: enum -> json -> enum"""
@@ -101,11 +102,11 @@ class TestSerializableEnum:
         json_value = original.to_json()
         restored = WorkflowStatus.from_string(json_value)
         
-        assert original == restored
-        assert original.value == restored.value
+        self.assertEqual(original, restored)
+        self.assertEqual(original.value, restored.value)
 
 
-class TestWorkflowStatus:
+class TestWorkflowStatus(unittest.TestCase):
     """Test cases specific to WorkflowStatus enum"""
     
     def test_workflow_status_has_all_expected_members(self):
@@ -116,13 +117,13 @@ class TestWorkflowStatus:
         }
         
         actual_members = {member.name for member in WorkflowStatus}
-        assert actual_members == expected_members
+        self.assertEqual(actual_members, expected_members)
     
     def test_workflow_status_pending_is_default(self):
         """Test that PENDING is a valid initial status"""
         # This is important for workflow initialization
         status = WorkflowStatus.PENDING
-        assert status.to_json() == "pending"
+        self.assertEqual(status.to_json(), "pending")
     
     def test_workflow_status_transitions(self):
         """Test common workflow status transitions"""
@@ -134,7 +135,7 @@ class TestWorkflowStatus:
         ]
         
         json_values = [s.to_json() for s in statuses]
-        assert json_values == ["pending", "running", "success"]
+        self.assertEqual(json_values, ["pending", "running", "success"])
     
     def test_workflow_status_failure_states(self):
         """Test that failure states are properly defined"""
@@ -145,58 +146,58 @@ class TestWorkflowStatus:
         ]
         
         for state in failure_states:
-            assert state.to_json() in ["failed", "cancelled", "rolled_back"]
+            self.assertIn(state.to_json(), ["failed", "cancelled", "rolled_back"])
     
     def test_workflow_status_inherits_from_serializable_enum(self):
         """Test that WorkflowStatus inherits from SerializableEnum"""
-        assert issubclass(WorkflowStatus, SerializableEnum)
+        self.assertTrue(issubclass(WorkflowStatus, SerializableEnum))
         
         # Ensure it has the to_json method
         status = WorkflowStatus.RUNNING
-        assert hasattr(status, 'to_json')
-        assert callable(status.to_json)
+        self.assertTrue(hasattr(status, 'to_json'))
+        self.assertTrue(callable(status.to_json))
     
     def test_workflow_status_string_representation(self):
         """Test the string representation of WorkflowStatus"""
         status = WorkflowStatus.RUNNING
         
         # The name should be accessible
-        assert status.name == "RUNNING"
+        self.assertEqual(status.name, "RUNNING")
         
         # The value should be accessible
-        assert status.value == "running"
+        self.assertEqual(status.value, "running")
         
         # The to_json() should return the value
-        assert status.to_json() == "running"
+        self.assertEqual(status.to_json(), "running")
 
 
-class TestEnumModularity:
+class TestEnumModularity(unittest.TestCase):
     """Test cases for enum module organization and imports"""
     
     def test_enums_module_exists(self):
         """Test that the enums module can be imported"""
         import api_integration.enums
-        assert api_integration.enums is not None
+        self.assertIsNotNone(api_integration.enums)
     
     def test_serializable_enum_is_importable(self):
         """Test that SerializableEnum can be imported"""
         from api_integration.enums import SerializableEnum
-        assert SerializableEnum is not None
+        self.assertIsNotNone(SerializableEnum)
     
     def test_workflow_status_is_importable(self):
         """Test that WorkflowStatus can be imported"""
         from api_integration.enums import WorkflowStatus
-        assert WorkflowStatus is not None
+        self.assertIsNotNone(WorkflowStatus)
     
     def test_enum_module_has_correct_exports(self):
         """Test that the enums module exports expected classes"""
         import api_integration.enums as enums_module
         
-        assert hasattr(enums_module, 'SerializableEnum')
-        assert hasattr(enums_module, 'WorkflowStatus')
+        self.assertTrue(hasattr(enums_module, 'SerializableEnum'))
+        self.assertTrue(hasattr(enums_module, 'WorkflowStatus'))
 
 
-class TestSerializableEnumEdgeCases:
+class TestSerializableEnumEdgeCases(unittest.TestCase):
     """Test edge cases and error handling for SerializableEnum"""
     
     def test_from_string_with_empty_string(self):
@@ -208,7 +209,7 @@ class TestSerializableEnumEdgeCases:
         """Test that from_string() is case-sensitive"""
         # Valid lowercase value
         status = WorkflowStatus.from_string("pending")
-        assert status == WorkflowStatus.PENDING
+        self.assertEqual(status, WorkflowStatus.PENDING)
         
         # Invalid uppercase value should fail
         with pytest.raises(ValueError):
@@ -222,7 +223,7 @@ class TestSerializableEnumEdgeCases:
         json2 = status.to_json()
         json3 = status.to_json()
         
-        assert json1 == json2 == json3 == "success"
+        self.assertEqual(json1, json2 == json3 == "success")
     
     def test_enum_cannot_be_modified(self):
         """Test that enum values are immutable"""

@@ -5,6 +5,7 @@ Tests multi-agent coordination, lifecycle management, and orchestration logic.
 Ensures Truth Protocol compliance with ≥90% coverage requirement.
 """
 
+import unittest
 import asyncio
 import pytest
 from datetime import datetime
@@ -34,27 +35,27 @@ def mock_agent():
     return agent
 
 
-class TestOrchestratorInitialization:
+class TestOrchestratorInitialization(unittest.TestCase):
     """Test orchestrator initialization and configuration."""
 
     def test_orchestrator_creates_successfully(self, orchestrator):
         """Orchestrator should initialize with default configuration."""
-        assert orchestrator is not None
-        assert hasattr(orchestrator, 'agents')
-        assert hasattr(orchestrator, 'max_concurrent_tasks')
+        self.assertIsNotNone(orchestrator)
+        self.assertTrue(hasattr(orchestrator, 'agents'))
+        self.assertTrue(hasattr(orchestrator, 'max_concurrent_tasks'))
 
     def test_orchestrator_has_default_config(self, orchestrator):
         """Orchestrator should have sensible defaults."""
         # Test default configuration values
-        assert orchestrator.max_concurrent_tasks > 0
-        assert orchestrator.max_concurrent_tasks <= 100
+        self.assertGreater(orchestrator.max_concurrent_tasks, 0)
+        self.assertLess(orchestrator.max_concurrent_tasks, = 100)
 
     def test_orchestrator_initializes_empty_agent_list(self, orchestrator):
         """Orchestrator should start with no registered agents."""
-        assert len(orchestrator.agents) == 0 or orchestrator.agents is not None
+        self.assertEqual(len(orchestrator.agents), 0 or orchestrator.agents is not None)
 
 
-class TestAgentRegistration:
+class TestAgentRegistration(unittest.TestCase):
     """Test agent registration and lifecycle management."""
 
     @pytest.mark.asyncio
@@ -62,7 +63,7 @@ class TestAgentRegistration:
         """Should successfully register a new agent."""
         if hasattr(orchestrator, 'register_agent'):
             result = await orchestrator.register_agent(mock_agent)
-            assert result is True or mock_agent.id in orchestrator.agents
+            self.assertIn(result is True or mock_agent.id, orchestrator.agents)
 
     @pytest.mark.asyncio
     async def test_register_duplicate_agent_fails(self, orchestrator, mock_agent):
@@ -75,10 +76,10 @@ class TestAgentRegistration:
             try:
                 result = await orchestrator.register_agent(mock_agent)
                 # If no exception, expect False return value
-                assert result is False, "Duplicate registration should return False"
+                self.assertIs(result, False, "Duplicate registration should return False")
             except (ValueError, KeyError, Exception) as e:
                 # If exception raised, that's also acceptable behavior
-                assert True, f"Duplicate registration correctly raised: {type(e).__name__}"
+                self.assertTrue(True, f"Duplicate registration correctly raised: {type(e).__name__}")
 
     @pytest.mark.asyncio
     async def test_unregister_agent_success(self, orchestrator, mock_agent):
@@ -86,10 +87,10 @@ class TestAgentRegistration:
         if hasattr(orchestrator, 'register_agent') and hasattr(orchestrator, 'unregister_agent'):
             await orchestrator.register_agent(mock_agent)
             result = await orchestrator.unregister_agent(mock_agent.id)
-            assert result is True or mock_agent.id not in orchestrator.agents
+            self.assertIn(result is True or mock_agent.id not, orchestrator.agents)
 
 
-class TestAgentExecution:
+class TestAgentExecution(unittest.TestCase):
     """Test agent task execution and coordination."""
 
     @pytest.mark.asyncio
@@ -105,8 +106,8 @@ class TestAgentExecution:
 
             with patch.object(orchestrator, 'get_agent', return_value=mock_agent):
                 result = await orchestrator.execute_task(task)
-                assert result is not None
-                assert result.get("status") in ["success", "completed", "done"]
+                self.assertIsNotNone(result)
+                self.assertIn(result.get("status"), ["success", "completed", "done"])
 
     @pytest.mark.asyncio
     async def test_execute_multiple_concurrent_tasks(self, orchestrator):
@@ -118,7 +119,7 @@ class TestAgentExecution:
             ]
 
             results = await orchestrator.execute_tasks(tasks)
-            assert len(results) == len(tasks)
+            self.assertEqual(len(results), len(tasks))
 
     @pytest.mark.asyncio
     async def test_respects_max_concurrent_limit(self, orchestrator):
@@ -129,10 +130,10 @@ class TestAgentExecution:
 
             # Verify orchestrator respects the limit
             # (Implementation depends on orchestrator design)
-            assert orchestrator.max_concurrent_tasks == max_limit
+            self.assertEqual(orchestrator.max_concurrent_tasks, max_limit)
 
 
-class TestCoordination:
+class TestCoordination(unittest.TestCase):
     """Test multi-agent coordination and communication."""
 
     @pytest.mark.asyncio
@@ -154,7 +155,7 @@ class TestCoordination:
 
             with patch.object(orchestrator, 'agents', {a.id: a for a in agents}):
                 result = await orchestrator.coordinate(workflow)
-                assert result is not None
+                self.assertIsNotNone(result)
 
     @pytest.mark.asyncio
     async def test_handle_coordination_failure(self, orchestrator):
@@ -173,46 +174,46 @@ class TestCoordination:
                 try:
                     result = await orchestrator.coordinate(workflow)
                     # If no exception, should return error status
-                    assert result is not None, "Should return result object"
+                    self.assertIsNotNone(result, "Should return result object")
                     # Check for error indicators in result
-                    assert (
+                    self.assertTrue(()
                         result.get('status') == 'failed' or
                         result.get('error') is not None or
                         result.get('success') is False
                     ), "Result should indicate failure"
                 except Exception as e:
                     # If exception propagated, that's also valid behavior
-                    assert "failed" in str(e).lower() or "error" in str(e).lower(), \
+                    self.assertIn("failed", str(e).lower() or "error" in str(e).lower(), \)
                         f"Exception should be related to agent failure: {e}"
 
 
-class TestMonitoring:
+class TestMonitoring(unittest.TestCase):
     """Test orchestrator monitoring and health checks."""
 
     def test_get_orchestrator_status(self, orchestrator):
         """Should return current orchestrator status."""
         if hasattr(orchestrator, 'get_status'):
             status = orchestrator.get_status()
-            assert status is not None
-            assert isinstance(status, dict)
+            self.assertIsNotNone(status)
+            self.assertIsInstance(status, dict)
 
     def test_get_agent_metrics(self, orchestrator, mock_agent):
         """Should return metrics for registered agents."""
         if hasattr(orchestrator, 'get_metrics'):
             metrics = orchestrator.get_metrics()
-            assert metrics is not None
-            assert isinstance(metrics, dict)
+            self.assertIsNotNone(metrics)
+            self.assertIsInstance(metrics, dict)
 
     @pytest.mark.asyncio
     async def test_health_check(self, orchestrator):
         """Should perform health check successfully."""
         if hasattr(orchestrator, 'health_check'):
             health = await orchestrator.health_check()
-            assert health is not None
-            assert health.get("status") in ["healthy", "ok", "running"]
+            self.assertIsNotNone(health)
+            self.assertIn(health.get("status"), ["healthy", "ok", "running"])
 
 
-class TestErrorHandling:
+class TestErrorHandling(unittest.TestCase):
     """Test error handling and recovery mechanisms."""
 
     @pytest.mark.asyncio
@@ -230,12 +231,12 @@ class TestErrorHandling:
                 try:
                     result = await orchestrator.execute_task(task)
                     # If no exception, should return error status
-                    assert result is not None, "Should return result object"
-                    assert result.get("status") in ["error", "failed"], \
+                    self.assertIsNotNone(result, "Should return result object")
+                    self.assertIn(result.get("status"), ["error", "failed"], \)
                         f"Result should indicate failure, got: {result.get('status')}"
                 except Exception as e:
                     # If exception propagated, that's also valid behavior
-                    assert "crashed" in str(e).lower() or "failed" in str(e).lower(), \
+                    self.assertIn("crashed", str(e).lower() or "failed" in str(e).lower(), \)
                         f"Exception should be related to agent failure: {e}"
 
     @pytest.mark.asyncio
@@ -265,7 +266,7 @@ class TestErrorHandling:
                     )
 
 
-class TestPerformanceRequirements:
+class TestPerformanceRequirements(unittest.TestCase):
     """Test performance requirements per Truth Protocol."""
 
     @pytest.mark.asyncio
@@ -300,7 +301,7 @@ class TestPerformanceRequirements:
             print(f"P95 Latency: {p95_latency:.2f}ms")
 
             # This is a guideline - actual performance depends on implementation
-            assert p95_latency < 500  # Allow 500ms in tests (production: 200ms)
+            self.assertLess(p95_latency, 500  # Allow 500ms in tests (production: 200ms))
 
     @pytest.mark.asyncio
     async def test_error_rate_under_threshold(self, orchestrator):
@@ -330,16 +331,16 @@ class TestPerformanceRequirements:
         print(f"Error Rate: {error_rate:.2f}%")
 
         # Error rate should be under 0.5%
-        assert error_rate < 1.0  # Allow 1% in tests
+        self.assertLess(error_rate, 1.0  # Allow 1% in tests)
 
 
-class TestTruthProtocolCompliance:
+class TestTruthProtocolCompliance(unittest.TestCase):
     """Verify Truth Protocol compliance requirements."""
 
     def test_orchestrator_has_logging(self, orchestrator):
         """Should have proper logging per Truth Protocol."""
         # Orchestrator should use structured logging
-        assert hasattr(orchestrator, 'logger') or 'logger' in dir(orchestrator.__class__)
+        self.assertIn(hasattr(orchestrator, 'logger') or 'logger', dir(orchestrator.__class__))
 
     def test_orchestrator_validates_inputs(self, orchestrator):
         """Should validate all inputs per Truth Protocol."""
@@ -349,17 +350,17 @@ class TestTruthProtocolCompliance:
             try:
                 result = asyncio.run(orchestrator.execute_task({}))
                 # If no exception, should return error status
-                assert result is not None, "Should return result object"
-                assert result.get("status") == "error", \
+                self.assertIsNotNone(result, "Should return result object")
+                self.assertEqual(result.get("status"), "error", \)
                     f"Invalid task should return error status, got: {result.get('status')}"
             except (ValueError, KeyError, TypeError, Exception) as e:
                 # If exception raised for invalid input, that's also valid
-                assert True, f"Invalid task correctly raised: {type(e).__name__}"
+                self.assertTrue(True, f"Invalid task correctly raised: {type(e).__name__}")
 
     def test_orchestrator_has_security_context(self, orchestrator):
         """Should maintain security context per Truth Protocol."""
         # Orchestrator should have security features
-        assert (
+        self.assertTrue(()
             hasattr(orchestrator, 'auth') or
             hasattr(orchestrator, 'rbac') or
             hasattr(orchestrator, 'security_context')
@@ -368,7 +369,7 @@ class TestTruthProtocolCompliance:
 
 # Integration tests (require actual agent implementations)
 @pytest.mark.integration
-class TestOrchestratorIntegration:
+class TestOrchestratorIntegration(unittest.TestCase):
     """Integration tests with real agent instances."""
 
     @pytest.mark.asyncio
@@ -396,7 +397,7 @@ if __name__ == "__main__":
 # ============================================================================
 
 
-class TestOrchestratorAdvancedScenarios:
+class TestOrchestratorAdvancedScenarios(unittest.TestCase):
     """Advanced orchestrator scenarios and edge cases."""
 
     @pytest.mark.asyncio
@@ -420,8 +421,8 @@ class TestOrchestratorAdvancedScenarios:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # All should succeed
-        assert all(isinstance(r, bool) or r is True for r in results)
-        assert len(orchestrator.agents) >= 5  # At least some should register
+        self.assertIn(all(isinstance(r, bool) or r is True for r, results))
+        self.assertGreater(len(orchestrator.agents), = 5  # At least some should register)
 
     @pytest.mark.asyncio
     async def test_circular_dependency_detection(self, orchestrator):
@@ -442,8 +443,8 @@ class TestOrchestratorAdvancedScenarios:
         await orchestrator.register_agent(agent_b, ["cap_b"], dependencies=["agent_a"])
 
         # Orchestrator should handle this gracefully
-        assert "agent_a" in orchestrator.agents
-        assert "agent_b" in orchestrator.agents
+        self.assertIn("agent_a", orchestrator.agents)
+        self.assertIn("agent_b", orchestrator.agents)
 
     @pytest.mark.asyncio
     async def test_agent_status_transitions(self, orchestrator):
@@ -462,7 +463,7 @@ class TestOrchestratorAdvancedScenarios:
         mock_agent.status = AgentStatus.HEALTHY
         health = await orchestrator.get_orchestrator_health()
 
-        assert "status_agent" in orchestrator.agents
+        self.assertIn("status_agent", orchestrator.agents)
 
     @pytest.mark.asyncio
     async def test_task_queue_overflow_handling(self, orchestrator):
@@ -485,7 +486,7 @@ class TestOrchestratorAdvancedScenarios:
             tasks.append(task_id)
 
         # Queue should handle overflow
-        assert len(orchestrator.tasks) > max_concurrent
+        self.assertGreater(len(orchestrator.tasks), max_concurrent)
 
     @pytest.mark.asyncio
     async def test_shared_context_cleanup(self, orchestrator):
@@ -495,14 +496,14 @@ class TestOrchestratorAdvancedScenarios:
 
         # Immediate retrieval should work
         value = orchestrator.get_shared_data("temp_key")
-        assert value == "temp_value"
+        self.assertEqual(value, "temp_value")
 
         # Wait for TTL to expire
         await asyncio.sleep(2)
 
         # Should be cleaned up
         value = orchestrator.get_shared_data("temp_key")
-        assert value is None
+        self.assertIsNone(value)
 
     @pytest.mark.asyncio
     async def test_broadcast_message_filtering(self, orchestrator):
@@ -517,8 +518,8 @@ class TestOrchestratorAdvancedScenarios:
         await orchestrator.broadcast_to_agents(message, ["agent1", "agent2"])
 
         # Check that messages were stored for correct agents
-        assert orchestrator.get_shared_data("message_agent1") == message
-        assert orchestrator.get_shared_data("message_agent2") == message
+        self.assertEqual(orchestrator.get_shared_data("message_agent1"), message)
+        self.assertEqual(orchestrator.get_shared_data("message_agent2"), message)
 
     @pytest.mark.asyncio
     async def test_agent_capability_enhancement(self, orchestrator):
@@ -535,10 +536,10 @@ class TestOrchestratorAdvancedScenarios:
 
         # Should have enhanced capabilities
         caps = orchestrator.agent_capabilities["fashion_vision"]
-        assert "video_generation" in caps.capabilities or "vision" in caps.capabilities
+        self.assertIn("video_generation", caps.capabilities or "vision" in caps.capabilities)
 
 
-class TestOrchestratorDependencyResolution:
+class TestOrchestratorDependencyResolution(unittest.TestCase):
     """Test dependency resolution algorithms."""
 
     @pytest.mark.asyncio
@@ -564,9 +565,9 @@ class TestOrchestratorDependencyResolution:
         order = orchestrator._resolve_dependencies(agents)
 
         # Should execute in correct order: D -> C -> B -> A
-        assert order.index("agent_d") < order.index("agent_c")
-        assert order.index("agent_c") < order.index("agent_b")
-        assert order.index("agent_b") < order.index("agent_a")
+        self.assertLess(order.index("agent_d"), order.index("agent_c"))
+        self.assertLess(order.index("agent_c"), order.index("agent_b"))
+        self.assertLess(order.index("agent_b"), order.index("agent_a"))
 
     @pytest.mark.asyncio
     async def test_diamond_dependency_pattern(self, orchestrator):
@@ -597,11 +598,11 @@ class TestOrchestratorDependencyResolution:
         c_idx = order.index("agent_c")
         a_idx = order.index("agent_a")
 
-        assert d_idx < b_idx and d_idx < c_idx
-        assert b_idx < a_idx and c_idx < a_idx
+        self.assertLess(d_idx, b_idx and d_idx < c_idx)
+        self.assertLess(b_idx, a_idx and c_idx < a_idx)
 
 
-class TestOrchestratorVideoGeneration:
+class TestOrchestratorVideoGeneration(unittest.TestCase):
     """Test video generation task handling."""
 
     @pytest.mark.asyncio
@@ -626,8 +627,8 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert result.get("success") is True
-        assert "video_path" in result
+        self.assertIs(result.get("success"), True)
+        self.assertIn("video_path", result)
         mock_agent.generate_fashion_runway_video.assert_called_once()
 
     @pytest.mark.asyncio
@@ -651,7 +652,7 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert result.get("success") is True
+        self.assertIs(result.get("success"), True)
         mock_agent.generate_product_360_video.assert_called_once()
 
     @pytest.mark.asyncio
@@ -675,7 +676,7 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert result.get("success") is True
+        self.assertIs(result.get("success"), True)
         mock_agent.upscale_video.assert_called_once()
 
     @pytest.mark.asyncio
@@ -699,7 +700,7 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert result.get("success") is True
+        self.assertIs(result.get("success"), True)
         mock_agent.train_lora_model.assert_called_once()
 
     @pytest.mark.asyncio
@@ -712,8 +713,8 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert "error" in result
-        assert result.get("status") == "failed"
+        self.assertIn("error", result)
+        self.assertEqual(result.get("status"), "failed")
 
     @pytest.mark.asyncio
     async def test_unknown_video_generation_task_type(self, orchestrator):
@@ -728,11 +729,11 @@ class TestOrchestratorVideoGeneration:
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
-        assert "error" in result
-        assert "Unknown task type" in result["error"]
+        self.assertIn("error", result)
+        self.assertIn("Unknown task type", result["error"])
 
 
-class TestOrchestratorCircuitBreaker:
+class TestOrchestratorCircuitBreaker(unittest.TestCase):
     """Test circuit breaker pattern implementation."""
 
     @pytest.mark.asyncio
@@ -749,8 +750,8 @@ class TestOrchestratorCircuitBreaker:
             orchestrator._increment_circuit_breaker("failing_agent")
 
         # Circuit should be open
-        assert orchestrator._is_circuit_open("failing_agent")
-        assert orchestrator.circuit_breakers["failing_agent"]["state"] == "open"
+        self.assertTrue(orchestrator._is_circuit_open("failing_agent"))
+        self.assertEqual(orchestrator.circuit_breakers["failing_agent"]["state"], "open")
 
     @pytest.mark.asyncio
     async def test_circuit_breaker_half_open_after_timeout(self, orchestrator):
@@ -759,7 +760,7 @@ class TestOrchestratorCircuitBreaker:
         for i in range(5):
             orchestrator._increment_circuit_breaker("timeout_agent")
 
-        assert orchestrator._is_circuit_open("timeout_agent")
+        self.assertTrue(orchestrator._is_circuit_open("timeout_agent"))
 
         # Manually set opened_at to past
         from datetime import timedelta
@@ -768,8 +769,8 @@ class TestOrchestratorCircuitBreaker:
 
         # Should be half-open now
         is_open = orchestrator._is_circuit_open("timeout_agent", timeout=60)
-        assert not is_open
-        assert orchestrator.circuit_breakers["timeout_agent"]["state"] == "half-open"
+        self.assertFalse(is_open)
+        self.assertEqual(orchestrator.circuit_breakers["timeout_agent"]["state"], "half-open")
 
     @pytest.mark.asyncio
     async def test_circuit_breaker_resets_on_success(self, orchestrator):
@@ -785,12 +786,12 @@ class TestOrchestratorCircuitBreaker:
         orchestrator._reset_circuit_breaker("reset_agent")
 
         breaker = orchestrator.circuit_breakers["reset_agent"]
-        assert breaker["failures"] == 0
-        assert breaker["state"] == "closed"
-        assert breaker["opened_at"] is None
+        self.assertEqual(breaker["failures"], 0)
+        self.assertEqual(breaker["state"], "closed")
+        self.assertIsNone(breaker["opened_at"])
 
 
-class TestOrchestratorMetrics:
+class TestOrchestratorMetrics(unittest.TestCase):
     """Test metrics collection and reporting."""
 
     @pytest.mark.asyncio
@@ -802,10 +803,10 @@ class TestOrchestratorMetrics:
 
         metrics = orchestrator.get_agent_metrics("metric_agent")
 
-        assert metrics["calls"] == 3
-        assert metrics["errors"] == 1
-        assert metrics["total_time"] > 1.0
-        assert metrics["avg_time"] > 0.4
+        self.assertEqual(metrics["calls"], 3)
+        self.assertEqual(metrics["errors"], 1)
+        self.assertGreater(metrics["total_time"], 1.0)
+        self.assertGreater(metrics["avg_time"], 0.4)
 
     @pytest.mark.asyncio
     async def test_execution_history_limit(self, orchestrator):
@@ -815,7 +816,7 @@ class TestOrchestratorMetrics:
             orchestrator._record_execution(f"agent_{i % 10}", True, 0.1)
 
         # Should be capped at 1000
-        assert len(orchestrator.execution_history) <= 1000
+        self.assertLess(len(orchestrator.execution_history), = 1000)
 
     @pytest.mark.asyncio
     async def test_get_metrics_for_all_agents(self, orchestrator):
@@ -825,9 +826,9 @@ class TestOrchestratorMetrics:
 
         all_metrics = orchestrator.get_agent_metrics()
 
-        assert "agent1" in all_metrics
-        assert "agent2" in all_metrics
-        assert isinstance(all_metrics, dict)
+        self.assertIn("agent1", all_metrics)
+        self.assertIn("agent2", all_metrics)
+        self.assertIsInstance(all_metrics, dict)
 
     @pytest.mark.asyncio
     async def test_dependency_graph_retrieval(self, orchestrator):
@@ -848,12 +849,12 @@ class TestOrchestratorMetrics:
 
         graph = orchestrator.get_dependency_graph()
 
-        assert "agent_a" in graph
-        assert "agent_b" in graph["agent_a"]
-        assert isinstance(graph, dict)
+        self.assertIn("agent_a", graph)
+        self.assertIn("agent_b", graph["agent_a"])
+        self.assertIsInstance(graph, dict)
 
 
-class TestOrchestratorDataSharing:
+class TestOrchestratorDataSharing(unittest.TestCase):
     """Test inter-agent data sharing mechanisms."""
 
     def test_share_data_without_ttl(self, orchestrator):
@@ -861,20 +862,20 @@ class TestOrchestratorDataSharing:
         orchestrator.share_data("persistent_key", {"data": "value"})
 
         retrieved = orchestrator.get_shared_data("persistent_key")
-        assert retrieved == {"data": "value"}
+        self.assertEqual(retrieved, {"data": "value"})
 
     def test_share_data_with_ttl(self, orchestrator):
         """Should respect TTL for shared data."""
         orchestrator.share_data("ttl_key", "test_value", ttl=3600)
 
         data_entry = orchestrator.shared_context["ttl_key"]
-        assert data_entry["ttl"] == 3600
-        assert data_entry["value"] == "test_value"
+        self.assertEqual(data_entry["ttl"], 3600)
+        self.assertEqual(data_entry["value"], "test_value")
 
     def test_get_nonexistent_shared_data(self, orchestrator):
         """Should return None for non-existent keys."""
         result = orchestrator.get_shared_data("nonexistent_key")
-        assert result is None
+        self.assertIsNone(result)
 
     @pytest.mark.asyncio
     async def test_broadcast_to_all_agents(self, orchestrator):
@@ -891,10 +892,10 @@ class TestOrchestratorDataSharing:
         # All agents should have message
         for agent_name in orchestrator.agents.keys():
             msg = orchestrator.get_shared_data(f"message_{agent_name}")
-            assert msg == message
+            self.assertEqual(msg, message)
 
 
-class TestOrchestratorRobustness:
+class TestOrchestratorRobustness(unittest.TestCase):
     """Test robustness and error recovery."""
 
     @pytest.mark.asyncio
@@ -908,14 +909,14 @@ class TestOrchestratorRobustness:
 
         result = await orchestrator.register_agent(failing_agent, ["test"])
 
-        assert result is False
-        assert "failing_init" not in orchestrator.agents
+        self.assertIs(result, False)
+        self.assertIn("failing_init" not, orchestrator.agents)
 
     @pytest.mark.asyncio
     async def test_unregister_nonexistent_agent(self, orchestrator):
         """Should handle unregistering non-existent agent."""
         result = await orchestrator.unregister_agent("nonexistent_agent")
-        assert result is False
+        self.assertIs(result, False)
 
     @pytest.mark.asyncio
     async def test_execute_task_with_partial_agent_failures(self, orchestrator):
@@ -952,7 +953,7 @@ class TestOrchestratorRobustness:
         )
 
         # Should have errors but also some results
-        assert "errors" in result or "results" in result
+        self.assertIn("errors", result or "results" in result)
 
     @pytest.mark.asyncio
     async def test_find_agents_with_multiple_capabilities(self, orchestrator):
@@ -968,8 +969,8 @@ class TestOrchestratorRobustness:
 
         agents = orchestrator._find_agents_with_capabilities(["cap1", "cap2"])
 
-        assert "multi_cap_agent" in agents
-        assert "partial_cap_agent" in agents
+        self.assertIn("multi_cap_agent", agents)
+        self.assertIn("partial_cap_agent", agents)
 
     @pytest.mark.asyncio
     async def test_health_check_with_degraded_agents(self, orchestrator):
@@ -992,11 +993,11 @@ class TestOrchestratorRobustness:
 
         health = await orchestrator.get_orchestrator_health()
 
-        assert health["system_status"] == "degraded"
-        assert "agent_health" in health
+        self.assertEqual(health["system_status"], "degraded")
+        self.assertIn("agent_health", health)
 
 
-class TestOrchestratorConcurrency:
+class TestOrchestratorConcurrency(unittest.TestCase):
     """Test concurrent operations and race conditions."""
 
     @pytest.mark.asyncio
@@ -1022,7 +1023,7 @@ class TestOrchestratorConcurrency:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # All should complete
-        assert len(results) == 10
+        self.assertEqual(len(results), 10)
 
     @pytest.mark.asyncio
     async def test_shared_context_concurrent_access(self, orchestrator):
@@ -1048,12 +1049,12 @@ class TestOrchestratorConcurrency:
             read_data("key3")
         )
 
-        assert "value1" in results
-        assert "value2" in results
-        assert "value3" in results
+        self.assertIn("value1", results)
+        self.assertIn("value2", results)
+        self.assertIn("value3", results)
 
 
-class TestOrchestratorEdgeCases:
+class TestOrchestratorEdgeCases(unittest.TestCase):
     """Test edge cases and boundary conditions."""
 
     @pytest.mark.asyncio
@@ -1061,8 +1062,8 @@ class TestOrchestratorEdgeCases:
         """Should handle operations with no registered agents."""
         result = await orchestrator.execute_task("test", {}, ["nonexistent_cap"])
 
-        assert "error" in result
-        assert "No agents found" in result["error"]
+        self.assertIn("error", result)
+        self.assertIn("No agents found", result["error"])
 
     @pytest.mark.asyncio
     async def test_agent_with_empty_capabilities(self, orchestrator):
@@ -1074,8 +1075,8 @@ class TestOrchestratorEdgeCases:
         )
 
         result = await orchestrator.register_agent(agent, [])
-        assert result is True
-        assert "empty_cap_agent" in orchestrator.agents
+        self.assertIs(result, True)
+        self.assertIn("empty_cap_agent", orchestrator.agents)
 
     @pytest.mark.asyncio
     async def test_task_execution_with_empty_parameters(self, orchestrator):
@@ -1094,22 +1095,22 @@ class TestOrchestratorEdgeCases:
         result = await orchestrator.execute_task("test", {}, ["test"])
 
         # Should execute successfully with empty params
-        assert "task_id" in result or "results" in result
+        self.assertIn("task_id", result or "results" in result)
 
     def test_metrics_for_never_executed_agent(self, orchestrator):
         """Should return empty metrics for agents that never executed."""
         metrics = orchestrator.get_agent_metrics("never_executed")
 
-        assert metrics.get("calls", 0) == 0
-        assert metrics.get("errors", 0) == 0
+        self.assertEqual(metrics.get("calls", 0), 0)
+        self.assertEqual(metrics.get("errors", 0), 0)
 
     @pytest.mark.asyncio
     async def test_video_task_nonexistent_task_id(self, orchestrator):
         """Should handle execution of non-existent video task."""
         result = await orchestrator.execute_video_generation_task("nonexistent_task_id")
 
-        assert "error" in result
-        assert "not found" in result["error"]
+        self.assertIn("error", result)
+        self.assertIn("not found", result["error"])
 
 
 # Run all tests

@@ -1,3 +1,4 @@
+import unittest
 import pytest
 import tempfile
 import shutil
@@ -11,7 +12,7 @@ Validates output quality, brand accuracy, and system integration
 """
 
 
-class TestFashionComputerVisionAgent:
+class TestFashionComputerVisionAgent(unittest.TestCase):
     """Test suite for FashionComputerVisionAgent video generation capabilities."""
 
     @pytest.fixture
@@ -63,11 +64,11 @@ class TestFashionComputerVisionAgent:
                     fps=8
                 )
                 
-                assert result["success"] is True
-                assert "video_path" in result
-                assert result["duration"] == 4
-                assert result["fps"] == 8
-                assert result["model"] == "stable-video-diffusion"
+                self.assertIs(result["success"], True)
+                self.assertIn("video_path", result)
+                self.assertEqual(result["duration"], 4)
+                self.assertEqual(result["fps"], 8)
+                self.assertEqual(result["model"], "stable-video-diffusion")
 
     @pytest.mark.asyncio
     async def test_product_360_video_generation(self, fashion_agent, sample_image):
@@ -86,11 +87,11 @@ class TestFashionComputerVisionAgent:
                     duration=3
                 )
                 
-                assert result["success"] is True
-                assert "video_path" in result
-                assert result["rotation_steps"] == 24
-                assert result["duration"] == 3
-                assert result["model"] == "animatediff"
+                self.assertIs(result["success"], True)
+                self.assertIn("video_path", result)
+                self.assertEqual(result["rotation_steps"], 24)
+                self.assertEqual(result["duration"], 3)
+                self.assertEqual(result["model"], "animatediff")
 
     @pytest.mark.asyncio
     async def test_video_upscaling(self, fashion_agent):
@@ -109,9 +110,9 @@ class TestFashionComputerVisionAgent:
                     target_resolution=(2048, 1152)
                 )
                 
-                assert result["success"] is True
-                assert "upscaled_video_path" in result
-                assert result["target_resolution"] == (2048, 1152)
+                self.assertIs(result["success"], True)
+                self.assertIn("upscaled_video_path", result)
+                self.assertEqual(result["target_resolution"], (2048, 1152))
         
         finally:
             Path(mock_video_path).unlink(missing_ok=True)
@@ -128,25 +129,25 @@ class TestFashionComputerVisionAgent:
                 
                 caption = await fashion_agent.generate_image_caption(sample_image)
                 
-                assert isinstance(caption, str)
-                assert len(caption) > 0
+                self.assertIsInstance(caption, str)
+                self.assertGreater(len(caption), 0)
 
     def test_model_loading_flags(self, fashion_agent):
         """Test model loading state management."""
-        assert hasattr(fashion_agent, '_models_loaded')
-        assert isinstance(fashion_agent._models_loaded, dict)
+        self.assertTrue(hasattr(fashion_agent, '_models_loaded'))
+        self.assertIsInstance(fashion_agent._models_loaded, dict)
         
         expected_models = ["clip", "vit", "sdxl", "svd", "animatediff", "blip2"]
         for model in expected_models:
-            assert model in fashion_agent._models_loaded
+            self.assertIn(model, fashion_agent._models_loaded)
 
     def test_storage_directories_creation(self, fashion_agent):
         """Test that required storage directories are created."""
-        assert fashion_agent.video_storage.exists()
-        assert fashion_agent.model_storage.exists()
+        self.assertTrue(fashion_agent.video_storage.exists())
+        self.assertTrue(fashion_agent.model_storage.exists())
 
 
-class TestSkyRoseBrandTrainer:
+class TestSkyRoseBrandTrainer(unittest.TestCase):
     """Test suite for SkyRoseBrandTrainer brand model training capabilities."""
 
     @pytest.fixture
@@ -190,12 +191,12 @@ class TestSkyRoseBrandTrainer:
                 category="dresses"
             )
             
-            assert result["success"] is True
-            assert result["category"] == "dresses"
-            assert result["total_processed"] == 5
-            assert "output_directory" in result
-            assert "metadata_file" in result
-            assert "manifest_file" in result
+            self.assertIs(result["success"], True)
+            self.assertEqual(result["category"], "dresses")
+            self.assertEqual(result["total_processed"], 5)
+            self.assertIn("output_directory", result)
+            self.assertIn("metadata_file", result)
+            self.assertIn("manifest_file", result)
 
     @pytest.mark.asyncio
     async def test_lora_model_training(self, brand_trainer):
@@ -233,10 +234,10 @@ class TestSkyRoseBrandTrainer:
                     model_name="test_model"
                 )
                 
-                assert result["success"] is True
-                assert result["model_name"] == "test_model"
-                assert "model_path" in result
-                assert "training_results" in result
+                self.assertIs(result["success"], True)
+                self.assertEqual(result["model_name"], "test_model")
+                self.assertIn("model_path", result)
+                self.assertIn("training_results", result)
         
         finally:
             shutil.rmtree(temp_dir)
@@ -254,10 +255,10 @@ class TestSkyRoseBrandTrainer:
                 trigger_word="skyrose_dress"
             )
             
-            assert result["success"] is True
-            assert "image_path" in result
-            assert result["model_used"] == "skyy_rose_v1"
-            assert result["trigger_word"] == "skyrose_dress"
+            self.assertIs(result["success"], True)
+            self.assertIn("image_path", result)
+            self.assertEqual(result["model_used"], "skyy_rose_v1")
+            self.assertEqual(result["trigger_word"], "skyrose_dress")
 
     @pytest.mark.asyncio
     async def test_brand_consistency_validation(self, brand_trainer):
@@ -271,34 +272,34 @@ class TestSkyRoseBrandTrainer:
             reference_images=reference_images
         )
         
-        assert result["success"] is True
-        assert "average_consistency" in result
-        assert "individual_scores" in result
-        assert "validation_status" in result
-        assert "recommendations" in result
+        self.assertIs(result["success"], True)
+        self.assertIn("average_consistency", result)
+        self.assertIn("individual_scores", result)
+        self.assertIn("validation_status", result)
+        self.assertIn("recommendations", result)
 
     def test_brand_configuration(self, brand_trainer):
         """Test brand configuration settings."""
         config = brand_trainer.brand_config
         
-        assert config["brand_name"] == "Skyy Rose Collection"
-        assert "trigger_words" in config
-        assert "skyrose_dress" in config["trigger_words"]
-        assert "skyrose_collection" in config["trigger_words"]
-        assert config["target_resolution"] == (1024, 1024)
+        self.assertEqual(config["brand_name"], "Skyy Rose Collection")
+        self.assertIn("trigger_words", config)
+        self.assertIn("skyrose_dress", config["trigger_words"])
+        self.assertIn("skyrose_collection", config["trigger_words"])
+        self.assertEqual(config["target_resolution"], (1024, 1024))
 
     def test_lora_configuration(self, brand_trainer):
         """Test LoRA configuration parameters."""
         lora_config = brand_trainer.lora_config
         
-        assert lora_config.r == 16  # Rank
-        assert lora_config.lora_alpha == 32  # Alpha parameter
-        assert lora_config.lora_dropout == 0.1
-        assert "to_k" in lora_config.target_modules
-        assert "to_q" in lora_config.target_modules
+        self.assertEqual(lora_config.r, 16  # Rank)
+        self.assertEqual(lora_config.lora_alpha, 32  # Alpha parameter)
+        self.assertEqual(lora_config.lora_dropout, 0.1)
+        self.assertIn("to_k", lora_config.target_modules)
+        self.assertIn("to_q", lora_config.target_modules)
 
 
-class TestVideoGenerationWorkflow:
+class TestVideoGenerationWorkflow(unittest.TestCase):
     """Test suite for video generation workflow integration."""
 
     @pytest.fixture
@@ -339,8 +340,8 @@ class TestVideoGenerationWorkflow:
         
         result = await workflow_engine._generate_runway_video_action(context)
         
-        assert result["success"] is True
-        assert result["video_path"] == "test_runway_video.mp4"
+        self.assertIs(result["success"], True)
+        self.assertEqual(result["video_path"], "test_runway_video.mp4")
 
     @pytest.mark.asyncio
     async def test_product_360_workflow_action(self, workflow_engine):
@@ -362,8 +363,8 @@ class TestVideoGenerationWorkflow:
         
         result = await workflow_engine._generate_product_360_action(context)
         
-        assert result["success"] is True
-        assert result["video_path"] == "test_360_video.mp4"
+        self.assertIs(result["success"], True)
+        self.assertEqual(result["video_path"], "test_360_video.mp4")
 
     @pytest.mark.asyncio
     async def test_brand_training_workflow_action(self, workflow_engine):
@@ -385,21 +386,21 @@ class TestVideoGenerationWorkflow:
         
         result = await workflow_engine._train_brand_model_action(context)
         
-        assert result["success"] is True
-        assert result["model_name"] == "test_model"
+        self.assertIs(result["success"], True)
+        self.assertEqual(result["model_name"], "test_model")
 
     def test_video_action_registration(self, workflow_engine):
         """Test that video generation actions are properly registered."""
         # Check that video generation actions are registered
-        assert hasattr(workflow_engine, '_generate_runway_video_action')
-        assert hasattr(workflow_engine, '_generate_product_360_action')
-        assert hasattr(workflow_engine, '_train_brand_model_action')
-        assert hasattr(workflow_engine, '_generate_brand_image_action')
-        assert hasattr(workflow_engine, '_upscale_video_action')
+        self.assertTrue(hasattr(workflow_engine, '_generate_runway_video_action'))
+        self.assertTrue(hasattr(workflow_engine, '_generate_product_360_action'))
+        self.assertTrue(hasattr(workflow_engine, '_train_brand_model_action'))
+        self.assertTrue(hasattr(workflow_engine, '_generate_brand_image_action'))
+        self.assertTrue(hasattr(workflow_engine, '_upscale_video_action'))
 
 
 # Integration tests
-class TestSystemIntegration:
+class TestSystemIntegration(unittest.TestCase):
     """Test suite for end-to-end system integration."""
 
     @pytest.mark.asyncio

@@ -8,6 +8,7 @@ References:
 - OWASP Top 10: Security best practices
 """
 
+import unittest
 from datetime import datetime, timezone
 
 import pytest
@@ -44,7 +45,7 @@ def aes_encryption(key_manager):
     return AESEncryption(key_manager)
 
 
-class TestJWTAuthentication:
+class TestJWTAuthentication(unittest.TestCase):
     """Test JWT authentication system per RFC 7519"""
 
     def test_create_access_token(self):
@@ -59,14 +60,14 @@ class TestJWTAuthentication:
         token = create_access_token(payload)
 
         # Verify token is a string
-        assert isinstance(token, str)
-        assert len(token) > 0
+        self.assertIsInstance(token, str)
+        self.assertGreater(len(token), 0)
 
         # Verify token can be decoded
         decoded = verify_token(token)
-        assert decoded["user_id"] == payload["user_id"]
-        assert decoded["email"] == payload["email"]
-        assert decoded["token_type"] == "access"
+        self.assertEqual(decoded["user_id"], payload["user_id"])
+        self.assertEqual(decoded["email"], payload["email"])
+        self.assertEqual(decoded["token_type"], "access")
 
     def test_create_refresh_token(self):
         """Test JWT refresh token creation"""
@@ -80,13 +81,13 @@ class TestJWTAuthentication:
         token = create_refresh_token(payload)
 
         # Verify token is a string
-        assert isinstance(token, str)
-        assert len(token) > 0
+        self.assertIsInstance(token, str)
+        self.assertGreater(len(token), 0)
 
         # Verify token can be decoded
         decoded = verify_token(token)
-        assert decoded["user_id"] == payload["user_id"]
-        assert decoded["token_type"] == "refresh"
+        self.assertEqual(decoded["user_id"], payload["user_id"])
+        self.assertEqual(decoded["token_type"], "refresh")
 
     def test_token_expiration(self):
         """Test that tokens include proper expiration"""
@@ -101,10 +102,10 @@ class TestJWTAuthentication:
         decoded = verify_token(token)
 
         # Verify expiration timestamp exists and is in the future
-        assert "exp" in decoded
+        self.assertIn("exp", decoded)
         exp_time = decoded["exp"]
-        assert isinstance(exp_time, datetime)
-        assert exp_time > datetime.now(timezone.utc)
+        self.assertIsInstance(exp_time, datetime)
+        self.assertGreater(exp_time, datetime.now(timezone.utc))
 
     def test_token_uses_utc_timestamps(self):
         """Test that tokens use UTC timestamps (critical for production)"""
@@ -119,12 +120,12 @@ class TestJWTAuthentication:
         decoded = verify_token(token)
 
         # Verify timestamps are timezone-aware (UTC)
-        assert decoded["exp"].tzinfo is not None
-        assert "iat" in decoded
-        assert decoded["iat"].tzinfo is not None
+        self.assertIsNotNone(decoded["exp"].tzinfo)
+        self.assertIn("iat", decoded)
+        self.assertIsNotNone(decoded["iat"].tzinfo)
 
 
-class TestRBAC:
+class TestRBAC(unittest.TestCase):
     """Test Role-Based Access Control"""
 
     def test_user_roles_defined(self):
@@ -138,8 +139,8 @@ class TestRBAC:
         ]
 
         for role in required_roles:
-            assert role is not None
-            assert len(role) > 0
+            self.assertIsNotNone(role)
+            self.assertGreater(len(role), 0)
 
     def test_protected_endpoint_requires_auth(self, client):
         """Test that protected endpoints require authentication"""
@@ -148,7 +149,7 @@ class TestRBAC:
             "/api/v1/agents/scanner/execute", json={"parameters": {}}
         )
 
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)
 
     def test_admin_endpoint_requires_admin_role(self, client):
         """Test that admin endpoints require admin role"""
@@ -166,10 +167,10 @@ class TestRBAC:
         response = client.get("/api/v1/monitoring/health/detailed", headers=headers)
 
         # Should be forbidden (403) or unauthorized (401)
-        assert response.status_code in [401, 403]
+        self.assertIn(response.status_code, [401, 403])
 
 
-class TestPasswordHashing:
+class TestPasswordHashing(unittest.TestCase):
     """Test password hashing with bcrypt"""
 
     def test_password_hashing(self):
@@ -178,13 +179,13 @@ class TestPasswordHashing:
         hashed = hash_password(password)
 
         # Verify hash is different from original
-        assert hashed != password
+        self.assertNotEqual(hashed, password)
 
         # Verify hash is a string
-        assert isinstance(hashed, str)
+        self.assertIsInstance(hashed, str)
 
         # Verify hash has proper length (bcrypt produces 60-char hashes)
-        assert len(hashed) >= 50
+        self.assertGreater(len(hashed), = 50)
 
     def test_password_verification(self):
         """Test password verification"""
@@ -192,10 +193,10 @@ class TestPasswordHashing:
         hashed = hash_password(password)
 
         # Correct password should verify
-        assert verify_password(password, hashed) is True
+        self.assertIs(verify_password(password, hashed), True)
 
         # Incorrect password should not verify
-        assert verify_password("WrongPassword", hashed) is False
+        self.assertIs(verify_password("WrongPassword", hashed), False)
 
     def test_same_password_different_hashes(self):
         """Test that same password produces different hashes (salt)"""
@@ -204,14 +205,14 @@ class TestPasswordHashing:
         hash2 = hash_password(password)
 
         # Hashes should be different due to salt
-        assert hash1 != hash2
+        self.assertNotEqual(hash1, hash2)
 
         # But both should verify correctly
-        assert verify_password(password, hash1) is True
-        assert verify_password(password, hash2) is True
+        self.assertIs(verify_password(password, hash1), True)
+        self.assertIs(verify_password(password, hash2), True)
 
 
-class TestAESEncryption:
+class TestAESEncryption(unittest.TestCase):
     """Test AES-256-GCM encryption per NIST SP 800-38D"""
 
     def test_encryption_decryption(self, aes_encryption):
@@ -222,14 +223,14 @@ class TestAESEncryption:
         encrypted = aes_encryption.encrypt(plaintext)
 
         # Verify encrypted data is different from plaintext
-        assert encrypted != plaintext
-        assert isinstance(encrypted, str)
+        self.assertNotEqual(encrypted, plaintext)
+        self.assertIsInstance(encrypted, str)
 
         # Decrypt
         decrypted = aes_encryption.decrypt(encrypted)
 
         # Verify decryption matches original
-        assert decrypted == plaintext
+        self.assertEqual(decrypted, plaintext)
 
     def test_encryption_produces_different_ciphertexts(self, aes_encryption):
         """Test that same plaintext produces different ciphertexts (nonce)"""
@@ -239,11 +240,11 @@ class TestAESEncryption:
         encrypted2 = aes_encryption.encrypt(plaintext)
 
         # Ciphertexts should be different due to nonce
-        assert encrypted1 != encrypted2
+        self.assertNotEqual(encrypted1, encrypted2)
 
         # But both should decrypt to same plaintext
-        assert aes_encryption.decrypt(encrypted1) == plaintext
-        assert aes_encryption.decrypt(encrypted2) == plaintext
+        self.assertEqual(aes_encryption.decrypt(encrypted1), plaintext)
+        self.assertEqual(aes_encryption.decrypt(encrypted2), plaintext)
 
     def test_dict_encryption(self, aes_encryption):
         """Test encryption of dictionary data"""
@@ -253,15 +254,15 @@ class TestAESEncryption:
         encrypted = aes_encryption.encrypt_dict(data)
 
         # Verify all fields are encrypted
-        assert encrypted["user_id"] != data["user_id"]
-        assert encrypted["api_key"] != data["api_key"]
-        assert encrypted["balance"] != str(data["balance"])
+        self.assertNotEqual(encrypted["user_id"], data["user_id"])
+        self.assertNotEqual(encrypted["api_key"], data["api_key"])
+        self.assertNotEqual(encrypted["balance"], str(data["balance"]))
 
         # Decrypt
         decrypted = aes_encryption.decrypt_dict(encrypted)
 
         # Verify decryption matches original
-        assert decrypted == data
+        self.assertEqual(decrypted, data)
 
     def test_tampered_data_fails_decryption(self, aes_encryption):
         """Test that tampered encrypted data fails to decrypt (authentication)"""
@@ -276,7 +277,7 @@ class TestAESEncryption:
             aes_encryption.decrypt(tampered)
 
 
-class TestKeyDerivation:
+class TestKeyDerivation(unittest.TestCase):
     """Test key derivation with PBKDF2"""
 
     def test_key_derivation(self, key_manager):
@@ -287,13 +288,13 @@ class TestKeyDerivation:
         key, returned_salt = key_manager.derive_key(password, salt)
 
         # Verify key is bytes
-        assert isinstance(key, bytes)
+        self.assertIsInstance(key, bytes)
 
         # Verify key has correct length (32 bytes for AES-256)
-        assert len(key) == 32
+        self.assertEqual(len(key), 32)
 
         # Verify salt is returned
-        assert returned_salt == salt
+        self.assertEqual(returned_salt, salt)
 
     def test_same_password_same_salt_same_key(self, key_manager):
         """Test that same password and salt produce same key"""
@@ -304,7 +305,7 @@ class TestKeyDerivation:
         key2, _ = key_manager.derive_key(password, salt)
 
         # Keys should be identical
-        assert key1 == key2
+        self.assertEqual(key1, key2)
 
     def test_different_salt_different_key(self, key_manager):
         """Test that different salts produce different keys"""
@@ -314,13 +315,13 @@ class TestKeyDerivation:
         key2, salt2 = key_manager.derive_key(password)
 
         # Salts should be different
-        assert salt1 != salt2
+        self.assertNotEqual(salt1, salt2)
 
         # Keys should be different
-        assert key1 != key2
+        self.assertNotEqual(key1, key2)
 
 
-class TestInputValidation:
+class TestInputValidation(unittest.TestCase):
     """Test input validation and sanitization"""
 
     def test_sql_injection_detection(self):
@@ -393,7 +394,7 @@ class TestInputValidation:
             pytest.fail(f"Safe input failed validation: {e}")
 
 
-class TestAuthenticationEndpoints:
+class TestAuthenticationEndpoints(unittest.TestCase):
     """Test authentication API endpoints"""
 
     def test_register_new_user(self, client):
@@ -412,16 +413,16 @@ class TestAuthenticationEndpoints:
         response = client.post("/api/v1/auth/register", json=register_data)
 
         # May be 201 (Created) or 200 (OK)
-        assert response.status_code in [200, 201]
+        self.assertIn(response.status_code, [200, 201])
         data = response.json()
 
         # Verify user data returned
-        assert data["email"] == register_data["email"]
-        assert data["username"] == register_data["username"]
-        assert "user_id" in data
+        self.assertEqual(data["email"], register_data["email"])
+        self.assertEqual(data["username"], register_data["username"])
+        self.assertIn("user_id", data)
 
         # Password should not be in response
-        assert "password" not in data
+        self.assertIn("password" not, data)
 
     def test_login_success(self, client):
         """Test successful login"""
@@ -430,18 +431,18 @@ class TestAuthenticationEndpoints:
 
         response = client.post("/api/v1/auth/login", data=login_data)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         data = response.json()
 
         # Verify tokens returned
-        assert "access_token" in data
-        assert "refresh_token" in data
-        assert data["token_type"] == "bearer"
+        self.assertIn("access_token", data)
+        self.assertIn("refresh_token", data)
+        self.assertEqual(data["token_type"], "bearer")
 
         # Verify tokens are valid strings
-        assert isinstance(data["access_token"], str)
-        assert isinstance(data["refresh_token"], str)
-        assert len(data["access_token"]) > 0
+        self.assertIsInstance(data["access_token"], str)
+        self.assertIsInstance(data["refresh_token"], str)
+        self.assertGreater(len(data["access_token"]), 0)
 
     def test_login_invalid_credentials(self, client):
         """Test login with invalid credentials"""
@@ -449,11 +450,11 @@ class TestAuthenticationEndpoints:
 
         response = client.post("/api/v1/auth/login", data=login_data)
 
-        assert response.status_code == 401  # Unauthorized
+        self.assertEqual(response.status_code, 401  # Unauthorized)
 
 
 @pytest.mark.integration
-class TestSecurityIntegration:
+class TestSecurityIntegration(unittest.TestCase):
     """Integration tests for complete security workflows"""
 
     def test_full_authentication_flow(self, client):
@@ -470,20 +471,20 @@ class TestSecurityIntegration:
         }
 
         register_response = client.post("/api/v1/auth/register", json=register_data)
-        assert register_response.status_code in [200, 201]
+        self.assertIn(register_response.status_code, [200, 201])
 
         # Step 2: Login with new user
         login_data = {"username": unique_email, "password": register_data["password"]}
 
         login_response = client.post("/api/v1/auth/login", data=login_data)
-        assert login_response.status_code == 200
+        self.assertEqual(login_response.status_code, 200)
         tokens = login_response.json()
 
         # Step 3: Access protected endpoint with token
         headers = {"Authorization": f"Bearer {tokens['access_token']}"}
 
         protected_response = client.get("/api/v1/monitoring/health", headers=headers)
-        assert protected_response.status_code == 200
+        self.assertEqual(protected_response.status_code, 200)
 
 
 if __name__ == "__main__":
