@@ -15,10 +15,12 @@ from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 @pytest.fixture
 def temp_output():
     """
-    Create a temporary directory for test output and remove it after the fixture completes.
+    Create a temporary directory for test output and remove it when the fixture tears down.
+    
+    The fixture yields the directory path to the test; the directory is deleted after the test using the fixture completes.
     
     Returns:
-        temp_dir (str): Path to the created temporary directory. The directory is deleted when the fixture teardown runs.
+        temp_dir (str): Path to the created temporary directory; removed during fixture teardown.
     """
     temp_dir = tempfile.mkdtemp()
     yield temp_dir
@@ -43,7 +45,11 @@ class TestReportGeneratorInitialization:
     """Test report generator initialization"""
 
     def test_initialization(self, temp_output):
-        """Test basic initialization"""
+        """
+        Verify that initializing ReportGenerator with an output path creates the expected output subdirectories.
+        
+        Asserts that summaries_path, metrics_path, validation_path, and recommendations_path exist under the configured output path.
+        """
         gen = ReportGenerator(output_path=temp_output)
         
         assert gen.summaries_path.exists()

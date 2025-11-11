@@ -34,11 +34,29 @@ class BoundedAutonomyTask(Task):
         logger.info(f"✅ {t('tasks.success', name=self.name, task_id=task_id)}")
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        """Log failed task execution"""
+        """
+        Handle a task failure by logging a localized error message that includes the task name, task id, and the error.
+        
+        Parameters:
+            exc (Exception): The exception instance raised by the task.
+            task_id (str): Identifier of the failed task execution.
+            args (tuple): Positional arguments originally passed to the task.
+            kwargs (dict): Keyword arguments originally passed to the task.
+            einfo (traceback): Traceback/info object for the failure.
+        """
         logger.error(f"❌ {t('tasks.failure', name=self.name, task_id=task_id, error=str(exc))}")
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
-        """Log task retry"""
+        """
+        Log a retry event for the task, including a localized message with the task name, task id, and error.
+        
+        Parameters:
+            exc (Exception): The exception that triggered the retry.
+            task_id (str): Identifier of the task execution.
+            args (tuple): Positional arguments originally passed to the task.
+            kwargs (dict): Keyword arguments originally passed to the task.
+            einfo: Exception traceback/info provided by Celery.
+        """
         logger.warning(f"🔄 {t('tasks.retry', name=self.name, task_id=task_id, error=str(exc))}")
 
 
@@ -49,12 +67,10 @@ class BoundedAutonomyTask(Task):
 @celery_app.task(base=BoundedAutonomyTask, bind=True, max_retries=3)
 def send_approval_notification_task(self, action_id: str, agent_name: str, risk_level: str):
     """
-    Send notification to operator for pending approval.
-
-    Args:
-        action_id: Action ID requiring approval
-        agent_name: Name of the agent requesting approval
-        risk_level: Risk level of the action
+    Notify an operator that a specific action requires approval.
+    
+    Returns:
+        dict: {"status": "sent", "action_id": <action_id>} when the notification is successfully enqueued.
     """
     try:
         from fashion_ai_bounded_autonomy.watchdog import Watchdog
@@ -82,7 +98,14 @@ def send_approval_notification_task(self, action_id: str, agent_name: str, risk_
 
 @celery_app.task(base=BoundedAutonomyTask)
 def cleanup_expired_approvals_task():
-    """Clean up expired approval requests (runs hourly)"""
+    """
+    Remove expired approval requests from the approval system.
+    
+    Runs the approval system cleanup and returns a summary of the operation.
+    
+    Returns:
+        result (dict): Operation result. On success: {"status": "completed", "cleaned_count": int} with the number of approvals removed. On failure: {"status": "failed", "error": str} with an error description.
+    """
     try:
         from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem
 
@@ -104,11 +127,14 @@ def cleanup_expired_approvals_task():
 @celery_app.task(base=BoundedAutonomyTask, bind=True, max_retries=3)
 def process_data_ingestion_task(self, file_path: str, source_type: str):
     """
-    Process data ingestion asynchronously.
-
-    Args:
-        file_path: Path to data file
-        source_type: Type of data source (csv, json, etc.)
+    Ingest data from a file into the data pipeline.
+    
+    Parameters:
+        file_path (str): Filesystem path to the input data file.
+        source_type (str): Format or source type of the file (e.g., "csv", "json").
+    
+    Returns:
+        dict: Ingestion result returned by the data pipeline, typically containing status and processed metadata.
     """
     try:
         from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
@@ -127,10 +153,15 @@ def process_data_ingestion_task(self, file_path: str, source_type: str):
 @celery_app.task(base=BoundedAutonomyTask)
 def validate_data_task(data: Dict[str, Any]):
     """
-    Validate and preprocess data asynchronously.
-
-    Args:
-        data: Data to validate
+    Validate and preprocess incoming data.
+    
+    Runs the data pipeline's preprocessing step and returns the pipeline's result. If preprocessing fails, returns a dict with keys `"status": "failed"` and `"error"` containing the error message.
+    
+    Parameters:
+        data (Dict[str, Any]): Input payload to validate and preprocess.
+    
+    Returns:
+        The processed data returned by the pipeline on success; on failure, a dict `{"status": "failed", "error": "<message>"}`.
     """
     try:
         from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
@@ -152,7 +183,13 @@ def validate_data_task(data: Dict[str, Any]):
 
 @celery_app.task(base=BoundedAutonomyTask)
 def generate_daily_reports_task():
-    """Generate daily summary reports (runs daily)"""
+    """
+    Generate the daily summary report.
+    
+    Returns:
+        result (dict): On success: {"status": "completed", "report": <summary>} where `<summary>` is the generated report object.
+                       On failure: {"status": "failed", "error": "<error message>"} with the error description.
+    """
     try:
         from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 
@@ -169,7 +206,13 @@ def generate_daily_reports_task():
 
 @celery_app.task(base=BoundedAutonomyTask)
 def generate_weekly_report_task():
-    """Generate weekly summary report"""
+    """
+    Generate the weekly summary report.
+    
+    Returns:
+        dict: On success, {"status": "completed", "report": <report>} where <report> is the generated weekly summary.
+              On failure, {"status": "failed", "error": "<error message>"} with a string describing the error.
+    """
     try:
         from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 
@@ -186,7 +229,14 @@ def generate_weekly_report_task():
 
 @celery_app.task(base=BoundedAutonomyTask)
 def generate_validation_report_task():
-    """Generate data validation report"""
+    """
+    Generate a data validation report.
+    
+    On success returns a dictionary with "status" set to "completed" and "report" containing the generated validation report; on failure returns a dictionary with "status" set to "failed" and "error" containing the error message.
+    
+    Returns:
+        dict: Success: {"status": "completed", "report": <report>}. Failure: {"status": "failed", "error": "<error message>"}.
+    """
     try:
         from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 
@@ -204,10 +254,15 @@ def generate_validation_report_task():
 @celery_app.task(base=BoundedAutonomyTask)
 def export_metrics_task(format: str = "csv"):
     """
-    Export performance metrics.
-
-    Args:
-        format: Export format (csv, json)
+    Export performance metrics in the specified format.
+    
+    Parameters:
+        format (str): Desired export format, typically "csv" or "json".
+    
+    Returns:
+        dict: Result object with one of the following shapes:
+            - {"status": "completed", "file_path": "<path>"} when export succeeds.
+            - {"status": "failed", "error": "<error message>"} when an error occurs.
     """
     try:
         from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
@@ -229,7 +284,20 @@ def export_metrics_task(format: str = "csv"):
 
 @celery_app.task(base=BoundedAutonomyTask)
 def monitor_agent_health_task():
-    """Monitor health of all registered agents (runs every 5 minutes)"""
+    """
+    Check health of all registered agents and report any that are unhealthy.
+    
+    Performs health checks for each agent registered with the Watchdog and returns a summary of the results.
+    
+    Returns:
+        result (dict): If successful, a dictionary with:
+            - "status": "completed"
+            - "unhealthy_agents": list of agent names that failed health checks (empty list if none)
+            - "timestamp": ISO 8601 timestamp of when the check completed.
+        If an error occurs, a dictionary with:
+            - "status": "failed"
+            - "error": string representation of the error that occurred.
+    """
     try:
         from fashion_ai_bounded_autonomy.watchdog import Watchdog
 
@@ -260,7 +328,17 @@ def monitor_agent_health_task():
 
 @celery_app.task(base=BoundedAutonomyTask)
 def check_system_status_task():
-    """Get comprehensive system status"""
+    """
+    Retrieve a comprehensive snapshot of the system's current status.
+    
+    Returns:
+        result (dict): On success, a dictionary with:
+            - "status": "completed"
+            - "system_status": the structured system status payload.
+        On failure, a dictionary with:
+            - "status": "failed"
+            - "error": a string describing the failure.
+    """
     try:
         from fashion_ai_bounded_autonomy.watchdog import Watchdog
 
@@ -281,7 +359,15 @@ def check_system_status_task():
 
 @celery_app.task(base=BoundedAutonomyTask)
 def performance_snapshot_task():
-    """Take performance metrics snapshot (runs every 15 minutes)"""
+    """
+    Take a snapshot of current performance metrics.
+    
+    Returns:
+        dict: A result object with keys:
+            - "status" (str): "completed" if snapshot succeeded, "failed" otherwise.
+            - "metrics" (Any): KPI summary when status is "completed".
+            - "error" (str): Error message when status is "failed".
+    """
     try:
         from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 
@@ -300,7 +386,12 @@ def performance_snapshot_task():
 
 @celery_app.task(base=BoundedAutonomyTask)
 def generate_performance_proposals_task():
-    """Generate performance improvement proposals"""
+    """
+    Generate performance improvement proposals for the system.
+    
+    Returns:
+        dict: On success, {"status": "completed", "proposals": [...]} containing the generated proposals; on failure, {"status": "failed", "error": "<error message>"}.
+    """
     try:
         from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 
@@ -322,11 +413,17 @@ def generate_performance_proposals_task():
 @celery_app.task(base=BoundedAutonomyTask, bind=True, max_retries=3)
 def execute_approved_task_async(self, task_id: str, approved_by: str):
     """
-    Execute an approved task asynchronously.
-
-    Args:
-        task_id: Task ID to execute
-        approved_by: Operator who approved
+    Execute a task that has been approved and return its execution result.
+    
+    Parameters:
+        task_id (str): Identifier of the approved task to execute.
+        approved_by (str): Identifier or name of the operator who approved the task.
+    
+    Returns:
+        Any: The result produced by executing the approved task.
+    
+    Raises:
+        celery.exceptions.Retry: Re-queues the task for retry with a countdown when execution fails.
     """
     try:
         from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
@@ -348,15 +445,18 @@ def execute_approved_task_async(self, task_id: str, approved_by: str):
 
 def submit_task_async(task_name: str, *args, **kwargs):
     """
-    Submit a task for async execution.
-
-    Args:
-        task_name: Name of the task to execute
-        *args: Positional arguments for the task
-        **kwargs: Keyword arguments for the task
-
+    Submit a named task to the Celery queue for execution.
+    
+    Parameters:
+        task_name (str): Key identifying the task to enqueue. Supported keys:
+            'send_approval_notification', 'process_data_ingestion',
+            'validate_data', 'generate_daily_reports', 'generate_weekly_report',
+            'export_metrics', 'monitor_agent_health', 'execute_approved_task'.
+        *args: Positional arguments passed to the task.
+        **kwargs: Keyword arguments passed to the task.
+    
     Returns:
-        AsyncResult object
+        Celery AsyncResult: Object representing the enqueued task.
     """
     task_map = {
         'send_approval_notification': send_approval_notification_task,

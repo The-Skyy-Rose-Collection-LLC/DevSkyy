@@ -33,7 +33,7 @@ fi
 
 echo -e "${GREEN}✅ Redis is running${NC}"
 
-# Function to start a worker
+# start_worker starts a Celery worker for the given queue with the specified concurrency, writing logs to LOG_DIR and PID files to PID_DIR and running the worker in detached mode.
 start_worker() {
     local queue=$1
     local concurrency=$2

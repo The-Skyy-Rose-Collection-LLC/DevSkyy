@@ -18,15 +18,11 @@ class MockAgent(BaseAgent):
     
     def __init__(self, name, fail_health_check=False):
         """
-        Create a test MockAgent with controllable health-check behavior.
+        Create a MockAgent for tests that can simulate passing or failing health checks.
         
         Parameters:
             name (str): Agent identifier.
-            fail_health_check (bool): If True, the agent will simulate failing health checks; if False, it will simulate healthy checks.
-        
-        Notes:
-            - Initializes an `initialize_count` counter to 0.
-            - Sets the agent version to "1.0.0" via the base class initializer.
+            fail_health_check (bool): If True, health checks will report failure; if False, they will report healthy.
         """
         super().__init__(name, version="1.0.0")
         self.fail_health_check = fail_health_check
@@ -47,10 +43,10 @@ class MockAgent(BaseAgent):
     
     async def execute_core_function(self, **_kwargs):
         """
-        Execute the agent's primary core function and indicate success.
+        Execute the agent's primary function and report success.
         
         Returns:
-            dict: A dictionary with "status" set to "success".
+            dict: A dictionary with "status" equal to "success".
         """
         return {"status": "success"}
     

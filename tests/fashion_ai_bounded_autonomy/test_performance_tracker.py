@@ -15,10 +15,10 @@ from fashion_ai_bounded_autonomy.performance_tracker import PerformanceTracker
 @pytest.fixture
 def temp_db():
     """
-    Create a temporary directory containing a test database path and remove it after use.
+    Create a temporary directory and provide the filesystem path to a test database file inside it.
     
     Yields:
-        str: Filesystem path to the temporary database file named "test_metrics.db".
+        str: Path to "test_metrics.db" inside the temporary directory. The temporary directory (and the file path it contains) is removed after the fixture is torn down.
     """
     temp_dir = tempfile.mkdtemp()
     db_path = Path(temp_dir) / "test_metrics.db"
@@ -29,13 +29,13 @@ def temp_db():
 @pytest.fixture
 def tracker(temp_db):
     """
-    Create a PerformanceTracker configured to use the provided temporary database path.
+    Create a PerformanceTracker configured to use the specified temporary database path.
     
     Parameters:
-        temp_db (str | pathlib.Path): Filesystem path to the temporary SQLite database to be used by the tracker.
+        temp_db (str | pathlib.Path): Path to the temporary SQLite database file used by the tracker.
     
     Returns:
-        PerformanceTracker: A new PerformanceTracker instance using the given database path.
+        PerformanceTracker: An instance of PerformanceTracker using the provided database path.
     """
     return PerformanceTracker(db_path=temp_db)
 

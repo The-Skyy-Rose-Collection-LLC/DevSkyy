@@ -24,7 +24,8 @@ if [ ! -d "$PID_DIR" ]; then
     exit 1
 fi
 
-# Function to stop a worker by PID file
+# stop_worker stops the Celery worker identified by the given PID file, attempts a graceful shutdown (waiting up to 10 seconds) and forces termination if necessary, then removes the PID file.
+# Arguments: pid_file — path to the worker's `.pid` file.
 stop_worker() {
     local pid_file=$1
     local worker_name=$(basename "$pid_file" .pid)

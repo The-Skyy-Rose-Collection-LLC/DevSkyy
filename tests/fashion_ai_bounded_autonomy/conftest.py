@@ -14,10 +14,10 @@ sys.path.insert(0, str(project_root))
 @pytest.fixture(scope="session")
 def project_root_path():
     """
-    Expose the repository root path for tests.
+    Provide the repository root path to tests.
     
     Returns:
-        project_root (Path): Path object pointing to the repository root directory.
+        Path: The Path object pointing to the repository root directory.
     """
     return project_root
 
@@ -25,9 +25,9 @@ def project_root_path():
 @pytest.fixture(autouse=True)
 def reset_singletons():
     """
-    Provide a per-test reset of global singleton instances.
+    Reset global singleton instances before and after each test.
     
-    This autouse pytest fixture yields control to the test and performs teardown after the test completes to reset or clean up any singleton state. Add cleanup logic in the post-yield section to clear or reinitialize singletons as needed.
+    Autouse pytest fixture that yields control to the test and then runs teardown so singleton state can be cleared or reinitialized in the post-yield section.
     """
     yield
     # Cleanup code here if needed

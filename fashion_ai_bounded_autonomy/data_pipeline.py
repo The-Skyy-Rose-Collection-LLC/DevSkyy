@@ -27,6 +27,18 @@ class DataPipeline:
     """
 
     def __init__(self, config_path: str = "fashion_ai_bounded_autonomy/config/dataflow.yaml"):
+        """
+        Initialize the DataPipeline by loading configuration, preparing storage directories, and setting up an in-memory processing log.
+        
+        Parameters:
+            config_path (str): Path to the YAML configuration file that provides pipeline settings; defaults to "fashion_ai_bounded_autonomy/config/dataflow.yaml".
+        
+        Side effects:
+            - Loads and stores the parsed pipeline configuration.
+            - Ensures the directories "fashion_ai_bounded_autonomy/quarantine/", "fashion_ai_bounded_autonomy/validated/", and "fashion_ai_bounded_autonomy/output/" exist, creating them if necessary.
+            - Initializes an empty in-memory processing log.
+            - Emits an informational startup log entry.
+        """
         self.config_path = Path(config_path)
         self.config = self._load_config()
 
@@ -44,20 +56,35 @@ class DataPipeline:
         logger.info("📊 Data pipeline initialized")
 
     def _load_config(self) -> dict[str, Any]:
-        """Load pipeline configuration"""
+        """
+        Load and return the "data_pipeline" configuration section from the YAML file at self.config_path.
+        
+        Returns:
+            dict[str, Any]: Mapping of configuration keys and values for the data pipeline (the YAML "data_pipeline" section).
+        """
         with open(self.config_path) as f:
             return yaml.safe_load(f)["data_pipeline"]
 
     async def ingest(self, file_path: str, source_type: str) -> dict[str, Any]:
         """
-        Ingest data from an approved source into the pipeline.
+        Ingest a file from an approved source into the pipeline and record ingestion metadata.
         
         Parameters:
-            file_path (str): Path to the input file.
-            source_type (str): Source type; one of "csv", "json", "parquet", or "image".
+            file_path (str): Path to the input file to ingest.
+            source_type (str): Source type, one of "csv", "json", "parquet", or "image".
         
         Returns:
-            dict: Result object. On success includes keys "status" (value "ingested"), "file_path", "source_type", "file_hash", "size_mb", "ingestion_time_seconds", and "data". On failure or rejection includes "status" and "reason".
+            dict: Result object. On success contains keys:
+                - "status": "ingested"
+                - "file_path": the ingested file path as a string
+                - "source_type": the provided source type
+                - "file_hash": SHA-256 hex digest of the file
+                - "size_mb": file size in megabytes
+                - "ingestion_time_seconds": duration of ingestion
+                - "data": loaded data or metadata for the source
+            On failure or rejection contains:
+                - "status": one of "error" or "rejected"
+                - "reason": brief machine-readable reason (e.g., "unsupported_type", "unapproved_source", "file_too_large", or an error message)
         """
         start_time = datetime.now()
         file_path = Path(file_path)
@@ -121,14 +148,16 @@ class DataPipeline:
 
     async def preprocess(self, data: Any, schema_name: str) -> dict[str, Any]:
         """
-        Preprocess and validate data.
-
-        Args:
-            data: Data to preprocess
-            schema_name: Schema to validate against
-
+        Validate and normalize input data against a named schema, quarantining invalid inputs and persisting validated output.
+        
+        Parameters:
+            data: The input data to validate and clean (may be a pandas DataFrame, list, dict, or other serializable structure).
+            schema_name: The key of the validation schema to apply from the pipeline configuration.
+        
         Returns:
-            Preprocessing result
+            A dict describing the preprocessing outcome:
+              - If validation fails: {"status": "quarantined", "errors": [...], "quarantine_file": "<path>"}.
+              - If validation succeeds: {"status": "validated", "schema": "<schema_name>", "validated_file": "<path>", "processing_time_seconds": <float>, "data": <cleaned_data>}.
         """
         start_time = datetime.now()
 
@@ -182,14 +211,19 @@ class DataPipeline:
 
     async def inference(self, data: Any, model_name: str) -> dict[str, Any]:
         """
-        Run model inference on validated data.
-
-        Args:
-            data: Validated data
-            model_name: Model to use for inference
-
+        Run inference using a configured model on validated data.
+        
+        If the model name is not listed in the pipeline configuration's inference models, the returned dictionary indicates an error.
+        
+        Parameters:
+            model_name (str): Name of the model as defined in the pipeline configuration's `inference_config.models`.
+        
         Returns:
-            Inference result
+            dict: Result dictionary with keys:
+                - "status": `"completed"` on success or `"error"` if the model is not approved.
+                - "model": the `model_name` used.
+                - "predictions": prediction payload produced by the model (placeholder structure in current implementation).
+                - "inference_time_seconds": elapsed inference time as a float.
         """
         start_time = datetime.now()
 
@@ -240,7 +274,15 @@ class DataPipeline:
         return 10.0  # Default
 
     def _calculate_file_hash(self, file_path: Path) -> str:
-        """Calculate SHA-256 hash of file"""
+        """
+        Compute the SHA-256 hex digest of the file at file_path.
+        
+        Parameters:
+            file_path (Path): Path to the file to hash.
+        
+        Returns:
+            str: Hexadecimal SHA-256 digest of the file contents.
+        """
         sha256 = hashlib.sha256()
         with open(file_path, "rb") as f:
             for block in iter(lambda: f.read(4096), b""):
@@ -248,7 +290,23 @@ class DataPipeline:
         return sha256.hexdigest()
 
     def _validate_schema(self, data: Any, schema_name: str) -> dict[str, Any]:
-        """Validate data against schema"""
+        """
+        Validate an input data sample against a named schema from the pipeline configuration.
+        
+        Checks that the named schema exists and that the provided data sample includes all fields listed under the schema's `required_fields`. Accepts a pandas DataFrame (validates the first row), a non-empty list (validates the first element), or a single mapping/object. On failure, returns validation errors that can be used for quarantining or reporting.
+        
+        Parameters:
+            data (Any): The data sample to validate; may be a DataFrame, a list, or a mapping/object.
+            schema_name (str): The key of the schema to use from self.config["schemas"].
+        
+        Returns:
+            dict[str, Any]: A dictionary with:
+                - "valid" (bool): `True` if all required fields are present, `False` otherwise.
+                - "errors" (list[str]): A list of error codes/messages. Possible entries include:
+                    - "unknown_schema" when the schema_name is not found.
+                    - "empty_dataframe" when a DataFrame is provided but contains no rows.
+                    - "missing_required_field: <field>" for each required field not present in the sample.
+        """
         if schema_name not in self.config["schemas"]:
             return {"valid": False, "errors": ["unknown_schema"]}
 
@@ -273,12 +331,28 @@ class DataPipeline:
         return {"valid": len(errors) == 0, "errors": errors}
 
     def _clean_data(self, data: Any) -> Any:
-        """Clean and normalize data"""
+        """
+        Normalize and clean input data according to the pipeline's cleaning rules.
+        
+        Parameters:
+            data (Any): Input dataset (for example, a pandas DataFrame, list, or dict) to be cleaned.
+        
+        Returns:
+            Any: Cleaned and normalized data. Currently a placeholder that returns the input unchanged.
+        """
         # Placeholder for data cleaning logic
         return data
 
     def _log_operation(self, operation: str, result: dict[str, Any]):
-        """Log pipeline operation"""
+        """
+        Record a pipeline operation entry in memory and append it to a daily JSONL log file.
+        
+        The created log entry contains a timestamp, the operation name, the `status` taken from `result.get("status")`, and a `details` object with all keys from `result` except `data` and `predictions`. The entry is appended to `self.processing_log` and written to logs/data_pipeline/pipeline_YYYYMMDD.jsonl; the log directory is created if it does not exist.
+        
+        Parameters:
+            operation (str): Short name of the pipeline operation (e.g., "ingest", "preprocess", "inference").
+            result (dict[str, Any]): Operation result dictionary whose keys will be recorded; `data` and `predictions` are excluded from the persisted `details`.
+        """
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "operation": operation,

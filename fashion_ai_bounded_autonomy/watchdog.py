@@ -32,6 +32,15 @@ class Watchdog:
         config_path: str = "fashion_ai_bounded_autonomy/config/monitor.yaml",
         max_restart_attempts: int = 3
     ):
+        """
+        Initialize the Watchdog instance and prepare monitoring state.
+        
+        Loads watcher configuration from the given path, records the maximum allowed restart attempts, initializes in-memory state used to track agent errors, restarts, halts, and incidents, ensures the incident logs directory exists, and sets the watcher to a stopped state.
+        
+        Parameters:
+            config_path (str): Filesystem path to the YAML monitoring configuration. Defaults to "fashion_ai_bounded_autonomy/config/monitor.yaml".
+            max_restart_attempts (int): Maximum number of automatic restart attempts allowed per agent before halting. Defaults to 3.
+        """
         self.config_path = Path(config_path)
         self.config = self._load_config()
         self.max_restart_attempts = max_restart_attempts
@@ -51,7 +60,15 @@ class Watchdog:
         logger.info("👁️  Watchdog system initialized")
 
     def _load_config(self) -> dict:
-        """Load watchdog configuration"""
+        """
+        Load and return the watchdog configuration from the configured YAML file.
+        
+        Reads the YAML file at self.config_path and returns the mapping stored under
+        the top-level keys "monitoring" -> "watchdog".
+        
+        Returns:
+            dict: The watchdog configuration mapping extracted from the YAML file.
+        """
         with open(self.config_path) as f:
             config = yaml.safe_load(f)
         return config["monitoring"]["watchdog"]
@@ -82,7 +99,19 @@ class Watchdog:
             await self._check_agent(agent_name, agent)
 
     async def _check_agent(self, agent_name: str, agent):
-        """Check individual agent health"""
+        """
+        Evaluate a single agent's health and dispatch the appropriate watchdog handlers.
+        
+        Calls the agent's async health_check() and:
+        - invokes _handle_agent_failure if the reported status is "failed";
+        - invokes _handle_agent_degraded if the reported status is "degraded" or "recovering";
+        - invokes _handle_agent_recovery if the agent was previously tracked as having errors and is now healthy.
+        If the health check raises an exception, records the error via _handle_agent_error.
+        
+        Parameters:
+            agent_name (str): Identifier of the agent being checked.
+            agent: Agent instance providing an async `health_check()` method that returns a dict containing a `"status"` key.
+        """
         try:
             health = await agent.health_check()
 
@@ -100,7 +129,13 @@ class Watchdog:
             await self._handle_agent_error(agent_name, str(e))
 
     async def _handle_agent_failure(self, agent_name: str, agent):
-        """Handle agent failure"""
+        """
+        Handle a detected agent failure by updating state and deciding whether to restart or halt the agent.
+        
+        Parameters:
+        	agent_name (str): Identifier of the failing agent.
+        	agent: The agent instance to restart if a restart is attempted.
+        """
         logger.error(f"❌ Agent {agent_name} has failed")
 
         # Increment error count
@@ -142,7 +177,15 @@ class Watchdog:
         })
 
     async def _restart_agent(self, agent_name: str, agent):
-        """Attempt to restart agent"""
+        """
+        Attempt to restart the specified agent and record the outcome.
+        
+        If the agent has reached the configured maximum restart attempts the agent is halted with reason "max_restarts_exceeded". Otherwise this method attempts to reinitialize the agent via its `initialize()` coroutine; on successful initialization the agent's restart count is incremented and an "agent_restarted" incident is logged. If initialization fails or raises an exception the agent is halted with an appropriate reason (e.g., "restart_failed" or "restart_error: <error>").
+        
+        Parameters:
+            agent_name (str): The unique name of the agent to restart.
+            agent: An agent instance that exposes an async `initialize()` method which returns `True` on success and `False` on a recoverable failure.
+        """
         if agent_name not in self.agent_restart_counts:
             self.agent_restart_counts[agent_name] = 0
 
@@ -175,7 +218,13 @@ class Watchdog:
             await self._halt_agent(agent_name, f"restart_error: {e!s}")
 
     async def _halt_agent(self, agent_name: str, reason: str):
-        """Halt agent and notify operator"""
+        """
+        Halt an agent, record halt details in the watchdog state, create a halt incident, and notify an operator.
+        
+        Parameters:
+            agent_name (str): Identifier of the agent to halt.
+            reason (str): Human-readable reason for halting the agent.
+        """
         logger.critical(f"🛑 HALTING AGENT {agent_name}: {reason}")
 
         self.halted_agents[agent_name] = {
@@ -200,7 +249,14 @@ class Watchdog:
         await self._notify_operator(incident)
 
     async def _handle_agent_recovery(self, agent_name: str):
-        """Handle agent recovery"""
+        """
+        Record and handle recovery of an agent.
+        
+        Clears stored error and restart counters for the specified agent, logs an informational recovery message, and records an "agent_recovered" incident with a timestamp.
+        
+        Parameters:
+            agent_name (str): Name or identifier of the recovered agent.
+        """
         logger.info(f"✅ Agent {agent_name} recovered")
 
         # Clear error count
@@ -218,7 +274,12 @@ class Watchdog:
         })
 
     def _log_incident(self, incident: dict):
-        """Log incident to file and memory"""
+        """
+        Append an incident record to the in-memory incident list and persist it as a JSON line in the daily incident log file.
+        
+        Parameters:
+            incident (dict): Incident data to record; appended to self.incidents and written (as one JSON line) to the daily file at self.incident_log_path/incidents_YYYYMMDD.jsonl (created if missing).
+        """
         self.incidents.append(incident)
 
         # Write to incident log
@@ -227,7 +288,17 @@ class Watchdog:
             f.write(json.dumps(incident) + "\n")
 
     async def _notify_operator(self, incident: dict):
-        """Notify operator of critical incident"""
+        """
+        Notify an operator about a critical incident and enqueue the notification.
+        
+        Appends a copy of `incident` augmented with a `notification_sent_at` ISO timestamp to
+        fashion_ai_bounded_autonomy/notifications.json and logs a critical, pretty-printed message.
+        If the notifications file does not exist it will be created.
+        
+        Parameters:
+            incident (dict): Incident details to notify the operator about; this dictionary will be
+                written (with an added `notification_sent_at` field) to the notifications file.
+        """
         logger.critical(f"🚨 OPERATOR NOTIFICATION REQUIRED: {json.dumps(incident, indent=2)}")
 
         # Write to notification queue
@@ -247,7 +318,18 @@ class Watchdog:
             json.dump(notifications, f, indent=2)
 
     async def get_status(self) -> dict:
-        """Get watchdog status"""
+        """
+        Return the current runtime status of the Watchdog.
+        
+        Returns:
+            status (dict): Mapping with keys:
+                - "running": bool indicating whether monitoring is active.
+                - "total_incidents": int total number of incidents recorded in memory.
+                - "halted_agents": int count of currently halted agents.
+                - "agents_with_errors": dict mapping agent name to current error count.
+                - "agents_with_restarts": dict mapping agent name to restart attempt count.
+                - "halted_details": the Watchdog's `halted_agents` value (details recorded when agents were halted).
+        """
         return {
             "running": self.running,
             "total_incidents": len(self.incidents),

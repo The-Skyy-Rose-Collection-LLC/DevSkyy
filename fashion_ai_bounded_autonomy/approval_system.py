@@ -106,19 +106,23 @@ class ApprovalSystem:
         timeout_hours: int = 24
     ) -> dict[str, Any]:
         """
-        Submit an action for human review.
-
-        Args:
-            action_id: Unique action identifier
-            agent_name: Name of the agent
-            function_name: Function to execute
-            parameters: Function parameters
-            risk_level: Risk level assessment
-            workflow_type: Approval workflow to use
-            timeout_hours: Hours before action expires
-
+        Create a pending review entry for the given action and record its submission.
+        
+        Parameters:
+            action_id (str): Unique identifier for the action being submitted.
+            agent_name (str): Name of the agent requesting the action.
+            function_name (str): Name of the function the action will execute.
+            parameters (dict[str, Any]): Parameters that will be passed to the function.
+            risk_level (str): Assessed risk level for the action.
+            workflow_type (ApprovalWorkflowType): Selected approval workflow that determines the review steps.
+            timeout_hours (int): Number of hours until the action expires and can no longer be approved.
+        
         Returns:
-            Submission confirmation
+            dict[str, Any]: Submission metadata containing:
+                - "action_id": the submitted action's identifier,
+                - "status": submission status (always "submitted"),
+                - "workflow": the workflow type value used,
+                - "timeout_at": ISO8601 timestamp when the action will expire.
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -180,15 +184,13 @@ class ApprovalSystem:
         notes: Optional[str] = None
     ) -> dict[str, Any]:
         """
-        Approve an action.
-
-        Args:
-            action_id: Action to approve
-            operator: Operator identifier
-            notes: Optional approval notes
-
+        Approve a pending review action and record the approval and operator activity.
+        
+        Parameters:
+            notes (Optional[str]): Optional free-text notes to attach to the approval event.
+        
         Returns:
-            Approval confirmation
+            dict: On success, a dictionary with keys `action_id`, `status` (set to `"approved"`), `approved_by`, and `approved_at` (ISO 8601 string). On failure, a dictionary with an `error` message and a `status` describing the failure (e.g., `"error"` or `"expired"`).
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -268,7 +270,12 @@ class ApprovalSystem:
         operator: str,
         reason: str
     ) -> dict[str, Any]:
-        """Reject an action"""
+        """
+        Mark a pending review action as rejected and record the rejection and operator activity.
+        
+        Returns:
+            dict: On success, a dictionary containing `action_id`, `status` (set to "rejected"), `rejected_by`, and `reason`. If the action does not exist or is not in a pending state, a dictionary with an `error` message and `status` set to `"error"`.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -331,7 +338,22 @@ class ApprovalSystem:
         }
 
     async def get_pending_actions(self) -> list[dict[str, Any]]:
-        """Get all pending actions"""
+        """
+        Return a list of actions currently awaiting review.
+        
+        Each item is a dictionary containing the action's identifiers, metadata and timestamps. The `parameters` field is parsed from JSON into a dict. Results are ordered by creation time (newest first).
+        
+        Returns:
+            list[dict[str, Any]]: List of pending action records with keys:
+                - action_id: Unique action identifier.
+                - agent_name: Name of the agent that requested the action.
+                - function_name: Target function or operation name.
+                - parameters: Parsed parameters as a dict.
+                - risk_level: Declared risk level for the action.
+                - workflow_type: Workflow type assigned to the action.
+                - created_at: ISO or stored timestamp when the action was submitted.
+                - timeout_at: Timestamp after which the action is considered expired.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -360,7 +382,12 @@ class ApprovalSystem:
         return actions
 
     async def get_action_details(self, action_id: str) -> Optional[dict[str, Any]]:
-        """Get detailed information about an action"""
+        """
+        Retrieve a detailed record for a review action, including its stored fields and ordered approval history.
+        
+        Returns:
+            A dict with the action's stored fields (action_id, agent_name, function_name, parameters, risk_level, workflow_type, status, created_at, timeout_at, approved_at, approved_by, rejection_reason, execution_result) and a `history` list of approval events (each with `event`, `operator`, `timestamp`, and parsed `details`), or `None` if no action with `action_id` exists.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -452,7 +479,14 @@ class ApprovalSystem:
         return rows_affected > 0
 
     async def cleanup_expired(self) -> int:
-        """Clean up expired actions"""
+        """
+        Mark pending review actions whose timeout has passed as expired.
+        
+        Updates review_queue rows with status 'pending' and timeout_at earlier than the current time to status 'expired' and commits the change.
+        
+        Returns:
+            expired_count (int): Number of actions that were marked expired.
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -473,7 +507,19 @@ class ApprovalSystem:
         return expired_count
 
     async def get_operator_statistics(self, operator: Optional[str] = None) -> dict[str, Any]:
-        """Get operator activity statistics"""
+        """
+        Collect statistics of operator activities recorded in the operator_activity table.
+        
+        When `operator` is provided, returns a mapping of action name to the number of times that operator performed the action.
+        When `operator` is omitted, returns a mapping of operator name to a nested mapping of action name to count.
+        
+        Parameters:
+            operator (Optional[str]): Optional operator identifier to filter statistics for a single operator.
+        
+        Returns:
+            dict: If `operator` is provided, a dict mapping action (str) to count (int).
+                  If `operator` is None, a dict mapping operator (str) to dicts of action (str) to count (int).
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
