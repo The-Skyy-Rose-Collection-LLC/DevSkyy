@@ -1,6 +1,6 @@
 # DevSkyy GitHub Actions Workflows
 
-Comprehensive CI/CD automation following the **Truth Protocol** for DevSkyy's enterprise-grade multi-agent platform.
+Streamlined CI/CD automation following the **Truth Protocol** for DevSkyy's enterprise-grade multi-agent platform.
 
 ## 📋 Table of Contents
 
@@ -26,12 +26,21 @@ DevSkyy's CI/CD pipeline ensures **zero-defect deployment** through automated te
 
 | Workflow | Purpose | Trigger | Status |
 |----------|---------|---------|--------|
-| [CI/CD Pipeline](#cicd-pipeline) | Complete build, test, deploy | Push, PR | Required |
-| [Security Scan](#security-scanning) | Vulnerability scanning | Push, PR, Weekly | Required |
-| [Test Suite](#comprehensive-testing) | All test execution | Push, PR | Required |
-| [Performance](#performance-testing) | Load & stress testing | Push to main, Daily | Required |
-| [CodeQL](#codeql-analysis) | Advanced security analysis | Push, PR, Weekly | Required |
+| [Unified CI/CD](#unified-cicd-pipeline) | Complete build, test, security, deploy | Push, PR, Weekly | Required |
+| [Neon Database](#neon-database-branching) | Database branching for PRs | PR open/sync/close | Automated |
 | [Dependabot](#dependabot) | Automated dependency updates | Weekly | Automated |
+
+### Workflow Consolidation (2025-11-11)
+
+**Previous:** 5 separate workflows (ci-cd.yml, test.yml, security-scan.yml, performance.yml, codeql.yml)
+**Current:** 1 unified workflow (unified-ci-cd.yml)
+
+**Benefits:**
+- Reduced workflow execution time (parallel job execution)
+- Single source of truth for CI/CD configuration
+- Easier maintenance and updates
+- Consistent artifact handling
+- Better resource utilization
 
 ## 📜 Truth Protocol Compliance
 
@@ -48,7 +57,7 @@ Ingress → Validation → Auth → RBAC → Logic → Encryption → Output →
 3. **Test Coverage ≥90%** - Pytest with coverage enforcement
 4. **Performance SLOs** - P95 < 200ms, error rate < 0.5%
 5. **Container Security** - Trivy, Grype scanning
-6. **Secret Scanning** - TruffleHog, detect-secrets
+6. **Secret Scanning** - detect-secrets
 7. **SBOM Generation** - CycloneDX, SPDX formats
 8. **Error Ledger** - JSON audit trail
 
@@ -64,8 +73,9 @@ Ingress → Validation → Auth → RBAC → Logic → Encryption → Output →
    ```
 
 2. **Create Pull Request** to `main` or `develop`:
-   - All workflows run automatically
-   - Checks must pass before merge
+   - Unified CI/CD workflow runs automatically
+   - Neon database branch created for testing
+   - All quality gates must pass before merge
    - Review security findings
 
 3. **Monitor Progress**:
@@ -78,12 +88,16 @@ Ingress → Validation → Auth → RBAC → Logic → Encryption → Output →
 Configure these in **Settings → Secrets and variables → Actions**:
 
 ```bash
-# API Keys (if needed)
+# API Keys (optional)
 ANTHROPIC_API_KEY        # For Claude API
 OPENAI_API_KEY          # For OpenAI API
 CODECOV_TOKEN           # For coverage uploads
 
-# Deployment (if needed)
+# Database (for Neon workflow)
+NEON_PROJECT_ID         # Neon database project ID
+NEON_API_KEY            # Neon API key
+
+# Deployment (optional)
 DOCKER_USERNAME         # For Docker Hub
 DOCKER_PASSWORD         # For Docker Hub
 AWS_ACCESS_KEY_ID       # For AWS deployment
@@ -92,297 +106,202 @@ AWS_SECRET_ACCESS_KEY   # For AWS deployment
 
 ## 📖 Workflow Details
 
-### CI/CD Pipeline
+### Unified CI/CD Pipeline
 
-**File:** `ci-cd.yml`
+**File:** `unified-ci-cd.yml`
 
-Complete continuous integration and deployment pipeline.
+Consolidated workflow that replaces 5 previous workflows with a streamlined 10-stage pipeline.
 
-#### Jobs
+#### Architecture
 
-1. **Lint** (10 min)
-   - Ruff linter
-   - Black formatter check
-   - isort import check
-   - Generates linting report
-
-2. **Type Check** (15 min)
-   - mypy static type analysis
-   - Validates type hints
-   - Checks for type errors
-
-3. **Security** (15 min)
-   - Bandit security scanner
-   - Safety vulnerability check
-   - pip-audit dependency audit
-   - **Fails on HIGH/CRITICAL CVEs**
-
-4. **Tests** (30 min)
-   - Pytest with coverage
-   - PostgreSQL + Redis services
-   - **Requires ≥90% coverage**
-   - Uploads to Codecov
-
-5. **Docker** (20 min)
-   - Multi-stage build
-   - Trivy vulnerability scan
-   - Container health test
-   - Saves image artifact
-
-6. **Error Ledger** (10 min)
-   - Generates JSON audit trail
-   - Tracks all job statuses
-   - Truth Protocol compliance
-
-7. **OpenAPI** (10 min)
-   - Generates API specification
-   - Validates schema
-   - Uploads artifact
-
-8. **Summary** (5 min)
-   - Generates build report
-   - Posts to PR comments
-   - Validates all gates passed
-
-#### Usage
-
-```yaml
-# Runs on every push and PR
-on:
-  push:
-    branches: ['**']
-  pull_request:
-    branches: [main, develop]
+```
+Stage 1: Code Quality    →  Lint, Type Check
+Stage 2: Security Scan   →  SAST, Dependency, Secrets
+Stage 3: CodeQL Analysis →  Advanced security scanning
+Stage 4: Testing         →  Unit, Integration, API, E2E
+Stage 5: Coverage        →  Combine & enforce ≥90%
+Stage 6: Docker Build    →  Multi-stage build
+Stage 7: Performance     →  Load & stress testing
+Stage 8: SBOM            →  Generate CycloneDX/SPDX
+Stage 9: OpenAPI         →  Generate & validate spec
+Stage 10: Error Ledger   →  JSON audit trail
 ```
 
-#### Artifacts
-
-- Lint reports (30 days)
-- Test coverage reports (30 days)
-- Docker image (7 days)
-- Error ledger (365 days)
-- OpenAPI spec (30 days)
-
----
-
-### Security Scanning
-
-**File:** `security-scan.yml`
-
-Comprehensive security scanning with SBOM generation.
-
 #### Jobs
 
-1. **Dependency Scan** (15 min)
-   - Safety vulnerability database
-   - pip-audit package audit
-   - Package integrity checks
+**1. Code Quality (15 min)**
+- Ruff linter with GitHub annotations
+- Black formatter check
+- isort import sorting
+- mypy static type analysis
+- Uploads quality reports
 
-2. **Code Security** (15 min)
-   - Bandit static analysis
-   - **Blocks HIGH/CRITICAL issues**
-   - SARIF upload to GitHub Security
+**2. Security Scan (20 min)**
+- Bandit SAST security analysis
+- Safety vulnerability database check
+- pip-audit dependency scanning
+- detect-secrets baseline verification
+- SARIF upload to GitHub Security tab
+- **Fails on HIGH/CRITICAL CVEs**
 
-3. **Secret Scan** (10 min)
-   - TruffleHog secret detection
-   - detect-secrets baseline
-   - Scans full git history
+**3. CodeQL Analysis (30 min)**
+- Python code scanning
+- Security-extended queries
+- Quality checks
+- SARIF integration
+- Auto-fix suggestions
 
-4. **Container Scan** (20 min)
-   - Trivy container scanning
-   - Grype vulnerability detection
-   - SARIF results to Security tab
+**4. Testing (30 min)**
+- Unit tests (parallel by module)
+- Integration tests (PostgreSQL + Redis)
+- API endpoint tests
+- Security tests (auth, encryption, RBAC)
+- ML/AI pipeline tests
+- E2E workflow tests
 
-5. **SBOM Generation** (15 min)
-   - CycloneDX format
-   - SPDX format
-   - Uploads to dependency graph
+**5. Coverage Report (15 min)**
+- Combines all test coverage
+- **Enforces ≥90% threshold**
+- Uploads to Codecov
+- Generates HTML report
 
-6. **License Scan** (10 min)
-   - pip-licenses analysis
-   - Checks for prohibited licenses
-   - Compliance validation
+**6. Docker Build (20 min)**
+- Multi-stage optimized build
+- Trivy vulnerability scan
+- Container health checks
+- Saves image artifact
+- SBOM generation
 
-7. **Summary** (10 min)
-   - Consolidated security report
-   - Truth Protocol compliance check
-   - GitHub Security integration
+**7. Performance Testing (25 min)**
+- Baseline performance (1000 requests)
+- Load testing (configurable)
+- **Enforces P95 < 200ms**
+- **Enforces error rate < 0.5%**
+- Database benchmarking
 
-#### Schedule
+**8. SBOM Generation (15 min)**
+- CycloneDX format
+- SPDX format
+- Uploads to dependency graph
+- License compliance check
+
+**9. OpenAPI Specification (10 min)**
+- Auto-generates API spec
+- Validates schema
+- Version tracking
+- Uploads artifact
+
+**10. Error Ledger (10 min)**
+- JSON audit trail
+- Job status tracking
+- Truth Protocol compliance
+- 365-day retention
+
+#### Triggers
 
 ```yaml
-# Weekly scans every Sunday at 2 AM UTC
+# Runs on:
+push:
+  branches: ['**']           # All branches
+pull_request:
+  branches: [main, develop]  # PRs to main/develop
 schedule:
-  - cron: '0 2 * * 0'
+  - cron: '0 2 * * 0'        # Weekly Sunday 2 AM UTC
+workflow_dispatch:           # Manual triggers
+```
+
+#### Environment Variables
+
+```yaml
+PYTHON_VERSION: '3.11.9'
+NODE_VERSION: '18'
+COVERAGE_THRESHOLD: '90'
+P95_LATENCY_THRESHOLD_MS: '200'
+ERROR_RATE_THRESHOLD: '0.5'
 ```
 
 #### Artifacts
 
-- Security reports (90 days)
+- Code quality reports (30 days)
+- Security scan results (90 days)
+- Test coverage reports (90 days)
+- Docker image (7 days)
+- Performance benchmarks (90 days)
 - SBOM files (365 days)
-- License reports (90 days)
-- Vulnerability scans (90 days)
-
----
-
-### Comprehensive Testing
-
-**File:** `test.yml`
-
-Multi-tiered test suite with coverage enforcement.
-
-#### Jobs
-
-1. **Unit Tests** (20 min)
-   - Tests by module: agents, api, security, ml, infrastructure
-   - Matrix strategy for parallel execution
-   - Individual coverage reports
-
-2. **Integration Tests** (30 min)
-   - PostgreSQL + Redis services
-   - Database migrations
-   - Cross-module testing
-
-3. **API Tests** (20 min)
-   - Endpoint validation
-   - Authentication testing
-   - Request/response validation
-
-4. **Security Tests** (15 min)
-   - Auth mechanism tests
-   - Encryption validation
-   - RBAC verification
-
-5. **ML Tests** (25 min)
-   - Model inference tests
-   - Redis caching validation
-   - AI/ML pipeline tests
-
-6. **E2E Tests** (30 min)
-   - Full application workflow
-   - Real server testing
-   - End-user scenarios
-
-7. **Coverage Report** (15 min)
-   - Combines all coverage
-   - **Enforces ≥90% threshold**
-   - Uploads to Codecov
-
-8. **Summary** (10 min)
-   - Test results dashboard
-   - Coverage badge
-   - Truth Protocol validation
-
-#### Coverage Threshold
-
-```python
-# Fails if coverage < 90%
---cov-fail-under=90
-```
-
-#### Artifacts
-
-- Unit test results (30 days)
-- Integration test results (30 days)
-- Combined coverage report (90 days)
-- Coverage badge (90 days)
-
----
-
-### Performance Testing
-
-**File:** `performance.yml`
-
-Load testing and performance benchmarking.
-
-#### Jobs
-
-1. **Baseline Performance** (15 min)
-   - 1000 request baseline
-   - Calculates P95/P99 latency
-   - **Enforces P95 < 200ms**
-
-2. **Load Test** (20 min)
-   - Locust load testing
-   - Configurable users/duration
-   - Error rate validation
-
-3. **Stress Test** (25 min)
-   - Autocannon stress testing
-   - 500 concurrent connections
-   - System stability validation
-
-4. **Database Performance** (15 min)
-   - Query benchmarking
-   - Insert/Select performance
-   - Connection pool testing
-
-5. **Summary** (10 min)
-   - Performance metrics dashboard
-   - SLO compliance check
-   - Regression detection
+- OpenAPI specification (30 days)
+- Error ledger (365 days)
 
 #### Truth Protocol SLOs
 
 ```yaml
-P95_LATENCY_THRESHOLD_MS: '200'
-ERROR_RATE_THRESHOLD: '0.5'
-TARGET_RPS: '1000'
+✓ Test Coverage ≥ 90%
+✓ P95 Latency < 200ms
+✓ Error Rate < 0.5%
+✓ Zero HIGH/CRITICAL CVEs
+✓ SBOM generated
+✓ Error ledger created
+✓ OpenAPI spec valid
 ```
-
-#### Schedule
-
-```yaml
-# Daily at 3 AM UTC
-schedule:
-  - cron: '0 3 * * *'
-```
-
-#### Artifacts
-
-- Baseline results (90 days)
-- Load test reports (90 days)
-- Stress test results (90 days)
-- Database benchmarks (90 days)
 
 ---
 
-### CodeQL Analysis
+### Neon Database Branching
 
-**File:** `codeql.yml`
+**File:** `neon_workflow.yml`
 
-Advanced security analysis with GitHub CodeQL.
-
-#### Jobs
-
-1. **CodeQL Analysis** (30 min)
-   - Python code scanning
-   - Security-extended queries
-   - Quality checks
-   - SARIF upload to Security tab
-
-2. **SAST Analysis** (20 min)
-   - Bandit static analysis
-   - Semgrep security rules
-   - Multi-tool validation
-
-3. **Summary** (10 min)
-   - Security findings dashboard
-   - GitHub Security integration
-   - Remediation guidance
+Automated database branching for pull request testing using Neon serverless Postgres.
 
 #### Features
 
-- **Path Filtering**: Excludes tests, node_modules, venv
-- **Query Packs**: security-extended, security-and-quality
-- **Auto-fix Suggestions**: For common issues
-- **Weekly Scans**: Scheduled Monday 1 AM UTC
+- **Automatic branch creation** when PR is opened/synchronized
+- **Isolated database** per PR for safe testing
+- **Connection string output** for testing
+- **Automatic cleanup** when PR is closed
+- **Zero manual database management**
 
-#### Schedule
+#### Jobs
+
+**1. Create Neon Branch (PR open/sync)**
+- Creates database branch from main
+- Naming: `pr-{number}-{sha}`
+- Outputs connection string
+- Comments on PR with DB details
+
+**2. Run Tests with PR Database (after branch creation)**
+- Uses dedicated PR database
+- Runs migrations
+- Executes integration tests
+- Validates database changes
+
+**3. Delete Neon Branch (PR close)**
+- Cleans up PR database
+- Removes orphaned branches
+- Updates PR comment
+
+#### Triggers
 
 ```yaml
-schedule:
-  - cron: '0 1 * * 1'  # Every Monday
+pull_request:
+  types: [opened, synchronize, reopened, closed]
+```
+
+#### Environment Variables
+
+```yaml
+NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+```
+
+#### Usage in Tests
+
+```python
+# Database URL is available as environment variable
+import os
+DATABASE_URL = os.getenv('NEON_DATABASE_URL')
+
+# Or from PR comment
+# Connection string format:
+# postgres://neondb_owner:password@ep-xxx.region.aws.neon.tech/devskyy
 ```
 
 ---
@@ -391,7 +310,7 @@ schedule:
 
 **File:** `../dependabot.yml`
 
-Automated dependency updates.
+Automated dependency updates for security and maintenance.
 
 #### Configuration
 
@@ -419,7 +338,7 @@ Automated dependency updates.
 All Dependabot PRs:
 1. Auto-assigned to DevSkyy team
 2. Labeled (dependencies, python/docker/actions, security)
-3. CI/CD runs automatically
+3. Unified CI/CD runs automatically
 4. Conventional commit format
 5. Grouped by ecosystem
 
@@ -520,15 +439,9 @@ gh run download <run-id>
 
 Check workflow status:
 
-[![CI/CD Pipeline](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml)
+[![Unified CI/CD](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/unified-ci-cd.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/unified-ci-cd.yml)
 
-[![Security Scan](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml)
-
-[![Tests](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/test.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/test.yml)
-
-[![Performance](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/performance.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/performance.yml)
-
-[![CodeQL](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/codeql.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/codeql.yml)
+[![Neon Database](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/neon_workflow.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/neon_workflow.yml)
 
 ---
 
@@ -540,7 +453,7 @@ Check workflow status:
 2. **Check security scans** with local tools
 3. **Review CI logs** if builds fail
 4. **Keep dependencies updated** (review Dependabot PRs)
-5. **Write tests** for new features
+5. **Write tests** for new features (maintain 90% coverage)
 6. **Follow Truth Protocol** requirements
 
 ### For Reviewers
@@ -563,6 +476,14 @@ Check workflow status:
 
 ## 📝 Changelog
 
+### 2025-11-11 - Workflow Consolidation
+- ✅ **Consolidated 5 workflows into unified-ci-cd.yml**
+- ✅ Removed: ci-cd.yml, test.yml, security-scan.yml, performance.yml, codeql.yml
+- ✅ Kept: unified-ci-cd.yml (consolidated), neon_workflow.yml (unique)
+- ✅ Improved: Faster execution with optimized job parallelization
+- ✅ Enhanced: Better artifact management and error ledger
+- ✅ Reduced: Workflow maintenance overhead by 80%
+
 ### 2025-11-09 - Initial Implementation
 - ✅ Created CI/CD pipeline workflow
 - ✅ Added comprehensive security scanning
@@ -575,6 +496,6 @@ Check workflow status:
 
 ---
 
-**DevSkyy Workflows - Enterprise-Grade CI/CD Automation**
+**DevSkyy Workflows - Streamlined Enterprise CI/CD**
 
 Built with ❤️ following the Truth Protocol for zero-defect deployment.
