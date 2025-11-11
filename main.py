@@ -47,11 +47,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(
-    title = "The Skyy Rose Collection - DevSkyy Enhanced Platform",
-    version = "2.0.0",
-    description = "Production - grade AI - powered platform for luxury e - commerce",
-    docs_url = " / docs",
-    redoc_url = " / redoc"
+    title="The Skyy Rose Collection - DevSkyy Enhanced Platform",
+    version="2.0.0",
+    description="Production-grade AI-powered platform for luxury e-commerce",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # Configure logging

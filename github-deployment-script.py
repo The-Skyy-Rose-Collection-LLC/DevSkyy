@@ -133,8 +133,8 @@ class GitHubDeployment:
         """Create backup of existing agent files"""
         print_header("Creating Backup")
 
-        backup_dir = f"backups / agents_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        agent_dir = "agent / modules"
+        backup_dir = f"backups/agents_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        agent_dir = "agent/modules"
 
         if os.path.exists(agent_dir):
             os.makedirs(backup_dir, exist_ok = True)
@@ -157,7 +157,7 @@ class GitHubDeployment:
         """Create agent module files"""
         print_header("Creating Agent Files")
 
-        agent_dir = Path("agent / modules")
+        agent_dir = Path("agent/modules")
         agent_dir.mkdir(parents = True, exist_ok = True)
 
         # Note: In production, these would be the actual file contents
@@ -191,7 +191,7 @@ class GitHubDeployment:
         # 1. Syntax check
         print_colored("🔍 Checking Python syntax...", Colors.CYAN)
         for filename in self.agent_files.keys():
-            filepath = Path("agent / modules") / filename
+            filepath = Path("agent/modules") / filename
             if filepath.exists():
                 result = run_command(
                     ["python", " - m", "py_compile", str(filepath)],
@@ -237,7 +237,7 @@ class GitHubDeployment:
             "async def"
         ]
 
-        agent_dir = Path("agent / modules")
+        agent_dir = Path("agent/modules")
         validation_passed = True
 
         for filename in ["inventory_agent.py", "financial_agent.py", "ecommerce_agent.py"]:
