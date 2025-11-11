@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 def setup_ssh_config() -> Dict[str, Any]:
     """
     Set up SSH configuration for secure repository access.
-    Production-level SSH key management.
+    Production - level SSH key management.
     """
     try:
         ssh_dir = Path.home() / '.ssh'
-        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        ssh_dir.mkdir(mode = 0o700, exist_ok = True)
 
         config_path = ssh_dir / 'config'
         known_hosts_path = ssh_dir / 'known_hosts'
@@ -27,7 +27,7 @@ def setup_ssh_config() -> Dict[str, Any]:
 Host github.com
     HostName github.com
     User git
-    IdentityFile ~/.ssh/id_rsa
+    IdentityFile ~/.ssh / id_rsa
     StrictHostKeyChecking yes
 
 Host *
@@ -45,8 +45,8 @@ Host *
         if not known_hosts_path.exists() or 'github.com' not in known_hosts_path.read_text():
             try:
                 result = subprocess.run([
-                    'ssh-keyscan', '-H', 'github.com'
-                ], capture_output=True, text=True, timeout=10)
+                    'ssh - keyscan', ' - H', 'github.com'
+                ], capture_output = True, text = True, timeout = 10)
 
                 if result.returncode == 0:
                     with open(known_hosts_path, 'a') as f:
@@ -62,7 +62,7 @@ Host *
         # Check if SSH key exists
         key_path = ssh_dir / 'id_rsa'
         if not key_path.exists():
-            logger.info("ℹ️ SSH key not found. Generate one with: ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'")
+            logger.info("ℹ️ SSH key not found. Generate one with: ssh - keygen -t rsa -b 4096 -C 'your_email@example.com'")
 
         return {
             "status": "configured",

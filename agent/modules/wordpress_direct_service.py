@@ -41,16 +41,16 @@ class WordPressDirectService:
         self.password = self.password.strip()
 
         # WordPress REST API base URL
-        self.api_base = f"{self.site_url.rstrip('/')}/wp-json/wp/v2"
+        self.api_base = f"{self.site_url.rstrip('/')} / wp - json / wp / v2"
 
         # Set up multiple authentication methods for bulletproof connection
         self.auth = HTTPBasicAuth(self.username, self.password)
 
         # Headers for API requests
         self.headers = {
-            'User-Agent': 'Skyy Rose AI Agent Platform/3.0',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'User - Agent': 'Skyy Rose AI Agent Platform / 3.0',
+            'Accept': 'application / json',
+            'Content - Type': 'application / json'
         }
 
         # Connection status
@@ -69,7 +69,7 @@ class WordPressDirectService:
             self._try_direct_login_simulation
         ]
 
-        for method_name, method in zip(['REST API', 'XML-RPC', 'Direct Login'], connection_methods):
+        for method_name, method in zip(['REST API', 'XML - RPC', 'Direct Login'], connection_methods):
             try:
                 logger.info(f"🔄 Attempting {method_name} connection...")
                 result = await method()
@@ -95,11 +95,11 @@ class WordPressDirectService:
         try:
             # First, try to get user info with basic auth
             response = requests.get(
-                f"{self.api_base}/users/me",
-                auth=self.auth,
-                headers=self.headers,
-                timeout=15,
-                verify=True
+                f"{self.api_base} / users / me",
+                auth = self.auth,
+                headers = self.headers,
+                timeout = 15,
+                verify = True
             )
 
             if response.status_code == 200:
@@ -107,9 +107,9 @@ class WordPressDirectService:
 
                 # Get site information
                 site_response = requests.get(
-                    f"{self.site_url.rstrip('/')}/wp-json",
-                    headers=self.headers,
-                    timeout=10
+                    f"{self.site_url.rstrip('/')} / wp - json",
+                    headers = self.headers,
+                    timeout = 10
                 )
 
                 site_info = {}
@@ -146,7 +146,7 @@ class WordPressDirectService:
             import xmlrpc.client
 
             # WordPress XML-RPC endpoint
-            xmlrpc_url = f"{self.site_url.rstrip('/')}/xmlrpc.php"
+            xmlrpc_url = f"{self.site_url.rstrip('/')} / xmlrpc.php"
 
             # Create XML-RPC client
             server = xmlrpc.client.ServerProxy(xmlrpc_url)
@@ -166,10 +166,10 @@ class WordPressDirectService:
                     'authenticated': True
                 }
             else:
-                raise Exception("XML-RPC authentication failed")
+                raise Exception("XML - RPC authentication failed")
 
         except Exception as e:
-            logger.error(f"❌ XML-RPC connection failed: {str(e)}")
+            logger.error(f"❌ XML - RPC connection failed: {str(e)}")
             raise e
 
     async def _try_direct_login_simulation(self) -> Dict[str, Any]:
@@ -178,9 +178,9 @@ class WordPressDirectService:
             session = requests.Session()
 
             # Get login page first
-            login_url = f"{self.site_url.rstrip('/')}/wp-login.php"
+            login_url = f"{self.site_url.rstrip('/')} / wp - login.php"
 
-            response = session.get(login_url, timeout=10)
+            response = session.get(login_url, timeout = 10)
 
             if response.status_code == 200:
                 # Extract any necessary tokens or nonces from the login page
@@ -227,9 +227,9 @@ class WordPressDirectService:
                 return {'error': 'Not connected to WordPress'}
 
             response = requests.get(
-                f"{self.api_base}/posts",
-                auth=self.auth,
-                params={'per_page': per_page, '_embed': True}
+                f"{self.api_base} / posts",
+                auth = self.auth,
+                params = {'per_page': per_page, '_embed': True}
             )
             response.raise_for_status()
 
@@ -252,9 +252,9 @@ class WordPressDirectService:
                 return {'error': 'Not connected to WordPress'}
 
             response = requests.get(
-                f"{self.api_base}/pages",
-                auth=self.auth,
-                params={'per_page': per_page, '_embed': True}
+                f"{self.api_base} / pages",
+                auth = self.auth,
+                params = {'per_page': per_page, '_embed': True}
             )
             response.raise_for_status()
 
@@ -278,9 +278,9 @@ class WordPressDirectService:
 
             # Create the page
             response = requests.post(
-                f"{self.api_base}/pages",
-                auth=self.auth,
-                json=page_data
+                f"{self.api_base} / pages",
+                auth = self.auth,
+                json = page_data
             )
             response.raise_for_status()
 
@@ -306,9 +306,9 @@ class WordPressDirectService:
                 return {'error': 'Not connected to WordPress'}
 
             response = requests.post(
-                f"{self.api_base}/posts/{post_id}",
-                auth=self.auth,
-                json=updates
+                f"{self.api_base} / posts / {post_id}",
+                auth = self.auth,
+                json = updates
             )
             response.raise_for_status()
 
@@ -392,7 +392,7 @@ class WordPressDirectService:
                 'Enhance content with luxury brand language',
                 'Add premium imagery to all posts',
                 'Optimize for luxury lifestyle keywords',
-                'Implement luxury call-to-actions'
+                'Implement luxury call - to - actions'
             ]
         }
 
@@ -433,7 +433,7 @@ class WordPressDirectService:
         return [
             {
                 'category': 'luxury_branding',
-                'opportunity': 'Enhance site-wide luxury positioning',
+                'opportunity': 'Enhance site - wide luxury positioning',
                 'impact': 'high',
                 'effort': 'medium',
                 'agent': 'brand_intelligence_agent'

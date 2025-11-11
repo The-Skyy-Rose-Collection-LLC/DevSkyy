@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -186,11 +186,11 @@ class TaskRiskManager:
         priority_order = {"urgent": 4, "high": 3, "medium": 2, "low": 1}
         risk_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
 
-        return sorted(tasks, key=lambda t: (
+        return sorted(tasks, key = lambda t: (
             priority_order.get(t["priority"], 0),
             risk_order.get(t["risk_level"], 0),
             t["estimated_impact"]
-        ), reverse=True)
+        ), reverse = True)
 
     def _initialize_agent_styling(self) -> Dict[str, Any]:
         """Initialize fashion guru styling configuration for agents."""

@@ -24,7 +24,7 @@ class EnhancedLearningScheduler:
         self.learning_active = False
         self.learning_history = []
         self.performance_metrics = {}
-        self.executor = ThreadPoolExecutor(max_workers=3)
+        self.executor = ThreadPoolExecutor(max_workers = 3)
 
     def start_learning_system(self) -> Dict[str, Any]:
         """Start the enhanced learning system with scheduled cycles."""
@@ -41,7 +41,7 @@ class EnhancedLearningScheduler:
             schedule.every().monday.at("02:00").do(self._weekly_optimization_cycle)
 
             # Start scheduler in background thread
-            scheduler_thread = threading.Thread(target=self._run_scheduler, daemon=True)
+            scheduler_thread = threading.Thread(target = self._run_scheduler, daemon = True)
             scheduler_thread.start()
 
             logger.info("🧠 Enhanced learning system started successfully")
@@ -88,14 +88,14 @@ class EnhancedLearningScheduler:
                 "timestamp": datetime.now().isoformat(),
                 "brand_updates": brand_update,
                 "performance_improvement": self._calculate_improvement(),
-                "next_cycle": (datetime.now() + timedelta(hours=1)).isoformat()
+                "next_cycle": (datetime.now() + timedelta(hours = 1)).isoformat()
             }
 
             self.learning_history.append(learning_result)
 
             # Keep only last 100 learning cycles
             if len(self.learning_history) > 100:
-                self.learning_history = self.learning_history[-100:]
+                self.learning_history = self.learning_history[ - 100:]
 
             logger.info("✅ Hourly learning cycle completed")
 
@@ -219,7 +219,7 @@ class EnhancedLearningScheduler:
 
         # Keep only last 30 entries per cycle type
         if len(self.performance_metrics[cycle_type]) > 30:
-            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][-30:]
+            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][ - 30:]
 
     def _calculate_improvement(self) -> float:
         """Calculate performance improvement percentage."""
@@ -239,7 +239,7 @@ class EnhancedLearningScheduler:
         if len(self.learning_history) < 5:
             return {"status": "insufficient_data", "cycles_analyzed": len(self.learning_history)}
 
-        recent_cycles = self.learning_history[-10:]
+        recent_cycles = self.learning_history[ - 10:]
 
         # Analyze success rates
         successful_cycles = sum(1 for cycle in recent_cycles
@@ -289,7 +289,7 @@ class EnhancedLearningScheduler:
 
         # Factor in learning success rate
         if self.learning_history:
-            recent_success = sum(1 for cycle in self.learning_history[-5:]
+            recent_success = sum(1 for cycle in self.learning_history[ - 5:]
                                  if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed")
             success_factor = recent_success / min(5, len(self.learning_history))
             base_score += success_factor * 0.2
@@ -361,7 +361,7 @@ class EnhancedLearningScheduler:
             "learning_cycles_completed": 168,  # 24 hours * 7 days
             "average_performance_score": 0.94,
             "improvement_trend": "positive",
-            "peak_performance_hours": ["10:00-12:00", "14:00-16:00"],
+            "peak_performance_hours": ["10:00 - 12:00", "14:00 - 16:00"],
             "optimization_effectiveness": 0.89
         }
 
@@ -386,13 +386,13 @@ class EnhancedLearningScheduler:
                 "Better context understanding"
             ],
             "algorithm_version": "2.1.0",
-            "performance_impact": "+12% accuracy improvement"
+            "performance_impact": " + 12% accuracy improvement"
         }
 
     def _generate_weekly_report(self) -> Dict[str, Any]:
         """Generate comprehensive weekly performance report."""
         return {
-            "report_period": f"{(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')} to {datetime.now().strftime('%Y-%m-%d')}",
+            "report_period": f"{(datetime.now() - timedelta(days = 7)).strftime('%Y - %m - %d')} to {datetime.now().strftime('%Y - %m - %d')}",
             "overall_performance": "Excellent",
             "key_achievements": [
                 "Maintained 99.5% system uptime",
@@ -402,13 +402,13 @@ class EnhancedLearningScheduler:
             ],
             "areas_for_improvement": [
                 "Mobile performance optimization",
-                "Real-time analytics enhancement",
-                "Cross-agent communication optimization"
+                "Real - time analytics enhancement",
+                "Cross - agent communication optimization"
             ],
             "next_week_goals": [
                 "Implement advanced ML models",
-                "Enhance real-time monitoring",
-                "Improve cross-platform compatibility"
+                "Enhance real - time monitoring",
+                "Improve cross - platform compatibility"
             ]
         }
 
@@ -418,8 +418,8 @@ class EnhancedLearningScheduler:
             return 0.05  # Default improvement for new systems
 
         # Compare recent performance with earlier performance
-        recent_cycles = self.learning_history[-7:]
-        earlier_cycles = self.learning_history[-14:-7] if len(self.learning_history) >= 14 else []
+        recent_cycles = self.learning_history[ - 7:]
+        earlier_cycles = self.learning_history[ - 14: - 7] if len(self.learning_history) >= 14 else []
 
         if not earlier_cycles:
             return 0.05
@@ -434,13 +434,13 @@ class EnhancedLearningScheduler:
         now = datetime.now()
 
         if cycle_type == "hourly":
-            next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+            next_run = now.replace(minute = 0, second = 0, microsecond = 0) + timedelta(hours = 1)
         elif cycle_type == "deep":
-            next_run = now.replace(hour=(now.hour // 6 + 1) * 6, minute=0, second=0, microsecond=0)
+            next_run = now.replace(hour = (now.hour // 6 + 1) * 6, minute = 0, second = 0, microsecond = 0)
             if next_run <= now:
-                next_run += timedelta(hours=6)
+                next_run += timedelta(hours = 6)
         else:
-            next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+            next_run = now.replace(hour = 0, minute = 0, second = 0, microsecond = 0) + timedelta(days = 1)
 
         return next_run.isoformat()
 
@@ -451,7 +451,7 @@ class EnhancedLearningScheduler:
             "total_learning_cycles": len(self.learning_history),
             "recent_performance": self._calculate_improvement(),
             "intelligence_score": self._calculate_intelligence_score(),
-            "last_cycle": self.learning_history[-1] if self.learning_history else None,
+            "last_cycle": self.learning_history[ - 1] if self.learning_history else None,
             "system_health": 0.96,
             "next_cycles": {
                 "hourly": self._get_next_run_time("hourly"),

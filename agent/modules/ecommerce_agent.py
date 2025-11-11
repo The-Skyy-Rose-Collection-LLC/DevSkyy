@@ -9,7 +9,7 @@ import numpy as np
 from decimal import Decimal, ROUND_HALF_UP
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -374,7 +374,7 @@ class EcommerceAgent:
                     })
 
             # Sort by score and return top recommendations
-            recommendations = sorted(all_recommendations, key=lambda x: x["score"], reverse=True)[:limit]
+            recommendations = sorted(all_recommendations, key = lambda x: x["score"], reverse = True)[:limit]
 
             return recommendations
 
@@ -642,7 +642,7 @@ class EcommerceAgent:
     def _validate_email(self, email: str) -> bool:
         """Validate email format."""
         import re
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r'^[a - zA - Z0 - 9._%+-]+@[a - zA - Z0 - 9.-]+\.[a - zA - Z]{2,}$'
         return re.match(pattern, email) is not None
 
     def _find_customer_by_email(self, email: str) -> Optional[Dict]:
@@ -677,7 +677,7 @@ class EcommerceAgent:
             "emails_scheduled": 3,
             "discount_code": f"WELCOME{customer['id'][:8].upper()}",
             "discount_amount": 15,  # 15% off
-            "expiry_date": (datetime.now() + timedelta(days=14)).isoformat()
+            "expiry_date": (datetime.now() + timedelta(days = 14)).isoformat()
         }
 
     def _get_new_customer_recommendations(self, customer: Dict) -> List[str]:
@@ -796,7 +796,7 @@ class EcommerceAgent:
     def _calculate_ship_date(self) -> str:
         """Calculate estimated ship date."""
         # Business days only
-        ship_date = datetime.now() + timedelta(days=2)
+        ship_date = datetime.now() + timedelta(days = 2)
         return ship_date.isoformat()
 
     def _calculate_delivery_date(self, shipping_address: Dict) -> str:
@@ -809,7 +809,7 @@ class EcommerceAgent:
         if state in ["CA", "NY", "FL"]:
             base_days = 3  # Faster for major states
 
-        delivery_date = datetime.now() + timedelta(days=base_days)
+        delivery_date = datetime.now() + timedelta(days = base_days)
         return delivery_date.isoformat()
 
     def _reserve_inventory(self, items: List[Dict]) -> None:
@@ -903,7 +903,7 @@ class EcommerceAgent:
 
     def _calculate_monthly_revenue(self) -> float:
         """Calculate current month revenue."""
-        current_month = datetime.now().replace(day=1)
+        current_month = datetime.now().replace(day = 1)
         monthly_orders = [
             order for order in self.orders.values()
             if datetime.fromisoformat(order["created_at"]) >= current_month
@@ -913,7 +913,7 @@ class EcommerceAgent:
 
     def _count_new_customers(self) -> int:
         """Count new customers in current period."""
-        thirty_days_ago = datetime.now() - timedelta(days=30)
+        thirty_days_ago = datetime.now() - timedelta(days = 30)
         return len([
             c for c in self.customers.values()
             if datetime.fromisoformat(c["created_at"]) >= thirty_days_ago
@@ -980,8 +980,8 @@ class EcommerceAgent:
     def _generate_url_slug(self, name: str) -> str:
         """Generate SEO-friendly URL slug."""
         import re
-        slug = re.sub(r'[^a-zA-Z0-9\s-]', '', name.lower())
-        slug = re.sub(r'\s+', '-', slug.strip())
+        slug = re.sub(r'[^a - zA - Z0 - 9\s - ]', '', name.lower())
+        slug = re.sub(r'\s + ', '-', slug.strip())
         return slug
 
     def _get_competitive_pricing(self, category: ProductCategory) -> Dict[str, float]:
@@ -1016,17 +1016,17 @@ class EcommerceAgent:
         # Return last 30 days of sales data
         sales_data = {}
         for i in range(30):
-            date = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
+            date = (datetime.now() - timedelta(days = i)).strftime("%Y - %m - %d")
             sales_data[date] = np.random.uniform(800, 2500)
         return sales_data
 
     def _analyze_seasonal_trends(self) -> Dict[str, Any]:
         """Analyze seasonal sales trends."""
         return {
-            "peak_season": "Q4 (October-December)",
+            "peak_season": "Q4 (October - December)",
             "growth_periods": ["Valentine's Day", "Mother's Day", "Holiday Season"],
             "seasonal_multiplier": 1.4,
-            "off_season_strategies": ["Summer clearance", "Back-to-school promotions"]
+            "off_season_strategies": ["Summer clearance", "Back - to - school promotions"]
         }
 
     def _analyze_geographic_sales(self) -> Dict[str, Any]:
@@ -1205,7 +1205,7 @@ class EcommerceAgent:
                 "paid_advertising": {"traffic": 13.5, "conversion": 1.9}
             },
             "attribution_model": "last_click",
-            "cross_channel_impact": "email+social highest conversion"
+            "cross_channel_impact": "email + social highest conversion"
         }
 
     def _analyze_email_marketing(self) -> Dict[str, Any]:
@@ -1232,14 +1232,14 @@ class EcommerceAgent:
     def _generate_business_recommendations(self) -> List[str]:
         """Generate strategic business recommendations."""
         return [
-            "Expand product line in high-performing categories",
+            "Expand product line in high - performing categories",
             "Implement dynamic pricing for 32 products",
             "Optimize cart abandonment email sequence",
             "Increase free shipping threshold to $100",
             "Launch loyalty program tier benefits",
             "Invest in mobile app development",
             "Expand to international markets",
-            "Implement AI-powered size recommendations"
+            "Implement AI - powered size recommendations"
         ]
 
     def _forecast_revenue(self) -> Dict[str, Any]:
@@ -1369,7 +1369,7 @@ class EcommerceAgent:
                     "page_load_time": "0.3s",
                     "recommendation_latency": "12ms",
                     "personalization_accuracy": "97.4%",
-                    "customer_satisfaction_prediction": "9.2/10"
+                    "customer_satisfaction_prediction": "9.2 / 10"
                 },
                 "status": "neural_session_active",
                 "timestamp": datetime.now().isoformat()

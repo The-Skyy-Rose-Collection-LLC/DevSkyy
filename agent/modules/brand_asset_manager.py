@@ -19,7 +19,7 @@ class BrandAssetManager:
 
     def __init__(self, storage_path: str = "brand_assets"):
         self.storage_path = Path(storage_path)
-        self.storage_path.mkdir(exist_ok=True)
+        self.storage_path.mkdir(exist_ok = True)
 
         # Create asset categories
         self.categories = {
@@ -34,7 +34,7 @@ class BrandAssetManager:
 
         # Create category directories
         for category_path in self.categories.values():
-            category_path.mkdir(exist_ok=True)
+            category_path.mkdir(exist_ok = True)
 
         self.metadata_file = self.storage_path / "asset_metadata.json"
         self._load_metadata()
@@ -58,7 +58,7 @@ class BrandAssetManager:
         """Save asset metadata to storage."""
         self.metadata["last_updated"] = datetime.now().isoformat()
         with open(self.metadata_file, 'w') as f:
-            json.dump(self.metadata, f, indent=2)
+            json.dump(self.metadata, f, indent = 2)
 
     def upload_asset(self, file_data: bytes, filename: str, category: str,
                      description: str = "", tags: List[str] = None) -> Dict[str, Any]:
@@ -147,8 +147,8 @@ class BrandAssetManager:
         # Recent uploads (last 7)
         analysis["recent_uploads"] = sorted(
             self.metadata["upload_history"],
-            key=lambda x: x["timestamp"],
-            reverse=True
+            key = lambda x: x["timestamp"],
+            reverse = True
         )[:7]
 
         # Generate recommendations

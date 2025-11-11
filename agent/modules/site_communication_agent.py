@@ -91,7 +91,7 @@ class SiteCommunicationAgent:
                 "Elegant Evening Dress",
                 "Signature Handbag"
             ],
-            "peak_hours": ["2PM-4PM", "7PM-9PM"],
+            "peak_hours": ["2PM - 4PM", "7PM - 9PM"],
             "conversion_assistance": "23%"
         }
 
@@ -102,7 +102,7 @@ class SiteCommunicationAgent:
 
         try:
             # Make actual request to check site health
-            response = requests.get(website_url, timeout=10)
+            response = requests.get(website_url, timeout = 10)
 
             health_data = {
                 "website": website_url,
@@ -190,11 +190,11 @@ class SiteCommunicationAgent:
             "analysis_date": datetime.now().isoformat(),
             "demographic_data": {
                 "age_groups": {
-                    "18-24": "22%",
-                    "25-34": "35%",
-                    "35-44": "28%",
-                    "45-54": "12%",
-                    "55+": "3%"
+                    "18 - 24": "22%",
+                    "25 - 34": "35%",
+                    "35 - 44": "28%",
+                    "45 - 54": "12%",
+                    "55 + ": "3%"
                 },
                 "geographic_distribution": {
                     "north_america": "65%",
@@ -216,7 +216,7 @@ class SiteCommunicationAgent:
                     "tablet": "4%"
                 },
                 "shopping_times": {
-                    "peak_hours": ["12PM-2PM", "6PM-8PM"],
+                    "peak_hours": ["12PM - 2PM", "6PM - 8PM"],
                     "peak_days": ["Thursday", "Friday", "Saturday"]
                 },
                 "average_session_duration": "4.2 minutes",
@@ -227,11 +227,11 @@ class SiteCommunicationAgent:
                 "top_categories": ["Fashion", "Jewelry", "Accessories", "Lifestyle"],
                 "brand_affinity": "High - 87% brand loyalty",
                 "price_sensitivity": "Medium",
-                "sustainability_interest": "High - 73% prefer eco-friendly options"
+                "sustainability_interest": "High - 73% prefer eco - friendly options"
             },
             "marketing_insights": {
                 "effective_channels": ["Instagram", "Email", "Google Ads"],
-                "content_preferences": ["Product videos", "Style guides", "Behind-the-scenes"],
+                "content_preferences": ["Product videos", "Style guides", "Behind - the - scenes"],
                 "seasonal_trends": ["Spring collections popular", "Holiday jewelry peak"]
             }
         }
@@ -268,7 +268,7 @@ class SiteCommunicationAgent:
             },
             "actionable_recommendations": [
                 "Continue monitoring site performance",
-                "Leverage mobile-first approach for 68% mobile users",
+                "Leverage mobile - first approach for 68% mobile users",
                 "Focus marketing on peak conversion times",
                 "Enhance chatbot capabilities for better customer support"
             ],
@@ -354,19 +354,19 @@ class SiteCommunicationAgent:
                     "conversion_probability": 87.6,
                     "churn_risk_assessment": 2.3,
                     "lifetime_value_prediction": 1247.89,
-                    "engagement_optimization": "+234%"
+                    "engagement_optimization": " + 234%"
                 },
                 "communication_optimization": {
                     "response_time": "0.23s",
-                    "accuracy_improvement": "+45.7%",
-                    "customer_satisfaction": "+67.2%",
+                    "accuracy_improvement": " + 45.7%",
+                    "customer_satisfaction": " + 67.2%",
                     "conversation_completion": "94.8%",
-                    "escalation_reduction": "-78.4%"
+                    "escalation_reduction": " - 78.4%"
                 },
                 "neural_insights": [
                     "Customers respond 34% better to empathetic language",
                     "Emotional state prediction accuracy at 99.7%",
-                    "Quantum analytics identify micro-conversion opportunities",
+                    "Quantum analytics identify micro - conversion opportunities",
                     "Neural adaptation reduces response time by 67%",
                     "AI personality matching increases satisfaction by 89%"
                 ],
@@ -374,8 +374,8 @@ class SiteCommunicationAgent:
                     "Quantum user behavior modeling",
                     "Neural emotional intelligence",
                     "Predictive conversation routing",
-                    "AI-powered empathy simulation",
-                    "Real-time personality adaptation"
+                    "AI - powered empathy simulation",
+                    "Real - time personality adaptation"
                 ],
                 "quantum_advantages": {
                     "parallel_conversation_analysis": "infinite",

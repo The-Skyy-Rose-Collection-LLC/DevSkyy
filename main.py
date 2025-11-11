@@ -47,18 +47,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(
-    title="The Skyy Rose Collection - DevSkyy Enhanced Platform",
-    version="2.0.0",
-    description="Production-grade AI-powered platform for luxury e-commerce",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    title = "The Skyy Rose Collection - DevSkyy Enhanced Platform",
+    version = "2.0.0",
+    description = "Production - grade AI - powered platform for luxury e - commerce",
+    docs_url = " / docs",
+    redoc_url = " / redoc"
 )
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
+    level = logging.INFO,
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers = [
         logging.StreamHandler(sys.stdout),
         logging.FileHandler("app.log")
     ]
@@ -69,9 +69,9 @@ logger = logging.getLogger(__name__)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
 )
 
 app.add_middleware(
@@ -86,8 +86,8 @@ app.add_middleware(
 async def http_exception_handler(request: Request, exc: HTTPException):
     logger.error(f"HTTP {exc.status_code}: {exc.detail} - {request.url}")
     return JSONResponse(
-        status_code=exc.status_code,
-        content={
+        status_code = exc.status_code,
+        content = {
             "error": True,
             "message": exc.detail,
             "status_code": exc.status_code,
@@ -100,8 +100,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation error: {exc} - {request.url}")
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content = {
             "error": True,
             "message": "Invalid request data",
             "details": exc.errors(),
@@ -114,8 +114,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def general_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unexpected error: {exc} - {request.url}")
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content = {
             "error": True,
             "message": "Internal server error",
             "path": str(request.url)
@@ -136,7 +136,7 @@ def get_brand_intelligence():
 def get_agent(agent_name: str):
     """Get or create agent instance (lazy initialization with caching)."""
     global _agent_cache
-    
+
     if agent_name not in _agent_cache:
         # Agent factory mapping
         agent_factories = {
@@ -160,13 +160,13 @@ def get_agent(agent_name: str):
             "email_sms_automation": lambda: EmailSMSAutomationAgent(),
             "design_automation": lambda: DesignAutomationAgent()
         }
-        
+
         if agent_name in agent_factories:
             _agent_cache[agent_name] = agent_factories[agent_name]()
-            
+
             # Inject brand intelligence for applicable agents
-            if agent_name in ["inventory", "financial", "ecommerce", "wordpress", 
-                            "web_development", "site_communication", "seo_marketing", 
+            if agent_name in ["inventory", "financial", "ecommerce", "wordpress",
+                            "web_development", "site_communication", "seo_marketing",
                             "customer_service", "security", "performance"]:
                 brand_intelligence = get_brand_intelligence()
                 agent = _agent_cache[agent_name]
@@ -176,7 +176,7 @@ def get_agent(agent_name: str):
                     setattr(agent, 'brand_context', brand_intelligence.get_brand_context_for_agent(agent_name))
         else:
             raise ValueError(f"Unknown agent: {agent_name}")
-    
+
     return _agent_cache[agent_name]
 
 # Convenience functions for backward compatibility
@@ -210,7 +210,7 @@ def run_agent() -> dict:
     return {"status": "completed"}
 
 
-@app.post("/run")
+@app.post(" / run")
 def run() -> dict:
     """Endpoint to trigger the DevSkyy agent workflow."""
     try:
@@ -220,7 +220,7 @@ def run() -> dict:
         return result
     except Exception as e:
         logger.error(f"DevSkyy workflow failed: {e}")
-        raise HTTPException(status_code=500, detail="Workflow execution failed")
+        raise HTTPException(status_code = 500, detail = "Workflow execution failed")
 
 
 @app.get("/")
@@ -234,7 +234,7 @@ def root() -> dict:
     }
 
 
-@app.get("/health")
+@app.get(" / health")
 def health_check() -> dict:
     """Comprehensive health check endpoint."""
     try:
@@ -252,10 +252,10 @@ def health_check() -> dict:
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        raise HTTPException(status_code=503, detail="Service temporarily unavailable")
+        raise HTTPException(status_code = 503, detail = "Service temporarily unavailable")
 
 
-@app.get("/metrics")
+@app.get(" / metrics")
 def get_metrics() -> dict:
     """System metrics endpoint for monitoring."""
     try:
@@ -270,16 +270,16 @@ def get_metrics() -> dict:
         }
     except Exception as e:
         logger.error(f"Metrics collection failed: {e}")
-        raise HTTPException(status_code=500, detail="Failed to collect metrics")
+        raise HTTPException(status_code = 500, detail = "Failed to collect metrics")
 
 
-@app.get("/cache/stats")
+@app.get(" / cache / stats")
 def get_cache_stats() -> Dict[str, Any]:
     """Get cache statistics."""
     return cache_manager.get_stats()
 
 
-@app.post("/cache/clear")
+@app.post(" / cache / clear")
 def clear_cache() -> Dict[str, Any]:
     """Clear all cache entries."""
     cache_manager.clear()
@@ -287,13 +287,13 @@ def clear_cache() -> Dict[str, Any]:
 
 
 # Database Optimization Endpoints
-@app.get("/database/stats")
+@app.get(" / database / stats")
 def get_database_performance_stats() -> Dict[str, Any]:
     """Get database performance statistics."""
     return get_database_stats()
 
 
-@app.post("/database/optimize")
+@app.post(" / database / optimize")
 async def optimize_database_queries() -> Dict[str, Any]:
     """Run database optimization analysis."""
     try:
@@ -303,10 +303,10 @@ async def optimize_database_queries() -> Dict[str, Any]:
             "SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC",
             "SELECT p.*, c.name FROM products p JOIN categories c ON p.category_id = c.id"
         ]
-        
+
         # Get index recommendations
         recommendations = index_optimizer.analyze_table("products", query_patterns)
-        
+
         return {
             "optimization_status": "completed",
             "recommendations": recommendations,
@@ -315,26 +315,26 @@ async def optimize_database_queries() -> Dict[str, Any]:
         }
     except Exception as e:
         logger.error(f"Database optimization failed: {e}")
-        raise HTTPException(status_code=500, detail="Database optimization failed")
+        raise HTTPException(status_code = 500, detail = "Database optimization failed")
 
 
-@app.get("/database/health")
+@app.get(" / database / health")
 async def check_database_health() -> Dict[str, Any]:
     """Check database health and performance."""
     try:
         stats = get_database_stats()
-        
+
         # Calculate health score
         query_stats = stats['query_optimizer']
         health_score = 100
-        
+
         if query_stats['slow_query_rate'] > 20:
             health_score -= 30
         if query_stats['cache_hit_rate'] < 50:
             health_score -= 20
         if stats['connection_pool']['connection_stats']['errors'] > 10:
             health_score -= 25
-        
+
         return {
             "health_score": max(0, health_score),
             "status": "healthy" if health_score > 80 else "needs_attention",
@@ -348,11 +348,11 @@ async def check_database_health() -> Dict[str, Any]:
         }
     except Exception as e:
         logger.error(f"Database health check failed: {e}")
-        raise HTTPException(status_code=500, detail="Database health check failed")
+        raise HTTPException(status_code = 500, detail = "Database health check failed")
 
 
 # Agent Scanning Endpoints
-@app.post("/scan/agents")
+@app.post(" / scan / agents")
 async def scan_agents() -> Dict[str, Any]:
     """Dedicated agent analysis endpoint - scan all agent modules for health and issues."""
     try:
@@ -362,33 +362,33 @@ async def scan_agents() -> Dict[str, Any]:
         return result
     except Exception as e:
         logger.error(f"Agent scan failed: {e}")
-        raise HTTPException(status_code=500, detail="Agent scan failed")
+        raise HTTPException(status_code = 500, detail = "Agent scan failed")
 
 
-@app.post("/scan/site")
+@app.post(" / scan / site")
 def scan_site_endpoint() -> Dict[str, Any]:
     """Enhanced site scan including comprehensive agent analysis."""
     try:
         logger.info("Starting enhanced site scan")
         site_result = scan_site()
         agent_result = scan_agents_only()
-        
+
         # Combine results
         enhanced_result = {
             **site_result,
             "agent_analysis": agent_result.get("agent_modules", {}),
             "scan_type": "comprehensive"
         }
-        
+
         logger.info("Enhanced site scan completed successfully")
         return enhanced_result
     except Exception as e:
         logger.error(f"Enhanced site scan failed: {e}")
-        raise HTTPException(status_code=500, detail="Enhanced site scan failed")
+        raise HTTPException(status_code = 500, detail = "Enhanced site scan failed")
 
 
 # Inventory Management Endpoints
-@app.post("/inventory/scan")
+@app.post(" / inventory / scan")
 async def scan_inventory() -> Dict[str, Any]:
     """Scan and analyze all digital assets."""
     inventory_agent = get_inventory_agent()
@@ -402,24 +402,24 @@ async def scan_inventory() -> Dict[str, Any]:
     }
 
 
-@app.get("/inventory/report")
+@app.get(" / inventory / report")
 @cached(ttl=300)  # Cache for 5 minutes
 def get_inventory_report() -> Dict[str, Any]:
     """Get comprehensive inventory report."""
     return get_inventory_agent().generate_report()
 
 
-@app.post("/inventory/cleanup")
+@app.post(" / inventory / cleanup")
 def cleanup_duplicates(keep_strategy: str = "latest") -> Dict[str, Any]:
     """Remove duplicate assets."""
     if keep_strategy not in ["latest", "largest", "first"]:
-        raise HTTPException(status_code=400, detail="Invalid keep_strategy")
+        raise HTTPException(status_code = 400, detail = "Invalid keep_strategy")
 
     result = get_inventory_agent().remove_duplicates(keep_strategy)
     return result
 
 
-@app.get("/inventory/visualize")
+@app.get(" / inventory / visualize")
 def visualize_similarities() -> Dict[str, str]:
     """Get visual representation of asset similarities."""
     visualization = get_inventory_agent().visualize_similarities()
@@ -427,7 +427,7 @@ def visualize_similarities() -> Dict[str, str]:
 
 
 # Financial Management Endpoints
-@app.post("/payments/process")
+@app.post(" / payments / process")
 def process_payment(payment_data: PaymentRequest) -> Dict[str, Any]:
     """Process a payment transaction."""
     try:
@@ -440,34 +440,34 @@ def process_payment(payment_data: PaymentRequest) -> Dict[str, Any]:
         return result
     except Exception as e:
         logger.error(f"Payment processing failed: {e}")
-        raise HTTPException(status_code=500, detail="Payment processing failed")
+        raise HTTPException(status_code = 500, detail = "Payment processing failed")
 
 
-@app.post("/chargebacks/create")
+@app.post(" / chargebacks / create")
 def create_chargeback(transaction_id: str, reason: str, amount: float = None) -> Dict[str, Any]:
     """Create a chargeback case."""
     try:
         chargeback_reason = ChargebackReason(reason.lower())
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid chargeback reason")
+        raise HTTPException(status_code = 400, detail = "Invalid chargeback reason")
 
     return financial_agent.create_chargeback(transaction_id, chargeback_reason, amount)
 
 
-@app.post("/chargebacks/{chargeback_id}/evidence")
+@app.post(" / chargebacks / {chargeback_id} / evidence")
 def submit_chargeback_evidence(chargeback_id: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
     """Submit evidence for a chargeback dispute."""
     return financial_agent.submit_chargeback_evidence(chargeback_id, evidence)
 
 
-@app.get("/financial/dashboard")
+@app.get(" / financial / dashboard")
 def get_financial_dashboard() -> Dict[str, Any]:
     """Get comprehensive financial dashboard."""
     return financial_agent.get_financial_dashboard()
 
 
 # Ecommerce Management Endpoints
-@app.post("/products/add")
+@app.post(" / products / add")
 def add_product(product_data: ProductRequest) -> Dict[str, Any]:
     """Add a new product to the catalog."""
     try:
@@ -482,68 +482,68 @@ def add_product(product_data: ProductRequest) -> Dict[str, Any]:
         return result
     except Exception as e:
         logger.error(f"Product addition failed: {e}")
-        raise HTTPException(status_code=500, detail="Failed to add product")
+        raise HTTPException(status_code = 500, detail = "Failed to add product")
 
 
-@app.post("/inventory/{product_id}/update")
+@app.post(" / inventory / {product_id} / update")
 def update_inventory(product_id: str, quantity_change: int) -> Dict[str, Any]:
     """Update product inventory levels."""
     return ecommerce_agent.update_inventory(product_id, quantity_change)
 
 
-@app.post("/customers/create")
+@app.post(" / customers / create")
 def create_customer(email: str, first_name: str, last_name: str,
                     phone: str = "", preferences: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create a new customer profile."""
     return ecommerce_agent.create_customer(email, first_name, last_name, phone, None, preferences)
 
 
-@app.post("/orders/create")
+@app.post(" / orders / create")
 def create_order(customer_id: str, items: List[Dict[str, Any]],
                  shipping_address: Dict[str, str], billing_address: Dict[str, str] = None) -> Dict[str, Any]:
     """Create a new order."""
     return ecommerce_agent.create_order(customer_id, items, shipping_address, billing_address)
 
 
-@app.get("/customers/{customer_id}/recommendations")
+@app.get(" / customers / {customer_id} / recommendations")
 def get_recommendations(customer_id: str, limit: int = 5) -> List[Dict[str, Any]]:
     """Get product recommendations for a customer."""
     return ecommerce_agent.get_product_recommendations(customer_id, limit)
 
 
-@app.get("/analytics/report")
+@app.get(" / analytics / report")
 def get_analytics_report() -> Dict[str, Any]:
     """Get comprehensive analytics report."""
     return ecommerce_agent.generate_analytics_report()
 
 
 # WordPress/Divi Management Endpoints
-@app.post("/wordpress/analyze-layout")
+@app.post(" / wordpress / analyze - layout")
 def analyze_divi_layout(layout_data: str) -> Dict[str, Any]:
     """Analyze Divi layout structure and performance."""
     return wordpress_agent.analyze_divi_layout(layout_data)
 
 
-@app.post("/wordpress/fix-layout")
+@app.post(" / wordpress / fix - layout")
 def fix_divi_layout(layout_data: str) -> Dict[str, Any]:
     """Fix Divi layout issues and optimize structure."""
     return wordpress_agent.fix_divi_layout_issues(layout_data)
 
 
-@app.post("/wordpress/generate-css")
+@app.post(" / wordpress / generate - css")
 def generate_custom_css(requirements: Dict[str, Any]) -> Dict[str, str]:
     """Generate production-ready custom CSS for Divi."""
     css = wordpress_agent.generate_divi_custom_css(requirements)
     return {"custom_css": css}
 
 
-@app.get("/wordpress/audit-woocommerce")
+@app.get(" / wordpress / audit - woocommerce")
 def audit_woocommerce() -> Dict[str, Any]:
     """Audit WooCommerce configuration and performance."""
     return wordpress_agent.audit_woocommerce_setup()
 
 
-@app.post("/wordpress/generate-layout/{layout_type}")
+@app.post(" / wordpress / generate - layout / {layout_type}")
 def generate_divi_layout(layout_type: str) -> Dict[str, str]:
     """Generate production-ready Divi 5 layout structures."""
     layout = wordpress_agent.generate_divi_5_layout(layout_type)
@@ -551,57 +551,57 @@ def generate_divi_layout(layout_type: str) -> Dict[str, str]:
 
 
 # Web Development & Code Fixing Endpoints
-@app.post("/webdev/analyze-code")
+@app.post(" / webdev / analyze - code")
 def analyze_code(code: str, language: str) -> Dict[str, Any]:
     """Analyze code quality and identify issues."""
     return web_dev_agent.analyze_code_quality(code, language)
 
 
-@app.post("/webdev/fix-code")
+@app.post(" / webdev / fix - code")
 def fix_code_issues(code: str, language: str) -> Dict[str, Any]:
     """Automatically fix common code issues."""
     return web_dev_agent.fix_code_issues(code, language)
 
 
-@app.post("/webdev/optimize-structure")
+@app.post(" / webdev / optimize - structure")
 def optimize_page_structure(html_content: str) -> Dict[str, Any]:
     """Optimize HTML page structure for SEO and performance."""
     return web_dev_agent.optimize_page_structure(html_content)
 
 
 # Site Communication & Insights Endpoints
-@app.post("/site/connect-chatbot")
+@app.post(" / site / connect - chatbot")
 async def connect_chatbot(website_url: str, api_key: str = None) -> Dict[str, Any]:
     """Connect to website chatbot for insights."""
     return await site_comm_agent.connect_to_chatbot(website_url, api_key)
 
 
-@app.get("/site/health-insights")
+@app.get(" / site / health - insights")
 def get_site_health(website_url: str) -> Dict[str, Any]:
     """Get comprehensive site health insights."""
     return site_comm_agent.gather_site_health_insights(website_url)
 
 
-@app.get("/site/customer-feedback")
+@app.get(" / site / customer - feedback")
 def get_customer_feedback(website_url: str) -> Dict[str, Any]:
     """Analyze customer feedback and sentiment."""
     return site_comm_agent.analyze_customer_feedback(website_url)
 
 
-@app.get("/site/market-insights")
+@app.get(" / site / market - insights")
 def get_market_insights(website_url: str) -> Dict[str, Any]:
     """Get target market insights and behavior analysis."""
     return site_comm_agent.get_target_market_insights(website_url)
 
 
-@app.get("/site/comprehensive-report")
+@app.get(" / site / comprehensive - report")
 def get_site_report(website_url: str) -> Dict[str, Any]:
     """Generate comprehensive site insights report."""
     return site_comm_agent.generate_comprehensive_report(website_url)
 
 
 # Enhanced Agent Management Endpoints
-@app.get("/agents/status")
+@app.get(" / agents / status")
 def get_all_agents_status() -> Dict[str, Any]:
     """Get comprehensive status of all agents with fashion guru styling."""
     try:
@@ -749,10 +749,10 @@ def get_all_agents_status() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/tasks/prioritized")
+@app.get(" / tasks / prioritized")
 async def get_prioritized_tasks(
     risk_level: str = None,
     agent_type: str = None,
@@ -771,10 +771,10 @@ async def get_prioritized_tasks(
         return await task_risk_manager.get_prioritized_task_list(filters)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/tasks/create")
+@app.post(" / tasks / create")
 async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new task with risk assessment."""
     try:
@@ -782,10 +782,10 @@ async def create_new_task(task_data: Dict[str, Any]) -> Dict[str, Any]:
         return await task_risk_manager.create_task(agent_type, task_data)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.put("/tasks/{task_id}/status")
+@app.put(" / tasks / {task_id} / status")
 async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[str, Any]:
     """Update task status and trigger automation if applicable."""
     try:
@@ -794,25 +794,25 @@ async def update_task_status(task_id: str, status_data: Dict[str, Any]) -> Dict[
         return await task_risk_manager.update_task_status(task_id, status, updates)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # SEO Marketing Agent Endpoints
 
 
-@app.get("/seo/analysis")
+@app.get(" / seo / analysis")
 async def get_seo_analysis() -> Dict[str, Any]:
     """Get comprehensive SEO analysis with fashion trend insights."""
     return await seo_marketing_agent.analyze_seo_performance()
 
 
 # Customer Service Agent Endpoints
-@app.get("/customer-service/satisfaction")
+@app.get(" / customer - service / satisfaction")
 async def get_customer_satisfaction() -> Dict[str, Any]:
     """Get comprehensive customer satisfaction analysis."""
     return await customer_service_agent.analyze_customer_satisfaction()
 
 
-@app.post("/customer-service/inquiry")
+@app.post(" / customer - service / inquiry")
 async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any]:
     """Handle customer inquiry with luxury service standards."""
     inquiry_type = inquiry_data.get("type", "general")
@@ -823,13 +823,13 @@ async def handle_customer_inquiry(inquiry_data: Dict[str, Any]) -> Dict[str, Any
 # Security Agent Endpoints
 
 
-@app.get("/security/assessment")
+@app.get(" / security / assessment")
 async def get_security_assessment() -> Dict[str, Any]:
     """Get comprehensive security assessment for luxury e-commerce."""
     return await security_agent.security_assessment()
 
 
-@app.post("/security/fraud-check")
+@app.post(" / security / fraud - check")
 async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, Any]:
     """Analyze transaction for fraud indicators with luxury-specific checks."""
     return await security_agent.fraud_detection_analysis(transaction_data)
@@ -837,31 +837,31 @@ async def check_fraud_indicators(transaction_data: Dict[str, Any]) -> Dict[str, 
 # Performance Agent Endpoints
 
 
-@app.get("/performance/analysis")
+@app.get(" / performance / analysis")
 async def get_performance_analysis() -> Dict[str, Any]:
     """Get comprehensive site performance analysis."""
     return await performance_agent.analyze_site_performance()
 
 
-@app.get("/performance/realtime")
+@app.get(" / performance / realtime")
 async def get_realtime_performance() -> Dict[str, Any]:
     """Get real-time performance metrics and alerts."""
     return await performance_agent.monitor_real_time_performance()
 
 
-@app.post("/performance/code-analysis")
+@app.post(" / performance / code - analysis")
 async def analyze_code_performance(code_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal code analysis and optimization for any programming language."""
     return await performance_agent.analyze_and_fix_code(code_data)
 
 
-@app.post("/performance/debug-error")
+@app.post(" / performance / debug - error")
 async def debug_application_error(error_data: Dict[str, Any]) -> Dict[str, Any]:
     """Universal debugging for any web application error."""
     return await performance_agent.debug_application_error(error_data)
 
 
-@app.post("/performance/optimize-fullstack")
+@app.post(" / performance / optimize - fullstack")
 async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive full-stack performance optimization."""
     return await performance_agent.optimize_full_stack_performance(stack_data)
@@ -869,19 +869,19 @@ async def optimize_full_stack_performance(stack_data: Dict[str, Any]) -> Dict[st
 # Enhanced Financial Agent Endpoints
 
 
-@app.post("/financial/tax-preparation")
+@app.post(" / financial / tax - preparation")
 async def prepare_tax_returns(tax_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive tax preparation and optimization service."""
     return await financial_agent.prepare_tax_returns(tax_data)
 
 
-@app.post("/financial/credit-analysis")
+@app.post(" / financial / credit - analysis")
 async def analyze_business_credit(credit_data: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive business credit analysis and improvement planning."""
     return await financial_agent.analyze_business_credit(credit_data)
 
 
-@app.post("/financial/advisory")
+@app.post(" / financial / advisory")
 async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[str, Any]:
     """Comprehensive financial advisory services for business growth."""
     return await financial_agent.provide_financial_advisory(advisory_request)
@@ -889,7 +889,7 @@ async def provide_financial_advisory(advisory_request: Dict[str, Any]) -> Dict[s
 # Integration Management Endpoints
 
 
-@app.get("/integrations/services")
+@app.get(" / integrations / services")
 async def get_supported_services() -> Dict[str, Any]:
     """Get all supported integration services."""
     try:
@@ -900,10 +900,10 @@ async def get_supported_services() -> Dict[str, Any]:
             "security_features": agent_assignment_manager.security_manager
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/integrations/create")
+@app.post(" / integrations / create")
 async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new integration between an agent and external service."""
     try:
@@ -913,32 +913,32 @@ async def create_integration(integration_data: Dict[str, Any]) -> Dict[str, Any]
         credentials = integration_data.get("credentials", {})
 
         if not all([agent_type, service_type, service_name]):
-            raise HTTPException(status_code=400, detail="Missing required fields")
+            raise HTTPException(status_code = 400, detail = "Missing required fields")
 
         return await agent_assignment_manager.create_integration(agent_type, service_type, service_name, credentials)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/integrations/agent/{agent_type}")
+@app.get(" / integrations / agent / {agent_type}")
 async def get_agent_integrations(agent_type: str) -> Dict[str, Any]:
     """Get all integrations for a specific agent."""
     try:
         return await agent_assignment_manager.get_agent_integrations(agent_type)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/integrations/{integration_id}/sync")
+@app.post(" / integrations / {integration_id} / sync")
 async def sync_integration_data(integration_id: str) -> Dict[str, Any]:
     """Sync data from integrated service."""
     try:
         return await agent_assignment_manager.sync_integration_data(integration_id)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/integrations/status")
+@app.get(" / integrations / status")
 async def get_integrations_overview() -> Dict[str, Any]:
     """Get overview of all integrations across agents."""
     try:
@@ -962,72 +962,72 @@ async def get_integrations_overview() -> Dict[str, Any]:
             service_name = integration["service_name"]
             service_counts[service_name] = service_counts.get(service_name, 0) + 1
 
-        overview["popular_services"] = dict(sorted(service_counts.items(), key=lambda x: x[1], reverse=True)[:5])
+        overview["popular_services"] = dict(sorted(service_counts.items(), key = lambda x: x[1], reverse = True)[:5])
 
         return overview
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # Frontend Agent Assignment Endpoints
 
 
-@app.post("/frontend/assign-agents")
+@app.post(" / frontend / assign - agents")
 async def assign_frontend_agents(frontend_request: Dict[str, Any]) -> Dict[str, Any]:
     """Assign agents specifically for frontend procedures with strict frontend-only focus."""
     try:
         return await agent_assignment_manager.assign_frontend_agents(frontend_request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/frontend/agents/status")
+@app.get(" / frontend / agents / status")
 async def get_frontend_agent_status() -> Dict[str, Any]:
     """Get comprehensive status of all frontend agents."""
     try:
         return await agent_assignment_manager.get_frontend_agent_status()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/frontend/collections/create")
+@app.post(" / frontend / collections / create")
 async def create_luxury_collection_page(collection_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a luxury collection page designed like top-selling landing pages."""
     try:
         return await agent_assignment_manager.create_luxury_collection_page(collection_data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/frontend/monitoring/24-7")
+@app.get(" / frontend / monitoring / 24 - 7")
 async def get_24_7_monitoring_status() -> Dict[str, Any]:
     """Get current status of 24/7 monitoring system."""
     try:
         return await agent_assignment_manager.get_24_7_monitoring_status()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/frontend/optimize-workload")
+@app.post(" / frontend / optimize - workload")
 async def optimize_frontend_workload(optimization_request: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize frontend agent workload distribution."""
     try:
         return await agent_assignment_manager.optimize_agent_workload(optimization_request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/frontend/assignments/{role}")
+@app.get(" / frontend / assignments / {role}")
 async def get_frontend_role_assignments(role: str = None) -> Dict[str, Any]:
     """Get current frontend agent assignments for specific role or all roles."""
     try:
         return await agent_assignment_manager.get_role_assignments(role)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # WordPress Integration Endpoints
 
 
-@app.get("/wordpress/auth-url")
+@app.get(" / wordpress / auth - url")
 async def get_wordpress_auth_url(state: str = None) -> Dict[str, Any]:
     """Get WordPress OAuth authorization URL."""
     try:
@@ -1042,10 +1042,10 @@ async def get_wordpress_auth_url(state: str = None) -> Dict[str, Any]:
         }
     except Exception as e:
         logger.error(f"Auth URL generation failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/auth/callback")
+@app.post(" / wordpress / auth / callback")
 async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, Any]:
     """Handle WordPress OAuth callback and exchange code for token."""
     try:
@@ -1066,7 +1066,7 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
 
         if not authorization_code:
             logger.error("❌ No authorization code received")
-            raise HTTPException(status_code=400, detail="Authorization code required")
+            raise HTTPException(status_code = 400, detail = "Authorization code required")
 
         logger.info(f"✅ Exchanging code for token: {authorization_code[:10]}...")
         result = await wordpress_service.exchange_code_for_token(authorization_code)
@@ -1079,7 +1079,7 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
                 "site_info": result.get('site_info'),
                 "agent_capabilities": result.get('agent_capabilities'),
                 "next_steps": [
-                    "Agents will begin 24/7 monitoring and optimization",
+                    "Agents will begin 24 / 7 monitoring and optimization",
                     "Collection pages can now be created automatically",
                     "Performance improvements will start immediately",
                     "Brand consistency will be enforced across all content"
@@ -1091,10 +1091,10 @@ async def wordpress_auth_callback(callback_data: Dict[str, Any]) -> Dict[str, An
 
     except Exception as e:
         logger.error(f"❌ Callback handling failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/auth/wordpress/callback")
+@app.get(" / auth / wordpress / callback")
 async def wordpress_auth_callback_get(
     code: str = None,
     error: str = None,
@@ -1150,7 +1150,7 @@ async def wordpress_auth_callback_get(
         }
 
 
-@app.get("/wordpress/site/info")
+@app.get(" / wordpress / site / info")
 async def get_wordpress_site_info() -> Dict[str, Any]:
     """Get WordPress site information and agent status."""
     try:
@@ -1164,10 +1164,10 @@ async def get_wordpress_site_info() -> Dict[str, Any]:
             "last_updated": datetime.now().isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/posts")
+@app.get(" / wordpress / posts")
 async def get_wordpress_posts(limit: int = 10, post_type: str = 'post') -> Dict[str, Any]:
     """Get WordPress posts for agent analysis and optimization."""
     try:
@@ -1178,10 +1178,10 @@ async def get_wordpress_posts(limit: int = 10, post_type: str = 'post') -> Dict[
             "improvement_opportunities": await _analyze_content_opportunities(posts)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/pages")
+@app.get(" / wordpress / pages")
 async def get_wordpress_pages(limit: int = 20) -> Dict[str, Any]:
     """Get WordPress pages for agent optimization."""
     try:
@@ -1192,10 +1192,10 @@ async def get_wordpress_pages(limit: int = 20) -> Dict[str, Any]:
             "luxury_enhancement_opportunities": await _analyze_luxury_opportunities(pages)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/theme")
+@app.get(" / wordpress / theme")
 async def get_wordpress_theme_info() -> Dict[str, Any]:
     """Get WordPress theme information for design agents."""
     try:
@@ -1207,10 +1207,10 @@ async def get_wordpress_theme_info() -> Dict[str, Any]:
             "luxury_branding_opportunities": theme_info.get('luxury_optimization_opportunities', [])
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/content/update")
+@app.post(" / wordpress / content / update")
 async def update_wordpress_content(update_request: Dict[str, Any]) -> Dict[str, Any]:
     """Update WordPress content with agent improvements."""
     try:
@@ -1218,20 +1218,20 @@ async def update_wordpress_content(update_request: Dict[str, Any]) -> Dict[str, 
         content_updates = update_request.get('updates', {})
 
         if not post_id:
-            raise HTTPException(status_code=400, detail="Post ID required")
+            raise HTTPException(status_code = 400, detail = "Post ID required")
 
         result = await wordpress_service.update_site_content(post_id, content_updates)
         return {
             "update_result": result,
             "agent_responsible": "design_automation_agent",
             "improvements_applied": result.get('agent_improvements', {}),
-            "next_optimization_scheduled": (datetime.now() + timedelta(hours=24)).isoformat()
+            "next_optimization_scheduled": (datetime.now() + timedelta(hours = 24)).isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/collection/create")
+@app.post(" / wordpress / collection / create")
 async def create_wordpress_collection_page(collection_request: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury collection page on WordPress site."""
     try:
@@ -1251,10 +1251,10 @@ async def create_wordpress_collection_page(collection_request: Dict[str, Any]) -
             return {"status": "error", "message": result.get('error')}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/performance/monitor")
+@app.get(" / wordpress / performance / monitor")
 async def monitor_wordpress_performance() -> Dict[str, Any]:
     """Get WordPress site performance monitoring from agents."""
     try:
@@ -1266,7 +1266,7 @@ async def monitor_wordpress_performance() -> Dict[str, Any]:
             "next_performance_check": performance_data.get('next_check')
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # Helper functions for WordPress integration
 
@@ -1279,7 +1279,7 @@ async def _analyze_content_opportunities(posts_data: Dict[str, Any]) -> List[str
         "Content readability improvements",
         "Image optimization and alt tags",
         "Internal linking enhancement",
-        "Call-to-action optimization"
+        "Call - to - action optimization"
     ]
 
 
@@ -1288,7 +1288,7 @@ async def _analyze_luxury_opportunities(pages_data: Dict[str, Any]) -> List[str]
     return [
         "Premium color scheme implementation",
         "Luxury typography upgrades",
-        "High-end imagery integration",
+        "High - end imagery integration",
         "Conversion rate optimization",
         "Mobile luxury experience enhancement",
         "Premium animation effects"
@@ -1321,7 +1321,7 @@ async def _get_design_recommendations(theme_info: Dict[str, Any]) -> List[Dict[s
 # WordPress Direct Connection Endpoints (Application Password Method)
 
 
-@app.post("/wordpress/connect-direct")
+@app.post(" / wordpress / connect - direct")
 async def connect_wordpress_direct() -> Dict[str, Any]:
     """BULLETPROOF WordPress direct connection with guaranteed success."""
     try:
@@ -1347,24 +1347,24 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
                     '⚡ Performance agent optimizing site speed and security',
                     '👑 Brand intelligence agent ensuring luxury consistency',
                     '🌐 WordPress specialist managing content and plugins',
-                    '🛒 WooCommerce integration ready for e-commerce optimization',
+                    '🛒 WooCommerce integration ready for e - commerce optimization',
                     '📊 Analytics agent tracking performance metrics',
                     '🔒 Security agent protecting against threats',
                     '📱 Social media integration ready for viral campaigns'
                 ],
                 'agent_capabilities': [
                     '✅ Automatic content optimization',
-                    '✅ Real-time performance monitoring',
+                    '✅ Real - time performance monitoring',
                     '✅ Security threat detection',
                     '✅ SEO enhancement automation',
                     '✅ Brand consistency enforcement',
-                    '✅ E-commerce optimization',
+                    '✅ E - commerce optimization',
                     '✅ Social media automation',
                     '✅ Customer experience enhancement'
                 ],
                 'status_message': '🚀 skyyrose.co is now connected and being optimized by your luxury AI agents!',
                 'next_steps': [
-                    'Agents are now monitoring your site 24/7',
+                    'Agents are now monitoring your site 24 / 7',
                     'Performance optimizations will begin automatically',
                     'Brand consistency will be enforced across all content',
                     'Security monitoring is now active'
@@ -1401,18 +1401,18 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
                     '⚡ Performance optimization in progress',
                     '👑 Brand intelligence ensuring luxury standards',
                     '🌐 WordPress management fully operational',
-                    '🛒 WooCommerce integration ready for e-commerce optimization',
+                    '🛒 WooCommerce integration ready for e - commerce optimization',
                     '📊 Analytics agent tracking performance metrics',
                     '🔒 Security agent protecting against threats',
                     '📱 Social media integration ready for viral campaigns'
                 ],
                 'agent_capabilities': [
                     '✅ Automatic content optimization',
-                    '✅ Real-time performance monitoring',
+                    '✅ Real - time performance monitoring',
                     '✅ Security threat detection',
                     '✅ SEO enhancement automation',
                     '✅ Brand consistency enforcement',
-                    '✅ E-commerce optimization',
+                    '✅ E - commerce optimization',
                     '✅ Social media automation',
                     '✅ Customer experience enhancement'
                 ],
@@ -1430,7 +1430,7 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
                     'luxury_score': 95
                 },
                 'next_steps': [
-                    'Agents are now monitoring your site 24/7',
+                    'Agents are now monitoring your site 24 / 7',
                     'Performance optimizations will begin automatically',
                     'Brand consistency will be enforced across all content',
                     'Security monitoring is now active'
@@ -1455,18 +1455,18 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
                 '⚡ Performance Agent: Boosting site speed',
                 '👑 Brand Agent: Maintaining luxury standards',
                 '🌐 Content Agent: Optimizing all content',
-                '🛒 WooCommerce integration ready for e-commerce optimization',
+                '🛒 WooCommerce integration ready for e - commerce optimization',
                 '📊 Analytics agent tracking performance metrics',
                 '🔒 Security agent protecting against threats',
                 '📱 Social media integration ready for viral campaigns'
             ],
             'agent_capabilities': [
                 '✅ Automatic content optimization',
-                '✅ Real-time performance monitoring',
+                '✅ Real - time performance monitoring',
                 '✅ Security threat detection',
                 '✅ SEO enhancement automation',
                 '✅ Brand consistency enforcement',
-                '✅ E-commerce optimization',
+                '✅ E - commerce optimization',
                 '✅ Social media automation',
                 '✅ Customer experience enhancement'
             ],
@@ -1497,7 +1497,7 @@ async def connect_wordpress_direct() -> Dict[str, Any]:
         }
 
 
-@app.get("/wordpress/site-status")
+@app.get(" / wordpress / site - status")
 async def get_wordpress_site_status() -> Dict[str, Any]:
     """Get comprehensive WordPress site status and agent activity."""
     try:
@@ -1522,10 +1522,10 @@ async def get_wordpress_site_status() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/create-luxury-page")
+@app.post(" / wordpress / create - luxury - page")
 async def create_wordpress_luxury_page(page_request: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury page directly on WordPress site."""
     try:
@@ -1556,10 +1556,10 @@ async def create_wordpress_luxury_page(page_request: Dict[str, Any]) -> Dict[str
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/posts-analysis")
+@app.get(" / wordpress / posts - analysis")
 async def get_wordpress_posts_analysis() -> Dict[str, Any]:
     """Get AI-powered analysis of WordPress posts for luxury optimization."""
     try:
@@ -1576,12 +1576,12 @@ async def get_wordpress_posts_analysis() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # WooCommerce Integration Endpoints
 
 
-@app.get("/woocommerce/products")
+@app.get(" / woocommerce / products")
 async def get_woocommerce_products(per_page: int = 20, category: str = None) -> Dict[str, Any]:
     """Get WooCommerce products for luxury optimization."""
     try:
@@ -1593,10 +1593,10 @@ async def get_woocommerce_products(per_page: int = 20, category: str = None) -> 
             "agent_recommendations": "ready_for_luxury_enhancement"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/woocommerce/orders")
+@app.get(" / woocommerce / orders")
 async def get_woocommerce_orders(per_page: int = 20, status: str = None) -> Dict[str, Any]:
     """Get WooCommerce orders for revenue analysis."""
     try:
@@ -1608,10 +1608,10 @@ async def get_woocommerce_orders(per_page: int = 20, status: str = None) -> Dict
             "luxury_performance": "analyzed_for_optimization"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/woocommerce/product/create")
+@app.post(" / woocommerce / product / create")
 async def create_luxury_woocommerce_product(product_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create luxury product with AI optimization."""
     try:
@@ -1628,10 +1628,10 @@ async def create_luxury_woocommerce_product(product_data: Dict[str, Any]) -> Dic
             "agent_responsible": "ai_enhanced_design_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.put("/woocommerce/product/{product_id}/optimize")
+@app.put(" / woocommerce / product / {product_id} / optimize")
 async def optimize_woocommerce_product(product_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize existing product with luxury AI enhancements."""
     try:
@@ -1648,10 +1648,10 @@ async def optimize_woocommerce_product(product_id: int, updates: Dict[str, Any])
             "conversion_impact": "positive"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/woocommerce/analytics")
+@app.get(" / woocommerce / analytics")
 async def get_woocommerce_analytics(period: str = '7d') -> Dict[str, Any]:
     """Get WooCommerce analytics with luxury insights."""
     try:
@@ -1663,12 +1663,12 @@ async def get_woocommerce_analytics(period: str = '7d') -> Dict[str, Any]:
             "agent_recommendations": analytics.get('agent_recommendations', [])
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # OpenAI Intelligence Endpoints
 
 
-@app.post("/ai/content-strategy")
+@app.post(" / ai / content - strategy")
 async def generate_ai_content_strategy(site_data: Dict[str, Any]) -> Dict[str, Any]:
     """Generate AI-powered luxury content strategy."""
     try:
@@ -1676,29 +1676,29 @@ async def generate_ai_content_strategy(site_data: Dict[str, Any]) -> Dict[str, A
         return {
             "content_strategy": strategy,
             "implementation_guide": "detailed_strategic_roadmap",
-            "expected_roi": strategy.get('expected_roi', '+200%'),
+            "expected_roi": strategy.get('expected_roi', ' + 200%'),
             "agent_responsible": "openai_enhanced_strategy_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/seo-optimize")
+@app.post(" / ai / seo - optimize")
 async def ai_optimize_page_seo(page_data: Dict[str, Any]) -> Dict[str, Any]:
     """Use AI to optimize page content for luxury SEO."""
     try:
         optimization = await openai_service.optimize_page_content_for_seo(page_data)
         return {
             "seo_optimization": optimization,
-            "traffic_potential": optimization.get('expected_traffic_increase', '+150%'),
+            "traffic_potential": optimization.get('expected_traffic_increase', ' + 150%'),
             "keyword_strategy": "luxury_focused_optimization",
             "agent_responsible": "openai_enhanced_seo_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/competitor-analysis")
+@app.post(" / ai / competitor - analysis")
 async def ai_competitor_analysis(competitor_data: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered competitive analysis for luxury brands."""
     try:
@@ -1710,10 +1710,10 @@ async def ai_competitor_analysis(competitor_data: Dict[str, Any]) -> Dict[str, A
             "agent_responsible": "openai_enhanced_intelligence_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/email-campaign")
+@app.post(" / ai / email - campaign")
 async def generate_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Generate luxury email campaign with AI."""
     try:
@@ -1727,10 +1727,10 @@ async def generate_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str,
             "agent_responsible": "openai_enhanced_email_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/executive-decision")
+@app.post(" / ai / executive - decision")
 async def ai_executive_decision(decision_context: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered executive business decision making."""
     try:
@@ -1742,22 +1742,22 @@ async def ai_executive_decision(decision_context: Dict[str, Any]) -> Dict[str, A
             "agent_responsible": "openai_enhanced_executive_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/conversion-optimize")
+@app.post(" / ai / conversion - optimize")
 async def ai_optimize_conversion_funnel(funnel_data: Dict[str, Any]) -> Dict[str, Any]:
     """AI-powered conversion funnel optimization."""
     try:
         optimization = await openai_service.optimize_conversion_funnel(funnel_data)
         return {
             "funnel_optimization": optimization,
-            "expected_improvement": optimization.get('expected_improvement', '+40%'),
+            "expected_improvement": optimization.get('expected_improvement', ' + 40%'),
             "implementation_complexity": optimization.get('implementation_complexity', 'moderate'),
             "agent_responsible": "openai_enhanced_conversion_agent"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 # Helper function to set WooCommerce URL when WordPress connects
 
@@ -1770,7 +1770,7 @@ async def setup_woocommerce_integration(site_url: str):
 # Risk Management Endpoints
 
 
-@app.get("/risks/dashboard")
+@app.get(" / risks / dashboard")
 async def get_risk_dashboard() -> Dict[str, Any]:
     """Get comprehensive risk dashboard with prioritization."""
     try:
@@ -1817,40 +1817,40 @@ async def get_risk_dashboard() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/experimental/quantum-inventory")
+@app.post(" / experimental / quantum - inventory")
 async def quantum_inventory_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum inventory optimization."""
     return await inventory_agent.quantum_asset_optimization()
 
 
-@app.post("/experimental/blockchain-audit")
+@app.post(" / experimental / blockchain - audit")
 async def blockchain_financial_audit() -> Dict[str, Any]:
     """EXPERIMENTAL: Blockchain financial audit."""
     return await financial_agent.experimental_blockchain_audit()
 
 
-@app.post("/experimental/neural-commerce/{customer_id}")
+@app.post(" / experimental / neural - commerce / {customer_id}")
 async def neural_commerce_session(customer_id: str) -> Dict[str, Any]:
     """EXPERIMENTAL: Neural commerce experience."""
     return await ecommerce_agent.experimental_neural_commerce_session(customer_id)
 
 
-@app.post("/experimental/quantum-wordpress")
+@app.post(" / experimental / quantum - wordpress")
 async def quantum_wordpress_optimization() -> Dict[str, Any]:
     """EXPERIMENTAL: Quantum WordPress optimization."""
     return await wordpress_agent.experimental_quantum_wordpress_optimization()
 
 
-@app.post("/experimental/neural-code")
+@app.post(" / experimental / neural - code")
 async def neural_code_generation(requirements: str, language: str = "javascript") -> Dict[str, Any]:
     """EXPERIMENTAL: Neural code generation."""
     return await web_dev_agent.experimental_neural_code_generation(requirements, language)
 
 
-@app.post("/experimental/neural-communication")
+@app.post(" / experimental / neural - communication")
 async def neural_communication_analysis(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
     """EXPERIMENTAL: Neural communication analysis."""
     return await site_comm_agent.experimental_neural_communication_analysis(website_url)
@@ -1858,7 +1858,7 @@ async def neural_communication_analysis(website_url: str = "https://theskyy-rose
 # Comprehensive Automation Empire Endpoints
 
 
-@app.get("/marketing/social-campaigns")
+@app.get(" / marketing / social - campaigns")
 async def get_social_campaigns() -> Dict[str, Any]:
     """Get social media campaigns with luxury branding focus."""
     try:
@@ -1895,10 +1895,10 @@ async def get_social_campaigns() -> Dict[str, Any]:
             }
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/integrations/social-platforms")
+@app.get(" / integrations / social - platforms")
 async def get_social_platforms() -> Dict[str, Any]:
     """Get social media platform connection status."""
     try:
@@ -1936,10 +1936,10 @@ async def get_social_platforms() -> Dict[str, Any]:
             }
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/marketing/campaign")
+@app.post(" / marketing / campaign")
 async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create new marketing campaign with AI optimization."""
     try:
@@ -1961,10 +1961,10 @@ async def create_marketing_campaign(campaign_data: Dict[str, Any]) -> Dict[str, 
             "status": "active"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/integrations/social-connect")
+@app.post(" / integrations / social - connect")
 async def connect_social_platform(connection_data: Dict[str, Any]) -> Dict[str, Any]:
     """Connect social media platform for automation."""
     try:
@@ -1987,10 +1987,10 @@ async def connect_social_platform(connection_data: Dict[str, Any]) -> Dict[str, 
             "next_step": "complete_oauth_flow"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/marketing/sms-campaign")
+@app.post(" / marketing / sms - campaign")
 async def create_sms_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create SMS marketing campaign with luxury focus."""
     try:
@@ -2008,10 +2008,10 @@ async def create_sms_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
             "campaign_id": f"sms_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/ai/email-campaign")
+@app.post(" / ai / email - campaign")
 async def create_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create AI-powered email campaign."""
     try:
@@ -2034,10 +2034,10 @@ async def create_ai_email_campaign(campaign_data: Dict[str, Any]) -> Dict[str, A
             "campaign_id": f"email_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/theme/deploy")
+@app.post(" / wordpress / theme / deploy")
 async def deploy_wordpress_theme(theme_data: Dict[str, Any]) -> Dict[str, Any]:
     """Deploy luxury WordPress theme with brand assets."""
     try:
@@ -2062,10 +2062,10 @@ async def deploy_wordpress_theme(theme_data: Dict[str, Any]) -> Dict[str, Any]:
             "message": f"🎨 Luxury theme '{layout_id}' deployed successfully with your brand assets!"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/section/create")
+@app.post(" / wordpress / section / create")
 async def create_custom_section(section_data: Dict[str, Any]) -> Dict[str, Any]:
     """Create custom WordPress section with luxury styling."""
     try:
@@ -2086,10 +2086,10 @@ async def create_custom_section(section_data: Dict[str, Any]) -> Dict[str, Any]:
             "divi_compatible": True
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/automation/quick-action")
+@app.post(" / automation / quick - action")
 async def execute_quick_action(action_data: Dict[str, Any]) -> Dict[str, Any]:
     """Execute quick automation actions."""
     try:
@@ -2100,8 +2100,8 @@ async def execute_quick_action(action_data: Dict[str, Any]) -> Dict[str, Any]:
             "social_campaign": {
                 "action": "social_campaign_launched",
                 "platform": "instagram_tiktok",
-                "estimated_reach": "50K+",
-                "content": "AI-generated luxury streetwear content"
+                "estimated_reach": "50K + ",
+                "content": "AI - generated luxury streetwear content"
             },
             "vip_email": {
                 "action": "vip_email_sent",
@@ -2131,10 +2131,10 @@ async def execute_quick_action(action_data: Dict[str, Any]) -> Dict[str, Any]:
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/recent-fixes")
+@app.get(" / wordpress / recent - fixes")
 async def get_wordpress_recent_fixes() -> Dict[str, Any]:
     """Get recent WordPress fixes made by agents."""
     try:
@@ -2179,10 +2179,10 @@ async def get_wordpress_recent_fixes() -> Dict[str, Any]:
             ]
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.get("/wordpress/upcoming-tasks")
+@app.get(" / wordpress / upcoming - tasks")
 async def get_wordpress_upcoming_tasks() -> Dict[str, Any]:
     """Get upcoming WordPress tasks for agents."""
     try:
@@ -2199,7 +2199,7 @@ async def get_wordpress_upcoming_tasks() -> Dict[str, Any]:
                 {
                     "id": 2,
                     "title": "WooCommerce Integration Enhancement",
-                    "agent": "E-commerce Agent",
+                    "agent": "E - commerce Agent",
                     "priority": "medium",
                     "eta": "2 hours",
                     "type": "ecommerce"
@@ -2215,10 +2215,10 @@ async def get_wordpress_upcoming_tasks() -> Dict[str, Any]:
             ]
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/wordpress/server-access")
+@app.post(" / wordpress / server - access")
 async def initialize_wordpress_server_access() -> Dict[str, Any]:
     """Initialize GOD MODE LEVEL 2: Full WordPress server access for deep optimization."""
     try:
@@ -2251,9 +2251,9 @@ async def initialize_wordpress_server_access() -> Dict[str, Any]:
                 'god_mode_level': 2,
                 'server_capabilities': [
                     '🔧 Direct file system access and modification',
-                    '📊 Real-time server performance monitoring',
+                    '📊 Real - time server performance monitoring',
                     '🧠 Deep brand learning from all site files',
-                    '⚡ Server-level performance optimizations',
+                    '⚡ Server - level performance optimizations',
                     '🔒 Advanced security hardening',
                     '🎨 Asset optimization and management',
                     '📈 Comprehensive analytics and insights',
@@ -2330,7 +2330,7 @@ async def initialize_wordpress_server_access() -> Dict[str, Any]:
 # Enhanced DevSkyy Workflow Endpoint with Brand Intelligence
 
 
-@app.post("/devskyy/full-optimization")
+@app.post(" / devskyy / full - optimization")
 async def run_full_optimization(website_url: str = "https://theskyy-rose-collection.com") -> Dict[str, Any]:
     """Run comprehensive DevSkyy optimization with brand-aware agents."""
 
@@ -2374,33 +2374,33 @@ async def run_full_optimization(website_url: str = "https://theskyy-rose-collect
 
 
 # Brand Intelligence Endpoints
-@app.get("/brand/intelligence")
+@app.get(" / brand / intelligence")
 def get_brand_intelligence_api() -> Dict[str, Any]:
     """Get comprehensive brand intelligence analysis."""
     brand_intelligence = get_brand_intelligence()
     return brand_intelligence.analyze_brand_assets()
 
 
-@app.get("/brand/context/{agent_type}")
+@app.get(" / brand / context / {agent_type}")
 def get_brand_context(agent_type: str) -> Dict[str, Any]:
     """Get brand context for specific agent type."""
     brand_intelligence = get_brand_intelligence()
     return brand_intelligence.get_brand_context_for_agent(agent_type)
 
 
-@app.post("/brand/learning-cycle")
+@app.post(" / brand / learning - cycle")
 async def run_learning_cycle() -> Dict[str, Any]:
     """Execute continuous brand learning cycle."""
     return await brand_intelligence.continuous_learning_cycle()
 
 
-@app.get("/brand/latest-drop")
+@app.get(" / brand / latest - drop")
 def get_latest_drop() -> Dict[str, Any]:
     """Get information about the latest product drop."""
     return brand_intelligence._get_latest_drop()
 
 
-@app.get("/brand/evolution")
+@app.get(" / brand / evolution")
 def get_brand_evolution() -> Dict[str, Any]:
     """Get brand evolution timeline and changes."""
     return {
@@ -2412,7 +2412,7 @@ def get_brand_evolution() -> Dict[str, Any]:
 # Enhanced Combined Dashboard Endpoint
 
 
-@app.get("/dashboard")
+@app.get(" / dashboard")
 async def get_dashboard():
     """Get comprehensive business dashboard."""
     try:
@@ -2429,10 +2429,10 @@ async def get_dashboard():
             "last_updated": datetime.now().isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code = 500, detail = str(e))
 
 
-@app.post("/github/push")
+@app.post(" / github / push")
 async def push_to_github():
     """Push all current changes to GitHub repository."""
     try:
@@ -2443,7 +2443,7 @@ async def push_to_github():
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to push to GitHub: {str(e)}")
+        raise HTTPException(status_code = 500, detail = f"Failed to push to GitHub: {str(e)}")
 
 # Start enhanced learning system on import
 enhanced_learning_status = start_enhanced_learning_system(get_brand_intelligence())
@@ -2452,7 +2452,7 @@ enhanced_learning_status = start_enhanced_learning_system(get_brand_intelligence
 start_cache_cleanup()
 
 
-@app.get("/learning/status")
+@app.get(" / learning / status")
 def get_learning_status() -> Dict[str, Any]:
     """Get enhanced learning system status."""
     return {
@@ -2503,4 +2503,4 @@ if __name__ == "__main__":
     logger.info("📚 Continuous Learning: ACTIVE")
     logger.info("⚡ Setting the Bar for AI Agents")
     logger.info("🌐 Server starting on http://0.0.0.0:5000")
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host = "0.0.0.0", port = 5000)

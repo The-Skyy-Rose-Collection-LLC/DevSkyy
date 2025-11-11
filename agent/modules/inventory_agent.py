@@ -15,7 +15,7 @@ import imagehash
 from PIL import Image
 import os
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -357,8 +357,8 @@ class InventoryAgent:
 
         # Group by similarity (simplified)
         for i in range(0, len(image_assets), 10):
-            if len(image_assets[i:i+3]) > 1:
-                similar_groups.append(image_assets[i:i+3])
+            if len(image_assets[i:i + 3]) > 1:
+                similar_groups.append(image_assets[i:i + 3])
 
         return similar_groups
 
@@ -370,8 +370,8 @@ class InventoryAgent:
 
         # Group by content similarity (simplified)
         for i in range(0, len(doc_assets), 8):
-            if len(doc_assets[i:i+2]) > 1:
-                content_groups.append(doc_assets[i:i+2])
+            if len(doc_assets[i:i + 2]) > 1:
+                content_groups.append(doc_assets[i:i + 2])
 
         return content_groups
 
@@ -401,7 +401,7 @@ class InventoryAgent:
             for group in groups:
                 if len(group) > 1:
                     # Keep largest, remove others
-                    sorted_group = sorted(group, key=lambda x: x['size'], reverse=True)
+                    sorted_group = sorted(group, key = lambda x: x['size'], reverse = True)
                     for asset in sorted_group[1:]:
                         total_savings += asset['size']
 
@@ -437,11 +437,11 @@ class InventoryAgent:
         """Select which asset to keep based on strategy."""
         if strategy == "latest":
             # Use the existing 'modified' key recorded during scanning.
-            return max(group, key=lambda x: x.get('modified', 0))
+            return max(group, key = lambda x: x.get('modified', 0))
         elif strategy == "largest":
-            return max(group, key=lambda x: x['size'])
+            return max(group, key = lambda x: x['size'])
         elif strategy == "highest_quality":
-            return max(group, key=lambda x: x.get('quality_score', 0))
+            return max(group, key = lambda x: x.get('quality_score', 0))
         else:  # first
             return group[0]
 
@@ -482,14 +482,14 @@ class InventoryAgent:
     def _create_interactive_visualization(self, data: Dict) -> str:
         """Create interactive visualization markup."""
         return f"""
-        <div class="similarity-visualization">
-            <h3>Asset Similarity Analysis</h3>
-            <p>Matrix Size: {data['matrix_size']} assets</p>
-            <p>Clusters: {data['clusters_identified']}</p>
-            <div class="chart-container">
+        <div class = "similarity - visualization">
+            <h3>Asset Similarity Analysis< / h3>
+            <p>Matrix Size: {data['matrix_size']} assets< / p>
+            <p>Clusters: {data['clusters_identified']}< / p>
+            <div class = "chart - container">
                 [Interactive similarity chart would be rendered here]
-            </div>
-        </div>
+            < / div>
+        < / div>
         """
 
     def _calculate_storage_efficiency(self) -> float:
@@ -536,7 +536,7 @@ class InventoryAgent:
     def _generate_strategic_recommendations(self) -> List[str]:
         """Generate strategic recommendations for inventory management."""
         return [
-            "Implement AI-powered auto-tagging for new uploads",
+            "Implement AI - powered auto - tagging for new uploads",
             "Establish monthly inventory review cycles",
             "Create asset approval workflow for brand compliance",
             "Set up automated duplicate detection for uploads",
@@ -548,7 +548,7 @@ class InventoryAgent:
         return {
             "growth_rate": "15% monthly",
             "popular_categories": ["product_images", "marketing_materials"],
-            "usage_patterns": {"peak_hours": "9-11 AM, 2-4 PM", "seasonal_spikes": "Q4"},
+            "usage_patterns": {"peak_hours": "9 - 11 AM, 2 - 4 PM", "seasonal_spikes": "Q4"},
             "storage_trends": {"growth_projection": "2.1TB by year end"}
         }
 
@@ -587,7 +587,7 @@ class InventoryAgent:
     def _get_last_scan_info(self) -> Dict[str, Any]:
         """Get information about the last scan."""
         return {
-            "last_scan": (datetime.now() - timedelta(hours=2)).isoformat(),
+            "last_scan": (datetime.now() - timedelta(hours = 2)).isoformat(),
             "assets_scanned": 1000,
             "issues_found": 46,
             "status": "completed"
@@ -672,7 +672,7 @@ class InventoryAgent:
         # Simulate quantum asset analysis
         asset_count = len(assets)
         if asset_count > 1000:
-            quantum_recs.append("QUANTUM: Implement superposition-based asset clustering")
+            quantum_recs.append("QUANTUM: Implement superposition - based asset clustering")
         if asset_count > 500:
             quantum_recs.append("QUANTUM: Enable entangled asset relationship mapping")
 
@@ -701,8 +701,8 @@ class InventoryAgent:
                 "asset_reorganization": {
                     "clusters_identified": 23,
                     "optimization_score": 94.7,
-                    "storage_efficiency": "+23.4%",
-                    "access_pattern_optimization": "+31.2%"
+                    "storage_efficiency": " + 23.4%",
+                    "access_pattern_optimization": " + 31.2%"
                 },
                 "experimental_features": [
                     "Quantum superposition asset states",

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import json
 import random
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -168,7 +168,7 @@ class DesignAutomationAgent:
                 "conversion_optimization": self._optimize_for_conversions(page_type),
                 "generated_code": self._generate_frontend_code(component_library, layout_structure),
                 "design_preview": self._create_design_preview_url(),
-                "estimated_development_time": "2-3 days",
+                "estimated_development_time": "2 - 3 days",
                 "luxury_score": self._calculate_luxury_design_score(design_system),
                 "created_at": datetime.now().isoformat()
             }
@@ -453,28 +453,28 @@ class DesignAutomationAgent:
         return {
             "html_structure": """
 <!DOCTYPE html>
-<html lang="en" class="luxury-theme">
+<html lang = "en" class = "luxury - theme">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxury Fashion Collection</title>
+    <meta charset = "UTF - 8">
+    <meta name = "viewport" content = "width = device - width, initial - scale = 1.0">
+    <title>Luxury Fashion Collection< / title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="luxury-styles.css">
-</head>
+    <link rel = "stylesheet" href = "luxury - styles.css">
+< / head>
 <body>
-    <header class="luxury-header">
-        <nav class="luxury-nav">
+    <header class = "luxury - header">
+        <nav class = "luxury - nav">
             <!-- Navigation components -->
-        </nav>
-    </header>
-    <main class="luxury-main">
+        < / nav>
+    < / header>
+    <main class = "luxury - main">
         <!-- Main content components -->
-    </main>
-    <footer class="luxury-footer">
+    < / main>
+    <footer class = "luxury - footer">
         <!-- Footer components -->
-    </footer>
-</body>
-</html>
+    < / footer>
+< / body>
+< / html>
             """,
             "css_styles": """
 :root {
@@ -483,55 +483,55 @@ class DesignAutomationAgent:
     --deep-black: #0A0A0A;
     --pearl-white: #FEFEFE;
     --champagne: #F7E7CE;
-    
-    --font-luxury: 'Playfair Display', serif;
-    --font-elegant: 'Inter', sans-serif;
-    
-    --shadow-elegant: 0 4px 24px rgba(232, 180, 184, 0.15);
-    --shadow-luxury: 0 8px 40px rgba(232, 180, 184, 0.25);
+
+    --font - luxury: 'Playfair Display', serif;
+    --font - elegant: 'Inter', sans - serif;
+
+    --shadow - elegant: 0 4px 24px rgba(232, 180, 184, 0.15);
+    --shadow - luxury: 0 8px 40px rgba(232, 180, 184, 0.25);
 }
 
-.luxury-theme {
-    font-family: var(--font-elegant);
-    color: var(--deep-black);
-    background: linear-gradient(135deg, var(--pearl-white) 0%, var(--champagne) 100%);
+.luxury - theme {
+    font - family: var(--font - elegant);
+    color: var(--deep - black);
+    background: linear - gradient(135deg, var(--pearl - white) 0%, var(--champagne) 100%);
 }
 
-.luxury-header {
+.luxury - header {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-elegant);
+    backdrop - filter: blur(10px);
+    box - shadow: var(--shadow - elegant);
     transition: all 0.3s ease;
 }
 
-.luxury-button {
-    background: linear-gradient(45deg, var(--rose-gold), var(--luxury-gold));
+.luxury - button {
+    background: linear - gradient(45deg, var(--rose - gold), var(--luxury - gold));
     color: white;
     border: none;
     padding: 12px 32px;
-    border-radius: 50px;
-    font-weight: 600;
+    border - radius: 50px;
+    font - weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-elegant);
+    box - shadow: var(--shadow - elegant);
 }
 
-.luxury-button:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-luxury);
+.luxury - button:hover {
+    transform: translateY( - 2px);
+    box - shadow: var(--shadow - luxury);
 }
 
-.luxury-card {
+.luxury - card {
     background: white;
-    border-radius: 16px;
+    border - radius: 16px;
     padding: 32px;
-    box-shadow: var(--shadow-elegant);
+    box - shadow: var(--shadow - elegant);
     transition: all 0.3s ease;
 }
 
-.luxury-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-luxury);
+.luxury - card:hover {
+    transform: translateY( - 8px);
+    box - shadow: var(--shadow - luxury);
 }
             """,
             "javascript_interactions": """
@@ -542,39 +542,39 @@ class LuxuryInteractions {
         this.initHoverEffects();
         this.initFormInteractions();
     }
-    
+
     initScrollAnimations() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-in');
+                    entry.target.classList.add('animate - in');
                 }
             });
         }, { threshold: 0.1 });
-        
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+
+        document.querySelectorAll('.animate - on - scroll').forEach(el => {
             observer.observe(el);
         });
     }
-    
+
     initHoverEffects() {
-        document.querySelectorAll('.luxury-card').forEach(card => {
+        document.querySelectorAll('.luxury - card').forEach(card => {
             card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-8px) scale(1.02)';
+                card.style.transform = 'translateY( - 8px) scale(1.02)';
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0) scale(1)';
             });
         });
     }
-    
+
     initFormInteractions() {
-        document.querySelectorAll('.luxury-input').forEach(input => {
+        document.querySelectorAll('.luxury - input').forEach(input => {
             input.addEventListener('focus', () => {
                 input.parentElement.classList.add('focused');
             });
-            
+
             input.addEventListener('blur', () => {
                 if (!input.value) {
                     input.parentElement.classList.remove('focused');
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             "overall_luxury_score": round(overall_score, 1),
             "score_breakdown": score_factors,
-            "luxury_grade": "Premium" if overall_score > 90 else "High-End" if overall_score > 80 else "Standard",
+            "luxury_grade": "Premium" if overall_score > 90 else "High - End" if overall_score > 80 else "Standard",
             "improvement_areas": [k for k, v in score_factors.items() if v < 90]
         }
 
@@ -795,45 +795,45 @@ document.addEventListener('DOMContentLoaded', () => {
     --luxury-primary: {colors[0] if len(colors) > 0 else '#E8B4B8'};
     --luxury-secondary: {colors[1] if len(colors) > 1 else '#FFD700'};
     --luxury-accent: {colors[2] if len(colors) > 2 else '#C0C0C0'};
-    --luxury-heading-font: '{fonts[0] if len(fonts) > 0 else 'Playfair Display'}', serif;
-    --luxury-body-font: '{fonts[1] if len(fonts) > 1 else 'Montserrat'}', sans-serif;
+    --luxury - heading - font: '{fonts[0] if len(fonts) > 0 else 'Playfair Display'}', serif;
+    --luxury - body - font: '{fonts[1] if len(fonts) > 1 else 'Montserrat'}', sans - serif;
 }}
 
-.luxury-theme {{
-    font-family: var(--luxury-body-font);
+.luxury - theme {{
+    font - family: var(--luxury - body - font);
     color: #333;
 }}
 
-.luxury-header {{
-    background: linear-gradient(135deg, var(--luxury-primary), var(--luxury-secondary));
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+.luxury - header {{
+    background: linear - gradient(135deg, var(--luxury - primary), var(--luxury - secondary));
+    backdrop - filter: blur(10px);
+    box - shadow: 0 4px 20px rgba(0,0,0,0.1);
 }}
 
-.luxury-button {{
-    background: linear-gradient(45deg, var(--luxury-primary), var(--luxury-secondary));
+.luxury - button {{
+    background: linear - gradient(45deg, var(--luxury - primary), var(--luxury - secondary));
     color: white;
     border: none;
     padding: 12px 32px;
-    border-radius: 50px;
-    font-weight: 600;
+    border - radius: 50px;
+    font - weight: 600;
     transition: all 0.3s ease;
     cursor: pointer;
 }}
 
-.luxury-button:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+.luxury - button:hover {{
+    transform: translateY( - 2px);
+    box - shadow: 0 8px 25px rgba(0,0,0,0.15);
 }}
 
-.luxury-section {{
+.luxury - section {{
     padding: 80px 0;
     background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }}
 
 h1, h2, h3, h4, h5, h6 {{
-    font-family: var(--luxury-heading-font);
-    color: var(--luxury-primary);
+    font - family: var(--luxury - heading - font);
+    color: var(--luxury - primary);
 }}
         """
 
@@ -917,37 +917,37 @@ h1, h2, h3, h4, h5, h6 {{
         """Generate section code."""
         return {
             "html": f"""
-<section class="luxury-section {structure.get('layout', 'default')}">
-    <div class="container">
-        <div class="section-content">
-            <h2 class="section-title">{structure.get('title', 'Section Title')}</h2>
-            <p class="section-subtitle">{structure.get('subtitle', 'Section Description')}</p>
-            <div class="section-elements">
+<section class = "luxury - section {structure.get('layout', 'default')}">
+    <div class = "container">
+        <div class = "section - content">
+            <h2 class = "section - title">{structure.get('title', 'Section Title')}< / h2>
+            <p class = "section - subtitle">{structure.get('subtitle', 'Section Description')}< / p>
+            <div class = "section - elements">
                 <!-- Section elements will be rendered here -->
-            </div>
-        </div>
-    </div>
-</section>
+            < / div>
+        < / div>
+    < / div>
+< / section>
             """,
             "css": """
-.luxury-section {
+.luxury - section {
     padding: 80px 0;
     background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
 }
 
-.section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
+.section - title {
+    font - family: 'Playfair Display', serif;
+    font - size: 2.5rem;
     color: #E8B4B8;
-    text-align: center;
-    margin-bottom: 1rem;
+    text - align: center;
+    margin - bottom: 1rem;
 }
 
-.section-subtitle {
-    font-size: 1.2rem;
+.section - subtitle {
+    font - size: 1.2rem;
     color: #666;
-    text-align: center;
-    margin-bottom: 3rem;
+    text - align: center;
+    margin - bottom: 3rem;
 }
             """
         }

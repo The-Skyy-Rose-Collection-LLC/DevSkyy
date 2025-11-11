@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class BrandIntelligenceAgent:
     """
-    Production-level Brand Intelligence Agent for The Skyy Rose Collection.
+    Production - level Brand Intelligence Agent for The Skyy Rose Collection.
     Provides comprehensive brand analysis, context awareness, and strategic insights.
     """
 
@@ -24,14 +24,14 @@ class BrandIntelligenceAgent:
             "luxury": "Premium quality fashion and accessories",
             "elegance": "Sophisticated and timeless designs",
             "empowerment": "Empowering women through beautiful fashion",
-            "sustainability": "Eco-conscious and ethical practices",
-            "innovation": "Cutting-edge design and technology"
+            "sustainability": "Eco - conscious and ethical practices",
+            "innovation": "Cutting - edge design and technology"
         }
 
         self.target_demographics = {
-            "primary": "Women aged 25-45, fashion-conscious, higher income",
+            "primary": "Women aged 25 - 45, fashion - conscious, higher income",
             "secondary": "Young professionals, fashion enthusiasts, luxury buyers",
-            "psychographics": "Quality-focused, brand-loyal, socially conscious"
+            "psychographics": "Quality - focused, brand - loyal, socially conscious"
         }
 
         self.brand_colors = {
@@ -77,7 +77,7 @@ class BrandIntelligenceAgent:
                 },
                 "market_positioning": {
                     "segment": "Premium Contemporary",
-                    "price_point": "Mid-to-High Luxury",
+                    "price_point": "Mid - to - High Luxury",
                     "target_demographics": self.target_demographics,
                     "competitive_advantage": "Sustainable luxury with personalized shopping experience"
                 },
@@ -103,8 +103,8 @@ class BrandIntelligenceAgent:
             "inventory": {
                 "product_categories": ["Dresses", "Tops", "Bottoms", "Outerwear", "Accessories"],
                 "quality_standards": "Premium materials only",
-                "sustainability_focus": "Eco-friendly and ethically sourced",
-                "size_range": "XS-XXL with inclusive sizing"
+                "sustainability_focus": "Eco - friendly and ethically sourced",
+                "size_range": "XS - XXL with inclusive sizing"
             },
             "financial": {
                 "pricing_strategy": "Premium positioning with value emphasis",
@@ -114,25 +114,25 @@ class BrandIntelligenceAgent:
             },
             "ecommerce": {
                 "shopping_experience": "Personalized, intuitive, luxurious",
-                "product_presentation": "High-quality imagery with detailed descriptions",
-                "customer_service": "White-glove service with personal touch",
-                "return_policy": "Generous and customer-friendly"
+                "product_presentation": "High - quality imagery with detailed descriptions",
+                "customer_service": "White - glove service with personal touch",
+                "return_policy": "Generous and customer - friendly"
             },
             "wordpress": {
-                "design_aesthetic": "Clean, elegant, mobile-first",
+                "design_aesthetic": "Clean, elegant, mobile - first",
                 "performance_priority": "Fast loading, seamless navigation",
                 "seo_focus": "Fashion keywords, local optimization",
                 "conversion_optimization": "Clear CTAs, trust signals, social proof"
             },
             "web_development": {
                 "code_standards": "Clean, maintainable, accessible",
-                "performance_targets": "Sub-3 second load times",
-                "mobile_optimization": "Mobile-first responsive design",
+                "performance_targets": "Sub - 3 second load times",
+                "mobile_optimization": "Mobile - first responsive design",
                 "security_requirements": "PCI compliance, data protection"
             },
             "site_communication": {
                 "tone_of_voice": "Warm, professional, inspiring",
-                "communication_style": "Personalized and relationship-focused",
+                "communication_style": "Personalized and relationship - focused",
                 "customer_touchpoints": "Email, SMS, live chat, social media",
                 "brand_messaging": "Empowerment through sustainable luxury"
             }
@@ -193,13 +193,13 @@ class BrandIntelligenceAgent:
             "retail_trends": [
                 "Personalized shopping experiences",
                 "Social commerce integration",
-                "Virtual try-on technology",
-                "Subscription-based models"
+                "Virtual try - on technology",
+                "Subscription - based models"
             ],
             "consumer_behavior": [
                 "Increased focus on sustainability",
                 "Preference for quality over quantity",
-                "Mobile-first shopping",
+                "Mobile - first shopping",
                 "Social media influence on purchases"
             ],
             "trend_confidence": 85,
@@ -267,14 +267,14 @@ class BrandIntelligenceAgent:
             "marketing_strategy": {
                 "channels": ["Instagram", "TikTok", "Email marketing"],
                 "messaging": "Sustainable luxury for everyday elegance",
-                "influencer_partnerships": "Micro-influencers in sustainability space"
+                "influencer_partnerships": "Micro - influencers in sustainability space"
             },
             "customer_experience": {
                 "improvements": ["Virtual styling", "Size advisory", "Sustainability tracking"],
-                "personalization": "AI-driven product recommendations"
+                "personalization": "AI - driven product recommendations"
             },
             "pricing_strategy": {
-                "approach": "Value-based pricing with clear sustainability premiums",
+                "approach": "Value - based pricing with clear sustainability premiums",
                 "promotions": "Limited strategic sales during key seasons"
             }
         }
@@ -297,7 +297,7 @@ class BrandIntelligenceAgent:
             {
                 "insight": "Optimize mobile shopping experience",
                 "priority": "high",
-                "action": "Implement mobile-first design improvements",
+                "action": "Implement mobile - first design improvements",
                 "expected_impact": "Increased mobile conversion rates"
             },
             {
@@ -326,7 +326,7 @@ class BrandIntelligenceAgent:
             "Strengthen sustainability messaging across all touchpoints",
             "Develop exclusive member experiences to build loyalty",
             "Expand product line into adjacent categories",
-            "Implement AI-driven personalization",
+            "Implement AI - driven personalization",
             "Create brand collaboration opportunities",
             "Develop mobile app for enhanced customer experience",
             "Increase social responsibility initiatives visibility"
@@ -336,20 +336,20 @@ class BrandIntelligenceAgent:
         """Get information about the latest product collection."""
         return {
             "collection_name": "Winter Elegance 2024",
-            "launch_date": "2024-01-15",
+            "launch_date": "2024 - 01 - 15",
             "theme": "Sustainable luxury meets winter sophistication",
             "key_pieces": [
                 "Cashmere Blend Coats",
                 "Sustainable Silk Blouses",
-                "Eco-Wool Sweaters",
+                "Eco - Wool Sweaters",
                 "Statement Accessories"
             ],
             "color_palette": ["Camel", "Deep Navy", "Cream", "Rose Gold"],
-            "price_range": "$120-$450",
+            "price_range": "$120 - $450",
             "sustainability_features": [
                 "Recycled materials",
                 "Ethical manufacturing",
-                "Carbon-neutral shipping"
+                "Carbon - neutral shipping"
             ],
             "marketing_focus": "Timeless pieces for conscious consumers"
         }
@@ -360,19 +360,19 @@ class BrandIntelligenceAgent:
             {
                 "change_type": "visual_identity",
                 "description": "Updated logo with more sustainable imagery",
-                "date": "2024-01-01",
+                "date": "2024 - 01 - 01",
                 "impact": "Stronger sustainability association"
             },
             {
                 "change_type": "product_line",
                 "description": "Introduced recycled material collection",
-                "date": "2024-01-10",
-                "impact": "Enhanced eco-conscious positioning"
+                "date": "2024 - 01 - 10",
+                "impact": "Enhanced eco - conscious positioning"
             },
             {
                 "change_type": "messaging",
                 "description": "Emphasized empowerment and sustainability equally",
-                "date": "2024-01-05",
+                "date": "2024 - 01 - 05",
                 "impact": "Broader appeal to conscious consumers"
             }
         ]
@@ -393,7 +393,7 @@ class BrandIntelligenceAgent:
             },
             "trend_predictions": [
                 "Increased demand for versatile pieces",
-                "Growing interest in rental/subscription models",
+                "Growing interest in rental / subscription models",
                 "Rise of digital fashion experiences"
             ]
         }
@@ -411,14 +411,14 @@ class BrandIntelligenceAgent:
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
+                model = "gpt - 3.5 - turbo",
+                messages = [
                     {"role": "system",
-                     "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON."},
+                     "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0 - 1.0), key sentiment - driving keywords, and a brief summary. Ensure the output is valid JSON."},
                     {"role": "user", "content": f"Analyze the sentiment of this text: '{content}'"}
                 ],
-                temperature=0.5,
-                max_tokens=150
+                temperature = 0.5,
+                max_tokens = 150
             )
 
             sentiment_data = json.loads(response.choices[0].message.content)
@@ -464,7 +464,7 @@ class BrandIntelligenceAgent:
                 "brand_patterns": brand_patterns,
                 "enhanced_insights": enhanced_insights,
                 "neural_brand_dna": neural_brand_dna,
-                "confidence_boost": "+35%",
+                "confidence_boost": " + 35%",
                 "experimental_features_active": True,
                 "timestamp": datetime.now().isoformat()
             }
@@ -476,7 +476,7 @@ class BrandIntelligenceAgent:
     def _experimental_neural_brand_analysis(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
         """EXPERIMENTAL: Advanced neural analysis of brand DNA patterns."""
         return {
-            "brand_dna_sequence": "LUXURY-SUSTAINABLE-EMPOWERMENT-ELEGANCE",
+            "brand_dna_sequence": "LUXURY - SUSTAINABLE - EMPOWERMENT - ELEGANCE",
             "emotional_resonance_score": 94.7,
             "brand_entropy": 0.23,  # Lower is more consistent
             "viral_potential": 87.2,
@@ -499,7 +499,7 @@ class BrandIntelligenceAgent:
             "recommendations": [
                 "Maintain consistent color usage across all materials",
                 "Ensure logo appears consistently in all contexts",
-                "Use high-quality product photography standards"
+                "Use high - quality product photography standards"
             ]
         }
 
@@ -527,7 +527,7 @@ class BrandIntelligenceAgent:
         """Update seasonal understanding from collection assets."""
         self.theme_evolution["asset_informed"] = True
         self.theme_evolution["collection_count"] = len(seasonal_assets)
-        self.theme_evolution["visual_evolution"] = "Data-driven from uploaded collections"
+        self.theme_evolution["visual_evolution"] = "Data - driven from uploaded collections"
 
 
 def initialize_brand_intelligence() -> BrandIntelligenceAgent:

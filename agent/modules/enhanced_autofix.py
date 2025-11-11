@@ -1,5 +1,5 @@
 """
-Enhanced Auto-Fix Module for DevSkyy Platform (Simplified)
+Enhanced Auto - Fix Module for DevSkyy Platform (Simplified)
 Provides advanced code analysis, fixing, and branch management
 """
 import os
@@ -36,7 +36,7 @@ git_commit_spec = importlib.util.spec_from_file_location("git_commit", current_d
 git_commit_module = importlib.util.module_from_spec(git_commit_spec)
 git_commit_spec.loader.exec_module(git_commit_module)
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +56,7 @@ class EnhancedAutoFix:
                              fix_types: List[str] = None) -> Dict[str, Any]:
         """Run enhanced auto-fix workflow with advanced features"""
         try:
-            logger.info("🚀 Starting Enhanced Auto-Fix Session...")
+            logger.info("🚀 Starting Enhanced Auto - Fix Session...")
 
             # Initialize fix session
             session_result = {
@@ -79,7 +79,7 @@ class EnhancedAutoFix:
 
             # Create fix branch if requested
             if create_branch:
-                fix_branch = branch_name or f"autofix/{self.fix_session_id}"
+                fix_branch = branch_name or f"autofix / {self.fix_session_id}"
                 branch_created = self._create_fix_branch(fix_branch)
                 session_result["branch_created"] = branch_created
                 session_result["fix_branch"] = fix_branch
@@ -109,7 +109,7 @@ class EnhancedAutoFix:
 
             # Auto-commit if requested
             if auto_commit and total_fixes > 0:
-                logger.info("📝 Auto-committing fixes...")
+                logger.info("📝 Auto - committing fixes...")
                 commit_message = self._generate_enhanced_commit_message(
                     fix_results, advanced_fixes
                 )
@@ -117,12 +117,12 @@ class EnhancedAutoFix:
                 session_result["commit_results"] = commit_results
 
             session_result["status"] = "completed"
-            logger.info(f"✅ Enhanced Auto-Fix completed: {total_fixes} fixes applied")
+            logger.info(f"✅ Enhanced Auto - Fix completed: {total_fixes} fixes applied")
 
             return session_result
 
         except Exception as e:
-            logger.error(f"❌ Enhanced Auto-Fix failed: {str(e)}")
+            logger.error(f"❌ Enhanced Auto - Fix failed: {str(e)}")
             # Cleanup on failure
             if create_branch and self.original_branch:
                 self._checkout_branch(self.original_branch)
@@ -138,8 +138,8 @@ class EnhancedAutoFix:
         """Get current git branch"""
         try:
             result = subprocess.run(
-                ['git', 'branch', '--show-current'],
-                capture_output=True, text=True, timeout=10
+                ['git', 'branch', '--show - current'],
+                capture_output = True, text = True, timeout = 10
             )
             if result.returncode == 0:
                 return result.stdout.strip()
@@ -152,8 +152,8 @@ class EnhancedAutoFix:
         try:
             # Create and checkout new branch
             result = subprocess.run(
-                ['git', 'checkout', '-b', branch_name],
-                capture_output=True, text=True, timeout=30
+                ['git', 'checkout', ' - b', branch_name],
+                capture_output = True, text = True, timeout = 30
             )
             if result.returncode == 0:
                 logger.info(f"✅ Created fix branch: {branch_name}")
@@ -170,7 +170,7 @@ class EnhancedAutoFix:
         try:
             result = subprocess.run(
                 ['git', 'checkout', branch_name],
-                capture_output=True, text=True, timeout=30
+                capture_output = True, text = True, timeout = 30
             )
             return result.returncode == 0
         except Exception as e:
@@ -204,21 +204,21 @@ class EnhancedAutoFix:
 
         # Check for hardcoded secrets and add warnings
         for root, dirs, files in os.walk('.'):
-            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_*'}]
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'__pycache__', 'backup_ * '}]
 
             for file in files:
                 if file.endswith(('.py', '.js', '.json', '.yaml', '.yml')):
                     file_path = os.path.join(root, file)
                     try:
-                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        with open(file_path, 'r', encoding = 'utf - 8', errors = 'ignore') as f:
                             content = f.read()
 
                         # Check for potential secrets
                         secret_patterns = [
-                            r'password\s*=\s*["\'][^"\']+["\']',
-                            r'api_key\s*=\s*["\'][^"\']+["\']',
-                            r'secret\s*=\s*["\'][^"\']+["\']',
-                            r'token\s*=\s*["\'][^"\']+["\']'
+                            r'password\s*=\s * ["\'][^"\']+["\']',
+                            r'api_key\s*=\s * ["\'][^"\']+["\']',
+                            r'secret\s*=\s * ["\'][^"\']+["\']',
+                            r'token\s*=\s * ["\'][^"\']+["\']'
                         ]
 
                         for pattern in secret_patterns:
@@ -283,7 +283,7 @@ class EnhancedAutoFix:
         for root, dirs, files in os.walk('.'):
             # Skip hidden directories and common non-package directories
             dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {
-                '__pycache__', 'node_modules', 'backup_*', '.git'
+                '__pycache__', 'node_modules', 'backup_ * ', '.git'
             }]
 
             # If directory contains Python files but no __init__.py
@@ -304,7 +304,7 @@ class EnhancedAutoFix:
                                           fix_results: Dict[str, Any],
                                           advanced_fixes: Dict[str, Any]) -> str:
         """Generate enhanced commit message"""
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y - %m - %d %H:%M:%S')
 
         # Count fixes by type
         all_fixes = fix_results.get("fixes_applied", []) + advanced_fixes.get("fixes_applied", [])
@@ -327,7 +327,7 @@ class EnhancedAutoFix:
                 fix_counts["security"] += 1
 
         # Build message
-        title = f"🤖 Enhanced Auto-Fix - {timestamp}"
+        title = f"🤖 Enhanced Auto - Fix - {timestamp}"
 
         summary_parts = []
         if fix_counts["error"]:
@@ -359,7 +359,7 @@ class EnhancedAutoFix:
             f"- Total fixes applied: {len(all_fixes)}",
             f"- Files modified: {len(set(fix.get('file', '') for fix in all_fixes))}",
             "",
-            "Generated by DevSkyy Enhanced Auto-Fix System 🤖"
+            "Generated by DevSkyy Enhanced Auto - Fix System 🤖"
         ])
 
         return "\n".join(message_parts)
@@ -382,9 +382,9 @@ def run_auto_fix_session(create_branch: bool = True,
     """Run a complete auto-fix session"""
     autofix = EnhancedAutoFix()
     return autofix.run_enhanced_autofix(
-        create_branch=create_branch,
-        branch_name=branch_name,
-        auto_commit=auto_commit
+        create_branch = create_branch,
+        branch_name = branch_name,
+        auto_commit = auto_commit
     )
 
 
@@ -392,6 +392,6 @@ def quick_fix() -> Dict[str, Any]:
     """Quick fix without branch creation"""
     autofix = EnhancedAutoFix()
     return autofix.run_enhanced_autofix(
-        create_branch=False,
-        auto_commit=True
+        create_branch = False,
+        auto_commit = True
     )

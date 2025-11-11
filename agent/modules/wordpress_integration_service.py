@@ -55,7 +55,7 @@ class WordPressIntegrationService:
                 'code': authorization_code
             }
 
-            response = requests.post(self.token_url, data=token_data)
+            response = requests.post(self.token_url, data = token_data)
             response.raise_for_status()
 
             token_info = response.json()
@@ -63,7 +63,7 @@ class WordPressIntegrationService:
             self.access_token = token_info.get('access_token')
             self.refresh_token = token_info.get('refresh_token')
             expires_in = token_info.get('expires_in', 3600)
-            self.token_expires_at = datetime.now() + timedelta(seconds=expires_in)
+            self.token_expires_at = datetime.now() + timedelta(seconds = expires_in)
 
             # Get site information
             await self._get_site_info()
@@ -84,7 +84,7 @@ class WordPressIntegrationService:
         """Get WordPress site information."""
         try:
             headers = {'Authorization': f'Bearer {self.access_token}'}
-            response = requests.get(f"{self.api_base}/sites/me", headers=headers)
+            response = requests.get(f"{self.api_base} / sites / me", headers = headers)
             response.raise_for_status()
 
             site_data = response.json()
@@ -170,9 +170,9 @@ class WordPressIntegrationService:
             }
 
             response = requests.get(
-                f"{self.api_base}/sites/{self.site_id}/posts",
-                headers=headers,
-                params=params
+                f"{self.api_base} / sites / {self.site_id} / posts",
+                headers = headers,
+                params = params
             )
             response.raise_for_status()
 
@@ -196,9 +196,9 @@ class WordPressIntegrationService:
             }
 
             response = requests.get(
-                f"{self.api_base}/sites/{self.site_id}/posts",
-                headers=headers,
-                params=params
+                f"{self.api_base} / sites / {self.site_id} / posts",
+                headers = headers,
+                params = params
             )
             response.raise_for_status()
 
@@ -217,8 +217,8 @@ class WordPressIntegrationService:
             headers = {'Authorization': f'Bearer {self.access_token}'}
 
             response = requests.get(
-                f"{self.api_base}/sites/{self.site_id}/themes/mine",
-                headers=headers
+                f"{self.api_base} / sites / {self.site_id} / themes / mine",
+                headers = headers
             )
             response.raise_for_status()
 
@@ -226,8 +226,8 @@ class WordPressIntegrationService:
 
             # Also get site customization options
             customizer_response = requests.get(
-                f"{self.api_base}/sites/{self.site_id}/customizer",
-                headers=headers
+                f"{self.api_base} / sites / {self.site_id} / customizer",
+                headers = headers
             )
 
             customizer_data = {}
@@ -253,13 +253,13 @@ class WordPressIntegrationService:
 
             headers = {
                 'Authorization': f'Bearer {self.access_token}',
-                'Content-Type': 'application/json'
+                'Content - Type': 'application / json'
             }
 
             response = requests.post(
-                f"{self.api_base}/sites/{self.site_id}/posts/{post_id}",
-                headers=headers,
-                json=content_updates
+                f"{self.api_base} / sites / {self.site_id} / posts / {post_id}",
+                headers = headers,
+                json = content_updates
             )
             response.raise_for_status()
 
@@ -303,13 +303,13 @@ class WordPressIntegrationService:
 
             headers = {
                 'Authorization': f'Bearer {self.access_token}',
-                'Content-Type': 'application/json'
+                'Content - Type': 'application / json'
             }
 
             response = requests.post(
-                f"{self.api_base}/sites/{self.site_id}/posts/new",
-                headers=headers,
-                json=page_data
+                f"{self.api_base} / sites / {self.site_id} / posts / new",
+                headers = headers,
+                json = page_data
             )
             response.raise_for_status()
 
@@ -339,9 +339,9 @@ class WordPressIntegrationService:
 
             # Get site stats
             stats_response = requests.get(
-                f"{self.api_base}/sites/{self.site_id}/stats",
-                headers=headers,
-                params={'period': 'day', 'date': datetime.now().strftime('%Y-%m-%d')}
+                f"{self.api_base} / sites / {self.site_id} / stats",
+                headers = headers,
+                params = {'period': 'day', 'date': datetime.now().strftime('%Y - %m - %d')}
             )
 
             performance_data = {}
@@ -356,7 +356,7 @@ class WordPressIntegrationService:
                 'performance_analysis': performance_analysis,
                 'agent_recommendations': await self._get_performance_recommendations(performance_analysis),
                 'monitoring_timestamp': datetime.now().isoformat(),
-                'next_check': (datetime.now() + timedelta(hours=1)).isoformat()
+                'next_check': (datetime.now() + timedelta(hours = 1)).isoformat()
             }
 
         except Exception as e:
@@ -386,7 +386,7 @@ class WordPressIntegrationService:
                 'refresh_token': self.refresh_token
             }
 
-            response = requests.post(self.token_url, data=refresh_data)
+            response = requests.post(self.token_url, data = refresh_data)
             response.raise_for_status()
 
             token_info = response.json()
@@ -396,7 +396,7 @@ class WordPressIntegrationService:
                 self.refresh_token = token_info['refresh_token']
 
             expires_in = token_info.get('expires_in', 3600)
-            self.token_expires_at = datetime.now() + timedelta(seconds=expires_in)
+            self.token_expires_at = datetime.now() + timedelta(seconds = expires_in)
 
             logger.info("🔄 WordPress access token refreshed successfully")
             return True
@@ -413,56 +413,56 @@ class WordPressIntegrationService:
 
         # Divi-optimized content with luxury styling
         content = f"""
-[et_pb_section fb_built="1" specialty="on" padding_top_1="0px" padding_top_2="0px" admin_label="Hero Section" _builder_version="4.16"]
-[et_pb_column type="1_2" specialty_columns="2"]
-[et_pb_row_inner admin_label="Hero Content"]
-[et_pb_column_inner type="4_4"]
+[et_pb_section fb_built = "1" specialty = "on" padding_top_1 = "0px" padding_top_2 = "0px" admin_label = "Hero Section" _builder_version = "4.16"]
+[et_pb_column type = "1_2" specialty_columns = "2"]
+[et_pb_row_inner admin_label = "Hero Content"]
+[et_pb_column_inner type = "4_4"]
 [et_pb_text admin_label="Collection Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="3.5rem" text_color="#D4AF37" header_font="Playfair Display||||||||" header_text_color="#2C2C2C" header_font_size="4rem" custom_margin="0px||20px||false|false"]
-<h1>{title}</h1>
-[/et_pb_text]
+<h1>{title}< / h1>
+[ / et_pb_text]
 [et_pb_text admin_label="Collection Description" _builder_version="4.16" text_font="Montserrat||||||||" text_font_size="1.2rem" text_color="#666666" text_line_height="1.8em" custom_margin="0px||30px||false|false"]
-<p>{description}</p>
-[/et_pb_text]
+<p>{description}< / p>
+[ / et_pb_text]
 [et_pb_button button_text="Explore Collection" button_alignment="left" admin_label="CTA Button" _builder_version="4.16" custom_button="on" button_text_color="#FFFFFF" button_bg_color="#D4AF37" button_border_width="0px" button_border_radius="30px" button_font="Montserrat|600|||||||" button_font_size="1rem" custom_padding="15px|40px|15px|40px|true|true" button_bg_color_hover="#B8860B" custom_css_main_element="transition: all 0.3s ease;||box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);"]
-[/et_pb_button]
-[/et_pb_column_inner]
-[/et_pb_row_inner]
-[/et_pb_column]
-[et_pb_column type="1_2"]
-[et_pb_image src="{collection_data.get('hero_image', '')}" admin_label="Hero Image" _builder_version="4.16" custom_css_main_element="border-radius: 20px;||box-shadow: 0 20px 40px rgba(0,0,0,0.1);"]
-[/et_pb_image]
-[/et_pb_column]
-[/et_pb_section]
+[ / et_pb_button]
+[ / et_pb_column_inner]
+[ / et_pb_row_inner]
+[ / et_pb_column]
+[et_pb_column type = "1_2"]
+[et_pb_image src = "{collection_data.get('hero_image', '')}" admin_label = "Hero Image" _builder_version = "4.16" custom_css_main_element = "border - radius: 20px;||box - shadow: 0 20px 40px rgba(0,0,0,0.1);"]
+[ / et_pb_image]
+[ / et_pb_column]
+[ / et_pb_section]
 
 [et_pb_section fb_built="1" admin_label="Product Showcase" _builder_version="4.16" background_color="#F8F8F8" custom_padding="80px||80px||true|false"]
-[et_pb_row admin_label="Products Grid"]
-[et_pb_column type="4_4"]
+[et_pb_row admin_label = "Products Grid"]
+[et_pb_column type = "4_4"]
 [et_pb_text admin_label="Section Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#2C2C2C" text_orientation="center" custom_margin="0px||50px||false|false"]
-<h2>Featured Items</h2>
-[/et_pb_text]
-[/et_pb_column]
-[/et_pb_row]
+<h2>Featured Items< / h2>
+[ / et_pb_text]
+[ / et_pb_column]
+[ / et_pb_row]
 <!-- Product grid will be populated by WooCommerce integration -->
-[/et_pb_section]
+[ / et_pb_section]
 
 [et_pb_section fb_built="1" admin_label="Luxury Features" _builder_version="4.16" background_color="#2C2C2C" custom_padding="80px||80px||true|false"]
-[et_pb_row admin_label="Features Content"]
-[et_pb_column type="4_4"]
+[et_pb_row admin_label = "Features Content"]
+[et_pb_column type = "4_4"]
 [et_pb_text admin_label="Features Title" _builder_version="4.16" text_font="Playfair Display||||||||" text_font_size="2.5rem" text_color="#D4AF37" text_orientation="center" custom_margin="0px||30px||false|false"]
-<h2>Why Choose Our {collection_type.title()} Collection</h2>
-[/et_pb_text]
+<h2>Why Choose Our {collection_type.title()} Collection< / h2>
+[ / et_pb_text]
 [et_pb_blurb title="Premium Quality" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 1" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
 Handcrafted with the finest materials and attention to detail that defines luxury.
-[/et_pb_blurb]
+[ / et_pb_blurb]
 [et_pb_blurb title="Exclusive Design" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 2" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
 Limited edition pieces that showcase exceptional craftsmanship and unique aesthetics.
-[/et_pb_blurb]
+[ / et_pb_blurb]
 [et_pb_blurb title="Lifetime Value" use_icon="on" font_icon="||divi||400" icon_color="#D4AF37" admin_label="Feature 3" _builder_version="4.16" header_font="Montserrat|600|||||||" header_text_color="#FFFFFF" body_font="Montserrat||||||||" body_text_color="#CCCCCC"]
 Investment pieces designed to appreciate in value and be treasured for generations.
-[/et_pb_blurb]
-[/et_pb_column]
-[/et_pb_row]
-[/et_pb_section]
+[ / et_pb_blurb]
+[ / et_pb_column]
+[ / et_pb_row]
+[ / et_pb_section]
 """
 
         return content
@@ -485,7 +485,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             'Implement luxury brand color palette',
             'Add premium font combinations',
             'Optimize for mobile luxury experience',
-            'Add conversion-optimized layouts',
+            'Add conversion - optimized layouts',
             'Implement luxury animation effects'
         ])
 
@@ -511,19 +511,19 @@ Investment pieces designed to appreciate in value and be treasured for generatio
                 'agent': 'performance_agent',
                 'action': 'implement_caching_optimization',
                 'priority': 'high',
-                'estimated_impact': '+40% speed improvement'
+                'estimated_impact': ' + 40% speed improvement'
             },
             {
                 'agent': 'design_automation_agent',
                 'action': 'optimize_image_compression',
                 'priority': 'medium',
-                'estimated_impact': '+25% loading speed'
+                'estimated_impact': ' + 25% loading speed'
             },
             {
                 'agent': 'wordpress_specialist_agent',
                 'action': 'clean_database_optimization',
                 'priority': 'medium',
-                'estimated_impact': '+15% performance boost'
+                'estimated_impact': ' + 15% performance boost'
             }
         ]
 
@@ -532,7 +532,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         improvements = []
 
         if 'title' in updates:
-            improvements.append('SEO-optimized title enhancement')
+            improvements.append('SEO - optimized title enhancement')
         if 'content' in updates:
             improvements.append('Content quality and readability improvement')
         if 'excerpt' in updates:
@@ -550,10 +550,10 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         return [
             'Premium Divi builder layout',
             'Luxury color scheme implementation',
-            'Conversion-optimized design',
-            'Mobile-responsive luxury experience',
-            'SEO-optimized structure',
-            'Brand-consistent styling'
+            'Conversion - optimized design',
+            'Mobile - responsive luxury experience',
+            'SEO - optimized structure',
+            'Brand - consistent styling'
         ]
 
     async def _apply_seo_optimization(self, page_id: int) -> Dict[str, Any]:
@@ -570,12 +570,12 @@ Investment pieces designed to appreciate in value and be treasured for generatio
     def _get_conversion_elements(self, collection_data: Dict[str, Any]) -> List[str]:
         """Get conversion elements added to the page."""
         return [
-            'Prominent call-to-action buttons',
+            'Prominent call - to - action buttons',
             'Social proof elements',
             'Scarcity indicators',
             'Trust signals and guarantees',
             'Optimized product showcase',
-            'Mobile-first design approach'
+            'Mobile - first design approach'
         ]
 
 # Factory function

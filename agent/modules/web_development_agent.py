@@ -15,9 +15,9 @@ class WebDevelopmentAgent:
         self.agent_type = "web_development"
         self.brand_context = {}
         self.code_quality_rules = {
-            "javascript": ["no-unused-vars", "consistent-return", "no-console"],
-            "python": ["line-too-long", "unused-import", "undefined-name"],
-            "css": ["duplicate-properties", "unknown-properties", "vendor-prefixes"]
+            "javascript": ["no - unused - vars", "consistent - return", "no - console"],
+            "python": ["line - too - long", "unused - import", "undefined - name"],
+            "css": ["duplicate - properties", "unknown - properties", "vendor - prefixes"]
         }
         # EXPERIMENTAL: Neural code generation and optimization
         self.neural_code_engine = self._initialize_neural_code_engine()
@@ -42,7 +42,7 @@ class WebDevelopmentAgent:
 
         elif language.lower() == "javascript":
             if 'var ' in code:
-                suggestions.append("Use let/const instead of var")
+                suggestions.append("Use let / const instead of var")
                 score -= 10
             if 'console.log' in code:
                 suggestions.append("Remove console.log statements")
@@ -75,7 +75,7 @@ class WebDevelopmentAgent:
 
             # Remove console.log statements
             if "console.log" in fixed_code:
-                fixed_code = re.sub(r'console\.log\([^)]*\);\s*', '', fixed_code)
+                fixed_code = re.sub(r'console\.log\([^)]*\);\s * ', '', fixed_code)
                 fixes_applied.append("Removed console.log statements")
 
         elif language.lower() == "python":
@@ -103,23 +103,23 @@ class WebDevelopmentAgent:
         optimized_html = html_content
 
         # Add missing meta tags
-        if '<meta charset=' not in optimized_html and '<head>' in optimized_html:
-            optimized_html = optimized_html.replace('<head>', '<head>\n    <meta charset="UTF-8">')
+        if '<meta charset = ' not in optimized_html and '<head>' in optimized_html:
+            optimized_html = optimized_html.replace('<head>', '<head>\n    <meta charset = "UTF - 8">')
             optimizations.append("Added charset meta tag")
 
-        if '<meta name="viewport"' not in optimized_html and '<head>' in optimized_html:
-            viewport_tag = '    <meta name="viewport" content="width=device-width, initial-scale=1.0">'
-            optimized_html = optimized_html.replace('</head>', f'    {viewport_tag}\n</head>')
+        if '<meta name = "viewport"' not in optimized_html and '<head>' in optimized_html:
+            viewport_tag = '    <meta name = "viewport" content = "width = device - width, initial - scale = 1.0">'
+            optimized_html = optimized_html.replace('< / head>', f'    {viewport_tag}\n< / head>')
             optimizations.append("Added viewport meta tag")
 
         # Add alt attributes to images
-        img_pattern = r'<img([^>]*?)(?<!alt="[^"]*")>'
+        img_pattern = r'<img([^>]*?)(?<!alt = "[^"]*")>'
 
         def add_alt(match):
             """TODO: Add docstring for add_alt."""
             img_tag = match.group(0)
-            if 'alt=' not in img_tag:
-                return img_tag[:-1] + ' alt="Image">'
+            if 'alt = ' not in img_tag:
+                return img_tag[: - 1] + ' alt = "Image">'
             return img_tag
 
         new_html = re.sub(img_pattern, add_alt, optimized_html)
@@ -183,20 +183,20 @@ class NeuralGeneratedSolution {{
         this.quantumDebugged = true;
         this.performanceScore = 98.7;
     }}
-    
+
     async executeRequirement() {{
-        // AI-optimized implementation
+        // AI - optimized implementation
         const result = await this.neuralProcessing();
         return this.quantumOptimize(result);
     }}
-    
+
     neuralProcessing() {{
         // Neural network processed logic
         return "optimized_solution";
     }}
-    
+
     quantumOptimize(input) {{
-        // Quantum-enhanced optimization
+        // Quantum - enhanced optimization
         return input + "_quantum_optimized";
     }}
 }}
@@ -229,7 +229,7 @@ export default NeuralGeneratedSolution;
                 "experimental_features": [
                     "Neural code completion",
                     "Quantum bug prediction",
-                    "AI-powered refactoring",
+                    "AI - powered refactoring",
                     "Predictive performance optimization",
                     "Automated security hardening"
                 ],

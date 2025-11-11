@@ -8,14 +8,14 @@ import time
 from pathlib import Path
 import json
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def scan_site() -> Dict[str, Any]:
     """
     Comprehensive site scanning with advanced error detection and analysis.
-    Production-level implementation with full error handling.
+    Production - level implementation with full error handling.
     """
     try:
         logger.info("🔍 Starting comprehensive site scan...")
@@ -105,7 +105,7 @@ def _analyze_file(file_path: str) -> Dict[str, Any]:
     }
 
     try:
-        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(file_path, 'r', encoding = 'utf - 8', errors = 'ignore') as f:
             content = f.read()
 
         # Python file analysis
@@ -149,7 +149,7 @@ def _analyze_python_file(content: str, file_path: str) -> Dict[str, Any]:
 
             # Check for TODO/FIXME comments
             if 'TODO' in line or 'FIXME' in line:
-                warnings.append(f"Line {i}: Unresolved TODO/FIXME comment")
+                warnings.append(f"Line {i}: Unresolved TODO / FIXME comment")
 
             # Check for print statements (should use logging)
             if line.strip().startswith('print(') and 'logger' not in content:
@@ -197,14 +197,14 @@ def _analyze_html_file(content: str, file_path: str) -> Dict[str, Any]:
     optimizations = []
 
     # Check for missing meta tags
-    if '<meta charset=' not in content:
+    if '<meta charset = ' not in content:
         warnings.append("Missing charset meta tag")
 
-    if '<meta name="viewport"' not in content:
+    if '<meta name = "viewport"' not in content:
         warnings.append("Missing viewport meta tag")
 
     # Check for images without alt attributes
-    if '<img' in content and 'alt=' not in content:
+    if '<img' in content and 'alt = ' not in content:
         warnings.append("Images missing alt attributes")
 
     # Check for missing title tag
@@ -260,7 +260,7 @@ def _check_site_health() -> Dict[str, Any]:
         for url in test_urls:
             try:
                 start_time = time.time()
-                response = requests.get(url, timeout=5)
+                response = requests.get(url, timeout = 5)
                 response_time = (time.time() - start_time) * 1000
 
                 health_check.update({
@@ -304,7 +304,7 @@ def scan_agents_only() -> Dict[str, Any]:
     Returns comprehensive health metrics for agents.
     """
     logger.info("🤖 Starting comprehensive agent analysis...")
-    
+
     result = {
         "agent_modules": {
             "total_agents": 0,
@@ -321,10 +321,10 @@ def scan_agents_only() -> Dict[str, Any]:
         "timestamp": datetime.now().isoformat(),
         "scan_type": "agents_only"
     }
-    
+
     agents_analyzed = _analyze_all_agents()
     result["agent_modules"].update(agents_analyzed)
-    
+
     logger.info(f"✅ Agent analysis completed: {result['agent_modules']['functional_agents']}/{result['agent_modules']['total_agents']} agents working")
     return result
 
@@ -333,8 +333,8 @@ def _analyze_all_agents() -> Dict[str, Any]:
     """Analyze all agent modules in the system."""
     import importlib.util
     import sys
-    
-    agents_dir = Path("agent/modules")
+
+    agents_dir = Path("agent / modules")
     if not agents_dir.exists():
         return {
             "total_agents": 0,
@@ -348,8 +348,8 @@ def _analyze_all_agents() -> Dict[str, Any]:
                 "security_concerns": []
             }
         }
-    
-    agent_files = list(agents_dir.glob("*_agent.py"))
+
+    agent_files = list(agents_dir.glob(" * _agent.py"))
     total_agents = len(agent_files)
     functional_agents = 0
     import_errors = []
@@ -357,7 +357,7 @@ def _analyze_all_agents() -> Dict[str, Any]:
     performance_issues = []
     security_concerns = []
     importable = []
-    
+
     for agent_file in agent_files:
         agent_name = agent_file.stem
         try:
@@ -365,17 +365,17 @@ def _analyze_all_agents() -> Dict[str, Any]:
             spec = importlib.util.spec_from_file_location(agent_name, agent_file)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            
+
             functional_agents += 1
             importable.append(agent_name)
-            
+
             # Analyze the agent for issues
             agent_analysis = _analyze_single_agent(agent_file)
             if agent_analysis["performance_issues"]:
                 performance_issues.extend(agent_analysis["performance_issues"])
             if agent_analysis["security_concerns"]:
                 security_concerns.extend(agent_analysis["security_concerns"])
-                
+
         except ImportError as e:
             import_errors.append({"agent": agent_name, "error": str(e)})
             # Try to extract missing dependency
@@ -384,9 +384,9 @@ def _analyze_all_agents() -> Dict[str, Any]:
                 missing_deps.append({"agent": agent_name, "dependency": dep_name})
         except Exception as e:
             import_errors.append({"agent": agent_name, "error": str(e)})
-    
+
     agents_with_issues = total_agents - functional_agents
-    
+
     return {
         "total_agents": total_agents,
         "functional_agents": functional_agents,
@@ -405,49 +405,49 @@ def _analyze_single_agent(agent_file: Path) -> Dict[str, Any]:
     """Analyze a single agent file for issues."""
     performance_issues = []
     security_concerns = []
-    
+
     try:
-        with open(agent_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(agent_file, 'r', encoding = 'utf - 8', errors = 'ignore') as f:
             content = f.read()
-        
+
         agent_name = agent_file.stem
-        
+
         # Check for performance issues
         if "while True:" in content and "time.sleep" not in content:
             performance_issues.append({
                 "agent": agent_name,
                 "issue": "Potential infinite loop detected"
             })
-        
+
         if "requests.get" in content and "timeout" not in content:
             performance_issues.append({
                 "agent": agent_name,
                 "issue": "HTTP requests without timeout"
             })
-        
+
         # Check for security concerns
         credential_patterns = [
-            (r'password\s*=\s*["\'][^"\']{8,}["\']', "Potential hardcoded password detected"),
-            (r'api_key\s*=\s*["\'][^"\']{20,}["\']', "Potential hardcoded API key detected"),
-            (r'secret\s*=\s*["\'][^"\']{16,}["\']', "Potential hardcoded secret detected"),
+            (r'password\s*=\s * ["\'][^"\']{8,}["\']', "Potential hardcoded password detected"),
+            (r'api_key\s*=\s * ["\'][^"\']{20,}["\']', "Potential hardcoded API key detected"),
+            (r'secret\s*=\s * ["\'][^"\']{16,}["\']', "Potential hardcoded secret detected"),
         ]
-        
+
         for pattern, message in credential_patterns:
             if re.search(pattern, content, re.IGNORECASE):
                 security_concerns.append({
                     "agent": agent_name,
                     "concern": message
                 })
-        
+
         if "eval(" in content:
             security_concerns.append({
                 "agent": agent_name,
                 "concern": "Unsafe eval() usage detected"
             })
-            
+
     except Exception as e:
         logger.warning(f"Could not analyze {agent_file}: {e}")
-    
+
     return {
         "performance_issues": performance_issues,
         "security_concerns": security_concerns
@@ -464,7 +464,7 @@ def _security_scan() -> List[str]:
             if file.endswith('.py'):
                 file_path = os.path.join(root, file)
                 try:
-                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, 'r', encoding = 'utf - 8', errors = 'ignore') as f:
                         content = f.read()
 
                     # Check for hardcoded credentials with more specific patterns
@@ -476,7 +476,7 @@ def _security_scan() -> List[str]:
                         r'api_key\s*=\s*[^"\'\s][^"\'\n]+',  # api_key = actual_key (no quotes)
                         r'secret\s*=\s*[^"\'\s][^"\'\n]+'    # secret = actual_secret (no quotes)
                     ]
-                    
+
                     for pattern in credential_patterns:
                         if re.search(pattern, content, re.IGNORECASE):
                             # Additional check to avoid false positives

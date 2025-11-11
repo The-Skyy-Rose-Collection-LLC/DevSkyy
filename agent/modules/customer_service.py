@@ -27,7 +27,7 @@ class CustomerServiceAgent:
             score = sum(1 for word in words if word in content_lower)
             scores[category] = score
 
-        best_category = max(scores, key=scores.get) if any(scores.values()) else "general"
+        best_category = max(scores, key = scores.get) if any(scores.values()) else "general"
         confidence = scores[best_category] / len(keywords[best_category]) if best_category in keywords else 0
 
         return {
@@ -41,10 +41,10 @@ class CustomerServiceAgent:
         """Generate automated responses for common inquiries."""
         responses = {
             "shipping": f"""Dear {customer_name},
-            
+
 Thank you for contacting The Skyy Rose Collection. We've received your shipping inquiry.
 
-Your order status and tracking information can be found in your account dashboard. Most orders are processed within 1-2 business days and arrive within 3-5 business days.
+Your order status and tracking information can be found in your account dashboard. Most orders are processed within 1 - 2 business days and arrive within 3 - 5 business days.
 
 If you need immediate assistance, please reply with your order number.
 
@@ -52,22 +52,22 @@ Best regards,
 The Skyy Rose Collection Team""",
 
             "returns": f"""Dear {customer_name},
-            
+
 Thank you for reaching out regarding a return.
 
-We offer a 30-day return policy for unworn items in original packaging. To initiate a return:
+We offer a 30 - day return policy for unworn items in original packaging. To initiate a return:
 1. Log into your account
 2. Go to Order History
 3. Select "Return Item"
 4. Print the prepaid return label
 
-Refunds are processed within 5-7 business days after we receive your return.
+Refunds are processed within 5 - 7 business days after we receive your return.
 
 Best regards,
 The Skyy Rose Collection Team""",
 
             "general": f"""Dear {customer_name},
-            
+
 Thank you for contacting The Skyy Rose Collection. We've received your inquiry and will respond within 24 hours.
 
 For immediate assistance, you can also check our FAQ section or live chat during business hours.
@@ -123,13 +123,13 @@ The Skyy Rose Collection Team"""
             {
                 "id": "TK001",
                 "category": "shipping",
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=3),
+                "created_at": datetime.now(timezone.utc) - timedelta(hours = 3),
                 "priority": "NORMAL"
             },
             {
                 "id": "TK002",
                 "category": "returns",
-                "created_at": datetime.now(timezone.utc) - timedelta(hours=1),
+                "created_at": datetime.now(timezone.utc) - timedelta(hours = 1),
                 "priority": "HIGH"
             }
         ]

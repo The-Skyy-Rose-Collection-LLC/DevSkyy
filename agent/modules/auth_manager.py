@@ -21,54 +21,54 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    id = Column(Integer, primary_key = True, index = True)
+    email = Column(String, unique = True, index = True, nullable = False)
+    username = Column(String, unique = True, index = True, nullable = False)
+    password_hash = Column(String, nullable = False)
     first_name = Column(String)
     last_name = Column(String)
-    role = Column(String, default="user")
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login = Column(DateTime(timezone=True))
-    failed_login_attempts = Column(Integer, default=0)
-    locked_until = Column(DateTime(timezone=True))
-    email_verified = Column(Boolean, default=False)
+    role = Column(String, default = "user")
+    is_active = Column(Boolean, default = True)
+    created_at = Column(DateTime(timezone = True), server_default = func.now())
+    last_login = Column(DateTime(timezone = True))
+    failed_login_attempts = Column(Integer, default = 0)
+    locked_until = Column(DateTime(timezone = True))
+    email_verified = Column(Boolean, default = False)
     verification_token = Column(String)
     reset_token = Column(String)
-    reset_token_expires = Column(DateTime(timezone=True))
+    reset_token_expires = Column(DateTime(timezone = True))
 
-    sessions = relationship("UserSession", back_populates="user")
-    preferences = relationship("UserPreference", back_populates="user", uselist=False)
+    sessions = relationship("UserSession", back_populates = "user")
+    preferences = relationship("UserPreference", back_populates = "user", uselist = False)
 
 
 class UserSession(Base):
     __tablename__ = "user_sessions"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key = True, index = True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    token_hash = Column(String, unique=True)
-    expires_at = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    token_hash = Column(String, unique = True)
+    expires_at = Column(DateTime(timezone = True))
+    created_at = Column(DateTime(timezone = True), server_default = func.now())
     ip_address = Column(String)
     user_agent = Column(Text)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default = True)
 
-    user = relationship("User", back_populates="sessions")
+    user = relationship("User", back_populates = "sessions")
 
 
 class UserPreference(Base):
     __tablename__ = "user_preferences"
 
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
-    theme = Column(String, default="light")
-    notifications_enabled = Column(Boolean, default=True)
-    marketing_emails = Column(Boolean, default=False)
-    dashboard_layout = Column(String, default="default")
-    timezone = Column(String, default="UTC")
-    language = Column(String, default="en")
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key = True)
+    theme = Column(String, default = "light")
+    notifications_enabled = Column(Boolean, default = True)
+    marketing_emails = Column(Boolean, default = False)
+    dashboard_layout = Column(String, default = "default")
+    timezone = Column(String, default = "UTC")
+    language = Column(String, default = "en")
 
-    user = relationship("User", back_populates="preferences")
+    user = relationship("User", back_populates = "preferences")
 
 
 class AuthManager:
@@ -77,7 +77,7 @@ class AuthManager:
     def __init__(self):
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
         self.database_url = os.getenv(
-            "DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep-young-morning-af7ti79i.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require")
+            "DATABASE_URL", "postgresql://neondb_owner:npg_DAy4pgnQB1Ci@ep - young - morning - af7ti79i.c - 2.us - west - 2.aws.neon.tech / neondb?sslmode = require")
         self.security = HTTPBearer()
         self.engine = None
         self.SessionLocal = None
@@ -93,8 +93,8 @@ class AuthManager:
         try:
             if not self.engine:
                 self.engine = create_engine(self.database_url)
-                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-            Base.metadata.create_all(bind=self.engine)
+                self.SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = self.engine)
+            Base.metadata.create_all(bind = self.engine)
             logger.info("Database tables created successfully")
             self._db_initialized = True
         except Exception as e:
@@ -115,15 +115,15 @@ class AuthManager:
     def hash_password(self, password: str) -> str:
         """Hash password using bcrypt."""
         salt = bcrypt.gensalt()
-        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        return bcrypt.hashpw(password.encode('utf - 8'), salt).decode('utf - 8')
 
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify password against hash."""
-        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+        return bcrypt.checkpw(password.encode('utf - 8'), hashed.encode('utf - 8'))
 
     def validate_email(self, email: str) -> bool:
         """Validate email format."""
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r'^[a - zA - Z0 - 9._%+-]+@[a - zA - Z0 - 9.-]+\.[a - zA - Z]{2,}$'
         return re.match(pattern, email) is not None
 
     def validate_password(self, password: str) -> Dict[str, Any]:
@@ -133,10 +133,10 @@ class AuthManager:
         if len(password) < 8:
             errors.append("Password must be at least 8 characters long")
 
-        if not re.search(r'[A-Z]', password):
+        if not re.search(r'[A - Z]', password):
             errors.append("Password must contain at least one uppercase letter")
 
-        if not re.search(r'[a-z]', password):
+        if not re.search(r'[a - z]', password):
             errors.append("Password must contain at least one lowercase letter")
 
         if not re.search(r'\d', password):
@@ -175,19 +175,19 @@ class AuthManager:
             verification_token = secrets.token_urlsafe(32)
 
             new_user = User(
-                email=email,
-                username=username,
-                password_hash=password_hash,
-                first_name=first_name,
-                last_name=last_name,
-                verification_token=verification_token
+                email = email,
+                username = username,
+                password_hash = password_hash,
+                first_name = first_name,
+                last_name = last_name,
+                verification_token = verification_token
             )
 
             db.add(new_user)
             db.flush()  # Get user ID
 
             # Create default preferences
-            user_prefs = UserPreference(user_id=new_user.id)
+            user_prefs = UserPreference(user_id = new_user.id)
             db.add(user_prefs)
 
             db.commit()
@@ -233,7 +233,7 @@ class AuthManager:
                 user.failed_login_attempts += 1
 
                 if user.failed_login_attempts >= 5:
-                    user.locked_until = datetime.now() + timedelta(minutes=30)
+                    user.locked_until = datetime.now() + timedelta(minutes = 30)
 
                 db.commit()
                 return {"success": False, "error": "Invalid credentials"}
@@ -248,22 +248,22 @@ class AuthManager:
                 "user_id": user.id,
                 "username": user.username,
                 "email": user.email,
-                "exp": datetime.utcnow() + timedelta(hours=24),
+                "exp": datetime.utcnow() + timedelta(hours = 24),
                 "iat": datetime.utcnow()
             }
 
-            token = jwt.encode(token_payload, self.secret_key, algorithm="HS256")
+            token = jwt.encode(token_payload, self.secret_key, algorithm = "HS256")
 
             # Store session
             token_hash = bcrypt.hashpw(token.encode(), bcrypt.gensalt()).decode()
-            expires_at = datetime.now() + timedelta(hours=24)
+            expires_at = datetime.now() + timedelta(hours = 24)
 
             new_session = UserSession(
-                user_id=user.id,
-                token_hash=token_hash,
-                expires_at=expires_at,
-                ip_address=ip_address,
-                user_agent=user_agent
+                user_id = user.id,
+                token_hash = token_hash,
+                expires_at = expires_at,
+                ip_address = ip_address,
+                user_agent = user_agent
             )
 
             db.add(new_session)
@@ -291,7 +291,7 @@ class AuthManager:
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
         """Verify JWT token and return user data."""
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+            payload = jwt.decode(token, self.secret_key, algorithms = ["HS256"])
 
             # Check if session is still valid
             db = self.SessionLocal()
@@ -323,9 +323,9 @@ class AuthManager:
 
         if not payload:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired token",
-                headers={"WWW-Authenticate": "Bearer"},
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "Invalid or expired token",
+                headers = {"WWW - Authenticate": "Bearer"},
             )
 
         return payload
@@ -351,7 +351,7 @@ class AuthManager:
             # Get or create preferences
             prefs = user.preferences
             if not prefs:
-                prefs = UserPreference(user_id=user_id)
+                prefs = UserPreference(user_id = user_id)
                 db.add(prefs)
                 db.commit()
 

@@ -8,7 +8,7 @@ import json
 import hashlib
 import base64
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -83,7 +83,7 @@ class IntegrationManager:
                     "capabilities": ["content_publishing", "story_management", "analytics", "influencer_tracking"]
                 },
                 "twitter": {
-                    "name": "Twitter/X",
+                    "name": "Twitter / X",
                     "icon": "🐦",
                     "auth_type": "oauth",
                     "required_fields": ["api_key", "api_secret", "access_token", "access_token_secret"],
@@ -214,7 +214,7 @@ class IntegrationManager:
                 "last_sync": None,
                 "sync_frequency": "hourly",
                 "data_mapping": self._create_data_mapping(agent_type, service_type, service_name),
-                "webhook_url": f"/webhooks/{integration_id}",
+                "webhook_url": f" / webhooks / {integration_id}",
                 "error_count": 0,
                 "success_count": 0
             }
@@ -431,7 +431,7 @@ class IntegrationManager:
             "records_synced": 47,
             "sync_duration_ms": 1200,
             "data_types": ["transactions", "balances"],
-            "next_sync": (datetime.now() + timedelta(hours=1)).isoformat()
+            "next_sync": (datetime.now() + timedelta(hours = 1)).isoformat()
         }
 
     def _initialize_security_manager(self) -> Dict[str, Any]:

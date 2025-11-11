@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Startup script for Skyy Rose AI Agent Management Platform
-Handles graceful startup, database connections, and WordPress auto-connection
+Handles graceful startup, database connections, and WordPress auto - connection
 """
 
 from agent.modules.wordpress_direct_service import create_wordpress_direct_service
@@ -18,8 +18,8 @@ sys.path.insert(0, str(project_root))
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level = logging.INFO,
+    format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class SkyRoseStartup:
         """Initialize MongoDB connection."""
         try:
             import os
-            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/skyy_rose_agents')
+            mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017 / skyy_rose_agents')
 
             logger.info("🔄 Initializing MongoDB connection...")
             self.mongodb_client = AsyncIOMotorClient(mongo_url)
@@ -51,7 +51,7 @@ class SkyRoseStartup:
     async def initialize_wordpress_connection(self):
         """Auto-connect to WordPress on startup."""
         try:
-            logger.info("🔄 Initializing WordPress auto-connection...")
+            logger.info("🔄 Initializing WordPress auto - connection...")
 
             self.wordpress_service = create_wordpress_direct_service()
 
@@ -59,16 +59,16 @@ class SkyRoseStartup:
             connection_result = await self.wordpress_service.connect_and_verify()
 
             if connection_result.get('status') == 'connected':
-                logger.info("✅ WordPress auto-connection successful!")
+                logger.info("✅ WordPress auto - connection successful!")
                 logger.info(f"   └─ Connected to: {connection_result.get('site_url', 'skyyrose.co')}")
                 logger.info(f"   └─ Site health: {connection_result.get('health', 'Unknown')}")
                 return True
             else:
-                logger.warning("⚠️ WordPress auto-connection failed - will retry on first request")
+                logger.warning("⚠️ WordPress auto - connection failed - will retry on first request")
                 return False
 
         except Exception as e:
-            logger.error(f"❌ WordPress auto-connection error: {str(e)}")
+            logger.error(f"❌ WordPress auto - connection error: {str(e)}")
             return False
 
     async def run_startup_sequence(self):

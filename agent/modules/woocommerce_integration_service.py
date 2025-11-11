@@ -21,11 +21,11 @@ class WooCommerceIntegrationService:
 
         self.auth = HTTPBasicAuth(self.consumer_key, self.consumer_secret)
 
-        logger.info("🛒 WooCommerce Integration Service initialized for luxury e-commerce")
+        logger.info("🛒 WooCommerce Integration Service initialized for luxury e - commerce")
 
     def set_site_url(self, site_url: str):
         """Set the WooCommerce site URL for API calls."""
-        self.base_url = f"{site_url.rstrip('/')}/wp-json/wc/v3"
+        self.base_url = f"{site_url.rstrip('/')} / wp - json / wc / v3"
         logger.info(f"🌐 WooCommerce API base URL set: {self.base_url}")
 
     async def get_products(self, per_page: int = 20, category: str = None, status: str = 'publish') -> Dict[str, Any]:
@@ -43,9 +43,9 @@ class WooCommerceIntegrationService:
                 params['category'] = category
 
             response = requests.get(
-                f"{self.base_url}/products",
-                auth=self.auth,
-                params=params
+                f"{self.base_url} / products",
+                auth = self.auth,
+                params = params
             )
             response.raise_for_status()
 
@@ -73,9 +73,9 @@ class WooCommerceIntegrationService:
                 params['status'] = status
 
             response = requests.get(
-                f"{self.base_url}/orders",
-                auth=self.auth,
-                params=params
+                f"{self.base_url} / orders",
+                auth = self.auth,
+                params = params
             )
             response.raise_for_status()
 
@@ -102,9 +102,9 @@ class WooCommerceIntegrationService:
             enhanced_product = await self._enhance_product_for_luxury(product_data)
 
             response = requests.post(
-                f"{self.base_url}/products",
-                auth=self.auth,
-                json=enhanced_product
+                f"{self.base_url} / products",
+                auth = self.auth,
+                json = enhanced_product
             )
             response.raise_for_status()
 
@@ -134,9 +134,9 @@ class WooCommerceIntegrationService:
             luxury_updates = await self._apply_luxury_enhancements(updates)
 
             response = requests.put(
-                f"{self.base_url}/products/{product_id}",
-                auth=self.auth,
-                json=luxury_updates
+                f"{self.base_url} / products / {product_id}",
+                auth = self.auth,
+                json = luxury_updates
             )
             response.raise_for_status()
 
@@ -162,9 +162,9 @@ class WooCommerceIntegrationService:
                 return {'error': 'WooCommerce site URL not configured'}
 
             response = requests.get(
-                f"{self.base_url}/products/categories",
-                auth=self.auth,
-                params={'per_page': 100}
+                f"{self.base_url} / products / categories",
+                auth = self.auth,
+                params = {'per_page': 100}
             )
             response.raise_for_status()
 
@@ -197,9 +197,9 @@ class WooCommerceIntegrationService:
             }
 
             response = requests.post(
-                f"{self.base_url}/products/categories",
-                auth=self.auth,
-                json=category_data
+                f"{self.base_url} / products / categories",
+                auth = self.auth,
+                json = category_data
             )
             response.raise_for_status()
 
@@ -230,7 +230,7 @@ class WooCommerceIntegrationService:
                     'mobile_luxury_experience',
                     'conversion_rate_optimization'
                 ],
-                'estimated_conversion_improvement': '+25%',
+                'estimated_conversion_improvement': ' + 25%',
                 'implementation_status': 'ready_for_deployment',
                 'agent_responsible': 'performance_agent'
             }
@@ -251,9 +251,9 @@ class WooCommerceIntegrationService:
 
             # Get sales reports
             reports_response = requests.get(
-                f"{self.base_url}/reports/sales",
-                auth=self.auth,
-                params={'period': period}
+                f"{self.base_url} / reports / sales",
+                auth = self.auth,
+                params = {'period': period}
             )
 
             sales_data = {}
@@ -356,7 +356,7 @@ class WooCommerceIntegrationService:
         # Enhance description
         if 'description' in enhanced:
             luxury_desc_additions = [
-                "\n\n✨ <strong>Luxury Features:</strong>",
+                "\n\n✨ <strong>Luxury Features:< / strong>",
                 "• Handcrafted with premium materials",
                 "• Exclusive design for discerning customers",
                 "• Limited availability - secure yours today",
