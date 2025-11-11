@@ -5,11 +5,11 @@
 # ============================================================================
 # Core Framework (CLAUDE.md Requirement: Specify exact versions)
 # ============================================================================
-fastapi==0.104.1  # Web framework - https://fastapi.tiangolo.com/
-pydantic==2.5.0  # Data validation - https://docs.pydantic.dev/
-pydantic-settings==2.1.0  # Settings management
-uvicorn[standard]==0.24.0  # ASGI server
-python-multipart==0.0.6  # File upload support
+fastapi==0.119.0  # Web framework - Updated for compatibility
+pydantic>=2.12.4,<3.0.0  # Data validation - Updated: mcp 1.21.0 requires >=2.11.0
+pydantic-settings>=2.12.0,<3.0.0  # Settings management - Required by mcp 1.21.0
+uvicorn[standard]==0.38.0  # ASGI server - Updated
+python-multipart==0.0.18  # File upload support - Updated
 
 # ============================================================================
 # Security (CLAUDE.md: Cite RFC 7519 for JWT, NIST SP 800-38D for encryption)

@@ -7,7 +7,8 @@ setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
 # Core Framework
 fastapi==0.119.0
 uvicorn[standard]==0.34.0
-pydantic==2.10.4
+pydantic>=2.12.4,<3.0.0  # Updated: mcp 1.21.0 requires >=2.11.0
+pydantic-settings>=2.12.0,<3.0.0  # Required by mcp 1.21.0
 python-dotenv==1.0.1
 
 # Database

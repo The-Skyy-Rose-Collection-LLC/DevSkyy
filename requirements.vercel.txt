@@ -7,8 +7,9 @@ fastapi==0.119.0
 uvicorn[standard]==0.34.0
 starlette==0.48.0
 
-# Essential Dependencies with Email Support (FIXED)
-pydantic==2.7.4
+# Essential Dependencies with Email Support (UPDATED)
+pydantic[email]>=2.12.4,<3.0.0  # Updated: mcp 1.21.0 requires >=2.11.0
+pydantic-settings>=2.12.0,<3.0.0  # Required by mcp 1.21.0
 email-validator==2.1.0  # Explicit email validator for Pydantic
 python-multipart==0.0.18
 PyJWT==2.10.1  # Replaces python-jose for better security
@@ -49,7 +50,7 @@ jinja2==3.1.4
 
 # Vercel-specific optimizations
 dnspython==2.7.0  # Required for some networking operations
-typing-extensions==4.12.2  # Ensure compatibility
+typing-extensions>=4.15.0  # Updated: pydantic 2.12.4 requires >=4.14.1
 
 # Note: Heavy dependencies like TensorFlow, PyTorch are excluded
 # for optimal serverless performance and faster cold starts
