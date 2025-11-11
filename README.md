@@ -423,11 +423,49 @@ python3 -c "from main import app; print('✅ Backend secure')"
 
 ## 🤝 Contributing
 
-1. Fork repository
-2. Create feature branch
-3. Add tests for new features
-4. Run safety check
-5. Submit pull request
+We welcome contributions! Please follow our code quality standards and review guidelines.
+
+### Quick Start for Contributors
+
+1. **Fork repository**
+2. **Set up development environment**
+   ```bash
+   pip install -r requirements-dev.txt
+   pre-commit install
+   ```
+3. **Create feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. **Make changes following our standards**
+   - See [Code Quality Quick Start](docs/CODE_QUALITY_QUICK_START.md)
+   - Follow [Code Quality Standards](docs/CODE_QUALITY_STANDARDS.md)
+   - Use [Docstring Guide](docs/DOCSTRING_GUIDE.md) for documentation
+5. **Add tests for new features**
+6. **Run quality checks**
+   ```bash
+   pre-commit run --all-files
+   pytest
+   ```
+7. **Submit pull request**
+   - Use [Code Review Checklist](docs/CODE_REVIEW_CHECKLIST.md)
+
+### Code Quality Documentation
+
+- 📘 [Code Quality Quick Start](docs/CODE_QUALITY_QUICK_START.md) - Get started in 5 minutes
+- 📙 [Code Quality Standards](docs/CODE_QUALITY_STANDARDS.md) - Complete standards guide
+- 📗 [Docstring Guide](docs/DOCSTRING_GUIDE.md) - How to write documentation
+- 📕 [Code Review Checklist](docs/CODE_REVIEW_CHECKLIST.md) - Review guidelines
+- 📓 [Implementation Summary](docs/CODE_QUALITY_IMPLEMENTATION_SUMMARY.md) - Recent improvements
+
+### Development Tools
+
+All code is automatically checked with:
+- **Linting**: Ruff, Flake8, Black, isort
+- **Type Checking**: MyPy
+- **Security**: Bandit
+- **Pre-commit Hooks**: Automated quality enforcement
+- **CI/CD Pipeline**: Continuous quality validation
 
 ## 📄 License
 
