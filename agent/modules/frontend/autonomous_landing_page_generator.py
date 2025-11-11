@@ -16,13 +16,14 @@ Features:
 """
 
 import asyncio
+from datetime import datetime
 import logging
 import random
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from uuid import uuid4
 
 from jinja2 import Template
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +68,7 @@ class AutonomousLandingPageGenerator:
 
         logger.info("🚀 Autonomous Landing Page Generator initialized")
 
-    def _load_templates(self) -> Dict[str, str]:
+    def _load_templates(self) -> dict[str, str]:
         """Load base templates for landing pages."""
         return {
             "luxury_fashion": """
@@ -151,7 +152,7 @@ class AutonomousLandingPageGenerator:
         target_audience: str,
         goal: str = "email_signup",
         num_variants: int = 4,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate multiple landing page variants for A/B testing.
 
@@ -196,7 +197,7 @@ class AutonomousLandingPageGenerator:
 
     async def _create_variant(
         self, product_name: str, target_audience: str, goal: str, variant_label: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a single landing page variant."""
         variant_id = str(uuid4())
 
@@ -357,11 +358,11 @@ class AutonomousLandingPageGenerator:
                 <button data-conversion="purchase" class="cta-large">{cta_text}</button>
                 <p>Free worldwide shipping on orders over $500</p>
             """,
-            "demo_request": f"""
+            "demo_request": """
                 <button data-conversion="demo_request">Schedule Personal Consultation</button>
                 <p>Experience our collection with a style expert</p>
             """,
-            "download": f"""
+            "download": """
                 <button data-conversion="download">Download Lookbook</button>
                 <p>Get our exclusive 2024 collection catalog</p>
             """,
@@ -565,7 +566,7 @@ class AutonomousLandingPageGenerator:
         test_id: str,
         variant_id: str,
         event_type: str,
-        data: Optional[Dict] = None,
+        data: Optional[dict] = None,
     ) -> bool:
         """
         Track user interaction event for A/B testing.
@@ -605,7 +606,7 @@ class AutonomousLandingPageGenerator:
 
         return True
 
-    async def analyze_test_performance(self, test_id: str) -> Dict[str, Any]:
+    async def analyze_test_performance(self, test_id: str) -> dict[str, Any]:
         """
         Analyze A/B test performance and determine winner.
 
@@ -664,7 +665,7 @@ class AutonomousLandingPageGenerator:
 
     def _calculate_confidence(
         self, conversions: int, views: int
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Calculate 95% confidence interval for conversion rate."""
         if views == 0:
             return (0, 0)
@@ -686,7 +687,7 @@ class AutonomousLandingPageGenerator:
 
         return (max(0, lower), min(1, upper))
 
-    def _get_recommendation(self, results: List[Dict], winner: Optional[Dict]) -> str:
+    def _get_recommendation(self, results: list[dict], winner: Optional[dict]) -> str:
         """Generate recommendation based on test results."""
         if winner:
             elements = winner["elements"]
@@ -717,7 +718,7 @@ class AutonomousLandingPageGenerator:
             3. Testing different page elements
             """
 
-    async def auto_optimize(self, test_id: str) -> Dict[str, Any]:
+    async def auto_optimize(self, test_id: str) -> dict[str, Any]:
         """
         Automatically optimize landing page based on test results.
         Generates new variants based on winning elements.
@@ -779,9 +780,9 @@ class AutonomousLandingPageGenerator:
         product_name: str,
         target_audience: str,
         goal: str,
-        winning_elements: Dict,
+        winning_elements: dict,
         variant_label: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create optimized variant based on winning elements."""
         # Start with winning elements and make minor variations
         variant = await self._create_variant(
@@ -826,7 +827,7 @@ class AutonomousLandingPageGenerator:
         # In production, would use proper color theory
         return f"{colors[0]}/{colors[1]}"
 
-    async def export_winner(self, test_id: str) -> Dict[str, Any]:
+    async def export_winner(self, test_id: str) -> dict[str, Any]:
         """
         Export winning landing page variant for production deployment.
         """
@@ -914,8 +915,6 @@ async def main():
         num_variants=4,
     )
 
-    print(f"✅ Generated test: {result['test_id']}")
-    print(f"📊 Created {len(result['variants'])} variants")
 
     # Simulate some traffic and conversions
     test_id = result["test_id"]
@@ -933,24 +932,21 @@ async def main():
     # Analyze results
     analysis = await generator.analyze_test_performance(test_id)
 
-    print("\n📊 Test Results:")
     for result in analysis["results"]:
-        print(
-            f"  {result['variant']}: {result['conversion_rate']:.2%} ({result['views']} views)"
-        )
+        pass
 
     if analysis.get("winner"):
-        print(f"\n🏆 Winner: {analysis['winner']['variant']}")
+        pass
 
     # Auto-optimize based on results
     optimization = await generator.auto_optimize(test_id)
     if optimization["status"] == "optimized":
-        print(f"\n🚀 Created optimized test: {optimization['new_test_id']}")
+        pass
 
     # Export winner
     export = await generator.export_winner(test_id)
     if export["status"] == "exported":
-        print(f"\n✅ Exported to: {export['filename']}")
+        pass
 
 
 if __name__ == "__main__":

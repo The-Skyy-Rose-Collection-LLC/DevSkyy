@@ -3,6 +3,7 @@ from agent.modules.backend.financial_agent import FinancialAgent
 from agent.modules.backend.inventory_agent import InventoryAgent
 from agent.modules.backend.seo_marketing_agent import SEOMarketingAgent
 
+
 class TestFinancialAgent:
 
     def test_chargeback_monitoring(self):

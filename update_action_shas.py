@@ -13,12 +13,13 @@ This script:
 
 import json
 import os
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
 
 # GitHub API base URL
 GITHUB_API = "https://api.github.com"
@@ -71,7 +72,7 @@ class ActionSHAUpdater:
     def __init__(self, dry_run: bool = False, verbose: bool = False):
         self.dry_run = dry_run
         self.verbose = verbose
-        self.sha_cache: Dict[str, str] = {}
+        self.sha_cache: dict[str, str] = {}
         self.github_token = os.environ.get("GITHUB_TOKEN", "")
 
     def log(self, message: str, level: str = "INFO"):
@@ -85,9 +86,7 @@ class ActionSHAUpdater:
             "ERROR": "\033[0;31m",
             "VERBOSE": "\033[0;36m",
         }
-        color = colors.get(level, "")
-        reset = "\033[0m"
-        print(f"{color}[{level}] {message}{reset}")
+        colors.get(level, "")
 
     def get_repo_from_action(self, action: str) -> Optional[str]:
         """Extract repository name from action string."""
@@ -204,7 +203,7 @@ class ActionSHAUpdater:
 
         return None
 
-    def extract_actions_from_file(self, filepath: Path) -> List[Tuple[str, str, int]]:
+    def extract_actions_from_file(self, filepath: Path) -> list[tuple[str, str, int]]:
         """Extract all action usages from a workflow file.
 
         Returns list of tuples: (action_name, version_or_sha, line_number)
@@ -254,11 +253,11 @@ class ActionSHAUpdater:
         with open(filepath, "r") as f:
             content = f.read()
 
-        _original_content = content  # noqa: F841
+        _original_content = content
         updates_made = 0
 
         # Process each action
-        for action, version, line_num in actions:
+        for action, version, _line_num in actions:
             repo = self.get_repo_from_action(action)
 
             if not repo:
@@ -301,7 +300,7 @@ class ActionSHAUpdater:
 
         return False
 
-    def update_all_workflows(self, workflows_dir: Path) -> Dict[str, int]:
+    def update_all_workflows(self, workflows_dir: Path) -> dict[str, int]:
         """Update all workflow files in directory.
 
         Returns dict with statistics.
@@ -361,47 +360,27 @@ def main():
     # Get workflows directory
     workflows_dir = Path(args.workflows_dir)
     if not workflows_dir.exists():
-        print(f"❌ Error: Workflows directory not found: {workflows_dir}")
         sys.exit(1)
 
     # Create updater
     updater = ActionSHAUpdater(dry_run=args.dry_run, verbose=args.verbose)
 
     # Show configuration
-    print("\n🔒 GitHub Actions SHA Updater")
-    print("=" * 60)
     if args.dry_run:
-        print("🔍 DRY RUN MODE: No files will be modified")
+        pass
     if not updater.github_token:
-        print("⚠️  No GITHUB_TOKEN set - rate limiting may occur")
-    print()
+        pass
 
     # Update workflows
     stats = updater.update_all_workflows(workflows_dir)
 
     # Print summary
-    print("\n" + "=" * 60)
-    print("📊 Summary")
-    print("=" * 60)
-    print(f"Total workflow files: {stats['total_files']}")
-    print(f"Files updated: {stats['updated_files']}")
-    print(f"Files unchanged: {stats['total_files'] - stats['updated_files']}")
 
-    if args.dry_run:
-        print("\n💡 This was a dry run. Use without --dry-run to apply changes.")
-    elif stats["updated_files"] > 0:
-        print("\n✅ Workflow files updated successfully!")
-        print("\n💡 Next steps:")
-        print("  1. Review changes: git diff .github/workflows/")
-        print("  2. Test workflows in a branch")
-        print(
-            "  3. Commit: git add .github/workflows/ && git commit -m 'security: Update actions to use commit SHAs'"
-        )
-        print("  4. Push: git push")
+    if args.dry_run or stats["updated_files"] > 0:
+        pass
     else:
-        print("\n✅ All workflows already use commit SHAs!")
+        pass
 
-    print()
 
 
 if __name__ == "__main__":

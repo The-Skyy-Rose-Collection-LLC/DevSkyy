@@ -17,18 +17,19 @@ Features:
 - Customer service voice automation
 """
 
+from datetime import datetime
 import io
 import logging
 import os
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
-import httpx
 from anthropic import AsyncAnthropic
+import httpx
 from openai import AsyncOpenAI
 from pydub import AudioSegment
 from pydub.effects import normalize
+
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +124,7 @@ class VoiceAudioContentAgent:
         content_type: str = "product_showcase",
         add_music: bool = True,
         output_format: str = "mp3",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate premium voice content with customizable style and music.
 
@@ -338,7 +339,7 @@ Return the enhanced text optimized for voice generation."""
 
     async def transcribe_audio(
         self, audio_path: Union[str, Path], language: str = "en"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Transcribe audio to text using OpenAI Whisper.
 
@@ -394,7 +395,7 @@ Return the enhanced text optimized for voice generation."""
 
     async def analyze_voice_sentiment(
         self, audio_path: Union[str, Path]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze sentiment and emotions from voice audio.
 
@@ -456,7 +457,7 @@ Consider this is for a luxury fashion brand customer interaction."""
         intro_text: Optional[str] = None,
         outro_text: Optional[str] = None,
         voice_style: str = "narrator",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Create a complete podcast episode with intro, main content, and outro.
 
@@ -478,7 +479,7 @@ Consider this is for a luxury fashion brand customer interaction."""
                 intro_text = f"Welcome to The Skyy Rose Collection Podcast. Today's episode: {episode_title}."
 
             if not outro_text:
-                outro_text = "Thank you for listening to The Skyy Rose Collection Podcast. Visit us at theskyy-rose-collection.com for more exclusive content."  # noqa: E501
+                outro_text = "Thank you for listening to The Skyy Rose Collection Podcast. Visit us at theskyy-rose-collection.com for more exclusive content."
 
             # Generate all audio segments
             segments = []
@@ -522,8 +523,8 @@ Consider this is for a luxury fashion brand customer interaction."""
             return {"error": str(e), "status": "failed"}
 
     async def _combine_audio_segments(
-        self, segments: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, segments: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Combine multiple audio segments into one file.
         """
@@ -563,7 +564,7 @@ Consider this is for a luxury fashion brand customer interaction."""
         product_description: str,
         call_to_action: str,
         duration_seconds: int = 30,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate a complete audio advertisement for a product.
 
@@ -636,21 +637,21 @@ voice_audio_agent = create_voice_audio_agent()
 
 
 # Convenience functions
-async def generate_voice(text: str, style: str = "luxury") -> Dict[str, Any]:
+async def generate_voice(text: str, style: str = "luxury") -> dict[str, Any]:
     """Generate voice content from text."""
     return await voice_audio_agent.generate_voice_content(text, style)
 
 
-async def transcribe(audio_path: str) -> Dict[str, Any]:
+async def transcribe(audio_path: str) -> dict[str, Any]:
     """Transcribe audio to text."""
     return await voice_audio_agent.transcribe_audio(audio_path)
 
 
-async def analyze_voice(audio_path: str) -> Dict[str, Any]:
+async def analyze_voice(audio_path: str) -> dict[str, Any]:
     """Analyze voice sentiment."""
     return await voice_audio_agent.analyze_voice_sentiment(audio_path)
 
 
-async def create_audio_ad(product: str, description: str, cta: str) -> Dict[str, Any]:
+async def create_audio_ad(product: str, description: str, cta: str) -> dict[str, Any]:
     """Create audio advertisement."""
     return await voice_audio_agent.generate_audio_ad(product, description, cta)

@@ -13,9 +13,10 @@ This system provides:
 """
 
 import asyncio
-import logging
 from datetime import datetime
-from typing import Any, Dict, List
+import logging
+from typing import Any
+
 
 logger = logging.getLogger(__name__)
 
@@ -74,8 +75,8 @@ class PredictiveAutomationSystem:
         }
 
     async def predict_and_prevent_issues(
-        self, system_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, system_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Main function to predict and prevent system issues."""
         try:
             logger.info("🔍 Running predictive issue analysis...")
@@ -127,8 +128,8 @@ class PredictiveAutomationSystem:
             return {"error": str(e), "status": "failed"}
 
     async def intelligent_resource_scaling(
-        self, demand_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, demand_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Intelligent resource scaling based on predicted demand."""
         try:
             logger.info("📈 Running intelligent resource scaling...")
@@ -179,8 +180,8 @@ class PredictiveAutomationSystem:
             return {"error": str(e), "status": "failed"}
 
     async def automated_performance_tuning(
-        self, performance_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, performance_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Automated performance tuning using ML algorithms."""
         try:
             logger.info("⚡ Running automated performance tuning...")
@@ -235,8 +236,8 @@ class PredictiveAutomationSystem:
             return {"error": str(e), "status": "failed"}
 
     async def predictive_security_hardening(
-        self, security_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, security_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predictive security hardening to prevent attacks."""
         try:
             logger.info("🛡️ Running predictive security hardening...")
@@ -285,8 +286,8 @@ class PredictiveAutomationSystem:
             return {"error": str(e), "status": "failed"}
 
     async def intelligent_capacity_planning(
-        self, growth_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, growth_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Intelligent capacity planning for future growth."""
         try:
             logger.info("📊 Running intelligent capacity planning...")
@@ -335,8 +336,8 @@ class PredictiveAutomationSystem:
             return {"error": str(e), "status": "failed"}
 
     async def proactive_user_experience_optimization(
-        self, ux_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, ux_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Proactive optimization of user experience."""
         try:
             logger.info("👥 Running proactive UX optimization...")
@@ -387,8 +388,8 @@ class PredictiveAutomationSystem:
     # Helper methods for predictive analysis
 
     async def _collect_comprehensive_data(
-        self, system_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, system_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Collect comprehensive system data for analysis."""
         enhanced_data = {
             "timestamp": datetime.now().isoformat(),
@@ -428,8 +429,8 @@ class PredictiveAutomationSystem:
         return enhanced_data
 
     async def _run_multi_dimensional_predictions(
-        self, data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Run predictions across multiple dimensions."""
         predictions = {}
 
@@ -459,7 +460,7 @@ class PredictiveAutomationSystem:
 
         return predictions
 
-    async def _assess_risk_levels(self, predictions: Dict[str, Any]) -> Dict[str, Any]:
+    async def _assess_risk_levels(self, predictions: dict[str, Any]) -> dict[str, Any]:
         """Assess risk levels based on predictions."""
         risk_assessment = {
             "overall_risk": "medium",
@@ -504,8 +505,8 @@ class PredictiveAutomationSystem:
         return risk_assessment
 
     async def _generate_prevention_strategies(
-        self, predictions: Dict[str, Any], risk_assessment: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, predictions: dict[str, Any], risk_assessment: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate prevention strategies based on predictions and risk assessment."""
         strategies = {
             "immediate_actions": [],
@@ -538,8 +539,8 @@ class PredictiveAutomationSystem:
         return strategies
 
     async def _execute_proactive_measures(
-        self, strategies: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, strategies: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute proactive measures based on strategies."""
         execution_results = {
             "immediate_actions_executed": 0,
@@ -584,8 +585,8 @@ class PredictiveAutomationSystem:
     # Prediction helper methods
 
     async def _predict_system_performance(
-        self, system_metrics: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, system_metrics: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predict system performance issues."""
         cpu_trend = system_metrics.get("cpu_usage", 65.5)
         memory_trend = system_metrics.get("memory_usage", 72.3)
@@ -604,8 +605,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _predict_application_health(
-        self, app_metrics: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, app_metrics: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predict application health issues."""
         error_rate = app_metrics.get("error_rate", 0.023)
         response_time = app_metrics.get("response_time", 145)
@@ -621,8 +622,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _predict_business_impact(
-        self, business_metrics: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, business_metrics: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predict business impact."""
         conversion_rate = business_metrics.get("conversion_rate", 0.034)
         satisfaction = business_metrics.get("customer_satisfaction", 4.3)
@@ -639,7 +640,7 @@ class PredictiveAutomationSystem:
             "confidence": 0.85,
         }
 
-    async def _predict_resource_demand(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_resource_demand(self, data: dict[str, Any]) -> dict[str, Any]:
         """Predict resource demand."""
         return {
             "risk_score": 0.4,
@@ -649,7 +650,7 @@ class PredictiveAutomationSystem:
             "confidence": 0.87,
         }
 
-    async def _predict_security_threats(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_security_threats(self, data: dict[str, Any]) -> dict[str, Any]:
         """Predict security threats."""
         return {
             "risk_score": 0.2,
@@ -659,7 +660,7 @@ class PredictiveAutomationSystem:
             "confidence": 0.78,
         }
 
-    async def _predict_user_experience(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _predict_user_experience(self, data: dict[str, Any]) -> dict[str, Any]:
         """Predict user experience issues."""
         bounce_rate = data["business_metrics"].get("bounce_rate", 0.42)
         risk_score = min(bounce_rate * 2, 1.0)
@@ -675,8 +676,8 @@ class PredictiveAutomationSystem:
     # Strategy creation helper methods
 
     async def _create_critical_issue_strategy(
-        self, issue: str, prediction: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, issue: str, prediction: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create strategy for critical issues."""
         return {
             "issue": issue,
@@ -693,8 +694,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _create_high_priority_strategy(
-        self, issue: str, prediction: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, issue: str, prediction: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create strategy for high priority issues."""
         return {
             "issue": issue,
@@ -704,8 +705,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _generate_preventive_measures(
-        self, predictions: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, predictions: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate preventive measures."""
         return [
             {
@@ -727,7 +728,7 @@ class PredictiveAutomationSystem:
 
     # Execution helper methods
 
-    async def _execute_immediate_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+    async def _execute_immediate_action(self, action: dict[str, Any]) -> dict[str, Any]:
         """Execute immediate action."""
         # Simulate action execution
         await asyncio.sleep(0.1)
@@ -740,8 +741,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _trigger_automated_response(
-        self, response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, response: dict[str, Any]
+    ) -> dict[str, Any]:
         """Trigger automated response."""
         # Simulate response triggering
         await asyncio.sleep(0.05)
@@ -754,8 +755,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _implement_preventive_measure(
-        self, measure: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, measure: dict[str, Any]
+    ) -> dict[str, Any]:
         """Implement preventive measure."""
         # Simulate measure implementation
         await asyncio.sleep(0.02)
@@ -770,8 +771,8 @@ class PredictiveAutomationSystem:
     # Monitoring and reporting helper methods
 
     async def _monitor_prevention_effectiveness(
-        self, prevention_results: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, prevention_results: dict[str, Any]
+    ) -> dict[str, Any]:
         """Monitor prevention effectiveness."""
         return {
             "effectiveness_score": 0.94,
@@ -782,8 +783,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _generate_executive_report(
-        self, predictions: Dict, prevention_results: Dict, effectiveness: Dict
-    ) -> Dict[str, Any]:
+        self, predictions: dict, prevention_results: dict, effectiveness: dict
+    ) -> dict[str, Any]:
         """Generate executive report."""
         return {
             "executive_summary": "Predictive automation successfully prevented 3 critical issues",
@@ -802,7 +803,7 @@ class PredictiveAutomationSystem:
             "next_review": "24_hours",
         }
 
-    async def _get_historical_context(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _get_historical_context(self, data: dict[str, Any]) -> dict[str, Any]:
         """Get historical context for predictions."""
         return {
             "similar_patterns": "detected_3_times_last_month",
@@ -815,8 +816,8 @@ class PredictiveAutomationSystem:
     # Due to length constraints, I'm including the key methods that demonstrate the pattern
 
     async def _analyze_current_utilization(
-        self, demand_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, demand_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze current resource utilization."""
         return {
             "cpu_utilization": 68.5,
@@ -827,8 +828,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _predict_demand_patterns(
-        self, demand_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, demand_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Predict future demand patterns."""
         return {
             "next_hour": {"cpu": "+15%", "memory": "+10%", "network": "+25%"},
@@ -838,8 +839,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _calculate_optimal_allocation(
-        self, utilization: Dict, predictions: Dict
-    ) -> Dict[str, Any]:
+        self, utilization: dict, predictions: dict
+    ) -> dict[str, Any]:
         """Calculate optimal resource allocation."""
         return {
             "recommended_cpu": "scale_to_150_percent",
@@ -849,8 +850,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _generate_scaling_recommendations(
-        self, allocation: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, allocation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate scaling recommendations."""
         return {
             "immediate_scaling": ["web_servers", "database_connections"],
@@ -861,8 +862,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _execute_scaling_actions(
-        self, recommendations: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, recommendations: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute scaling actions."""
         return {
             "actions_executed": 4,
@@ -873,8 +874,8 @@ class PredictiveAutomationSystem:
         }
 
     async def _monitor_scaling_effectiveness(
-        self, results: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, results: dict[str, Any]
+    ) -> dict[str, Any]:
         """Monitor scaling effectiveness."""
         return {
             "performance_improvement": results["performance_gain"],
@@ -895,35 +896,35 @@ predictive_system = create_predictive_automation_system()
 
 
 # Convenience functions for easy access
-async def predict_and_prevent_issues(system_data: Dict[str, Any]) -> Dict[str, Any]:
+async def predict_and_prevent_issues(system_data: dict[str, Any]) -> dict[str, Any]:
     """Predict and prevent system issues."""
     return await predictive_system.predict_and_prevent_issues(system_data)
 
 
-async def intelligent_scale_resources(demand_data: Dict[str, Any]) -> Dict[str, Any]:
+async def intelligent_scale_resources(demand_data: dict[str, Any]) -> dict[str, Any]:
     """Intelligently scale resources."""
     return await predictive_system.intelligent_resource_scaling(demand_data)
 
 
-async def auto_tune_performance(performance_data: Dict[str, Any]) -> Dict[str, Any]:
+async def auto_tune_performance(performance_data: dict[str, Any]) -> dict[str, Any]:
     """Automatically tune performance."""
     return await predictive_system.automated_performance_tuning(performance_data)
 
 
 async def predictive_security_hardening(
-    security_data: Dict[str, Any]
-) -> Dict[str, Any]:
+    security_data: dict[str, Any]
+) -> dict[str, Any]:
     """Predictively harden security."""
     return await predictive_system.predictive_security_hardening(security_data)
 
 
-async def intelligent_capacity_planning(growth_data: Dict[str, Any]) -> Dict[str, Any]:
+async def intelligent_capacity_planning(growth_data: dict[str, Any]) -> dict[str, Any]:
     """Plan capacity intelligently."""
     return await predictive_system.intelligent_capacity_planning(growth_data)
 
 
 async def optimize_user_experience_proactively(
-    ux_data: Dict[str, Any]
-) -> Dict[str, Any]:
+    ux_data: dict[str, Any]
+) -> dict[str, Any]:
     """Proactively optimize user experience."""
     return await predictive_system.proactive_user_experience_optimization(ux_data)

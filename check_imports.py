@@ -6,9 +6,9 @@ without actually executing them
 """
 
 import ast
-import sys
 from pathlib import Path
-from typing import List, Tuple
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [
@@ -25,7 +25,7 @@ CRITICAL_FILES = [
     "api/training_data_interface.py",
 ]
 
-def extract_imports(file_path: Path) -> Tuple[bool, List[str], str]:
+def extract_imports(file_path: Path) -> tuple[bool, list[str], str]:
     """
     Extract and verify all import statements from a Python file.
     Returns (success, imports_list, error_message)
@@ -55,9 +55,9 @@ def extract_imports(file_path: Path) -> Tuple[bool, List[str], str]:
     except SyntaxError as e:
         return False, [], f"Syntax error: Line {e.lineno}: {e.msg}"
     except Exception as e:
-        return False, [], f"Error: {str(e)}"
+        return False, [], f"Error: {e!s}"
 
-def check_common_issues(imports: List[str]) -> List[str]:
+def check_common_issues(imports: list[str]) -> list[str]:
     """Check for common import issues"""
     issues = []
 
@@ -79,10 +79,6 @@ def check_common_issues(imports: List[str]) -> List[str]:
 
 def main():
     """Main verification function"""
-    print("=" * 70)
-    print("DevSkyy Import Syntax Verification")
-    print("=" * 70)
-    print()
 
     base_path = Path("/home/user/DevSkyy")
     passed = 0
@@ -93,33 +89,25 @@ def main():
         full_path = base_path / file_path
 
         if not full_path.exists():
-            print(f"❌ {file_path}: File not found")
             failed += 1
             continue
 
-        success, imports, error = extract_imports(full_path)
+        success, imports, _error = extract_imports(full_path)
 
         if success:
             issues = check_common_issues(imports)
 
             if issues:
-                print(f"⚠️  {file_path}: {len(imports)} imports, {len(issues)} warnings")
-                for issue in issues:
-                    print(f"    - {issue}")
+                for _issue in issues:
+                    pass
             else:
-                print(f"✅ {file_path}: {len(imports)} imports - OK")
+                pass
 
             passed += 1
             total_imports += len(imports)
         else:
-            print(f"❌ {file_path}: {error}")
             failed += 1
 
-    print()
-    print("=" * 70)
-    print(f"Files: {passed} passed, {failed} failed")
-    print(f"Total imports verified: {total_imports}")
-    print("=" * 70)
 
     return 0 if failed == 0 else 1
 

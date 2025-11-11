@@ -1,20 +1,21 @@
+from abc import ABC, abstractmethod
+import ast
+import asyncio
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from enum import Enum
+import logging
+import time
+from typing import Any, Optional
+import uuid
+
 from api_integration.core_engine import api_gateway
 from api_integration.enums import WorkflowStatus
-from datetime import datetime
+from fashion.intelligence_engine import fashion_intelligence
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.notification_manager import notification_manager
 from infrastructure.redis_manager import redis_manager
-import time
 
-from abc import ABC, abstractmethod
-from dataclasses import asdict, dataclass, field
-from enum import Enum
-from fashion.intelligence_engine import fashion_intelligence
-from typing import Any, Dict, List, Optional
-import ast
-import asyncio
-import logging
-import uuid
 
 """
 Automation Workflow Engine
@@ -68,11 +69,11 @@ class WorkflowTrigger:
     trigger_type: TriggerType
     name: str
     description: str
-    config: Dict[str, Any]
+    config: dict[str, Any]
     enabled: bool = True
     created_at: datetime = field(default_factory=datetime.now)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["trigger_type"] = self.trigger_type.value
@@ -86,19 +87,19 @@ class WorkflowStep:
     step_id: str
     name: str
     action_type: ActionType
-    config: Dict[str, Any]
-    depends_on: List[str] = field(default_factory=list)
+    config: dict[str, Any]
+    depends_on: list[str] = field(default_factory=list)
     retry_count: int = 0
     max_retries: int = 3
     timeout: int = 300
-    rollback_config: Optional[Dict[str, Any]] = None
+    rollback_config: Optional[dict[str, Any]] = None
     status: StepStatus = StepStatus.PENDING
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     error_message: Optional[str] = None
     result: Any = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["action_type"] = self.action_type.value
@@ -117,8 +118,8 @@ class Workflow:
     name: str
     description: str
     trigger: WorkflowTrigger
-    steps: List[WorkflowStep]
-    variables: Dict[str, Any] = field(default_factory=dict)
+    steps: list[WorkflowStep]
+    variables: dict[str, Any] = field(default_factory=dict)
     status: WorkflowStatus = WorkflowStatus.PENDING
     created_at: datetime = field(default_factory=datetime.now)
     started_at: Optional[datetime] = None
@@ -126,7 +127,7 @@ class Workflow:
     execution_time: float = 0.0
     fashion_context: bool = False
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["trigger"] = self.trigger.to_dict()
@@ -144,20 +145,20 @@ class WorkflowAction(ABC):
 
     @abstractmethod
     async def execute(
-        self, step: WorkflowStep, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute the workflow action"""
 
     @abstractmethod
-    async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
+    async def rollback(self, step: WorkflowStep, context: dict[str, Any]) -> bool:
         """Rollback the workflow action"""
 
 class APICallAction(WorkflowAction):
     """API call workflow action"""
 
     async def execute(
-        self, step: WorkflowStep, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute API call"""
 
         config = step.config
@@ -178,7 +179,7 @@ class APICallAction(WorkflowAction):
 
         return result
 
-    async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
+    async def rollback(self, step: WorkflowStep, context: dict[str, Any]) -> bool:
         """Rollback API call (if rollback config provided)"""
 
         if not step.rollback_config:
@@ -201,8 +202,8 @@ class APICallAction(WorkflowAction):
             return False
 
     def _resolve_variables(
-        self, config: Dict[str, Any], context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, config: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve variables in configuration"""
 
         resolved = {}
@@ -226,8 +227,8 @@ class NotificationAction(WorkflowAction):
     """Notification workflow action"""
 
     async def execute(
-        self, step: WorkflowStep, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send notification"""
 
         config = step.config
@@ -241,7 +242,7 @@ class NotificationAction(WorkflowAction):
 
         return {"success": True, "message_id": message_id, "notification_sent": True}
 
-    async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
+    async def rollback(self, step: WorkflowStep, context: dict[str, Any]) -> bool:
         """Rollback notification (no-op for notifications)"""
         return True
 
@@ -249,8 +250,8 @@ class FashionAnalysisAction(WorkflowAction):
     """Fashion analysis workflow action"""
 
     async def execute(
-        self, step: WorkflowStep, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Perform fashion analysis"""
 
         config = step.config
@@ -282,7 +283,7 @@ class FashionAnalysisAction(WorkflowAction):
             "analysis_type": analysis_type,
         }
 
-    async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
+    async def rollback(self, step: WorkflowStep, context: dict[str, Any]) -> bool:
         """Rollback fashion analysis (no-op for analysis)"""
         return True
 
@@ -290,8 +291,8 @@ class ConditionAction(WorkflowAction):
     """Conditional logic workflow action"""
 
     async def execute(
-        self, step: WorkflowStep, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Evaluate condition"""
 
         config = step.config
@@ -302,7 +303,7 @@ class ConditionAction(WorkflowAction):
 
         return {"success": True, "condition_result": result, "condition": condition}
 
-    def _evaluate_condition(self, condition: str, context: Dict[str, Any]) -> bool:
+    def _evaluate_condition(self, condition: str, context: dict[str, Any]) -> bool:
         """Evaluate condition string"""
 
         # Simple condition evaluation (in production, use a proper expression evaluator)
@@ -326,7 +327,7 @@ class ConditionAction(WorkflowAction):
             logger.error(f"Error evaluating condition '{condition}': {e}")
             return False
 
-    async def rollback(self, step: WorkflowStep, context: Dict[str, Any]) -> bool:
+    async def rollback(self, step: WorkflowStep, context: dict[str, Any]) -> bool:
         """Rollback condition (no-op for conditions)"""
         return True
 
@@ -391,7 +392,7 @@ class ConditionAction(WorkflowAction):
             return node.value
         elif isinstance(node, ast.Compare):
             left = self._eval_node(node.left, allowed_operators)
-            for op, comparator in zip(node.ops, node.comparators):
+            for op, comparator in zip(node.ops, node.comparators, strict=False):
                 if type(op) not in allowed_operators:
                     raise ValueError(f"Operator {type(op)} not allowed")
                 right = self._eval_node(comparator, allowed_operators)
@@ -402,7 +403,7 @@ class ConditionAction(WorkflowAction):
         elif isinstance(node, ast.BoolOp):
             if type(node.op) not in allowed_operators:
                 raise ValueError(f"Boolean operator {type(node.op)} not allowed")
-            op_func = allowed_operators[type(node.op)]
+            allowed_operators[type(node.op)]
             values = [self._eval_node(value, allowed_operators) for value in node.values]
             if isinstance(node.op, ast.And):
                 return all(values)
@@ -420,9 +421,9 @@ class WorkflowEngine:
     """Main workflow automation engine"""
 
     def __init__(self):
-        self.workflows: Dict[str, Workflow] = {}
-        self.triggers: Dict[str, WorkflowTrigger] = {}
-        self.running_workflows: Dict[str, asyncio.Task] = {}
+        self.workflows: dict[str, Workflow] = {}
+        self.triggers: dict[str, WorkflowTrigger] = {}
+        self.running_workflows: dict[str, asyncio.Task] = {}
 
         # Action registry
         self.actions = {
@@ -489,7 +490,7 @@ class WorkflowEngine:
 
         return True
 
-    def _has_circular_dependencies(self, steps: List[WorkflowStep]) -> bool:
+    def _has_circular_dependencies(self, steps: list[WorkflowStep]) -> bool:
         """Check for circular dependencies in workflow steps"""
 
         # Simple cycle detection using DFS
@@ -515,15 +516,10 @@ class WorkflowEngine:
             rec_stack.remove(step_id)
             return False
 
-        for step in steps:
-            if step.step_id not in visited:
-                if has_cycle(step.step_id):
-                    return True
-
-        return False
+        return any(step.step_id not in visited and has_cycle(step.step_id) for step in steps)
 
     async def trigger_workflow(
-        self, workflow_id: str, trigger_data: Dict[str, Any] = None
+        self, workflow_id: str, trigger_data: dict[str, Any] | None = None
     ) -> str:
         """Trigger workflow execution"""
 
@@ -553,8 +549,8 @@ class WorkflowEngine:
         return execution_id
 
     async def _execute_workflow(
-        self, workflow: Workflow, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, workflow: Workflow, context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute workflow with all steps"""
 
         execution_id = context["execution_id"]
@@ -675,8 +671,8 @@ class WorkflowEngine:
                 del self.running_workflows[execution_id]
 
     async def _execute_step(
-        self, step: WorkflowStep, context: Dict[str, Any], step_results: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, step: WorkflowStep, context: dict[str, Any], step_results: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute individual workflow step"""
 
         step.status = StepStatus.RUNNING
@@ -700,7 +696,7 @@ class WorkflowEngine:
             logger.info(f"Step {step.name} completed successfully")
             return result
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             step.status = StepStatus.FAILED
             step.error_message = f"Step timed out after {step.timeout} seconds"
             step.completed_at = datetime.now()
@@ -713,7 +709,7 @@ class WorkflowEngine:
             raise e
 
     async def _rollback_workflow(
-        self, workflow: Workflow, executed_steps: set, context: Dict[str, Any]
+        self, workflow: Workflow, executed_steps: set, context: dict[str, Any]
     ):
         """Rollback executed workflow steps"""
 
@@ -746,8 +742,8 @@ class WorkflowEngine:
         self,
         workflow: Workflow,
         event_type: str,
-        context: Dict[str, Any],
-        error_message: str = None,
+        context: dict[str, Any],
+        error_message: str | None = None,
     ):
         """Log workflow event to Elasticsearch"""
 
@@ -799,7 +795,7 @@ class WorkflowEngine:
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_workflow_status(self, execution_id: str) -> Dict[str, Any]:
+    async def get_workflow_status(self, execution_id: str) -> dict[str, Any]:
         """Get workflow execution status"""
 
         if execution_id in self.running_workflows:
@@ -814,7 +810,7 @@ class WorkflowEngine:
         # This would typically query a persistent store
         return {"execution_id": execution_id, "status": "unknown"}
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get workflow engine metrics"""
 
         return {
@@ -825,7 +821,7 @@ class WorkflowEngine:
             "available_actions": list(self.actions.keys()),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for workflow engine"""
 
         try:
@@ -863,8 +859,8 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
 
         # Import video generation modules
         try:
-            from agent.modules.frontend.fashion_computer_vision_agent import fashion_vision_agent
             from agent.modules.backend.brand_model_trainer import brand_trainer
+            from agent.modules.frontend.fashion_computer_vision_agent import fashion_vision_agent
 
             self.fashion_vision_agent = fashion_vision_agent
             self.brand_trainer = brand_trainer
@@ -917,7 +913,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             self._upscale_video_action
         )
 
-    async def _generate_runway_video_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_runway_video_action(self, context: dict[str, Any]) -> dict[str, Any]:
         """Workflow action for generating fashion runway videos."""
         try:
             if not self.fashion_vision_agent:
@@ -957,7 +953,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             logger.error(f"❌ Runway video generation workflow failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_product_360_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_product_360_action(self, context: dict[str, Any]) -> dict[str, Any]:
         """Workflow action for generating product 360° videos."""
         try:
             if not self.fashion_vision_agent:
@@ -993,7 +989,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             logger.error(f"❌ Product 360° video generation workflow failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _train_brand_model_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _train_brand_model_action(self, context: dict[str, Any]) -> dict[str, Any]:
         """Workflow action for training brand models."""
         try:
             if not self.brand_trainer:
@@ -1021,7 +1017,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             logger.error(f"❌ Brand model training workflow failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_brand_image_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_brand_image_action(self, context: dict[str, Any]) -> dict[str, Any]:
         """Workflow action for generating brand-specific images."""
         try:
             if not self.brand_trainer:
@@ -1049,7 +1045,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             logger.error(f"❌ Brand image generation workflow failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _upscale_video_action(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _upscale_video_action(self, context: dict[str, Any]) -> dict[str, Any]:
         """Workflow action for upscaling videos."""
         try:
             if not self.fashion_vision_agent:
@@ -1074,7 +1070,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
             logger.error(f"❌ Video upscaling workflow failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _log_video_generation(self, video_type: str, video_path: str, context: Dict[str, Any]):
+    async def _log_video_generation(self, video_type: str, video_path: str, context: dict[str, Any]):
         """Log video generation for monitoring and analytics."""
         try:
             log_data = {
@@ -1099,7 +1095,7 @@ class VideoGenerationWorkflowEngine(WorkflowEngine):
         except Exception as e:
             logger.warning(f"Failed to log video generation: {e}")
 
-    async def _log_model_training(self, model_name: str, result: Dict[str, Any], context: Dict[str, Any]):
+    async def _log_model_training(self, model_name: str, result: dict[str, Any], context: dict[str, Any]):
         """Log model training for monitoring and analytics."""
         try:
             log_data = {

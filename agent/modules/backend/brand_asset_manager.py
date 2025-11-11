@@ -1,10 +1,10 @@
 from datetime import datetime
-from pathlib import Path
 import json
-
-from typing import Any, Dict, List, Optional
 import logging
 import mimetypes
+from pathlib import Path
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +63,8 @@ class BrandAssetManager:
         filename: str,
         category: str,
         description: str = "",
-        tags: List[str] = None,
-    ) -> Dict[str, Any]:
+        tags: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Upload a brand asset."""
         try:
             if category not in self.categories:
@@ -121,10 +121,10 @@ class BrandAssetManager:
             }
 
         except Exception as e:
-            logger.error(f"Asset upload failed: {str(e)}")
+            logger.error(f"Asset upload failed: {e!s}")
             return {"error": str(e)}
 
-    def get_assets_by_category(self, category: str) -> List[Dict[str, Any]]:
+    def get_assets_by_category(self, category: str) -> list[dict[str, Any]]:
         """Get all assets in a specific category."""
         return [
             asset
@@ -132,11 +132,11 @@ class BrandAssetManager:
             if asset["category"] == category
         ]
 
-    def get_asset_info(self, asset_id: str) -> Optional[Dict[str, Any]]:
+    def get_asset_info(self, asset_id: str) -> Optional[dict[str, Any]]:
         """Get detailed information about a specific asset."""
         return self.metadata["assets"].get(asset_id)
 
-    def analyze_brand_consistency(self) -> Dict[str, Any]:
+    def analyze_brand_consistency(self) -> dict[str, Any]:
         """Analyze brand consistency across uploaded assets."""
         analysis = {
             "total_assets": self.metadata["total_assets"],
@@ -175,7 +175,7 @@ class BrandAssetManager:
 
         return analysis
 
-    def get_learning_data_for_brand_intelligence(self) -> Dict[str, Any]:
+    def get_learning_data_for_brand_intelligence(self) -> dict[str, Any]:
         """Prepare asset data for Brand Intelligence Agent learning."""
         learning_data = {
             "visual_assets": {

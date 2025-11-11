@@ -1,10 +1,11 @@
 from datetime import datetime
 import json
+import logging
 import os
+from typing import Any, Optional
 
 from anthropic import Anthropic, AsyncAnthropic
-from typing import Any, Dict, List, Optional
-import logging
+
 
 """
 Claude Sonnet 4.5 Advanced Intelligence Service
@@ -57,9 +58,9 @@ class ClaudeSonnetIntelligenceService:
     async def advanced_reasoning(
         self,
         task: str,
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         max_tokens: int = 4096,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Use Claude's advanced reasoning capabilities for complex problem-solving.
 
@@ -118,8 +119,8 @@ class ClaudeSonnetIntelligenceService:
             return {"error": str(e), "status": "failed"}
 
     async def enhance_luxury_product_description(
-        self, product_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Create ultra-premium product descriptions using Claude's superior writing.
         """
@@ -152,7 +153,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=1500,
-                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers. Your words create desire and justify premium pricing.",  # noqa: E501
+                system="You are the world's premier luxury copywriter, crafting descriptions that convert high-net-worth individuals into devoted customers. Your words create desire and justify premium pricing.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.8,
             )
@@ -175,8 +176,8 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             return {"error": str(e), "status": "failed"}
 
 async def generate_strategic_marketing_plan(
-        self, business_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, business_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate comprehensive marketing strategy using Claude's strategic reasoning.
         """
@@ -208,7 +209,7 @@ Make it actionable, specific, and focused on luxury market best practices."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=4096,
-                system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",  # noqa: E501
+                system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
             )
@@ -230,8 +231,8 @@ Make it actionable, specific, and focused on luxury market best practices."""
             return {"error": str(e), "status": "failed"}
 
 async def analyze_competitor_intelligence(
-        self, competitor_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, competitor_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Deep competitive analysis using Claude's analytical capabilities.
         """
@@ -261,7 +262,7 @@ Provide actionable insights for luxury market domination."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3000,
-                system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",  # noqa: E501
+                system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.6,
             )
@@ -282,8 +283,8 @@ Provide actionable insights for luxury market domination."""
             return {"error": str(e), "status": "failed"}
 
 async def optimize_conversion_funnel(
-        self, funnel_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, funnel_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Analyze and optimize conversion funnel using advanced reasoning.
         """
@@ -313,7 +314,7 @@ Focus on luxury customer behavior and premium positioning."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3000,
-                system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",  # noqa: E501
+                system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
             )
@@ -339,7 +340,7 @@ async def generate_advanced_code(
         code_request: str,
         language: str = "python",
         framework: Optional[str] = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate production-ready code using Claude's superior coding abilities.
         """
@@ -368,7 +369,7 @@ Provide complete, working code that can be deployed immediately."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=4096,
-                system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",  # noqa: E501
+                system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
             )
@@ -390,8 +391,8 @@ Provide complete, working code that can be deployed immediately."""
             return {"error": str(e), "status": "failed"}
 
 async def analyze_customer_sentiment(
-        self, customer_data: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, customer_data: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Advanced sentiment analysis and customer insights using Claude.
         """
@@ -421,7 +422,7 @@ Focus on insights that drive business value for a luxury brand."""
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=2500,
-                system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",  # noqa: E501
+                system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
             )
@@ -442,8 +443,8 @@ Focus on insights that drive business value for a luxury brand."""
             return {"error": str(e), "status": "failed"}
 
 async def create_viral_social_content(
-        self, campaign_brief: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, campaign_brief: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate viral-worthy social media content using Claude's creativity.
         """
@@ -478,7 +479,7 @@ Focus on The Skyy Rose Collection's brand values: exclusivity, elegance, quality
             response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=3500,
-                system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",  # noqa: E501
+                system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.9,  # Higher creativity for viral content
             )
@@ -509,35 +510,35 @@ claude_service = create_claude_service()
 
 # Convenience functions for easy access
 async def advanced_ai_reasoning(
-    task: str, context: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+    task: str, context: Optional[dict[str, Any]] = None
+) -> dict[str, Any]:
     """Use Claude's advanced reasoning for complex tasks."""
     return await claude_service.advanced_reasoning(task, context)
 
-async def enhance_luxury_description(product_data: Dict[str, Any]) -> Dict[str, Any]:
+async def enhance_luxury_description(product_data: dict[str, Any]) -> dict[str, Any]:
     """Create luxury product descriptions with Claude."""
     return await claude_service.enhance_luxury_product_description(product_data)
 
-async def generate_marketing_strategy(business_data: Dict[str, Any]) -> Dict[str, Any]:
+async def generate_marketing_strategy(business_data: dict[str, Any]) -> dict[str, Any]:
     """Generate comprehensive marketing strategy with Claude."""
     return await claude_service.generate_strategic_marketing_plan(business_data)
 
-async def analyze_competitors(competitor_data: Dict[str, Any]) -> Dict[str, Any]:
+async def analyze_competitors(competitor_data: dict[str, Any]) -> dict[str, Any]:
     """Perform competitive intelligence analysis with Claude."""
     return await claude_service.analyze_competitor_intelligence(competitor_data)
 
-async def optimize_conversions(funnel_data: Dict[str, Any]) -> Dict[str, Any]:
+async def optimize_conversions(funnel_data: dict[str, Any]) -> dict[str, Any]:
     """Optimize conversion funnel with Claude."""
     return await claude_service.optimize_conversion_funnel(funnel_data)
 
-async def generate_code(code_request: str, language: str = "python") -> Dict[str, Any]:
+async def generate_code(code_request: str, language: str = "python") -> dict[str, Any]:
     """Generate production code with Claude."""
     return await claude_service.generate_advanced_code(code_request, language)
 
-async def analyze_sentiment(customer_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+async def analyze_sentiment(customer_data: list[dict[str, Any]]) -> dict[str, Any]:
     """Analyze customer sentiment with Claude."""
     return await claude_service.analyze_customer_sentiment(customer_data)
 
-async def create_viral_content(campaign_brief: Dict[str, Any]) -> Dict[str, Any]:
+async def create_viral_content(campaign_brief: dict[str, Any]) -> dict[str, Any]:
     """Create viral social content with Claude."""
     return await claude_service.create_viral_social_content(campaign_brief)

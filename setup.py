@@ -2,6 +2,7 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+
 """
 DevSkyy - AI-Powered Luxury E-Commerce Platform
 Setup configuration for package distribution

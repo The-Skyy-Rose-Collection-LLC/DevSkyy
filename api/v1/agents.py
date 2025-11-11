@@ -4,13 +4,14 @@ Organized by category with consistent interface
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from api.validation_models import AgentExecutionRequest
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 class LegacyAgentExecutionRequest(BaseModel):
     """Legacy agent execution request - use AgentExecutionRequest instead"""
 
-    parameters: Dict[str, Any] = Field(default_factory=dict)
+    parameters: dict[str, Any] = Field(default_factory=dict)
     timeout: Optional[int] = Field(
         default=300, description="Execution timeout in seconds"
     )
@@ -39,7 +40,7 @@ class AgentExecuteResponse(BaseModel):
 
     agent_name: str
     status: str
-    result: Dict[str, Any]
+    result: dict[str, Any]
     execution_time_ms: float
     timestamp: str
 
@@ -47,7 +48,7 @@ class AgentExecuteResponse(BaseModel):
 class BatchRequest(BaseModel):
     """Batch execution request"""
 
-    operations: List[Dict[str, Any]] = Field(
+    operations: list[dict[str, Any]] = Field(
         ..., description="List of operations to execute"
     )
     parallel: bool = Field(default=True, description="Execute operations in parallel")
@@ -65,13 +66,13 @@ async def execute_scanner(
 ):
     """
     Run the Scanner V1 agent to analyze code and websites.
-    
+
     Parameters:
         request (AgentExecutionRequest): Execution parameters for the scanner agent.
-    
+
     Returns:
         AgentExecuteResponse: Response containing agent metadata (`agent_name`, `status`), the `result` dictionary produced by the scan, `execution_time_ms`, and a `timestamp`.
-    
+
     Raises:
         HTTPException: If the scanner encounters an error during execution.
     """
@@ -126,10 +127,10 @@ async def execute_fixer(
 ):
     """
     Run the Fixer V1 agent to apply automated code fixes based on scan results.
-    
+
     Parameters:
         request (AgentExecutionRequest): Execution request whose `parameters` may include a `scan_results` dict; that dictionary is passed to the fixer.
-    
+
     Returns:
         AgentExecuteResponse: Response containing `agent_name` ("Fixer V1"), `status`, `result` (fixer output), `execution_time_ms`, and `timestamp`.
     """
@@ -658,7 +659,7 @@ async def execute_performance(
 # ============================================================================
 
 
-@router.post("/batch", response_model=Dict[str, Any])
+@router.post("/batch", response_model=dict[str, Any])
 async def batch_execute(
     request: BatchRequest, current_user: TokenData = Depends(get_current_active_user)
 ):
@@ -672,7 +673,7 @@ async def batch_execute(
 
         for operation in request.operations:
             agent_name = operation.get("agent")
-            _parameters = operation.get("parameters", {})  # noqa: F841
+            _parameters = operation.get("parameters", {})
 
             # Execute agent based on name
             # This would route to the appropriate agent endpoint
@@ -695,7 +696,7 @@ async def batch_execute(
 # ============================================================================
 
 
-@router.get("/list", response_model=Dict[str, Any])
+@router.get("/list", response_model=dict[str, Any])
 async def list_all_agents(current_user: TokenData = Depends(get_current_active_user)):
     """List all available agents with their capabilities"""
     agents = {

@@ -9,7 +9,7 @@ This module provides a comprehensive exception hierarchy for the DevSkyy Platfor
 enabling precise error handling and better debugging.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 
 # ============================================================================
@@ -24,12 +24,12 @@ class DevSkyyError(Exception):
         self,
         message: str,
         error_code: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
         original_error: Optional[Exception] = None
     ):
         """
         Initialize the exception with a human-readable message and optional metadata.
-        
+
         Parameters:
             message (str): Human-readable description of the error.
             error_code (Optional[str]): Unique machine-friendly error code; defaults to the exception class name when omitted.
@@ -42,16 +42,16 @@ class DevSkyyError(Exception):
         self.original_error = original_error
         super().__init__(self.message)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Return a dictionary representation of the exception suitable for serialization.
-        
+
         The returned dictionary includes:
         - `error_type`: the exception class name,
         - `error_code`: an optional machine-readable error code,
         - `message`: the human-readable error message,
         - `details`: additional context or metadata.
-        
+
         Returns:
             mapping (Dict[str, Any]): A dictionary with keys `error_type`, `error_code`, `message`, and `details`.
         """
@@ -439,14 +439,14 @@ def exception_from_status_code(
 ) -> DevSkyyError:
     """
     Map an HTTP status code to a corresponding DevSkyyError subclass and instantiate it.
-    
+
     Selects the exception type associated with the provided HTTP status code and returns a new exception instance constructed with the given message and any additional keyword arguments. If the status code is not mapped, a DevSkyyError instance is returned.
-    
+
     Parameters:
         status_code (int): HTTP status code to map to an exception class.
         message (str): Human-readable error message for the exception.
         **kwargs: Additional initialization parameters forwarded to the exception (e.g., `error_code`, `details`, `original_error`).
-    
+
     Returns:
         DevSkyyError: An instance of the mapped DevSkyyError subclass; `DevSkyyError` if no mapping exists.
     """
@@ -472,12 +472,12 @@ def map_database_error(
 ) -> DatabaseError:
     """
     Create an exception instance that represents a database error for a given error type.
-    
+
     Parameters:
         error_type (str): Key identifying the database error category (used to select a specific DatabaseError subclass).
         message (str): Human-readable error message for the created exception.
         original_error (Optional[Exception]): Original low-level exception to attach as context on the returned exception.
-    
+
     Returns:
         DatabaseError: An instance of the DatabaseError subclass mapped from `error_type`, initialized with `message` and `original_error`.
     """
@@ -487,106 +487,92 @@ def map_database_error(
 
 # Export all exceptions
 __all__ = [
-    # Base
-    "DevSkyyError",
-
-    # Authentication & Authorization
-    "AuthenticationError",
-    "InvalidCredentialsError",
-    "TokenExpiredError",
-    "TokenInvalidError",
-    "TokenMissingError",
-    "AuthorizationError",
-    "InsufficientPermissionsError",
-    "RoleRequiredError",
-
-    # Database
-    "DatabaseError",
-    "ConnectionError",
-    "QueryError",
-    "TransactionError",
-    "RecordNotFoundError",
-    "DuplicateRecordError",
-    "IntegrityError",
-
-    # Validation
-    "ValidationError",
-    "InvalidInputError",
-    "MissingFieldError",
-    "InvalidFormatError",
-    "SchemaValidationError",
-
-    # Network
-    "NetworkError",
-    "RequestTimeoutError",
-    "RequestFailedError",
-    "ConnectionTimeoutError",
-    "ServiceUnavailableError",
-
-    # Business Logic
-    "BusinessLogicError",
-    "InvalidStateError",
-    "OperationNotAllowedError",
-    "QuotaExceededError",
-    "ResourceConflictError",
-
-    # Configuration
-    "ConfigurationError",
-    "MissingConfigurationError",
-    "InvalidConfigurationError",
-    "EnvironmentError",
-
-    # External API
-    "ExternalAPIError",
-    "APIKeyMissingError",
     "APIKeyInvalidError",
+    "APIKeyMissingError",
     "APIRateLimitError",
     "APIResponseError",
-
-    # File System
-    "FileSystemError",
-    "FileNotFoundError",
-    "FilePermissionError",
-    "DiskSpaceError",
-    "FileCorruptedError",
-
+    "AgentCircuitBreakerError",
     # Agent
     "AgentError",
-    "AgentNotFoundError",
-    "AgentNotAvailableError",
     "AgentExecutionError",
+    "AgentNotAvailableError",
+    "AgentNotFoundError",
     "AgentTimeoutError",
-    "AgentCircuitBreakerError",
-
+    # Authentication & Authorization
+    "AuthenticationError",
+    "AuthorizationError",
+    # Business Logic
+    "BusinessLogicError",
+    "CPUError",
+    # GDPR/Compliance
+    "ComplianceError",
+    # Configuration
+    "ConfigurationError",
+    "ConnectionError",
+    "ConnectionTimeoutError",
+    "ConsentError",
+    "DataRetentionError",
+    # Database
+    "DatabaseError",
+    "DecryptionError",
+    # Base
+    "DevSkyyError",
+    "DiskSpaceError",
+    "DuplicateRecordError",
+    "EncryptionError",
+    "EnvironmentError",
+    # External API
+    "ExternalAPIError",
+    "FileCorruptedError",
+    "FileNotFoundError",
+    "FilePermissionError",
+    # File System
+    "FileSystemError",
+    "GDPRViolationError",
+    "HashingError",
+    "InsufficientPermissionsError",
+    "IntegrityError",
+    "InvalidConfigurationError",
+    "InvalidCredentialsError",
+    "InvalidFormatError",
+    "InvalidInputError",
+    "InvalidModelError",
+    "InvalidStateError",
     # ML/AI
     "MLError",
-    "ModelNotFoundError",
+    "MemoryError",
+    "MissingConfigurationError",
+    "MissingFieldError",
     "ModelLoadError",
-    "PredictionError",
-    "TrainingError",
-    "InvalidModelError",
-
-    # Security
-    "SecurityError",
-    "EncryptionError",
-    "DecryptionError",
-    "HashingError",
-    "SignatureError",
-    "SQLInjectionAttemptError",
-    "XSSAttemptError",
-
+    "ModelNotFoundError",
+    # Network
+    "NetworkError",
+    "OperationNotAllowedError",
     # Performance
     "PerformanceError",
     "PerformanceThresholdError",
-    "MemoryError",
-    "CPUError",
-
-    # GDPR/Compliance
-    "ComplianceError",
-    "GDPRViolationError",
-    "DataRetentionError",
-    "ConsentError",
-
+    "PredictionError",
+    "QueryError",
+    "QuotaExceededError",
+    "RecordNotFoundError",
+    "RequestFailedError",
+    "RequestTimeoutError",
+    "ResourceConflictError",
+    "RoleRequiredError",
+    "SQLInjectionAttemptError",
+    "SchemaValidationError",
+    # Security
+    "SecurityError",
+    "ServiceUnavailableError",
+    "SignatureError",
+    "TokenExpiredError",
+    "TokenInvalidError",
+    "TokenMissingError",
+    "TrainingError",
+    "TransactionError",
+    # Validation
+    "ValidationError",
+    "XSSAttemptError",
     # Utilities
     "exception_from_status_code",
     "map_database_error",

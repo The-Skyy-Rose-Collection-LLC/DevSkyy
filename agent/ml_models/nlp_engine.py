@@ -1,7 +1,7 @@
-import re
-
-from typing import Any, Dict, List
 import logging
+import re
+from typing import Any
+
 
 """
 NLP Engine - Natural Language Processing
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class NLPEngine:
     """NLP capabilities for text processing and analysis"""
 
-    async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
+    async def analyze_sentiment(self, text: str) -> dict[str, Any]:
         """Analyze sentiment of text"""
         # Simplified sentiment analysis
         positive_words = ["good", "great", "excellent", "love", "amazing", "perfect"]
@@ -36,13 +36,13 @@ class NLPEngine:
 
         return {"sentiment": sentiment, "score": score, "confidence": 0.75}
 
-    async def extract_keywords(self, text: str, top_n: int = 10) -> List[str]:
+    async def extract_keywords(self, text: str, top_n: int = 10) -> list[str]:
         """Extract keywords from text"""
         words = re.findall(r"\b[a-zA-Z]{4,}\b", text.lower())
         stop_words = {"this", "that", "with", "from", "have", "will"}
         filtered = [w for w in words if w not in stop_words]
         return list(set(filtered))[:top_n]
 
-    async def classify_text(self, text: str, categories: List[str]) -> Dict[str, float]:
+    async def classify_text(self, text: str, categories: list[str]) -> dict[str, float]:
         """Classify text into categories"""
         return {cat: 1.0 / len(categories) for cat in categories}

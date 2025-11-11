@@ -1,11 +1,14 @@
 import logging
+
 from fastapi import APIRouter, Depends
+
 from monitoring.observability import (
     health_monitor,
     metrics_collector,
     performance_tracker,
 )
-from security.jwt_auth import get_current_active_user, require_admin, TokenData
+from security.jwt_auth import TokenData, get_current_active_user, require_admin
+
 
 """
 Monitoring & Observability API Endpoints
@@ -93,7 +96,7 @@ async def get_histograms(current_user: TokenData = Depends(get_current_active_us
     """Get all histogram metrics with statistics"""
     histograms = {
         name: metrics_collector.get_histogram_stats(name)
-        for name in metrics_collector.histograms.keys()
+        for name in metrics_collector.histograms
     }
 
     return {"histograms": histograms}

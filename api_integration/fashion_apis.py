@@ -1,3 +1,10 @@
+import asyncio
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
+import logging
+from typing import Any
+
 from api_integration.core_engine import api_gateway
 from api_integration.workflow_engine import (
     ActionType,
@@ -5,19 +12,15 @@ from api_integration.workflow_engine import (
     Workflow,
     WorkflowStep,
     WorkflowTrigger,
+    workflow_engine,
 )
-from datetime import datetime
-from dataclasses import asdict, dataclass
-from enum import Enum
 from fashion.intelligence_engine import (
-    fashion_intelligence,
     FashionCategory,
+    fashion_intelligence,
 )
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
-from typing import Any, Dict, List
-import asyncio
-import logging
+
 
 """
 Fashion Domain API Integrations
@@ -49,17 +52,17 @@ class FashionTrendData:
     category: str
     season: str
     popularity_score: float
-    color_palette: List[str]
-    materials: List[str]
-    target_demographics: List[str]
-    geographic_regions: List[str]
+    color_palette: list[str]
+    materials: list[str]
+    target_demographics: list[str]
+    geographic_regions: list[str]
     social_mentions: int
     runway_appearances: int
     retail_adoption: float
     sustainability_score: float
     created_at: datetime
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["created_at"] = self.created_at.isoformat()
@@ -76,18 +79,18 @@ class ProductData:
     category: str
     price: float
     currency: str
-    sizes: List[str]
-    colors: List[str]
-    materials: List[str]
-    images: List[str]
+    sizes: list[str]
+    colors: list[str]
+    materials: list[str]
+    images: list[str]
     availability: bool
     stock_quantity: int
     sustainability_rating: float
-    fashion_trends: List[str]
+    fashion_trends: list[str]
     created_at: datetime
     updated_at: datetime
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["created_at"] = self.created_at.isoformat()
@@ -549,8 +552,8 @@ class FashionAPIIntegrator:
         )
 
     async def sync_fashion_trends(
-        self, sources: List[str] = None, categories: List[FashionCategory] = None
-    ) -> Dict[str, Any]:
+        self, sources: list[str] | None = None, categories: list[FashionCategory] | None = None
+    ) -> dict[str, Any]:
         """Sync fashion trends from multiple sources"""
 
         sources = sources or ["pinterest", "instagram", "fashion_blogs"]
@@ -641,8 +644,8 @@ class FashionAPIIntegrator:
         }
 
     async def _fetch_pinterest_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+        self, categories: list[FashionCategory]
+    ) -> list[dict[str, Any]]:
         """Fetch fashion trends from Pinterest"""
 
         trends = []
@@ -680,8 +683,8 @@ class FashionAPIIntegrator:
         return trends
 
     async def _fetch_instagram_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+        self, categories: list[FashionCategory]
+    ) -> list[dict[str, Any]]:
         """Fetch fashion trends from Instagram"""
 
         trends = []
@@ -727,8 +730,8 @@ class FashionAPIIntegrator:
         return trends
 
     async def _fetch_fashion_blog_trends(
-        self, categories: List[FashionCategory]
-    ) -> List[Dict[str, Any]]:
+        self, categories: list[FashionCategory]
+    ) -> list[dict[str, Any]]:
         """Fetch fashion trends from fashion blogs and websites"""
 
         # This would integrate with fashion blog APIs or RSS feeds
@@ -749,7 +752,7 @@ class FashionAPIIntegrator:
 
         return trends
 
-    async def get_fashion_metrics(self) -> Dict[str, Any]:
+    async def get_fashion_metrics(self) -> dict[str, Any]:
         """Get fashion API integration metrics"""
 
         return {
@@ -764,7 +767,7 @@ class FashionAPIIntegrator:
             "api_health": await self._check_fashion_api_health(),
         }
 
-    async def _check_fashion_api_health(self) -> Dict[str, str]:
+    async def _check_fashion_api_health(self) -> dict[str, str]:
         """Check health of fashion APIs"""
 
         health_status = {}
@@ -788,7 +791,7 @@ class FashionAPIIntegrator:
 
         return health_status
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for fashion API integrator"""
 
         try:

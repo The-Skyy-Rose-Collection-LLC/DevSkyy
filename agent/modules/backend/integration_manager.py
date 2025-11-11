@@ -1,10 +1,11 @@
 import base64
-import json
-import logging
-import uuid
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List
+import json
+import logging
+from typing import Any
+import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class IntegrationManager:
         self.security_manager = self._initialize_security_manager()
         logger.info("🔗 Integration Manager initialized with Universal Service Support")
 
-    def _initialize_supported_services(self) -> Dict[str, Any]:
+    def _initialize_supported_services(self) -> dict[str, Any]:
         """Initialize comprehensive list of supported integrations."""
         return {
             "websites": {
@@ -285,8 +286,8 @@ class IntegrationManager:
         agent_type: str,
         service_type: str,
         service_name: str,
-        credentials: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        credentials: dict[str, Any],
+    ) -> dict[str, Any]:
         """Create a new integration between an agent and external service."""
         try:
             integration_id = str(uuid.uuid4())
@@ -361,10 +362,10 @@ class IntegrationManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Integration creation failed: {str(e)}")
+            logger.error(f"❌ Integration creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def get_agent_integrations(self, agent_type: str) -> Dict[str, Any]:
+    async def get_agent_integrations(self, agent_type: str) -> dict[str, Any]:
         """Get all integrations for a specific agent."""
         try:
             agent_integrations = self.agent_integrations.get(agent_type, [])
@@ -393,10 +394,10 @@ class IntegrationManager:
             }
 
         except Exception as e:
-            logger.error(f"❌ Failed to get agent integrations: {str(e)}")
+            logger.error(f"❌ Failed to get agent integrations: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def sync_integration_data(self, integration_id: str) -> Dict[str, Any]:
+    async def sync_integration_data(self, integration_id: str) -> dict[str, Any]:
         """Sync data from integrated service."""
         try:
             if integration_id not in self.integrations:
@@ -426,7 +427,7 @@ class IntegrationManager:
             return sync_result
 
         except Exception as e:
-            logger.error(f"❌ Data sync failed: {str(e)}")
+            logger.error(f"❌ Data sync failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
@@ -437,8 +438,8 @@ class IntegrationManager:
         )
 
     async def _validate_credentials(
-        self, service_type: str, service_name: str, credentials: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, service_type: str, service_name: str, credentials: dict[str, Any]
+    ) -> dict[str, Any]:
         """Validate provided credentials."""
         service_config = self.supported_services[service_type][service_name]
         required_fields = service_config["required_fields"]
@@ -451,14 +452,14 @@ class IntegrationManager:
         # Additional validation logic can be added here
         return {"valid": True}
 
-    def _encrypt_credentials(self, credentials: Dict[str, Any]) -> str:
+    def _encrypt_credentials(self, credentials: dict[str, Any]) -> str:
         """Encrypt credentials for secure storage."""
         credentials_json = json.dumps(credentials)
         # In production, use proper encryption (AES, etc.)
         encoded = base64.b64encode(credentials_json.encode()).decode()
         return encoded
 
-    def _decrypt_credentials(self, encrypted_credentials: str) -> Dict[str, Any]:
+    def _decrypt_credentials(self, encrypted_credentials: str) -> dict[str, Any]:
         """Decrypt stored credentials."""
         # In production, use proper decryption
         decoded = base64.b64decode(encrypted_credentials.encode()).decode()
@@ -466,7 +467,7 @@ class IntegrationManager:
 
     def _create_data_mapping(
         self, agent_type: str, service_type: str, service_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create data mapping configuration for integration."""
         mappings = {
             "financial": {
@@ -497,12 +498,12 @@ class IntegrationManager:
 
         return mappings.get(agent_type, {}).get(service_type, {})
 
-    async def _test_integration_connection(self, integration_id: str) -> Dict[str, Any]:
+    async def _test_integration_connection(self, integration_id: str) -> dict[str, Any]:
         """Test integration connection."""
         # Simulate connection test
         return {"success": True, "response_time": 245}
 
-    def _generate_sync_preview(self, integration: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_sync_preview(self, integration: dict[str, Any]) -> dict[str, Any]:
         """Generate preview of what data will be synced."""
         return {
             "data_types": ["transactions", "account_balances", "customer_data"],
@@ -513,7 +514,7 @@ class IntegrationManager:
 
     def _get_available_services_for_agent(
         self, agent_type: str
-    ) -> Dict[str, List[str]]:
+    ) -> dict[str, list[str]]:
         """Get available services for specific agent type."""
         agent_service_compatibility = {
             "financial": ["banking", "payment_processors", "accounting_software"],
@@ -535,8 +536,8 @@ class IntegrationManager:
         return available
 
     def _calculate_integration_health(
-        self, integrations: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, integrations: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Calculate overall health of agent integrations."""
         if not integrations:
             return {"status": "no_integrations", "score": 0}
@@ -559,8 +560,8 @@ class IntegrationManager:
         }
 
     def _generate_health_recommendations(
-        self, integrations: List[Dict[str, Any]]
-    ) -> List[str]:
+        self, integrations: list[dict[str, Any]]
+    ) -> list[str]:
         """Generate recommendations for improving integration health."""
         recommendations = []
 
@@ -582,8 +583,8 @@ class IntegrationManager:
         return recommendations
 
     async def _perform_data_sync(
-        self, integration: Dict[str, Any], credentials: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, integration: dict[str, Any], credentials: dict[str, Any]
+    ) -> dict[str, Any]:
         """Perform actual data synchronization."""
         # Simulate data sync - in production, this would make actual API calls
         return {
@@ -594,7 +595,7 @@ class IntegrationManager:
             "next_sync": (datetime.now() + timedelta(hours=1)).isoformat(),
         }
 
-    def _initialize_security_manager(self) -> Dict[str, Any]:
+    def _initialize_security_manager(self) -> dict[str, Any]:
         """Initialize security features for credential management."""
         return {
             "encryption_algorithm": "AES_256_GCM",

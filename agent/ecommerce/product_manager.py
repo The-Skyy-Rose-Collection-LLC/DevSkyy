@@ -1,10 +1,11 @@
-import re
 from datetime import datetime
+import logging
+import re
+from typing import Any, Optional
 
 from anthropic import Anthropic
-from typing import Any, Dict, List, Optional
-import logging
 import numpy as np
+
 
 """
 Product Manager
@@ -36,7 +37,7 @@ class ProductManager:
 
         logger.info("📦 Product Manager initialized")
 
-    def _initialize_categories(self) -> Dict[str, List[str]]:
+    def _initialize_categories(self) -> dict[str, list[str]]:
         """Initialize fashion product categories"""
         return {
             "clothing": {
@@ -71,7 +72,7 @@ class ProductManager:
             "seasonal": ["spring-summer", "fall-winter", "resort", "holiday"],
         }
 
-    def _initialize_attributes(self) -> Dict[str, List]:
+    def _initialize_attributes(self) -> dict[str, list]:
         """Initialize product attributes"""
         return {
             "sizes": ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
@@ -116,8 +117,8 @@ class ProductManager:
         }
 
     async def create_product(
-        self, product_data: Dict[str, Any], auto_generate: bool = True
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any], auto_generate: bool = True
+    ) -> dict[str, Any]:
         """
         Create a new product with ML enhancements
 
@@ -201,7 +202,7 @@ class ProductManager:
             logger.error(f"Product creation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_description(self, product_data: Dict) -> str:
+    async def _generate_description(self, product_data: dict) -> str:
         """Generate AI-powered product description"""
         try:
             if self.anthropic:
@@ -229,7 +230,7 @@ class ProductManager:
             logger.error(f"Description generation failed: {e}")
             return f"High-quality {product_data.get('name')}"
 
-    async def _generate_seo_metadata(self, product_data: Dict) -> Dict[str, str]:
+    async def _generate_seo_metadata(self, product_data: dict) -> dict[str, str]:
         """Generate SEO-optimized metadata"""
         name = product_data.get("name", "")
         category = product_data.get("category", "fashion")
@@ -256,7 +257,7 @@ class ProductManager:
             ),
         }
 
-    async def _auto_categorize(self, product_data: Dict) -> str:
+    async def _auto_categorize(self, product_data: dict) -> str:
         """Auto-categorize product using ML"""
         # Simple keyword-based categorization
         # In production, this would use actual ML classification
@@ -277,7 +278,7 @@ class ProductManager:
         else:
             return "clothing/unisex"
 
-    async def _generate_variants(self, product_data: Dict) -> List[Dict]:
+    async def _generate_variants(self, product_data: dict) -> list[dict]:
         """Generate product variants"""
         variants = []
 
@@ -307,7 +308,7 @@ class ProductManager:
 
         return variants
 
-    async def _recommend_price(self, product_data: Dict) -> float:
+    async def _recommend_price(self, product_data: dict) -> float:
         """Recommend product price using ML"""
         # Simplified pricing algorithm
         # In production, this would use the DynamicPricingEngine
@@ -329,7 +330,7 @@ class ProductManager:
 
         return round(recommended_price, 2)
 
-    async def _generate_tags(self, product_data: Dict) -> List[str]:
+    async def _generate_tags(self, product_data: dict) -> list[str]:
         """Generate product tags"""
         tags = []
 
@@ -368,8 +369,8 @@ class ProductManager:
         return slug
 
     async def bulk_import_products(
-        self, products: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, products: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Bulk import products with ML enhancements
 
@@ -413,8 +414,8 @@ class ProductManager:
             return {"success": False, "error": str(e)}
 
     async def optimize_product_images(
-        self, product_id: str, images: List[str]
-    ) -> Dict[str, Any]:
+        self, product_id: str, images: list[str]
+    ) -> dict[str, Any]:
         """
         Optimize product images using ML
 
@@ -464,7 +465,7 @@ class ProductManager:
         else:
             return "Product image"
 
-    async def get_product_analytics(self, product_id: str) -> Dict[str, Any]:
+    async def get_product_analytics(self, product_id: str) -> dict[str, Any]:
         """Get ML-powered analytics for a product"""
         try:
             # Find product

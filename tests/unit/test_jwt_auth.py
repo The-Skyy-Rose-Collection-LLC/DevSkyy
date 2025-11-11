@@ -3,17 +3,17 @@ DevSkyy Enterprise - JWT Authentication Unit Tests
 Comprehensive tests for JWT token creation, validation, and security
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-import pytest
 from jose import jwt
+import pytest
 
 from security.jwt_auth import (
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
     create_access_token,
     create_refresh_token,
     get_token_payload,
-    JWT_ALGORITHM,
-    JWT_SECRET_KEY,
     verify_token,
 )
 
@@ -68,12 +68,12 @@ class TestJWTTokenCreation:
 
     def test_create_token_with_utc_timestamps(self, test_user_data):
         """Test that tokens use UTC timestamps (critical bug fix)"""
-        before_time = datetime.now(timezone.utc)
+        before_time = datetime.now(UTC)
         token = create_access_token(data=test_user_data)
-        after_time = datetime.now(timezone.utc)
+        after_time = datetime.now(UTC)
 
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        iat_time = datetime.fromtimestamp(payload["iat"], tz=timezone.utc)
+        iat_time = datetime.fromtimestamp(payload["iat"], tz=UTC)
 
         # Issued time should be between before and after
         assert before_time <= iat_time <= after_time
@@ -197,7 +197,7 @@ class TestJWTSecurity:
         """Test that token expiration is in the future"""
         payload = get_token_payload(test_access_token)
         exp_timestamp = payload["exp"]
-        current_timestamp = datetime.now(timezone.utc).timestamp()
+        current_timestamp = datetime.now(UTC).timestamp()
 
         assert exp_timestamp > current_timestamp
 

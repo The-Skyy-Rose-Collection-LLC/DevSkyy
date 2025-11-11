@@ -1,12 +1,13 @@
-import hashlib
-import logging
-import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+import hashlib
+import logging
+from typing import Any, Optional
+import uuid
 
 import numpy as np
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -189,7 +190,7 @@ class FinancialAgent:
         product_id: str,
         payment_method: str,
         gateway: str = "stripe",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process payment with comprehensive fraud detection and validation."""
         try:
             transaction_id = str(uuid.uuid4())
@@ -274,7 +275,7 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Payment processing failed: {str(e)}")
+            logger.error(f"❌ Payment processing failed: {e!s}")
             return {"error": str(e), "status": "processing_failed"}
 
     def create_chargeback(
@@ -282,7 +283,7 @@ class FinancialAgent:
         transaction_id: str,
         reason: ChargebackReason,
         amount: Optional[float] = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle chargeback creation with automated response system."""
         try:
             if transaction_id not in self.transactions:
@@ -332,12 +333,12 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Chargeback creation failed: {str(e)}")
+            logger.error(f"❌ Chargeback creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def submit_chargeback_evidence(
-        self, chargeback_id: str, evidence: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, chargeback_id: str, evidence: dict[str, Any]
+    ) -> dict[str, Any]:
         """Submit comprehensive evidence for chargeback dispute."""
         try:
             if chargeback_id not in self.chargebacks:
@@ -381,10 +382,10 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Evidence submission failed: {str(e)}")
+            logger.error(f"❌ Evidence submission failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_financial_dashboard(self) -> Dict[str, Any]:
+    def get_financial_dashboard(self) -> dict[str, Any]:
         """Comprehensive financial dashboard with real-time metrics."""
         try:
             # Calculate key metrics
@@ -420,10 +421,10 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Dashboard generation failed: {str(e)}")
+            logger.error(f"❌ Dashboard generation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_financial_overview(self) -> Dict[str, Any]:
+    def get_financial_overview(self) -> dict[str, Any]:
         """Quick financial overview for main dashboard."""
         return {
             "total_revenue": self._calculate_total_revenue(),
@@ -441,7 +442,7 @@ class FinancialAgent:
         customer_id: str,
         payment_method: str,
         gateway: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Comprehensive input validation."""
         errors = []
 
@@ -461,7 +462,7 @@ class FinancialAgent:
             "error": "; ".join(errors) if errors else None,
         }
 
-    def _comprehensive_fraud_check(self, transaction_data: Dict) -> Dict[str, Any]:
+    def _comprehensive_fraud_check(self, transaction_data: dict) -> dict[str, Any]:
         """Advanced fraud detection using multiple algorithms."""
         fraud_score = 0
         indicators = []
@@ -508,7 +509,7 @@ class FinancialAgent:
 
     def _calculate_processing_fees(
         self, amount: float, gateway: str
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Calculate detailed processing fees."""
         gateway_config = self.payment_gateways[gateway]
 
@@ -530,7 +531,7 @@ class FinancialAgent:
         currency: str,
         payment_method: str,
         gateway: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Simulate payment processing with gateway."""
         # Simulate processing with different success rates
         success_rate = 0.96 if gateway == "stripe" else 0.94
@@ -548,7 +549,7 @@ class FinancialAgent:
                 "error_message": "Payment was declined by the issuing bank",
             }
 
-    def _monitor_compliance(self, transaction: Dict) -> None:
+    def _monitor_compliance(self, transaction: dict) -> None:
         """Monitor transaction for compliance requirements."""
         # PCI DSS compliance checks
         # AML (Anti-Money Laundering) checks
@@ -557,7 +558,7 @@ class FinancialAgent:
             f"✅ Compliance monitoring completed for transaction {transaction['id']}"
         )
 
-    def _update_financial_metrics(self, transaction: Dict) -> None:
+    def _update_financial_metrics(self, transaction: dict) -> None:
         """Update real-time financial metrics."""
         # Update revenue counters
         # Update transaction success rates
@@ -568,7 +569,7 @@ class FinancialAgent:
         return (datetime.now() + timedelta(days=2)).isoformat()
 
     def _generate_auto_response(
-        self, reason: ChargebackReason, transaction: Dict
+        self, reason: ChargebackReason, transaction: dict
     ) -> str:
         """Generate automated chargeback response."""
         responses = {
@@ -579,7 +580,7 @@ class FinancialAgent:
         return responses.get(reason, "Standard dispute response generated")
 
     def _calculate_win_probability(
-        self, reason: ChargebackReason, transaction: Dict
+        self, reason: ChargebackReason, transaction: dict
     ) -> float:
         """Calculate probability of winning chargeback dispute."""
         base_probabilities = {
@@ -591,8 +592,8 @@ class FinancialAgent:
         return base_probabilities.get(reason, 0.60)
 
     def _auto_collect_evidence(
-        self, transaction: Dict, reason: ChargebackReason
-    ) -> List[str]:
+        self, transaction: dict, reason: ChargebackReason
+    ) -> list[str]:
         """Automatically collect relevant evidence."""
         evidence = []
 
@@ -610,12 +611,12 @@ class FinancialAgent:
         return evidence
 
     def _send_chargeback_notifications(
-        self, chargeback: Dict, transaction: Dict
+        self, chargeback: dict, transaction: dict
     ) -> None:
         """Send notifications about chargeback."""
         logger.info(f"📧 Chargeback notifications sent for {chargeback['id']}")
 
-    def _recommend_chargeback_action(self, chargeback: Dict) -> str:
+    def _recommend_chargeback_action(self, chargeback: dict) -> str:
         """Recommend action for chargeback."""
         if chargeback["likelihood_of_winning"] > 0.7:
             return "dispute"
@@ -624,7 +625,7 @@ class FinancialAgent:
         else:
             return "gather_additional_evidence"
 
-    def _validate_evidence(self, evidence: Dict, reason: str) -> Dict[str, Any]:
+    def _validate_evidence(self, evidence: dict, reason: str) -> dict[str, Any]:
         """Validate evidence completeness and quality."""
         required_fields = {
             "fraudulent": ["transaction_log", "customer_verification"],
@@ -645,7 +646,7 @@ class FinancialAgent:
             "completeness": len(missing_fields) == 0,
         }
 
-    def _enhance_evidence(self, evidence: Dict, chargeback: Dict) -> Dict[str, Any]:
+    def _enhance_evidence(self, evidence: dict, chargeback: dict) -> dict[str, Any]:
         """Enhance evidence with automated data collection."""
         enhanced = evidence.copy()
 
@@ -664,8 +665,8 @@ class FinancialAgent:
         return enhanced
 
     def _submit_to_processor(
-        self, chargeback_id: str, evidence: Dict
-    ) -> Dict[str, Any]:
+        self, chargeback_id: str, evidence: dict
+    ) -> dict[str, Any]:
         """Submit evidence to payment processor."""
         return {
             "tracking_id": f"CB_{uuid.uuid4().hex[:8].upper()}",
@@ -673,7 +674,7 @@ class FinancialAgent:
             "estimated_response": "7-10 business days",
         }
 
-    def _recalculate_win_probability(self, chargeback: Dict, evidence: Dict) -> float:
+    def _recalculate_win_probability(self, chargeback: dict, evidence: dict) -> float:
         """Recalculate win probability based on evidence quality."""
         base_probability = chargeback["likelihood_of_winning"]
 
@@ -685,7 +686,7 @@ class FinancialAgent:
 
         return min(base_probability, 0.95)
 
-    def _get_next_steps(self, chargeback: Dict) -> List[str]:
+    def _get_next_steps(self, chargeback: dict) -> list[str]:
         """Get next steps for chargeback process."""
         return [
             "Monitor response from payment processor",
@@ -718,7 +719,7 @@ class FinancialAgent:
         ]
         return sum(float(t["amount"]) for t in monthly_transactions)
 
-    def _calculate_chargeback_metrics(self) -> Dict[str, Any]:
+    def _calculate_chargeback_metrics(self) -> dict[str, Any]:
         """Calculate comprehensive chargeback metrics."""
         total_chargebacks = len(self.chargebacks)
         chargeback_amount = sum(float(cb["amount"]) for cb in self.chargebacks.values())
@@ -732,7 +733,7 @@ class FinancialAgent:
             "chargebacks_by_reason": self._get_chargebacks_by_reason(),
         }
 
-    def _calculate_fraud_metrics(self) -> Dict[str, Any]:
+    def _calculate_fraud_metrics(self) -> dict[str, Any]:
         """Calculate fraud detection metrics."""
         fraud_blocked = len(
             [t for t in self.transactions.values() if t.get("risk_level") == "HIGH"]
@@ -761,7 +762,7 @@ class FinancialAgent:
         """Calculate overall financial health score."""
         return 0.92  # 92% health score
 
-    def _initialize_fraud_rules(self) -> Dict[str, Any]:
+    def _initialize_fraud_rules(self) -> dict[str, Any]:
         """Initialize fraud detection rules."""
         return {
             "max_amount_per_transaction": 50000,
@@ -771,7 +772,7 @@ class FinancialAgent:
             "risk_scoring": {"enabled": True, "threshold": 50},
         }
 
-    def _initialize_compliance(self) -> Dict[str, Any]:
+    def _initialize_compliance(self) -> dict[str, Any]:
         """Initialize compliance settings."""
         return {
             "pci_dss": {"enabled": True, "level": 1},
@@ -780,7 +781,7 @@ class FinancialAgent:
             "gdpr": {"enabled": True, "data_retention_days": 2555},
         }
 
-    def _get_recent_transactions(self, customer_id: str) -> List[Dict]:
+    def _get_recent_transactions(self, customer_id: str) -> list[dict]:
         """Get recent transactions for customer."""
         cutoff_time = datetime.now() - timedelta(hours=1)
         return [
@@ -790,17 +791,17 @@ class FinancialAgent:
             and datetime.fromisoformat(t["created_at"]) > cutoff_time
         ]
 
-    def _check_geographic_risk(self, transaction_data: Dict) -> bool:
+    def _check_geographic_risk(self, transaction_data: dict) -> bool:
         """Check for geographic risk factors."""
         # Simulate geographic risk check
         return False
 
-    def _check_device_risk(self, transaction_data: Dict) -> bool:
+    def _check_device_risk(self, transaction_data: dict) -> bool:
         """Check for device-based risk factors."""
         # Simulate device risk check
         return False
 
-    def _ml_fraud_assessment(self, transaction_data: Dict) -> float:
+    def _ml_fraud_assessment(self, transaction_data: dict) -> float:
         """Machine learning-based fraud assessment."""
         # Simulate ML fraud score
         return np.random.uniform(0, 20)
@@ -813,7 +814,7 @@ class FinancialAgent:
         """Calculate revenue growth rate."""
         return 0.125  # 12.5% growth
 
-    def _get_revenue_by_product(self) -> Dict[str, float]:
+    def _get_revenue_by_product(self) -> dict[str, float]:
         """Get revenue breakdown by product."""
         return {
             "necklaces": 15420.50,
@@ -822,7 +823,7 @@ class FinancialAgent:
             "bracelets": 8920.00,
         }
 
-    def _get_revenue_by_gateway(self) -> Dict[str, float]:
+    def _get_revenue_by_gateway(self) -> dict[str, float]:
         """Get revenue breakdown by payment gateway."""
         return {"stripe": 28500.50, "paypal": 12450.75, "square": 5915.25}
 
@@ -845,7 +846,7 @@ class FinancialAgent:
             self.transactions
         )
 
-    def _get_transactions_by_status(self) -> Dict[str, int]:
+    def _get_transactions_by_status(self) -> dict[str, int]:
         """Get transaction count by status."""
         status_counts = {}
         for transaction in self.transactions.values():
@@ -853,7 +854,7 @@ class FinancialAgent:
             status_counts[status] = status_counts.get(status, 0) + 1
         return status_counts
 
-    def _get_processing_time_metrics(self) -> Dict[str, float]:
+    def _get_processing_time_metrics(self) -> dict[str, float]:
         """Get processing time metrics."""
         return {
             "average_ms": 450.5,
@@ -862,7 +863,7 @@ class FinancialAgent:
             "p99_ms": 1200.0,
         }
 
-    def _analyze_processing_fees(self) -> Dict[str, Any]:
+    def _analyze_processing_fees(self) -> dict[str, Any]:
         """Analyze processing fees across gateways."""
         return {
             "total_fees_paid": 2850.75,
@@ -871,7 +872,7 @@ class FinancialAgent:
             "fee_optimization_potential": 285.50,
         }
 
-    def _calculate_cash_flow(self) -> Dict[str, Any]:
+    def _calculate_cash_flow(self) -> dict[str, Any]:
         """Calculate cash flow metrics."""
         return {
             "net_cash_flow": 44285.75,
@@ -880,7 +881,7 @@ class FinancialAgent:
             "next_settlement_date": (datetime.now() + timedelta(days=2)).isoformat(),
         }
 
-    def _get_compliance_status(self) -> Dict[str, str]:
+    def _get_compliance_status(self) -> dict[str, str]:
         """Get compliance status across regulations."""
         return {
             "pci_dss": "compliant",
@@ -890,7 +891,7 @@ class FinancialAgent:
             "sox": "compliant",
         }
 
-    def _get_financial_alerts(self) -> List[str]:
+    def _get_financial_alerts(self) -> list[str]:
         """Get current financial alerts."""
         return [
             "Chargeback rate above 0.5% threshold",
@@ -898,7 +899,7 @@ class FinancialAgent:
             "Monthly fee analysis suggests gateway optimization",
         ]
 
-    def _get_financial_recommendations(self) -> List[str]:
+    def _get_financial_recommendations(self) -> list[str]:
         """Get financial optimization recommendations."""
         return [
             "Consider switching high-volume transactions to Stripe for better rates",
@@ -911,7 +912,7 @@ class FinancialAgent:
         """Calculate chargeback dispute win rate."""
         return 0.78  # 78% win rate
 
-    def _get_chargebacks_by_reason(self) -> Dict[str, int]:
+    def _get_chargebacks_by_reason(self) -> dict[str, int]:
         """Get chargeback breakdown by reason."""
         reason_counts = {}
         for chargeback in self.chargebacks.values():
@@ -919,7 +920,7 @@ class FinancialAgent:
             reason_counts[reason] = reason_counts.get(reason, 0) + 1
         return reason_counts
 
-    def _initialize_blockchain_ledger(self) -> Dict[str, Any]:
+    def _initialize_blockchain_ledger(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize blockchain-based transaction ledger."""
         return {
             "consensus_mechanism": "proof_of_stake",
@@ -933,7 +934,7 @@ class FinancialAgent:
             "cross_chain_compatibility": ["ethereum", "polygon", "arbitrum"],
         }
 
-    def _initialize_defi_analytics(self) -> Dict[str, Any]:
+    def _initialize_defi_analytics(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize DeFi analytics engine."""
         return {
             "yield_farming_optimization": True,
@@ -943,7 +944,7 @@ class FinancialAgent:
             "token_economics": "deflationary_model",
         }
 
-    def _initialize_neural_fraud_detector(self) -> Dict[str, Any]:
+    def _initialize_neural_fraud_detector(self) -> dict[str, Any]:
         """EXPERIMENTAL: Initialize neural fraud detection system."""
         return {
             "architecture": "transformer_based",
@@ -959,7 +960,7 @@ class FinancialAgent:
             ],
         }
 
-    async def experimental_blockchain_audit(self) -> Dict[str, Any]:
+    async def experimental_blockchain_audit(self) -> dict[str, Any]:
         """EXPERIMENTAL: Blockchain-powered financial audit."""
         try:
             logger.info("🔗 Initiating blockchain financial audit...")
@@ -969,7 +970,7 @@ class FinancialAgent:
                 "blockchain_verification": {
                     "transactions_verified": len(self.transactions),
                     "merkle_root": "0x"
-                    + hashlib.sha256("audit_data".encode()).hexdigest(),
+                    + hashlib.sha256(b"audit_data").hexdigest(),
                     "consensus_reached": True,
                     "validator_nodes": 21,
                     "finality_time": "3.2_seconds",
@@ -1007,10 +1008,10 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"Blockchain audit failed: {str(e)}")
+            logger.error(f"Blockchain audit failed: {e!s}")
             return {"error": str(e), "status": "consensus_failure"}
 
-    async def prepare_tax_returns(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def prepare_tax_returns(self, tax_data: dict[str, Any]) -> dict[str, Any]:
         """Comprehensive tax preparation and optimization service."""
         try:
             business_type = tax_data.get("business_type", "LLC")
@@ -1062,12 +1063,12 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Tax preparation failed: {str(e)}")
+            logger.error(f"❌ Tax preparation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def analyze_business_credit(
-        self, credit_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, credit_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Comprehensive business credit analysis and improvement planning."""
         try:
             business_ein = credit_data.get("ein", "")
@@ -1114,12 +1115,12 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Credit analysis failed: {str(e)}")
+            logger.error(f"❌ Credit analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     async def provide_financial_advisory(
-        self, advisory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, advisory_request: dict[str, Any]
+    ) -> dict[str, Any]:
         """Comprehensive financial advisory services for business growth."""
         try:
             advisory_type = advisory_request.get("type", "general")
@@ -1175,12 +1176,12 @@ class FinancialAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Financial advisory failed: {str(e)}")
+            logger.error(f"❌ Financial advisory failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _calculate_deductible_expenses(
-        self, tax_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tax_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Calculate deductible business expenses."""
         expenses = tax_data.get("expenses", {})
         return {
@@ -1194,7 +1195,7 @@ class FinancialAgent:
             "total_deductible": sum(expenses.values()) * 0.8,  # Estimate 80% deductible
         }
 
-    def _calculate_depreciation(self, tax_data: Dict[str, Any]) -> float:
+    def _calculate_depreciation(self, tax_data: dict[str, Any]) -> float:
         """Calculate business asset depreciation."""
         assets = tax_data.get("assets", {})
         depreciation = 0
@@ -1209,8 +1210,8 @@ class FinancialAgent:
         return depreciation
 
     def _calculate_quarterly_estimates(
-        self, tax_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, tax_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Calculate quarterly tax estimates."""
         annual_income = tax_data.get("projected_income", 0)
         estimated_tax = annual_income * 0.25  # Estimate 25% tax rate
@@ -1224,7 +1225,7 @@ class FinancialAgent:
             "due_dates": ["2025-01-15", "2025-04-15", "2025-06-17", "2025-09-16"],
         }
 
-    def _identify_tax_credits(self, tax_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _identify_tax_credits(self, tax_data: dict[str, Any]) -> list[dict[str, Any]]:
         """Identify available tax credits."""
         credits = []
 
@@ -1262,8 +1263,8 @@ class FinancialAgent:
             return net_income * 0.15  # Default rate
 
     def _generate_tax_optimization_strategies(
-        self, analysis: Dict, business_type: str
-    ) -> List[Dict[str, Any]]:
+        self, analysis: dict, business_type: str
+    ) -> list[dict[str, Any]]:
         """Generate tax optimization strategies."""
         strategies = [
             {
@@ -1289,7 +1290,7 @@ class FinancialAgent:
 
     def _get_filing_deadlines(
         self, tax_year: int, business_type: str
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Get tax filing deadlines."""
         deadlines = {
             "LLC": f"{tax_year + 1}-03-15",
@@ -1309,7 +1310,7 @@ class FinancialAgent:
             ],
         }
 
-    def _get_required_tax_forms(self, business_type: str) -> List[str]:
+    def _get_required_tax_forms(self, business_type: str) -> list[str]:
         """Get required tax forms by business type."""
         forms = {
             "LLC": ["1065", "Schedule K-1", "1040", "Schedule E"],
@@ -1319,7 +1320,7 @@ class FinancialAgent:
         }
         return forms.get(business_type, ["1040"])
 
-    def _assess_audit_risk(self, analysis: Dict) -> Dict[str, Any]:
+    def _assess_audit_risk(self, analysis: dict) -> dict[str, Any]:
         """Assess IRS audit risk."""
         risk_factors = []
         risk_score = 10  # Base score
@@ -1357,7 +1358,7 @@ class FinancialAgent:
             ],
         }
 
-    def _generate_credit_improvement_plan(self, analysis: Dict) -> List[Dict[str, Any]]:
+    def _generate_credit_improvement_plan(self, analysis: dict) -> list[dict[str, Any]]:
         """Generate comprehensive credit improvement plan."""
         plan = []
 
@@ -1399,7 +1400,7 @@ class FinancialAgent:
 
         return plan
 
-    def _initialize_tax_engine(self) -> Dict[str, Any]:
+    def _initialize_tax_engine(self) -> dict[str, Any]:
         """Initialize tax optimization engine."""
         return {
             "tax_calculator": "multi_jurisdiction_tax_engine",
@@ -1408,7 +1409,7 @@ class FinancialAgent:
             "audit_risk_assessor": "irs_audit_probability_calculator",
         }
 
-    def _initialize_credit_system(self) -> Dict[str, Any]:
+    def _initialize_credit_system(self) -> dict[str, Any]:
         """Initialize credit improvement system."""
         return {
             "credit_monitoring": "real_time_score_tracking",
@@ -1417,7 +1418,7 @@ class FinancialAgent:
             "credit_building": "personalized_improvement_strategies",
         }
 
-    def _initialize_integration_manager(self) -> Dict[str, Any]:
+    def _initialize_integration_manager(self) -> dict[str, Any]:
         """Initialize integration management capabilities."""
         return {
             "bank_connections": "secure_open_banking_api",
@@ -1427,7 +1428,7 @@ class FinancialAgent:
         }
 
 
-def monitor_financial_health() -> Dict[str, Any]:
+def monitor_financial_health() -> dict[str, Any]:
     """Main financial health monitoring function for compatibility."""
     agent = FinancialAgent()
     return {

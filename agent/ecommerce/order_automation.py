@@ -12,12 +12,13 @@ Features:
 - Fraud detection
 """
 
-import logging
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List
+import logging
+from typing import Any
 
 import numpy as np
+
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class OrderAutomation:
         self.processing_rules = self._initialize_processing_rules()
         self.fraud_detector = self._initialize_fraud_detection()
 
-    def _initialize_processing_rules(self) -> Dict[str, Any]:
+    def _initialize_processing_rules(self) -> dict[str, Any]:
         """Initialize order processing rules"""
         return {
             "auto_confirm_threshold": 500.0,  # Orders under $500 auto-confirm
@@ -55,7 +56,7 @@ class OrderAutomation:
             "fraud_check_enabled": True,
         }
 
-    def _initialize_fraud_detection(self) -> Dict[str, Any]:
+    def _initialize_fraud_detection(self) -> dict[str, Any]:
         """Initialize fraud detection system"""
         return {
             "enabled": True,
@@ -70,8 +71,8 @@ class OrderAutomation:
         }
 
     async def process_order(
-        self, order_data: Dict[str, Any], auto_process: bool = True
-    ) -> Dict[str, Any]:
+        self, order_data: dict[str, Any], auto_process: bool = True
+    ) -> dict[str, Any]:
         """
         Process incoming order with automation
 
@@ -146,7 +147,7 @@ class OrderAutomation:
         logger.info(f"Order {order_id} confirmed and routed to {routing['warehouse']}")
         return result
 
-    async def validate_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def validate_order(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Validate order data and requirements
 
@@ -190,7 +191,7 @@ class OrderAutomation:
 
         return validation
 
-    async def check_fraud_risk(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def check_fraud_risk(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Check order for fraud risk
 
@@ -241,7 +242,7 @@ class OrderAutomation:
             ),
         }
 
-    async def allocate_inventory(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def allocate_inventory(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Allocate inventory for order items
 
@@ -295,7 +296,7 @@ class OrderAutomation:
             > 0,
         }
 
-    async def process_payment(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_payment(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Process payment for order
 
@@ -332,7 +333,7 @@ class OrderAutomation:
                 "retry_allowed": True,
             }
 
-    async def route_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def route_order(self, order_data: dict[str, Any]) -> dict[str, Any]:
         """
         Route order to optimal fulfillment center
 
@@ -386,7 +387,7 @@ class OrderAutomation:
             "carrier": "FedEx" if priority == "express" else "USPS",
         }
 
-    async def track_order(self, order_id: str) -> Dict[str, Any]:
+    async def track_order(self, order_id: str) -> dict[str, Any]:
         """
         Get order tracking information
 
@@ -437,8 +438,8 @@ class OrderAutomation:
         return tracking
 
     async def process_return(
-        self, order_id: str, return_items: List[Dict[str, Any]], reason: str
-    ) -> Dict[str, Any]:
+        self, order_id: str, return_items: list[dict[str, Any]], reason: str
+    ) -> dict[str, Any]:
         """
         Process order return request
 
@@ -486,7 +487,7 @@ class OrderAutomation:
 
     async def process_refund(
         self, order_id: str, refund_amount: float, reason: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process refund for order
 
@@ -516,7 +517,7 @@ class OrderAutomation:
 
     def get_order_statistics(
         self, start_date: datetime, end_date: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get order processing statistics
 

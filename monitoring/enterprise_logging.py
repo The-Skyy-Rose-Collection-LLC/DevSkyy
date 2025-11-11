@@ -4,19 +4,20 @@ Enterprise Logging System for DevSkyy Platform
 Comprehensive logging with structured output, correlation IDs, and observability
 """
 
-import logging
-import json
-import sys
-import traceback
+from contextlib import contextmanager
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Dict, Any, Optional
-from dataclasses import dataclass, asdict
 from enum import Enum
-import uuid
+import json
+import logging
 import os
 from pathlib import Path
+import sys
 import threading
-from contextlib import contextmanager
+import traceback
+from typing import Any, Optional
+import uuid
+
 
 class LogLevel(Enum):
     """Log levels for structured logging."""
@@ -60,74 +61,74 @@ class StructuredLogEntry:
     category: str
     message: str
     context: LogContext
-    metadata: Dict[str, Any]
-    error_details: Optional[Dict[str, Any]] = None
-    performance_metrics: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any]
+    error_details: Optional[dict[str, Any]] = None
+    performance_metrics: Optional[dict[str, Any]] = None
 
 class EnterpriseLogger:
     """
     Enterprise-grade logging system with structured output,
     correlation tracking, and observability features.
     """
-    
+
     def __init__(self, name: str = "devskyy"):
         self.name = name
         self.logger = logging.getLogger(name)
         self._context_storage = threading.local()
         self._setup_logging()
-        
+
     def _setup_logging(self):
         """Setup enterprise logging configuration."""
         # Clear existing handlers
         self.logger.handlers.clear()
-        
+
         # Set log level from environment
         log_level = os.getenv("LOG_LEVEL", "INFO").upper()
         self.logger.setLevel(getattr(logging, log_level))
-        
+
         # Create formatters
         json_formatter = JsonFormatter()
         console_formatter = ConsoleFormatter()
-        
+
         # Console handler for development
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setFormatter(console_formatter)
         self.logger.addHandler(console_handler)
-        
+
         # File handler for structured logs
         logs_dir = Path("logs")
         logs_dir.mkdir(exist_ok=True)
-        
+
         file_handler = logging.FileHandler(logs_dir / "devskyy.jsonl")
         file_handler.setFormatter(json_formatter)
         self.logger.addHandler(file_handler)
-        
+
         # Error file handler
         error_handler = logging.FileHandler(logs_dir / "errors.jsonl")
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(json_formatter)
         self.logger.addHandler(error_handler)
-        
+
         # Audit log handler
         audit_handler = logging.FileHandler(logs_dir / "audit.jsonl")
         audit_handler.setFormatter(json_formatter)
         self.audit_logger = logging.getLogger(f"{self.name}.audit")
         self.audit_logger.addHandler(audit_handler)
         self.audit_logger.setLevel(logging.INFO)
-    
+
     def set_context(self, context: LogContext):
         """Set logging context for current thread."""
         self._context_storage.context = context
-    
+
     def get_context(self) -> Optional[LogContext]:
         """Get current logging context."""
         return getattr(self._context_storage, 'context', None)
-    
+
     @contextmanager
     def context(self, **kwargs):
         """Context manager for temporary logging context."""
         old_context = self.get_context()
-        
+
         # Create new context or update existing
         if old_context:
             new_context = LogContext(
@@ -153,28 +154,28 @@ class EnterpriseLogger:
                 operation=kwargs.get('operation'),
                 environment=kwargs.get('environment', 'development')
             )
-        
+
         self.set_context(new_context)
         try:
             yield new_context
         finally:
             self.set_context(old_context)
-    
+
     def _create_log_entry(
         self,
         level: LogLevel,
         category: LogCategory,
         message: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
         error: Optional[Exception] = None,
-        performance_metrics: Optional[Dict[str, Any]] = None
+        performance_metrics: Optional[dict[str, Any]] = None
     ) -> StructuredLogEntry:
         """Create structured log entry."""
         context = self.get_context() or LogContext(
             correlation_id=str(uuid.uuid4()),
             environment=os.getenv("ENVIRONMENT", "development")
         )
-        
+
         error_details = None
         if error:
             error_details = {
@@ -182,7 +183,7 @@ class EnterpriseLogger:
                 "message": str(error),
                 "traceback": traceback.format_exc()
             }
-        
+
         return StructuredLogEntry(
             timestamp=datetime.utcnow().isoformat() + "Z",
             level=level.value,
@@ -193,67 +194,67 @@ class EnterpriseLogger:
             error_details=error_details,
             performance_metrics=performance_metrics
         )
-    
+
     def debug(
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Log debug message."""
         entry = self._create_log_entry(LogLevel.DEBUG, category, message, metadata)
         self.logger.debug(entry)
-    
+
     def info(
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: Optional[Dict[str, Any]] = None,
-        performance_metrics: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None,
+        performance_metrics: Optional[dict[str, Any]] = None
     ):
         """Log info message."""
         entry = self._create_log_entry(
             LogLevel.INFO, category, message, metadata, performance_metrics=performance_metrics
         )
         self.logger.info(entry)
-    
+
     def warning(
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Log warning message."""
         entry = self._create_log_entry(LogLevel.WARNING, category, message, metadata)
         self.logger.warning(entry)
-    
+
     def error(
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
         error: Optional[Exception] = None
     ):
         """Log error message."""
         entry = self._create_log_entry(LogLevel.ERROR, category, message, metadata, error)
         self.logger.error(entry)
-    
+
     def critical(
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
         error: Optional[Exception] = None
     ):
         """Log critical message."""
         entry = self._create_log_entry(LogLevel.CRITICAL, category, message, metadata, error)
         self.logger.critical(entry)
-    
+
     def audit(
         self,
         action: str,
         resource: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Log audit event."""
         entry = self._create_log_entry(
@@ -263,12 +264,12 @@ class EnterpriseLogger:
             metadata
         )
         self.audit_logger.info(entry)
-    
+
     def security(
         self,
         event: str,
         severity: str = "medium",
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Log security event."""
         security_metadata = {
@@ -276,7 +277,7 @@ class EnterpriseLogger:
             "event_type": "security",
             **(metadata or {})
         }
-        
+
         level = LogLevel.WARNING if severity in ["medium", "high"] else LogLevel.INFO
         entry = self._create_log_entry(
             level,
@@ -284,19 +285,19 @@ class EnterpriseLogger:
             f"Security Event: {event}",
             security_metadata
         )
-        
+
         if severity == "high":
             self.logger.error(entry)
         elif severity == "medium":
             self.logger.warning(entry)
         else:
             self.logger.info(entry)
-    
+
     def performance(
         self,
         operation: str,
         duration: float,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[dict[str, Any]] = None
     ):
         """Log performance metrics."""
         performance_metrics = {
@@ -304,7 +305,7 @@ class EnterpriseLogger:
             "duration_ms": duration * 1000,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
         entry = self._create_log_entry(
             LogLevel.INFO,
             LogCategory.PERFORMANCE,
@@ -316,7 +317,7 @@ class EnterpriseLogger:
 
 class JsonFormatter(logging.Formatter):
     """JSON formatter for structured logging."""
-    
+
     def format(self, record):
         if isinstance(record.msg, StructuredLogEntry):
             return json.dumps(asdict(record.msg), ensure_ascii=False)
@@ -334,7 +335,7 @@ class JsonFormatter(logging.Formatter):
 
 class ConsoleFormatter(logging.Formatter):
     """Human-readable console formatter."""
-    
+
     COLORS = {
         'DEBUG': '\033[36m',    # Cyan
         'INFO': '\033[32m',     # Green
@@ -343,13 +344,13 @@ class ConsoleFormatter(logging.Formatter):
         'CRITICAL': '\033[35m', # Magenta
         'RESET': '\033[0m'      # Reset
     }
-    
+
     def format(self, record):
         if isinstance(record.msg, StructuredLogEntry):
             entry = record.msg
             color = self.COLORS.get(entry.level, '')
             reset = self.COLORS['RESET']
-            
+
             return (
                 f"{color}[{entry.timestamp}] {entry.level} "
                 f"[{entry.category}] {entry.message}{reset}"

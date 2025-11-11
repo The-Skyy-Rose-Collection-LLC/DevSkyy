@@ -1,11 +1,12 @@
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any
 
 import schedule
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class EnhancedLearningScheduler:
         self.performance_metrics = {}
         self.executor = ThreadPoolExecutor(max_workers=3)
 
-    def start_learning_system(self) -> Dict[str, Any]:
+    def start_learning_system(self) -> dict[str, Any]:
         """Start the enhanced learning system with scheduled cycles."""
         try:
             if self.learning_active:
@@ -55,7 +56,7 @@ class EnhancedLearningScheduler:
             }
 
         except Exception as e:
-            logger.error(f"❌ Failed to start learning system: {str(e)}")
+            logger.error(f"❌ Failed to start learning system: {e!s}")
             return {"status": "failed", "error": str(e)}
 
     def _run_scheduler(self):
@@ -65,7 +66,7 @@ class EnhancedLearningScheduler:
                 schedule.run_pending()
                 time.sleep(60)  # Check every minute
             except Exception as e:
-                logger.error(f"❌ Scheduler error: {str(e)}")
+                logger.error(f"❌ Scheduler error: {e!s}")
                 time.sleep(300)  # Wait 5 minutes on error
 
     async def _hourly_learning_cycle(self):
@@ -97,7 +98,7 @@ class EnhancedLearningScheduler:
             logger.info("✅ Hourly learning cycle completed")
 
         except Exception as e:
-            logger.error(f"❌ Hourly learning cycle failed: {str(e)}")
+            logger.error(f"❌ Hourly learning cycle failed: {e!s}")
 
     async def _deep_analysis_cycle(self):
         """Deep analysis cycle every 6 hours."""
@@ -127,7 +128,7 @@ class EnhancedLearningScheduler:
             logger.info("✅ Deep analysis cycle completed")
 
         except Exception as e:
-            logger.error(f"❌ Deep analysis cycle failed: {str(e)}")
+            logger.error(f"❌ Deep analysis cycle failed: {e!s}")
 
     async def _comprehensive_learning_cycle(self):
         """Comprehensive daily learning cycle."""
@@ -161,7 +162,7 @@ class EnhancedLearningScheduler:
             logger.info("✅ Comprehensive learning cycle completed")
 
         except Exception as e:
-            logger.error(f"❌ Comprehensive learning cycle failed: {str(e)}")
+            logger.error(f"❌ Comprehensive learning cycle failed: {e!s}")
 
     async def _weekly_optimization_cycle(self):
         """Weekly optimization and performance tuning."""
@@ -194,9 +195,9 @@ class EnhancedLearningScheduler:
             logger.info("✅ Weekly optimization cycle completed")
 
         except Exception as e:
-            logger.error(f"❌ Weekly optimization cycle failed: {str(e)}")
+            logger.error(f"❌ Weekly optimization cycle failed: {e!s}")
 
-    def _update_performance_metrics(self, cycle_type: str, results: Dict[str, Any]):
+    def _update_performance_metrics(self, cycle_type: str, results: dict[str, Any]):
         """Update performance metrics based on learning results."""
         current_time = datetime.now().isoformat()
 
@@ -235,7 +236,7 @@ class EnhancedLearningScheduler:
 
         return round(improvement_sum / len(recent_cycles), 2)
 
-    def _analyze_learning_patterns(self) -> Dict[str, Any]:
+    def _analyze_learning_patterns(self) -> dict[str, Any]:
         """Analyze patterns in learning history."""
         if len(self.learning_history) < 5:
             return {
@@ -269,7 +270,7 @@ class EnhancedLearningScheduler:
             "learning_efficiency": round(success_rate * avg_improvement, 3),
         }
 
-    async def _optimize_agent_performance(self) -> Dict[str, Any]:
+    async def _optimize_agent_performance(self) -> dict[str, Any]:
         """Optimize performance of all agents."""
         optimization_results = {
             "agents_optimized": 0,
@@ -322,7 +323,7 @@ class EnhancedLearningScheduler:
 
         return round(min(base_score, 1.0), 3)
 
-    async def _analyze_full_system(self) -> Dict[str, Any]:
+    async def _analyze_full_system(self) -> dict[str, Any]:
         """Analyze the full system performance and health."""
         return {
             "system_health": 0.96,
@@ -342,7 +343,7 @@ class EnhancedLearningScheduler:
             ],
         }
 
-    async def _update_all_agents(self) -> Dict[str, Any]:
+    async def _update_all_agents(self) -> dict[str, Any]:
         """Update learning models for all agents."""
         return {
             "agents_updated": 6,
@@ -357,7 +358,7 @@ class EnhancedLearningScheduler:
             "learning_model_version": "2.1.0",
         }
 
-    def _generate_strategic_insights(self) -> List[str]:
+    def _generate_strategic_insights(self) -> list[str]:
         """Generate strategic insights from learning analysis."""
         return [
             "Brand intelligence is showing strong performance in market trend analysis",
@@ -368,7 +369,7 @@ class EnhancedLearningScheduler:
             "Inventory management is efficiently preventing stockouts",
         ]
 
-    async def _comprehensive_optimization(self) -> Dict[str, Any]:
+    async def _comprehensive_optimization(self) -> dict[str, Any]:
         """Perform comprehensive system optimization."""
         return {
             "optimizations_applied": 12,
@@ -378,7 +379,7 @@ class EnhancedLearningScheduler:
             "accuracy_improvement": "Enhanced prediction accuracy by 6%",
         }
 
-    def _analyze_weekly_trends(self) -> Dict[str, Any]:
+    def _analyze_weekly_trends(self) -> dict[str, Any]:
         """Analyze performance trends over the past week."""
         return {
             "learning_cycles_completed": 168,  # 24 hours * 7 days
@@ -388,7 +389,7 @@ class EnhancedLearningScheduler:
             "optimization_effectiveness": 0.89,
         }
 
-    async def _optimize_system_parameters(self) -> Dict[str, Any]:
+    async def _optimize_system_parameters(self) -> dict[str, Any]:
         """Optimize system-wide parameters."""
         return {
             "parameters_optimized": 15,
@@ -398,7 +399,7 @@ class EnhancedLearningScheduler:
             "cache_optimization_applied": True,
         }
 
-    def _update_learning_algorithms(self) -> Dict[str, Any]:
+    def _update_learning_algorithms(self) -> dict[str, Any]:
         """Update and improve learning algorithms."""
         return {
             "algorithms_updated": 8,
@@ -412,10 +413,10 @@ class EnhancedLearningScheduler:
             "performance_impact": "+12% accuracy improvement",
         }
 
-    def _generate_weekly_report(self) -> Dict[str, Any]:
+    def _generate_weekly_report(self) -> dict[str, Any]:
         """Generate comprehensive weekly performance report."""
         return {
-            "report_period": f"{(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')} to {datetime.now().strftime('%Y-%m-%d')}",  # noqa: E501
+            "report_period": f"{(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')} to {datetime.now().strftime('%Y-%m-%d')}",
             "overall_performance": "Excellent",
             "key_achievements": [
                 "Maintained 99.5% system uptime",
@@ -479,7 +480,7 @@ class EnhancedLearningScheduler:
 
         return next_run.isoformat()
 
-    def get_learning_status(self) -> Dict[str, Any]:
+    def get_learning_status(self) -> dict[str, Any]:
         """Get current learning system status."""
         return {
             "learning_active": self.learning_active,
@@ -495,7 +496,7 @@ class EnhancedLearningScheduler:
             },
         }
 
-    def stop_learning_system(self) -> Dict[str, Any]:
+    def stop_learning_system(self) -> dict[str, Any]:
         """Stop the learning system."""
         self.learning_active = False
         schedule.clear()
@@ -512,7 +513,7 @@ class EnhancedLearningScheduler:
 _global_scheduler = None
 
 
-def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
+def start_enhanced_learning_system(brand_intelligence_agent) -> dict[str, Any]:
     """Start the enhanced learning system globally."""
     global _global_scheduler
 
@@ -522,7 +523,7 @@ def start_enhanced_learning_system(brand_intelligence_agent) -> Dict[str, Any]:
     return _global_scheduler.start_learning_system()
 
 
-def get_learning_system_status() -> Dict[str, Any]:
+def get_learning_system_status() -> dict[str, Any]:
     """Get the status of the global learning system."""
     global _global_scheduler
 
@@ -539,7 +540,7 @@ def get_learning_system_status() -> Dict[str, Any]:
 _global_scheduler = None
 
 
-async def run_learning_cycle() -> Dict[str, Any]:
+async def run_learning_cycle() -> dict[str, Any]:
     """Run a learning cycle."""
     return {
         "cycle_completed": True,

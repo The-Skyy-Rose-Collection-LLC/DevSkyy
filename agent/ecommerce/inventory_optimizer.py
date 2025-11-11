@@ -1,8 +1,9 @@
+import logging
+from typing import Any
+
+import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 
-from typing import Any, Dict, List
-import logging
-import numpy as np
 
 """
 Inventory Optimizer
@@ -32,8 +33,8 @@ class InventoryOptimizer:
         logger.info("📊 Inventory Optimizer initialized")
 
     async def forecast_demand(
-        self, product_id: str, historical_sales: List[int], forecast_periods: int = 30
-    ) -> Dict[str, Any]:
+        self, product_id: str, historical_sales: list[int], forecast_periods: int = 30
+    ) -> dict[str, Any]:
         """
         Forecast product demand using ML
 
@@ -108,8 +109,8 @@ class InventoryOptimizer:
             return {"success": False, "error": str(e)}
 
     async def calculate_reorder_point(
-        self, product_data: Dict[str, Any], sales_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any], sales_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Calculate optimal reorder point and quantity
 
@@ -146,10 +147,7 @@ class InventoryOptimizer:
             should_reorder = current_stock <= reorder_point
 
             # Calculate days until stockout
-            if avg_daily_sales > 0:
-                days_until_stockout = current_stock / avg_daily_sales
-            else:
-                days_until_stockout = 999
+            days_until_stockout = current_stock / avg_daily_sales if avg_daily_sales > 0 else 999
 
             return {
                 "success": True,
@@ -173,8 +171,8 @@ class InventoryOptimizer:
             return {"success": False, "error": str(e)}
 
     async def identify_dead_stock(
-        self, inventory: List[Dict[str, Any]], threshold_days: int = 90
-    ) -> Dict[str, Any]:
+        self, inventory: list[dict[str, Any]], threshold_days: int = 90
+    ) -> dict[str, Any]:
         """
         Identify slow-moving and dead stock
 
@@ -246,8 +244,8 @@ class InventoryOptimizer:
             return {"success": False, "error": str(e)}
 
     async def optimize_stock_levels(
-        self, products: List[Dict[str, Any]], target_service_level: float = 0.95
-    ) -> Dict[str, Any]:
+        self, products: list[dict[str, Any]], target_service_level: float = 0.95
+    ) -> dict[str, Any]:
         """
         Optimize stock levels across all products
 

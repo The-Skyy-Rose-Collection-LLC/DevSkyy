@@ -1,8 +1,8 @@
 from datetime import datetime
-
-from typing import Any, Dict, List
 import logging
+from typing import Any
 import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ class SecurityAgent:
         }
         logger.info("🔒 Security Agent initialized with Advanced Threat Intelligence")
 
-    async def security_assessment(self) -> Dict[str, Any]:
+    async def security_assessment(self) -> dict[str, Any]:
         """Comprehensive security assessment for luxury e-commerce."""
         try:
             logger.info("🛡️ Conducting comprehensive security assessment...")
@@ -84,12 +84,12 @@ class SecurityAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Security assessment failed: {str(e)}")
+            logger.error(f"❌ Security assessment failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
     def _generate_security_recommendations(
-        self, assessment: Dict
-    ) -> List[Dict[str, Any]]:
+        self, assessment: dict
+    ) -> list[dict[str, Any]]:
         """Generate prioritized security recommendations."""
         recommendations = [
             {
@@ -117,7 +117,7 @@ class SecurityAgent:
         ]
         return recommendations
 
-    def _prioritize_security_risks(self, assessment: Dict) -> List[Dict[str, Any]]:
+    def _prioritize_security_risks(self, assessment: dict) -> list[dict[str, Any]]:
         """Prioritize security risks based on impact and likelihood."""
         risks = []
 
@@ -126,10 +126,7 @@ class SecurityAgent:
         for risk_type, risk_data in luxury_risks.items():
             risk_score = risk_data.get("risk_score", 0)
 
-            if risk_score > 25:
-                priority = "HIGH"
-            else:
-                priority = "MEDIUM"
+            priority = "HIGH" if risk_score > 25 else "MEDIUM"
 
             risks.append(
                 {
@@ -142,7 +139,7 @@ class SecurityAgent:
 
         return sorted(risks, key=lambda x: x["score"], reverse=True)
 
-def secure_luxury_platform() -> Dict[str, Any]:
+def secure_luxury_platform() -> dict[str, Any]:
     """Main function to secure luxury e-commerce platform."""
     SecurityAgent()
     return {

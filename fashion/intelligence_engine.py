@@ -4,12 +4,13 @@ Comprehensive knowledge base and intelligence system for fashion industry contex
 Integrated into all agents for fashion-specific insights and decision making
 """
 
-import logging
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -69,20 +70,20 @@ class FashionTrend:
     year: int
     status: TrendStatus
     popularity_score: float
-    color_palette: List[str]
-    materials: List[str]
-    target_demographics: List[str]
-    price_points: List[str]
+    color_palette: list[str]
+    materials: list[str]
+    target_demographics: list[str]
+    price_points: list[str]
     sustainability_score: float
-    geographic_relevance: List[str]
+    geographic_relevance: list[str]
     social_media_mentions: int
-    influencer_endorsements: List[str]
+    influencer_endorsements: list[str]
     runway_appearances: int
     retail_adoption_rate: float
     created_at: datetime
     updated_at: datetime
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["category"] = self.category.value
@@ -102,8 +103,8 @@ class FashionInsight:
     content: str
     category: str
     confidence_score: float
-    data_sources: List[str]
-    applicable_regions: List[str]
+    data_sources: list[str]
+    applicable_regions: list[str]
     time_relevance: str
     business_impact: str
     created_at: datetime
@@ -118,11 +119,11 @@ class MarketIntelligence:
     segment: str
     market_size_usd: float
     growth_rate: float
-    key_players: List[str]
-    consumer_preferences: Dict[str, Any]
-    seasonal_patterns: Dict[str, float]
-    sustainability_trends: Dict[str, Any]
-    technology_adoption: Dict[str, float]
+    key_players: list[str]
+    consumer_preferences: dict[str, Any]
+    seasonal_patterns: dict[str, float]
+    sustainability_trends: dict[str, Any]
+    technology_adoption: dict[str, float]
     last_updated: datetime
 
 
@@ -130,9 +131,9 @@ class FashionIntelligenceEngine:
     """Comprehensive fashion industry intelligence engine"""
 
     def __init__(self):
-        self.trends_database: Dict[str, FashionTrend] = {}
-        self.insights_database: Dict[str, FashionInsight] = {}
-        self.market_intelligence: Dict[str, MarketIntelligence] = {}
+        self.trends_database: dict[str, FashionTrend] = {}
+        self.insights_database: dict[str, FashionInsight] = {}
+        self.market_intelligence: dict[str, MarketIntelligence] = {}
 
         # Fashion industry knowledge base
         self.color_trends = {}
@@ -151,7 +152,7 @@ class FashionIntelligenceEngine:
 
         logger.info("Fashion Intelligence Engine initialized")
 
-    def _build_fashion_vocabulary(self) -> Dict[str, List[str]]:
+    def _build_fashion_vocabulary(self) -> dict[str, list[str]]:
         """Build comprehensive fashion vocabulary"""
         return {
             "colors": [
@@ -242,7 +243,7 @@ class FashionIntelligenceEngine:
             ],
         }
 
-    def _build_trend_patterns(self) -> Dict[str, Any]:
+    def _build_trend_patterns(self) -> dict[str, Any]:
         """Build trend analysis patterns"""
         return {
             "seasonal_cycles": {
@@ -409,7 +410,7 @@ class FashionIntelligenceEngine:
             ],
         }
 
-    async def analyze_fashion_context(self, text: str) -> Dict[str, Any]:
+    async def analyze_fashion_context(self, text: str) -> dict[str, Any]:
         """Analyze text for fashion industry context and insights"""
 
         context_analysis = {
@@ -514,7 +515,7 @@ class FashionIntelligenceEngine:
         season: Optional[FashionSeason] = None,
         target_demographic: Optional[str] = None,
         sustainability_focus: bool = False,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get fashion trend recommendations based on criteria"""
 
         recommendations = []
@@ -560,7 +561,7 @@ class FashionIntelligenceEngine:
 
         return recommendations
 
-    def _calculate_business_potential(self, trend: FashionTrend) -> Dict[str, Any]:
+    def _calculate_business_potential(self, trend: FashionTrend) -> dict[str, Any]:
         """Calculate business potential for a trend"""
 
         # Base score from popularity and status
@@ -614,7 +615,7 @@ class FashionIntelligenceEngine:
         else:
             return "low"
 
-    def _generate_implementation_suggestions(self, trend: FashionTrend) -> List[str]:
+    def _generate_implementation_suggestions(self, trend: FashionTrend) -> list[str]:
         """Generate implementation suggestions for a trend"""
         suggestions = []
 
@@ -649,13 +650,13 @@ class FashionIntelligenceEngine:
 
     async def get_market_intelligence(
         self, region: str = "global", segment: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get market intelligence for fashion industry"""
 
         # Find relevant market data
         relevant_markets = []
         for market in self.market_intelligence.values():
-            if region != "global" and market.region != region:
+            if region not in ("global", market.region):
                 continue
             if segment and market.segment != segment:
                 continue
@@ -685,7 +686,7 @@ class FashionIntelligenceEngine:
 
     def _get_default_market_intelligence(
         self, region: str, segment: Optional[str]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get default market intelligence when specific data is not available"""
 
         return {
@@ -724,7 +725,7 @@ class FashionIntelligenceEngine:
             ],
         }
 
-    def _extract_key_trends(self, markets: List[MarketIntelligence]) -> List[str]:
+    def _extract_key_trends(self, markets: list[MarketIntelligence]) -> list[str]:
         """Extract key trends from market data"""
         # Analyze market data to identify trends
         trends = []
@@ -745,8 +746,8 @@ class FashionIntelligenceEngine:
         return trends
 
     def _aggregate_consumer_insights(
-        self, markets: List[MarketIntelligence]
-    ) -> Dict[str, Any]:
+        self, markets: list[MarketIntelligence]
+    ) -> dict[str, Any]:
         """Aggregate consumer insights from market data"""
 
         all_preferences = {}
@@ -772,8 +773,8 @@ class FashionIntelligenceEngine:
         }
 
     def _analyze_competitive_landscape(
-        self, markets: List[MarketIntelligence]
-    ) -> Dict[str, Any]:
+        self, markets: list[MarketIntelligence]
+    ) -> dict[str, Any]:
         """Analyze competitive landscape from market data"""
 
         all_players = []
@@ -789,10 +790,10 @@ class FashionIntelligenceEngine:
             "market_fragmentation": (
                 len(set(all_players)) / len(all_players) if all_players else 0
             ),
-            "regional_variations": len(set(m.region for m in markets)),
+            "regional_variations": len({m.region for m in markets}),
         }
 
-    def _identify_opportunities(self, markets: List[MarketIntelligence]) -> List[str]:
+    def _identify_opportunities(self, markets: list[MarketIntelligence]) -> list[str]:
         """Identify business opportunities from market data"""
 
         opportunities = []
@@ -818,7 +819,7 @@ class FashionIntelligenceEngine:
 
         return opportunities
 
-    def _identify_challenges(self, markets: List[MarketIntelligence]) -> List[str]:
+    def _identify_challenges(self, markets: list[MarketIntelligence]) -> list[str]:
         """Identify business challenges from market data"""
 
         challenges = []
@@ -835,7 +836,7 @@ class FashionIntelligenceEngine:
 
         return challenges
 
-    async def update_fashion_knowledge(self, new_data: Dict[str, Any]):
+    async def update_fashion_knowledge(self, new_data: dict[str, Any]):
         """Update fashion knowledge base with new data"""
 
         if "trends" in new_data:
@@ -856,7 +857,7 @@ class FashionIntelligenceEngine:
 
         logger.info("Fashion knowledge base updated")
 
-    async def get_fashion_health_check(self) -> Dict[str, Any]:
+    async def get_fashion_health_check(self) -> dict[str, Any]:
         """Get fashion intelligence system health check"""
 
         return {

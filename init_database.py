@@ -10,6 +10,7 @@ from pathlib import Path
 # Load environment variables FIRST before any other imports
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 # Configure logging
@@ -23,9 +24,9 @@ async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
-        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
         from database import db_manager, init_db
         from database_config import DATABASE_URL, DB_PROVIDER
+        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
 
         logger.info(f"🗄️  Database Provider: {DB_PROVIDER}")
         logger.info(f"📍 Database URL: {DATABASE_URL}")

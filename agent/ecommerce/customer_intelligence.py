@@ -11,9 +11,9 @@ Features:
 - Customer journey mapping
 """
 
-import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
 import numpy as np
@@ -23,6 +23,7 @@ from sklearn.cluster import (  # noqa: F401 - Reserved for future ML clustering 
 from sklearn.preprocessing import (  # noqa: F401 - Reserved for Phase 3 data preprocessing
     StandardScaler,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,8 @@ class CustomerIntelligence:
         self.ltv_model = None
 
     async def segment_customers(
-        self, customer_data: Optional[List[Dict]] = None, n_segments: int = 5
-    ) -> Dict[str, Any]:
+        self, customer_data: Optional[list[dict]] = None, n_segments: int = 5
+    ) -> dict[str, Any]:
         """
         Segment customers using ML clustering
 
@@ -146,7 +147,7 @@ class CustomerIntelligence:
 
     async def predict_customer_ltv(
         self, customer_id: str, time_horizon_months: int = 12
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Predict customer lifetime value
 
@@ -191,7 +192,7 @@ class CustomerIntelligence:
 
     async def predict_churn_risk(
         self, customer_id: str, prediction_window_days: int = 90
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Predict customer churn risk
 
@@ -270,7 +271,7 @@ class CustomerIntelligence:
 
     async def analyze_purchase_behavior(
         self, customer_id: str, lookback_days: int = 180
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze customer purchase behavior patterns
 
@@ -331,8 +332,8 @@ class CustomerIntelligence:
         self,
         customer_id: str,
         n_recommendations: int = 10,
-        context: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        context: Optional[dict] = None,
+    ) -> dict[str, Any]:
         """
         Generate personalized product recommendations
 
@@ -386,7 +387,7 @@ class CustomerIntelligence:
 
     async def map_customer_journey(
         self, customer_id: str, session_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Map customer journey and touchpoints
 
@@ -447,7 +448,7 @@ class CustomerIntelligence:
 
         return journey
 
-    def get_customer_profile(self, customer_id: str) -> Dict[str, Any]:
+    def get_customer_profile(self, customer_id: str) -> dict[str, Any]:
         """
         Get comprehensive customer profile
 

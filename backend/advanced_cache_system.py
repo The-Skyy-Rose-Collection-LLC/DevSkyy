@@ -1,15 +1,17 @@
-import aioredis
-import json
-import os
-import redis
-import time
-
+import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import wraps
-from typing import Any, Callable, Dict
-import asyncio
 import hashlib
+import json
 import logging
+import os
+import time
+from typing import Any
+
+import aioredis
+import redis
+
 
 """
 Advanced Caching System for DevSkyy Enhanced Platform
@@ -227,7 +229,7 @@ class AdvancedCacheManager:
             return default
 
     def set(
-        self, key: str, value: Any, ttl: int = None, namespace: str = "default"
+        self, key: str, value: Any, ttl: int | None = None, namespace: str = "default"
     ) -> bool:
         """
         Set value in cache (synchronous).
@@ -263,7 +265,7 @@ class AdvancedCacheManager:
             return False
 
     async def aset(
-        self, key: str, value: Any, ttl: int = None, namespace: str = "default"
+        self, key: str, value: Any, ttl: int | None = None, namespace: str = "default"
     ) -> bool:
         """
         Set value in cache (asynchronous).
@@ -373,7 +375,7 @@ class AdvancedCacheManager:
             # Clear from memory cache
             keys_to_delete = [
                 key
-                for key in self.memory_cache.keys()
+                for key in self.memory_cache
                 if key.startswith(f"{self.config.cache_prefix}{namespace}:")
             ]
             for key in keys_to_delete:
@@ -398,7 +400,7 @@ class AdvancedCacheManager:
             self.cache_stats["errors"] += 1
             return False
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         Get cache statistics.
         """
@@ -420,7 +422,7 @@ class AdvancedCacheManager:
         }
 
     def warm_cache(
-        self, warmup_data: Dict[str, Any], namespace: str = "warmup"
+        self, warmup_data: dict[str, Any], namespace: str = "warmup"
     ) -> bool:
         """
         Warm the cache with frequently accessed data.
@@ -437,7 +439,7 @@ class AdvancedCacheManager:
             return False
 
 # Cache decorators for easy integration
-def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = None):
+def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable | None = None):
     """
     Decorator for caching function results.
 
@@ -478,7 +480,7 @@ def cached(ttl: int = 3600, namespace: str = "default", key_func: Callable = Non
     return decorator
 
 def async_cached(
-    ttl: int = 3600, namespace: str = "default", key_func: Callable = None
+    ttl: int = 3600, namespace: str = "default", key_func: Callable | None = None
 ):
     """
     Decorator for caching async function results.
@@ -529,14 +531,14 @@ class DatabaseCacheManager:
         """
         Cache database query result.
         """
-        query_hash = hashlib.sha256(f"{query}:{str(params)}".encode()).hexdigest()
+        query_hash = hashlib.sha256(f"{query}:{params!s}".encode()).hexdigest()
         self.cache_manager.set(query_hash, result, ttl, self.namespace)
 
     def get_cached_query_result(self, query: str, params: tuple) -> Any:
         """
         Get cached database query result.
         """
-        query_hash = hashlib.sha256(f"{query}:{str(params)}".encode()).hexdigest()
+        query_hash = hashlib.sha256(f"{query}:{params!s}".encode()).hexdigest()
         return self.cache_manager.get(query_hash, self.namespace)
 
     def invalidate_table_cache(self, table_name: str):
@@ -558,7 +560,7 @@ class APICacheManager:
         self.namespace = "api"
 
     def cache_api_response(
-        self, endpoint: str, params: Dict[str, Any], response: Any, ttl: int = 600
+        self, endpoint: str, params: dict[str, Any], response: Any, ttl: int = 600
     ):
         """
         Cache API response.
@@ -566,7 +568,7 @@ class APICacheManager:
         cache_key = f"{endpoint}:{hashlib.sha256(json.dumps(params, sort_keys=True).encode()).hexdigest()}"
         self.cache_manager.set(cache_key, response, ttl, self.namespace)
 
-    def get_cached_api_response(self, endpoint: str, params: Dict[str, Any]) -> Any:
+    def get_cached_api_response(self, endpoint: str, params: dict[str, Any]) -> Any:
         """
         Get cached API response.
         """

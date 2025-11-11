@@ -8,14 +8,15 @@ IMPACT: Increases organic traffic by 30-50% through optimized meta tags
 Truth Protocol: Validated output, character limits enforced, no placeholders
 """
 
-import logging
-import json
-from typing import Dict, Optional
 from enum import Enum
+import json
+import logging
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator
 import anthropic
 from openai import OpenAI
+from pydantic import BaseModel, Field, validator
+
 
 logger = logging.getLogger(__name__)
 
@@ -185,7 +186,7 @@ Output ONLY valid JSON with this exact structure:
     def _build_user_prompt(self, product: ProductInfo) -> str:
         """Build user prompt from product information"""
         prompt_parts = [
-            f"Create metatitle and metadescription for the following product:\n"
+            "Create metatitle and metadescription for the following product:\n"
         ]
 
         prompt_parts.append(f"- Title: {product.title}")
@@ -248,7 +249,7 @@ Output ONLY valid JSON with this exact structure:
 
         except Exception as e:
             logger.exception("Anthropic generation failed")
-            raise AIProviderError(f"Anthropic error: {str(e)}")
+            raise AIProviderError(f"Anthropic error: {e!s}")
 
     async def _generate_with_openai(self, product: ProductInfo) -> SEOMetaTags:
         """Generate SEO tags using OpenAI"""
@@ -284,7 +285,7 @@ Output ONLY valid JSON with this exact structure:
 
         except Exception as e:
             logger.exception("OpenAI generation failed")
-            raise AIProviderError(f"OpenAI error: {str(e)}")
+            raise AIProviderError(f"OpenAI error: {e!s}")
 
     async def generate_seo_tags(
         self,
@@ -329,7 +330,7 @@ Output ONLY valid JSON with this exact structure:
             except AIProviderError as fallback_error:
                 logger.exception("Fallback provider also failed")
                 raise SEOOptimizerError(
-                    f"Both providers failed. Primary: {str(e)}, Fallback: {str(fallback_error)}"
+                    f"Both providers failed. Primary: {e!s}, Fallback: {fallback_error!s}"
                 )
 
         raise SEOOptimizerError("No AI provider available")
@@ -375,6 +376,6 @@ Output ONLY valid JSON with this exact structure:
             )
             return True
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Failed to update SEO for product {product_id}")
             return False

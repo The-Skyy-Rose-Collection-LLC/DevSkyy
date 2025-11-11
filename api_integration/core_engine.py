@@ -1,18 +1,21 @@
+from collections.abc import Awaitable, Callable
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from enum import Enum
+import hashlib
+import json
+import logging
+import time
+from typing import Any, Optional
+import uuid
+
+import aiohttp
+from aiohttp import ClientTimeout
+
+from api_integration.auth_manager import auth_manager, rate_limit_manager
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
-import json
-import time
 
-from aiohttp import ClientTimeout
-from api_integration.auth_manager import auth_manager, rate_limit_manager
-from dataclasses import asdict, dataclass
-from enum import Enum
-from typing import Any, Awaitable, Callable, Dict, Optional
-import aiohttp
-import hashlib
-import logging
-import uuid
 
 """
 Core API Integration Engine
@@ -23,6 +26,7 @@ data transformation pipelines, and circuit breaker patterns for fault tolerance
 from api_integration.discovery_engine import (
     api_discovery_engine,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +56,8 @@ class APIRequest:
     api_id: str
     endpoint: str
     method: str
-    headers: Dict[str, str]
-    params: Dict[str, Any]
+    headers: dict[str, str]
+    params: dict[str, Any]
     data: Any
     timeout: int
     retry_count: int
@@ -64,7 +68,7 @@ class APIRequest:
     error_message: str = None
     execution_time: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["status"] = self.status.value
@@ -131,10 +135,10 @@ class DataTransformer:
     """Data transformation pipeline for API responses"""
 
     def __init__(self):
-        self.transformers: Dict[str, Callable] = {}
+        self.transformers: dict[str, Callable] = {}
         self.fashion_transformers = self._setup_fashion_transformers()
 
-    def _setup_fashion_transformers(self) -> Dict[str, Callable]:
+    def _setup_fashion_transformers(self) -> dict[str, Callable]:
         """Setup fashion-specific data transformers"""
         return {
             "product_catalog": self._transform_product_data,
@@ -146,7 +150,7 @@ class DataTransformer:
 
     async def transform(
         self, data: Any, source_api: str, target_format: str = "standard"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Transform API response data to standard format"""
 
         if not data:
@@ -166,7 +170,7 @@ class DataTransformer:
 
     async def _transform_product_data(
         self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Transform product catalog data"""
 
         if isinstance(data, list):
@@ -185,7 +189,7 @@ class DataTransformer:
 
         return {"raw_data": data, "source_api": source_api}
 
-    async def _normalize_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _normalize_product(self, product_data: dict[str, Any]) -> dict[str, Any]:
         """Normalize product data to standard format"""
 
         return {
@@ -210,7 +214,7 @@ class DataTransformer:
             "updated_at": product_data.get("updated_at"),
         }
 
-    async def _transform_trend_data(self, data: Any, source_api: str) -> Dict[str, Any]:
+    async def _transform_trend_data(self, data: Any, source_api: str) -> dict[str, Any]:
         """Transform fashion trend data"""
 
         if isinstance(data, list):
@@ -229,7 +233,7 @@ class DataTransformer:
 
         return {"raw_data": data, "source_api": source_api}
 
-    async def _normalize_trend(self, trend_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _normalize_trend(self, trend_data: dict[str, Any]) -> dict[str, Any]:
         """Normalize trend data to standard format"""
 
         return {
@@ -252,7 +256,7 @@ class DataTransformer:
 
     async def _transform_inventory_data(
         self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Transform inventory data"""
 
         return {
@@ -263,7 +267,7 @@ class DataTransformer:
 
     async def _transform_analytics_data(
         self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Transform customer analytics data"""
 
         return {
@@ -274,7 +278,7 @@ class DataTransformer:
 
     async def _transform_payment_data(
         self, data: Any, source_api: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Transform payment data"""
 
         return {
@@ -283,7 +287,7 @@ class DataTransformer:
             "transformed_at": datetime.now().isoformat(),
         }
 
-    async def _default_transform(self, data: Any) -> Dict[str, Any]:
+    async def _default_transform(self, data: Any) -> dict[str, Any]:
         """Default data transformation"""
 
         return {"data": data, "transformed_at": datetime.now().isoformat()}
@@ -292,9 +296,9 @@ class APIGateway:
     """API Gateway for managing all external API communications"""
 
     def __init__(self):
-        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
+        self.circuit_breakers: dict[str, CircuitBreaker] = {}
         self.data_transformer = DataTransformer()
-        self.request_cache: Dict[str, Any] = {}
+        self.request_cache: dict[str, Any] = {}
 
         # Performance metrics
         self.metrics = {
@@ -326,13 +330,13 @@ class APIGateway:
         api_id: str,
         endpoint: str,
         method: str = "GET",
-        params: Dict[str, Any] = None,
+        params: dict[str, Any] | None = None,
         data: Any = None,
-        headers: Dict[str, str] = None,
+        headers: dict[str, str] | None = None,
         timeout: int = 30,
         use_cache: bool = True,
         transform_response: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Make API request with full integration features"""
 
         request_id = str(uuid.uuid4())
@@ -363,7 +367,7 @@ class APIGateway:
                     return cached_response
 
             # Check rate limits
-            can_request, rate_info = await rate_limit_manager.can_make_request(api_id)
+            can_request, _rate_info = await rate_limit_manager.can_make_request(api_id)
             if not can_request:
                 api_request.status = RequestStatus.RATE_LIMITED
                 api_request.error_message = "Rate limit exceeded"
@@ -460,36 +464,35 @@ class APIGateway:
         timeout = ClientTimeout(total=api_request.timeout)
 
         # Make HTTP request
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.request(
-                method=api_request.method,
-                url=full_url,
-                params=api_request.params,
-                json=(
-                    api_request.data
-                    if api_request.method in ["POST", "PUT", "PATCH"]
-                    else None
-                ),
-                headers=headers,
-            ) as response:
+        async with aiohttp.ClientSession(timeout=timeout) as session, session.request(
+            method=api_request.method,
+            url=full_url,
+            params=api_request.params,
+            json=(
+                api_request.data
+                if api_request.method in ["POST", "PUT", "PATCH"]
+                else None
+            ),
+            headers=headers,
+        ) as response:
 
-                if response.status >= 400:
-                    error_text = await response.text()
-                    raise Exception(f"HTTP {response.status}: {error_text}")
+            if response.status >= 400:
+                error_text = await response.text()
+                raise Exception(f"HTTP {response.status}: {error_text}")
 
-                # Parse response based on content type
-                content_type = response.headers.get("content-type", "").lower()
+            # Parse response based on content type
+            content_type = response.headers.get("content-type", "").lower()
 
-                if "application/json" in content_type:
-                    return await response.json()
-                elif "text/" in content_type:
-                    return await response.text()
-                else:
-                    return await response.read()
+            if "application/json" in content_type:
+                return await response.json()
+            elif "text/" in content_type:
+                return await response.text()
+            else:
+                return await response.read()
 
     async def _get_cached_response(
         self, api_request: APIRequest
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Get cached API response"""
 
         cache_key = self._generate_cache_key(api_request)
@@ -583,7 +586,7 @@ class APIGateway:
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get API gateway metrics"""
 
         return {
@@ -600,7 +603,7 @@ class APIGateway:
             "rate_limit_status": await rate_limit_manager.get_all_rate_limit_status(),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Health check for API gateway"""
 
         try:
@@ -622,9 +625,7 @@ class APIGateway:
             )
 
             status = "healthy"
-            if open_circuits:
-                status = "degraded"
-            elif success_rate < 0.9:
+            if open_circuits or success_rate < 0.9:
                 status = "degraded"
 
             return {

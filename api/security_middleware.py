@@ -1,17 +1,18 @@
-import re
+from collections import defaultdict, deque
 from datetime import datetime, timedelta
-from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
+import logging
+import re
 import time
+from typing import Optional
+import uuid
 
 from fastapi import Request, Response, status
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from api.validation_models import SecurityViolationResponse, ValidationErrorResponse
-from collections import defaultdict, deque
-from typing import Dict, List, Optional
-import logging
-import uuid
+
 
 """
 Security Middleware for DevSkyy Enterprise Platform
@@ -28,9 +29,9 @@ class RateLimiter:
     """Advanced rate limiter with multiple strategies"""
 
     def __init__(self):
-        self.requests: Dict[str, deque] = defaultdict(deque)
-        self.blocked_ips: Dict[str, datetime] = {}
-        self.suspicious_patterns: Dict[str, int] = defaultdict(int)
+        self.requests: dict[str, deque] = defaultdict(deque)
+        self.blocked_ips: dict[str, datetime] = {}
+        self.suspicious_patterns: dict[str, int] = defaultdict(int)
 
         # Rate limits (requests per minute)
         self.limits = {
@@ -185,7 +186,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.rate_limiter = RateLimiter()
         self.threat_detector = ThreatDetector()
-        self.request_log: List[Dict] = deque(maxlen=1000)  # Keep last 1000 requests
+        self.request_log: list[dict] = deque(maxlen=1000)  # Keep last 1000 requests
 
     async def dispatch(self, request: Request, call_next):
         """Process request through security pipeline"""

@@ -1,8 +1,7 @@
+import logging
 from pathlib import Path
 import re
 
-from typing import List
-from typing import List
 
 """
 Agent Upgrade Script
@@ -15,9 +14,11 @@ This script:
 4. Adds comprehensive error handling and ML features
 """
 
+logger = logging.getLogger(__name__)
+
 AGENT_MODULES_DIR = Path(__file__).parent / "modules"
 
-def find_agents_to_upgrade() -> List[Path]:
+def find_agents_to_upgrade() -> list[Path]:
     """Find all agent files that need upgrading"""
     agent_files = []
 

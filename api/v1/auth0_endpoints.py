@@ -1,11 +1,14 @@
+from datetime import timedelta
 import json
 import logging
 import os
+from typing import Any, Optional
+
 from authlib.common.security import generate_token
-from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
+
 from security.auth0_integration import (
     auth0_oauth_client,
     create_devskyy_jwt_token,
@@ -13,7 +16,7 @@ from security.auth0_integration import (
     log_auth_event,
     verify_devskyy_jwt_token,
 )
-from typing import Any, Dict, Optional
+
 
 """
 Auth0 Authentication Endpoints for DevSkyy FastAPI Platform
@@ -45,7 +48,7 @@ class Auth0TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
-    user_info: Dict[str, Any]
+    user_info: dict[str, Any]
 
 class Auth0LogoutResponse(BaseModel):
     """Auth0 logout response model."""
@@ -63,7 +66,7 @@ async def auth0_login(
 ):
     """
     Initiate Auth0 login flow.
-    
+
     This endpoint generates an Auth0 authorization URL and redirects the user
     to Auth0 for authentication. Compatible with the original Flask implementation.
     """
@@ -116,7 +119,7 @@ async def auth0_callback(
 ):
     """
     Handle Auth0 callback and exchange code for tokens.
-    
+
     This endpoint handles the Auth0 callback, exchanges the authorization code
     for tokens, and creates DevSkyy JWT tokens for seamless integration.
     """
@@ -204,7 +207,7 @@ async def auth0_logout(
 ):
     """
     Handle Auth0 logout.
-    
+
     This endpoint clears the user session and redirects to Auth0 logout
     to ensure complete logout from Auth0 as well.
     """
@@ -331,7 +334,7 @@ async def auth0_demo_home(request: Request):
     <body>
         <div class="container">
             <h1>🦄 DevSkyy Auth0 Integration Demo</h1>
-            
+
             {f'''
             <div class="user-info">
                 <h2>Welcome {user_info["name"]}!</h2>
@@ -347,7 +350,7 @@ async def auth0_demo_home(request: Request):
                 <p><a href="/api/v1/auth0/login" class="button">Login with Auth0</a></p>
             </div>
             '''}
-            
+
             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
                 <h3>API Endpoints:</h3>
                 <ul>

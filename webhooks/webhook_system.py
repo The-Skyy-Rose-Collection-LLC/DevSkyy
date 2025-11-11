@@ -8,17 +8,18 @@ Citation: RFC 2104 (HMAC: Keyed-Hashing for Message Authentication)
 """
 
 import asyncio
+from datetime import UTC, datetime, timedelta
+from enum import Enum
 import hashlib
 import hmac
 import logging
 import secrets
-from datetime import datetime, timedelta, timezone
-from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 from uuid import uuid4
 
 import httpx
 from pydantic import BaseModel, HttpUrl, validator
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,47 +29,47 @@ logger = logging.getLogger(__name__)
 
 class WebhookEvent(str, Enum):
     """Webhook event types"""
-    
+
     # Agent Events
     AGENT_STARTED = "agent.started"
     AGENT_COMPLETED = "agent.completed"
     AGENT_FAILED = "agent.failed"
-    
+
     # Code Scanning
     SCAN_COMPLETED = "scan.completed"
     SCAN_FAILED = "scan.failed"
-    
+
     # Code Fixing
     FIX_COMPLETED = "fix.completed"
     FIX_FAILED = "fix.failed"
-    
+
     # Product Events
     PRODUCT_CREATED = "product.created"
     PRODUCT_UPDATED = "product.updated"
     PRODUCT_DELETED = "product.deleted"
-    
+
     # Order Events
     ORDER_CREATED = "order.created"
     ORDER_UPDATED = "order.updated"
     ORDER_CANCELLED = "order.cancelled"
-    
+
     # Inventory Events
     INVENTORY_LOW = "inventory.low"
     INVENTORY_OUT = "inventory.out"
     INVENTORY_RESTOCKED = "inventory.restocked"
-    
+
     # Theme Events
     THEME_GENERATED = "theme.generated"
     THEME_DEPLOYED = "theme.deployed"
-    
+
     # Security Events
     SECURITY_THREAT = "security.threat"
     SECURITY_AUDIT = "security.audit"
-    
+
     # System Events
     SYSTEM_ERROR = "system.error"
     SYSTEM_WARNING = "system.warning"
-    
+
     # Custom Events
     CUSTOM = "custom.event"
 
@@ -86,53 +87,53 @@ class DeliveryStatus(str, Enum):
 
 class WebhookSubscription(BaseModel):
     """Webhook subscription configuration"""
-    
+
     subscription_id: str = None
     endpoint: HttpUrl
-    events: List[WebhookEvent]
+    events: list[WebhookEvent]
     secret: str  # HMAC secret for signature generation
     active: bool = True
     max_retries: int = 3
     retry_delay_seconds: int = 60
     timeout_seconds: int = 30
     created_at: datetime = None
-    metadata: Dict[str, Any] = {}
-    
+    metadata: dict[str, Any] = {}
+
     @validator("subscription_id", pre=True, always=True)
     def set_subscription_id(cls, v):
         return v or str(uuid4())
-    
+
     @validator("created_at", pre=True, always=True)
     def set_created_at(cls, v):
-        return v or datetime.now(timezone.utc)
+        return v or datetime.now(UTC)
 
 class WebhookPayload(BaseModel):
     """Webhook payload structure (RFC 2104 for signature)"""
-    
+
     event_id: str  # Unique event identifier
     event_type: WebhookEvent
     timestamp: datetime
-    data: Dict[str, Any]
+    data: dict[str, Any]
     idempotency_key: str = None  # Prevent duplicate processing
-    
+
     @validator("event_id", pre=True, always=True)
     def set_event_id(cls, v):
         return v or str(uuid4())
-    
+
     @validator("idempotency_key", pre=True, always=True)
     def set_idempotency_key(cls, v):
         return v or str(uuid4())
 
 class WebhookDelivery(BaseModel):
     """Webhook delivery record (for tracking)"""
-    
+
     delivery_id: str
     subscription_id: str
     event_id: str
     status: DeliveryStatus
     attempt_number: int
     request_body: str  # JSON payload
-    request_headers: Dict[str, str]
+    request_headers: dict[str, str]
     response_status_code: Optional[int] = None
     response_body: Optional[str] = None
     error_message: Optional[str] = None
@@ -147,14 +148,14 @@ class WebhookDelivery(BaseModel):
 def generate_signature(payload: str, secret: str) -> str:
     """
     Generate HMAC-SHA256 signature for webhook payload (RFC 2104)
-    
+
     Args:
         payload: JSON payload to sign
         secret: HMAC secret key
-        
+
     Returns:
         Hex-encoded HMAC-SHA256 signature
-        
+
     Citation: RFC 2104 Section 2 (HMAC Definition)
     """
     signature = hmac.new(
@@ -162,18 +163,18 @@ def generate_signature(payload: str, secret: str) -> str:
         payload.encode('utf-8'),
         hashlib.sha256
     ).hexdigest()
-    
+
     return signature
 
 def verify_signature(payload: str, signature: str, secret: str) -> bool:
     """
     Verify HMAC-SHA256 signature
-    
+
     Args:
         payload: Original JSON payload
         signature: Signature to verify
         secret: HMAC secret key
-        
+
     Returns:
         True if signature valid
     """
@@ -188,7 +189,7 @@ def verify_signature(payload: str, signature: str, secret: str) -> bool:
 class WebhookManager:
     """
     Enterprise webhook management system
-    
+
     Features:
     - HMAC-SHA256 signatures (RFC 2104)
     - Exponential backoff retry
@@ -196,61 +197,61 @@ class WebhookManager:
     - Delivery tracking
     - Idempotency
     """
-    
+
     def __init__(self):
         """Initialize webhook manager"""
-        self.subscriptions: Dict[str, WebhookSubscription] = {}
-        self.delivery_history: List[WebhookDelivery] = []
-        self.failed_deliveries: Dict[str, int] = {}  # Track failures per endpoint
+        self.subscriptions: dict[str, WebhookSubscription] = {}
+        self.delivery_history: list[WebhookDelivery] = []
+        self.failed_deliveries: dict[str, int] = {}  # Track failures per endpoint
         self.circuit_breaker_threshold = 5  # Fail open after 5 consecutive failures
-        
+
         logger.info("Webhook manager initialized")
-    
+
     async def subscribe(
         self,
         endpoint: str,
-        events: List[str],
+        events: list[str],
         secret: Optional[str] = None,
-        metadata: Optional[Dict] = None
+        metadata: Optional[dict] = None
     ) -> WebhookSubscription:
         """
         Subscribe to webhook events
-        
+
         Args:
             endpoint: Webhook destination URL
             events: List of event types to subscribe to
             secret: Secret for HMAC signature (auto-generated if not provided)
             metadata: Optional metadata
-            
+
         Returns:
             WebhookSubscription with subscription_id
         """
         if not secret:
             secret = secrets.token_urlsafe(32)
-        
+
         subscription = WebhookSubscription(
             endpoint=endpoint,
             events=[WebhookEvent(e) for e in events],
             secret=secret,
             metadata=metadata or {}
         )
-        
+
         self.subscriptions[subscription.subscription_id] = subscription
-        
+
         logger.info(
             f"Webhook subscribed: {subscription.subscription_id} -> {endpoint} "
             f"({len(events)} events)"
         )
-        
+
         return subscription
-    
+
     async def unsubscribe(self, subscription_id: str) -> bool:
         """
         Unsubscribe from webhooks
-        
+
         Args:
             subscription_id: Subscription to remove
-            
+
         Returns:
             True if successfully removed
         """
@@ -259,37 +260,37 @@ class WebhookManager:
             logger.info(f"Webhook unsubscribed: {subscription_id}")
             return True
         return False
-    
-    async def emit(self, event_type: WebhookEvent, data: Dict[str, Any]):
+
+    async def emit(self, event_type: WebhookEvent, data: dict[str, Any]):
         """
         Emit webhook event to all subscribed endpoints
-        
+
         Args:
             event_type: Type of event to emit
             data: Event data
         """
         payload = WebhookPayload(
             event_type=event_type,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             data=data
         )
-        
+
         # Find all subscriptions for this event type
         matching_subscriptions = [
             sub for sub in self.subscriptions.values()
             if event_type in sub.events and sub.active
         ]
-        
+
         # Deliver to all matching subscriptions
         tasks = [
             self._deliver_webhook(sub, payload)
             for sub in matching_subscriptions
         ]
-        
+
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
             logger.debug(f"Event '{event_type}' emitted to {len(matching_subscriptions)} subscribers")
-    
+
     async def _deliver_webhook(
         self,
         subscription: WebhookSubscription,
@@ -298,7 +299,7 @@ class WebhookManager:
     ):
         """
         Deliver webhook with retry logic (exponential backoff)
-        
+
         Args:
             subscription: Target subscription
             payload: Webhook payload
@@ -306,7 +307,7 @@ class WebhookManager:
         """
         payload_json = payload.json()
         signature = generate_signature(payload_json, subscription.secret)
-        
+
         headers = {
             "Content-Type": "application/json",
             "X-Webhook-Event": payload.event_type,
@@ -315,7 +316,7 @@ class WebhookManager:
             "X-Webhook-Timestamp": payload.timestamp.isoformat(),
             "X-Idempotency-Key": payload.idempotency_key
         }
-        
+
         delivery = WebhookDelivery(
             delivery_id=str(uuid4()),
             subscription_id=subscription.subscription_id,
@@ -324,10 +325,10 @@ class WebhookManager:
             attempt_number=attempt,
             request_body=payload_json,
             request_headers=headers,
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc)
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC)
         )
-        
+
         try:
             # Check circuit breaker
             failure_count = self.failed_deliveries.get(str(subscription.endpoint), 0)
@@ -340,7 +341,7 @@ class WebhookManager:
                 delivery.error_message = "Circuit breaker open - too many failures"
                 self.delivery_history.append(delivery)
                 return
-            
+
             # Send webhook with timeout
             async with httpx.AsyncClient(timeout=subscription.timeout_seconds) as client:
                 response = await client.post(
@@ -348,10 +349,10 @@ class WebhookManager:
                     content=payload_json,
                     headers=headers
                 )
-                
+
                 delivery.response_status_code = response.status_code
                 delivery.response_body = response.text[:1000]  # Truncate for storage
-                
+
                 if response.status_code in [200, 201, 202, 204]:
                     delivery.status = DeliveryStatus.SENT
                     self.failed_deliveries[str(subscription.endpoint)] = 0
@@ -361,24 +362,24 @@ class WebhookManager:
                     )
                 else:
                     raise Exception(f"HTTP {response.status_code}: {response.text[:100]}")
-        
+
         except Exception as e:
             delivery.error_message = str(e)
-            
+
             # Decide if we should retry
             if attempt < subscription.max_retries:
                 delivery.status = DeliveryStatus.RETRYING
-                
+
                 # Exponential backoff: 60s, 120s, 240s, ...
                 backoff_seconds = subscription.retry_delay_seconds * (2 ** (attempt - 1))
-                next_retry = datetime.now(timezone.utc) + timedelta(seconds=backoff_seconds)
+                next_retry = datetime.now(UTC) + timedelta(seconds=backoff_seconds)
                 delivery.next_retry_at = next_retry
-                
+
                 logger.warning(
                     f"Webhook delivery failed (attempt {attempt}/{subscription.max_retries}): "
-                    f"{str(e)}. Retrying in {backoff_seconds}s..."
+                    f"{e!s}. Retrying in {backoff_seconds}s..."
                 )
-                
+
                 # Schedule retry
                 asyncio.create_task(
                     asyncio.sleep(backoff_seconds)
@@ -388,53 +389,53 @@ class WebhookManager:
                 delivery.status = DeliveryStatus.PERMANENTLY_FAILED
                 self.failed_deliveries[str(subscription.endpoint)] = \
                     self.failed_deliveries.get(str(subscription.endpoint), 0) + 1
-                
+
                 logger.error(
                     f"Webhook permanently failed after {attempt} attempts: "
-                    f"{subscription.endpoint} - {str(e)}"
+                    f"{subscription.endpoint} - {e!s}"
                 )
-        
+
         finally:
-            delivery.updated_at = datetime.now(timezone.utc)
+            delivery.updated_at = datetime.now(UTC)
             self.delivery_history.append(delivery)
-    
+
     async def test_webhook(self, subscription_id: str) -> WebhookDelivery:
         """
         Test webhook delivery with sample payload
-        
+
         Args:
             subscription_id: Subscription to test
-            
+
         Returns:
             WebhookDelivery record with test result
         """
         subscription = self.subscriptions.get(subscription_id)
         if not subscription:
             raise ValueError(f"Subscription not found: {subscription_id}")
-        
+
         test_payload = WebhookPayload(
             event_type=WebhookEvent.CUSTOM,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             data={"test": True, "message": "Webhook test delivery"}
         )
-        
+
         await self._deliver_webhook(subscription, test_payload)
-        
+
         # Return last delivery record
         return self.delivery_history[-1]
-    
+
     async def get_delivery_history(
         self,
         subscription_id: str,
         limit: int = 10
-    ) -> List[WebhookDelivery]:
+    ) -> list[WebhookDelivery]:
         """
         Get delivery history for a subscription
-        
+
         Args:
             subscription_id: Subscription ID
             limit: Maximum number of records to return
-            
+
         Returns:
             List of WebhookDelivery records
         """
@@ -443,12 +444,12 @@ class WebhookManager:
             if d.subscription_id == subscription_id
         ]
         return matching[-limit:]  # Return most recent
-    
+
     async def get_subscription(self, subscription_id: str) -> Optional[WebhookSubscription]:
         """Get subscription by ID"""
         return self.subscriptions.get(subscription_id)
-    
-    async def list_subscriptions(self) -> List[WebhookSubscription]:
+
+    async def list_subscriptions(self) -> list[WebhookSubscription]:
         """List all subscriptions"""
         return list(self.subscriptions.values())
 
@@ -462,17 +463,16 @@ if __name__ == "__main__":
     # Demo usage
     async def demo():
         # Subscribe
-        sub = await webhook_manager.subscribe(
+        await webhook_manager.subscribe(
             endpoint="https://example.com/webhook",
             events=["agent.completed", "product.created"],
             metadata={"source": "demo"}
         )
-        print(f"Subscription created: {sub.subscription_id}")
-        
+
         # Emit event
         await webhook_manager.emit(
             WebhookEvent.AGENT_COMPLETED,
             {"agent_id": "scanner", "status": "success"}
         )
-    
+
     asyncio.run(demo())

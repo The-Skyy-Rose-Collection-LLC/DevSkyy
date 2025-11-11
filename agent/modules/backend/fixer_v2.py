@@ -11,18 +11,19 @@ Features:
 - Integration with orchestrator
 """
 
+from datetime import datetime
 import logging
 import os
+from pathlib import Path
 import re
 import shutil
 import time
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import autopep8
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class FixerAgentV2(BaseAgent):
         }
 
         # Statistics
-        self.fix_history: List[Dict[str, Any]] = []
+        self.fix_history: list[dict[str, Any]] = []
         self.total_fixes_applied = 0
 
     async def initialize(self) -> bool:
@@ -85,7 +86,7 @@ class FixerAgentV2(BaseAgent):
             self.status = AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Execute core fixing functionality.
 
@@ -156,10 +157,10 @@ class FixerAgentV2(BaseAgent):
 
     async def _auto_fix(
         self,
-        scan_results: Optional[Dict[str, Any]],
-        target_files: Optional[List[str]],
+        scan_results: Optional[dict[str, Any]],
+        target_files: Optional[list[str]],
         dry_run: bool,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Automatically fix issues based on scan results"""
         results = {
             "files_fixed": 0,
@@ -192,7 +193,7 @@ class FixerAgentV2(BaseAgent):
 
         # Update counts
         results["files_fixed"] = len(
-            set(fix["file"] for fix in results["fixes_applied"])
+            {fix["file"] for fix in results["fixes_applied"]}
         )
         results["errors_fixed"] = sum(
             1 for fix in results["fixes_applied"] if fix.get("severity") == "error"
@@ -204,8 +205,8 @@ class FixerAgentV2(BaseAgent):
         return results
 
     async def _security_fix(
-        self, scan_results: Optional[Dict[str, Any]], dry_run: bool
-    ) -> Dict[str, Any]:
+        self, scan_results: Optional[dict[str, Any]], dry_run: bool
+    ) -> dict[str, Any]:
         """Fix security vulnerabilities"""
         results = {"fixes_applied": [], "vulnerabilities_fixed": 0}
 
@@ -232,8 +233,8 @@ class FixerAgentV2(BaseAgent):
         return results
 
     async def _performance_fix(
-        self, scan_results: Optional[Dict[str, Any]], dry_run: bool
-    ) -> Dict[str, Any]:
+        self, scan_results: Optional[dict[str, Any]], dry_run: bool
+    ) -> dict[str, Any]:
         """Apply performance optimizations"""
         results = {"fixes_applied": [], "optimizations": 0}
 
@@ -249,8 +250,8 @@ class FixerAgentV2(BaseAgent):
         return results
 
     async def _format_fix(
-        self, target_files: Optional[List[str]], dry_run: bool
-    ) -> Dict[str, Any]:
+        self, target_files: Optional[list[str]], dry_run: bool
+    ) -> dict[str, Any]:
         """Format code according to standards"""
         results = {"fixes_applied": [], "files_formatted": 0}
 
@@ -266,8 +267,8 @@ class FixerAgentV2(BaseAgent):
         return results
 
     async def _fix_python_files(
-        self, target_files: Optional[List[str]], dry_run: bool
-    ) -> List[Dict[str, Any]]:
+        self, target_files: Optional[list[str]], dry_run: bool
+    ) -> list[dict[str, Any]]:
         """Fix Python-specific issues"""
         fixes = []
 
@@ -313,8 +314,8 @@ class FixerAgentV2(BaseAgent):
         return fixes
 
     async def _fix_javascript_files(
-        self, target_files: Optional[List[str]], dry_run: bool
-    ) -> List[Dict[str, Any]]:
+        self, target_files: Optional[list[str]], dry_run: bool
+    ) -> list[dict[str, Any]]:
         """Fix JavaScript/TypeScript issues"""
         fixes = []
 
@@ -358,8 +359,8 @@ class FixerAgentV2(BaseAgent):
         return fixes
 
     async def _fix_common_issues(
-        self, target_files: Optional[List[str]], dry_run: bool
-    ) -> List[Dict[str, Any]]:
+        self, target_files: Optional[list[str]], dry_run: bool
+    ) -> list[dict[str, Any]]:
         """Fix common issues across all file types"""
         fixes = []
 
@@ -402,7 +403,7 @@ class FixerAgentV2(BaseAgent):
 
     async def _fix_hardcoded_secret(
         self, file_path: str, dry_run: bool
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Fix hardcoded secrets by replacing with environment variables"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -432,7 +433,7 @@ class FixerAgentV2(BaseAgent):
 
     async def _fix_sql_injection(
         self, file_path: str, dry_run: bool
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """
         Add SQL injection prevention.
 
@@ -449,7 +450,7 @@ class FixerAgentV2(BaseAgent):
             "recommendation": "Use parameterized queries with prepared statements or ORM methods",
         }
 
-    async def _add_caching(self, dry_run: bool) -> List[Dict[str, Any]]:
+    async def _add_caching(self, dry_run: bool) -> list[dict[str, Any]]:
         """
         Add caching to expensive operations.
 
@@ -459,7 +460,7 @@ class FixerAgentV2(BaseAgent):
         """
         return []
 
-    async def _remove_unused_imports(self, dry_run: bool) -> List[Dict[str, Any]]:
+    async def _remove_unused_imports(self, dry_run: bool) -> list[dict[str, Any]]:
         """
         Remove unused imports from Python files.
 
@@ -471,7 +472,7 @@ class FixerAgentV2(BaseAgent):
 
     async def _format_python_file(
         self, file_path: str, dry_run: bool
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Format a Python file"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -525,7 +526,7 @@ class FixerAgentV2(BaseAgent):
                 shutil.rmtree(old_backup)
                 logger.info(f"Removed old backup: {old_backup}")
 
-    async def rollback(self, backup_path: str) -> Dict[str, Any]:
+    async def rollback(self, backup_path: str) -> dict[str, Any]:
         """Rollback to a previous backup"""
         try:
             backup = Path(backup_path)
@@ -547,7 +548,7 @@ class FixerAgentV2(BaseAgent):
             logger.error(f"Rollback failed: {e}")
             return {"error": str(e)}
 
-    def _get_all_code_files(self) -> List[str]:
+    def _get_all_code_files(self) -> list[str]:
         """Get all code files in project"""
         files = []
         extensions = {".py", ".js", ".ts", ".tsx", ".html", ".css"}
@@ -564,7 +565,7 @@ class FixerAgentV2(BaseAgent):
 
         return files
 
-    async def get_fix_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+    async def get_fix_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get recent fix history"""
         return self.fix_history[-limit:]
 

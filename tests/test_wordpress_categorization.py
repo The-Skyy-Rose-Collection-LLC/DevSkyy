@@ -8,13 +8,14 @@ IMPACT: Ensures correct category assignment
 pytest tests/test_wordpress_categorization.py -v
 """
 
+from unittest.mock import MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from services.wordpress_categorization import (
-    WordPressCategorizationService,
-    CategoryMapping,
     CategorizationResult,
+    CategoryMapping,
+    WordPressCategorizationService,
 )
 
 

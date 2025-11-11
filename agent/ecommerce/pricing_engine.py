@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
+import logging
+from typing import Any
+
 from sklearn.ensemble import GradientBoostingRegressor
 
-from typing import Any, Dict, List
-import logging
 
 """
 Dynamic Pricing Engine
@@ -34,8 +35,8 @@ class DynamicPricingEngine:
         logger.info("💰 Dynamic Pricing Engine initialized")
 
     async def optimize_price(
-        self, product_data: Dict[str, Any], market_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any], market_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Calculate optimal price for a product
 
@@ -176,7 +177,7 @@ class DynamicPricingEngine:
             return {"success": False, "error": str(e)}
 
     async def _calculate_elasticity(
-        self, product_data: Dict, market_data: Dict
+        self, product_data: dict, market_data: dict
     ) -> float:
         """Calculate price elasticity of demand"""
         # Simplified elasticity calculation
@@ -204,8 +205,8 @@ class DynamicPricingEngine:
         return revenue
 
     async def _get_pricing_recommendations(
-        self, product_data: Dict, optimal_price: float, current_price: float
-    ) -> List[str]:
+        self, product_data: dict, optimal_price: float, current_price: float
+    ) -> list[str]:
         """Generate pricing recommendations"""
         recommendations = []
 
@@ -227,8 +228,8 @@ class DynamicPricingEngine:
         return recommendations
 
     async def create_pricing_strategy(
-        self, strategy_type: str, products: List[Dict]
-    ) -> Dict[str, Any]:
+        self, strategy_type: str, products: list[dict]
+    ) -> dict[str, Any]:
         """
         Create pricing strategy for multiple products
 
@@ -314,7 +315,7 @@ class DynamicPricingEngine:
         price_variant_a: float,
         price_variant_b: float,
         duration_days: int = 14,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Set up A/B test for pricing
 

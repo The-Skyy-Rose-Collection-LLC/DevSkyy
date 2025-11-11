@@ -4,55 +4,44 @@ User Creation Utility for DevSkyy Enterprise Platform
 Creates new users with proper password hashing and authentication setup
 """
 
+from getpass import getpass
 import os
 import sys
-from getpass import getpass
+
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from security.jwt_auth import (
+    UserRole,
     create_access_token,
     create_refresh_token,
     user_manager,
-    UserRole,
 )
 
 
 def create_user_interactive():
     """Create a user interactively"""
-    print("🔐 DevSkyy Enterprise - User Creation Utility")
-    print("=" * 50)
 
     # Get user details
     username = input("Enter username: ").strip()
     if not username:
-        print("❌ Username cannot be empty")
         return False
 
     email = input("Enter email: ").strip()
     if not email:
-        print("❌ Email cannot be empty")
         return False
 
     # Get password securely
     password = getpass("Enter password: ")
     if not password:
-        print("❌ Password cannot be empty")
         return False
 
     password_confirm = getpass("Confirm password: ")
     if password != password_confirm:
-        print("❌ Passwords do not match")
         return False
 
     # Get role
-    print("\nAvailable roles:")
-    print("1. super_admin - Full system access")
-    print("2. admin - Administrative access")
-    print("3. developer - Development access")
-    print("4. api_user - API access (default)")
-    print("5. read_only - Read-only access")
 
     role_choice = input("Select role (1-5, default: 4): ").strip()
     role_map = {
@@ -72,21 +61,13 @@ def create_user_interactive():
             email=email, username=username, password=password, role=role
         )
 
-        print(f"\n✅ User created successfully!")
-        print(f"   User ID: {user.user_id}")
-        print(f"   Username: {user.username}")
-        print(f"   Email: {user.email}")
-        print(f"   Role: {user.role}")
-        print(f"   Created: {user.created_at}")
 
         # Test authentication
-        print(f"\n🔍 Testing authentication...")
         auth_user = user_manager.authenticate_user(username, password)
         if auth_user:
-            print("✅ Authentication test successful!")
 
             # Generate test tokens
-            access_token = create_access_token(
+            create_access_token(
                 {
                     "user_id": user.user_id,
                     "email": user.email,
@@ -95,7 +76,7 @@ def create_user_interactive():
                 }
             )
 
-            refresh_token = create_refresh_token(
+            create_refresh_token(
                 {
                     "user_id": user.user_id,
                     "email": user.email,
@@ -104,24 +85,15 @@ def create_user_interactive():
                 }
             )
 
-            print("✅ JWT tokens generated successfully!")
-            print(f"\n📋 Authentication Details:")
-            print(f"   Username/Email: {username} or {email}")
-            print(f"   Password: [HIDDEN]")
-            print(f"   Access Token: {access_token[:50]}...")
-            print(f"   Refresh Token: {refresh_token[:50]}...")
 
         else:
-            print("❌ Authentication test failed!")
             return False
 
         return True
 
-    except ValueError as e:
-        print(f"❌ Error creating user: {e}")
+    except ValueError:
         return False
-    except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+    except Exception:
         return False
 
 
@@ -141,41 +113,31 @@ def create_user_programmatic(
 
         return user
 
-    except Exception as e:
-        print(f"❌ Error creating user: {e}")
+    except Exception:
         return None
 
 
 def list_users():
     """List all existing users"""
-    print("👥 Existing Users:")
-    print("=" * 50)
 
     if not user_manager.users:
-        print("No users found.")
         return
 
-    for user_id, user in user_manager.users.items():
-        print(f"   {user.username} ({user.email}) - {user.role}")
+    for _user_id, _user in user_manager.users.items():
+        pass
 
 
 def test_authentication():
     """Test authentication with existing users"""
-    print("🔍 Authentication Test")
-    print("=" * 50)
 
     username_or_email = input("Enter username or email: ").strip()
     password = getpass("Enter password: ")
 
     user = user_manager.authenticate_user(username_or_email, password)
     if user:
-        print("✅ Authentication successful!")
-        print(f"   User: {user.username} ({user.email})")
-        print(f"   Role: {user.role}")
-        print(f"   Last Login: {user.last_login}")
 
         # Generate tokens
-        access_token = create_access_token(
+        create_access_token(
             {
                 "user_id": user.user_id,
                 "email": user.email,
@@ -184,10 +146,9 @@ def test_authentication():
             }
         )
 
-        print(f"   Access Token: {access_token[:50]}...")
 
     else:
-        print("❌ Authentication failed!")
+        pass
 
 
 def main():
@@ -198,7 +159,7 @@ def main():
         elif sys.argv[1] == "test":
             test_authentication()
         else:
-            print("Usage: python create_user.py [list|test]")
+            pass
     else:
         create_user_interactive()
 

@@ -7,17 +7,15 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel, HttpUrl
-from typing import List, Dict, Any, Optional
 from datetime import datetime
 import logging
+from typing import Any, Optional
 
-from webhook_system import (
-    webhook_manager,
-    WebhookEvent
-)
+from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user
+from pydantic import BaseModel, HttpUrl
+from webhook_system import WebhookEvent, webhook_manager
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,15 +28,15 @@ router = APIRouter(prefix="/api/v1/webhooks", tags=["webhooks"])
 class WebhookSubscribeRequest(BaseModel):
     """Webhook subscription request"""
     endpoint: HttpUrl
-    events: List[str]
+    events: list[str]
     secret: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
 
 class WebhookSubscribeResponse(BaseModel):
     """Webhook subscription response"""
     subscription_id: str
     endpoint: str
-    events: List[str]
+    events: list[str]
     active: bool
     created_at: datetime
     secret: str  # Return secret so client can verify signatures
@@ -70,22 +68,22 @@ class WebhookTestResponse(BaseModel):
 @router.post("/subscribe", response_model=WebhookSubscribeResponse)
 async def subscribe_to_webhooks(
     request: WebhookSubscribeRequest,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Subscribe to webhook events
-    
+
     Creates a new webhook subscription for the specified events.
     The client will receive HTTP POST requests to the endpoint URL
     when subscribed events occur.
-    
+
     Args:
         request: WebhookSubscribeRequest with endpoint and events
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         WebhookSubscribeResponse with subscription_id and secret
-        
+
     Status Codes:
         201: Successfully subscribed
         400: Invalid endpoint or events
@@ -126,7 +124,7 @@ async def subscribe_to_webhooks(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Subscription error: {str(e)}")
+        logger.error(f"Subscription error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to subscribe to webhooks"
@@ -135,18 +133,18 @@ async def subscribe_to_webhooks(
 @router.delete("/{subscription_id}")
 async def unsubscribe_from_webhooks(
     subscription_id: str,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Unsubscribe from webhooks
-    
+
     Args:
         subscription_id: Subscription ID to remove
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         Unsubscribe confirmation
-        
+
     Status Codes:
         200: Successfully unsubscribed
         404: Subscription not found
@@ -169,16 +167,16 @@ async def unsubscribe_from_webhooks(
         "message": f"Successfully unsubscribed from {subscription_id}"
     }
 
-@router.get("/list", response_model=List[WebhookSubscribeResponse])
+@router.get("/list", response_model=list[WebhookSubscribeResponse])
 async def list_subscriptions(
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     List all active webhook subscriptions
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         List of WebhookSubscribeResponse
     """
@@ -199,21 +197,21 @@ async def list_subscriptions(
 @router.post("/{subscription_id}/test", response_model=WebhookTestResponse)
 async def test_webhook(
     subscription_id: str,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Test webhook delivery with sample payload
-    
+
     Sends a test payload to the webhook endpoint to verify delivery.
     Useful for validating webhook configuration.
-    
+
     Args:
         subscription_id: Subscription ID to test
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         WebhookTestResponse with delivery status
-        
+
     Status Codes:
         200: Test sent (check status for delivery result)
         404: Subscription not found
@@ -239,40 +237,38 @@ async def test_webhook(
             detail=str(e)
         )
     except Exception as e:
-        logger.error(f"Webhook test error: {str(e)}")
+        logger.error(f"Webhook test error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to test webhook"
         )
 
-@router.get("/{subscription_id}/deliveries", response_model=List[WebhookDeliveryResponse])
+@router.get("/{subscription_id}/deliveries", response_model=list[WebhookDeliveryResponse])
 async def get_delivery_history(
     subscription_id: str,
     limit: int = 10,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get delivery history for a subscription
-    
+
     Returns recent webhook delivery attempts (sent, failed, retrying)
-    
+
     Args:
         subscription_id: Subscription ID
         limit: Maximum number of records to return (default: 10, max: 100)
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         List of WebhookDeliveryResponse in reverse chronological order
-        
+
     Status Codes:
         200: Success
         404: Subscription not found
     """
     # Validate limit
-    if limit > 100:
-        limit = 100
-    if limit < 1:
-        limit = 1
+    limit = min(limit, 100)
+    limit = max(limit, 1)
 
     try:
         deliveries = await webhook_manager.get_delivery_history(
@@ -297,7 +293,7 @@ async def get_delivery_history(
         ]
 
     except Exception as e:
-        logger.error(f"Delivery history error: {str(e)}")
+        logger.error(f"Delivery history error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve delivery history"
@@ -306,18 +302,18 @@ async def get_delivery_history(
 @router.get("/{subscription_id}/info", response_model=WebhookSubscribeResponse)
 async def get_subscription_info(
     subscription_id: str,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get information about a specific subscription
-    
+
     Args:
         subscription_id: Subscription ID
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         WebhookSubscribeResponse with subscription details
-        
+
     Status Codes:
         200: Success
         404: Subscription not found
@@ -339,16 +335,16 @@ async def get_subscription_info(
         secret=subscription.secret
     )
 
-@router.get("/events/list", response_model=Dict[str, List[str]])
+@router.get("/events/list", response_model=dict[str, list[str]])
 async def list_webhook_events(
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     List all available webhook event types
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         Dictionary mapping event categories to event types
     """

@@ -3,14 +3,15 @@ Base ML Engine
 Foundational machine learning capabilities for all agents
 """
 
-import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, Optional, Tuple
+import logging
+from typing import Any, Optional
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,11 +42,11 @@ class BaseMLEngine(ABC):
         logger.info(f"🤖 ML Engine initialized: {model_name}")
 
     @abstractmethod
-    async def train(self, X: np.ndarray, y: np.ndarray, **kwargs) -> Dict[str, Any]:
+    async def train(self, X: np.ndarray, y: np.ndarray, **kwargs) -> dict[str, Any]:
         """Train the ML model"""
 
     @abstractmethod
-    async def predict(self, X: np.ndarray, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
+    async def predict(self, X: np.ndarray, **kwargs) -> tuple[np.ndarray, np.ndarray]:
         """Make predictions with confidence scores"""
 
     async def preprocess_data(self, data: np.ndarray, fit: bool = False) -> np.ndarray:
@@ -74,13 +75,13 @@ class BaseMLEngine(ABC):
         y: np.ndarray,
         test_size: float = 0.2,
         random_state: int = 42,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Split data into training and testing sets"""
         return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
     async def evaluate_model(
         self, X_test: np.ndarray, y_test: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Evaluate model performance
 
@@ -124,7 +125,7 @@ class BaseMLEngine(ABC):
             logger.error(f"Model evaluation failed: {e}")
             return {"error": str(e)}
 
-    async def get_feature_importance(self) -> Optional[Dict[str, float]]:
+    async def get_feature_importance(self) -> Optional[dict[str, float]]:
         """Get feature importance scores if model supports it"""
         try:
             if hasattr(self.model, "feature_importances_"):
@@ -187,7 +188,7 @@ class BaseMLEngine(ABC):
             logger.error(f"Failed to load model: {e}")
             return False
 
-    async def get_model_info(self) -> Dict[str, Any]:
+    async def get_model_info(self) -> dict[str, Any]:
         """Get comprehensive model information"""
         return {
             "name": self.model_name,
@@ -200,7 +201,7 @@ class BaseMLEngine(ABC):
 
     async def continuous_learning(
         self, new_X: np.ndarray, new_y: np.ndarray, retrain_threshold: float = 0.1
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Implement continuous learning
 

@@ -1,17 +1,20 @@
+from datetime import datetime
 import logging
 import re
+from typing import Any, Optional
 import uuid
-from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
+
 from security.jwt_auth import (
+    TokenData,
     get_current_active_user,
     require_admin,
-    TokenData,
     user_manager,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
-from typing import Any, Dict, List, Optional
+
 
 """
 GDPR Compliance API Endpoints
@@ -45,8 +48,8 @@ class GDPRExportResponse(BaseModel):
     user_id: str
     email: str
     export_timestamp: datetime
-    data: Dict[str, Any]
-    metadata: Dict[str, Any]
+    data: dict[str, Any]
+    metadata: dict[str, Any]
 
 class GDPRDeleteRequest(BaseModel):
     """GDPR data deletion request"""
@@ -63,16 +66,16 @@ class GDPRDeleteResponse(BaseModel):
     email: str
     deletion_timestamp: datetime
     status: str
-    deleted_records: Dict[str, int]
-    retained_records: Optional[Dict[str, int]] = None  # For audit purposes
+    deleted_records: dict[str, int]
+    retained_records: Optional[dict[str, int]] = None  # For audit purposes
 
 class DataRetentionPolicyResponse(BaseModel):
     """Data retention policy information"""
 
     policy_version: str
     last_updated: datetime
-    retention_periods: Dict[str, str]
-    legal_basis: List[str]
+    retention_periods: dict[str, str]
+    legal_basis: list[str]
 
 # ============================================================================
 # GDPR DATA EXPORT (Article 15)
@@ -138,8 +141,8 @@ async def export_user_data(
                 "data_access_logs": [],
             }
             logger.info(
-                f"   ✓ Including audit logs in export"
-            )  # noqa: F541 - Consistent logging format
+                "   ✓ Including audit logs in export"
+            )
 
         # Include activity history if requested
         if request.include_activity_history:
@@ -149,8 +152,8 @@ async def export_user_data(
                 "api_usage_statistics": {},
             }
             logger.info(
-                f"   ✓ Including activity history in export"
-            )  # noqa: F541 - Consistent logging format
+                "   ✓ Including activity history in export"
+            )
 
         # Generate export metadata
 
@@ -237,8 +240,8 @@ async def delete_user_data(
         if request.anonymize_instead_of_delete:
             # Anonymization approach - retain data for legal/audit purposes
             logger.info(
-                f"   → Anonymizing user data instead of deletion"
-            )  # noqa: F541 - Consistent logging format
+                "   → Anonymizing user data instead of deletion"
+            )
 
             # Anonymize personal information
             anonymized_user_data = {

@@ -1,14 +1,17 @@
+import asyncio
+from collections import defaultdict, deque
+from collections.abc import Callable
 from datetime import datetime
-from logging_config import error_logger, get_correlation_id
+from enum import Enum
+from functools import wraps
+import logging
+import secrets
+from typing import Any, Optional
 
 from fastapi import HTTPException, status
 
-from collections import defaultdict, deque
-from enum import Enum
-from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Type
-import asyncio
-import logging
+from logging_config import error_logger, get_correlation_id
+
 
 """
 Enterprise Error Handling & Recovery System for DevSkyy Platform
@@ -81,7 +84,7 @@ class DevSkyError(Exception):
         message: str,
         error_code: ErrorCode,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
         correlation_id: Optional[str] = None,
     ):
         super().__init__(message)
@@ -111,7 +114,7 @@ class CircuitBreaker:
         name: str,
         failure_threshold: int = 5,
         recovery_timeout: int = 60,
-        expected_exception: Type[Exception] = Exception,
+        expected_exception: type[Exception] = Exception,
     ):
         self.name = name
         self.failure_threshold = failure_threshold
@@ -212,7 +215,7 @@ class CircuitBreaker:
                 f"🚨 Circuit breaker {self.name} OPENED - service failing"
             )
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get circuit breaker statistics"""
         return {
             "name": self.name,
@@ -241,7 +244,7 @@ class RetryConfig:
         max_delay: float = 60.0,
         exponential_base: float = 2.0,
         jitter: bool = True,
-        retryable_exceptions: List[Type[Exception]] = None,
+        retryable_exceptions: list[type[Exception]] | None = None,
     ):
         self.max_attempts = max_attempts
         self.base_delay = base_delay
@@ -323,7 +326,7 @@ class ErrorHandler:
     """Centralized error handling and recovery system"""
 
     def __init__(self):
-        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
+        self.circuit_breakers: dict[str, CircuitBreaker] = {}
         self.error_stats = defaultdict(int)
         self.recent_errors = deque(maxlen=1000)
         self.error_patterns = defaultdict(list)
@@ -341,9 +344,9 @@ class ErrorHandler:
     async def handle_error(
         self,
         error: Exception,
-        context: Dict[str, Any] = None,
-        user_id: str = None,
-        request_id: str = None,
+        context: dict[str, Any] | None = None,
+        user_id: str | None = None,
+        request_id: str | None = None,
     ) -> HTTPException:
         """Handle and convert errors to HTTP exceptions"""
 
@@ -449,7 +452,7 @@ class ErrorHandler:
             },
         )
 
-    def get_error_stats(self) -> Dict[str, Any]:
+    def get_error_stats(self) -> dict[str, Any]:
         """Get error statistics"""
         return {
             "total_errors": sum(self.error_stats.values()),

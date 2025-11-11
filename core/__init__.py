@@ -12,11 +12,12 @@ from .error_ledger import (
     log_error,
 )
 
+
 __all__ = [
-    "ErrorLedger",
-    "ErrorSeverity",
     "ErrorCategory",
     "ErrorEntry",
+    "ErrorLedger",
+    "ErrorSeverity",
     "get_error_ledger",
     "log_error",
 ]

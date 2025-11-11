@@ -1,15 +1,16 @@
 from datetime import datetime
-from infrastructure.redis_manager import redis_manager, SessionData
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
+import logging
 import secrets
 import time
+from typing import Any, Optional
+import uuid
 
 from fastapi import HTTPException, Request, Response, status
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
-from typing import Any, Dict, Optional
-import logging
-import uuid
+from infrastructure.redis_manager import SessionData, redis_manager
+
 
 """
 Enterprise Session Middleware - FastAPI Integration
@@ -29,7 +30,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         session_cookie_secure: bool = True,
         session_cookie_httponly: bool = True,
         session_cookie_samesite: str = "lax",
-        require_session_for_paths: list = None,
+        require_session_for_paths: list | None = None,
     ):
         super().__init__(app)
         self.session_cookie_name = session_cookie_name
@@ -130,7 +131,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         permissions: list,
         ip_address: str,
         user_agent: str,
-        fashion_preferences: Dict[str, Any] = None,
+        fashion_preferences: dict[str, Any] | None = None,
     ) -> str:
         """Create new session and set cookie"""
 
@@ -195,7 +196,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
         return False
 
     async def update_fashion_preferences(
-        self, request: Request, fashion_preferences: Dict[str, Any]
+        self, request: Request, fashion_preferences: dict[str, Any]
     ) -> bool:
         """Update fashion preferences in session"""
         session_id = getattr(request.state, "session_id", None)
@@ -245,7 +246,7 @@ class SessionManager:
         return getattr(request.state, "user_permissions", [])
 
     @staticmethod
-    def get_fashion_preferences(request: Request) -> Dict[str, Any]:
+    def get_fashion_preferences(request: Request) -> dict[str, Any]:
         """Get fashion preferences from session"""
         return getattr(request.state, "fashion_preferences", {})
 
@@ -273,7 +274,7 @@ class SessionManager:
         fashion_roles = ["fashion_expert", "trend_analyst", "buyer", "merchandiser"]
         return user_role in fashion_roles
 
-    async def get_session_metrics(self) -> Dict[str, Any]:
+    async def get_session_metrics(self) -> dict[str, Any]:
         """Get session management metrics"""
         redis_metrics = await redis_manager.get_metrics()
         active_sessions = await redis_manager.cleanup_expired_sessions()

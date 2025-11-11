@@ -18,10 +18,10 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from anthropic import Anthropic
-from pydantic import BaseModel, ValidationError
+
 
 # Logfire for observability
 try:
@@ -85,7 +85,7 @@ class MCPToolClient:
         """
         self.schema_path = Path(schema_path)
         self.schema = self._load_schema()
-        self.loaded_tools: Dict[str, Dict] = {}
+        self.loaded_tools: dict[str, dict] = {}
         self.invocation_count = 0
 
         # Initialize Anthropic client
@@ -98,7 +98,7 @@ class MCPToolClient:
                 "No Anthropic API key provided. Tool invocations will fail."
             )
 
-    def _load_schema(self) -> Dict[str, Any]:
+    def _load_schema(self) -> dict[str, Any]:
         """
         Load MCP tool schema from JSON file
 
@@ -121,7 +121,7 @@ class MCPToolClient:
             logger.error(f"❌ Invalid JSON in MCP schema: {e}")
             raise
 
-    def load_tool(self, tool_name: str, category: str) -> Dict[str, Any]:
+    def load_tool(self, tool_name: str, category: str) -> dict[str, Any]:
         """
         Load tool definition on-demand
 
@@ -165,10 +165,10 @@ class MCPToolClient:
         self,
         tool_name: str,
         category: str,
-        inputs: Dict[str, Any],
+        inputs: dict[str, Any],
         model: str = "claude-3-5-sonnet-20241022",
         max_tokens: int = 2000,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Invoke MCP tool with AI execution
 
@@ -218,12 +218,12 @@ class MCPToolClient:
         self,
         tool_name: str,
         category: str,
-        inputs: Dict[str, Any],
+        inputs: dict[str, Any],
         model: str,
         max_tokens: int,
         invocation_id: int,
-        tool_def: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        tool_def: Optional[dict] = None,
+    ) -> dict[str, Any]:
         """Internal method for executing tool invocation with instrumentation"""
 
         logger.info(
@@ -331,7 +331,7 @@ class MCPToolClient:
 
             raise
 
-    def _validate_inputs(self, inputs: Dict, schema: Dict):
+    def _validate_inputs(self, inputs: dict, schema: dict):
         """
         Validate inputs against JSON schema
 
@@ -377,7 +377,7 @@ class MCPToolClient:
                         f"Field '{field}' must be an object, got {type(value).__name__}"
                     )
 
-    def _validate_outputs(self, outputs: Dict, schema: Dict):
+    def _validate_outputs(self, outputs: dict, schema: dict):
         """
         Validate outputs against JSON schema
 
@@ -397,7 +397,7 @@ class MCPToolClient:
                     f"⚠️  Missing required output field: '{field}' (will continue anyway)"
                 )
 
-    def _create_tool_prompt(self, tool_def: Dict, inputs: Dict) -> str:
+    def _create_tool_prompt(self, tool_def: dict, inputs: dict) -> str:
         """
         Create prompt for AI tool invocation
 
@@ -430,7 +430,7 @@ Provide ONLY the JSON response below:
 """
         return prompt
 
-    def _get_nested(self, data: Dict, path: str) -> Optional[Any]:
+    def _get_nested(self, data: dict, path: str) -> Optional[Any]:
         """
         Get nested dictionary value by dot-notation path
 
@@ -452,7 +452,7 @@ Provide ONLY the JSON response below:
                 return None
         return value
 
-    def get_loaded_tools(self) -> List[str]:
+    def get_loaded_tools(self) -> list[str]:
         """
         Get list of currently loaded tools
 
@@ -461,7 +461,7 @@ Provide ONLY the JSON response below:
         """
         return list(self.loaded_tools.keys())
 
-    def get_available_tools(self, category: Optional[str] = None) -> List[str]:
+    def get_available_tools(self, category: Optional[str] = None) -> list[str]:
         """
         Get list of available tools from schema
 
@@ -479,7 +479,7 @@ Provide ONLY the JSON response below:
         else:
             all_tools = []
             for cat, tools in tool_defs.items():
-                for tool_name in tools.keys():
+                for tool_name in tools:
                     all_tools.append(f"{cat}.{tool_name}")
             return all_tools
 

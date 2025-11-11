@@ -1,18 +1,19 @@
+from datetime import datetime
 import logging
 import os
 import re
 import shutil
 import time
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import autopep8
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
+def fix_code(scan_results: dict[str, Any]) -> dict[str, Any]:
     """
     Comprehensive code fixing based on scan results.
     Production-level implementation with automatic code repair.
@@ -57,7 +58,7 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
 
         # Update count
         fix_results["files_fixed"] = len(
-            set(fix["file"] for fix in fix_results["fixes_applied"])
+            {fix["file"] for fix in fix_results["fixes_applied"]}
         )
         fix_results["errors_fixed"] = sum(
             1 for fix in fix_results["fixes_applied"] if fix["type"] == "error"
@@ -76,7 +77,7 @@ def fix_code(scan_results: Dict[str, Any]) -> Dict[str, Any]:
         return fix_results
 
     except Exception as e:
-        logger.error(f"❌ Code fixing failed: {str(e)}")
+        logger.error(f"❌ Code fixing failed: {e!s}")
         return {
             "status": "failed",
             "error": str(e),
@@ -126,10 +127,10 @@ def _create_backup():
         )
 
     except Exception as e:
-        logger.warning(f"⚠️ Backup creation failed: {str(e)}")
+        logger.warning(f"⚠️ Backup creation failed: {e!s}")
 
 
-def _fix_python_files() -> List[Dict[str, Any]]:
+def _fix_python_files() -> list[dict[str, Any]]:
     """Fix Python files with comprehensive improvements."""
     fixes = []
 
@@ -149,7 +150,7 @@ def _fix_python_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_python_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual Python file."""
     fixes = []
 
@@ -249,7 +250,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -257,7 +258,7 @@ def _fix_python_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_javascript_files() -> List[Dict[str, Any]]:
+def _fix_javascript_files() -> list[dict[str, Any]]:
     """Fix JavaScript files."""
     fixes = []
 
@@ -277,7 +278,7 @@ def _fix_javascript_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_javascript_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual JavaScript file."""
     fixes = []
 
@@ -329,7 +330,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -337,7 +338,7 @@ def _fix_javascript_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_html_files() -> List[Dict[str, Any]]:
+def _fix_html_files() -> list[dict[str, Any]]:
     """Fix HTML files for SEO and accessibility."""
     fixes = []
 
@@ -353,7 +354,7 @@ def _fix_html_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_html_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual HTML file."""
     fixes = []
 
@@ -419,7 +420,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -427,7 +428,7 @@ def _fix_html_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_css_files() -> List[Dict[str, Any]]:
+def _fix_css_files() -> list[dict[str, Any]]:
     """Fix CSS files for better performance."""
     fixes = []
 
@@ -443,7 +444,7 @@ def _fix_css_files() -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
+def _fix_css_file(file_path: str) -> list[dict[str, Any]]:
     """Fix individual CSS file."""
     fixes = []
 
@@ -509,7 +510,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
             {
                 "file": file_path,
                 "type": "error",
-                "description": f"Failed to fix file: {str(e)}",
+                "description": f"Failed to fix file: {e!s}",
                 "line": "unknown",
             }
         )
@@ -517,7 +518,7 @@ def _fix_css_file(file_path: str) -> List[Dict[str, Any]]:
     return fixes
 
 
-def _fix_configuration_files() -> List[Dict[str, Any]]:
+def _fix_configuration_files() -> list[dict[str, Any]]:
     """Fix configuration files."""
     fixes = []
 
@@ -548,7 +549,7 @@ def _fix_configuration_files() -> List[Dict[str, Any]]:
                     {
                         "file": init_path,
                         "type": "error",
-                        "description": f"Failed to create __init__.py: {str(e)}",
+                        "description": f"Failed to create __init__.py: {e!s}",
                         "line": 1,
                     }
                 )

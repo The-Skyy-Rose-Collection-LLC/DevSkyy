@@ -5,10 +5,11 @@ SQLAlchemy-based database initialization with zero MongoDB dependencies
 """
 
 import logging
-import sys
 from pathlib import Path
+import sys
 
 from database import db_manager, init_db
+
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
@@ -50,7 +51,7 @@ class DevSkyStartup:
                 return False
 
         except Exception as e:
-            logger.error(f"❌ Database initialization failed: {str(e)}")
+            logger.error(f"❌ Database initialization failed: {e!s}")
             logger.info("ℹ️  Platform will run with in-memory storage only")
             return False
 
@@ -76,7 +77,7 @@ class DevSkyStartup:
             return True
 
         except Exception as e:
-            logger.warning(f"⚠️  WordPress service initialization failed: {str(e)}")
+            logger.warning(f"⚠️  WordPress service initialization failed: {e!s}")
             return False
 
     async def startup(self):

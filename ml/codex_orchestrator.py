@@ -17,11 +17,12 @@ Architecture:
 5. Learning → Store successful patterns
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
 from ml.codex_integration import codex
+
 
 logger = logging.getLogger(__name__)
 
@@ -99,9 +100,9 @@ class CodexOrchestrator:
         self,
         code: str,
         language: str = "python",
-        context: Optional[Dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         auto_apply: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Comprehensive code healing using AI orchestration
 
@@ -166,8 +167,8 @@ class CodexOrchestrator:
             return {"status": "error", "error": str(e), "original_code": code}
 
     async def _scan_code(
-        self, code: str, language: str, context: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, code: str, language: str, context: Optional[dict] = None
+    ) -> dict[str, Any]:
         """Scan code for issues using scanner agent"""
         logger.info("📊 Scanning code for issues...")
 
@@ -191,10 +192,10 @@ class CodexOrchestrator:
     async def _generate_healing_strategy(
         self,
         code: str,
-        issues: List[Dict],
+        issues: list[dict],
         language: str,
-        context: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        context: Optional[dict] = None,
+    ) -> dict[str, Any]:
         """Use GPT-4 to analyze issues and generate optimal healing strategy"""
         logger.info("🧠 Generating AI-powered healing strategy...")
 
@@ -257,8 +258,8 @@ Respond with a structured healing strategy."""
             }
 
     async def _generate_fixes(
-        self, code: str, strategy: Dict, language: str
-    ) -> List[Dict[str, Any]]:
+        self, code: str, strategy: dict, language: str
+    ) -> list[dict[str, Any]]:
         """Generate fixes for each issue using Codex"""
         logger.info("🔧 Generating AI-powered fixes...")
 
@@ -307,8 +308,8 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             return []
 
     async def _validate_fixes(
-        self, original_code: str, fixes: List[Dict], language: str
-    ) -> Dict[str, Any]:
+        self, original_code: str, fixes: list[dict], language: str
+    ) -> dict[str, Any]:
         """Validate fixes before applying"""
         logger.info("✅ Validating fixes...")
 
@@ -364,7 +365,7 @@ Respond with validation analysis."""
             logger.error(f"Validation failed: {e}")
             return {"safe": False, "reason": str(e)}
 
-    async def _apply_fixes(self, code: str, fixes: List[Dict], language: str) -> str:
+    async def _apply_fixes(self, code: str, fixes: list[dict], language: str) -> str:
         """Apply validated fixes to code"""
         logger.info("🚀 Applying fixes...")
 
@@ -377,7 +378,7 @@ Respond with validation analysis."""
         return best_fix.get("fixed_code", code)
 
     async def _learn_from_healing(
-        self, strategy: Dict, fixes: List[Dict], validation: Dict
+        self, strategy: dict, fixes: list[dict], validation: dict
     ):
         """Learn from successful healing to improve future operations"""
         if validation.get("safe"):
@@ -396,7 +397,7 @@ Respond with validation analysis."""
 
             logger.info("📚 Learned from successful healing")
 
-    def _parse_review_into_issues(self, review_text: str) -> List[Dict[str, Any]]:
+    def _parse_review_into_issues(self, review_text: str) -> list[dict[str, Any]]:
         """Parse code review text into structured issues"""
         issues = []
 
@@ -444,7 +445,7 @@ Respond with validation analysis."""
 
         return issues
 
-    def _group_related_issues(self, issues: List[Dict]) -> List[List[Dict]]:
+    def _group_related_issues(self, issues: list[dict]) -> list[list[dict]]:
         """Group related issues for efficient fixing"""
         if not issues:
             return []
@@ -459,7 +460,7 @@ Respond with validation analysis."""
 
         return list(groups.values())
 
-    def get_healing_stats(self) -> Dict[str, Any]:
+    def get_healing_stats(self) -> dict[str, Any]:
         """Get statistics about healing operations"""
         total_healings = len(self.healing_history)
         successful = sum(1 for h in self.healing_history if h.get("success"))

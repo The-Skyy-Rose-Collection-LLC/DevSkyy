@@ -8,19 +8,19 @@ References:
 - OWASP Top 10: Security best practices
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 from main import app
 from security.encryption import AESEncryption, KeyManager
 from security.input_validation import InputSanitizer
 from security.jwt_auth import (
+    UserRole,
     create_access_token,
     create_refresh_token,
     hash_password,
-    UserRole,
     verify_password,
     verify_token,
 )
@@ -104,7 +104,7 @@ class TestJWTAuthentication:
         assert "exp" in decoded
         exp_time = decoded["exp"]
         assert isinstance(exp_time, datetime)
-        assert exp_time > datetime.now(timezone.utc)
+        assert exp_time > datetime.now(UTC)
 
     def test_token_uses_utc_timestamps(self):
         """Test that tokens use UTC timestamps (critical for production)"""

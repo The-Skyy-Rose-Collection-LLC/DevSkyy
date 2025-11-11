@@ -1,10 +1,11 @@
 from datetime import datetime
-import os
-
-from typing import Any, Dict, List
 import logging
-import openai
+import os
+from typing import Any
 import uuid
+
+import openai
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class CustomerServiceAgent:
                 "💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)"
             )
 
-    async def analyze_customer_satisfaction(self) -> Dict[str, Any]:
+    async def analyze_customer_satisfaction(self) -> dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
         try:
             logger.info("💝 Analyzing luxury customer satisfaction metrics...")
@@ -82,10 +83,10 @@ class CustomerServiceAgent:
             }
 
         except Exception as e:
-            logger.error(f"❌ Customer satisfaction analysis failed: {str(e)}")
+            logger.error(f"❌ Customer satisfaction analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_service_recommendations(self, analysis: Dict) -> List[Dict[str, Any]]:
+    def _generate_service_recommendations(self, analysis: dict) -> list[dict[str, Any]]:
         """Generate prioritized customer service recommendations."""
         recommendations = [
             {
@@ -113,7 +114,7 @@ class CustomerServiceAgent:
         ]
         return recommendations
 
-    def _assess_service_risks(self, analysis: Dict) -> Dict[str, Any]:
+    def _assess_service_risks(self, analysis: dict) -> dict[str, Any]:
         """Assess customer service risks and mitigation strategies."""
         return {
             "reputation_risk": {
@@ -126,7 +127,7 @@ class CustomerServiceAgent:
             }
         }
 
-def optimize_customer_service() -> Dict[str, Any]:
+def optimize_customer_service() -> dict[str, Any]:
     """Main function to optimize customer service operations."""
     return {
         "status": "customer_service_optimized",

@@ -3,13 +3,14 @@ Approval System for Bounded Autonomy
 Manages human review queue and approval workflows
 """
 
-import json
-import sqlite3
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+import json
 import logging
+from pathlib import Path
+import sqlite3
+from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -97,11 +98,11 @@ class ApprovalSystem:
         action_id: str,
         agent_name: str,
         function_name: str,
-        parameters: Dict[str, Any],
+        parameters: dict[str, Any],
         risk_level: str,
         workflow_type: ApprovalWorkflowType = ApprovalWorkflowType.DEFAULT,
         timeout_hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Submit an action for human review.
 
@@ -168,7 +169,7 @@ class ApprovalSystem:
         action_id: str,
         operator: str,
         notes: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Approve an action.
 
@@ -257,7 +258,7 @@ class ApprovalSystem:
         action_id: str,
         operator: str,
         reason: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Reject an action"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -320,7 +321,7 @@ class ApprovalSystem:
             "reason": reason
         }
 
-    async def get_pending_actions(self) -> List[Dict[str, Any]]:
+    async def get_pending_actions(self) -> list[dict[str, Any]]:
         """Get all pending actions"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -349,7 +350,7 @@ class ApprovalSystem:
         conn.close()
         return actions
 
-    async def get_action_details(self, action_id: str) -> Optional[Dict[str, Any]]:
+    async def get_action_details(self, action_id: str) -> Optional[dict[str, Any]]:
         """Get detailed information about an action"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -399,7 +400,7 @@ class ApprovalSystem:
             "history": history
         }
 
-    async def mark_executed(self, action_id: str, result: Dict[str, Any]) -> bool:
+    async def mark_executed(self, action_id: str, result: dict[str, Any]) -> bool:
         """Mark an action as executed"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -447,7 +448,7 @@ class ApprovalSystem:
 
         return expired_count
 
-    async def get_operator_statistics(self, operator: Optional[str] = None) -> Dict[str, Any]:
+    async def get_operator_statistics(self, operator: Optional[str] = None) -> dict[str, Any]:
         """Get operator activity statistics"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()

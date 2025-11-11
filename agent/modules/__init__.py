@@ -7,4 +7,4 @@ Enterprise-grade agents organized by backend/frontend responsibility
 # Frontend agents are in agent.modules.frontend.*
 # Core agents (base_agent.py) remain in root
 
-__all__ = ["backend", "frontend", "base_agent"]
+__all__ = ["backend", "base_agent", "frontend"]

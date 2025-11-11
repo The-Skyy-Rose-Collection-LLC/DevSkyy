@@ -251,7 +251,7 @@ class TestModelExplainer:
         try:
             model = MockModel()
             X_bg = np.random.randn(100, 5)
-            result = explainer.create_explainer(model, X_bg, "test_model")
+            explainer.create_explainer(model, X_bg, "test_model")
             # If SHAP is installed, this should work
             # If not, it should raise ImportError
         except ImportError as e:
@@ -288,7 +288,7 @@ class TestMLIntegration:
 
     def test_full_ml_workflow(self, setup_ml):
         """Test complete ML workflow"""
-        registry, cache, explainer = setup_ml
+        registry, cache, _explainer = setup_ml
 
         # 1. Train and register model
         model = MockModel()
@@ -325,7 +325,7 @@ class TestMLIntegration:
 
     def test_model_versioning_workflow(self, setup_ml):
         """Test model versioning and comparison"""
-        registry, cache, _ = setup_ml
+        registry, _cache, _ = setup_ml
 
         model = MockModel()
 

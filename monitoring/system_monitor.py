@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta
-
-from collections import deque
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
 import asyncio
+from collections import deque
+import contextlib
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 import logging
+from typing import Any, Optional
+
 import psutil
+
 
 """
 Advanced System Monitoring - Enterprise Grade
@@ -28,7 +30,7 @@ class SystemMetrics:
     network_bytes_recv: int
     active_connections: int
     process_count: int
-    load_average: List[float]
+    load_average: list[float]
 
 @dataclass
 class AlertRule:
@@ -65,10 +67,8 @@ class MetricsCollector:
         self.is_collecting = False
         if self._collection_task:
             self._collection_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._collection_task
-            except asyncio.CancelledError:
-                pass
         logger.info("Stopped system metrics collection")
 
     async def _collect_metrics(self):
@@ -148,12 +148,12 @@ class MetricsCollector:
         """Get the latest metrics"""
         return self.metrics_history[-1] if self.metrics_history else None
 
-    def get_metrics_history(self, minutes: int = 60) -> List[SystemMetrics]:
+    def get_metrics_history(self, minutes: int = 60) -> list[SystemMetrics]:
         """Get metrics history for specified minutes"""
         cutoff_time = datetime.now() - timedelta(minutes=minutes)
         return [m for m in self.metrics_history if m.timestamp >= cutoff_time]
 
-    def get_average_metrics(self, minutes: int = 60) -> Dict[str, float]:
+    def get_average_metrics(self, minutes: int = 60) -> dict[str, float]:
         """Get average metrics over specified time period"""
         history = self.get_metrics_history(minutes)
 
@@ -175,8 +175,8 @@ class AlertManager:
     """System alert manager"""
 
     def __init__(self):
-        self.alert_rules: List[AlertRule] = []
-        self.active_alerts: Dict[str, Dict] = {}
+        self.alert_rules: list[AlertRule] = []
+        self.active_alerts: dict[str, dict] = {}
         self.alert_history: deque = deque(maxlen=1000)
 
         # Default alert rules
@@ -252,10 +252,9 @@ class AlertManager:
                     duration = (current_time - alert["first_triggered"]).total_seconds()
                     if duration >= rule.duration:
                         self._fire_alert(alert_key, alert)
-            else:
-                # Clear alert if it exists
-                if alert_key in self.active_alerts:
-                    self._clear_alert(alert_key)
+            # Clear alert if it exists
+            elif alert_key in self.active_alerts:
+                self._clear_alert(alert_key)
 
     def _evaluate_condition(
         self, value: float, operator: str, threshold: float
@@ -273,7 +272,7 @@ class AlertManager:
             return value == threshold
         return False
 
-    def _fire_alert(self, alert_key: str, alert_data: Dict):
+    def _fire_alert(self, alert_key: str, alert_data: dict):
         """Fire an alert"""
         rule = alert_data["rule"]
 
@@ -317,7 +316,7 @@ class AlertManager:
 
             logger.info(f"ALERT CLEARED: {rule.name}")
 
-    def get_active_alerts(self) -> List[Dict]:
+    def get_active_alerts(self) -> list[dict]:
         """Get all active alerts"""
         return [
             {
@@ -334,7 +333,7 @@ class AlertManager:
             for key, data in self.active_alerts.items()
         ]
 
-    def get_alert_history(self, hours: int = 24) -> List[Dict]:
+    def get_alert_history(self, hours: int = 24) -> list[dict]:
         """Get alert history"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
         return [
@@ -370,10 +369,8 @@ class SystemMonitor:
 
         if self._monitoring_task:
             self._monitoring_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._monitoring_task
-            except asyncio.CancelledError:
-                pass
 
         logger.info("System monitoring stopped")
 
@@ -391,7 +388,7 @@ class SystemMonitor:
                 logger.error(f"Error in monitoring loop: {e}")
                 await asyncio.sleep(10)  # TODO: Move to config
 
-    def get_system_status(self) -> Dict[str, Any]:
+    def get_system_status(self) -> dict[str, Any]:
         """Get comprehensive system status"""
         latest_metrics = self.metrics_collector.get_latest_metrics()
         active_alerts = self.alert_manager.get_active_alerts()

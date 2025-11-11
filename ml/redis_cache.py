@@ -1,10 +1,11 @@
-import redis
-import json
-import os
-
-from typing import Any, Optional
 import hashlib
+import json
 import logging
+import os
+from typing import Any, Optional
+
+import redis
+
 
 """
 Redis Caching Layer - Distributed caching for scalability
@@ -24,7 +25,7 @@ class RedisCache:
     """Distributed Redis cache with fallback to in-memory"""
 
     def __init__(
-        self, host: str = None, port: int = None, db: int = 0, ttl: int = 3600
+        self, host: str | None = None, port: int | None = None, db: int = 0, ttl: int = 3600
     ):
         self.ttl = ttl
         self.memory_cache = {}

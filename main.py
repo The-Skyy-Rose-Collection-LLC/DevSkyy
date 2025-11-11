@@ -8,12 +8,12 @@ Version: 5.1.0 Enterprise
 Python: >=3.11
 """
 
+from datetime import datetime
 import logging
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+import sys
+from typing import Any, Optional
 
 # Core FastAPI imports
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -25,6 +25,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 # Observability: Logfire (OpenTelemetry-based monitoring)
 try:
     import logfire
@@ -35,7 +36,7 @@ except ImportError:
 
 # Prometheus monitoring
 try:
-    from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest, Histogram
+    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
     from prometheus_fastapi_instrumentator import Instrumentator
 
     PROMETHEUS_AVAILABLE = True
@@ -73,8 +74,7 @@ try:
     from ml.redis_cache import RedisCache
 
     CORE_MODULES_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Core modules not available: {e}")
+except ImportError:
     CORE_MODULES_AVAILABLE = False
 
 # Security imports
@@ -85,8 +85,7 @@ try:
     from security.jwt_auth import JWTManager
 
     SECURITY_MODULES_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Security modules not available: {e}")
+except ImportError:
     SECURITY_MODULES_AVAILABLE = False
 
 # Webhook system
@@ -94,8 +93,7 @@ try:
     from webhooks.webhook_system import WebhookManager
 
     WEBHOOK_SYSTEM_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Webhook system not available: {e}")
+except ImportError:
     WEBHOOK_SYSTEM_AVAILABLE = False
 
 # Agent modules with error handling
@@ -108,8 +106,7 @@ try:
     from agent.modules.frontend.web_development_agent import WebDevelopmentAgent
 
     AGENT_MODULES_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Agent modules not available: {e}")
+except ImportError:
     AGENT_MODULES_AVAILABLE = False
 
 # AI Intelligence Services
@@ -120,8 +117,7 @@ try:
     from intelligence.openai_service import OpenAIIntelligenceService
 
     AI_SERVICES_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: AI services not available: {e}")
+except ImportError:
     AI_SERVICES_AVAILABLE = False
 
 # ============================================================================
@@ -150,8 +146,7 @@ def setup_logging():
         logger.info(f"✅ Logging configured - Level: {LOG_LEVEL}, Environment: {ENVIRONMENT}")
         return logger
 
-    except Exception as e:
-        print(f"❌ Failed to setup logging: {e}")
+    except Exception:
         return logging.getLogger(__name__)
 
 
@@ -467,17 +462,17 @@ try:
     from api.v1.api_v1_webhooks_router import router as enterprise_webhooks_router
     from api.v1.auth import router as auth_router
     from api.v1.codex import router as codex_router
+    from api.v1.consensus import router as consensus_router
+    from api.v1.content import router as content_router
     from api.v1.dashboard import router as dashboard_router
+
+    # DevSkyy Automation Routers (n8n replacements)
+    from api.v1.ecommerce import router as ecommerce_router
     from api.v1.gdpr import router as gdpr_router
     from api.v1.ml import router as ml_router
     from api.v1.monitoring import router as monitoring_router
     from api.v1.orchestration import router as orchestration_router
     from api.v1.webhooks import router as webhooks_router
-
-    # DevSkyy Automation Routers (n8n replacements)
-    from api.v1.ecommerce import router as ecommerce_router
-    from api.v1.content import router as content_router
-    from api.v1.consensus import router as consensus_router
 
     API_ROUTERS_AVAILABLE = True
     logger.info("✅ All API routers loaded successfully")
@@ -543,6 +538,7 @@ if API_ROUTERS_AVAILABLE:
 # Register MCP Server for external tool access
 try:
     from mcp.server.sse import SseServerTransport
+
     from services.mcp_server import get_mcp_server
 
     # Create MCP server instance
@@ -716,8 +712,8 @@ except ImportError as e:
 
 # Import and initialize advanced features
 try:
-    from intelligence.multi_agent_orchestrator import multi_agent_orchestrator
     from fashion.skyy_rose_3d_pipeline import skyy_rose_3d_pipeline
+    from intelligence.multi_agent_orchestrator import multi_agent_orchestrator
 
     app.state.multi_agent_orchestrator = multi_agent_orchestrator
     app.state.skyy_rose_3d_pipeline = skyy_rose_3d_pipeline
@@ -745,9 +741,9 @@ except ImportError as e:
 # Import and initialize WordPress credentials
 try:
     from config.wordpress_credentials import (
-        wordpress_credentials_manager,
         get_skyy_rose_credentials,
-        validate_environment_setup
+        validate_environment_setup,
+        wordpress_credentials_manager,
     )
 
     app.state.wordpress_credentials_manager = wordpress_credentials_manager
@@ -803,7 +799,7 @@ async def get_agent_endpoint(agent_type: str, agent_name: str):
 
 
 @app.post("/api/v1/agents/{agent_type}/{agent_name}/execute")
-async def execute_agent_task(agent_type: str, agent_name: str, task_data: Dict[str, Any]):
+async def execute_agent_task(agent_type: str, agent_name: str, task_data: dict[str, Any]):
     """Execute a task using the specified agent."""
     try:
         agent = get_agent(agent_type, agent_name)
@@ -837,7 +833,7 @@ async def execute_agent_task(agent_type: str, agent_name: str, task_data: Dict[s
 # ============================================================================
 
 @app.post("/api/v1/orchestration/multi-agent")
-async def execute_multi_agent_task(task_data: Dict[str, Any]):
+async def execute_multi_agent_task(task_data: dict[str, Any]):
     """Execute task using multi-agent orchestration."""
     try:
         if not hasattr(app.state, 'multi_agent_orchestrator'):
@@ -905,7 +901,7 @@ async def upload_3d_model(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/avatars/create")
-async def create_avatar(avatar_data: Dict[str, Any]):
+async def create_avatar(avatar_data: dict[str, Any]):
     """Create a new avatar."""
     try:
         if not hasattr(app.state, 'skyy_rose_3d_pipeline'):
@@ -1049,19 +1045,16 @@ async def get_active_incidents():
 # ============================================================================
 
 @app.post("/api/v1/themes/build-and-deploy")
-async def build_and_deploy_theme(theme_request: Dict[str, Any]):
+async def build_and_deploy_theme(theme_request: dict[str, Any]):
     """Build and deploy a WordPress theme automatically."""
     try:
         from agent.wordpress.theme_builder_orchestrator import (
-            theme_builder_orchestrator,
             ThemeBuildRequest,
             ThemeType,
-            UploadMethod
+            UploadMethod,
+            theme_builder_orchestrator,
         )
-        from config.wordpress_credentials import (
-            WordPressCredentials,
-            wordpress_credentials_manager
-        )
+        from config.wordpress_credentials import WordPressCredentials, wordpress_credentials_manager
 
         # Get credentials - either from request or use configured credentials
         site_key = theme_request.get("site_key", "skyy_rose")
@@ -1155,13 +1148,13 @@ async def get_theme_build_status(build_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/themes/upload-only")
-async def upload_theme_only(upload_request: Dict[str, Any]):
+async def upload_theme_only(upload_request: dict[str, Any]):
     """Upload an existing theme package without building."""
     try:
         from agent.wordpress.automated_theme_uploader import (
-            automated_theme_uploader,
+            UploadMethod,
             WordPressCredentials,
-            UploadMethod
+            automated_theme_uploader,
         )
 
         # Parse credentials
@@ -1230,13 +1223,10 @@ async def get_theme_system_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/themes/skyy-rose/build")
-async def build_skyy_rose_theme(theme_request: Dict[str, Any]):
+async def build_skyy_rose_theme(theme_request: dict[str, Any]):
     """Build and deploy a theme specifically for Skyy Rose Collection using configured credentials."""
     try:
-        from agent.wordpress.theme_builder_orchestrator import (
-            theme_builder_orchestrator,
-            ThemeType
-        )
+        from agent.wordpress.theme_builder_orchestrator import ThemeType, theme_builder_orchestrator
 
         # Use the convenience method for Skyy Rose themes
         result = await theme_builder_orchestrator.build_skyy_rose_theme(
@@ -1281,9 +1271,9 @@ async def get_credentials_status():
     """Get status of configured WordPress credentials."""
     try:
         from config.wordpress_credentials import (
-            wordpress_credentials_manager,
+            list_configured_sites,
             validate_environment_setup,
-            list_configured_sites
+            wordpress_credentials_manager,
         )
 
         # Validate environment setup
@@ -1311,11 +1301,12 @@ async def get_credentials_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/themes/credentials/test")
-async def test_wordpress_connection(test_request: Dict[str, Any]):
+async def test_wordpress_connection(test_request: dict[str, Any]):
     """Test WordPress connection with configured or provided credentials."""
     try:
-        from config.wordpress_credentials import wordpress_credentials_manager
         import requests
+
+        from config.wordpress_credentials import wordpress_credentials_manager
 
         site_key = test_request.get("site_key", "skyy_rose")
         credentials = wordpress_credentials_manager.get_credentials(site_key)

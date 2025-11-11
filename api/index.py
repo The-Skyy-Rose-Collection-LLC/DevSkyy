@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from main import app
 
+
 """
 Vercel serverless function entry point for DevSkyy Platform
 """
@@ -18,6 +19,7 @@ try:
 
 except Exception as e:
     # Fallback minimal app if main app fails to load
+    fallback_error = str(e)
     fallback_app = FastAPI(title="DevSkyy Fallback")
 
     @fallback_app.get("/")
@@ -25,7 +27,7 @@ except Exception as e:
         return {
             "name": "DevSkyy Platform",
             "status": "fallback_mode",
-            "error": str(e),
+            "error": fallback_error,
             "message": "Main application failed to load, running in fallback mode"
         }
 
@@ -34,7 +36,7 @@ except Exception as e:
         return {
             "status": "degraded",
             "mode": "fallback",
-            "error": str(e)
+            "error": fallback_error
         }
 
     handler = fallback_app

@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from abc import ABC, abstractmethod
+from datetime import UTC, datetime
+from typing import Any, Optional
+import uuid
 
 from pydantic import BaseModel
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
-import uuid
 
 """
 Event Sourcing Pattern for Grade A+ Architecture
@@ -23,15 +23,15 @@ class DomainEvent(BaseModel):
     aggregate_id: str
     aggregate_type: str
     timestamp: datetime
-    data: Dict[str, Any]
+    data: dict[str, Any]
     version: int
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[dict[str, Any]] = None
 
     def __init__(self, **data):
         if "event_id" not in data:
             data["event_id"] = str(uuid.uuid4())
         if "timestamp" not in data:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = datetime.now(UTC)
         if "event_type" not in data:
             data["event_type"] = self.__class__.__name__
         super().__init__(**data)
@@ -47,8 +47,8 @@ class EventStore:
     """
 
     def __init__(self):
-        self._events: Dict[str, List[DomainEvent]] = {}
-        self._snapshots: Dict[str, Dict[str, Any]] = {}
+        self._events: dict[str, list[DomainEvent]] = {}
+        self._snapshots: dict[str, dict[str, Any]] = {}
 
     async def save_event(self, event: DomainEvent) -> bool:
         """
@@ -68,7 +68,7 @@ class EventStore:
         self._events[aggregate_id].append(event)
         return True
 
-    async def save_events(self, events: List[DomainEvent]) -> bool:
+    async def save_events(self, events: list[DomainEvent]) -> bool:
         """
         Save multiple events atomically
 
@@ -84,7 +84,7 @@ class EventStore:
 
     async def get_events(
         self, aggregate_id: str, from_version: int = 0, to_version: Optional[int] = None
-    ) -> List[DomainEvent]:
+    ) -> list[DomainEvent]:
         """
         Get events for an aggregate
 
@@ -108,7 +108,7 @@ class EventStore:
 
         return filtered
 
-    async def get_all_events(self) -> List[DomainEvent]:
+    async def get_all_events(self) -> list[DomainEvent]:
         """
         Get all events across all aggregates
 
@@ -121,7 +121,7 @@ class EventStore:
         return sorted(all_events, key=lambda e: e.timestamp)
 
     async def save_snapshot(
-        self, aggregate_id: str, state: Dict[str, Any], version: int
+        self, aggregate_id: str, state: dict[str, Any], version: int
     ):
         """
         Save snapshot of aggregate state for faster reconstruction
@@ -134,10 +134,10 @@ class EventStore:
         self._snapshots[aggregate_id] = {
             "state": state,
             "version": version,
-            "timestamp": datetime.now(timezone.utc),
+            "timestamp": datetime.now(UTC),
         }
 
-    async def get_snapshot(self, aggregate_id: str) -> Optional[Dict[str, Any]]:
+    async def get_snapshot(self, aggregate_id: str) -> Optional[dict[str, Any]]:
         """
         Get latest snapshot for an aggregate
 
@@ -162,7 +162,7 @@ class AggregateRoot(ABC):
     def __init__(self, aggregate_id: str):
         self.aggregate_id = aggregate_id
         self.version = 0
-        self.uncommitted_events: List[DomainEvent] = []
+        self.uncommitted_events: list[DomainEvent] = []
 
     @abstractmethod
     def apply_event(self, event: DomainEvent):
@@ -185,7 +185,7 @@ class AggregateRoot(ABC):
         self.uncommitted_events.append(event)
         self.version = event.version
 
-    async def load_from_history(self, events: List[DomainEvent]):
+    async def load_from_history(self, events: list[DomainEvent]):
         """
         Reconstruct aggregate state from event history
 
@@ -196,7 +196,7 @@ class AggregateRoot(ABC):
             self.apply_event(event)
             self.version = event.version
 
-    def get_uncommitted_events(self) -> List[DomainEvent]:
+    def get_uncommitted_events(self) -> list[DomainEvent]:
         """
         Get events that haven't been persisted
 
@@ -236,7 +236,7 @@ class AgentAggregate(AggregateRoot):
         self.name: Optional[str] = None
         self.agent_type: Optional[str] = None
         self.status: str = "inactive"
-        self.capabilities: Dict[str, Any] = {}
+        self.capabilities: dict[str, Any] = {}
 
     def apply_event(self, event: DomainEvent):
         """Apply event to update agent state"""
@@ -255,7 +255,7 @@ class AgentAggregate(AggregateRoot):
         elif isinstance(event, AgentDeletedEvent):
             self.status = "deleted"
 
-    def create(self, name: str, agent_type: str, capabilities: Dict[str, Any]):
+    def create(self, name: str, agent_type: str, capabilities: dict[str, Any]):
         """Create new agent"""
         event = AgentCreatedEvent(
             aggregate_id=self.aggregate_id,
@@ -281,7 +281,7 @@ class AgentAggregate(AggregateRoot):
             aggregate_id=self.aggregate_id,
             aggregate_type="Agent",
             version=self.version + 1,
-            data={"deleted_at": datetime.now(timezone.utc).isoformat()},
+            data={"deleted_at": datetime.now(UTC).isoformat()},
         )
         self.raise_event(event)
 

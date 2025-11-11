@@ -12,18 +12,19 @@ Features:
 """
 
 import asyncio
-import logging
-import os
-import re
-import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+import logging
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+import re
+import time
+from typing import Any, Optional
 
 import requests
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +80,7 @@ class ScannerAgentV2(BaseAgent):
         }
 
         # Performance tracking
-        self.scan_history: List[Dict[str, Any]] = []
+        self.scan_history: list[dict[str, Any]] = []
         self.thread_pool = ThreadPoolExecutor(max_workers=4)
 
     async def initialize(self) -> bool:
@@ -102,7 +103,7 @@ class ScannerAgentV2(BaseAgent):
             self.status = AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Execute core scanning functionality.
 
@@ -158,7 +159,7 @@ class ScannerAgentV2(BaseAgent):
 
     async def _full_scan(
         self, target_path: str, include_live_check: bool
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Perform comprehensive full scan"""
         results = {
             "files_scanned": 0,
@@ -207,7 +208,7 @@ class ScannerAgentV2(BaseAgent):
 
         return results
 
-    async def _security_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _security_scan(self, target_path: str) -> dict[str, Any]:
         """Focused security vulnerability scan"""
         results = {"security_issues": [], "vulnerabilities": [], "risk_level": "low"}
 
@@ -237,7 +238,7 @@ class ScannerAgentV2(BaseAgent):
 
         return results
 
-    async def _performance_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _performance_scan(self, target_path: str) -> dict[str, Any]:
         """Focused performance analysis"""
         return {
             "performance_metrics": await self._analyze_site_performance(),
@@ -246,7 +247,7 @@ class ScannerAgentV2(BaseAgent):
             ),
         }
 
-    async def _quick_scan(self, target_path: str) -> Dict[str, Any]:
+    async def _quick_scan(self, target_path: str) -> dict[str, Any]:
         """Quick health check scan"""
         files = await self._scan_project_files(target_path)
 
@@ -256,7 +257,7 @@ class ScannerAgentV2(BaseAgent):
             "last_modified": self._get_last_modified_time(files),
         }
 
-    async def _scan_project_files(self, target_path: str) -> List[str]:
+    async def _scan_project_files(self, target_path: str) -> list[str]:
         """Scan all project files for analysis"""
         files = []
 
@@ -279,7 +280,7 @@ class ScannerAgentV2(BaseAgent):
 
         return files
 
-    async def _analyze_file(self, file_path: str) -> Dict[str, Any]:
+    async def _analyze_file(self, file_path: str) -> dict[str, Any]:
         """Analyze a single file for issues"""
         result = {"file": file_path, "errors": [], "warnings": [], "optimizations": []}
 
@@ -319,7 +320,7 @@ class ScannerAgentV2(BaseAgent):
 
     async def _analyze_python_file(
         self, content: str, file_path: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Python-specific analysis"""
         result = {"errors": [], "warnings": [], "optimizations": []}
 
@@ -341,7 +342,7 @@ class ScannerAgentV2(BaseAgent):
 
     async def _analyze_javascript_file(
         self, content: str, file_path: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """JavaScript/TypeScript specific analysis"""
         result = {"errors": [], "warnings": [], "optimizations": []}
 
@@ -362,7 +363,7 @@ class ScannerAgentV2(BaseAgent):
 
         return result
 
-    async def _detect_security_issues(self, files: List[str]) -> List[Dict[str, Any]]:
+    async def _detect_security_issues(self, files: list[str]) -> list[dict[str, Any]]:
         """Detect security vulnerabilities"""
         issues = []
 
@@ -391,7 +392,7 @@ class ScannerAgentV2(BaseAgent):
 
         return issues
 
-    async def _analyze_site_performance(self) -> Dict[str, Any]:
+    async def _analyze_site_performance(self) -> dict[str, Any]:
         """Analyze live site performance"""
         try:
             # Try to check localhost backend
@@ -413,7 +414,7 @@ class ScannerAgentV2(BaseAgent):
         except Exception as e:
             return {"health": "unavailable", "error": str(e)}
 
-    async def _analyze_dependencies(self) -> Dict[str, Any]:
+    async def _analyze_dependencies(self) -> dict[str, Any]:
         """Analyze project dependencies"""
         dependencies = {"python": [], "nodejs": [], "status": "unknown"}
 
@@ -437,7 +438,7 @@ class ScannerAgentV2(BaseAgent):
         dependencies["status"] = "analyzed"
         return dependencies
 
-    async def _generate_optimization_suggestions(self, target_path: str) -> List[str]:
+    async def _generate_optimization_suggestions(self, target_path: str) -> list[str]:
         """Generate optimization suggestions"""
         suggestions = []
 
@@ -460,7 +461,7 @@ class ScannerAgentV2(BaseAgent):
 
         return suggestions
 
-    def _generate_summary(self, results: Dict[str, Any]) -> str:
+    def _generate_summary(self, results: dict[str, Any]) -> str:
         """Generate human-readable summary"""
         errors = len(results.get("errors_found", []))
         warnings = len(results.get("warnings", []))
@@ -473,7 +474,7 @@ class ScannerAgentV2(BaseAgent):
         else:
             return f"✅ Scan completed with {warnings} warnings, {security} security issues"
 
-    def _get_last_modified_time(self, files: List[str]) -> Optional[str]:
+    def _get_last_modified_time(self, files: list[str]) -> Optional[str]:
         """Get last modified time of most recent file"""
         if not files:
             return None
@@ -484,7 +485,7 @@ class ScannerAgentV2(BaseAgent):
         except Exception:
             return None
 
-    async def get_scan_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+    async def get_scan_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get recent scan history"""
         return self.scan_history[-limit:]
 

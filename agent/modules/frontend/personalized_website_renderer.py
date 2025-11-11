@@ -1,10 +1,11 @@
-from datetime import datetime
-
-import random
-from geopy.geocoders import Nominatim
-from typing import Any, Dict, List, Optional
 import asyncio
+from datetime import datetime
 import logging
+import random
+from typing import Any, Optional
+
+from geopy.geocoders import Nominatim
+
 
 """
 Personalized Website Renderer with Dynamic Content Based on User Context
@@ -83,7 +84,7 @@ class PersonalizedWebsiteRenderer:
 
         logger.info("🎯 Personalized Website Renderer initialized")
 
-    def _load_location_rules(self) -> Dict[str, Any]:
+    def _load_location_rules(self) -> dict[str, Any]:
         """Load location-based personalization rules."""
         return {
             "United States": {
@@ -123,7 +124,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_interest_rules(self) -> Dict[str, Any]:
+    def _load_interest_rules(self) -> dict[str, Any]:
         """Load interest-based personalization rules."""
         return {
             "high_fashion": {
@@ -152,7 +153,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_behavior_rules(self) -> Dict[str, Any]:
+    def _load_behavior_rules(self) -> dict[str, Any]:
         """Load behavior-based personalization rules."""
         return {
             "first_time_visitor": {
@@ -193,7 +194,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_demographic_rules(self) -> Dict[str, Any]:
+    def _load_demographic_rules(self) -> dict[str, Any]:
         """Load demographic-based personalization rules."""
         return {
             "gen_z": {
@@ -226,7 +227,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_device_rules(self) -> Dict[str, Any]:
+    def _load_device_rules(self) -> dict[str, Any]:
         """Load device-specific personalization rules."""
         return {
             "mobile": {
@@ -252,7 +253,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_headline_variations(self) -> Dict[str, List[str]]:
+    def _load_headline_variations(self) -> dict[str, list[str]]:
         """Load headline variations for different segments."""
         return {
             "luxury": [
@@ -277,7 +278,7 @@ class PersonalizedWebsiteRenderer:
             ],
         }
 
-    def _load_product_catalog(self) -> Dict[str, Any]:
+    def _load_product_catalog(self) -> dict[str, Any]:
         """Load product catalog with segment tags."""
         return {
             "products": [
@@ -299,7 +300,7 @@ class PersonalizedWebsiteRenderer:
             ]
         }
 
-    def _load_pricing_strategies(self) -> Dict[str, Any]:
+    def _load_pricing_strategies(self) -> dict[str, Any]:
         """Load pricing strategies for different segments."""
         return {
             "luxury": {"display": "subtle", "discounts": "rare", "payment": "premium"},
@@ -315,7 +316,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_copy_variations(self) -> Dict[str, Dict[str, str]]:
+    def _load_copy_variations(self) -> dict[str, dict[str, str]]:
         """Load copy variations for different contexts."""
         return {
             "cta_buttons": {
@@ -332,7 +333,7 @@ class PersonalizedWebsiteRenderer:
             },
         }
 
-    def _load_image_variations(self) -> Dict[str, Any]:
+    def _load_image_variations(self) -> dict[str, Any]:
         """Load image variation strategies."""
         return {
             "luxury": {
@@ -357,9 +358,9 @@ class PersonalizedWebsiteRenderer:
 
     async def render_personalized_experience(
         self,
-        user_data: Dict[str, Any],
+        user_data: dict[str, Any],
         page_type: str = "homepage",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Render personalized website experience based on user data.
 
@@ -411,7 +412,7 @@ class PersonalizedWebsiteRenderer:
             logger.error(f"Personalization failed: {e}")
             return self._get_fallback_content(page_type)
 
-    async def _analyze_user_profile(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_user_profile(self, user_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze and enrich user profile data."""
         profile = {
             "location": await self._enrich_location(user_data.get("ip_address")),
@@ -431,7 +432,7 @@ class PersonalizedWebsiteRenderer:
 
         return profile
 
-    async def _enrich_location(self, ip_address: Optional[str]) -> Dict[str, Any]:
+    async def _enrich_location(self, ip_address: Optional[str]) -> dict[str, Any]:
         """Enrich location data from IP address."""
         if not ip_address:
             return {"country": "United States", "city": "Unknown", "region": "Unknown"}
@@ -451,7 +452,7 @@ class PersonalizedWebsiteRenderer:
             logger.error(f"Location enrichment failed: {e}")
             return {"country": "United States", "city": "Unknown", "region": "Unknown"}
 
-    def _analyze_interests(self, browsing_history: List[Dict]) -> List[str]:
+    def _analyze_interests(self, browsing_history: list[dict]) -> list[str]:
         """Analyze user interests from browsing history."""
         interests = []
 
@@ -474,7 +475,7 @@ class PersonalizedWebsiteRenderer:
 
         return interests or ["general"]
 
-    def _analyze_behavior(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_behavior(self, user_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze user behavior patterns."""
         session_count = user_data.get("session_count", 1)
         cart_abandonment_count = user_data.get("cart_abandonments", 0)
@@ -509,7 +510,7 @@ class PersonalizedWebsiteRenderer:
             ),
         }
 
-    def _infer_demographics(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _infer_demographics(self, user_data: dict[str, Any]) -> dict[str, Any]:
         """Infer demographic information from user data."""
         # In production, would use more sophisticated analysis
         # For demo, use simple rules
@@ -530,7 +531,7 @@ class PersonalizedWebsiteRenderer:
             "social_media_active": "Instagram" in user_agent or "TikTok" in user_agent,
         }
 
-    def _detect_device(self, user_agent: Optional[str]) -> Dict[str, Any]:
+    def _detect_device(self, user_agent: Optional[str]) -> dict[str, Any]:
         """Detect device type from user agent."""
         if not user_agent:
             return {"type": "desktop", "screen_size": "large"}
@@ -544,7 +545,7 @@ class PersonalizedWebsiteRenderer:
         else:
             return {"type": "desktop", "screen_size": "large", "touch": False}
 
-    async def _get_weather_context(self, location: Dict[str, Any]) -> Dict[str, Any]:
+    async def _get_weather_context(self, location: dict[str, Any]) -> dict[str, Any]:
         """Get weather context for location-based personalization."""
         # In production, would use weather API
         # For demo, return seasonal data
@@ -583,7 +584,7 @@ class PersonalizedWebsiteRenderer:
             "recommendations": ["bestsellers"],
         }
 
-    def _get_time_context(self) -> Dict[str, Any]:
+    def _get_time_context(self) -> dict[str, Any]:
         """Get time-based context for personalization."""
         now = datetime.now()
         hour = now.hour
@@ -608,7 +609,7 @@ class PersonalizedWebsiteRenderer:
             "is_weekend": now.weekday() >= 5,
         }
 
-    def _determine_segment(self, user_profile: Dict[str, Any]) -> str:
+    def _determine_segment(self, user_profile: dict[str, Any]) -> str:
         """Determine primary user segment."""
         interests = user_profile.get("interests", [])
         behavior = user_profile.get("behavior", {})
@@ -636,7 +637,7 @@ class PersonalizedWebsiteRenderer:
 
         return "general"
 
-    async def _get_location_content(self, location: Dict[str, Any]) -> Dict[str, Any]:
+    async def _get_location_content(self, location: dict[str, Any]) -> dict[str, Any]:
         """Get location-specific content."""
         if not location:
             location = {"country": "United States"}
@@ -655,7 +656,7 @@ class PersonalizedWebsiteRenderer:
             "local_holidays": self._get_local_holidays(country),
         }
 
-    def _get_local_holidays(self, country: str) -> List[str]:
+    def _get_local_holidays(self, country: str) -> list[str]:
         """Get upcoming local holidays for promotional content."""
         # In production, would use holiday API
         # For demo, return common holidays
@@ -670,8 +671,8 @@ class PersonalizedWebsiteRenderer:
         return holidays.get(country, [])
 
     def _generate_personalized_content(
-        self, segment: str, location_content: Dict[str, Any], page_type: str
-    ) -> Dict[str, Any]:
+        self, segment: str, location_content: dict[str, Any], page_type: str
+    ) -> dict[str, Any]:
         """Generate personalized content based on segment and location."""
 
         # Get segment-specific content
@@ -741,7 +742,7 @@ class PersonalizedWebsiteRenderer:
 
         return subheadlines.get(segment, "Discover your perfect style")
 
-    def _get_hero_style(self, content_style: str) -> Dict[str, Any]:
+    def _get_hero_style(self, content_style: str) -> dict[str, Any]:
         """Get hero section styling based on content style."""
         styles = {
             "luxury": {
@@ -769,8 +770,8 @@ class PersonalizedWebsiteRenderer:
         return styles.get(content_style, styles["luxury"])
 
     def _get_personalized_products(
-        self, segment: str, location_content: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, segment: str, location_content: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Get personalized product recommendations."""
         products = self.content_library["products"]["products"]
 
@@ -802,7 +803,7 @@ class PersonalizedWebsiteRenderer:
 
         return None
 
-    def _get_social_proof(self, segment: str) -> Dict[str, Any]:
+    def _get_social_proof(self, segment: str) -> dict[str, Any]:
         """Get social proof elements based on segment."""
         if segment == "trend_follower":
             return {
@@ -830,8 +831,8 @@ class PersonalizedWebsiteRenderer:
         }
 
     def _apply_behavioral_targeting(
-        self, behavior: Optional[Dict[str, Any]], content: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, behavior: Optional[dict[str, Any]], content: dict[str, Any]
+    ) -> dict[str, Any]:
         """Apply behavioral targeting overlays to content."""
         if not behavior:
             return content
@@ -857,8 +858,8 @@ class PersonalizedWebsiteRenderer:
         return content
 
     def _optimize_for_device(
-        self, device: Optional[Dict[str, Any]], content: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, device: Optional[dict[str, Any]], content: dict[str, Any]
+    ) -> dict[str, Any]:
         """Optimize content for specific device type."""
         if not device:
             return content
@@ -886,7 +887,7 @@ class PersonalizedWebsiteRenderer:
 
         return content
 
-    def _calculate_personalization_score(self, user_profile: Dict[str, Any]) -> float:
+    def _calculate_personalization_score(self, user_profile: dict[str, Any]) -> float:
         """Calculate how well we can personalize for this user."""
         score = 0
         max_score = 100
@@ -918,7 +919,7 @@ class PersonalizedWebsiteRenderer:
 
         return score / max_score
 
-    def _get_fallback_content(self, page_type: str) -> Dict[str, Any]:
+    def _get_fallback_content(self, page_type: str) -> dict[str, Any]:
         """Get fallback content when personalization fails."""
         return {
             "status": "fallback",
@@ -941,7 +942,7 @@ class PersonalizedWebsiteRenderer:
         }
 
     async def track_engagement(
-        self, user_id: str, content_version: str, engagement_data: Dict[str, Any]
+        self, user_id: str, content_version: str, engagement_data: dict[str, Any]
     ) -> bool:
         """
         Track user engagement with personalized content.
@@ -1025,7 +1026,7 @@ async def main():
             content = result["content"]
             logger.info(f"✅ Segment: {result['user_segment']}")
             logger.info(f"📊 Personalization Score: {result['personalization_score']:.0%}")
-            logger.info(f"\n📝 Content:")
+            logger.info("\n📝 Content:")
             logger.info(f"  Headline: {content['hero']['headline']}")
             logger.info(f"  CTA: {content['hero']['cta_text']}")
             logger.info(f"  Currency: {content['pricing']['currency']}")

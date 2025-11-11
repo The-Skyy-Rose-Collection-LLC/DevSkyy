@@ -1,18 +1,19 @@
-from datetime import datetime
-from pathlib import Path
-import json
-from typing import Any, Dict, List, Optional, Union, Tuple
 import asyncio
-import logging
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+import json
+import logging
+from pathlib import Path
+from typing import Any, Optional, Union
 
-import torch
-from PIL import Image, ImageOps
 from diffusers import StableDiffusionXLPipeline
-from transformers import Blip2Processor, Blip2ForConditionalGeneration
-from peft import LoraConfig, get_peft_model, TaskType
 import numpy as np
+from peft import LoraConfig, TaskType, get_peft_model
+from PIL import Image, ImageOps
 from sklearn.model_selection import train_test_split
+import torch
+from transformers import Blip2ForConditionalGeneration, Blip2Processor
+
 
 """
 Skyy Rose Collection Custom Brand Model Trainer
@@ -134,16 +135,16 @@ class SkyRoseBrandTrainer:
         category: str = "general",
         remove_background: bool = False,
         enhance_images: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Prepare training dataset from input images.
-        
+
         Args:
             input_directory: Directory containing training images
             category: Category name (e.g., "dresses", "tops", "accessories")
             remove_background: Whether to remove image backgrounds
             enhance_images: Whether to enhance image quality
-            
+
         Returns:
             Dict with dataset preparation results
         """
@@ -213,11 +214,11 @@ class SkyRoseBrandTrainer:
             training_manifest = {
                 "train": [
                     {"image": str(img), "caption": cap}
-                    for img, cap in zip(train_images, train_captions)
+                    for img, cap in zip(train_images, train_captions, strict=False)
                 ],
                 "validation": [
                     {"image": str(img), "caption": cap}
-                    for img, cap in zip(val_images, val_captions)
+                    for img, cap in zip(val_images, val_captions, strict=False)
                 ]
             }
 
@@ -249,7 +250,7 @@ class SkyRoseBrandTrainer:
         remove_background: bool,
         enhance_images: bool,
         category: str
-    ) -> Tuple[Path, str]:
+    ) -> tuple[Path, str]:
         """Process a single image for training."""
         def process_image():
             # Load image
@@ -326,7 +327,7 @@ class SkyRoseBrandTrainer:
         dataset_path: Union[str, Path],
         model_name: str = "skyy_rose_v1",
         resume_from_checkpoint: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Train LoRA model for Skyy Rose Collection.
 
@@ -402,11 +403,11 @@ class SkyRoseBrandTrainer:
     async def _run_training_loop(
         self,
         model,
-        train_data: List[Dict],
-        val_data: List[Dict],
+        train_data: list[dict],
+        val_data: list[dict],
         output_dir: Path,
         resume_checkpoint: Optional[str] = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run the actual training loop."""
         # This is a simplified training loop
         # In production, you'd use a proper training framework like Accelerate
@@ -439,14 +440,14 @@ class SkyRoseBrandTrainer:
             "epochs_completed": len(training_losses)
         }
 
-    async def _training_step(self, model, train_data: List[Dict]) -> float:
+    async def _training_step(self, model, train_data: list[dict]) -> float:
         """Perform one training step."""
         # Simplified training step - would implement proper loss calculation
         # and backpropagation in production
         await asyncio.sleep(0.1)  # Simulate training time
         return np.random.uniform(0.1, 0.5)  # Simulated loss
 
-    async def _validation_step(self, model, val_data: List[Dict]) -> float:
+    async def _validation_step(self, model, val_data: list[dict]) -> float:
         """Perform validation step."""
         # Simplified validation step
         await asyncio.sleep(0.05)  # Simulate validation time
@@ -459,7 +460,7 @@ class SkyRoseBrandTrainer:
         trigger_word: str = "skyrose_collection",
         width: int = 1024,
         height: int = 1024
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate images using trained brand model.
 
@@ -515,9 +516,9 @@ class SkyRoseBrandTrainer:
 
     async def validate_brand_consistency(
         self,
-        generated_images: List[Union[str, Path]],
-        reference_images: List[Union[str, Path]]
-    ) -> Dict[str, Any]:
+        generated_images: list[Union[str, Path]],
+        reference_images: list[Union[str, Path]]
+    ) -> dict[str, Any]:
         """
         Validate that generated images maintain brand consistency.
 
@@ -535,7 +536,7 @@ class SkyRoseBrandTrainer:
             # using CLIP embeddings, style transfer metrics, etc.
 
             consistency_scores = []
-            for gen_img in generated_images:
+            for _gen_img in generated_images:
                 # Simplified consistency check
                 score = np.random.uniform(0.7, 0.95)  # Simulated consistency score
                 consistency_scores.append(score)
@@ -555,7 +556,7 @@ class SkyRoseBrandTrainer:
             logger.error(f"❌ Brand consistency validation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_consistency_recommendations(self, consistency_score: float) -> List[str]:
+    def _generate_consistency_recommendations(self, consistency_score: float) -> list[str]:
         """Generate recommendations based on consistency score."""
         if consistency_score > 0.9:
             return ["Excellent brand consistency maintained"]
@@ -587,11 +588,11 @@ brand_trainer = create_brand_trainer()
 
 
 # Convenience functions
-async def prepare_dataset(input_dir: str, category: str = "general") -> Dict[str, Any]:
+async def prepare_dataset(input_dir: str, category: str = "general") -> dict[str, Any]:
     """Prepare training dataset from input directory."""
     return await brand_trainer.prepare_training_dataset(input_dir, category)
 
 
-async def train_brand_model(dataset_path: str, model_name: str = "skyy_rose_v1") -> Dict[str, Any]:
+async def train_brand_model(dataset_path: str, model_name: str = "skyy_rose_v1") -> dict[str, Any]:
     """Train custom brand model with LoRA."""
     return await brand_trainer.train_lora_model(dataset_path, model_name)

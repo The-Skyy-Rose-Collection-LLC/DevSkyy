@@ -1,15 +1,16 @@
+from contextvars import ContextVar
 from datetime import datetime
 import json
-import os
-import sys
-
-from contextvars import ContextVar
-from structlog.stdlib import LoggerFactory
-from typing import Any, Dict, Optional
 import logging
 import logging.config
-import structlog
+import os
+import sys
+from typing import Any, Optional
 import uuid
+
+import structlog
+from structlog.stdlib import LoggerFactory
+
 
 """
 Enterprise Structured Logging Configuration for DevSkyy Platform
@@ -376,7 +377,7 @@ class SecurityLogger:
         user_id: str,
         table: str,
         operation: str,
-        record_count: int = None,
+        record_count: int | None = None,
         **kwargs,
     ):
         """Log data access events"""
@@ -399,10 +400,10 @@ class ErrorLogger:
     def __init__(self):
         self.logger = logging.getLogger("devskyy.error")
 
-    def log_application_error(self, error: Exception, context: Dict[str, Any] = None):
+    def log_application_error(self, error: Exception, context: dict[str, Any] | None = None):
         """Log application errors with context"""
         self.logger.error(
-            f"Application error: {str(error)}",
+            f"Application error: {error!s}",
             exc_info=error,
             extra={
                 "error_type": type(error).__name__,
@@ -418,7 +419,7 @@ class ErrorLogger:
         method: str,
         status_code: int,
         error: Exception,
-        user_id: str = None,
+        user_id: str | None = None,
     ):
         """Log API errors"""
         self.logger.error(
@@ -435,7 +436,7 @@ class ErrorLogger:
         )
 
     def log_database_error(
-        self, operation: str, error: Exception, query: str = None, user_id: str = None
+        self, operation: str, error: Exception, query: str | None = None, user_id: str | None = None
     ):
         """Log database errors"""
         self.logger.error(

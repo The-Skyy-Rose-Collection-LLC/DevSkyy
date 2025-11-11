@@ -1,11 +1,12 @@
 from datetime import datetime
 import json
+import logging
 import os
+from typing import Any
 
 from dotenv import load_dotenv
-from typing import Any, Dict, List
-import logging
 import openai
+
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class BrandIntelligenceAgent:
             "🌟 Brand Intelligence Agent initialized for The Skyy Rose Collection"
         )
 
-    def analyze_brand_assets(self) -> Dict[str, Any]:
+    def analyze_brand_assets(self) -> dict[str, Any]:
         """Comprehensive analysis of all brand assets and positioning."""
         try:
             return {
@@ -91,10 +92,10 @@ class BrandIntelligenceAgent:
                 "analysis_timestamp": datetime.now().isoformat(),
             }
         except Exception as e:
-            logger.error(f"Brand analysis failed: {str(e)}")
+            logger.error(f"Brand analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def get_brand_context_for_agent(self, agent_type: str) -> Dict[str, Any]:
+    def get_brand_context_for_agent(self, agent_type: str) -> dict[str, Any]:
         """Provide tailored brand context for specific agent types."""
         base_context = {
             "brand_name": self.brand_name,
@@ -153,7 +154,7 @@ class BrandIntelligenceAgent:
         logger.info(f"🎯 Generated brand context for {agent_type} agent")
         return context
 
-    async def continuous_learning_cycle(self) -> Dict[str, Any]:
+    async def continuous_learning_cycle(self) -> dict[str, Any]:
         """Execute continuous brand learning and adaptation."""
         try:
             # Analyze current market trends
@@ -187,14 +188,14 @@ class BrandIntelligenceAgent:
             }
 
         except Exception as e:
-            logger.error(f"Brand learning cycle failed: {str(e)}")
+            logger.error(f"Brand learning cycle failed: {e!s}")
             return {
                 "status": "failed",
                 "error": str(e),
                 "timestamp": datetime.now().isoformat(),
             }
 
-    async def _analyze_market_trends(self) -> Dict[str, Any]:
+    async def _analyze_market_trends(self) -> dict[str, Any]:
         """Analyze current fashion and retail market trends."""
         # In production, this would connect to trend analysis APIs
         return {
@@ -220,7 +221,7 @@ class BrandIntelligenceAgent:
             "sources": ["Fashion Week Reports", "Retail Analytics", "Consumer Surveys"],
         }
 
-    def _track_brand_performance(self) -> Dict[str, Any]:
+    def _track_brand_performance(self) -> dict[str, Any]:
         """Track key brand performance indicators."""
         return {
             "brand_awareness": {
@@ -244,7 +245,7 @@ class BrandIntelligenceAgent:
             },
         }
 
-    async def _analyze_customer_sentiment(self) -> Dict[str, Any]:
+    async def _analyze_customer_sentiment(self) -> dict[str, Any]:
         """Analyze customer sentiment across all touchpoints."""
         # In production, this would analyze real customer data
         return {
@@ -271,8 +272,8 @@ class BrandIntelligenceAgent:
         }
 
     def _update_brand_strategies(
-        self, market_analysis: Dict, sentiment_analysis: Dict
-    ) -> Dict[str, Any]:
+        self, market_analysis: dict, sentiment_analysis: dict
+    ) -> dict[str, Any]:
         """Update brand strategies based on analysis."""
         return {
             "product_strategy": {
@@ -300,8 +301,8 @@ class BrandIntelligenceAgent:
         }
 
     def _generate_actionable_insights(
-        self, market_analysis: Dict, performance_metrics: Dict, sentiment_analysis: Dict
-    ) -> List[Dict[str, Any]]:
+        self, market_analysis: dict, performance_metrics: dict, sentiment_analysis: dict
+    ) -> list[dict[str, Any]]:
         """Generate actionable insights from all analyses."""
         return [
             {
@@ -348,7 +349,7 @@ class BrandIntelligenceAgent:
         )
         return round(total_score)
 
-    def _generate_brand_recommendations(self) -> List[str]:
+    def _generate_brand_recommendations(self) -> list[str]:
         """Generate strategic brand recommendations."""
         return [
             "Strengthen sustainability messaging across all touchpoints",
@@ -360,7 +361,7 @@ class BrandIntelligenceAgent:
             "Increase social responsibility initiatives visibility",
         ]
 
-    def _get_latest_drop(self) -> Dict[str, Any]:
+    def _get_latest_drop(self) -> dict[str, Any]:
         """Get information about the latest product collection."""
         return {
             "collection_name": "Winter Elegance 2024",
@@ -382,7 +383,7 @@ class BrandIntelligenceAgent:
             "marketing_focus": "Timeless pieces for conscious consumers",
         }
 
-    def _track_brand_changes(self) -> List[Dict[str, Any]]:
+    def _track_brand_changes(self) -> list[dict[str, Any]]:
         """Track recent brand changes and evolution."""
         return [
             {
@@ -405,7 +406,7 @@ class BrandIntelligenceAgent:
             },
         ]
 
-    def _analyze_seasonal_content(self) -> Dict[str, Any]:
+    def _analyze_seasonal_content(self) -> dict[str, Any]:
         """Analyze seasonal content and upcoming updates."""
         return {
             "current_season": "Winter 2024",
@@ -426,7 +427,7 @@ class BrandIntelligenceAgent:
             ],
         }
 
-    def analyze_brand_sentiment(self, content: str) -> Dict[str, Any]:
+    def analyze_brand_sentiment(self, content: str) -> dict[str, Any]:
         """Analyze brand sentiment using OpenAI."""
         if not self.openai_available:
             return {
@@ -443,7 +444,7 @@ class BrandIntelligenceAgent:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",  # noqa: E501
+                        "content": "You are a brand sentiment analysis expert. Analyze the sentiment of the following text and provide a structured JSON output with sentiment (positive, negative, neutral), confidence score (0.0-1.0), key sentiment-driving keywords, and a brief summary. Ensure the output is valid JSON.",
                     },
                     {
                         "role": "user",
@@ -459,16 +460,16 @@ class BrandIntelligenceAgent:
             logger.info("✅ Brand sentiment analyzed successfully using OpenAI")
             return sentiment_data
         except Exception as e:
-            logger.error(f"Brand sentiment analysis failed: {str(e)}")
+            logger.error(f"Brand sentiment analysis failed: {e!s}")
             return {
                 "sentiment": "error",
                 "confidence": 0.0,
                 "keywords": ["analysis", "error"],
-                "summary": f"Error during OpenAI sentiment analysis: {str(e)}",
+                "summary": f"Error during OpenAI sentiment analysis: {e!s}",
                 "timestamp": datetime.now().isoformat(),
             }
 
-    def learn_from_brand_assets(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
+    def learn_from_brand_assets(self, asset_data: dict[str, Any]) -> dict[str, Any]:
         """Learn from uploaded brand assets to enhance intelligence."""
         try:
             self.uploaded_assets = asset_data
@@ -507,12 +508,12 @@ class BrandIntelligenceAgent:
             }
 
         except Exception as e:
-            logger.error(f"Asset learning failed: {str(e)}")
+            logger.error(f"Asset learning failed: {e!s}")
             return {"error": str(e), "learning_status": "failed"}
 
     def _experimental_neural_brand_analysis(
-        self, asset_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, asset_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """EXPERIMENTAL: Advanced neural analysis of brand DNA patterns."""
         return {
             "brand_dna_sequence": "LUXURY-SUSTAINABLE-EMPOWERMENT-ELEGANCE",
@@ -528,7 +529,7 @@ class BrandIntelligenceAgent:
             ],
         }
 
-    def _analyze_visual_assets(self, visual_assets: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_visual_assets(self, visual_assets: dict[str, Any]) -> dict[str, Any]:
         """Analyze visual brand assets for consistency."""
         return {
             "logo_variations": len(visual_assets.get("logos", [])),
@@ -550,7 +551,7 @@ class BrandIntelligenceAgent:
             ],
         }
 
-    def _extract_brand_patterns(self, asset_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_brand_patterns(self, asset_data: dict[str, Any]) -> dict[str, Any]:
         """Extract recurring brand patterns from assets."""
         return {
             "dominant_colors": ["Rose Gold", "Deep Navy", "Cream"],
@@ -561,8 +562,8 @@ class BrandIntelligenceAgent:
         }
 
     def _generate_asset_insights(
-        self, visual_analysis: Dict, patterns: Dict
-    ) -> List[str]:
+        self, visual_analysis: dict, patterns: dict
+    ) -> list[str]:
         """Generate insights from asset analysis."""
         return [
             "Brand visual identity shows strong luxury positioning",
@@ -572,7 +573,7 @@ class BrandIntelligenceAgent:
             "Marketing materials align with empowerment themes",
         ]
 
-    def _update_seasonal_understanding(self, seasonal_assets: List[Dict]):
+    def _update_seasonal_understanding(self, seasonal_assets: list[dict]):
         """Update seasonal understanding from collection assets."""
         self.theme_evolution["asset_informed"] = True
         self.theme_evolution["collection_count"] = len(seasonal_assets)
