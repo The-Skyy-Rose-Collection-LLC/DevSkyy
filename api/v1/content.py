@@ -17,7 +17,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel, Field
 
 from services.content_publishing_orchestrator import ContentPublishingOrchestrator
-from services.wordpress_categorization import WordPressCategorizationService, CategorizationResult
+from services.wordpress_categorization import WordPressCategorizationService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/content", tags=["Content Publishing"])

@@ -36,7 +36,7 @@ jobs:
       - name: Install linting dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ruff==0.8.4 black==24.10.0 isort==5.13.2
+          pip install ruff==0.8.4 black==24.10.0 isort==5.13.2 flake8==7.1.1
 
       - name: Run Ruff linter
         run: |
@@ -52,6 +52,11 @@ jobs:
         run: |
           echo "Checking import order with isort..."
           isort --check-only --diff . || echo "::warning::isort found issues"
+
+      - name: Run Flake8 PEP8 checker
+        run: |
+          echo "Running Flake8 PEP8 compliance checker..."
+          flake8 --statistics --count agent/ api/ ml/ || echo "::warning::Flake8 found PEP8 violations"
 
       - name: Generate linting report
         if: always()

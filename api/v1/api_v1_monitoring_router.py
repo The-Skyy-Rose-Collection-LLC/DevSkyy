@@ -77,7 +77,7 @@ class AlertResponse(BaseModel):
 
 class MetricsCollector:
     """Simple in-memory metrics collector"""
-    
+
     def __init__(self):
         self.start_time = datetime.utcnow()
         self.request_times: List[float] = []
@@ -89,7 +89,7 @@ class MetricsCollector:
         self.webhook_failures = 0
         self.agent_successes = 0
         self.agent_failures = 0
-    
+
     def add_request(self, latency_ms: float, error: bool = False):
         """Record API request"""
         self.request_times.append(latency_ms)
@@ -97,23 +97,23 @@ class MetricsCollector:
             self.request_errors += 1
         else:
             self.request_success += 1
-        
+
         # Keep only recent 1000 requests for percentile calculations
         if len(self.request_times) > 1000:
             self.request_times = self.request_times[-1000:]
-    
+
     def get_latency_percentiles(self) -> LatencyPercentile:
         """Calculate latency percentiles (p50, p95, p99)"""
         if not self.request_times:
             return LatencyPercentile(p50=0, p95=0, p99=0)
-        
+
         sorted_times = sorted(self.request_times)
         n = len(sorted_times)
-        
+
         p50_idx = int(n * 0.50)
         p95_idx = int(n * 0.95)
         p99_idx = int(n * 0.99)
-        
+
         return LatencyPercentile(
             p50=sorted_times[max(0, p50_idx)],
             p95=sorted_times[max(0, p95_idx)],
@@ -146,7 +146,7 @@ async def health_check(current_user: Dict = Depends(get_current_user)):
     """
     try:
         uptime = (datetime.utcnow() - metrics_collector.start_time).total_seconds()
-        
+
         # Check components
         components = {
             "api": "healthy",
@@ -154,16 +154,16 @@ async def health_check(current_user: Dict = Depends(get_current_user)):
             "cache": "healthy",  # TODO: Ping Redis
             "webhooks": "healthy"
         }
-        
+
         # Determine overall status
         overall_status = "healthy"
         if any(v == "unhealthy" for v in components.values()):
             overall_status = "unhealthy"
         elif any(v == "degraded" for v in components.values()):
             overall_status = "degraded"
-        
+
         status_code = 200 if overall_status == "healthy" else 503
-        
+
         return HealthCheckResponse(
             status=overall_status,
             timestamp=datetime.utcnow(),
@@ -171,7 +171,7 @@ async def health_check(current_user: Dict = Depends(get_current_user)):
             version="5.1.0",
             components=components
         )
-    
+
     except Exception as e:
         logger.error(f"Health check error: {str(e)}")
         raise HTTPException(
@@ -197,18 +197,18 @@ async def get_metrics(current_user: Dict = Depends(get_current_user)):
         cpu_percent = psutil.cpu_percent(interval=1)
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
-        
+
         # Process metrics
         process = psutil.Process(os.getpid())
         process_memory_mb = process.memory_info().rss / 1024 / 1024
-        
+
         # Request metrics
         total_requests = metrics_collector.request_success + metrics_collector.request_errors
         avg_latency = (
             sum(metrics_collector.request_times) / len(metrics_collector.request_times)
             if metrics_collector.request_times else 0
         )
-        
+
         return MetricsResponse(
             timestamp=datetime.utcnow(),
             cpu_percent=cpu_percent,
@@ -220,7 +220,7 @@ async def get_metrics(current_user: Dict = Depends(get_current_user)):
             api_requests_success=metrics_collector.request_success,
             avg_request_latency_ms=avg_latency
         )
-    
+
     except Exception as e:
         logger.error(f"Metrics error: {str(e)}")
         raise HTTPException(
@@ -245,26 +245,26 @@ async def get_performance_metrics(
     """
     try:
         percentiles = metrics_collector.get_latency_percentiles()
-        
+
         # Calculate rates
         total_cache_ops = metrics_collector.cache_hits + metrics_collector.cache_misses
         cache_hit_rate = (
             metrics_collector.cache_hits / total_cache_ops
             if total_cache_ops > 0 else 0
         )
-        
+
         total_webhooks = metrics_collector.webhook_successes + metrics_collector.webhook_failures
         webhook_success_rate = (
             metrics_collector.webhook_successes / total_webhooks
             if total_webhooks > 0 else 0
         )
-        
+
         total_agents = metrics_collector.agent_successes + metrics_collector.agent_failures
         agent_success_rate = (
             metrics_collector.agent_successes / total_agents
             if total_agents > 0 else 0
         )
-        
+
         return PerformanceMetrics(
             timestamp=datetime.utcnow(),
             request_latency_percentiles=percentiles,
@@ -274,7 +274,7 @@ async def get_performance_metrics(
             webhook_delivery_success_rate=webhook_success_rate,
             agent_execution_success_rate=agent_success_rate
         )
-    
+
     except Exception as e:
         logger.error(f"Performance metrics error: {str(e)}")
         raise HTTPException(
@@ -300,13 +300,13 @@ async def get_active_alerts(
         List of AlertResponse
     """
     alerts: List[AlertResponse] = []
-    
+
     try:
         # Get current metrics
         cpu_percent = psutil.cpu_percent(interval=1)
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
-        
+
         # Check thresholds
         if cpu_percent > 80:
             alerts.append(AlertResponse(
@@ -318,7 +318,7 @@ async def get_active_alerts(
                 current_value=cpu_percent,
                 created_at=datetime.utcnow()
             ))
-        
+
         if memory.percent > 85:
             alerts.append(AlertResponse(
                 alert_id="memory_high",
@@ -329,7 +329,7 @@ async def get_active_alerts(
                 current_value=memory.percent,
                 created_at=datetime.utcnow()
             ))
-        
+
         if disk.percent > 90:
             alerts.append(AlertResponse(
                 alert_id="disk_high",
@@ -340,13 +340,13 @@ async def get_active_alerts(
                 current_value=disk.percent,
                 created_at=datetime.utcnow()
             ))
-        
+
         # Filter by severity if provided
         if severity:
             alerts = [a for a in alerts if a.severity == severity]
-        
+
         return alerts
-    
+
     except Exception as e:
         logger.error(f"Alerts error: {str(e)}")
         raise HTTPException(
@@ -391,5 +391,5 @@ async def check_dependencies(
             "error": None
         }
     }
-    
+
     return dependencies

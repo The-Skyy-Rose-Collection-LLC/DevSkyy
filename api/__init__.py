@@ -1,4 +1,4 @@
-refactor/clean-main-py
+# refactor / clean - main - py
 """
 API module initialization for DevSkyy Platform.
 """
@@ -19,7 +19,7 @@ def create_app() -> FastAPI:
         docs_url="/docs",
         redoc_url="/redoc",
     )
-    
+
     return app
 """DevSkyy API Package"""
 

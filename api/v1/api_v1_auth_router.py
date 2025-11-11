@@ -88,22 +88,22 @@ async def login_endpoint(request: LoginRequest):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password"
             )
-        
+
         # Create tokens
         access_token = create_access_token(
             user_id=str(user["id"]),
             roles=user.get("roles", [])
         )
         refresh_token = create_refresh_token(user_id=str(user["id"]))
-        
+
         logger.info(f"User logged in: {request.username}")
-        
+
         return TokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
         )
-    
+
     except HTTPException:
         raise
     except Exception as e:
@@ -139,15 +139,15 @@ async def refresh_endpoint(request: RefreshTokenRequest):
         new_refresh_token = create_refresh_token(
             user_id="user_id_from_refresh_token"
         )
-        
+
         logger.info("Token refreshed")
-        
+
         return TokenResponse(
             access_token=access_token,
             refresh_token=new_refresh_token,
             expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
         )
-    
+
     except HTTPException:
         raise
     except Exception as e:
@@ -173,9 +173,9 @@ async def logout_endpoint(current_user: dict = Depends(get_current_user)):
     """
     user_id = current_user.get("sub")
     logger.info(f"User logged out: {user_id}")
-    
+
     # TODO: Add token to blacklist (if implementing token revocation)
-    
+
     return {
         "status": "success",
         "message": "Successfully logged out"
@@ -225,13 +225,13 @@ async def register_endpoint(request: RegisterRequest):
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Passwords do not match"
         )
-    
+
     # TODO: Check if user exists in database
     # TODO: Create new user in database
     # TODO: Send verification email
-    
+
     logger.warning("register_endpoint() is not fully implemented")
-    
+
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
         detail="Registration endpoint not yet implemented"
@@ -252,6 +252,6 @@ async def authenticate_user_from_db(username: str, password: str):
     # if user and verify_password(password, user.hashed_password):
     #     return {"id": user.id, "username": user.username, "roles": user.roles}
     # return None
-    
+
     logger.warning("authenticate_user_from_db() is a stub - implement database lookup")
     return None

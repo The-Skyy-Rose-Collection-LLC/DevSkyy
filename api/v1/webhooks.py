@@ -271,10 +271,10 @@ def _sanitize_log_input(self, user_input):
     """Sanitize user input for safe logging."""
     if not isinstance(user_input, str):
         user_input = str(user_input)
-    
+
     # Remove control characters and potential log injection
     sanitized = re.sub(r'[\r\n\t]', ' ', user_input)
     sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', sanitized)
-    
+
     # Limit length to prevent log flooding
     return sanitized[:500] + "..." if len(sanitized) > 500 else sanitized

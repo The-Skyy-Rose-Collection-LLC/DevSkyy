@@ -48,7 +48,7 @@ class SkyRoseBrandTrainer:
         self.training_data_path = Path("training_data")
         self.models_path = Path("custom_models/skyy_rose")
         self.processed_data_path = Path("processed_training_data")
-        
+
         # Create directories
         for path in [self.training_data_path, self.models_path, self.processed_data_path]:
             path.mkdir(parents=True, exist_ok=True)
@@ -61,7 +61,7 @@ class SkyRoseBrandTrainer:
             "brand_name": "Skyy Rose Collection",
             "trigger_words": [
                 "skyrose_dress",
-                "skyrose_collection", 
+                "skyrose_collection",
                 "skyrose_fashion",
                 "skyrose_luxury",
                 "skyrose_style"
@@ -149,7 +149,7 @@ class SkyRoseBrandTrainer:
         """
         try:
             logger.info(f"📁 Preparing training dataset from: {input_directory}")
-            
+
             input_path = Path(input_directory)
             if not input_path.exists():
                 return {"error": f"Input directory not found: {input_directory}", "status": "failed"}
@@ -179,10 +179,10 @@ class SkyRoseBrandTrainer:
                     processed_image_path, caption = await self._process_single_image(
                         image_file, output_dir, i, remove_background, enhance_images, category
                     )
-                    
+
                     processed_images.append(processed_image_path)
                     captions.append(caption)
-                    
+
                     if (i + 1) % 10 == 0:
                         logger.info(f"Processed {i + 1}/{len(image_files)} images")
 
@@ -212,11 +212,11 @@ class SkyRoseBrandTrainer:
             # Create training manifest
             training_manifest = {
                 "train": [
-                    {"image": str(img), "caption": cap} 
+                    {"image": str(img), "caption": cap}
                     for img, cap in zip(train_images, train_captions)
                 ],
                 "validation": [
-                    {"image": str(img), "caption": cap} 
+                    {"image": str(img), "caption": cap}
                     for img, cap in zip(val_images, val_captions)
                 ]
             }
@@ -254,26 +254,26 @@ class SkyRoseBrandTrainer:
         def process_image():
             # Load image
             image = Image.open(image_path).convert("RGB")
-            
+
             # Enhance image if requested
             if enhance_images:
                 image = ImageOps.autocontrast(image)
                 image = ImageOps.equalize(image)
-            
+
             # Remove background if requested
             if remove_background:
                 # Simple background removal (would use more advanced methods in production)
                 image = self._simple_background_removal(image)
-            
+
             # Resize to target resolution
             target_size = self.brand_config["target_resolution"]
             image = image.resize(target_size, Image.Resampling.LANCZOS)
-            
+
             # Save processed image
             output_filename = f"{category}_{index:04d}.jpg"
             output_path = output_dir / output_filename
             image.save(output_path, "JPEG", quality=95)
-            
+
             return output_path, image
 
         # Run image processing in thread pool
@@ -302,7 +302,7 @@ class SkyRoseBrandTrainer:
         try:
             # Generate base caption using BLIP-2
             inputs = self.blip2_processor(image, return_tensors="pt").to(self.device)
-            
+
             with torch.no_grad():
                 generated_ids = self.blip2_model.generate(**inputs, max_length=50)
                 base_caption = self.blip2_processor.batch_decode(

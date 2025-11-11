@@ -14,17 +14,14 @@ from typing import Optional
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from services.consensus_orchestrator import (
     ConsensusOrchestrator,
-    WorkflowState,
     HumanDecision,
-    ReviewDecision,
 )
 from agent.wordpress.content_generator import ContentGenerator
-import httpx
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/consensus", tags=["Consensus Workflow"])

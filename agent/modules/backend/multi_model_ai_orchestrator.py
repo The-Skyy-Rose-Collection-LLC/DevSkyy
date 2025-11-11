@@ -266,7 +266,7 @@ class MultiModelAIOrchestrator:
 Original Question: {prompt}
 
 Responses:
-{chr(10).join([f"Response {i+1}: {r}" for i, r in enumerate(valid_responses)])}
+{chr(10).join([f"Response {i + 1}: {r}" for i, r in enumerate(valid_responses)])}
 
 Create the optimal combined response that leverages the strengths of each."""
 

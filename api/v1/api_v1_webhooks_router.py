@@ -100,7 +100,7 @@ async def subscribe_to_webhooks(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Invalid event type: {event}. Valid events: {valid_events}"
                 )
-        
+
         # Subscribe
         subscription = await webhook_manager.subscribe(
             endpoint=str(request.endpoint),
@@ -108,12 +108,12 @@ async def subscribe_to_webhooks(
             secret=request.secret,
             metadata=request.metadata
         )
-        
+
         logger.info(
             f"Webhook subscribed by user {current_user.get('sub')}: "
             f"{subscription.subscription_id}"
         )
-        
+
         return WebhookSubscribeResponse(
             subscription_id=subscription.subscription_id,
             endpoint=str(subscription.endpoint),
@@ -122,7 +122,7 @@ async def subscribe_to_webhooks(
             created_at=subscription.created_at,
             secret=subscription.secret
         )
-    
+
     except HTTPException:
         raise
     except Exception as e:
@@ -152,18 +152,18 @@ async def unsubscribe_from_webhooks(
         404: Subscription not found
     """
     success = await webhook_manager.unsubscribe(subscription_id)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Subscription not found: {subscription_id}"
         )
-    
+
     logger.info(
         f"Webhook unsubscribed by user {current_user.get('sub')}: "
         f"{subscription_id}"
     )
-    
+
     return {
         "status": "success",
         "message": f"Successfully unsubscribed from {subscription_id}"
@@ -183,7 +183,7 @@ async def list_subscriptions(
         List of WebhookSubscribeResponse
     """
     subscriptions = await webhook_manager.list_subscriptions()
-    
+
     return [
         WebhookSubscribeResponse(
             subscription_id=sub.subscription_id,
@@ -220,19 +220,19 @@ async def test_webhook(
     """
     try:
         delivery = await webhook_manager.test_webhook(subscription_id)
-        
+
         logger.info(
             f"Webhook test by user {current_user.get('sub')}: "
             f"{subscription_id} -> status {delivery.status}"
         )
-        
+
         return WebhookTestResponse(
             status=delivery.status,
             delivery_id=delivery.delivery_id,
             response_status_code=delivery.response_status_code,
             error_message=delivery.error_message
         )
-    
+
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -273,13 +273,13 @@ async def get_delivery_history(
         limit = 100
     if limit < 1:
         limit = 1
-    
+
     try:
         deliveries = await webhook_manager.get_delivery_history(
             subscription_id,
             limit
         )
-        
+
         return [
             WebhookDeliveryResponse(
                 delivery_id=d.delivery_id,
@@ -295,7 +295,7 @@ async def get_delivery_history(
             )
             for d in deliveries
         ]
-    
+
     except Exception as e:
         logger.error(f"Delivery history error: {str(e)}")
         raise HTTPException(
@@ -323,13 +323,13 @@ async def get_subscription_info(
         404: Subscription not found
     """
     subscription = await webhook_manager.get_subscription(subscription_id)
-    
+
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Subscription not found: {subscription_id}"
         )
-    
+
     return WebhookSubscribeResponse(
         subscription_id=subscription.subscription_id,
         endpoint=str(subscription.endpoint),
@@ -364,5 +364,5 @@ async def list_webhook_events(
         "system": ["system.error", "system.warning"],
         "custom": ["custom.event"]
     }
-    
+
     return events_by_category
