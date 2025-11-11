@@ -535,10 +535,6 @@ def get_learning_system_status() -> Dict[str, Any]:
     return _global_scheduler.get_learning_status()
 
 
-# Global scheduler instance
-_global_scheduler = None
-
-
 async def run_learning_cycle() -> Dict[str, Any]:
     """Run a learning cycle."""
     return {

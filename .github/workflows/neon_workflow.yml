@@ -3,10 +3,28 @@ name: Neon Database Branching & CI/CD
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   push:
     branches:
       - main
       - develop
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
 
 env:
   NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}

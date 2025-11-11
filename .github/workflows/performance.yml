@@ -3,8 +3,26 @@ name: Performance Testing & Benchmarking
 on:
   push:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   schedule:
     # Run performance tests every day at 3 AM UTC
     - cron: '0 3 * * *'

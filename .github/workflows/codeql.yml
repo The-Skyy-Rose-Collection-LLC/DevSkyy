@@ -28,8 +28,26 @@ name: CodeQL Security Analysis
 on:
   push:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   schedule:
     # Run CodeQL analysis every Monday at 1 AM UTC
     - cron: '0 1 * * 1'

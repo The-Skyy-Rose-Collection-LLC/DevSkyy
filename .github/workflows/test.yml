@@ -3,8 +3,26 @@ name: Comprehensive Test Suite
 on:
   push:
     branches: ['**']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   pull_request:
     branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'README*'
+      - 'LICENSE*'
+      - '.github/**/*.md'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+      - 'CODE_OF_CONDUCT*'
   workflow_dispatch:
 
 env:
