@@ -323,7 +323,6 @@ ignore = [
     "UP031",  # Use format specifiers instead of percent format
     "UP004",  # Class inherits from object
     "UP028",  # Checks for for loops that can be replaced with yield from
-    "UP045",  # Use X | None for type annotations
     "UP007",  # Use X | Y for type annotations
 ]
 
@@ -339,7 +338,7 @@ ignore = [
 known-first-party = ["devskyy", "agent", "api", "ml", "fashion", "infrastructure"]
 lines-after-imports = 2
 split-on-trailing-comma = true
-force-alphabetical-sort-within-sections = true
+force-sort-within-sections = true
 
 [tool.ruff.lint.mccabe]
 max-complexity = 12  # Slightly higher for complex business logic
