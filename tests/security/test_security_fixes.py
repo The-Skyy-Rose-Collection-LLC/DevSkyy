@@ -11,7 +11,7 @@ from unittest.mock import patch
 import pytest
 
 from agent.modules.frontend.autonomous_landing_page_generator import render_safe_template
-from database.security import DatabaseSecurity
+from database.db_security import DatabaseSecurity
 
 # Test imports for the fixed modules
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
