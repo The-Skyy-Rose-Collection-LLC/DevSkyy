@@ -142,10 +142,10 @@ class TestScannerEndpoint(unittest.TestCase):
         
         response = client.post("/api/v1/agents/scanner/execute", json=request_data)
         
-        self.assertIn(response.status_code, [)
+        self.assertIn(response.status_code, [
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
-        ]
+        ])
 
     @pytest.mark.api
     @pytest.mark.unit
