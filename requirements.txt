@@ -128,12 +128,10 @@ click==8.1.8
 python-slugify==8.0.4
 redis==5.2.1
 celery[redis]==5.4.0
-SQLAlchemy==2.0.36  # Updated
 alembic==1.14.0  # Database migrations
 
 # Async Support
 aioredis==2.0.1
-asyncpg==0.30.0  # PostgreSQL async
 aiomysql==0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerability
 
 # Social Media & Marketing APIs (Verified)
@@ -198,14 +196,12 @@ jedi==0.19.2  # Code completion
 woocommerce==3.0.0
 
 # Logging & Observability
-structlog==24.4.0  # Structured logging
 python-json-logger==3.2.0
 loguru==0.7.3  # Enhanced logging
 
 # Data Validation
 cerberus==1.3.6  # Schema validation
 marshmallow==3.23.2  # Serialization
-pydantic[email]==2.10.4  # Updated: langchain 0.3+ fully supports pydantic v2
 
 # Caching
 cachetools==5.5.0
