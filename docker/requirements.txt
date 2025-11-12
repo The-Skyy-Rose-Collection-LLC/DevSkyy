@@ -1,0 +1,58 @@
+# ============================================================================
+# DevSkyy Docker - Isolated Dependencies
+# For Docker container builds and orchestration
+# ============================================================================
+
+# Build Dependencies (Security-Critical)
+setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
+
+# Core Framework
+fastapi==0.119.0
+uvicorn[standard]==0.38.0
+pydantic[email]==2.10.4
+python-dotenv==1.0.1
+email-validator==2.1.0
+
+# Database (Essential)
+SQLAlchemy==2.0.36
+aiosqlite==0.20.0  # Async SQLite driver
+asyncpg==0.30.0  # Async PostgreSQL driver
+psycopg2-binary==2.9.9  # PostgreSQL driver
+
+# HTTP & API
+requests==2.32.4
+python-multipart==0.0.18
+aiofiles==24.1.0
+httpx==0.28.1
+
+# Authentication & Security
+passlib[bcrypt]==1.7.4
+cryptography==46.0.3
+PyJWT==2.10.1
+bcrypt==4.2.1
+argon2-cffi==23.1.0
+
+# Security Middleware
+slowapi==0.1.9
+secure==0.3.0
+
+# Monitoring & Logging
+prometheus-client==0.22.0
+structlog==24.4.0
+python-json-logger==3.2.0
+
+# Performance
+psutil==6.0.0
+
+# Additional Tools
+click==8.1.8
+redis==5.2.1
+aioredis==2.0.1
+
+# Date & Time
+python-dateutil==2.9.0.post0
+pytz==2024.2
+
+# Environment & Config
+python-decouple==3.8
+environs==11.2.1

@@ -79,6 +79,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     "cryptography>=46.0.3,<47.0.0" \
     "setuptools>=78.1.1,<79.0.0"
 
+# Copy Docker-specific isolated requirements for subproject support
+COPY docker/requirements.txt ./docker-requirements.txt
+
 # Install production dependencies with cache mount
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --user -r requirements-production.txt
