@@ -6,7 +6,51 @@ The DevSkyy MCP Server exposes 54 specialized AI agents through 11 powerful tool
 
 ---
 
-## ⚡ Quick Start (5 Minutes)
+## ⚡ Quick Start - One-Click Installation (Recommended)
+
+### Method 1: Deeplink Installation (Fastest - 30 Seconds)
+
+**NEW!** Install DevSkyy MCP Server with a single click using our deeplink installer:
+
+1. **Get your installation link:**
+   ```bash
+   curl "https://devskyy.com/api/v1/mcp/install?api_key=YOUR_API_KEY"
+   ```
+
+   Or visit in your browser:
+   ```
+   https://devskyy.com/api/v1/mcp/install?api_key=YOUR_API_KEY
+   ```
+
+2. **Click the deeplink URL** from the response (looks like `cursor://anysphere.cursor-deeplink/mcp/install?...`)
+
+3. **Done!** Claude Desktop/Cursor will automatically configure DevSkyy MCP Server
+
+**Example Response:**
+```json
+{
+  "deeplink_url": "cursor://anysphere.cursor-deeplink/mcp/install?name=devskyy&config=eyJtY3BTZXJ2ZXJzIjp7ImRldnNreXkiOnsic3...",
+  "cursor_url": "cursor://anysphere.cursor-deeplink/mcp/install?...",
+  "installation_instructions": "# DevSkyy MCP Server - One-Click Installation..."
+}
+```
+
+**Custom Installation Options:**
+```bash
+# Custom API URL
+curl "https://devskyy.com/api/v1/mcp/install?api_key=YOUR_KEY&api_url=https://api.devskyy.com"
+
+# Custom server name
+curl "https://devskyy.com/api/v1/mcp/install?api_key=YOUR_KEY&server_name=my-devskyy"
+```
+
+---
+
+## ⚡ Quick Start - Manual Installation (5 Minutes)
+
+### Method 2: Manual Setup
+
+If you prefer manual installation or the deeplink doesn't work:
 
 ### 1. Install Dependencies
 
@@ -15,11 +59,33 @@ cd ~/DevSkyy
 pip install -r requirements_mcp.txt
 ```
 
-### 2. Set Environment Variables
+### 2. Configure Environment Variables (.env file)
 
+**IMPORTANT:** Always use environment variables for API keys and secrets!
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit .env and add your keys:**
+   ```bash
+   # DevSkyy MCP Server
+   DEVSKYY_API_KEY=your-devskyy-api-key-here
+   DEVSKYY_API_URL=http://localhost:8000
+
+   # HuggingFace MCP (if using)
+   HUGGING_FACE_TOKEN=hf_your_token_here
+   ```
+
+3. **The .env file is automatically loaded** by the MCP server
+4. **.env is in .gitignore** - never commit secrets!
+
+**Alternative - Export manually:**
 ```bash
 export DEVSKYY_API_KEY="your-api-key-here"
 export DEVSKYY_API_URL="http://localhost:8000"
+export HUGGING_FACE_TOKEN="hf_your_token_here"
 ```
 
 ### 3. Test the Server
@@ -89,12 +155,58 @@ Edit the file and add:
 - Replace `/Users/YOUR_USERNAME` with your actual path
 - Use your real API key
 
-### Step 3: Restart Claude Desktop
+### Step 3: (Optional) Add HuggingFace MCP Server
+
+To use both DevSkyy AND HuggingFace together, add HuggingFace to your configuration:
+
+```json
+{
+  "mcpServers": {
+    "devskyy": {
+      "command": "python",
+      "args": ["/Users/YOUR_USERNAME/DevSkyy/devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_KEY": "your-devskyy-api-key",
+        "DEVSKYY_API_URL": "http://localhost:8000"
+      }
+    },
+    "hf-mcp-server": {
+      "url": "https://huggingface.co/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HF_TOKEN_FROM_ENV"
+      }
+    }
+  }
+}
+```
+
+**Best Practice - Use .env file:**
+```bash
+# In your .env file
+DEVSKYY_API_KEY=your-key-here
+HUGGING_FACE_TOKEN=hf_your_token_here
+```
+
+Then your configuration can reference them:
+- For stdio servers (DevSkyy): Use the `env` section (shown above)
+- For HTTP servers (HuggingFace): Replace the token manually or use the API
+
+**Quick Way - Use Our API:**
+```bash
+# Generate combined config automatically
+curl "https://devskyy.com/api/v1/mcp/servers/huggingface?hf_token=$HUGGING_FACE_TOKEN&devskyy_api_key=$DEVSKYY_API_KEY"
+```
+
+This returns a ready-to-use deeplink with both servers configured!
+
+### Step 4: Restart Claude Desktop
 
 1. Quit Claude Desktop completely
 2. Reopen Claude Desktop
 3. Look for the 🔌 icon in the interface
-4. Click it to see "devskyy" with 11 tools listed
+4. Click it to see your configured servers:
+   - "devskyy" with 14 tools
+   - "hf-mcp-server" (if added) with HuggingFace tools
 
 ---
 
@@ -305,6 +417,106 @@ REQUEST_TIMEOUT = 120.0  # Increase to 120 seconds
 - 📧 Complete marketing automation
 - 🔧 Self-healing infrastructure
 - 🎨 AI WordPress theme generation
+
+---
+
+## 🔗 API Endpoints for Developers
+
+The DevSkyy platform provides REST API endpoints for programmatic MCP configuration management.
+
+### GET /api/v1/mcp/install
+
+Generate a one-click install deeplink for MCP server configuration.
+
+**Parameters:**
+- `api_key` (required): Your DevSkyy API key
+- `api_url` (optional): Custom API URL (defaults to production)
+- `server_name` (optional): Custom server name (defaults to "devskyy")
+
+**Example:**
+```bash
+curl "https://devskyy.com/api/v1/mcp/install?api_key=YOUR_API_KEY"
+```
+
+**Response:**
+```json
+{
+  "config": { ... },
+  "deeplink_url": "cursor://anysphere.cursor-deeplink/mcp/install?name=devskyy&config=...",
+  "cursor_url": "cursor://anysphere.cursor-deeplink/mcp/install?...",
+  "installation_instructions": "..."
+}
+```
+
+### GET /api/v1/mcp/config
+
+Get MCP server configuration JSON only (without deeplink).
+
+**Example:**
+```bash
+curl "https://devskyy.com/api/v1/mcp/config?api_key=YOUR_API_KEY"
+```
+
+**Response:**
+```json
+{
+  "mcpServers": {
+    "devskyy": {
+      "command": "uvx",
+      "args": ["--from", "devskyy-mcp==1.0.0", "devskyy-mcp"],
+      "env": {
+        "DEVSKYY_API_URL": "https://devskyy.com",
+        "DEVSKYY_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+### GET /api/v1/mcp/status
+
+Get MCP server status and capabilities (no authentication required).
+
+**Example:**
+```bash
+curl "https://devskyy.com/api/v1/mcp/status"
+```
+
+**Response:**
+```json
+{
+  "status": "active",
+  "version": "1.0.0",
+  "available_tools": 14,
+  "agent_count": 54
+}
+```
+
+### POST /api/v1/mcp/validate
+
+Validate API key for MCP server usage (requires JWT authentication).
+
+**Example:**
+```bash
+curl -X POST "https://devskyy.com/api/v1/mcp/validate?api_key=YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+**Response:**
+```json
+{
+  "valid": true,
+  "user": "your_username",
+  "role": "Developer",
+  "permissions": ["mcp_access", "agent_execution", "tool_calling"],
+  "message": "API key is valid and authorized for MCP server usage"
+}
+```
+
+**Security Notes:**
+- Per Truth Protocol Rule #5: No secrets in code - API keys passed as parameters
+- Per Truth Protocol Rule #6: RBAC roles enforced - SuperAdmin, Admin, Developer, APIUser allowed
+- Per Truth Protocol Rule #3: Cite standards - RFC 4648 (base64), RFC 7519 (JWT)
 
 ---
 

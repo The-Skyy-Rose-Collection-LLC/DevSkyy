@@ -1,0 +1,228 @@
+# DevSkyy MCP Gateway - Docker Compose Configuration
+# Per Truth Protocol: Secure defaults, no hardcoded secrets
+# Version: 1.1.0
+
+version: '3.8'
+
+# =============================================================================
+# SERVICES
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # DevSkyy Main API Server
+  # ---------------------------------------------------------------------------
+  devskyy-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+      target: runtime
+    image: devskyy/api:latest
+    container_name: devskyy-api
+    command: api-server
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      # Application
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=false
+
+      # API Keys (from .env - NEVER hardcode!)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+
+      # DevSkyy MCP
+      - DEVSKYY_API_KEY=${DEVSKYY_API_KEY}
+      - DEVSKYY_API_URL=http://devskyy-api:8000
+
+      # Database
+      - DATABASE_URL=${DATABASE_URL:-postgresql://devskyy:devskyy@postgres:5432/devskyy}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+
+      # Workers
+      - WORKERS=${API_WORKERS:-4}
+      - PORT=8000
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    networks:
+      - devskyy-network
+    depends_on:
+      - postgres
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    labels:
+      com.devskyy.service: "api"
+      com.devskyy.version: "1.1.0"
+
+  # ---------------------------------------------------------------------------
+  # MCP Gateway Service
+  # ---------------------------------------------------------------------------
+  mcp-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+      target: runtime
+    image: devskyy/mcp-gateway:latest
+    container_name: devskyy-mcp-gateway
+    command: mcp-gateway
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    environment:
+      # Gateway configuration
+      - GATEWAY_PORT=3000
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+      # MCP Servers
+      - DEVSKYY_API_KEY=${DEVSKYY_API_KEY}
+      - DEVSKYY_API_URL=http://devskyy-api:8000
+      - HUGGING_FACE_TOKEN=${HUGGING_FACE_TOKEN}
+
+      # Connection to API
+      - DATABASE_URL=${DATABASE_URL:-postgresql://devskyy:devskyy@postgres:5432/devskyy}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - devskyy-network
+    depends_on:
+      - devskyy-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    labels:
+      com.devskyy.service: "mcp-gateway"
+      com.devskyy.version: "1.0.0"
+
+  # ---------------------------------------------------------------------------
+  # MCP Server (stdio mode for Claude Desktop)
+  # ---------------------------------------------------------------------------
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+      target: runtime
+    image: devskyy/mcp-server:latest
+    container_name: devskyy-mcp-server
+    command: mcp-server
+    stdin_open: true
+    tty: true
+    environment:
+      - DEVSKYY_API_KEY=${DEVSKYY_API_KEY}
+      - DEVSKYY_API_URL=http://devskyy-api:8000
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - devskyy-network
+    depends_on:
+      - devskyy-api
+    restart: unless-stopped
+    labels:
+      com.devskyy.service: "mcp-server"
+      com.devskyy.version: "1.0.0"
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: devskyy-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-devskyy}
+      - POSTGRES_USER=${POSTGRES_USER:-devskyy}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-devskyy}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devskyy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    labels:
+      com.devskyy.service: "database"
+
+  # ---------------------------------------------------------------------------
+  # Redis Cache
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: devskyy-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-devskyy}
+    volumes:
+      - redis-data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    labels:
+      com.devskyy.service: "cache"
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+
+networks:
+  devskyy-network:
+    driver: bridge
+    name: devskyy-mcp-network
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+
+volumes:
+  postgres-data:
+    driver: local
+    name: devskyy-postgres-data
+  redis-data:
+    driver: local
+    name: devskyy-redis-data
+
+# =============================================================================
+# USAGE
+# =============================================================================
+
+# Quick Start:
+# 1. Copy .env.example to .env and configure your keys
+# 2. docker-compose -f docker-compose.mcp.yml up -d
+# 3. Access MCP Gateway: http://localhost:3000
+# 4. Access API: http://localhost:8000
+#
+# Services:
+# - devskyy-api: Main FastAPI application (port 8000)
+# - mcp-gateway: Multi-server MCP gateway (port 3000)
+# - mcp-server: stdio MCP server for Claude Desktop
+# - postgres: PostgreSQL database (port 5432)
+# - redis: Redis cache (port 6379)
+#
+# Commands:
+# docker-compose -f docker-compose.mcp.yml up -d     # Start all services
+# docker-compose -f docker-compose.mcp.yml logs -f   # View logs
+# docker-compose -f docker-compose.mcp.yml down      # Stop all services
+# docker-compose -f docker-compose.mcp.yml ps        # Check status

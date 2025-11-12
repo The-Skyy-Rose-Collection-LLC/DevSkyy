@@ -159,6 +159,14 @@ langchain==0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using lat
 langchain-text-splitters==0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability
 langsmith==0.2.6  # LLM monitoring
 
+# RAG (Retrieval-Augmented Generation)
+chromadb==0.5.23  # Vector database for semantic search
+tiktoken==0.8.0  # Token counting for embeddings
+pypdf==5.1.0  # PDF document processing
+python-docx==1.1.2  # Word document processing
+python-magic==0.4.27  # File type detection
+faiss-cpu==1.9.0.post1  # Facebook AI Similarity Search (CPU version)
+
 # Blockchain & Web3 (Security Verified)
 web3==7.7.0  # Updated
 eth-account==0.13.4
