@@ -310,6 +310,71 @@ python production_safety_check.py
 pytest tests/test_agents.py -v
 ```
 
+## 📋 Logging & Troubleshooting
+
+### Where to Find Error Logs
+
+All error logs are located in the **`logs/`** directory:
+
+```bash
+logs/
+├── devskyy.log      # Main application log (all levels)
+├── error.log        # Error-level logs only
+├── security.log     # Security events and audit trail
+└── access.log       # HTTP access logs (production)
+```
+
+### Quick Log Access
+
+```bash
+# View error logs
+tail -n 50 logs/error.log
+
+# Follow logs in real-time
+tail -f logs/devskyy.log
+
+# Interactive log viewer
+python scripts/view_logs.py
+
+# Search for specific errors
+grep "Exception" logs/error.log
+
+# View security events
+cat logs/security.log
+```
+
+### Interactive Log Viewer
+
+Use the built-in log viewer for enhanced log exploration:
+
+```bash
+# Interactive menu
+python scripts/view_logs.py
+
+# View specific log
+python scripts/view_logs.py --file error
+
+# Follow logs in real-time
+python scripts/view_logs.py --file devskyy --follow
+
+# Filter by level
+python scripts/view_logs.py --level ERROR
+
+# Search logs
+python scripts/view_logs.py --search "ValueError" --lines 100
+```
+
+### Complete Logging Documentation
+
+For comprehensive logging documentation, see **[LOGGING_GUIDE.md](LOGGING_GUIDE.md)**:
+
+- 📍 **Log locations** and file descriptions
+- 🔍 **Common troubleshooting scenarios**
+- 🛠️ **Log management** and rotation
+- 📊 **Log analysis tools**
+- ⚙️ **Configuration options**
+- 🚨 **Error tracking best practices**
+
 ## 🚀 Deployment
 
 ### Production Checklist
@@ -319,7 +384,7 @@ pytest tests/test_agents.py -v
 4. Configure production database (PostgreSQL/MySQL recommended) and Redis
 5. Set up SSL certificates
 6. Configure rate limiting
-7. Enable monitoring (logs, metrics)
+7. Enable monitoring (logs, metrics) - see [LOGGING_GUIDE.md](LOGGING_GUIDE.md)
 
 ### Docker Deployment
 ```bash
