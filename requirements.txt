@@ -138,7 +138,7 @@ aiomysql==0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerabilit
 
 # Social Media & Marketing APIs (Verified)
 facebook-sdk==3.1.0
-# instagrapi==2.1.2  # Disabled: requires pydantic==2.7.1 exactly, conflicts with current pydantic 2.10.4
+# instagrapi==2.1.2  # Disabled: requires pydantic==2.7.1 exactly, conflicts with current pydantic 2.12.4
 tweepy==4.14.0
 google-api-python-client==2.155.0  # Updated
 linkedin-api==2.3.0
