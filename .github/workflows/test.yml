@@ -3,8 +3,16 @@ name: Comprehensive Test Suite
 on:
   push:
     branches: ['**']
+    paths:
+      - '**.py'
+      - 'requirements*.txt'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, develop]
+    paths:
+      - '**.py'
+      - 'requirements*.txt'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 env:
@@ -440,7 +448,7 @@ jobs:
             --tb=short \
             --maxfail=3 \
             --junit-xml=junit-e2e.xml \
-            -m e2e || echo "::warning::Some E2E tests failed"
+            -m e2e
 
       - name: Upload E2E test results
         if: always()
@@ -458,7 +466,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [unit-tests, integration-tests, api-tests, security-tests, ml-tests]
-    if: always()
+    if: success() || failure()
 
     steps:
       - name: Checkout repository
@@ -498,6 +506,7 @@ jobs:
           coverage-badge -o coverage-badge.svg -f
 
       - name: Check coverage threshold
+        if: needs.unit-tests.result == 'success' && needs.integration-tests.result == 'success' && needs.api-tests.result == 'success'
         run: |
           COVERAGE=$(python -c "import json; print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
           echo "Total coverage: $COVERAGE%"
@@ -538,7 +547,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [unit-tests, integration-tests, api-tests, security-tests, ml-tests, e2e-tests, coverage-report]
-    if: always()
+    if: success() || failure()
 
     steps:
       - name: Download coverage report
@@ -590,11 +599,13 @@ jobs:
 
       - name: Check overall test status
         run: |
-          if [[ "${{ needs.coverage-report.result }}" != "success" ]]; then
+          # Only fail if coverage-report job actually ran and failed
+          if [[ "${{ needs.coverage-report.result }}" == "failure" ]]; then
             echo "::error::Coverage validation failed! Must achieve ≥90% coverage per Truth Protocol."
             exit 1
           fi
 
+          # Fail if any critical test suite failed (not skipped or cancelled)
           if [[ "${{ needs.unit-tests.result }}" == "failure" ]] || \
              [[ "${{ needs.integration-tests.result }}" == "failure" ]] || \
              [[ "${{ needs.api-tests.result }}" == "failure" ]] || \
