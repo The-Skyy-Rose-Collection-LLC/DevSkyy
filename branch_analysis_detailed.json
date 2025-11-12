@@ -1,0 +1,1445 @@
+{
+  "generated_at": "2025-11-12T07:55:40.301122",
+  "total_branches": 138,
+  "main_commit": "origin/main\n77fc1547aadac6f28c60ff627facd45c5e3d8438",
+  "categories": {
+    "other": {
+      "count": 10,
+      "branches": [
+        {
+          "name": "alert-autofix-11",
+          "hash": "56c38a1cc3179eff3f2caa2c7af1b39f1919068b",
+          "short_hash": "56c38a1",
+          "analysis": {
+            "type": "alert-autofix",
+            "purpose": "Auto-fix branch",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "conflict_190825_1815",
+          "hash": "2ed688cac2296fed9f40af8ba54f312ad485f91a",
+          "short_hash": "2ed688c",
+          "analysis": {
+            "type": "conflict",
+            "purpose": "Conflict resolution branch",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "conflict_200825_1427",
+          "hash": "3845454836345719269f21898497d942d2cb88f0",
+          "short_hash": "3845454",
+          "analysis": {
+            "type": "conflict",
+            "purpose": "Conflict resolution branch",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "conflict_200825_1439",
+          "hash": "84b6f2a84ee8231af50b059801d37ffb68a96c1e",
+          "short_hash": "84b6f2a",
+          "analysis": {
+            "type": "conflict",
+            "purpose": "Conflict resolution branch",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "conflict_210825_1608",
+          "hash": "09e0dd8e4945f204c65273b9c941550aedfb9f7e",
+          "short_hash": "09e0dd8",
+          "analysis": {
+            "type": "conflict",
+            "purpose": "Conflict resolution branch",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "dev",
+          "hash": "2015dce2f1ba157703dfe8260323abf920a6b3a0",
+          "short_hash": "2015dce",
+          "analysis": {
+            "type": "unknown",
+            "purpose": "Unknown purpose",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "devagent",
+          "hash": "0e9b197f9f600f87d32f272a08e03067f3a7db8b",
+          "short_hash": "0e9b197",
+          "analysis": {
+            "type": "unknown",
+            "purpose": "Unknown purpose",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "fix-commit-compliance-new",
+          "hash": "0d31f9dda996ff81b0b8ad7559ebae6082c134c4",
+          "short_hash": "0d31f9d",
+          "analysis": {
+            "type": "unknown",
+            "purpose": "Unknown purpose",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "fix-commit-compliance-sLWW3",
+          "hash": "58af1b943e31b9690beb7661effbcd7bf14f8427",
+          "short_hash": "58af1b9",
+          "analysis": {
+            "type": "unknown",
+            "purpose": "Unknown purpose",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "main",
+          "hash": "77fc1547aadac6f28c60ff627facd45c5e3d8438",
+          "short_hash": "77fc154",
+          "analysis": {
+            "type": "unknown",
+            "purpose": "Unknown purpose",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "claude": {
+      "count": 12,
+      "branches": [
+        {
+          "name": "claude/debug-enterprise-readiness-011CUNmLYAvP7xufkw8FW1oA",
+          "hash": "a415e56b29c9e358d24627a6c68e50f1f4d3f8b9",
+          "short_hash": "a415e56",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "claude/fashion-ai-bounded-autonomy-011CUcPykPuK8RaqTtv9AugE",
+          "hash": "27ffd5e05e82120d3b0ca84786570680d17c5343",
+          "short_hash": "27ffd5e",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/fashion-ai-repo-setup-011CUeHEzBVRZGDYG8TbH3jd",
+          "hash": "19235bc22ea68d8fdefcaffbed36369a2a490e37",
+          "short_hash": "19235bc",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/fix-import-syntax-error-011CUgPRFavUi4V5q2Qoo7T4",
+          "hash": "98dc55cb354214d69bd3407cc2b832c112407a11",
+          "short_hash": "98dc55c",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "claude/fix-mypy-type-errors-011CV2sRj2Gedo8MQAFRdBj2",
+          "hash": "7ebbc41ed9f5522290a4bd9f5abd0813ff2c2283",
+          "short_hash": "7ebbc41",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "claude/flake8-configuration-setup-011CUsaLmfrvgLBvqsV3qTEU",
+          "hash": "d0197d46028c5f41b6774c1da4736537415a578e",
+          "short_hash": "d0197d4",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/mcp-install-deeplink-011CV34Ajg5NQ9mccxahAM7T",
+          "hash": "6c940dad3d62ddca6fd794114bded6a73c065087",
+          "short_hash": "6c940da",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/production-cleanup-011CUonMTKU2RiPZGwBsbYyK",
+          "hash": "e72291421f0a2a60d7982718a37084a65fc2084c",
+          "short_hash": "e722914",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/pyassist-python-helper-011CUyBiiX4KuZqPoEy9ziLX",
+          "hash": "777378f15c03b7fe62223b3e3cc552ddae7206bf",
+          "short_hash": "777378f",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/refactor-ruff-linting-011CV2oforuP5zyWG7EN2DBG",
+          "hash": "dc24dbea8a6a01d384eac99da96f3144f2f974e0",
+          "short_hash": "dc24dbe",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/review-and-implement-pr-011CV11gUUjz2H2q25vdXNJd",
+          "hash": "d5f6c78d0061534b86649b3ed193f0a221a4fc22",
+          "short_hash": "d5f6c78",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "claude/verified-compliant-practices-011CUonMTKU2RiPZGwBsbYyK",
+          "hash": "fb5f403d2df544f94ce94a53490492cabf65fdd5",
+          "short_hash": "fb5f403",
+          "analysis": {
+            "type": "claude",
+            "purpose": "AI assistant branch (Claude)",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "coderabbitai": {
+      "count": 9,
+      "branches": [
+        {
+          "name": "coderabbitai/docstrings/6ba3fdd",
+          "hash": "88abecb303af6c57f9fc6de724a5d38d068630e8",
+          "short_hash": "88abecb",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/docstrings/6bd75c7",
+          "hash": "e18fc5157ac76528f46bcfb4876ba05b78592e81",
+          "short_hash": "e18fc51",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/docstrings/777378f",
+          "hash": "dc0f9511932ebf4ff905b21cf641b0d884982243",
+          "short_hash": "dc0f951",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/docstrings/a0df0c1",
+          "hash": "76c6b70e1a907e0a1512e94449803def2d780188",
+          "short_hash": "76c6b70",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/docstrings/b71a5ba",
+          "hash": "151d3664dd8eedfe13f358b8df254e34c460d49a",
+          "short_hash": "151d366",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/docstrings/c2a600c",
+          "hash": "9113fd198a23f2ecf6df73949f4eac05ee200f68",
+          "short_hash": "9113fd1",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/utg/5f2ee99",
+          "hash": "0f19688eaf62b740fc4ce73cbc82939f6afc77b1",
+          "short_hash": "0f19688",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/utg/841c3cd",
+          "hash": "d30116f84391c3723c707007d72ac5b99c4e7d61",
+          "short_hash": "d30116f",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "coderabbitai/utg/fcc3225",
+          "hash": "458224f533018efa1d145b8b0921ba1418913ccb",
+          "short_hash": "458224f",
+          "analysis": {
+            "type": "coderabbitai",
+            "purpose": "Code review branch (CodeRabbit)",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "codex": {
+      "count": 7,
+      "branches": [
+        {
+          "name": "codex/add-tests-for-main.py-with-mocking",
+          "hash": "5d086748139ebc744a89c3d5c52892ae3fcc9731",
+          "short_hash": "5d08674",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "codex/create-agent-package-and-modules",
+          "hash": "2646e8e9872b5132dec2ee83ba15ca9fbb99cf06",
+          "short_hash": "2646e8e",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "codex/create-task-agent-files-for-repo",
+          "hash": "259c230c1799a721b0effad283a93f0fb96b63ab",
+          "short_hash": "259c230",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "codex/fix-code-review-recommendations",
+          "hash": "fb6edb10307b666d1e8d0e2478a7b118efd973b8",
+          "short_hash": "fb6edb1",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "codex/locate-and-fix-important-bug",
+          "hash": "1e2bd473342077e9d25903248d3df8469d6323ee",
+          "short_hash": "1e2bd47",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "codex/set-up-fastapi-on-replit",
+          "hash": "9addc804e178a91bc5cf12c998a933efc2cdb0bd",
+          "short_hash": "9addc80",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "codex/update-readme.md-for-error-description",
+          "hash": "94bd43b20e79e0e6d3dcb2269cb8c9a9da207212",
+          "short_hash": "94bd43b",
+          "analysis": {
+            "type": "codex",
+            "purpose": "Code generation branch (Codex)",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "copilot": {
+      "count": 61,
+      "branches": [
+        {
+          "name": "copilot/add-code-repair-and-review-files",
+          "hash": "ebf0a7be09eff29994729a4b9c75ce05810305c9",
+          "short_hash": "ebf0a7b",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/create-security-md-file",
+          "hash": "4ac47067efb1ef36a02161a6af4272c9d83222da",
+          "short_hash": "4ac4706",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/diagram-active-branches-files",
+          "hash": "a7102f415a97b3798f4ba2b084143bb9ec7302a2",
+          "short_hash": "a7102f4",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/diagram-issues-and-fixes",
+          "hash": "a77be21309e0a9664b810dcd4e5095b78c52f423",
+          "short_hash": "a77be21",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/ensure-agent-imports-deployment-ready",
+          "hash": "23bb88c1094e77ab009e65e32bcccdf608789de2",
+          "short_hash": "23bb88c",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/find-error-log-location",
+          "hash": "4d67bb04715204ef5fd907c10a44525e70fba50c",
+          "short_hash": "4d67bb0",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/fix-02fa0414-dcf1-4526-81a8-6ed12555aa97",
+          "hash": "82e46ae2d6ef3f30e1b3ac07d16ab34d9a48ac11",
+          "short_hash": "82e46ae",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-13af7234-3423-4023-8f6c-4aa7f319191e",
+          "hash": "bda885ff358f3969cebb35c111ea947f15e3777a",
+          "short_hash": "bda885f",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-13bbc674-5081-4942-8ec8-400ff7ca0883",
+          "hash": "ec3731cbeb7baf411bd16768d75aa83998859e02",
+          "short_hash": "ec3731c",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-159225f0-e5f9-4ee0-8822-5b5dcafa6039",
+          "hash": "ab09fa7e15507a029386e2de6d49234d1c93f34f",
+          "short_hash": "ab09fa7",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-1d3c69de-e7e7-493b-b642-66506b4a8f7c",
+          "hash": "4e883f9ca84a693ca9df7b6a70a1f36cf9778ae8",
+          "short_hash": "4e883f9",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-1e98ff5d-c404-4f23-9f95-0e4dee7f6c2a",
+          "hash": "25e2805126bdcd6963f721138f15a4a8a81d69d5",
+          "short_hash": "25e2805",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-22a306ff-7db4-4117-a748-33ff7d830c0e",
+          "hash": "48eb5bc825cf437227f5a2d3a8eb511b86d18d48",
+          "short_hash": "48eb5bc",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-2adfeef7-0a37-4ccb-b25f-df8f340a1e91",
+          "hash": "595ca08012a76b77727aca6c4db5b1fb2965ba32",
+          "short_hash": "595ca08",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-2b93e334-3a37-43d8-96d8-ed75c49add8b",
+          "hash": "cf351eb5bfcb2e6c0200dafe7365004bf86a5b6f",
+          "short_hash": "cf351eb",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-44",
+          "hash": "5855ef39755e813385859c636e5a3000382d03d4",
+          "short_hash": "5855ef3",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-448ac027-e821-423c-ae10-1f949a3e14cc",
+          "hash": "2fa8e1df0b4b97db1aa7b54c12ed4870f5aebd9b",
+          "short_hash": "2fa8e1d",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-4abd3770-7bdd-4afc-8b26-c4613f414993",
+          "hash": "6da628c66cd3252fb3527685b60edac5c15a7268",
+          "short_hash": "6da628c",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-4b8f18ac-9440-407b-b942-75b28ece64e0",
+          "hash": "46be381df6d16239f9efaa1bb510e3dcf70005dc",
+          "short_hash": "46be381",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-50",
+          "hash": "bc3992cd3901656220ad15d2260831bd68c96262",
+          "short_hash": "bc3992c",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-5091dcb7-fad4-4a16-a871-745189b5f2c6",
+          "hash": "711947244d12f9d9621ea1dfed698f5f12f44669",
+          "short_hash": "7119472",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-52",
+          "hash": "b841c8cae5218f112c2b9ff4a99b0bb297c57359",
+          "short_hash": "b841c8c",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-54",
+          "hash": "abfbfa652a746fede3cfb5fbe944c0303d6a86fd",
+          "short_hash": "abfbfa6",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-68213ce5-22d5-4ddc-bb6b-ca60baca76ef",
+          "hash": "c4f9ce3ffce4cf8b31c237f79e12d4f20d21aaed",
+          "short_hash": "c4f9ce3",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-6f9e47e2-ba21-4dc2-bc8f-50c0a864ecee",
+          "hash": "17f735033f15d3906e0839b4a371c3151835061c",
+          "short_hash": "17f7350",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-78cc3307-c1d7-41da-81ce-cd0149be468a",
+          "hash": "d0a98bdccd79fa81839214bc854260d3ac5438b7",
+          "short_hash": "d0a98bd",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-85f10c21-1050-4a51-9975-742472fb41e7",
+          "hash": "c7b0a1f9e0c08b6c8de6ff5e9f8cb00917b558f0",
+          "short_hash": "c7b0a1f",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-8c0984b8-6f8f-46e8-a20d-c729dfd9fb69",
+          "hash": "71a5340a9f4226716f6fe68ca297bfc6ba8b3d7c",
+          "short_hash": "71a5340",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-8f280958-eb19-41f0-a38e-74cebd6b9f30",
+          "hash": "2e42b6d4318b6eb84ff6c5dc815cc6d74cede520",
+          "short_hash": "2e42b6d",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-94eac5bb-2c37-4384-81a3-473acaf4ede5",
+          "hash": "23ac8d97c214a40ec6920229528d7e480793ef05",
+          "short_hash": "23ac8d9",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-a43d60e8-cb38-42ea-bae2-b948e98af8e8",
+          "hash": "31056ce5f2e2a2c415d945e44b72708b89509b61",
+          "short_hash": "31056ce",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-acb13196-d13c-4bab-b67b-ea5af313e7df",
+          "hash": "269b84f1a39e2fac22e18bc8086e2f9106707837",
+          "short_hash": "269b84f",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-b870cc78-e5f0-43d9-a735-5e0209638de7",
+          "hash": "6942e2299102620985bccce63a2a5eef232e1fd8",
+          "short_hash": "6942e22",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-d61c2934-4f84-42fe-ab25-6bd6b4fe7938",
+          "hash": "02b144aa84d665dacc3d0783f83a802b8c3e162f",
+          "short_hash": "02b144a",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-e40af137-0dd6-4f5d-bd04-37d85d6faab6",
+          "hash": "02f5e1e884483d705890733ccd2d50fc63daedc7",
+          "short_hash": "02f5e1e",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-f10cd1fb-d53a-41e8-8de1-c45c0c1bc378",
+          "hash": "05d4a35f878a921d76ce951ed7f204aa54d2289d",
+          "short_hash": "05d4a35",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-f37c8a9c-8a96-49c2-bd57-14b1fde9d3cd",
+          "hash": "033bf655046b774e4895b79760628872db28d718",
+          "short_hash": "033bf65",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-fa02f9d5-32d1-4089-87b7-35dcd76ec535",
+          "hash": "421cbce3cfede447e8ddee4e31f0b8805eb445a3",
+          "short_hash": "421cbce",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-magic-value-comparisons",
+          "hash": "a40c1bcc4dd2311becd79991f3b2433c72f95847",
+          "short_hash": "a40c1bc",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-pydantic-version-conflict",
+          "hash": "5970f67812b0f87cb12eaa00fffe9d0d041cd59f",
+          "short_hash": "5970f67",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-syntax-errors",
+          "hash": "b7b47c23e7e6ff9a80afdb595e21a3281e103c67",
+          "short_hash": "b7b47c2",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/fix-vercel-python-version-issue",
+          "hash": "7433131a7968a3a9c8f5ada10cd39ad4f1915229",
+          "short_hash": "7433131",
+          "analysis": {
+            "type": "copilot/fix",
+            "purpose": "Bug fix branch (Copilot)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "copilot/optimize-cicd-workflow-filtering",
+          "hash": "e3d4586f53241747af73eadd0ba6fb8e71b163be",
+          "short_hash": "e3d4586",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-ci-cl-pipeline",
+          "hash": "753787d2239ad900e08b6547314dea071478bbc5",
+          "short_hash": "753787d",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-coverage-handling",
+          "hash": "914053ee65328cbb89eaba1b49f34a1686124332",
+          "short_hash": "914053e",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-requirements-files",
+          "hash": "a0704d9e1f60d6cf5890791d4c5875644892f291",
+          "short_hash": "a0704d9",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-subproject-environments",
+          "hash": "e023947caa2b7aa8acfda0ace801cd503df5bcde",
+          "short_hash": "e023947",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-test-asserts",
+          "hash": "0f8a78af09b7237edefc3940a226acf7360ea189",
+          "short_hash": "0f8a78a",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-test-suite-structure",
+          "hash": "ef0ba4ed245a3d2155eb317aadfd1ce9145e214b",
+          "short_hash": "ef0ba4e",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-test-workflow",
+          "hash": "c21530e4022b5a28a524eccfded4dd1032ebebd3",
+          "short_hash": "c21530e",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/refactor-workflowstatus-enum",
+          "hash": "6d457c672735b45a06e3d5eb597546808aa6ae8f",
+          "short_hash": "6d457c6",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/remove-unused-imports",
+          "hash": "df9ca2c44fa6477d1e4aec8b16300f3b8799302f",
+          "short_hash": "df9ca2c",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-4",
+          "hash": "9ffea18f3baa91b0ee1f69367440de97cfb6e052",
+          "short_hash": "9ffea18",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-4-again",
+          "hash": "b768acfff40b82fae362832418852214e1c29560",
+          "short_hash": "b768acf",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-4-another-one",
+          "hash": "0d9565a21e8f01e9676baf119ff4652aa8d1e7c0",
+          "short_hash": "0d9565a",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-4-yet-again",
+          "hash": "ff7c5bc6e9ca583bfa4dbfad10f6fe177381ffe3",
+          "short_hash": "ff7c5bc",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-9",
+          "hash": "2ccc493955ce8d8eac4b1125867a32814b62b066",
+          "short_hash": "2ccc493",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/sub-pr-9-again",
+          "hash": "622df9a3555757ecff10aecbe96e6de1d361d9ba",
+          "short_hash": "622df9a",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/update-deprecated-stage-names",
+          "hash": "30b2231633fb1bcf46899dde1e150692e6d2c28b",
+          "short_hash": "30b2231",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/update-requirements-txt-versions",
+          "hash": "5640b0fa246aafa33b74469f1e35cd3d59542d0c",
+          "short_hash": "5640b0f",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        },
+        {
+          "name": "copilot/update-workflow-to-use-shas",
+          "hash": "8644420a8facc8fc7a11b128085286801e96bb40",
+          "short_hash": "8644420",
+          "analysis": {
+            "type": "copilot",
+            "purpose": "Feature/task branch (Copilot)",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "cursor": {
+      "count": 15,
+      "branches": [
+        {
+          "name": "cursor/debug-and-manage-code-commits-a7b0",
+          "hash": "6a79b60394defd4bc1f1588ec84edaa6541aea97",
+          "short_hash": "6a79b60",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/enterprise-code-cleanup-and-debugging-9645",
+          "hash": "3ec0b579a0e97a7b302a3434014435d18c75cdb0",
+          "short_hash": "3ec0b57",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/enterprise-code-cleanup-and-debugging-c53f",
+          "hash": "243578bc22f8c78eccca07b2f65f0ed37cbb175d",
+          "short_hash": "243578b",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-09db",
+          "hash": "84dbc1ae03038351b1bcbb47aea5f4db9aad6da2",
+          "short_hash": "84dbc1a",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-5b3e",
+          "hash": "23f876372bb9c8db31fecd48c3870067147607dc",
+          "short_hash": "23f8763",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-6048",
+          "hash": "cc790262092d8e13d683711afb9d1790e7cf0d12",
+          "short_hash": "cc79026",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-719d",
+          "hash": "a6ed9f214d832158f23fe6fd819cb3baad402445",
+          "short_hash": "a6ed9f2",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-9937",
+          "hash": "696e22319918fc20d3b35120e555ba43de300170",
+          "short_hash": "696e223",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/fix-bugs-and-optimize-codebase-9c11",
+          "hash": "26ebb8c2e89beece6405d7ba572b2578b7f02aad",
+          "short_hash": "26ebb8c",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/production-readiness-build-and-debug-21a2",
+          "hash": "339adc1c4c56671232f73e6e076c95466f8a229c",
+          "short_hash": "339adc1",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/production-readiness-build-and-debug-49de",
+          "hash": "3bf1009cb99519b20e03babfd98ab6e1fc1de2c8",
+          "short_hash": "3bf1009",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/production-readiness-build-and-debug-6ea3",
+          "hash": "e4f675ba5032543880b6e40a2ebf07147a3ebc36",
+          "short_hash": "e4f675b",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/production-readiness-build-and-debug-c4d2",
+          "hash": "2c78b0c9f94686cb781dc932a46815b3dbd163e3",
+          "short_hash": "2c78b0c",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/production-readiness-build-and-debug-f775",
+          "hash": "6e4b57982b45279f7128293c8deb43fc197caebd",
+          "short_hash": "6e4b579",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "high"
+          }
+        },
+        {
+          "name": "cursor/update-all-for-flawless-execution-21d8",
+          "hash": "094351179890d604733a47b690b3017f44dc725b",
+          "short_hash": "0943511",
+          "analysis": {
+            "type": "cursor",
+            "purpose": "Feature branch (Cursor)",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    "dependabot": {
+      "count": 23,
+      "branches": [
+        {
+          "name": "dependabot/docker/python-3.14-slim",
+          "hash": "ec0f1bb5fe4c187c1698dd1ed8758b08967a7a2c",
+          "short_hash": "ec0f1bb",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/github_actions/actions/checkout-5.0.0",
+          "hash": "c29ada1426a02f6c06aeaa577b5c9ce710cb1302",
+          "short_hash": "c29ada1",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/github_actions/actions/setup-python-6.0.0",
+          "hash": "cc7537dd8780104f7f5d2c033818bb243ccf5c78",
+          "short_hash": "cc7537d",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/github_actions/docker/build-push-action-6.18.0",
+          "hash": "76515708585a1359fb25eba397b31b7fde60d065",
+          "short_hash": "7651570",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/build-tools-26a9d70949",
+          "hash": "d790ef05a819897ae2ac4ea69da8b60b61c5c1e2",
+          "short_hash": "d790ef0",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/eslint-9.37.0",
+          "hash": "3244ce45f8a65fa1f4055d501f4885837b72aa11",
+          "short_hash": "3244ce4",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/framer-motion-12.23.24",
+          "hash": "0462ba955be597d735b6257a2a542aac1e51f874",
+          "short_hash": "0462ba9",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/react-ecosystem-167f3b7565",
+          "hash": "ce8bd6245d1f4dcc1a0b88e6c6af4bd2be909c3c",
+          "short_hash": "ce8bd62",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/react-router-dom-7.9.4",
+          "hash": "73a7d7749da7d2d9456d6ed2ab8a8b0c649bb3c4",
+          "short_hash": "73a7d77",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/recharts-3.2.1",
+          "hash": "24130bb289ee558eeccf773ce2165c1f7044e3bb",
+          "short_hash": "24130bb",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/npm_and_yarn/frontend/tailwindcss-4.1.13",
+          "hash": "e16838a7b6191800f497232f3176d39e0199b741",
+          "short_hash": "e16838a",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/backend/python-multipart-0.0.18",
+          "hash": "7556c9141f155c6f861c55201da87955690981ae",
+          "short_hash": "7556c91",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/backend/requests-2.32.4",
+          "hash": "3436bc86eae3f92205fbae700f68f5e63b7777c9",
+          "short_hash": "3436bc8",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/flake8-7.3.0",
+          "hash": "3b3be721fd74b6d0a635977bc85ebd120a44a7e7",
+          "short_hash": "3b3be72",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/mlflow-3.4.0",
+          "hash": "2c72aecb0b5db3a7feaffb601731b7d90f0cb77d",
+          "short_hash": "2c72aec",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/mlflow-3.5.0rc0",
+          "hash": "29915234048e076d8e0a38c4a27eb01cc647f6ac",
+          "short_hash": "2991523",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/numpy-2.3.3",
+          "hash": "7e4169f0b7b27ec63193846ba785627a1b1e409d",
+          "short_hash": "7e4169f",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/pillow-11.3.0",
+          "hash": "f8cb5de612a8b9b8bf18a58e1e4d2df9cc078025",
+          "short_hash": "f8cb5de",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/python-multipart-0.0.20",
+          "hash": "6e7dc3bb6ae9a33deb05809ef7fb3d1a3e81f0ea",
+          "short_hash": "6e7dc3b",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/security-updates-11218333f6",
+          "hash": "dfc4479120c14e73f2ba865b7c0ca7c9558ce028",
+          "short_hash": "dfc4479",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/torch-2.8.0",
+          "hash": "19054b7dd43f2399e11ced0435787ecc202ea740",
+          "short_hash": "19054b7",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/transformers-4.53.0",
+          "hash": "4edb445616c395634ee8a7db995f2add49376f79",
+          "short_hash": "4edb445",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        },
+        {
+          "name": "dependabot/pip/transformers-4.57.0",
+          "hash": "e6e11a453c7a0414bc64c3fde5ae3e3a1ed02f32",
+          "short_hash": "e6e11a4",
+          "analysis": {
+            "type": "dependabot",
+            "purpose": "Dependency update (Dependabot)",
+            "priority": "medium"
+          }
+        }
+      ]
+    },
+    "feature": {
+      "count": 1,
+      "branches": [
+        {
+          "name": "feature/huggingface-best-practices-docs",
+          "hash": "b9dcec8b0078857f302dabd4425375e767d10d88",
+          "short_hash": "b9dcec8",
+          "analysis": {
+            "type": "feature",
+            "purpose": "Feature branch",
+            "priority": "low"
+          }
+        }
+      ]
+    }
+  },
+  "recommendations": [
+    "\ud83d\udd34 CRITICAL: Found 4 conflict resolution branches. These should be merged or deleted: conflict_190825_1815, conflict_200825_1427, conflict_200825_1439",
+    "\u26a0\ufe0f  WARNING: 23 Dependabot branches found. Consider reviewing and merging dependency updates in batches.",
+    "\u2139\ufe0f  INFO: 37 Copilot fix branches. Consider consolidating merged fixes.",
+    "\u2139\ufe0f  INFO: Found 1 patterns with multiple branches. This might indicate duplicate work or stale branches."
+  ],
+  "statistics": {
+    "by_category": {
+      "other": 10,
+      "claude": 12,
+      "coderabbitai": 9,
+      "codex": 7,
+      "copilot": 61,
+      "cursor": 15,
+      "dependabot": 23,
+      "feature": 1
+    }
+  }
+}
