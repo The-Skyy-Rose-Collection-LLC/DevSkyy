@@ -151,7 +151,7 @@ def process_data_ingestion_task(self, file_path: str, source_type: str):
 
 
 @celery_app.task(base=BoundedAutonomyTask)
-def validate_data_task(data: Dict[str, Any]):
+def validate_data_task(data: Dict[str, Any], source_type: str = "json"):
     """
     Validate and preprocess incoming data.
     
@@ -159,6 +159,7 @@ def validate_data_task(data: Dict[str, Any]):
     
     Parameters:
         data (Dict[str, Any]): Input payload to validate and preprocess.
+        source_type (str, optional): Format or source type of the input data (e.g., "csv", "json"). Defaults to "json".
     
     Returns:
         The processed data returned by the pipeline on success; on failure, a dict `{"status": "failed", "error": "<message>"}`.
@@ -167,7 +168,7 @@ def validate_data_task(data: Dict[str, Any]):
         from fashion_ai_bounded_autonomy.data_pipeline import DataPipeline
 
         pipeline = DataPipeline()
-        result = asyncio.run(pipeline.preprocess(data))
+        result = asyncio.run(pipeline.preprocess(data, source_type))
 
         logger.info("✅ Data validation completed")
         return result
