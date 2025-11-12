@@ -4,8 +4,12 @@ from collections.abc import Callable
 from datetime import datetime
 from enum import Enum
 from functools import wraps
+from typing import Any, Dict, List, Optional, Type
 import logging
 import secrets
+
+from fastapi import HTTPException, status
+from logging_config import error_logger, get_correlation_id
 
 """
 Enterprise Error Handling & Recovery System for DevSkyy Platform
