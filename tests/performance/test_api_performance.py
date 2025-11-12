@@ -28,6 +28,7 @@ def test_root_endpoint_performance(test_client, performance_timer):
     
     # Root endpoint should respond quickly
     assert elapsed < 0.2, f"Root endpoint took {elapsed:.3f}s (should be < 0.2s)"
+    assert response.status_code == 200  # Root endpoint should return HTTP 200 OK
 
 
 @pytest.mark.performance
