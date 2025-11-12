@@ -582,5 +582,313 @@ class TestMCPEdgeCases:
         assert data["config"]["mcpServers"]["devskyy"]["env"]["DEVSKYY_API_URL"] == invalid_url
 
 
+# ============================================================================
+# Multi-Server Configuration Tests
+# ============================================================================
+
+
+class TestMultiServerEndpoints:
+    """Test suite for multi-server MCP configuration"""
+
+    def test_add_huggingface_server(self, client):
+        """Test adding HuggingFace MCP server"""
+        hf_token = "hf_test_token_1234567890abcdef"
+
+        response = client.get(
+            "/api/v1/mcp/servers/huggingface",
+            params={"hf_token": hf_token}
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        # Verify response structure
+        assert "config" in data
+        assert "deeplink_url" in data
+        assert "installation_instructions" in data
+
+        # Verify HuggingFace server in config
+        config = data["config"]
+        assert "huggingface" in config["mcpServers"]
+
+        hf_config = config["mcpServers"]["huggingface"]
+        assert hf_config["url"] == "https://huggingface.co/mcp"
+        assert "headers" in hf_config
+        assert hf_config["headers"]["Authorization"] == f"Bearer {hf_token}"
+
+    def test_add_huggingface_without_token(self, client):
+        """Test adding HuggingFace server without authentication"""
+        response = client.get("/api/v1/mcp/servers/huggingface")
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        # Should work, but without Authorization header
+        config = data["config"]
+        assert "huggingface" in config["mcpServers"]
+
+        hf_config = config["mcpServers"]["huggingface"]
+        assert "headers" not in hf_config or hf_config.get("headers") is None
+
+    def test_add_huggingface_with_devskyy(self, client, sample_api_key):
+        """Test adding HuggingFace + DevSkyy together"""
+        response = client.get(
+            "/api/v1/mcp/servers/huggingface",
+            params={
+                "hf_token": "hf_test_token",
+                "devskyy_api_key": sample_api_key
+            }
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        # Should have both servers
+        assert "huggingface" in config["mcpServers"]
+        assert "devskyy" in config["mcpServers"]
+
+    def test_add_custom_server_http_transport(self, client):
+        """Test adding custom MCP server with HTTP transport"""
+        server_data = {
+            "server_name": "custom-http-server",
+            "transport": "http",
+            "url": "https://example.com/mcp",
+            "headers": {
+                "Authorization": "Bearer custom_token"
+            }
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        assert "custom-http-server" in config["mcpServers"]
+
+        server_config = config["mcpServers"]["custom-http-server"]
+        assert server_config["url"] == "https://example.com/mcp"
+        assert server_config["headers"]["Authorization"] == "Bearer custom_token"
+
+    def test_add_custom_server_stdio_transport(self, client):
+        """Test adding custom MCP server with stdio transport"""
+        server_data = {
+            "server_name": "custom-stdio-server",
+            "transport": "stdio",
+            "command": "node",
+            "args": ["./custom-server.js"],
+            "env": {
+                "API_KEY": "test_key"
+            }
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        assert "custom-stdio-server" in config["mcpServers"]
+
+        server_config = config["mcpServers"]["custom-stdio-server"]
+        assert server_config["command"] == "node"
+        assert "./custom-server.js" in server_config["args"]
+        assert server_config["env"]["API_KEY"] == "test_key"
+
+    def test_add_server_missing_url_for_http(self, client):
+        """Test adding HTTP server without URL fails"""
+        server_data = {
+            "server_name": "invalid-server",
+            "transport": "http",
+            # Missing URL
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_add_server_missing_command_for_stdio(self, client):
+        """Test adding stdio server without command fails"""
+        server_data = {
+            "server_name": "invalid-server",
+            "transport": "stdio",
+            # Missing command
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_multi_server_configuration(self, client, sample_api_key):
+        """Test configuring multiple servers at once"""
+        multi_config = {
+            "include_devskyy": True,
+            "devskyy_api_key": sample_api_key,
+            "servers": [
+                {
+                    "server_name": "huggingface",
+                    "transport": "http",
+                    "url": "https://huggingface.co/mcp",
+                    "headers": {"Authorization": "Bearer hf_token"}
+                },
+                {
+                    "server_name": "custom-server",
+                    "transport": "stdio",
+                    "command": "python",
+                    "args": ["server.py"]
+                }
+            ]
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/multi",
+            json=multi_config
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        # Should have all 3 servers
+        assert len(config["mcpServers"]) == 3
+        assert "devskyy" in config["mcpServers"]
+        assert "huggingface" in config["mcpServers"]
+        assert "custom-server" in config["mcpServers"]
+
+    def test_multi_server_without_devskyy(self, client):
+        """Test multi-server config without DevSkyy"""
+        multi_config = {
+            "include_devskyy": False,
+            "servers": [
+                {
+                    "server_name": "server1",
+                    "transport": "http",
+                    "url": "https://server1.com/mcp"
+                },
+                {
+                    "server_name": "server2",
+                    "transport": "http",
+                    "url": "https://server2.com/mcp"
+                }
+            ]
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/multi",
+            json=multi_config
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        # Should have only 2 servers (no DevSkyy)
+        assert len(config["mcpServers"]) == 2
+        assert "devskyy" not in config["mcpServers"]
+        assert "server1" in config["mcpServers"]
+        assert "server2" in config["mcpServers"]
+
+    def test_multi_server_missing_devskyy_key(self, client):
+        """Test multi-server fails when include_devskyy=True but no key"""
+        multi_config = {
+            "include_devskyy": True,
+            # Missing devskyy_api_key
+            "servers": []
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/multi",
+            json=multi_config
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_duplicate_server_names(self, client, sample_api_key):
+        """Test that duplicate server names are rejected"""
+        multi_config = {
+            "include_devskyy": False,
+            "servers": [
+                {
+                    "server_name": "duplicate",
+                    "transport": "http",
+                    "url": "https://server1.com/mcp"
+                },
+                {
+                    "server_name": "duplicate",  # Duplicate name
+                    "transport": "http",
+                    "url": "https://server2.com/mcp"
+                }
+            ]
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/multi",
+            json=multi_config
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Duplicate" in response.json()["detail"]
+
+
+# ============================================================================
+# Transport Type Tests
+# ============================================================================
+
+
+class TestTransportTypes:
+    """Test different MCP transport types"""
+
+    def test_streaming_http_transport(self, client):
+        """Test streamingHttp transport type"""
+        server_data = {
+            "server_name": "streaming-server",
+            "transport": "streamingHttp",
+            "url": "https://streaming.example.com/mcp"
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        assert "streaming-server" in config["mcpServers"]
+
+    def test_streaming_http_json_transport(self, client):
+        """Test streamingHttpJson transport type"""
+        server_data = {
+            "server_name": "json-streaming-server",
+            "transport": "streamingHttpJson",
+            "url": "https://json-streaming.example.com/mcp"
+        }
+
+        response = client.post(
+            "/api/v1/mcp/servers/add",
+            json=server_data
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        config = data["config"]
+        assert "json-streaming-server" in config["mcpServers"]
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--cov=api.v1.mcp", "--cov-report=term-missing"])

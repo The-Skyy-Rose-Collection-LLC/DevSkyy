@@ -59,11 +59,33 @@ cd ~/DevSkyy
 pip install -r requirements_mcp.txt
 ```
 
-### 2. Set Environment Variables
+### 2. Configure Environment Variables (.env file)
 
+**IMPORTANT:** Always use environment variables for API keys and secrets!
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit .env and add your keys:**
+   ```bash
+   # DevSkyy MCP Server
+   DEVSKYY_API_KEY=your-devskyy-api-key-here
+   DEVSKYY_API_URL=http://localhost:8000
+
+   # HuggingFace MCP (if using)
+   HUGGING_FACE_TOKEN=hf_your_token_here
+   ```
+
+3. **The .env file is automatically loaded** by the MCP server
+4. **.env is in .gitignore** - never commit secrets!
+
+**Alternative - Export manually:**
 ```bash
 export DEVSKYY_API_KEY="your-api-key-here"
 export DEVSKYY_API_URL="http://localhost:8000"
+export HUGGING_FACE_TOKEN="hf_your_token_here"
 ```
 
 ### 3. Test the Server
@@ -133,12 +155,58 @@ Edit the file and add:
 - Replace `/Users/YOUR_USERNAME` with your actual path
 - Use your real API key
 
-### Step 3: Restart Claude Desktop
+### Step 3: (Optional) Add HuggingFace MCP Server
+
+To use both DevSkyy AND HuggingFace together, add HuggingFace to your configuration:
+
+```json
+{
+  "mcpServers": {
+    "devskyy": {
+      "command": "python",
+      "args": ["/Users/YOUR_USERNAME/DevSkyy/devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_KEY": "your-devskyy-api-key",
+        "DEVSKYY_API_URL": "http://localhost:8000"
+      }
+    },
+    "hf-mcp-server": {
+      "url": "https://huggingface.co/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HF_TOKEN_FROM_ENV"
+      }
+    }
+  }
+}
+```
+
+**Best Practice - Use .env file:**
+```bash
+# In your .env file
+DEVSKYY_API_KEY=your-key-here
+HUGGING_FACE_TOKEN=hf_your_token_here
+```
+
+Then your configuration can reference them:
+- For stdio servers (DevSkyy): Use the `env` section (shown above)
+- For HTTP servers (HuggingFace): Replace the token manually or use the API
+
+**Quick Way - Use Our API:**
+```bash
+# Generate combined config automatically
+curl "https://devskyy.com/api/v1/mcp/servers/huggingface?hf_token=$HUGGING_FACE_TOKEN&devskyy_api_key=$DEVSKYY_API_KEY"
+```
+
+This returns a ready-to-use deeplink with both servers configured!
+
+### Step 4: Restart Claude Desktop
 
 1. Quit Claude Desktop completely
 2. Reopen Claude Desktop
 3. Look for the 🔌 icon in the interface
-4. Click it to see "devskyy" with 11 tools listed
+4. Click it to see your configured servers:
+   - "devskyy" with 14 tools
+   - "hf-mcp-server" (if added) with HuggingFace tools
 
 ---
 

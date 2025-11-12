@@ -1,9 +1,10 @@
 """
 MCP Install Deeplink API Endpoints
 Provides one-click installation for DevSkyy MCP Server via deeplink URLs
+Supports multiple MCP servers with stdio and HTTP transports
 
 Author: DevSkyy Platform Team
-Version: 1.0.0
+Version: 1.1.0
 Python: 3.11+
 """
 
@@ -11,9 +12,10 @@ import base64
 import json
 import logging
 import os
+from enum import Enum
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from security.jwt_auth import TokenData, get_current_active_user
@@ -22,6 +24,20 @@ from security.jwt_auth import TokenData, get_current_active_user
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/mcp", tags=["mcp"])
+
+
+# ============================================================================
+# ENUMS
+# ============================================================================
+
+
+class TransportType(str, Enum):
+    """MCP server transport types"""
+
+    STDIO = "stdio"
+    HTTP = "http"
+    STREAMING_HTTP = "streamingHttp"
+    STREAMING_HTTP_JSON = "streamingHttpJson"
 
 
 # ============================================================================
@@ -38,6 +54,43 @@ class MCPConfigRequest(BaseModel):
     )
     server_name: Optional[str] = Field(
         default="devskyy", description="MCP server name"
+    )
+
+
+class AddServerRequest(BaseModel):
+    """Request model for adding an external MCP server"""
+
+    server_name: str = Field(..., description="Unique name for the MCP server")
+    transport: TransportType = Field(..., description="Transport type (stdio, http, etc.)")
+    url: Optional[str] = Field(
+        default=None, description="Server URL (required for HTTP transport)"
+    )
+    command: Optional[str] = Field(
+        default=None, description="Command to run (required for stdio transport)"
+    )
+    args: Optional[list[str]] = Field(
+        default=None, description="Command arguments (for stdio transport)"
+    )
+    env: Optional[dict[str, str]] = Field(
+        default=None, description="Environment variables"
+    )
+    headers: Optional[dict[str, str]] = Field(
+        default=None, description="HTTP headers (for HTTP transport)"
+    )
+    metadata: Optional[dict[str, Any]] = Field(
+        default=None, description="Server metadata"
+    )
+
+
+class MultiServerConfigRequest(BaseModel):
+    """Request model for multi-server configuration"""
+
+    servers: list[AddServerRequest] = Field(..., description="List of MCP servers to configure")
+    include_devskyy: bool = Field(
+        default=True, description="Include DevSkyy MCP server in configuration"
+    )
+    devskyy_api_key: Optional[str] = Field(
+        default=None, description="DevSkyy API key (required if include_devskyy=True)"
     )
 
 
@@ -148,6 +201,125 @@ def generate_deeplink_url(config_b64: str, server_name: str = "devskyy") -> str:
     # Cursor-compatible deeplink format
     cursor_url = f"cursor://anysphere.cursor-deeplink/mcp/install?name={server_name}&config={config_b64}"
     return cursor_url
+
+
+def generate_server_config(server_request: AddServerRequest) -> dict[str, Any]:
+    """
+    Generate MCP server configuration from AddServerRequest.
+
+    Args:
+        server_request: Server configuration request
+
+    Returns:
+        MCP server configuration dictionary
+
+    Raises:
+        ValueError: If required fields are missing for transport type
+
+    Per Truth Protocol Rule #1: Never guess - Validate all required fields
+    Per Truth Protocol Rule #3: Cite standards - MCP protocol specification
+    """
+    config: dict[str, Any] = {}
+
+    # HTTP-based transports (streamingHttp, http, etc.)
+    if server_request.transport in [
+        TransportType.HTTP,
+        TransportType.STREAMING_HTTP,
+        TransportType.STREAMING_HTTP_JSON,
+    ]:
+        if not server_request.url:
+            raise ValueError(f"URL is required for {server_request.transport} transport")
+
+        config["url"] = server_request.url
+
+        if server_request.headers:
+            config["headers"] = server_request.headers
+
+    # stdio transport
+    elif server_request.transport == TransportType.STDIO:
+        if not server_request.command:
+            raise ValueError("Command is required for stdio transport")
+
+        config["command"] = server_request.command
+
+        if server_request.args:
+            config["args"] = server_request.args
+
+        if server_request.env:
+            config["env"] = server_request.env
+
+    # Add metadata if provided
+    if server_request.metadata:
+        config["metadata"] = server_request.metadata
+
+    return config
+
+
+def create_huggingface_server(
+    hf_token: Optional[str] = None,
+    server_name: str = "huggingface",
+    url: str = "https://huggingface.co/mcp",
+) -> AddServerRequest:
+    """
+    Create HuggingFace MCP server configuration helper.
+
+    Args:
+        hf_token: HuggingFace API token (optional for login)
+        server_name: Server name (defaults to "huggingface")
+        url: HuggingFace MCP server URL
+
+    Returns:
+        AddServerRequest configured for HuggingFace MCP server
+
+    Per Truth Protocol Rule #5: No secrets in code - Token passed as parameter
+    Per Truth Protocol Rule #2: Pin versions - Uses stable HF MCP endpoint
+    """
+    headers = {}
+    if hf_token:
+        headers["Authorization"] = f"Bearer {hf_token}"
+
+    return AddServerRequest(
+        server_name=server_name,
+        transport=TransportType.HTTP,
+        url=url,
+        headers=headers if headers else None,
+        metadata={
+            "name": "HuggingFace MCP Server",
+            "description": "Access HuggingFace models, datasets, and spaces via MCP",
+            "author": "HuggingFace",
+            "url": "https://huggingface.co",
+            "documentation": "https://huggingface.co/docs/mcp",
+        },
+    )
+
+
+def merge_server_configs(
+    base_config: dict[str, Any], servers: list[AddServerRequest]
+) -> dict[str, Any]:
+    """
+    Merge multiple MCP server configurations into one.
+
+    Args:
+        base_config: Base configuration (e.g., DevSkyy server)
+        servers: List of additional servers to add
+
+    Returns:
+        Merged configuration with all servers
+
+    Per Truth Protocol Rule #1: Never guess - Validate uniqueness of server names
+    """
+    merged = base_config.copy()
+
+    for server in servers:
+        # Check for duplicate server names
+        if server.server_name in merged["mcpServers"]:
+            raise ValueError(f"Duplicate server name: {server.server_name}")
+
+        # Generate and add server config
+        server_config = generate_server_config(server)
+        merged["mcpServers"][server.server_name] = server_config
+
+    return merged
 
 
 # ============================================================================
@@ -422,4 +594,373 @@ async def validate_api_key(
         logger.error(f"API key validation failed: {e}")
         raise HTTPException(
             status_code=500, detail=f"Validation failed: {str(e)}"
+        )
+
+
+@router.post("/servers/add", response_model=MCPConfigResponse)
+async def add_mcp_server(
+    server: AddServerRequest = Body(...),
+    devskyy_api_key: Optional[str] = Query(
+        default=None, description="DevSkyy API key (optional, to include DevSkyy server)"
+    ),
+):
+    """
+    Add an external MCP server to configuration and generate deeplink.
+
+    This endpoint allows you to add external MCP servers (like HuggingFace)
+    alongside the DevSkyy MCP server in a single configuration.
+
+    **Supported Transport Types:**
+    - `stdio`: Standard input/output (command-based)
+    - `http`: HTTP transport
+    - `streamingHttp`: Streaming HTTP (MCP standard)
+    - `streamingHttpJson`: Streaming HTTP with JSON
+
+    **Usage:**
+    ```
+    POST /api/v1/mcp/servers/add
+    {
+      "server_name": "huggingface",
+      "transport": "http",
+      "url": "https://huggingface.co/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HF_TOKEN"
+      }
+    }
+    ```
+
+    Args:
+        server: MCP server configuration to add
+        devskyy_api_key: Optional DevSkyy API key to include DevSkyy server
+
+    Returns:
+        MCPConfigResponse: Configuration with deeplink URLs
+
+    Raises:
+        HTTPException: If configuration generation fails
+    """
+    try:
+        logger.info(f"Adding MCP server: {server.server_name} with transport: {server.transport}")
+
+        # Start with base config or empty config
+        if devskyy_api_key:
+            config = generate_mcp_config(api_key=devskyy_api_key)
+        else:
+            config = {"mcpServers": {}}
+
+        # Add the new server
+        config = merge_server_configs(config, [server])
+
+        # Encode configuration as base64
+        config_b64 = encode_config_base64(config)
+
+        # Generate deeplink URLs (use first server name for deeplink)
+        server_name = server.server_name
+        cursor_url = generate_deeplink_url(config_b64, server_name)
+        deeplink_url = cursor_url
+
+        # Generate installation instructions
+        server_count = len(config["mcpServers"])
+        server_list = ", ".join(config["mcpServers"].keys())
+
+        instructions = f"""
+# MCP Multi-Server Configuration
+
+## Servers Configured ({server_count}):
+{server_list}
+
+## One-Click Install
+
+Click this link to automatically install all configured MCP servers:
+{cursor_url}
+
+## Manual Installation
+
+Add this configuration to your Claude Desktop config file:
+
+```json
+{json.dumps(config, indent=2)}
+```
+
+## Server Details
+
+### {server.server_name}
+- Transport: {server.transport}
+- URL: {server.url if server.url else 'N/A'}
+- Command: {server.command if server.command else 'N/A'}
+
+## Verification
+
+After installation, restart Claude Desktop and check for the MCP server icon (🔌).
+All {server_count} servers should be listed.
+        """
+
+        logger.info(f"✅ MCP server added successfully: {server.server_name}")
+
+        return MCPConfigResponse(
+            config=config,
+            deeplink_url=deeplink_url,
+            cursor_url=cursor_url,
+            installation_instructions=instructions.strip(),
+        )
+
+    except ValueError as e:
+        logger.error(f"Validation error adding MCP server: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Failed to add MCP server: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to add MCP server: {str(e)}"
+        )
+
+
+@router.post("/servers/multi", response_model=MCPConfigResponse)
+async def configure_multiple_servers(
+    request: MultiServerConfigRequest = Body(...),
+):
+    """
+    Configure multiple MCP servers at once with deeplink generation.
+
+    This endpoint allows you to configure multiple MCP servers (both DevSkyy
+    and external servers like HuggingFace) in a single request.
+
+    **Usage:**
+    ```
+    POST /api/v1/mcp/servers/multi
+    {
+      "include_devskyy": true,
+      "devskyy_api_key": "YOUR_DEVSKYY_KEY",
+      "servers": [
+        {
+          "server_name": "huggingface",
+          "transport": "http",
+          "url": "https://huggingface.co/mcp",
+          "headers": {"Authorization": "Bearer YOUR_HF_TOKEN"}
+        },
+        {
+          "server_name": "custom-server",
+          "transport": "stdio",
+          "command": "node",
+          "args": ["./custom-mcp-server.js"]
+        }
+      ]
+    }
+    ```
+
+    Args:
+        request: Multi-server configuration request
+
+    Returns:
+        MCPConfigResponse: Configuration with all servers and deeplink
+
+    Raises:
+        HTTPException: If configuration generation fails
+    """
+    try:
+        logger.info(f"Configuring {len(request.servers)} MCP servers")
+
+        # Validate DevSkyy API key if including DevSkyy
+        if request.include_devskyy:
+            if not request.devskyy_api_key:
+                raise HTTPException(
+                    status_code=400,
+                    detail="devskyy_api_key is required when include_devskyy=True",
+                )
+            config = generate_mcp_config(api_key=request.devskyy_api_key)
+        else:
+            config = {"mcpServers": {}}
+
+        # Add all servers
+        if request.servers:
+            config = merge_server_configs(config, request.servers)
+
+        # Encode configuration as base64
+        config_b64 = encode_config_base64(config)
+
+        # Generate deeplink URLs (use first server name)
+        server_names = list(config["mcpServers"].keys())
+        first_server = server_names[0] if server_names else "mcp"
+        cursor_url = generate_deeplink_url(config_b64, first_server)
+        deeplink_url = cursor_url
+
+        # Generate installation instructions
+        server_count = len(config["mcpServers"])
+        server_list = "\n".join([f"- {name}" for name in server_names])
+
+        instructions = f"""
+# MCP Multi-Server Configuration
+
+## Configured Servers ({server_count}):
+{server_list}
+
+## One-Click Install
+
+Click this link to automatically install all {server_count} MCP servers:
+{cursor_url}
+
+## Manual Installation
+
+1. Open Claude Desktop or Cursor
+2. Navigate to: Settings → Model Context Protocol
+3. Add this configuration:
+
+```json
+{json.dumps(config, indent=2)}
+```
+
+4. Save and restart Claude Desktop/Cursor
+
+## Verification
+
+After installation:
+1. Look for the MCP server icon (🔌)
+2. Click it to see all {server_count} servers listed
+3. Each server should show its available tools
+
+## Support
+
+For issues with specific servers, check their documentation:
+- DevSkyy: https://devskyy.com/docs/mcp
+- HuggingFace: https://huggingface.co/docs/mcp
+        """
+
+        logger.info(f"✅ Multi-server configuration generated: {server_count} servers")
+
+        return MCPConfigResponse(
+            config=config,
+            deeplink_url=deeplink_url,
+            cursor_url=cursor_url,
+            installation_instructions=instructions.strip(),
+        )
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        logger.error(f"Validation error in multi-server config: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Failed to generate multi-server config: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate configuration: {str(e)}"
+        )
+
+
+@router.get("/servers/huggingface")
+async def get_huggingface_config(
+    hf_token: Optional[str] = Query(
+        default=None, description="HuggingFace API token (optional)"
+    ),
+    server_name: str = Query(
+        default="huggingface", description="Server name for HuggingFace"
+    ),
+    devskyy_api_key: Optional[str] = Query(
+        default=None, description="DevSkyy API key (optional)"
+    ),
+):
+    """
+    Quick helper endpoint to generate HuggingFace MCP server configuration.
+
+    This is a convenience endpoint that simplifies adding the HuggingFace MCP
+    server to your configuration.
+
+    **Without HF Token (Public Access):**
+    ```
+    GET /api/v1/mcp/servers/huggingface
+    ```
+
+    **With HF Token (Authenticated Access):**
+    ```
+    GET /api/v1/mcp/servers/huggingface?hf_token=YOUR_HF_TOKEN
+    ```
+
+    **With Both DevSkyy and HuggingFace:**
+    ```
+    GET /api/v1/mcp/servers/huggingface?hf_token=YOUR_HF_TOKEN&devskyy_api_key=YOUR_DEVSKYY_KEY
+    ```
+
+    Args:
+        hf_token: HuggingFace API token (optional)
+        server_name: Custom server name (defaults to "huggingface")
+        devskyy_api_key: DevSkyy API key to include DevSkyy server (optional)
+
+    Returns:
+        MCPConfigResponse: Configuration with HuggingFace (and optionally DevSkyy)
+
+    Raises:
+        HTTPException: If configuration generation fails
+    """
+    try:
+        logger.info(f"Generating HuggingFace MCP server config: {server_name}")
+
+        # Create HuggingFace server configuration
+        hf_server = create_huggingface_server(
+            hf_token=hf_token, server_name=server_name
+        )
+
+        # Use the add_mcp_server logic
+        if devskyy_api_key:
+            config = generate_mcp_config(api_key=devskyy_api_key)
+        else:
+            config = {"mcpServers": {}}
+
+        # Add HuggingFace server
+        config = merge_server_configs(config, [hf_server])
+
+        # Encode and generate deeplink
+        config_b64 = encode_config_base64(config)
+        cursor_url = generate_deeplink_url(config_b64, server_name)
+
+        instructions = f"""
+# HuggingFace MCP Server - Quick Install
+
+## One-Click Install
+
+{cursor_url}
+
+## What You Get
+
+The HuggingFace MCP Server provides access to:
+- 🤗 Models: Search and use HuggingFace models
+- 📊 Datasets: Access datasets from HuggingFace
+- 🚀 Spaces: Interact with HuggingFace Spaces
+- 🔍 Search: Find models, datasets, and papers
+
+## Manual Setup
+
+Add this to your Claude Desktop config:
+
+```json
+{json.dumps(config, indent=2)}
+```
+
+## Authentication
+
+{"✅ Authenticated with HuggingFace token" if hf_token else "ℹ️  Using public access (no token). Add ?hf_token=YOUR_TOKEN for authenticated access"}
+
+## Next Steps
+
+1. Click the deeplink above or manually add the configuration
+2. Restart Claude Desktop
+3. Try: "Search HuggingFace for BERT models"
+4. Or: "Show me popular datasets on HuggingFace"
+
+## Documentation
+
+https://huggingface.co/docs/mcp
+        """
+
+        logger.info("✅ HuggingFace MCP configuration generated")
+
+        return MCPConfigResponse(
+            config=config,
+            deeplink_url=cursor_url,
+            cursor_url=cursor_url,
+            installation_instructions=instructions.strip(),
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to generate HuggingFace config: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate HuggingFace configuration: {str(e)}",
         )
