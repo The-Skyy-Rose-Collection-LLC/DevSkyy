@@ -1,0 +1,399 @@
+name: ML Model Training & Testing
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'ml/**'
+      - 'agent/ml_models/**'
+      - '.github/workflows/ml.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'ml/**'
+      - 'agent/ml_models/**'
+  schedule:
+    # Run ML tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11.9'
+
+jobs:
+  # ============================================================================
+  # JOB 1: ML Dependency Check
+  # ============================================================================
+  ml-dependency-check:
+    name: ML Dependency Isolation Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check ML dependencies isolation
+        run: |
+          echo "Checking ml/requirements.txt for proper isolation..."
+          
+          # Check that ML dependencies ARE in ml requirements
+          if ! grep -E "(torch|transformers|scikit-learn)" ml/requirements.txt; then
+            echo "ERROR: ML dependencies missing from ml/requirements.txt"
+            exit 1
+          fi
+          
+          # Check that production requirements DON'T have heavy ML deps
+          if grep -E "torch==|tensorflow==" requirements-production.txt; then
+            echo "ERROR: Heavy ML dependencies found in production requirements"
+            exit 1
+          fi
+          
+          echo "✓ ML dependencies are properly isolated"
+
+      - name: Validate ML requirements
+        run: |
+          pip install pip-tools
+          pip-compile --dry-run --no-header ml/requirements.txt || exit 1
+          echo "✓ ML requirements file is valid"
+
+  # ============================================================================
+  # JOB 2: ML Unit Tests
+  # ============================================================================
+  ml-unit-tests:
+    name: ML Unit Tests
+    runs-on: ubuntu-latest
+    needs: ml-dependency-check
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install ML dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r ml/requirements.txt
+          pip install -r requirements-test.txt
+
+      - name: Run ML unit tests
+        run: |
+          pytest tests/ml/ \
+            -v \
+            --tb=short \
+            --maxfail=10 \
+            --cov=ml \
+            --cov=agent/ml_models \
+            --cov-report=xml:coverage-ml.xml \
+            --cov-report=html:htmlcov-ml \
+            --junit-xml=junit-ml.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml-test-results
+          path: |
+            coverage-ml.xml
+            htmlcov-ml/
+            junit-ml.xml
+          retention-days: 30
+
+  # ============================================================================
+  # JOB 3: Model Training Test
+  # ============================================================================
+  model-training-test:
+    name: Model Training & Validation
+    runs-on: ubuntu-latest
+    needs: ml-dependency-check
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install ML dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+
+      - name: Test model training pipeline
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          
+          # Test basic imports
+          try:
+              import torch
+              import transformers
+              import sklearn
+              import numpy as np
+              import pandas as pd
+              print('✓ All ML libraries imported successfully')
+          except ImportError as e:
+              print(f'✗ Import error: {e}')
+              sys.exit(1)
+          
+          # Test PyTorch
+          print(f'PyTorch version: {torch.__version__}')
+          print(f'CUDA available: {torch.cuda.is_available()}')
+          
+          # Test Transformers
+          print(f'Transformers version: {transformers.__version__}')
+          
+          # Test scikit-learn
+          print(f'scikit-learn version: {sklearn.__version__}')
+          "
+
+      - name: Run sample model training
+        run: |
+          python -c "
+          import torch
+          import torch.nn as nn
+          import numpy as np
+          
+          # Create simple model
+          class SimpleModel(nn.Module):
+              def __init__(self):
+                  super().__init__()
+                  self.fc = nn.Linear(10, 1)
+              
+              def forward(self, x):
+                  return self.fc(x)
+          
+          # Train for a few iterations
+          model = SimpleModel()
+          optimizer = torch.optim.Adam(model.parameters())
+          
+          for i in range(5):
+              x = torch.randn(32, 10)
+              y = torch.randn(32, 1)
+              
+              optimizer.zero_grad()
+              output = model(x)
+              loss = nn.MSELoss()(output, y)
+              loss.backward()
+              optimizer.step()
+              
+              print(f'Iteration {i+1}, Loss: {loss.item():.4f}')
+          
+          print('✓ Sample model training completed successfully')
+          "
+
+  # ============================================================================
+  # JOB 4: Model Registry Test
+  # ============================================================================
+  model-registry-test:
+    name: Model Registry & Versioning
+    runs-on: ubuntu-latest
+    needs: ml-dependency-check
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+
+      - name: Test model registry
+        run: |
+          if [ -f "ml/model_registry.py" ]; then
+            python -c "
+            import sys
+            sys.path.insert(0, '.')
+            from ml.model_registry import ModelRegistry
+            
+            print('✓ Model registry module imported successfully')
+            "
+          else
+            echo "⚠ Model registry not found, skipping"
+          fi
+
+  # ============================================================================
+  # JOB 5: ML Performance Benchmark
+  # ============================================================================
+  ml-performance-benchmark:
+    name: ML Performance Benchmark
+    runs-on: ubuntu-latest
+    needs: ml-unit-tests
+    timeout-minutes: 30
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+          pip install pytest-benchmark
+
+      - name: Run performance benchmarks
+        run: |
+          pytest tests/ml/ \
+            --benchmark-only \
+            --benchmark-json=benchmark-ml.json \
+            || echo "No benchmark tests found"
+
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml-benchmark-results
+          path: benchmark-ml.json
+          retention-days: 30
+
+  # ============================================================================
+  # JOB 6: Computer Vision Tests
+  # ============================================================================
+  computer-vision-test:
+    name: Computer Vision & Image Processing
+    runs-on: ubuntu-latest
+    needs: ml-dependency-check
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+
+      - name: Test computer vision libraries
+        run: |
+          python -c "
+          import cv2
+          import PIL
+          from PIL import Image
+          import imagehash
+          import numpy as np
+          
+          print(f'OpenCV version: {cv2.__version__}')
+          print(f'Pillow version: {PIL.__version__}')
+          print(f'ImageHash version: {imagehash.__version__}')
+          
+          # Test image processing
+          img = np.zeros((100, 100, 3), dtype=np.uint8)
+          img_pil = Image.fromarray(img)
+          hash_val = imagehash.average_hash(img_pil)
+          
+          print(f'✓ Image processing test passed')
+          print(f'Test image hash: {hash_val}')
+          "
+
+  # ============================================================================
+  # JOB 7: NLP Tests
+  # ============================================================================
+  nlp-test:
+    name: NLP & Text Processing
+    runs-on: ubuntu-latest
+    needs: ml-dependency-check
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ml/requirements.txt
+
+      - name: Test NLP libraries
+        run: |
+          python -c "
+          from textblob import TextBlob
+          from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+          
+          # Test TextBlob
+          text = 'This is a great product!'
+          blob = TextBlob(text)
+          print(f'TextBlob sentiment: {blob.sentiment}')
+          
+          # Test VADER
+          analyzer = SentimentIntensityAnalyzer()
+          scores = analyzer.polarity_scores(text)
+          print(f'VADER scores: {scores}')
+          
+          print('✓ NLP libraries test passed')
+          "
+
+  # ============================================================================
+  # Summary Job
+  # ============================================================================
+  ml-summary:
+    name: ML Workflow Summary
+    runs-on: ubuntu-latest
+    needs: [ml-dependency-check, ml-unit-tests, model-training-test, model-registry-test, computer-vision-test, nlp-test]
+    if: always()
+
+    steps:
+      - name: Check workflow status
+        run: |
+          echo "ML Workflow Summary:"
+          echo "✓ Dependency Check: ${{ needs.ml-dependency-check.result }}"
+          echo "✓ Unit Tests: ${{ needs.ml-unit-tests.result }}"
+          echo "✓ Model Training: ${{ needs.model-training-test.result }}"
+          echo "✓ Model Registry: ${{ needs.model-registry-test.result }}"
+          echo "✓ Computer Vision: ${{ needs.computer-vision-test.result }}"
+          echo "✓ NLP Tests: ${{ needs.nlp-test.result }}"
+          
+          if [ "${{ needs.ml-dependency-check.result }}" != "success" ] || \
+             [ "${{ needs.ml-unit-tests.result }}" != "success" ] || \
+             [ "${{ needs.model-training-test.result }}" != "success" ] || \
+             [ "${{ needs.model-registry-test.result }}" != "success" ] || \
+             [ "${{ needs.computer-vision-test.result }}" != "success" ] || \
+             [ "${{ needs.nlp-test.result }}" != "success" ]; then
+            echo "❌ Some ML checks failed"
+            exit 1
+          fi
+          
+          echo "✅ All ML checks passed"

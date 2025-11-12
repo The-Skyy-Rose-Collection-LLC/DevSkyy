@@ -5,9 +5,9 @@
   "version": 2,
   "name": "devskyy-enterprise-platform",
   "framework": "other",
-  "buildCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt && pip install email-validator==2.1.0",
+  "buildCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r vercel/requirements.txt && pip install email-validator==2.1.0",
   "outputDirectory": ".",
-  "installCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt",
+  "installCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r vercel/requirements.txt",
   "devCommand": "uvicorn main:app --host 0.0.0.0 --port $PORT --reload",
   "builds": [
     {

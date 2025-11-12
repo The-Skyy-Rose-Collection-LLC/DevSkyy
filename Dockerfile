@@ -35,7 +35,8 @@ FROM base AS dependencies
 WORKDIR /tmp
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+# Use Docker-specific isolated requirements
+COPY docker/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
