@@ -181,6 +181,10 @@ seaborn==0.13.2
 matplotlib==3.9.3
 plotly==5.24.1  # Interactive plots
 
+# Fashion AI & Marketing Automation
+scikit-learn==1.5.2  # For color extraction and clustering
+Pillow==12.0.0  # Image processing (already listed above, confirming version)
+
 # Machine Learning Extensions
 gym==0.26.2
 stable-baselines3==2.4.0
