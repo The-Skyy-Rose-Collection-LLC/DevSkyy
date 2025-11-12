@@ -468,6 +468,7 @@ try:
 
     # DevSkyy Automation Routers (n8n replacements)
     from api.v1.ecommerce import router as ecommerce_router
+    from api.v1.fashion import router as fashion_router
     from api.v1.gdpr import router as gdpr_router
     from api.v1.mcp import router as mcp_router
     from api.v1.ml import router as ml_router
@@ -497,6 +498,7 @@ if API_ROUTERS_AVAILABLE:
         app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["v1-dashboard"])
         app.include_router(mcp_router, prefix="/api/v1", tags=["v1-mcp"])
         app.include_router(rag_router, prefix="/api/v1", tags=["v1-rag"])
+        app.include_router(fashion_router, prefix="/api/v1", tags=["v1-fashion"])
         app.include_router(orchestration_router, prefix="/api/v1/orchestration", tags=["v1-orchestration"])
 
         # DevSkyy Automation Routers (n8n workflow replacements)
