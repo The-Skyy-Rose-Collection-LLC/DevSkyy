@@ -32,13 +32,14 @@ Monitoring:
 """
 
 import asyncio
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 import uuid
+
 
 logger = logging.getLogger(__name__)
 
@@ -116,15 +117,15 @@ class InventoryItem:
     margin_percent: Decimal = Decimal("0.00")
 
     # Multi-location tracking
-    warehouse_locations: Dict[str, int] = field(default_factory=dict)
-    store_locations: Dict[str, int] = field(default_factory=dict)
+    warehouse_locations: dict[str, int] = field(default_factory=dict)
+    store_locations: dict[str, int] = field(default_factory=dict)
 
     # Attributes
     size: Optional[str] = None
     color: Optional[str] = None
     material: Optional[str] = None
     weight: Optional[float] = None
-    dimensions: Optional[Dict[str, float]] = None
+    dimensions: Optional[dict[str, float]] = None
 
     # Timestamps
     created_at: datetime = field(default_factory=datetime.now)
@@ -134,8 +135,8 @@ class InventoryItem:
     # Metadata
     supplier_id: Optional[str] = None
     barcode: Optional[str] = None
-    tags: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    tags: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -152,7 +153,7 @@ class FinancialTransaction:
     customer_id: Optional[str] = None
 
     # Line items
-    line_items: List[Dict[str, Any]] = field(default_factory=list)
+    line_items: list[dict[str, Any]] = field(default_factory=list)
 
     # Financial breakdown
     subtotal: Decimal = Decimal("0.00")
@@ -176,7 +177,7 @@ class FinancialTransaction:
 
     # Metadata
     notes: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -208,7 +209,7 @@ class InventoryAlert:
     created_at: datetime = field(default_factory=datetime.now)
 
     # Metadata
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -242,7 +243,7 @@ class DemandForecast:
 
     # Metadata
     model_used: str = "time_series"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class FinanceInventoryPipelineAgent:
@@ -268,7 +269,7 @@ class FinanceInventoryPipelineAgent:
     def __init__(self):
         """
         Initialize the agent and configure its in-memory stores, runtime counters, alert thresholds, async event queue, and integration circuit-breakers.
-        
+
         Attributes:
             agent_name (str): Human-readable agent name.
             agent_type (str): Internal agent type identifier.
@@ -289,10 +290,10 @@ class FinanceInventoryPipelineAgent:
         self.version = "1.0.0-production"
 
         # Data stores
-        self.inventory: Dict[str, InventoryItem] = {}
-        self.transactions: Dict[str, FinancialTransaction] = {}
-        self.alerts: Dict[str, InventoryAlert] = {}
-        self.forecasts: Dict[str, DemandForecast] = {}
+        self.inventory: dict[str, InventoryItem] = {}
+        self.transactions: dict[str, FinancialTransaction] = {}
+        self.alerts: dict[str, InventoryAlert] = {}
+        self.forecasts: dict[str, DemandForecast] = {}
 
         # Configuration
         self.alert_thresholds = {
@@ -319,11 +320,11 @@ class FinanceInventoryPipelineAgent:
         logger.info(f"✅ {self.agent_name} v{self.version} initialized")
 
     async def sync_inventory(
-        self, channel: Channel, items: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, channel: Channel, items: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Synchronize inventory records from an external sales channel into the agent's in-memory inventory store.
-        
+
         Parameters:
             channel (Channel): Source channel of the inventory payload.
             items (List[Dict[str, Any]]): List of item payloads to ingest. Each item dict is expected to contain identifying and stock fields such as:
@@ -335,7 +336,7 @@ class FinanceInventoryPipelineAgent:
                 - reorder_point (int | float): Threshold for reorder alerts.
                 - retail_price / cost_price (numbers, optional): Pricing fields.
                 Additional keys are accepted and will be used when creating or updating InventoryItem fields.
-        
+
         Returns:
             Dict[str, Any]: Summary of the sync operation with these keys on success:
                 - success (bool): True when the sync completed without fatal errors.
@@ -400,11 +401,11 @@ class FinanceInventoryPipelineAgent:
             }
 
     async def record_transaction(
-        self, transaction_data: Dict[str, Any]
+        self, transaction_data: dict[str, Any]
     ) -> FinancialTransaction:
         """
         Record a financial transaction, persist it in the agent store, update inventory for sales, and enqueue a transaction event.
-        
+
         Parameters:
             transaction_data (Dict[str, Any]): Transaction payload. Recognized keys include:
                 - type: transaction type name (e.g., "sale", "refund")
@@ -414,7 +415,7 @@ class FinanceInventoryPipelineAgent:
                 - order_id, customer_id: identifiers
                 - line_items: list of line item dicts
                 - payment_method, payment_status, payment_gateway: payment details
-        
+
         Returns:
             FinancialTransaction: The created and persisted transaction object.
         """
@@ -466,9 +467,9 @@ class FinanceInventoryPipelineAgent:
     async def _process_sale_transaction(self, transaction: FinancialTransaction):
         """
         Update inventory reservations for a completed sale transaction.
-        
+
         Iterates the transaction's line items and, for each item present in the inventory, increments the item's reserved quantity, updates its timestamp, and triggers a reorder alert when available quantity minus reserved quantity is less than or equal to the item's reorder point.
-        
+
         Parameters:
             transaction (FinancialTransaction): The sale transaction containing `line_items`, where each line item is expected to be a mapping with keys `item_id` (identifier of the inventory item) and `quantity` (number of units sold).
         """
@@ -490,16 +491,16 @@ class FinanceInventoryPipelineAgent:
     ) -> DemandForecast:
         """
         Produce a demand forecast for a specific inventory item.
-        
+
         Generates a DemandForecast for the given item over the specified horizon using recent sales history (90 days) to estimate predicted demand, confidence interval bounds, a confidence score, and a recommended order quantity based on current available stock.
-        
+
         Parameters:
             item_id (str): Identifier of the inventory item to forecast.
             forecast_period_days (int): Number of days to forecast into the future.
-        
+
         Returns:
             DemandForecast: Forecast containing predicted_demand, confidence_interval_lower, confidence_interval_upper, confidence_score, recommended_order_quantity, and related metadata.
-        
+
         Raises:
             ValueError: If the item_id does not exist in the inventory.
         """
@@ -546,14 +547,14 @@ class FinanceInventoryPipelineAgent:
             logger.error(f"❌ Demand forecasting failed: {e}")
             raise
 
-    def _get_historical_sales(self, item_id: str, days: int) -> List[float]:
+    def _get_historical_sales(self, item_id: str, days: int) -> list[float]:
         """
         Retrieve historical daily sales figures for an item over a specified number of days.
-        
+
         Parameters:
             item_id (str): Identifier of the inventory item.
             days (int): Number of past days to retrieve daily sales for.
-        
+
         Returns:
             List[float]: One daily sales quantity per requested day. This function returns simulated data (random floats between 1 and 10) representing daily sales.
         """
@@ -562,13 +563,13 @@ class FinanceInventoryPipelineAgent:
         import random
         return [random.uniform(1, 10) for _ in range(days)]
 
-    def _calculate_std_dev(self, data: List[float]) -> float:
+    def _calculate_std_dev(self, data: list[float]) -> float:
         """
         Compute the population standard deviation of the provided numeric samples.
-        
+
         Parameters:
             data (List[float]): Numeric samples to evaluate. If empty, no variance is computed.
-        
+
         Returns:
             float: Population standard deviation of `data`; `0.0` if `data` is empty.
         """
@@ -581,13 +582,13 @@ class FinanceInventoryPipelineAgent:
     async def _check_inventory_alerts(self, item: InventoryItem):
         """
         Evaluate an inventory item against configured thresholds and create alerts when stock conditions are met.
-        
+
         Parameters:
             item (InventoryItem): The inventory item to evaluate for alert conditions. The function compares available quantity (quantity_available minus quantity_reserved) against thresholds.
-        
+
         Returns:
             None
-        
+
         Behavior:
             - Creates an OUT_OF_STOCK alert with severity "critical" if available quantity is less than or equal to 0.
             - Creates a LOW_STOCK alert with severity "high" if available quantity is greater than 0 but less than or equal to the item's reorder_point.
@@ -616,13 +617,13 @@ class FinanceInventoryPipelineAgent:
     ):
         """
         Create and store an inventory alert for the given item and emit an `alert_created` event.
-        
+
         Parameters:
             alert_type (AlertType): The kind of alert to create (e.g., LOW_STOCK, OUT_OF_STOCK).
             item (InventoryItem): The inventory item the alert pertains to.
             message (str): Human-readable message describing the alert.
             severity (str): Severity level for the alert; defaults to "medium". Common values include "low", "medium", "high", and "critical".
-        
+
         Side effects:
             - Persists the created InventoryAlert in the agent's alerts store and increments the alert counter.
             - Enqueues an `alert_created` event to the agent's event queue containing alert metadata and a timestamp.
@@ -654,7 +655,7 @@ class FinanceInventoryPipelineAgent:
     async def _create_reorder_alert(self, item: InventoryItem):
         """
         Create and emit a high-severity low-stock alert recommending reorder for the given inventory item.
-        
+
         Parameters:
             item (InventoryItem): The inventory item to create the alert for; alert message includes the item's `sku` and `reorder_quantity`.
         """
@@ -665,10 +666,10 @@ class FinanceInventoryPipelineAgent:
             severity="high",
         )
 
-    def _create_inventory_item(self, item_data: Dict[str, Any]) -> InventoryItem:
+    def _create_inventory_item(self, item_data: dict[str, Any]) -> InventoryItem:
         """
         Build an InventoryItem populated from a raw item data mapping.
-        
+
         Parameters:
             item_data (dict): Mapping of item attributes. Recognized keys:
                 - item_id: str (generated UUID if missing)
@@ -685,7 +686,7 @@ class FinanceInventoryPipelineAgent:
                 - cost_price: numeric or str (defaults to "0.00")
                 - retail_price: numeric or str (defaults to "0.00")
                 - currency: str (defaults to "USD")
-        
+
         Returns:
             InventoryItem: An InventoryItem instance with fields populated from `item_data` and sensible defaults for missing values.
         """
@@ -706,17 +707,17 @@ class FinanceInventoryPipelineAgent:
             currency=item_data.get("currency", "USD"),
         )
 
-    def _update_inventory_item(self, item: InventoryItem, item_data: Dict[str, Any]):
+    def _update_inventory_item(self, item: InventoryItem, item_data: dict[str, Any]):
         """
         Update an InventoryItem with values from a payload.
-        
+
         Parameters:
             item (InventoryItem): The inventory item to modify in place.
             item_data (Dict[str, Any]): Source data that may include keys
                 'quantity_available', 'quantity_reserved', and 'retail_price'.
                 Values provided overwrite the corresponding fields; missing keys leave existing values.
                 The 'retail_price' value is converted to a Decimal.
-        
+
         """
         item.quantity_available = item_data.get("quantity_available", item.quantity_available)
         item.quantity_reserved = item_data.get("quantity_reserved", item.quantity_reserved)
@@ -725,10 +726,10 @@ class FinanceInventoryPipelineAgent:
 
     async def generate_financial_report(
         self, start_date: datetime, end_date: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate a financial report for the given date range summarizing revenue, refunds, channel breakdown, top-selling items, and key KPIs.
-        
+
         Returns:
             report (dict): A report dictionary containing:
                 - period: dict with ISO-formatted `start_date` and `end_date`.
@@ -802,10 +803,10 @@ class FinanceInventoryPipelineAgent:
             logger.error(f"❌ Report generation failed: {e}")
             raise
 
-    def get_system_status(self) -> Dict[str, Any]:
+    def get_system_status(self) -> dict[str, Any]:
         """
         Provide a snapshot of the agent's current system state.
-        
+
         Returns:
             status (dict): A dictionary containing:
                 - agent_name: The agent's configured name.

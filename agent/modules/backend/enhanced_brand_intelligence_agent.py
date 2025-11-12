@@ -1,6 +1,7 @@
-import logging
 from datetime import datetime
-from typing import Any, Dict, List
+import logging
+from typing import Any
+
 
 # Import the server access module
 try:
@@ -12,7 +13,6 @@ except ImportError:
         # Fallback if module not available
         def create_wordpress_server_access():
             logger.warning("WordPress server access not available")
-            return None
 
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class EnhancedBrandIntelligenceAgent:
             "🧠 Enhanced Brand Intelligence Agent initialized - GOD MODE Level 2"
         )
 
-    async def initialize_server_learning(self) -> Dict[str, Any]:
+    async def initialize_server_learning(self) -> dict[str, Any]:
         """Initialize server access for deep brand learning."""
         try:
             self.server_access = create_wordpress_server_access()
@@ -90,10 +90,10 @@ class EnhancedBrandIntelligenceAgent:
                 }
 
         except Exception as e:
-            logger.error(f"Server learning initialization failed: {str(e)}")
+            logger.error(f"Server learning initialization failed: {e!s}")
             return {"server_access_established": False, "error": str(e)}
 
-    async def _comprehensive_brand_analysis(self) -> Dict[str, Any]:
+    async def _comprehensive_brand_analysis(self) -> dict[str, Any]:
         """Perform comprehensive brand analysis using server access."""
         try:
             analysis_results = {
@@ -136,10 +136,10 @@ class EnhancedBrandIntelligenceAgent:
             return analysis_results
 
         except Exception as e:
-            logger.error(f"Comprehensive brand analysis failed: {str(e)}")
+            logger.error(f"Comprehensive brand analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_brand_dna(self, brand_intel: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_brand_dna(self, brand_intel: dict[str, Any]) -> dict[str, Any]:
         """Analyze core brand DNA from server files."""
         try:
             brand_dna = {
@@ -189,12 +189,12 @@ class EnhancedBrandIntelligenceAgent:
             return brand_dna
 
         except Exception as e:
-            logger.error(f"Brand DNA analysis failed: {str(e)}")
+            logger.error(f"Brand DNA analysis failed: {e!s}")
             return {"error": str(e)}
 
     async def _analyze_visual_identity(
-        self, brand_intel: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, brand_intel: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze visual brand identity from server assets."""
         try:
             visual_identity = {
@@ -235,12 +235,12 @@ class EnhancedBrandIntelligenceAgent:
             return visual_identity
 
         except Exception as e:
-            logger.error(f"Visual identity analysis failed: {str(e)}")
+            logger.error(f"Visual identity analysis failed: {e!s}")
             return {"error": str(e)}
 
     async def _analyze_content_strategy(
-        self, brand_intel: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, brand_intel: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze content strategy from server content."""
         try:
             content_strategy = {
@@ -280,12 +280,12 @@ class EnhancedBrandIntelligenceAgent:
             return content_strategy
 
         except Exception as e:
-            logger.error(f"Content strategy analysis failed: {str(e)}")
+            logger.error(f"Content strategy analysis failed: {e!s}")
             return {"error": str(e)}
 
     async def _analyze_technical_excellence(
-        self, brand_intel: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, brand_intel: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze technical brand excellence from server performance."""
         try:
             technical_excellence = {
@@ -325,12 +325,12 @@ class EnhancedBrandIntelligenceAgent:
             return technical_excellence
 
         except Exception as e:
-            logger.error(f"Technical excellence analysis failed: {str(e)}")
+            logger.error(f"Technical excellence analysis failed: {e!s}")
             return {"error": str(e)}
 
     async def _generate_brand_insights(
-        self, analysis_results: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, analysis_results: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate actionable brand insights from analysis."""
         try:
             insights = []
@@ -390,10 +390,10 @@ class EnhancedBrandIntelligenceAgent:
             return insights
 
         except Exception as e:
-            logger.error(f"Insight generation failed: {str(e)}")
+            logger.error(f"Insight generation failed: {e!s}")
             return []
 
-    async def continuous_brand_monitoring(self) -> Dict[str, Any]:
+    async def continuous_brand_monitoring(self) -> dict[str, Any]:
         """Continuously monitor and learn about brand evolution."""
         try:
             if not self.server_access or not self.server_access.connected:
@@ -424,10 +424,10 @@ class EnhancedBrandIntelligenceAgent:
             }
 
         except Exception as e:
-            logger.error(f"Continuous monitoring failed: {str(e)}")
+            logger.error(f"Continuous monitoring failed: {e!s}")
             return {"error": str(e)}
 
-    async def generate_brand_strategy_recommendations(self) -> Dict[str, Any]:
+    async def generate_brand_strategy_recommendations(self) -> dict[str, Any]:
         """Generate strategic brand recommendations based on deep analysis."""
         try:
             recommendations = {
@@ -473,7 +473,7 @@ class EnhancedBrandIntelligenceAgent:
             return recommendations
 
         except Exception as e:
-            logger.error(f"Strategy recommendations failed: {str(e)}")
+            logger.error(f"Strategy recommendations failed: {e!s}")
             return {"error": str(e)}
 
 

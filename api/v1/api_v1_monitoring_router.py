@@ -7,15 +7,16 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
 from datetime import datetime
 import logging
-import psutil
 import os
+from typing import Any, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user
+import psutil
+from pydantic import BaseModel
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class HealthCheckResponse(BaseModel):
     timestamp: datetime
     uptime_seconds: float
     version: str
-    components: Dict[str, str]
+    components: dict[str, str]
 
 class MetricsResponse(BaseModel):
     """System metrics response"""
@@ -80,7 +81,7 @@ class MetricsCollector:
 
     def __init__(self):
         self.start_time = datetime.utcnow()
-        self.request_times: List[float] = []
+        self.request_times: list[float] = []
         self.request_errors = 0
         self.request_success = 0
         self.cache_hits = 0
@@ -128,18 +129,18 @@ metrics_collector = MetricsCollector()
 # ============================================================================
 
 @router.get("/health", response_model=HealthCheckResponse)
-async def health_check(current_user: Dict = Depends(get_current_user)):
+async def health_check(current_user: dict = Depends(get_current_user)):
     """
     Health check endpoint
-    
+
     Returns overall system health status and component health
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         HealthCheckResponse with status and component health
-        
+
     Status Codes:
         200: System healthy
         503: System unhealthy
@@ -162,7 +163,6 @@ async def health_check(current_user: Dict = Depends(get_current_user)):
         elif any(v == "degraded" for v in components.values()):
             overall_status = "degraded"
 
-        status_code = 200 if overall_status == "healthy" else 503
 
         return HealthCheckResponse(
             status=overall_status,
@@ -173,22 +173,22 @@ async def health_check(current_user: Dict = Depends(get_current_user)):
         )
 
     except Exception as e:
-        logger.error(f"Health check error: {str(e)}")
+        logger.error(f"Health check error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Health check failed"
         )
 
 @router.get("/metrics", response_model=MetricsResponse)
-async def get_metrics(current_user: Dict = Depends(get_current_user)):
+async def get_metrics(current_user: dict = Depends(get_current_user)):
     """
     Get system and application metrics
-    
+
     Returns CPU, memory, disk usage and API request metrics
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         MetricsResponse with system metrics
     """
@@ -222,7 +222,7 @@ async def get_metrics(current_user: Dict = Depends(get_current_user)):
         )
 
     except Exception as e:
-        logger.error(f"Metrics error: {str(e)}")
+        logger.error(f"Metrics error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve metrics"
@@ -230,16 +230,16 @@ async def get_metrics(current_user: Dict = Depends(get_current_user)):
 
 @router.get("/performance", response_model=PerformanceMetrics)
 async def get_performance_metrics(
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get detailed performance metrics
-    
+
     Returns latency percentiles (p50, p95, p99), cache rates, and success rates
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         PerformanceMetrics with percentiles and rates
     """
@@ -276,30 +276,30 @@ async def get_performance_metrics(
         )
 
     except Exception as e:
-        logger.error(f"Performance metrics error: {str(e)}")
+        logger.error(f"Performance metrics error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve performance metrics"
         )
 
-@router.get("/alerts", response_model=List[AlertResponse])
+@router.get("/alerts", response_model=list[AlertResponse])
 async def get_active_alerts(
     severity: Optional[str] = None,
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Get active system alerts
-    
+
     Returns alerts when thresholds are exceeded (CPU > 80%, memory > 85%, etc.)
-    
+
     Args:
         severity: Filter by severity (info, warning, critical)
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         List of AlertResponse
     """
-    alerts: List[AlertResponse] = []
+    alerts: list[AlertResponse] = []
 
     try:
         # Get current metrics
@@ -348,24 +348,24 @@ async def get_active_alerts(
         return alerts
 
     except Exception as e:
-        logger.error(f"Alerts error: {str(e)}")
+        logger.error(f"Alerts error: {e!s}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve alerts"
         )
 
-@router.get("/dependencies", response_model=Dict[str, Dict[str, Any]])
+@router.get("/dependencies", response_model=dict[str, dict[str, Any]])
 async def check_dependencies(
-    current_user: Dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Check status of external dependencies
-    
+
     Returns health status of database, cache, external APIs, etc.
-    
+
     Args:
         current_user: Current authenticated user (from JWT)
-        
+
     Returns:
         Dictionary with dependency status
     """

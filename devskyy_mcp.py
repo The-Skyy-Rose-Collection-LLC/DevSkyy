@@ -16,14 +16,15 @@ Version: 1.0.0
 Python: 3.11+
 """
 
+from datetime import datetime
 import json
 import os
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-import httpx
 from fastmcp import FastMCP
+import httpx
 from pydantic import BaseModel, Field
+
 
 # ============================================================================
 # CONFIGURATION
@@ -47,21 +48,21 @@ class AgentInfo(BaseModel):
     name: str
     category: str
     description: str
-    capabilities: List[str]
+    capabilities: list[str]
     status: str = "active"
 
 class ScanResult(BaseModel):
     """Code scanning results."""
-    errors: List[Dict[str, Any]] = Field(default_factory=list)
-    warnings: List[Dict[str, Any]] = Field(default_factory=list)
-    suggestions: List[Dict[str, Any]] = Field(default_factory=list)
-    metrics: Dict[str, Any] = Field(default_factory=dict)
+    errors: list[dict[str, Any]] = Field(default_factory=list)
+    warnings: list[dict[str, Any]] = Field(default_factory=list)
+    suggestions: list[dict[str, Any]] = Field(default_factory=list)
+    metrics: dict[str, Any] = Field(default_factory=dict)
 
 class FixResult(BaseModel):
     """Code fix results."""
     fixed: bool
-    changes_made: List[str] = Field(default_factory=list)
-    files_modified: List[str] = Field(default_factory=list)
+    changes_made: list[str] = Field(default_factory=list)
+    files_modified: list[str] = Field(default_factory=list)
 
 # ============================================================================
 # DEVSKYY API CLIENT
@@ -82,9 +83,9 @@ class DevSkyyClient:
         self,
         method: str,
         endpoint: str,
-        data: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        data: Optional[dict[str, Any]] = None,
+        params: Optional[dict[str, Any]] = None
+    ) -> dict[str, Any]:
         """Make API request."""
         url = f"{self.api_url}{endpoint}"
 
@@ -105,7 +106,7 @@ class DevSkyyClient:
                     "status_code": getattr(e.response, "status_code", None)
                 }
 
-    async def list_agents(self) -> List[AgentInfo]:
+    async def list_agents(self) -> list[AgentInfo]:
         """List all available agents."""
         # For now, return the comprehensive list of agents
         # In production, this would call /api/v1/agents
@@ -245,7 +246,7 @@ class DevSkyyClient:
             ),
         ]
 
-    async def scan_code(self, directory: str, options: Dict[str, Any]) -> ScanResult:
+    async def scan_code(self, directory: str, options: dict[str, Any]) -> ScanResult:
         """Scan code for issues."""
         result = await self.request(
             "POST",
@@ -254,7 +255,7 @@ class DevSkyyClient:
         )
         return ScanResult(**result) if "error" not in result else ScanResult()
 
-    async def fix_code(self, issues: List[Dict[str, Any]]) -> FixResult:
+    async def fix_code(self, issues: list[dict[str, Any]]) -> FixResult:
         """Fix code issues."""
         result = await self.request(
             "POST",
@@ -263,11 +264,11 @@ class DevSkyyClient:
         )
         return FixResult(**result) if "error" not in result else FixResult(fixed=False)
 
-    async def self_healing_check(self) -> Dict[str, Any]:
+    async def self_healing_check(self) -> dict[str, Any]:
         """Run self-healing system check."""
         return await self.request("POST", "/api/v1/agents/self_healing/check")
 
-    async def generate_wordpress_theme(self, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def generate_wordpress_theme(self, config: dict[str, Any]) -> dict[str, Any]:
         """Generate WordPress theme."""
         return await self.request(
             "POST",
@@ -275,7 +276,7 @@ class DevSkyyClient:
             data=config
         )
 
-    async def ml_prediction(self, prediction_type: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def ml_prediction(self, prediction_type: str, data: dict[str, Any]) -> dict[str, Any]:
         """Make ML prediction."""
         return await self.request(
             "POST",
@@ -283,7 +284,7 @@ class DevSkyyClient:
             data=data
         )
 
-    async def manage_product(self, action: str, product_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def manage_product(self, action: str, product_data: dict[str, Any]) -> dict[str, Any]:
         """Manage product."""
         return await self.request(
             "POST",
@@ -291,7 +292,7 @@ class DevSkyyClient:
             data=product_data
         )
 
-    async def dynamic_pricing(self, product_ids: List[str], strategy: str) -> Dict[str, Any]:
+    async def dynamic_pricing(self, product_ids: list[str], strategy: str) -> dict[str, Any]:
         """Optimize pricing."""
         return await self.request(
             "POST",
@@ -299,7 +300,7 @@ class DevSkyyClient:
             data={"product_ids": product_ids, "strategy": strategy}
         )
 
-    async def marketing_campaign(self, campaign_type: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    async def marketing_campaign(self, campaign_type: str, config: dict[str, Any]) -> dict[str, Any]:
         """Create marketing campaign."""
         return await self.request(
             "POST",
@@ -307,7 +308,7 @@ class DevSkyyClient:
             data=config
         )
 
-    async def multi_agent_workflow(self, workflow_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def multi_agent_workflow(self, workflow_name: str, params: dict[str, Any]) -> dict[str, Any]:
         """Execute multi-agent workflow."""
         return await self.request(
             "POST",
@@ -315,7 +316,7 @@ class DevSkyyClient:
             data={"workflow": workflow_name, "parameters": params}
         )
 
-    async def system_monitoring(self) -> Dict[str, Any]:
+    async def system_monitoring(self) -> dict[str, Any]:
         """Get system monitoring data."""
         return await self.request("GET", "/api/v1/monitoring/metrics")
 
@@ -413,7 +414,7 @@ async def devskyy_scan_code(
             output.append(f"- {suggestion.get('message')}")
 
     if result.metrics:
-        output.append(f"\n## Metrics\n")
+        output.append("\n## Metrics\n")
         for key, value in result.metrics.items():
             output.append(f"- {key}: {value}")
 
@@ -475,7 +476,7 @@ async def devskyy_self_healing() -> str:
             output.append(f"- {repair}")
 
     if "health_checks" in result:
-        output.append(f"\n## Health Checks\n")
+        output.append("\n## Health Checks\n")
         for check, status in result['health_checks'].items():
             emoji = "✅" if status == "healthy" else "❌"
             output.append(f"- {emoji} {check}: {status}")
@@ -519,9 +520,9 @@ async def devskyy_generate_wordpress_theme(
     output.append(f"**Theme Type:** {theme_type}\n")
 
     if "download_url" in result:
-        output.append(f"\n✅ **Theme Generated Successfully!**\n")
+        output.append("\n✅ **Theme Generated Successfully!**\n")
         output.append(f"**Download:** {result['download_url']}\n")
-        output.append(f"\n## Features\n")
+        output.append("\n## Features\n")
         for feature in result.get("features", []):
             output.append(f"- {feature}")
     else:
@@ -550,13 +551,13 @@ async def devskyy_ml_prediction(
     output = [f"# ML Prediction: {prediction_type}\n"]
 
     if "predictions" in result:
-        output.append(f"\n## Predictions\n")
+        output.append("\n## Predictions\n")
         for pred in result["predictions"]:
             conf = pred.get("confidence", 0) * 100
             output.append(f"- **{pred.get('label')}**: {pred.get('value')} (confidence: {conf:.1f}%)")
 
     if "insights" in result:
-        output.append(f"\n## Insights\n")
+        output.append("\n## Insights\n")
         for insight in result["insights"]:
             output.append(f"- {insight}")
 
@@ -583,14 +584,14 @@ async def devskyy_manage_products(
     output = [f"# Product Management: {action}\n"]
 
     if "product_id" in result:
-        output.append(f"\n✅ **Success!**\n")
+        output.append("\n✅ **Success!**\n")
         output.append(f"**Product ID:** {result['product_id']}")
 
         if "url" in result:
             output.append(f"**URL:** {result['url']}")
 
     if "optimizations" in result:
-        output.append(f"\n## Optimizations Applied\n")
+        output.append("\n## Optimizations Applied\n")
         for opt in result["optimizations"]:
             output.append(f"- {opt}")
 
@@ -617,12 +618,12 @@ async def devskyy_dynamic_pricing(
     output = [f"# Dynamic Pricing: {strategy}\n"]
 
     if "optimized_prices" in result:
-        output.append(f"\n## Optimized Prices\n")
+        output.append("\n## Optimized Prices\n")
         for price_data in result["optimized_prices"]:
             output.append(f"- **{price_data['product_id']}**: ${price_data['old_price']} → ${price_data['new_price']} ({price_data['change_pct']:+.1f}%)")
 
     if "projected_revenue" in result:
-        output.append(f"\n## Revenue Projection\n")
+        output.append("\n## Revenue Projection\n")
         output.append(f"- Current: ${result['current_revenue']:,.2f}")
         output.append(f"- Projected: ${result['projected_revenue']:,.2f}")
         output.append(f"- Increase: ${result['revenue_increase']:,.2f} ({result['increase_pct']:+.1f}%)")
@@ -650,7 +651,7 @@ async def devskyy_marketing_campaign(
     output = [f"# Marketing Campaign: {campaign_type}\n"]
 
     if "campaign_id" in result:
-        output.append(f"\n✅ **Campaign Created!**\n")
+        output.append("\n✅ **Campaign Created!**\n")
         output.append(f"**Campaign ID:** {result['campaign_id']}")
         output.append(f"**Status:** {result.get('status', 'scheduled')}")
 
@@ -699,7 +700,7 @@ async def devskyy_multi_agent_workflow(
         output.append(f"**Status:** {result.get('status', 'running')}\n")
 
     if "steps" in result:
-        output.append(f"\n## Workflow Steps\n")
+        output.append("\n## Workflow Steps\n")
         for step in result["steps"]:
             status_emoji = "✅" if step["status"] == "completed" else "⏳"
             output.append(f"{status_emoji} **{step['agent']}**: {step['description']}")
@@ -729,26 +730,26 @@ async def devskyy_system_monitoring() -> str:
     output.append(f"**Timestamp:** {datetime.now().isoformat()}\n")
 
     if "api_health" in result:
-        output.append(f"\n## API Health\n")
+        output.append("\n## API Health\n")
         health = result["api_health"]
         output.append(f"- Status: {health.get('status', 'unknown')}")
         output.append(f"- Uptime: {health.get('uptime', '0s')}")
         output.append(f"- Version: {health.get('version', 'unknown')}")
 
     if "agents" in result:
-        output.append(f"\n## Agent Status\n")
+        output.append("\n## Agent Status\n")
         for agent, status in result["agents"].items():
             output.append(f"- {agent}: {status}")
 
     if "resources" in result:
-        output.append(f"\n## Resources\n")
+        output.append("\n## Resources\n")
         res = result["resources"]
         output.append(f"- CPU: {res.get('cpu_percent', 0):.1f}%")
         output.append(f"- Memory: {res.get('memory_percent', 0):.1f}%")
         output.append(f"- Disk: {res.get('disk_percent', 0):.1f}%")
 
     if "metrics" in result:
-        output.append(f"\n## Request Metrics\n")
+        output.append("\n## Request Metrics\n")
         metrics = result["metrics"]
         output.append(f"- Requests/min: {metrics.get('requests_per_minute', 0)}")
         output.append(f"- Avg Latency: {metrics.get('avg_latency_ms', 0):.1f}ms")
@@ -793,7 +794,7 @@ async def devskyy_security_scan() -> str:
 
                 # Vulnerabilities by severity
                 vulns = result.get("vulnerabilities", {})
-                output.append(f"\n**Vulnerabilities Found:**")
+                output.append("\n**Vulnerabilities Found:**")
                 output.append(f"- 🔴 Critical: {vulns.get('critical', 0)}")
                 output.append(f"- 🟠 High: {vulns.get('high', 0)}")
                 output.append(f"- 🟡 Medium: {vulns.get('medium', 0)}")
@@ -801,14 +802,14 @@ async def devskyy_security_scan() -> str:
 
                 # Top issues
                 if "top_issues" in result:
-                    output.append(f"\n**Top Security Issues:**")
+                    output.append("\n**Top Security Issues:**")
                     for issue in result["top_issues"][:5]:
                         output.append(f"- {issue['severity'].upper()}: {issue['title']}")
                         output.append(f"  Fix: {issue['remediation']}")
 
                 # Compliance status
                 if "compliance" in result:
-                    output.append(f"\n**Compliance Status:**")
+                    output.append("\n**Compliance Status:**")
                     for standard, status in result["compliance"].items():
                         emoji = "✅" if status == "compliant" else "❌"
                         output.append(f"- {emoji} {standard}: {status}")
@@ -818,7 +819,7 @@ async def devskyy_security_scan() -> str:
                 return f"❌ Security scan failed: {response.text}"
 
     except Exception as e:
-        return f"❌ Error during security scan: {str(e)}"
+        return f"❌ Error during security scan: {e!s}"
 
 @mcp.tool()
 async def devskyy_security_remediate(issue_ids: str) -> str:
@@ -858,14 +859,14 @@ async def devskyy_security_remediate(issue_ids: str) -> str:
 
                 # Fixed issues
                 if "fixed_issues" in result:
-                    output.append(f"\n**✅ Successfully Fixed:**")
+                    output.append("\n**✅ Successfully Fixed:**")
                     for fix in result["fixed_issues"]:
                         output.append(f"- {fix['id']}: {fix['title']}")
                         output.append(f"  Action: {fix['action_taken']}")
 
                 # Failed issues
                 if "failed_issues" in result:
-                    output.append(f"\n**❌ Failed to Fix:**")
+                    output.append("\n**❌ Failed to Fix:**")
                     for fail in result["failed_issues"]:
                         output.append(f"- {fail['id']}: {fail['title']}")
                         output.append(f"  Reason: {fail['reason']}")
@@ -873,7 +874,7 @@ async def devskyy_security_remediate(issue_ids: str) -> str:
 
                 # Files modified
                 if "files_modified" in result:
-                    output.append(f"\n**📝 Files Modified:**")
+                    output.append("\n**📝 Files Modified:**")
                     for file in result["files_modified"]:
                         output.append(f"- {file}")
 
@@ -882,7 +883,7 @@ async def devskyy_security_remediate(issue_ids: str) -> str:
                 return f"❌ Remediation failed: {response.text}"
 
     except Exception as e:
-        return f"❌ Error during remediation: {str(e)}"
+        return f"❌ Error during remediation: {e!s}"
 
 # ============================================================================
 # ENHANCED ANALYTICS TOOLS
@@ -924,20 +925,20 @@ async def devskyy_analytics_dashboard() -> str:
 
                 # Performance
                 perf = result.get("performance", {})
-                output.append(f"\n**⚡ Performance:**")
+                output.append("\n**⚡ Performance:**")
                 output.append(f"- Avg Response Time: {perf.get('avg_response_time', 0):.2f}ms")
                 output.append(f"- Success Rate: {perf.get('success_rate', 0):.1f}%")
                 output.append(f"- Uptime: {perf.get('uptime', 0):.2f}%")
 
                 # Top agents
                 if "top_agents" in result:
-                    output.append(f"\n**🤖 Most Used Agents:**")
+                    output.append("\n**🤖 Most Used Agents:**")
                     for agent in result["top_agents"][:5]:
                         output.append(f"- {agent['name']}: {agent['usage_count']} executions")
 
                 # Trends
                 if "trends" in result:
-                    output.append(f"\n**📈 Trends:**")
+                    output.append("\n**📈 Trends:**")
                     for trend in result["trends"]:
                         direction = "📈" if trend["direction"] == "up" else "📉"
                         output.append(f"- {direction} {trend['metric']}: {trend['change']:+.1f}%")
@@ -947,7 +948,7 @@ async def devskyy_analytics_dashboard() -> str:
                 return f"❌ Analytics request failed: {response.text}"
 
     except Exception as e:
-        return f"❌ Error fetching analytics: {str(e)}"
+        return f"❌ Error fetching analytics: {e!s}"
 
 # ============================================================================
 # MAIN
@@ -955,53 +956,13 @@ async def devskyy_analytics_dashboard() -> str:
 
 def print_banner():
     """Print startup banner."""
-    print("╔══════════════════════════════════════════════════════════════════╗")
-    print("║   DevSkyy MCP Server v1.1.0 - Enhanced Edition                  ║")
-    print("║   Industry-First Multi-Agent AI Platform Integration            ║")
-    print("╚══════════════════════════════════════════════════════════════════╝")
-    print()
-    print("✅ Configuration:")
-    print(f"   API URL: {DEVSKYY_API_URL}")
-    print(f"   API Key: {'Set ✓' if DEVSKYY_API_KEY else 'Not Set ✗'}")
-    print()
-    print("🔧 Tools Available: 14 (Enhanced with Security & Analytics)")
-    print("   📋 Core Tools (11):")
-    print("     - devskyy_list_agents")
-    print("     - devskyy_scan_code")
-    print("     - devskyy_fix_code")
-    print("     - devskyy_self_healing")
-    print("     - devskyy_generate_wordpress_theme")
-    print("     - devskyy_ml_prediction")
-    print("     - devskyy_manage_products")
-    print("     - devskyy_dynamic_pricing")
-    print("     - devskyy_marketing_campaign")
-    print("     - devskyy_multi_agent_workflow")
-    print("     - devskyy_system_monitoring")
-    print()
-    print("   🔒 Security Tools (2):")
-    print("     - devskyy_security_scan")
-    print("     - devskyy_security_remediate")
-    print()
-    print("   📊 Analytics Tools (1):")
-    print("     - devskyy_analytics_dashboard")
-    print()
-    print("🚀 New Features:")
-    print("   - Comprehensive vulnerability scanning")
-    print("   - Automated security remediation")
-    print("   - Real-time analytics dashboard")
-    print("   - Enhanced error handling")
-    print()
-    print("Starting MCP server on stdio...")
-    print()
 
 if __name__ == "__main__":
     print_banner()
 
     # Validate configuration
     if not DEVSKYY_API_KEY:
-        print("⚠️  WARNING: DEVSKYY_API_KEY not set. Some features may not work.")
-        print("   Set it with: export DEVSKYY_API_KEY='your-api-key'")
-        print()
+        pass
 
     # Run MCP server
     mcp.run()

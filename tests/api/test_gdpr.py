@@ -1,10 +1,9 @@
-from security.jwt_auth import create_access_token, UserRole
-
 from fastapi.testclient import TestClient
-
-from security.jwt_auth import User, user_manager
-from main import app
 import pytest
+
+from main import app
+from security.jwt_auth import User, UserRole, create_access_token, user_manager
+
 
 """
 Tests for GDPR Compliance API Endpoints
@@ -315,7 +314,7 @@ class TestGDPRCompliance:
         data = response.json()
 
         # Verify audit trail is preserved
-        if "retained_records" in data and data["retained_records"]:
+        if data.get("retained_records"):
             # Some records should be retained for legal compliance
             assert "deletion_audit_log" in data["retained_records"]
 

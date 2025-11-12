@@ -4,14 +4,16 @@ Enhanced Google Drive Processor for Skyy Rose Collection
 Handles shared Google Drive folders with direct download capabilities
 """
 
-import os
-import requests
-import json
-from pathlib import Path
-from typing import Dict, Any
 import asyncio
-import logging
 from datetime import datetime
+import json
+import logging
+import os
+from pathlib import Path
+from typing import Any
+
+import requests
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -21,15 +23,15 @@ class EnhancedSkyRoseProcessor:
     """
     Enhanced processor for Skyy Rose Collection with direct Google Drive access.
     """
-    
+
     def __init__(self):
         self.base_dir = Path("skyy_rose_collection")
         self.base_dir.mkdir(exist_ok=True)
-        
+
         # Updated folder URL
         self.drive_folder_url = "https://drive.google.com/drive/folders/1F19qdkeAxleX-t28OzZk0vN6xAv52Vkt?usp=sharing"
         self.folder_id = "1F19qdkeAxleX-t28OzZk0vN6xAv52Vkt"
-        
+
         # Processing stats
         self.stats = {
             "total_found": 0,
@@ -39,11 +41,11 @@ class EnhancedSkyRoseProcessor:
             "errors": []
         }
 
-    def get_folder_info(self) -> Dict[str, Any]:
+    def get_folder_info(self) -> dict[str, Any]:
         """Get information about the Google Drive folder."""
         try:
             logger.info(f"📁 Analyzing Google Drive folder: {self.drive_folder_url}")
-            
+
             # Try to extract folder information from the shared link
             folder_info = {
                 "folder_id": self.folder_id,
@@ -51,12 +53,12 @@ class EnhancedSkyRoseProcessor:
                 "access_type": "shared",
                 "status": "accessible"
             }
-            
+
             # Check if we can access the folder
             response = requests.get(self.drive_folder_url, timeout=10)
             if response.status_code == 200:
                 folder_info["status"] = "accessible"
-                
+
                 # Try to extract folder name from the page
                 if "Skyy Rose Collection" in response.text:
                     folder_info["folder_name"] = "Skyy Rose Collection"
@@ -67,9 +69,9 @@ class EnhancedSkyRoseProcessor:
             else:
                 folder_info["status"] = "access_denied"
                 logger.warning("⚠️ Folder access may be restricted")
-            
+
             return folder_info
-            
+
         except Exception as e:
             logger.error(f"❌ Failed to analyze folder: {e}")
             return {
@@ -79,16 +81,16 @@ class EnhancedSkyRoseProcessor:
                 "error": str(e)
             }
 
-    def generate_comprehensive_instructions(self) -> Dict[str, Any]:
+    def generate_comprehensive_instructions(self) -> dict[str, Any]:
         """Generate comprehensive download and processing instructions."""
-        
+
         instructions = {
             "folder_info": {
                 "url": self.drive_folder_url,
                 "folder_id": self.folder_id,
                 "status": "shared_accessible"
             },
-            
+
             "download_methods": {
                 "method_1_web_download": {
                     "title": "🌐 Web Browser Download (Recommended)",
@@ -110,7 +112,7 @@ class EnhancedSkyRoseProcessor:
                     ],
                     "expected_result": "ZIP file containing all Skyy Rose Collection images"
                 },
-                
+
                 "method_2_individual_download": {
                     "title": "🖼️ Individual Image Download",
                     "difficulty": "Medium",
@@ -124,7 +126,7 @@ class EnhancedSkyRoseProcessor:
                     ],
                     "expected_result": "Individual image files in a local folder"
                 },
-                
+
                 "method_3_google_takeout": {
                     "title": "📦 Google Takeout (For Large Collections)",
                     "difficulty": "Medium",
@@ -141,7 +143,7 @@ class EnhancedSkyRoseProcessor:
                     "expected_result": "Complete archive of the folder contents"
                 }
             },
-            
+
             "processing_options": {
                 "option_1_drag_drop": {
                     "title": "🎯 Drag & Drop Interface (Easiest)",
@@ -153,7 +155,7 @@ class EnhancedSkyRoseProcessor:
                         "4. ✅ Images are categorized, resized, and uploaded automatically"
                     ]
                 },
-                
+
                 "option_2_command_line": {
                     "title": "💻 Command Line Processing",
                     "steps": [
@@ -163,7 +165,7 @@ class EnhancedSkyRoseProcessor:
                         "4. ✅ Check results in the training interface"
                     ]
                 },
-                
+
                 "option_3_manual_upload": {
                     "title": "📤 Manual Upload Interface",
                     "url": "http://localhost:8001/classic",
@@ -175,7 +177,7 @@ class EnhancedSkyRoseProcessor:
                     ]
                 }
             },
-            
+
             "expected_outcomes": {
                 "automatic_categorization": [
                     "🌹 Dresses: evening gowns, cocktail dresses, casual dresses",
@@ -199,7 +201,7 @@ class EnhancedSkyRoseProcessor:
                     "🎬 Compatible with video generation system"
                 ]
             },
-            
+
             "troubleshooting": {
                 "access_issues": {
                     "problem": "Cannot access the Google Drive folder",
@@ -230,12 +232,12 @@ class EnhancedSkyRoseProcessor:
                 }
             }
         }
-        
+
         return instructions
 
     def create_download_script(self) -> str:
         """Create a comprehensive download script."""
-        
+
         script_content = f'''#!/bin/bash
 # Skyy Rose Collection - Comprehensive Download Script
 # Generated: {datetime.now().isoformat()}
@@ -350,11 +352,11 @@ if [ $IMAGE_COUNT -gt 0 ]; then
     echo "1. 🌐 Open: http://localhost:8001/classic"
     echo "2. 📤 Use the form-based upload interface"
     echo ""
-    
+
     echo -e "${{YELLOW}}Would you like to start automatic processing now? (y/n)${{NC}}"
     read -p "" -n 1 -r
     echo ""
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo -e "${{GREEN}}🚀 Starting automatic processing...${{NC}}"
         cd ..
@@ -370,29 +372,29 @@ fi
 echo ""
 echo -e "${{GREEN}}🌹 Skyy Rose Collection processing setup complete!${{NC}}"
 '''
-        
+
         return script_content
 
-    async def create_processing_guide(self) -> Dict[str, Any]:
+    async def create_processing_guide(self) -> dict[str, Any]:
         """Create a comprehensive processing guide."""
-        
+
         # Get folder info
         folder_info = self.get_folder_info()
-        
+
         # Generate instructions
         instructions = self.generate_comprehensive_instructions()
-        
+
         # Create download script
         script_content = self.create_download_script()
-        
+
         # Save the script
         script_path = Path("download_skyy_rose_enhanced.sh")
         with open(script_path, 'w') as f:
             f.write(script_content)
-        
+
         # Make script executable
         os.chmod(script_path, 0o755)
-        
+
         return {
             "success": True,
             "folder_info": folder_info,
@@ -417,15 +419,15 @@ echo -e "${{GREEN}}🌹 Skyy Rose Collection processing setup complete!${{NC}}"
 # CLI interface
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Enhanced Skyy Rose Collection Processor")
     parser.add_argument("--create-guide", action="store_true", help="Create comprehensive processing guide")
     parser.add_argument("--folder-info", action="store_true", help="Get folder information")
-    
+
     args = parser.parse_args()
-    
+
     processor = EnhancedSkyRoseProcessor()
-    
+
     async def main():
         if args.create_guide:
             result = await processor.create_processing_guide()
@@ -440,5 +442,5 @@ if __name__ == "__main__":
             print(f"📋 Instructions: {result['success']}")
             print(f"📜 Download script: {result['script_path']}")
             print(f"🌐 Drag & Drop Interface: {result['interfaces_available']['drag_drop']}")
-    
+
     asyncio.run(main())

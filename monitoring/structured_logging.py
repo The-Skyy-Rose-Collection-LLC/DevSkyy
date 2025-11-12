@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import json
-import sys
-
-from typing import Any, Dict, Optional
 import logging
+import sys
 import traceback
+from typing import Any, Optional
+
 
 """
 Structured Logging for Grade A+ Infrastructure Score
@@ -27,8 +27,8 @@ class JSONFormatter(logging.Formatter):
         Returns:
             JSON-formatted log string
         """
-        log_data: Dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        log_data: dict[str, Any] = {
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -85,7 +85,7 @@ class StructuredLogger:
         self.logger.addHandler(file_handler)
 
     def _log(
-        self, level: int, message: str, extra: Optional[Dict[str, Any]] = None, **kwargs
+        self, level: int, message: str, extra: Optional[dict[str, Any]] = None, **kwargs
     ):
         """
         Internal log method with extra fields

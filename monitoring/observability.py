@@ -1,14 +1,15 @@
+import asyncio
+from collections import defaultdict, deque
+from collections.abc import Callable
 from datetime import datetime
+from enum import Enum
+import logging
 import time
+from typing import Any, Optional
 
+import psutil
 from pydantic import BaseModel
 
-from collections import defaultdict, deque
-from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
-import asyncio
-import logging
-import psutil
 
 """
 Enterprise Observability & Monitoring System
@@ -35,7 +36,7 @@ class Metric(BaseModel):
     name: str
     type: MetricType
     value: float
-    labels: Dict[str, str] = {}
+    labels: dict[str, str] = {}
     timestamp: datetime
 
 class HealthStatus(str, Enum):
@@ -53,7 +54,7 @@ class HealthCheck(BaseModel):
     message: str
     latency_ms: float
     timestamp: datetime
-    metadata: Dict[str, Any] = {}
+    metadata: dict[str, Any] = {}
 
 # ============================================================================
 # METRICS COLLECTOR
@@ -65,10 +66,10 @@ class MetricsCollector:
     """
 
     def __init__(self, retention_minutes: int = 60):
-        self.metrics: Dict[str, deque] = defaultdict(lambda: deque(maxlen=10000))
-        self.counters: Dict[str, float] = defaultdict(float)
-        self.gauges: Dict[str, float] = {}
-        self.histograms: Dict[str, List[float]] = defaultdict(list)
+        self.metrics: dict[str, deque] = defaultdict(lambda: deque(maxlen=10000))
+        self.counters: dict[str, float] = defaultdict(float)
+        self.gauges: dict[str, float] = {}
+        self.histograms: dict[str, list[float]] = defaultdict(list)
 
         self.retention_minutes = retention_minutes
         self.start_time = time.time()
@@ -80,7 +81,7 @@ class MetricsCollector:
     # ========================================================================
 
     def increment_counter(
-        self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float = 1.0, labels: Optional[dict[str, str]] = None
     ):
         """Increment a counter metric"""
         key = self._make_key(name, labels)
@@ -89,7 +90,7 @@ class MetricsCollector:
         self._record_metric(name, MetricType.COUNTER, self.counters[key], labels or {})
 
     def set_gauge(
-        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float, labels: Optional[dict[str, str]] = None
     ):
         """Set a gauge metric"""
         key = self._make_key(name, labels)
@@ -98,7 +99,7 @@ class MetricsCollector:
         self._record_metric(name, MetricType.GAUGE, value, labels or {})
 
     def record_histogram(
-        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float, labels: Optional[dict[str, str]] = None
     ):
         """Record a histogram value"""
         key = self._make_key(name, labels)
@@ -111,7 +112,7 @@ class MetricsCollector:
         self._record_metric(name, MetricType.HISTOGRAM, value, labels or {})
 
     def _record_metric(
-        self, name: str, metric_type: MetricType, value: float, labels: Dict[str, str]
+        self, name: str, metric_type: MetricType, value: float, labels: dict[str, str]
     ):
         """Record a metric data point"""
         metric = Metric(
@@ -125,7 +126,7 @@ class MetricsCollector:
         self.metrics[name].append(metric)
 
     @staticmethod
-    def _make_key(name: str, labels: Optional[Dict[str, str]]) -> str:
+    def _make_key(name: str, labels: Optional[dict[str, str]]) -> str:
         """Create a unique key for a metric with labels"""
         if not labels:
             return name
@@ -137,21 +138,21 @@ class MetricsCollector:
     # METRIC QUERIES
     # ========================================================================
 
-    def get_counter(self, name: str, labels: Optional[Dict[str, str]] = None) -> float:
+    def get_counter(self, name: str, labels: Optional[dict[str, str]] = None) -> float:
         """Get current counter value"""
         key = self._make_key(name, labels)
         return self.counters.get(key, 0.0)
 
     def get_gauge(
-        self, name: str, labels: Optional[Dict[str, str]] = None
+        self, name: str, labels: Optional[dict[str, str]] = None
     ) -> Optional[float]:
         """Get current gauge value"""
         key = self._make_key(name, labels)
         return self.gauges.get(key)
 
     def get_histogram_stats(
-        self, name: str, labels: Optional[Dict[str, str]] = None
-    ) -> Dict[str, float]:
+        self, name: str, labels: Optional[dict[str, str]] = None
+    ) -> dict[str, float]:
         """Get histogram statistics"""
         key = self._make_key(name, labels)
         values = self.histograms.get(key, [])
@@ -173,13 +174,13 @@ class MetricsCollector:
             "p99": sorted_values[int(count * 0.99)],
         }
 
-    def get_all_metrics(self) -> Dict[str, Any]:
+    def get_all_metrics(self) -> dict[str, Any]:
         """Get all current metrics"""
         return {
             "counters": dict(self.counters),
             "gauges": dict(self.gauges),
             "histograms": {
-                k: self.get_histogram_stats(k) for k in self.histograms.keys()
+                k: self.get_histogram_stats(k) for k in self.histograms
             },
             "uptime_seconds": time.time() - self.start_time,
         }
@@ -222,8 +223,8 @@ class HealthMonitor:
     """
 
     def __init__(self):
-        self.health_checks: Dict[str, Callable] = {}
-        self.last_results: Dict[str, HealthCheck] = {}
+        self.health_checks: dict[str, Callable] = {}
+        self.last_results: dict[str, HealthCheck] = {}
 
         logger.info("🏥 Health Monitor initialized")
 
@@ -272,7 +273,7 @@ class HealthMonitor:
             result = HealthCheck(
                 component=name,
                 status=HealthStatus.UNHEALTHY,
-                message=f"Check failed: {str(e)}",
+                message=f"Check failed: {e!s}",
                 latency_ms=latency_ms,
                 timestamp=datetime.now(),
             )
@@ -280,14 +281,14 @@ class HealthMonitor:
         self.last_results[name] = result
         return result
 
-    async def run_all_checks(self) -> Dict[str, HealthCheck]:
+    async def run_all_checks(self) -> dict[str, HealthCheck]:
         """Run all health checks"""
-        tasks = [self.run_check(name) for name in self.health_checks.keys()]
+        tasks = [self.run_check(name) for name in self.health_checks]
         results = await asyncio.gather(*tasks)
 
         return {result.component: result for result in results}
 
-    def get_overall_status(self) -> Tuple[HealthStatus, str]:
+    def get_overall_status(self) -> tuple[HealthStatus, str]:
         """Get overall system health status"""
         if not self.last_results:
             return HealthStatus.UNHEALTHY, "No health checks configured"
@@ -325,9 +326,9 @@ class PerformanceTracker:
     """
 
     def __init__(self):
-        self.endpoint_metrics: Dict[str, List[float]] = defaultdict(list)
-        self.request_count: Dict[str, int] = defaultdict(int)
-        self.error_count: Dict[str, int] = defaultdict(int)
+        self.endpoint_metrics: dict[str, list[float]] = defaultdict(list)
+        self.request_count: dict[str, int] = defaultdict(int)
+        self.error_count: dict[str, int] = defaultdict(int)
 
         logger.info("⚡ Performance Tracker initialized")
 
@@ -343,7 +344,7 @@ class PerformanceTracker:
         if len(self.endpoint_metrics[endpoint]) > 1000:
             self.endpoint_metrics[endpoint] = self.endpoint_metrics[endpoint][-1000:]
 
-    def get_endpoint_stats(self, endpoint: str) -> Dict[str, Any]:
+    def get_endpoint_stats(self, endpoint: str) -> dict[str, Any]:
         """Get statistics for an endpoint"""
         durations = self.endpoint_metrics.get(endpoint, [])
 
@@ -371,11 +372,11 @@ class PerformanceTracker:
             },
         }
 
-    def get_all_stats(self) -> Dict[str, Any]:
+    def get_all_stats(self) -> dict[str, Any]:
         """Get all endpoint statistics"""
         return {
             endpoint: self.get_endpoint_stats(endpoint)
-            for endpoint in self.endpoint_metrics.keys()
+            for endpoint in self.endpoint_metrics
         }
 
 # ============================================================================
@@ -398,8 +399,8 @@ class Span:
         self.parent_id = parent_id
         self.start_time = time.time()
         self.end_time: Optional[float] = None
-        self.tags: Dict[str, Any] = {}
-        self.logs: List[Dict[str, Any]] = []
+        self.tags: dict[str, Any] = {}
+        self.logs: list[dict[str, Any]] = []
 
     def set_tag(self, key: str, value: Any):
         """Add a tag to the span"""

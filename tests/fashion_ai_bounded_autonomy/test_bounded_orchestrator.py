@@ -5,26 +5,26 @@ Tests bounded orchestration with approval workflows
 
 import pytest
 
-from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
-from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel
+from agent.modules.base_agent import AgentStatus, BaseAgent
 from agent.orchestrator import ExecutionPriority
-from agent.modules.base_agent import BaseAgent, AgentStatus
+from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel
+from fashion_ai_bounded_autonomy.bounded_orchestrator import BoundedOrchestrator
 
 
 class MockAgent(BaseAgent):
     """Mock agent for testing"""
-    
+
     def __init__(self, name: str, version: str = "1.0.0"):
         super().__init__(name, version)
         self.status = AgentStatus.HEALTHY
-        
+
     async def initialize(self) -> bool:
         self.status = AgentStatus.HEALTHY
         return True
-        
+
     async def execute_core_function(self, **_kwargs) -> dict:
         return {"status": "success", "result": "completed"}
-    
+
     async def health_check(self) -> dict:
         return {"status": "healthy", "agent": self.agent_name}
 
@@ -72,7 +72,7 @@ class TestRegisterAgent:
             capabilities=["test_capability"],
             priority=ExecutionPriority.MEDIUM
         )
-        
+
         assert success is True
         assert mock_agent.agent_name in orchestrator.wrapped_agents
 
@@ -83,7 +83,7 @@ class TestRegisterAgent:
             agent=mock_agent,
             capabilities=["test_capability"]
         )
-        
+
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
         assert wrapper is not None
         assert wrapper.wrapped_agent == mock_agent
@@ -92,13 +92,13 @@ class TestRegisterAgent:
     async def test_register_multiple_agents(self, orchestrator):
         """Test registering multiple agents"""
         agents = [MockAgent(f"agent_{i}") for i in range(3)]
-        
+
         for agent in agents:
             await orchestrator.register_agent(
                 agent=agent,
                 capabilities=[f"cap_{agent.agent_name}"]
             )
-        
+
         assert len(orchestrator.wrapped_agents) == 3
 
 
@@ -112,14 +112,14 @@ class TestExecuteTask:
             agent=mock_agent,
             capabilities=["read_data"]
         )
-        
+
         result = await orchestrator.execute_task(
             task_type="read_data",
             parameters={"source": "test.csv"},
             required_capabilities=["read_data"],
             priority=ExecutionPriority.MEDIUM
         )
-        
+
         # Low-risk tasks may execute immediately depending on configuration
         assert "status" in result
 
@@ -130,7 +130,7 @@ class TestExecuteTask:
             agent=mock_agent,
             capabilities=["write_data"]
         )
-        
+
         result = await orchestrator.execute_task(
             task_type="update_database",
             parameters={"data": "test"},
@@ -138,7 +138,7 @@ class TestExecuteTask:
             priority=ExecutionPriority.HIGH,
             require_approval=True
         )
-        
+
         assert result["status"] == "pending_approval"
         assert "task_id" in result
 
@@ -149,15 +149,15 @@ class TestExecuteTask:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         await orchestrator.emergency_stop("Test emergency", "operator")
-        
+
         result = await orchestrator.execute_task(
             task_type="test_task",
             parameters={},
             required_capabilities=["test_cap"]
         )
-        
+
         assert result["status"] == "blocked"
         assert "emergency" in result["error"].lower()
 
@@ -168,15 +168,15 @@ class TestExecuteTask:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         await orchestrator.pause_system("operator")
-        
+
         result = await orchestrator.execute_task(
             task_type="test_task",
             parameters={},
             required_capabilities=["test_cap"]
         )
-        
+
         assert result["status"] == "queued"
 
     @pytest.mark.asyncio
@@ -187,7 +187,7 @@ class TestExecuteTask:
             parameters={},
             required_capabilities=["nonexistent_capability"]
         )
-        
+
         assert "error" in result
 
 
@@ -201,7 +201,7 @@ class TestExecuteApprovedTask:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         # Create task requiring approval
         result = await orchestrator.execute_task(
             task_type="test_task",
@@ -209,15 +209,15 @@ class TestExecuteApprovedTask:
             required_capabilities=["test_cap"],
             require_approval=True
         )
-        
+
         task_id = result["task_id"]
-        
+
         # Execute approved task
         exec_result = await orchestrator.execute_approved_task(
             task_id=task_id,
             approved_by="operator"
         )
-        
+
         assert "status" in exec_result
 
     @pytest.mark.asyncio
@@ -227,7 +227,7 @@ class TestExecuteApprovedTask:
             task_id="nonexistent",
             approved_by="operator"
         )
-        
+
         assert result["status"] == "error"
 
 
@@ -241,7 +241,7 @@ class TestRiskAssessment:
             parameters={},
             agents=["agent1"]
         )
-        
+
         assert risk == ActionRiskLevel.CRITICAL
 
     def test_assess_task_risk_high(self, orchestrator):
@@ -251,7 +251,7 @@ class TestRiskAssessment:
             parameters={},
             agents=["agent1"]
         )
-        
+
         assert risk == ActionRiskLevel.HIGH
 
     def test_assess_task_risk_medium(self, orchestrator):
@@ -261,7 +261,7 @@ class TestRiskAssessment:
             parameters={},
             agents=["agent1"]
         )
-        
+
         assert risk == ActionRiskLevel.MEDIUM
 
     def test_assess_task_risk_low(self, orchestrator):
@@ -271,7 +271,7 @@ class TestRiskAssessment:
             parameters={},
             agents=["agent1"]
         )
-        
+
         assert risk == ActionRiskLevel.LOW
 
     def test_assess_task_risk_multiple_agents_increases_risk(self, orchestrator):
@@ -281,7 +281,7 @@ class TestRiskAssessment:
             parameters={},
             agents=["agent1", "agent2", "agent3", "agent4"]
         )
-        
+
         assert risk == ActionRiskLevel.HIGH
 
 
@@ -292,7 +292,7 @@ class TestEmergencyStop:
     async def test_emergency_stop_sets_flag(self, orchestrator):
         """Test that emergency stop sets the flag"""
         await orchestrator.emergency_stop("Test emergency", "operator")
-        
+
         assert orchestrator.emergency_stop_active is True
 
     @pytest.mark.asyncio
@@ -302,9 +302,9 @@ class TestEmergencyStop:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         await orchestrator.emergency_stop("Test emergency", "operator")
-        
+
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
         assert wrapper.emergency_stop is True
 
@@ -315,10 +315,10 @@ class TestEmergencyStop:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         await orchestrator.emergency_stop("Test emergency", "operator")
         result = await orchestrator.resume_operations("operator")
-        
+
         assert result["status"] == "resumed"
         assert orchestrator.emergency_stop_active is False
 
@@ -326,7 +326,7 @@ class TestEmergencyStop:
     async def test_resume_without_emergency_stop(self, orchestrator):
         """Test resuming when no emergency stop is active"""
         result = await orchestrator.resume_operations("operator")
-        
+
         assert "error" in result
 
 
@@ -337,7 +337,7 @@ class TestPauseResume:
     async def test_pause_system(self, orchestrator):
         """Test pausing the system"""
         result = await orchestrator.pause_system("operator")
-        
+
         assert result["status"] == "paused"
         assert orchestrator.system_paused is True
 
@@ -346,7 +346,7 @@ class TestPauseResume:
         """Test resuming the system"""
         await orchestrator.pause_system("operator")
         result = await orchestrator.resume_system("operator")
-        
+
         assert result["status"] == "resumed"
         assert orchestrator.system_paused is False
 
@@ -357,9 +357,9 @@ class TestPauseResume:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         await orchestrator.pause_system("operator")
-        
+
         wrapper = orchestrator.wrapped_agents[mock_agent.agent_name]
         assert wrapper.paused is True
 
@@ -371,7 +371,7 @@ class TestGetBoundedStatus:
     async def test_get_bounded_status_complete(self, orchestrator):
         """Test getting complete bounded status"""
         status = await orchestrator.get_bounded_status()
-        
+
         assert "bounded_autonomy" in status
         assert "system_controls" in status["bounded_autonomy"]
 
@@ -379,7 +379,7 @@ class TestGetBoundedStatus:
     async def test_get_bounded_status_includes_controls(self, orchestrator):
         """Test that status includes control flags"""
         status = await orchestrator.get_bounded_status()
-        
+
         controls = status["bounded_autonomy"]["system_controls"]
         assert "emergency_stop" in controls
         assert "paused" in controls
@@ -393,9 +393,9 @@ class TestGetBoundedStatus:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         status = await orchestrator.get_bounded_status()
-        
+
         assert "wrapped_agents" in status["bounded_autonomy"]
         assert mock_agent.agent_name in status["bounded_autonomy"]["wrapped_agents"]
 
@@ -410,13 +410,13 @@ class TestEdgeCases:
             agent=mock_agent,
             capabilities=["cap1"]
         )
-        
+
         # Second registration should succeed (updates existing)
         success = await orchestrator.register_agent(
             agent=mock_agent,
             capabilities=["cap2"]
         )
-        
+
         assert success is True
 
     @pytest.mark.asyncio
@@ -426,12 +426,12 @@ class TestEdgeCases:
             agent=mock_agent,
             capabilities=["test_cap"]
         )
-        
+
         result = await orchestrator.execute_task(
             task_type="test_task",
             parameters={},
             required_capabilities=[]
         )
-        
+
         # Should fail with error about no capabilities
         assert "error" in result or "status" in result

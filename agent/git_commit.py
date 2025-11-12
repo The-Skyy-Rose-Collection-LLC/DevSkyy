@@ -1,14 +1,14 @@
 from datetime import datetime
-from pathlib import Path
-import os
-
-from typing import Any, Dict
 import logging
+import os
+from pathlib import Path
 import subprocess
+from typing import Any
+
 
 logger = logging.getLogger(__name__)
 
-def commit_fixes(fixes_applied: Dict[str, Any]) -> Dict[str, Any]:
+def commit_fixes(fixes_applied: dict[str, Any]) -> dict[str, Any]:
     """
     Commit code fixes to Git repository with detailed commit messages.
     Production-level Git operations with comprehensive error handling.
@@ -49,14 +49,14 @@ def commit_fixes(fixes_applied: Dict[str, Any]) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"❌ Git commit failed: {str(e)}")
+        logger.error(f"❌ Git commit failed: {e!s}")
         return {
             "status": "failed",
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
         }
 
-def commit_all_changes() -> Dict[str, Any]:
+def commit_all_changes() -> dict[str, Any]:
     """
     Commit all current changes to the repository.
     Used for manual commits and deployment preparation.
@@ -101,19 +101,19 @@ def commit_all_changes() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"❌ Failed to commit all changes: {str(e)}")
+        logger.error(f"❌ Failed to commit all changes: {e!s}")
         return {
             "status": "failed",
             "error": str(e),
             "timestamp": datetime.now().isoformat(),
         }
 
-def _init_git_repo() -> Dict[str, Any]:
+def _init_git_repo() -> dict[str, Any]:
     """Initialize a new Git repository."""
     try:
         # Initialize repo
         result = subprocess.run(
-            ["git", "init"], capture_output=True, text=True, timeout=30
+            ["git", "init"], check=False, capture_output=True, text=True, timeout=30
         )
         if result.returncode != 0:
             return {"status": "failed", "error": "Failed to initialize Git repository"}
@@ -183,33 +183,33 @@ def _configure_git() -> None:
     try:
         # Check if user.name is configured
         result = subprocess.run(
-            ["git", "config", "user.name"], capture_output=True, text=True, timeout=10
+            ["git", "config", "user.name"], check=False, capture_output=True, text=True, timeout=10
         )
         if result.returncode != 0 or not result.stdout.strip():
             subprocess.run(
-                ["git", "config", "user.name", "DevSkyy Enhanced Platform"], timeout=10
+                ["git", "config", "user.name", "DevSkyy Enhanced Platform"], check=False, timeout=10
             )
 
         # Check if user.email is configured
         result = subprocess.run(
-            ["git", "config", "user.email"], capture_output=True, text=True, timeout=10
+            ["git", "config", "user.email"], check=False, capture_output=True, text=True, timeout=10
         )
         if result.returncode != 0 or not result.stdout.strip():
             subprocess.run(
                 ["git", "config", "user.email", "devskyy@theskyy-rose-collection.com"],
-                timeout=10,
+                check=False, timeout=10,
             )
 
         logger.info("✅ Git configuration verified")
 
     except Exception as e:
-        logger.warning(f"⚠️ Git configuration warning: {str(e)}")
+        logger.warning(f"⚠️ Git configuration warning: {e!s}")
 
-def _git_status() -> Dict[str, Any]:
+def _git_status() -> dict[str, Any]:
     """Check Git repository status."""
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10
+            ["git", "status", "--porcelain"], check=False, capture_output=True, text=True, timeout=10
         )
         if result.returncode != 0:
             return {"has_changes": False, "error": "Failed to get Git status"}
@@ -224,24 +224,24 @@ def _git_status() -> Dict[str, Any]:
     except Exception as e:
         return {"has_changes": False, "error": str(e)}
 
-def _git_add_files() -> Dict[str, Any]:
+def _git_add_files() -> dict[str, Any]:
     """Add modified files to Git staging area."""
     try:
         # Add Python files
         subprocess.run(
-            ["git", "add", "*.py"], capture_output=True, text=True, timeout=30
+            ["git", "add", "*.py"], check=False, capture_output=True, text=True, timeout=30
         )
 
         # Add other important files
         important_files = ["main.py", "README.md", ".gitignore"]
         for file in important_files:
             if os.path.exists(file):
-                subprocess.run(["git", "add", file], timeout=10)
+                subprocess.run(["git", "add", file], check=False, timeout=10)
 
         # Get status to count added files
         status_result = subprocess.run(
             ["git", "status", "--porcelain", "--cached"],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
             timeout=10,
         )
@@ -255,11 +255,11 @@ def _git_add_files() -> Dict[str, Any]:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def _git_add_all() -> Dict[str, Any]:
+def _git_add_all() -> dict[str, Any]:
     """Add all files to Git staging area."""
     try:
         result = subprocess.run(
-            ["git", "add", "."], capture_output=True, text=True, timeout=30
+            ["git", "add", "."], check=False, capture_output=True, text=True, timeout=30
         )
         if result.returncode != 0:
             return {"success": False, "error": "Failed to add files to Git"}
@@ -267,7 +267,7 @@ def _git_add_all() -> Dict[str, Any]:
         # Get count of staged files
         status_result = subprocess.run(
             ["git", "status", "--porcelain", "--cached"],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
             timeout=10,
         )
@@ -281,11 +281,11 @@ def _git_add_all() -> Dict[str, Any]:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def _git_commit(message: str) -> Dict[str, Any]:
+def _git_commit(message: str) -> dict[str, Any]:
     """Commit staged changes with the provided message."""
     try:
         result = subprocess.run(
-            ["git", "commit", "-m", message], capture_output=True, text=True, timeout=30
+            ["git", "commit", "-m", message], check=False, capture_output=True, text=True, timeout=30
         )
 
         if result.returncode != 0:
@@ -305,7 +305,7 @@ def _git_commit(message: str) -> Dict[str, Any]:
         commit_hash = None
         try:
             hash_result = subprocess.run(
-                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10
+                ["git", "rev-parse", "HEAD"], check=False, capture_output=True, text=True, timeout=10
             )
             if hash_result.returncode == 0:
                 commit_hash = hash_result.stdout.strip()[:8]  # Short hash
@@ -326,12 +326,12 @@ def _git_commit(message: str) -> Dict[str, Any]:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def _git_push() -> Dict[str, Any]:
+def _git_push() -> dict[str, Any]:
     """Push commits to remote repository."""
     try:
         # Check if remote exists
         result = subprocess.run(
-            ["git", "remote"], capture_output=True, text=True, timeout=10
+            ["git", "remote"], check=False, capture_output=True, text=True, timeout=10
         )
         if result.returncode != 0 or not result.stdout.strip():
             return {"success": False, "error": "No remote repository configured"}
@@ -339,7 +339,7 @@ def _git_push() -> Dict[str, Any]:
         # Get current branch name
         current_branch_result = subprocess.run(
             ["git", "branch", "--show-current"],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
             timeout=10,
         )
@@ -353,7 +353,7 @@ def _git_push() -> Dict[str, Any]:
         # Try to push current branch
         result = subprocess.run(
             ["git", "push", "origin", current_branch],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True,
             timeout=60,
         )
@@ -369,7 +369,7 @@ def _git_push() -> Dict[str, Any]:
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def _generate_commit_message(fixes_applied: Dict[str, Any]) -> str:
+def _generate_commit_message(fixes_applied: dict[str, Any]) -> str:
     """Generate detailed commit message based on fixes applied."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 

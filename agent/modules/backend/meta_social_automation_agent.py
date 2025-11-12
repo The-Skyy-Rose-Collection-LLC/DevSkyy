@@ -20,16 +20,17 @@ Features:
 - Ad campaign automation
 """
 
+from datetime import datetime
 import json
 import logging
 import os
 import random
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-import httpx
 from anthropic import AsyncAnthropic
+import httpx
 from openai import AsyncOpenAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -108,11 +109,11 @@ class MetaSocialAutomationAgent:
     async def publish_content(
         self,
         content_text: str,
-        media_urls: Optional[List[str]] = None,
-        platforms: List[str] = ["instagram", "facebook"],
+        media_urls: Optional[list[str]] = None,
+        platforms: list[str] | None = None,
         schedule_time: Optional[datetime] = None,
-        shopping_tags: Optional[List[Dict]] = None,
-    ) -> Dict[str, Any]:
+        shopping_tags: Optional[list[dict]] = None,
+    ) -> dict[str, Any]:
         """
         Publish content across Meta platforms with advanced features.
 
@@ -126,6 +127,8 @@ class MetaSocialAutomationAgent:
         Returns:
             Dict with posting results
         """
+        if platforms is None:
+            platforms = ["instagram", "facebook"]
         try:
             logger.info(f"📤 Publishing content to {platforms}")
 
@@ -175,8 +178,8 @@ class MetaSocialAutomationAgent:
             return {"error": str(e), "status": "failed"}
 
     async def _optimize_content_for_platform(
-        self, content: str, platforms: List[str]
-    ) -> Dict[str, str]:
+        self, content: str, platforms: list[str]
+    ) -> dict[str, str]:
         """
         Optimize content for each platform's best practices.
         """
@@ -226,7 +229,7 @@ Return JSON with: instagram_content, facebook_content"""
             logger.error(f"Content optimization failed: {e}")
             return {"instagram": content, "facebook": content}
 
-    async def _generate_hashtags(self, content: str) -> List[str]:
+    async def _generate_hashtags(self, content: str) -> list[str]:
         """
         Generate optimal hashtags using AI and trending data.
         """
@@ -277,11 +280,11 @@ Return as JSON array of hashtags."""
     async def _publish_to_instagram(
         self,
         content: str,
-        media_urls: Optional[List[str]],
-        hashtags: List[str],
+        media_urls: Optional[list[str]],
+        hashtags: list[str],
         schedule_time: Optional[datetime],
-        shopping_tags: Optional[List[Dict]],
-    ) -> Dict[str, Any]:
+        shopping_tags: Optional[list[dict]],
+    ) -> dict[str, Any]:
         """
         Publish content to Instagram Business account.
         """
@@ -321,7 +324,7 @@ Return as JSON array of hashtags."""
             return {"error": str(e)}
 
     async def _create_ig_media_container(
-        self, media_url: str, caption: str, shopping_tags: Optional[List[Dict]]
+        self, media_url: str, caption: str, shopping_tags: Optional[list[dict]]
     ) -> str:
         """
         Create Instagram media container for single post.
@@ -353,7 +356,7 @@ Return as JSON array of hashtags."""
             raise
 
     async def _create_ig_carousel_container(
-        self, media_urls: List[str], caption: str, shopping_tags: Optional[List[Dict]]
+        self, media_urls: list[str], caption: str, shopping_tags: Optional[list[dict]]
     ) -> str:
         """
         Create Instagram carousel container for multiple images.
@@ -400,7 +403,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Carousel container creation failed: {e}")
             raise
 
-    async def _publish_ig_container(self, container_id: str) -> Dict[str, Any]:
+    async def _publish_ig_container(self, container_id: str) -> dict[str, Any]:
         """
         Publish Instagram media container.
         """
@@ -430,7 +433,7 @@ Return as JSON array of hashtags."""
 
     async def _schedule_ig_post(
         self, container_id: str, schedule_time: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Schedule Instagram post for future publishing.
         """
@@ -446,9 +449,9 @@ Return as JSON array of hashtags."""
     async def _publish_to_facebook(
         self,
         content: str,
-        media_urls: Optional[List[str]],
+        media_urls: Optional[list[str]],
         schedule_time: Optional[datetime],
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Publish content to Facebook Page.
         """
@@ -497,7 +500,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Facebook publishing failed: {e}")
             return {"error": str(e)}
 
-    async def _upload_fb_photos(self, media_urls: List[str]) -> List[str]:
+    async def _upload_fb_photos(self, media_urls: list[str]) -> list[str]:
         """
         Upload photos to Facebook for multi-photo posts.
         """
@@ -526,10 +529,10 @@ Return as JSON array of hashtags."""
 
     async def find_potential_customers(
         self,
-        target_interests: List[str],
-        demographics: Optional[Dict[str, Any]] = None,
-        behavior: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        target_interests: list[str],
+        demographics: Optional[dict[str, Any]] = None,
+        behavior: Optional[list[str]] = None,
+    ) -> dict[str, Any]:
         """
         Find potential customers using Meta's targeting capabilities.
 
@@ -584,7 +587,7 @@ Return as JSON array of hashtags."""
             logger.error(f"❌ Customer finding failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _get_interest_ids(self, interests: List[str]) -> List[Dict]:
+    async def _get_interest_ids(self, interests: list[str]) -> list[dict]:
         """
         Convert interest names to Meta interest IDs.
         """
@@ -602,7 +605,7 @@ Return as JSON array of hashtags."""
             for interest in interests
         ]
 
-    async def _get_behavior_ids(self, behaviors: List[str]) -> List[Dict]:
+    async def _get_behavior_ids(self, behaviors: list[str]) -> list[dict]:
         """
         Convert behavior names to Meta behavior IDs.
         """
@@ -620,7 +623,7 @@ Return as JSON array of hashtags."""
             for behavior in behaviors
         ]
 
-    async def _get_audience_insights(self, targeting_spec: Dict) -> Dict[str, Any]:
+    async def _get_audience_insights(self, targeting_spec: dict) -> dict[str, Any]:
         """
         Get audience insights from Meta.
         """
@@ -633,8 +636,8 @@ Return as JSON array of hashtags."""
         }
 
     async def _generate_customer_personas(
-        self, insights: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, insights: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """
         Generate detailed customer personas using AI.
         """
@@ -676,7 +679,7 @@ Return as JSON array."""
             logger.error(f"Persona generation failed: {e}")
             return []
 
-    async def _suggest_lookalike_audiences(self) -> List[Dict[str, Any]]:
+    async def _suggest_lookalike_audiences(self) -> list[dict[str, Any]]:
         """
         Suggest lookalike audience configurations.
         """
@@ -702,8 +705,8 @@ Return as JSON array."""
         ]
 
     async def generate_viral_content(
-        self, product_info: Dict[str, Any], trend_data: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        self, product_info: dict[str, Any], trend_data: Optional[dict] = None
+    ) -> dict[str, Any]:
         """
         Generate viral content optimized for Meta platforms.
 
@@ -767,8 +770,8 @@ Return detailed content plan."""
             return {"error": str(e), "status": "failed"}
 
     async def _generate_visual_concepts(
-        self, product_info: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, product_info: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """
         Generate visual concepts for content.
         """
@@ -798,7 +801,7 @@ Return detailed content plan."""
         optimal_times = ["10:00", "14:00", "19:00", "21:00"]
         return random.choice(optimal_times)
 
-    async def _track_post_performance(self, posts: Dict[str, Any]) -> None:
+    async def _track_post_performance(self, posts: dict[str, Any]) -> None:
         """
         Track and analyze post performance.
         """
@@ -806,8 +809,8 @@ Return detailed content plan."""
         logger.info(f"📊 Tracking performance for {len(posts)} posts")
 
     async def automate_engagement(
-        self, response_templates: Optional[Dict[str, str]] = None
-    ) -> Dict[str, Any]:
+        self, response_templates: Optional[dict[str, str]] = None
+    ) -> dict[str, Any]:
         """
         Automate engagement responses and interactions.
 
@@ -851,40 +854,40 @@ Return detailed content plan."""
             logger.error(f"❌ Engagement automation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _get_recent_comments(self) -> List[Dict[str, Any]]:
+    async def _get_recent_comments(self) -> list[dict[str, Any]]:
         """
         Get recent comments on posts.
         """
         # Simplified - would use actual API
         return []
 
-    async def _get_recent_messages(self) -> List[Dict[str, Any]]:
+    async def _get_recent_messages(self) -> list[dict[str, Any]]:
         """
         Get recent DMs.
         """
         # Simplified - would use actual API
         return []
 
-    async def _should_respond_to_comment(self, comment: Dict) -> bool:
+    async def _should_respond_to_comment(self, comment: dict) -> bool:
         """
         Determine if comment needs response.
         """
         # Check if already responded, if positive/negative, etc.
         return True
 
-    async def _should_respond_to_message(self, message: Dict) -> bool:
+    async def _should_respond_to_message(self, message: dict) -> bool:
         """
         Determine if message needs response.
         """
         return True
 
-    async def _generate_comment_response(self, comment: Dict) -> str:
+    async def _generate_comment_response(self, comment: dict) -> str:
         """
         Generate appropriate comment response.
         """
         return "Thank you for your interest! 💕 Check out our latest collection at theskyy-rose-collection.com"
 
-    async def _generate_message_response(self, message: Dict) -> str:
+    async def _generate_message_response(self, message: dict) -> str:
         """
         Generate appropriate DM response.
         """
@@ -913,17 +916,19 @@ meta_agent = create_meta_automation_agent()
 
 # Convenience functions
 async def publish_to_meta(
-    content: str, platforms: List[str] = ["instagram", "facebook"]
-) -> Dict[str, Any]:
+    content: str, platforms: list[str] | None = None
+) -> dict[str, Any]:
     """Publish content to Meta platforms."""
+    if platforms is None:
+        platforms = ["instagram", "facebook"]
     return await meta_agent.publish_content(content, platforms=platforms)
 
 
-async def find_customers(interests: List[str]) -> Dict[str, Any]:
+async def find_customers(interests: list[str]) -> dict[str, Any]:
     """Find potential customers."""
     return await meta_agent.find_potential_customers(interests)
 
 
-async def generate_viral(product: Dict[str, Any]) -> Dict[str, Any]:
+async def generate_viral(product: dict[str, Any]) -> dict[str, Any]:
     """Generate viral content."""
     return await meta_agent.generate_viral_content(product)

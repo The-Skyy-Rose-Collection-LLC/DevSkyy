@@ -1,15 +1,16 @@
-from datetime import datetime
-from redis.asyncio import ConnectionPool
-from redis.exceptions import ConnectionError, RedisError, TimeoutError
-import json
-import redis.asyncio as redis
-import time
-
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Optional
+from datetime import datetime
 import hashlib
+import json
 import logging
 import pickle
+import time
+from typing import Any, Optional
+
+import redis.asyncio as redis
+from redis.asyncio import ConnectionPool
+from redis.exceptions import ConnectionError, RedisError, TimeoutError
+
 
 """
 Enterprise Redis Manager - High Performance Caching & Session Management
@@ -36,7 +37,7 @@ class CacheMetrics:
             return 0.0
         return self.hits / self.total_requests
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return {
             "hits": self.hits,
@@ -57,14 +58,14 @@ class SessionData:
     username: str
     email: str
     role: str
-    permissions: List[str]
+    permissions: list[str]
     created_at: datetime
     last_accessed: datetime
     ip_address: str
     user_agent: str
-    fashion_preferences: Dict[str, Any] = None
+    fashion_preferences: dict[str, Any] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for Redis storage"""
         data = asdict(self)
         data["created_at"] = self.created_at.isoformat()
@@ -72,7 +73,7 @@ class SessionData:
         return data
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "SessionData":
+    def from_dict(cls, data: dict[str, Any]) -> "SessionData":
         """Create from dictionary"""
         data["created_at"] = datetime.fromisoformat(data["created_at"])
         data["last_accessed"] = datetime.fromisoformat(data["last_accessed"])
@@ -402,7 +403,7 @@ class RedisManager:
             logger.error(f"Session cleanup error: {e}")
             return 0
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get cache performance metrics"""
         pool_stats = {
             "max_connections": self.max_connections,
@@ -418,7 +419,7 @@ class RedisManager:
             "redis_info": {"host": self.host, "port": self.port, "db": self.db},
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check"""
         start_time = time.time()
 
@@ -431,7 +432,7 @@ class RedisManager:
             test_value = {"timestamp": datetime.now().isoformat(), "test": True}
 
             await self.set(test_key, test_value, ttl=60)
-            retrieved_value = await self.get(test_key)
+            await self.get(test_key)
             await self.delete(test_key)
 
             response_time = (time.time() - start_time) * 1000

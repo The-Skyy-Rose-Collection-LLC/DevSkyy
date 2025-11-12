@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 from requests.auth import HTTPBasicAuth
+
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class WordPressDirectService:
         logger.info(f"👤 Username: {self.username}")
         logger.info("🔑 Authentication: Basic Auth (Guaranteed Connection)")
 
-    async def connect_and_verify(self) -> Dict[str, Any]:
+    async def connect_and_verify(self) -> dict[str, Any]:
         """BULLETPROOF WordPress connection with multiple fallback methods."""
         connection_methods = [
             self._try_rest_api_connection,
@@ -68,7 +69,7 @@ class WordPressDirectService:
         ]
 
         for method_name, method in zip(
-            ["REST API", "XML-RPC", "Direct Login"], connection_methods
+            ["REST API", "XML-RPC", "Direct Login"], connection_methods, strict=False
         ):
             try:
                 logger.info(f"🔄 Attempting {method_name} connection...")
@@ -80,7 +81,7 @@ class WordPressDirectService:
                     return result
 
             except Exception as e:
-                logger.warning(f"⚠️ {method_name} failed: {str(e)}")
+                logger.warning(f"⚠️ {method_name} failed: {e!s}")
                 continue
 
         # All connection attempts failed. Bubble up a clear error instead of
@@ -92,7 +93,7 @@ class WordPressDirectService:
             "Unable to connect to WordPress with the provided credentials"
         )
 
-    async def _try_rest_api_connection(self) -> Dict[str, Any]:
+    async def _try_rest_api_connection(self) -> dict[str, Any]:
         """Try REST API connection with user credentials."""
         try:
             # First, try to get user info with basic auth
@@ -141,10 +142,10 @@ class WordPressDirectService:
                 raise Exception(f"HTTP {response.status_code}")
 
         except Exception as e:
-            logger.error(f"❌ REST API connection failed: {str(e)}")
+            logger.error(f"❌ REST API connection failed: {e!s}")
             raise e
 
-    async def _try_xmlrpc_connection(self) -> Dict[str, Any]:
+    async def _try_xmlrpc_connection(self) -> dict[str, Any]:
         """Try XML-RPC connection (fallback method)."""
         try:
             import xmlrpc.client
@@ -173,10 +174,10 @@ class WordPressDirectService:
                 raise Exception("XML-RPC authentication failed")
 
         except Exception as e:
-            logger.error(f"❌ XML-RPC connection failed: {str(e)}")
+            logger.error(f"❌ XML-RPC connection failed: {e!s}")
             raise e
 
-    async def _try_direct_login_simulation(self) -> Dict[str, Any]:
+    async def _try_direct_login_simulation(self) -> dict[str, Any]:
         """Try simulating direct WordPress login."""
         try:
             session = requests.Session()
@@ -204,7 +205,7 @@ class WordPressDirectService:
                 raise Exception(f"Site not accessible: {response.status_code}")
 
         except Exception as e:
-            logger.error(f"❌ Direct access failed: {str(e)}")
+            logger.error(f"❌ Direct access failed: {e!s}")
             raise e
 
     # NOTE: _guaranteed_connection_response removed – silent success paths are
@@ -224,9 +225,9 @@ class WordPressDirectService:
             logger.info("🛒 WooCommerce integration configured for skyyrose.co")
 
         except Exception as e:
-            logger.error(f"WooCommerce setup failed: {str(e)}")
+            logger.error(f"WooCommerce setup failed: {e!s}")
 
-    async def get_site_posts(self, per_page: int = 10) -> Dict[str, Any]:
+    async def get_site_posts(self, per_page: int = 10) -> dict[str, Any]:
         """Get WordPress posts."""
         try:
             if not self.connected:
@@ -248,10 +249,10 @@ class WordPressDirectService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get posts: {str(e)}")
+            logger.error(f"Failed to get posts: {e!s}")
             return {"error": str(e)}
 
-    async def get_site_pages(self, per_page: int = 20) -> Dict[str, Any]:
+    async def get_site_pages(self, per_page: int = 20) -> dict[str, Any]:
         """Get WordPress pages."""
         try:
             if not self.connected:
@@ -275,10 +276,10 @@ class WordPressDirectService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get pages: {str(e)}")
+            logger.error(f"Failed to get pages: {e!s}")
             return {"error": str(e)}
 
-    async def create_luxury_page(self, page_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_luxury_page(self, page_data: dict[str, Any]) -> dict[str, Any]:
         """Create a luxury page with AI-optimized content."""
         try:
             if not self.connected:
@@ -304,12 +305,12 @@ class WordPressDirectService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to create page: {str(e)}")
+            logger.error(f"Failed to create page: {e!s}")
             return {"error": str(e)}
 
     async def update_site_content(
-        self, post_id: int, updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, post_id: int, updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update WordPress content with luxury enhancements."""
         try:
             if not self.connected:
@@ -331,10 +332,10 @@ class WordPressDirectService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to update content: {str(e)}")
+            logger.error(f"Failed to update content: {e!s}")
             return {"error": str(e)}
 
-    async def get_site_health(self) -> Dict[str, Any]:
+    async def get_site_health(self) -> dict[str, Any]:
         """Get comprehensive site health and optimization status."""
         try:
             if not self.connected:
@@ -359,12 +360,12 @@ class WordPressDirectService:
             return health_data
 
         except Exception as e:
-            logger.error(f"Site health check failed: {str(e)}")
+            logger.error(f"Site health check failed: {e!s}")
             return {"error": str(e)}
 
     async def _analyze_posts_for_luxury_optimization(
-        self, posts: List[Dict]
-    ) -> Dict[str, Any]:
+        self, posts: list[dict]
+    ) -> dict[str, Any]:
         """Analyze posts for luxury brand optimization opportunities."""
         opportunities = []
 
@@ -418,8 +419,8 @@ class WordPressDirectService:
         }
 
     async def _analyze_pages_for_luxury_enhancement(
-        self, pages: List[Dict]
-    ) -> List[Dict[str, Any]]:
+        self, pages: list[dict]
+    ) -> list[dict[str, Any]]:
         """Analyze pages for luxury enhancement opportunities."""
         enhancements = []
 
@@ -453,7 +454,7 @@ class WordPressDirectService:
 
         return enhancements[:10]  # Top 10 optimization opportunities
 
-    async def _identify_optimization_opportunities(self) -> List[Dict[str, Any]]:
+    async def _identify_optimization_opportunities(self) -> list[dict[str, Any]]:
         """Identify comprehensive site optimization opportunities."""
         return [
             {

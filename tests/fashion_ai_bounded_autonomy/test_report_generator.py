@@ -3,9 +3,10 @@ Unit tests for ReportGenerator
 Tests report generation and formatting
 """
 
-import pytest
-import tempfile
 import shutil
+import tempfile
+
+import pytest
 
 from fashion_ai_bounded_autonomy.report_generator import ReportGenerator
 
@@ -54,7 +55,7 @@ class TestDailySummary:
                 }
             }
         }
-        
+
         performance_data = {
             "agent_performance": {
                 "agent1": {
@@ -62,17 +63,17 @@ class TestDailySummary:
                 }
             }
         }
-        
+
         approval_stats = {
             "pending": 3,
             "approved_today": 5,
             "rejected_today": 1
         }
-        
+
         report_file = await report_gen.generate_daily_summary(
             orchestrator_status, performance_data, approval_stats
         )
-        
+
         assert report_file.exists()
         assert report_file.suffix == ".md"
 
@@ -82,11 +83,11 @@ class TestDailySummary:
         orchestrator_status = {"system_status": "healthy", "registered_agents": 0}
         performance_data = {"agent_performance": {}}
         approval_stats = {"pending": 0}
-        
+
         report_file = await report_gen.generate_daily_summary(
             orchestrator_status, performance_data, approval_stats
         )
-        
+
         content = report_file.read_text()
         assert "System Status" in content
         assert "Bounded Autonomy Controls" in content
@@ -108,19 +109,19 @@ class TestWeeklyReport:
                 }
             }
         }
-        
+
         incidents = [
             {"type": "agent_failure", "agent_name": "agent1", "timestamp": "2024-01-01", "status": "resolved"}
         ]
-        
+
         proposals = [
             {"id": "prop1", "type": "optimization", "priority": "medium", "agent": "agent1", "recommendation": "Test"}
         ]
-        
+
         report_file = await report_gen.generate_weekly_report(
             performance_data, incidents, proposals
         )
-        
+
         assert report_file.exists()
         assert report_file.suffix == ".md"
 
@@ -130,11 +131,11 @@ class TestWeeklyReport:
         performance_data = {"agent_performance": {}}
         incidents = []
         proposals = []
-        
+
         report_file = await report_gen.generate_weekly_report(
             performance_data, incidents, proposals
         )
-        
+
         content = report_file.read_text()
         assert "No incidents" in content
 
@@ -154,9 +155,9 @@ class TestMetricsExport:
                 }
             }
         }
-        
+
         csv_file = await report_gen.export_metrics_csv(metrics_data)
-        
+
         assert csv_file.exists()
         assert csv_file.suffix == ".csv"
 
@@ -164,9 +165,9 @@ class TestMetricsExport:
     async def test_export_metrics_csv_empty_data(self, report_gen):
         """Test exporting empty metrics data"""
         metrics_data = {"agent_kpis": {}}
-        
+
         csv_file = await report_gen.export_metrics_csv(metrics_data)
-        
+
         # Should handle empty data gracefully
         assert csv_file.exists()
 
@@ -181,9 +182,9 @@ class TestValidationReport:
             {"status": "validated", "file": "file1.csv"},
             {"status": "quarantined", "file": "file2.csv", "errors": ["missing_field"]}
         ]
-        
+
         report_file = await report_gen.generate_validation_report(validation_results)
-        
+
         assert report_file.exists()
         assert report_file.suffix == ".json"
 
@@ -195,13 +196,13 @@ class TestValidationReport:
             {"status": "validated"},
             {"status": "quarantined"}
         ]
-        
+
         report_file = await report_gen.generate_validation_report(validation_results)
-        
+
         import json
         with open(report_file) as f:
             report = json.load(f)
-        
+
         assert report["total_validations"] == 3
         assert report["passed"] == 2
         assert report["failed"] == 1
@@ -217,9 +218,9 @@ class TestRecommendationsReport:
             {"id": "prop1", "type": "optimization", "priority": "high", "recommendation": "Test", "status": "pending"},
             {"id": "prop2", "type": "fix", "priority": "medium", "recommendation": "Test2", "status": "approved"}
         ]
-        
+
         report_file = await report_gen.generate_recommendations_report(proposals)
-        
+
         assert report_file.exists()
         assert report_file.suffix == ".md"
 
@@ -231,9 +232,9 @@ class TestRecommendationsReport:
             {"id": "p2", "priority": "low", "type": "test", "recommendation": "Fix2"},
             {"id": "p3", "priority": "high", "type": "test", "recommendation": "Fix3"}
         ]
-        
+
         report_file = await report_gen.generate_recommendations_report(proposals)
-        
+
         content = report_file.read_text()
         assert "HIGH Priority" in content
         assert "LOW Priority" in content
@@ -248,19 +249,19 @@ class TestEdgeCases:
         orchestrator_status = {}
         performance_data = {}
         approval_stats = {}
-        
+
         # Should not raise exception
         report_file = await report_gen.generate_daily_summary(
             orchestrator_status, performance_data, approval_stats
         )
-        
+
         assert report_file.exists()
 
     @pytest.mark.asyncio
     async def test_export_csv_with_custom_filename(self, report_gen):
         """Test exporting CSV with custom filename"""
         metrics_data = {"agent_kpis": {"agent1": {"metric": 1.0}}}
-        
+
         csv_file = await report_gen.export_metrics_csv(metrics_data, "custom.csv")
-        
+
         assert csv_file.name == "custom.csv"

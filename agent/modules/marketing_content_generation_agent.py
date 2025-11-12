@@ -11,13 +11,14 @@ This agent specializes in:
 - Performance tracking and optimization
 """
 
-import logging
-import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+import logging
+import os
+from typing import Any
 
 import openai
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,8 +80,8 @@ class MarketingContentGenerationAgent:
         ]
 
     async def create_viral_social_campaign(
-        self, campaign_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, campaign_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Create a viral social media campaign with multi-platform content.
 
@@ -144,12 +145,12 @@ class MarketingContentGenerationAgent:
             }
 
         except Exception as e:
-            logger.error(f"Viral campaign creation failed: {str(e)}")
+            logger.error(f"Viral campaign creation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
     async def generate_luxury_email_sequence(
-        self, sequence_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, sequence_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate sophisticated email marketing sequences for luxury brand engagement.
 
@@ -209,12 +210,12 @@ class MarketingContentGenerationAgent:
             }
 
         except Exception as e:
-            logger.error(f"Email sequence generation failed: {str(e)}")
+            logger.error(f"Email sequence generation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
     async def create_influencer_campaign(
-        self, campaign_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, campaign_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Create comprehensive influencer marketing campaign strategy.
 
@@ -276,12 +277,12 @@ class MarketingContentGenerationAgent:
             }
 
         except Exception as e:
-            logger.error(f"Influencer campaign creation failed: {str(e)}")
+            logger.error(f"Influencer campaign creation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
     async def generate_seo_content_strategy(
-        self, content_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, content_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Generate SEO-optimized content strategy for luxury brand visibility.
 
@@ -335,12 +336,12 @@ class MarketingContentGenerationAgent:
             }
 
         except Exception as e:
-            logger.error(f"SEO content strategy generation failed: {str(e)}")
+            logger.error(f"SEO content strategy generation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
     async def create_product_launch_campaign(
-        self, launch_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, launch_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Create comprehensive product launch campaign across all channels.
 
@@ -408,7 +409,7 @@ class MarketingContentGenerationAgent:
             }
 
         except Exception as e:
-            logger.error(f"Product launch campaign creation failed: {str(e)}")
+            logger.error(f"Product launch campaign creation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
     # Template Methods
@@ -504,8 +505,8 @@ Visual Requirements: {visual_requirements}
     # Implementation methods (condensed for brevity)
 
     async def _develop_viral_strategy(
-        self, campaign_spec: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, campaign_spec: dict[str, Any]
+    ) -> dict[str, Any]:
         """Develop viral content strategy."""
         return {
             "core_message": f"Luxury meets innovation in the new {campaign_spec.get('product_name', 'collection')}",
@@ -530,8 +531,8 @@ Visual Requirements: {visual_requirements}
         }
 
     async def _create_content_calendar(
-        self, platforms: List[str], duration: int
-    ) -> Dict[str, Any]:
+        self, platforms: list[str], duration: int
+    ) -> dict[str, Any]:
         """Create content calendar for campaign."""
         calendar = {}
         for i in range(duration):
@@ -548,8 +549,8 @@ Visual Requirements: {visual_requirements}
         return calendar
 
     async def _generate_platform_content(
-        self, platform: str, campaign_spec: Dict[str, Any], duration: int
-    ) -> Dict[str, Any]:
+        self, platform: str, campaign_spec: dict[str, Any], duration: int
+    ) -> dict[str, Any]:
         """Generate platform-specific content."""
         content = {
             "strategy": f"{platform.title()} strategy for luxury brand engagement",
@@ -581,7 +582,7 @@ Visual Requirements: {visual_requirements}
 
     async def _generate_luxury_email(
         self, sequence_type: str, email_number: int, total_emails: int, segment: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate individual luxury email."""
         email_subjects = {
             "welcome_series": [
@@ -669,7 +670,7 @@ Visual Requirements: {visual_requirements}
 
         return themes[day % len(themes)]
 
-    def _get_platform_engagement_tactics(self, platform: str) -> List[str]:
+    def _get_platform_engagement_tactics(self, platform: str) -> list[str]:
         """Get engagement tactics for specific platform."""
         tactics = {
             "instagram": [
@@ -698,13 +699,13 @@ Visual Requirements: {visual_requirements}
         return tactics.get(platform, ["General engagement tactics"])
 
     def _generate_sample_content(
-        self, platform: str, campaign_spec: Dict[str, Any], day: int
+        self, platform: str, campaign_spec: dict[str, Any], day: int
     ) -> str:
         """Generate sample content for platform."""
         content_samples = {
             "instagram": f"Day {day + 1}: Luxury meets innovation in every detail ✨ #SkyyRose #LuxuryFashion",
             "tiktok": f"Day {day + 1}: Behind the scenes of luxury craftsmanship 👑 #LuxuryFashion #SkyyRose",
-            "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",  # noqa: E501
+            "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",
         }
 
         return content_samples.get(
@@ -727,8 +728,7 @@ async def main():
         "objective": "brand_awareness",
     }
 
-    viral_campaign = await agent.create_viral_social_campaign(campaign_spec)
-    print(f"Viral campaign creation: {viral_campaign['status']}")
+    await agent.create_viral_social_campaign(campaign_spec)
 
     # Generate email sequence
     email_spec = {
@@ -738,8 +738,7 @@ async def main():
         "objective": "nurture_and_convert",
     }
 
-    email_sequence = await agent.generate_luxury_email_sequence(email_spec)
-    print(f"Email sequence generation: {email_sequence['status']}")
+    await agent.generate_luxury_email_sequence(email_spec)
 
 
 if __name__ == "__main__":

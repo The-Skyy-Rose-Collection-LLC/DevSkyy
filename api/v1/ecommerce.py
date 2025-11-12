@@ -8,20 +8,16 @@ IMPACT: Enables automated product management workflows
 Truth Protocol: Input validation, error handling, logging, no placeholders
 """
 
+from datetime import datetime
 import logging
 from typing import Optional
-from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from services.woocommerce_importer import (
-    WooCommerceImporterService
-)
-from services.seo_optimizer import (
-    SEOOptimizerService,
-    ProductInfo
-)
+from services.seo_optimizer import ProductInfo, SEOOptimizerService
+from services.woocommerce_importer import WooCommerceImporterService
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ecommerce", tags=["E-Commerce Automation"])
@@ -143,7 +139,7 @@ async def import_products(
         logger.exception("Product import failed")
         raise HTTPException(
             status_code=500,
-            detail=f"Import failed: {str(e)}"
+            detail=f"Import failed: {e!s}"
         )
 
 
@@ -273,12 +269,12 @@ async def execute_complete_workflow(
 
         if request.notify_telegram:
             await importer.send_telegram_notification(
-                f"❌ Workflow Failed\n\nError: {str(e)}"
+                f"❌ Workflow Failed\n\nError: {e!s}"
             )
 
         raise HTTPException(
             status_code=500,
-            detail=f"Workflow failed: {str(e)}"
+            detail=f"Workflow failed: {e!s}"
         )
 
 

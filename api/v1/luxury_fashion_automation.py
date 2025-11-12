@@ -36,19 +36,20 @@ Role Requirements by Endpoint Type:
 - System status: READ_ONLY
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
+from typing import Any, Optional
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, status, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
+
 
 # Security imports (RFC 7519 JWT + RBAC)
 try:
     from security.jwt_auth import (
-        require_role,
         UserRole,
         get_current_user,
+        require_role,
     )
     SECURITY_AVAILABLE = True
 except ImportError:
@@ -65,11 +66,11 @@ except ImportError:
 # Import agents
 try:
     from agent.modules.content.visual_content_generation_agent import (
-        visual_content_agent,
-        GenerationRequest,
-        ContentType,
-        StylePreset,
         ContentProvider,
+        ContentType,
+        GenerationRequest,
+        StylePreset,
+        visual_content_agent,
     )
     VISUAL_AGENT_AVAILABLE = True
 except ImportError:
@@ -78,8 +79,10 @@ except ImportError:
 
 try:
     from agent.modules.finance.finance_inventory_pipeline_agent import (
-        finance_inventory_agent,
         Channel as InventoryChannel,
+    )
+    from agent.modules.finance.finance_inventory_pipeline_agent import (
+        finance_inventory_agent,
     )
     FINANCE_AGENT_AVAILABLE = True
 except ImportError:
@@ -97,11 +100,13 @@ except ImportError:
 
 try:
     from agent.modules.development.code_recovery_cursor_agent import (
-        code_recovery_agent,
-        CodeLanguage,
-        RecoveryStrategy,
         CodeGenerationRequest as CodeGenRequest,
+    )
+    from agent.modules.development.code_recovery_cursor_agent import (
+        CodeLanguage,
         CodeRecoveryRequest,
+        RecoveryStrategy,
+        code_recovery_agent,
     )
     CODE_AGENT_AVAILABLE = True
 except ImportError:
@@ -110,8 +115,8 @@ except ImportError:
 
 try:
     from agent.enterprise_workflow_engine import (
-        workflow_engine,
         WorkflowType,
+        workflow_engine,
     )
     WORKFLOW_ENGINE_AVAILABLE = True
 except ImportError:
@@ -120,10 +125,10 @@ except ImportError:
 
 try:
     from agent.modules.content.asset_preprocessing_pipeline import (
-        asset_pipeline,
-        ProcessingRequest,
         AssetType,
+        ProcessingRequest,
         UpscaleQuality,
+        asset_pipeline,
     )
     ASSET_PIPELINE_AVAILABLE = True
 except ImportError:
@@ -132,12 +137,12 @@ except ImportError:
 
 try:
     from agent.modules.content.virtual_tryon_huggingface_agent import (
-        virtual_tryon_agent,
-        TryOnRequest,
+        BodyType,
+        ModelEthnicity,
         ModelSpecification,
         PoseType,
-        ModelEthnicity,
-        BodyType,
+        TryOnRequest,
+        virtual_tryon_agent,
     )
     VIRTUAL_TRYON_AVAILABLE = True
 except ImportError:
@@ -171,10 +176,10 @@ class CampaignRequest(BaseModel):
     name: str = Field(..., description="Campaign name")
     description: Optional[str] = Field(default="")
     campaign_type: str = Field(default="email")
-    channels: List[str] = Field(default=["email"])
-    target_segments: List[str] = Field(default=[])
+    channels: list[str] = Field(default=["email"])
+    target_segments: list[str] = Field(default=[])
     enable_testing: bool = Field(default=False)
-    variants: Optional[List[Dict[str, Any]]] = Field(default=None)
+    variants: Optional[list[dict[str, Any]]] = Field(default=None)
     budget: float = Field(default=0.0)
     scheduled_start: Optional[datetime] = None
     scheduled_end: Optional[datetime] = None
@@ -183,7 +188,7 @@ class CampaignRequest(BaseModel):
 class InventorySyncRequest(BaseModel):
     """Request model for inventory synchronization."""
     channel: str = Field(..., description="Sales channel")
-    items: List[Dict[str, Any]] = Field(..., description="Items to sync")
+    items: list[dict[str, Any]] = Field(..., description="Items to sync")
 
 
 class FinancialTransactionRequest(BaseModel):
@@ -194,7 +199,7 @@ class FinancialTransactionRequest(BaseModel):
     channel: str = Field(default="online_store")
     order_id: Optional[str] = None
     customer_id: Optional[str] = None
-    line_items: List[Dict[str, Any]] = Field(default=[])
+    line_items: list[dict[str, Any]] = Field(default=[])
     payment_method: Optional[str] = None
 
 
@@ -203,7 +208,7 @@ class CodeGenerationRequest(BaseModel):
     description: str = Field(..., description="What code to generate")
     language: str = Field(default="python")
     framework: Optional[str] = None
-    requirements: List[str] = Field(default=[])
+    requirements: list[str] = Field(default=[])
     include_tests: bool = Field(default=True)
     include_docs: bool = Field(default=True)
     model: str = Field(default="cursor")
@@ -221,7 +226,7 @@ class CodeRecoveryRequestModel(BaseModel):
 class WorkflowExecutionRequest(BaseModel):
     """Request model for workflow execution."""
     workflow_type: str = Field(..., description="Type of workflow")
-    workflow_data: Dict[str, Any] = Field(..., description="Workflow configuration")
+    workflow_data: dict[str, Any] = Field(..., description="Workflow configuration")
 
 
 class AssetUploadRequest(BaseModel):
@@ -263,16 +268,16 @@ class VirtualTryOnRequestModel(BaseModel):
 async def upload_and_process_asset(
     request: AssetUploadRequest,
     background_tasks: BackgroundTasks,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Upload an asset and run the asset preprocessing pipeline to produce processed files and metadata for downstream use.
-    
+
     Processes the uploaded asset through enhancement, upscaling, background removal, optional 3D generation, and texture extraction (when enabled) and returns resulting file paths and quality metrics.
-    
+
     Parameters:
         request (AssetUploadRequest): Specifications for the uploaded asset and preprocessing options.
-    
+
     Returns:
         dict: Contains processed asset metadata and output file references:
             - success (bool): `True` if processing succeeded.
@@ -287,7 +292,7 @@ async def upload_and_process_asset(
             - sharpness_score (float): Sharpness metric for the processed asset.
             - processing_time (float): Total processing time in seconds.
             - stages_completed (List[str]): Ordered list of completed processing stage identifiers.
-    
+
     Raises:
         HTTPException: With 503 when the asset preprocessing pipeline is unavailable, or with 500 when processing fails.
     """
@@ -347,18 +352,18 @@ async def upload_and_process_asset(
 @router.get("/assets/{asset_id}", tags=["Assets"])
 async def get_asset_info(
     asset_id: str,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Retrieve metadata for a preprocessed asset by its ID.
-    
+
     Raises:
         HTTPException: 503 if the asset preprocessing pipeline is unavailable.
         HTTPException: 404 if no asset with the given ID is found.
-    
+
     Parameters:
         asset_id (str): Unique identifier of the asset to retrieve.
-    
+
     Returns:
         dict: Asset metadata containing:
             - asset_id (str): Asset identifier.
@@ -414,7 +419,7 @@ async def get_asset_info(
 async def list_assets():
     """
     Retrieve aggregated metrics about preprocessed assets.
-    
+
     Returns:
         dict: Aggregated asset metrics with keys:
             total_assets (int): Total number of assets tracked by the pipeline.
@@ -449,10 +454,10 @@ async def generate_virtual_tryon(
 ):
     """
     Generate virtual try-on assets (images, optional videos and 3D previews) for a product using the provided model specification.
-    
+
     Parameters:
         request (VirtualTryOnRequestModel): Specifies the product asset ID, target model demographics (gender, ethnicity, age_range, body_type), pose, number of variations, and flags for video, multiple angles, and 3D preview generation.
-        
+
     Returns:
         dict: A result payload containing:
             - `success` (bool): `True` when generation succeeded.
@@ -466,7 +471,7 @@ async def generate_virtual_tryon(
             - `realism_score` (float): Perceived realism metric for the outputs.
             - `generation_time` (float): Time in seconds taken to generate outputs.
             - `model_used` (str): Identifier or name of the underlying model(s) used.
-    
+
     Raises:
         HTTPException: 503 if the virtual try-on agent is unavailable.
         HTTPException: 500 if generation fails or an internal error occurs.
@@ -530,14 +535,14 @@ async def generate_virtual_tryon(
 async def get_available_models():
     """
     Return available HuggingFace models and their high-level capabilities for the virtual try-on subsystem.
-    
+
     Returns:
         dict: {
             "total_models": int — count of discovered models,
             "models": list — detailed model entries returned by the agent,
             "capabilities": list — human-readable capability categories supported by the models
         }
-    
+
     Raises:
         fastapi.HTTPException: If the virtual try-on agent is not available (HTTP 503).
     """
@@ -571,7 +576,7 @@ async def get_available_models():
 async def get_tryon_status():
     """
     Get virtual try-on system status.
-    
+
     Returns:
         dict: Status payload containing:
             - `available` (bool): True if the virtual try-on agent is available, False otherwise.
@@ -598,7 +603,7 @@ async def generate_visual_content(
 ):
     """
     Generate visual content for the brand based on the provided VisualContentRequest.
-    
+
     Returns:
         dict: Result payload with keys:
             - `success` (bool): `true` when generation succeeded, `false` otherwise.
@@ -609,7 +614,7 @@ async def generate_visual_content(
             - `generation_time` (float|None): Time taken to generate content in seconds.
             - `cost` (float|None): Estimated cost for the generation operation.
             - `error` (str|None): Error message when generation failed.
-    
+
     Raises:
         HTTPException: With 503 when the visual content agent is unavailable.
         HTTPException: With 500 when generation fails due to an internal error.
@@ -654,14 +659,14 @@ async def generate_visual_content(
 
 @router.post("/visual-content/batch-generate", tags=["Visual Content"])
 async def batch_generate_visual_content(
-    requests: List[VisualContentRequest]
+    requests: list[VisualContentRequest]
 ):
     """
     Generate visual content for a batch of VisualContentRequest objects.
-    
+
     Parameters:
         requests (List[VisualContentRequest]): List of visual content requests to process in bulk.
-    
+
     Returns:
         dict: Summary of the batch operation with keys:
             - `success` (bool): `True` if the batch request was submitted and processed.
@@ -718,7 +723,7 @@ async def batch_generate_visual_content(
 async def get_visual_content_status():
     """
     Report availability and system status of the visual content agent.
-    
+
     Returns:
         dict: If the agent is available, returns {"available": True, "status": <status>} where <status> is the agent's system status. If unavailable, returns {"available": False, "error": "<message>"}.
     """
@@ -739,10 +744,10 @@ async def get_visual_content_status():
 async def sync_inventory(request: InventorySyncRequest):
     """
     Synchronize inventory from an external sales channel specified in the request.
-    
+
     Parameters:
         request (InventorySyncRequest): Sync request containing `channel` (the external platform name) and `items` to be synchronized. Supported channels include WooCommerce, Shopify, Magento, Amazon, and eBay.
-    
+
     Returns:
         dict: Result object describing the synchronization outcome, for example keys such as `success` (bool), `processed_count` (int), and `errors` (list) when applicable.
     """
@@ -766,7 +771,7 @@ async def sync_inventory(request: InventorySyncRequest):
 @router.post("/finance/transactions/record", tags=["Finance & Inventory"])
 async def record_transaction(
     request: FinancialTransactionRequest,
-    current_user: Dict[str, Any] = Depends(require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user)
 ):
     """
     Record a financial transaction and apply related inventory updates and tax calculations.
@@ -824,11 +829,11 @@ async def get_demand_forecast(
 ):
     """
     Produce a demand forecast for a given inventory item.
-    
+
     Parameters:
         item_id (str): Identifier of the inventory item (SKU or internal ID).
         forecast_period_days (int): Forecast horizon in days (default 30).
-    
+
     Returns:
         dict: Forecast payload containing:
             - forecast_id: Unique identifier for the forecast.
@@ -840,7 +845,7 @@ async def get_demand_forecast(
             - recommended_order_quantity: Suggested order quantity based on the forecast.
             - forecast_period: Human-readable period string (e.g., "30 days").
             - generated_at: ISO 8601 timestamp when the forecast was produced.
-    
+
     Raises:
         HTTPException: If the finance & inventory agent is unavailable or if forecasting fails.
     """
@@ -882,11 +887,11 @@ async def generate_financial_report(
 ):
     """
     Generate a financial report for the specified date range.
-    
+
     Parameters:
         start_date (datetime): Start of the reporting period (inclusive).
         end_date (datetime): End of the reporting period (inclusive).
-    
+
     Returns:
         dict: A report containing aggregated financial metrics and breakdowns, typically including:
             - revenue: total revenue for the period
@@ -920,7 +925,7 @@ async def generate_financial_report(
 async def get_finance_inventory_status():
     """
     Return availability and operational status for the finance and inventory agent.
-    
+
     Returns:
         dict: A status payload with either:
             - When the agent is available: {"available": True, "status": <agent status dict>}
@@ -943,10 +948,10 @@ async def get_finance_inventory_status():
 async def create_campaign(request: CampaignRequest):
     """
     Create a new marketing campaign.
-    
+
     Parameters:
         request (CampaignRequest): Campaign definition including name, description, campaign_type, channels, target segments, variants, budget, and scheduling.
-    
+
     Returns:
         dict: Metadata about the created campaign containing:
             - success (bool): `True` when creation succeeded.
@@ -990,7 +995,7 @@ async def create_campaign(request: CampaignRequest):
 async def launch_campaign(campaign_id: str):
     """
     Launches a marketing campaign across configured channels and starts A/B testing when enabled.
-    
+
     @param campaign_id: Identifier of the campaign to launch.
     @returns: A dictionary with launch metadata (e.g., `campaign_id`, `status`, `launch_time`, and any provider-specific details or errors).
     @raises HTTPException: Raised with status 503 if the marketing orchestrator is unavailable; raised with status 500 if the campaign launch fails.
@@ -1014,13 +1019,13 @@ async def launch_campaign(campaign_id: str):
 async def complete_campaign(campaign_id: str):
     """
     Finalize a marketing campaign and produce its final performance report.
-    
+
     Parameters:
         campaign_id (str): Identifier of the campaign to complete.
-    
+
     Returns:
         dict: Final campaign metadata and analytics, typically including fields such as `campaign_id`, `status`, `roi`, `conversion_rates`, `ab_test_results`, and `completed_at`.
-    
+
     Raises:
         HTTPException: If the marketing orchestrator is unavailable or the completion operation fails.
     """
@@ -1040,13 +1045,13 @@ async def complete_campaign(campaign_id: str):
 
 
 @router.post("/marketing/segments/create", tags=["Marketing"])
-async def create_segment(segment_data: Dict[str, Any]):
+async def create_segment(segment_data: dict[str, Any]):
     """
     Create a customer segment for targeted marketing.
-    
+
     Parameters:
         segment_data (Dict[str, Any]): Criteria and metadata for the segment (for example: "name", "demographics", "behavior", "purchase_history", "engagement", "filters"). Keys and value shapes depend on the marketing orchestrator's schema.
-    
+
     Returns:
         dict: Result object with keys:
             - success (bool): `True` on successful creation.
@@ -1054,7 +1059,7 @@ async def create_segment(segment_data: Dict[str, Any]):
             - name (str): Segment name.
             - customer_count (int): Number of customers included in the segment.
             - created_at (str): ISO 8601 timestamp of creation.
-    
+
     Raises:
         HTTPException: `503` if the marketing orchestrator is unavailable.
         HTTPException: `500` if segment creation fails due to an internal error.
@@ -1085,7 +1090,7 @@ async def create_segment(segment_data: Dict[str, Any]):
 async def get_marketing_status():
     """
     Return the availability and system status of the marketing orchestrator.
-    
+
     Returns:
         dict: `{"available": True, "status": <status_payload>}` when the orchestrator is available; `{"available": False, "error": "<message>"}` when it is not.
     """
@@ -1106,10 +1111,10 @@ async def get_marketing_status():
 async def generate_code(request: CodeGenerationRequest):
     """
     Generate source code and accompanying metadata from a high-level code specification.
-    
+
     Parameters:
         request (CodeGenerationRequest): Generation parameters including a textual description, target language and framework, dependency requirements, whether to include tests and documentation, and the preferred model.
-    
+
     Returns:
         dict: Generation result with keys:
             - `success` (bool): `true` if generation completed without fatal errors, `false` otherwise.
@@ -1124,7 +1129,7 @@ async def generate_code(request: CodeGenerationRequest):
             - `generation_time` (float|None): Time in seconds taken to generate the code.
             - `model_used` (str|None): Model identifier used for generation.
             - `error` (str|None): Error message when generation failed.
-    
+
     Raises:
         HTTPException: with status 503 if the code recovery agent is unavailable.
         HTTPException: with status 500 on internal generation failures.
@@ -1172,10 +1177,10 @@ async def generate_code(request: CodeGenerationRequest):
 async def recover_code(request: CodeRecoveryRequestModel):
     """
     Recover source code from a repository or backups using the code recovery agent.
-    
+
     Parameters:
         request (CodeRecoveryRequestModel): Recovery parameters including recovery_type (strategy), repository_url, file_path, branch, and commit_hash.
-    
+
     Returns:
         dict: Recovery result containing:
             - `success`: `true` if recovery succeeded, `false` otherwise.
@@ -1186,7 +1191,7 @@ async def recover_code(request: CodeRecoveryRequestModel):
             - `integrity_verified`: `true` if recovered content passed integrity checks, `false` otherwise.
             - `recovery_time`: Recovery duration or timestamp as provided by the agent.
             - `error`: Error message when recovery failed, or `null` on success.
-    
+
     Raises:
         HTTPException: 503 when the code recovery agent is unavailable.
         HTTPException: 500 for internal errors encountered during recovery.
@@ -1228,7 +1233,7 @@ async def recover_code(request: CodeRecoveryRequestModel):
 async def get_code_agent_status():
     """
     Report the availability and system status of the code recovery agent.
-    
+
     Returns:
         dict: If the agent is available, returns {"available": True, "status": <status dict>}.
               If the agent is unavailable, returns {"available": False, "error": "<error message>"}.
@@ -1250,14 +1255,14 @@ async def get_code_agent_status():
 async def create_workflow(request: WorkflowExecutionRequest):
     """
     Create a multi-agent workflow.
-    
+
     Supported workflow types:
     - fashion_brand_launch: Complete brand launch automation
     - product_launch: New product launch with marketing
     - marketing_campaign: Multi-channel campaign with A/B testing
     - inventory_sync: Cross-platform inventory synchronization
     - content_generation: Automated content pipeline
-    
+
     Returns:
         dict: Workflow creation result containing:
             - `success` (bool): `True` if creation succeeded.
@@ -1266,7 +1271,7 @@ async def create_workflow(request: WorkflowExecutionRequest):
             - `type` (str): Workflow type value.
             - `total_tasks` (int): Number of tasks in the workflow.
             - `status` (str): Current workflow status value.
-    
+
     Raises:
         HTTPException: 503 if the workflow engine is not available.
         HTTPException: 500 if workflow creation fails.
@@ -1301,9 +1306,9 @@ async def create_workflow(request: WorkflowExecutionRequest):
 async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
     """
     Start execution of the specified workflow and schedule it to run in the background.
-    
+
     Schedules the workflow engine to execute the workflow identified by `workflow_id`. If the workflow engine is unavailable an HTTP 503 is raised.
-    
+
     Returns:
         result (dict): Execution acknowledgement containing:
             - `success` (bool): `True` when execution was scheduled.
@@ -1332,14 +1337,14 @@ async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
 async def get_workflow_status(workflow_id: str):
     """
     Fetch the current execution status and progress for a workflow.
-    
+
     Returns:
-    	A dict with workflow runtime state and metadata, typically including keys such as `status`, `progress` (percentage), and `tasks` (per-task results).
-    
+        A dict with workflow runtime state and metadata, typically including keys such as `status`, `progress` (percentage), and `tasks` (per-task results).
+
     Raises:
-    	HTTPException: 503 if the workflow engine is unavailable.
-    	HTTPException: 404 if the requested workflow reports an error or is not found.
-    	HTTPException: 500 for unexpected server-side errors.
+        HTTPException: 503 if the workflow engine is unavailable.
+        HTTPException: 404 if the requested workflow reports an error or is not found.
+        HTTPException: 500 for unexpected server-side errors.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
         raise HTTPException(
@@ -1366,7 +1371,7 @@ async def get_workflow_status(workflow_id: str):
 async def get_workflow_engine_status():
     """
     Get the workflow engine's availability and current system status.
-    
+
     Returns:
         dict: A status payload with:
             - available (bool): True when the workflow engine is available, False otherwise.
@@ -1390,7 +1395,7 @@ async def get_workflow_engine_status():
 async def get_system_status():
     """
     Get the overall runtime status of the system and its optional agents.
-    
+
     Returns:
         dict: A dictionary with keys:
             - `timestamp` (str): ISO 8601 timestamp of the status snapshot.

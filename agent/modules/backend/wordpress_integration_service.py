@@ -1,10 +1,11 @@
+from datetime import datetime, timedelta
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any
 from urllib.parse import urlencode
 
 import requests
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class WordPressIntegrationService:
             "🌐 WordPress Integration Service initialized for luxury brand agents"
         )
 
-    def generate_auth_url(self, state: str = None) -> str:
+    def generate_auth_url(self, state: str | None = None) -> str:
         """Generate WordPress OAuth authorization URL."""
         params = {
             "client_id": self.client_id,
@@ -44,7 +45,7 @@ class WordPressIntegrationService:
         logger.info("🔗 Generated WordPress auth URL for luxury brand integration")
         return auth_url
 
-    async def exchange_code_for_token(self, authorization_code: str) -> Dict[str, Any]:
+    async def exchange_code_for_token(self, authorization_code: str) -> dict[str, Any]:
         """Exchange authorization code for access token."""
         try:
             token_data = {
@@ -79,10 +80,10 @@ class WordPressIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"❌ WordPress token exchange failed: {str(e)}")
+            logger.error(f"❌ WordPress token exchange failed: {e!s}")
             return {"status": "error", "message": str(e)}
 
-    async def _get_site_info(self) -> Dict[str, Any]:
+    async def _get_site_info(self) -> dict[str, Any]:
         """Get WordPress site information."""
         try:
             headers = {"Authorization": f"Bearer {self.access_token}"}
@@ -110,10 +111,10 @@ class WordPressIntegrationService:
             return {"message": "No sites found"}
 
         except Exception as e:
-            logger.error(f"Failed to get site info: {str(e)}")
+            logger.error(f"Failed to get site info: {e!s}")
             return {"error": str(e)}
 
-    def _get_agent_capabilities(self) -> Dict[str, List[str]]:
+    def _get_agent_capabilities(self) -> dict[str, list[str]]:
         """Define what each agent can do with WordPress."""
         return {
             "design_automation_agent": [
@@ -160,7 +161,7 @@ class WordPressIntegrationService:
 
     async def get_site_posts(
         self, limit: int = 10, post_type: str = "post"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get WordPress site posts for agent analysis."""
         try:
             if not await self._ensure_valid_token():
@@ -183,10 +184,10 @@ class WordPressIntegrationService:
             return response.json()
 
         except Exception as e:
-            logger.error(f"Failed to get posts: {str(e)}")
+            logger.error(f"Failed to get posts: {e!s}")
             return {"error": str(e)}
 
-    async def get_site_pages(self, limit: int = 20) -> Dict[str, Any]:
+    async def get_site_pages(self, limit: int = 20) -> dict[str, Any]:
         """Get WordPress site pages for agent optimization."""
         try:
             if not await self._ensure_valid_token():
@@ -209,10 +210,10 @@ class WordPressIntegrationService:
             return response.json()
 
         except Exception as e:
-            logger.error(f"Failed to get pages: {str(e)}")
+            logger.error(f"Failed to get pages: {e!s}")
             return {"error": str(e)}
 
-    async def get_site_theme_info(self) -> Dict[str, Any]:
+    async def get_site_theme_info(self) -> dict[str, Any]:
         """Get current theme information for design agents."""
         try:
             if not await self._ensure_valid_token():
@@ -246,12 +247,12 @@ class WordPressIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get theme info: {str(e)}")
+            logger.error(f"Failed to get theme info: {e!s}")
             return {"error": str(e)}
 
     async def update_site_content(
-        self, post_id: int, content_updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, post_id: int, content_updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update WordPress content with agent improvements."""
         try:
             if not await self._ensure_valid_token():
@@ -281,12 +282,12 @@ class WordPressIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to update content: {str(e)}")
+            logger.error(f"Failed to update content: {e!s}")
             return {"error": str(e)}
 
     async def create_luxury_collection_page(
-        self, collection_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create a luxury collection page optimized for conversions."""
         try:
             if not await self._ensure_valid_token():
@@ -343,10 +344,10 @@ class WordPressIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to create collection page: {str(e)}")
+            logger.error(f"Failed to create collection page: {e!s}")
             return {"error": str(e)}
 
-    async def monitor_site_performance(self) -> Dict[str, Any]:
+    async def monitor_site_performance(self) -> dict[str, Any]:
         """Monitor WordPress site performance for agents."""
         try:
             if not await self._ensure_valid_token():
@@ -381,7 +382,7 @@ class WordPressIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Performance monitoring failed: {str(e)}")
+            logger.error(f"Performance monitoring failed: {e!s}")
             return {"error": str(e)}
 
     async def _ensure_valid_token(self) -> bool:
@@ -423,11 +424,11 @@ class WordPressIntegrationService:
             return True
 
         except Exception as e:
-            logger.error(f"Token refresh failed: {str(e)}")
+            logger.error(f"Token refresh failed: {e!s}")
             return False
 
     async def _generate_luxury_page_content(
-        self, collection_data: Dict[str, Any]
+        self, collection_data: dict[str, Any]
     ) -> str:
         """Generate luxury page content with Divi builder elements."""
         collection_type = collection_data.get("collection_type", "premium")
@@ -492,8 +493,8 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         return content
 
     async def _analyze_luxury_opportunities(
-        self, theme_data: Dict[str, Any]
-    ) -> List[str]:
+        self, theme_data: dict[str, Any]
+    ) -> list[str]:
         """Analyze opportunities for luxury brand improvements."""
         opportunities = []
 
@@ -522,8 +523,8 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         return opportunities
 
     async def _analyze_performance_metrics(
-        self, stats_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, stats_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Analyze performance metrics for agent recommendations."""
         return {
             "traffic_analysis": {
@@ -537,8 +538,8 @@ Investment pieces designed to appreciate in value and be treasured for generatio
         }
 
     async def _get_performance_recommendations(
-        self, analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Get performance recommendations for agents."""
         return [
             {
@@ -561,7 +562,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             },
         ]
 
-    def _analyze_content_improvements(self, updates: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_content_improvements(self, updates: dict[str, Any]) -> dict[str, Any]:
         """Analyze what improvements were made by agents."""
         improvements = []
 
@@ -579,7 +580,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             "brand_consistency": "maintained",
         }
 
-    async def _get_luxury_page_features(self, page_data: Dict[str, Any]) -> List[str]:
+    async def _get_luxury_page_features(self, page_data: dict[str, Any]) -> list[str]:
         """Get luxury features of the created page."""
         return [
             "Premium Divi builder layout",
@@ -590,7 +591,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             "Brand-consistent styling",
         ]
 
-    async def _apply_seo_optimization(self, page_id: int) -> Dict[str, Any]:
+    async def _apply_seo_optimization(self, page_id: int) -> dict[str, Any]:
         """Apply SEO optimization to the page."""
         return {
             "meta_title_optimized": True,
@@ -601,7 +602,7 @@ Investment pieces designed to appreciate in value and be treasured for generatio
             "loading_speed_optimized": True,
         }
 
-    def _get_conversion_elements(self, collection_data: Dict[str, Any]) -> List[str]:
+    def _get_conversion_elements(self, collection_data: dict[str, Any]) -> list[str]:
         """Get conversion elements added to the page."""
         return [
             "Prominent call-to-action buttons",

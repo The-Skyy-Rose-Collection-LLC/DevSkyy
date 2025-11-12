@@ -1,11 +1,12 @@
-from datetime import datetime
-import time
-
 from dataclasses import dataclass
+from datetime import datetime
+import logging
+import time
+from typing import Any, Optional
+
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError
-from typing import Any, Dict, List, Optional
-import logging
+
 
 """
 Enterprise Elasticsearch Manager - Search & Analytics Engine
@@ -33,7 +34,7 @@ class SearchMetrics:
             return 0.0
         return self.successful_queries / self.total_queries
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         return {
             "total_queries": self.total_queries,
@@ -51,9 +52,9 @@ class ElasticsearchManager:
 
     def __init__(
         self,
-        hosts: List[str] = None,
-        username: str = None,
-        password: str = None,
+        hosts: list[str] | None = None,
+        username: str | None = None,
+        password: str | None = None,
         use_ssl: bool = True,
         verify_certs: bool = True,
         timeout: int = 30,
@@ -104,7 +105,7 @@ class ElasticsearchManager:
 
         logger.info(f"Elasticsearch manager initialized - Hosts: {self.hosts}")
 
-    def _get_index_mappings(self) -> Dict[str, Dict]:
+    def _get_index_mappings(self) -> dict[str, dict]:
         """Get index mappings for fashion e-commerce"""
         return {
             "logs": {
@@ -223,7 +224,7 @@ class ElasticsearchManager:
             },
         }
 
-    def _get_ilm_policies(self) -> Dict[str, Dict]:
+    def _get_ilm_policies(self) -> dict[str, dict]:
         """Get Index Lifecycle Management policies"""
         return {
             "logs_policy": {
@@ -376,7 +377,7 @@ class ElasticsearchManager:
         self.metrics.last_updated = datetime.now()
 
     async def index_document(
-        self, index_type: str, document: Dict[str, Any], doc_id: Optional[str] = None
+        self, index_type: str, document: dict[str, Any], doc_id: Optional[str] = None
     ) -> bool:
         """Index a document"""
         start_time = time.time()
@@ -410,11 +411,11 @@ class ElasticsearchManager:
     async def search(
         self,
         index_type: str,
-        query: Dict[str, Any],
+        query: dict[str, Any],
         size: int = 10,
         from_: int = 0,
-        sort: List[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        sort: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Perform search query"""
         start_time = time.time()
 
@@ -463,10 +464,10 @@ class ElasticsearchManager:
         self,
         index_type: str,
         search_text: str,
-        fields: List[str] = None,
+        fields: list[str] | None = None,
         size: int = 10,
         min_score: float = 0.1,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Perform full-text search with relevance scoring"""
 
         # Default fields for fashion e-commerce
@@ -517,7 +518,7 @@ class ElasticsearchManager:
         category: Optional[str] = None,
         year: Optional[int] = None,
         min_popularity: float = 0.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Fashion-specific trend search"""
 
         query = {
@@ -566,7 +567,7 @@ class ElasticsearchManager:
         end_date: datetime,
         aggregation: str = "avg",
         interval: str = "1h",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get analytics data with time-based aggregation"""
 
         query = {
@@ -618,7 +619,7 @@ class ElasticsearchManager:
             logger.error(f"Analytics query error: {e}")
             return {"error": str(e)}
 
-    async def get_metrics(self) -> Dict[str, Any]:
+    async def get_metrics(self) -> dict[str, Any]:
         """Get search performance metrics"""
         cluster_health = None
         indices_stats = None
@@ -637,7 +638,7 @@ class ElasticsearchManager:
             "configured_indices": list(self.indices.keys()),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check"""
         start_time = time.time()
 

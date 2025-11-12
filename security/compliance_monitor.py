@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
+from enum import Enum
 import json
+import logging
 import time
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from enum import Enum
-from typing import Any, Dict, List, Optional
-import logging
 
 """
 DevSkyy Compliance Monitor v1.0.0
@@ -59,8 +59,8 @@ class ComplianceViolation(BaseModel):
     severity: ViolationSeverity
     timestamp: datetime = Field(default_factory=datetime.now)
     description: str
-    evidence: Dict[str, Any] = Field(default_factory=dict)
-    remediation_steps: List[str] = Field(default_factory=list)
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    remediation_steps: list[str] = Field(default_factory=list)
     resolved: bool = False
     resolution_date: Optional[datetime] = None
     resolution_notes: Optional[str] = None
@@ -72,10 +72,10 @@ class ComplianceControl(BaseModel):
     standard: ComplianceStandard
     title: str
     description: str
-    requirements: List[str]
-    automated_checks: List[str] = Field(default_factory=list)
-    manual_checks: List[str] = Field(default_factory=list)
-    evidence_required: List[str] = Field(default_factory=list)
+    requirements: list[str]
+    automated_checks: list[str] = Field(default_factory=list)
+    manual_checks: list[str] = Field(default_factory=list)
+    evidence_required: list[str] = Field(default_factory=list)
     frequency: str = "daily"  # daily, weekly, monthly, quarterly, annually
 
 class ComplianceReport(BaseModel):
@@ -88,8 +88,8 @@ class ComplianceReport(BaseModel):
     controls_assessed: int
     controls_compliant: int
     controls_non_compliant: int
-    violations: List[ComplianceViolation]
-    recommendations: List[str] = Field(default_factory=list)
+    violations: list[ComplianceViolation]
+    recommendations: list[str] = Field(default_factory=list)
     next_assessment_date: datetime
 
 # ============================================================================
@@ -110,9 +110,9 @@ class ComplianceMonitor:
 
     def __init__(self, redis_client=None):
         self.redis_client = redis_client
-        self.controls: Dict[str, ComplianceControl] = {}
-        self.violations: List[ComplianceViolation] = []
-        self.audit_logs: List[Dict[str, Any]] = []
+        self.controls: dict[str, ComplianceControl] = {}
+        self.violations: list[ComplianceViolation] = []
+        self.audit_logs: list[dict[str, Any]] = []
 
         # Initialize compliance controls
         self._initialize_controls()
@@ -283,7 +283,7 @@ class ComplianceMonitor:
 
     async def _assess_control(
         self, control: ComplianceControl
-    ) -> List[ComplianceViolation]:
+    ) -> list[ComplianceViolation]:
         """Assess a specific compliance control."""
         violations = []
 
@@ -311,14 +311,14 @@ class ComplianceMonitor:
                 standard=control.standard,
                 control_id=control.control_id,
                 severity=ViolationSeverity.MEDIUM,
-                description=f"Control assessment failed: {str(e)}",
+                description=f"Control assessment failed: {e!s}",
                 evidence={"error": str(e)},
             )
             return [violation]
 
     async def _run_automated_check(
         self, check_name: str, control: ComplianceControl
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Run an automated compliance check."""
         try:
             if check_name == "check_security_policies":
@@ -347,7 +347,7 @@ class ComplianceMonitor:
                 "remediation_steps": ["Fix automated check implementation"],
             }
 
-    async def _check_security_policies(self) -> Dict[str, Any]:
+    async def _check_security_policies(self) -> dict[str, Any]:
         """Check if security policies are in place."""
         # In a real implementation, this would check:
         # - Policy documents exist
@@ -361,7 +361,7 @@ class ComplianceMonitor:
             "details": "Security policies are documented and current",
         }
 
-    async def _check_access_controls(self) -> Dict[str, Any]:
+    async def _check_access_controls(self) -> dict[str, Any]:
         """Check access control implementation."""
         # Check for proper access controls
         return {
@@ -370,7 +370,7 @@ class ComplianceMonitor:
             "details": "Access controls are properly implemented",
         }
 
-    async def _check_mfa_enforcement(self) -> Dict[str, Any]:
+    async def _check_mfa_enforcement(self) -> dict[str, Any]:
         """Check multi-factor authentication enforcement."""
         # In a real implementation, check MFA configuration
         return {
@@ -383,7 +383,7 @@ class ComplianceMonitor:
             ],
         }
 
-    async def _check_consent_management(self) -> Dict[str, Any]:
+    async def _check_consent_management(self) -> dict[str, Any]:
         """Check GDPR consent management."""
         return {
             "compliant": True,
@@ -391,7 +391,7 @@ class ComplianceMonitor:
             "details": "Consent management system is operational",
         }
 
-    async def _check_data_retention(self) -> Dict[str, Any]:
+    async def _check_data_retention(self) -> dict[str, Any]:
         """Check data retention policies."""
         return {
             "compliant": True,
@@ -399,7 +399,7 @@ class ComplianceMonitor:
             "details": "Data retention policies are enforced",
         }
 
-    async def _check_data_encryption(self) -> Dict[str, Any]:
+    async def _check_data_encryption(self) -> dict[str, Any]:
         """Check data encryption implementation."""
         return {
             "compliant": True,
@@ -407,7 +407,7 @@ class ComplianceMonitor:
             "details": "Data encryption is properly implemented",
         }
 
-    def _determine_severity(self, check_result: Dict[str, Any]) -> ViolationSeverity:
+    def _determine_severity(self, check_result: dict[str, Any]) -> ViolationSeverity:
         """Determine violation severity based on check result."""
         # Simple severity determination logic
         if "critical" in check_result.get("details", "").lower():
@@ -420,8 +420,8 @@ class ComplianceMonitor:
             return ViolationSeverity.LOW
 
     def _generate_recommendations(
-        self, violations: List[ComplianceViolation]
-    ) -> List[str]:
+        self, violations: list[ComplianceViolation]
+    ) -> list[str]:
         """Generate compliance recommendations based on violations."""
         recommendations = []
 
@@ -446,7 +446,7 @@ class ComplianceMonitor:
 
         return recommendations
 
-    async def _log_audit_event(self, event_type: str, details: Dict[str, Any]):
+    async def _log_audit_event(self, event_type: str, details: dict[str, Any]):
         """Log audit event for compliance tracking."""
         audit_event = {
             "timestamp": datetime.now().isoformat(),
@@ -464,7 +464,7 @@ class ComplianceMonitor:
             )
             await self.redis_client.ltrim("compliance_audit_log", 0, 9999)
 
-    async def get_compliance_status(self) -> Dict[str, Any]:
+    async def get_compliance_status(self) -> dict[str, Any]:
         """Get current compliance status across all standards."""
         status = {}
 

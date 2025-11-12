@@ -5,15 +5,16 @@ Enterprise-grade orchestration with Gemini, Cursor, ChatGPT, and HuggingFace int
 """
 
 import asyncio
-import logging
-from datetime import datetime
-from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
+import logging
+from typing import Any, Optional
 
 # Core imports
 from intelligence.claude_sonnet import ClaudeSonnetIntelligenceService
 from intelligence.openai_service import OpenAIIntelligenceService
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class TaskType(Enum):
 class AICapability:
     """AI provider capability definition."""
     provider: AIProvider
-    task_types: List[TaskType]
+    task_types: list[TaskType]
     performance_score: float
     cost_per_request: float
     max_tokens: int
@@ -58,7 +59,7 @@ class TaskRequest:
     task_id: str
     task_type: TaskType
     content: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     priority: int = 1  # 1=highest, 5=lowest
     max_tokens: Optional[int] = None
     temperature: float = 0.7
@@ -72,9 +73,9 @@ class TaskResult:
     task_id: str
     provider: AIProvider
     result: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     processing_time: float = 0.0
-    token_usage: Dict[str, int] = field(default_factory=dict)
+    token_usage: dict[str, int] = field(default_factory=dict)
     cost: float = 0.0
     success: bool = True
     error: Optional[str] = None
@@ -82,11 +83,11 @@ class TaskResult:
 class MultiAgentOrchestrator:
     """
     Enterprise-grade multi-agent ML orchestration system.
-    
+
     Manages multiple AI providers with intelligent routing, load balancing,
     fallback strategies, and performance optimization.
     """
-    
+
     def __init__(self):
         self.capabilities = self._initialize_capabilities()
         self.providers = {}
@@ -94,13 +95,13 @@ class MultiAgentOrchestrator:
         self.results_cache = {}
         self.performance_metrics = {}
         self.active_tasks = {}
-        
+
         # Initialize providers
         self._initialize_providers()
-        
+
         logger.info("✅ Multi-Agent Orchestrator initialized")
-    
-    def _initialize_capabilities(self) -> Dict[AIProvider, AICapability]:
+
+    def _initialize_capabilities(self) -> dict[AIProvider, AICapability]:
         """Initialize AI provider capabilities matrix."""
         return {
             AIProvider.CLAUDE_SONNET: AICapability(
@@ -181,7 +182,7 @@ class MultiAgentOrchestrator:
                 supports_vision=True
             )
         }
-    
+
     def _initialize_providers(self):
         """Initialize AI provider instances."""
         try:
@@ -190,7 +191,7 @@ class MultiAgentOrchestrator:
             logger.info("✅ Claude Sonnet initialized")
         except Exception as e:
             logger.warning(f"⚠️ Claude Sonnet initialization failed: {e}")
-        
+
         try:
             # Initialize OpenAI services
             self.providers[AIProvider.OPENAI_GPT4] = OpenAIIntelligenceService(model="gpt-4")
@@ -198,28 +199,28 @@ class MultiAgentOrchestrator:
             logger.info("✅ OpenAI services initialized")
         except Exception as e:
             logger.warning(f"⚠️ OpenAI initialization failed: {e}")
-        
+
         # Note: Gemini, Cursor, and HuggingFace would be initialized here
         # with their respective service classes when available
-        
+
         logger.info(f"✅ Initialized {len(self.providers)} AI providers")
-    
+
     def get_optimal_provider(self, task: TaskRequest) -> Optional[AIProvider]:
         """
         Select optimal AI provider for a task based on capabilities,
         performance, cost, and current load.
         """
         suitable_providers = []
-        
+
         for provider, capability in self.capabilities.items():
             # Check if provider supports the task type
             if task.task_type not in capability.task_types:
                 continue
-            
+
             # Check if provider is available
             if provider not in self.providers:
                 continue
-            
+
             # Check capability requirements
             if task.requires_vision and not capability.supports_vision:
                 continue
@@ -227,29 +228,29 @@ class MultiAgentOrchestrator:
                 continue
             if task.requires_streaming and not capability.supports_streaming:
                 continue
-            
+
             # Check token limits
             if task.max_tokens and task.max_tokens > capability.max_tokens:
                 continue
-            
+
             suitable_providers.append((provider, capability))
-        
+
         if not suitable_providers:
             logger.warning(f"No suitable provider found for task {task.task_id}")
             return None
-        
+
         # Sort by performance score and cost efficiency
         suitable_providers.sort(
             key=lambda x: (x[1].performance_score, -x[1].cost_per_request),
             reverse=True
         )
-        
+
         return suitable_providers[0][0]
-    
+
     async def process_task(self, task: TaskRequest) -> TaskResult:
         """Process a single task with the optimal AI provider."""
         start_time = datetime.now()
-        
+
         try:
             # Get optimal provider
             provider = self.get_optimal_provider(task)
@@ -261,29 +262,29 @@ class MultiAgentOrchestrator:
                     success=False,
                     error="No suitable provider found"
                 )
-            
+
             # Track active task
             self.active_tasks[task.task_id] = {
                 'provider': provider,
                 'start_time': start_time,
                 'task_type': task.task_type
             }
-            
+
             # Process with selected provider
             provider_service = self.providers[provider]
-            
+
             # Prepare request based on provider type
             if provider in [AIProvider.CLAUDE_SONNET, AIProvider.OPENAI_GPT4, AIProvider.OPENAI_GPT35]:
                 result = await self._process_with_llm(provider_service, task)
             else:
                 # Handle other provider types (Gemini, Cursor, HuggingFace)
                 result = await self._process_with_specialized_provider(provider_service, task)
-            
+
             processing_time = (datetime.now() - start_time).total_seconds()
-            
+
             # Update performance metrics
             self._update_metrics(provider, processing_time, True)
-            
+
             return TaskResult(
                 task_id=task.task_id,
                 provider=provider,
@@ -291,15 +292,15 @@ class MultiAgentOrchestrator:
                 processing_time=processing_time,
                 success=True
             )
-            
+
         except Exception as e:
             processing_time = (datetime.now() - start_time).total_seconds()
             logger.error(f"❌ Task {task.task_id} failed: {e}")
-            
+
             # Update metrics for failure
             if 'provider' in locals():
                 self._update_metrics(provider, processing_time, False)
-            
+
             return TaskResult(
                 task_id=task.task_id,
                 provider=provider if 'provider' in locals() else AIProvider.CLAUDE_SONNET,
@@ -308,23 +309,23 @@ class MultiAgentOrchestrator:
                 success=False,
                 error=str(e)
             )
-        
+
         finally:
             # Remove from active tasks
             self.active_tasks.pop(task.task_id, None)
-    
+
     async def _process_with_llm(self, provider_service, task: TaskRequest) -> str:
         """Process task with LLM-based provider."""
         # This would call the actual provider service
         # For now, return a placeholder
         return f"Processed by LLM: {task.content[:100]}..."
-    
+
     async def _process_with_specialized_provider(self, provider_service, task: TaskRequest) -> str:
         """Process task with specialized provider (Gemini, Cursor, HuggingFace)."""
         # This would call the specialized provider service
         # For now, return a placeholder
         return f"Processed by specialized provider: {task.content[:100]}..."
-    
+
     def _update_metrics(self, provider: AIProvider, processing_time: float, success: bool):
         """Update performance metrics for a provider."""
         if provider not in self.performance_metrics:
@@ -335,27 +336,27 @@ class MultiAgentOrchestrator:
                 'average_processing_time': 0.0,
                 'success_rate': 0.0
             }
-        
+
         metrics = self.performance_metrics[provider]
         metrics['total_requests'] += 1
         metrics['total_processing_time'] += processing_time
-        
+
         if success:
             metrics['successful_requests'] += 1
-        
+
         metrics['average_processing_time'] = metrics['total_processing_time'] / metrics['total_requests']
         metrics['success_rate'] = metrics['successful_requests'] / metrics['total_requests']
-    
-    async def batch_process(self, tasks: List[TaskRequest]) -> List[TaskResult]:
+
+    async def batch_process(self, tasks: list[TaskRequest]) -> list[TaskResult]:
         """Process multiple tasks concurrently."""
         logger.info(f"🚀 Processing batch of {len(tasks)} tasks")
-        
+
         # Process tasks concurrently
         results = await asyncio.gather(
             *[self.process_task(task) for task in tasks],
             return_exceptions=True
         )
-        
+
         # Handle any exceptions
         processed_results = []
         for i, result in enumerate(results):
@@ -369,11 +370,11 @@ class MultiAgentOrchestrator:
                 ))
             else:
                 processed_results.append(result)
-        
+
         logger.info(f"✅ Batch processing completed: {len(processed_results)} results")
         return processed_results
-    
-    def get_system_status(self) -> Dict[str, Any]:
+
+    def get_system_status(self) -> dict[str, Any]:
         """Get comprehensive system status."""
         return {
             'active_providers': list(self.providers.keys()),

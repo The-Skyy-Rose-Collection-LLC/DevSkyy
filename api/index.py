@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from main import app
 
+
 """
 Vercel serverless function entry point for DevSkyy Platform
 """

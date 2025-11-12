@@ -3,14 +3,15 @@ Enterprise Database Configuration - SQLAlchemy Support
 Production-ready with Neon, Supabase, PlanetScale support
 """
 
+from collections.abc import AsyncGenerator
 import logging
 import os
-from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from database_config import CONNECTION_ARGS, DATABASE_URL
+
 
 logger = logging.getLogger(__name__)
 
@@ -36,13 +37,13 @@ Base = declarative_base()
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Provide a transactional async SQLAlchemy session for use as a dependency.
-    
+
     Yields:
         AsyncSession: an active asynchronous SQLAlchemy session for database operations.
-    
+
     Raises:
         DatabaseError: when an error occurs while using the session; the original exception is attached as `original_error`.
-    
+
     Notes:
         The session is committed after normal use, rolled back on exception, and always closed when the generator exits.
     """
@@ -90,11 +91,11 @@ class DatabaseManager:
     async def connect(self):
         """
         Initialize the database schema and mark this manager as connected.
-        
+
         Attempts to create all ORM tables via init_db(); on success sets `self.connected = True`
         and returns a status dictionary. On failure logs the error and returns a failure status
         dictionary containing the error message.
-        
+
         Returns:
             status (dict): On success: {"status": "connected", "type": "SQLAlchemy", "url": DATABASE_URL}.
                            On failure: {"status": "failed", "error": "<error message>"}.
@@ -125,7 +126,7 @@ class DatabaseManager:
     async def health_check(self):
         """
         Perform a lightweight connectivity check against the configured database.
-        
+
         Returns:
             dict: A status dictionary with the following keys:
                 - status (str): "healthy" on success, "unhealthy" on failure.
@@ -147,7 +148,7 @@ class DatabaseManager:
                         DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
                     ),
                 }
-        except (Exception,) as e:
+        except Exception as e:
             logger.warning(f"Database health check failed: {e}")
             return {"status": "unhealthy", "connected": False, "error": str(e)}
 

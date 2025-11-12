@@ -8,20 +8,21 @@ IMPACT: Higher quality content through AI peer review and human oversight
 Truth Protocol: Input validation, error handling, audit trails, webhook security
 """
 
+from datetime import datetime
 import logging
 import os
 from typing import Optional
-from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+from agent.wordpress.content_generator import ContentGenerator
 from services.consensus_orchestrator import (
     ConsensusOrchestrator,
     HumanDecision,
 )
-from agent.wordpress.content_generator import ContentGenerator
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/consensus", tags=["Consensus Workflow"])
@@ -112,7 +113,7 @@ async def send_approval_email(
 
         email_subject = f"Content Review Required: {draft_preview.get('title', 'Untitled')}"
 
-        email_body = f"""
+        f"""
 <html>
 <head>
     <style>
@@ -197,7 +198,7 @@ async def send_approval_email(
         # For now, log the approval URLs
         logger.info(f"Approval URLs:\n  Approve: {approval_urls['approve_url']}\n  Reject: {approval_urls['reject_url']}")
 
-    except Exception as e:
+    except Exception:
         logger.exception(f"Failed to send approval email to {email}")
 
 
@@ -298,7 +299,7 @@ async def start_consensus_workflow(
     except Exception as e:
         logger.exception("Failed to start consensus workflow")
         raise HTTPException(
-            status_code=500, detail=f"Workflow failed: {str(e)}"
+            status_code=500, detail=f"Workflow failed: {e!s}"
         )
 
 
@@ -430,7 +431,7 @@ async def approve_content(
         </html>
         """
 
-    except ValueError as e:
+    except ValueError:
         logger.error(f"Invalid approval token for workflow {workflow_id}")
         raise HTTPException(status_code=403, detail="Invalid approval token")
     except Exception as e:
@@ -494,7 +495,7 @@ async def reject_content(
         </html>
         """
 
-    except ValueError as e:
+    except ValueError:
         logger.error(f"Invalid rejection token for workflow {workflow_id}")
         raise HTTPException(status_code=403, detail="Invalid rejection token")
     except Exception as e:

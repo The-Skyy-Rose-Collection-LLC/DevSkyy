@@ -1,13 +1,14 @@
-from pathlib import Path
-
-from agent.modules.base_agent import BaseAgent
-from agent.orchestrator import ExecutionPriority, orchestrator
-from agent.security_manager import security_manager, SecurityRole
-from typing import Any, Dict, List, Optional
 import asyncio
 import importlib
 import inspect
 import logging
+from pathlib import Path
+from typing import Any, Optional
+
+from agent.modules.base_agent import BaseAgent
+from agent.orchestrator import ExecutionPriority, orchestrator
+from agent.security_manager import SecurityRole, security_manager
+
 
 """
 Enterprise Agent Registry
@@ -37,9 +38,9 @@ class AgentRegistry:
     """
 
     def __init__(self):
-        self.registered_agents: Dict[str, Dict[str, Any]] = {}
-        self.agent_capabilities: Dict[str, List[str]] = {}
-        self.agent_metadata: Dict[str, Dict[str, Any]] = {}
+        self.registered_agents: dict[str, dict[str, Any]] = {}
+        self.agent_capabilities: dict[str, list[str]] = {}
+        self.agent_metadata: dict[str, dict[str, Any]] = {}
 
         # Agent capability mappings
         self.capability_map = {
@@ -93,7 +94,7 @@ class AgentRegistry:
             "openai": ExecutionPriority.MEDIUM,
         }
 
-    async def discover_and_register_all_agents(self) -> Dict[str, Any]:
+    async def discover_and_register_all_agents(self) -> dict[str, Any]:
         """
         Discover and register all agents automatically.
 
@@ -155,7 +156,7 @@ class AgentRegistry:
 
     async def _discover_agents_in_directory(
         self, directory: Path, module_prefix: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Discover all agent files in a directory"""
         agents = []
 
@@ -175,7 +176,7 @@ class AgentRegistry:
 
     async def _analyze_agent_file(
         self, file_path: Path, module_prefix: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> Optional[dict[str, Any]]:
         """Analyze an agent file to extract information"""
         try:
             # Get module name
@@ -186,7 +187,7 @@ class AgentRegistry:
             module = importlib.import_module(full_module_path)
 
             # Find BaseAgent subclasses
-            for name, obj in inspect.getmembers(module, inspect.isclass):
+            for _name, obj in inspect.getmembers(module, inspect.isclass):
                 if issubclass(obj, BaseAgent) and obj != BaseAgent:
                     # Extract agent info
                     agent_key = module_name.replace("_v2", "").replace("_agent", "")
@@ -204,7 +205,7 @@ class AgentRegistry:
 
         return None
 
-    async def _register_discovered_agent(self, agent_info: Dict[str, Any]) -> bool:
+    async def _register_discovered_agent(self, agent_info: dict[str, Any]) -> bool:
         """Register a discovered agent with the orchestrator"""
         try:
             agent_name = agent_info["name"]
@@ -268,7 +269,7 @@ class AgentRegistry:
         agent_info = self.registered_agents.get(agent_name)
         return agent_info["instance"] if agent_info else None
 
-    def list_agents(self, capability: Optional[str] = None) -> List[str]:
+    def list_agents(self, capability: Optional[str] = None) -> list[str]:
         """
         List all registered agents.
 
@@ -287,7 +288,7 @@ class AgentRegistry:
 
         return list(self.registered_agents.keys())
 
-    def get_agent_info(self, agent_name: str) -> Optional[Dict[str, Any]]:
+    def get_agent_info(self, agent_name: str) -> Optional[dict[str, Any]]:
         """Get detailed information about an agent"""
         if agent_name not in self.registered_agents:
             return None
@@ -305,7 +306,7 @@ class AgentRegistry:
             "module": agent_data["module"],
         }
 
-    async def health_check_all(self) -> Dict[str, Any]:
+    async def health_check_all(self) -> dict[str, Any]:
         """Perform health check on all registered agents"""
         results = {}
 
@@ -360,8 +361,8 @@ class AgentRegistry:
         return False
 
     async def execute_workflow(
-        self, workflow_name: str, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, workflow_name: str, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Execute a predefined multi-agent workflow.
 
@@ -380,8 +381,8 @@ class AgentRegistry:
             return {"error": f"Unknown workflow: {workflow_name}"}
 
     async def _workflow_scan_and_fix(
-        self, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """Workflow: Scan codebase then apply fixes"""
         # Execute scan
         scan_result = await orchestrator.execute_task(
@@ -412,8 +413,8 @@ class AgentRegistry:
         }
 
     async def _workflow_content_pipeline(
-        self, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """Workflow: Content generation → SEO optimization → Publishing"""
         results = {}
 
@@ -439,8 +440,8 @@ class AgentRegistry:
         return {"workflow": "content_pipeline", "results": results}
 
     async def _workflow_ecommerce_order(
-        self, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         """Workflow: Order processing through multiple agents"""
         results = {}
 

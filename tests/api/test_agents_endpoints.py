@@ -3,14 +3,15 @@ Comprehensive Unit Tests for Agent API Endpoints (api/v1/agents.py)
 Testing scanner and fixer agent execution endpoints with various scenarios
 """
 
-import pytest
+from datetime import datetime
+from unittest.mock import AsyncMock, patch
+
 from fastapi import status
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch
-from datetime import datetime
+import pytest
 
 from main import app
-from security.jwt_auth import create_access_token, User, UserRole, user_manager
+from security.jwt_auth import User, UserRole, create_access_token, user_manager
 
 
 @pytest.fixture
@@ -74,7 +75,7 @@ def auth_headers():
         "username": "testuser",
         "role": UserRole.API_USER,
     }
-    
+
     # Add user to user manager
     test_user = User(
         user_id=token_data["user_id"],
@@ -85,12 +86,12 @@ def auth_headers():
     )
     user_manager.users[test_user.user_id] = test_user
     user_manager.email_index[test_user.email] = test_user.user_id
-    
+
     access_token = create_access_token(token_data)
     headers = {"Authorization": f"Bearer {access_token}"}
-    
+
     yield headers
-    
+
     # Cleanup
     if test_user.user_id in user_manager.users:
         del user_manager.users[test_user.user_id]
@@ -107,7 +108,7 @@ def developer_headers():
         "username": "devuser",
         "role": UserRole.DEVELOPER,
     }
-    
+
     test_user = User(
         user_id=token_data["user_id"],
         email=token_data["email"],
@@ -117,12 +118,12 @@ def developer_headers():
     )
     user_manager.users[test_user.user_id] = test_user
     user_manager.email_index[test_user.email] = test_user.user_id
-    
+
     access_token = create_access_token(token_data)
     headers = {"Authorization": f"Bearer {access_token}"}
-    
+
     yield headers
-    
+
     # Cleanup
     if test_user.user_id in user_manager.users:
         del user_manager.users[test_user.user_id]
@@ -138,9 +139,9 @@ class TestScannerEndpoint:
     def test_scanner_endpoint_without_auth(self, client):
         """Test scanner endpoint requires authentication"""
         request_data = {"parameters": {}}
-        
+
         response = client.post("/api/v1/agents/scanner/execute", json=request_data)
-        
+
         assert response.status_code in [
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
@@ -153,7 +154,7 @@ class TestScannerEndpoint:
         """Test successful scanner execution"""
         # Setup mock
         mock_scanner.execute_core_function = AsyncMock(return_value=mock_scanner_result)
-        
+
         request_data = {
             "parameters": {
                 "target": ".",
@@ -161,13 +162,13 @@ class TestScannerEndpoint:
                 "include_security": True
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["agent_name"] == "Scanner"
@@ -181,13 +182,13 @@ class TestScannerEndpoint:
     def test_scanner_endpoint_empty_parameters(self, client, auth_headers):
         """Test scanner with empty parameters"""
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         # Should accept empty parameters or return validation error
         assert response.status_code in [
             status.HTTP_200_OK,
@@ -206,7 +207,7 @@ class TestScannerEndpoint:
             "status": "completed"
         }
         mock_scanner.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {
             "parameters": {
                 "target": "api/v1/",
@@ -214,13 +215,13 @@ class TestScannerEndpoint:
                 "exclude_patterns": ["test_*", "__pycache__"]
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
     @pytest.mark.api
@@ -232,15 +233,15 @@ class TestScannerEndpoint:
         mock_scanner.execute_core_function = AsyncMock(
             side_effect=Exception("Scanner module not found")
         )
-        
+
         request_data = {"parameters": {"target": "."}}
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         data = response.json()
         assert "detail" in data
@@ -253,20 +254,20 @@ class TestScannerEndpoint:
         mock_scanner.execute_core_function = AsyncMock(
             side_effect=TimeoutError("Scanner timed out after 300 seconds")
         )
-        
+
         request_data = {
             "parameters": {
                 "target": ".",
                 "timeout": 300
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
     @pytest.mark.api
@@ -283,15 +284,15 @@ class TestScannerEndpoint:
             "status": "completed"
         }
         mock_scanner.execute_core_function = AsyncMock(return_value=large_result)
-        
+
         request_data = {"parameters": {"target": "."}}
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["result"]["files_scanned"] == 1000
@@ -305,7 +306,7 @@ class TestScannerEndpoint:
             data="invalid json",
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
@@ -317,9 +318,9 @@ class TestFixerEndpoint:
     def test_fixer_endpoint_without_auth(self, client):
         """Test fixer endpoint requires authentication"""
         request_data = {"parameters": {}}
-        
+
         response = client.post("/api/v1/agents/fixer/execute", json=request_data)
-        
+
         assert response.status_code in [
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
@@ -330,13 +331,13 @@ class TestFixerEndpoint:
     def test_fixer_endpoint_requires_developer_role(self, client, auth_headers):
         """Test fixer requires developer role or higher"""
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         # Should be forbidden for non-developer users
         assert response.status_code in [
             status.HTTP_403_FORBIDDEN,
@@ -349,7 +350,7 @@ class TestFixerEndpoint:
     def test_fixer_endpoint_success(self, mock_fixer, client, developer_headers, mock_fixer_result):
         """Test successful fixer execution"""
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_fixer_result)
-        
+
         request_data = {
             "parameters": {
                 "scan_results": {
@@ -359,13 +360,13 @@ class TestFixerEndpoint:
                 "create_backup": True
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
@@ -383,15 +384,15 @@ class TestFixerEndpoint:
             "files_fixed": 0
         }
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
     @pytest.mark.api
@@ -406,7 +407,7 @@ class TestFixerEndpoint:
             "errors_fixed": 10
         }
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {
             "parameters": {
                 "scan_results": {
@@ -419,13 +420,13 @@ class TestFixerEndpoint:
                 "dry_run": False
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
     @pytest.mark.api
@@ -436,15 +437,15 @@ class TestFixerEndpoint:
         mock_fixer.execute_core_function = AsyncMock(
             side_effect=Exception("Fixer module failed")
         )
-        
+
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         data = response.json()
         assert "detail" in data
@@ -462,20 +463,20 @@ class TestFixerEndpoint:
             "files_fixed": 0
         }
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {
             "parameters": {
                 "dry_run": True,
                 "scan_results": {"errors_found": []}
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
     @pytest.mark.api
@@ -491,19 +492,19 @@ class TestFixerEndpoint:
             "files_fixed": 3
         }
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {
             "parameters": {
                 "create_backup": True
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
     @pytest.mark.api
@@ -522,15 +523,15 @@ class TestFixerEndpoint:
             ]
         }
         mock_fixer.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/fixer/execute",
             json=request_data,
             headers=developer_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
 
@@ -550,20 +551,20 @@ class TestScannerV2Endpoint:
             "status": "completed"
         }
         mock_scanner.execute_core_function = AsyncMock(return_value=mock_result)
-        
+
         request_data = {
             "parameters": {
                 "enhanced_security": True,
                 "deep_analysis": True
             }
         }
-        
+
         response = client.post(
             "/api/v1/agents/scanner-v2/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_500_INTERNAL_SERVER_ERROR]
 
 
@@ -575,7 +576,7 @@ class TestAgentListEndpoint:
     def test_list_all_agents_without_auth(self, client):
         """Test listing agents requires authentication"""
         response = client.get("/api/v1/agents")
-        
+
         assert response.status_code in [
             status.HTTP_401_UNAUTHORIZED,
             status.HTTP_403_FORBIDDEN
@@ -586,14 +587,14 @@ class TestAgentListEndpoint:
     def test_list_all_agents_success(self, client, auth_headers):
         """Test successful retrieval of agent list"""
         response = client.get("/api/v1/agents", headers=auth_headers)
-        
+
         # Endpoint might return list or might not be fully implemented
         assert response.status_code in [
             status.HTTP_200_OK,
             status.HTTP_404_NOT_FOUND,
             status.HTTP_500_INTERNAL_SERVER_ERROR
         ]
-        
+
         if response.status_code == status.HTTP_200_OK:
             data = response.json()
             assert "agents" in data or isinstance(data, list)
@@ -609,13 +610,13 @@ class TestEdgeCases:
         request_data = {
             "parameters": "not a dict"
         }
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     @pytest.mark.api
@@ -623,13 +624,13 @@ class TestEdgeCases:
     def test_missing_parameters_field(self, client, auth_headers):
         """Test request without parameters field"""
         request_data = {}
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         assert response.status_code in [
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_200_OK,
@@ -642,15 +643,15 @@ class TestEdgeCases:
     def test_null_result_handling(self, mock_scanner, client, auth_headers):
         """Test handling of null results from agent"""
         mock_scanner.execute_core_function = AsyncMock(return_value=None)
-        
+
         request_data = {"parameters": {}}
-        
+
         response = client.post(
             "/api/v1/agents/scanner/execute",
             json=request_data,
             headers=auth_headers
         )
-        
+
         # Should handle null result gracefully
         assert response.status_code in [
             status.HTTP_200_OK,
@@ -662,18 +663,18 @@ class TestEdgeCases:
     def test_concurrent_requests(self, client, auth_headers):
         """Test handling of concurrent agent requests"""
         import concurrent.futures
-        
+
         def make_request():
             return client.post(
                 "/api/v1/agents/scanner/execute",
                 json={"parameters": {}},
                 headers=auth_headers
             )
-        
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             futures = [executor.submit(make_request) for _ in range(5)]
             results = [f.result() for f in concurrent.futures.as_completed(futures)]
-        
+
         # All requests should complete
         assert len(results) == 5
         for response in results:

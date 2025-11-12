@@ -15,40 +15,41 @@ CRITICAL CI/CD FIXES:
 # This MUST be at the top before any local imports
 # =============================================================================
 
-import sys
 import os
 from pathlib import Path
+import sys
+
 
 # Add project root to Python path for CI/CD
 project_root = Path(__file__).parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-print(f"✅ Test configuration: Project root added to path: {project_root}")
 
 # =============================================================================
 # Standard Library and Third-Party Imports
 # =============================================================================
 
-import requests
-import time
 import asyncio
-import pytest
-from typing import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Generator
+import time
+
 from fastapi.testclient import TestClient
+from httpx import AsyncClient
+import pytest
+import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from httpx import AsyncClient
+
+from main import app
+from models_sqlalchemy import Base
 
 # =============================================================================
 # Local Imports (now work because of sys.path fix above)
 # =============================================================================
+from security.jwt_auth import User, UserRole, create_access_token, create_refresh_token, user_manager
 
-from security.jwt_auth import create_access_token, create_refresh_token
-from models_sqlalchemy import Base
-from security.jwt_auth import User, user_manager, UserRole
-from main import app
 
 # Import main app
 
@@ -221,7 +222,6 @@ def setup_test_environment():
 
     This fixture sets safe defaults that work in CI/CD.
     """
-    print("\n🔧 Setting up test environment variables for CI/CD...")
 
     # Set defaults (only if not already set)
     os.environ.setdefault("ENVIRONMENT", "test")
@@ -235,7 +235,6 @@ def setup_test_environment():
     os.environ.setdefault("LOG_LEVEL", "DEBUG")
     os.environ.setdefault("ENABLE_RATE_LIMITING", "false")
 
-    print("✅ Test environment configured successfully")
 
     yield
 

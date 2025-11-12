@@ -28,13 +28,13 @@ USAGE:
     logger.info("task_started", task_id="123", user_id="user-456")
 """
 
-import logging
-import sys
-import json
-from typing import Dict, Any, Optional
 from datetime import datetime
-import traceback
+import json
+import logging
 import re
+import sys
+import traceback
+from typing import Any, Optional
 
 
 # =============================================================================
@@ -189,7 +189,7 @@ class PerformanceLogger:
 
     def __init__(self, name: str):
         self.logger = get_logger(name)
-        self.latencies: Dict[str, list] = {}
+        self.latencies: dict[str, list] = {}
 
     def track(self, operation: str):
         """
@@ -410,7 +410,7 @@ class ContextLogger:
 def log_to_error_ledger(
     error_type: str,
     error_message: str,
-    context: Dict[str, Any],
+    context: dict[str, Any],
     ledger_file: str = "artifacts/error-ledger.json"
 ):
     """
@@ -480,7 +480,6 @@ if __name__ == "__main__":
         import time
         time.sleep(0.05)  # Simulate query
 
-    print(f"P95 latency: {perf_logger.get_p95_latency('user_query')}ms")
 
     # Example 3: Context logger
     ctx_logger = ContextLogger("api", request_id="req-123", user_id="user-456")

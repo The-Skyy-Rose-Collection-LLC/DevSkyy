@@ -8,19 +8,18 @@ IMPACT: Ensures consensus system works correctly before production
 pytest -m consensus -v
 """
 
-import asyncio
-import pytest
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from services.consensus_orchestrator import (
-    ConsensusOrchestrator,
     BrandIntelligenceReviewer,
-    SEOMarketingReviewer,
-    SecurityComplianceReviewer,
+    ConsensusOrchestrator,
     ContentDraft,
-    ReviewDecision,
     HumanDecision,
+    ReviewDecision,
+    SecurityComplianceReviewer,
+    SEOMarketingReviewer,
 )
 
 
@@ -388,7 +387,7 @@ async def test_max_redraft_iterations(mock_content_generator, brand_config):
 
     # Force all reviews to require redraft
     with patch.object(orchestrator, 'review_draft', new_callable=AsyncMock) as mock_review:
-        from services.consensus_orchestrator import ConsensusVote, AgentReview
+        from services.consensus_orchestrator import AgentReview, ConsensusVote
 
         mock_review.return_value = ConsensusVote(
             total_reviewers=3,
@@ -419,7 +418,7 @@ async def test_max_redraft_iterations(mock_content_generator, brand_config):
 def test_approval_urls_generation(orchestrator):
     """Test approval URL generation"""
     # Create a workflow
-    from services.consensus_orchestrator import WorkflowState, ContentDraft
+    from services.consensus_orchestrator import ContentDraft, WorkflowState
 
     draft = ContentDraft(
         title="Test",

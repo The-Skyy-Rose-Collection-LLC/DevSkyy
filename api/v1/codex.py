@@ -1,12 +1,13 @@
-from security.jwt_auth import get_current_user
+import logging
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from ml.codex_integration import codex
 from ml.codex_orchestrator import codex_orchestrator
-from typing import List, Literal, Optional
-import logging
+from security.jwt_auth import get_current_user
+
 
 """
 Codex Integration API Endpoints
@@ -47,7 +48,7 @@ class CodeGenerationRequest(BaseModel):
     temperature: Optional[float] = Field(
         default=None, description="Sampling temperature (0.0-1.0)"
     )
-    context: Optional[List[str]] = Field(default=None, description="Additional context")
+    context: Optional[list[str]] = Field(default=None, description="Additional context")
 
 class CodeCompletionRequest(BaseModel):
     """Request model for code completion"""

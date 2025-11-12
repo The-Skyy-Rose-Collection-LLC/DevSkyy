@@ -4,14 +4,15 @@ Provides advanced code analysis, fixing, and branch management
 """
 
 # Import existing modules using importlib
+from datetime import datetime
 import importlib.util
 import logging
 import os
+from pathlib import Path
 import re
 import subprocess
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
+
 
 # Get the current directory to import other modules
 current_dir = Path(__file__).parent
@@ -54,8 +55,8 @@ class EnhancedAutoFix:
         create_branch: bool = True,
         branch_name: Optional[str] = None,
         auto_commit: bool = True,
-        fix_types: List[str] = None,
-    ) -> Dict[str, Any]:
+        fix_types: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Run enhanced auto-fix workflow with advanced features"""
         try:
             logger.info("🚀 Starting Enhanced Auto-Fix Session...")
@@ -123,7 +124,7 @@ class EnhancedAutoFix:
             return session_result
 
         except Exception as e:
-            logger.error(f"❌ Enhanced Auto-Fix failed: {str(e)}")
+            logger.error(f"❌ Enhanced Auto-Fix failed: {e!s}")
             # Cleanup on failure
             if create_branch and self.original_branch:
                 self._checkout_branch(self.original_branch)
@@ -140,7 +141,7 @@ class EnhancedAutoFix:
         try:
             result = subprocess.run(
                 ["git", "branch", "--show-current"],
-                capture_output=True,
+                check=False, capture_output=True,
                 text=True,
                 timeout=10,
             )
@@ -156,7 +157,7 @@ class EnhancedAutoFix:
             # Create and checkout new branch
             result = subprocess.run(
                 ["git", "checkout", "-b", branch_name],
-                capture_output=True,
+                check=False, capture_output=True,
                 text=True,
                 timeout=30,
             )
@@ -175,7 +176,7 @@ class EnhancedAutoFix:
         try:
             result = subprocess.run(
                 ["git", "checkout", branch_name],
-                capture_output=True,
+                check=False, capture_output=True,
                 text=True,
                 timeout=30,
             )
@@ -185,8 +186,8 @@ class EnhancedAutoFix:
             return False
 
     def _run_enhanced_fixes(
-        self, scan_results: Dict[str, Any], fix_types: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, scan_results: dict[str, Any], fix_types: Optional[list[str]] = None
+    ) -> dict[str, Any]:
         """Run enhanced version of the fixer with additional capabilities"""
         # Use existing fixer as base
         fix_results = fixer_module.fix_code(scan_results)
@@ -206,7 +207,7 @@ class EnhancedAutoFix:
 
         return fix_results
 
-    def _apply_security_fixes(self) -> List[Dict[str, Any]]:
+    def _apply_security_fixes(self) -> list[dict[str, Any]]:
         """Apply security-related fixes"""
         fixes = []
 
@@ -241,7 +242,7 @@ class EnhancedAutoFix:
                                     {
                                         "file": file_path,
                                         "type": "security_warning",
-                                        "description": "Potential hardcoded secret detected - consider using environment variables",  # noqa: E501
+                                        "description": "Potential hardcoded secret detected - consider using environment variables",
                                         "line": "multiple",
                                     }
                                 )
@@ -252,7 +253,7 @@ class EnhancedAutoFix:
 
         return fixes
 
-    def _apply_advanced_fixes(self) -> Dict[str, Any]:
+    def _apply_advanced_fixes(self) -> dict[str, Any]:
         """Apply advanced fixes beyond basic code fixing"""
         advanced_fixes = {
             "fixes_applied": [],
@@ -276,7 +277,7 @@ class EnhancedAutoFix:
 
         return advanced_fixes
 
-    def _improve_configuration(self) -> List[Dict[str, Any]]:
+    def _improve_configuration(self) -> list[dict[str, Any]]:
         """Improve project configuration"""
         fixes = []
 
@@ -293,7 +294,7 @@ class EnhancedAutoFix:
 
         return fixes
 
-    def _improve_project_structure(self) -> List[Dict[str, Any]]:
+    def _improve_project_structure(self) -> list[dict[str, Any]]:
         """Improve overall project structure"""
         fixes = []
 
@@ -324,7 +325,7 @@ class EnhancedAutoFix:
         return fixes
 
     def _generate_enhanced_commit_message(
-        self, fix_results: Dict[str, Any], advanced_fixes: Dict[str, Any]
+        self, fix_results: dict[str, Any], advanced_fixes: dict[str, Any]
     ) -> str:
         """Generate enhanced commit message"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -385,7 +386,7 @@ class EnhancedAutoFix:
                 "## Session Details",
                 f"- Session ID: {self.fix_session_id}",
                 f"- Total fixes applied: {len(all_fixes)}",
-                f"- Files modified: {len(set(fix.get('file', '') for fix in all_fixes))}",
+                f"- Files modified: {len({fix.get('file', '') for fix in all_fixes})}",
                 "",
                 "Generated by DevSkyy Enhanced Auto-Fix System 🤖",
             ]
@@ -393,7 +394,7 @@ class EnhancedAutoFix:
 
         return "\n".join(message_parts)
 
-    def _commit_fixes(self, message: str) -> Dict[str, Any]:
+    def _commit_fixes(self, message: str) -> dict[str, Any]:
         """Commit the fixes with enhanced message"""
         try:
             # Use existing commit functionality
@@ -409,7 +410,7 @@ def run_auto_fix_session(
     create_branch: bool = True,
     branch_name: Optional[str] = None,
     auto_commit: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run a complete auto-fix session"""
     autofix = EnhancedAutoFix()
     return autofix.run_enhanced_autofix(
@@ -417,7 +418,7 @@ def run_auto_fix_session(
     )
 
 
-def quick_fix() -> Dict[str, Any]:
+def quick_fix() -> dict[str, Any]:
     """Quick fix without branch creation"""
     autofix = EnhancedAutoFix()
     return autofix.run_enhanced_autofix(create_branch=False, auto_commit=True)

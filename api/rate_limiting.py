@@ -1,8 +1,8 @@
+from collections import defaultdict
 import threading
 import time
+from typing import Optional
 
-from collections import defaultdict
-from typing import Dict, Optional
 
 """
 API Rate Limiting for Grade A+ API Score
@@ -16,14 +16,14 @@ class RateLimiter:
     """
 
     def __init__(self):
-        self._buckets: Dict[str, Dict] = defaultdict(
+        self._buckets: dict[str, dict] = defaultdict(
             lambda: {"tokens": 0, "last_update": 0}
         )
         self._lock = threading.Lock()
 
     def is_allowed(
         self, client_identifier: str, max_requests: int = 100, window_seconds: int = 60
-    ) -> tuple[bool, Optional[Dict]]:
+    ) -> tuple[bool, Optional[dict]]:
         """
         Check if request is allowed under rate limit
 
@@ -69,7 +69,7 @@ class RateLimiter:
         """Reset rate limit for a client"""
         with self._lock:
             keys_to_remove = [
-                k for k in self._buckets.keys() if k.startswith(client_identifier)
+                k for k in self._buckets if k.startswith(client_identifier)
             ]
             for key in keys_to_remove:
                 del self._buckets[key]

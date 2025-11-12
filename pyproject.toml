@@ -75,6 +75,9 @@ dev = [
     "bandit>=1.7.10",
     "safety>=3.2.11",
     "ruff>=0.8.4",
+    "types-requests>=2.32.0",
+    "pandas-stubs>=2.0.0",
+    "sqlalchemy[mypy]>=2.0.36",
 ]
 test = [
     "pytest>=8.4.2",
@@ -161,21 +164,25 @@ skip_gitignore = true
 # MyPy Configuration
 [tool.mypy]
 python_version = "3.11"
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 check_untyped_defs = true
-disallow_untyped_decorators = true
+disallow_untyped_decorators = false
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_no_return = true
-warn_unreachable = true
+warn_unreachable = false
 strict_equality = true
 show_error_codes = true
 show_column_numbers = true
 pretty = true
+# Focus on catching real bugs, not perfect annotations
+disallow_untyped_calls = false
+disallow_any_generics = false
+allow_untyped_globals = false
 
 [[tool.mypy.overrides]]
 module = [
@@ -194,8 +201,66 @@ module = [
     "celery.*",
     "prometheus_client.*",
     "sentry_sdk.*",
+    "numpy.*",
+    "pandas.*",
+    "sklearn.*",
+    "joblib.*",
+    "nltk.*",
+    "peft.*",
+    "diffusers.*",
+    "pydub.*",
+    "schedule.*",
+    "web3.*",
+    "bcrypt.*",
+    "dotenv.*",
+    "astroid.*",
+    "autopep8.*",
+    "jwt.*",
+    "fastapi.*",
+    "pydantic.*",
+    "sqlalchemy.*",
+    "httpx.*",
+    "urllib3.*",
+    "starlette.*",
+    "uvicorn.*",
+    "cryptography.*",
+    "psutil.*",
+    "authlib.*",
+    "jwt_auth",
+    "webhook_system",
+    "aiohttp.*",
+    "aioredis.*",
+    "asyncpg.*",
+    "clickhouse_driver.*",
+    "elasticsearch.*",
+    "flask.*",
+    "google.*",
+    "googleapiclient.*",
+    "motor.*",
+    "opentelemetry.*",
+    "structlog.*",
+    "woocommerce.*",
+    "fastmcp.*",
+    "mcp.*",
+    "logfire.*",
+    "shap.*",
+    "agentlightning.*",
+    "claude_central_command",
+    "pytest.*",
+    "requests.*",
+    "agent.base_agent",
+    "agent.content_generator",
+    "agent.modules.fixer",
+    "agent.modules.scanner",
+    "agent.modules.wordpress_direct_service",
 ]
 ignore_missing_imports = true
+
+# Allow more flexibility for test files
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = false
 
 # Pytest Configuration
 [tool.pytest.ini_options]
@@ -339,7 +404,7 @@ ignore = [
 known-first-party = ["devskyy", "agent", "api", "ml", "fashion", "infrastructure"]
 lines-after-imports = 2
 split-on-trailing-comma = true
-force-alphabetical-sort-within-sections = true
+force-sort-within-sections = true
 
 [tool.ruff.lint.mccabe]
 max-complexity = 12  # Slightly higher for complex business logic

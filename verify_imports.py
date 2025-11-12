@@ -4,9 +4,10 @@ Import Verification Script
 Verifies that all critical files can import successfully
 """
 
-import sys
 import importlib.util
 from pathlib import Path
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [
@@ -44,16 +45,12 @@ def verify_imports(file_path: str) -> tuple[bool, str]:
 
         return True, "OK"
     except ImportError as e:
-        return False, f"Import error: {str(e)}"
+        return False, f"Import error: {e!s}"
     except Exception as e:
-        return False, f"Error: {str(e)}"
+        return False, f"Error: {e!s}"
 
 def main():
     """Main verification function"""
-    print("=" * 60)
-    print("DevSkyy Import Verification")
-    print("=" * 60)
-    print()
 
     base_path = Path("/home/user/DevSkyy")
     passed = 0
@@ -63,23 +60,16 @@ def main():
         full_path = base_path / file_path
 
         if not full_path.exists():
-            print(f"❌ {file_path}: File not found")
             failed += 1
             continue
 
-        success, message = verify_imports(str(full_path))
+        success, _message = verify_imports(str(full_path))
 
         if success:
-            print(f"✅ {file_path}: {message}")
             passed += 1
         else:
-            print(f"❌ {file_path}: {message}")
             failed += 1
 
-    print()
-    print("=" * 60)
-    print(f"Results: {passed} passed, {failed} failed")
-    print("=" * 60)
 
     return 0 if failed == 0 else 1
 

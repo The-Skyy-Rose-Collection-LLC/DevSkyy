@@ -13,18 +13,20 @@ Features:
 - Adaptive learning and improvement
 """
 
-import asyncio
-import inspect
-import logging
-import traceback
 from abc import ABC, abstractmethod
+import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Set
+import inspect
+import logging
+import traceback
+from typing import Any, Optional
 
 import numpy as np
+
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -163,15 +165,15 @@ class BaseAgent(ABC):
         self.agent_metrics = AgentMetrics()
 
         # Issue tracking
-        self.detected_issues: List[Issue] = []
-        self.known_errors: Set[str] = set()
+        self.detected_issues: list[Issue] = []
+        self.known_errors: set[str] = set()
 
         # Circuit breaker for resilience
         self.circuit_breaker = CircuitBreaker()
 
         # ML components
-        self.anomaly_baseline: Dict[str, List[float]] = {}
-        self.performance_history: List[float] = []
+        self.anomaly_baseline: dict[str, list[float]] = {}
+        self.performance_history: list[float] = []
 
         # Configuration
         self.max_retries = 3
@@ -189,7 +191,7 @@ class BaseAgent(ABC):
         """
 
     @abstractmethod
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Core agent functionality. Must be implemented by subclasses.
         """
@@ -242,7 +244,7 @@ class BaseAgent(ABC):
                                 continue
 
                         logger.warning(
-                            f"⚠️ Attempt {attempt + 1}/{self.max_retries} failed for {func.__name__}: {str(e)}"
+                            f"⚠️ Attempt {attempt + 1}/{self.max_retries} failed for {func.__name__}: {e!s}"
                         )
                         await asyncio.sleep(self.retry_delay * (attempt + 1))
                     else:
@@ -267,7 +269,7 @@ class BaseAgent(ABC):
 
     async def _attempt_self_healing(
         self, error: Exception, function_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Attempt to heal from an error automatically.
 
@@ -332,14 +334,14 @@ class BaseAgent(ABC):
             self.detected_issues.append(
                 Issue(
                     severity=SeverityLevel.HIGH,
-                    description=f"Unresolved error in {function_name}: {str(error)}",
+                    description=f"Unresolved error in {function_name}: {error!s}",
                 )
             )
 
             return {"healed": False, "strategy": "none"}
 
         except Exception as healing_error:
-            logger.error(f"Self-healing failed: {str(healing_error)}")
+            logger.error(f"Self-healing failed: {healing_error!s}")
             return {"healed": False, "error": str(healing_error)}
 
     async def _reinitialize_connections(self):
@@ -414,7 +416,7 @@ class BaseAgent(ABC):
 
         return False
 
-    def predict_performance(self) -> Dict[str, Any]:
+    def predict_performance(self) -> dict[str, Any]:
         """
         Predict future performance based on historical data using simple linear regression.
 
@@ -448,7 +450,7 @@ class BaseAgent(ABC):
 
     # === Health Checks and Diagnostics ===
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """
         Comprehensive health check of the agent.
 
@@ -476,7 +478,7 @@ class BaseAgent(ABC):
             elif self.health_metrics.success_rate < 80:
                 self.status = AgentStatus.DEGRADED
             elif (
-                self.status == AgentStatus.FAILED or self.status == AgentStatus.DEGRADED
+                self.status in (AgentStatus.FAILED, AgentStatus.DEGRADED)
             ):
                 self.status = AgentStatus.RECOVERING
             else:
@@ -528,10 +530,10 @@ class BaseAgent(ABC):
                 "timestamp": datetime.now().isoformat(),
             }
         except Exception as e:
-            logger.error(f"Health check failed: {str(e)}")
+            logger.error(f"Health check failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
-    async def diagnose_issues(self) -> Dict[str, Any]:
+    async def diagnose_issues(self) -> dict[str, Any]:
         """
         Diagnose current issues and recommend solutions.
 
@@ -609,7 +611,7 @@ class BaseAgent(ABC):
 
         # Log the error with stack trace
         logger.error(
-            f"Agent {self.agent_name} error: {str(error)}\n{traceback.format_exc()}"
+            f"Agent {self.agent_name} error: {error!s}\n{traceback.format_exc()}"
         )
 
     def _calculate_ops_per_minute(self) -> float:
@@ -622,7 +624,7 @@ class BaseAgent(ABC):
 
     # === Utility Methods ===
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current agent status"""
         return {
             "agent_name": self.agent_name,

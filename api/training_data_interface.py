@@ -1,23 +1,32 @@
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks, Body
-from fastapi.responses import JSONResponse, HTMLResponse
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel
-import shutil
-import zipfile
-from pathlib import Path
-import logging
-from datetime import datetime
-import json
-import gc
-import tempfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
+import gc
+import json
+import logging
+from pathlib import Path
+import shutil
+import tempfile
+from typing import Any, Optional
+import zipfile
+
+from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import HTMLResponse, JSONResponse
 import psutil
+from pydantic import BaseModel
+
+
+"""
+Training Data Upload Interface
+Handles Skyy Rose Collection training image uploads and preprocessing
+"""
+
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
 # Production-grade image processing imports
 try:
-    from PIL import Image, ImageOps, ImageEnhance
+    from PIL import Image, ImageEnhance, ImageOps
     PIL_AVAILABLE = True
 except ImportError:
     logger.error("PIL/Pillow not available - image processing will be limited")
@@ -31,13 +40,6 @@ except ImportError:
     logger.warning("OpenCV not available - advanced image processing disabled")
     OPENCV_AVAILABLE = False
 
-"""
-Training Data Upload Interface
-Handles Skyy Rose Collection training image uploads and preprocessing
-"""
-
-logger = logging.getLogger(__name__)
-
 # Import the brand trainer
 try:
     from agent.modules.backend.brand_model_trainer import brand_trainer
@@ -50,6 +52,8 @@ app = FastAPI(title="Skyy Rose Training Data Interface", version="1.0.0")
 
 # Add CORS middleware for web interface
 from fastapi.middleware.cors import CORSMiddleware
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -94,26 +98,26 @@ QUALITY_CONFIG["temp_dir"].mkdir(exist_ok=True)
 
 # Pydantic models for bulk operations
 class BulkCategoryUpdate(BaseModel):
-    image_paths: List[str]
+    image_paths: list[str]
     new_category: str
     preserve_existing_metadata: bool = True
 
 class BulkCaptionUpdate(BaseModel):
-    image_paths: List[str]
+    image_paths: list[str]
     caption_template: str
     preserve_trigger_words: bool = True
-    add_trigger_words: List[str] = []
-    remove_trigger_words: List[str] = []
+    add_trigger_words: list[str] = []
+    remove_trigger_words: list[str] = []
 
 class BulkTagUpdate(BaseModel):
-    image_paths: List[str]
-    add_tags: List[str] = []
-    remove_tags: List[str] = []
-    replace_tags: Dict[str, str] = {}
+    image_paths: list[str]
+    add_tags: list[str] = []
+    remove_tags: list[str] = []
+    replace_tags: dict[str, str] = {}
 
 class BulkQualitySettings(BaseModel):
-    image_paths: List[str]
-    resize_dimensions: List[int] = [1024, 1024]  # Changed from tuple to List for JSON compatibility
+    image_paths: list[str]
+    resize_dimensions: list[int] = [1024, 1024]  # Changed from tuple to List for JSON compatibility
     quality_enhancement: bool = True
     auto_contrast: bool = True
     equalize: bool = True
@@ -125,21 +129,21 @@ class BulkQualitySettings(BaseModel):
         return tuple(self.resize_dimensions[:2]) if len(self.resize_dimensions) >= 2 else (1024, 1024)
 
 class BulkMetadataUpdate(BaseModel):
-    image_paths: List[str]
-    metadata_updates: Dict[str, Any]
+    image_paths: list[str]
+    metadata_updates: dict[str, Any]
     merge_with_existing: bool = True
 
 class BulkOperationPreview(BaseModel):
     operation_type: str
-    affected_images: List[str]
-    changes_preview: Dict[str, Any]
+    affected_images: list[str]
+    changes_preview: dict[str, Any]
     estimated_processing_time: float
 
 class UndoOperation(BaseModel):
     operation_id: str
     operation_type: str
-    affected_images: List[str]
-    previous_state: Dict[str, Any]
+    affected_images: list[str]
+    previous_state: dict[str, Any]
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -198,13 +202,13 @@ async def upload_single_image(
 ):
     """
     Upload a single training image for Skyy Rose Collection.
-    
+
     Args:
         file: Image file to upload
         category: Category name (e.g., "dresses", "tops", "accessories")
         description: Optional description of the item
         auto_process: Whether to automatically process the image
-    
+
     Returns:
         Upload confirmation with processing status
     """
@@ -287,18 +291,18 @@ async def upload_single_image(
 @app.post("/upload/batch-images")
 async def upload_batch_images(
     background_tasks: BackgroundTasks,
-    files: List[UploadFile] = File(...),
+    files: list[UploadFile] = File(...),
     category: str = Form("general"),
     auto_process: bool = Form(True)
 ):
     """
     Upload multiple training images in batch.
-    
+
     Args:
         files: List of image files to upload
         category: Category name for all images
         auto_process: Whether to automatically process the images
-    
+
     Returns:
         Batch upload results with processing status
     """
@@ -392,7 +396,7 @@ async def upload_batch_images(
 
         return JSONResponse({
             "success": True,
-            "message": f"Batch upload completed",
+            "message": "Batch upload completed",
             "uploaded_count": len(uploaded_files),
             "failed_count": len(failed_files),
             "total_size": total_size,
@@ -417,12 +421,12 @@ async def upload_zip_archive(
 ):
     """
     Upload a ZIP archive containing training images.
-    
+
     Args:
         file: ZIP file containing images
         category: Category name for all images
         auto_process: Whether to automatically process the images
-    
+
     Returns:
         Archive extraction and upload results
     """
@@ -591,12 +595,12 @@ async def process_category(
 ):
     """
     Process all images in a category for training.
-    
+
     Args:
         category: Category name to process
         remove_background: Whether to remove image backgrounds
         enhance_images: Whether to enhance image quality
-    
+
     Returns:
         Processing initiation confirmation
     """
@@ -642,7 +646,7 @@ async def process_category(
 # ============================================================================
 
 @app.post("/bulk/preview")
-async def preview_bulk_operation(operation_data: Dict[str, Any] = Body(...)):
+async def preview_bulk_operation(operation_data: dict[str, Any] = Body(...)):
     """
     Preview the effects of a bulk operation before applying it.
 
@@ -1123,7 +1127,7 @@ async def list_bulk_operations():
 
 
 # Background task functions
-async def process_single_image(file_path: str, category: str, metadata: Dict[str, Any]):
+async def process_single_image(file_path: str, category: str, metadata: dict[str, Any]):
     """Background task to process a single uploaded image."""
     try:
         logger.info(f"Processing single image: {file_path}")
@@ -1204,7 +1208,7 @@ class ImageQualityProcessor:
         self.config = QUALITY_CONFIG
         self.executor = ThreadPoolExecutor(max_workers=self.config["max_concurrent_operations"])
 
-    def validate_quality_settings(self, settings: BulkQualitySettings) -> Dict[str, Any]:
+    def validate_quality_settings(self, settings: BulkQualitySettings) -> dict[str, Any]:
         """Validate quality settings before processing."""
         validation_result = {"valid": True, "errors": [], "warnings": []}
 
@@ -1248,12 +1252,12 @@ class ImageQualityProcessor:
                 validation_result["warnings"].append("Background removal is experimental and may not work on all images")
 
         except Exception as e:
-            validation_result["errors"].append(f"Validation error: {str(e)}")
+            validation_result["errors"].append(f"Validation error: {e!s}")
             validation_result["valid"] = False
 
         return validation_result
 
-    def validate_image_file(self, image_path: Path) -> Dict[str, Any]:
+    def validate_image_file(self, image_path: Path) -> dict[str, Any]:
         """Validate individual image file."""
         validation_result = {"valid": True, "errors": [], "warnings": [], "info": {}}
 
@@ -1300,11 +1304,11 @@ class ImageQualityProcessor:
                             validation_result["warnings"].append(f"Large image may use significant memory: ~{estimated_memory:.1f}MB")
 
                 except Exception as e:
-                    validation_result["errors"].append(f"Cannot open image: {str(e)}")
+                    validation_result["errors"].append(f"Cannot open image: {e!s}")
                     validation_result["valid"] = False
 
         except Exception as e:
-            validation_result["errors"].append(f"File validation error: {str(e)}")
+            validation_result["errors"].append(f"File validation error: {e!s}")
             validation_result["valid"] = False
 
         return validation_result
@@ -1334,7 +1338,7 @@ class ImageQualityProcessor:
         image_path: Path,
         settings: BulkQualitySettings,
         operation_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process a single image with comprehensive error handling."""
         result = {
             "success": False,
@@ -1384,12 +1388,12 @@ class ImageQualityProcessor:
                 try:
                     with Image.open(image_path) as img:
                         result["final_size"] = img.size
-                except (IOError, OSError) as e:
+                except OSError as e:
                     logger.debug(f"Could not read final image info: {e}")
 
         except Exception as e:
             logger.error(f"Error processing image {image_path}: {e}")
-            result["errors"].append(f"Processing error: {str(e)}")
+            result["errors"].append(f"Processing error: {e!s}")
 
         finally:
             # Cleanup temporary file
@@ -1412,7 +1416,7 @@ class ImageQualityProcessor:
         input_path: Path,
         output_path: Path,
         settings: BulkQualitySettings,
-        result: Dict[str, Any]
+        result: dict[str, Any]
     ) -> bool:
         """Apply quality enhancements to image with fallback mechanisms."""
 
@@ -1464,7 +1468,7 @@ class ImageQualityProcessor:
                 return True
 
         except Exception as e:
-            result["errors"].append(f"Image enhancement error: {str(e)}")
+            result["errors"].append(f"Image enhancement error: {e!s}")
             logger.error(f"Enhancement error for {input_path}: {e}")
             return False
 
@@ -1472,7 +1476,7 @@ class ImageQualityProcessor:
         self,
         img: Image.Image,
         settings: BulkQualitySettings,
-        result: Dict[str, Any]
+        result: dict[str, Any]
     ) -> Image.Image:
         """Apply quality enhancements with error handling."""
 
@@ -1483,7 +1487,7 @@ class ImageQualityProcessor:
                     img = ImageOps.autocontrast(img, cutoff=1)
                     result["warnings"].append("Applied auto contrast")
                 except Exception as e:
-                    result["warnings"].append(f"Auto contrast failed: {str(e)}")
+                    result["warnings"].append(f"Auto contrast failed: {e!s}")
 
             # Histogram equalization
             if settings.equalize:
@@ -1491,7 +1495,7 @@ class ImageQualityProcessor:
                     img = ImageOps.equalize(img)
                     result["warnings"].append("Applied histogram equalization")
                 except Exception as e:
-                    result["warnings"].append(f"Equalization failed: {str(e)}")
+                    result["warnings"].append(f"Equalization failed: {e!s}")
 
             # Additional quality enhancements
             try:
@@ -1506,10 +1510,10 @@ class ImageQualityProcessor:
                 result["warnings"].append("Applied sharpening and color enhancement")
 
             except Exception as e:
-                result["warnings"].append(f"Additional enhancements failed: {str(e)}")
+                result["warnings"].append(f"Additional enhancements failed: {e!s}")
 
         except Exception as e:
-            result["warnings"].append(f"Quality enhancement error: {str(e)}")
+            result["warnings"].append(f"Quality enhancement error: {e!s}")
             logger.warning(f"Quality enhancement failed: {e}")
 
         return img
@@ -1517,7 +1521,7 @@ class ImageQualityProcessor:
     def _remove_background_fallback(
         self,
         img: Image.Image,
-        result: Dict[str, Any]
+        result: dict[str, Any]
     ) -> Image.Image:
         """Fallback background removal implementation."""
 
@@ -1551,7 +1555,7 @@ class ImageQualityProcessor:
                 result["warnings"].append("Background removal skipped - OpenCV not available")
 
         except Exception as e:
-            result["warnings"].append(f"Background removal failed: {str(e)}")
+            result["warnings"].append(f"Background removal failed: {e!s}")
             logger.warning(f"Background removal error: {e}")
 
         return img
@@ -1565,7 +1569,7 @@ image_processor = ImageQualityProcessor()
 # BULK OPERATIONS SUPPORT FUNCTIONS
 # ============================================================================
 
-async def generate_bulk_operation_preview(operation_type: str, operation_data: Dict[str, Any]) -> Dict[str, Any]:
+async def generate_bulk_operation_preview(operation_type: str, operation_data: dict[str, Any]) -> dict[str, Any]:
     """Generate a preview of what a bulk operation would do."""
     try:
         image_paths = operation_data.get("image_paths", [])
@@ -1619,7 +1623,7 @@ async def generate_bulk_operation_preview(operation_type: str, operation_data: D
         return {"error": str(e)}
 
 
-async def capture_images_state(image_paths: List[str]) -> Dict[str, Any]:
+async def capture_images_state(image_paths: list[str]) -> dict[str, Any]:
     """Capture the current state of images for undo functionality."""
     try:
         state = {}
@@ -1656,7 +1660,7 @@ async def capture_images_state(image_paths: List[str]) -> Dict[str, Any]:
 
 async def execute_bulk_category_update(
     operation_id: str,
-    image_paths: List[str],
+    image_paths: list[str],
     new_category: str,
     preserve_existing_metadata: bool
 ):
@@ -1730,11 +1734,11 @@ async def execute_bulk_category_update(
 
 async def execute_bulk_caption_update(
     operation_id: str,
-    image_paths: List[str],
+    image_paths: list[str],
     caption_template: str,
     preserve_trigger_words: bool,
-    add_trigger_words: List[str],
-    remove_trigger_words: List[str]
+    add_trigger_words: list[str],
+    remove_trigger_words: list[str]
 ):
     """Execute bulk caption update operation."""
     try:
@@ -1779,10 +1783,9 @@ async def execute_bulk_caption_update(
                     # Build final caption
                     if all_triggers:
                         new_caption = f"{', '.join(all_triggers)}, {new_caption}"
-                else:
-                    # Just add new trigger words
-                    if add_trigger_words:
-                        new_caption = f"{', '.join(add_trigger_words)}, {new_caption}"
+                # Just add new trigger words
+                elif add_trigger_words:
+                    new_caption = f"{', '.join(add_trigger_words)}, {new_caption}"
 
                 # Update metadata
                 metadata["caption"] = new_caption
@@ -1817,10 +1820,10 @@ async def execute_bulk_caption_update(
 
 async def execute_bulk_tag_update(
     operation_id: str,
-    image_paths: List[str],
-    add_tags: List[str],
-    remove_tags: List[str],
-    replace_tags: Dict[str, str]
+    image_paths: list[str],
+    add_tags: list[str],
+    remove_tags: list[str],
+    replace_tags: dict[str, str]
 ):
     """Execute bulk tag update operation."""
     try:
@@ -1900,7 +1903,7 @@ async def execute_bulk_tag_update(
 
 async def execute_bulk_quality_update(
     operation_id: str,
-    image_paths: List[str],
+    image_paths: list[str],
     quality_settings: BulkQualitySettings
 ):
     """Execute bulk quality update operation with production-grade error handling."""
@@ -2012,7 +2015,7 @@ async def execute_bulk_quality_update(
 
                     except Exception as e:
                         processing_results["failed_updates"] += 1
-                        error_msg = f"Processing exception: {str(e)}"
+                        error_msg = f"Processing exception: {e!s}"
                         logger.error(error_msg)
                         processing_results["individual_results"].append({
                             "success": False,
@@ -2052,7 +2055,7 @@ async def execute_bulk_quality_update(
         )
 
     except Exception as e:
-        error_msg = f"Critical error in bulk quality update: {str(e)}"
+        error_msg = f"Critical error in bulk quality update: {e!s}"
         logger.error(error_msg)
         bulk_operations_history[operation_id]["status"] = "failed"
         bulk_operations_history[operation_id]["error"] = error_msg
@@ -2066,7 +2069,7 @@ async def _update_quality_metadata(
     image_path: Path,
     quality_settings: BulkQualitySettings,
     operation_id: str,
-    processing_result: Dict[str, Any]
+    processing_result: dict[str, Any]
 ):
     """Update metadata file with quality processing information."""
     try:
@@ -2113,8 +2116,8 @@ async def _update_quality_metadata(
 
 async def execute_bulk_metadata_update(
     operation_id: str,
-    image_paths: List[str],
-    metadata_updates: Dict[str, Any],
+    image_paths: list[str],
+    metadata_updates: dict[str, Any],
     merge_with_existing: bool
 ):
     """Execute bulk metadata update operation."""
@@ -2170,7 +2173,7 @@ async def execute_bulk_metadata_update(
         bulk_operations_history[operation_id]["error"] = str(e)
 
 
-async def execute_bulk_undo(operation_id: str, original_operation: Dict[str, Any]):
+async def execute_bulk_undo(operation_id: str, original_operation: dict[str, Any]):
     """Execute bulk undo operation."""
     try:
         logger.info(f"↩️ Executing bulk undo: {operation_id}")

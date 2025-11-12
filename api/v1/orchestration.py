@@ -7,14 +7,16 @@ Author: DevSkyy Team
 Version: 1.0.0
 """
 
-import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
-import sys
+import logging
 import os
+import sys
+from typing import Any, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, Field
+
 
 # Add orchestration module to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'ai_orchestration'))
@@ -28,30 +30,30 @@ router = APIRouter()
 # Pydantic models for request/response validation
 class HealthResponse(BaseModel):
     status: str = Field(..., description="Overall system health status")
-    partnerships: Dict[str, Dict[str, Any]] = Field(..., description="Partnership health details")
+    partnerships: dict[str, dict[str, Any]] = Field(..., description="Partnership health details")
     last_updated: datetime = Field(..., description="Last health check timestamp")
 
 class MetricsResponse(BaseModel):
     partnership_type: str = Field(..., description="Partnership type")
-    metrics: Dict[str, float] = Field(..., description="Performance metrics")
+    metrics: dict[str, float] = Field(..., description="Performance metrics")
     timestamp: datetime = Field(..., description="Metrics collection timestamp")
 
 class DecisionRequest(BaseModel):
-    context: Dict[str, Any] = Field(..., description="Decision context parameters")
+    context: dict[str, Any] = Field(..., description="Decision context parameters")
 
 class DecisionResponse(BaseModel):
     decision: str = Field(..., description="Strategic decision")
     rationale: str = Field(..., description="Decision rationale")
-    implementation_plan: List[Dict[str, Any]] = Field(..., description="Implementation phases")
-    success_metrics: List[str] = Field(..., description="Success criteria")
-    risk_mitigation: List[str] = Field(..., description="Risk mitigation strategies")
+    implementation_plan: list[dict[str, Any]] = Field(..., description="Implementation phases")
+    success_metrics: list[str] = Field(..., description="Success criteria")
+    risk_mitigation: list[str] = Field(..., description="Risk mitigation strategies")
 
 class PartnershipStatus(BaseModel):
     id: str = Field(..., description="Partnership identifier")
     name: str = Field(..., description="Partnership name")
     health: str = Field(..., description="Partnership health status")
     progress: float = Field(..., description="Overall progress percentage")
-    deliverables: List[Dict[str, Any]] = Field(..., description="Deliverable status")
+    deliverables: list[dict[str, Any]] = Field(..., description="Deliverable status")
 
 class DeliverableUpdate(BaseModel):
     completion_percentage: float = Field(..., ge=0, le=100, description="Completion percentage")
@@ -63,7 +65,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     """Validate JWT token and return user info"""
     try:
         # Import JWT authentication
-        from security.jwt_auth import verify_token, get_current_user_from_token
+        from security.jwt_auth import get_current_user_from_token, verify_token
 
         # Extract token from credentials
         token = credentials.credentials
@@ -193,13 +195,13 @@ async def get_orchestration_health(
         logger.error(f"Health check failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Health check failed: {str(e)}"
+            detail=f"Health check failed: {e!s}"
         )
 
-@router.get("/metrics", response_model=List[MetricsResponse], tags=["Metrics"])
+@router.get("/metrics", response_model=list[MetricsResponse], tags=["Metrics"])
 async def get_all_metrics(
     current_user: dict = Depends(get_current_user)
-) -> List[MetricsResponse]:
+) -> list[MetricsResponse]:
     """Get real-time metrics from all partnerships"""
 
     try:
@@ -223,7 +225,7 @@ async def get_all_metrics(
                 logger.warning(f"Failed to get metrics for {partnership_type}: {e}")
                 all_metrics.append(MetricsResponse(
                     partnership_type=partnership_type.value,
-                    metrics={"error": f"Metrics unavailable: {str(e)}"},
+                    metrics={"error": f"Metrics unavailable: {e!s}"},
                     timestamp=timestamp
                 ))
 
@@ -233,7 +235,7 @@ async def get_all_metrics(
         logger.error(f"Metrics collection failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Metrics collection failed: {str(e)}"
+            detail=f"Metrics collection failed: {e!s}"
         )
 
 @router.get("/metrics/{partnership_type}", response_model=MetricsResponse, tags=["Metrics"])
@@ -282,7 +284,7 @@ async def get_partnership_metrics(
         logger.error(f"Partnership metrics failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership metrics failed: {str(e)}"
+            detail=f"Partnership metrics failed: {e!s}"
         )
 
 # Strategic Decision Engine
@@ -320,14 +322,14 @@ async def make_strategic_decision(
         logger.error(f"Strategic decision failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Strategic decision failed: {str(e)}"
+            detail=f"Strategic decision failed: {e!s}"
         )
 
 # Partnership Management
-@router.get("/partnerships", response_model=List[PartnershipStatus], tags=["Partnerships"])
+@router.get("/partnerships", response_model=list[PartnershipStatus], tags=["Partnerships"])
 async def get_all_partnerships(
     current_user: dict = Depends(get_current_user)
-) -> List[PartnershipStatus]:
+) -> list[PartnershipStatus]:
     """Get status of all partnerships"""
 
     try:
@@ -391,7 +393,7 @@ async def get_all_partnerships(
         logger.error(f"Partnership status failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership status failed: {str(e)}"
+            detail=f"Partnership status failed: {e!s}"
         )
 
 @router.get("/partnerships/{partnership_id}/status", response_model=PartnershipStatus, tags=["Partnerships"])
@@ -420,18 +422,18 @@ async def get_partnership_status(
         logger.error(f"Partnership status failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership status failed: {str(e)}"
+            detail=f"Partnership status failed: {e!s}"
         )
 
 # System Information
 @router.get("/info", tags=["System"])
 async def get_system_info(
     current_user: dict = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get orchestration system information"""
 
     try:
-        central_command = await get_orchestration_system()
+        await get_orchestration_system()
 
         # Get system statistics
         system_stats = {
@@ -471,18 +473,18 @@ async def get_system_info(
         logger.error(f"System info failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"System info failed: {str(e)}"
+            detail=f"System info failed: {e!s}"
         )
 
 # System Status Endpoint
 @router.get("/status", tags=["System"])
 async def get_system_status(
     current_user: dict = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get comprehensive system status including all components"""
 
     try:
-        central_command = await get_orchestration_system()
+        await get_orchestration_system()
 
         # Check all system components
         components_status = {
@@ -523,14 +525,14 @@ async def get_system_status(
         logger.error(f"System status check failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"System status check failed: {str(e)}"
+            detail=f"System status check failed: {e!s}"
         )
 
 # Configuration Management
 @router.get("/config", tags=["Configuration"])
 async def get_system_configuration(
     current_user: dict = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get current system configuration"""
 
     try:
@@ -541,7 +543,7 @@ async def get_system_configuration(
                 detail="Admin access required for configuration"
             )
 
-        central_command = await get_orchestration_system()
+        await get_orchestration_system()
 
         config = {
             "api_settings": {
@@ -582,18 +584,18 @@ async def get_system_configuration(
         logger.error(f"Configuration retrieval failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Configuration retrieval failed: {str(e)}"
+            detail=f"Configuration retrieval failed: {e!s}"
         )
 
 # Deployment Readiness Check
 @router.get("/deployment/readiness", tags=["Deployment"])
 async def check_deployment_readiness(
     current_user: dict = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Check if system is ready for production deployment"""
 
     try:
-        central_command = await get_orchestration_system()
+        await get_orchestration_system()
 
         # Check all deployment requirements
         checks = {
@@ -651,14 +653,14 @@ async def check_deployment_readiness(
         logger.error(f"Deployment readiness check failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Deployment readiness check failed: {str(e)}"
+            detail=f"Deployment readiness check failed: {e!s}"
         )
 
 # API Documentation
 @router.get("/docs/endpoints", tags=["Documentation"])
 async def get_api_documentation(
     current_user: dict = Depends(get_current_user)
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get comprehensive API documentation for orchestration endpoints"""
 
     try:
@@ -803,5 +805,5 @@ async def get_api_documentation(
         logger.error(f"API documentation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"API documentation failed: {str(e)}"
+            detail=f"API documentation failed: {e!s}"
         )

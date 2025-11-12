@@ -4,9 +4,9 @@ Tests for complete API workflows with database and external services
 """
 
 
-import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+import pytest
 
 from main import app
 
@@ -377,7 +377,7 @@ class TestRateLimiting:
         """Test that rate limiting is enforced"""
         # Make multiple rapid requests
         responses = []
-        for i in range(15):  # Exceed typical rate limit
+        for _i in range(15):  # Exceed typical rate limit
             response = self.client.get("/health")
             responses.append(response)
 
@@ -386,7 +386,7 @@ class TestRateLimiting:
         assert success_count > 0
 
         # Some might be rate limited (429) depending on configuration
-        rate_limited = sum(1 for r in responses if r.status_code == 429)
+        sum(1 for r in responses if r.status_code == 429)
         # This test depends on actual rate limiting configuration
 
 

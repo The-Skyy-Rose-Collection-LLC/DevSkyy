@@ -1,10 +1,11 @@
-from requests.auth import HTTPBasicAuth
-import os
-import requests
-
-from typing import Any, Dict, List
-import httpx
 import logging
+import os
+from typing import Any
+
+import httpx
+import requests
+from requests.auth import HTTPBasicAuth
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +29,8 @@ class WooCommerceIntegrationService:
         logger.info(f"🌐 WooCommerce API base URL set: {self.base_url}")
 
     async def get_products(
-        self, per_page: int = 20, category: str = None, status: str = "publish"
-    ) -> Dict[str, Any]:
+        self, per_page: int = 20, category: str | None = None, status: str = "publish"
+    ) -> dict[str, Any]:
         """Get WooCommerce products for agent analysis."""
         try:
             if not self.base_url:
@@ -57,12 +58,12 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get products: {str(e)}")
+            logger.error(f"Failed to get products: {e!s}")
             return {"error": str(e)}
 
     async def get_orders(
-        self, per_page: int = 20, status: str = None
-    ) -> Dict[str, Any]:
+        self, per_page: int = 20, status: str | None = None
+    ) -> dict[str, Any]:
         """Get WooCommerce orders for revenue analysis."""
         try:
             if not self.base_url:
@@ -87,12 +88,12 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get orders: {str(e)}")
+            logger.error(f"Failed to get orders: {e!s}")
             return {"error": str(e)}
 
     async def create_luxury_product(
-        self, product_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create a luxury product with optimized settings."""
         try:
             if not self.base_url:
@@ -121,12 +122,12 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to create product: {str(e)}")
+            logger.error(f"Failed to create product: {e!s}")
             return {"error": str(e)}
 
     async def update_product_for_luxury(
-        self, product_id: int, updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_id: int, updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update product with luxury optimizations."""
         try:
             if not self.base_url:
@@ -154,10 +155,10 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to update product: {str(e)}")
+            logger.error(f"Failed to update product: {e!s}")
             return {"error": str(e)}
 
-    async def get_product_categories(self) -> Dict[str, Any]:
+    async def get_product_categories(self) -> dict[str, Any]:
         """Get product categories for luxury organization."""
         try:
             if not self.base_url:
@@ -183,12 +184,12 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to get categories: {str(e)}")
+            logger.error(f"Failed to get categories: {e!s}")
             return {"error": str(e)}
 
     async def create_luxury_collection_category(
-        self, collection_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, collection_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Create a luxury collection category."""
         try:
             if not self.base_url:
@@ -225,10 +226,10 @@ class WooCommerceIntegrationService:
             }
 
         except Exception as e:
-            logger.error(f"Failed to create category: {str(e)}")
+            logger.error(f"Failed to create category: {e!s}")
             return {"error": str(e)}
 
-    async def optimize_checkout_process(self) -> Dict[str, Any]:
+    async def optimize_checkout_process(self) -> dict[str, Any]:
         """Optimize WooCommerce checkout for luxury conversion."""
         try:
             # Get current checkout settings and optimize
@@ -250,10 +251,10 @@ class WooCommerceIntegrationService:
             return optimizations
 
         except Exception as e:
-            logger.error(f"Checkout optimization failed: {str(e)}")
+            logger.error(f"Checkout optimization failed: {e!s}")
             return {"error": str(e)}
 
-    async def get_sales_analytics(self, period: str = "7d") -> Dict[str, Any]:
+    async def get_sales_analytics(self, period: str = "7d") -> dict[str, Any]:
         """Get WooCommerce sales analytics for agent insights."""
         try:
             if not self.base_url:
@@ -287,14 +288,14 @@ class WooCommerceIntegrationService:
             return analytics
 
         except Exception as e:
-            logger.error(f"Sales analytics failed: {str(e)}")
+            logger.error(f"Sales analytics failed: {e!s}")
             return {"error": str(e)}
 
     # Helper methods for luxury e-commerce optimization
 
     async def _analyze_luxury_products(
-        self, products: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, products: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze products for luxury positioning."""
         luxury_indicators = []
         optimization_needed = []
@@ -337,8 +338,8 @@ class WooCommerceIntegrationService:
         }
 
     async def _identify_product_optimizations(
-        self, products: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, products: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Identify specific optimization opportunities."""
         optimizations = []
 
@@ -376,8 +377,8 @@ class WooCommerceIntegrationService:
         return optimizations[:10]  # Return top 10 optimization opportunities
 
     async def _enhance_product_for_luxury(
-        self, product_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, product_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Enhance product data with luxury features."""
         enhanced = product_data.copy()
 
@@ -385,13 +386,12 @@ class WooCommerceIntegrationService:
         luxury_features = []
 
         # Enhance name
-        if "name" in enhanced:
-            if not any(
-                word in enhanced["name"].lower()
-                for word in ["luxury", "premium", "exclusive"]
-            ):
-                enhanced["name"] = f"Premium {enhanced['name']}"
-                luxury_features.append("premium_naming")
+        if "name" in enhanced and not any(
+            word in enhanced["name"].lower()
+            for word in ["luxury", "premium", "exclusive"]
+        ):
+            enhanced["name"] = f"Premium {enhanced['name']}"
+            luxury_features.append("premium_naming")
 
         # Enhance description
         if "description" in enhanced:
@@ -427,8 +427,8 @@ class WooCommerceIntegrationService:
         return enhanced
 
     async def _apply_luxury_enhancements(
-        self, updates: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, updates: dict[str, Any]
+    ) -> dict[str, Any]:
         """Apply luxury enhancements to product updates."""
         enhanced_updates = updates.copy()
         enhancements = []
@@ -454,8 +454,8 @@ class WooCommerceIntegrationService:
         return enhanced_updates
 
     async def _analyze_revenue_patterns(
-        self, orders: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, orders: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze revenue patterns for luxury insights."""
         total_revenue = sum(float(order.get("total", 0)) for order in orders)
         average_order_value = total_revenue / len(orders) if orders else 0
@@ -478,8 +478,8 @@ class WooCommerceIntegrationService:
         }
 
     async def _analyze_customer_behavior(
-        self, orders: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, orders: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze customer behavior for luxury targeting."""
         customer_segments = {
             "luxury_customers": 0,

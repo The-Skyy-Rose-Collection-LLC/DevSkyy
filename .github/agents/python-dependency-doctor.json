@@ -1,0 +1,64 @@
+{
+  "schema_version": "v1alpha",
+  "name": "Python Dependency Doctor",
+  "description": "Diagnose and patch missing Python dependencies that break the DevSkyy pytest suite (e.g., ModuleNotFoundError: fastapi).",
+  "labels": ["bug", "tests"],
+  "triggers": {
+    "workflow_dispatch": {
+      "inputs": {
+        "target_test": {
+          "description": "Optional pytest node id to focus on (defaults to full suite).",
+          "type": "string",
+          "required": false
+        }
+      }
+    },
+    "issue_comment": ["/agent run python-dependency-doctor"]
+  },
+  "environment": {
+    "language": "python",
+    "python_version": "3.11",
+    "package_managers": ["pip"],
+    "pre_checks": [
+      "python -m pip install --upgrade pip",
+      "python -m pip install -r requirements.txt"
+    ]
+  },
+  "playbook": [
+    {
+      "title": "Reproduce failure",
+      "instructions": [
+        "Run pytest targeting the provided node id or the default failing suite to capture the current stack trace.",
+        "If pytest raises ModuleNotFoundError, capture the missing module name and version requirements from upstream FastAPI docs or existing lock files."
+      ]
+    },
+    {
+      "title": "Patch dependencies",
+      "instructions": [
+        "Inspect requirements files (requirements.txt, requirements-dev.txt, pyproject.toml) for the missing package.",
+        "Add or update the dependency pin so that FastAPI-compatible versions remain aligned with Starlette and Pydantic already in the project.",
+        "Update constraints across duplicated requirement files to maintain parity."
+      ],
+      "edits": [
+        "requirements.txt",
+        "requirements-dev.txt",
+        "pyproject.toml"
+      ]
+    },
+    {
+      "title": "Regression verification",
+      "instructions": [
+        "Re-run pytest on the previously failing node and the smoke test target suite.",
+        "Document the before/after output in the pull request summary and flag any new regressions."
+      ],
+      "checks": [
+        "pytest ${target_test:-tests/test_sqlite_setup.py}"
+      ]
+    }
+  ],
+  "success_criteria": [
+    "Pytest completes without ModuleNotFoundError.",
+    "New dependency pins are reflected in all requirements files and pass formatting checks.",
+    "No new test failures are introduced."
+  ]
+}

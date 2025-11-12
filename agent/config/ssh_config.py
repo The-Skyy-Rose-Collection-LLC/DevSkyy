@@ -1,13 +1,13 @@
-from pathlib import Path
-import os
-
-from typing import Any, Dict
 import logging
+import os
+from pathlib import Path
 import subprocess
+from typing import Any
+
 
 logger = logging.getLogger(__name__)
 
-def setup_ssh_config() -> Dict[str, Any]:
+def setup_ssh_config() -> dict[str, Any]:
     """
     Set up SSH configuration for secure repository access.
     Production-level SSH key management.
@@ -48,7 +48,7 @@ Host *
             try:
                 result = subprocess.run(
                     ["ssh-keyscan", "-H", "github.com"],
-                    capture_output=True,
+                    check=False, capture_output=True,
                     text=True,
                     timeout=10,
                 )
@@ -62,7 +62,7 @@ Host *
             except subprocess.TimeoutExpired:
                 logger.warning("⚠️ SSH keyscan timeout")
             except Exception as e:
-                logger.warning(f"⚠️ Failed to add GitHub to known hosts: {str(e)}")
+                logger.warning(f"⚠️ Failed to add GitHub to known hosts: {e!s}")
 
         # Check if SSH key exists
         key_path = ssh_dir / "id_rsa"
@@ -81,5 +81,5 @@ Host *
         }
 
     except Exception as e:
-        logger.error(f"❌ SSH configuration failed: {str(e)}")
+        logger.error(f"❌ SSH configuration failed: {e!s}")
         return {"status": "failed", "error": str(e)}

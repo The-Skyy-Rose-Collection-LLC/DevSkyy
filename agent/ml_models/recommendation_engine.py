@@ -1,6 +1,8 @@
-from typing import Any, Dict, List
 import logging
+from typing import Any
+
 import numpy as np
+
 
 """
 Recommendation Engine - Product Recommendations
@@ -15,7 +17,7 @@ class RecommendationEngine:
 
     async def get_recommendations(
         self, user_id: str, n_recommendations: int = 10, method: str = "hybrid"
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get personalized product recommendations"""
         return [
             {
@@ -27,10 +29,10 @@ class RecommendationEngine:
             for i in range(n_recommendations)
         ]
 
-    async def get_similar_products(self, product_id: str, n: int = 5) -> List[str]:
+    async def get_similar_products(self, product_id: str, n: int = 5) -> list[str]:
         """Find similar products"""
         return [f"PROD-{i:04d}" for i in range(1, n + 1)]
 
-    async def collaborative_filtering(self, user_id: str) -> List[Dict]:
+    async def collaborative_filtering(self, user_id: str) -> list[dict]:
         """Collaborative filtering recommendations"""
         return await self.get_recommendations(user_id, method="collaborative")

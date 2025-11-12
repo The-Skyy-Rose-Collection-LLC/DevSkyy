@@ -10,13 +10,14 @@ Usage:
     DATABASE_URL=postgresql://user:pass@host/db python scripts/setup_consensus_schema.py
 """
 
+import logging
 import os
 import sys
-import logging
 from typing import Optional
 
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -211,7 +212,7 @@ def setup_schema(database_url: str) -> bool:
         logger.info("✅ Schema setup completed successfully!")
         return True
 
-    except Exception as e:
+    except Exception:
         logger.exception("❌ Schema setup failed")
         return False
 

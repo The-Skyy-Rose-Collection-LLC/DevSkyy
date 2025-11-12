@@ -3,9 +3,10 @@ Unit Tests for HuggingFace Best Practices Documentation
 Validates the structure, content, and quality of the documentation
 """
 
-import re
 from pathlib import Path
+import re
 from urllib.parse import urlparse
+
 import pytest
 
 

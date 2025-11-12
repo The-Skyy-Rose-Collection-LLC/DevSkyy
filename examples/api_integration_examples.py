@@ -1,23 +1,28 @@
+import asyncio
+from datetime import datetime
+import logging
+
+from api_integration.auth_manager import AuthenticationType, auth_manager
 from api_integration.core_engine import api_gateway
-from api_integration.auth_manager import auth_manager, AuthenticationType
-from api_integration.discovery_engine import api_discovery_engine, APICategory
+from api_integration.discovery_engine import APICategory, api_discovery_engine
 from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
-    workflow_engine,
+    ActionType,
+    TriggerType,
+    Workflow,
+    WorkflowStep,
     WorkflowTrigger,
     TriggerType,
     ActionType,
     WorkflowStep,
     Workflow,
 )
-from datetime import datetime
 from fashion.intelligence_engine import (
-    fashion_intelligence,
     FashionCategory,
     FashionSeason,
+    fashion_intelligence,
 )
-import asyncio
-import logging
+
 
 """
 API Integration Examples & Templates
@@ -291,7 +296,7 @@ class FashionAPIExamples:
 
         # Make the same call again to test caching
         start_time = datetime.now()
-        cached_result = await api_gateway.make_request(
+        await api_gateway.make_request(
             api_id="fashion_trends_api",
             endpoint="/trends/current",
             method="GET",
@@ -329,23 +334,9 @@ class FashionAPIExamples:
         # Step 1: Analyze customer fashion preferences
         logger.info("Step 1: Analyzing customer preferences...")
 
-        customer_data = {
-            "user_id": "customer_123",
-            "purchase_history": [
-                {"category": "dresses", "style": "bohemian", "color": "earth_tones"},
-                {"category": "accessories", "style": "minimalist", "color": "neutral"},
-                {"category": "shoes", "style": "casual", "color": "brown"},
-            ],
-            "browsing_behavior": {
-                "frequently_viewed_categories": ["dresses", "accessories"],
-                "preferred_brands": ["sustainable_brand_a", "eco_fashion_b"],
-                "price_range": "mid_range",
-            },
-            "sustainability_preference": "high",
-        }
 
         # Analyze fashion context for customer
-        customer_text = f"""
+        customer_text = """
         Customer prefers bohemian and minimalist styles with earth tones and neutral colors.
         Shows strong preference for sustainable and eco-friendly fashion brands.
         Frequently browses dresses and accessories in mid-range price category.

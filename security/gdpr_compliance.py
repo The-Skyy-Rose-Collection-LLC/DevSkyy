@@ -9,14 +9,15 @@ Date: October 26, 2025
 Citation: GDPR Articles 15, 17, 5; Recital 83
 """
 
-import logging
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Any, Optional
+from datetime import UTC, datetime, timedelta
 from enum import Enum
+import logging
+from typing import Any, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter
 from pydantic import BaseModel
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ class ConsentRecord(BaseModel):
     expires_at: Optional[datetime] = None
     ip_address: str
     user_agent: str
-    metadata: Dict[str, Any] = {}
+    metadata: dict[str, Any] = {}
 
 class DataExportRequest(BaseModel):
     """GDPR Article 15 - Right of Access"""
@@ -72,7 +73,7 @@ class DataExportResponse(BaseModel):
     created_at: datetime
     expires_at: datetime
     download_url: str
-    data: Dict[str, Any]
+    data: dict[str, Any]
 
 class DataDeletionRequest(BaseModel):
     """GDPR Article 17 - Right to Erasure"""
@@ -104,7 +105,7 @@ class AuditLog(BaseModel):
     timestamp: datetime
     actor_id: Optional[str] = None  # Admin who performed action
     ip_address: str
-    details: Dict[str, Any] = {}
+    details: dict[str, Any] = {}
 
 # ============================================================================
 # DATA RETENTION POLICIES (GDPR Article 5.1(e))
@@ -156,18 +157,18 @@ RETENTION_POLICIES = {
 class GDPRManager:
     """
     GDPR Compliance Manager
-    
+
     Handles data export, deletion, consent, and audit logging
     per GDPR Articles 15, 17, and 5
     """
-    
+
     def __init__(self):
         """Initialize GDPR manager"""
-        self.consent_records: Dict[str, List[ConsentRecord]] = {}
-        self.audit_logs: List[AuditLog] = []
-        self.data_exports: Dict[str, DataExportResponse] = {}
-        self.data_deletions: Dict[str, DataDeletionResponse] = {}
-    
+        self.consent_records: dict[str, list[ConsentRecord]] = {}
+        self.audit_logs: list[AuditLog] = []
+        self.data_exports: dict[str, DataExportResponse] = {}
+        self.data_deletions: dict[str, DataDeletionResponse] = {}
+
     async def request_data_export(
         self,
         user_id: str,
@@ -176,51 +177,51 @@ class GDPRManager:
     ) -> DataExportResponse:
         """
         GDPR Article 15 - Right of Access
-        
+
         User can request export of all personal data
-        
+
         Args:
             user_id: User requesting export
             format: Export format (json, csv, xml)
             include_related: Include data from 3rd parties
-            
+
         Returns:
             DataExportResponse with download URL
-            
+
         Citation: GDPR Article 15 - Right of Access
         """
         export_id = str(uuid4())
-        
+
         # TODO: Query all user data from database
         user_data = {
             "profile": {
                 "user_id": user_id,
-                "created_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
                 "email": "user@example.com"
             },
             "orders": [],
             "preferences": {},
             "interactions": []
         }
-        
+
         if format == "csv":
             # TODO: Convert to CSV
             pass
         elif format == "xml":
             # TODO: Convert to XML
             pass
-        
+
         export_response = DataExportResponse(
             export_id=export_id,
             user_id=user_id,
-            created_at=datetime.now(timezone.utc),
-            expires_at=datetime.now(timezone.utc) + timedelta(days=30),
+            created_at=datetime.now(UTC),
+            expires_at=datetime.now(UTC) + timedelta(days=30),
             download_url=f"/api/v1/gdpr/exports/{export_id}/download",
             data=user_data
         )
-        
+
         self.data_exports[export_id] = export_response
-        
+
         # Audit log
         await self._log_audit(
             user_id=user_id,
@@ -231,11 +232,11 @@ class GDPRManager:
                 "include_related": include_related
             }
         )
-        
+
         logger.info(f"Data export requested: {export_id} for user {user_id}")
-        
+
         return export_response
-    
+
     async def request_data_deletion(
         self,
         user_id: str,
@@ -244,45 +245,45 @@ class GDPRManager:
     ) -> DataDeletionResponse:
         """
         GDPR Article 17 - Right to Erasure
-        
+
         User can request deletion of all personal data
-        
+
         Args:
             user_id: User requesting deletion
             reason: Reason for deletion request
             include_backups: Delete from backups too
-            
+
         Returns:
             DataDeletionResponse with deletion status
-            
+
         Citation: GDPR Article 17 - Right to Erasure
-        
+
         Exceptions:
             - Legal obligation to retain (taxes, accounting)
             - Legitimate interest in retaining (contract, public interest)
         """
         deletion_id = str(uuid4())
-        
+
         # Check for legal retention obligations
         exceptions = [
             "Transactional data (legal obligation)",
             "Account security logs (3-year retention)"
         ]
-        
+
         # TODO: Query and delete all user data
         items_deleted = 0
-        
+
         deletion_response = DataDeletionResponse(
             deletion_id=deletion_id,
             user_id=user_id,
             status="completed",
-            deleted_at=datetime.now(timezone.utc),
+            deleted_at=datetime.now(UTC),
             items_deleted=items_deleted,
             note=f"Deletion requested with reason: {reason}. Exceptions: {', '.join(exceptions)}"
         )
-        
+
         self.data_deletions[deletion_id] = deletion_response
-        
+
         # Audit log
         await self._log_audit(
             user_id=user_id,
@@ -294,11 +295,11 @@ class GDPRManager:
                 "items_deleted": items_deleted
             }
         )
-        
+
         logger.info(f"Data deletion requested: {deletion_id} for user {user_id}")
-        
+
         return deletion_response
-    
+
     async def update_consent(
         self,
         user_id: str,
@@ -309,17 +310,17 @@ class GDPRManager:
     ) -> ConsentRecord:
         """
         Update user consent (GDPR Recital 83)
-        
+
         Args:
             user_id: User granting/revoking consent
             consent_type: Type of consent
             given: Whether consent is given or revoked
             ip_address: IP address of user
             user_agent: User agent string
-            
+
         Returns:
             ConsentRecord with consent status
-            
+
         Citation: GDPR Recital 83 - Freely Given Consent
         """
         consent_record = ConsentRecord(
@@ -327,17 +328,17 @@ class GDPRManager:
             user_id=user_id,
             consent_type=consent_type,
             given=given,
-            timestamp=datetime.now(timezone.utc),
-            expires_at=datetime.now(timezone.utc) + timedelta(days=730),  # 2 years
+            timestamp=datetime.now(UTC),
+            expires_at=datetime.now(UTC) + timedelta(days=730),  # 2 years
             ip_address=ip_address,
             user_agent=user_agent
         )
-        
+
         if user_id not in self.consent_records:
             self.consent_records[user_id] = []
-        
+
         self.consent_records[user_id].append(consent_record)
-        
+
         # Audit log
         await self._log_audit(
             user_id=user_id,
@@ -348,41 +349,41 @@ class GDPRManager:
                 "consent_id": consent_record.consent_id
             }
         )
-        
+
         logger.info(f"Consent updated: {consent_type} = {given} for user {user_id}")
-        
+
         return consent_record
-    
-    async def get_user_consents(self, user_id: str) -> List[ConsentRecord]:
+
+    async def get_user_consents(self, user_id: str) -> list[ConsentRecord]:
         """Get all consent records for a user"""
         return self.consent_records.get(user_id, [])
-    
-    async def get_retention_policies(self) -> Dict[str, RetentionPolicy]:
+
+    async def get_retention_policies(self) -> dict[str, RetentionPolicy]:
         """Get all data retention policies"""
         return RETENTION_POLICIES
-    
+
     async def get_audit_logs(
         self,
         user_id: Optional[str] = None,
         action: Optional[str] = None,
         limit: int = 100
-    ) -> List[AuditLog]:
+    ) -> list[AuditLog]:
         """Get GDPR audit logs"""
         logs = self.audit_logs
-        
+
         if user_id:
             logs = [l for l in logs if l.user_id == user_id]
-        
+
         if action:
             logs = [l for l in logs if l.action == action]
-        
+
         return logs[-limit:]
-    
+
     async def _log_audit(
         self,
         user_id: str,
         action: str,
-        details: Dict[str, Any],
+        details: dict[str, Any],
         actor_id: Optional[str] = None,
         ip_address: str = "0.0.0.0"
     ) -> AuditLog:
@@ -391,12 +392,12 @@ class GDPRManager:
             log_id=str(uuid4()),
             user_id=user_id,
             action=action,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             actor_id=actor_id,
             ip_address=ip_address,
             details=details
         )
-        
+
         self.audit_logs.append(audit_log)
         return audit_log
 
@@ -420,24 +421,21 @@ gdpr_manager = GDPRManager()
 
 if __name__ == "__main__":
     import asyncio
-    
+
     async def demo():
         # Test data export
-        export = await gdpr_manager.request_data_export("user123", format="json")
-        print(f"Export created: {export.export_id}")
-        
+        await gdpr_manager.request_data_export("user123", format="json")
+
         # Test consent update
-        consent = await gdpr_manager.update_consent(
+        await gdpr_manager.update_consent(
             user_id="user123",
             consent_type=ConsentType.MARKETING,
             given=True,
             ip_address="192.168.1.1",
             user_agent="Mozilla/5.0..."
         )
-        print(f"Consent updated: {consent.consent_id}")
-        
+
         # Test retention policies
-        policies = await gdpr_manager.get_retention_policies()
-        print(f"Retention policies: {len(policies)}")
-    
+        await gdpr_manager.get_retention_policies()
+
     asyncio.run(demo())

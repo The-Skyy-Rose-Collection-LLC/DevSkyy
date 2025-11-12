@@ -11,12 +11,12 @@ Usage:
     python -m fashion_ai_bounded_autonomy.approval_cli stats [--operator <name>]
 """
 
-import asyncio
-import sys
 import argparse
-import json
+import asyncio
 from pathlib import Path
+import sys
 from typing import Optional
+
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -46,160 +46,111 @@ class ApprovalCLI:
 
     async def list_pending(self):
         """List all pending actions"""
-        print(self.colorize("\n📋 PENDING ACTIONS FOR REVIEW\n", "BOLD"))
 
         actions = await self.approval_system.get_pending_actions()
 
         if not actions:
-            print(self.colorize("✓ No pending actions", "GREEN"))
             return
 
-        for idx, action in enumerate(actions, 1):
-            risk_color = {
+        for _idx, action in enumerate(actions, 1):
+            {
                 "low": "GREEN",
                 "medium": "YELLOW",
                 "high": "MAGENTA",
                 "critical": "RED"
             }.get(action["risk_level"], "CYAN")
 
-            print(f"{self.colorize(f'[{idx}]', 'BOLD')} {self.colorize(action['action_id'], 'CYAN')}")
-            print(f"    Agent: {action['agent_name']}")
-            print(f"    Function: {action['function_name']}")
-            print(f"    Risk: {self.colorize(action['risk_level'].upper(), risk_color)}")
-            print(f"    Created: {action['created_at']}")
-            print(f"    Expires: {action['timeout_at']}")
-            print()
 
-        print(self.colorize(f"\nTotal pending: {len(actions)}", "BOLD"))
-        print(f"\nTo review: python -m fashion_ai_bounded_autonomy.approval_cli review <action_id>")
 
     async def review_action(self, action_id: str):
         """Show detailed information about an action"""
         details = await self.approval_system.get_action_details(action_id)
 
         if not details:
-            print(self.colorize(f"❌ Action {action_id} not found", "RED"))
             return
 
-        print(self.colorize("\n🔍 ACTION DETAILS\n", "BOLD"))
-        print("=" * 70)
 
         # Basic info
-        print(self.colorize("IDENTIFICATION", "BOLD"))
-        print(f"  Action ID: {self.colorize(details['action_id'], 'CYAN')}")
-        print(f"  Agent: {details['agent_name']}")
-        print(f"  Function: {details['function_name']}")
 
         # Risk assessment
-        risk_color = {
+        {
             "low": "GREEN",
             "medium": "YELLOW",
             "high": "MAGENTA",
             "critical": "RED"
         }.get(details['risk_level'], "CYAN")
-        print(f"\n{self.colorize('RISK ASSESSMENT', 'BOLD')}")
-        print(f"  Risk Level: {self.colorize(details['risk_level'].upper(), risk_color)}")
-        print(f"  Workflow: {details['workflow_type']}")
 
         # Parameters
-        print(f"\n{self.colorize('PARAMETERS', 'BOLD')}")
-        for key, value in details['parameters'].items():
+        for value in details['parameters'].values():
             if isinstance(value, (dict, list)):
-                print(f"  {key}:")
-                print(f"    {json.dumps(value, indent=4)}")
+                pass
             else:
-                print(f"  {key}: {value}")
+                pass
 
         # Status
-        status_color = {
+        {
             "pending": "YELLOW",
             "approved": "GREEN",
             "rejected": "RED",
             "expired": "MAGENTA",
             "executed": "CYAN"
         }.get(details['status'], "CYAN")
-        print(f"\n{self.colorize('STATUS', 'BOLD')}")
-        print(f"  Current: {self.colorize(details['status'].upper(), status_color)}")
-        print(f"  Created: {details['created_at']}")
-        print(f"  Timeout: {details['timeout_at']}")
 
         if details['approved_at']:
-            print(f"  Approved: {details['approved_at']} by {details['approved_by']}")
+            pass
         if details['rejection_reason']:
-            print(f"  Rejected: {details['rejection_reason']}")
+            pass
 
         # History
         if details['history']:
-            print(f"\n{self.colorize('AUDIT TRAIL', 'BOLD')}")
             for event in details['history']:
-                timestamp = event['timestamp']
-                event_type = event['event']
-                operator = event.get('operator', 'system')
-                print(f"  [{timestamp}] {event_type} by {operator}")
+                event['timestamp']
+                event['event']
+                event.get('operator', 'system')
 
         # Execution result
         if details['execution_result']:
-            print(f"\n{self.colorize('EXECUTION RESULT', 'BOLD')}")
-            print(f"  {json.dumps(details['execution_result'], indent=2)}")
+            pass
 
-        print("=" * 70)
 
         # Actions
         if details['status'] == 'pending':
-            print(f"\n{self.colorize('AVAILABLE ACTIONS:', 'BOLD')}")
-            print(f"  Approve: python -m fashion_ai_bounded_autonomy.approval_cli approve {action_id} --operator <your_name>")
-            print(f"  Reject:  python -m fashion_ai_bounded_autonomy.approval_cli reject {action_id} --operator <your_name> --reason \"<reason>\"")
+            pass
 
     async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
         """Approve an action"""
-        print(f"\n🔄 Approving action {action_id}...")
 
         result = await self.approval_system.approve(action_id, operator, notes)
 
         if result.get("error"):
-            print(self.colorize(f"❌ Error: {result['error']}", "RED"))
             return
 
-        print(self.colorize(f"✅ Action {action_id} approved by {operator}", "GREEN"))
-        print(f"Approved at: {result['approved_at']}")
-        print("\n⚠️  Note: The action will be executed by the agent system automatically.")
 
     async def reject_action(self, action_id: str, operator: str, reason: str):
         """Reject an action"""
-        print(f"\n🔄 Rejecting action {action_id}...")
 
         result = await self.approval_system.reject(action_id, operator, reason)
 
         if result.get("error"):
-            print(self.colorize(f"❌ Error: {result['error']}", "RED"))
             return
 
-        print(self.colorize(f"⛔ Action {action_id} rejected by {operator}", "RED"))
-        print(f"Reason: {reason}")
 
     async def show_statistics(self, operator: Optional[str] = None):
         """Show approval statistics"""
-        print(self.colorize("\n📊 APPROVAL STATISTICS\n", "BOLD"))
 
         stats = await self.approval_system.get_operator_statistics(operator)
 
         if operator:
-            print(f"Operator: {self.colorize(operator, 'CYAN')}")
-            print("=" * 40)
-            for action, count in stats.items():
-                print(f"  {action}: {count}")
+            for _action, _count in stats.items():
+                pass
         else:
-            for op, actions in stats.items():
-                print(f"{self.colorize(op, 'CYAN')}:")
-                for action, count in actions.items():
-                    print(f"  {action}: {count}")
-                print()
+            for actions in stats.values():
+                for _action, _count in actions.items():
+                    pass
 
     async def cleanup_expired(self):
         """Clean up expired actions"""
-        print("\n🧹 Cleaning up expired actions...")
-        count = await self.approval_system.cleanup_expired()
-        print(self.colorize(f"✅ Cleaned up {count} expired actions", "GREEN"))
+        await self.approval_system.cleanup_expired()
 
 
 async def main():
@@ -257,8 +208,7 @@ async def main():
             await cli.show_statistics(args.operator)
         elif args.command == "cleanup":
             await cli.cleanup_expired()
-    except Exception as e:
-        print(cli.colorize(f"\n❌ Error: {str(e)}", "RED"))
+    except Exception:
         import traceback
         traceback.print_exc()
 

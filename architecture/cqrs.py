@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
+from abc import ABC, abstractmethod
+from datetime import UTC, datetime
+from typing import Any, Generic, Optional, TypeVar
+import uuid
 
 from pydantic import BaseModel
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, Optional, TypeVar
-import uuid
 
 """
 CQRS (Command Query Responsibility Segregation) Pattern
@@ -25,7 +25,7 @@ class Command(BaseModel):
         if "command_id" not in data or data["command_id"] is None:
             data["command_id"] = str(uuid.uuid4())
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = datetime.now(UTC)
         super().__init__(**data)
 
 class Query(BaseModel):
@@ -38,7 +38,7 @@ class Query(BaseModel):
         if "query_id" not in data or data["query_id"] is None:
             data["query_id"] = str(uuid.uuid4())
         if "timestamp" not in data or data["timestamp"] is None:
-            data["timestamp"] = datetime.now(timezone.utc)
+            data["timestamp"] = datetime.now(UTC)
         super().__init__(**data)
 
 TCommand = TypeVar("TCommand", bound=Command)
@@ -90,7 +90,7 @@ class CommandBus:
     """
 
     def __init__(self):
-        self._handlers: Dict[type, CommandHandler] = {}
+        self._handlers: dict[type, CommandHandler] = {}
 
     def register(self, command_type: type, handler: CommandHandler):
         """
@@ -131,7 +131,7 @@ class QueryBus:
     """
 
     def __init__(self):
-        self._handlers: Dict[type, QueryHandler] = {}
+        self._handlers: dict[type, QueryHandler] = {}
 
     def register(self, query_type: type, handler: QueryHandler):
         """
@@ -182,13 +182,13 @@ class CreateAgentCommand(Command):
 
     name: str
     agent_type: str
-    capabilities: Dict[str, Any]
+    capabilities: dict[str, Any]
 
 # Example Command Handler
-class CreateAgentHandler(CommandHandler[CreateAgentCommand, Dict]):
+class CreateAgentHandler(CommandHandler[CreateAgentCommand, dict]):
     """Handler for CreateAgentCommand"""
 
-    async def handle(self, command: CreateAgentCommand) -> Dict:
+    async def handle(self, command: CreateAgentCommand) -> dict:
         """
         Handle agent creation command
 
@@ -214,10 +214,10 @@ class GetAgentQuery(Query):
     agent_id: str
 
 # Example Query Handler
-class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[Dict]]):
+class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[dict]]):
     """Handler for GetAgentQuery"""
 
-    async def handle(self, query: GetAgentQuery) -> Optional[Dict]:
+    async def handle(self, query: GetAgentQuery) -> Optional[dict]:
         """
         Handle agent retrieval query
 

@@ -17,17 +17,17 @@ Truth Protocol: Validated reviews, audit trail, no placeholders, comprehensive l
 """
 
 import asyncio
-import json
-import logging
-import secrets
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+import logging
+import secrets
+from typing import Any, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
 from services.mcp_client import MCPToolClient, MCPToolError
+
 
 # Logfire for observability
 try:
@@ -63,10 +63,10 @@ class AgentReview(BaseModel):
     decision: ReviewDecision = Field(..., description="Approval decision")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
     feedback: str = Field(..., description="Detailed feedback for improvement")
-    issues_found: List[str] = Field(
+    issues_found: list[str] = Field(
         default_factory=list, description="Specific issues identified"
     )
-    suggestions: List[str] = Field(
+    suggestions: list[str] = Field(
         default_factory=list, description="Improvement suggestions"
     )
     review_timestamp: datetime = Field(default_factory=datetime.now)
@@ -85,7 +85,7 @@ class ConsensusVote(BaseModel):
     consensus_feedback: str = Field(
         ..., description="Combined feedback from all agents"
     )
-    reviews: List[AgentReview] = Field(
+    reviews: list[AgentReview] = Field(
         default_factory=list, description="Individual reviews"
     )
 
@@ -99,7 +99,7 @@ class ContentDraft(BaseModel):
     content: str
     meta_description: str
     word_count: int
-    keywords: List[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=datetime.now)
     feedback_applied: Optional[str] = None  # Feedback from previous iteration
 
@@ -110,8 +110,8 @@ class WorkflowState(BaseModel):
     workflow_id: str = Field(default_factory=lambda: str(uuid4()))
     topic: str
     current_draft: ContentDraft
-    draft_history: List[ContentDraft] = Field(default_factory=list)
-    review_history: List[ConsensusVote] = Field(default_factory=list)
+    draft_history: list[ContentDraft] = Field(default_factory=list)
+    review_history: list[ConsensusVote] = Field(default_factory=list)
     iteration_count: int = Field(default=0)
     human_decision: HumanDecision = Field(default=HumanDecision.PENDING)
     human_feedback: Optional[str] = None
@@ -137,7 +137,7 @@ class BrandIntelligenceReviewer:
     - Target audience fit
     """
 
-    def __init__(self, brand_config: Dict[str, Any], mcp_client: Optional[MCPToolClient] = None):
+    def __init__(self, brand_config: dict[str, Any], mcp_client: Optional[MCPToolClient] = None):
         self.brand_config = brand_config
         self.agent_name = "Brand Intelligence Agent"
         self.mcp_client = mcp_client or MCPToolClient()
@@ -256,7 +256,7 @@ class BrandIntelligenceReviewer:
         )
 
     def _generate_feedback(
-        self, issues: List[str], suggestions: List[str], decision: ReviewDecision
+        self, issues: list[str], suggestions: list[str], decision: ReviewDecision
     ) -> str:
         """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
@@ -427,7 +427,7 @@ class SEOMarketingReviewer:
         )
 
     def _generate_feedback(
-        self, issues: List[str], suggestions: List[str], decision: ReviewDecision
+        self, issues: list[str], suggestions: list[str], decision: ReviewDecision
     ) -> str:
         """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
@@ -465,7 +465,7 @@ class SecurityComplianceReviewer:
 
     def __init__(
         self,
-        compliance_standards: List[str] = None,
+        compliance_standards: list[str] | None = None,
         mcp_client: Optional[MCPToolClient] = None
     ):
         self.agent_name = "Security & Compliance Agent"
@@ -576,16 +576,15 @@ class SecurityComplianceReviewer:
         regulated_topics = ["medical", "diagnosis", "investment", "financial advice"]
         found_regulated = [t for t in regulated_topics if t in content_lower]
 
-        if found_regulated:
-            if not any(
-                phrase in content_lower
-                for phrase in ["consult", "professional", "disclaimer"]
-            ):
-                issues.append(f"Regulated topic without disclaimer: {', '.join(found_regulated)}")
-                suggestions.append(
-                    "Add professional consultation disclaimer for regulated topics"
-                )
-                decision = ReviewDecision.MAJOR_ISSUE
+        if found_regulated and not any(
+            phrase in content_lower
+            for phrase in ["consult", "professional", "disclaimer"]
+        ):
+            issues.append(f"Regulated topic without disclaimer: {', '.join(found_regulated)}")
+            suggestions.append(
+                "Add professional consultation disclaimer for regulated topics"
+            )
+            decision = ReviewDecision.MAJOR_ISSUE
 
         feedback = self._generate_feedback(issues, suggestions, decision)
 
@@ -599,7 +598,7 @@ class SecurityComplianceReviewer:
         )
 
     def _generate_feedback(
-        self, issues: List[str], suggestions: List[str], decision: ReviewDecision
+        self, issues: list[str], suggestions: list[str], decision: ReviewDecision
     ) -> str:
         """Generate comprehensive feedback from issues and suggestions"""
         if decision == ReviewDecision.APPROVED:
@@ -635,7 +634,7 @@ class ConsensusOrchestrator:
 
     MAX_REDRAFT_ITERATIONS = 2
 
-    def __init__(self, content_generator, brand_config: Dict[str, Any]):
+    def __init__(self, content_generator, brand_config: dict[str, Any]):
         """
         Initialize consensus orchestrator
 
@@ -654,12 +653,12 @@ class ConsensusOrchestrator:
         ]
 
         # Workflow state storage (in production, use PostgreSQL)
-        self.workflows: Dict[str, WorkflowState] = {}
+        self.workflows: dict[str, WorkflowState] = {}
 
         logger.info("ConsensusOrchestrator initialized with 3 reviewer agents")
 
     async def generate_initial_draft(
-        self, topic: str, keywords: List[str], tone: str, length: int
+        self, topic: str, keywords: list[str], tone: str, length: int
     ) -> ContentDraft:
         """
         Generate initial content draft
@@ -741,7 +740,7 @@ class ConsensusOrchestrator:
         return vote
 
     def _combine_feedback(
-        self, reviews: List[AgentReview], requires_redraft: bool
+        self, reviews: list[AgentReview], requires_redraft: bool
     ) -> str:
         """Combine feedback from all reviewers"""
         if not requires_redraft:
@@ -794,7 +793,7 @@ class ConsensusOrchestrator:
     async def execute_consensus_workflow(
         self,
         topic: str,
-        keywords: List[str],
+        keywords: list[str],
         tone: str = "professional",
         length: int = 800,
     ) -> WorkflowState:
@@ -832,7 +831,7 @@ class ConsensusOrchestrator:
             return await self._execute_workflow_internal(topic, keywords, tone, length)
 
     async def _execute_workflow_internal(
-        self, topic: str, keywords: List[str], tone: str, length: int
+        self, topic: str, keywords: list[str], tone: str, length: int
     ) -> WorkflowState:
         """Internal workflow execution with instrumentation"""
 
@@ -972,7 +971,7 @@ class ConsensusOrchestrator:
 
     def get_approval_urls(
         self, workflow_id: str, base_url: str = "http://localhost:8000"
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Generate approval/rejection URLs for human review
 

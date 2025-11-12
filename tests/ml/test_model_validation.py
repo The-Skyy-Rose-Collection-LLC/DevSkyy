@@ -1,13 +1,15 @@
-from agent.ml_models.forecasting_engine import ForecastingEngine
-from ml.model_registry import ModelRegistry
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, r2_score
 import time
 
-from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+
+from agent.ml_models.forecasting_engine import ForecastingEngine
+from ml.model_registry import ModelRegistry
+
 
 """
 ML Model Validation Tests
@@ -99,7 +101,7 @@ class TestModelPerformance:
         model.fit(self.X_train, self.y_train)
 
         start_time = time.time()
-        predictions = model.predict(self.X_test)
+        model.predict(self.X_test)
         prediction_time = time.time() - start_time
 
         # Assert prediction time is reasonable

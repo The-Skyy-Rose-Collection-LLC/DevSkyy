@@ -4,14 +4,14 @@ Continuous learning with scheduled retraining
 """
 
 import asyncio
-import logging
+from collections.abc import Callable
 from datetime import datetime, timedelta
+import logging
 from typing import (  # noqa: F401 - Reserved for Phase 3 ML enhancements
     Any,
-    Callable,
-    Dict,
     Optional,
 )
+
 
 logger = logging.getLogger(__name__)
 

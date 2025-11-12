@@ -5,9 +5,9 @@ Tests for enhanced JWT authentication, validation, and security features
 
 from unittest.mock import Mock, patch
 
-import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+import pytest
 
 from api.validation_models import EnhancedRegisterRequest
 from main import app
@@ -66,7 +66,7 @@ class TestAccountLockout:
     def test_failed_login_tracking(self):
         """Test failed login attempt tracking"""
         # Record failed attempts
-        for i in range(4):
+        for _i in range(4):
             locked = record_failed_login(self.test_email)
             assert not locked  # Should not be locked yet
 
@@ -78,7 +78,7 @@ class TestAccountLockout:
     def test_clear_failed_attempts(self):
         """Test clearing failed login attempts"""
         # Record some failed attempts
-        for i in range(3):
+        for _i in range(3):
             record_failed_login(self.test_email)
 
         # Clear attempts
@@ -325,7 +325,7 @@ class TestSecurityLogging:
         """Test that security events are logged"""
         with patch(
             "logging_config.security_logger.log_authentication_event"
-        ) as mock_log:
+        ):
             # Simulate a failed login
             record_failed_login("test@example.com")
 

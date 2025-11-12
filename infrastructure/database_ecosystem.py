@@ -1,13 +1,14 @@
-from datetime import datetime
-import time
-
-from clickhouse_driver import Client as ClickHouseClient
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-import asyncpg
 import logging
+import time
+from typing import Any, Optional, Union
+
+import asyncpg
+from clickhouse_driver import Client as ClickHouseClient
 import motor.motor_asyncio
+
 
 """
 Database Ecosystem Integration
@@ -41,7 +42,7 @@ class DatabaseConfig:
     ssl_enabled: bool = False
     ssl_cert_path: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         data["db_type"] = self.db_type.value
@@ -61,7 +62,7 @@ class ConnectionMetrics:
     failed_queries: int = 0
     last_updated: datetime = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""
         data = asdict(self)
         if self.last_updated:
@@ -76,7 +77,7 @@ class PostgreSQLManager:
         self.pool = None
         self.metrics = ConnectionMetrics()
         self.is_connected = False
-        
+
         logger.info(
             f"PostgreSQL manager initialized - Host: {config.host}:{config.port}"
         )
@@ -112,8 +113,8 @@ class PostgreSQLManager:
             return False
 
     async def execute_query(
-        self, query: str, params: tuple = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: tuple | None = None
+    ) -> list[dict[str, Any]]:
         """Execute query and return results"""
         if not self.pool:
             raise Exception("Database not connected")
@@ -143,7 +144,7 @@ class PostgreSQLManager:
             logger.error(f"PostgreSQL query failed: {e}")
             raise e
 
-    async def execute_command(self, command: str, params: tuple = None) -> str:
+    async def execute_command(self, command: str, params: tuple | None = None) -> str:
         """Execute command (INSERT, UPDATE, DELETE)"""
         if not self.pool:
             raise Exception("Database not connected")
@@ -222,7 +223,7 @@ class PostgreSQLManager:
 
         self.metrics.last_updated = datetime.now()
 
-    async def get_pool_status(self) -> Dict[str, Any]:
+    async def get_pool_status(self) -> dict[str, Any]:
         """Get connection pool status"""
         if not self.pool:
             return {"status": "disconnected"}
@@ -284,8 +285,8 @@ class MongoDBManager:
             return False
 
     async def find_documents(
-        self, collection: str, query: Dict[str, Any] = None, limit: int = 100
-    ) -> List[Dict[str, Any]]:
+        self, collection: str, query: dict[str, Any] | None = None, limit: int = 100
+    ) -> list[dict[str, Any]]:
         """Find documents in collection"""
         if not self.database:
             raise Exception("Database not connected")
@@ -315,7 +316,7 @@ class MongoDBManager:
             logger.error(f"MongoDB find failed: {e}")
             raise e
 
-    async def insert_document(self, collection: str, document: Dict[str, Any]) -> str:
+    async def insert_document(self, collection: str, document: dict[str, Any]) -> str:
         """Insert document into collection"""
         if not self.database:
             raise Exception("Database not connected")
@@ -340,7 +341,7 @@ class MongoDBManager:
             raise e
 
     async def update_document(
-        self, collection: str, query: Dict[str, Any], update: Dict[str, Any]
+        self, collection: str, query: dict[str, Any], update: dict[str, Any]
     ) -> int:
         """Update documents in collection"""
         if not self.database:
@@ -448,7 +449,7 @@ class ClickHouseManager:
         self.client = None
         self.metrics = ConnectionMetrics()
         self.is_connected = False
-        
+
         logger.info(
             f"ClickHouse manager initialized - Host: {config.host}:{config.port}"
         )
@@ -469,7 +470,7 @@ class ClickHouseManager:
             )
 
             # Test connection
-            result = self.client.execute("SELECT 1")
+            self.client.execute("SELECT 1")
 
             self.is_connected = True
             self.metrics.total_connections += 1
@@ -482,8 +483,8 @@ class ClickHouseManager:
             return False
 
     async def execute_query(
-        self, query: str, params: Dict[str, Any] = None
-    ) -> List[Dict[str, Any]]:
+        self, query: str, params: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Execute query and return results"""
         if not self.client:
             raise Exception("Database not connected")
@@ -491,16 +492,13 @@ class ClickHouseManager:
         start_time = time.time()
 
         try:
-            if params:
-                result = self.client.execute(query, params)
-            else:
-                result = self.client.execute(query)
+            result = self.client.execute(query, params) if params else self.client.execute(query)
 
             # Convert to list of dictionaries
             if result and len(result) > 0:
                 # Get column names from the query or use generic names
                 columns = [f"col_{i}" for i in range(len(result[0]))]
-                rows = [dict(zip(columns, row)) for row in result]
+                rows = [dict(zip(columns, row, strict=False)) for row in result]
             else:
                 rows = []
 
@@ -650,7 +648,7 @@ class DatabaseEcosystem:
 
         return self.databases[name]
 
-    async def initialize_all_indexes(self) -> Dict[str, bool]:
+    async def initialize_all_indexes(self) -> dict[str, bool]:
         """Initialize indexes for all databases"""
         results = {}
 
@@ -671,7 +669,7 @@ class DatabaseEcosystem:
 
         return results
 
-    async def get_ecosystem_metrics(self) -> Dict[str, Any]:
+    async def get_ecosystem_metrics(self) -> dict[str, Any]:
         """Get metrics for all databases"""
         metrics = {}
 
@@ -695,7 +693,7 @@ class DatabaseEcosystem:
 
         return metrics
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Comprehensive health check for all databases"""
         health_status = {}
         overall_healthy = True
@@ -706,9 +704,7 @@ class DatabaseEcosystem:
 
                 # Test basic connectivity
                 if hasattr(manager, "execute_query"):
-                    if isinstance(manager, PostgreSQLManager):
-                        await manager.execute_query("SELECT 1")
-                    elif isinstance(manager, ClickHouseManager):
+                    if isinstance(manager, (PostgreSQLManager, ClickHouseManager)):
                         await manager.execute_query("SELECT 1")
                 elif hasattr(manager, "find_documents"):
                     # MongoDB test
