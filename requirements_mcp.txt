@@ -9,7 +9,7 @@ mcp>=1.0.0            # Model Context Protocol core
 httpx>=0.27.0         # Async HTTP client for API calls
 
 # Data Validation
-pydantic>=2.7.0       # Data validation and settings management
+pydantic>=2.12.4       # Data validation and settings management (>=2.11.0 required by mcp 1.21.0)
 
 # Async Support
 asyncio-throttle>=1.0.0  # Rate limiting for async operations
