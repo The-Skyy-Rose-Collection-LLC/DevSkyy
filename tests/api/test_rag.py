@@ -26,15 +26,22 @@ from main import app
 
 @pytest.fixture
 def client():
-    """Test client fixture"""
+    """
+    Provide a configured TestClient for testing the FastAPI app.
+    
+    Returns:
+        TestClient: A TestClient instance bound to the application under test.
+    """
     return TestClient(app)
 
 
 @pytest.fixture
 def auth_headers():
     """
-    Mock authentication headers for testing
-    In production, these would be JWT tokens from Auth0
+    Provide mock HTTP authorization headers for tests.
+    
+    Returns:
+        headers (dict): HTTP headers including an 'Authorization' bearer token and 'Content-Type' set to 'application/json'.
     """
     return {
         "Authorization": "Bearer test_token_superadmin",
@@ -44,7 +51,14 @@ def auth_headers():
 
 @pytest.fixture
 def mock_rag_service():
-    """Mock RAG service for testing"""
+    """
+    Provide a preconfigured mock RAG service for tests.
+    
+    The fixture yields a MagicMock that simulates the RAG service API with pre-mocked methods commonly used in tests: `ingest_text`, `ingest_document`, `search`, `query`, `get_stats`, and a `vector_db` with `delete_collection`. Each mocked method returns representative example data to allow endpoint and integration tests to exercise success paths and inspect returned structures.
+    
+    Returns:
+        MagicMock: A mock RAG service instance with the mocked methods described above.
+    """
     with patch("api.v1.rag.get_rag_service") as mock:
         service = MagicMock()
 
@@ -125,9 +139,25 @@ def mock_rag_service():
 
 @pytest.fixture
 def mock_auth():
-    """Mock authentication for testing"""
+    """
+    Provide a pytest fixture that patches the `get_current_user_with_role` dependency to supply a test user.
+    
+    The fixture patches `api.v1.rag.get_current_user_with_role` so code depending on that dependency receives a callable that, when invoked, returns a dictionary representing an authenticated test user with `user_id` "test_user", `email` "test@example.com", and `role` "SuperAdmin".
+    
+    Returns:
+        mock: The patched mock object for `get_current_user_with_role`.
+    """
     with patch("api.v1.rag.get_current_user_with_role") as mock:
         def auth_factory(roles):
+            """
+            Create a test authentication dependency that returns a mock user object.
+            
+            The returned callable can be used as a dependency in tests to simulate an authenticated user. The callable returns a dict with keys "user_id", "email", and "role". The `roles` parameter is accepted for API compatibility but is not used by the produced dependency.
+            Parameters:
+                roles (any): Intended roles to simulate; this value is ignored by the factory.
+            Returns:
+                callable: A no-argument function that returns a dict with keys `"user_id"`, `"email"`, and `"role"`.
+            """
             def auth_dependency():
                 return {
                     "user_id": "test_user",
@@ -247,7 +277,11 @@ class TestIngestFileEndpoint:
         assert data["file_type"] == "pdf"
 
     def test_ingest_text_file_success(self, client, auth_headers, mock_rag_service, mock_auth):
-        """Test successful text file ingestion"""
+        """
+        Verify uploading a plain text file to the file ingestion endpoint succeeds.
+        
+        Posts a text file to /api/v1/rag/ingest/file and asserts the response status is HTTP 201 Created.
+        """
         text_content = "DevSkyy platform documentation.\n\nThis is a test document."
 
         response = client.post(
@@ -415,7 +449,11 @@ class TestStatsEndpoint:
     """Test suite for GET /api/v1/rag/stats"""
 
     def test_get_stats_success(self, client, auth_headers, mock_rag_service, mock_auth):
-        """Test successful stats retrieval"""
+        """
+        Verify that the /api/v1/rag/stats endpoint returns vector DB and config information and that key fields match expected values.
+        
+        Asserts the response status is 200, the JSON contains "vector_db" and "config", and that "vector_db.document_count" equals 100, "vector_db.collection_name" equals "devskyy_docs", and "config.chunk_size" equals 1000.
+        """
         response = client.get(
             "/api/v1/rag/stats",
             headers=auth_headers,
@@ -503,6 +541,15 @@ class TestRBACAuthorization:
         with patch("api.v1.rag.get_current_user_with_role") as mock_auth:
             # Mock unauthorized user
             def auth_factory(roles):
+                """
+                Create a FastAPI dependency that denies access with an HTTP 403 error.
+                
+                Parameters:
+                    roles (Iterable[str]): Iterable of role names intended to specify required roles for access.
+                
+                Returns:
+                    Callable[[], None]: A dependency callable that, when invoked, raises an `HTTPException` with status code 403 and detail "Insufficient permissions".
+                """
                 def auth_dependency():
                     raise HTTPException(status_code=403, detail="Insufficient permissions")
                 return auth_dependency
@@ -521,6 +568,15 @@ class TestRBACAuthorization:
         """Test that search allows APIUser role"""
         with patch("api.v1.rag.get_current_user_with_role") as mock_auth:
             def auth_factory(roles):
+                """
+                Create a dependency function that injects a mock API user when the provided roles include "APIUser".
+                
+                Parameters:
+                    roles (Iterable[str]): Collection of role names to check for "APIUser".
+                
+                Returns:
+                    callable or None: A zero-argument callable that returns a dict with keys `user_id` and `role` for an API user when "APIUser" is present in `roles`; otherwise `None`.
+                """
                 if "APIUser" in roles:
                     def auth_dependency():
                         return {"user_id": "api_user", "role": "APIUser"}
@@ -617,7 +673,9 @@ class TestRAGIntegration:
         assert "answer" in query_response.json()
 
     def test_stats_after_ingestion(self, client, auth_headers, mock_rag_service, mock_auth):
-        """Test stats endpoint after document ingestion"""
+        """
+        Verify that after ingesting a document, the stats endpoint returns vector_db statistics including a non-negative document_count.
+        """
         # Ingest document
         client.post(
             "/api/v1/rag/ingest/text",

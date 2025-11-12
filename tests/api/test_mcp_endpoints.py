@@ -29,7 +29,14 @@ def client():
 
 @pytest.fixture
 def auth_headers():
-    """Create authentication headers with valid JWT token"""
+    """
+    Create an Authorization header containing a valid JWT for a test Developer user.
+    
+    Registers a test user in the in-memory user_manager and embeds the resulting JWT as a Bearer token in the header.
+    
+    Returns:
+        dict: A mapping with the `Authorization` header set to `Bearer <token>`.
+    """
     token_data = {
         "user_id": "test_user_mcp_001",
         "email": "mcp@devskyy.com",
@@ -55,7 +62,12 @@ def auth_headers():
 
 @pytest.fixture
 def sample_api_key():
-    """Sample API key for testing"""
+    """
+    Provide a deterministic sample API key used by tests.
+    
+    Returns:
+        str: A constant test API key string suitable for use in unit and integration tests.
+    """
     return "devskyy_test_api_key_1234567890abcdef1234567890abcdef"
 
 
@@ -396,12 +408,9 @@ class TestMCPIntegration:
 
     def test_full_installation_workflow(self, client, auth_headers, sample_api_key):
         """
-        Test complete MCP installation workflow:
-        1. Get status
-        2. Generate install deeplink
-        3. Validate API key
-
-        Per Truth Protocol Rule #8: Integration testing required
+        Integration test that runs the full MCP installation and validation workflow.
+        
+        Performs an MCP status check, requests an installation deeplink with a provided API key, and validates the same API key via the validate endpoint; asserts successful HTTP responses, that the status is "active", that the generated config contains the provided API key, and that validation returns `valid: True`.
         """
         # Step 1: Check MCP status
         status_response = client.get("/api/v1/mcp/status")
