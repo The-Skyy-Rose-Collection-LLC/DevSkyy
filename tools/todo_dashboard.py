@@ -21,7 +21,7 @@ from fastapi import FastAPI, HTTPException, Request
 import uvicorn
 import logging
 from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
-from typing import Dict, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
