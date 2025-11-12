@@ -78,7 +78,7 @@ google-cloud-storage==2.19.0  # Google Cloud Storage (updated)
 # Task Queue & Background Jobs (updated to match main requirements.txt)
 # ============================================================================
 celery==5.4.0  # Distributed task queue (updated)
-redis==5.2.1  # Celery broker (updated)
+# (redis already defined in Database & Caching section)
 
 # ============================================================================
 # Testing (CLAUDE.md: Unit and integration tests required) (updated)

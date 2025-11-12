@@ -179,12 +179,10 @@ wheel>=0.45.1
 # ============================================================================
 
 # Load Testing
-locust>=2.32.4
-artillery>=1.0.0
+locust==2.32.4
 
 # Performance Testing
-pytest-benchmark>=4.0.0
-py-spy>=0.3.14
+# (pytest-benchmark and py-spy already defined in Profiling & Performance section)
 
 # ============================================================================
 # MACHINE LEARNING DEVELOPMENT
@@ -273,23 +271,22 @@ httpie>=3.2.4
 curl-cffi>=0.7.3
 
 # Network Testing
-pytest-socket>=0.7.0
-responses>=0.25.3
+pytest-socket==0.7.0
+# (responses already defined in HTTP Testing section)
 
 # ============================================================================
 # ENTERPRISE DEVELOPMENT TOOLS
 # ============================================================================
 
 # Enterprise Logging
-python-json-logger>=3.2.0
-structlog>=24.4.0
+# (python-json-logger and structlog already defined in Logging section)
 
 # Enterprise Monitoring
-datadog>=0.50.2
-newrelic>=10.4.0
+datadog==0.50.2
+newrelic==10.4.0
 
 # Enterprise Security
-cryptography>=46.0.2
+cryptography==46.0.3  # Updated to match requirements.txt
 pycryptodome>=3.21.0
 
 # ============================================================================
@@ -297,9 +294,9 @@ pycryptodome>=3.21.0
 # ============================================================================
 
 # Git Integration
-gitpython>=3.1.43
-pygit2>=1.16.0
-pre-commit>=3.8.0
+gitpython==3.1.43
+pygit2==1.16.0
+# (pre-commit already defined in Pre-commit Hooks section)
 
 # ============================================================================
 # PACKAGE MANAGEMENT
