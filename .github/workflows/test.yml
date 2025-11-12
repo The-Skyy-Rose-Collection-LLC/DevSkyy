@@ -56,6 +56,8 @@ jobs:
             --cov-report=xml:coverage-${{ matrix.test-group }}.xml \
             --cov-report=html:htmlcov-${{ matrix.test-group }} \
             --junit-xml=junit-${{ matrix.test-group }}.xml
+        env:
+          COVERAGE_FILE: .coverage.unit.${{ matrix.test-group }}
 
       - name: Upload test results
         if: always()
@@ -64,10 +66,11 @@ jobs:
           name: unit-test-results-${{ matrix.test-group }}
           path: |
             coverage-${{ matrix.test-group }}.xml
-            .coverage
+            .coverage.unit.${{ matrix.test-group }}
             htmlcov-${{ matrix.test-group }}/
             junit-${{ matrix.test-group }}.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 2: Integration Tests
@@ -152,6 +155,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://devskyy_test:test_password@localhost:5432/devskyy_test
           REDIS_URL: redis://localhost:6379/0
+          COVERAGE_FILE: .coverage.integration
 
       - name: Upload integration test results
         if: always()
@@ -160,10 +164,11 @@ jobs:
           name: integration-test-results
           path: |
             coverage-integration.xml
-            .coverage
+            .coverage.integration
             htmlcov-integration/
             junit-integration.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 3: API Tests
@@ -238,6 +243,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://devskyy_test:test_password@localhost:5432/devskyy_test
           REDIS_URL: redis://localhost:6379/0
+          COVERAGE_FILE: .coverage.api
 
       - name: Upload API test results
         if: always()
@@ -246,10 +252,11 @@ jobs:
           name: api-test-results
           path: |
             coverage-api.xml
-            .coverage
+            .coverage.api
             htmlcov-api/
             junit-api.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 4: Security Tests
@@ -287,6 +294,8 @@ jobs:
             --cov-report=html:htmlcov-security \
             --junit-xml=junit-security.xml \
             -m security
+        env:
+          COVERAGE_FILE: .coverage.security
 
       - name: Upload security test results
         if: always()
@@ -295,10 +304,11 @@ jobs:
           name: security-test-results
           path: |
             coverage-security.xml
-            .coverage
+            .coverage.security
             htmlcov-security/
             junit-security.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 5: ML/AI Tests
@@ -350,6 +360,7 @@ jobs:
             -m "not slow"
         env:
           REDIS_URL: redis://localhost:6379/0
+          COVERAGE_FILE: .coverage.ml
 
       - name: Upload ML test results
         if: always()
@@ -358,10 +369,11 @@ jobs:
           name: ml-test-results
           path: |
             coverage-ml.xml
-            .coverage
+            .coverage.ml
             htmlcov-ml/
             junit-ml.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 6: E2E Tests
@@ -449,6 +461,7 @@ jobs:
           name: e2e-test-results
           path: junit-e2e.xml
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 7: Coverage Consolidation & Validation
@@ -477,37 +490,93 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: coverage-reports/
+        continue-on-error: true
 
       - name: Combine coverage reports
         run: |
-          echo "Combining coverage reports..."
-          # Find all .coverage files from downloaded artifacts
-          find coverage-reports -name ".coverage" -type f -exec echo "Found: {}" \;
-
-          # Combine all .coverage data files (not XML!)
-          # Each test job created a .coverage file that we now combine
-          coverage combine coverage-reports/**/.coverage
-
-          # Generate combined reports from the merged .coverage file
-          coverage report --format=markdown > coverage-summary.md
-          coverage html -d htmlcov-combined
-          coverage json -o coverage.json
+          echo "=== Combining coverage reports ==="
+          
+          # Find all .coverage.* files from downloaded artifacts
+          echo "Searching for coverage data files..."
+          find coverage-reports -name ".coverage.*" -type f -exec echo "Found: {}" \;
+          
+          # Create directory for coverage files
+          mkdir -p .coverage_data
+          
+          # Copy all .coverage.* files to current directory for combining
+          find coverage-reports -name ".coverage.*" -type f -exec cp {} .coverage_data/ \;
+          
+          # Count coverage files
+          COVERAGE_FILES=$(find .coverage_data -name ".coverage.*" -type f | wc -l)
+          echo "Found $COVERAGE_FILES coverage data files"
+          
+          if [ "$COVERAGE_FILES" -eq 0 ]; then
+            echo "::warning::No coverage data files found. Creating empty report."
+            echo "# Coverage Report" > coverage-summary.md
+            echo "⚠️ No coverage data available" >> coverage-summary.md
+            echo '{"totals": {"percent_covered_display": "0.00"}}' > coverage.json
+          else
+            # Combine all .coverage.* data files
+            echo "Combining coverage data..."
+            coverage combine .coverage_data/.coverage.*
+            
+            # Generate combined reports from the merged .coverage file
+            echo "Generating coverage reports..."
+            coverage report --format=markdown > coverage-summary.md || echo "# Coverage Report\n⚠️ Error generating report" > coverage-summary.md
+            coverage html -d htmlcov-combined || echo "::warning::Failed to generate HTML report"
+            coverage json -o coverage.json || echo '{"totals": {"percent_covered_display": "0.00"}}' > coverage.json
+            
+            # Display coverage summary
+            echo "Coverage Summary:"
+            cat coverage-summary.md
+          fi
+        continue-on-error: true
 
       - name: Generate coverage badge
         run: |
-          coverage-badge -o coverage-badge.svg -f
+          coverage-badge -o coverage-badge.svg -f || echo "::warning::Failed to generate coverage badge"
+        continue-on-error: true
 
       - name: Check coverage threshold
         run: |
-          COVERAGE=$(python -c "import json; print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
-          echo "Total coverage: $COVERAGE%"
-
-          if (( $(echo "$COVERAGE < ${{ env.COVERAGE_THRESHOLD }}" | bc -l) )); then
-            echo "::error::Coverage $COVERAGE% is below threshold ${{ env.COVERAGE_THRESHOLD }}%"
-            echo "::error::Truth Protocol requires ≥90% test coverage"
+          echo "=== Checking coverage threshold ==="
+          
+          # Extract coverage percentage using Python (no bc dependency)
+          COVERAGE=$(python3 << 'EOF'
+          import json
+          import sys
+          try:
+              with open('coverage.json', 'r') as f:
+                  data = json.load(f)
+                  coverage = float(data['totals']['percent_covered_display'])
+                  print(f"{coverage:.2f}")
+          except Exception as e:
+              print(f"Error reading coverage: {e}", file=sys.stderr)
+              print("0.00")
+          EOF
+          )
+          
+          THRESHOLD="${{ env.COVERAGE_THRESHOLD }}"
+          
+          echo "📊 Total coverage: ${COVERAGE}%"
+          echo "🎯 Required threshold: ${THRESHOLD}%"
+          
+          # Use Python for float comparison (no bc dependency)
+          MEETS_THRESHOLD=$(python3 << EOF
+          coverage = float("${COVERAGE}")
+          threshold = float("${THRESHOLD}")
+          print("true" if coverage >= threshold else "false")
+          EOF
+          )
+          
+          if [ "$MEETS_THRESHOLD" = "false" ]; then
+            echo "::error::❌ Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+            echo "::error::Truth Protocol Requirement: ≥${THRESHOLD}% test coverage"
+            echo "::error::Please add more tests to improve coverage."
             exit 1
           else
-            echo "::notice::Coverage $COVERAGE% meets threshold ✅"
+            echo "::notice::✅ Coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"
+            echo "COVERAGE_STATUS=success" >> $GITHUB_ENV
           fi
 
       - name: Upload combined coverage
@@ -521,6 +590,7 @@ jobs:
             coverage-badge.svg
             htmlcov-combined/
           retention-days: 90
+          if-no-files-found: warn
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v4
@@ -529,6 +599,7 @@ jobs:
           flags: comprehensive-tests
           name: codecov-devskyy
           fail_ci_if_error: false
+        continue-on-error: true
 
   # ============================================================================
   # JOB 8: Test Summary
@@ -546,6 +617,7 @@ jobs:
         with:
           name: combined-coverage-report
           path: coverage/
+        continue-on-error: true
 
       - name: Generate test summary
         run: |
@@ -568,6 +640,8 @@ jobs:
 
           if [ -f coverage/coverage-summary.md ]; then
             cat coverage/coverage-summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Coverage summary not available" >> $GITHUB_STEP_SUMMARY
           fi
 
           cat >> $GITHUB_STEP_SUMMARY << EOF
@@ -579,13 +653,13 @@ jobs:
           - ✅ Multi-environment testing (Postgres, Redis)
 
           ## Test Artifacts
-          - Unit test results
+          - Unit test results (per test group)
           - Integration test results
           - API test results
           - Security test results
           - ML test results
           - E2E test results
-          - Combined coverage report (HTML + JSON + XML)
+          - Combined coverage report (HTML + JSON + Badge)
           EOF
 
       - name: Check overall test status
