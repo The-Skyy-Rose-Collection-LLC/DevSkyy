@@ -147,7 +147,7 @@ openpyxl==3.1.5
 
 # ML Model Testing
 pytest-ml==0.1.0
-deepdiff==8.0.1
+deepdiff==8.6.1
 numpy-testing==1.26.4
 
 # Data Science Testing
