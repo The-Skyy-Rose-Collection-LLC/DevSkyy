@@ -10,6 +10,8 @@ import anthropic
 import openai
 from pydantic import BaseModel, Field
 
+from config.unified_config import get_config
+
 
 """
 DevSkyy Enhanced AI Orchestrator v2.0.0
@@ -222,10 +224,14 @@ class EnhancedAIOrchestrator:
 
             # Initialize OpenAI client
             if OPENAI_AVAILABLE and openai_api_key:
+                config = get_config()
+                is_consequential = config.ai.openai_is_consequential
+                default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
                 self.clients[ModelProvider.OPENAI] = openai.AsyncOpenAI(
-                    api_key=openai_api_key
+                    api_key=openai_api_key,
+                    default_headers=default_headers
                 )
-                logger.info("✅ OpenAI client initialized")
+                logger.info(f"✅ OpenAI client initialized (consequential={is_consequential})")
 
             # Start health monitoring
             asyncio.create_task(self._health_monitor_loop())

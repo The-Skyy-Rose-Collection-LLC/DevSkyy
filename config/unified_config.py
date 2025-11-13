@@ -151,6 +151,7 @@ class AIConfig(BaseModel):
     max_tokens: int = Field(default=4096, ge=256, le=200000)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     timeout_seconds: int = Field(default=120, ge=10, le=300)
+    openai_is_consequential: bool = Field(default=True)
 
     class Config:
         frozen = True
@@ -457,6 +458,7 @@ class UnifiedConfig:
         - AI_MAX_TOKENS: 4096
         - AI_TEMPERATURE: 0.7
         - AI_TIMEOUT_SECONDS: 120
+        - OPENAI_IS_CONSEQUENTIAL: "true" (marks OpenAI requests as having real-world consequences per OpenAI safety features)
         """
         self.ai = AIConfig(
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -464,7 +466,8 @@ class UnifiedConfig:
             default_model=os.getenv("AI_DEFAULT_MODEL", "claude-sonnet-4-5"),
             max_tokens=int(os.getenv("AI_MAX_TOKENS", 4096)),
             temperature=float(os.getenv("AI_TEMPERATURE", 0.7)),
-            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120))
+            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120)),
+            openai_is_consequential=os.getenv("OPENAI_IS_CONSEQUENTIAL", "true").lower() == "true"
         )
 
     def is_production(self) -> bool:
