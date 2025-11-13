@@ -6,7 +6,7 @@
 # Build Dependencies (Security-Critical)
 # WHY: setuptools and pip have RCE vulnerabilities (CVE-2025-47273, CVE-2025-8869)
 # Note: pip managed by system, upgrade in deployment environment
-setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345 (RCE via package_index)
+setuptools==78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345 (RCE via package_index)
 
 # Core Framework (Latest Secure Versions)
 fastapi==0.119.0  # Includes starlette dependency - do not pin separately

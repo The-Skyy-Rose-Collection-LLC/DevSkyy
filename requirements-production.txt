@@ -3,7 +3,7 @@
 # For ML features, use separate specialized containers
 
 # Build Dependencies (Security-Critical)
-setuptools>=78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
+setuptools==78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
 
 # Core Framework
 fastapi==0.119.0  # Includes starlette dependency - do not pin separately

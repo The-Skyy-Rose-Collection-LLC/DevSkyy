@@ -384,6 +384,32 @@ jobs:
           docker stop devskyy-test
           docker rm devskyy-test
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.2'
+
+      - name: Sign Docker image
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        env:
+          COSIGN_EXPERIMENTAL: 1
+        run: |
+          # Sign the Docker image using keyless signing (OIDC)
+          echo "Signing Docker image with Cosign..."
+          cosign sign --yes devskyy:${{ github.sha }}
+          cosign sign --yes devskyy:latest
+          echo "✓ Docker images signed successfully"
+
+      - name: Verify Docker image signature
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        env:
+          COSIGN_EXPERIMENTAL: 1
+        run: |
+          echo "Verifying Docker image signatures..."
+          cosign verify devskyy:${{ github.sha }}
+          cosign verify devskyy:latest
+          echo "✓ Docker image signatures verified"
+
       - name: Save Docker image
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
         run: |
