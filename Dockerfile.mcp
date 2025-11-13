@@ -26,8 +26,9 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy requirements files
-COPY requirements_mcp.txt /tmp/
-COPY requirements.txt /tmp/
+# Use MCP-specific isolated requirements
+COPY mcp/requirements.txt /tmp/requirements_mcp.txt
+COPY requirements.txt /tmp/requirements.txt
 
 # Install Python dependencies
 RUN pip install --upgrade pip setuptools wheel && \

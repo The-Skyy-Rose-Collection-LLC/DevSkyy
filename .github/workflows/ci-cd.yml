@@ -1,5 +1,11 @@
 name: DevSkyy CI/CD Pipeline
 
+# NOTE: This is the main CI/CD pipeline. For subproject-specific testing:
+# - Docker builds: .github/workflows/docker.yml
+# - ML models: .github/workflows/ml.yml
+# - MCP server: .github/workflows/mcp.yml
+# - Vercel deployment: .github/workflows/vercel.yml
+
 on:
   push:
     branches: ['**']

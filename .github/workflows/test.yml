@@ -1,5 +1,12 @@
 name: Comprehensive Test Suite
 
+# NOTE: This workflow runs tests with FULL dependencies.
+# For subproject-specific isolated testing, see:
+# - ML tests: .github/workflows/ml.yml (uses ml/requirements.txt)
+# - MCP tests: .github/workflows/mcp.yml (uses mcp/requirements.txt)
+# - Docker tests: .github/workflows/docker.yml (uses docker/requirements.txt)
+# - Vercel tests: .github/workflows/vercel.yml (uses vercel/requirements.txt)
+
 on:
   push:
     branches: ['**']

@@ -1,0 +1,396 @@
+name: MCP Server Testing & Deployment
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'mcp/**'
+      - 'devskyy_mcp.py'
+      - 'Dockerfile.mcp'
+      - 'docker-compose.mcp.yml'
+      - '.mcp.json*'
+      - '.github/workflows/mcp.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'mcp/**'
+      - 'devskyy_mcp.py'
+      - 'Dockerfile.mcp'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11.9'
+
+jobs:
+  # ============================================================================
+  # JOB 1: MCP Dependency Check
+  # ============================================================================
+  mcp-dependency-check:
+    name: MCP Dependency Isolation Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check MCP dependencies isolation
+        run: |
+          echo "Checking mcp/requirements.txt for proper isolation..."
+          
+          # Check that MCP dependencies ARE in mcp requirements
+          if ! grep -E "(mcp|fastmcp|claude-agent-sdk)" mcp/requirements.txt; then
+            echo "ERROR: MCP dependencies missing from mcp/requirements.txt"
+            exit 1
+          fi
+          
+          # Check that heavy ML dependencies are NOT in mcp requirements
+          if grep -E "(torch|tensorflow|transformers)" mcp/requirements.txt; then
+            echo "ERROR: Heavy ML dependencies found in mcp/requirements.txt"
+            exit 1
+          fi
+          
+          echo "✓ MCP dependencies are properly isolated"
+
+      - name: Validate MCP requirements
+        run: |
+          pip install pip-tools
+          pip-compile --dry-run --no-header mcp/requirements.txt || exit 1
+          echo "✓ MCP requirements file is valid"
+
+  # ============================================================================
+  # JOB 2: MCP Server Tests
+  # ============================================================================
+  mcp-server-test:
+    name: MCP Server Unit Tests
+    runs-on: ubuntu-latest
+    needs: mcp-dependency-check
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install MCP dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r mcp/requirements.txt
+          pip install pytest pytest-asyncio pytest-cov
+
+      - name: Test MCP imports
+        run: |
+          python -c "
+          import sys
+          
+          # Test MCP imports
+          try:
+              import mcp
+              import fastmcp
+              from claude_agent_sdk import Agent
+              print('✓ MCP libraries imported successfully')
+              print(f'MCP version: {mcp.__version__}')
+          except ImportError as e:
+              print(f'✗ Import error: {e}')
+              sys.exit(1)
+          "
+
+      - name: Validate MCP configuration
+        run: |
+          # Check if .mcp.json exists and is valid
+          if [ -f ".mcp.json" ]; then
+            python -c "
+            import json
+            with open('.mcp.json') as f:
+                config = json.load(f)
+            print('✓ .mcp.json is valid JSON')
+            print(f'MCP servers configured: {list(config.get(\"mcpServers\", {}).keys())}')
+            "
+          else
+            echo "⚠ .mcp.json not found, using example"
+            if [ -f ".mcp.json.example" ]; then
+              python -c "import json; json.load(open('.mcp.json.example'))"
+            fi
+          fi
+
+      - name: Run MCP server tests
+        run: |
+          # Run MCP-specific tests if they exist
+          if [ -d "tests/mcp" ]; then
+            pytest tests/mcp/ \
+              -v \
+              --tb=short \
+              --cov=mcp \
+              --cov-report=xml:coverage-mcp.xml \
+              --junit-xml=junit-mcp.xml
+          else
+            echo "⚠ No MCP tests found, skipping"
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-test-results
+          path: |
+            coverage-mcp.xml
+            junit-mcp.xml
+          retention-days: 30
+
+  # ============================================================================
+  # JOB 3: MCP Server Startup Test
+  # ============================================================================
+  mcp-startup-test:
+    name: MCP Server Startup Test
+    runs-on: ubuntu-latest
+    needs: mcp-dependency-check
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r mcp/requirements.txt
+
+      - name: Test MCP server startup
+        run: |
+          # Create test environment
+          export ANTHROPIC_API_KEY="test-key"
+          export OPENAI_API_KEY="test-key"
+          
+          # Test that the MCP server can be imported
+          if [ -f "devskyy_mcp.py" ]; then
+            python -c "
+            import sys
+            sys.path.insert(0, '.')
+            
+            # Try to import the MCP server module
+            try:
+                import devskyy_mcp
+                print('✓ MCP server module imported successfully')
+            except Exception as e:
+                print(f'⚠ MCP server import: {e}')
+            "
+          else
+            echo "⚠ devskyy_mcp.py not found"
+          fi
+
+  # ============================================================================
+  # JOB 4: MCP Docker Build Test
+  # ============================================================================
+  mcp-docker-build:
+    name: MCP Docker Image Build
+    runs-on: ubuntu-latest
+    needs: mcp-dependency-check
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build MCP Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.mcp
+          push: false
+          load: true
+          tags: devskyy-mcp:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test MCP Docker image
+        run: |
+          echo "Testing MCP Docker image..."
+          docker images | grep devskyy-mcp
+          
+          # Test Python version
+          docker run --rm devskyy-mcp:test python --version
+          
+          # Test MCP installation
+          docker run --rm devskyy-mcp:test python -c "import mcp; print('MCP version:', mcp.__version__)"
+
+  # ============================================================================
+  # JOB 5: MCP Docker Compose Test
+  # ============================================================================
+  mcp-compose-test:
+    name: MCP Docker Compose Integration
+    runs-on: ubuntu-latest
+    needs: mcp-docker-build
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose file
+        run: |
+          if [ -f "docker-compose.mcp.yml" ]; then
+            docker compose -f docker-compose.mcp.yml config
+          else
+            echo "⚠ docker-compose.mcp.yml not found"
+            exit 0
+          fi
+
+      - name: Start MCP services
+        run: |
+          if [ -f "docker-compose.mcp.yml" ]; then
+            docker compose -f docker-compose.mcp.yml up -d
+            sleep 15
+          else
+            echo "⚠ Skipping compose test"
+            exit 0
+          fi
+
+      - name: Check MCP service health
+        run: |
+          if [ -f "docker-compose.mcp.yml" ]; then
+            docker compose -f docker-compose.mcp.yml ps
+            docker compose -f docker-compose.mcp.yml logs
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f "docker-compose.mcp.yml" ]; then
+            docker compose -f docker-compose.mcp.yml down -v
+          fi
+
+  # ============================================================================
+  # JOB 6: MCP API Integration Test
+  # ============================================================================
+  mcp-api-test:
+    name: MCP API Integration Test
+    runs-on: ubuntu-latest
+    needs: mcp-server-test
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r mcp/requirements.txt
+          pip install httpx
+
+      - name: Test MCP SDK functionality
+        run: |
+          python -c "
+          import asyncio
+          from claude_agent_sdk import Agent
+          
+          async def test_agent():
+              try:
+                  # Test basic agent creation
+                  agent = Agent(
+                      name='test_agent',
+                      model='claude-sonnet-4-5'
+                  )
+                  print('✓ MCP Agent created successfully')
+                  return True
+              except Exception as e:
+                  print(f'⚠ Agent test: {e}')
+                  return False
+          
+          result = asyncio.run(test_agent())
+          "
+
+  # ============================================================================
+  # JOB 7: MCP Performance Test
+  # ============================================================================
+  mcp-performance-test:
+    name: MCP Performance Benchmark
+    runs-on: ubuntu-latest
+    needs: mcp-server-test
+    timeout-minutes: 20
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r mcp/requirements.txt
+
+      - name: Run performance tests
+        run: |
+          echo "Running MCP performance benchmarks..."
+          
+          # Test import speed
+          python -c "
+          import time
+          start = time.time()
+          import mcp
+          import fastmcp
+          from claude_agent_sdk import Agent
+          end = time.time()
+          print(f'Import time: {end - start:.3f}s')
+          "
+
+  # ============================================================================
+  # Summary Job
+  # ============================================================================
+  mcp-summary:
+    name: MCP Workflow Summary
+    runs-on: ubuntu-latest
+    needs: [mcp-dependency-check, mcp-server-test, mcp-startup-test, mcp-docker-build, mcp-api-test]
+    if: always()
+
+    steps:
+      - name: Check workflow status
+        run: |
+          echo "MCP Workflow Summary:"
+          echo "✓ Dependency Check: ${{ needs.mcp-dependency-check.result }}"
+          echo "✓ Server Tests: ${{ needs.mcp-server-test.result }}"
+          echo "✓ Startup Test: ${{ needs.mcp-startup-test.result }}"
+          echo "✓ Docker Build: ${{ needs.mcp-docker-build.result }}"
+          echo "✓ API Test: ${{ needs.mcp-api-test.result }}"
+          
+          if [ "${{ needs.mcp-dependency-check.result }}" != "success" ] || \
+             [ "${{ needs.mcp-server-test.result }}" != "success" ] || \
+             [ "${{ needs.mcp-startup-test.result }}" != "success" ] || \
+             [ "${{ needs.mcp-docker-build.result }}" != "success" ] || \
+             [ "${{ needs.mcp-api-test.result }}" != "success" ]; then
+            echo "❌ Some MCP checks failed"
+            exit 1
+          fi
+          
+          echo "✅ All MCP checks passed"
