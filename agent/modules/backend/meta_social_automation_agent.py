@@ -31,6 +31,7 @@ from anthropic import AsyncAnthropic
 import httpx
 from openai import AsyncOpenAI
 
+from config.unified_config import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,15 @@ class MetaSocialAutomationAgent:
 
     def __init__(self):
         # AI Services
+        config = get_config()
+        is_consequential = config.ai.openai_is_consequential
+        default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.openai = AsyncOpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            default_headers=default_headers
+        )
 
         # Meta API Configuration
         self.meta_app_id = os.getenv("META_APP_ID")

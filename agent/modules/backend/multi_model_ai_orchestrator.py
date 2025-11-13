@@ -32,6 +32,7 @@ from anthropic import AsyncAnthropic
 import httpx
 from openai import AsyncOpenAI
 
+from config.unified_config import get_config
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +64,12 @@ class MultiModelAIOrchestrator:
         # OpenAI
         openai_key = os.getenv("OPENAI_API_KEY")
         if openai_key:
+            config = get_config()
+            is_consequential = config.ai.openai_is_consequential
+            default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
             self.models["openai"] = {
-                "client": AsyncOpenAI(api_key=openai_key),
+                "client": AsyncOpenAI(api_key=openai_key, default_headers=default_headers),
                 "models": {
                     "gpt4": "gpt-4-turbo-preview",
                     "gpt4_vision": "gpt-4-vision-preview",
