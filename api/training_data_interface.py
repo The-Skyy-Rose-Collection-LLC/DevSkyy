@@ -22,6 +22,8 @@ Handles Skyy Rose Collection training image uploads and preprocessing
 
 logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+
 # Production-grade image processing imports
 try:
     from PIL import Image, ImageEnhance, ImageOps

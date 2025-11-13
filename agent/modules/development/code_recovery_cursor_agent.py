@@ -44,6 +44,7 @@ from pathlib import Path
 import re
 from typing import Any, Optional
 import uuid
+from fastapi import HTTPException
 
 from fastapi import HTTPException
 

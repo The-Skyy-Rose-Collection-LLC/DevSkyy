@@ -16,6 +16,15 @@ import uvicorn
 
 logger = logging.getLogger(__name__)
 
+from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request
+import uvicorn
+import logging
+from todo_tracker import TodoTracker, TodoItem, Priority, Status, Category
+from typing import Optional
+
+logger = logging.getLogger(__name__)
+
 class TodoDashboard:
     """Web dashboard for TODO management"""
 

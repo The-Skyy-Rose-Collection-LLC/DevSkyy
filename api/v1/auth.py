@@ -15,6 +15,11 @@ from security.jwt_auth import (
     get_current_active_user,
     user_manager,
     verify_token,
+    User,
+    UserRole,
+    TokenResponse,
+    TokenData,
+    user_manager,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
 

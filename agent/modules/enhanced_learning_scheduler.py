@@ -525,8 +525,6 @@ def start_enhanced_learning_system(brand_intelligence_agent) -> dict[str, Any]:
 
 def get_learning_system_status() -> dict[str, Any]:
     """Get the status of the global learning system."""
-    global _global_scheduler
-
     if _global_scheduler is None:
         return {
             "status": "not_initialized",
