@@ -247,8 +247,9 @@ jobs:
               exit 1
             fi
 
-            if [ "$HIGH" -gt 5 ]; then
-              echo "::warning::Found $HIGH HIGH vulnerabilities (threshold: 5)"
+            if [ "$HIGH" -gt 0 ]; then
+              echo "::error::Found $HIGH HIGH vulnerabilities! Truth Protocol requires zero HIGH/CRITICAL CVEs."
+              exit 1
             fi
           fi
 

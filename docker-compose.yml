@@ -73,7 +73,7 @@ services:
 
   # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: devskyy-postgres
     restart: unless-stopped
     environment:

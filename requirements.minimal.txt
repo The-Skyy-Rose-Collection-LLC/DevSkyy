@@ -7,7 +7,7 @@
 # For full-featured deployment, use requirements.txt directly
 
 # Build Dependencies (Security-Critical)
-setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
+setuptools==78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
 
 # Core Framework
 fastapi==0.119.0

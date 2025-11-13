@@ -6,7 +6,7 @@
 # Heavy dependencies like TensorFlow, PyTorch are excluded for optimal performance
 
 # Build Dependencies (Security-Critical)
-setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
+setuptools==78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
 
 # Core FastAPI Framework (Latest Secure Versions)
 fastapi==0.119.0
