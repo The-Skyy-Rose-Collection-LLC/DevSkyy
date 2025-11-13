@@ -11,7 +11,7 @@ setuptools>=78.1.1  # Fix CVE-2025-47273, CVE-2024-6345
 # Core FastAPI Framework (Latest Secure Versions)
 fastapi==0.119.0
 uvicorn[standard]==0.38.0  # Updated to match requirements.txt
-starlette==0.48.0
+starlette==0.49.1
 
 # Essential Dependencies with Email Support
 pydantic==2.10.4  # Updated to match requirements.txt
