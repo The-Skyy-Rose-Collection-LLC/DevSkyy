@@ -53,7 +53,20 @@ class IngestTextRequest(BaseModel):
 
     @validator("text")
     def validate_text(cls, v: str) -> str:
-        """Validate text content"""
+        """
+        Validate ingest text content.
+        
+        Ensures the string is not empty after stripping and does not exceed 1,000,000 characters.
+        
+        Parameters:
+            v (str): Text to validate.
+        
+        Returns:
+            str: The original text if valid.
+        
+        Raises:
+            ValueError: If text is empty after stripping or longer than 1,000,000 characters.
+        """
         if not v.strip():
             raise ValueError("Text content cannot be empty")
         if len(v) > 1_000_000:  # 1MB text limit
@@ -157,20 +170,16 @@ async def ingest_text(
     ),
 ):
     """
-    Ingest text content into RAG system
-
-    Requires: SuperAdmin, Admin, or Developer role
-
-    **Process:**
-    1. Validate text content
-    2. Chunk text into smaller segments
-    3. Generate embeddings
-    4. Store in vector database
-
-    **Returns:**
-    - Ingestion statistics
-    - Chunk count
-    - Timestamp
+    Ingest the provided text into the RAG service and return ingestion statistics.
+    
+    Parameters:
+        request (IngestTextRequest): Text, source, and optional metadata to ingest.
+    
+    Returns:
+        IngestResponse: Ingestion outcome and statistics (e.g., total_documents, added, chunks_created, file_path, source, ingested_at).
+    
+    Raises:
+        HTTPException: If ingestion fails (returns status 500 with error detail).
     """
     try:
         rag_service = get_rag_service()
@@ -208,25 +217,16 @@ async def ingest_file(
     ),
 ):
     """
-    Ingest a document file into RAG system
-
-    Requires: SuperAdmin, Admin, or Developer role
-
-    **Supported formats:**
-    - PDF (.pdf)
-    - Text (.txt, .md)
-
-    **Process:**
-    1. Upload file
-    2. Extract text content
-    3. Chunk document
-    4. Generate embeddings
-    5. Store in vector database
-
-    **Returns:**
-    - Ingestion statistics
-    - Chunk count
-    - Timestamp
+    Ingests an uploaded document file into the RAG system.
+    
+    Validates the file type (allowed: .pdf, .txt, .md), writes the upload to a temporary file, delegates ingestion to the RAG service, and cleans up the temporary file. The response includes ingestion statistics and metadata.
+    
+    Returns:
+        IngestResponse: Contains `success`, `total_documents`, `added`, `chunks_created`, optional `file_path`, optional `source`, and `ingested_at`.
+    
+    Raises:
+        HTTPException: 400 if the file type is unsupported.
+        HTTPException: 500 if ingestion fails due to an internal error.
     """
     try:
         # Validate file type
@@ -288,19 +288,10 @@ async def search(
     ),
 ):
     """
-    Semantic search in RAG knowledge base
-
-    Requires: SuperAdmin, Admin, Developer, or APIUser role
-
-    **Process:**
-    1. Generate query embedding
-    2. Search vector database
-    3. Return top-k most similar documents
-
-    **Returns:**
-    - Ranked search results
-    - Similarity scores
-    - Source metadata
+    Perform a semantic search against the RAG knowledge base for the provided query.
+    
+    Returns:
+        SearchResponse: A response containing a list of ranked search results (each with content, metadata, similarity, and distance), the total count of results returned, and the original query.
     """
     try:
         rag_service = get_rag_service()
@@ -339,20 +330,13 @@ async def query(
     ),
 ):
     """
-    RAG query - Retrieve context and generate answer
-
-    Requires: SuperAdmin, Admin, Developer, or APIUser role
-
-    **Process:**
-    1. Retrieve relevant context from knowledge base
-    2. Build prompt with context
-    3. Generate answer with Claude
-    4. Return answer with sources
-
-    **Returns:**
-    - AI-generated answer
-    - Source documents
-    - Token usage
+    Perform a retrieval-augmented generation query and return the model answer together with source documents and metadata.
+    
+    Returns:
+        QueryResponse: Contains the generated `answer`, `sources` (list of documents used with content, metadata, similarity, distance), `context_used` (text retrieved from the knowledge base), and optional `model` and `tokens_used` fields.
+    
+    Raises:
+        HTTPException: If the query processing fails.
     """
     try:
         rag_service = get_rag_service()
@@ -392,14 +376,13 @@ async def get_stats(
     ),
 ):
     """
-    Get RAG system statistics
-
-    Requires: SuperAdmin, Admin, or Developer role
-
-    **Returns:**
-    - Vector database stats
-    - Configuration
-    - Document count
+    Retrieve aggregated RAG service statistics.
+    
+    Returns:
+        StatsResponse: Contains vector database statistics, configuration details, and document counts.
+    
+    Raises:
+        HTTPException: Raised with status 500 if statistics cannot be retrieved.
     """
     try:
         rag_service = get_rag_service()
@@ -426,14 +409,15 @@ async def reset_database(
     ),
 ):
     """
-    Reset RAG database (delete all documents)
-
-    Requires: SuperAdmin role only
-
-    **WARNING:** This action is irreversible!
-
-    **Returns:**
-    - Success message
+    Delete all documents from the RAG vector database and reinitialize the collection.
+    
+    This action irreversibly removes all stored vectors and documents and creates a fresh vector database instance. Access is restricted to users with the SuperAdmin role.
+    
+    Returns:
+        JSONResponse: Object with keys `success` (bool), `message` (str), and `timestamp` (ISO 8601 str).
+    
+    Raises:
+        HTTPException: with status 500 if the reset operation fails.
     """
     try:
         rag_service = get_rag_service()
@@ -467,12 +451,12 @@ async def reset_database(
 )
 async def health_check():
     """
-    RAG system health check
-
-    **Returns:**
-    - System status
-    - Configuration
-    - Document count
+    Return overall RAG service health as a JSONResponse.
+    
+    On success, returns a JSONResponse containing service status "healthy", service name, version, document_count, embedding_model, and timestamp. On failure, returns a JSONResponse with HTTP 503 containing status "unhealthy", service name, error message, and timestamp.
+    
+    Returns:
+        JSONResponse: Health payload; status code 200 on success, 503 on failure.
     """
     try:
         rag_service = get_rag_service()

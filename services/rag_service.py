@@ -75,6 +75,13 @@ class DocumentProcessor:
         chunk_size: int = RAGConfig.CHUNK_SIZE,
         chunk_overlap: int = RAGConfig.CHUNK_OVERLAP,
     ):
+        """
+        Initialize the DocumentProcessor with chunking behavior and a tokenizer.
+        
+        Parameters:
+            chunk_size (int): Maximum number of characters per chunk.
+            chunk_overlap (int): Number of characters that overlap between consecutive chunks.
+        """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -87,13 +94,21 @@ class DocumentProcessor:
 
     def process_pdf(self, file_path: str) -> list[dict[str, Any]]:
         """
-        Process PDF document and extract text chunks
-
-        Args:
-            file_path: Path to PDF file
-
+        Extracts text from a PDF and splits it into tokenized content chunks with metadata.
+        
+        Parameters:
+            file_path (str): Filesystem path to the PDF to process.
+        
         Returns:
-            List of document chunks with metadata
+            list[dict[str, Any]]: A list of chunk objects. Each chunk has:
+                - `content` (str): The chunk text.
+                - `metadata` (dict): Metadata including:
+                    - `source` (str): Original file path.
+                    - `page` (int): 1-based page number the chunk came from.
+                    - `chunk_index` (int): Zero-based index of the chunk within the page.
+                    - `total_pages` (int): Total number of pages in the PDF.
+                    - `file_type` (str): The string "pdf".
+                    - `tokens` (int): Token count for the chunk as computed by the configured tokenizer.
         """
         try:
             reader = PdfReader(file_path)
@@ -130,14 +145,16 @@ class DocumentProcessor:
 
     def process_text(self, text: str, source: str = "text") -> list[dict[str, Any]]:
         """
-        Process plain text and extract chunks
-
-        Args:
-            text: Text content
-            source: Source identifier
-
+        Split input text into token-aware chunks and return a list of chunk objects with metadata.
+        
+        Parameters:
+            text (str): The input text to be split into chunks.
+            source (str): Identifier for the text source stored in each chunk's metadata (default "text").
+        
         Returns:
-            List of document chunks with metadata
+            list[dict[str, Any]]: A list where each item is a dict with:
+                - "content" (str): The chunk text.
+                - "metadata" (dict): Contains "source" (str), "chunk_index" (int), "file_type" (str, "text"), and "tokens" (int) representing the token count.
         """
         try:
             chunks = self.text_splitter.split_text(text)
@@ -160,7 +177,15 @@ class DocumentProcessor:
             raise
 
     def calculate_chunk_hash(self, content: str) -> str:
-        """Calculate SHA256 hash of chunk content"""
+        """
+        Compute the SHA-256 hash of a chunk's content.
+        
+        Parameters:
+            content (str): Text content of the chunk to hash.
+        
+        Returns:
+            str: Hexadecimal SHA-256 digest of the provided content.
+        """
         return hashlib.sha256(content.encode()).hexdigest()
 
 
@@ -177,6 +202,19 @@ class VectorDatabase:
         collection_name: str = RAGConfig.CHROMA_COLLECTION_NAME,
         embedding_model: str = RAGConfig.EMBEDDING_MODEL,
     ):
+        """
+        Initialize the VectorDatabase, ensuring persistence, loading the embedding model, and preparing the ChromaDB collection.
+        
+        Parameters:
+            persist_directory (str): Filesystem path where ChromaDB will persist its data; the directory will be created if it does not exist.
+            collection_name (str): Name of the ChromaDB collection to use or create for storing embeddings and documents.
+            embedding_model (str): Identifier or path of the SentenceTransformer model used to generate embeddings.
+        
+        Side effects:
+            - Creates the persistence directory if missing.
+            - Instantiates a ChromaDB PersistentClient and obtains (or creates) the specified collection.
+            - Loads the SentenceTransformer embedding model and stores it along with the client and collection on the instance.
+        """
         self.persist_directory = persist_directory
         self.collection_name = collection_name
 
@@ -209,14 +247,18 @@ class VectorDatabase:
         batch_size: int = 100,
     ) -> dict[str, Any]:
         """
-        Add documents to vector database
-
-        Args:
-            documents: List of document chunks with content and metadata
-            batch_size: Batch size for processing
-
+        Ingest document chunks into the vector collection in batches.
+        
+        Parameters:
+            documents (list[dict[str, Any]]): List of document chunks where each item is a dict containing at least the keys "content" (str) and "metadata" (dict). Each chunk will be encoded to an embedding and added to the collection.
+            batch_size (int): Number of documents to process per batch.
+        
         Returns:
-            Dictionary with ingestion statistics
+            dict[str, Any]: Ingestion statistics with keys:
+                - "total_documents": total number of input documents,
+                - "added": number of documents successfully added,
+                - "skipped": number of documents skipped (reserved for future use),
+                - "collection_size": current document count in the collection.
         """
         try:
             total_docs = len(documents)
@@ -268,15 +310,20 @@ class VectorDatabase:
         filters: Optional[dict[str, Any]] = None,
     ) -> list[dict[str, Any]]:
         """
-        Semantic search in vector database
-
-        Args:
-            query: Search query
-            top_k: Number of results to return
-            filters: Metadata filters
-
+        Perform a semantic search over the vector collection using the provided query.
+        
+        Parameters:
+            query (str): Natural-language search query.
+            top_k (int): Maximum number of results to return.
+            filters (dict | None): Optional metadata filter applied to the collection query (e.g., {"source": "doc.pdf"}).
+        
         Returns:
-            List of search results with content, metadata, and scores
+            list[dict[str, Any]]: Ordered list of result objects containing:
+                - `content` (str): The matched document text.
+                - `metadata` (dict): Stored metadata for the document.
+                - `distance` (float): Vector distance between the query and the document embedding.
+                - `similarity` (float): Similarity score computed as `1 - distance`.
+                - `id` (str): Document identifier.
         """
         try:
             # Generate query embedding
@@ -310,7 +357,12 @@ class VectorDatabase:
             raise
 
     def delete_collection(self):
-        """Delete the entire collection"""
+        """
+        Delete the ChromaDB collection managed by this VectorDatabase instance.
+        
+        Raises:
+            Exception: If the collection could not be deleted.
+        """
         try:
             self.client.delete_collection(name=self.collection_name)
             logger.info(f"Deleted collection: {self.collection_name}")
@@ -319,7 +371,16 @@ class VectorDatabase:
             raise
 
     def get_stats(self) -> dict[str, Any]:
-        """Get database statistics"""
+        """
+        Return summary information about the vector database collection.
+        
+        Returns:
+            stats (dict): Dictionary with keys:
+                - "collection_name": Name of the Chroma collection.
+                - "document_count": Number of documents currently in the collection.
+                - "persist_directory": Filesystem directory where the collection is persisted.
+                - "embedding_model": Name of the embedding model configured for the service.
+        """
         return {
             "collection_name": self.collection_name,
             "document_count": self.collection.count(),
@@ -340,6 +401,11 @@ class RAGService:
         vector_db: Optional[VectorDatabase] = None,
         doc_processor: Optional[DocumentProcessor] = None,
     ):
+        """
+        Initialize the RAGService with supplied or default components and configure an Anthropic client when an API key is available.
+        
+        If `vector_db` or `doc_processor` are not provided, default instances are created and assigned to `self.vector_db` and `self.doc_processor`. If the Anthropic API key is present in configuration, `self.anthropic` is set to a configured client; otherwise `self.anthropic` is set to `None`, causing RAG queries to fall back to retrieval-only behavior.
+        """
         self.vector_db = vector_db or VectorDatabase()
         self.doc_processor = doc_processor or DocumentProcessor()
 
@@ -356,14 +422,19 @@ class RAGService:
         file_type: Optional[str] = None,
     ) -> dict[str, Any]:
         """
-        Ingest a document into the RAG system
-
-        Args:
-            file_path: Path to document file
-            file_type: Document type (pdf, text, etc.) - auto-detected if None
-
+        Ingest a file (PDF or text) into the vector store and return ingestion metadata.
+        
+        Parameters:
+            file_path (str): Path to the file to ingest.
+            file_type (Optional[str]): File extension/type (e.g., "pdf", "txt"); if omitted, the type is inferred from the file_path suffix.
+        
         Returns:
-            Ingestion statistics
+            dict: Ingestion summary containing:
+                - keys returned by the vector database ingestion (e.g., counts of added/skipped items and collection size),
+                - "file_path": the ingested file path,
+                - "file_type": the resolved file type,
+                - "chunks_created": number of content chunks generated from the document,
+                - "ingested_at": ISO 8601 UTC timestamp of ingestion.
         """
         try:
             # Auto-detect file type
@@ -401,15 +472,15 @@ class RAGService:
         metadata: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
         """
-        Ingest text content directly
-
-        Args:
-            text: Text content
-            source: Source identifier
-            metadata: Additional metadata
-
+        Ingest the provided text by chunking it, attaching optional metadata, and adding the chunks to the vector store.
+        
+        Parameters:
+            text (str): The text to ingest.
+            source (str): Identifier for the text source (e.g., filename, "direct_input").
+            metadata (dict[str, Any], optional): Additional metadata to merge into every chunk's metadata.
+        
         Returns:
-            Ingestion statistics
+            dict[str, Any]: Ingestion results including vector DB statistics (e.g., totals and collection size), plus `source`, `text_length` (number of characters), `chunks_created`, and `ingested_at` (UTC ISO timestamp).
         """
         try:
             # Process text
@@ -443,16 +514,16 @@ class RAGService:
         min_similarity: float = RAGConfig.SIMILARITY_THRESHOLD,
     ) -> list[dict[str, Any]]:
         """
-        Semantic search for documents
-
-        Args:
-            query: Search query
-            top_k: Number of results
-            filters: Metadata filters
-            min_similarity: Minimum similarity threshold
-
+        Perform a semantic search over the vector store and return results meeting a similarity threshold.
+        
+        Parameters:
+        	query (str): The user query to encode and search.
+        	top_k (int): Maximum number of candidate results to retrieve before filtering.
+        	filters (Optional[dict[str, Any]]): Optional metadata filters to restrict the search.
+        	min_similarity (float): Minimum similarity score required for a result to be included.
+        
         Returns:
-            List of search results
+        	list[dict[str, Any]]: Filtered search results. Each dict contains at least `content`, `metadata`, `distance`, `similarity`, and `id`.
         """
         try:
             results = self.vector_db.search(query, top_k=top_k, filters=filters)
@@ -477,16 +548,23 @@ class RAGService:
         system_prompt: Optional[str] = None,
     ) -> dict[str, Any]:
         """
-        RAG query - Retrieve relevant context and generate answer
-
-        Args:
-            question: User question
-            top_k: Number of context chunks to retrieve
-            model: LLM model to use
-            system_prompt: Custom system prompt
-
+        Retrieve relevant context for a question and generate an answer grounded in those contexts.
+        
+        Performs a semantic search to collect up to `top_k` context chunks, assembles them into a prompt, and—if an Anthropic LLM is configured—uses the model to produce a concise answer that cites sources. If no LLM is configured, returns the relevant excerpts as the answer. If no relevant context is found, returns a default "no information" response.
+        
+        Parameters:
+            question: The user's question to answer.
+            top_k: Maximum number of context chunks to retrieve and include.
+            model: LLM model identifier to use when generating the answer.
+            system_prompt: Optional custom system prompt to guide the model's behavior; when omitted a default DevSkyy prompt is used.
+        
         Returns:
-            Answer with sources and metadata
+            A dictionary containing:
+              - `answer` (str): The generated answer or a fallback context excerpt or "no information" message.
+              - `sources` (list[dict]): Retrieved context items (each includes content, metadata, similarity, id, etc.).
+              - `context_used` (int): Number of context chunks included in the response.
+              - `model` (str, optional): The model used to generate the answer (present when an LLM was called).
+              - `tokens_used` (dict, optional): Token usage with keys `input` and `output` when available.
         """
         try:
             # 1. Retrieve relevant context
@@ -553,7 +631,18 @@ class RAGService:
             raise
 
     def get_stats(self) -> dict[str, Any]:
-        """Get RAG system statistics"""
+        """
+        Return aggregated RAG service statistics including vector database metrics and the current chunking/retrieval configuration.
+        
+        Returns:
+            stats (dict): A dictionary with keys:
+                - "vector_db": statistics for the underlying vector database (document count, collection name, persist directory, embedding model, etc.).
+                - "config": a dictionary containing current RAG configuration values:
+                    - "chunk_size": configured chunk size in tokens/characters.
+                    - "chunk_overlap": configured overlap between chunks.
+                    - "top_k": configured number of retrieval results to return.
+                    - "similarity_threshold": configured minimum similarity threshold for results.
+        """
         return {
             "vector_db": self.vector_db.get_stats(),
             "config": {
@@ -574,7 +663,12 @@ _rag_service: Optional[RAGService] = None
 
 
 def get_rag_service() -> RAGService:
-    """Get or create global RAG service instance"""
+    """
+    Get the singleton global RAGService instance, creating it if necessary.
+    
+    Returns:
+        RAGService: The singleton RAGService instance.
+    """
     global _rag_service
 
     if _rag_service is None:

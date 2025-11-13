@@ -11,20 +11,22 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Logging functions
+# log_info prints an informational message to stdout prefixed with a green [INFO] tag; the first argument is the message.
 log_info() {
     echo -e "${GREEN}[INFO]${NC} $1"
 }
 
+# log_warn prints the given message prefixed with [WARN] in yellow to stdout.
 log_warn() {
     echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
+# log_error prints an error message prefixed with `[ERROR]` in red.
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Banner
+# print_banner prints an ASCII banner for the DevSkyy MCP Server to stdout.
 print_banner() {
     cat <<'EOF'
 ╔══════════════════════════════════════════════════════════════════╗
@@ -34,7 +36,7 @@ print_banner() {
 EOF
 }
 
-# Validate environment variables
+# validate_env validates required and optional environment variables, sets a default DEVSKYY_API_URL when absent, and logs warnings for any missing required variables.
 validate_env() {
     log_info "Validating environment configuration..."
 
@@ -63,7 +65,7 @@ validate_env() {
     log_info "✅ Environment validation complete"
 }
 
-# Wait for dependencies
+# wait_for_dependencies waits for DATABASE_URL and REDIS_URL targets to become reachable (30 second timeout per service) and logs status; if a service remains unreachable the function logs a warning and continues.
 wait_for_dependencies() {
     log_info "Checking dependencies..."
 
@@ -100,7 +102,7 @@ wait_for_dependencies() {
     fi
 }
 
-# Run database migrations
+# run_migrations runs the project's database migrations when RUN_MIGRATIONS is set to "true" (placeholder for the actual migration tool).
 run_migrations() {
     if [ "$RUN_MIGRATIONS" = "true" ]; then
         log_info "Running database migrations..."
@@ -110,7 +112,7 @@ run_migrations() {
     fi
 }
 
-# Start MCP server
+# start_mcp_server starts the DevSkyy MCP server, logs the API URL and a masked API key, and replaces the shell with the server process.
 start_mcp_server() {
     log_info "Starting DevSkyy MCP Server..."
     log_info "API URL: $DEVSKYY_API_URL"
@@ -119,7 +121,11 @@ start_mcp_server() {
     exec python devskyy_mcp.py
 }
 
-# Start FastAPI application
+# start_api_server starts the FastAPI application with uvicorn using configured environment variables.
+# 
+# Uses ENVIRONMENT for informational logging, PORT (default 8000) for the listen port,
+# WORKERS (default 4) for the worker count, and LOG_LEVEL (default "info") for logging verbosity.
+# The function execs uvicorn to replace the shell process.
 start_api_server() {
     log_info "Starting DevSkyy FastAPI application..."
     log_info "Environment: ${ENVIRONMENT:-development}"
@@ -132,7 +138,7 @@ start_api_server() {
         --log-level ${LOG_LEVEL:-info}
 }
 
-# Start MCP gateway
+# start_mcp_gateway starts the MCP Gateway service.
 start_mcp_gateway() {
     log_info "Starting MCP Gateway..."
     log_info "Gateway Port: ${GATEWAY_PORT:-3000}"
@@ -140,7 +146,7 @@ start_mcp_gateway() {
     exec python docker/mcp_gateway.py
 }
 
-# Main entrypoint logic
+# main orchestrates the container startup sequence, validates configuration, waits for dependencies, runs optional migrations, and dispatches to the selected run mode (mcp-server, api-server, mcp-gateway, shell/bash, or a custom command).
 main() {
     print_banner
 

@@ -101,13 +101,28 @@ class StdioMCPClient:
     """Client for stdio-based MCP servers"""
 
     def __init__(self, server_config: dict[str, Any]):
+        """
+        Initialize a stdio-based MCP client using the provided server configuration.
+        
+        Parameters:
+            server_config (dict[str, Any]): Configuration dictionary with the following keys:
+                - "command": required; the executable (string or list) to run for the MCP subprocess.
+                - "args": optional; list of command-line arguments to pass to the subprocess (defaults to empty list).
+                - "env": optional; mapping of environment variables to set for the subprocess (defaults to empty dict).
+        
+        This sets the client's command, args, env, and initializes the subprocess handle to None.
+        """
         self.command = server_config["command"]
         self.args = server_config.get("args", [])
         self.env = server_config.get("env", {})
         self.process: Optional[subprocess.Popen] = None
 
     async def start(self):
-        """Start the stdio process"""
+        """
+        Start and attach a subprocess for the stdio MCP server.
+        
+        Starts the configured command as a subprocess with stdin/stdout/stderr pipes, merging the instance's environment overrides into the current environment, and stores the resulting subprocess object on `self.process`.
+        """
         env = os.environ.copy()
         env.update(self.env)
 
@@ -123,7 +138,15 @@ class StdioMCPClient:
         logger.info(f"Started stdio MCP server: {self.command}")
 
     async def call(self, request: MCPRequest) -> MCPResponse:
-        """Call MCP method via stdio"""
+        """
+        Send an MCPRequest to the managed stdio subprocess and parse its JSON-RPC response.
+        
+        Parameters:
+            request (MCPRequest): The JSON-RPC request to send; the subprocess will be started if it is not already running.
+        
+        Returns:
+            MCPResponse: The parsed JSON-RPC response from the subprocess.
+        """
         if not self.process:
             await self.start()
 
@@ -139,7 +162,14 @@ class StdioMCPClient:
         return MCPResponse(**response_data)
 
     async def close(self):
-        """Close the stdio process"""
+        """
+        Terminate the managed subprocess and wait up to 5 seconds for it to exit.
+        
+        If a subprocess is running, this sends a termination signal and waits up to 5 seconds for the process to exit. Does nothing if no subprocess is present.
+        
+        Raises:
+            subprocess.TimeoutExpired: If the process does not exit within 5 seconds.
+        """
         if self.process:
             self.process.terminate()
             self.process.wait(timeout=5)
@@ -150,12 +180,25 @@ class HttpMCPClient:
     """Client for HTTP-based MCP servers"""
 
     def __init__(self, server_config: dict[str, Any]):
+        """
+        Create an HTTP MCP client configured for a target server.
+        
+        Parameters:
+            server_config (dict[str, Any]): Configuration for the HTTP server. Must contain the key `"url"` with the target endpoint. May include `"headers"` to send with each request.
+        
+        """
         self.url = server_config["url"]
         self.headers = server_config.get("headers", {})
         self.client = httpx.AsyncClient(timeout=30.0)
 
     async def call(self, request: MCPRequest) -> MCPResponse:
-        """Call MCP method via HTTP"""
+        """
+        Forward an MCP JSON-RPC request to the configured HTTP MCP server.
+        
+        If the HTTP request succeeds, returns the server's response parsed as an MCPResponse. If an HTTP transport or protocol error occurs, returns an MCPResponse with `error` set to `{"code": -32000, "message": "<error message>"}` and the original request `id`.
+        
+        @returns MCPResponse: The parsed MCPResponse from the server, or an error MCPResponse on HTTP failure.
+        """
         try:
             response = await self.client.post(
                 self.url,
@@ -185,10 +228,19 @@ class MCPGateway:
     """Manages multiple MCP server clients"""
 
     def __init__(self):
+        """
+        Initialize the gateway and prepare an empty registry for MCP server clients.
+        
+        The registry maps server names to their client instances (either StdioMCPClient or HttpMCPClient).
+        """
         self.clients: dict[str, StdioMCPClient | HttpMCPClient] = {}
 
     async def initialize(self):
-        """Initialize all MCP clients"""
+        """
+        Initialize and register MCP server clients from the MCP_SERVERS configuration.
+        
+        Creates and stores a client instance for each configured server: for servers of type "stdio" it starts a StdioMCPClient (starting its subprocess), and for type "http" it creates an HttpMCPClient. Successful clients are added to the gateway's client registry and failures are logged; the method handles exceptions internally and does not raise.
+        """
         for server_name, config in MCP_SERVERS.items():
             try:
                 if config["type"] == "stdio":
@@ -209,7 +261,19 @@ class MCPGateway:
     async def route_request(
         self, server_name: str, request: MCPRequest
     ) -> MCPResponse:
-        """Route request to specific MCP server"""
+        """
+        Forward an MCPRequest to the MCP server identified by server_name and return its MCPResponse.
+        
+        If the named server is not registered, returns an MCPResponse with error code -32601.
+        If forwarding the request raises an exception, returns an MCPResponse with error code -32603 and the original request id.
+        
+        Parameters:
+            server_name (str): Name of the configured MCP server to route the request to.
+            request (MCPRequest): JSON-RPC 2.0 formatted request to forward.
+        
+        Returns:
+            MCPResponse: The MCP server's response, or an error response with `id` set to the original request id.
+        """
         client = self.clients.get(server_name)
 
         if not client:
@@ -231,7 +295,11 @@ class MCPGateway:
             )
 
     async def shutdown(self):
-        """Shutdown all MCP clients"""
+        """
+        Close and cleanly shut down all registered MCP clients.
+        
+        Iterates over each client in the gateway's registry and awaits its `close()` coroutine. Exceptions raised while closing an individual client are caught and logged, and do not prevent attempts to shut down remaining clients.
+        """
         for server_name, client in self.clients.items():
             try:
                 await client.close()
@@ -254,7 +322,11 @@ gateway = MCPGateway()
 
 @app.on_event("startup")
 async def startup():
-    """Initialize gateway on startup"""
+    """
+    Initialize the gateway and prepare configured MCP servers when the FastAPI application starts.
+    
+    Logs startup banners, triggers gateway initialization, and records the listening port and active server list.
+    """
     logger.info("=" * 70)
     logger.info("DevSkyy MCP Gateway v1.0.0")
     logger.info("=" * 70)
@@ -270,7 +342,9 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    """Cleanup on shutdown"""
+    """
+    Perform shutdown tasks for the MCP gateway, closing all managed MCP server clients and logging progress.
+    """
     logger.info("Shutting down MCP Gateway...")
     await gateway.shutdown()
     logger.info("✅ Gateway shutdown complete")
@@ -278,7 +352,16 @@ async def shutdown():
 
 @app.get("/")
 async def root():
-    """Gateway status endpoint"""
+    """
+    Provide gateway status including the gateway name, version, list of active servers, and overall status.
+    
+    Returns:
+        status (dict): Dictionary with keys:
+            - name (str): Human-readable gateway name.
+            - version (str): Gateway version string.
+            - servers (list[str]): Names of initialized/registered MCP servers.
+            - status (str): Overall gateway status (e.g., "active").
+    """
     return {
         "name": "DevSkyy MCP Gateway",
         "version": "1.0.0",
@@ -289,7 +372,14 @@ async def root():
 
 @app.get("/health")
 async def health():
-    """Health check endpoint"""
+    """
+    Report gateway health and per-server activity status.
+    
+    Returns:
+        dict: A dictionary with keys:
+            - "status": the overall gateway status (the string "healthy").
+            - "servers": a mapping of server names to their activity status (each value is the string "active").
+    """
     return {
         "status": "healthy",
         "servers": {
@@ -301,14 +391,14 @@ async def health():
 @app.post("/mcp/{server_name}")
 async def mcp_request(server_name: str, request: MCPRequest):
     """
-    Route MCP request to specific server
-
-    Args:
-        server_name: Name of MCP server (devskyy, huggingface, etc.)
-        request: MCP JSON-RPC request
-
+    Forward an MCP JSON-RPC request to the named MCP server.
+    
+    Parameters:
+        server_name (str): Identifier of the target MCP server (e.g., "devskyy", "huggingface").
+        request (MCPRequest): JSON-RPC 2.0 request to send to the server.
+    
     Returns:
-        MCP JSON-RPC response
+        MCPResponse: JSON-RPC 2.0 response from the server, containing either a `result` or an `error`.
     """
     logger.info(f"Routing request to {server_name}: {request.method}")
 
@@ -318,7 +408,14 @@ async def mcp_request(server_name: str, request: MCPRequest):
 
 @app.get("/servers")
 async def list_servers():
-    """List all available MCP servers"""
+    """
+    Return a mapping of available MCP servers and their reported status.
+    
+    Returns:
+        dict: A dictionary with a "servers" key mapping server names to objects containing:
+            - "type" (str): the configured server type (e.g., "stdio" or "http").
+            - "status" (str): the server status, currently "active".
+    """
     return {
         "servers": {
             name: {
