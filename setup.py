@@ -36,21 +36,21 @@ setup(
     url="https://github.com/SkyyRoseLLC/DevSkyy",
     license="Proprietary",
     packages=find_packages(exclude=["tests", "frontend", "docs"]),
-    python_requires=">=3.11",  # Python 3.11+ required for performance improvements
+    python_requires=">=3.11,<3.12",  # Python 3.11.x required (Truth Protocol compliance)
     install_requires=requirements,
     extras_require={
         "dev": [
-            "pytest>=8.4.2",
-            "pytest-asyncio>=0.24.0",
-            "pytest-cov>=5.0.0",
-            "flake8>=7.1.1",
-            "black>=24.10.0",
-            "isort>=5.13.2",
-            "mypy>=1.0.0",
+            "pytest==8.4.2",
+            "pytest-asyncio==0.24.0",
+            "pytest-cov==5.0.0",
+            "flake8==7.1.1",
+            "black==24.10.0",
+            "isort==5.13.2",
+            "mypy==1.13.0",
         ],
         "docs": [
-            "sphinx>=7.0.0",
-            "sphinx-rtd-theme>=2.0.0",
+            "sphinx==8.1.3",
+            "sphinx-rtd-theme==3.0.2",
         ],
     },
     entry_points={
