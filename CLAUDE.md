@@ -8,7 +8,7 @@
 ## Truth Protocol
 
 1. **Never guess** – Verify all syntax, APIs, security from official docs
-2. **Pin versions** – Explicit version numbers for all dependencies
+2. **Version strategy** – Use compatible releases (`~=`) for patch updates, range constraints (`>=,<`) for security packages. Generate lock files for reproducible deployments. Security-critical packages (crypto, auth, certs) must allow patch updates. Review dependencies monthly or when CVEs detected.
 3. **Cite standards** – RFC 7519 (JWT), NIST SP 800-38D (AES-GCM)
 4. **State uncertainty** – Use: `I cannot confirm without testing.`
 5. **No secrets in code** – Environment variables or secret manager only
@@ -46,8 +46,9 @@ Never skip. Always record. Use: `I cannot confirm this without testing.`
 | Audit | Tool | Target | Pass |
 |-------|------|--------|------|
 | Lint/Type | Ruff + Mypy | Python 3.11 | Clean |
-| Security | Bandit + Safety + Trivy | All deps | No HIGH/CRITICAL |
+| Security | Bandit + Safety + pip-audit + Trivy | All deps | No HIGH/CRITICAL |
 | Tests | Pytest | Coverage | ≥90% |
 | Performance | Autocannon | Latency | P95 < 200ms |
+| Dependencies | pip-audit weekly | requirements.txt | Compatible releases |
 
 Claude enforces the **Truth Protocol** and ensures DevSkyy remains verifiable, secure, and enterprise-grade.
