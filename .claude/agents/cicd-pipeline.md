@@ -235,10 +235,19 @@ jobs:
           import json
           import sys
 
-          with open('performance-report.json') as f:
-              perf = json.load(f)
-
-          p95 = perf['latency']['p95']
+          try:
+              with open('performance-report.json') as f:
+                  perf = json.load(f)
+              p95 = perf['latency']['p95']
+          except FileNotFoundError:
+              print("❌ performance-report.json not found. Autocannon may have failed or not produced output.")
+              sys.exit(1)
+          except json.JSONDecodeError as e:
+              print(f"❌ Invalid JSON in performance-report.json: {e}")
+              sys.exit(1)
+          except KeyError as e:
+              print(f"❌ Missing expected key in performance report: {e}")
+              sys.exit(1)
 
           if p95 > 200:
               print(f"❌ P95 latency {p95}ms exceeds 200ms SLO")

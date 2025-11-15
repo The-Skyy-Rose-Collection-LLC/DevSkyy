@@ -42,6 +42,26 @@ setuptools>=78.1.1,<79.0.0      # Security fixes
 - werkzeug
 - starlette
 
+### Date-Based Versions (Exact Pins)
+
+Some packages use date-based versioning (YYYYMMDD format) instead of semantic versioning. These packages require exact pins because compatible releases don't make sense for date-based versions:
+
+```
+certifi==2024.12.14          # Certificate bundle dated Dec 14, 2024
+openai-whisper==20240930     # Whisper model dated Sept 30, 2024
+```
+
+**Why exact pins for date-based versions:**
+- Compatible release (`~=`) doesn't work with date formats
+- Each release is a snapshot at a specific point in time
+- Updates are intentional (new models, certificate bundles, etc.)
+- Range constraints would be overly permissive
+
+**Examples of date-based versioned packages:**
+- `certifi` - SSL certificate bundles
+- `openai-whisper` - Whisper speech recognition models
+- Some ML model packages with dated releases
+
 ## Generating Lock Files
 
 ### When to Generate

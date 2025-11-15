@@ -34,10 +34,13 @@ def convert_requirement(line: str) -> str:
 
     # Security-critical packages: use range constraints
     if base_package in SECURITY_PACKAGES:
-        # e.g., cryptography==46.0.3 → cryptography>=46.0.3,<47.0.0
-        major = version.split('.')[0]
-        next_major = str(int(major) + 1)
-        return line.replace(f'=={version}', f'>={version},<{next_major}.0.0')
+        # e.g., cryptography==46.0.3 → cryptography>=46.0.3,<46.1.0
+        parts = version.split('.')
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+        next_minor = minor + 1
+        upper_bound = f"{major}.{next_minor}.0"
+        return line.replace(f'=={version}', f'>={version},<{upper_bound}')
 
     # All other packages: use compatible release
     # e.g., fastapi==0.119.0 → fastapi~=0.119.0

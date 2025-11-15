@@ -384,7 +384,8 @@ def validate_migration(revision_id):
 
     # Check for dangerous operations
     dangerous_ops = ['drop_table', 'drop_column']
-    source = open(revision.path).read()
+    with open(revision.path) as f:
+        source = f.read()
     for op in dangerous_ops:
         if f'op.{op}' in source:
             issues.append(f"⚠️ Dangerous operation: {op}")
