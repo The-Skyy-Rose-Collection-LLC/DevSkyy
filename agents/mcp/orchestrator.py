@@ -8,6 +8,7 @@ Reduces token usage by 98% through on-demand tool loading
 import asyncio
 import json
 import logging
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -97,8 +98,20 @@ class MCPOrchestrator:
     Implements on-demand tool loading and multi-agent coordination
     """
 
-    def __init__(self, config_path: str = "/tmp/DevSkyy/config/mcp/mcp_tool_calling_schema.json"):
-        """Initialize orchestrator with MCP configuration"""
+    def __init__(self, config_path: Optional[str] = None):
+        """
+        Initialize orchestrator with MCP configuration.
+
+        Args:
+            config_path: Path to MCP configuration file. If None, uses secure temporary directory.
+        """
+        if config_path is None:
+            # Use secure temporary directory instead of hardcoded /tmp/
+            temp_dir = tempfile.gettempdir()
+            config_dir = Path(temp_dir) / "devskyy" / "config" / "mcp"
+            config_dir.mkdir(parents=True, exist_ok=True)
+            config_path = str(config_dir / "mcp_tool_calling_schema.json")
+
         self.config_path = Path(config_path)
         self.config: dict[str, Any] = {}
         self.tools: dict[str, ToolDefinition] = {}

@@ -565,11 +565,14 @@ class TestOrchestratorVideoGeneration:
     """Test video generation task handling."""
 
     @pytest.mark.asyncio
-    async def test_runway_video_generation_task(self, orchestrator):
+    async def test_runway_video_generation_task(self, orchestrator, tmp_path):
         """Should create and execute runway video generation task."""
+        video_file = tmp_path / "video.mp4"
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            generate_fashion_runway_video=AsyncMock(return_value={"success": True, "video_path": "/tmp/video.mp4"}),
+            generate_fashion_runway_video=AsyncMock(
+                return_value={"success": True, "video_path": str(video_file)}
+            ),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
@@ -584,16 +587,20 @@ class TestOrchestratorVideoGeneration:
         mock_agent.generate_fashion_runway_video.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_product_360_video_generation(self, orchestrator):
+    async def test_product_360_video_generation(self, orchestrator, tmp_path):
         """Should generate product 360° videos."""
+        video_file = tmp_path / "360.mp4"
+        product_image = tmp_path / "product.jpg"
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            generate_product_360_video=AsyncMock(return_value={"success": True, "video_path": "/tmp/360.mp4"}),
+            generate_product_360_video=AsyncMock(
+                return_value={"success": True, "video_path": str(video_file)}
+            ),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "product_360", {"product_image_path": "/tmp/product.jpg", "rotation_steps": 24}
+            "product_360", {"product_image_path": str(product_image), "rotation_steps": 24}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -602,16 +609,21 @@ class TestOrchestratorVideoGeneration:
         mock_agent.generate_product_360_video.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_video_upscaling_task(self, orchestrator):
+    async def test_video_upscaling_task(self, orchestrator, tmp_path):
         """Should upscale videos to higher resolution."""
+        input_video = tmp_path / "input.mp4"
+        upscaled_video = tmp_path / "upscaled.mp4"
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            upscale_video=AsyncMock(return_value={"success": True, "upscaled_path": "/tmp/upscaled.mp4"}),
+            upscale_video=AsyncMock(
+                return_value={"success": True, "upscaled_path": str(upscaled_video)}
+            ),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "video_upscaling", {"video_path": "/tmp/input.mp4", "target_resolution": (2048, 1152)}
+            "video_upscaling",
+            {"video_path": str(input_video), "target_resolution": (2048, 1152)},
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -620,16 +632,20 @@ class TestOrchestratorVideoGeneration:
         mock_agent.upscale_video.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_brand_training_task(self, orchestrator):
+    async def test_brand_training_task(self, orchestrator, tmp_path):
         """Should execute brand model training."""
+        dataset_dir = tmp_path / "dataset"
+        dataset_dir.mkdir(exist_ok=True)
         mock_agent = MagicMock(
             agent_name="brand_trainer",
-            train_lora_model=AsyncMock(return_value={"success": True, "model_name": "skyy_rose_v1"}),
+            train_lora_model=AsyncMock(
+                return_value={"success": True, "model_name": "skyy_rose_v1"}
+            ),
         )
         orchestrator.agents["brand_trainer"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "brand_training", {"dataset_path": "/tmp/dataset", "model_name": "skyy_rose_v1"}
+            "brand_training", {"dataset_path": str(dataset_dir), "model_name": "skyy_rose_v1"}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)

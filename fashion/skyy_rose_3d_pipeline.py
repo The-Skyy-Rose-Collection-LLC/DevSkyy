@@ -180,7 +180,7 @@ class SkyRose3DPipeline:
 
     def _generate_model_id(self, file_path: str) -> str:
         """Generate unique ID for a model."""
-        content_hash = hashlib.md5(str(file_path).encode()).hexdigest()
+        content_hash = hashlib.sha256(str(file_path).encode()).hexdigest()
         return f"model_{content_hash[:12]}"
 
     async def _extract_model_metadata(self, file_path: Path, model_format: ModelFormat) -> dict[str, Any]:
@@ -324,7 +324,7 @@ class SkyRose3DPipeline:
 
     def _generate_avatar_id(self, customization_options: dict[str, Any]) -> str:
         """Generate unique ID for an avatar."""
-        options_hash = hashlib.md5(json.dumps(customization_options, sort_keys=True).encode()).hexdigest()
+        options_hash = hashlib.sha256(json.dumps(customization_options, sort_keys=True).encode()).hexdigest()
         return f"avatar_{options_hash[:12]}"
 
     async def _create_ready_player_me_avatar(

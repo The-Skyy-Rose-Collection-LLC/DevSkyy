@@ -314,7 +314,7 @@ class InventoryAgent:
     def _extract_metadata(self, index: int) -> dict[str, Any]:
         """Extract metadata for asset."""
         return {
-            "checksum": hashlib.md5(f"asset_{index}".encode()).hexdigest(),
+            "checksum": hashlib.sha256(f"asset_{index}".encode()).hexdigest(),
             "dimensions": f"{random.randint(800, 2000)}x{random.randint(600, 1500)}",
             "color_profile": "sRGB",
             "camera_model": "Professional Camera" if index % 10 == 0 else None,

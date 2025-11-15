@@ -275,7 +275,7 @@ class ClaudeGrokBrandEngine:
     ) -> str:
         """Add a new content piece to the library"""
 
-        content_id = hashlib.md5(f"{platform}_{content_type}_{datetime.now()}".encode()).hexdigest()[:8]
+        content_id = hashlib.sha256(f"{platform}_{content_type}_{datetime.now()}".encode()).hexdigest()[:8]
 
         content = ContentPiece(
             id=content_id,
@@ -295,7 +295,7 @@ class ClaudeGrokBrandEngine:
     async def add_influencer(self, name: str, platform: str, followers: int, engagement_rate: float, tier: str) -> str:
         """Add an influencer to the network"""
 
-        influencer_id = hashlib.md5(f"{name}_{platform}".encode()).hexdigest()[:8]
+        influencer_id = hashlib.sha256(f"{name}_{platform}".encode()).hexdigest()[:8]
 
         self.influencer_network[influencer_id] = {
             "name": name,

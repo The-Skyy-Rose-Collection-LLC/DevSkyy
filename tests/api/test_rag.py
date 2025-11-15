@@ -40,10 +40,13 @@ def auth_headers():
 
 
 @pytest.fixture
-def mock_rag_service():
+def mock_rag_service(tmp_path):
     """Mock RAG service for testing"""
     with patch("api.v1.rag.get_rag_service") as mock:
         service = MagicMock()
+
+        # Create temporary test file
+        test_pdf = tmp_path / "test.pdf"
 
         # Mock ingest_text
         service.ingest_text = AsyncMock(
@@ -62,7 +65,7 @@ def mock_rag_service():
                 "total_documents": 15,
                 "added": 5,
                 "chunks_created": 5,
-                "file_path": "/tmp/test.pdf",
+                "file_path": str(test_pdf),
                 "file_type": "pdf",
                 "ingested_at": "2025-01-12T00:00:00",
             }
