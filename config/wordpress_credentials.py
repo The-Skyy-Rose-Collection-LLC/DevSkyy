@@ -4,22 +4,23 @@ WordPress Credentials Management for DevSkyy Platform
 Secure credential handling with environment variables and validation
 """
 
-from dataclasses import dataclass
 import logging
 import os
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from dotenv import load_dotenv
-
 
 # Load environment variables
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class WordPressCredentials:
     """Secure WordPress credentials with validation."""
+
     site_url: str
     username: str
     password: str
@@ -44,11 +45,11 @@ class WordPressCredentials:
             raise ValueError("WordPress password is required")
 
         # Ensure site URL has proper format
-        if not self.site_url.startswith(('http://', 'https://')):
+        if not self.site_url.startswith(("http://", "https://")):
             self.site_url = f"https://{self.site_url}"
 
         # Remove trailing slash
-        self.site_url = self.site_url.rstrip('/')
+        self.site_url = self.site_url.rstrip("/")
 
     def get_rest_api_url(self) -> str:
         """Get WordPress REST API base URL."""
@@ -60,8 +61,7 @@ class WordPressCredentials:
 
     def has_sftp_credentials(self) -> bool:
         """Check if SFTP credentials are available."""
-        return bool(self.sftp_host and self.sftp_username and
-                   (self.sftp_password or self.sftp_private_key_path))
+        return bool(self.sftp_host and self.sftp_username and (self.sftp_password or self.sftp_private_key_path))
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary (excluding sensitive data)."""
@@ -74,8 +74,9 @@ class WordPressCredentials:
             "ftp_host": self.ftp_host,
             "ftp_port": self.ftp_port,
             "sftp_host": self.sftp_host,
-            "sftp_port": self.sftp_port
+            "sftp_port": self.sftp_port,
         }
+
 
 class WordPressCredentialsManager:
     """
@@ -127,7 +128,7 @@ class WordPressCredentialsManager:
             sftp_username=os.getenv(f"{prefix}_SFTP_USERNAME"),
             sftp_password=os.getenv(f"{prefix}_SFTP_PASSWORD"),
             sftp_private_key_path=os.getenv(f"{prefix}_SFTP_PRIVATE_KEY"),
-            sftp_port=int(os.getenv(f"{prefix}_SFTP_PORT", "22"))
+            sftp_port=int(os.getenv(f"{prefix}_SFTP_PORT", "22")),
         )
 
     def get_credentials(self, site_key: str = "skyy_rose") -> Optional[WordPressCredentials]:
@@ -156,7 +157,7 @@ class WordPressCredentialsManager:
             "has_application_password": bool(credentials.application_password),
             "has_ftp_credentials": credentials.has_ftp_credentials(),
             "has_sftp_credentials": credentials.has_sftp_credentials(),
-            "rest_api_url": credentials.get_rest_api_url()
+            "rest_api_url": credentials.get_rest_api_url(),
         }
 
         return validation_result
@@ -165,34 +166,36 @@ class WordPressCredentialsManager:
         """Get default Skyy Rose Collection credentials."""
         return self.get_credentials("skyy_rose")
 
+
 # Global credentials manager instance
 wordpress_credentials_manager = WordPressCredentialsManager()
+
 
 # Convenience functions
 def get_skyy_rose_credentials() -> Optional[WordPressCredentials]:
     """Get Skyy Rose Collection credentials."""
     return wordpress_credentials_manager.get_default_credentials()
 
+
 def get_credentials_for_site(site_key: str) -> Optional[WordPressCredentials]:
     """Get credentials for any configured site."""
     return wordpress_credentials_manager.get_credentials(site_key)
+
 
 def validate_site_credentials(site_key: str = "skyy_rose") -> dict[str, Any]:
     """Validate credentials for a site."""
     return wordpress_credentials_manager.validate_credentials(site_key)
 
+
 def list_configured_sites() -> list:
     """List all configured WordPress sites."""
     return wordpress_credentials_manager.list_available_sites()
 
+
 # Environment variable validation
 def validate_environment_setup() -> dict[str, Any]:
     """Validate that required environment variables are set."""
-    required_vars = [
-        "SKYY_ROSE_SITE_URL",
-        "SKYY_ROSE_USERNAME",
-        "SKYY_ROSE_PASSWORD"
-    ]
+    required_vars = ["SKYY_ROSE_SITE_URL", "SKYY_ROSE_USERNAME", "SKYY_ROSE_PASSWORD"]
 
     optional_vars = [
         "SKYY_ROSE_APP_PASSWORD",
@@ -202,15 +205,10 @@ def validate_environment_setup() -> dict[str, Any]:
         "SKYY_ROSE_SFTP_HOST",
         "SKYY_ROSE_SFTP_USERNAME",
         "SKYY_ROSE_SFTP_PASSWORD",
-        "SKYY_ROSE_SFTP_PRIVATE_KEY"
+        "SKYY_ROSE_SFTP_PRIVATE_KEY",
     ]
 
-    result = {
-        "valid": True,
-        "missing_required": [],
-        "missing_optional": [],
-        "configured_vars": []
-    }
+    result = {"valid": True, "missing_required": [], "missing_optional": [], "configured_vars": []}
 
     # Check required variables
     for var in required_vars:
@@ -228,6 +226,7 @@ def validate_environment_setup() -> dict[str, Any]:
             result["configured_vars"].append(var)
 
     return result
+
 
 # Configuration templates for easy setup
 def generate_env_template() -> str:
@@ -285,12 +284,14 @@ LOG_LEVEL=INFO
 DEBUG=false
 """
 
+
 def save_env_template(file_path: str = ".env.template"):
     """Save environment template to file."""
     template = generate_env_template()
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         f.write(template)
     logger.info(f"✅ Environment template saved to: {file_path}")
+
 
 if __name__ == "__main__":
     # Test credential loading
@@ -298,10 +299,10 @@ if __name__ == "__main__":
     # Validate environment setup
     env_validation = validate_environment_setup()
 
-    if env_validation['missing_required']:
+    if env_validation["missing_required"]:
         pass
 
-    if env_validation['configured_vars']:
+    if env_validation["configured_vars"]:
         pass
 
     # Test credential loading

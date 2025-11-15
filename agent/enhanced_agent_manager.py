@@ -1,9 +1,9 @@
 import asyncio
+import logging
+import time
 from collections import deque
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
-import time
 from typing import Any
 
 from agent.base_agent import BaseAgent
@@ -12,12 +12,10 @@ from agent.ecommerce.analytics_engine import EcommerceAnalyticsEngine
 from agent.ecommerce.order_automation import OrderAutomationAgent
 from agent.ml_models.forecasting_engine import ForecastingEngine
 
-
 """
 Enhanced Agent Manager - Enterprise Grade
 Advanced agent orchestration with circuit breakers, monitoring, and performance optimization
 """
-
 
 
 logger = logging.getLogger(__name__)
@@ -57,10 +55,8 @@ class CircuitBreaker:
         if self.state == CircuitBreakerState.CLOSED:
             return True
         elif self.state == CircuitBreakerState.OPEN:
-            if (
-                self.last_failure_time
-                and datetime.now() - self.last_failure_time
-                > timedelta(seconds=self.recovery_timeout)
+            if self.last_failure_time and datetime.now() - self.last_failure_time > timedelta(
+                seconds=self.recovery_timeout
             ):
                 self.state = CircuitBreakerState.HALF_OPEN
                 return True
@@ -80,9 +76,7 @@ class CircuitBreaker:
 
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitBreakerState.OPEN
-            logger.warning(
-                f"Circuit breaker opened after {self.failure_count} failures"
-            )
+            logger.warning(f"Circuit breaker opened after {self.failure_count} failures")
 
 
 class AgentMetrics:
@@ -174,9 +168,7 @@ class EnhancedAgentManager:
 
         return self.agents[agent_type]
 
-    async def execute_agent(
-        self, agent_type: str, task_data: dict[str, Any], timeout: int = 300
-    ) -> dict[str, Any]:
+    async def execute_agent(self, agent_type: str, task_data: dict[str, Any], timeout: int = 300) -> dict[str, Any]:
         """Execute agent with enhanced error handling and monitoring"""
         execution_id = f"{agent_type}_{int(time.time() * 1000)}"
         start_time = time.time()
@@ -194,10 +186,7 @@ class EnhancedAgentManager:
                 }
 
             # Check concurrent execution limit
-            if (
-                len(self.active_executions)
-                >= self.performance_thresholds["max_concurrent_executions"]
-            ):
+            if len(self.active_executions) >= self.performance_thresholds["max_concurrent_executions"]:
                 logger.warning("Maximum concurrent executions reached")
                 return {
                     "success": False,
@@ -218,9 +207,7 @@ class EnhancedAgentManager:
 
             # Execute with timeout
             try:
-                result = await asyncio.wait_for(
-                    agent.execute(task_data), timeout=timeout
-                )
+                result = await asyncio.wait_for(agent.execute(task_data), timeout=timeout)
 
                 # Record success
                 execution_time = time.time() - start_time
@@ -228,9 +215,7 @@ class EnhancedAgentManager:
                 if circuit_breaker:
                     circuit_breaker.record_success()
 
-                logger.info(
-                    f"Agent {agent_type} executed successfully in {execution_time:.2f}s"
-                )
+                logger.info(f"Agent {agent_type} executed successfully in {execution_time:.2f}s")
 
                 return {
                     "success": True,
@@ -293,14 +278,8 @@ class EnhancedAgentManager:
             "failure_count": metrics.failure_count,
             "success_rate": metrics.success_rate,
             "average_execution_time": metrics.average_execution_time,
-            "last_execution_time": (
-                metrics.last_execution_time.isoformat()
-                if metrics.last_execution_time
-                else None
-            ),
-            "circuit_breaker_state": (
-                circuit_breaker.state.value if circuit_breaker else None
-            ),
+            "last_execution_time": (metrics.last_execution_time.isoformat() if metrics.last_execution_time else None),
+            "circuit_breaker_state": (circuit_breaker.state.value if circuit_breaker else None),
             "recent_executions": len(metrics.execution_history),
         }
 
@@ -312,16 +291,10 @@ class EnhancedAgentManager:
         # Calculate overall metrics
         total_executions = sum(m.execution_count for m in self.metrics.values())
         total_successes = sum(m.success_count for m in self.metrics.values())
-        overall_success_rate = (
-            total_successes / total_executions if total_executions > 0 else 0
-        )
+        overall_success_rate = total_successes / total_executions if total_executions > 0 else 0
 
         # Check circuit breaker states
-        open_circuits = sum(
-            1
-            for cb in self.circuit_breakers.values()
-            if cb.state == CircuitBreakerState.OPEN
-        )
+        open_circuits = sum(1 for cb in self.circuit_breakers.values() if cb.state == CircuitBreakerState.OPEN)
 
         return {
             "timestamp": datetime.now().isoformat(),
@@ -330,11 +303,7 @@ class EnhancedAgentManager:
             "total_executions": total_executions,
             "overall_success_rate": overall_success_rate,
             "open_circuit_breakers": open_circuits,
-            "system_status": (
-                "healthy"
-                if open_circuits == 0 and overall_success_rate > 0.9
-                else "degraded"
-            ),
+            "system_status": ("healthy" if open_circuits == 0 and overall_success_rate > 0.9 else "degraded"),
         }
 
     def list_available_agents(self) -> list[str]:

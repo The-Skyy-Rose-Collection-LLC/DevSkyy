@@ -4,19 +4,18 @@ User Creation Utility for DevSkyy Enterprise Platform
 Creates new users with proper password hashing and authentication setup
 """
 
-from getpass import getpass
 import os
 import sys
-
+from getpass import getpass
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from security.jwt_auth import (
-    UserRole,
     create_access_token,
     create_refresh_token,
     user_manager,
+    UserRole,
 )
 
 
@@ -57,10 +56,7 @@ def create_user_interactive():
 
     try:
         # Create the user
-        user = user_manager.create_user(
-            email=email, username=username, password=password, role=role
-        )
-
+        user = user_manager.create_user(email=email, username=username, password=password, role=role)
 
         # Test authentication
         auth_user = user_manager.authenticate_user(username, password)
@@ -85,7 +81,6 @@ def create_user_interactive():
                 }
             )
 
-
         else:
             return False
 
@@ -97,14 +92,10 @@ def create_user_interactive():
         return False
 
 
-def create_user_programmatic(
-    username: str, email: str, password: str, role: str = UserRole.API_USER
-):
+def create_user_programmatic(username: str, email: str, password: str, role: str = UserRole.API_USER):
     """Create a user programmatically"""
     try:
-        user = user_manager.create_user(
-            email=email, username=username, password=password, role=role
-        )
+        user = user_manager.create_user(email=email, username=username, password=password, role=role)
 
         # Test authentication
         auth_user = user_manager.authenticate_user(username, password)
@@ -145,7 +136,6 @@ def test_authentication():
                 "role": user.role,
             }
         )
-
 
     else:
         pass

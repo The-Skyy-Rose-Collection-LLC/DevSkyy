@@ -1,11 +1,11 @@
 import logging
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 from typing import Any
 
-
 logger = logging.getLogger(__name__)
+
 
 def setup_ssh_config() -> dict[str, Any]:
     """
@@ -41,14 +41,12 @@ Host *
             logger.info("✅ SSH config created")
 
         # Add GitHub to known hosts if not present
-        if (
-            not known_hosts_path.exists()
-            or "github.com" not in known_hosts_path.read_text()
-        ):
+        if not known_hosts_path.exists() or "github.com" not in known_hosts_path.read_text():
             try:
                 result = subprocess.run(
                     ["ssh-keyscan", "-H", "github.com"],
-                    check=False, capture_output=True,
+                    check=False,
+                    capture_output=True,
                     text=True,
                     timeout=10,
                 )
@@ -68,8 +66,7 @@ Host *
         key_path = ssh_dir / "id_rsa"
         if not key_path.exists():
             logger.info(
-                "ℹ️ SSH key not found. Generate one with: "
-                "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
+                "ℹ️ SSH key not found. Generate one with: " "ssh-keygen -t rsa -b 4096 -C 'your_email@example.com'"
             )
 
         return {

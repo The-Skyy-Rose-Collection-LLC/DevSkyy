@@ -9,7 +9,6 @@ import sys
 
 from main import app
 
-
 # Add the parent directory to the Python path so we can import from main.py
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

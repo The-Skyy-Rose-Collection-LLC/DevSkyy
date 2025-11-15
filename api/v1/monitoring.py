@@ -7,8 +7,7 @@ from monitoring.observability import (
     metrics_collector,
     performance_tracker,
 )
-from security.jwt_auth import TokenData, get_current_active_user, require_admin
-
+from security.jwt_auth import get_current_active_user, require_admin, TokenData
 
 """
 Monitoring & Observability API Endpoints
@@ -22,6 +21,7 @@ router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 # ============================================================================
 # HEALTH CHECKS
 # ============================================================================
+
 
 @router.get("/health")
 async def health_check():
@@ -39,6 +39,7 @@ async def health_check():
         "message": message,
         "checks": {name: result.model_dump() for name, result in results.items()},
     }
+
 
 @router.get("/health/detailed", dependencies=[Depends(require_admin)])
 async def detailed_health_check(
@@ -66,9 +67,11 @@ async def detailed_health_check(
         },
     }
 
+
 # ============================================================================
 # METRICS
 # ============================================================================
+
 
 @router.get("/metrics")
 async def get_metrics(current_user: TokenData = Depends(get_current_active_user)):
@@ -81,29 +84,31 @@ async def get_metrics(current_user: TokenData = Depends(get_current_active_user)
 
     return metrics
 
+
 @router.get("/metrics/counters")
 async def get_counters(current_user: TokenData = Depends(get_current_active_user)):
     """Get all counter metrics"""
     return {"counters": dict(metrics_collector.counters)}
+
 
 @router.get("/metrics/gauges")
 async def get_gauges(current_user: TokenData = Depends(get_current_active_user)):
     """Get all gauge metrics"""
     return {"gauges": dict(metrics_collector.gauges)}
 
+
 @router.get("/metrics/histograms")
 async def get_histograms(current_user: TokenData = Depends(get_current_active_user)):
     """Get all histogram metrics with statistics"""
-    histograms = {
-        name: metrics_collector.get_histogram_stats(name)
-        for name in metrics_collector.histograms
-    }
+    histograms = {name: metrics_collector.get_histogram_stats(name) for name in metrics_collector.histograms}
 
     return {"histograms": histograms}
+
 
 # ============================================================================
 # PERFORMANCE
 # ============================================================================
+
 
 @router.get("/performance")
 async def get_performance_stats(
@@ -118,10 +123,9 @@ async def get_performance_stats(
 
     return stats
 
+
 @router.get("/performance/{endpoint:path}")
-async def get_endpoint_performance(
-    endpoint: str, current_user: TokenData = Depends(get_current_active_user)
-):
+async def get_endpoint_performance(endpoint: str, current_user: TokenData = Depends(get_current_active_user)):
     """
     Get performance statistics for a specific endpoint
 
@@ -131,9 +135,11 @@ async def get_endpoint_performance(
 
     return stats
 
+
 # ============================================================================
 # SYSTEM METRICS
 # ============================================================================
+
 
 @router.get("/system")
 async def get_system_metrics(
@@ -150,14 +156,13 @@ async def get_system_metrics(
     return {
         "cpu_percent": metrics_collector.get_gauge("system_cpu_percent"),
         "memory_percent": metrics_collector.get_gauge("system_memory_percent"),
-        "memory_available_mb": metrics_collector.get_gauge(
-            "system_memory_available_mb"
-        ),
+        "memory_available_mb": metrics_collector.get_gauge("system_memory_available_mb"),
         "disk_percent": metrics_collector.get_gauge("system_disk_percent"),
         "disk_free_gb": metrics_collector.get_gauge("system_disk_free_gb"),
         "network_sent_mb": metrics_collector.get_gauge("system_network_sent_mb"),
         "network_recv_mb": metrics_collector.get_gauge("system_network_recv_mb"),
         "uptime_seconds": metrics_collector.get_all_metrics().get("uptime_seconds"),
     }
+
 
 logger.info("✅ Monitoring API endpoints registered")

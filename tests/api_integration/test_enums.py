@@ -2,6 +2,7 @@
 Tests for api_integration.enums module
 Tests the SerializableEnum base class and WorkflowStatus enum
 """
+
 import pytest
 
 from api_integration.enums import SerializableEnum, WorkflowStatus
@@ -88,10 +89,7 @@ class TestSerializableEnum:
 
     def test_enum_in_dict_serialization(self):
         """Test that enum serializes correctly in dictionaries"""
-        data = {
-            "status": WorkflowStatus.PENDING.to_json(),
-            "message": "Workflow is pending"
-        }
+        data = {"status": WorkflowStatus.PENDING.to_json(), "message": "Workflow is pending"}
 
         assert data["status"] == "pending"
         assert isinstance(data["status"], str)
@@ -111,10 +109,7 @@ class TestWorkflowStatus:
 
     def test_workflow_status_has_all_expected_members(self):
         """Test that WorkflowStatus has all expected status values"""
-        expected_members = {
-            "PENDING", "RUNNING", "SUCCESS", "FAILED",
-            "CANCELLED", "PAUSED", "ROLLED_BACK"
-        }
+        expected_members = {"PENDING", "RUNNING", "SUCCESS", "FAILED", "CANCELLED", "PAUSED", "ROLLED_BACK"}
 
         actual_members = {member.name for member in WorkflowStatus}
         assert actual_members == expected_members
@@ -128,22 +123,14 @@ class TestWorkflowStatus:
     def test_workflow_status_transitions(self):
         """Test common workflow status transitions"""
         # Simulate a workflow lifecycle
-        statuses = [
-            WorkflowStatus.PENDING,
-            WorkflowStatus.RUNNING,
-            WorkflowStatus.SUCCESS
-        ]
+        statuses = [WorkflowStatus.PENDING, WorkflowStatus.RUNNING, WorkflowStatus.SUCCESS]
 
         json_values = [s.to_json() for s in statuses]
         assert json_values == ["pending", "running", "success"]
 
     def test_workflow_status_failure_states(self):
         """Test that failure states are properly defined"""
-        failure_states = [
-            WorkflowStatus.FAILED,
-            WorkflowStatus.CANCELLED,
-            WorkflowStatus.ROLLED_BACK
-        ]
+        failure_states = [WorkflowStatus.FAILED, WorkflowStatus.CANCELLED, WorkflowStatus.ROLLED_BACK]
 
         for state in failure_states:
             assert state.to_json() in ["failed", "cancelled", "rolled_back"]
@@ -154,7 +141,7 @@ class TestWorkflowStatus:
 
         # Ensure it has the to_json method
         status = WorkflowStatus.RUNNING
-        assert hasattr(status, 'to_json')
+        assert hasattr(status, "to_json")
         assert callable(status.to_json)
 
     def test_workflow_status_string_representation(self):
@@ -177,24 +164,27 @@ class TestEnumModularity:
     def test_enums_module_exists(self):
         """Test that the enums module can be imported"""
         import api_integration.enums
+
         assert api_integration.enums is not None
 
     def test_serializable_enum_is_importable(self):
         """Test that SerializableEnum can be imported"""
         from api_integration.enums import SerializableEnum
+
         assert SerializableEnum is not None
 
     def test_workflow_status_is_importable(self):
         """Test that WorkflowStatus can be imported"""
         from api_integration.enums import WorkflowStatus
+
         assert WorkflowStatus is not None
 
     def test_enum_module_has_correct_exports(self):
         """Test that the enums module exports expected classes"""
         import api_integration.enums as enums_module
 
-        assert hasattr(enums_module, 'SerializableEnum')
-        assert hasattr(enums_module, 'WorkflowStatus')
+        assert hasattr(enums_module, "SerializableEnum")
+        assert hasattr(enums_module, "WorkflowStatus")
 
 
 class TestSerializableEnumEdgeCases:

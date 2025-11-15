@@ -18,8 +18,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from security.jwt_auth import TokenData, get_current_active_user
-
+from security.jwt_auth import get_current_active_user, TokenData
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +48,8 @@ class MCPConfigRequest(BaseModel):
     """Request model for MCP configuration generation"""
 
     api_key: str = Field(..., description="DevSkyy API key for authentication")
-    api_url: Optional[str] = Field(
-        default=None, description="Custom API URL (defaults to production)"
-    )
-    server_name: Optional[str] = Field(
-        default="devskyy", description="MCP server name"
-    )
+    api_url: Optional[str] = Field(default=None, description="Custom API URL (defaults to production)")
+    server_name: Optional[str] = Field(default="devskyy", description="MCP server name")
 
 
 class AddServerRequest(BaseModel):
@@ -62,33 +57,19 @@ class AddServerRequest(BaseModel):
 
     server_name: str = Field(..., description="Unique name for the MCP server")
     transport: TransportType = Field(..., description="Transport type (stdio, http, etc.)")
-    url: Optional[str] = Field(
-        default=None, description="Server URL (required for HTTP transport)"
-    )
-    command: Optional[str] = Field(
-        default=None, description="Command to run (required for stdio transport)"
-    )
-    args: Optional[list[str]] = Field(
-        default=None, description="Command arguments (for stdio transport)"
-    )
-    env: Optional[dict[str, str]] = Field(
-        default=None, description="Environment variables"
-    )
-    headers: Optional[dict[str, str]] = Field(
-        default=None, description="HTTP headers (for HTTP transport)"
-    )
-    metadata: Optional[dict[str, Any]] = Field(
-        default=None, description="Server metadata"
-    )
+    url: Optional[str] = Field(default=None, description="Server URL (required for HTTP transport)")
+    command: Optional[str] = Field(default=None, description="Command to run (required for stdio transport)")
+    args: Optional[list[str]] = Field(default=None, description="Command arguments (for stdio transport)")
+    env: Optional[dict[str, str]] = Field(default=None, description="Environment variables")
+    headers: Optional[dict[str, str]] = Field(default=None, description="HTTP headers (for HTTP transport)")
+    metadata: Optional[dict[str, Any]] = Field(default=None, description="Server metadata")
 
 
 class MultiServerConfigRequest(BaseModel):
     """Request model for multi-server configuration"""
 
     servers: list[AddServerRequest] = Field(..., description="List of MCP servers to configure")
-    include_devskyy: bool = Field(
-        default=True, description="Include DevSkyy MCP server in configuration"
-    )
+    include_devskyy: bool = Field(default=True, description="Include DevSkyy MCP server in configuration")
     devskyy_api_key: Optional[str] = Field(
         default=None, description="DevSkyy API key (required if include_devskyy=True)"
     )
@@ -100,9 +81,7 @@ class MCPConfigResponse(BaseModel):
     config: dict[str, Any] = Field(..., description="MCP server configuration JSON")
     deeplink_url: str = Field(..., description="One-click install deeplink URL")
     cursor_url: str = Field(..., description="Cursor-compatible deeplink URL")
-    installation_instructions: str = Field(
-        ..., description="Human-readable installation instructions"
-    )
+    installation_instructions: str = Field(..., description="Human-readable installation instructions")
 
 
 class MCPStatusResponse(BaseModel):
@@ -293,9 +272,7 @@ def create_huggingface_server(
     )
 
 
-def merge_server_configs(
-    base_config: dict[str, Any], servers: list[AddServerRequest]
-) -> dict[str, Any]:
+def merge_server_configs(base_config: dict[str, Any], servers: list[AddServerRequest]) -> dict[str, Any]:
     """
     Merge multiple MCP server configurations into one.
 
@@ -330,12 +307,8 @@ def merge_server_configs(
 @router.get("/install", response_model=MCPConfigResponse)
 async def get_mcp_install_deeplink(
     api_key: str = Query(..., description="DevSkyy API key for authentication"),
-    api_url: Optional[str] = Query(
-        default=None, description="Custom API URL (defaults to production)"
-    ),
-    server_name: Optional[str] = Query(
-        default="devskyy", description="MCP server name"
-    ),
+    api_url: Optional[str] = Query(default=None, description="Custom API URL (defaults to production)"),
+    server_name: Optional[str] = Query(default="devskyy", description="MCP server name"),
 ):
     """
     Generate MCP install deeplink for one-click installation.
@@ -374,9 +347,7 @@ async def get_mcp_install_deeplink(
         logger.info(f"Generating MCP install deeplink for server: {server_name}")
 
         # Generate MCP configuration
-        config = generate_mcp_config(
-            api_key=api_key, api_url=api_url, server_name=server_name
-        )
+        config = generate_mcp_config(api_key=api_key, api_url=api_url, server_name=server_name)
 
         # Encode configuration as base64
         config_b64 = encode_config_base64(config)
@@ -435,20 +406,14 @@ API Reference: https://devskyy.com/api/docs
 
     except Exception as e:
         logger.error(f"Failed to generate MCP install deeplink: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to generate MCP configuration: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to generate MCP configuration: {e!s}")
 
 
 @router.get("/config", response_model=dict[str, Any])
 async def get_mcp_config(
     api_key: str = Query(..., description="DevSkyy API key for authentication"),
-    api_url: Optional[str] = Query(
-        default=None, description="Custom API URL (defaults to production)"
-    ),
-    server_name: Optional[str] = Query(
-        default="devskyy", description="MCP server name"
-    ),
+    api_url: Optional[str] = Query(default=None, description="Custom API URL (defaults to production)"),
+    server_name: Optional[str] = Query(default="devskyy", description="MCP server name"),
 ):
     """
     Get MCP server configuration JSON only (without deeplink).
@@ -475,9 +440,7 @@ async def get_mcp_config(
     try:
         logger.info(f"Generating MCP configuration for server: {server_name}")
 
-        config = generate_mcp_config(
-            api_key=api_key, api_url=api_url, server_name=server_name
-        )
+        config = generate_mcp_config(api_key=api_key, api_url=api_url, server_name=server_name)
 
         logger.info("✅ MCP configuration generated successfully")
 
@@ -485,9 +448,7 @@ async def get_mcp_config(
 
     except Exception as e:
         logger.error(f"Failed to generate MCP configuration: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to generate MCP configuration: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to generate MCP configuration: {e!s}")
 
 
 @router.get("/status", response_model=MCPStatusResponse)
@@ -522,9 +483,7 @@ async def get_mcp_status():
 
     except Exception as e:
         logger.error(f"Failed to get MCP status: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to get MCP status: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get MCP status: {e!s}")
 
 
 @router.post("/validate")
@@ -592,9 +551,7 @@ async def validate_api_key(
         raise
     except Exception as e:
         logger.error(f"API key validation failed: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Validation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Validation failed: {e!s}")
 
 
 @router.post("/servers/add", response_model=MCPConfigResponse)
@@ -709,9 +666,7 @@ All {server_count} servers should be listed.
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to add MCP server: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to add MCP server: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to add MCP server: {e!s}")
 
 
 @router.post("/servers/multi", response_model=MCPConfigResponse)
@@ -840,22 +795,14 @@ For issues with specific servers, check their documentation:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to generate multi-server config: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to generate configuration: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to generate configuration: {e!s}")
 
 
 @router.get("/servers/huggingface")
 async def get_huggingface_config(
-    hf_token: Optional[str] = Query(
-        default=None, description="HuggingFace API token (optional)"
-    ),
-    server_name: str = Query(
-        default="huggingface", description="Server name for HuggingFace"
-    ),
-    devskyy_api_key: Optional[str] = Query(
-        default=None, description="DevSkyy API key (optional)"
-    ),
+    hf_token: Optional[str] = Query(default=None, description="HuggingFace API token (optional)"),
+    server_name: str = Query(default="huggingface", description="Server name for HuggingFace"),
+    devskyy_api_key: Optional[str] = Query(default=None, description="DevSkyy API key (optional)"),
 ):
     """
     Quick helper endpoint to generate HuggingFace MCP server configuration.
@@ -893,9 +840,7 @@ async def get_huggingface_config(
         logger.info(f"Generating HuggingFace MCP server config: {server_name}")
 
         # Create HuggingFace server configuration
-        hf_server = create_huggingface_server(
-            hf_token=hf_token, server_name=server_name
-        )
+        hf_server = create_huggingface_server(hf_token=hf_token, server_name=server_name)
 
         # Use the add_mcp_server logic
         if devskyy_api_key:
@@ -962,5 +907,5 @@ https://huggingface.co/docs/mcp
         logger.error(f"Failed to generate HuggingFace config: {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate HuggingFace configuration: {str(e)}",
+            detail=f"Failed to generate HuggingFace configuration: {e!s}",
         )

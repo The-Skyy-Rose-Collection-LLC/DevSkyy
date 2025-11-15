@@ -5,7 +5,6 @@ Full-stack fashion ecommerce with ML-powered automation
 
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from .analytics_engine import EcommerceAnalytics
     from .customer_intelligence import CustomerIntelligence

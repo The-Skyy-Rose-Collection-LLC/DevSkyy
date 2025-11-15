@@ -15,11 +15,10 @@ Features:
 - Context-aware generation with repository understanding
 """
 
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
 from typing import Any, Literal, Optional
-
 
 try:
     from openai import AsyncOpenAI
@@ -52,9 +51,7 @@ class CodexIntegration:
             if not self.api_key:
                 logger.warning("⚠️  OpenAI API key not configured")
             if not AsyncOpenAI:
-                logger.warning(
-                    "⚠️  OpenAI library not installed - run: pip install openai"
-                )
+                logger.warning("⚠️  OpenAI library not installed - run: pip install openai")
 
         # Model configurations
         self.models = {
@@ -199,7 +196,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            system_message = (
+                f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            )
 
             user_message = f"```{language}\n{code_prefix}\n```\n\nComplete this code:"
 
@@ -219,9 +218,7 @@ class CodexIntegration:
             completions = []
             for choice in response.choices:
                 code = self._extract_code_block(choice.message.content, language)
-                completions.append(
-                    {"code": code, "finish_reason": choice.finish_reason}
-                )
+                completions.append({"code": code, "finish_reason": choice.finish_reason})
 
             return {
                 "status": "success",
@@ -250,13 +247,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = (
-                "You are an expert programmer who explains code clearly and thoroughly."
-            )
+            system_message = "You are an expert programmer who explains code clearly and thoroughly."
 
-            user_message = (
-                f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
-            )
+            user_message = f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
 
             response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
@@ -330,9 +323,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_documentation(
-        self, code: str, language: str = "python"
-    ) -> dict[str, Any]:
+    async def generate_documentation(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Generate documentation for code
 
@@ -374,9 +365,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Documentation generation failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def optimize_code(
-        self, code: str, language: str = "python"
-    ) -> dict[str, Any]:
+    async def optimize_code(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Optimize code for performance and readability
 
@@ -421,9 +410,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code optimization failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    def _build_system_message(
-        self, language: str, context: Optional[list[str]] = None
-    ) -> str:
+    def _build_system_message(self, language: str, context: Optional[list[str]] = None) -> str:
         """Build system message with language-specific context"""
         lang_config = self.language_configs.get(language, {})
         frameworks = lang_config.get("framework_hints", [])
@@ -432,18 +419,14 @@ Provide specific, actionable feedback."""
         message += "Generate clean, well-documented, production-ready code. "
 
         if frameworks:
-            message += (
-                f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
-            )
+            message += f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
 
         if context:
             message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 
-    def _build_code_generation_prompt(
-        self, prompt: str, language: str, context: Optional[list[str]] = None
-    ) -> str:
+    def _build_code_generation_prompt(self, prompt: str, language: str, context: Optional[list[str]] = None) -> str:
         """Build user prompt for code generation"""
         message = f"Generate {language} code for: {prompt}\n\n"
         message += "Requirements:\n"

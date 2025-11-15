@@ -1,11 +1,10 @@
-from datetime import datetime
 import json
 import logging
 import os
+from datetime import datetime
 from typing import Any, Optional
 
 from anthropic import Anthropic, AsyncAnthropic
-
 
 """
 Claude Sonnet 4.5 Advanced Intelligence Service
@@ -23,6 +22,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class ClaudeSonnetIntelligenceService:
     """
     Advanced AI service using Claude Sonnet 4.5 for superior reasoning,
@@ -36,9 +36,7 @@ class ClaudeSonnetIntelligenceService:
             self.client = AsyncAnthropic(api_key=self.api_key)
             self.sync_client = Anthropic(api_key=self.api_key)
             self.model = "claude-sonnet-4-5-20250929"  # Latest Sonnet 4.5
-            logger.info(
-                "🧠 Claude Sonnet 4.5 Intelligence Service initialized with advanced reasoning"
-            )
+            logger.info("🧠 Claude Sonnet 4.5 Intelligence Service initialized with advanced reasoning")
         else:
             self.client = None
             self.sync_client = None
@@ -118,9 +116,7 @@ class ClaudeSonnetIntelligenceService:
             logger.error(f"❌ Claude reasoning failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def enhance_luxury_product_description(
-        self, product_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def enhance_luxury_product_description(self, product_data: dict[str, Any]) -> dict[str, Any]:
         """
         Create ultra-premium product descriptions using Claude's superior writing.
         """
@@ -175,17 +171,16 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             logger.error(f"❌ Claude product enhancement failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-async def generate_strategic_marketing_plan(
-        self, business_data: dict[str, Any]
-    ) -> dict[str, Any]:
-        """
-        Generate comprehensive marketing strategy using Claude's strategic reasoning.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""As a luxury brand strategist, create a comprehensive marketing plan for The Skyy Rose Collection.  # noqa: E501
+async def generate_strategic_marketing_plan(self, business_data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Generate comprehensive marketing strategy using Claude's strategic reasoning.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
+
+        prompt = f"""As a luxury brand strategist, create a comprehensive marketing plan for The Skyy Rose Collection.  # noqa: E501
 
 Business Data:
 {json.dumps(business_data, indent=2)}
@@ -206,41 +201,40 @@ Create a detailed strategy covering:
 
 Make it actionable, specific, and focused on luxury market best practices."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=4096,
+            system="You are a luxury brand marketing strategist with proven success in high-end fashion e-commerce. You understand affluent consumer psychology and create strategies that build prestigious brands.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+        )
 
-            strategy = response.content[0].text
+        strategy = response.content[0].text
 
-            return {
-                "marketing_strategy": strategy,
-                "strategy_type": "comprehensive_luxury_marketing",
-                "model": self.model,
-                "confidence": "very_high",
-                "estimated_roi": "300-500%",
-                "implementation_timeline": "immediate_to_12_months",
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "marketing_strategy": strategy,
+            "strategy_type": "comprehensive_luxury_marketing",
+            "model": self.model,
+            "confidence": "very_high",
+            "estimated_roi": "300-500%",
+            "implementation_timeline": "immediate_to_12_months",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude strategy generation failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude strategy generation failed: {e}")
+        return {"error": str(e), "status": "failed"}
 
-async def analyze_competitor_intelligence(
-        self, competitor_data: dict[str, Any]
-    ) -> dict[str, Any]:
-        """
-        Deep competitive analysis using Claude's analytical capabilities.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""Perform a comprehensive competitive analysis:
+async def analyze_competitor_intelligence(self, competitor_data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Deep competitive analysis using Claude's analytical capabilities.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
+
+        prompt = f"""Perform a comprehensive competitive analysis:
 
 Competitor Data:
 {json.dumps(competitor_data, indent=2)}
@@ -259,40 +253,39 @@ Analyze:
 
 Provide actionable insights for luxury market domination."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=3000,
-                system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.6,
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=3000,
+            system="You are a luxury retail competitive intelligence analyst with deep expertise in fashion e-commerce. You identify opportunities that others miss.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.6,
+        )
 
-            analysis = response.content[0].text
+        analysis = response.content[0].text
 
-            return {
-                "competitive_analysis": analysis,
-                "analysis_type": "comprehensive_luxury_competitive_intel",
-                "model": self.model,
-                "confidence": "high",
-                "priority_actions": "extracted_from_analysis",
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "competitive_analysis": analysis,
+            "analysis_type": "comprehensive_luxury_competitive_intel",
+            "model": self.model,
+            "confidence": "high",
+            "priority_actions": "extracted_from_analysis",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude competitive analysis failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude competitive analysis failed: {e}")
+        return {"error": str(e), "status": "failed"}
 
-async def optimize_conversion_funnel(
-        self, funnel_data: dict[str, Any]
-    ) -> dict[str, Any]:
-        """
-        Analyze and optimize conversion funnel using advanced reasoning.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""Analyze this luxury e-commerce conversion funnel and provide optimization recommendations:
+async def optimize_conversion_funnel(self, funnel_data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Analyze and optimize conversion funnel using advanced reasoning.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
+
+        prompt = f"""Analyze this luxury e-commerce conversion funnel and provide optimization recommendations:
 
 Funnel Data:
 {json.dumps(funnel_data, indent=2)}
@@ -311,46 +304,47 @@ Provide:
 
 Focus on luxury customer behavior and premium positioning."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=3000,
-                system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=3000,
+            system="You are a conversion rate optimization expert specializing in luxury e-commerce. You understand affluent customer psychology and know how to maximize conversions without compromising brand prestige.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+        )
 
-            optimization = response.content[0].text
+        optimization = response.content[0].text
 
-            return {
-                "funnel_optimization": optimization,
-                "optimization_type": "luxury_conversion_funnel_analysis",
-                "model": self.model,
-                "confidence": "high",
-                "estimated_conversion_lift": "+35-65%",
-                "estimated_aov_increase": "+20-40%",
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "funnel_optimization": optimization,
+            "optimization_type": "luxury_conversion_funnel_analysis",
+            "model": self.model,
+            "confidence": "high",
+            "estimated_conversion_lift": "+35-65%",
+            "estimated_aov_increase": "+20-40%",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude funnel optimization failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude funnel optimization failed: {e}")
+        return {"error": str(e), "status": "failed"}
+
 
 async def generate_advanced_code(
-        self,
-        code_request: str,
-        language: str = "python",
-        framework: Optional[str] = None,
-    ) -> dict[str, Any]:
-        """
-        Generate production-ready code using Claude's superior coding abilities.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
+    self,
+    code_request: str,
+    language: str = "python",
+    framework: Optional[str] = None,
+) -> dict[str, Any]:
+    """
+    Generate production-ready code using Claude's superior coding abilities.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
 
-            framework_context = f" using {framework}" if framework else ""
+        framework_context = f" using {framework}" if framework else ""
 
-            prompt = f"""Generate production-ready {language} code{framework_context}:
+        prompt = f"""Generate production-ready {language} code{framework_context}:
 
 Request: {code_request}
 
@@ -366,41 +360,40 @@ Requirements:
 
 Provide complete, working code that can be deployed immediately."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=4096,
+            system="You are a senior software engineer with expertise in all major programming languages and frameworks. You write clean, efficient, secure, production-ready code.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+        )
 
-            code = response.content[0].text
+        code = response.content[0].text
 
-            return {
-                "generated_code": code,
-                "language": language,
-                "framework": framework,
-                "model": self.model,
-                "code_quality": "production_ready",
-                "security_level": "enterprise",
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "generated_code": code,
+            "language": language,
+            "framework": framework,
+            "model": self.model,
+            "code_quality": "production_ready",
+            "security_level": "enterprise",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude code generation failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude code generation failed: {e}")
+        return {"error": str(e), "status": "failed"}
 
-async def analyze_customer_sentiment(
-        self, customer_data: list[dict[str, Any]]
-    ) -> dict[str, Any]:
-        """
-        Advanced sentiment analysis and customer insights using Claude.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""Analyze customer sentiment and extract deep insights:
+async def analyze_customer_sentiment(self, customer_data: list[dict[str, Any]]) -> dict[str, Any]:
+    """
+    Advanced sentiment analysis and customer insights using Claude.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
+
+        prompt = f"""Analyze customer sentiment and extract deep insights:
 
 Customer Data (reviews, feedback, interactions):
 {json.dumps(customer_data[:50], indent=2)}  # Limit for token efficiency
@@ -419,40 +412,39 @@ Provide:
 
 Focus on insights that drive business value for a luxury brand."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=2500,
-                system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5,
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=2500,
+            system="You are a customer insights analyst specializing in luxury brands. You extract meaningful patterns from customer feedback and translate them into actionable business strategies.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+        )
 
-            analysis = response.content[0].text
+        analysis = response.content[0].text
 
-            return {
-                "sentiment_analysis": analysis,
-                "analysis_type": "comprehensive_customer_insights",
-                "model": self.model,
-                "confidence": "high",
-                "sample_size": len(customer_data),
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "sentiment_analysis": analysis,
+            "analysis_type": "comprehensive_customer_insights",
+            "model": self.model,
+            "confidence": "high",
+            "sample_size": len(customer_data),
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude sentiment analysis failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude sentiment analysis failed: {e}")
+        return {"error": str(e), "status": "failed"}
 
-async def create_viral_social_content(
-        self, campaign_brief: dict[str, Any]
-    ) -> dict[str, Any]:
-        """
-        Generate viral-worthy social media content using Claude's creativity.
-        """
-        try:
-            if not self.client:
-                return {"error": "Claude API not configured", "status": "failed"}
 
-            prompt = f"""Create viral social media content for The Skyy Rose Collection:
+async def create_viral_social_content(self, campaign_brief: dict[str, Any]) -> dict[str, Any]:
+    """
+    Generate viral-worthy social media content using Claude's creativity.
+    """
+    try:
+        if not self.client:
+            return {"error": "Claude API not configured", "status": "failed"}
+
+        prompt = f"""Create viral social media content for The Skyy Rose Collection:
 
 Campaign Brief:
 {json.dumps(campaign_brief, indent=2)}
@@ -476,68 +468,76 @@ Make it:
 
 Focus on The Skyy Rose Collection's brand values: exclusivity, elegance, quality."""
 
-            response = await self.client.messages.create(
-                model=self.model,
-                max_tokens=3500,
-                system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.9,  # Higher creativity for viral content
-            )
+        response = await self.client.messages.create(
+            model=self.model,
+            max_tokens=3500,
+            system="You are a viral social media strategist who has created campaigns for top luxury brands. You understand platform algorithms, luxury brand positioning, and create content that drives massive engagement while maintaining brand prestige.",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.9,  # Higher creativity for viral content
+        )
 
-            content = response.content[0].text
+        content = response.content[0].text
 
-            return {
-                "viral_content": content,
-                "content_type": "multi_platform_viral_campaign",
-                "model": self.model,
-                "confidence": "high",
-                "estimated_reach": "10x_normal",
-                "estimated_engagement": "+250%",
-                "timestamp": datetime.now().isoformat(),
-            }
+        return {
+            "viral_content": content,
+            "content_type": "multi_platform_viral_campaign",
+            "model": self.model,
+            "confidence": "high",
+            "estimated_reach": "10x_normal",
+            "estimated_engagement": "+250%",
+            "timestamp": datetime.now().isoformat(),
+        }
 
-        except Exception as e:
-            logger.error(f"❌ Claude viral content creation failed: {e}")
-            return {"error": str(e), "status": "failed"}
+    except Exception as e:
+        logger.error(f"❌ Claude viral content creation failed: {e}")
+        return {"error": str(e), "status": "failed"}
+
 
 # Factory function for creating Claude intelligence service
 def create_claude_service() -> ClaudeSonnetIntelligenceService:
     """Create and return a Claude Sonnet Intelligence Service instance."""
     return ClaudeSonnetIntelligenceService()
 
+
 # Global Claude service instance
 claude_service = create_claude_service()
 
+
 # Convenience functions for easy access
-async def advanced_ai_reasoning(
-    task: str, context: Optional[dict[str, Any]] = None
-) -> dict[str, Any]:
+async def advanced_ai_reasoning(task: str, context: Optional[dict[str, Any]] = None) -> dict[str, Any]:
     """Use Claude's advanced reasoning for complex tasks."""
     return await claude_service.advanced_reasoning(task, context)
+
 
 async def enhance_luxury_description(product_data: dict[str, Any]) -> dict[str, Any]:
     """Create luxury product descriptions with Claude."""
     return await claude_service.enhance_luxury_product_description(product_data)
 
+
 async def generate_marketing_strategy(business_data: dict[str, Any]) -> dict[str, Any]:
     """Generate comprehensive marketing strategy with Claude."""
     return await claude_service.generate_strategic_marketing_plan(business_data)
+
 
 async def analyze_competitors(competitor_data: dict[str, Any]) -> dict[str, Any]:
     """Perform competitive intelligence analysis with Claude."""
     return await claude_service.analyze_competitor_intelligence(competitor_data)
 
+
 async def optimize_conversions(funnel_data: dict[str, Any]) -> dict[str, Any]:
     """Optimize conversion funnel with Claude."""
     return await claude_service.optimize_conversion_funnel(funnel_data)
+
 
 async def generate_code(code_request: str, language: str = "python") -> dict[str, Any]:
     """Generate production code with Claude."""
     return await claude_service.generate_advanced_code(code_request, language)
 
+
 async def analyze_sentiment(customer_data: list[dict[str, Any]]) -> dict[str, Any]:
     """Analyze customer sentiment with Claude."""
     return await claude_service.analyze_customer_sentiment(customer_data)
+
 
 async def create_viral_content(campaign_brief: dict[str, Any]) -> dict[str, Any]:
     """Create viral social content with Claude."""

@@ -1,8 +1,7 @@
-from datetime import datetime
 import logging
-from typing import Any
 import uuid
-
+from datetime import datetime
+from typing import Any
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -190,44 +189,28 @@ class EmailSMSAutomationAgent:
         self.personalization_engine = self._initialize_personalization_engine()
         self.optimization_system = self._initialize_optimization_system()
 
-        logger.info(
-            "💌 Email & SMS Automation Agent initialized with Luxury Messaging Intelligence"
-        )
+        logger.info("💌 Email & SMS Automation Agent initialized with Luxury Messaging Intelligence")
 
-    async def create_email_campaign(
-        self, campaign_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_email_campaign(self, campaign_data: dict[str, Any]) -> dict[str, Any]:
         """Create comprehensive email marketing campaign for luxury fashion brand."""
         try:
             campaign_type = campaign_data.get("type", "promotional")
             target_audience = campaign_data.get("audience", "all_customers")
-            launch_date = campaign_data.get(
-                "launch_date", datetime.now().strftime("%Y-%m-%d")
-            )
+            launch_date = campaign_data.get("launch_date", datetime.now().strftime("%Y-%m-%d"))
 
-            logger.info(
-                f"📧 Creating {campaign_type} email campaign for {target_audience}..."
-            )
+            logger.info(f"📧 Creating {campaign_type} email campaign for {target_audience}...")
 
             # Generate campaign strategy
-            campaign_strategy = self._generate_email_strategy(
-                campaign_type, target_audience
-            )
+            campaign_strategy = self._generate_email_strategy(campaign_type, target_audience)
 
             # Create email sequence
-            email_sequence = self._create_email_sequence(
-                campaign_type, campaign_strategy
-            )
+            email_sequence = self._create_email_sequence(campaign_type, campaign_strategy)
 
             # Generate luxury content
-            email_content = self._generate_luxury_email_content(
-                campaign_type, campaign_strategy
-            )
+            email_content = self._generate_luxury_email_content(campaign_type, campaign_strategy)
 
             # Set up automation triggers
-            automation_setup = self._setup_email_automation(
-                campaign_type, target_audience
-            )
+            automation_setup = self._setup_email_automation(campaign_type, target_audience)
 
             # Configure A/B testing
             ab_testing = self._configure_email_ab_testing(campaign_type)
@@ -245,9 +228,7 @@ class EmailSMSAutomationAgent:
                 "personalization": self._setup_email_personalization(target_audience),
                 "luxury_elements": self._add_luxury_email_elements(),
                 "performance_tracking": self._setup_email_tracking(),
-                "estimated_metrics": self._predict_email_performance(
-                    campaign_type, target_audience
-                ),
+                "estimated_metrics": self._predict_email_performance(campaign_type, target_audience),
                 "created_at": datetime.now().isoformat(),
             }
 
@@ -255,18 +236,14 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ Email campaign creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def create_sms_campaign(
-        self, campaign_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_sms_campaign(self, campaign_data: dict[str, Any]) -> dict[str, Any]:
         """Create targeted SMS marketing campaign with luxury brand messaging."""
         try:
             campaign_type = campaign_data.get("type", "promotional")
             target_segments = campaign_data.get("segments", ["vip_customers"])
             send_time = campaign_data.get("send_time", "optimal")
 
-            logger.info(
-                f"📱 Creating {campaign_type} SMS campaign for {len(target_segments)} segments..."
-            )
+            logger.info(f"📱 Creating {campaign_type} SMS campaign for {len(target_segments)} segments...")
 
             # Generate SMS strategy
             sms_strategy = self._generate_sms_strategy(campaign_type, target_segments)
@@ -278,9 +255,7 @@ class EmailSMSAutomationAgent:
             personalization = self._setup_sms_personalization(target_segments)
 
             # Configure delivery optimization
-            delivery_optimization = self._optimize_sms_delivery(
-                target_segments, send_time
-            )
+            delivery_optimization = self._optimize_sms_delivery(target_segments, send_time)
 
             # Set up compliance
             compliance_setup = self._ensure_sms_compliance(target_segments)
@@ -306,35 +281,25 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ SMS campaign creation failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def setup_omnichannel_automation(
-        self, automation_config: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def setup_omnichannel_automation(self, automation_config: dict[str, Any]) -> dict[str, Any]:
         """Set up comprehensive omnichannel email & SMS automation."""
         try:
             channels = automation_config.get("channels", ["email", "sms"])
             customer_journey_stage = automation_config.get("journey_stage", "all")
             automation_triggers = automation_config.get("triggers", [])
 
-            logger.info(
-                f"🔄 Setting up omnichannel automation for {len(channels)} channels..."
-            )
+            logger.info(f"🔄 Setting up omnichannel automation for {len(channels)} channels...")
 
             # Create customer journey mapping
-            journey_mapping = self._create_customer_journey_mapping(
-                customer_journey_stage
-            )
+            journey_mapping = self._create_customer_journey_mapping(customer_journey_stage)
 
             # Set up cross-channel workflows
             workflows = {}
             for channel in channels:
-                workflows[channel] = self._create_channel_workflow(
-                    channel, journey_mapping
-                )
+                workflows[channel] = self._create_channel_workflow(channel, journey_mapping)
 
             # Configure trigger-based automation
-            trigger_automation = self._setup_trigger_automation(
-                automation_triggers, channels
-            )
+            trigger_automation = self._setup_trigger_automation(automation_triggers, channels)
 
             # Set up personalization across channels
             cross_channel_personalization = self._setup_cross_channel_personalization()
@@ -365,9 +330,7 @@ class EmailSMSAutomationAgent:
             logger.error(f"❌ Omnichannel automation setup failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_email_strategy(
-        self, campaign_type: str, audience: str
-    ) -> dict[str, Any]:
+    def _generate_email_strategy(self, campaign_type: str, audience: str) -> dict[str, Any]:
         """Generate comprehensive email marketing strategy."""
         strategies = {
             "welcome_series": {
@@ -404,9 +367,7 @@ class EmailSMSAutomationAgent:
 
         return strategies.get(campaign_type, strategies["seasonal_campaign"])
 
-    def _generate_sms_strategy(
-        self, campaign_type: str, target_segments: list[str]
-    ) -> dict[str, Any]:
+    def _generate_sms_strategy(self, campaign_type: str, target_segments: list[str]) -> dict[str, Any]:
         """Generate comprehensive SMS marketing strategy."""
         strategies = {
             "promotional": {
@@ -443,9 +404,7 @@ class EmailSMSAutomationAgent:
 
         return strategies.get(campaign_type, strategies["promotional"])
 
-    def _create_email_sequence(
-        self, campaign_type: str, strategy: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    def _create_email_sequence(self, campaign_type: str, strategy: dict[str, Any]) -> list[dict[str, Any]]:
         """Create detailed email sequence for campaign."""
         if campaign_type == "welcome_series":
             return [
@@ -486,9 +445,7 @@ class EmailSMSAutomationAgent:
             }
         ]
 
-    def _generate_luxury_email_content(
-        self, campaign_type: str, strategy: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _generate_luxury_email_content(self, campaign_type: str, strategy: dict[str, Any]) -> dict[str, Any]:
         """Generate luxury-focused email content."""
         return {
             "design_elements": {
@@ -524,9 +481,7 @@ class EmailSMSAutomationAgent:
             ],
         }
 
-    def _setup_email_automation(
-        self, campaign_type: str, audience: str
-    ) -> dict[str, Any]:
+    def _setup_email_automation(self, campaign_type: str, audience: str) -> dict[str, Any]:
         """Set up email automation triggers and workflows."""
         return {
             "trigger_types": {
@@ -561,9 +516,7 @@ class EmailSMSAutomationAgent:
             },
         }
 
-    def _create_sms_variants(
-        self, campaign_type: str, strategy: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    def _create_sms_variants(self, campaign_type: str, strategy: dict[str, Any]) -> list[dict[str, Any]]:
         """Create SMS message variants for testing."""
         if campaign_type == "flash_sale":
             return [
@@ -601,9 +554,7 @@ class EmailSMSAutomationAgent:
                 "variant": "A",
                 "message": f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]",
                 "tone": "professional",
-                "length": len(
-                    f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]"
-                ),
+                "length": len(f"{campaign_type.replace('_', ' ').title()} - Discover luxury: [link]"),
             }
         ]
 

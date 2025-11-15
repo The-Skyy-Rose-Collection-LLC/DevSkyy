@@ -3,15 +3,14 @@ Base ML Engine
 Foundational machine learning capabilities for all agents
 """
 
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-import logging
 from typing import Any, Optional
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-
 
 logger = logging.getLogger(__name__)
 
@@ -79,9 +78,7 @@ class BaseMLEngine(ABC):
         """Split data into training and testing sets"""
         return train_test_split(X, y, test_size=test_size, random_state=random_state)
 
-    async def evaluate_model(
-        self, X_test: np.ndarray, y_test: np.ndarray
-    ) -> dict[str, float]:
+    async def evaluate_model(self, X_test: np.ndarray, y_test: np.ndarray) -> dict[str, float]:
         """
         Evaluate model performance
 
@@ -101,19 +98,9 @@ class BaseMLEngine(ABC):
 
             metrics = {
                 "accuracy": float(accuracy_score(y_test, predictions)),
-                "precision": float(
-                    precision_score(
-                        y_test, predictions, average="weighted", zero_division=0
-                    )
-                ),
-                "recall": float(
-                    recall_score(
-                        y_test, predictions, average="weighted", zero_division=0
-                    )
-                ),
-                "f1_score": float(
-                    f1_score(y_test, predictions, average="weighted", zero_division=0)
-                ),
+                "precision": float(precision_score(y_test, predictions, average="weighted", zero_division=0)),
+                "recall": float(recall_score(y_test, predictions, average="weighted", zero_division=0)),
+                "f1_score": float(f1_score(y_test, predictions, average="weighted", zero_division=0)),
                 "avg_confidence": float(np.mean(confidence)),
                 "timestamp": datetime.utcnow().isoformat(),
             }
@@ -130,14 +117,10 @@ class BaseMLEngine(ABC):
         try:
             if hasattr(self.model, "feature_importances_"):
                 return {
-                    f"feature_{i}": float(importance)
-                    for i, importance in enumerate(self.model.feature_importances_)
+                    f"feature_{i}": float(importance) for i, importance in enumerate(self.model.feature_importances_)
                 }
             elif hasattr(self.model, "coef_"):
-                return {
-                    f"feature_{i}": float(abs(coef))
-                    for i, coef in enumerate(self.model.coef_[0])
-                }
+                return {f"feature_{i}": float(abs(coef)) for i, coef in enumerate(self.model.coef_[0])}
             return None
         except Exception as e:
             logger.error(f"Failed to get feature importance: {e}")
@@ -223,9 +206,7 @@ class BaseMLEngine(ABC):
                 current_f1 = current_metrics.get("f1_score", 0)
 
                 if prev_f1 - current_f1 > retrain_threshold:
-                    logger.warning(
-                        f"Performance degradation detected: {prev_f1:.3f} -> {current_f1:.3f}"
-                    )
+                    logger.warning(f"Performance degradation detected: {prev_f1:.3f} -> {current_f1:.3f}")
 
                     # Retrain model
                     train_result = await self.train(new_X, new_y)

@@ -3,15 +3,14 @@ Enterprise Database Configuration - SQLAlchemy Support
 Production-ready with Neon, Supabase, PlanetScale support
 """
 
-from collections.abc import AsyncGenerator
 import logging
 import os
+from collections.abc import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from database_config import CONNECTION_ARGS, DATABASE_URL
-
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +53,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         except Exception as e:
             await session.rollback()
             from core.exceptions import DatabaseError
+
             raise DatabaseError("Database session error", original_error=e)
         finally:
             await session.close()
@@ -144,9 +144,7 @@ class DatabaseManager:
                     "status": "healthy",
                     "connected": True,
                     "type": "SQLAlchemy",
-                    "url": (
-                        DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"
-                    ),
+                    "url": (DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else "sqlite"),
                 }
         except Exception as e:
             logger.warning(f"Database health check failed: {e}")

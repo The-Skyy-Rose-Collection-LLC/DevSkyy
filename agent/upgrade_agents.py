@@ -1,7 +1,6 @@
 import logging
-from pathlib import Path
 import re
-
+from pathlib import Path
 
 """
 Agent Upgrade Script
@@ -17,6 +16,7 @@ This script:
 logger = logging.getLogger(__name__)
 
 AGENT_MODULES_DIR = Path(__file__).parent / "modules"
+
 
 def find_agents_to_upgrade() -> list[Path]:
     """Find all agent files that need upgrading"""
@@ -34,6 +34,7 @@ def find_agents_to_upgrade() -> list[Path]:
 
     return sorted(agent_files)
 
+
 def check_if_uses_base_agent(file_path: Path) -> bool:
     """Check if agent already inherits from BaseAgent"""
     try:
@@ -41,6 +42,7 @@ def check_if_uses_base_agent(file_path: Path) -> bool:
         return "from .base_agent import BaseAgent" in content or "BaseAgent" in content
     except Exception:
         return False
+
 
 def analyze_agent_structure(file_path: Path) -> dict:
     """Analyze agent structure and identify key components"""
@@ -75,6 +77,7 @@ def analyze_agent_structure(file_path: Path) -> dict:
         }
     except Exception as e:
         return {"file": file_path.name, "error": str(e)}
+
 
 def generate_upgrade_template(agent_name: str, original_class_name: str) -> str:
     """Generate a template for upgrading an agent"""
@@ -253,6 +256,7 @@ def create_{agent_name.lower().replace(" ", "_")}_v2() -> {original_class_name}V
 
     return template
 
+
 def main():
     """Main upgrade process"""
     logger.info("🔧 DevSkyy Agent Upgrade Script")
@@ -268,11 +272,7 @@ def main():
         analysis = analyze_agent_structure(agent_file)
         results.append(analysis)
 
-        status = (
-            "✅ Uses BaseAgent"
-            if analysis.get("uses_base_agent")
-            else "⚠️  Needs Upgrade"
-        )
+        status = "✅ Uses BaseAgent" if analysis.get("uses_base_agent") else "⚠️  Needs Upgrade"
         logger.info(f"{status}: {analysis['file']}")
         logger.info(f"   Classes: {', '.join(analysis.get('classes', []))}")
         logger.info(f"   Lines: {analysis.get('lines', 0)}")
@@ -306,6 +306,7 @@ def main():
     logger.info("5. Add ML features and optimization")
     logger.info("6. Test thoroughly")
     logger.info("7. Update imports in main.py")
+
 
 if __name__ == "__main__":
     main()

@@ -39,6 +39,7 @@ class TaskType(str, Enum):
 
     Follows Truth Protocol: Explicit enumeration, no dynamic types
     """
+
     # Code & Development
     CODE_GENERATION = "code_generation"
     CODE_REVIEW = "code_review"
@@ -92,6 +93,7 @@ class RoutingResult:
 
     All fields validated, no optional without defaults (Truth Protocol)
     """
+
     agent_id: str
     agent_name: str
     task_type: TaskType
@@ -103,13 +105,13 @@ class RoutingResult:
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization"""
         return {
-            'agent_id': self.agent_id,
-            'agent_name': self.agent_name,
-            'task_type': self.task_type.value if isinstance(self.task_type, TaskType) else self.task_type,
-            'confidence': self.confidence,
-            'routing_method': self.routing_method,
-            'metadata': self.metadata,
-            'timestamp': self.timestamp
+            "agent_id": self.agent_id,
+            "agent_name": self.agent_name,
+            "task_type": self.task_type.value if isinstance(self.task_type, TaskType) else self.task_type,
+            "confidence": self.confidence,
+            "routing_method": self.routing_method,
+            "metadata": self.metadata,
+            "timestamp": self.timestamp,
         }
 
 
@@ -120,6 +122,7 @@ class TaskRequest:
 
     Truth Protocol: Explicit validation, no assumptions
     """
+
     task_type: TaskType
     description: str
     priority: int = 50  # 0-100
@@ -172,31 +175,25 @@ class AgentRouter:
             TaskType.CODE_REFACTORING: ["refactoring_agent", "code_optimizer", "development"],
             TaskType.CODE_TESTING: ["test_runner", "qa_agent", "development"],
             TaskType.CODE_DEBUGGING: ["debugger", "error_analyzer", "development"],
-
             TaskType.CONTENT_GENERATION: ["content_writer", "copywriter", "marketing"],
             TaskType.IMAGE_PROCESSING: ["image_processor", "computer_vision", "media"],
             TaskType.VIDEO_PROCESSING: ["video_processor", "media_encoder", "media"],
             TaskType.AUDIO_PROCESSING: ["audio_processor", "speech_recognition", "media"],
-
             TaskType.DATA_ANALYSIS: ["data_analyst", "analytics_engine", "data"],
             TaskType.DATA_PROCESSING: ["data_processor", "etl_engine", "data"],
             TaskType.ML_TRAINING: ["ml_trainer", "model_builder", "ml"],
             TaskType.ML_INFERENCE: ["ml_inference", "prediction_engine", "ml"],
-
             TaskType.FINANCIAL_ANALYSIS: ["financial_analyst", "finance_agent", "finance"],
             TaskType.INVENTORY_MANAGEMENT: ["inventory_manager", "stock_optimizer", "inventory"],
             TaskType.CUSTOMER_SERVICE: ["customer_service", "support_agent", "customer"],
             TaskType.MARKETING_AUTOMATION: ["marketing_agent", "campaign_manager", "marketing"],
-
             TaskType.DATABASE_OPTIMIZATION: ["database_optimizer", "query_optimizer", "database"],
             TaskType.SECURITY_SCAN: ["security_scanner", "vulnerability_scanner", "security"],
             TaskType.PERFORMANCE_MONITORING: ["performance_monitor", "observability", "monitoring"],
             TaskType.DEPLOYMENT: ["deployment_agent", "devops", "infrastructure"],
-
             TaskType.WORDPRESS_THEME: ["wordpress_theme_builder", "theme_developer", "wordpress"],
             TaskType.WORDPRESS_PLUGIN: ["wordpress_plugin_developer", "wp_developer", "wordpress"],
             TaskType.CMS_CONTENT: ["cms_manager", "content_manager", "cms"],
-
             TaskType.PRODUCT_MANAGEMENT: ["product_manager", "catalog_manager", "ecommerce"],
             TaskType.ORDER_PROCESSING: ["order_processor", "fulfillment_agent", "ecommerce"],
             TaskType.PRICING_OPTIMIZATION: ["pricing_engine", "price_optimizer", "ecommerce"],
@@ -209,19 +206,15 @@ class AgentRouter:
             TaskType.CODE_REFACTORING: ["refactor", "improve", "optimize", "restructure", "clean"],
             TaskType.CODE_TESTING: ["test", "verify", "validate", "check", "qa"],
             TaskType.CODE_DEBUGGING: ["debug", "fix", "error", "bug", "issue"],
-
             TaskType.CONTENT_GENERATION: ["write", "content", "article", "blog", "copy"],
             TaskType.IMAGE_PROCESSING: ["image", "photo", "picture", "visual", "graphics"],
             TaskType.VIDEO_PROCESSING: ["video", "movie", "clip", "footage"],
             TaskType.AUDIO_PROCESSING: ["audio", "sound", "voice", "speech", "music"],
-
             TaskType.FINANCIAL_ANALYSIS: ["finance", "financial", "accounting", "revenue", "profit"],
             TaskType.INVENTORY_MANAGEMENT: ["inventory", "stock", "warehouse", "products"],
             TaskType.CUSTOMER_SERVICE: ["customer", "support", "help", "service", "assistance"],
-
             TaskType.SECURITY_SCAN: ["security", "vulnerability", "scan", "threat", "penetration"],
             TaskType.DEPLOYMENT: ["deploy", "release", "publish", "production"],
-
             TaskType.WORDPRESS_THEME: ["wordpress", "theme", "wp", "template"],
             TaskType.PRODUCT_MANAGEMENT: ["product", "catalog", "sku", "merchandise"],
         }
@@ -256,7 +249,7 @@ class AgentRouter:
                 task_type=task.task_type,
                 confidence=cached.confidence,
                 routing_method="cached",
-                metadata={'cache_hit': True}
+                metadata={"cache_hit": True},
             )
 
         # Try exact match first
@@ -277,8 +270,7 @@ class AgentRouter:
             return fallback_result
 
         raise NoAgentFoundError(
-            f"No agent found for task type: {task.task_type.value}. "
-            f"Description: {task.description}"
+            f"No agent found for task type: {task.task_type.value}. " f"Description: {task.description}"
         )
 
     @trace_agent("route_multiple_tasks", agent_id="agent_router")
@@ -323,14 +315,16 @@ class AgentRouter:
             except NoAgentFoundError as e:
                 errors.append(f"Task {i} ({task.task_type.value}): {e!s}")
                 # Add a fallback result
-                results.append(RoutingResult(
-                    agent_id="unknown",
-                    agent_name="Unknown Agent",
-                    task_type=task.task_type,
-                    confidence=0.0,
-                    routing_method="failed",
-                    metadata={'error': str(e)}
-                ))
+                results.append(
+                    RoutingResult(
+                        agent_id="unknown",
+                        agent_name="Unknown Agent",
+                        task_type=task.task_type,
+                        confidence=0.0,
+                        routing_method="failed",
+                        metadata={"error": str(e)},
+                    )
+                )
 
         if errors:
             # Log errors but don't fail the entire batch
@@ -358,10 +352,7 @@ class AgentRouter:
             return None
 
         # Find agents matching the task type
-        matching_agents = [
-            agent for agent in all_agents
-            if agent.agent_type in agent_types
-        ]
+        matching_agents = [agent for agent in all_agents if agent.agent_type in agent_types]
 
         if not matching_agents:
             return None
@@ -378,7 +369,7 @@ class AgentRouter:
             task_type=task.task_type,
             confidence=0.95,  # High confidence for exact match
             routing_method="exact",
-            metadata={'matched_types': agent_types}
+            metadata={"matched_types": agent_types},
         )
 
     def _fuzzy_match_routing(self, task: TaskRequest) -> Optional[RoutingResult]:
@@ -419,17 +410,14 @@ class AgentRouter:
 
         # Route using the matched task type
         matched_task = TaskRequest(
-            task_type=best_match[0],
-            description=task.description,
-            priority=task.priority,
-            parameters=task.parameters
+            task_type=best_match[0], description=task.description, priority=task.priority, parameters=task.parameters
         )
 
         exact_result = self._exact_match_routing(matched_task)
         if exact_result:
             exact_result.confidence = best_match[1]  # Use fuzzy confidence
             exact_result.routing_method = "fuzzy"
-            exact_result.metadata['fuzzy_score'] = best_match[1]
+            exact_result.metadata["fuzzy_score"] = best_match[1]
             return exact_result
 
         return None
@@ -454,7 +442,7 @@ class AgentRouter:
                     task_type=task.task_type,
                     confidence=0.3,  # Low confidence for fallback
                     routing_method="fallback",
-                    metadata={'fallback': True}
+                    metadata={"fallback": True},
                 )
         except LoaderError:
             pass
@@ -527,10 +515,10 @@ class AgentRouter:
             Dictionary with routing stats
         """
         return {
-            'cache_size': len(self._routing_cache),
-            'cached_routes': list(self._routing_cache.keys()),
-            'supported_task_types': len(TaskType),
-            'task_type_mappings': len(self._task_to_agent_mapping)
+            "cache_size": len(self._routing_cache),
+            "cached_routes": list(self._routing_cache.keys()),
+            "supported_task_types": len(TaskType),
+            "task_type_mappings": len(self._task_to_agent_mapping),
         }
 
     def clear_cache(self) -> None:
@@ -552,10 +540,6 @@ def route_task_simple(task_type: str, description: str, priority: int = 50) -> R
     Returns:
         RoutingResult
     """
-    task = TaskRequest(
-        task_type=TaskType(task_type),
-        description=description,
-        priority=priority
-    )
+    task = TaskRequest(task_type=TaskType(task_type), description=description, priority=priority)
     router = AgentRouter()
     return router.route_task(task)

@@ -3,25 +3,23 @@ Enhanced Auto-Fix Module for DevSkyy Platform (Simplified)
 Provides advanced code analysis, fixing, and branch management
 """
 
-# Import existing modules using importlib
-from datetime import datetime
 import importlib.util
 import logging
 import os
-from pathlib import Path
 import re
 import subprocess
-from typing import Any, Optional
 
+# Import existing modules using importlib
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Optional
 
 # Get the current directory to import other modules
 current_dir = Path(__file__).parent
 project_root = current_dir.parent.parent
 
 # Import scanner module
-scanner_spec = importlib.util.spec_from_file_location(
-    "scanner", current_dir / "scanner.py"
-)
+scanner_spec = importlib.util.spec_from_file_location("scanner", current_dir / "scanner.py")
 scanner_module = importlib.util.module_from_spec(scanner_spec)
 scanner_spec.loader.exec_module(scanner_module)
 
@@ -31,9 +29,7 @@ fixer_module = importlib.util.module_from_spec(fixer_spec)
 fixer_spec.loader.exec_module(fixer_module)
 
 # Import git_commit module
-git_commit_spec = importlib.util.spec_from_file_location(
-    "git_commit", current_dir.parent / "git_commit.py"
-)
+git_commit_spec = importlib.util.spec_from_file_location("git_commit", current_dir.parent / "git_commit.py")
 git_commit_module = importlib.util.module_from_spec(git_commit_spec)
 git_commit_spec.loader.exec_module(git_commit_module)
 
@@ -104,17 +100,13 @@ class EnhancedAutoFix:
             session_result["advanced_fixes"] = advanced_fixes
 
             # Calculate total fixes
-            total_fixes = len(fix_results.get("fixes_applied", [])) + len(
-                advanced_fixes.get("fixes_applied", [])
-            )
+            total_fixes = len(fix_results.get("fixes_applied", [])) + len(advanced_fixes.get("fixes_applied", []))
             session_result["total_fixes"] = total_fixes
 
             # Auto-commit if requested
             if auto_commit and total_fixes > 0:
                 logger.info("📝 Auto-committing fixes...")
-                commit_message = self._generate_enhanced_commit_message(
-                    fix_results, advanced_fixes
-                )
+                commit_message = self._generate_enhanced_commit_message(fix_results, advanced_fixes)
                 commit_results = self._commit_fixes(commit_message)
                 session_result["commit_results"] = commit_results
 
@@ -141,7 +133,8 @@ class EnhancedAutoFix:
         try:
             result = subprocess.run(
                 ["git", "branch", "--show-current"],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=10,
             )
@@ -157,7 +150,8 @@ class EnhancedAutoFix:
             # Create and checkout new branch
             result = subprocess.run(
                 ["git", "checkout", "-b", branch_name],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=30,
             )
@@ -176,7 +170,8 @@ class EnhancedAutoFix:
         try:
             result = subprocess.run(
                 ["git", "checkout", branch_name],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=30,
             )
@@ -213,19 +208,13 @@ class EnhancedAutoFix:
 
         # Check for hardcoded secrets and add warnings
         for root, dirs, files in os.walk("."):
-            dirs[:] = [
-                d
-                for d in dirs
-                if not d.startswith(".") and d not in {"__pycache__", "backup_*"}
-            ]
+            dirs[:] = [d for d in dirs if not d.startswith(".") and d not in {"__pycache__", "backup_*"}]
 
             for file in files:
                 if file.endswith((".py", ".js", ".json", ".yaml", ".yml")):
                     file_path = os.path.join(root, file)
                     try:
-                        with open(
-                            file_path, "r", encoding="utf-8", errors="ignore"
-                        ) as f:
+                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                             content = f.read()
 
                         # Check for potential secrets
@@ -304,8 +293,7 @@ class EnhancedAutoFix:
             dirs[:] = [
                 d
                 for d in dirs
-                if not d.startswith(".")
-                and d not in {"__pycache__", "node_modules", "backup_*", ".git"}
+                if not d.startswith(".") and d not in {"__pycache__", "node_modules", "backup_*", ".git"}
             ]
 
             # If directory contains Python files but no __init__.py
@@ -324,16 +312,12 @@ class EnhancedAutoFix:
 
         return fixes
 
-    def _generate_enhanced_commit_message(
-        self, fix_results: dict[str, Any], advanced_fixes: dict[str, Any]
-    ) -> str:
+    def _generate_enhanced_commit_message(self, fix_results: dict[str, Any], advanced_fixes: dict[str, Any]) -> str:
         """Generate enhanced commit message"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Count fixes by type
-        all_fixes = fix_results.get("fixes_applied", []) + advanced_fixes.get(
-            "fixes_applied", []
-        )
+        all_fixes = fix_results.get("fixes_applied", []) + advanced_fixes.get("fixes_applied", [])
 
         fix_counts = {
             "error": 0,
@@ -367,9 +351,7 @@ class EnhancedAutoFix:
         if fix_counts["security"]:
             summary_parts.append(f"🔒 {fix_counts['security']} security improvements")
         if fix_counts["configuration"]:
-            summary_parts.append(
-                f"⚙️ {fix_counts['configuration']} configuration improvements"
-            )
+            summary_parts.append(f"⚙️ {fix_counts['configuration']} configuration improvements")
         if fix_counts["structure"]:
             summary_parts.append(f"🏗️ {fix_counts['structure']} structure improvements")
 
@@ -413,9 +395,7 @@ def run_auto_fix_session(
 ) -> dict[str, Any]:
     """Run a complete auto-fix session"""
     autofix = EnhancedAutoFix()
-    return autofix.run_enhanced_autofix(
-        create_branch=create_branch, branch_name=branch_name, auto_commit=auto_commit
-    )
+    return autofix.run_enhanced_autofix(create_branch=create_branch, branch_name=branch_name, auto_commit=auto_commit)
 
 
 def quick_fix() -> dict[str, Any]:

@@ -1,12 +1,11 @@
+import logging
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
 from typing import Any, Optional
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
-
 
 """
 Enterprise Multi-Agent Orchestration System
@@ -24,6 +23,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class ExecutionPriority(Enum):
     """Agent execution priority levels"""
 
@@ -31,6 +31,7 @@ class ExecutionPriority(Enum):
     HIGH = 2  # Core business logic (payments, orders)
     MEDIUM = 3  # Standard operations (content, analytics)
     LOW = 4  # Background tasks (learning, optimization)
+
 
 class TaskStatus(Enum):
     """Multi-agent task status"""
@@ -40,6 +41,7 @@ class TaskStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
+
 
 @dataclass
 class AgentCapability:
@@ -51,6 +53,7 @@ class AgentCapability:
     priority: ExecutionPriority = ExecutionPriority.MEDIUM
     max_concurrent: int = 5  # Max concurrent executions
     rate_limit: int = 100  # Requests per minute
+
 
 @dataclass
 class AgentTask:
@@ -67,6 +70,7 @@ class AgentTask:
     created_at: datetime = field(default_factory=datetime.now)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
+
 
 class AgentOrchestrator:
     """
@@ -153,24 +157,28 @@ class AgentOrchestrator:
             enhanced_capabilities = capabilities.copy()
 
             # Add video generation capabilities if this is a fashion vision agent
-            if hasattr(agent, 'generate_fashion_runway_video'):
-                enhanced_capabilities.extend([
-                    "video_generation",
-                    "runway_video_generation",
-                    "product_360_video_generation",
-                    "video_upscaling",
-                    "fashion_image_generation"
-                ])
+            if hasattr(agent, "generate_fashion_runway_video"):
+                enhanced_capabilities.extend(
+                    [
+                        "video_generation",
+                        "runway_video_generation",
+                        "product_360_video_generation",
+                        "video_upscaling",
+                        "fashion_image_generation",
+                    ]
+                )
 
             # Add brand training capabilities if this is a brand trainer
-            if hasattr(agent, 'train_lora_model'):
-                enhanced_capabilities.extend([
-                    "brand_model_training",
-                    "dataset_preparation",
-                    "lora_fine_tuning",
-                    "brand_consistency_validation",
-                    "custom_model_generation"
-                ])
+            if hasattr(agent, "train_lora_model"):
+                enhanced_capabilities.extend(
+                    [
+                        "brand_model_training",
+                        "dataset_preparation",
+                        "lora_fine_tuning",
+                        "brand_consistency_validation",
+                        "custom_model_generation",
+                    ]
+                )
 
             # Register capabilities
             self.agent_capabilities[agent_name] = AgentCapability(
@@ -186,9 +194,7 @@ class AgentOrchestrator:
                 for dep in dependencies:
                     self.reverse_dependencies[dep].add(agent_name)
 
-            logger.info(
-                f"✅ Registered agent: {agent_name} with capabilities: {capabilities}"
-            )
+            logger.info(f"✅ Registered agent: {agent_name} with capabilities: {capabilities}")
             return True
 
         except Exception as e:
@@ -249,9 +255,7 @@ class AgentOrchestrator:
         # Find agents with required capabilities
         capable_agents = self._find_agents_with_capabilities(required_capabilities)
         if not capable_agents:
-            return {
-                "error": f"No agents found with capabilities: {required_capabilities}"
-            }
+            return {"error": f"No agents found with capabilities: {required_capabilities}"}
 
         # Resolve execution order based on dependencies
         execution_order = self._resolve_dependencies(capable_agents)
@@ -344,9 +348,7 @@ class AgentOrchestrator:
             task.error = str(e)
             return {"error": str(e), "task_id": task_id}
 
-    def _find_agents_with_capabilities(
-        self, required_capabilities: list[str]
-    ) -> list[str]:
+    def _find_agents_with_capabilities(self, required_capabilities: list[str]) -> list[str]:
         """Find all agents that have the required capabilities"""
         capable_agents = []
 
@@ -356,9 +358,7 @@ class AgentOrchestrator:
                 capable_agents.append(agent_name)
 
         # Sort by priority
-        capable_agents.sort(
-            key=lambda name: self.agent_capabilities[name].priority.value
-        )
+        capable_agents.sort(key=lambda name: self.agent_capabilities[name].priority.value)
 
         return capable_agents
 
@@ -404,9 +404,7 @@ class AgentOrchestrator:
     # CIRCUIT BREAKER PATTERN
     # ============================================================================
 
-    def _is_circuit_open(
-        self, agent_name: str, threshold: int = 5, timeout: int = 60
-    ) -> bool:
+    def _is_circuit_open(self, agent_name: str, threshold: int = 5, timeout: int = 60) -> bool:
         """Check if circuit breaker is open for an agent"""
         breaker = self.circuit_breakers[agent_name]
 
@@ -414,10 +412,7 @@ class AgentOrchestrator:
             return False
 
         # Check if timeout has passed
-        if (
-            breaker["opened_at"]
-            and (datetime.now() - breaker["opened_at"]).seconds > timeout
-        ):
+        if breaker["opened_at"] and (datetime.now() - breaker["opened_at"]).seconds > timeout:
             # Try to close circuit (half-open state)
             breaker["state"] = "half-open"
             return False
@@ -490,9 +485,7 @@ class AgentOrchestrator:
             "total_tasks": len(self.tasks),
             "agent_health": agent_health,
             "system_status": (
-                "healthy"
-                if all(a.status != AgentStatus.FAILED for a in self.agents.values())
-                else "degraded"
+                "healthy" if all(a.status != AgentStatus.FAILED for a in self.agents.values()) else "degraded"
             ),
         }
 
@@ -533,9 +526,7 @@ class AgentOrchestrator:
 
         return data.get("value")
 
-    async def broadcast_to_agents(
-        self, message: dict[str, Any], agent_names: Optional[list[str]] = None
-    ):
+    async def broadcast_to_agents(self, message: dict[str, Any], agent_names: Optional[list[str]] = None):
         """Broadcast a message to multiple agents"""
         target_agents = agent_names if agent_names else list(self.agents.keys())
 
@@ -549,10 +540,7 @@ class AgentOrchestrator:
     # ============================================================================
 
     async def create_video_generation_task(
-        self,
-        task_type: str,
-        parameters: dict[str, Any],
-        priority: ExecutionPriority = ExecutionPriority.MEDIUM
+        self, task_type: str, parameters: dict[str, Any], priority: ExecutionPriority = ExecutionPriority.MEDIUM
     ) -> str:
         """
         Create a video generation task.
@@ -566,6 +554,7 @@ class AgentOrchestrator:
             Task ID
         """
         import uuid
+
         task_id = str(uuid.uuid4())
 
         # Determine required agents based on task type
@@ -582,7 +571,7 @@ class AgentOrchestrator:
             task_type=task_type,
             parameters=parameters,
             required_agents=required_agents,
-            priority=priority
+            priority=priority,
         )
 
         self.tasks[task_id] = task
@@ -658,7 +647,7 @@ class AgentOrchestrator:
             width=task.parameters.get("width", 1024),
             height=task.parameters.get("height", 576),
             style=task.parameters.get("style", "luxury fashion runway"),
-            upscale=task.parameters.get("upscale", True)
+            upscale=task.parameters.get("upscale", True),
         )
 
     async def _execute_product_360_task(self, task: AgentTask) -> dict[str, Any]:
@@ -672,7 +661,7 @@ class AgentOrchestrator:
             product_image_path=task.parameters.get("product_image_path"),
             rotation_steps=task.parameters.get("rotation_steps", 24),
             duration=task.parameters.get("duration", 3),
-            upscale=task.parameters.get("upscale", True)
+            upscale=task.parameters.get("upscale", True),
         )
 
     async def _execute_brand_training_task(self, task: AgentTask) -> dict[str, Any]:
@@ -685,7 +674,7 @@ class AgentOrchestrator:
         return await agent.train_lora_model(
             dataset_path=task.parameters.get("dataset_path"),
             model_name=task.parameters.get("model_name", "skyy_rose_v1"),
-            resume_from_checkpoint=task.parameters.get("resume_from_checkpoint")
+            resume_from_checkpoint=task.parameters.get("resume_from_checkpoint"),
         )
 
     async def _execute_custom_model_generation_task(self, task: AgentTask) -> dict[str, Any]:
@@ -700,7 +689,7 @@ class AgentOrchestrator:
             model_name=task.parameters.get("model_name", "skyy_rose_v1"),
             trigger_word=task.parameters.get("trigger_word", "skyrose_collection"),
             width=task.parameters.get("width", 1024),
-            height=task.parameters.get("height", 1024)
+            height=task.parameters.get("height", 1024),
         )
 
     async def _execute_video_upscaling_task(self, task: AgentTask) -> dict[str, Any]:
@@ -712,8 +701,9 @@ class AgentOrchestrator:
 
         return await agent.upscale_video(
             video_path=task.parameters.get("video_path"),
-            target_resolution=task.parameters.get("target_resolution", (2048, 1152))
+            target_resolution=task.parameters.get("target_resolution", (2048, 1152)),
         )
+
 
 # Global orchestrator instance with video generation capabilities
 orchestrator = AgentOrchestrator()

@@ -1,12 +1,11 @@
-from datetime import datetime
 import json
 import logging
 import os
-from typing import Any
 import uuid
+from datetime import datetime
+from typing import Any
 
 import openai
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -141,9 +140,7 @@ class PerformanceAgent:
         else:
             self.openai_client = None
 
-        logger.info(
-            "🚀 Universal Web Development Guru initialized with Multi-Language Mastery"
-        )
+        logger.info("🚀 Universal Web Development Guru initialized with Multi-Language Mastery")
 
     async def analyze_site_performance(self) -> dict[str, Any]:
         """Comprehensive site performance analysis."""
@@ -188,9 +185,7 @@ class PerformanceAgent:
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
                 "performance_analysis": analysis,
-                "optimization_recommendations": self._generate_performance_recommendations(
-                    analysis
-                ),
+                "optimization_recommendations": self._generate_performance_recommendations(analysis),
                 "risk_assessment": self._assess_performance_risks(analysis),
             }
 
@@ -198,9 +193,7 @@ class PerformanceAgent:
             logger.error(f"❌ Performance analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_performance_recommendations(
-        self, analysis: dict
-    ) -> list[dict[str, Any]]:
+    def _generate_performance_recommendations(self, analysis: dict) -> list[dict[str, Any]]:
         """Generate prioritized performance recommendations."""
         recommendations = [
             {
@@ -338,26 +331,14 @@ class PerformanceAgent:
             analysis = {
                 "language_detected": language,
                 "code_quality_score": 87.5,
-                "performance_issues": self._detect_performance_issues(
-                    code_content, language
-                ),
-                "security_vulnerabilities": self._detect_security_issues(
-                    code_content, language
-                ),
+                "performance_issues": self._detect_performance_issues(code_content, language),
+                "security_vulnerabilities": self._detect_security_issues(code_content, language),
                 "code_smells": self._detect_code_smells(code_content, language),
-                "optimization_opportunities": self._identify_optimizations(
-                    code_content, language
-                ),
-                "best_practices_violations": self._check_best_practices(
-                    code_content, language
-                ),
-                "dependency_analysis": self._analyze_dependencies(
-                    code_content, language
-                ),
+                "optimization_opportunities": self._identify_optimizations(code_content, language),
+                "best_practices_violations": self._check_best_practices(code_content, language),
+                "dependency_analysis": self._analyze_dependencies(code_content, language),
                 "memory_leaks": self._detect_memory_leaks(code_content, language),
-                "scalability_concerns": self._assess_scalability(
-                    code_content, language
-                ),
+                "scalability_concerns": self._assess_scalability(code_content, language),
             }
 
             # Generate fixes and improvements
@@ -370,12 +351,8 @@ class PerformanceAgent:
                 "file_path": file_path,
                 "analysis": analysis,
                 "generated_fixes": fixes,
-                "optimization_suggestions": self._generate_optimization_suggestions(
-                    language
-                ),
-                "performance_improvements": self._suggest_performance_improvements(
-                    analysis, language
-                ),
+                "optimization_suggestions": self._generate_optimization_suggestions(language),
+                "performance_improvements": self._suggest_performance_improvements(analysis, language),
                 "automated_fix_available": True,
                 "estimated_improvement": "25-40% performance boost",
             }
@@ -384,9 +361,7 @@ class PerformanceAgent:
             logger.error(f"❌ Code analysis failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_code_god_mode(
-        self, code_analysis: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def optimize_code_god_mode(self, code_analysis: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED CODE OPTIMIZATION WITH GOD MODE INTELLIGENCE."""
         try:
             prompt = f"""
@@ -444,9 +419,7 @@ class PerformanceAgent:
             logger.error(f"GOD MODE optimization failed: {e!s}")
             return {"error": str(e), "fallback": "standard_optimization_available"}
 
-    async def debug_application_error(
-        self, error_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def debug_application_error(self, error_data: dict[str, Any]) -> dict[str, Any]:
         """Universal debugging for any web application error."""
         try:
             error_type = error_data.get("error_type", "runtime")
@@ -459,16 +432,10 @@ class PerformanceAgent:
             debugging_analysis = {
                 "error_classification": self._classify_error(stack_trace, language),
                 "root_cause_analysis": self._perform_root_cause_analysis(error_data),
-                "potential_causes": self._identify_potential_causes(
-                    error_type, language, framework
-                ),
+                "potential_causes": self._identify_potential_causes(error_type, language, framework),
                 "fix_suggestions": self._generate_fix_suggestions(error_data),
-                "prevention_strategies": self._suggest_prevention_strategies(
-                    error_type, language
-                ),
-                "testing_recommendations": self._recommend_testing_approaches(
-                    error_data
-                ),
+                "prevention_strategies": self._suggest_prevention_strategies(error_type, language),
+                "testing_recommendations": self._recommend_testing_approaches(error_data),
                 "monitoring_setup": self._setup_error_monitoring(language, framework),
             }
 
@@ -486,9 +453,7 @@ class PerformanceAgent:
             logger.error(f"❌ Debugging failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    async def optimize_full_stack_performance(
-        self, stack_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def optimize_full_stack_performance(self, stack_data: dict[str, Any]) -> dict[str, Any]:
         """Comprehensive full-stack performance optimization."""
         try:
             logger.info("🚀 Performing full-stack performance optimization...")
@@ -541,18 +506,13 @@ class PerformanceAgent:
             logger.error(f"❌ Full-stack optimization failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _detect_performance_issues(
-        self, code: str, language: str
-    ) -> list[dict[str, Any]]:
+    def _detect_performance_issues(self, code: str, language: str) -> list[dict[str, Any]]:
         """Detect performance issues in code across different languages."""
         issues = []
 
         if language in ["javascript", "typescript"]:
             # JavaScript/TypeScript specific performance issues
-            if (
-                "document.getElementById" in code
-                and code.count("document.getElementById") > 5
-            ):
+            if "document.getElementById" in code and code.count("document.getElementById") > 5:
                 issues.append(
                     {
                         "type": "DOM_QUERY_OPTIMIZATION",
@@ -620,9 +580,7 @@ class PerformanceAgent:
                         "fix": "Use JSON.parse() or safer alternatives",
                     }
                 )
-            if "innerHTML" in code and (
-                "user" in code.lower() or "input" in code.lower()
-            ):
+            if "innerHTML" in code and ("user" in code.lower() or "input" in code.lower()):
                 vulnerabilities.append(
                     {
                         "type": "XSS_VULNERABILITY",
@@ -665,9 +623,7 @@ class PerformanceAgent:
 
         return vulnerabilities
 
-    def _generate_code_fixes(
-        self, analysis: dict, code: str, language: str
-    ) -> dict[str, Any]:
+    def _generate_code_fixes(self, analysis: dict, code: str, language: str) -> dict[str, Any]:
         """Generate automated fixes for detected issues."""
         fixes = {
             "performance_fixes": [],
@@ -877,9 +833,7 @@ class PerformanceAgent:
                 "import_count": imports,
                 "require_count": requires,
                 "outdated_patterns": requires > 0,
-                "recommendations": (
-                    ["Use ES6 imports instead of require()"] if requires > 0 else []
-                ),
+                "recommendations": (["Use ES6 imports instead of require()"] if requires > 0 else []),
             }
         elif language == "python":
             imports = code.count("import ")
@@ -993,9 +947,7 @@ class PerformanceAgent:
 
         return suggestions
 
-    def _suggest_performance_improvements(
-        self, analysis: dict, language: str
-    ) -> list[dict[str, Any]]:
+    def _suggest_performance_improvements(self, analysis: dict, language: str) -> list[dict[str, Any]]:
         """Suggest specific performance improvements based on analysis."""
         improvements = []
 

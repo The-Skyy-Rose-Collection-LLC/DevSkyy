@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-from datetime import datetime
 import json
 import logging
-from pathlib import Path
 import time
-
+from datetime import datetime
+from pathlib import Path
 
 """
 DevSkyy Vercel Build Performance Monitor
@@ -14,6 +13,7 @@ helping optimize build times and identify potential issues.
 """
 
 logger = logging.getLogger(__name__)
+
 
 class VercelBuildMonitor:
     """Monitor Vercel build performance and health"""
@@ -25,7 +25,7 @@ class VercelBuildMonitor:
             "dependencies": {},
             "build_steps": [],
             "performance": {},
-            "errors": []
+            "errors": [],
         }
 
     def check_dependencies(self):
@@ -41,8 +41,8 @@ class VercelBuildMonitor:
                 logger.info(f"   Requirements file size: {size} bytes")
 
             # Count dependencies
-            with open(req_file, 'r') as f:
-                lines = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+            with open(req_file, "r") as f:
+                lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
                 dep_count = len(lines)
                 self.metrics["dependencies"]["count"] = dep_count
                 logger.info(f"   Dependencies count: {dep_count}")
@@ -57,7 +57,7 @@ class VercelBuildMonitor:
 
         try:
             # Get directory size
-            total_size = sum(f.stat().st_size for f in Path('.').rglob('*') if f.is_file())
+            total_size = sum(f.stat().st_size for f in Path(".").rglob("*") if f.is_file())
             self.metrics["performance"]["total_size"] = total_size
             logger.info(f"   Total project size: {total_size / (1024*1024):.2f} MB")
 
@@ -78,12 +78,19 @@ class VercelBuildMonitor:
 
         try:
             # Check main.py for heavy imports
-            with open("main.py", 'r') as f:
+            with open("main.py", "r") as f:
                 content = f.read()
 
             heavy_imports = [
-                "tensorflow", "torch", "sklearn", "pandas", "numpy",
-                "matplotlib", "seaborn", "opencv", "PIL"
+                "tensorflow",
+                "torch",
+                "sklearn",
+                "pandas",
+                "numpy",
+                "matplotlib",
+                "seaborn",
+                "opencv",
+                "PIL",
             ]
 
             found_heavy = []
@@ -107,7 +114,7 @@ class VercelBuildMonitor:
         logger.info("⚙️  Checking Vercel configuration...")
 
         try:
-            with open("vercel.json", 'r') as f:
+            with open("vercel.json", "r") as f:
                 config = json.load(f)
 
             # Check essential configurations
@@ -117,9 +124,8 @@ class VercelBuildMonitor:
                 "routes": "routes" in config,
                 "functions": "functions" in config,
                 "python_runtime": any(
-                    build.get("config", {}).get("runtime") == "python3.11"
-                    for build in config.get("builds", [])
-                )
+                    build.get("config", {}).get("runtime") == "python3.11" for build in config.get("builds", [])
+                ),
             }
 
             self.metrics["performance"]["config_checks"] = checks
@@ -161,9 +167,9 @@ class VercelBuildMonitor:
         self.metrics["build_end"] = datetime.now().isoformat()
         self.metrics["total_duration"] = time.time() - self.start_time
 
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("📊 VERCEL BUILD PERFORMANCE REPORT")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
         logger.info(f"Build Duration: {self.metrics['total_duration']:.2f} seconds")
         logger.info(f"Dependencies: {self.metrics['dependencies'].get('count', 'Unknown')}")
@@ -178,7 +184,7 @@ class VercelBuildMonitor:
             logger.info("\n✅ No issues found - Build optimized for Vercel!")
 
         # Save detailed report
-        with open("vercel-build-report.json", 'w') as f:
+        with open("vercel-build-report.json", "w") as f:
             json.dump(self.metrics, f, indent=2)
 
         logger.info("\nDetailed report saved to: vercel-build-report.json")
@@ -186,7 +192,7 @@ class VercelBuildMonitor:
     def run_full_check(self):
         """Run complete build performance check"""
         logger.info("🔧 DevSkyy Vercel Build Performance Monitor")
-        logger.info("="*50)
+        logger.info("=" * 50)
 
         self.check_dependencies()
         self.check_build_size()
@@ -194,6 +200,7 @@ class VercelBuildMonitor:
         self.check_vercel_config()
         self.simulate_cold_start()
         self.generate_report()
+
 
 if __name__ == "__main__":
     monitor = VercelBuildMonitor()

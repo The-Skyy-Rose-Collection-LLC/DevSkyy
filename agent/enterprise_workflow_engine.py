@@ -29,20 +29,20 @@ Based on:
 """
 
 import asyncio
+import logging
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
 from typing import Any, Optional
-import uuid
-
 
 logger = logging.getLogger(__name__)
 
 
 class WorkflowStatus(Enum):
     """Workflow execution states."""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -54,6 +54,7 @@ class WorkflowStatus(Enum):
 
 class TaskStatus(Enum):
     """Task execution states."""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -64,6 +65,7 @@ class TaskStatus(Enum):
 
 class WorkflowType(Enum):
     """Pre-defined workflow templates."""
+
     FASHION_BRAND_LAUNCH = "fashion_brand_launch"
     PRODUCT_LAUNCH = "product_launch"
     MARKETING_CAMPAIGN = "marketing_campaign"
@@ -76,6 +78,7 @@ class WorkflowType(Enum):
 @dataclass
 class Task:
     """Workflow task definition."""
+
     task_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     description: str = ""
@@ -114,6 +117,7 @@ class Task:
 @dataclass
 class Workflow:
     """Workflow definition and execution state."""
+
     workflow_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     description: str = ""
@@ -228,9 +232,7 @@ class EnterpriseWorkflowEngine:
         self.agents[agent_type] = agent_instance
         logger.info(f"✅ Agent registered: {agent_type}")
 
-    async def create_workflow(
-        self, workflow_type: WorkflowType, workflow_data: dict[str, Any]
-    ) -> Workflow:
+    async def create_workflow(self, workflow_type: WorkflowType, workflow_data: dict[str, Any]) -> Workflow:
         """
         Create a workflow from a predefined template or from a custom workflow definition.
 
@@ -282,8 +284,7 @@ class EnterpriseWorkflowEngine:
             self.workflows[workflow.workflow_id] = workflow
 
             logger.info(
-                f"✅ Workflow created: {workflow.name} "
-                f"({len(workflow.tasks)} tasks, {workflow.workflow_id})"
+                f"✅ Workflow created: {workflow.name} " f"({len(workflow.tasks)} tasks, {workflow.workflow_id})"
             )
 
             return workflow
@@ -292,9 +293,7 @@ class EnterpriseWorkflowEngine:
             logger.error(f"❌ Workflow creation failed: {e}")
             raise
 
-    async def execute_workflow(
-        self, workflow_id: str
-    ) -> dict[str, Any]:
+    async def execute_workflow(self, workflow_id: str) -> dict[str, Any]:
         """
         Execute the workflow identified by `workflow_id`, run its tasks according to dependencies, and update workflow state.
 
@@ -334,15 +333,16 @@ class EnterpriseWorkflowEngine:
             self.active_workflows.add(workflow_id)
 
             # Emit workflow started event
-            await self._emit_event(workflow_id, "workflow_started", {
-                "workflow_name": workflow.name,
-                "total_tasks": len(workflow.tasks),
-            })
-
-            logger.info(
-                f"🚀 Executing workflow: {workflow.name} "
-                f"({len(workflow.tasks)} tasks)"
+            await self._emit_event(
+                workflow_id,
+                "workflow_started",
+                {
+                    "workflow_name": workflow.name,
+                    "total_tasks": len(workflow.tasks),
+                },
             )
+
+            logger.info(f"🚀 Executing workflow: {workflow.name} " f"({len(workflow.tasks)} tasks)")
 
             # Execute tasks based on dependency order
             try:
@@ -355,10 +355,14 @@ class EnterpriseWorkflowEngine:
 
                 self.workflows_executed += 1
 
-                await self._emit_event(workflow_id, "workflow_completed", {
-                    "duration_seconds": duration,
-                    "tasks_completed": len(workflow.completed_tasks),
-                })
+                await self._emit_event(
+                    workflow_id,
+                    "workflow_completed",
+                    {
+                        "duration_seconds": duration,
+                        "tasks_completed": len(workflow.completed_tasks),
+                    },
+                )
 
                 logger.info(
                     f"✅ Workflow completed: {workflow.name} "
@@ -386,11 +390,15 @@ class EnterpriseWorkflowEngine:
                 if workflow.enable_rollback:
                     await self._rollback_workflow(workflow)
 
-                await self._emit_event(workflow_id, "workflow_failed", {
-                    "error": str(e),
-                    "tasks_completed": len(workflow.completed_tasks),
-                    "tasks_failed": len(workflow.failed_tasks),
-                })
+                await self._emit_event(
+                    workflow_id,
+                    "workflow_failed",
+                    {
+                        "error": str(e),
+                        "tasks_completed": len(workflow.completed_tasks),
+                        "tasks_failed": len(workflow.failed_tasks),
+                    },
+                )
 
                 return {
                     "success": False,
@@ -416,10 +424,7 @@ class EnterpriseWorkflowEngine:
                 task = workflow.tasks[task_id]
 
                 # Check if all dependencies are completed
-                dependencies_met = all(
-                    dep_id in workflow.completed_tasks
-                    for dep_id in task.depends_on
-                )
+                dependencies_met = all(dep_id in workflow.completed_tasks for dep_id in task.depends_on)
 
                 if dependencies_met:
                     ready_tasks.append(task_id)
@@ -434,9 +439,7 @@ class EnterpriseWorkflowEngine:
                 workflow.current_tasks.add(task_id)
 
                 # Execute task asynchronously
-                asyncio.create_task(
-                    self._execute_task(workflow, workflow.tasks[task_id])
-                )
+                asyncio.create_task(self._execute_task(workflow, workflow.tasks[task_id]))
 
             # Wait a bit before checking again
             await asyncio.sleep(0.1)
@@ -450,21 +453,29 @@ class EnterpriseWorkflowEngine:
                     workflow.completed_tasks.add(task_id)
                     workflow.results[task_id] = task.result
 
-                    await self._emit_event(workflow.workflow_id, "task_completed", {
-                        "task_id": task_id,
-                        "task_name": task.name,
-                    })
+                    await self._emit_event(
+                        workflow.workflow_id,
+                        "task_completed",
+                        {
+                            "task_id": task_id,
+                            "task_name": task.name,
+                        },
+                    )
 
                 elif task.status == TaskStatus.FAILED:
                     workflow.current_tasks.remove(task_id)
                     workflow.failed_tasks.add(task_id)
                     workflow.errors[task_id] = task.error
 
-                    await self._emit_event(workflow.workflow_id, "task_failed", {
-                        "task_id": task_id,
-                        "task_name": task.name,
-                        "error": task.error,
-                    })
+                    await self._emit_event(
+                        workflow.workflow_id,
+                        "task_failed",
+                        {
+                            "task_id": task_id,
+                            "task_name": task.name,
+                            "error": task.error,
+                        },
+                    )
 
                     if not task.allow_failure and not workflow.continue_on_failure:
                         raise Exception(f"Task {task.name} failed: {task.error}")
@@ -501,18 +512,13 @@ class EnterpriseWorkflowEngine:
 
                 # Get method
                 if not hasattr(agent, task.agent_method):
-                    raise ValueError(
-                        f"Method {task.agent_method} not found on agent {task.agent_type}"
-                    )
+                    raise ValueError(f"Method {task.agent_method} not found on agent {task.agent_type}")
 
                 method = getattr(agent, task.agent_method)
 
                 # Execute with timeout
                 try:
-                    result = await asyncio.wait_for(
-                        method(**task.parameters),
-                        timeout=task.timeout_seconds
-                    )
+                    result = await asyncio.wait_for(method(**task.parameters), timeout=task.timeout_seconds)
 
                     # Task succeeded
                     task.status = TaskStatus.COMPLETED
@@ -520,10 +526,7 @@ class EnterpriseWorkflowEngine:
                     task.end_time = datetime.now()
                     self.tasks_executed += 1
 
-                    logger.info(
-                        f"✅ Task completed: {task.name} "
-                        f"(attempt {attempt + 1}/{task.retry_count})"
-                    )
+                    logger.info(f"✅ Task completed: {task.name} " f"(attempt {attempt + 1}/{task.retry_count})")
 
                     return
 
@@ -533,13 +536,12 @@ class EnterpriseWorkflowEngine:
             except Exception as e:
                 error_msg = str(e)
                 logger.warning(
-                    f"⚠️ Task attempt {attempt + 1}/{task.retry_count} failed: "
-                    f"{task.name} - {error_msg}"
+                    f"⚠️ Task attempt {attempt + 1}/{task.retry_count} failed: " f"{task.name} - {error_msg}"
                 )
 
                 if attempt < task.retry_count - 1:
                     # Retry with exponential backoff
-                    delay = task.retry_delay_seconds * (2 ** attempt)
+                    delay = task.retry_delay_seconds * (2**attempt)
                     logger.info(f"Retrying in {delay}s...")
                     await asyncio.sleep(delay)
                 else:
@@ -562,10 +564,7 @@ class EnterpriseWorkflowEngine:
         self.rollbacks_performed += 1
 
         # Get completed tasks in reverse order
-        rollback_tasks = [
-            task_id for task_id in reversed(workflow.task_order)
-            if task_id in workflow.completed_tasks
-        ]
+        rollback_tasks = [task_id for task_id in reversed(workflow.task_order) if task_id in workflow.completed_tasks]
 
         for task_id in rollback_tasks:
             task = workflow.tasks[task_id]
@@ -583,9 +582,7 @@ class EnterpriseWorkflowEngine:
                     continue
 
                 if not hasattr(agent, task.compensation_method):
-                    logger.warning(
-                        f"Compensation method not found: {task.compensation_method}"
-                    )
+                    logger.warning(f"Compensation method not found: {task.compensation_method}")
                     continue
 
                 compensation = getattr(agent, task.compensation_method)
@@ -601,9 +598,13 @@ class EnterpriseWorkflowEngine:
             except Exception as e:
                 logger.error(f"❌ Rollback failed for task {task.name}: {e}")
 
-        await self._emit_event(workflow.workflow_id, "workflow_rolled_back", {
-            "tasks_rolled_back": len(rollback_tasks),
-        })
+        await self._emit_event(
+            workflow.workflow_id,
+            "workflow_rolled_back",
+            {
+                "tasks_rolled_back": len(rollback_tasks),
+            },
+        )
 
     def _topological_sort(self, workflow: Workflow) -> list[str]:
         """
@@ -690,9 +691,7 @@ class EnterpriseWorkflowEngine:
     # WORKFLOW TEMPLATES
     # ========================================================================
 
-    async def _create_brand_launch_workflow(
-        self, workflow_data: dict[str, Any]
-    ) -> Workflow:
+    async def _create_brand_launch_workflow(self, workflow_data: dict[str, Any]) -> Workflow:
         """
         Constructs a Workflow preconfigured for a fashion brand launch.
 
@@ -766,9 +765,7 @@ class EnterpriseWorkflowEngine:
 
         return workflow
 
-    async def _create_product_launch_workflow(
-        self, workflow_data: dict[str, Any]
-    ) -> Workflow:
+    async def _create_product_launch_workflow(self, workflow_data: dict[str, Any]) -> Workflow:
         """
         Create a product launch workflow template tailored for launching a single product.
 
@@ -787,9 +784,7 @@ class EnterpriseWorkflowEngine:
         # Add tasks...
         return workflow
 
-    async def _create_marketing_campaign_workflow(
-        self, workflow_data: dict[str, Any]
-    ) -> Workflow:
+    async def _create_marketing_campaign_workflow(self, workflow_data: dict[str, Any]) -> Workflow:
         """
         Builds a predefined Marketing Campaign workflow template.
 
@@ -809,9 +804,7 @@ class EnterpriseWorkflowEngine:
         # Add tasks...
         return workflow
 
-    async def _create_content_generation_workflow(
-        self, workflow_data: dict[str, Any]
-    ) -> Workflow:
+    async def _create_content_generation_workflow(self, workflow_data: dict[str, Any]) -> Workflow:
         """
         Builds a Content Generation Pipeline workflow template.
 
@@ -866,17 +859,15 @@ class EnterpriseWorkflowEngine:
                 "completed_tasks": len(workflow.completed_tasks),
                 "failed_tasks": len(workflow.failed_tasks),
                 "current_tasks": len(workflow.current_tasks),
-                "percentage": (
-                    len(workflow.completed_tasks) / len(workflow.tasks) * 100
-                    if workflow.tasks else 0
-                ),
+                "percentage": (len(workflow.completed_tasks) / len(workflow.tasks) * 100 if workflow.tasks else 0),
             },
             "timing": {
                 "start_time": workflow.start_time.isoformat() if workflow.start_time else None,
                 "end_time": workflow.end_time.isoformat() if workflow.end_time else None,
                 "duration_seconds": (
                     (workflow.end_time - workflow.start_time).total_seconds()
-                    if workflow.start_time and workflow.end_time else None
+                    if workflow.start_time and workflow.end_time
+                    else None
                 ),
             },
             "results": workflow.results,

@@ -1,14 +1,14 @@
-from datetime import datetime
 import logging
 import os
-from typing import Any
 import uuid
+from datetime import datetime
+from typing import Any
 
 import openai
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class CustomerServiceAgent:
     """Luxury customer service specialist with fashion industry expertise."""
@@ -37,9 +37,7 @@ class CustomerServiceAgent:
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning(
-                "💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)"
-            )
+            logger.warning("💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)")
 
     async def analyze_customer_satisfaction(self) -> dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
@@ -76,9 +74,7 @@ class CustomerServiceAgent:
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
                 "satisfaction_analysis": analysis,
-                "improvement_recommendations": self._generate_service_recommendations(
-                    analysis
-                ),
+                "improvement_recommendations": self._generate_service_recommendations(analysis),
                 "risk_assessment": self._assess_service_risks(analysis),
             }
 
@@ -126,6 +122,7 @@ class CustomerServiceAgent:
                 "impact_score": 85,
             }
         }
+
 
 def optimize_customer_service() -> dict[str, Any]:
     """Main function to optimize customer service operations."""
