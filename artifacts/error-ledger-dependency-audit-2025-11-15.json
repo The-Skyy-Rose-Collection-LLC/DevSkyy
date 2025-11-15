@@ -1,0 +1,536 @@
+{
+  "audit_metadata": {
+    "timestamp": "2025-11-15T00:00:00Z",
+    "audit_type": "comprehensive_dependency_audit",
+    "repository": "DevSkyy Enterprise Platform",
+    "branch": "claude/enterprise-repo-refactor-01Rxg5AauCSgtrULxNBg7ZEt",
+    "auditor": "Claude Code (Dependency Management Agent)",
+    "python_version": "3.11.14",
+    "total_dependency_files": 8,
+    "total_packages_declared": 621,
+    "unique_packages_estimate": 200
+  },
+  "summary": {
+    "total_findings": 20,
+    "critical_vulnerabilities": 1,
+    "critical_outdated_packages": 1,
+    "high_priority_updates": 7,
+    "moderate_priority_updates": 1,
+    "truth_protocol_violations": 2,
+    "dependency_conflicts": 1,
+    "overall_compliance_score": "70%",
+    "target_compliance_score": "100%",
+    "estimated_time_to_compliance": "4-8 hours"
+  },
+  "critical_vulnerabilities": [
+    {
+      "id": "CVE-001",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "CRITICAL",
+      "type": "denial_of_service",
+      "package": "starlette",
+      "current_version": "0.48.0",
+      "fix_version": "0.49.1",
+      "vulnerability_id": "GHSA-7f5h-v6xp-fcq8",
+      "description": "Quadratic-time processing in FileResponse Range header parsing enables CPU exhaustion via crafted HTTP Range header",
+      "attack_vector": "Unauthenticated remote attackers via single HTTP request",
+      "affected_files": [
+        "requirements.txt (indirect via fastapi~=0.119.0)",
+        "requirements-production.txt",
+        "requirements-luxury-automation.txt",
+        "requirements.minimal.txt"
+      ],
+      "unaffected_files": [
+        "requirements.vercel.txt (correctly pins starlette==0.49.1)"
+      ],
+      "remediation": {
+        "action": "Update fastapi to version that includes starlette 0.49.1+",
+        "recommended_version": "fastapi>=0.121.2,<0.122.0",
+        "priority": "IMMEDIATE",
+        "estimated_effort": "30 minutes",
+        "breaking_changes": false,
+        "testing_required": true
+      },
+      "status": "OPEN",
+      "assigned_to": "DevOps Team",
+      "due_date": "2025-11-15T23:59:59Z"
+    }
+  ],
+  "critical_outdated_packages": [
+    {
+      "id": "CVE-002",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "CRITICAL",
+      "type": "outdated_security_package",
+      "package": "certifi",
+      "current_version": "2024.12.14",
+      "latest_version": "2025.11.12",
+      "category": "certificate_authority_bundle",
+      "description": "Outdated CA certificates may fail to validate newer SSL/TLS certificates, causing connection failures or security risks",
+      "risk": "Certificate validation failures, potential MITM vulnerabilities",
+      "affected_files": [
+        "requirements.txt",
+        "requirements-production.txt",
+        "requirements.vercel.txt"
+      ],
+      "remediation": {
+        "action": "Update certifi range constraint to latest version",
+        "current_constraint": "certifi>=2024.12.14,<2025.0.0",
+        "recommended_constraint": "certifi>=2025.11.12,<2026.0.0",
+        "priority": "IMMEDIATE",
+        "estimated_effort": "15 minutes",
+        "breaking_changes": false,
+        "testing_required": true
+      },
+      "status": "OPEN",
+      "assigned_to": "DevOps Team",
+      "due_date": "2025-11-15T23:59:59Z"
+    }
+  ],
+  "high_priority_updates": [
+    {
+      "id": "UPDATE-001",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "setuptools",
+      "current_version": "78.1.1",
+      "latest_version": "80.9.0",
+      "category": "security_critical_build_tool",
+      "updates_behind": "2 minor versions",
+      "potential_cves": "Build tool vulnerabilities (CVE-2025-47273, CVE-2024-6345 fixed in current, check for newer)",
+      "remediation": {
+        "current_constraint": "setuptools>=78.1.1,<79.0.0",
+        "recommended_constraint": "setuptools>=80.9.0,<81.0.0",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-002",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "requests",
+      "current_version": "2.32.4",
+      "latest_version": "2.32.5",
+      "category": "security_critical_http_library",
+      "updates_behind": "1 patch version",
+      "potential_cves": "HTTP security fixes",
+      "remediation": {
+        "current_constraint": "requests>=2.32.4,<3.0.0",
+        "recommended_constraint": "requests>=2.32.5,<3.0.0",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-003",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "pydantic",
+      "current_version": "2.9.0",
+      "latest_version": "2.12.4",
+      "category": "core_framework",
+      "updates_behind": "3 minor versions",
+      "impact": "Data validation improvements, bug fixes",
+      "remediation": {
+        "current_constraint": "pydantic[email]>=2.9.0,<3.0.0",
+        "recommended_constraint": "pydantic[email]>=2.12.4,<3.0.0",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true,
+        "potential_breaking_changes": "Minor API changes possible"
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-004",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "torch",
+      "current_version": "2.9.0",
+      "latest_version": "2.9.1",
+      "category": "ml_framework",
+      "updates_behind": "1 patch version",
+      "impact": "Security fixes, bug fixes",
+      "remediation": {
+        "current_constraint": "torch~=2.9.0",
+        "recommended_constraint": "torch~=2.9.1",
+        "related_updates": [
+          "torchvision~=0.20.1 (update to match torch 2.9.1)"
+        ],
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-005",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "openai",
+      "current_version": "2.7.2",
+      "latest_version": "2.8.0",
+      "category": "ai_api_client",
+      "updates_behind": "1 minor version",
+      "impact": "New API features, bug fixes",
+      "remediation": {
+        "current_constraint": "openai~=2.7.2",
+        "recommended_constraint": "openai~=2.8.0",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-006",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "anthropic",
+      "current_version": "0.69.0",
+      "latest_version": "0.73.0",
+      "category": "ai_api_client",
+      "updates_behind": "4 minor versions",
+      "impact": "New Claude API features, improvements",
+      "remediation": {
+        "current_constraint": "anthropic~=0.69.0",
+        "recommended_constraint": "anthropic~=0.73.0",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "UPDATE-007",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "package": "openai-whisper",
+      "current_version": "20240930",
+      "latest_version": "20250625",
+      "category": "ml_model",
+      "updates_behind": "8 months",
+      "impact": "Fixes torch 2.9.x compatibility (resolves dependency conflict)",
+      "conflict_resolution": true,
+      "remediation": {
+        "current_constraint": "openai-whisper==20240930",
+        "recommended_constraint": "openai-whisper==20250625",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "testing_required": true,
+        "notes": "Resolves pip installation conflict with torch~=2.9.0"
+      },
+      "status": "OPEN"
+    }
+  ],
+  "moderate_priority_updates": [],
+  "truth_protocol_violations": [
+    {
+      "id": "VIOLATION-001",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "type": "incorrect_version_strategy",
+      "package": "PyJWT",
+      "current_version": "2.10.1",
+      "current_strategy": "~= (compatible release)",
+      "required_strategy": ">=,< (range constraint)",
+      "truth_protocol_section": "Section 2: Version strategy",
+      "description": "PyJWT is security-critical (JWT authentication per RFC 7519) and must use range constraints to allow patch updates, not compatible release",
+      "justification": "Security-critical packages (crypto, auth, certs) must allow patch updates per Truth Protocol",
+      "affected_files": [
+        "requirements.txt line 50",
+        "requirements-production.txt line 30",
+        "requirements-luxury-automation.txt line 19",
+        "requirements_mcp.txt line 19",
+        "requirements.vercel.txt line 20",
+        "requirements.minimal.txt line 31"
+      ],
+      "remediation": {
+        "current": "PyJWT~=2.10.1",
+        "required": "PyJWT>=2.10.1,<3.0.0  # Security-critical JWT (RFC 7519)",
+        "priority": "HIGH",
+        "due_within": "24 hours",
+        "estimated_effort": "30 minutes (update across 6 files)"
+      },
+      "status": "OPEN",
+      "compliance_impact": "Prevents automatic patch updates for JWT security fixes"
+    },
+    {
+      "id": "VIOLATION-002",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "MODERATE",
+      "type": "missing_lock_files",
+      "truth_protocol_section": "Section 2: Generate lock files for reproducible deployments",
+      "description": "No lock files present for reproducible production deployments",
+      "missing_files": [
+        "requirements.lock (for requirements.txt)",
+        "requirements-production.lock (for requirements-production.txt)"
+      ],
+      "impact": "Cannot guarantee exact reproducibility in production deployments",
+      "remediation": {
+        "action": "Generate lock files using pip-tools",
+        "commands": [
+          "pip install pip-tools",
+          "pip-compile requirements.txt --output-file requirements.lock",
+          "pip-compile requirements-production.txt --output-file requirements-production.lock"
+        ],
+        "priority": "MODERATE",
+        "due_within": "24 hours",
+        "estimated_effort": "30 minutes"
+      },
+      "status": "OPEN",
+      "compliance_impact": "Violates Truth Protocol requirement for reproducible deployments"
+    }
+  ],
+  "dependency_conflicts": [
+    {
+      "id": "CONFLICT-001",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "HIGH",
+      "type": "version_incompatibility",
+      "packages": [
+        {
+          "name": "torch",
+          "version": "~=2.9.0",
+          "location": "requirements.txt:66"
+        },
+        {
+          "name": "openai-whisper",
+          "version": "==20240930",
+          "location": "requirements.txt:146"
+        }
+      ],
+      "error_message": "ERROR: Cannot install torch~=2.9.0 and openai-whisper==20240930 - ResolutionImpossible: conflicting dependencies",
+      "detected_by": "pip-audit",
+      "impact": "Prevents installation of requirements.txt",
+      "root_cause": "openai-whisper 20240930 may have pinned torch to incompatible version (likely torch<2.9.0)",
+      "resolution_options": [
+        {
+          "option": 1,
+          "description": "Update openai-whisper to 20250625 (latest)",
+          "recommended": true,
+          "pros": "Latest features, likely compatible with torch 2.9.x",
+          "cons": "May introduce breaking changes",
+          "testing_required": true
+        },
+        {
+          "option": 2,
+          "description": "Create separate environment for whisper workloads",
+          "recommended": false,
+          "pros": "No compatibility issues",
+          "cons": "Increased complexity, maintenance overhead"
+        },
+        {
+          "option": 3,
+          "description": "Downgrade torch to version compatible with whisper 20240930",
+          "recommended": false,
+          "pros": "Maintains whisper compatibility",
+          "cons": "Loses torch 2.9.x security fixes"
+        }
+      ],
+      "remediation": {
+        "chosen_option": 1,
+        "action": "Update openai-whisper to 20250625",
+        "current": "openai-whisper==20240930",
+        "recommended": "openai-whisper==20250625",
+        "priority": "HIGH",
+        "due_within": "24 hours"
+      },
+      "status": "OPEN"
+    }
+  ],
+  "version_consistency_issues": [
+    {
+      "id": "CONSISTENCY-001",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "MODERATE",
+      "type": "cross_file_version_mismatch",
+      "package": "uvicorn[standard]",
+      "versions": {
+        "requirements.txt": "~=0.38.0",
+        "requirements-production.txt": "==0.34.0",
+        "requirements.vercel.txt": "==0.38.0"
+      },
+      "impact": "Inconsistent behavior across environments",
+      "remediation": {
+        "action": "Sync all files to latest version",
+        "recommended_version": "~=0.38.0",
+        "files_to_update": [
+          "requirements-production.txt line 10"
+        ]
+      },
+      "status": "OPEN"
+    },
+    {
+      "id": "CONSISTENCY-002",
+      "timestamp": "2025-11-15T00:00:00Z",
+      "severity": "MODERATE",
+      "type": "cross_file_version_mismatch",
+      "package": "openai",
+      "versions": {
+        "requirements.txt": "~=2.7.2",
+        "requirements-production.txt": "==2.3.0",
+        "requirements.vercel.txt": "==2.7.2"
+      },
+      "impact": "Outdated API features in production lightweight build",
+      "remediation": {
+        "action": "Sync all files to latest version",
+        "recommended_version": "~=2.8.0",
+        "files_to_update": [
+          "requirements-production.txt line 42"
+        ]
+      },
+      "status": "OPEN"
+    }
+  ],
+  "unused_dependencies": [
+    {
+      "package": "tensorflow",
+      "location": "requirements.txt:75",
+      "status": "DISABLED",
+      "reason": "System compatibility issues",
+      "recommendation": "Remove commented line to reduce confusion"
+    },
+    {
+      "package": "instagrapi",
+      "location": "requirements.txt:139",
+      "status": "DISABLED",
+      "reason": "Pydantic version conflict (requires pydantic==2.7.1 exactly)",
+      "recommendation": "Remove commented line or fix pydantic compatibility"
+    },
+    {
+      "package": "python-wordpress-xmlrpc",
+      "location": "requirements.txt:195",
+      "status": "DISABLED",
+      "reason": "Setuptools compatibility issue, using REST API instead",
+      "recommendation": "Remove commented line, documented alternative in use"
+    },
+    {
+      "package": "agentlightning",
+      "location": "requirements.txt:28",
+      "status": "DISABLED",
+      "reason": "Pydantic version conflicts",
+      "recommendation": "Remove commented line or verify compatibility"
+    },
+    {
+      "package": "pyaudio",
+      "location": "requirements.txt:149",
+      "status": "DISABLED",
+      "reason": "Requires PortAudio system libraries not available in Docker",
+      "recommendation": "Remove commented line or document system requirements"
+    }
+  ],
+  "actions_completed": [
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Generated comprehensive dependency audit report",
+      "output": "artifacts/dependency-audit-report-2025-11-15.md"
+    },
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Identified 1 CRITICAL vulnerability (Starlette DoS)",
+      "cve": "GHSA-7f5h-v6xp-fcq8"
+    },
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Identified 9 outdated packages requiring updates",
+      "packages": ["certifi", "setuptools", "requests", "pydantic", "fastapi", "torch", "openai", "anthropic", "openai-whisper"]
+    },
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Detected 2 Truth Protocol violations",
+      "violations": ["PyJWT version strategy", "Missing lock files"]
+    },
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Identified 1 dependency conflict",
+      "conflict": "torch~=2.9.0 vs openai-whisper==20240930"
+    },
+    {
+      "timestamp": "2025-11-15T00:00:00Z",
+      "action": "Created error ledger for dependency audit",
+      "output": "artifacts/error-ledger-dependency-audit-2025-11-15.json"
+    }
+  ],
+  "actions_required": [
+    {
+      "priority": "CRITICAL",
+      "due": "2025-11-15T23:59:59Z",
+      "action": "Update fastapi to fix Starlette DoS vulnerability",
+      "command": "Edit requirements.txt line 12: fastapi>=0.121.2,<0.122.0",
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "30 minutes"
+    },
+    {
+      "priority": "CRITICAL",
+      "due": "2025-11-15T23:59:59Z",
+      "action": "Update certifi to latest CA certificates",
+      "command": "Edit requirements.txt line 48: certifi>=2025.11.12,<2026.0.0",
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "15 minutes"
+    },
+    {
+      "priority": "HIGH",
+      "due": "2025-11-16T23:59:59Z",
+      "action": "Fix PyJWT version strategy (Truth Protocol violation)",
+      "command": "Edit requirements.txt line 50: PyJWT>=2.10.1,<3.0.0",
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "30 minutes"
+    },
+    {
+      "priority": "HIGH",
+      "due": "2025-11-16T23:59:59Z",
+      "action": "Update openai-whisper to resolve torch dependency conflict",
+      "command": "Edit requirements.txt line 146: openai-whisper==20250625",
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "15 minutes"
+    },
+    {
+      "priority": "HIGH",
+      "due": "2025-11-16T23:59:59Z",
+      "action": "Apply all HIGH priority package updates",
+      "packages": ["setuptools", "requests", "pydantic", "torch", "openai", "anthropic"],
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "2 hours"
+    },
+    {
+      "priority": "HIGH",
+      "due": "2025-11-16T23:59:59Z",
+      "action": "Generate lock files for reproducible deployments",
+      "commands": [
+        "pip install pip-tools",
+        "pip-compile requirements.txt --output-file requirements.lock",
+        "pip-compile requirements-production.txt --output-file requirements-production.lock"
+      ],
+      "assigned_to": "DevOps Team",
+      "estimated_effort": "30 minutes"
+    },
+    {
+      "priority": "HIGH",
+      "due": "2025-11-16T23:59:59Z",
+      "action": "Run full test suite after updates",
+      "command": "pytest tests/ --cov --cov-report=term --cov-fail-under=90",
+      "assigned_to": "QA Team",
+      "estimated_effort": "1 hour"
+    },
+    {
+      "priority": "MODERATE",
+      "due": "2025-11-22T23:59:59Z",
+      "action": "Update CHANGELOG.md with all dependency changes",
+      "assigned_to": "Documentation Team",
+      "estimated_effort": "30 minutes"
+    }
+  ],
+  "next_audit": {
+    "scheduled_date": "2025-12-15",
+    "frequency": "monthly",
+    "scope": "comprehensive_dependency_audit",
+    "automated": false,
+    "recommendation": "Implement automated weekly security scans in CI/CD"
+  }
+}

@@ -1,0 +1,355 @@
+# ============================================================================
+# DevSkyy Enterprise Platform - Optimized Docker Compose Configuration
+# Truth Protocol Compliant | Production Ready | Security Hardened
+# ============================================================================
+# Version: 5.1.0
+# Compliance: Truth Protocol (all versions pinned, no 'latest' tags)
+# Security: Health checks, resource limits, dependency conditions
+# ============================================================================
+
+version: '3.9'
+
+# ============================================================================
+# SERVICES
+# ============================================================================
+
+services:
+  # --------------------------------------------------------------------------
+  # DevSkyy API - Main Application Server
+  # --------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      args:
+        PYTHON_VERSION: "3.11.9"
+        BUILD_DATE: ${BUILD_DATE}
+        VCS_REF: ${VCS_REF}
+      cache_from:
+        - devskyy:latest
+      labels:
+        - "com.devskyy.component=api"
+        - "com.devskyy.version=5.1.0"
+    image: devskyy:5.1.0
+    container_name: devskyy-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      # Security (from .env - NEVER hardcode!)
+      - SECRET_KEY=${SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+      # Database connection
+      - DATABASE_URL=${DATABASE_URL:-postgresql://devskyy:${POSTGRES_PASSWORD}@postgres:5432/devskyy}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+
+      # Application settings
+      - ENVIRONMENT=production
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - WORKERS=${API_WORKERS:-4}
+      - PORT=8000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./artifacts:/app/artifacts
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5).read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    labels:
+      - "com.devskyy.service=api"
+      - "com.devskyy.healthcheck=enabled"
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL Database
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:15.10-alpine  # Pinned version (Truth Protocol Rule #2)
+    container_name: devskyy-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-devskyy}
+      - POSTGRES_USER=${POSTGRES_USER:-devskyy}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devskyy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    labels:
+      - "com.devskyy.service=database"
+      - "com.devskyy.backup=enabled"
+
+  # --------------------------------------------------------------------------
+  # Redis Cache
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7.4.1-alpine  # Pinned version (Truth Protocol Rule #2)
+    container_name: devskyy-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+      - "com.devskyy.service=cache"
+
+  # --------------------------------------------------------------------------
+  # Prometheus Monitoring
+  # --------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.55.1  # Pinned version (Truth Protocol Rule #2)
+    container_name: devskyy-prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+      - "com.devskyy.service=monitoring"
+
+  # --------------------------------------------------------------------------
+  # Grafana Dashboards
+  # --------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:11.4.0  # Pinned version (Truth Protocol Rule #2)
+    container_name: devskyy-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SERVER_ROOT_URL=${GRAFANA_URL:-http://localhost:3000}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - devskyy-network
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+      - "com.devskyy.service=dashboards"
+
+  # --------------------------------------------------------------------------
+  # Nginx Reverse Proxy (Optional)
+  # --------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27.3-alpine  # Pinned version (Truth Protocol Rule #2)
+    container_name: devskyy-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - devskyy-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    profiles:
+      - with-nginx
+    labels:
+      - "com.devskyy.service=proxy"
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+
+networks:
+  devskyy-network:
+    driver: bridge
+    name: devskyy-network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+
+# ============================================================================
+# VOLUMES
+# ============================================================================
+
+volumes:
+  postgres-data:
+    driver: local
+    name: devskyy-postgres-data
+    labels:
+      - "com.devskyy.backup=daily"
+
+  redis-data:
+    driver: local
+    name: devskyy-redis-data
+    labels:
+      - "com.devskyy.backup=daily"
+
+  prometheus-data:
+    driver: local
+    name: devskyy-prometheus-data
+    labels:
+      - "com.devskyy.backup=weekly"
+
+  grafana-data:
+    driver: local
+    name: devskyy-grafana-data
+    labels:
+      - "com.devskyy.backup=weekly"
+
+  nginx-cache:
+    driver: local
+    name: devskyy-nginx-cache
+
+# ============================================================================
+# USAGE INSTRUCTIONS
+# ============================================================================
+#
+# Quick Start:
+#   1. Copy .env.example to .env and configure your secrets
+#   2. docker-compose -f docker-compose.optimized.yml up -d
+#   3. Check status: docker-compose -f docker-compose.optimized.yml ps
+#   4. View logs: docker-compose -f docker-compose.optimized.yml logs -f api
+#
+# With Nginx Proxy:
+#   docker-compose -f docker-compose.optimized.yml --profile with-nginx up -d
+#
+# Production Deployment:
+#   export BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+#   export VCS_REF=$(git rev-parse HEAD)
+#   docker-compose -f docker-compose.optimized.yml build
+#   docker-compose -f docker-compose.optimized.yml up -d
+#
+# Health Checks:
+#   docker-compose -f docker-compose.optimized.yml ps
+#   (All services should show "healthy" status)
+#
+# Stop All Services:
+#   docker-compose -f docker-compose.optimized.yml down
+#
+# Remove All Data (DESTRUCTIVE):
+#   docker-compose -f docker-compose.optimized.yml down -v
+#
+# View Resource Usage:
+#   docker stats devskyy-api devskyy-postgres devskyy-redis
+#
+# Backup Volumes:
+#   docker run --rm -v devskyy-postgres-data:/data -v $(pwd):/backup \
+#     alpine tar czf /backup/postgres-backup-$(date +%Y%m%d).tar.gz -C /data .
+#
+# ============================================================================

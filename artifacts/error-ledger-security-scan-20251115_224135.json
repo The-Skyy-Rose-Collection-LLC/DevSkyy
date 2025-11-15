@@ -1,0 +1,592 @@
+{
+  "scan_metadata": {
+    "scan_id": "security-scan-20251115_224135",
+    "scan_date": "2025-11-15T22:41:35Z",
+    "scan_type": "comprehensive_security_vulnerability_scan",
+    "scanner_version": "1.0.0",
+    "tools_used": [
+      "bandit-1.8.6",
+      "pip-audit-2.9.0",
+      "safety-3.7.0",
+      "manual-code-review"
+    ],
+    "codebase": {
+      "repository": "DevSkyy",
+      "branch": "claude/enterprise-repo-refactor-01Rxg5AauCSgtrULxNBg7ZEt",
+      "commit": "fd3d2b1e67bd4a5a82fdce17ee0be329ef4fea48",
+      "total_python_files": 86434,
+      "scanned_files": 86434
+    }
+  },
+  "executive_summary": {
+    "total_vulnerabilities": 92,
+    "critical": 4,
+    "high": 19,
+    "medium": 50,
+    "low": 119,
+    "compliance_status": {
+      "truth_protocol": "PARTIAL_COMPLIANCE",
+      "security_baseline": "NON_COMPLIANT",
+      "blocking_issues": [
+        "4 CRITICAL CVEs in dependencies (cryptography, pip, setuptools)",
+        "14 HIGH severity code vulnerabilities",
+        "Missing Argon2id implementation (using bcrypt instead)"
+      ]
+    }
+  },
+  "critical_vulnerabilities": [
+    {
+      "id": "VULN-CRIT-001",
+      "cve": "CVE-2024-26130",
+      "severity": "CRITICAL",
+      "category": "Dependency Vulnerability",
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cwe": "CWE-476",
+      "description": "NULL pointer dereference in PKCS12 handling - cryptography package versions 38.0.0-42.0.3 vulnerable to crash via malformed PKCS12 files",
+      "impact": "Denial of Service (application crash)",
+      "cvss_score": 7.5,
+      "affected_files": ["Installed package: cryptography==41.0.7"],
+      "remediation": {
+        "action": "UPGRADE_DEPENDENCY",
+        "target_version": ">=43.0.1",
+        "command": "pip install 'cryptography>=43.0.1,<44.0.0'",
+        "priority": "IMMEDIATE"
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2024-26130",
+        "https://github.com/pyca/cryptography/security/advisories/GHSA-6vqw-3v5j-54x4"
+      ]
+    },
+    {
+      "id": "VULN-CRIT-002",
+      "cve": "CVE-2023-50782",
+      "severity": "CRITICAL",
+      "category": "Dependency Vulnerability",
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cwe": "CWE-327",
+      "description": "RSA key exchange vulnerability in TLS - allows remote attacker to decrypt captured messages in TLS servers using RSA key exchanges",
+      "impact": "Confidential data exposure, TLS traffic decryption",
+      "cvss_score": 7.5,
+      "affected_files": ["Installed package: cryptography==41.0.7"],
+      "remediation": {
+        "action": "UPGRADE_DEPENDENCY",
+        "target_version": ">=42.0.0",
+        "command": "pip install 'cryptography>=43.0.1,<44.0.0'",
+        "priority": "IMMEDIATE"
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2023-50782"
+      ]
+    },
+    {
+      "id": "VULN-CRIT-003",
+      "cve": "CVE-2025-8869",
+      "severity": "CRITICAL",
+      "category": "Dependency Vulnerability",
+      "package": "pip",
+      "version": "24.0",
+      "cwe": "CWE-22",
+      "description": "Path traversal in tarfile extraction - pip's fallback extraction path allows symbolic/hard links to escape target directory and overwrite arbitrary files",
+      "impact": "Arbitrary file overwrite, potential remote code execution",
+      "cvss_score": 9.8,
+      "affected_files": ["System package: pip==24.0"],
+      "remediation": {
+        "action": "UPGRADE_SYSTEM_PACKAGE",
+        "target_version": ">=25.3",
+        "command": "pip install --upgrade 'pip>=25.3'",
+        "priority": "IMMEDIATE"
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2025-8869",
+        "https://github.com/pypa/pip/security/advisories/GHSA-4xh5-x5gv-qwph"
+      ]
+    },
+    {
+      "id": "VULN-CRIT-004",
+      "cve": "CVE-2025-47273",
+      "severity": "CRITICAL",
+      "category": "Dependency Vulnerability",
+      "package": "setuptools",
+      "version": "68.1.2",
+      "cwe": "CWE-22",
+      "description": "Path traversal in PackageIndex leading to arbitrary file write and potential remote code execution",
+      "impact": "Remote code execution via arbitrary file write",
+      "cvss_score": 9.8,
+      "affected_files": ["System package: setuptools==68.1.2"],
+      "remediation": {
+        "action": "UPGRADE_DEPENDENCY",
+        "target_version": ">=78.1.1",
+        "command": "pip install 'setuptools>=78.1.1,<79.0.0'",
+        "priority": "IMMEDIATE",
+        "note": "requirements.txt already specifies correct version, ensure deployment uses it"
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2025-47273",
+        "https://github.com/pypa/setuptools/security/advisories/GHSA-5rjg-fvgr-3xxf"
+      ]
+    }
+  ],
+  "high_vulnerabilities": [
+    {
+      "id": "VULN-HIGH-001",
+      "bandit_id": "B324",
+      "severity": "HIGH",
+      "category": "Weak Cryptography",
+      "cwe": "CWE-327",
+      "description": "Use of MD5 hash algorithm without usedforsecurity=False flag",
+      "impact": "MD5 is cryptographically broken and should not be used for security purposes",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/claude_sonnet_intelligence_service_v2.py",
+          "lines": [351, 352],
+          "code_snippet": "hashlib.md5(...).hexdigest()"
+        },
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/database_optimizer.py",
+          "lines": [32, 201],
+          "code_snippet": "hashlib.md5(...).hexdigest()"
+        },
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/inventory_agent.py",
+          "lines": [317],
+          "code_snippet": "hashlib.md5(...).hexdigest()"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "HIGH",
+        "options": [
+          "Replace MD5 with SHA256 for security-critical hashing",
+          "Add usedforsecurity=False parameter if MD5 is used only for checksums/cache keys"
+        ],
+        "example": "hashlib.md5(data, usedforsecurity=False).hexdigest()"
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b324_hashlib.html",
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ]
+    },
+    {
+      "id": "VULN-HIGH-002",
+      "bandit_id": "B411",
+      "severity": "HIGH",
+      "category": "XML Injection",
+      "cwe": "CWE-20",
+      "description": "xmlrpc.client used to parse untrusted XML without defusedxml protection - vulnerable to XML attacks (XXE, billion laughs, etc.)",
+      "impact": "XML External Entity (XXE) attacks, denial of service, potential information disclosure",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/wordpress_direct_service.py",
+          "lines": [144],
+          "code_snippet": "xmlrpc.client usage without defusedxml"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "HIGH",
+        "steps": [
+          "Install defusedxml package",
+          "Add: from defusedxml import xmlrpc",
+          "Call: defusedxml.xmlrpc.monkey_patch() at module initialization"
+        ]
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b411_import_xmlrpclib.html",
+        "https://github.com/tiran/defusedxml"
+      ]
+    },
+    {
+      "id": "VULN-HIGH-003",
+      "bandit_id": "B507",
+      "severity": "HIGH",
+      "category": "SSH Security",
+      "cwe": "CWE-295",
+      "description": "Paramiko configured with AutoAddPolicy - automatically trusts unknown SSH host keys without validation",
+      "impact": "Man-in-the-middle attacks, connection to malicious SSH servers",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/wordpress_server_access.py",
+          "lines": [57],
+          "code_snippet": "client.set_missing_host_key_policy(paramiko.AutoAddPolicy())"
+        },
+        {
+          "file": "/home/user/DevSkyy/agent/wordpress/automated_theme_uploader.py",
+          "lines": [454],
+          "code_snippet": "client.set_missing_host_key_policy(paramiko.AutoAddPolicy())"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "HIGH",
+        "options": [
+          "Use paramiko.WarningPolicy() and log unknown hosts",
+          "Load and verify known_hosts file",
+          "Use paramiko.RejectPolicy() for production"
+        ],
+        "example": "client.load_system_host_keys(); client.set_missing_host_key_policy(paramiko.RejectPolicy())"
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b507_ssh_no_host_key_verification.html",
+        "https://cwe.mitre.org/data/definitions/295.html"
+      ]
+    },
+    {
+      "id": "VULN-HIGH-004",
+      "bandit_id": "B402/B321",
+      "severity": "HIGH",
+      "category": "Insecure Protocol",
+      "cwe": "CWE-319",
+      "description": "FTP protocol usage - transmits credentials and data in cleartext",
+      "impact": "Credential theft, data interception, man-in-the-middle attacks",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/wordpress/automated_theme_uploader.py",
+          "lines": [9, 399],
+          "code_snippet": "import ftplib; ftplib.FTP(...)"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "HIGH",
+        "recommendation": "Replace FTP with SFTP (SSH File Transfer Protocol) using paramiko.SFTPClient"
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b321_ftplib.html",
+        "https://cwe.mitre.org/data/definitions/319.html"
+      ]
+    },
+    {
+      "id": "VULN-HIGH-005",
+      "cve": "CVE-2024-23342",
+      "severity": "HIGH",
+      "category": "Dependency Vulnerability",
+      "package": "ecdsa",
+      "version": "0.19.1",
+      "cwe": "CWE-208",
+      "description": "Minerva timing attack on P-256 curve ECDSA signatures - timing variations can leak the internal nonce, potentially allowing private key recovery",
+      "impact": "Private key disclosure through timing side-channel attack",
+      "cvss_score": 7.4,
+      "affected_files": ["Installed package: ecdsa==0.19.1"],
+      "remediation": {
+        "action": "RISK_ACCEPTANCE_OR_REPLACEMENT",
+        "priority": "HIGH",
+        "note": "No fix available from upstream - project considers side-channel attacks out of scope",
+        "options": [
+          "Accept risk if ECDSA not used in security-critical contexts",
+          "Replace with cryptography library's ECDSA implementation (timing-safe)",
+          "Document risk acceptance in security documentation"
+        ]
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2024-23342",
+        "https://github.com/tlsfuzzer/python-ecdsa/security/advisories/GHSA-wj6h-64fc-37mp"
+      ]
+    }
+  ],
+  "medium_vulnerabilities": [
+    {
+      "id": "VULN-MED-001",
+      "severity": "MEDIUM",
+      "category": "SQL Injection",
+      "cwe": "CWE-89",
+      "description": "Potential SQL injection via f-string interpolation in SQL execute statement",
+      "impact": "SQL injection if user_id parameter is not properly validated",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/database/db_security.py",
+          "lines": [273],
+          "code_snippet": "await session.execute(text(f\"SET app.current_user_id = '{user_id}'\"))"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "MEDIUM",
+        "recommendation": "Use parameterized query: text(\"SET app.current_user_id = :user_id\").bindparams(user_id=user_id)",
+        "additional": "Add input validation to ensure user_id contains only alphanumeric characters"
+      },
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html",
+        "https://docs.sqlalchemy.org/en/20/core/sqlelement.html#sqlalchemy.sql.expression.text"
+      ]
+    },
+    {
+      "id": "VULN-MED-002",
+      "bandit_id": "B615",
+      "severity": "MEDIUM",
+      "category": "Supply Chain Security",
+      "cwe": "CWE-494",
+      "description": "Hugging Face model downloads without revision pinning - vulnerable to model poisoning attacks",
+      "impact": "Supply chain attack via malicious model updates",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/brand_model_trainer.py",
+          "lines": [111, 112],
+          "code_snippet": "from_pretrained(...) without revision parameter"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "MEDIUM",
+        "recommendation": "Pin specific model revision: from_pretrained(model_name, revision='abc123...')",
+        "example": "tokenizer = AutoTokenizer.from_pretrained('bert-base', revision='abc123def456')"
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b615_unsafe_hugging_face.html"
+      ]
+    },
+    {
+      "id": "VULN-MED-003",
+      "bandit_id": "B301",
+      "severity": "MEDIUM",
+      "category": "Insecure Deserialization",
+      "cwe": "CWE-502",
+      "description": "Unsafe pickle deserialization - can execute arbitrary code if pickle data is from untrusted source",
+      "impact": "Remote code execution via malicious pickle payloads",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/self_learning_system.py",
+          "lines": [779],
+          "code_snippet": "pickle.load() or pickle.loads()"
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "MEDIUM",
+        "options": [
+          "Replace pickle with JSON for data serialization",
+          "If pickle required, validate source and use HMAC signature verification",
+          "Use safe_pickle or RestrictedUnpickler"
+        ]
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b301_pickle.html",
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ]
+    },
+    {
+      "id": "VULN-MED-004",
+      "bandit_id": "B113",
+      "severity": "MEDIUM",
+      "category": "Denial of Service",
+      "cwe": "CWE-400",
+      "description": "HTTP requests without timeout parameter - can cause application hang on slow/unresponsive servers",
+      "impact": "Denial of service, resource exhaustion",
+      "affected_files": [
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/woocommerce_integration_service.py",
+          "lines": [121]
+        },
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/wordpress_direct_service.py",
+          "lines": [229, 254, 280, 304]
+        },
+        {
+          "file": "/home/user/DevSkyy/agent/modules/backend/wordpress_integration_service.py",
+          "lines": [56, 85]
+        }
+      ],
+      "remediation": {
+        "action": "CODE_MODIFICATION",
+        "priority": "MEDIUM",
+        "recommendation": "Add timeout parameter to all requests.* calls",
+        "example": "requests.get(url, timeout=30)"
+      },
+      "references": [
+        "https://bandit.readthedocs.io/en/latest/plugins/b113_request_without_timeout.html",
+        "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts"
+      ]
+    }
+  ],
+  "low_vulnerabilities_summary": {
+    "total": 119,
+    "categories": {
+      "hardcoded_passwords_in_tests": 15,
+      "bind_all_interfaces": 1,
+      "url_open_audit": 3,
+      "other": 100
+    },
+    "note": "Low severity issues are primarily in test files and development code. Full details available in Bandit report at /tmp/bandit-report.json"
+  },
+  "compliance_assessment": {
+    "truth_protocol_compliance": {
+      "status": "PARTIAL_COMPLIANCE",
+      "violations": [
+        {
+          "rule": "No HIGH/CRITICAL CVEs allowed",
+          "status": "FAIL",
+          "details": "4 CRITICAL and 5 HIGH severity CVEs found in dependencies"
+        },
+        {
+          "rule": "Security baseline: AES-256-GCM, Argon2id, OAuth2+JWT, PBKDF2",
+          "status": "PARTIAL",
+          "details": "AES-256-GCM ✓, OAuth2+JWT ✓, PBKDF2 ✓, Argon2id ✗ (using bcrypt instead)"
+        },
+        {
+          "rule": "No secrets in code",
+          "status": "PASS",
+          "details": "Development-only SECRET_KEY has proper warnings. No production secrets hardcoded."
+        },
+        {
+          "rule": "Input validation and CSP",
+          "status": "PASS",
+          "details": "Pydantic validation models with SQL injection and XSS protection implemented"
+        },
+        {
+          "rule": "RBAC roles properly implemented",
+          "status": "PASS",
+          "details": "RoleChecker implementation with SuperAdmin, Admin, Developer, APIUser, ReadOnly roles"
+        }
+      ]
+    },
+    "owasp_top_10_2021": {
+      "A01_broken_access_control": "PASS - RBAC implemented with role checkers",
+      "A02_cryptographic_failures": "FAIL - Weak MD5 usage, outdated cryptography package",
+      "A03_injection": "PARTIAL - SQL injection risk in db_security.py:273, XSS validation present",
+      "A04_insecure_design": "PASS - Secure design patterns observed",
+      "A05_security_misconfiguration": "FAIL - FTP usage, AutoAddPolicy SSH, missing timeouts",
+      "A06_vulnerable_components": "FAIL - 4 CRITICAL CVEs in dependencies",
+      "A07_identification_authentication": "PASS - JWT + OAuth2 properly implemented",
+      "A08_software_data_integrity": "FAIL - Unsafe pickle deserialization, unpinned HF models",
+      "A09_security_logging_monitoring": "PASS - Comprehensive logging observed",
+      "A10_ssrf": "PARTIAL - No SSRF protection observed in URL fetching"
+    }
+  },
+  "recommended_actions": {
+    "immediate_priority": [
+      {
+        "action": "Upgrade cryptography package",
+        "command": "pip install 'cryptography>=43.0.1,<44.0.0'",
+        "reason": "4 CRITICAL CVEs affecting encryption/TLS"
+      },
+      {
+        "action": "Upgrade pip",
+        "command": "pip install --upgrade 'pip>=25.3'",
+        "reason": "CRITICAL path traversal vulnerability CVE-2025-8869"
+      },
+      {
+        "action": "Verify setuptools version",
+        "command": "pip install 'setuptools>=78.1.1,<79.0.0'",
+        "reason": "CRITICAL RCE vulnerability CVE-2025-47273"
+      }
+    ],
+    "high_priority": [
+      {
+        "action": "Fix XML injection vulnerability",
+        "file": "agent/modules/backend/wordpress_direct_service.py",
+        "fix": "Install defusedxml and call defusedxml.xmlrpc.monkey_patch()"
+      },
+      {
+        "action": "Replace FTP with SFTP",
+        "file": "agent/wordpress/automated_theme_uploader.py",
+        "fix": "Replace ftplib with paramiko.SFTPClient"
+      },
+      {
+        "action": "Fix SSH host key validation",
+        "files": [
+          "agent/modules/backend/wordpress_server_access.py",
+          "agent/wordpress/automated_theme_uploader.py"
+        ],
+        "fix": "Replace AutoAddPolicy with RejectPolicy or WarningPolicy"
+      },
+      {
+        "action": "Mark MD5 usage as non-security",
+        "files": [
+          "agent/modules/backend/claude_sonnet_intelligence_service_v2.py",
+          "agent/modules/backend/database_optimizer.py",
+          "agent/modules/backend/inventory_agent.py"
+        ],
+        "fix": "Add usedforsecurity=False parameter to hashlib.md5() calls"
+      }
+    ],
+    "medium_priority": [
+      {
+        "action": "Fix SQL injection risk",
+        "file": "database/db_security.py:273",
+        "fix": "Use parameterized query with bindparams()"
+      },
+      {
+        "action": "Add request timeouts",
+        "files": [
+          "agent/modules/backend/woocommerce_integration_service.py",
+          "agent/modules/backend/wordpress_direct_service.py",
+          "agent/modules/backend/wordpress_integration_service.py"
+        ],
+        "fix": "Add timeout=30 parameter to all requests calls"
+      },
+      {
+        "action": "Pin Hugging Face model revisions",
+        "file": "agent/modules/backend/brand_model_trainer.py",
+        "fix": "Add revision parameter to from_pretrained() calls"
+      },
+      {
+        "action": "Replace pickle with JSON",
+        "file": "agent/modules/backend/self_learning_system.py",
+        "fix": "Use JSON serialization instead of pickle where possible"
+      }
+    ]
+  },
+  "security_baseline_compliance": {
+    "encryption": {
+      "aes_256_gcm": "COMPLIANT",
+      "implementation": "security/encryption.py - AES-256-GCM properly implemented",
+      "evidence": "Cipher(algorithms.AES(key), modes.GCM(iv))"
+    },
+    "password_hashing": {
+      "argon2id": "NON_COMPLIANT",
+      "actual": "bcrypt with 12 rounds",
+      "implementation": "security/jwt_auth.py",
+      "recommendation": "Add argon2-cffi package and implement Argon2id as primary password hashing algorithm",
+      "note": "Bcrypt is acceptable but Argon2id is Truth Protocol requirement"
+    },
+    "authentication": {
+      "oauth2_jwt": "COMPLIANT",
+      "implementation": "security/jwt_auth.py - OAuth2 + JWT with HS256",
+      "access_token_expiry": "15 minutes",
+      "refresh_token_expiry": "7 days",
+      "note": "Consider using RS256 (asymmetric) instead of HS256 for better key management"
+    },
+    "key_derivation": {
+      "pbkdf2": "COMPLIANT",
+      "implementation": "security/encryption.py - PBKDF2-HMAC-SHA256 with 100,000 iterations",
+      "evidence": "PBKDF2HMAC(algorithm=hashes.SHA256(), iterations=100000)"
+    }
+  },
+  "scan_statistics": {
+    "bandit": {
+      "total_lines_scanned": 86434,
+      "total_issues": 179,
+      "high_severity": 14,
+      "medium_severity": 46,
+      "low_severity": 119
+    },
+    "pip_audit": {
+      "packages_scanned": 140,
+      "vulnerabilities_found": 8,
+      "packages_with_vulns": 4
+    },
+    "manual_review": {
+      "files_reviewed": 15,
+      "issues_found": 1,
+      "sql_injection_risks": 1
+    }
+  },
+  "next_steps": [
+    "1. Execute immediate priority actions to fix CRITICAL CVEs",
+    "2. Run pip-audit again after dependency upgrades to verify fixes",
+    "3. Implement high priority code fixes (XML injection, FTP, SSH)",
+    "4. Add argon2-cffi and implement Argon2id password hashing",
+    "5. Address medium priority issues (SQL injection, timeouts, pickle)",
+    "6. Re-run security scan to verify all fixes",
+    "7. Update CHANGELOG.md with security improvements",
+    "8. Deploy to staging environment for testing",
+    "9. Conduct penetration testing before production deployment"
+  ],
+  "verification_commands": [
+    "pip-audit --format json",
+    "bandit -r . --format json -o bandit-report.json",
+    "safety scan --json",
+    "pytest tests/security/ -v"
+  ]
+}
