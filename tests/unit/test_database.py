@@ -28,7 +28,7 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_commits_on_success(self):
         """Test get_db commits transaction on successful completion"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()
@@ -48,10 +48,11 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_rolls_back_on_exception(self):
         """Test get_db rolls back transaction on exception"""
+
         def _raise_error():
             raise ValueError()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()
@@ -74,7 +75,7 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_closes_session_always(self):
         """Test get_db always closes session in finally block"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()
@@ -94,7 +95,7 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_reraises_exception(self):
         """Test get_db re-raises exceptions after rollback"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()
@@ -112,7 +113,7 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_handles_commit_failure(self):
         """Test get_db handles commit failure gracefully"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock(side_effect=SQLAlchemyError("Commit failed"))
             mock_session.rollback = AsyncMock()
@@ -130,7 +131,7 @@ class TestGetDbDependency:
     @pytest.mark.unit
     async def test_get_db_handles_rollback_failure(self):
         """Test get_db handles rollback failure"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock(spec=AsyncSession)
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock(side_effect=SQLAlchemyError("Rollback failed"))
@@ -163,7 +164,7 @@ class TestDatabaseManager:
         """Test successful database connection"""
         manager = DatabaseManager()
 
-        with patch('database.init_db', new_callable=AsyncMock):
+        with patch("database.init_db", new_callable=AsyncMock):
             result = await manager.connect()
 
             assert result["status"] == "connected"
@@ -177,8 +178,9 @@ class TestDatabaseManager:
         """Test database connection failure handling"""
         manager = DatabaseManager()
 
-        with patch('database.init_db', new_callable=AsyncMock,
-                   side_effect=OperationalError("Connection refused", None, None)):
+        with patch(
+            "database.init_db", new_callable=AsyncMock, side_effect=OperationalError("Connection refused", None, None)
+        ):
             result = await manager.connect()
 
             assert result["status"] == "failed"
@@ -194,11 +196,11 @@ class TestDatabaseManager:
         exceptions = [
             ValueError("Invalid database URL"),
             RuntimeError("Database not initialized"),
-            Exception("Generic error")
+            Exception("Generic error"),
         ]
 
         for exc in exceptions:
-            with patch('database.init_db', new_callable=AsyncMock, side_effect=exc):
+            with patch("database.init_db", new_callable=AsyncMock, side_effect=exc):
                 result = await manager.connect()
 
                 assert result["status"] == "failed"
@@ -211,7 +213,7 @@ class TestDatabaseManager:
         manager = DatabaseManager()
         manager.connected = True
 
-        with patch('database.close_db', new_callable=AsyncMock):
+        with patch("database.close_db", new_callable=AsyncMock):
             await manager.disconnect()
 
             assert manager.connected is False
@@ -223,7 +225,7 @@ class TestDatabaseManager:
         manager = DatabaseManager()
         assert manager.connected is False
 
-        with patch('database.close_db', new_callable=AsyncMock) as mock_close:
+        with patch("database.close_db", new_callable=AsyncMock) as mock_close:
             await manager.disconnect()
 
             mock_close.assert_called_once()
@@ -235,7 +237,7 @@ class TestDatabaseManager:
         """Test successful database health check"""
         manager = DatabaseManager()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.execute = AsyncMock()
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -255,7 +257,7 @@ class TestDatabaseManager:
         """Test database health check failure"""
         manager = DatabaseManager()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.execute = AsyncMock(side_effect=OperationalError("Cannot connect", None, None))
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -274,7 +276,7 @@ class TestDatabaseManager:
         """Test health check with database timeout"""
         manager = DatabaseManager()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.execute = AsyncMock(side_effect=TimeoutError("Query timeout"))
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -309,7 +311,7 @@ class TestDatabaseManager:
         """Test handling multiple connection attempts"""
         manager = DatabaseManager()
 
-        with patch('database.init_db', new_callable=AsyncMock):
+        with patch("database.init_db", new_callable=AsyncMock):
             # First connection
             result1 = await manager.connect()
             assert result1["status"] == "connected"
@@ -326,8 +328,7 @@ class TestDatabaseManager:
         """Test connect-disconnect cycle"""
         manager = DatabaseManager()
 
-        with patch('database.init_db', new_callable=AsyncMock), \
-             patch('database.close_db', new_callable=AsyncMock):
+        with patch("database.init_db", new_callable=AsyncMock), patch("database.close_db", new_callable=AsyncMock):
 
             # Connect
             result = await manager.connect()
@@ -368,7 +369,7 @@ class TestDatabaseEdgeCases:
     @pytest.mark.unit
     async def test_get_db_with_sqlalchemy_error(self):
         """Test get_db handles SQLAlchemy errors"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.commit = AsyncMock(side_effect=SQLAlchemyError("Database error"))
             mock_session.rollback = AsyncMock()
@@ -388,7 +389,7 @@ class TestDatabaseEdgeCases:
         """Test health check with network errors"""
         manager = DatabaseManager()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.execute = AsyncMock(side_effect=ConnectionError("Network unreachable"))
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -408,7 +409,7 @@ class TestDatabaseEdgeCases:
 
         manager = DatabaseManager()
 
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.execute = AsyncMock()
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
@@ -416,11 +417,7 @@ class TestDatabaseEdgeCases:
             mock_session_local.return_value = mock_session
 
             # Run multiple health checks concurrently
-            results = await asyncio.gather(
-                manager.health_check(),
-                manager.health_check(),
-                manager.health_check()
-            )
+            results = await asyncio.gather(manager.health_check(), manager.health_check(), manager.health_check())
 
             assert len(results) == 3
             for result in results:
@@ -430,7 +427,7 @@ class TestDatabaseEdgeCases:
     @pytest.mark.unit
     async def test_get_db_with_close_error(self):
         """Test get_db handles close errors gracefully"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()
@@ -454,9 +451,11 @@ class TestDatabaseIntegration:
         """Test complete database lifecycle"""
         manager = DatabaseManager()
 
-        with patch('database.init_db', new_callable=AsyncMock), \
-             patch('database.close_db', new_callable=AsyncMock), \
-             patch('database.AsyncSessionLocal') as mock_session_local:
+        with (
+            patch("database.init_db", new_callable=AsyncMock),
+            patch("database.close_db", new_callable=AsyncMock),
+            patch("database.AsyncSessionLocal") as mock_session_local,
+        ):
 
             mock_session = MagicMock()
             mock_session.execute = AsyncMock()
@@ -480,7 +479,7 @@ class TestDatabaseIntegration:
     @pytest.mark.integration
     async def test_session_usage_pattern(self):
         """Test typical session usage pattern"""
-        with patch('database.AsyncSessionLocal') as mock_session_local:
+        with patch("database.AsyncSessionLocal") as mock_session_local:
             mock_session = MagicMock()
             mock_session.commit = AsyncMock()
             mock_session.rollback = AsyncMock()

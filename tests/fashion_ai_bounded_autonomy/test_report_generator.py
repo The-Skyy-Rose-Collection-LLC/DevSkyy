@@ -47,32 +47,16 @@ class TestDailySummary:
             "registered_agents": 5,
             "active_tasks": 2,
             "total_tasks": 10,
-            "bounded_autonomy": {
-                "system_controls": {
-                    "emergency_stop": False,
-                    "paused": False,
-                    "local_only": True
-                }
-            }
+            "bounded_autonomy": {"system_controls": {"emergency_stop": False, "paused": False, "local_only": True}},
         }
 
         performance_data = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 1.5, "min": 1.0, "max": 2.0}
-                }
-            }
+            "agent_performance": {"agent1": {"execution_time": {"average": 1.5, "min": 1.0, "max": 2.0}}}
         }
 
-        approval_stats = {
-            "pending": 3,
-            "approved_today": 5,
-            "rejected_today": 1
-        }
+        approval_stats = {"pending": 3, "approved_today": 5, "rejected_today": 1}
 
-        report_file = await report_gen.generate_daily_summary(
-            orchestrator_status, performance_data, approval_stats
-        )
+        report_file = await report_gen.generate_daily_summary(orchestrator_status, performance_data, approval_stats)
 
         assert report_file.exists()
         assert report_file.suffix == ".md"
@@ -84,9 +68,7 @@ class TestDailySummary:
         performance_data = {"agent_performance": {}}
         approval_stats = {"pending": 0}
 
-        report_file = await report_gen.generate_daily_summary(
-            orchestrator_status, performance_data, approval_stats
-        )
+        report_file = await report_gen.generate_daily_summary(orchestrator_status, performance_data, approval_stats)
 
         content = report_file.read_text()
         assert "System Status" in content
@@ -103,11 +85,7 @@ class TestWeeklyReport:
         performance_data = {
             "start_date": "2024-01-01",
             "end_date": "2024-01-07",
-            "agent_performance": {
-                "agent1": {
-                    "metric1": {"average": 1.5, "min": 1.0, "max": 2.0, "samples": 100}
-                }
-            }
+            "agent_performance": {"agent1": {"metric1": {"average": 1.5, "min": 1.0, "max": 2.0, "samples": 100}}},
         }
 
         incidents = [
@@ -118,9 +96,7 @@ class TestWeeklyReport:
             {"id": "prop1", "type": "optimization", "priority": "medium", "agent": "agent1", "recommendation": "Test"}
         ]
 
-        report_file = await report_gen.generate_weekly_report(
-            performance_data, incidents, proposals
-        )
+        report_file = await report_gen.generate_weekly_report(performance_data, incidents, proposals)
 
         assert report_file.exists()
         assert report_file.suffix == ".md"
@@ -132,9 +108,7 @@ class TestWeeklyReport:
         incidents = []
         proposals = []
 
-        report_file = await report_gen.generate_weekly_report(
-            performance_data, incidents, proposals
-        )
+        report_file = await report_gen.generate_weekly_report(performance_data, incidents, proposals)
 
         content = report_file.read_text()
         assert "No incidents" in content
@@ -147,13 +121,7 @@ class TestMetricsExport:
     async def test_export_metrics_csv(self, report_gen):
         """Test exporting metrics to CSV"""
         metrics_data = {
-            "agent_kpis": {
-                "agent1": {
-                    "active_days": 7,
-                    "total_operations": 100,
-                    "avg_execution_time": 1.5
-                }
-            }
+            "agent_kpis": {"agent1": {"active_days": 7, "total_operations": 100, "avg_execution_time": 1.5}}
         }
 
         csv_file = await report_gen.export_metrics_csv(metrics_data)
@@ -180,7 +148,7 @@ class TestValidationReport:
         """Test generating validation report"""
         validation_results = [
             {"status": "validated", "file": "file1.csv"},
-            {"status": "quarantined", "file": "file2.csv", "errors": ["missing_field"]}
+            {"status": "quarantined", "file": "file2.csv", "errors": ["missing_field"]},
         ]
 
         report_file = await report_gen.generate_validation_report(validation_results)
@@ -191,15 +159,12 @@ class TestValidationReport:
     @pytest.mark.asyncio
     async def test_validation_report_calculates_summary(self, report_gen):
         """Test that validation report includes summary statistics"""
-        validation_results = [
-            {"status": "validated"},
-            {"status": "validated"},
-            {"status": "quarantined"}
-        ]
+        validation_results = [{"status": "validated"}, {"status": "validated"}, {"status": "quarantined"}]
 
         report_file = await report_gen.generate_validation_report(validation_results)
 
         import json
+
         with open(report_file) as f:
             report = json.load(f)
 
@@ -216,7 +181,7 @@ class TestRecommendationsReport:
         """Test generating recommendations report"""
         proposals = [
             {"id": "prop1", "type": "optimization", "priority": "high", "recommendation": "Test", "status": "pending"},
-            {"id": "prop2", "type": "fix", "priority": "medium", "recommendation": "Test2", "status": "approved"}
+            {"id": "prop2", "type": "fix", "priority": "medium", "recommendation": "Test2", "status": "approved"},
         ]
 
         report_file = await report_gen.generate_recommendations_report(proposals)
@@ -230,7 +195,7 @@ class TestRecommendationsReport:
         proposals = [
             {"id": "p1", "priority": "high", "type": "test", "recommendation": "Fix1"},
             {"id": "p2", "priority": "low", "type": "test", "recommendation": "Fix2"},
-            {"id": "p3", "priority": "high", "type": "test", "recommendation": "Fix3"}
+            {"id": "p3", "priority": "high", "type": "test", "recommendation": "Fix3"},
         ]
 
         report_file = await report_gen.generate_recommendations_report(proposals)
@@ -251,9 +216,7 @@ class TestEdgeCases:
         approval_stats = {}
 
         # Should not raise exception
-        report_file = await report_gen.generate_daily_summary(
-            orchestrator_status, performance_data, approval_stats
-        )
+        report_file = await report_gen.generate_daily_summary(orchestrator_status, performance_data, approval_stats)
 
         assert report_file.exists()
 

@@ -8,8 +8,8 @@ Author: DevSkyy Team
 Version: 1.0.0
 """
 
-from fastapi import HTTPException
 import pytest
+from fastapi import HTTPException
 
 from security.input_validation import (
     AlphanumericValidator,

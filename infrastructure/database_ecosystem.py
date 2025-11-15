@@ -1,14 +1,13 @@
+import logging
+import time
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-import logging
-import time
 from typing import Any, Optional, Union
 
 import asyncpg
-from clickhouse_driver import Client as ClickHouseClient
 import motor.motor_asyncio
-
+from clickhouse_driver import Client as ClickHouseClient
 
 """
 Database Ecosystem Integration
@@ -18,6 +17,7 @@ with connection pooling, indexing, migration tools, and backup automation
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseType(Enum):
     """Database types supported"""
 
@@ -25,6 +25,7 @@ class DatabaseType(Enum):
     MONGODB = "mongodb"
     CLICKHOUSE = "clickhouse"
     REDIS = "redis"
+
 
 @dataclass
 class DatabaseConfig:
@@ -48,6 +49,7 @@ class DatabaseConfig:
         data["db_type"] = self.db_type.value
         return data
 
+
 @dataclass
 class ConnectionMetrics:
     """Database connection metrics"""
@@ -69,6 +71,7 @@ class ConnectionMetrics:
             data["last_updated"] = self.last_updated.isoformat()
         return data
 
+
 class PostgreSQLManager:
     """PostgreSQL database manager with connection pooling"""
 
@@ -78,9 +81,7 @@ class PostgreSQLManager:
         self.metrics = ConnectionMetrics()
         self.is_connected = False
 
-        logger.info(
-            f"PostgreSQL manager initialized - Host: {config.host}:{config.port}"
-        )
+        logger.info(f"PostgreSQL manager initialized - Host: {config.host}:{config.port}")
 
     async def connect(self) -> bool:
         """Establish connection pool"""
@@ -112,9 +113,7 @@ class PostgreSQLManager:
             self.metrics.failed_connections += 1
             return False
 
-    async def execute_query(
-        self, query: str, params: tuple | None = None
-    ) -> list[dict[str, Any]]:
+    async def execute_query(self, query: str, params: tuple | None = None) -> list[dict[str, Any]]:
         """Execute query and return results"""
         if not self.pool:
             raise Exception("Database not connected")
@@ -243,6 +242,7 @@ class PostgreSQLManager:
             self.is_connected = False
             logger.info("PostgreSQL connection pool closed")
 
+
 class MongoDBManager:
     """MongoDB database manager with connection pooling"""
 
@@ -340,9 +340,7 @@ class MongoDBManager:
             logger.error(f"MongoDB insert failed: {e}")
             raise e
 
-    async def update_document(
-        self, collection: str, query: dict[str, Any], update: dict[str, Any]
-    ) -> int:
+    async def update_document(self, collection: str, query: dict[str, Any], update: dict[str, Any]) -> int:
         """Update documents in collection"""
         if not self.database:
             raise Exception("Database not connected")
@@ -411,9 +409,7 @@ class MongoDBManager:
 
                 for index_spec in collection_indexes:
                     await collection.create_index(index_spec)
-                    logger.info(
-                        f"Created MongoDB index on {collection_name}: {index_spec}"
-                    )
+                    logger.info(f"Created MongoDB index on {collection_name}: {index_spec}")
 
             return True
 
@@ -441,6 +437,7 @@ class MongoDBManager:
             self.is_connected = False
             logger.info("MongoDB connection closed")
 
+
 class ClickHouseManager:
     """ClickHouse database manager for analytics"""
 
@@ -450,9 +447,7 @@ class ClickHouseManager:
         self.metrics = ConnectionMetrics()
         self.is_connected = False
 
-        logger.info(
-            f"ClickHouse manager initialized - Host: {config.host}:{config.port}"
-        )
+        logger.info(f"ClickHouse manager initialized - Host: {config.host}:{config.port}")
 
     async def connect(self) -> bool:
         """Establish ClickHouse connection"""
@@ -482,9 +477,7 @@ class ClickHouseManager:
             self.metrics.failed_connections += 1
             return False
 
-    async def execute_query(
-        self, query: str, params: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def execute_query(self, query: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Execute query and return results"""
         if not self.client:
             raise Exception("Database not connected")
@@ -601,6 +594,7 @@ class ClickHouseManager:
             self.is_connected = False
             logger.info("ClickHouse connection closed")
 
+
 class DatabaseEcosystem:
     """Unified database ecosystem manager"""
 
@@ -639,9 +633,7 @@ class DatabaseEcosystem:
             logger.error(f"Error adding database {name}: {e}")
             return False
 
-    def get_database(
-        self, name: str
-    ) -> Union[PostgreSQLManager, MongoDBManager, ClickHouseManager]:
+    def get_database(self, name: str) -> Union[PostgreSQLManager, MongoDBManager, ClickHouseManager]:
         """Get database manager by name"""
         if name not in self.databases:
             raise ValueError(f"Database not found: {name}")
@@ -733,9 +725,7 @@ class DatabaseEcosystem:
             "overall_status": "healthy" if overall_healthy else "degraded",
             "databases": health_status,
             "total_databases": len(self.databases),
-            "healthy_databases": sum([
-                1 for db in health_status.values() if db.get("status") == "healthy"
-            ]),
+            "healthy_databases": sum([1 for db in health_status.values() if db.get("status") == "healthy"]),
         }
 
     async def close_all(self):
@@ -749,6 +739,7 @@ class DatabaseEcosystem:
                 logger.info(f"Closed database connection: {name}")
             except Exception as e:
                 logger.error(f"Error closing database {name}: {e}")
+
 
 # Global database ecosystem instance
 database_ecosystem = DatabaseEcosystem()

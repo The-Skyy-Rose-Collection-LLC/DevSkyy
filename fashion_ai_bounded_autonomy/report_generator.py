@@ -4,12 +4,11 @@ Generate organized, human-readable reports for operator review
 """
 
 import csv
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +40,7 @@ class ReportGenerator:
         logger.info("📊 Report generator initialized")
 
     async def generate_daily_summary(
-        self,
-        orchestrator_status: dict[str, Any],
-        performance_data: dict[str, Any],
-        approval_stats: dict[str, Any]
+        self, orchestrator_status: dict[str, Any], performance_data: dict[str, Any], approval_stats: dict[str, Any]
     ) -> Path:
         """Generate daily operations summary"""
         timestamp = datetime.now()
@@ -78,7 +74,7 @@ Generated: {timestamp.isoformat()}
 """
 
         # Add agent metrics
-        for agent_name, metrics in performance_data.get('agent_performance', {}).items():
+        for agent_name, metrics in performance_data.get("agent_performance", {}).items():
             report += f"### {agent_name}\n\n"
             for metric_name, stats in metrics.items():
                 report += f"- **{metric_name}:** {stats.get('average', 0):.2f} "
@@ -104,10 +100,7 @@ Generated: {timestamp.isoformat()}
         return report_file
 
     async def generate_weekly_report(
-        self,
-        performance_data: dict[str, Any],
-        incidents: list[dict[str, Any]],
-        proposals: list[dict[str, Any]]
+        self, performance_data: dict[str, Any], incidents: list[dict[str, Any]], proposals: list[dict[str, Any]]
     ) -> Path:
         """Generate weekly performance and improvement report"""
         timestamp = datetime.now()
@@ -128,7 +121,7 @@ Generated: {timestamp.isoformat()}
 """
 
         # Agent performance
-        for agent_name, metrics in performance_data.get('agent_performance', {}).items():
+        for agent_name, metrics in performance_data.get("agent_performance", {}).items():
             report += f"### {agent_name}\n\n"
             report += "| Metric | Average | Min | Max | Samples |\n"
             report += "|--------|---------|-----|-----|\n"
@@ -180,11 +173,7 @@ Generated: {timestamp.isoformat()}
         logger.info(f"✅ Weekly report generated: {report_file}")
         return report_file
 
-    async def export_metrics_csv(
-        self,
-        metrics_data: dict[str, Any],
-        filename: Optional[str] = None
-    ) -> Path:
+    async def export_metrics_csv(self, metrics_data: dict[str, Any], filename: Optional[str] = None) -> Path:
         """Export metrics to CSV for analysis"""
         if not filename:
             filename = f"metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
@@ -193,18 +182,20 @@ Generated: {timestamp.isoformat()}
 
         # Flatten metrics data
         rows = []
-        for agent_name, metrics in metrics_data.get('agent_kpis', {}).items():
+        for agent_name, metrics in metrics_data.get("agent_kpis", {}).items():
             for metric_name, value in metrics.items():
-                rows.append({
-                    'timestamp': datetime.now().isoformat(),
-                    'agent': agent_name,
-                    'metric': metric_name,
-                    'value': value
-                })
+                rows.append(
+                    {
+                        "timestamp": datetime.now().isoformat(),
+                        "agent": agent_name,
+                        "metric": metric_name,
+                        "value": value,
+                    }
+                )
 
         if rows:
-            with open(csv_file, 'w', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=['timestamp', 'agent', 'metric', 'value'])
+            with open(csv_file, "w", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["timestamp", "agent", "metric", "value"])
                 writer.writeheader()
                 writer.writerows(rows)
 
@@ -214,10 +205,7 @@ Generated: {timestamp.isoformat()}
 
         return csv_file
 
-    async def generate_validation_report(
-        self,
-        validation_results: list[dict[str, Any]]
-    ) -> Path:
+    async def generate_validation_report(self, validation_results: list[dict[str, Any]]) -> Path:
         """Generate data validation report"""
         timestamp = datetime.now()
         report_file = self.validation_path / f"validation_{timestamp.strftime('%Y%m%d_%H%M%S')}.json"
@@ -225,21 +213,18 @@ Generated: {timestamp.isoformat()}
         report = {
             "timestamp": timestamp.isoformat(),
             "total_validations": len(validation_results),
-            "passed": sum(1 for r in validation_results if r.get('status') == 'validated'),
-            "failed": sum(1 for r in validation_results if r.get('status') == 'quarantined'),
-            "details": validation_results
+            "passed": sum(1 for r in validation_results if r.get("status") == "validated"),
+            "failed": sum(1 for r in validation_results if r.get("status") == "quarantined"),
+            "details": validation_results,
         }
 
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             json.dump(report, f, indent=2)
 
         logger.info(f"✅ Validation report generated: {report_file}")
         return report_file
 
-    async def generate_recommendations_report(
-        self,
-        proposals: list[dict[str, Any]]
-    ) -> Path:
+    async def generate_recommendations_report(self, proposals: list[dict[str, Any]]) -> Path:
         """Generate formatted recommendations report"""
         timestamp = datetime.now()
         report_file = self.recommendations_path / f"recommendations_{timestamp.strftime('%Y%m%d')}.md"
@@ -259,23 +244,20 @@ Generated: {timestamp.isoformat()}
 """
 
         # Group by priority
-        by_priority = {'high': [], 'medium': [], 'low': []}
+        by_priority = {"high": [], "medium": [], "low": []}
         for proposal in proposals:
-            priority = proposal.get('priority', 'medium')
+            priority = proposal.get("priority", "medium")
             by_priority[priority].append(proposal)
 
-        for priority in ['high', 'medium', 'low']:
+        for priority in ["high", "medium", "low"]:
             proposals_list = by_priority[priority]
             if proposals_list:
                 report += f"### {priority.upper()} Priority ({len(proposals_list)})\n\n"
 
                 for proposal in proposals_list:
-                    status_icon = {
-                        'pending': '⏳',
-                        'approved': '✅',
-                        'rejected': '⛔',
-                        'implemented': '🎉'
-                    }.get(proposal.get('status', 'pending'), '❓')
+                    status_icon = {"pending": "⏳", "approved": "✅", "rejected": "⛔", "implemented": "🎉"}.get(
+                        proposal.get("status", "pending"), "❓"
+                    )
 
                     report += f"{status_icon} **{proposal.get('id', 'N/A')}** - {proposal.get('type', 'unknown')}\n"
                     report += f"   {proposal.get('recommendation', 'No details')}\n\n"
@@ -306,7 +288,7 @@ asyncio.run(main())
 *All recommendations require manual operator review and approval.*
 """
 
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write(report)
 
         logger.info(f"✅ Recommendations report generated: {report_file}")

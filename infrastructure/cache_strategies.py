@@ -1,13 +1,12 @@
 import asyncio
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
 from typing import Any, Optional
 
 from infrastructure.redis_manager import redis_manager
-
 
 """
 Enterprise Cache Invalidation Strategies
@@ -16,6 +15,7 @@ Fashion industry specific caching patterns and strategies
 """
 
 logger = logging.getLogger(__name__)
+
 
 class InvalidationStrategy(Enum):
     """Cache invalidation strategies"""
@@ -26,6 +26,7 @@ class InvalidationStrategy(Enum):
     PATTERN = "pattern"  # Invalidate by pattern
     DEPENDENCY = "dependency"  # Invalidate based on dependencies
     TTL_REFRESH = "ttl_refresh"  # Refresh TTL instead of invalidating
+
 
 @dataclass
 class InvalidationRule:
@@ -39,6 +40,7 @@ class InvalidationRule:
     dependencies: list[str] = None
     condition: Optional[Callable] = None
     fashion_context: bool = False  # Fashion industry specific rule
+
 
 class CacheInvalidationManager:
     """Manages cache invalidation strategies and execution"""
@@ -101,9 +103,7 @@ class CacheInvalidationManager:
                 name="seasonal_data_refresh",
                 strategy=InvalidationStrategy.SCHEDULED,
                 patterns=["trends:seasonal:*", "analytics:seasonal:*"],
-                schedule_time=datetime.now().replace(
-                    hour=2, minute=0, second=0
-                ),  # 2 AM daily
+                schedule_time=datetime.now().replace(hour=2, minute=0, second=0),  # 2 AM daily
                 fashion_context=True,
             )
         )
@@ -186,9 +186,7 @@ class CacheInvalidationManager:
                         "execution_time_ms": result.get("execution_time_ms", 0),
                     }
                 )
-                invalidation_results["keys_invalidated"] += result.get(
-                    "keys_invalidated", 0
-                )
+                invalidation_results["keys_invalidated"] += result.get("keys_invalidated", 0)
 
             except Exception as e:
                 error_msg = f"Error executing rule {rule.name}: {e!s}"
@@ -202,14 +200,10 @@ class CacheInvalidationManager:
         if len(self.invalidation_history) > 1000:
             self.invalidation_history = self.invalidation_history[-1000:]
 
-        logger.info(
-            f"Cache invalidation completed: {trigger} - {invalidation_results['keys_invalidated']} keys"
-        )
+        logger.info(f"Cache invalidation completed: {trigger} - {invalidation_results['keys_invalidated']} keys")
         return invalidation_results
 
-    def _rule_matches_trigger(
-        self, rule: InvalidationRule, trigger: str, context: dict[str, Any]
-    ) -> bool:
+    def _rule_matches_trigger(self, rule: InvalidationRule, trigger: str, context: dict[str, Any]) -> bool:
         """Check if rule matches the trigger"""
         # Check if trigger matches any pattern
         for pattern in rule.patterns:
@@ -267,9 +261,7 @@ class CacheInvalidationManager:
             keys_invalidated = await self._dependency_invalidation(rule.dependencies)
 
         elif rule.strategy == InvalidationStrategy.TTL_REFRESH:
-            keys_invalidated = await self._ttl_refresh(
-                rule.patterns, rule.delay_seconds
-            )
+            keys_invalidated = await self._ttl_refresh(rule.patterns, rule.delay_seconds)
 
         execution_time = (datetime.now() - start_time).total_seconds() * 1000
 
@@ -291,9 +283,7 @@ class CacheInvalidationManager:
                 prefix_part = "api_cache"
                 pattern_part = pattern
 
-            invalidated = await redis_manager.invalidate_pattern(
-                pattern_part, prefix_part
-            )
+            invalidated = await redis_manager.invalidate_pattern(pattern_part, prefix_part)
             total_invalidated += invalidated
 
         return total_invalidated
@@ -330,9 +320,7 @@ class CacheInvalidationManager:
             if dependency in self.fashion_dependencies:
                 dependent_patterns = self.fashion_dependencies[dependency]
                 for pattern in dependent_patterns:
-                    invalidated = await redis_manager.invalidate_pattern(
-                        f"{pattern}:*", pattern
-                    )
+                    invalidated = await redis_manager.invalidate_pattern(f"{pattern}:*", pattern)
                     total_invalidated += invalidated
 
         return total_invalidated
@@ -352,9 +340,7 @@ class CacheInvalidationManager:
 
             # In a real implementation, we'd get all matching keys and refresh their TTL
             # For now, we'll just log the refresh operation
-            logger.debug(
-                f"TTL refresh scheduled for pattern {pattern} (+{refresh_seconds}s)"
-            )
+            logger.debug(f"TTL refresh scheduled for pattern {pattern} (+{refresh_seconds}s)")
             total_refreshed += 1
 
         return total_refreshed
@@ -384,25 +370,18 @@ class CacheInvalidationManager:
         recent_invalidations = [
             inv
             for inv in self.invalidation_history
-            if datetime.fromisoformat(inv["timestamp"])
-            > datetime.now() - timedelta(hours=24)
+            if datetime.fromisoformat(inv["timestamp"]) > datetime.now() - timedelta(hours=24)
         ]
 
-        total_keys_invalidated = sum([
-            inv["keys_invalidated"] for inv in recent_invalidations
-])
-        total_rules_executed = sum([
-            len(inv["rules_executed"]) for inv in recent_invalidations
-        ])
+        total_keys_invalidated = sum([inv["keys_invalidated"] for inv in recent_invalidations])
+        total_rules_executed = sum([len(inv["rules_executed"]) for inv in recent_invalidations])
 
         return {
             "total_rules": len(self.invalidation_rules),
             "recent_invalidations_24h": len(recent_invalidations),
             "total_keys_invalidated_24h": total_keys_invalidated,
             "total_rules_executed_24h": total_rules_executed,
-            "fashion_specific_rules": len([
-                r for r in self.invalidation_rules.values() if r.fashion_context
-            ]),
+            "fashion_specific_rules": len([r for r in self.invalidation_rules.values() if r.fashion_context]),
             "dependency_graph_size": len(self.dependency_graph),
             "scheduled_invalidations": len(self.scheduled_invalidations),
         }
@@ -414,9 +393,7 @@ class CacheInvalidationManager:
             redis_health = await redis_manager.health_check()
 
             return {
-                "status": (
-                    "healthy" if redis_health["status"] == "healthy" else "degraded"
-                ),
+                "status": ("healthy" if redis_health["status"] == "healthy" else "degraded"),
                 "invalidation_stats": stats,
                 "redis_health": redis_health,
                 "rules_configured": len(self.invalidation_rules),
@@ -424,6 +401,7 @@ class CacheInvalidationManager:
             }
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
+
 
 # Global cache invalidation manager
 cache_invalidation_manager = CacheInvalidationManager()

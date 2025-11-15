@@ -1,10 +1,10 @@
 import base64
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from enum import Enum
 import logging
 import secrets
 import time
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+from enum import Enum
 from typing import Any, Optional
 from urllib.parse import urlencode
 
@@ -14,7 +14,6 @@ from cryptography.fernet import Fernet
 from api_integration.discovery_engine import AuthenticationType
 from infrastructure.redis_manager import redis_manager
 
-
 """
 API Authentication & Rate Limiting Manager
 Standardized authentication handling and intelligent rate limiting for fashion e-commerce APIs
@@ -22,6 +21,7 @@ Supports OAuth2, API keys, JWT, and custom authentication methods
 """
 
 logger = logging.getLogger(__name__)
+
 
 class TokenStatus(Enum):
     """Token status enumeration"""
@@ -31,6 +31,7 @@ class TokenStatus(Enum):
     INVALID = "invalid"
     REVOKED = "revoked"
     PENDING = "pending"
+
 
 @dataclass
 class AuthCredentials:
@@ -70,6 +71,7 @@ class AuthCredentials:
             data["last_used"] = self.last_used.isoformat()
         return data
 
+
 @dataclass
 class RateLimitRule:
     """Rate limiting rule configuration"""
@@ -91,6 +93,7 @@ class RateLimitRule:
             "day": self.requests_per_day,
         }
         return limits.get(window_type, self.requests_per_minute)
+
 
 class AuthenticationManager:
     """Manages API authentication and credentials"""
@@ -169,17 +172,11 @@ class AuthenticationManager:
                 # Reconstruct AuthCredentials object
                 cached_data["auth_type"] = AuthenticationType(cached_data["auth_type"])
                 if cached_data.get("expires_at"):
-                    cached_data["expires_at"] = datetime.fromisoformat(
-                        cached_data["expires_at"]
-                    )
+                    cached_data["expires_at"] = datetime.fromisoformat(cached_data["expires_at"])
                 if cached_data.get("created_at"):
-                    cached_data["created_at"] = datetime.fromisoformat(
-                        cached_data["created_at"]
-                    )
+                    cached_data["created_at"] = datetime.fromisoformat(cached_data["created_at"])
                 if cached_data.get("last_used"):
-                    cached_data["last_used"] = datetime.fromisoformat(
-                        cached_data["last_used"]
-                    )
+                    cached_data["last_used"] = datetime.fromisoformat(cached_data["last_used"])
 
                 creds = AuthCredentials(**cached_data)
 
@@ -206,17 +203,13 @@ class AuthenticationManager:
 
         for key, value in credentials.items():
             if key in sensitive_fields and isinstance(value, str):
-                encrypted_creds[key] = self.cipher_suite.encrypt(
-                    value.encode()
-                ).decode()
+                encrypted_creds[key] = self.cipher_suite.encrypt(value.encode()).decode()
             else:
                 encrypted_creds[key] = value
 
         return encrypted_creds
 
-    def _decrypt_credentials(
-        self, encrypted_credentials: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _decrypt_credentials(self, encrypted_credentials: dict[str, Any]) -> dict[str, Any]:
         """Decrypt credential data"""
 
         decrypted_creds = {}
@@ -231,9 +224,7 @@ class AuthenticationManager:
         for key, value in encrypted_credentials.items():
             if key in sensitive_fields and isinstance(value, str):
                 try:
-                    decrypted_creds[key] = self.cipher_suite.decrypt(
-                        value.encode()
-                    ).decode()
+                    decrypted_creds[key] = self.cipher_suite.decrypt(value.encode()).decode()
                 except Exception:
                     # If decryption fails, assume it's already decrypted
                     decrypted_creds[key] = value
@@ -275,9 +266,7 @@ class AuthenticationManager:
 
         return {}
 
-    async def _get_bearer_token_headers(
-        self, credentials: dict[str, Any]
-    ) -> dict[str, str]:
+    async def _get_bearer_token_headers(self, credentials: dict[str, Any]) -> dict[str, str]:
         """Get Bearer token authentication headers"""
 
         access_token = credentials.get("access_token")
@@ -307,9 +296,7 @@ class AuthenticationManager:
 
         return {}
 
-    async def _get_basic_auth_headers(
-        self, credentials: dict[str, Any]
-    ) -> dict[str, str]:
+    async def _get_basic_auth_headers(self, credentials: dict[str, Any]) -> dict[str, str]:
         """Get Basic authentication headers"""
 
         username = credentials.get("username")
@@ -386,9 +373,7 @@ class AuthenticationManager:
                         # Store credentials
                         expires_at = None
                         if "expires_in" in token_response:
-                            expires_at = datetime.now() + timedelta(
-                                seconds=token_response["expires_in"]
-                            )
+                            expires_at = datetime.now() + timedelta(seconds=token_response["expires_in"])
 
                         await self.store_credentials(
                             api_id=oauth_data["api_id"],
@@ -396,9 +381,7 @@ class AuthenticationManager:
                             credentials={
                                 "access_token": token_response.get("access_token"),
                                 "refresh_token": token_response.get("refresh_token"),
-                                "token_type": token_response.get(
-                                    "token_type", "Bearer"
-                                ),
+                                "token_type": token_response.get("token_type", "Bearer"),
                             },
                             expires_at=expires_at,
                             scopes=oauth_data["scopes"],
@@ -407,9 +390,7 @@ class AuthenticationManager:
                         # Clean up OAuth state
                         del self.oauth_states[state]
 
-                        logger.info(
-                            f"Completed OAuth2 flow for API: {oauth_data['api_id']}"
-                        )
+                        logger.info(f"Completed OAuth2 flow for API: {oauth_data['api_id']}")
                         return True
                     else:
                         logger.error(f"OAuth2 token exchange failed: {response.status}")
@@ -419,9 +400,7 @@ class AuthenticationManager:
             logger.error(f"Error completing OAuth2 flow: {e}")
             return False
 
-    async def refresh_oauth2_token(
-        self, api_id: str, token_url: str, client_id: str, client_secret: str
-    ) -> bool:
+    async def refresh_oauth2_token(self, api_id: str, token_url: str, client_id: str, client_secret: str) -> bool:
         """Refresh OAuth2 access token"""
 
         credentials = await self.get_credentials(api_id)
@@ -450,21 +429,15 @@ class AuthenticationManager:
                         # Update credentials
                         expires_at = None
                         if "expires_in" in token_response:
-                            expires_at = datetime.now() + timedelta(
-                                seconds=token_response["expires_in"]
-                            )
+                            expires_at = datetime.now() + timedelta(seconds=token_response["expires_in"])
 
                         await self.store_credentials(
                             api_id=api_id,
                             auth_type=AuthenticationType.OAUTH2,
                             credentials={
                                 "access_token": token_response.get("access_token"),
-                                "refresh_token": token_response.get(
-                                    "refresh_token", refresh_token
-                                ),
-                                "token_type": token_response.get(
-                                    "token_type", "Bearer"
-                                ),
+                                "refresh_token": token_response.get("refresh_token", refresh_token),
+                                "token_type": token_response.get("token_type", "Bearer"),
                             },
                             expires_at=expires_at,
                             scopes=credentials.scopes,
@@ -479,6 +452,7 @@ class AuthenticationManager:
         except Exception as e:
             logger.error(f"Error refreshing OAuth2 token: {e}")
             return False
+
 
 class RateLimitManager:
     """Manages API rate limiting and quota tracking"""
@@ -503,9 +477,7 @@ class RateLimitManager:
 
         # Cache in Redis
         cache_key = f"rate_limit:{api_id}"
-        await redis_manager.set(
-            cache_key, asdict(rate_limit), ttl=86400, prefix="api_limits"  # 24 hours
-        )
+        await redis_manager.set(cache_key, asdict(rate_limit), ttl=86400, prefix="api_limits")  # 24 hours
 
         logger.info(f"Set rate limit for API: {api_id}")
 
@@ -572,11 +544,7 @@ class RateLimitManager:
                 return False, rate_limit_info
 
         # Check burst limit
-        recent_requests = len(
-
-            [t for t in history if t > current_time - 10]
-
-        )  # Last 10 seconds
+        recent_requests = len([t for t in history if t > current_time - 10])  # Last 10 seconds
         if recent_requests >= rate_limit.burst_limit:
             rate_limit_info["burst_limit_exceeded"] = True
             return False, rate_limit_info
@@ -618,11 +586,7 @@ class RateLimitManager:
             "api_id": api_id,
             "can_make_request": can_request,
             "rate_limit_info": rate_info,
-            "total_requests_today": len([
-                    t
-                    for t in self.request_history.get(api_id, [])
-                    if t > time.time() - 86400
-                ]),
+            "total_requests_today": len([t for t in self.request_history.get(api_id, []) if t > time.time() - 86400]),
         }
 
     async def get_all_rate_limit_status(self) -> dict[str, dict[str, Any]]:
@@ -634,6 +598,7 @@ class RateLimitManager:
             status[api_id] = await self.get_rate_limit_status(api_id)
 
         return status
+
 
 # Global instances
 auth_manager = AuthenticationManager()

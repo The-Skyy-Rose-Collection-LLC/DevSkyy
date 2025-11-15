@@ -5,13 +5,13 @@ Test all WordPress credential configurations and theme builder integration
 """
 
 import asyncio
-from pathlib import Path
 import sys
 import tempfile
-
+from pathlib import Path
 
 # Add DevSkyy to path
 sys.path.insert(0, str(Path(__file__).parent))
+
 
 async def test_credential_loading():
     """Test credential loading from environment."""
@@ -22,10 +22,10 @@ async def test_credential_loading():
         # Test environment validation
         env_validation = validate_environment_setup()
 
-        if env_validation['missing_required']:
+        if env_validation["missing_required"]:
             return False
 
-        if env_validation['configured_vars']:
+        if env_validation["configured_vars"]:
             pass
 
         # Test credential loading
@@ -34,6 +34,7 @@ async def test_credential_loading():
 
     except Exception:
         return False
+
 
 async def test_wordpress_connection():
     """Test WordPress REST API connection."""
@@ -74,7 +75,7 @@ async def test_wordpress_connection():
                 auth_response = requests.get(
                     f"{credentials.site_url}/wp-json/wp/v2/users/me",
                     headers={"Authorization": f"Basic {auth_header}"},
-                    timeout=10
+                    timeout=10,
                 )
 
                 if auth_response.status_code == 200:
@@ -91,6 +92,7 @@ async def test_wordpress_connection():
     except Exception:
         return False
 
+
 async def test_theme_package_creation():
     """Test theme package creation."""
 
@@ -103,41 +105,43 @@ async def test_theme_package_creation():
             theme_dir.mkdir()
 
             # Create basic theme files
-            (theme_dir / "style.css").write_text("""/*
+            (theme_dir / "style.css").write_text(
+                """/*
 Theme Name: Test Theme
 Description: Test theme for DevSkyy
 Version: 1.0.0
 Author: DevSkyy Platform
-*/""")
+*/"""
+            )
 
-            (theme_dir / "index.php").write_text("""<?php
+            (theme_dir / "index.php").write_text(
+                """<?php
 // Test theme index
 get_header();
 echo '<h1>Test Theme</h1>';
 get_footer();
-?>""")
+?>"""
+            )
 
-            (theme_dir / "functions.php").write_text("""<?php
+            (theme_dir / "functions.php").write_text(
+                """<?php
 // Test theme functions
 function test_theme_setup() {
     add_theme_support('post-thumbnails');
 }
 add_action('after_setup_theme', 'test_theme_setup');
-?>""")
-
+?>"""
+            )
 
             # Test package creation
             theme_info = {
                 "name": "test-theme",
                 "version": "1.0.0",
                 "description": "Test theme for DevSkyy integration",
-                "author": "DevSkyy Platform"
+                "author": "DevSkyy Platform",
             }
 
-            package = await automated_theme_uploader.create_theme_package(
-                str(theme_dir), theme_info
-            )
-
+            package = await automated_theme_uploader.create_theme_package(str(theme_dir), theme_info)
 
             # Test package validation
             validation_results = await automated_theme_uploader.validate_theme_package(package)
@@ -157,11 +161,12 @@ add_action('after_setup_theme', 'test_theme_setup');
     except Exception:
         return False
 
+
 async def test_theme_builder_orchestrator():
     """Test theme builder orchestrator."""
 
     try:
-        from agent.wordpress.theme_builder_orchestrator import ThemeType, theme_builder_orchestrator
+        from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator, ThemeType
         from config.wordpress_credentials import get_skyy_rose_credentials
 
         credentials = get_skyy_rose_credentials()
@@ -173,13 +178,7 @@ async def test_theme_builder_orchestrator():
             theme_name="test-skyy-rose-theme",
             theme_type=ThemeType.LUXURY_FASHION,
             auto_deploy=False,  # Don't actually deploy during testing
-            customizations={
-                "test_mode": True,
-                "colors": {
-                    "primary": "#1a1a1a",
-                    "secondary": "#d4af37"
-                }
-            }
+            customizations={"test_mode": True, "colors": {"primary": "#1a1a1a", "secondary": "#d4af37"}},
         )
 
         if build_request:
@@ -193,6 +192,7 @@ async def test_theme_builder_orchestrator():
 
     except Exception:
         return False
+
 
 async def test_api_endpoints():
     """Test API endpoints (if server is running)."""
@@ -225,9 +225,7 @@ async def test_api_endpoints():
         # Test WordPress connection endpoint
         try:
             response = requests.post(
-                f"{base_url}/api/v1/themes/credentials/test",
-                json={"site_key": "skyy_rose"},
-                timeout=10
+                f"{base_url}/api/v1/themes/credentials/test", json={"site_key": "skyy_rose"}, timeout=10
             )
             if response.status_code == 200:
                 response.json()
@@ -241,6 +239,7 @@ async def test_api_endpoints():
     except Exception:
         return False
 
+
 async def main():
     """Run all integration tests."""
 
@@ -249,7 +248,7 @@ async def main():
         ("WordPress Connection", test_wordpress_connection),
         ("Theme Package Creation", test_theme_package_creation),
         ("Theme Builder Orchestrator", test_theme_builder_orchestrator),
-        ("API Endpoints", test_api_endpoints)
+        ("API Endpoints", test_api_endpoints),
     ]
 
     results = []
@@ -270,11 +269,11 @@ async def main():
         if result:
             passed += 1
 
-
     if passed == total:
         return 0
     else:
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main()))

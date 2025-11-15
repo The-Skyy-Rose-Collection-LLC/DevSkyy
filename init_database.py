@@ -10,13 +10,10 @@ from pathlib import Path
 # Load environment variables FIRST before any other imports
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -24,9 +21,9 @@ async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
+        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
         from database import db_manager, init_db
         from database_config import DATABASE_URL, DB_PROVIDER
-        import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
 
         logger.info(f"🗄️  Database Provider: {DB_PROVIDER}")
         logger.info(f"📍 Database URL: {DATABASE_URL}")
@@ -65,17 +62,13 @@ async def init_database():
             if "sqlite" in DATABASE_URL:
                 # Query SQLite system table
                 result = await session.execute(
-                    text(
-                        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
-                    )
+                    text("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
                 )
                 tables = [row[0] for row in result.fetchall()]
             else:
                 # For PostgreSQL/MySQL, use information_schema
                 result = await session.execute(
-                    text(
-                        "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-                    )
+                    text("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
                 )
                 tables = [row[0] for row in result.fetchall()]
 

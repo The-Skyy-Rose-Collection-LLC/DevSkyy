@@ -67,7 +67,6 @@ from .performance_tracker import PerformanceTracker
 from .report_generator import ReportGenerator
 from .watchdog import Watchdog
 
-
 __all__ = [
     "ActionRiskLevel",
     "ApprovalSystem",

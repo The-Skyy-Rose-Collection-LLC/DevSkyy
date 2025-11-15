@@ -32,20 +32,20 @@ Monitoring:
 """
 
 import asyncio
+import logging
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-import logging
 from typing import Any, Optional
-import uuid
-
 
 logger = logging.getLogger(__name__)
 
 
 class InventoryStatus(Enum):
     """Inventory status states."""
+
     IN_STOCK = "in_stock"
     LOW_STOCK = "low_stock"
     OUT_OF_STOCK = "out_of_stock"
@@ -56,6 +56,7 @@ class InventoryStatus(Enum):
 
 class TransactionType(Enum):
     """Financial transaction types."""
+
     SALE = "sale"
     REFUND = "refund"
     PURCHASE = "purchase"
@@ -67,6 +68,7 @@ class TransactionType(Enum):
 
 class Channel(Enum):
     """Sales channels."""
+
     ONLINE_STORE = "online_store"
     PHYSICAL_STORE = "physical_store"
     MARKETPLACE = "marketplace"  # Amazon, eBay, etc.
@@ -77,6 +79,7 @@ class Channel(Enum):
 
 class AlertType(Enum):
     """Alert types for notifications."""
+
     LOW_STOCK = "low_stock"
     OUT_OF_STOCK = "out_of_stock"
     HIGH_DEMAND = "high_demand"
@@ -89,6 +92,7 @@ class AlertType(Enum):
 @dataclass
 class InventoryItem:
     """Inventory item representation."""
+
     item_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     sku: str = ""
     name: str = ""
@@ -142,6 +146,7 @@ class InventoryItem:
 @dataclass
 class FinancialTransaction:
     """Financial transaction record."""
+
     transaction_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     type: TransactionType = TransactionType.SALE
     amount: Decimal = Decimal("0.00")
@@ -183,6 +188,7 @@ class FinancialTransaction:
 @dataclass
 class InventoryAlert:
     """Inventory alert notification."""
+
     alert_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     alert_type: AlertType = AlertType.LOW_STOCK
     severity: str = "medium"  # low, medium, high, critical
@@ -215,6 +221,7 @@ class InventoryAlert:
 @dataclass
 class DemandForecast:
     """Demand forecast for inventory planning."""
+
     forecast_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     item_id: str = ""
     sku: str = ""
@@ -319,9 +326,7 @@ class FinanceInventoryPipelineAgent:
 
         logger.info(f"✅ {self.agent_name} v{self.version} initialized")
 
-    async def sync_inventory(
-        self, channel: Channel, items: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    async def sync_inventory(self, channel: Channel, items: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Synchronize inventory records from an external sales channel into the agent's in-memory inventory store.
 
@@ -400,9 +405,7 @@ class FinanceInventoryPipelineAgent:
                 "timestamp": datetime.now().isoformat(),
             }
 
-    async def record_transaction(
-        self, transaction_data: dict[str, Any]
-    ) -> FinancialTransaction:
+    async def record_transaction(self, transaction_data: dict[str, Any]) -> FinancialTransaction:
         """
         Record a financial transaction, persist it in the agent store, update inventory for sales, and enqueue a transaction event.
 
@@ -447,11 +450,13 @@ class FinanceInventoryPipelineAgent:
                 await self._process_sale_transaction(transaction)
 
             # Emit event for downstream processing
-            await self.event_queue.put({
-                "event_type": "transaction_recorded",
-                "transaction_id": transaction.transaction_id,
-                "timestamp": datetime.now().isoformat(),
-            })
+            await self.event_queue.put(
+                {
+                    "event_type": "transaction_recorded",
+                    "transaction_id": transaction.transaction_id,
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
             logger.info(
                 f"✅ Transaction recorded: {transaction.transaction_id} "
@@ -486,9 +491,7 @@ class FinanceInventoryPipelineAgent:
                 if item.quantity_available - item.quantity_reserved <= item.reorder_point:
                     await self._create_reorder_alert(item)
 
-    async def forecast_demand(
-        self, item_id: str, forecast_period_days: int = 30
-    ) -> DemandForecast:
+    async def forecast_demand(self, item_id: str, forecast_period_days: int = 30) -> DemandForecast:
         """
         Produce a demand forecast for a specific inventory item.
 
@@ -537,8 +540,7 @@ class FinanceInventoryPipelineAgent:
             self.forecasts[forecast.forecast_id] = forecast
 
             logger.info(
-                f"📊 Forecast generated for {item.sku}: "
-                f"{predicted_demand} units over {forecast_period_days} days"
+                f"📊 Forecast generated for {item.sku}: " f"{predicted_demand} units over {forecast_period_days} days"
             )
 
             return forecast
@@ -561,6 +563,7 @@ class FinanceInventoryPipelineAgent:
         # Placeholder - would query transaction history
         # For now, return simulated data
         import random
+
         return [random.uniform(1, 10) for _ in range(days)]
 
     def _calculate_std_dev(self, data: list[float]) -> float:
@@ -577,7 +580,7 @@ class FinanceInventoryPipelineAgent:
             return 0.0
         mean = sum(data) / len(data)
         variance = sum((x - mean) ** 2 for x in data) / len(data)
-        return variance ** 0.5
+        return variance**0.5
 
     async def _check_inventory_alerts(self, item: InventoryItem):
         """
@@ -612,9 +615,7 @@ class FinanceInventoryPipelineAgent:
                 severity="high",
             )
 
-    async def _create_alert(
-        self, alert_type: AlertType, item: InventoryItem, message: str, severity: str = "medium"
-    ):
+    async def _create_alert(self, alert_type: AlertType, item: InventoryItem, message: str, severity: str = "medium"):
         """
         Create and store an inventory alert for the given item and emit an `alert_created` event.
 
@@ -644,13 +645,15 @@ class FinanceInventoryPipelineAgent:
         logger.warning(f"⚠️ Alert created: {message}")
 
         # Emit event
-        await self.event_queue.put({
-            "event_type": "alert_created",
-            "alert_id": alert.alert_id,
-            "alert_type": alert_type.value,
-            "severity": severity,
-            "timestamp": datetime.now().isoformat(),
-        })
+        await self.event_queue.put(
+            {
+                "event_type": "alert_created",
+                "alert_id": alert.alert_id,
+                "alert_type": alert_type.value,
+                "severity": severity,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     async def _create_reorder_alert(self, item: InventoryItem):
         """
@@ -724,9 +727,7 @@ class FinanceInventoryPipelineAgent:
         item.retail_price = Decimal(str(item_data.get("retail_price", str(item.retail_price))))
         item.updated_at = datetime.now()
 
-    async def generate_financial_report(
-        self, start_date: datetime, end_date: datetime
-    ) -> dict[str, Any]:
+    async def generate_financial_report(self, start_date: datetime, end_date: datetime) -> dict[str, Any]:
         """
         Generate a financial report for the given date range summarizing revenue, refunds, channel breakdown, top-selling items, and key KPIs.
 
@@ -741,26 +742,20 @@ class FinanceInventoryPipelineAgent:
         try:
             # Filter transactions in date range
             period_transactions = [
-                t for t in self.transactions.values()
-                if start_date <= t.transaction_date <= end_date
+                t for t in self.transactions.values() if start_date <= t.transaction_date <= end_date
             ]
 
             # Calculate metrics
-            total_revenue = sum(
-                t.total_amount for t in period_transactions
-                if t.type == TransactionType.SALE
-            )
+            total_revenue = sum(t.total_amount for t in period_transactions if t.type == TransactionType.SALE)
 
-            total_refunds = sum(
-                t.total_amount for t in period_transactions
-                if t.type == TransactionType.REFUND
-            )
+            total_refunds = sum(t.total_amount for t in period_transactions if t.type == TransactionType.REFUND)
 
             # Revenue by channel
             revenue_by_channel = {}
             for channel in Channel:
                 channel_revenue = sum(
-                    t.total_amount for t in period_transactions
+                    t.total_amount
+                    for t in period_transactions
                     if t.channel == channel and t.type == TransactionType.SALE
                 )
                 revenue_by_channel[channel.value] = float(channel_revenue)
@@ -787,15 +782,11 @@ class FinanceInventoryPipelineAgent:
                     "net_revenue": float(total_revenue - total_refunds),
                     "transaction_count": len(period_transactions),
                     "average_order_value": float(
-                        total_revenue / len(period_transactions)
-                        if period_transactions else 0
+                        total_revenue / len(period_transactions) if period_transactions else 0
                     ),
                 },
                 "revenue_by_channel": revenue_by_channel,
-                "top_selling_items": [
-                    {"sku": sku, "quantity_sold": qty}
-                    for sku, qty in top_selling
-                ],
+                "top_selling_items": [{"sku": sku, "quantity_sold": qty} for sku, qty in top_selling],
                 "generated_at": datetime.now().isoformat(),
             }
 
@@ -832,17 +823,10 @@ class FinanceInventoryPipelineAgent:
             "version": self.version,
             "inventory": {
                 "total_items": len(self.inventory),
-                "in_stock": sum(
-                    1 for item in self.inventory.values()
-                    if item.status == InventoryStatus.IN_STOCK
-                ),
-                "low_stock": sum(
-                    1 for item in self.inventory.values()
-                    if item.status == InventoryStatus.LOW_STOCK
-                ),
+                "in_stock": sum(1 for item in self.inventory.values() if item.status == InventoryStatus.IN_STOCK),
+                "low_stock": sum(1 for item in self.inventory.values() if item.status == InventoryStatus.LOW_STOCK),
                 "out_of_stock": sum(
-                    1 for item in self.inventory.values()
-                    if item.status == InventoryStatus.OUT_OF_STOCK
+                    1 for item in self.inventory.values() if item.status == InventoryStatus.OUT_OF_STOCK
                 ),
             },
             "transactions": {

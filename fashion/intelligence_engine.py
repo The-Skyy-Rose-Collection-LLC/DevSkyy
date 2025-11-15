@@ -4,13 +4,12 @@ Comprehensive knowledge base and intelligence system for fashion industry contex
 Integrated into all agents for fashion-specific insights and decision making
 """
 
+import logging
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
-import logging
 from typing import Any, Optional
-
 
 logger = logging.getLogger(__name__)
 
@@ -433,9 +432,7 @@ class FashionIntelligenceEngine:
                 if keyword.lower() in text_lower:
                     fashion_keywords.append((category, keyword))
 
-        context_analysis["fashion_relevance_score"] = min(
-            len(fashion_keywords) / 10.0, 1.0
-        )
+        context_analysis["fashion_relevance_score"] = min(len(fashion_keywords) / 10.0, 1.0)
 
         # Identify fashion categories
         category_matches = defaultdict(int)
@@ -443,8 +440,7 @@ class FashionIntelligenceEngine:
             category_matches[category] += 1
 
         context_analysis["identified_categories"] = [
-            {"category": cat, "mentions": count}
-            for cat, count in category_matches.most_common(5)
+            {"category": cat, "mentions": count} for cat, count in category_matches.most_common(5)
         ]
 
         # Detect trend indicators
@@ -488,22 +484,13 @@ class FashionIntelligenceEngine:
             implications = []
 
             if sustainability_mentions:
-                implications.append(
-                    "High sustainability focus - consider eco-friendly alternatives"
-                )
+                implications.append("High sustainability focus - consider eco-friendly alternatives")
 
-            if any(
-                "luxury" in indicator.get("keyword", "")
-                for indicator in trend_indicators
-            ):
-                implications.append(
-                    "Luxury market positioning - emphasize quality and exclusivity"
-                )
+            if any("luxury" in indicator.get("keyword", "") for indicator in trend_indicators):
+                implications.append("Luxury market positioning - emphasize quality and exclusivity")
 
             if context_analysis["seasonal_context"] in ["spring_summer", "fall_winter"]:
-                implications.append(
-                    f"Seasonal relevance - align with {context_analysis['seasonal_context']} trends"
-                )
+                implications.append(f"Seasonal relevance - align with {context_analysis['seasonal_context']} trends")
 
             context_analysis["business_implications"] = implications
 
@@ -527,10 +514,7 @@ class FashionIntelligenceEngine:
                 continue
             if season and trend.season != season:
                 continue
-            if (
-                target_demographic
-                and target_demographic not in trend.target_demographics
-            ):
+            if target_demographic and target_demographic not in trend.target_demographics:
                 continue
             if sustainability_focus and trend.sustainability_score < 0.7:
                 continue
@@ -553,9 +537,7 @@ class FashionIntelligenceEngine:
                     "target_demographics": trend.target_demographics,
                 },
                 "business_potential": self._calculate_business_potential(trend),
-                "implementation_suggestions": self._generate_implementation_suggestions(
-                    trend
-                ),
+                "implementation_suggestions": self._generate_implementation_suggestions(trend),
             }
             recommendations.append(recommendation)
 
@@ -584,11 +566,7 @@ class FashionIntelligenceEngine:
 
         return {
             "score": min(adjusted_score, 1.0),
-            "risk_level": (
-                "low"
-                if trend.status in [TrendStatus.GROWING, TrendStatus.PEAK]
-                else "medium"
-            ),
+            "risk_level": ("low" if trend.status in [TrendStatus.GROWING, TrendStatus.PEAK] else "medium"),
             "time_to_market": self._estimate_time_to_market(trend),
             "investment_level": self._estimate_investment_level(trend),
         }
@@ -621,36 +599,26 @@ class FashionIntelligenceEngine:
 
         # Color implementation
         if trend.color_palette:
-            suggestions.append(
-                f"Incorporate {', '.join(trend.color_palette[:2])} in key pieces"
-            )
+            suggestions.append(f"Incorporate {', '.join(trend.color_palette[:2])} in key pieces")
 
         # Material suggestions
         if trend.materials:
-            suggestions.append(
-                f"Focus on {', '.join(trend.materials[:2])} for authenticity"
-            )
+            suggestions.append(f"Focus on {', '.join(trend.materials[:2])} for authenticity")
 
         # Target demographic alignment
         if trend.target_demographics:
-            suggestions.append(
-                f"Target {', '.join(trend.target_demographics[:2])} segments"
-            )
+            suggestions.append(f"Target {', '.join(trend.target_demographics[:2])} segments")
 
         # Sustainability integration
         if trend.sustainability_score > 0.7:
             suggestions.append("Emphasize sustainable production methods")
 
         # Seasonal timing
-        suggestions.append(
-            f"Launch during {trend.season.value.replace('_', ' ')} season"
-        )
+        suggestions.append(f"Launch during {trend.season.value.replace('_', ' ')} season")
 
         return suggestions
 
-    async def get_market_intelligence(
-        self, region: str = "global", segment: Optional[str] = None
-    ) -> dict[str, Any]:
+    async def get_market_intelligence(self, region: str = "global", segment: Optional[str] = None) -> dict[str, Any]:
         """Get market intelligence for fashion industry"""
 
         # Find relevant market data
@@ -671,22 +639,17 @@ class FashionIntelligenceEngine:
             "region": region,
             "segment": segment or "all",
             "total_market_size_usd": sum(m.market_size_usd for m in relevant_markets),
-            "average_growth_rate": sum(m.growth_rate for m in relevant_markets)
-            / len(relevant_markets),
+            "average_growth_rate": sum(m.growth_rate for m in relevant_markets) / len(relevant_markets),
             "key_trends": self._extract_key_trends(relevant_markets),
             "consumer_insights": self._aggregate_consumer_insights(relevant_markets),
-            "competitive_landscape": self._analyze_competitive_landscape(
-                relevant_markets
-            ),
+            "competitive_landscape": self._analyze_competitive_landscape(relevant_markets),
             "opportunities": self._identify_opportunities(relevant_markets),
             "challenges": self._identify_challenges(relevant_markets),
         }
 
         return aggregated_intelligence
 
-    def _get_default_market_intelligence(
-        self, region: str, segment: Optional[str]
-    ) -> dict[str, Any]:
+    def _get_default_market_intelligence(self, region: str, segment: Optional[str]) -> dict[str, Any]:
         """Get default market intelligence when specific data is not available"""
 
         return {
@@ -736,18 +699,14 @@ class FashionIntelligenceEngine:
             trends.append("Strong market growth momentum")
 
         # Sustainability analysis
-        sustainability_focus = sum(
-            m.sustainability_trends.get("importance_score", 0) for m in markets
-        ) / len(markets)
+        sustainability_focus = sum(m.sustainability_trends.get("importance_score", 0) for m in markets) / len(markets)
 
         if sustainability_focus > 0.7:
             trends.append("High sustainability focus across markets")
 
         return trends
 
-    def _aggregate_consumer_insights(
-        self, markets: list[MarketIntelligence]
-    ) -> dict[str, Any]:
+    def _aggregate_consumer_insights(self, markets: list[MarketIntelligence]) -> dict[str, Any]:
         """Aggregate consumer insights from market data"""
 
         all_preferences = {}
@@ -772,9 +731,7 @@ class FashionIntelligenceEngine:
             "data_freshness": min(m.last_updated for m in markets).isoformat(),
         }
 
-    def _analyze_competitive_landscape(
-        self, markets: list[MarketIntelligence]
-    ) -> dict[str, Any]:
+    def _analyze_competitive_landscape(self, markets: list[MarketIntelligence]) -> dict[str, Any]:
         """Analyze competitive landscape from market data"""
 
         all_players = []
@@ -784,12 +741,8 @@ class FashionIntelligenceEngine:
         player_frequency = Counter(all_players)
 
         return {
-            "dominant_players": [
-                player for player, count in player_frequency.most_common(5)
-            ],
-            "market_fragmentation": (
-                len(set(all_players)) / len(all_players) if all_players else 0
-            ),
+            "dominant_players": [player for player, count in player_frequency.most_common(5)],
+            "market_fragmentation": (len(set(all_players)) / len(all_players) if all_players else 0),
             "regional_variations": len({m.region for m in markets}),
         }
 
@@ -801,21 +754,14 @@ class FashionIntelligenceEngine:
         # High growth markets
         high_growth_markets = [m for m in markets if m.growth_rate > 0.06]
         if high_growth_markets:
-            opportunities.append(
-                f"High growth potential in {len(high_growth_markets)} markets"
-            )
+            opportunities.append(f"High growth potential in {len(high_growth_markets)} markets")
 
         # Sustainability opportunities
         sustainability_gaps = [
-            m
-            for m in markets
-            if m.sustainability_trends.get("demand", 0)
-            > m.sustainability_trends.get("supply", 0)
+            m for m in markets if m.sustainability_trends.get("demand", 0) > m.sustainability_trends.get("supply", 0)
         ]
         if sustainability_gaps:
-            opportunities.append(
-                "Sustainability supply-demand gap presents opportunities"
-            )
+            opportunities.append("Sustainability supply-demand gap presents opportunities")
 
         return opportunities
 

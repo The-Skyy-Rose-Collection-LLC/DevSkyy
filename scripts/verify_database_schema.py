@@ -17,75 +17,131 @@ from typing import Optional
 
 import psycopg2
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 EXPECTED_TABLES = {
-    'consensus_workflows': [
-        'id', 'topic', 'iteration_count', 'human_decision', 'human_feedback',
-        'approval_token', 'rejection_token', 'webhook_expires_at',
-        'created_at', 'updated_at'
+    "consensus_workflows": [
+        "id",
+        "topic",
+        "iteration_count",
+        "human_decision",
+        "human_feedback",
+        "approval_token",
+        "rejection_token",
+        "webhook_expires_at",
+        "created_at",
+        "updated_at",
     ],
-    'content_drafts': [
-        'id', 'workflow_id', 'version', 'title', 'content',
-        'meta_description', 'word_count', 'keywords', 'feedback_applied', 'created_at'
+    "content_drafts": [
+        "id",
+        "workflow_id",
+        "version",
+        "title",
+        "content",
+        "meta_description",
+        "word_count",
+        "keywords",
+        "feedback_applied",
+        "created_at",
     ],
-    'agent_reviews': [
-        'id', 'workflow_id', 'draft_id', 'agent_name', 'decision',
-        'confidence', 'feedback', 'issues_found', 'suggestions', 'created_at'
+    "agent_reviews": [
+        "id",
+        "workflow_id",
+        "draft_id",
+        "agent_name",
+        "decision",
+        "confidence",
+        "feedback",
+        "issues_found",
+        "suggestions",
+        "created_at",
     ],
-    'consensus_votes': [
-        'id', 'workflow_id', 'draft_id', 'total_reviewers', 'approved_count',
-        'minor_issue_count', 'major_issue_count', 'requires_redraft',
-        'consensus_feedback', 'created_at'
+    "consensus_votes": [
+        "id",
+        "workflow_id",
+        "draft_id",
+        "total_reviewers",
+        "approved_count",
+        "minor_issue_count",
+        "major_issue_count",
+        "requires_redraft",
+        "consensus_feedback",
+        "created_at",
     ],
-    'woocommerce_products': [
-        'id', 'wordpress_product_id', 'sku', 'title', 'regular_price',
-        'sale_price', 'category_ids', 'image_url', 'short_description',
-        'description', 'stock_quantity', 'metatitle', 'metadescription',
-        'synced_at', 'created_at'
+    "woocommerce_products": [
+        "id",
+        "wordpress_product_id",
+        "sku",
+        "title",
+        "regular_price",
+        "sale_price",
+        "category_ids",
+        "image_url",
+        "short_description",
+        "description",
+        "stock_quantity",
+        "metatitle",
+        "metadescription",
+        "synced_at",
+        "created_at",
     ],
-    'content_publishing_log': [
-        'id', 'workflow_id', 'wordpress_post_id', 'wordpress_url', 'title',
-        'word_count', 'image_url', 'publish_status', 'published_at', 'created_at'
+    "content_publishing_log": [
+        "id",
+        "workflow_id",
+        "wordpress_post_id",
+        "wordpress_url",
+        "title",
+        "word_count",
+        "image_url",
+        "publish_status",
+        "published_at",
+        "created_at",
     ],
-    'wordpress_categorization_cache': [
-        'id', 'post_id', 'post_title', 'assigned_category_id',
-        'assigned_category_name', 'confidence', 'reasoning', 'categorized_at'
-    ]
+    "wordpress_categorization_cache": [
+        "id",
+        "post_id",
+        "post_title",
+        "assigned_category_id",
+        "assigned_category_name",
+        "confidence",
+        "reasoning",
+        "categorized_at",
+    ],
 }
 
 EXPECTED_INDEXES = [
-    'idx_workflows_human_decision',
-    'idx_workflows_created_at',
-    'idx_drafts_workflow',
-    'idx_reviews_workflow',
-    'idx_reviews_draft',
-    'idx_votes_workflow',
-    'idx_woo_products_sku',
-    'idx_woo_products_synced',
-    'idx_content_log_status',
-    'idx_content_log_published',
-    'idx_categorization_post'
+    "idx_workflows_human_decision",
+    "idx_workflows_created_at",
+    "idx_drafts_workflow",
+    "idx_reviews_workflow",
+    "idx_reviews_draft",
+    "idx_votes_workflow",
+    "idx_woo_products_sku",
+    "idx_woo_products_synced",
+    "idx_content_log_status",
+    "idx_content_log_published",
+    "idx_categorization_post",
 ]
 
 
 def get_database_url() -> Optional[str]:
     """Get database URL from environment"""
-    return os.getenv('DATABASE_URL') or os.getenv('NEON_DATABASE_URL')
+    return os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
 
 
 def check_tables(cursor) -> dict[str, bool]:
     """Check if all expected tables exist"""
     logger.info("Checking tables...")
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
         ORDER BY table_name;
-    """)
+    """
+    )
 
     existing_tables = {row[0] for row in cursor.fetchall()}
     results = {}
@@ -104,13 +160,16 @@ def check_tables(cursor) -> dict[str, bool]:
 
 def check_columns(cursor, table_name: str, expected_columns: list[str]) -> dict[str, bool]:
     """Check if all expected columns exist in table"""
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT column_name
         FROM information_schema.columns
         WHERE table_schema = 'public'
         AND table_name = %s
         ORDER BY ordinal_position;
-    """, (table_name,))
+    """,
+        (table_name,),
+    )
 
     existing_columns = {row[0] for row in cursor.fetchall()}
     results = {}
@@ -129,12 +188,14 @@ def check_indexes(cursor) -> dict[str, bool]:
     """Check if all expected indexes exist"""
     logger.info("Checking indexes...")
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT indexname
         FROM pg_indexes
         WHERE schemaname = 'public'
         ORDER BY indexname;
-    """)
+    """
+    )
 
     existing_indexes = {row[0] for row in cursor.fetchall()}
     results = {}
@@ -155,7 +216,8 @@ def check_foreign_keys(cursor) -> dict[str, bool]:
     """Check foreign key constraints"""
     logger.info("Checking foreign key constraints...")
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             tc.table_name,
             tc.constraint_name,
@@ -172,7 +234,8 @@ def check_foreign_keys(cursor) -> dict[str, bool]:
         WHERE tc.constraint_type = 'FOREIGN KEY'
         AND tc.table_schema = 'public'
         ORDER BY tc.table_name;
-    """)
+    """
+    )
 
     foreign_keys = cursor.fetchall()
 
@@ -231,7 +294,8 @@ def verify_schema(database_url: str) -> bool:
         logger.info("\n" + "=" * 60)
         logger.info("Database statistics:")
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 schemaname,
                 tablename,
@@ -239,7 +303,8 @@ def verify_schema(database_url: str) -> bool:
             FROM pg_tables
             WHERE schemaname = 'public'
             ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
-        """)
+        """
+        )
 
         stats = cursor.fetchall()
         for stat in stats:

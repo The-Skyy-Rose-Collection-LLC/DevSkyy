@@ -13,13 +13,12 @@ This script:
 
 import json
 import os
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-
 
 # GitHub API base URL
 GITHUB_API = "https://api.github.com"
@@ -164,9 +163,7 @@ class ActionSHAUpdater:
                 return self.fetch_sha_for_branch(repo, tag)
             elif e.code == 403:
                 # Rate limited - use known SHA if available
-                self.log(
-                    f"API rate limited for {repo}@{tag}, checking fallback", "WARNING"
-                )
+                self.log(f"API rate limited for {repo}@{tag}, checking fallback", "WARNING")
                 return None
             else:
                 self.log(f"HTTP error fetching {repo}@{tag}: {e}", "ERROR")
@@ -311,9 +308,7 @@ class ActionSHAUpdater:
             "total_actions": 0,
         }
 
-        workflow_files = list(workflows_dir.glob("*.yml")) + list(
-            workflows_dir.glob("*.yaml")
-        )
+        workflow_files = list(workflows_dir.glob("*.yml")) + list(workflows_dir.glob("*.yaml"))
 
         if not workflow_files:
             self.log(f"No workflow files found in {workflows_dir}", "WARNING")
@@ -335,18 +330,14 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Update GitHub Actions to use commit SHAs instead of tags"
-    )
+    parser = argparse.ArgumentParser(description="Update GitHub Actions to use commit SHAs instead of tags")
     parser.add_argument(
         "--dry-run",
         "-d",
         action="store_true",
         help="Preview changes without modifying files",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     parser.add_argument(
         "--workflows-dir",
         "-w",
@@ -380,7 +371,6 @@ def main():
         pass
     else:
         pass
-
 
 
 if __name__ == "__main__":

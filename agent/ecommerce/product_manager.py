@@ -1,11 +1,10 @@
-from datetime import datetime
 import logging
 import re
+from datetime import datetime
 from typing import Any, Optional
 
-from anthropic import Anthropic
 import numpy as np
-
+from anthropic import Anthropic
 
 """
 Product Manager
@@ -13,6 +12,7 @@ ML-powered product management for fashion ecommerce
 """
 
 logger = logging.getLogger(__name__)
+
 
 class ProductManager:
     """
@@ -116,9 +116,7 @@ class ProductManager:
             "fits": ["slim", "regular", "relaxed", "oversized", "tailored"],
         }
 
-    async def create_product(
-        self, product_data: dict[str, Any], auto_generate: bool = True
-    ) -> dict[str, Any]:
+    async def create_product(self, product_data: dict[str, Any], auto_generate: bool = True) -> dict[str, Any]:
         """
         Create a new product with ML enhancements
 
@@ -137,9 +135,7 @@ class ProductManager:
 
             # Auto-generate description if not provided
             if auto_generate and not product_data.get("description"):
-                product_data["description"] = await self._generate_description(
-                    product_data
-                )
+                product_data["description"] = await self._generate_description(product_data)
 
             # Generate SEO metadata
             if auto_generate:
@@ -250,11 +246,7 @@ class ProductManager:
             ),
             "og_title": name,
             "og_description": product_data.get("description", "")[:200],
-            "og_image": (
-                product_data.get("images", [None])[0]
-                if product_data.get("images")
-                else None
-            ),
+            "og_image": (product_data.get("images", [None])[0] if product_data.get("images") else None),
         }
 
     async def _auto_categorize(self, product_data: dict) -> str:
@@ -283,12 +275,8 @@ class ProductManager:
         variants = []
 
         # Get available sizes and colors
-        sizes = product_data.get(
-            "sizes", self.attributes["sizes"][:5]
-        )  # Default to first 5 sizes
-        colors = product_data.get(
-            "colors", ["black", "white", "navy"]
-        )  # Default colors
+        sizes = product_data.get("sizes", self.attributes["sizes"][:5])  # Default to first 5 sizes
+        colors = product_data.get("colors", ["black", "white", "navy"])  # Default colors
 
         base_price = product_data.get("price", 100)
         base_sku = product_data.get("sku", "ITEM")
@@ -368,9 +356,7 @@ class ProductManager:
         slug = slug.strip("-")
         return slug
 
-    async def bulk_import_products(
-        self, products: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    async def bulk_import_products(self, products: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Bulk import products with ML enhancements
 
@@ -398,9 +384,7 @@ class ProductManager:
                         }
                     )
 
-            logger.info(
-                f"✅ Imported {len(results['success'])}/{len(products)} products"
-            )
+            logger.info(f"✅ Imported {len(results['success'])}/{len(products)} products")
 
             return {
                 "success": True,
@@ -413,9 +397,7 @@ class ProductManager:
             logger.error(f"Bulk import failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def optimize_product_images(
-        self, product_id: str, images: list[str]
-    ) -> dict[str, Any]:
+    async def optimize_product_images(self, product_id: str, images: list[str]) -> dict[str, Any]:
         """
         Optimize product images using ML
 
@@ -436,9 +418,7 @@ class ProductManager:
                         "optimized": image_url,  # Would process through image optimization service
                         "size_reduction": "35%",
                         "format": "webp",
-                        "alt_text": await self._generate_image_alt_text(
-                            product_id, image_url
-                        ),
+                        "alt_text": await self._generate_image_alt_text(product_id, image_url),
                     }
                 )
 
@@ -456,9 +436,7 @@ class ProductManager:
     async def _generate_image_alt_text(self, product_id: str, image_url: str) -> str:
         """Generate SEO-optimized alt text for product images"""
         # Find product
-        product = next(
-            (p for p in self.products_database if p["id"] == product_id), None
-        )
+        product = next((p for p in self.products_database if p["id"] == product_id), None)
 
         if product:
             return f"{product['name']} - {product.get('category', 'fashion item')}"
@@ -469,9 +447,7 @@ class ProductManager:
         """Get ML-powered analytics for a product"""
         try:
             # Find product
-            product = next(
-                (p for p in self.products_database if p["id"] == product_id), None
-            )
+            product = next((p for p in self.products_database if p["id"] == product_id), None)
 
             if not product:
                 return {"success": False, "error": "Product not found"}

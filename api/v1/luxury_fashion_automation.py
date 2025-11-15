@@ -36,21 +36,21 @@ Role Requirements by Endpoint Type:
 - System status: READ_ONLY
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-
 # Security imports (RFC 7519 JWT + RBAC)
 try:
     from security.jwt_auth import (
-        UserRole,
         get_current_user,
         require_role,
+        UserRole,
     )
+
     SECURITY_AVAILABLE = True
 except ImportError:
     SECURITY_AVAILABLE = False
@@ -72,18 +72,18 @@ try:
         StylePreset,
         visual_content_agent,
     )
+
     VISUAL_AGENT_AVAILABLE = True
 except ImportError:
     VISUAL_AGENT_AVAILABLE = False
     logging.warning("Visual Content Agent not available")
 
 try:
-    from agent.modules.finance.finance_inventory_pipeline_agent import (
-        Channel as InventoryChannel,
-    )
+    from agent.modules.finance.finance_inventory_pipeline_agent import Channel as InventoryChannel
     from agent.modules.finance.finance_inventory_pipeline_agent import (
         finance_inventory_agent,
     )
+
     FINANCE_AGENT_AVAILABLE = True
 except ImportError:
     FINANCE_AGENT_AVAILABLE = False
@@ -93,6 +93,7 @@ try:
     from agent.modules.marketing.marketing_campaign_orchestrator import (
         marketing_orchestrator,
     )
+
     MARKETING_AGENT_AVAILABLE = True
 except ImportError:
     MARKETING_AGENT_AVAILABLE = False
@@ -100,14 +101,15 @@ except ImportError:
 
 try:
     from agent.modules.development.code_recovery_cursor_agent import (
-        CodeGenerationRequest as CodeGenRequest,
+        code_recovery_agent,
     )
+    from agent.modules.development.code_recovery_cursor_agent import CodeGenerationRequest as CodeGenRequest
     from agent.modules.development.code_recovery_cursor_agent import (
         CodeLanguage,
         CodeRecoveryRequest,
         RecoveryStrategy,
-        code_recovery_agent,
     )
+
     CODE_AGENT_AVAILABLE = True
 except ImportError:
     CODE_AGENT_AVAILABLE = False
@@ -115,9 +117,10 @@ except ImportError:
 
 try:
     from agent.enterprise_workflow_engine import (
-        WorkflowType,
         workflow_engine,
+        WorkflowType,
     )
+
     WORKFLOW_ENGINE_AVAILABLE = True
 except ImportError:
     WORKFLOW_ENGINE_AVAILABLE = False
@@ -125,11 +128,12 @@ except ImportError:
 
 try:
     from agent.modules.content.asset_preprocessing_pipeline import (
+        asset_pipeline,
         AssetType,
         ProcessingRequest,
         UpscaleQuality,
-        asset_pipeline,
     )
+
     ASSET_PIPELINE_AVAILABLE = True
 except ImportError:
     ASSET_PIPELINE_AVAILABLE = False
@@ -144,6 +148,7 @@ try:
         TryOnRequest,
         virtual_tryon_agent,
     )
+
     VIRTUAL_TRYON_AVAILABLE = True
 except ImportError:
     VIRTUAL_TRYON_AVAILABLE = False
@@ -159,8 +164,10 @@ router = APIRouter()
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class VisualContentRequest(BaseModel):
     """Request model for visual content generation."""
+
     prompt: str = Field(..., description="Description of the content to generate")
     content_type: str = Field(default="product_photo", description="Type of content")
     style_preset: Optional[str] = Field(default="minimalist_luxury", description="Style preset")
@@ -173,6 +180,7 @@ class VisualContentRequest(BaseModel):
 
 class CampaignRequest(BaseModel):
     """Request model for marketing campaign creation."""
+
     name: str = Field(..., description="Campaign name")
     description: Optional[str] = Field(default="")
     campaign_type: str = Field(default="email")
@@ -187,12 +195,14 @@ class CampaignRequest(BaseModel):
 
 class InventorySyncRequest(BaseModel):
     """Request model for inventory synchronization."""
+
     channel: str = Field(..., description="Sales channel")
     items: list[dict[str, Any]] = Field(..., description="Items to sync")
 
 
 class FinancialTransactionRequest(BaseModel):
     """Request model for recording financial transactions."""
+
     type: str = Field(default="sale")
     amount: float = Field(..., ge=0)
     currency: str = Field(default="USD")
@@ -205,6 +215,7 @@ class FinancialTransactionRequest(BaseModel):
 
 class CodeGenerationRequest(BaseModel):
     """Request model for code generation."""
+
     description: str = Field(..., description="What code to generate")
     language: str = Field(default="python")
     framework: Optional[str] = None
@@ -216,6 +227,7 @@ class CodeGenerationRequest(BaseModel):
 
 class CodeRecoveryRequestModel(BaseModel):
     """Request model for code recovery."""
+
     recovery_type: str = Field(default="git_history")
     repository_url: Optional[str] = None
     file_path: Optional[str] = None
@@ -225,12 +237,14 @@ class CodeRecoveryRequestModel(BaseModel):
 
 class WorkflowExecutionRequest(BaseModel):
     """Request model for workflow execution."""
+
     workflow_type: str = Field(..., description="Type of workflow")
     workflow_data: dict[str, Any] = Field(..., description="Workflow configuration")
 
 
 class AssetUploadRequest(BaseModel):
     """Request model for asset upload and preprocessing."""
+
     asset_path: str = Field(..., description="Path to uploaded asset")
     asset_type: str = Field(default="clothing", description="Type of asset")
     target_quality: str = Field(default="uhd_8k", description="Target quality")
@@ -245,6 +259,7 @@ class AssetUploadRequest(BaseModel):
 
 class VirtualTryOnRequestModel(BaseModel):
     """Request model for virtual try-on generation."""
+
     product_asset_id: str = Field(..., description="Preprocessed asset ID")
     # Model specification
     gender: str = Field(default="female")
@@ -264,11 +279,14 @@ class VirtualTryOnRequestModel(BaseModel):
 # ASSET PREPROCESSING ENDPOINTS
 # ============================================================================
 
+
 @router.post("/assets/upload", tags=["Assets"])
 async def upload_and_process_asset(
     request: AssetUploadRequest,
     background_tasks: BackgroundTasks,
-    current_user: dict[str, Any] = Depends(require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
 ):
     """
     Upload an asset and run the asset preprocessing pipeline to produce processed files and metadata for downstream use.
@@ -298,8 +316,7 @@ async def upload_and_process_asset(
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Asset preprocessing pipeline not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Asset preprocessing pipeline not available"
         )
 
     try:
@@ -319,8 +336,7 @@ async def upload_and_process_asset(
 
         if not result.success:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Asset processing failed: {result.error}"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Asset processing failed: {result.error}"
             )
 
         return {
@@ -352,7 +368,9 @@ async def upload_and_process_asset(
 @router.get("/assets/{asset_id}", tags=["Assets"])
 async def get_asset_info(
     asset_id: str,
-    current_user: dict[str, Any] = Depends(require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
 ):
     """
     Retrieve metadata for a preprocessed asset by its ID.
@@ -383,8 +401,7 @@ async def get_asset_info(
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Asset preprocessing pipeline not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Asset preprocessing pipeline not available"
         )
 
     asset = asset_pipeline.get_asset(asset_id)
@@ -429,8 +446,7 @@ async def list_assets():
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Asset preprocessing pipeline not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Asset preprocessing pipeline not available"
         )
 
     status_info = asset_pipeline.get_system_status()
@@ -447,11 +463,9 @@ async def list_assets():
 # VIRTUAL TRY-ON & HUGGINGFACE ENDPOINTS
 # ============================================================================
 
+
 @router.post("/tryon/generate", tags=["Virtual Try-On"])
-async def generate_virtual_tryon(
-    request: VirtualTryOnRequestModel,
-    background_tasks: BackgroundTasks
-):
+async def generate_virtual_tryon(request: VirtualTryOnRequestModel, background_tasks: BackgroundTasks):
     """
     Generate virtual try-on assets (images, optional videos and 3D previews) for a product using the provided model specification.
 
@@ -478,8 +492,7 @@ async def generate_virtual_tryon(
     """
     if not VIRTUAL_TRYON_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Virtual try-on agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Virtual try-on agent not available"
         )
 
     try:
@@ -508,8 +521,7 @@ async def generate_virtual_tryon(
 
         if not result.success:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Try-on generation failed: {result.error}"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Try-on generation failed: {result.error}"
             )
 
         return {
@@ -548,8 +560,7 @@ async def get_available_models():
     """
     if not VIRTUAL_TRYON_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Virtual try-on agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Virtual try-on agent not available"
         )
 
     models = virtual_tryon_agent.get_available_models()
@@ -567,8 +578,8 @@ async def get_available_models():
             "Segmentation (SAM, CLIPSeg)",
             "Detection (Grounding DINO, DWPose)",
             "Enhancement (Real-ESRGAN)",
-            "Fashion-Specific (DeepFashion)"
-        ]
+            "Fashion-Specific (DeepFashion)",
+        ],
     }
 
 
@@ -596,11 +607,9 @@ async def get_tryon_status():
 # VISUAL CONTENT GENERATION ENDPOINTS
 # ============================================================================
 
+
 @router.post("/visual-content/generate", tags=["Visual Content"])
-async def generate_visual_content(
-    request: VisualContentRequest,
-    background_tasks: BackgroundTasks
-):
+async def generate_visual_content(request: VisualContentRequest, background_tasks: BackgroundTasks):
     """
     Generate visual content for the brand based on the provided VisualContentRequest.
 
@@ -621,8 +630,7 @@ async def generate_visual_content(
     """
     if not VISUAL_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Visual content agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Visual content agent not available"
         )
 
     try:
@@ -658,9 +666,7 @@ async def generate_visual_content(
 
 
 @router.post("/visual-content/batch-generate", tags=["Visual Content"])
-async def batch_generate_visual_content(
-    requests: list[VisualContentRequest]
-):
+async def batch_generate_visual_content(requests: list[VisualContentRequest]):
     """
     Generate visual content for a batch of VisualContentRequest objects.
 
@@ -679,8 +685,7 @@ async def batch_generate_visual_content(
     """
     if not VISUAL_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Visual content agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Visual content agent not available"
         )
 
     try:
@@ -740,6 +745,7 @@ async def get_visual_content_status():
 # FINANCE & INVENTORY ENDPOINTS
 # ============================================================================
 
+
 @router.post("/finance/inventory/sync", tags=["Finance & Inventory"])
 async def sync_inventory(request: InventorySyncRequest):
     """
@@ -753,8 +759,7 @@ async def sync_inventory(request: InventorySyncRequest):
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Finance & inventory agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Finance & inventory agent not available"
         )
 
     try:
@@ -771,7 +776,7 @@ async def sync_inventory(request: InventorySyncRequest):
 @router.post("/finance/transactions/record", tags=["Finance & Inventory"])
 async def record_transaction(
     request: FinancialTransactionRequest,
-    current_user: dict[str, Any] = Depends(require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user)
+    current_user: dict[str, Any] = Depends(require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Record a financial transaction and apply related inventory updates and tax calculations.
@@ -799,8 +804,7 @@ async def record_transaction(
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Finance & inventory agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Finance & inventory agent not available"
         )
 
     try:
@@ -823,10 +827,7 @@ async def record_transaction(
 
 
 @router.get("/finance/forecast/{item_id}", tags=["Finance & Inventory"])
-async def get_demand_forecast(
-    item_id: str,
-    forecast_period_days: int = 30
-):
+async def get_demand_forecast(item_id: str, forecast_period_days: int = 30):
     """
     Produce a demand forecast for a given inventory item.
 
@@ -851,14 +852,11 @@ async def get_demand_forecast(
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Finance & inventory agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Finance & inventory agent not available"
         )
 
     try:
-        forecast = await finance_inventory_agent.forecast_demand(
-            item_id, forecast_period_days
-        )
+        forecast = await finance_inventory_agent.forecast_demand(item_id, forecast_period_days)
 
         return {
             "forecast_id": forecast.forecast_id,
@@ -881,10 +879,7 @@ async def get_demand_forecast(
 
 
 @router.get("/finance/reports/financial", tags=["Finance & Inventory"])
-async def generate_financial_report(
-    start_date: datetime,
-    end_date: datetime
-):
+async def generate_financial_report(start_date: datetime, end_date: datetime):
     """
     Generate a financial report for the specified date range.
 
@@ -905,14 +900,11 @@ async def generate_financial_report(
     """
     if not FINANCE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Finance & inventory agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Finance & inventory agent not available"
         )
 
     try:
-        report = await finance_inventory_agent.generate_financial_report(
-            start_date, end_date
-        )
+        report = await finance_inventory_agent.generate_financial_report(start_date, end_date)
 
         return report
 
@@ -944,6 +936,7 @@ async def get_finance_inventory_status():
 # MARKETING CAMPAIGN ENDPOINTS
 # ============================================================================
 
+
 @router.post("/marketing/campaigns/create", tags=["Marketing"])
 async def create_campaign(request: CampaignRequest):
     """
@@ -966,8 +959,7 @@ async def create_campaign(request: CampaignRequest):
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Marketing orchestrator not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Marketing orchestrator not available"
         )
 
     try:
@@ -1002,8 +994,7 @@ async def launch_campaign(campaign_id: str):
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Marketing orchestrator not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Marketing orchestrator not available"
         )
 
     try:
@@ -1031,8 +1022,7 @@ async def complete_campaign(campaign_id: str):
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Marketing orchestrator not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Marketing orchestrator not available"
         )
 
     try:
@@ -1066,8 +1056,7 @@ async def create_segment(segment_data: dict[str, Any]):
     """
     if not MARKETING_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Marketing orchestrator not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Marketing orchestrator not available"
         )
 
     try:
@@ -1107,6 +1096,7 @@ async def get_marketing_status():
 # CODE GENERATION & RECOVERY ENDPOINTS
 # ============================================================================
 
+
 @router.post("/code/generate", tags=["Code Development"])
 async def generate_code(request: CodeGenerationRequest):
     """
@@ -1136,8 +1126,7 @@ async def generate_code(request: CodeGenerationRequest):
     """
     if not CODE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Code recovery agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Code recovery agent not available"
         )
 
     try:
@@ -1198,8 +1187,7 @@ async def recover_code(request: CodeRecoveryRequestModel):
     """
     if not CODE_AGENT_AVAILABLE:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Code recovery agent not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Code recovery agent not available"
         )
 
     try:
@@ -1251,6 +1239,7 @@ async def get_code_agent_status():
 # WORKFLOW ORCHESTRATION ENDPOINTS
 # ============================================================================
 
+
 @router.post("/workflows/create", tags=["Workflows"])
 async def create_workflow(request: WorkflowExecutionRequest):
     """
@@ -1277,16 +1266,11 @@ async def create_workflow(request: WorkflowExecutionRequest):
         HTTPException: 500 if workflow creation fails.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Workflow engine not available"
-        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Workflow engine not available")
 
     try:
         workflow_type = WorkflowType(request.workflow_type)
-        workflow = await workflow_engine.create_workflow(
-            workflow_type, request.workflow_data
-        )
+        workflow = await workflow_engine.create_workflow(workflow_type, request.workflow_data)
 
         return {
             "success": True,
@@ -1317,10 +1301,7 @@ async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
             - `status_endpoint` (str): URL where the workflow status can be queried.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Workflow engine not available"
-        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Workflow engine not available")
 
     # Execute workflow in background
     background_tasks.add_task(workflow_engine.execute_workflow, workflow_id)
@@ -1347,10 +1328,7 @@ async def get_workflow_status(workflow_id: str):
         HTTPException: 500 for unexpected server-side errors.
     """
     if not WORKFLOW_ENGINE_AVAILABLE:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Workflow engine not available"
-        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Workflow engine not available")
 
     try:
         status = workflow_engine.get_workflow_status(workflow_id)
@@ -1390,6 +1368,7 @@ async def get_workflow_engine_status():
 # ============================================================================
 # SYSTEM STATUS ENDPOINT
 # ============================================================================
+
 
 @router.get("/system/status", tags=["System"])
 async def get_system_status():

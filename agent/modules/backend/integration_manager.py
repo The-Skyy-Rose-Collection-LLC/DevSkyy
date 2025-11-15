@@ -1,11 +1,10 @@
 import base64
-from datetime import datetime, timedelta
-from enum import Enum
 import json
 import logging
-from typing import Any
 import uuid
-
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -300,9 +299,7 @@ class IntegrationManager:
                 }
 
             # Validate credentials
-            validation_result = await self._validate_credentials(
-                service_type, service_name, credentials
-            )
+            validation_result = await self._validate_credentials(service_type, service_name, credentials)
             if not validation_result["valid"]:
                 return {
                     "error": validation_result["error"],
@@ -320,15 +317,11 @@ class IntegrationManager:
                 "service_name": service_name,
                 "credentials": encrypted_credentials,
                 "status": IntegrationStatus.PENDING.value,
-                "capabilities": self.supported_services[service_type][service_name][
-                    "capabilities"
-                ],
+                "capabilities": self.supported_services[service_type][service_name]["capabilities"],
                 "created_at": datetime.now().isoformat(),
                 "last_sync": None,
                 "sync_frequency": "hourly",
-                "data_mapping": self._create_data_mapping(
-                    agent_type, service_type, service_name
-                ),
+                "data_mapping": self._create_data_mapping(agent_type, service_type, service_name),
                 "webhook_url": f"/webhooks/{integration_id}",
                 "error_count": 0,
                 "success_count": 0,
@@ -381,16 +374,10 @@ class IntegrationManager:
             return {
                 "agent_type": agent_type,
                 "total_integrations": len(integrations_data),
-                "active_integrations": len(
-                    [i for i in integrations_data if i["status"] == "active"]
-                ),
+                "active_integrations": len([i for i in integrations_data if i["status"] == "active"]),
                 "integrations": integrations_data,
-                "available_services": self._get_available_services_for_agent(
-                    agent_type
-                ),
-                "integration_health": self._calculate_integration_health(
-                    integrations_data
-                ),
+                "available_services": self._get_available_services_for_agent(agent_type),
+                "integration_health": self._calculate_integration_health(integrations_data),
             }
 
         except Exception as e:
@@ -432,10 +419,7 @@ class IntegrationManager:
 
     def _validate_service_support(self, service_type: str, service_name: str) -> bool:
         """Validate if service is supported."""
-        return (
-            service_type in self.supported_services
-            and service_name in self.supported_services[service_type]
-        )
+        return service_type in self.supported_services and service_name in self.supported_services[service_type]
 
     async def _validate_credentials(
         self, service_type: str, service_name: str, credentials: dict[str, Any]
@@ -465,9 +449,7 @@ class IntegrationManager:
         decoded = base64.b64decode(encrypted_credentials.encode()).decode()
         return json.loads(decoded)
 
-    def _create_data_mapping(
-        self, agent_type: str, service_type: str, service_name: str
-    ) -> dict[str, Any]:
+    def _create_data_mapping(self, agent_type: str, service_type: str, service_name: str) -> dict[str, Any]:
         """Create data mapping configuration for integration."""
         mappings = {
             "financial": {
@@ -512,9 +494,7 @@ class IntegrationManager:
             "data_retention": "90 days",
         }
 
-    def _get_available_services_for_agent(
-        self, agent_type: str
-    ) -> dict[str, list[str]]:
+    def _get_available_services_for_agent(self, agent_type: str) -> dict[str, list[str]]:
         """Get available services for specific agent type."""
         agent_service_compatibility = {
             "financial": ["banking", "payment_processors", "accounting_software"],
@@ -529,15 +509,11 @@ class IntegrationManager:
 
         for service_type in compatible_services:
             if service_type in self.supported_services:
-                available[service_type] = list(
-                    self.supported_services[service_type].keys()
-                )
+                available[service_type] = list(self.supported_services[service_type].keys())
 
         return available
 
-    def _calculate_integration_health(
-        self, integrations: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    def _calculate_integration_health(self, integrations: list[dict[str, Any]]) -> dict[str, Any]:
         """Calculate overall health of agent integrations."""
         if not integrations:
             return {"status": "no_integrations", "score": 0}
@@ -548,20 +524,14 @@ class IntegrationManager:
         health_score = (active_count / len(integrations)) * 100
 
         return {
-            "status": (
-                "healthy"
-                if health_score > 80
-                else "needs_attention" if health_score > 50 else "critical"
-            ),
+            "status": ("healthy" if health_score > 80 else "needs_attention" if health_score > 50 else "critical"),
             "score": round(health_score, 1),
             "active_integrations": active_count,
             "error_integrations": error_count,
             "recommendations": self._generate_health_recommendations(integrations),
         }
 
-    def _generate_health_recommendations(
-        self, integrations: list[dict[str, Any]]
-    ) -> list[str]:
+    def _generate_health_recommendations(self, integrations: list[dict[str, Any]]) -> list[str]:
         """Generate recommendations for improving integration health."""
         recommendations = []
 
@@ -572,19 +542,14 @@ class IntegrationManager:
         old_syncs = [
             i
             for i in integrations
-            if i["last_sync"]
-            and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
+            if i["last_sync"] and (datetime.now() - datetime.fromisoformat(i["last_sync"])).days > 1
         ]
         if old_syncs:
-            recommendations.append(
-                f"Update {len(old_syncs)} integrations with stale data"
-            )
+            recommendations.append(f"Update {len(old_syncs)} integrations with stale data")
 
         return recommendations
 
-    async def _perform_data_sync(
-        self, integration: dict[str, Any], credentials: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _perform_data_sync(self, integration: dict[str, Any], credentials: dict[str, Any]) -> dict[str, Any]:
         """Perform actual data synchronization."""
         # Simulate data sync - in production, this would make actual API calls
         return {

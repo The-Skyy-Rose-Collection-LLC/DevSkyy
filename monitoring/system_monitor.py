@@ -1,13 +1,12 @@
 import asyncio
-from collections import deque
 import contextlib
+import logging
+from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import logging
 from typing import Any, Optional
 
 import psutil
-
 
 """
 Advanced System Monitoring - Enterprise Grade
@@ -15,6 +14,7 @@ Comprehensive system health monitoring with metrics collection and alerting
 """
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class SystemMetrics:
@@ -32,6 +32,7 @@ class SystemMetrics:
     process_count: int
     load_average: list[float]
 
+
 @dataclass
 class AlertRule:
     """Alert rule configuration"""
@@ -43,6 +44,7 @@ class AlertRule:
     duration: int  # seconds
     severity: str  # 'critical', 'warning', 'info'
     enabled: bool = True
+
 
 class MetricsCollector:
     """System metrics collector"""
@@ -86,9 +88,7 @@ class MetricsCollector:
                     logger.warning(f"High memory usage: {metrics.memory_percent:.1f}%")
 
                 if metrics.disk_usage_percent > 90:
-                    logger.warning(
-                        f"High disk usage: {metrics.disk_usage_percent:.1f}%"
-                    )
+                    logger.warning(f"High disk usage: {metrics.disk_usage_percent:.1f}%")
 
                 await asyncio.sleep(self.collection_interval)
 
@@ -163,13 +163,12 @@ class MetricsCollector:
         return {
             "cpu_percent": sum(m.cpu_percent for m in history) / len(history),
             "memory_percent": sum(m.memory_percent for m in history) / len(history),
-            "disk_usage_percent": sum(m.disk_usage_percent for m in history)
-            / len(history),
-            "active_connections": sum(m.active_connections for m in history)
-            / len(history),
+            "disk_usage_percent": sum(m.disk_usage_percent for m in history) / len(history),
+            "active_connections": sum(m.active_connections for m in history) / len(history),
             "process_count": sum(m.process_count for m in history) / len(history),
             "load_average_1m": sum(m.load_average[0] for m in history) / len(history),
         }
+
 
 class AlertManager:
     """System alert manager"""
@@ -186,16 +185,10 @@ class AlertManager:
         """Setup default alert rules"""
         default_rules = [
             AlertRule("High CPU Usage", "cpu_percent", 90.0, ">=", 300, "critical"),
-            AlertRule(
-                "High Memory Usage", "memory_percent", 90.0, ">=", 300, "critical"
-            ),
-            AlertRule(
-                "High Disk Usage", "disk_usage_percent", 90.0, ">=", 600, "warning"
-            ),
+            AlertRule("High Memory Usage", "memory_percent", 90.0, ">=", 300, "critical"),
+            AlertRule("High Disk Usage", "disk_usage_percent", 90.0, ">=", 600, "warning"),
             AlertRule("Low Disk Space", "disk_free_gb", 1.0, "<=", 600, "critical"),
-            AlertRule(
-                "High Load Average", "load_average_1m", 5.0, ">=", 300, "warning"
-            ),
+            AlertRule("High Load Average", "load_average_1m", 5.0, ">=", 300, "warning"),
             AlertRule("Too Many Processes", "process_count", 500, ">=", 300, "warning"),
         ]
 
@@ -225,9 +218,7 @@ class AlertManager:
                 metric_value = metrics.load_average[0]
 
             # Check threshold
-            triggered = self._evaluate_condition(
-                metric_value, rule.operator, rule.threshold
-            )
+            triggered = self._evaluate_condition(metric_value, rule.operator, rule.threshold)
 
             alert_key = f"{rule.name}_{rule.metric}"
 
@@ -256,9 +247,7 @@ class AlertManager:
             elif alert_key in self.active_alerts:
                 self._clear_alert(alert_key)
 
-    def _evaluate_condition(
-        self, value: float, operator: str, threshold: float
-    ) -> bool:
+    def _evaluate_condition(self, value: float, operator: str, threshold: float) -> bool:
         """Evaluate alert condition"""
         if operator == ">":
             return value > threshold
@@ -336,11 +325,8 @@ class AlertManager:
     def get_alert_history(self, hours: int = 24) -> list[dict]:
         """Get alert history"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
-        return [
-            alert
-            for alert in self.alert_history
-            if datetime.fromisoformat(alert["timestamp"]) >= cutoff_time
-        ]
+        return [alert for alert in self.alert_history if datetime.fromisoformat(alert["timestamp"]) >= cutoff_time]
+
 
 class SystemMonitor:
     """Main system monitor class"""
@@ -428,6 +414,7 @@ class SystemMonitor:
             },
             "averages_1h": self.metrics_collector.get_average_metrics(60),
         }
+
 
 # Global instance
 system_monitor = SystemMonitor()

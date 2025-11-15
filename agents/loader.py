@@ -7,9 +7,9 @@ Implements caching for performance (MCP efficiency pattern).
 Truth Protocol: Pydantic validation, no placeholders, explicit error handling.
 """
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime
-import json
 from pathlib import Path
 from typing import Any, Optional
 
@@ -31,6 +31,7 @@ class ConfigNotFoundError(LoaderError):
 @dataclass
 class AgentCapability:
     """Represents a capability of an agent"""
+
     name: str
     confidence: float
     keywords: list[str] = field(default_factory=list)
@@ -43,6 +44,7 @@ class AgentConfig(BaseModel):
 
     Follows Truth Protocol: All fields validated, no optional without defaults
     """
+
     agent_id: str = Field(..., min_length=1, description="Unique agent identifier")
     agent_name: str = Field(..., min_length=1, description="Human-readable agent name")
     agent_type: str = Field(..., min_length=1, description="Agent type/category")
@@ -54,21 +56,21 @@ class AgentConfig(BaseModel):
     enabled: bool = Field(default=True, description="Whether agent is enabled")
     metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-    @validator('agent_type')
+    @validator("agent_type")
     def validate_agent_type(cls, v: str) -> str:
         """Validate agent type is not empty and follows naming convention"""
-        if not v or not v.replace('_', '').replace('-', '').isalnum():
+        if not v or not v.replace("_", "").replace("-", "").isalnum():
             raise ValueError(f"Invalid agent_type: {v}. Must contain only alphanumeric, underscore, or hyphen")
         return v.lower()
 
-    @validator('capabilities')
+    @validator("capabilities")
     def validate_capabilities(cls, v: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Validate capabilities structure"""
         for cap in v:
-            if 'name' not in cap:
+            if "name" not in cap:
                 raise ValueError("Each capability must have a 'name' field")
-            if 'confidence' in cap:
-                conf = cap['confidence']
+            if "confidence" in cap:
+                conf = cap["confidence"]
                 if not isinstance(conf, (int, float)) or not (0.0 <= conf <= 1.0):
                     raise ValueError(f"Capability confidence must be between 0.0 and 1.0, got {conf}")
         return v
@@ -77,18 +79,19 @@ class AgentConfig(BaseModel):
         """Convert capabilities dict to AgentCapability objects"""
         return [
             AgentCapability(
-                name=cap.get('name', ''),
-                confidence=cap.get('confidence', 0.5),
-                keywords=cap.get('keywords', []),
-                dependencies=cap.get('dependencies', [])
+                name=cap.get("name", ""),
+                confidence=cap.get("confidence", 0.5),
+                keywords=cap.get("keywords", []),
+                dependencies=cap.get("dependencies", []),
             )
             for cap in self.capabilities
         ]
 
     class Config:
         """Pydantic configuration"""
+
         validate_assignment = True
-        extra = 'forbid'  # No extra fields allowed (strict validation)
+        extra = "forbid"  # No extra fields allowed (strict validation)
 
 
 class AgentConfigLoader:
@@ -146,24 +149,18 @@ class AgentConfigLoader:
             )
 
         try:
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
         except json.JSONDecodeError as e:
-            raise ConfigValidationError(
-                f"Invalid JSON in {config_path}: {e!s}"
-            )
+            raise ConfigValidationError(f"Invalid JSON in {config_path}: {e!s}")
         except OSError as e:
-            raise LoaderError(
-                f"Error reading config file {config_path}: {e!s}"
-            )
+            raise LoaderError(f"Error reading config file {config_path}: {e!s}")
 
         # Validate using Pydantic
         try:
             config = AgentConfig(**config_data)
         except ValidationError as e:
-            raise ConfigValidationError(
-                f"Configuration validation failed for {agent_id}: {e!s}"
-            )
+            raise ConfigValidationError(f"Configuration validation failed for {agent_id}: {e!s}")
 
         # Update cache
         self._cache[agent_id] = config
@@ -188,8 +185,7 @@ class AgentConfigLoader:
         """
         if not self.config_dir.exists():
             raise LoaderError(
-                f"Config directory not found: {self.config_dir}. "
-                "Create it or specify a valid directory."
+                f"Config directory not found: {self.config_dir}. " "Create it or specify a valid directory."
             )
 
         configs = {}
@@ -199,9 +195,7 @@ class AgentConfigLoader:
         config_files = list(self.config_dir.glob("*.json"))
 
         if not config_files:
-            raise LoaderError(
-                f"No configuration files found in {self.config_dir}"
-            )
+            raise LoaderError(f"No configuration files found in {self.config_dir}")
 
         for config_file in config_files:
             agent_id = config_file.stem
@@ -212,9 +206,7 @@ class AgentConfigLoader:
                 errors.append(f"{agent_id}: {e!s}")
 
         if errors:
-            raise ConfigValidationError(
-                f"Failed to load {len(errors)} configs:\n" + "\n".join(errors)
-            )
+            raise ConfigValidationError(f"Failed to load {len(errors)} configs:\n" + "\n".join(errors))
 
         return configs
 
@@ -240,7 +232,8 @@ class AgentConfigLoader:
         """
         all_configs = self.load_all_configs()
         return [
-            config for config in all_configs.values()
+            config
+            for config in all_configs.values()
             if config.agent_type.lower() == agent_type.lower() and config.enabled
         ]
 
@@ -284,7 +277,7 @@ class AgentConfigLoader:
             Tuple of (is_valid, error_message)
         """
         try:
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
 
             AgentConfig(**config_data)
@@ -305,15 +298,14 @@ class AgentConfigLoader:
             Dictionary with cache statistics
         """
         return {
-            'cached_configs': len(self._cache),
-            'agent_ids': list(self._cache.keys()),
-            'cache_ttl_seconds': self._cache_ttl_seconds,
-            'oldest_cache_age_seconds': (
-                min(
-                    (datetime.now() - ts).total_seconds()
-                    for ts in self._cache_timestamps.values()
-                ) if self._cache_timestamps else 0
-            )
+            "cached_configs": len(self._cache),
+            "agent_ids": list(self._cache.keys()),
+            "cache_ttl_seconds": self._cache_ttl_seconds,
+            "oldest_cache_age_seconds": (
+                min((datetime.now() - ts).total_seconds() for ts in self._cache_timestamps.values())
+                if self._cache_timestamps
+                else 0
+            ),
         }
 
 

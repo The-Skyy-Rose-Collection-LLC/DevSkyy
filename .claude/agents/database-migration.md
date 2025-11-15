@@ -507,7 +507,7 @@ jobs:
       - name: Test migrations up
         run: alembic upgrade head
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost/test
+          DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
 
       - name: Test migrations down
         run: alembic downgrade base

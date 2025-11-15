@@ -14,7 +14,6 @@ Truth Protocol Compliant: All implementations verified, no placeholders.
 from agents.loader import AgentConfig, AgentConfigLoader, LoaderError
 from agents.router import AgentRouter, RoutingError, RoutingResult, TaskType
 
-
 __all__ = [
     "AgentConfig",
     "AgentConfigLoader",

@@ -7,13 +7,12 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from jwt_auth import RefreshTokenRequest, create_access_token, create_refresh_token, get_current_user, settings
+from jwt_auth import create_access_token, create_refresh_token, get_current_user, RefreshTokenRequest, settings
 from pydantic import BaseModel, EmailStr
-
 
 logger = logging.getLogger(__name__)
 
@@ -23,27 +22,35 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 # MODELS
 # ============================================================================
 
+
 class LoginRequest(BaseModel):
     """User login request"""
+
     username: str
     password: str
 
+
 class RegisterRequest(BaseModel):
     """User registration request"""
+
     username: str
     email: EmailStr
     password: str
     password_confirm: str
 
+
 class TokenResponse(BaseModel):
     """Token response"""
+
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
 
+
 class UserInfoResponse(BaseModel):
     """User information response"""
+
     id: int
     username: str
     email: str
@@ -51,9 +58,11 @@ class UserInfoResponse(BaseModel):
     roles: list
     created_at: datetime
 
+
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
+
 
 @router.post("/login", response_model=TokenResponse, tags=["authentication"])
 async def login_endpoint(request: LoginRequest):
@@ -79,16 +88,10 @@ async def login_endpoint(request: LoginRequest):
         user = await authenticate_user_from_db(request.username, request.password)
         if not user:
             logger.warning(f"Failed login attempt for user: {request.username}")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
 
         # Create tokens
-        access_token = create_access_token(
-            user_id=str(user["id"]),
-            roles=user.get("roles", [])
-        )
+        access_token = create_access_token(user_id=str(user["id"]), roles=user.get("roles", []))
         refresh_token = create_refresh_token(user_id=str(user["id"]))
 
         logger.info(f"User logged in: {request.username}")
@@ -96,17 +99,15 @@ async def login_endpoint(request: LoginRequest):
         return TokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Login error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+
 
 @router.post("/refresh", response_model=TokenResponse, tags=["authentication"])
 async def refresh_endpoint(request: RefreshTokenRequest):
@@ -127,30 +128,23 @@ async def refresh_endpoint(request: RefreshTokenRequest):
     """
     try:
         # Verify refresh token and create new tokens
-        access_token = create_access_token(
-            user_id="user_id_from_refresh_token",  # TODO: extract from token
-            roles=[]
-        )
-        new_refresh_token = create_refresh_token(
-            user_id="user_id_from_refresh_token"
-        )
+        access_token = create_access_token(user_id="user_id_from_refresh_token", roles=[])  # TODO: extract from token
+        new_refresh_token = create_refresh_token(user_id="user_id_from_refresh_token")
 
         logger.info("Token refreshed")
 
         return TokenResponse(
             access_token=access_token,
             refresh_token=new_refresh_token,
-            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Refresh error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+
 
 @router.post("/logout", tags=["authentication"])
 async def logout_endpoint(current_user: dict = Depends(get_current_user)):
@@ -171,10 +165,8 @@ async def logout_endpoint(current_user: dict = Depends(get_current_user)):
 
     # TODO: Add token to blacklist (if implementing token revocation)
 
-    return {
-        "status": "success",
-        "message": "Successfully logged out"
-    }
+    return {"status": "success", "message": "Successfully logged out"}
+
 
 @router.get("/me", response_model=UserInfoResponse, tags=["authentication"])
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
@@ -196,8 +188,9 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         "email": "user@example.com",
         "is_active": True,
         "roles": current_user.get("roles", []),
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow(),
     }
+
 
 @router.post("/register", response_model=dict, tags=["authentication"])
 async def register_endpoint(request: RegisterRequest):
@@ -216,10 +209,7 @@ async def register_endpoint(request: RegisterRequest):
         422: Validation error
     """
     if request.password != request.password_confirm:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Passwords do not match"
-        )
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Passwords do not match")
 
     # TODO: Check if user exists in database
     # TODO: Create new user in database
@@ -228,13 +218,14 @@ async def register_endpoint(request: RegisterRequest):
     logger.warning("register_endpoint() is not fully implemented")
 
     raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Registration endpoint not yet implemented"
+        status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Registration endpoint not yet implemented"
     )
+
 
 # ============================================================================
 # HELPER FUNCTIONS (STUBS)
 # ============================================================================
+
 
 async def authenticate_user_from_db(username: str, password: str):
     """

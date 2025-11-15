@@ -6,13 +6,12 @@ All enhancements are written to proposals.json and never executed automatically.
 Operator reviews and integrates approved updates manually.
 """
 
-from datetime import datetime, timedelta
 import json
 import logging
-from pathlib import Path
 import sqlite3
+from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Optional
-
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,8 @@ class PerformanceTracker:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS agent_metrics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 agent_name TEXT NOT NULL,
@@ -51,14 +51,18 @@ class PerformanceTracker:
                 metric_value REAL NOT NULL,
                 timestamp TEXT NOT NULL
             )
-        """)
+        """
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE INDEX IF NOT EXISTS idx_agent_timestamp
             ON agent_metrics (agent_name, timestamp)
-        """)
+        """
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS system_metrics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 metric_name TEXT NOT NULL,
@@ -66,48 +70,40 @@ class PerformanceTracker:
                 metadata TEXT,
                 timestamp TEXT NOT NULL
             )
-        """)
+        """
+        )
 
         conn.commit()
         conn.close()
 
-    def log_metric(
-        self,
-        agent_name: str,
-        metric_name: str,
-        metric_value: float
-    ):
+    def log_metric(self, agent_name: str, metric_name: str, metric_value: float):
         """Log agent performance metric"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO agent_metrics (agent_name, metric_name, metric_value, timestamp)
             VALUES (?, ?, ?, ?)
-        """, (agent_name, metric_name, metric_value, datetime.now().isoformat()))
+        """,
+            (agent_name, metric_name, metric_value, datetime.now().isoformat()),
+        )
 
         conn.commit()
         conn.close()
 
-    def log_system_metric(
-        self,
-        metric_name: str,
-        metric_value: float,
-        metadata: Optional[dict] = None
-    ):
+    def log_system_metric(self, metric_name: str, metric_value: float, metadata: Optional[dict] = None):
         """Log system-wide metric"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO system_metrics (metric_name, metric_value, metadata, timestamp)
             VALUES (?, ?, ?, ?)
-        """, (
-            metric_name,
-            metric_value,
-            json.dumps(metadata) if metadata else None,
-            datetime.now().isoformat()
-        ))
+        """,
+            (metric_name, metric_value, json.dumps(metadata) if metadata else None, datetime.now().isoformat()),
+        )
 
         conn.commit()
         conn.close()
@@ -120,14 +116,17 @@ class PerformanceTracker:
         week_ago = (datetime.now() - timedelta(days=7)).isoformat()
 
         # Agent performance
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT agent_name, metric_name, AVG(metric_value) as avg_value,
                    MIN(metric_value) as min_value, MAX(metric_value) as max_value,
                    COUNT(*) as sample_count
             FROM agent_metrics
             WHERE timestamp >= ?
             GROUP BY agent_name, metric_name
-        """, (week_ago,))
+        """,
+            (week_ago,),
+        )
 
         agent_stats = {}
         for row in cursor.fetchall():
@@ -139,16 +138,19 @@ class PerformanceTracker:
                 "average": avg_val,
                 "min": min_val,
                 "max": max_val,
-                "samples": count
+                "samples": count,
             }
 
         # System performance
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT metric_name, AVG(metric_value) as avg_value
             FROM system_metrics
             WHERE timestamp >= ?
             GROUP BY metric_name
-        """, (week_ago,))
+        """,
+            (week_ago,),
+        )
 
         system_stats = {}
         for row in cursor.fetchall():
@@ -162,7 +164,7 @@ class PerformanceTracker:
             "start_date": week_ago,
             "end_date": datetime.now().isoformat(),
             "agent_performance": agent_stats,
-            "system_performance": system_stats
+            "system_performance": system_stats,
         }
 
         logger.info("📊 Weekly performance report generated")
@@ -183,52 +185,58 @@ class PerformanceTracker:
             if "execution_time" in metrics:
                 avg_time = metrics["execution_time"]["average"]
                 if avg_time > 5.0:  # 5 seconds threshold
-                    proposals.append({
-                        "id": f"proposal_{len(proposals) + 1}",
-                        "type": "performance_optimization",
-                        "agent": agent_name,
-                        "issue": "slow_execution",
-                        "current_value": avg_time,
-                        "threshold": 5.0,
-                        "recommendation": f"Agent {agent_name} average execution time ({avg_time:.2f}s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
-                        "priority": "medium",
-                        "requires_testing": True,
-                        "created_at": datetime.now().isoformat()
-                    })
+                    proposals.append(
+                        {
+                            "id": f"proposal_{len(proposals) + 1}",
+                            "type": "performance_optimization",
+                            "agent": agent_name,
+                            "issue": "slow_execution",
+                            "current_value": avg_time,
+                            "threshold": 5.0,
+                            "recommendation": f"Agent {agent_name} average execution time ({avg_time:.2f}s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
+                            "priority": "medium",
+                            "requires_testing": True,
+                            "created_at": datetime.now().isoformat(),
+                        }
+                    )
 
             # Proposal 2: High error rate
             if "error_rate" in metrics:
                 error_rate = metrics["error_rate"]["average"]
                 if error_rate > 0.05:  # 5% error rate
-                    proposals.append({
-                        "id": f"proposal_{len(proposals) + 1}",
-                        "type": "reliability_improvement",
-                        "agent": agent_name,
-                        "issue": "high_error_rate",
-                        "current_value": error_rate,
-                        "threshold": 0.05,
-                        "recommendation": f"Agent {agent_name} error rate ({error_rate:.2%}) exceeds acceptable threshold. Review error logs and add additional error handling.",
-                        "priority": "high",
-                        "requires_testing": True,
-                        "created_at": datetime.now().isoformat()
-                    })
+                    proposals.append(
+                        {
+                            "id": f"proposal_{len(proposals) + 1}",
+                            "type": "reliability_improvement",
+                            "agent": agent_name,
+                            "issue": "high_error_rate",
+                            "current_value": error_rate,
+                            "threshold": 0.05,
+                            "recommendation": f"Agent {agent_name} error rate ({error_rate:.2%}) exceeds acceptable threshold. Review error logs and add additional error handling.",
+                            "priority": "high",
+                            "requires_testing": True,
+                            "created_at": datetime.now().isoformat(),
+                        }
+                    )
 
         # System-wide proposals
         system_perf = report.get("system_performance", {})
 
         if "cpu_usage" in system_perf and system_perf["cpu_usage"] > 80:
-            proposals.append({
-                "id": f"proposal_{len(proposals) + 1}",
-                "type": "resource_optimization",
-                "scope": "system",
-                "issue": "high_cpu_usage",
-                "current_value": system_perf["cpu_usage"],
-                "threshold": 80,
-                "recommendation": "System CPU usage is high. Consider implementing request throttling or increasing hardware resources.",
-                "priority": "medium",
-                "requires_testing": False,
-                "created_at": datetime.now().isoformat()
-            })
+            proposals.append(
+                {
+                    "id": f"proposal_{len(proposals) + 1}",
+                    "type": "resource_optimization",
+                    "scope": "system",
+                    "issue": "high_cpu_usage",
+                    "current_value": system_perf["cpu_usage"],
+                    "threshold": 80,
+                    "recommendation": "System CPU usage is high. Consider implementing request throttling or increasing hardware resources.",
+                    "priority": "medium",
+                    "requires_testing": False,
+                    "created_at": datetime.now().isoformat(),
+                }
+            )
 
         # Save proposals to file
         await self._save_proposals(proposals)
@@ -266,11 +274,7 @@ class PerformanceTracker:
         return proposals
 
     async def update_proposal_status(
-        self,
-        proposal_id: str,
-        status: str,
-        operator: str,
-        notes: Optional[str] = None
+        self, proposal_id: str, status: str, operator: str, notes: Optional[str] = None
     ) -> dict[str, Any]:
         """Update proposal status (approved/rejected/implemented)"""
         if not self.proposals_path.exists():
@@ -304,7 +308,8 @@ class PerformanceTracker:
         cutoff_date = (datetime.now() - timedelta(days=days)).isoformat()
 
         # Agent KPIs
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT agent_name,
                    COUNT(DISTINCT DATE(timestamp)) as active_days,
                    COUNT(*) as total_operations,
@@ -312,7 +317,9 @@ class PerformanceTracker:
             FROM agent_metrics
             WHERE timestamp >= ? AND metric_name = 'execution_time'
             GROUP BY agent_name
-        """, (cutoff_date,))
+        """,
+            (cutoff_date,),
+        )
 
         agent_kpis = {}
         for row in cursor.fetchall():
@@ -320,13 +327,9 @@ class PerformanceTracker:
             agent_kpis[agent_name] = {
                 "active_days": active_days,
                 "total_operations": total_ops,
-                "avg_execution_time": avg_time
+                "avg_execution_time": avg_time,
             }
 
         conn.close()
 
-        return {
-            "period_days": days,
-            "agent_kpis": agent_kpis,
-            "generated_at": datetime.now().isoformat()
-        }
+        return {"period_days": days, "agent_kpis": agent_kpis, "generated_at": datetime.now().isoformat()}

@@ -5,26 +5,29 @@ Enterprise-grade incident detection, response, and recovery automation
 """
 
 import asyncio
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
-import uuid
 
-from monitoring.enterprise_logging import LogCategory, enterprise_logger
+from monitoring.enterprise_logging import enterprise_logger, LogCategory
 from monitoring.enterprise_metrics import Alert, AlertSeverity, metrics_collector
 
 
 class IncidentStatus(Enum):
     """Incident status levels."""
+
     OPEN = "open"
     INVESTIGATING = "investigating"
     IDENTIFIED = "identified"
     MONITORING = "monitoring"
     RESOLVED = "resolved"
 
+
 class ResponseAction(Enum):
     """Automated response actions."""
+
     SCALE_UP = "scale_up"
     SCALE_DOWN = "scale_down"
     RESTART_SERVICE = "restart_service"
@@ -35,9 +38,11 @@ class ResponseAction(Enum):
     RUNBOOK = "runbook"
     CUSTOM = "custom"
 
+
 @dataclass
 class IncidentResponse:
     """Incident response action definition."""
+
     action: ResponseAction
     parameters: dict[str, Any] = field(default_factory=dict)
     delay_seconds: int = 0
@@ -45,9 +50,11 @@ class IncidentResponse:
     timeout_seconds: int = 300
     condition: Optional[str] = None  # Condition to execute action
 
+
 @dataclass
 class Incident:
     """Incident tracking object."""
+
     id: str
     title: str
     description: str
@@ -62,15 +69,18 @@ class Incident:
     assignee: Optional[str] = None
     tags: list[str] = field(default_factory=list)
 
+
 @dataclass
 class ResponsePlan:
     """Incident response plan."""
+
     name: str
     description: str
     triggers: list[str]  # Alert rule names that trigger this plan
     responses: list[IncidentResponse]
     escalation_time: int = 300  # seconds before escalation
     auto_resolve: bool = False
+
 
 class IncidentResponseSystem:
     """
@@ -95,10 +105,7 @@ class IncidentResponseSystem:
         # Register with metrics collector for alerts
         metrics_collector.add_alert_callback(self.handle_alert)
 
-        enterprise_logger.info(
-            "Incident response system initialized",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info("Incident response system initialized", category=LogCategory.SYSTEM)
 
     def _initialize_default_plans(self):
         """Initialize default incident response plans."""
@@ -109,27 +116,25 @@ class IncidentResponseSystem:
                 triggers=["high_response_time"],
                 responses=[
                     IncidentResponse(
-                        action=ResponseAction.CLEAR_CACHE,
-                        parameters={"cache_type": "all"},
-                        delay_seconds=0
+                        action=ResponseAction.CLEAR_CACHE, parameters={"cache_type": "all"}, delay_seconds=0
                     ),
                     IncidentResponse(
                         action=ResponseAction.SCALE_UP,
                         parameters={"service": "web", "replicas": 2},
                         delay_seconds=60,
-                        condition="response_time > 3.0"
+                        condition="response_time > 3.0",
                     ),
                     IncidentResponse(
                         action=ResponseAction.NOTIFICATION,
                         parameters={
                             "channels": ["slack", "email"],
-                            "message": "High response time detected - auto-scaling initiated"
+                            "message": "High response time detected - auto-scaling initiated",
                         },
-                        delay_seconds=120
-                    )
+                        delay_seconds=120,
+                    ),
                 ],
                 escalation_time=600,
-                auto_resolve=True
+                auto_resolve=True,
             ),
             ResponsePlan(
                 name="high_error_rate_plan",
@@ -139,24 +144,24 @@ class IncidentResponseSystem:
                     IncidentResponse(
                         action=ResponseAction.CIRCUIT_BREAKER,
                         parameters={"service": "external_apis", "duration": 300},
-                        delay_seconds=0
+                        delay_seconds=0,
                     ),
                     IncidentResponse(
                         action=ResponseAction.RATE_LIMIT,
                         parameters={"limit": "100/minute", "duration": 600},
-                        delay_seconds=30
+                        delay_seconds=30,
                     ),
                     IncidentResponse(
                         action=ResponseAction.NOTIFICATION,
                         parameters={
                             "channels": ["slack", "pagerduty"],
                             "message": "Critical: High error rate detected - circuit breaker activated",
-                            "severity": "critical"
+                            "severity": "critical",
                         },
-                        delay_seconds=0
-                    )
+                        delay_seconds=0,
+                    ),
                 ],
-                escalation_time=180
+                escalation_time=180,
             ),
             ResponsePlan(
                 name="memory_pressure_plan",
@@ -164,23 +169,19 @@ class IncidentResponseSystem:
                 triggers=["low_memory"],
                 responses=[
                     IncidentResponse(
-                        action=ResponseAction.CLEAR_CACHE,
-                        parameters={"cache_type": "memory"},
-                        delay_seconds=0
+                        action=ResponseAction.CLEAR_CACHE, parameters={"cache_type": "memory"}, delay_seconds=0
                     ),
                     IncidentResponse(
                         action=ResponseAction.RESTART_SERVICE,
                         parameters={"service": "background_workers"},
                         delay_seconds=120,
-                        condition="memory_usage > 0.95"
+                        condition="memory_usage > 0.95",
                     ),
                     IncidentResponse(
-                        action=ResponseAction.SCALE_UP,
-                        parameters={"service": "web", "replicas": 1},
-                        delay_seconds=300
-                    )
+                        action=ResponseAction.SCALE_UP, parameters={"service": "web", "replicas": 1}, delay_seconds=300
+                    ),
                 ],
-                escalation_time=900
+                escalation_time=900,
             ),
             ResponsePlan(
                 name="security_incident_plan",
@@ -190,25 +191,25 @@ class IncidentResponseSystem:
                     IncidentResponse(
                         action=ResponseAction.RATE_LIMIT,
                         parameters={"limit": "10/minute", "duration": 3600},
-                        delay_seconds=0
+                        delay_seconds=0,
                     ),
                     IncidentResponse(
                         action=ResponseAction.NOTIFICATION,
                         parameters={
                             "channels": ["security_team", "pagerduty"],
                             "message": "Security incident detected - rate limiting activated",
-                            "severity": "critical"
+                            "severity": "critical",
                         },
-                        delay_seconds=0
+                        delay_seconds=0,
                     ),
                     IncidentResponse(
                         action=ResponseAction.RUNBOOK,
                         parameters={"runbook_url": "https://docs.devskyy.com/security-incident"},
-                        delay_seconds=60
-                    )
+                        delay_seconds=60,
+                    ),
                 ],
-                escalation_time=300
-            )
+                escalation_time=300,
+            ),
         ]
 
         for plan in default_plans:
@@ -220,10 +221,7 @@ class IncidentResponseSystem:
         enterprise_logger.info(
             f"Added response plan: {plan.name}",
             category=LogCategory.SYSTEM,
-            metadata={
-                "triggers": plan.triggers,
-                "responses": len(plan.responses)
-            }
+            metadata={"triggers": plan.triggers, "responses": len(plan.responses)},
         )
 
     def handle_alert(self, alert: Alert):
@@ -236,10 +234,7 @@ class IncidentResponseSystem:
                     triggered_plans.append(plan)
 
             if not triggered_plans:
-                enterprise_logger.debug(
-                    f"No response plan for alert: {alert.rule_name}",
-                    category=LogCategory.SYSTEM
-                )
+                enterprise_logger.debug(f"No response plan for alert: {alert.rule_name}", category=LogCategory.SYSTEM)
                 return
 
             # Create or update incident
@@ -250,19 +245,16 @@ class IncidentResponseSystem:
                 asyncio.create_task(self._execute_response_plan(incident, plan))
 
         except Exception as e:
-            enterprise_logger.error(
-                f"Error handling alert: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Error handling alert: {e}", category=LogCategory.SYSTEM, error=e)
 
     def _create_or_update_incident(self, alert: Alert, plans: list[ResponsePlan]) -> Incident:
         """Create new incident or update existing one."""
         # Check for existing incident with same alert rule
         existing_incident = None
         for incident in self.incidents.values():
-            if (incident.status != IncidentStatus.RESOLVED and
-                any(a.rule_name == alert.rule_name for a in incident.alerts)):
+            if incident.status != IncidentStatus.RESOLVED and any(
+                a.rule_name == alert.rule_name for a in incident.alerts
+            ):
                 existing_incident = incident
                 break
 
@@ -275,7 +267,7 @@ class IncidentResponseSystem:
             enterprise_logger.info(
                 f"Updated incident: {existing_incident.id}",
                 category=LogCategory.SYSTEM,
-                metadata={"alert_rule": alert.rule_name}
+                metadata={"alert_rule": alert.rule_name},
             )
 
             return existing_incident
@@ -291,7 +283,7 @@ class IncidentResponseSystem:
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
                 alerts=[alert],
-                tags=[plan.name for plan in plans]
+                tags=[plan.name for plan in plans],
             )
 
             self.incidents[incident_id] = incident
@@ -299,11 +291,7 @@ class IncidentResponseSystem:
             enterprise_logger.error(
                 f"New incident created: {incident_id}",
                 category=LogCategory.SYSTEM,
-                metadata={
-                    "title": incident.title,
-                    "severity": incident.severity.value,
-                    "alert_rule": alert.rule_name
-                }
+                metadata={"title": incident.title, "severity": incident.severity.value, "alert_rule": alert.rule_name},
             )
 
             return incident
@@ -312,8 +300,7 @@ class IncidentResponseSystem:
         """Execute incident response plan."""
         try:
             enterprise_logger.info(
-                f"Executing response plan: {plan.name} for incident {incident.id}",
-                category=LogCategory.SYSTEM
+                f"Executing response plan: {plan.name} for incident {incident.id}", category=LogCategory.SYSTEM
             )
 
             incident.status = IncidentStatus.INVESTIGATING
@@ -328,7 +315,7 @@ class IncidentResponseSystem:
                 if response.condition and not self._evaluate_condition(response.condition, incident):
                     enterprise_logger.debug(
                         f"Skipping response action - condition not met: {response.condition}",
-                        category=LogCategory.SYSTEM
+                        category=LogCategory.SYSTEM,
                     )
                     continue
 
@@ -351,9 +338,7 @@ class IncidentResponseSystem:
 
         except Exception as e:
             enterprise_logger.error(
-                f"Error executing response plan {plan.name}: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
+                f"Error executing response plan {plan.name}: {e}", category=LogCategory.SYSTEM, error=e
             )
 
     def _evaluate_condition(self, condition: str, incident: Incident) -> bool:
@@ -373,7 +358,7 @@ class IncidentResponseSystem:
                 "incident_id": incident.id,
                 "action": response.action.value,
                 "started_at": datetime.utcnow(),
-                "parameters": response.parameters
+                "parameters": response.parameters,
             }
 
             success = False
@@ -401,31 +386,28 @@ class IncidentResponseSystem:
             enterprise_logger.info(
                 f"Response action {response.action.value}: {'SUCCESS' if success else 'FAILED'}",
                 category=LogCategory.SYSTEM,
-                metadata={
-                    "incident_id": incident.id,
-                    "parameters": response.parameters
-                }
+                metadata={"incident_id": incident.id, "parameters": response.parameters},
             )
 
             # Remove from active responses
             self.active_responses.pop(action_key, None)
 
             # Add to history
-            self.response_history.append({
-                "incident_id": incident.id,
-                "action": response.action.value,
-                "success": success,
-                "executed_at": datetime.utcnow(),
-                "parameters": response.parameters
-            })
+            self.response_history.append(
+                {
+                    "incident_id": incident.id,
+                    "action": response.action.value,
+                    "success": success,
+                    "executed_at": datetime.utcnow(),
+                    "parameters": response.parameters,
+                }
+            )
 
             return success
 
         except Exception as e:
             enterprise_logger.error(
-                f"Response action {response.action.value} failed: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
+                f"Response action {response.action.value} failed: {e}", category=LogCategory.SYSTEM, error=e
             )
             return False
 
@@ -436,9 +418,7 @@ class IncidentResponseSystem:
         channels = parameters.get("channels", [])
 
         enterprise_logger.info(
-            f"Notification sent: {message}",
-            category=LogCategory.SYSTEM,
-            metadata={"channels": channels}
+            f"Notification sent: {message}", category=LogCategory.SYSTEM, metadata={"channels": channels}
         )
         return True
 
@@ -447,10 +427,7 @@ class IncidentResponseSystem:
         service = parameters.get("service", "unknown")
         replicas = parameters.get("replicas", 1)
 
-        enterprise_logger.info(
-            f"Scaling {service} {direction} by {replicas} replicas",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info(f"Scaling {service} {direction} by {replicas} replicas", category=LogCategory.SYSTEM)
         # Placeholder for actual scaling implementation
         return True
 
@@ -458,10 +435,7 @@ class IncidentResponseSystem:
         """Restart a service."""
         service = parameters.get("service", "unknown")
 
-        enterprise_logger.info(
-            f"Restarting service: {service}",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info(f"Restarting service: {service}", category=LogCategory.SYSTEM)
         # Placeholder for actual restart implementation
         return True
 
@@ -469,10 +443,7 @@ class IncidentResponseSystem:
         """Clear cache."""
         cache_type = parameters.get("cache_type", "all")
 
-        enterprise_logger.info(
-            f"Clearing cache: {cache_type}",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info(f"Clearing cache: {cache_type}", category=LogCategory.SYSTEM)
         # Placeholder for actual cache clearing implementation
         return True
 
@@ -482,8 +453,7 @@ class IncidentResponseSystem:
         duration = parameters.get("duration", 300)
 
         enterprise_logger.info(
-            f"Activating circuit breaker for {service} (duration: {duration}s)",
-            category=LogCategory.SYSTEM
+            f"Activating circuit breaker for {service} (duration: {duration}s)", category=LogCategory.SYSTEM
         )
         # Placeholder for actual circuit breaker implementation
         return True
@@ -493,10 +463,7 @@ class IncidentResponseSystem:
         limit = parameters.get("limit", "100/minute")
         duration = parameters.get("duration", 600)
 
-        enterprise_logger.info(
-            f"Applying rate limit: {limit} for {duration}s",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info(f"Applying rate limit: {limit} for {duration}s", category=LogCategory.SYSTEM)
         # Placeholder for actual rate limiting implementation
         return True
 
@@ -504,10 +471,7 @@ class IncidentResponseSystem:
         """Execute runbook."""
         runbook_url = parameters.get("runbook_url", "")
 
-        enterprise_logger.info(
-            f"Executing runbook: {runbook_url}",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info(f"Executing runbook: {runbook_url}", category=LogCategory.SYSTEM)
         # Placeholder for actual runbook execution
         return True
 
@@ -520,9 +484,7 @@ class IncidentResponseSystem:
                 return await self.custom_actions[action_name](parameters)
             except Exception as e:
                 enterprise_logger.error(
-                    f"Custom action {action_name} failed: {e}",
-                    category=LogCategory.SYSTEM,
-                    error=e
+                    f"Custom action {action_name} failed: {e}", category=LogCategory.SYSTEM, error=e
                 )
                 return False
 
@@ -536,7 +498,7 @@ class IncidentResponseSystem:
             enterprise_logger.warning(
                 f"Escalating incident: {incident.id}",
                 category=LogCategory.SYSTEM,
-                metadata={"incident_age": (datetime.utcnow() - incident.created_at).total_seconds()}
+                metadata={"incident_age": (datetime.utcnow() - incident.created_at).total_seconds()},
             )
 
             # Execute escalation callbacks
@@ -544,11 +506,7 @@ class IncidentResponseSystem:
                 try:
                     await callback(incident)
                 except Exception as e:
-                    enterprise_logger.error(
-                        f"Escalation callback failed: {e}",
-                        category=LogCategory.SYSTEM,
-                        error=e
-                    )
+                    enterprise_logger.error(f"Escalation callback failed: {e}", category=LogCategory.SYSTEM, error=e)
 
     async def _schedule_auto_resolve(self, incident: Incident, delay_seconds: int):
         """Schedule automatic incident resolution."""
@@ -580,8 +538,8 @@ class IncidentResponseSystem:
                 category=LogCategory.SYSTEM,
                 metadata={
                     "duration": (incident.resolved_at - incident.created_at).total_seconds(),
-                    "resolution_note": resolution_note
-                }
+                    "resolution_note": resolution_note,
+                },
             )
 
     def get_system_status(self) -> dict[str, Any]:
@@ -593,9 +551,11 @@ class IncidentResponseSystem:
             "active_incidents": len(active_incidents),
             "response_plans": len(self.response_plans),
             "active_responses": len(self.active_responses),
-            "recent_responses": len([r for r in self.response_history if
-                                   (datetime.utcnow() - r["executed_at"]).total_seconds() < 3600])
+            "recent_responses": len(
+                [r for r in self.response_history if (datetime.utcnow() - r["executed_at"]).total_seconds() < 3600]
+            ),
         }
+
 
 # Global incident response system
 incident_response_system = IncidentResponseSystem()

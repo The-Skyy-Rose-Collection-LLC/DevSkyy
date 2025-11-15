@@ -3,12 +3,12 @@ Centralized Logging Configuration for DevSkyy Platform
 Enterprise-grade logging with structured output and multiple handlers
 """
 
-from datetime import datetime
 import logging
 import logging.handlers
 import os
-from pathlib import Path
 import sys
+from datetime import datetime
+from pathlib import Path
 
 
 class ColoredFormatter(logging.Formatter):
@@ -145,9 +145,7 @@ def setup_logging(
         root_logger.addHandler(file_handler)
 
     # Log initial configuration
-    root_logger.info(
-        f"Logging configured - Level: {log_level}, File: {log_file if enable_file else 'Disabled'}"
-    )
+    root_logger.info(f"Logging configured - Level: {log_level}, File: {log_file if enable_file else 'Disabled'}")
 
     return root_logger
 
@@ -180,9 +178,7 @@ def log_execution_time(func):
             return result
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(
-                f"{func.__name__} failed after {execution_time:.4f} seconds: {e!s}"
-            )
+            logger.error(f"{func.__name__} failed after {execution_time:.4f} seconds: {e!s}")
             raise
 
     return wrapper
@@ -203,18 +199,16 @@ def log_async_execution_time(func):
             return result
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(
-                f"{func.__name__} failed after {execution_time:.4f} seconds: {e!s}"
-            )
+            logger.error(f"{func.__name__} failed after {execution_time:.4f} seconds: {e!s}")
             raise
 
     return wrapper
 
 
-# Import for decorator usage
-from functools import wraps
 import time
 
+# Import for decorator usage
+from functools import wraps
 
 # Initialize logging on module import
 if not logging.getLogger().handlers:

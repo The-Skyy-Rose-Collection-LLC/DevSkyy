@@ -1,17 +1,17 @@
 import asyncio
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
 
 import main
 
-
 """
 Basic functionality tests to ensure CI/CD pipeline works
 These tests are designed to always pass and validate basic functionality
 """
+
 
 class TestBasicFunctionality:
     """Basic functionality tests that should always pass"""
@@ -68,6 +68,7 @@ class TestBasicFunctionality:
         assert "type" in test_dict
         assert len(test_dict) == 2
 
+
 class TestApplicationImports:
     """Test application imports work (with error handling)"""
 
@@ -95,6 +96,7 @@ class TestApplicationImports:
         except ImportError as e:
             pytest.skip(f"Main module not importable: {e}")
 
+
 class TestEnvironmentSetup:
     """Test environment setup and configuration"""
 
@@ -117,6 +119,7 @@ class TestEnvironmentSetup:
         test_path = current_path / "tests"
         if test_path.exists():
             assert test_path.is_dir()
+
 
 @pytest.mark.asyncio
 class TestAsyncFunctionality:
@@ -144,6 +147,7 @@ class TestAsyncFunctionality:
 
         async with AsyncContextManager() as value:
             assert value == "context_value"
+
 
 if __name__ == "__main__":
     # Run tests if this file is executed directly

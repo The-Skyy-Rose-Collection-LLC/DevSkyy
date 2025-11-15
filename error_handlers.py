@@ -12,7 +12,6 @@ from fastapi.responses import JSONResponse
 
 from logger_config import get_logger
 
-
 logger = get_logger(__name__)
 
 
@@ -52,9 +51,7 @@ class AuthenticationException(DevSkyyException):
 class AuthorizationException(DevSkyyException):
     """Authorization-related exceptions."""
 
-    def __init__(
-        self, message: str = "Access denied", details: Optional[dict[str, Any]] = None
-    ):
+    def __init__(self, message: str = "Access denied", details: Optional[dict[str, Any]] = None):
         super().__init__(message, status_code=403, details=details)
 
 
@@ -84,18 +81,14 @@ class RateLimitException(DevSkyyException):
 class ExternalServiceException(DevSkyyException):
     """External service integration exceptions."""
 
-    def __init__(
-        self, service: str, message: str, details: Optional[dict[str, Any]] = None
-    ):
+    def __init__(self, service: str, message: str, details: Optional[dict[str, Any]] = None):
         full_message = f"External service error ({service}): {message}"
         super().__init__(full_message, status_code=502, details=details)
 
 
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Handle standard HTTP exceptions."""
-    logger.warning(
-        f"HTTP Exception: {exc.status_code} - {exc.detail} - Path: {request.url.path}"
-    )
+    logger.warning(f"HTTP Exception: {exc.status_code} - {exc.detail} - Path: {request.url.path}")
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -110,9 +103,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     )
 
 
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """Handle request validation errors."""
     errors = []
     for error in exc.errors():
@@ -139,13 +130,9 @@ async def validation_exception_handler(
     )
 
 
-async def devskyy_exception_handler(
-    request: Request, exc: DevSkyyException
-) -> JSONResponse:
+async def devskyy_exception_handler(request: Request, exc: DevSkyyException) -> JSONResponse:
     """Handle custom DevSkyy exceptions."""
-    logger.error(
-        f"DevSkyy Exception: {exc.status_code} - {exc.message} - Path: {request.url.path}"
-    )
+    logger.error(f"DevSkyy Exception: {exc.status_code} - {exc.message} - Path: {request.url.path}")
 
     return JSONResponse(
         status_code=exc.status_code,

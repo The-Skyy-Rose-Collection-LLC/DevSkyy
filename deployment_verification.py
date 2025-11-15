@@ -6,9 +6,8 @@ Verifies all imports, endpoints, configurations, and system health
 import importlib
 import logging
 import os
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -186,9 +185,7 @@ class DeploymentVerifier:
             # Just verify the URL format and skip actual connection test
             if "asyncpg" in db_url or "postgresql+asyncpg" in db_url:
                 self.info("Async database detected - skipping connection test")
-                self.warn(
-                    "Database connection test skipped", "AsyncPG requires async context"
-                )
+                self.warn("Database connection test skipped", "AsyncPG requires async context")
                 return True
 
             # For sync databases, test the connection
@@ -196,9 +193,7 @@ class DeploymentVerifier:
             from sqlalchemy.pool import NullPool
 
             # Create engine with sync driver
-            sync_url = db_url.replace("+asyncpg", "").replace(
-                "asyncpg://", "postgresql://"
-            )
+            sync_url = db_url.replace("+asyncpg", "").replace("asyncpg://", "postgresql://")
             engine = create_engine(sync_url, poolclass=NullPool)
 
             # Test connection
@@ -339,12 +334,8 @@ class DeploymentVerifier:
                 except Exception as verify_error:
                     # This is actually expected - verify_token raises HTTPException
                     # when used outside of FastAPI context
-                    if "Could not validate" in str(verify_error) or "401" in str(
-                        verify_error
-                    ):
-                        self.info(
-                            "JWT verification requires FastAPI request context (expected)"
-                        )
+                    if "Could not validate" in str(verify_error) or "401" in str(verify_error):
+                        self.info("JWT verification requires FastAPI request context (expected)")
                         self.check("JWT token system operational", True)
                     else:
                         raise verify_error
@@ -413,16 +404,12 @@ class DeploymentVerifier:
 
         if self.failed == 0:
             logger.info(f"{GREEN}{'=' * 70}{RESET}")
-            logger.info(
-                f"{GREEN}✓ DEPLOYMENT READY - All critical checks passed{RESET}"
-            )
+            logger.info(f"{GREEN}✓ DEPLOYMENT READY - All critical checks passed{RESET}")
             logger.info(f"{GREEN}{'=' * 70}{RESET}\n")
             return 0
         else:
             logger.error(f"{RED}{'=' * 70}{RESET}")
-            logger.error(
-                f"{RED}✗ DEPLOYMENT NOT READY - {self.failed} critical failures{RESET}"
-            )
+            logger.error(f"{RED}✗ DEPLOYMENT NOT READY - {self.failed} critical failures{RESET}")
             logger.error(f"{RED}{'=' * 70}{RESET}\n")
             return 1
 

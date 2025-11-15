@@ -1,13 +1,12 @@
-from datetime import datetime
-from enum import Enum
 import json
 import logging
 import random
 import time
+from datetime import datetime
+from enum import Enum
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
-
 
 """
 DevSkyy ML Recommendation Engine v1.0.0
@@ -26,6 +25,7 @@ logger = logging.getLogger(__name__)
 # RECOMMENDATION MODELS
 # ============================================================================
 
+
 class RecommendationType(str, Enum):
     """Types of recommendations."""
 
@@ -34,6 +34,7 @@ class RecommendationType(str, Enum):
     HYBRID = "hybrid"
     TRENDING = "trending"
     PERSONALIZED = "personalized"
+
 
 class RecommendationRequest(BaseModel):
     """Recommendation request model."""
@@ -44,6 +45,7 @@ class RecommendationRequest(BaseModel):
     limit: int = Field(default=10, ge=1, le=100)
     exclude_items: list[str] = Field(default_factory=list)
     context: dict[str, Any] = Field(default_factory=dict)
+
 
 class RecommendationItem(BaseModel):
     """Recommended item model."""
@@ -56,6 +58,7 @@ class RecommendationItem(BaseModel):
     reason: str
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+
 class RecommendationResponse(BaseModel):
     """Recommendation response model."""
 
@@ -66,9 +69,11 @@ class RecommendationResponse(BaseModel):
     total_items: int
     processing_time_ms: float
 
+
 # ============================================================================
 # RECOMMENDATION ENGINE
 # ============================================================================
+
 
 class RecommendationEngine:
     """
@@ -146,9 +151,7 @@ class RecommendationEngine:
             },
         }
 
-    async def get_recommendations(
-        self, request: RecommendationRequest
-    ) -> RecommendationResponse:
+    async def get_recommendations(self, request: RecommendationRequest) -> RecommendationResponse:
         """
         Get recommendations for a user.
 
@@ -189,9 +192,7 @@ class RecommendationEngine:
             # Return fallback recommendations
             return await self._fallback_recommendations(request)
 
-    async def _collaborative_filtering(
-        self, request: RecommendationRequest
-    ) -> list[RecommendationItem]:
+    async def _collaborative_filtering(self, request: RecommendationRequest) -> list[RecommendationItem]:
         """Generate collaborative filtering recommendations."""
         recommendations = []
 
@@ -221,9 +222,7 @@ class RecommendationEngine:
                     recommended_items[item_id] += rating * similarity_score
 
             # Convert to recommendation items
-            for item_id, score in sorted(
-                recommended_items.items(), key=lambda x: x[1], reverse=True
-            ):
+            for item_id, score in sorted(recommended_items.items(), key=lambda x: x[1], reverse=True):
                 if item_id in self.item_features:
                     item_data = self.item_features[item_id]
                     recommendations.append(
@@ -243,9 +242,7 @@ class RecommendationEngine:
 
         return recommendations
 
-    async def _content_based_filtering(
-        self, request: RecommendationRequest
-    ) -> list[RecommendationItem]:
+    async def _content_based_filtering(self, request: RecommendationRequest) -> list[RecommendationItem]:
         """Generate content-based recommendations."""
         recommendations = []
 
@@ -265,15 +262,11 @@ class RecommendationEngine:
                 if item_id in user_item_ids:
                     continue
 
-                similarity_score = self._calculate_content_similarity(
-                    user_profile, item_data
-                )
+                similarity_score = self._calculate_content_similarity(user_profile, item_data)
                 item_scores[item_id] = similarity_score
 
             # Convert to recommendation items
-            for item_id, score in sorted(
-                item_scores.items(), key=lambda x: x[1], reverse=True
-            ):
+            for item_id, score in sorted(item_scores.items(), key=lambda x: x[1], reverse=True):
                 item_data = self.item_features[item_id]
                 recommendations.append(
                     RecommendationItem(
@@ -292,9 +285,7 @@ class RecommendationEngine:
 
         return recommendations
 
-    async def _trending_recommendations(
-        self, request: RecommendationRequest
-    ) -> list[RecommendationItem]:
+    async def _trending_recommendations(self, request: RecommendationRequest) -> list[RecommendationItem]:
         """Generate trending recommendations."""
         recommendations = []
 
@@ -319,9 +310,7 @@ class RecommendationEngine:
             trending_items = []
             for item_id, stats in item_popularity.items():
                 avg_rating = stats["total_rating"] / stats["count"]
-                popularity_score = avg_rating * (
-                    stats["count"] ** 0.5
-                )  # Weight by number of ratings
+                popularity_score = avg_rating * (stats["count"] ** 0.5)  # Weight by number of ratings
                 trending_items.append((item_id, popularity_score))
 
             trending_items.sort(key=lambda x: x[1], reverse=True)
@@ -347,9 +336,7 @@ class RecommendationEngine:
 
         return recommendations
 
-    async def _hybrid_recommendations(
-        self, request: RecommendationRequest
-    ) -> list[RecommendationItem]:
+    async def _hybrid_recommendations(self, request: RecommendationRequest) -> list[RecommendationItem]:
         """Generate hybrid recommendations combining multiple approaches."""
         try:
             # Get recommendations from different approaches
@@ -380,9 +367,7 @@ class RecommendationEngine:
 
             # Create final recommendations
             recommendations = []
-            for item_id, score in sorted(
-                combined_scores.items(), key=lambda x: x[1], reverse=True
-            ):
+            for item_id, score in sorted(combined_scores.items(), key=lambda x: x[1], reverse=True):
                 if item_id in self.item_features:
                     item_data = self.item_features[item_id]
                     recommendations.append(
@@ -424,9 +409,7 @@ class RecommendationEngine:
             if similarity > 0.1:  # Minimum similarity threshold
                 similar_users.append((other_user_id, similarity))
 
-        return sorted(similar_users, key=lambda x: x[1], reverse=True)[
-            :5
-        ]  # Top 5 similar users
+        return sorted(similar_users, key=lambda x: x[1], reverse=True)[:5]  # Top 5 similar users
 
     def _calculate_user_similarity(self, user1_items: dict, user2_items: dict) -> float:
         """Calculate similarity between two users based on their item ratings."""
@@ -442,9 +425,7 @@ class RecommendationEngine:
         sum1_sq = sum(user1_items[item] ** 2 for item in common_items)
         sum2_sq = sum(user2_items[item] ** 2 for item in common_items)
 
-        sum_products = sum(
-            user1_items[item] * user2_items[item] for item in common_items
-)
+        sum_products = sum(user1_items[item] * user2_items[item] for item in common_items)
 
         n = len(common_items)
         numerator = sum_products - (sum1 * sum2 / n)
@@ -486,9 +467,7 @@ class RecommendationEngine:
 
         return profile
 
-    def _calculate_content_similarity(
-        self, user_profile: dict, item_data: dict
-    ) -> float:
+    def _calculate_content_similarity(self, user_profile: dict, item_data: dict) -> float:
         """Calculate similarity between user profile and item."""
         similarity = 0.0
 
@@ -524,19 +503,14 @@ class RecommendationEngine:
 
                 # Example: filter by category
                 required_category = request.context.get("category")
-                if (
-                    required_category
-                    and rec.metadata.get("category") != required_category
-                ):
+                if required_category and rec.metadata.get("category") != required_category:
                     continue
 
             filtered.append(rec)
 
         return filtered
 
-    async def _fallback_recommendations(
-        self, request: RecommendationRequest
-    ) -> RecommendationResponse:
+    async def _fallback_recommendations(self, request: RecommendationRequest) -> RecommendationResponse:
         """Generate fallback recommendations when main algorithms fail."""
         recommendations = []
 
@@ -590,15 +564,12 @@ class RecommendationEngine:
 
             # Store in Redis if available
             if self.redis_client:
-                await self.redis_client.lpush(
-                    f"user_interactions:{user_id}", json.dumps(interaction)
-                )
-                await self.redis_client.ltrim(
-                    f"user_interactions:{user_id}", 0, 999
-                )  # Keep last 1000
+                await self.redis_client.lpush(f"user_interactions:{user_id}", json.dumps(interaction))
+                await self.redis_client.ltrim(f"user_interactions:{user_id}", 0, 999)  # Keep last 1000
 
         except Exception as e:
             logger.error(f"❌ Failed to record interaction: {e}")
+
 
 # Global recommendation engine instance
 recommendation_engine = RecommendationEngine()

@@ -4,18 +4,18 @@ Test script for production-grade bulk quality processing
 Tests the enhanced quality update functionality with comprehensive error handling
 """
 
-from pathlib import Path
 import shutil
 import sys
 import time
+from pathlib import Path
 
-from PIL import Image
 import requests
-
+from PIL import Image
 
 # Test configuration
 API_BASE = "http://localhost:8001"
 TEST_DIR = Path("test_quality_images")
+
 
 def create_test_images():
     """Create test images for quality processing."""
@@ -26,30 +26,31 @@ def create_test_images():
     test_images = []
 
     # Test image 1: Standard RGB image
-    img1 = Image.new('RGB', (800, 600), color='red')
+    img1 = Image.new("RGB", (800, 600), color="red")
     img1_path = TEST_DIR / "test_rgb.jpg"
     img1.save(img1_path, "JPEG", quality=80)
     test_images.append(str(img1_path))
 
     # Test image 2: RGBA image (with transparency)
-    img2 = Image.new('RGBA', (1200, 900), color=(0, 255, 0, 128))
+    img2 = Image.new("RGBA", (1200, 900), color=(0, 255, 0, 128))
     img2_path = TEST_DIR / "test_rgba.png"
     img2.save(img2_path, "PNG")
     test_images.append(str(img2_path))
 
     # Test image 3: Large image
-    img3 = Image.new('RGB', (2048, 1536), color='blue')
+    img3 = Image.new("RGB", (2048, 1536), color="blue")
     img3_path = TEST_DIR / "test_large.jpg"
     img3.save(img3_path, "JPEG", quality=90)
     test_images.append(str(img3_path))
 
     # Test image 4: Small image
-    img4 = Image.new('RGB', (200, 150), color='yellow')
+    img4 = Image.new("RGB", (200, 150), color="yellow")
     img4_path = TEST_DIR / "test_small.jpg"
     img4.save(img4_path, "JPEG", quality=70)
     test_images.append(str(img4_path))
 
     return test_images
+
 
 def test_quality_settings_validation():
     """Test quality settings validation."""
@@ -61,13 +62,10 @@ def test_quality_settings_validation():
         "quality_enhancement": True,
         "auto_contrast": True,
         "equalize": True,
-        "remove_background": False
+        "remove_background": False,
     }
 
-    response = requests.post(f"{API_BASE}/bulk/preview", json={
-        "operation_type": "quality_update",
-        **valid_settings
-    })
+    response = requests.post(f"{API_BASE}/bulk/preview", json={"operation_type": "quality_update", **valid_settings})
 
     if response.status_code == 200:
         pass
@@ -81,7 +79,7 @@ def test_quality_settings_validation():
         "quality_enhancement": True,
         "auto_contrast": True,
         "equalize": True,
-        "remove_background": False
+        "remove_background": False,
     }
 
     response = requests.post(f"{API_BASE}/bulk/quality-update", json=invalid_settings)
@@ -93,6 +91,7 @@ def test_quality_settings_validation():
 
     return True
 
+
 def test_bulk_quality_processing(test_images):
     """Test the bulk quality processing functionality."""
 
@@ -103,7 +102,7 @@ def test_bulk_quality_processing(test_images):
         "quality_enhancement": True,
         "auto_contrast": True,
         "equalize": True,
-        "remove_background": False
+        "remove_background": False,
     }
 
     # Start bulk quality update
@@ -136,13 +135,11 @@ def test_bulk_quality_processing(test_images):
         operation = status_result.get("operation", {})
         status = operation.get("status", "unknown")
 
-
         if status == "completed":
             results = operation.get("results", {})
             successful = results.get("successful_updates", 0)
             results.get("failed_updates", 0)
             results.get("skipped_updates", 0)
-
 
             return successful > 0
 
@@ -151,6 +148,7 @@ def test_bulk_quality_processing(test_images):
             return False
 
     return False
+
 
 def test_error_handling():
     """Test error handling with invalid inputs."""
@@ -162,7 +160,7 @@ def test_error_handling():
         "quality_enhancement": True,
         "auto_contrast": True,
         "equalize": True,
-        "remove_background": False
+        "remove_background": False,
     }
 
     response = requests.post(f"{API_BASE}/bulk/quality-update", json=invalid_settings)
@@ -186,6 +184,7 @@ def test_error_handling():
 
     return False
 
+
 def verify_processed_images(test_images):
     """Verify that images were actually processed."""
 
@@ -208,6 +207,7 @@ def verify_processed_images(test_images):
 
     return processed_count > 0
 
+
 def cleanup_test_files():
     """Clean up test files."""
 
@@ -216,6 +216,7 @@ def cleanup_test_files():
             shutil.rmtree(TEST_DIR)
     except Exception:
         pass
+
 
 def main():
     """Run all quality processing tests."""
@@ -227,7 +228,6 @@ def main():
             sys.exit(1)
     except Exception:
         sys.exit(1)
-
 
     # Run tests
     tests_passed = 0
@@ -263,6 +263,7 @@ def main():
         sys.exit(0)
     else:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

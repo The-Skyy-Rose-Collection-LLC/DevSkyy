@@ -7,16 +7,15 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from datetime import datetime
 import logging
 import os
+from datetime import datetime
 from typing import Any, Optional
 
+import psutil
 from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user
-import psutil
 from pydantic import BaseModel
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,16 +25,20 @@ router = APIRouter(prefix="/api/v1/monitoring", tags=["monitoring"])
 # MODELS
 # ============================================================================
 
+
 class HealthCheckResponse(BaseModel):
     """Health check response"""
+
     status: str  # "healthy", "degraded", "unhealthy"
     timestamp: datetime
     uptime_seconds: float
     version: str
     components: dict[str, str]
 
+
 class MetricsResponse(BaseModel):
     """System metrics response"""
+
     timestamp: datetime
     cpu_percent: float
     memory_percent: float
@@ -46,14 +49,18 @@ class MetricsResponse(BaseModel):
     api_requests_success: int
     avg_request_latency_ms: float
 
+
 class LatencyPercentile(BaseModel):
     """Latency percentile"""
+
     p50: float  # milliseconds
     p95: float
     p99: float
 
+
 class PerformanceMetrics(BaseModel):
     """Performance metrics with percentiles"""
+
     timestamp: datetime
     request_latency_percentiles: LatencyPercentile
     cache_hit_rate: float
@@ -62,8 +69,10 @@ class PerformanceMetrics(BaseModel):
     webhook_delivery_success_rate: float
     agent_execution_success_rate: float
 
+
 class AlertResponse(BaseModel):
     """Alert/threshold response"""
+
     alert_id: str
     severity: str  # "info", "warning", "critical"
     component: str
@@ -72,9 +81,11 @@ class AlertResponse(BaseModel):
     current_value: float
     created_at: datetime
 
+
 # ============================================================================
 # GLOBAL STATE (in production, use Prometheus/time-series database)
 # ============================================================================
+
 
 class MetricsCollector:
     """Simple in-memory metrics collector"""
@@ -116,10 +127,9 @@ class MetricsCollector:
         p99_idx = int(n * 0.99)
 
         return LatencyPercentile(
-            p50=sorted_times[max(0, p50_idx)],
-            p95=sorted_times[max(0, p95_idx)],
-            p99=sorted_times[max(0, p99_idx)]
+            p50=sorted_times[max(0, p50_idx)], p95=sorted_times[max(0, p95_idx)], p99=sorted_times[max(0, p99_idx)]
         )
+
 
 # Global metrics instance
 metrics_collector = MetricsCollector()
@@ -127,6 +137,7 @@ metrics_collector = MetricsCollector()
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
+
 
 @router.get("/health", response_model=HealthCheckResponse)
 async def health_check(current_user: dict = Depends(get_current_user)):
@@ -153,7 +164,7 @@ async def health_check(current_user: dict = Depends(get_current_user)):
             "api": "healthy",
             "database": "healthy",  # TODO: Ping database
             "cache": "healthy",  # TODO: Ping Redis
-            "webhooks": "healthy"
+            "webhooks": "healthy",
         }
 
         # Determine overall status
@@ -163,21 +174,18 @@ async def health_check(current_user: dict = Depends(get_current_user)):
         elif any(v == "degraded" for v in components.values()):
             overall_status = "degraded"
 
-
         return HealthCheckResponse(
             status=overall_status,
             timestamp=datetime.utcnow(),
             uptime_seconds=uptime,
             version="5.1.0",
-            components=components
+            components=components,
         )
 
     except Exception as e:
         logger.error(f"Health check error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Health check failed"
-        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Health check failed")
+
 
 @router.get("/metrics", response_model=MetricsResponse)
 async def get_metrics(current_user: dict = Depends(get_current_user)):
@@ -196,7 +204,7 @@ async def get_metrics(current_user: dict = Depends(get_current_user)):
         # System metrics (using psutil)
         cpu_percent = psutil.cpu_percent(interval=1)
         memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
+        disk = psutil.disk_usage("/")
 
         # Process metrics
         process = psutil.Process(os.getpid())
@@ -206,7 +214,8 @@ async def get_metrics(current_user: dict = Depends(get_current_user)):
         total_requests = metrics_collector.request_success + metrics_collector.request_errors
         avg_latency = (
             sum(metrics_collector.request_times) / len(metrics_collector.request_times)
-            if metrics_collector.request_times else 0
+            if metrics_collector.request_times
+            else 0
         )
 
         return MetricsResponse(
@@ -218,20 +227,16 @@ async def get_metrics(current_user: dict = Depends(get_current_user)):
             api_requests_total=total_requests,
             api_requests_errors=metrics_collector.request_errors,
             api_requests_success=metrics_collector.request_success,
-            avg_request_latency_ms=avg_latency
+            avg_request_latency_ms=avg_latency,
         )
 
     except Exception as e:
         logger.error(f"Metrics error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve metrics"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve metrics")
+
 
 @router.get("/performance", response_model=PerformanceMetrics)
-async def get_performance_metrics(
-    current_user: dict = Depends(get_current_user)
-):
+async def get_performance_metrics(current_user: dict = Depends(get_current_user)):
     """
     Get detailed performance metrics
 
@@ -248,22 +253,13 @@ async def get_performance_metrics(
 
         # Calculate rates
         total_cache_ops = metrics_collector.cache_hits + metrics_collector.cache_misses
-        cache_hit_rate = (
-            metrics_collector.cache_hits / total_cache_ops
-            if total_cache_ops > 0 else 0
-        )
+        cache_hit_rate = metrics_collector.cache_hits / total_cache_ops if total_cache_ops > 0 else 0
 
         total_webhooks = metrics_collector.webhook_successes + metrics_collector.webhook_failures
-        webhook_success_rate = (
-            metrics_collector.webhook_successes / total_webhooks
-            if total_webhooks > 0 else 0
-        )
+        webhook_success_rate = metrics_collector.webhook_successes / total_webhooks if total_webhooks > 0 else 0
 
         total_agents = metrics_collector.agent_successes + metrics_collector.agent_failures
-        agent_success_rate = (
-            metrics_collector.agent_successes / total_agents
-            if total_agents > 0 else 0
-        )
+        agent_success_rate = metrics_collector.agent_successes / total_agents if total_agents > 0 else 0
 
         return PerformanceMetrics(
             timestamp=datetime.utcnow(),
@@ -272,21 +268,18 @@ async def get_performance_metrics(
             cache_miss_rate=1 - cache_hit_rate,
             database_query_time_ms=0,  # TODO: Track actual DB query times
             webhook_delivery_success_rate=webhook_success_rate,
-            agent_execution_success_rate=agent_success_rate
+            agent_execution_success_rate=agent_success_rate,
         )
 
     except Exception as e:
         logger.error(f"Performance metrics error: {e!s}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve performance metrics"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve performance metrics"
         )
 
+
 @router.get("/alerts", response_model=list[AlertResponse])
-async def get_active_alerts(
-    severity: Optional[str] = None,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_active_alerts(severity: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     """
     Get active system alerts
 
@@ -305,41 +298,47 @@ async def get_active_alerts(
         # Get current metrics
         cpu_percent = psutil.cpu_percent(interval=1)
         memory = psutil.virtual_memory()
-        disk = psutil.disk_usage('/')
+        disk = psutil.disk_usage("/")
 
         # Check thresholds
         if cpu_percent > 80:
-            alerts.append(AlertResponse(
-                alert_id="cpu_high",
-                severity="critical",
-                component="system/cpu",
-                message=f"CPU usage high: {cpu_percent}%",
-                threshold=80.0,
-                current_value=cpu_percent,
-                created_at=datetime.utcnow()
-            ))
+            alerts.append(
+                AlertResponse(
+                    alert_id="cpu_high",
+                    severity="critical",
+                    component="system/cpu",
+                    message=f"CPU usage high: {cpu_percent}%",
+                    threshold=80.0,
+                    current_value=cpu_percent,
+                    created_at=datetime.utcnow(),
+                )
+            )
 
         if memory.percent > 85:
-            alerts.append(AlertResponse(
-                alert_id="memory_high",
-                severity="critical",
-                component="system/memory",
-                message=f"Memory usage high: {memory.percent}%",
-                threshold=85.0,
-                current_value=memory.percent,
-                created_at=datetime.utcnow()
-            ))
+            alerts.append(
+                AlertResponse(
+                    alert_id="memory_high",
+                    severity="critical",
+                    component="system/memory",
+                    message=f"Memory usage high: {memory.percent}%",
+                    threshold=85.0,
+                    current_value=memory.percent,
+                    created_at=datetime.utcnow(),
+                )
+            )
 
         if disk.percent > 90:
-            alerts.append(AlertResponse(
-                alert_id="disk_high",
-                severity="warning",
-                component="system/disk",
-                message=f"Disk usage high: {disk.percent}%",
-                threshold=90.0,
-                current_value=disk.percent,
-                created_at=datetime.utcnow()
-            ))
+            alerts.append(
+                AlertResponse(
+                    alert_id="disk_high",
+                    severity="warning",
+                    component="system/disk",
+                    message=f"Disk usage high: {disk.percent}%",
+                    threshold=90.0,
+                    current_value=disk.percent,
+                    created_at=datetime.utcnow(),
+                )
+            )
 
         # Filter by severity if provided
         if severity:
@@ -349,15 +348,11 @@ async def get_active_alerts(
 
     except Exception as e:
         logger.error(f"Alerts error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve alerts"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve alerts")
+
 
 @router.get("/dependencies", response_model=dict[str, dict[str, Any]])
-async def check_dependencies(
-    current_user: dict = Depends(get_current_user)
-):
+async def check_dependencies(current_user: dict = Depends(get_current_user)):
     """
     Check status of external dependencies
 
@@ -370,26 +365,10 @@ async def check_dependencies(
         Dictionary with dependency status
     """
     dependencies = {
-        "database": {
-            "status": "unknown",  # TODO: Ping database
-            "latency_ms": None,
-            "error": None
-        },
-        "cache": {
-            "status": "unknown",  # TODO: Ping Redis
-            "latency_ms": None,
-            "error": None
-        },
-        "anthropic_api": {
-            "status": "unknown",  # TODO: Ping Anthropic API
-            "latency_ms": None,
-            "error": None
-        },
-        "openai_api": {
-            "status": "unknown",  # TODO: Ping OpenAI API
-            "latency_ms": None,
-            "error": None
-        }
+        "database": {"status": "unknown", "latency_ms": None, "error": None},  # TODO: Ping database
+        "cache": {"status": "unknown", "latency_ms": None, "error": None},  # TODO: Ping Redis
+        "anthropic_api": {"status": "unknown", "latency_ms": None, "error": None},  # TODO: Ping Anthropic API
+        "openai_api": {"status": "unknown", "latency_ms": None, "error": None},  # TODO: Ping OpenAI API
     }
 
     return dependencies

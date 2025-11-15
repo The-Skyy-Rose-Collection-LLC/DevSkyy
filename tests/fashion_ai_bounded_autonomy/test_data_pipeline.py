@@ -4,9 +4,9 @@ Tests data ingestion, validation, and processing
 """
 
 import json
-from pathlib import Path
 import shutil
 import tempfile
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -31,30 +31,17 @@ def temp_config_path(temp_data_dir):
                 {"type": "csv", "path_pattern": "*.csv", "max_size_mb": 10},
                 {"type": "json", "path_pattern": "*.json", "max_size_mb": 5},
                 {"type": "image", "path_pattern": "*.jpg", "max_size_mb": 2},
-                {"type": "parquet", "path_pattern": "*.parquet", "max_size_mb": 20}
+                {"type": "parquet", "path_pattern": "*.parquet", "max_size_mb": 20},
             ],
-            "schemas": {
-                "test_schema": {
-                    "required_fields": {
-                        "id": "string",
-                        "value": "number"
-                    }
-                }
-            },
-            "inference_config": {
-                "models": {
-                    "test_model": {
-                        "type": "classification",
-                        "version": "1.0"
-                    }
-                }
-            }
+            "schemas": {"test_schema": {"required_fields": {"id": "string", "value": "number"}}},
+            "inference_config": {"models": {"test_model": {"type": "classification", "version": "1.0"}}},
         }
     }
 
     config_path = temp_data_dir / "dataflow.yaml"
     import yaml
-    with open(config_path, 'w') as f:
+
+    with open(config_path, "w") as f:
         yaml.dump(config, f)
 
     return str(config_path)
@@ -107,6 +94,7 @@ class TestIngestCSV:
 
         # Patch file size check
         import os
+
         original_stat = os.stat
 
         def mock_stat(path):
@@ -115,10 +103,11 @@ class TestIngestCSV:
                 # Mock 100MB file
                 class MockStat:
                     st_size = 100 * 1024 * 1024
+
                 return MockStat()
             return result
 
-        with pytest.mock.patch('os.stat', side_effect=mock_stat):
+        with pytest.mock.patch("os.stat", side_effect=mock_stat):
             result = await data_pipeline.ingest(str(csv_file), "csv")
             assert result["status"] == "rejected"
             assert result["reason"] == "file_too_large"
@@ -132,7 +121,7 @@ class TestIngestJSON:
         """Test ingesting valid JSON file"""
         json_file = temp_data_dir / "test.json"
         data = {"items": [{"id": 1, "value": 100}]}
-        with open(json_file, 'w') as f:
+        with open(json_file, "w") as f:
             json.dump(data, f)
 
         result = await data_pipeline.ingest(str(json_file), "json")

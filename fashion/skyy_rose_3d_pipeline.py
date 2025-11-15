@@ -4,28 +4,31 @@ Skyy Rose Collection 3D Model Pipeline
 Enterprise-grade 3D model processing and avatar system for luxury fashion
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
 import hashlib
 import json
 import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Any, Optional
 
-
 logger = logging.getLogger(__name__)
+
 
 class ModelFormat(Enum):
     """Supported 3D model formats."""
+
     GLB = "glb"
     GLTF = "gltf"
     FBX = "fbx"
     OBJ = "obj"
     USD = "usd"
 
+
 class TextureType(Enum):
     """Texture types for materials."""
+
     DIFFUSE = "diffuse"
     NORMAL = "normal"
     ROUGHNESS = "roughness"
@@ -33,23 +36,29 @@ class TextureType(Enum):
     EMISSION = "emission"
     OCCLUSION = "occlusion"
 
+
 class AvatarType(Enum):
     """Avatar system types."""
+
     READY_PLAYER_ME = "ready_player_me"
     VROID_STUDIO = "vroid_studio"
     CUSTOM_AVATAR = "custom_avatar"
 
+
 @dataclass
 class Material:
     """3D material definition."""
+
     name: str
     textures: dict[TextureType, str] = field(default_factory=dict)
     properties: dict[str, Any] = field(default_factory=dict)
     pbr_enabled: bool = True
 
+
 @dataclass
 class Model3D:
     """3D model representation."""
+
     id: str
     name: str
     format: ModelFormat
@@ -60,9 +69,11 @@ class Model3D:
     created_at: datetime = field(default_factory=datetime.now)
     brand_tags: list[str] = field(default_factory=list)
 
+
 @dataclass
 class Avatar:
     """Avatar system representation."""
+
     id: str
     name: str
     avatar_type: AvatarType
@@ -70,6 +81,7 @@ class Avatar:
     animations: list[str] = field(default_factory=list)
     customization_options: dict[str, Any] = field(default_factory=dict)
     voice_settings: dict[str, Any] = field(default_factory=dict)
+
 
 class SkyRose3DPipeline:
     """
@@ -106,19 +118,16 @@ class SkyRose3DPipeline:
                 "keywords": ["skyy", "rose", "luxury", "fashion", "couture"],
                 "color_palette": ["#FF69B4", "#FFB6C1", "#FFC0CB", "#000000", "#FFFFFF"],
                 "style_attributes": ["elegant", "sophisticated", "modern", "luxury"],
-                "material_preferences": ["silk", "satin", "velvet", "leather", "cashmere"]
+                "material_preferences": ["silk", "satin", "velvet", "leather", "cashmere"],
             },
             "luxury_brands": {
                 "keywords": ["premium", "haute", "couture", "designer", "exclusive"],
-                "style_attributes": ["refined", "opulent", "prestigious", "artisanal"]
-            }
+                "style_attributes": ["refined", "opulent", "prestigious", "artisanal"],
+            },
         }
 
     async def load_3d_model(
-        self,
-        file_path: str,
-        model_format: ModelFormat,
-        brand_context: Optional[str] = None
+        self, file_path: str, model_format: ModelFormat, brand_context: Optional[str] = None
     ) -> Model3D:
         """Load and process a 3D model file."""
         try:
@@ -153,7 +162,7 @@ class SkyRose3DPipeline:
                 materials=materials,
                 metadata=metadata,
                 file_size=file_path_obj.stat().st_size,
-                brand_tags=brand_tags
+                brand_tags=brand_tags,
             )
 
             # Optimize for web rendering
@@ -171,14 +180,10 @@ class SkyRose3DPipeline:
 
     def _generate_model_id(self, file_path: str) -> str:
         """Generate unique ID for a model."""
-        content_hash = hashlib.md5(str(file_path).encode()).hexdigest()
+        content_hash = hashlib.sha256(str(file_path).encode()).hexdigest()
         return f"model_{content_hash[:12]}"
 
-    async def _extract_model_metadata(
-        self,
-        file_path: Path,
-        model_format: ModelFormat
-    ) -> dict[str, Any]:
+    async def _extract_model_metadata(self, file_path: Path, model_format: ModelFormat) -> dict[str, Any]:
         """Extract metadata from 3D model file."""
         metadata = {
             "format": model_format.value,
@@ -188,7 +193,7 @@ class SkyRose3DPipeline:
             "faces": 0,
             "materials": 0,
             "textures": 0,
-            "animations": 0
+            "animations": 0,
         }
 
         # Format-specific metadata extraction would go here
@@ -209,7 +214,7 @@ class SkyRose3DPipeline:
             "format_version": "2.0",
             "generator": "DevSkyy 3D Pipeline",
             "supports_pbr": True,
-            "supports_animations": True
+            "supports_animations": True,
         }
 
     async def _extract_gltf_metadata(self, file_path: Path) -> dict[str, Any]:
@@ -219,23 +224,15 @@ class SkyRose3DPipeline:
             "format_version": "2.0",
             "generator": "DevSkyy 3D Pipeline",
             "supports_pbr": True,
-            "supports_animations": True
+            "supports_animations": True,
         }
 
     async def _extract_fbx_metadata(self, file_path: Path) -> dict[str, Any]:
         """Extract metadata from FBX file."""
         # Placeholder for FBX metadata extraction
-        return {
-            "format_version": "7.4",
-            "generator": "DevSkyy 3D Pipeline",
-            "supports_animations": True
-        }
+        return {"format_version": "7.4", "generator": "DevSkyy 3D Pipeline", "supports_animations": True}
 
-    async def _process_materials(
-        self,
-        file_path: Path,
-        metadata: dict[str, Any]
-    ) -> list[Material]:
+    async def _process_materials(self, file_path: Path, metadata: dict[str, Any]) -> list[Material]:
         """Process and optimize materials from 3D model."""
         materials = []
 
@@ -248,23 +245,15 @@ class SkyRose3DPipeline:
             textures={
                 TextureType.DIFFUSE: "textures/skyrose_diffuse.jpg",
                 TextureType.NORMAL: "textures/skyrose_normal.jpg",
-                TextureType.ROUGHNESS: "textures/skyrose_roughness.jpg"
+                TextureType.ROUGHNESS: "textures/skyrose_roughness.jpg",
             },
-            properties={
-                "metallic": 0.1,
-                "roughness": 0.3,
-                "emission_strength": 0.0
-            }
+            properties={"metallic": 0.1, "roughness": 0.3, "emission_strength": 0.0},
         )
 
         materials.append(base_material)
         return materials
 
-    def _match_brand_attributes(
-        self,
-        metadata: dict[str, Any],
-        brand_context: Optional[str]
-    ) -> list[str]:
+    def _match_brand_attributes(self, metadata: dict[str, Any], brand_context: Optional[str]) -> list[str]:
         """Match model attributes with brand database."""
         brand_tags = []
 
@@ -305,7 +294,7 @@ class SkyRose3DPipeline:
         self,
         avatar_type: AvatarType,
         customization_options: dict[str, Any],
-        voice_settings: Optional[dict[str, Any]] = None
+        voice_settings: Optional[dict[str, Any]] = None,
     ) -> Avatar:
         """Create a new avatar with customization options."""
         try:
@@ -317,17 +306,11 @@ class SkyRose3DPipeline:
 
             # Create avatar based on type
             if avatar_type == AvatarType.READY_PLAYER_ME:
-                avatar = await self._create_ready_player_me_avatar(
-                    avatar_id, customization_options, voice_settings
-                )
+                avatar = await self._create_ready_player_me_avatar(avatar_id, customization_options, voice_settings)
             elif avatar_type == AvatarType.VROID_STUDIO:
-                avatar = await self._create_vroid_avatar(
-                    avatar_id, customization_options, voice_settings
-                )
+                avatar = await self._create_vroid_avatar(avatar_id, customization_options, voice_settings)
             else:
-                avatar = await self._create_custom_avatar(
-                    avatar_id, customization_options, voice_settings
-                )
+                avatar = await self._create_custom_avatar(avatar_id, customization_options, voice_settings)
 
             # Cache avatar
             self.avatars_cache[avatar_id] = avatar
@@ -341,16 +324,11 @@ class SkyRose3DPipeline:
 
     def _generate_avatar_id(self, customization_options: dict[str, Any]) -> str:
         """Generate unique ID for an avatar."""
-        options_hash = hashlib.md5(
-            json.dumps(customization_options, sort_keys=True).encode()
-        ).hexdigest()
+        options_hash = hashlib.sha256(json.dumps(customization_options, sort_keys=True).encode()).hexdigest()
         return f"avatar_{options_hash[:12]}"
 
     async def _create_ready_player_me_avatar(
-        self,
-        avatar_id: str,
-        customization_options: dict[str, Any],
-        voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create Ready Player Me avatar."""
         return Avatar(
@@ -360,14 +338,11 @@ class SkyRose3DPipeline:
             model_path=f"avatars/rpm_{avatar_id}.glb",
             animations=["idle", "walking", "talking", "gesturing"],
             customization_options=customization_options,
-            voice_settings=voice_settings or {}
+            voice_settings=voice_settings or {},
         )
 
     async def _create_vroid_avatar(
-        self,
-        avatar_id: str,
-        customization_options: dict[str, Any],
-        voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create VRoid Studio avatar."""
         return Avatar(
@@ -377,14 +352,11 @@ class SkyRose3DPipeline:
             model_path=f"avatars/vroid_{avatar_id}.vrm",
             animations=["idle", "walking", "talking"],
             customization_options=customization_options,
-            voice_settings=voice_settings or {}
+            voice_settings=voice_settings or {},
         )
 
     async def _create_custom_avatar(
-        self,
-        avatar_id: str,
-        customization_options: dict[str, Any],
-        voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
     ) -> Avatar:
         """Create custom avatar."""
         return Avatar(
@@ -394,7 +366,7 @@ class SkyRose3DPipeline:
             model_path=f"avatars/custom_{avatar_id}.glb",
             animations=["idle", "walking", "talking", "presenting"],
             customization_options=customization_options,
-            voice_settings=voice_settings or {}
+            voice_settings=voice_settings or {},
         )
 
     async def generate_360_view(self, model: Model3D, output_path: str) -> dict[str, Any]:
@@ -408,17 +380,15 @@ class SkyRose3DPipeline:
             views = []
             for angle in range(0, 360, 30):  # 12 views
                 view_path = f"{output_path}/view_{angle:03d}.jpg"
-                views.append({
-                    "angle": angle,
-                    "image_path": view_path,
-                    "thumbnail_path": f"{output_path}/thumb_{angle:03d}.jpg"
-                })
+                views.append(
+                    {"angle": angle, "image_path": view_path, "thumbnail_path": f"{output_path}/thumb_{angle:03d}.jpg"}
+                )
 
             return {
                 "model_id": model.id,
                 "total_views": len(views),
                 "views": views,
-                "generated_at": datetime.now().isoformat()
+                "generated_at": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -433,8 +403,9 @@ class SkyRose3DPipeline:
             "storage_path": str(self.storage_path),
             "supported_formats": [fmt.value for fmt in ModelFormat],
             "avatar_types": [atype.value for atype in AvatarType],
-            "brand_database_size": len(self.brand_database)
+            "brand_database_size": len(self.brand_database),
         }
+
 
 # Global pipeline instance
 skyy_rose_3d_pipeline = SkyRose3DPipeline()

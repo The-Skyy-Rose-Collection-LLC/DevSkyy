@@ -6,26 +6,26 @@ Reduces token usage by 98% through on-demand tool loading
 """
 
 import asyncio
+import json
+import logging
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import json
-import logging
 from pathlib import Path
 from typing import Any, Optional, Union
 from uuid import uuid4
 
-
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}'
+    level=logging.INFO, format='{"timestamp": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}'
 )
 logger = logging.getLogger(__name__)
 
 
 class AgentRole(str, Enum):
     """Agent roles in the orchestration system"""
+
     ORCHESTRATOR = "orchestrator"
     PROFESSOR_OF_CODE = "professors_of_code"
     GROWTH_STACK = "growth_stack"
@@ -36,6 +36,7 @@ class AgentRole(str, Enum):
 
 class ToolCategory(str, Enum):
     """MCP tool categories"""
+
     CODE_EXECUTION = "code_execution"
     FILE_OPERATIONS = "file_operations"
     API_INTERACTIONS = "api_interactions"
@@ -47,6 +48,7 @@ class ToolCategory(str, Enum):
 
 class TaskStatus(str, Enum):
     """Task execution status"""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -57,6 +59,7 @@ class TaskStatus(str, Enum):
 @dataclass
 class ToolDefinition:
     """MCP Tool Definition"""
+
     name: str
     description: str
     category: ToolCategory
@@ -69,6 +72,7 @@ class ToolDefinition:
 @dataclass
 class Task:
     """Orchestrated task"""
+
     task_id: str = field(default_factory=lambda: str(uuid4()))
     name: str = ""
     agent_role: AgentRole = AgentRole.ORCHESTRATOR
@@ -94,8 +98,20 @@ class MCPOrchestrator:
     Implements on-demand tool loading and multi-agent coordination
     """
 
-    def __init__(self, config_path: str = "/tmp/DevSkyy/config/mcp/mcp_tool_calling_schema.json"):
-        """Initialize orchestrator with MCP configuration"""
+    def __init__(self, config_path: Optional[str] = None):
+        """
+        Initialize orchestrator with MCP configuration.
+
+        Args:
+            config_path: Path to MCP configuration file. If None, uses secure temporary directory.
+        """
+        if config_path is None:
+            # Use secure temporary directory instead of hardcoded /tmp/
+            temp_dir = tempfile.gettempdir()
+            config_dir = Path(temp_dir) / "devskyy" / "config" / "mcp"
+            config_dir.mkdir(parents=True, exist_ok=True)
+            config_path = str(config_dir / "mcp_tool_calling_schema.json")
+
         self.config_path = Path(config_path)
         self.config: dict[str, Any] = {}
         self.tools: dict[str, ToolDefinition] = {}
@@ -106,7 +122,7 @@ class MCPOrchestrator:
             "completed_tasks": 0,
             "failed_tasks": 0,
             "total_tokens_saved": 0,
-            "total_execution_time": 0.0
+            "total_execution_time": 0.0,
         }
 
         # Load configuration
@@ -114,15 +130,15 @@ class MCPOrchestrator:
         self._initialize_tools()
         self._initialize_agents()
 
-        logger.info("MCP Orchestrator initialized", extra={
-            "tools_loaded": len(self.tools),
-            "agents_configured": len(self.agents)
-        })
+        logger.info(
+            "MCP Orchestrator initialized",
+            extra={"tools_loaded": len(self.tools), "agents_configured": len(self.agents)},
+        )
 
     def _load_config(self):
         """Load MCP configuration from JSON"""
         try:
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path, "r") as f:
                 self.config = json.load(f)
             logger.info(f"Configuration loaded from {self.config_path}")
         except FileNotFoundError:
@@ -146,7 +162,7 @@ class MCPOrchestrator:
                     category=category,
                     input_schema=tool_spec.get("input_schema", {}),
                     output_schema=tool_spec.get("output_schema", {}),
-                    security=tool_spec.get("security", {})
+                    security=tool_spec.get("security", {}),
                 )
                 self.tools[tool_name] = tool
 
@@ -166,7 +182,7 @@ class MCPOrchestrator:
             "growth_stack": AgentRole.GROWTH_STACK,
             "data_reasoning": AgentRole.DATA_REASONING,
             "visual_foundry": AgentRole.VISUAL_FOUNDRY,
-            "voice_media_video_elite": AgentRole.VOICE_MEDIA_VIDEO
+            "voice_media_video_elite": AgentRole.VOICE_MEDIA_VIDEO,
         }
 
         for config_key, agent_role in role_mapping.items():
@@ -199,10 +215,10 @@ class MCPOrchestrator:
         tokens_saved = baseline_tokens - optimized_tokens
         self.metrics["total_tokens_saved"] += tokens_saved
 
-        logger.info(f"Tool loaded on-demand: {tool_name}", extra={
-            "category": tool.category.value,
-            "tokens_saved": tokens_saved
-        })
+        logger.info(
+            f"Tool loaded on-demand: {tool_name}",
+            extra={"category": tool.category.value, "tokens_saved": tokens_saved},
+        )
 
         return True
 
@@ -212,29 +228,16 @@ class MCPOrchestrator:
             self.tools[tool_name].loaded = False
             logger.debug(f"Tool unloaded: {tool_name}")
 
-    async def create_task(
-        self,
-        name: str,
-        agent_role: AgentRole,
-        tool_name: str,
-        input_data: dict[str, Any]
-    ) -> Task:
+    async def create_task(self, name: str, agent_role: AgentRole, tool_name: str, input_data: dict[str, Any]) -> Task:
         """Create a new orchestrated task"""
-        task = Task(
-            name=name,
-            agent_role=agent_role,
-            tool_name=tool_name,
-            input_data=input_data
-        )
+        task = Task(name=name, agent_role=agent_role, tool_name=tool_name, input_data=input_data)
 
         self.tasks[task.task_id] = task
         self.metrics["total_tasks"] += 1
 
-        logger.info(f"Task created: {task.name}", extra={
-            "task_id": task.task_id,
-            "agent": agent_role.value,
-            "tool": tool_name
-        })
+        logger.info(
+            f"Task created: {task.name}", extra={"task_id": task.task_id, "agent": agent_role.value, "tool": tool_name}
+        )
 
         return task
 
@@ -269,10 +272,10 @@ class MCPOrchestrator:
             # Unload tool to free context
             self.unload_tool(task.tool_name)
 
-            logger.info(f"Task completed: {task.name}", extra={
-                "task_id": task.task_id,
-                "duration_seconds": task.duration_seconds()
-            })
+            logger.info(
+                f"Task completed: {task.name}",
+                extra={"task_id": task.task_id, "duration_seconds": task.duration_seconds()},
+            )
 
             return result
 
@@ -283,18 +286,12 @@ class MCPOrchestrator:
 
             self.metrics["failed_tasks"] += 1
 
-            logger.error(f"Task failed: {task.name}", extra={
-                "task_id": task.task_id,
-                "error": str(e)
-            })
+            logger.error(f"Task failed: {task.name}", extra={"task_id": task.task_id, "error": str(e)})
 
             raise
 
     async def _execute_tool(
-        self,
-        tool_name: str,
-        input_data: dict[str, Any],
-        agent_config: dict[str, Any]
+        self, tool_name: str, input_data: dict[str, Any], agent_config: dict[str, Any]
     ) -> dict[str, Any]:
         """Execute a specific tool (placeholder for actual implementations)"""
 
@@ -317,7 +314,7 @@ class MCPOrchestrator:
             "agent": agent_config.get("name"),
             "timestamp": datetime.utcnow().isoformat(),
             "input": input_data,
-            "output_schema": tool.output_schema
+            "output_schema": tool.output_schema,
         }
 
     async def execute_workflow(self, workflow_name: str, context: dict[str, Any]) -> list[dict[str, Any]]:
@@ -331,10 +328,7 @@ class MCPOrchestrator:
         steps = workflow.get("steps", [])
         parallel = workflow.get("parallel", False)
 
-        logger.info(f"Executing workflow: {workflow_name}", extra={
-            "steps": len(steps),
-            "parallel": parallel
-        })
+        logger.info(f"Executing workflow: {workflow_name}", extra={"steps": len(steps), "parallel": parallel})
 
         tasks = []
         results = {}
@@ -351,7 +345,7 @@ class MCPOrchestrator:
                 name=f"{workflow_name}_step_{step_num}",
                 agent_role=agent_role,
                 tool_name=tool_name,
-                input_data=input_data
+                input_data=input_data,
             )
 
             tasks.append((step_num, step.get("output"), task))
@@ -371,10 +365,7 @@ class MCPOrchestrator:
         return list(results.values())
 
     def _resolve_workflow_input(
-        self,
-        input_spec: Union[str, dict, list],
-        context: dict[str, Any],
-        results: dict[str, Any]
+        self, input_spec: Union[str, dict, list], context: dict[str, Any], results: dict[str, Any]
     ) -> dict[str, Any]:
         """Resolve workflow input from variables"""
         if isinstance(input_spec, str):
@@ -415,16 +406,14 @@ class MCPOrchestrator:
         return {
             **self.metrics,
             "success_rate": (
-                self.metrics["completed_tasks"] / self.metrics["total_tasks"]
-                if self.metrics["total_tasks"] > 0
-                else 0
+                self.metrics["completed_tasks"] / self.metrics["total_tasks"] if self.metrics["total_tasks"] > 0 else 0
             ),
             "average_execution_time": (
                 self.metrics["total_execution_time"] / self.metrics["completed_tasks"]
                 if self.metrics["completed_tasks"] > 0
                 else 0
             ),
-            "token_reduction_ratio": 0.98  # 98% reduction through on-demand loading
+            "token_reduction_ratio": 0.98,  # 98% reduction through on-demand loading
         }
 
     def get_agent_capabilities(self, agent_role: AgentRole) -> list[str]:
@@ -449,7 +438,6 @@ async def main():
     # Initialize orchestrator
     orchestrator = MCPOrchestrator()
 
-
     # Show agent capabilities
     for role in AgentRole:
         if role in orchestrator.agents:
@@ -466,8 +454,8 @@ async def main():
         input_data={
             "code": "def hello(): print('world')",
             "language": "python",
-            "checks": ["syntax", "security", "style"]
-        }
+            "checks": ["syntax", "security", "style"],
+        },
     )
 
     await orchestrator.execute_task(task1)
@@ -480,8 +468,8 @@ async def main():
         input_data={
             "prompt": "luxury fashion runway, haute couture, dramatic lighting",
             "width": 1024,
-            "height": 1024
-        }
+            "height": 1024,
+        },
     )
 
     await orchestrator.execute_task(task2)
@@ -491,10 +479,7 @@ async def main():
         name="Generate voiceover",
         agent_role=AgentRole.VOICE_MEDIA_VIDEO,
         tool_name="tts_synthesizer",
-        input_data={
-            "text": "Welcome to DevSkyy, the future of luxury fashion AI",
-            "voice": "nova"
-        }
+        input_data={"text": "Welcome to DevSkyy, the future of luxury fashion AI", "voice": "nova"},
     )
 
     await orchestrator.execute_task(task3)

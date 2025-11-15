@@ -1,13 +1,13 @@
-from collections import defaultdict
 import threading
 import time
+from collections import defaultdict
 from typing import Optional
-
 
 """
 API Rate Limiting for Grade A+ API Score
 Implements token bucket algorithm with Redis backend
 """
+
 
 class RateLimiter:
     """
@@ -16,9 +16,7 @@ class RateLimiter:
     """
 
     def __init__(self):
-        self._buckets: dict[str, dict] = defaultdict(
-            lambda: {"tokens": 0, "last_update": 0}
-        )
+        self._buckets: dict[str, dict] = defaultdict(lambda: {"tokens": 0, "last_update": 0})
         self._lock = threading.Lock()
 
     def is_allowed(
@@ -68,14 +66,14 @@ class RateLimiter:
     def reset(self, client_identifier: str):
         """Reset rate limit for a client"""
         with self._lock:
-            keys_to_remove = [
-                k for k in self._buckets if k.startswith(client_identifier)
-            ]
+            keys_to_remove = [k for k in self._buckets if k.startswith(client_identifier)]
             for key in keys_to_remove:
                 del self._buckets[key]
 
+
 # Global rate limiter instance
 rate_limiter = RateLimiter()
+
 
 def get_client_identifier(request) -> str:
     """

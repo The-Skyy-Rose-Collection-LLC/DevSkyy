@@ -49,6 +49,6 @@ Never skip. Always record. Use: `I cannot confirm this without testing.`
 | Security | Bandit + Safety + pip-audit + Trivy | All deps | No HIGH/CRITICAL |
 | Tests | Pytest | Coverage | ≥90% |
 | Performance | Autocannon | Latency | P95 < 200ms |
-| Dependencies | pip-audit weekly | requirements.txt | Compatible releases |
+| Dependencies | pip-audit weekly | requirements.txt | No known vulnerabilities |
 
 Claude enforces the **Truth Protocol** and ensures DevSkyy remains verifiable, secure, and enterprise-grade.

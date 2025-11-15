@@ -4,48 +4,46 @@ DevSkyy Fixed Luxury Theme Builder Server
 Corrected server that generates actual luxury fashion themes with verifiable styling
 """
 
-from datetime import datetime
 import os
-from pathlib import Path
 import sys
 import tempfile
+from datetime import datetime
+from pathlib import Path
 from typing import Any
 
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-
 
 # Load environment
 load_dotenv()
 
 # Create FastAPI app
 app = FastAPI(
-    title='DevSkyy Platform - Fixed Luxury Theme Builder',
-    description='Corrected WordPress Theme Builder for Skyy Rose Collection',
-    version='5.1.0'
+    title="DevSkyy Platform - Fixed Luxury Theme Builder",
+    description="Corrected WordPress Theme Builder for Skyy Rose Collection",
+    version="5.1.0",
 )
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add WordPress credentials to app state
 sys.path.append(os.getcwd())
 from config.wordpress_credentials import get_skyy_rose_credentials
 
-
 credentials = get_skyy_rose_credentials()
 app.state.wordpress_credentials = credentials
 
 
-@app.post('/api/v1/themes/skyy-rose/build-fixed')
+@app.post("/api/v1/themes/skyy-rose/build-fixed")
 async def build_fixed_skyy_rose_theme(theme_request: dict[str, Any]):
     """Build and deploy a CORRECTED luxury fashion theme for Skyy Rose Collection."""
     try:
@@ -54,14 +52,13 @@ async def build_fixed_skyy_rose_theme(theme_request: dict[str, Any]):
         from agent.wordpress.automated_theme_uploader import automated_theme_uploader
 
         # Get theme configuration
-        theme_name = theme_request.get('theme_name', 'skyy-rose-luxury-fixed-2024')
-        auto_deploy = theme_request.get('auto_deploy', True)
-        customizations = theme_request.get('customizations', {})
+        theme_name = theme_request.get("theme_name", "skyy-rose-luxury-fixed-2024")
+        auto_deploy = theme_request.get("auto_deploy", True)
+        customizations = theme_request.get("customizations", {})
 
         # Use configured credentials
         if not credentials:
-            raise HTTPException(status_code=400, detail='WordPress credentials not configured')
-
+            raise HTTPException(status_code=400, detail="WordPress credentials not configured")
 
         # Create CORRECTED luxury fashion theme package
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -73,21 +70,19 @@ async def build_fixed_skyy_rose_theme(theme_request: dict[str, Any]):
 
             # Create theme package
             theme_info = {
-                'name': theme_name,
-                'version': '1.1.0',
-                'description': 'FIXED Luxury fashion theme for Skyy Rose Collection with verifiable styling',
-                'author': 'DevSkyy Platform - Fixed Version'
+                "name": theme_name,
+                "version": "1.1.0",
+                "description": "FIXED Luxury fashion theme for Skyy Rose Collection with verifiable styling",
+                "author": "DevSkyy Platform - Fixed Version",
             }
 
-            package = await automated_theme_uploader.create_theme_package(
-                str(theme_dir), theme_info
-            )
-
+            package = await automated_theme_uploader.create_theme_package(str(theme_dir), theme_info)
 
             # Deploy if requested (using staging for WordPress.com compatibility)
             deployment_result = None
             if auto_deploy:
                 from agent.wordpress.automated_theme_uploader import UploadMethod
+
                 deployment_result = await automated_theme_uploader.deploy_theme(
                     package, credentials, UploadMethod.STAGING_AREA, False
                 )
@@ -95,47 +90,52 @@ async def build_fixed_skyy_rose_theme(theme_request: dict[str, Any]):
                     pass
 
             return {
-                'success': True,
-                'theme_name': theme_name,
-                'package_size': f'{package.size_bytes / 1024:.1f} KB',
-                'files_count': len(package.files),
-                'deployment_success': deployment_result.success if deployment_result else None,
-                'deployment_message': deployment_result.error_message if deployment_result and deployment_result.error_message else ('Deployed to staging' if deployment_result and deployment_result.success else 'Not deployed'),
-                'deployment_method': 'staging_area' if auto_deploy else 'none',
-                'created_at': datetime.now().isoformat(),
-                'target_site': credentials.site_url,
-                'note': 'FIXED theme with verifiable luxury styling - ready for upload',
-                'fixes_applied': [
-                    'Complete container structure for proper styling',
-                    'Enhanced navigation with fallback menu',
-                    'Comprehensive WooCommerce product styling',
-                    'WordPress integration with proper hooks',
-                    'Luxury content styling with animations',
-                    'Verifiable color and typography implementation'
-                ]
+                "success": True,
+                "theme_name": theme_name,
+                "package_size": f"{package.size_bytes / 1024:.1f} KB",
+                "files_count": len(package.files),
+                "deployment_success": deployment_result.success if deployment_result else None,
+                "deployment_message": (
+                    deployment_result.error_message
+                    if deployment_result and deployment_result.error_message
+                    else ("Deployed to staging" if deployment_result and deployment_result.success else "Not deployed")
+                ),
+                "deployment_method": "staging_area" if auto_deploy else "none",
+                "created_at": datetime.now().isoformat(),
+                "target_site": credentials.site_url,
+                "note": "FIXED theme with verifiable luxury styling - ready for upload",
+                "fixes_applied": [
+                    "Complete container structure for proper styling",
+                    "Enhanced navigation with fallback menu",
+                    "Comprehensive WooCommerce product styling",
+                    "WordPress integration with proper hooks",
+                    "Luxury content styling with animations",
+                    "Verifiable color and typography implementation",
+                ],
             }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 async def generate_fixed_luxury_theme_files(theme_dir: Path, theme_name: str, customizations: dict):
     """Generate CORRECTED luxury fashion theme files with verifiable styling."""
 
     # Get customizations
-    colors = customizations.get('colors', {
-        'primary': '#1a1a1a',
-        'secondary': '#d4af37',
-        'accent': '#8b7355',
-        'background': '#ffffff',
-        'text': '#333333'
-    })
+    colors = customizations.get(
+        "colors",
+        {
+            "primary": "#1a1a1a",
+            "secondary": "#d4af37",
+            "accent": "#8b7355",
+            "background": "#ffffff",
+            "text": "#333333",
+        },
+    )
 
-    typography = customizations.get('typography', {
-        'headings': 'Playfair Display',
-        'body': 'Source Sans Pro',
-        'accent': 'Dancing Script'
-    })
-
+    typography = customizations.get(
+        "typography", {"headings": "Playfair Display", "body": "Source Sans Pro", "accent": "Dancing Script"}
+    )
 
     # Generate COMPREHENSIVE style.css with VERIFIED luxury styling
     style_css = f"""/*
@@ -852,7 +852,7 @@ a:hover {{
    ============================================================================ */
 """
 
-    (theme_dir / 'style.css').write_text(style_css)
+    (theme_dir / "style.css").write_text(style_css)
 
     # Generate ENHANCED index.php with proper structure
     index_php = f"""<?php
@@ -935,7 +935,7 @@ get_header(); ?>
 <?php get_footer(); ?>
 """
 
-    (theme_dir / 'index.php').write_text(index_php)
+    (theme_dir / "index.php").write_text(index_php)
 
     # Generate COMPREHENSIVE functions.php
     functions_php = f"""<?php
@@ -1261,7 +1261,7 @@ add_action('after_setup_theme', '{theme_name.replace('-', '_')}_gutenberg_suppor
 ?>
 """
 
-    (theme_dir / 'functions.php').write_text(functions_php)
+    (theme_dir / "functions.php").write_text(functions_php)
 
     # Generate ENHANCED header.php with proper structure
     header_php = f"""<!DOCTYPE html>
@@ -1324,7 +1324,7 @@ add_action('after_setup_theme', '{theme_name.replace('-', '_')}_gutenberg_suppor
     </header>
 """
 
-    (theme_dir / 'header.php').write_text(header_php)
+    (theme_dir / "header.php").write_text(header_php)
 
     # Generate ENHANCED footer.php
     footer_php = f"""    <footer id="colophon" class="site-footer">
@@ -1356,7 +1356,7 @@ add_action('after_setup_theme', '{theme_name.replace('-', '_')}_gutenberg_suppor
 </html>
 """
 
-    (theme_dir / 'footer.php').write_text(footer_php)
+    (theme_dir / "footer.php").write_text(footer_php)
 
     # Generate additional template files for completeness
 
@@ -1421,7 +1421,7 @@ get_header(); ?>
 <?php get_footer(); ?>
 """
 
-    (theme_dir / 'single.php').write_text(single_php)
+    (theme_dir / "single.php").write_text(single_php)
 
     # Page template
     page_php = f"""<?php
@@ -1456,42 +1456,45 @@ get_header(); ?>
 <?php get_footer(); ?>
 """
 
-    (theme_dir / 'page.php').write_text(page_php)
+    (theme_dir / "page.php").write_text(page_php)
 
 
-@app.get('/api/v1/themes/system-status')
+@app.get("/api/v1/themes/system-status")
 async def get_system_status():
     """Get system status for FIXED theme builder."""
-    return {{
-        'status': 'operational',
-        'version': '5.1.0 - FIXED',
-        'wordpress_site': credentials.site_url if credentials else 'Not configured',
-        'theme_builder': 'ready - FIXED VERSION',
-        'uploader': 'ready',
-        'fixes_applied': [
-            'Complete container structure',
-            'Enhanced navigation system',
-            'Comprehensive WooCommerce styling',
-            'WordPress integration with proper hooks',
-            'Luxury content styling with animations',
-            'Verifiable color and typography implementation'
-        ],
-        'timestamp': datetime.now().isoformat()
-    }}
+    return {
+        {
+            "status": "operational",
+            "version": "5.1.0 - FIXED",
+            "wordpress_site": credentials.site_url if credentials else "Not configured",
+            "theme_builder": "ready - FIXED VERSION",
+            "uploader": "ready",
+            "fixes_applied": [
+                "Complete container structure",
+                "Enhanced navigation system",
+                "Comprehensive WooCommerce styling",
+                "WordPress integration with proper hooks",
+                "Luxury content styling with animations",
+                "Verifiable color and typography implementation",
+            ],
+            "timestamp": datetime.now().isoformat(),
+        }
+    }
 
-@app.get('/')
+
+@app.get("/")
 async def root():
-    return {{
-        'message': 'DevSkyy Platform - FIXED Luxury Theme Builder',
-        'status': 'ready',
-        'version': '5.1.0 - FIXED',
-        'endpoints': [
-            'POST /api/v1/themes/skyy-rose/build-fixed',
-            'GET /api/v1/themes/system-status'
-        ],
-        'fixes': 'Complete luxury styling implementation with verifiable outputs'
-    }}
+    return {
+        {
+            "message": "DevSkyy Platform - FIXED Luxury Theme Builder",
+            "status": "ready",
+            "version": "5.1.0 - FIXED",
+            "endpoints": ["POST /api/v1/themes/skyy-rose/build-fixed", "GET /api/v1/themes/system-status"],
+            "fixes": "Complete luxury styling implementation with verifiable outputs",
+        }
+    }
+
 
 if __name__ == "__main__":
 
-    uvicorn.run(app, host='0.0.0.0', port=8002, log_level='info')
+    uvicorn.run(app, host="0.0.0.0", port=8002, log_level="info")

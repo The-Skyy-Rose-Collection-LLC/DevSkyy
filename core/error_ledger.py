@@ -14,32 +14,33 @@ Features:
 - JSON format for machine readability
 """
 
+import json
+import logging
+import sys
+import traceback
+import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
-import json
-import logging
 from pathlib import Path
-import sys
-import traceback
 from typing import Any, Optional
-import uuid
-
 
 logger = logging.getLogger(__name__)
 
 
 class ErrorSeverity(str, Enum):
     """Error severity levels"""
+
     CRITICAL = "critical"  # System failure, immediate action required
-    HIGH = "high"          # Major functionality broken
-    MEDIUM = "medium"      # Partial functionality affected
-    LOW = "low"            # Minor issue, workaround available
-    INFO = "info"          # Informational, not actually an error
+    HIGH = "high"  # Major functionality broken
+    MEDIUM = "medium"  # Partial functionality affected
+    LOW = "low"  # Minor issue, workaround available
+    INFO = "info"  # Informational, not actually an error
 
 
 class ErrorCategory(str, Enum):
     """Error categories for classification"""
+
     AUTHENTICATION = "authentication"
     AUTHORIZATION = "authorization"
     DATABASE = "database"
@@ -59,6 +60,7 @@ class ErrorCategory(str, Enum):
 @dataclass
 class ErrorEntry:
     """Single error entry in the ledger"""
+
     error_id: str
     timestamp: str
     severity: ErrorSeverity
@@ -83,11 +85,7 @@ class ErrorEntry:
         Returns:
             dict: Mapping of all dataclass fields to their values; `severity` and `category` are returned as their string values.
         """
-        return {
-            **asdict(self),
-            "severity": self.severity.value,
-            "category": self.category.value
-        }
+        return {**asdict(self), "severity": self.severity.value, "category": self.category.value}
 
 
 class ErrorLedger:
@@ -120,7 +118,7 @@ class ErrorLedger:
             "started_at": datetime.utcnow().isoformat() + "Z",
             "platform": sys.platform,
             "python_version": sys.version,
-            "environment": self._get_environment()
+            "environment": self._get_environment(),
         }
 
         # Initialize ledger file
@@ -147,6 +145,7 @@ class ErrorLedger:
             env (str): The value of the `ENVIRONMENT` environment variable if set; otherwise `"development"`.
         """
         import os
+
         return os.getenv("ENVIRONMENT", "development")
 
     def _initialize_ledger(self):
@@ -158,12 +157,7 @@ class ErrorLedger:
         initial_data = {
             "metadata": self.metadata,
             "errors": [],
-            "statistics": {
-                "total_errors": 0,
-                "by_severity": {},
-                "by_category": {},
-                "resolved_count": 0
-            }
+            "statistics": {"total_errors": 0, "by_severity": {}, "by_category": {}, "resolved_count": 0},
         }
 
         with open(self.ledger_file, "w") as f:
@@ -178,7 +172,7 @@ class ErrorLedger:
         correlation_id: Optional[str] = None,
         user_id: Optional[str] = None,
         endpoint: Optional[str] = None,
-        method: Optional[str] = None
+        method: Optional[str] = None,
     ) -> str:
         """
         Record an exception in the ledger and persist the corresponding error entry.
@@ -228,7 +222,7 @@ class ErrorLedger:
             endpoint=endpoint,
             method=method,
             source_file=source_file,
-            source_line=source_line
+            source_line=source_line,
         )
 
         # Add to in-memory list
@@ -238,7 +232,9 @@ class ErrorLedger:
         self._persist_error(error_entry)
 
         # Log to standard logger
-        log_message = f"Error logged [{error_entry.error_id}] - {severity.value.upper()}: {error_type} - {error_message}"
+        log_message = (
+            f"Error logged [{error_entry.error_id}] - {severity.value.upper()}: {error_type} - {error_message}"
+        )
 
         if severity == ErrorSeverity.CRITICAL:
             logger.critical(log_message)
@@ -274,13 +270,15 @@ class ErrorLedger:
 
             # By severity
             severity_key = error_entry.severity.value
-            ledger_data["statistics"]["by_severity"][severity_key] = \
+            ledger_data["statistics"]["by_severity"][severity_key] = (
                 ledger_data["statistics"]["by_severity"].get(severity_key, 0) + 1
+            )
 
             # By category
             category_key = error_entry.category.value
-            ledger_data["statistics"]["by_category"][category_key] = \
+            ledger_data["statistics"]["by_category"][category_key] = (
                 ledger_data["statistics"]["by_category"].get(category_key, 0) + 1
+            )
 
             # Resolved count
             ledger_data["statistics"]["resolved_count"] = sum(
@@ -353,7 +351,7 @@ class ErrorLedger:
         severity: Optional[ErrorSeverity] = None,
         category: Optional[ErrorCategory] = None,
         resolved: Optional[bool] = None,
-        limit: Optional[int] = None
+        limit: Optional[int] = None,
     ) -> list[dict[str, Any]]:
         """
         Retrieve persisted errors with optional filtering by severity, category, resolution status, and result limit.
@@ -428,43 +426,41 @@ class ErrorLedger:
                 "By Severity:",
             ]
 
-            for severity, count in ledger_data['statistics']['by_severity'].items():
+            for severity, count in ledger_data["statistics"]["by_severity"].items():
                 report_lines.append(f"  {severity.upper()}: {count}")
 
-            report_lines.extend([
-                "",
-                "By Category:",
-            ])
+            report_lines.extend(
+                [
+                    "",
+                    "By Category:",
+                ]
+            )
 
-            for category, count in ledger_data['statistics']['by_category'].items():
+            for category, count in ledger_data["statistics"]["by_category"].items():
                 report_lines.append(f"  {category}: {count}")
 
-            report_lines.extend([
-                "",
-                "=" * 80,
-                "ERROR DETAILS",
-                "=" * 80,
-                ""
-            ])
+            report_lines.extend(["", "=" * 80, "ERROR DETAILS", "=" * 80, ""])
 
             # Add error details
-            for error in ledger_data['errors']:
-                report_lines.extend([
-                    f"Error ID: {error['error_id']}",
-                    f"Timestamp: {error['timestamp']}",
-                    f"Severity: {error['severity'].upper()}",
-                    f"Category: {error['category']}",
-                    f"Type: {error['error_type']}",
-                    f"Message: {error['error_message']}",
-                    f"Resolved: {'✅ Yes' if error.get('resolved') else '❌ No'}",
-                    ""
-                ])
+            for error in ledger_data["errors"]:
+                report_lines.extend(
+                    [
+                        f"Error ID: {error['error_id']}",
+                        f"Timestamp: {error['timestamp']}",
+                        f"Severity: {error['severity'].upper()}",
+                        f"Category: {error['category']}",
+                        f"Type: {error['error_type']}",
+                        f"Message: {error['error_message']}",
+                        f"Resolved: {'✅ Yes' if error.get('resolved') else '❌ No'}",
+                        "",
+                    ]
+                )
 
-                if error.get('resolution_notes'):
+                if error.get("resolution_notes"):
                     report_lines.append(f"Resolution: {error['resolution_notes']}")
                     report_lines.append("")
 
-                if error.get('source_file'):
+                if error.get("source_file"):
                     report_lines.append(f"Source: {error['source_file']}:{error.get('source_line', '?')}")
                     report_lines.append("")
 
@@ -537,7 +533,7 @@ def log_error(
     error: Exception,
     severity: ErrorSeverity = ErrorSeverity.MEDIUM,
     category: ErrorCategory = ErrorCategory.UNKNOWN,
-    **kwargs
+    **kwargs,
 ) -> str:
     """
     Log an exception to the global error ledger.
@@ -556,11 +552,4 @@ def log_error(
 
 
 # Export main components
-__all__ = [
-    "ErrorCategory",
-    "ErrorEntry",
-    "ErrorLedger",
-    "ErrorSeverity",
-    "get_error_ledger",
-    "log_error"
-]
+__all__ = ["ErrorCategory", "ErrorEntry", "ErrorLedger", "ErrorSeverity", "get_error_ledger", "log_error"]
