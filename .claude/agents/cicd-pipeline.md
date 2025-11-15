@@ -248,6 +248,7 @@ jobs:
           except KeyError as e:
               print(f"❌ Missing expected key in performance report: {e}")
               sys.exit(1)
+
           if p95 > 200:
               print(f"❌ P95 latency {p95}ms exceeds 200ms SLO")
               sys.exit(1)
