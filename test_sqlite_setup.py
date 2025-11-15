@@ -1,8 +1,8 @@
 import asyncio
 import logging
-from pathlib import Path
 import sys
 import time
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import select, text
@@ -10,7 +10,6 @@ from sqlalchemy import select, text
 from database import AsyncSessionLocal, db_manager, init_db
 from database_config import DATABASE_URL
 from models_sqlalchemy import AgentLog, BrandAsset, Product, User
-
 
 #!/usr/bin/env python3
 """
@@ -25,16 +24,14 @@ Python: >=3.11
 """
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
 
 # Import database modules
+
 
 class SQLiteTestSuite:
     """Comprehensive SQLite test suite."""
@@ -56,7 +53,7 @@ class SQLiteTestSuite:
             ("Transaction Handling", self.test_transaction_handling),
             ("Health Checks", self.test_health_checks),
             ("Concurrent Operations", self.test_concurrent_operations),
-            ("Data Integrity", self.test_data_integrity)
+            ("Data Integrity", self.test_data_integrity),
         ]
 
         for test_name, test_func in tests:
@@ -148,7 +145,7 @@ class SQLiteTestSuite:
                     email="test@example.com",
                     username="testuser",
                     full_name="Test User",
-                    hashed_password="hashed_password"
+                    hashed_password="hashed_password",
                 )
                 session.add(user)
                 await session.commit()
@@ -168,7 +165,7 @@ class SQLiteTestSuite:
                     price=99.99,
                     stock_quantity=10,
                     tags=["test", "product"],
-                    colors=["red", "blue"]
+                    colors=["red", "blue"],
                 )
                 session.add(product)
                 await session.commit()
@@ -229,7 +226,7 @@ class SQLiteTestSuite:
                         sku=f"PERF-{i:03d}",
                         category="Performance",
                         price=float(i + 1),
-                        stock_quantity=i
+                        stock_quantity=i,
                     )
                     products.append(product)
 
@@ -267,7 +264,7 @@ class SQLiteTestSuite:
                         email="transaction@test.com",
                         username="transactionuser",
                         full_name="Transaction Test",
-                        hashed_password="password"
+                        hashed_password="password",
                     )
                     session.add(user)
 
@@ -279,7 +276,7 @@ class SQLiteTestSuite:
                         email="transaction@test.com",  # Duplicate email
                         username="duplicate",
                         full_name="Duplicate",
-                        hashed_password="password"
+                        hashed_password="password",
                     )
                     session.add(duplicate_user)
 
@@ -294,9 +291,7 @@ class SQLiteTestSuite:
                     await session.rollback()
 
                     # Verify the first user was not committed
-                    result = await session.execute(
-                        select(User).where(User.email == "transaction@test.com")
-                    )
+                    result = await session.execute(select(User).where(User.email == "transaction@test.com"))
                     user = result.scalar_one_or_none()
 
                     # User should not exist due to rollback
@@ -327,23 +322,16 @@ class SQLiteTestSuite:
     async def test_concurrent_operations(self) -> bool:
         """Test concurrent database operations."""
         try:
+
             async def create_agent_log(agent_name: str, action: str):
                 async with AsyncSessionLocal() as session:
-                    log = AgentLog(
-                        agent_name=agent_name,
-                        action=action,
-                        status="success",
-                        execution_time_ms=100.0
-                    )
+                    log = AgentLog(agent_name=agent_name, action=action, status="success", execution_time_ms=100.0)
                     session.add(log)
                     await session.commit()
                     return log.id
 
             # Run multiple concurrent operations
-            tasks = [
-                create_agent_log(f"Agent_{i}", f"action_{i}")
-                for i in range(10)
-            ]
+            tasks = [create_agent_log(f"Agent_{i}", f"action_{i}") for i in range(10)]
 
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -363,15 +351,8 @@ class SQLiteTestSuite:
                 brand_asset = BrandAsset(
                     asset_type="color_palette",
                     name="Primary Colors",
-                    data={
-                        "primary": "#FF6B6B",
-                        "secondary": "#4ECDC4",
-                        "accent": "#45B7D1"
-                    },
-                    asset_metadata={
-                        "created_by": "AI Designer",
-                        "version": "1.0"
-                    }
+                    data={"primary": "#FF6B6B", "secondary": "#4ECDC4", "accent": "#45B7D1"},
+                    asset_metadata={"created_by": "AI Designer", "version": "1.0"},
                 )
                 session.add(brand_asset)
                 await session.commit()
@@ -396,7 +377,6 @@ class SQLiteTestSuite:
         passed = sum(1 for result in self.test_results.values() if result)
         total = len(self.test_results)
 
-
         for _test_name, _result in self.test_results.items():
             pass
 
@@ -405,6 +385,7 @@ class SQLiteTestSuite:
         else:
 
             [name for name, result in self.test_results.items() if not result]
+
 
 async def main():
     """Main test function."""
@@ -421,6 +402,7 @@ async def main():
         sys.exit(0)
     else:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

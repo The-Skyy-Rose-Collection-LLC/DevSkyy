@@ -4,13 +4,12 @@ Monitors agent health, detects anomalies, and performs automatic recovery
 """
 
 import asyncio
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import yaml
-
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,7 @@ class Watchdog:
     """
 
     def __init__(
-        self,
-        config_path: str = "fashion_ai_bounded_autonomy/config/monitor.yaml",
-        max_restart_attempts: int = 3
+        self, config_path: str = "fashion_ai_bounded_autonomy/config/monitor.yaml", max_restart_attempts: int = 3
     ):
         self.config_path = Path(config_path)
         self.config = self._load_config()
@@ -123,23 +120,27 @@ class Watchdog:
         logger.warning(f"⚠️  Agent {agent_name} is degraded")
 
         # Log but don't restart - agent is still functional
-        self._log_incident({
-            "type": "agent_degraded",
-            "agent_name": agent_name,
-            "timestamp": datetime.now().isoformat(),
-            "action": "monitoring"
-        })
+        self._log_incident(
+            {
+                "type": "agent_degraded",
+                "agent_name": agent_name,
+                "timestamp": datetime.now().isoformat(),
+                "action": "monitoring",
+            }
+        )
 
     async def _handle_agent_error(self, agent_name: str, error: str):
         """Handle agent error"""
         logger.error(f"❌ Error monitoring {agent_name}: {error}")
 
-        self._log_incident({
-            "type": "monitoring_error",
-            "agent_name": agent_name,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
-        })
+        self._log_incident(
+            {
+                "type": "monitoring_error",
+                "agent_name": agent_name,
+                "error": error,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     async def _restart_agent(self, agent_name: str, agent):
         """Attempt to restart agent"""
@@ -159,13 +160,15 @@ class Watchdog:
             if success:
                 logger.info(f"✅ Agent {agent_name} restarted successfully")
                 self.agent_restart_counts[agent_name] += 1
-                self._log_incident({
-                    "type": "agent_restarted",
-                    "agent_name": agent_name,
-                    "attempt": self.agent_restart_counts[agent_name],
-                    "timestamp": datetime.now().isoformat(),
-                    "success": True
-                })
+                self._log_incident(
+                    {
+                        "type": "agent_restarted",
+                        "agent_name": agent_name,
+                        "attempt": self.agent_restart_counts[agent_name],
+                        "timestamp": datetime.now().isoformat(),
+                        "success": True,
+                    }
+                )
             else:
                 logger.error(f"❌ Failed to restart {agent_name}")
                 await self._halt_agent(agent_name, "restart_failed")
@@ -182,7 +185,7 @@ class Watchdog:
             "reason": reason,
             "halted_at": datetime.now().isoformat(),
             "error_count": self.agent_error_counts.get(agent_name, 0),
-            "restart_attempts": self.agent_restart_counts.get(agent_name, 0)
+            "restart_attempts": self.agent_restart_counts.get(agent_name, 0),
         }
 
         # Create incident report
@@ -193,7 +196,7 @@ class Watchdog:
             "error_count": self.agent_error_counts.get(agent_name, 0),
             "restart_attempts": self.agent_restart_counts.get(agent_name, 0),
             "timestamp": datetime.now().isoformat(),
-            "requires_operator_intervention": True
+            "requires_operator_intervention": True,
         }
 
         self._log_incident(incident)
@@ -211,11 +214,9 @@ class Watchdog:
         if agent_name in self.agent_restart_counts:
             del self.agent_restart_counts[agent_name]
 
-        self._log_incident({
-            "type": "agent_recovered",
-            "agent_name": agent_name,
-            "timestamp": datetime.now().isoformat()
-        })
+        self._log_incident(
+            {"type": "agent_recovered", "agent_name": agent_name, "timestamp": datetime.now().isoformat()}
+        )
 
     def _log_incident(self, incident: dict):
         """Log incident to file and memory"""
@@ -238,10 +239,7 @@ class Watchdog:
             with open(notification_file) as f:
                 notifications = json.load(f)
 
-        notifications.append({
-            **incident,
-            "notification_sent_at": datetime.now().isoformat()
-        })
+        notifications.append({**incident, "notification_sent_at": datetime.now().isoformat()})
 
         with open(notification_file, "w") as f:
             json.dump(notifications, f, indent=2)
@@ -254,7 +252,7 @@ class Watchdog:
             "halted_agents": len(self.halted_agents),
             "agents_with_errors": dict(self.agent_error_counts.items()),
             "agents_with_restarts": dict(self.agent_restart_counts.items()),
-            "halted_details": self.halted_agents
+            "halted_details": self.halted_agents,
         }
 
     async def clear_agent_halt(self, agent_name: str, operator: str):

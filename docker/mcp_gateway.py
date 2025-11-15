@@ -9,18 +9,15 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import asyncio
 import json
 import logging
 import os
 import subprocess
 from typing import Any, Optional
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field
 import httpx
-
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
 
 # =============================================================================
 # CONFIGURATION
@@ -43,9 +40,11 @@ MCP_SERVERS = {
     "huggingface": {
         "type": "http",
         "url": "https://huggingface.co/mcp",
-        "headers": {
-            "Authorization": f"Bearer {os.getenv('HUGGING_FACE_TOKEN', '')}"
-        } if os.getenv("HUGGING_FACE_TOKEN") else {},
+        "headers": (
+            {"Authorization": f"Bearer {os.getenv('HUGGING_FACE_TOKEN', '')}"}
+            if os.getenv("HUGGING_FACE_TOKEN")
+            else {}
+        ),
     },
 }
 
@@ -206,9 +205,7 @@ class MCPGateway:
             except Exception as e:
                 logger.error(f"❌ Failed to initialize {server_name}: {e}")
 
-    async def route_request(
-        self, server_name: str, request: MCPRequest
-    ) -> MCPResponse:
+    async def route_request(self, server_name: str, request: MCPRequest) -> MCPResponse:
         """Route request to specific MCP server"""
         client = self.clients.get(server_name)
 
@@ -226,7 +223,7 @@ class MCPGateway:
         except Exception as e:
             logger.error(f"MCP request failed: {e}")
             return MCPResponse(
-                error={"code": -32603, "message": f"Internal error: {str(e)}"},
+                error={"code": -32603, "message": f"Internal error: {e!s}"},
                 id=request.id,
             )
 
@@ -292,9 +289,7 @@ async def health():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "servers": {
-            name: "active" for name in gateway.clients.keys()
-        },
+        "servers": dict.fromkeys(gateway.clients.keys(), "active"),
     }
 
 

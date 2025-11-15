@@ -5,20 +5,17 @@ SQLAlchemy-based database initialization with zero MongoDB dependencies
 """
 
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from database import db_manager, init_db
-
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -45,9 +42,7 @@ class DevSkyStartup:
                 logger.info(f"✅ Database connection established: {result.get('type')}")
                 return True
             else:
-                logger.warning(
-                    f"⚠️  Database connection issue: {result.get('error', 'Unknown')}"
-                )
+                logger.warning(f"⚠️  Database connection issue: {result.get('error', 'Unknown')}")
                 return False
 
         except Exception as e:
@@ -62,9 +57,7 @@ class DevSkyStartup:
 
             wordpress_url = os.getenv("WORDPRESS_URL")
             if not wordpress_url:
-                logger.info(
-                    "ℹ️  WordPress URL not configured, skipping WordPress service"
-                )
+                logger.info("ℹ️  WordPress URL not configured, skipping WordPress service")
                 return False
 
             from agent.modules.wordpress_direct_service import (

@@ -7,15 +7,14 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user
 from pydantic import BaseModel, HttpUrl
-from webhook_system import WebhookEvent, webhook_manager
-
+from webhook_system import webhook_manager, WebhookEvent
 
 logger = logging.getLogger(__name__)
 
@@ -25,15 +24,19 @@ router = APIRouter(prefix="/api/v1/webhooks", tags=["webhooks"])
 # MODELS
 # ============================================================================
 
+
 class WebhookSubscribeRequest(BaseModel):
     """Webhook subscription request"""
+
     endpoint: HttpUrl
     events: list[str]
     secret: Optional[str] = None
     metadata: Optional[dict[str, Any]] = None
 
+
 class WebhookSubscribeResponse(BaseModel):
     """Webhook subscription response"""
+
     subscription_id: str
     endpoint: str
     events: list[str]
@@ -41,8 +44,10 @@ class WebhookSubscribeResponse(BaseModel):
     created_at: datetime
     secret: str  # Return secret so client can verify signatures
 
+
 class WebhookDeliveryResponse(BaseModel):
     """Webhook delivery record response"""
+
     delivery_id: str
     subscription_id: str
     event_id: str
@@ -54,22 +59,23 @@ class WebhookDeliveryResponse(BaseModel):
     updated_at: datetime
     next_retry_at: Optional[datetime]
 
+
 class WebhookTestResponse(BaseModel):
     """Webhook test response"""
+
     status: str
     delivery_id: str
     response_status_code: Optional[int]
     error_message: Optional[str]
 
+
 # ============================================================================
 # ENDPOINTS
 # ============================================================================
 
+
 @router.post("/subscribe", response_model=WebhookSubscribeResponse)
-async def subscribe_to_webhooks(
-    request: WebhookSubscribeRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def subscribe_to_webhooks(request: WebhookSubscribeRequest, current_user: dict = Depends(get_current_user)):
     """
     Subscribe to webhook events
 
@@ -96,21 +102,15 @@ async def subscribe_to_webhooks(
             if event not in valid_events:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Invalid event type: {event}. Valid events: {valid_events}"
+                    detail=f"Invalid event type: {event}. Valid events: {valid_events}",
                 )
 
         # Subscribe
         subscription = await webhook_manager.subscribe(
-            endpoint=str(request.endpoint),
-            events=request.events,
-            secret=request.secret,
-            metadata=request.metadata
+            endpoint=str(request.endpoint), events=request.events, secret=request.secret, metadata=request.metadata
         )
 
-        logger.info(
-            f"Webhook subscribed by user {current_user.get('sub')}: "
-            f"{subscription.subscription_id}"
-        )
+        logger.info(f"Webhook subscribed by user {current_user.get('sub')}: " f"{subscription.subscription_id}")
 
         return WebhookSubscribeResponse(
             subscription_id=subscription.subscription_id,
@@ -118,7 +118,7 @@ async def subscribe_to_webhooks(
             events=subscription.events,
             active=subscription.active,
             created_at=subscription.created_at,
-            secret=subscription.secret
+            secret=subscription.secret,
         )
 
     except HTTPException:
@@ -126,15 +126,12 @@ async def subscribe_to_webhooks(
     except Exception as e:
         logger.error(f"Subscription error: {e!s}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to subscribe to webhooks"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to subscribe to webhooks"
         )
 
+
 @router.delete("/{subscription_id}")
-async def unsubscribe_from_webhooks(
-    subscription_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def unsubscribe_from_webhooks(subscription_id: str, current_user: dict = Depends(get_current_user)):
     """
     Unsubscribe from webhooks
 
@@ -152,25 +149,15 @@ async def unsubscribe_from_webhooks(
     success = await webhook_manager.unsubscribe(subscription_id)
 
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Subscription not found: {subscription_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Subscription not found: {subscription_id}")
 
-    logger.info(
-        f"Webhook unsubscribed by user {current_user.get('sub')}: "
-        f"{subscription_id}"
-    )
+    logger.info(f"Webhook unsubscribed by user {current_user.get('sub')}: " f"{subscription_id}")
 
-    return {
-        "status": "success",
-        "message": f"Successfully unsubscribed from {subscription_id}"
-    }
+    return {"status": "success", "message": f"Successfully unsubscribed from {subscription_id}"}
+
 
 @router.get("/list", response_model=list[WebhookSubscribeResponse])
-async def list_subscriptions(
-    current_user: dict = Depends(get_current_user)
-):
+async def list_subscriptions(current_user: dict = Depends(get_current_user)):
     """
     List all active webhook subscriptions
 
@@ -186,19 +173,17 @@ async def list_subscriptions(
         WebhookSubscribeResponse(
             subscription_id=sub.subscription_id,
             endpoint=str(sub.endpoint),
-            events=[e.value if hasattr(e, 'value') else str(e) for e in sub.events],
+            events=[e.value if hasattr(e, "value") else str(e) for e in sub.events],
             active=sub.active,
             created_at=sub.created_at,
-            secret=sub.secret
+            secret=sub.secret,
         )
         for sub in subscriptions
     ]
 
+
 @router.post("/{subscription_id}/test", response_model=WebhookTestResponse)
-async def test_webhook(
-    subscription_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def test_webhook(subscription_id: str, current_user: dict = Depends(get_current_user)):
     """
     Test webhook delivery with sample payload
 
@@ -220,35 +205,25 @@ async def test_webhook(
         delivery = await webhook_manager.test_webhook(subscription_id)
 
         logger.info(
-            f"Webhook test by user {current_user.get('sub')}: "
-            f"{subscription_id} -> status {delivery.status}"
+            f"Webhook test by user {current_user.get('sub')}: " f"{subscription_id} -> status {delivery.status}"
         )
 
         return WebhookTestResponse(
             status=delivery.status,
             delivery_id=delivery.delivery_id,
             response_status_code=delivery.response_status_code,
-            error_message=delivery.error_message
+            error_message=delivery.error_message,
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         logger.error(f"Webhook test error: {e!s}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to test webhook"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to test webhook")
+
 
 @router.get("/{subscription_id}/deliveries", response_model=list[WebhookDeliveryResponse])
-async def get_delivery_history(
-    subscription_id: str,
-    limit: int = 10,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_delivery_history(subscription_id: str, limit: int = 10, current_user: dict = Depends(get_current_user)):
     """
     Get delivery history for a subscription
 
@@ -271,10 +246,7 @@ async def get_delivery_history(
     limit = max(limit, 1)
 
     try:
-        deliveries = await webhook_manager.get_delivery_history(
-            subscription_id,
-            limit
-        )
+        deliveries = await webhook_manager.get_delivery_history(subscription_id, limit)
 
         return [
             WebhookDeliveryResponse(
@@ -287,7 +259,7 @@ async def get_delivery_history(
                 error_message=d.error_message,
                 created_at=d.created_at,
                 updated_at=d.updated_at,
-                next_retry_at=d.next_retry_at
+                next_retry_at=d.next_retry_at,
             )
             for d in deliveries
         ]
@@ -295,15 +267,12 @@ async def get_delivery_history(
     except Exception as e:
         logger.error(f"Delivery history error: {e!s}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve delivery history"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve delivery history"
         )
 
+
 @router.get("/{subscription_id}/info", response_model=WebhookSubscribeResponse)
-async def get_subscription_info(
-    subscription_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_subscription_info(subscription_id: str, current_user: dict = Depends(get_current_user)):
     """
     Get information about a specific subscription
 
@@ -321,24 +290,20 @@ async def get_subscription_info(
     subscription = await webhook_manager.get_subscription(subscription_id)
 
     if not subscription:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Subscription not found: {subscription_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Subscription not found: {subscription_id}")
 
     return WebhookSubscribeResponse(
         subscription_id=subscription.subscription_id,
         endpoint=str(subscription.endpoint),
-        events=[e.value if hasattr(e, 'value') else str(e) for e in subscription.events],
+        events=[e.value if hasattr(e, "value") else str(e) for e in subscription.events],
         active=subscription.active,
         created_at=subscription.created_at,
-        secret=subscription.secret
+        secret=subscription.secret,
     )
 
+
 @router.get("/events/list", response_model=dict[str, list[str]])
-async def list_webhook_events(
-    current_user: dict = Depends(get_current_user)
-):
+async def list_webhook_events(current_user: dict = Depends(get_current_user)):
     """
     List all available webhook event types
 
@@ -358,7 +323,7 @@ async def list_webhook_events(
         "themes": ["theme.generated", "theme.deployed"],
         "security": ["security.threat", "security.audit"],
         "system": ["system.error", "system.warning"],
-        "custom": ["custom.event"]
+        "custom": ["custom.event"],
     }
 
     return events_by_category

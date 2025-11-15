@@ -9,14 +9,14 @@ Truth Protocol: Uses existing verified services, environment variables, comprehe
 """
 
 import asyncio
-from datetime import datetime, timedelta
 import logging
 import random
+from datetime import datetime, timedelta
 from typing import Any, Optional
 
+import httpx
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-import httpx
 
 from agent.modules.backend.wordpress_integration_service import (
     WordPressIntegrationService,
@@ -28,10 +28,9 @@ from agent.modules.marketing_content_generation_agent import (
 # Import existing DevSkyy agents
 from agent.wordpress.content_generator import ContentGenerator
 from config.wordpress_credentials import (
-    WordPressCredentialsManager,
     get_skyy_rose_credentials,
+    WordPressCredentialsManager,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -88,9 +87,7 @@ class PexelsImageService:
                     "per_page": per_page,
                 }
 
-                response = await client.get(
-                    f"{self.base_url}/search", headers=self.headers, params=params
-                )
+                response = await client.get(f"{self.base_url}/search", headers=self.headers, params=params)
                 response.raise_for_status()
 
                 data = response.json()
@@ -155,9 +152,7 @@ class GoogleSheetsLogger:
         self.spreadsheet_id = spreadsheet_id
         self.service = build("sheets", "v4", credentials=credentials)
 
-    async def log_content_publish(
-        self, sheet_name: str, content_data: dict[str, Any]
-    ) -> bool:
+    async def log_content_publish(self, sheet_name: str, content_data: dict[str, Any]) -> bool:
         """
         Log content publish event to Google Sheets
 
@@ -197,9 +192,7 @@ class GoogleSheetsLogger:
                 .execute()
             )
 
-            logger.info(
-                f"Content logged to Google Sheets: {content_data.get('title', '')}"
-            )
+            logger.info(f"Content logged to Google Sheets: {content_data.get('title', '')}")
             return True
 
         except Exception:
@@ -297,21 +290,15 @@ class ContentPublishingOrchestrator:
         # Initialize optional services
         self.telegram_service = None
         if telegram_bot_token and telegram_chat_id:
-            self.telegram_service = TelegramNotificationService(
-                bot_token=telegram_bot_token, chat_id=telegram_chat_id
-            )
+            self.telegram_service = TelegramNotificationService(bot_token=telegram_bot_token, chat_id=telegram_chat_id)
 
         self.sheets_logger = None
         if google_credentials and google_sheets_id:
-            self.sheets_logger = GoogleSheetsLogger(
-                credentials=google_credentials, spreadsheet_id=google_sheets_id
-            )
+            self.sheets_logger = GoogleSheetsLogger(credentials=google_credentials, spreadsheet_id=google_sheets_id)
 
         logger.info("ContentPublishingOrchestrator initialized with existing agents")
 
-    def calculate_random_delay(
-        self, min_hours: float = 0, max_hours: float = 6
-    ) -> timedelta:
+    def calculate_random_delay(self, min_hours: float = 0, max_hours: float = 6) -> timedelta:
         """
         Calculate random delay for anti-detection
 
@@ -356,9 +343,7 @@ class ContentPublishingOrchestrator:
                 topic=topic, keywords=keywords, tone=tone, length=length
             )
 
-            logger.info(
-                f"Content generated: {content['title']} ({content['word_count']} words)"
-            )
+            logger.info(f"Content generated: {content['title']} ({content['word_count']} words)")
             return content
 
         except Exception:
@@ -384,14 +369,10 @@ class ContentPublishingOrchestrator:
             # Use first keyword as primary search term
             query = keywords[0] if keywords else "luxury lifestyle"
 
-            image_data = await self.pexels_service.search_images(
-                query=query, orientation=orientation, per_page=1
-            )
+            image_data = await self.pexels_service.search_images(query=query, orientation=orientation, per_page=1)
 
             if image_data:
-                logger.info(
-                    f"Image found: {image_data['url']} by {image_data['photographer']}"
-                )
+                logger.info(f"Image found: {image_data['url']} by {image_data['photographer']}")
                 return image_data
             else:
                 logger.warning("No image found, will use placeholder")
@@ -442,9 +423,7 @@ class ContentPublishingOrchestrator:
             # Use existing WordPressIntegrationService
             # Note: This requires OAuth token exchange first
             # For direct REST API, we'd use requests with basic auth
-            logger.info(
-                f"WordPress post created (simulation - OAuth required): {content['title']}"
-            )
+            logger.info(f"WordPress post created (simulation - OAuth required): {content['title']}")
 
             # Return simulated result
             return {
@@ -499,18 +478,14 @@ class ContentPublishingOrchestrator:
             Workflow result with all data
         """
         workflow_start = datetime.now()
-        logger.info(
-            f"Starting content publishing workflow for topic: {topic}"
-        )
+        logger.info(f"Starting content publishing workflow for topic: {topic}")
 
         try:
             # Step 1: Calculate random delay
             delay = timedelta(seconds=0)
             if apply_random_delay:
                 delay = self.calculate_random_delay(min_delay_hours, max_delay_hours)
-                logger.info(
-                    f"Random delay calculated: {delay.total_seconds() / 3600:.2f} hours"
-                )
+                logger.info(f"Random delay calculated: {delay.total_seconds() / 3600:.2f} hours")
 
                 # Step 2: Wait for delay
                 if delay.total_seconds() > 0:
@@ -518,14 +493,10 @@ class ContentPublishingOrchestrator:
                     await asyncio.sleep(delay.total_seconds())
 
             # Step 3: Generate AI content
-            content = await self.generate_content(
-                topic=topic, keywords=keywords, tone=tone, length=length
-            )
+            content = await self.generate_content(topic=topic, keywords=keywords, tone=tone, length=length)
 
             # Step 4: Fetch Pexels image
-            image_data = await self.fetch_featured_image(
-                keywords=keywords, orientation="landscape"
-            )
+            image_data = await self.fetch_featured_image(keywords=keywords, orientation="landscape")
 
             # Step 5: Publish to WordPress
             wordpress_post = await self.publish_to_wordpress(
@@ -563,9 +534,7 @@ class ContentPublishingOrchestrator:
 
             workflow_duration = (datetime.now() - workflow_start).total_seconds()
 
-            logger.info(
-                f"Content publishing workflow completed in {workflow_duration:.1f}s"
-            )
+            logger.info(f"Content publishing workflow completed in {workflow_duration:.1f}s")
 
             return {
                 "success": True,
@@ -582,9 +551,7 @@ class ContentPublishingOrchestrator:
             # Send error notification
             if notify and self.telegram_service:
                 error_message = (
-                    f"<b>❌ Content Publishing Failed</b>\n\n"
-                    f"<b>Topic:</b> {topic}\n"
-                    f"<b>Error:</b> {e!s}"
+                    f"<b>❌ Content Publishing Failed</b>\n\n" f"<b>Topic:</b> {topic}\n" f"<b>Error:</b> {e!s}"
                 )
                 await self.telegram_service.send_notification(error_message)
 

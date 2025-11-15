@@ -7,19 +7,18 @@ Author: DevSkyy Team
 Version: 1.0.0
 """
 
-from datetime import datetime, timedelta
 import logging
 import os
 import sys
+from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
-
 # Add orchestration module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'ai_orchestration'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "ai_orchestration"))
 
 logger = logging.getLogger(__name__)
 security = HTTPBearer()
@@ -27,19 +26,23 @@ security = HTTPBearer()
 # Initialize router
 router = APIRouter()
 
+
 # Pydantic models for request/response validation
 class HealthResponse(BaseModel):
     status: str = Field(..., description="Overall system health status")
     partnerships: dict[str, dict[str, Any]] = Field(..., description="Partnership health details")
     last_updated: datetime = Field(..., description="Last health check timestamp")
 
+
 class MetricsResponse(BaseModel):
     partnership_type: str = Field(..., description="Partnership type")
     metrics: dict[str, float] = Field(..., description="Performance metrics")
     timestamp: datetime = Field(..., description="Metrics collection timestamp")
 
+
 class DecisionRequest(BaseModel):
     context: dict[str, Any] = Field(..., description="Decision context parameters")
+
 
 class DecisionResponse(BaseModel):
     decision: str = Field(..., description="Strategic decision")
@@ -48,6 +51,7 @@ class DecisionResponse(BaseModel):
     success_metrics: list[str] = Field(..., description="Success criteria")
     risk_mitigation: list[str] = Field(..., description="Risk mitigation strategies")
 
+
 class PartnershipStatus(BaseModel):
     id: str = Field(..., description="Partnership identifier")
     name: str = Field(..., description="Partnership name")
@@ -55,10 +59,12 @@ class PartnershipStatus(BaseModel):
     progress: float = Field(..., description="Overall progress percentage")
     deliverables: list[dict[str, Any]] = Field(..., description="Deliverable status")
 
+
 class DeliverableUpdate(BaseModel):
     completion_percentage: float = Field(..., ge=0, le=100, description="Completion percentage")
     status: str = Field(..., description="Current status description")
     last_updated: Optional[datetime] = Field(default=None, description="Last update timestamp")
+
 
 # Dependency for authentication
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -86,8 +92,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         required_roles = ["admin", "orchestration_manager", "system_admin"]
         if user_info.get("role") not in required_roles:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions for orchestration access"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions for orchestration access"
             )
 
         return user_info
@@ -102,24 +107,24 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+
 # Initialize orchestration system
 async def get_orchestration_system():
     """Get orchestration system instance"""
     try:
         from claude_central_command import ClaudeCentralCommand
+
         return ClaudeCentralCommand()
     except ImportError as e:
         logger.error(f"Failed to import orchestration system: {e}")
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Orchestration system not available"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Orchestration system not available"
         )
+
 
 # Health and Status Endpoints
 @router.get("/health", response_model=HealthResponse, tags=["Health"])
-async def get_orchestration_health(
-    current_user: dict = Depends(get_current_user)
-) -> HealthResponse:
+async def get_orchestration_health(current_user: dict = Depends(get_current_user)) -> HealthResponse:
     """Get overall orchestration system health status"""
 
     try:
@@ -164,7 +169,7 @@ async def get_orchestration_health(
                 partnerships_health[partnership_type.value] = {
                     "health": health_status,
                     "score": round(avg_health, 1),
-                    **{k: v for k, v in metrics.items() if isinstance(v, (int, float))}
+                    **{k: v for k, v in metrics.items() if isinstance(v, (int, float))},
                 }
 
         except Exception as e:
@@ -185,23 +190,15 @@ async def get_orchestration_health(
         else:
             overall_status = "unknown"
 
-        return HealthResponse(
-            status=overall_status,
-            partnerships=partnerships_health,
-            last_updated=datetime.now()
-        )
+        return HealthResponse(status=overall_status, partnerships=partnerships_health, last_updated=datetime.now())
 
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Health check failed: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Health check failed: {e!s}")
+
 
 @router.get("/metrics", response_model=list[MetricsResponse], tags=["Metrics"])
-async def get_all_metrics(
-    current_user: dict = Depends(get_current_user)
-) -> list[MetricsResponse]:
+async def get_all_metrics(current_user: dict = Depends(get_current_user)) -> list[MetricsResponse]:
     """Get real-time metrics from all partnerships"""
 
     try:
@@ -215,33 +212,32 @@ async def get_all_metrics(
             try:
                 metrics = await central_command._get_partnership_performance(partnership_type)
 
-                all_metrics.append(MetricsResponse(
-                    partnership_type=partnership_type.value,
-                    metrics=metrics,
-                    timestamp=timestamp
-                ))
+                all_metrics.append(
+                    MetricsResponse(partnership_type=partnership_type.value, metrics=metrics, timestamp=timestamp)
+                )
 
             except Exception as e:
                 logger.warning(f"Failed to get metrics for {partnership_type}: {e}")
-                all_metrics.append(MetricsResponse(
-                    partnership_type=partnership_type.value,
-                    metrics={"error": f"Metrics unavailable: {e!s}"},
-                    timestamp=timestamp
-                ))
+                all_metrics.append(
+                    MetricsResponse(
+                        partnership_type=partnership_type.value,
+                        metrics={"error": f"Metrics unavailable: {e!s}"},
+                        timestamp=timestamp,
+                    )
+                )
 
         return all_metrics
 
     except Exception as e:
         logger.error(f"Metrics collection failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Metrics collection failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Metrics collection failed: {e!s}"
         )
+
 
 @router.get("/metrics/{partnership_type}", response_model=MetricsResponse, tags=["Metrics"])
 async def get_partnership_metrics(
-    partnership_type: str,
-    current_user: dict = Depends(get_current_user)
+    partnership_type: str, current_user: dict = Depends(get_current_user)
 ) -> MetricsResponse:
     """Get real-time metrics for specific partnership"""
 
@@ -253,8 +249,7 @@ async def get_partnership_metrics(
         valid_types = [pt.value for pt in PartnershipType]
         if partnership_type not in valid_types:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid partnership type. Valid types: {valid_types}"
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid partnership type. Valid types: {valid_types}"
             )
 
         # Find the enum value
@@ -266,32 +261,26 @@ async def get_partnership_metrics(
 
         if not partnership_enum:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Partnership type not found: {partnership_type}"
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f"Partnership type not found: {partnership_type}"
             )
 
         metrics = await central_command._get_partnership_performance(partnership_enum)
 
-        return MetricsResponse(
-            partnership_type=partnership_type,
-            metrics=metrics,
-            timestamp=datetime.now()
-        )
+        return MetricsResponse(partnership_type=partnership_type, metrics=metrics, timestamp=datetime.now())
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Partnership metrics failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership metrics failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Partnership metrics failed: {e!s}"
         )
+
 
 # Strategic Decision Engine
 @router.post("/decisions", response_model=DecisionResponse, tags=["Strategy"])
 async def make_strategic_decision(
-    request: DecisionRequest,
-    current_user: dict = Depends(get_current_user)
+    request: DecisionRequest, current_user: dict = Depends(get_current_user)
 ) -> DecisionResponse:
     """Submit decision context and get strategic recommendations"""
 
@@ -300,10 +289,7 @@ async def make_strategic_decision(
 
         # Validate decision context
         if not request.context:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Decision context is required"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Decision context is required")
 
         # Make strategic decision
         decision_result = await central_command.strategic_decision_engine(request.context)
@@ -313,7 +299,7 @@ async def make_strategic_decision(
             rationale=decision_result.get("rationale", "No rationale provided"),
             implementation_plan=decision_result.get("implementation_plan", []),
             success_metrics=decision_result.get("success_metrics", []),
-            risk_mitigation=decision_result.get("risk_mitigation", [])
+            risk_mitigation=decision_result.get("risk_mitigation", []),
         )
 
     except HTTPException:
@@ -321,15 +307,13 @@ async def make_strategic_decision(
     except Exception as e:
         logger.error(f"Strategic decision failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Strategic decision failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Strategic decision failed: {e!s}"
         )
+
 
 # Partnership Management
 @router.get("/partnerships", response_model=list[PartnershipStatus], tags=["Partnerships"])
-async def get_all_partnerships(
-    current_user: dict = Depends(get_current_user)
-) -> list[PartnershipStatus]:
+async def get_all_partnerships(current_user: dict = Depends(get_current_user)) -> list[PartnershipStatus]:
     """Get status of all partnerships"""
 
     try:
@@ -355,8 +339,7 @@ async def get_all_partnerships(
 
                 # Format deliverables
                 deliverables = [
-                    {"name": name, "progress": progress}
-                    for name, progress in deliverables_progress.items()
+                    {"name": name, "progress": progress} for name, progress in deliverables_progress.items()
                 ]
 
                 # Determine health status
@@ -369,37 +352,40 @@ async def get_all_partnerships(
                 else:
                     health = "poor"
 
-                partnerships.append(PartnershipStatus(
-                    id=partnership_type.value,
-                    name=partnership_config.get("name", f"{partnership_type.value} Partnership"),
-                    health=health,
-                    progress=round(overall_progress, 1),
-                    deliverables=deliverables
-                ))
+                partnerships.append(
+                    PartnershipStatus(
+                        id=partnership_type.value,
+                        name=partnership_config.get("name", f"{partnership_type.value} Partnership"),
+                        health=health,
+                        progress=round(overall_progress, 1),
+                        deliverables=deliverables,
+                    )
+                )
 
             except Exception as e:
                 logger.warning(f"Failed to get status for {partnership_type}: {e}")
-                partnerships.append(PartnershipStatus(
-                    id=partnership_type.value,
-                    name=f"{partnership_type.value} Partnership",
-                    health="unknown",
-                    progress=0.0,
-                    deliverables=[{"name": "error", "progress": 0, "error": str(e)}]
-                ))
+                partnerships.append(
+                    PartnershipStatus(
+                        id=partnership_type.value,
+                        name=f"{partnership_type.value} Partnership",
+                        health="unknown",
+                        progress=0.0,
+                        deliverables=[{"name": "error", "progress": 0, "error": str(e)}],
+                    )
+                )
 
         return partnerships
 
     except Exception as e:
         logger.error(f"Partnership status failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership status failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Partnership status failed: {e!s}"
         )
+
 
 @router.get("/partnerships/{partnership_id}/status", response_model=PartnershipStatus, tags=["Partnerships"])
 async def get_partnership_status(
-    partnership_id: str,
-    current_user: dict = Depends(get_current_user)
+    partnership_id: str, current_user: dict = Depends(get_current_user)
 ) -> PartnershipStatus:
     """Get status of specific partnership"""
 
@@ -411,25 +397,20 @@ async def get_partnership_status(
             if partnership.id == partnership_id:
                 return partnership
 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Partnership not found: {partnership_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Partnership not found: {partnership_id}")
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Partnership status failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Partnership status failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Partnership status failed: {e!s}"
         )
+
 
 # System Information
 @router.get("/info", tags=["System"])
-async def get_system_info(
-    current_user: dict = Depends(get_current_user)
-) -> dict[str, Any]:
+async def get_system_info(current_user: dict = Depends(get_current_user)) -> dict[str, Any]:
     """Get orchestration system information"""
 
     try:
@@ -441,7 +422,7 @@ async def get_system_info(
             "active_partnerships": 4,
             "total_decisions": 1247,
             "avg_response_time": "45ms",
-            "success_rate": "98.7%"
+            "success_rate": "98.7%",
         }
 
         return {
@@ -457,7 +438,7 @@ async def get_system_info(
                 "ROI optimization",
                 "JWT authentication",
                 "Rate limiting",
-                "Comprehensive logging"
+                "Comprehensive logging",
             ],
             "api_version": "v1",
             "statistics": system_stats,
@@ -465,22 +446,18 @@ async def get_system_info(
             "user": {
                 "id": current_user.get("user_id"),
                 "role": current_user.get("role"),
-                "permissions": ["read", "write", "admin"] if current_user.get("role") == "admin" else ["read"]
-            }
+                "permissions": ["read", "write", "admin"] if current_user.get("role") == "admin" else ["read"],
+            },
         }
 
     except Exception as e:
         logger.error(f"System info failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"System info failed: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"System info failed: {e!s}")
+
 
 # System Status Endpoint
 @router.get("/status", tags=["System"])
-async def get_system_status(
-    current_user: dict = Depends(get_current_user)
-) -> dict[str, Any]:
+async def get_system_status(current_user: dict = Depends(get_current_user)) -> dict[str, Any]:
     """Get comprehensive system status including all components"""
 
     try:
@@ -494,22 +471,25 @@ async def get_system_status(
             "metrics_collector": "healthy",
             "authentication": "healthy",
             "database": "healthy",
-            "api_gateway": "healthy"
+            "api_gateway": "healthy",
         }
 
         # Get resource usage
-        resource_usage = {
-            "cpu_usage": "23%",
-            "memory_usage": "67%",
-            "disk_usage": "45%",
-            "network_io": "normal"
-        }
+        resource_usage = {"cpu_usage": "23%", "memory_usage": "67%", "disk_usage": "45%", "network_io": "normal"}
 
         # Get recent activity
         recent_activity = [
             {"timestamp": datetime.now().isoformat(), "event": "Partnership metrics updated", "status": "success"},
-            {"timestamp": (datetime.now() - timedelta(minutes=5)).isoformat(), "event": "Strategic decision processed", "status": "success"},
-            {"timestamp": (datetime.now() - timedelta(minutes=10)).isoformat(), "event": "Health check completed", "status": "success"}
+            {
+                "timestamp": (datetime.now() - timedelta(minutes=5)).isoformat(),
+                "event": "Strategic decision processed",
+                "status": "success",
+            },
+            {
+                "timestamp": (datetime.now() - timedelta(minutes=10)).isoformat(),
+                "event": "Health check completed",
+                "status": "success",
+            },
         ]
 
         return {
@@ -518,29 +498,26 @@ async def get_system_status(
             "resource_usage": resource_usage,
             "recent_activity": recent_activity,
             "last_check": datetime.now().isoformat(),
-            "next_check": (datetime.now() + timedelta(minutes=5)).isoformat()
+            "next_check": (datetime.now() + timedelta(minutes=5)).isoformat(),
         }
 
     except Exception as e:
         logger.error(f"System status check failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"System status check failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"System status check failed: {e!s}"
         )
+
 
 # Configuration Management
 @router.get("/config", tags=["Configuration"])
-async def get_system_configuration(
-    current_user: dict = Depends(get_current_user)
-) -> dict[str, Any]:
+async def get_system_configuration(current_user: dict = Depends(get_current_user)) -> dict[str, Any]:
     """Get current system configuration"""
 
     try:
         # Only admin users can view configuration
         if current_user.get("role") != "admin":
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Admin access required for configuration"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required for configuration"
             )
 
         await get_orchestration_system()
@@ -550,48 +527,42 @@ async def get_system_configuration(
                 "rate_limit": "100 requests/minute",
                 "timeout": "60 seconds",
                 "max_payload_size": "10MB",
-                "cors_enabled": True
+                "cors_enabled": True,
             },
             "security_settings": {
                 "jwt_expiry": "15 minutes",
                 "refresh_token_expiry": "7 days",
                 "max_login_attempts": 5,
-                "lockout_duration": "15 minutes"
+                "lockout_duration": "15 minutes",
             },
             "orchestration_settings": {
                 "max_concurrent_decisions": 10,
                 "partnership_check_interval": "5 minutes",
                 "metrics_collection_interval": "1 minute",
-                "health_check_interval": "30 seconds"
+                "health_check_interval": "30 seconds",
             },
             "partnership_settings": {
                 "cursor_technical": {"enabled": True, "priority": "high"},
                 "grok_brand": {"enabled": True, "priority": "medium"},
                 "claude_strategic": {"enabled": True, "priority": "high"},
-                "perplexity_research": {"enabled": True, "priority": "medium"}
-            }
+                "perplexity_research": {"enabled": True, "priority": "medium"},
+            },
         }
 
-        return {
-            "configuration": config,
-            "last_updated": datetime.now().isoformat(),
-            "version": "1.0.0"
-        }
+        return {"configuration": config, "last_updated": datetime.now().isoformat(), "version": "1.0.0"}
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Configuration retrieval failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Configuration retrieval failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Configuration retrieval failed: {e!s}"
         )
+
 
 # Deployment Readiness Check
 @router.get("/deployment/readiness", tags=["Deployment"])
-async def check_deployment_readiness(
-    current_user: dict = Depends(get_current_user)
-) -> dict[str, Any]:
+async def check_deployment_readiness(current_user: dict = Depends(get_current_user)) -> dict[str, Any]:
     """Check if system is ready for production deployment"""
 
     try:
@@ -608,7 +579,7 @@ async def check_deployment_readiness(
             "partnerships": {"status": "pass", "message": "All partnerships operational"},
             "database": {"status": "pass", "message": "Database connections healthy"},
             "api_documentation": {"status": "pass", "message": "OpenAPI documentation complete"},
-            "ssl_certificates": {"status": "warning", "message": "SSL certificates should be verified in production"}
+            "ssl_certificates": {"status": "warning", "message": "SSL certificates should be verified in production"},
         }
 
         # Calculate overall readiness
@@ -634,33 +605,35 @@ async def check_deployment_readiness(
                 "total_checks": total_checks,
                 "passed": passed_checks,
                 "warnings": warning_checks,
-                "failed": failed_checks
+                "failed": failed_checks,
             },
-            "recommendations": [
-                "Verify SSL certificates in production environment",
-                "Set up monitoring dashboards",
-                "Configure backup strategies",
-                "Test disaster recovery procedures"
-            ] if warning_checks > 0 or failed_checks > 0 else [
-                "System is production ready!",
-                "Consider setting up monitoring dashboards",
-                "Implement backup strategies"
-            ],
-            "last_check": datetime.now().isoformat()
+            "recommendations": (
+                [
+                    "Verify SSL certificates in production environment",
+                    "Set up monitoring dashboards",
+                    "Configure backup strategies",
+                    "Test disaster recovery procedures",
+                ]
+                if warning_checks > 0 or failed_checks > 0
+                else [
+                    "System is production ready!",
+                    "Consider setting up monitoring dashboards",
+                    "Implement backup strategies",
+                ]
+            ),
+            "last_check": datetime.now().isoformat(),
         }
 
     except Exception as e:
         logger.error(f"Deployment readiness check failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Deployment readiness check failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Deployment readiness check failed: {e!s}"
         )
+
 
 # API Documentation
 @router.get("/docs/endpoints", tags=["Documentation"])
-async def get_api_documentation(
-    current_user: dict = Depends(get_current_user)
-) -> dict[str, Any]:
+async def get_api_documentation(current_user: dict = Depends(get_current_user)) -> dict[str, Any]:
     """Get comprehensive API documentation for orchestration endpoints"""
 
     try:
@@ -675,10 +648,10 @@ async def get_api_documentation(
                     "status": "healthy",
                     "partnerships": {
                         "cursor_technical": {"health": "excellent", "score": 95.2},
-                        "grok_brand": {"health": "good", "score": 87.1}
+                        "grok_brand": {"health": "good", "score": 87.1},
                     },
-                    "last_updated": "2025-10-25T10:30:00Z"
-                }
+                    "last_updated": "2025-10-25T10:30:00Z",
+                },
             },
             "metrics": {
                 "method": "GET",
@@ -690,9 +663,9 @@ async def get_api_documentation(
                     {
                         "partnership_type": "cursor_technical",
                         "metrics": {"uptime": 99.9, "response_time": 45, "success_rate": 98.7},
-                        "timestamp": "2025-10-25T10:30:00Z"
+                        "timestamp": "2025-10-25T10:30:00Z",
                     }
-                ]
+                ],
             },
             "decisions": {
                 "method": "POST",
@@ -702,21 +675,15 @@ async def get_api_documentation(
                 "request_model": "DecisionRequest",
                 "response_model": "DecisionResponse",
                 "example_request": {
-                    "context": {
-                        "business_goal": "increase_revenue",
-                        "timeframe": "Q1_2025",
-                        "budget": 50000
-                    }
+                    "context": {"business_goal": "increase_revenue", "timeframe": "Q1_2025", "budget": 50000}
                 },
                 "example_response": {
                     "decision": "EXPAND_PARTNERSHIP_NETWORK",
                     "rationale": "Analysis shows 23% revenue increase potential",
-                    "implementation_plan": [
-                        {"phase": 1, "action": "Identify new partners", "timeline": "2 weeks"}
-                    ],
+                    "implementation_plan": [{"phase": 1, "action": "Identify new partners", "timeline": "2 weeks"}],
                     "success_metrics": ["Revenue growth", "Partnership satisfaction"],
-                    "risk_mitigation": ["Gradual rollout", "Performance monitoring"]
-                }
+                    "risk_mitigation": ["Gradual rollout", "Performance monitoring"],
+                },
             },
             "partnerships": {
                 "method": "GET",
@@ -732,10 +699,10 @@ async def get_api_documentation(
                         "progress": 95.2,
                         "deliverables": [
                             {"name": "Code optimization", "progress": 100},
-                            {"name": "Performance tuning", "progress": 90}
-                        ]
+                            {"name": "Performance tuning", "progress": 90},
+                        ],
                     }
-                ]
+                ],
             },
             "status": {
                 "method": "GET",
@@ -745,8 +712,8 @@ async def get_api_documentation(
                 "example_response": {
                     "overall_status": "healthy",
                     "components": {"orchestration_engine": "healthy", "database": "healthy"},
-                    "resource_usage": {"cpu_usage": "23%", "memory_usage": "67%"}
-                }
+                    "resource_usage": {"cpu_usage": "23%", "memory_usage": "67%"},
+                },
             },
             "config": {
                 "method": "GET",
@@ -757,9 +724,9 @@ async def get_api_documentation(
                 "example_response": {
                     "configuration": {
                         "api_settings": {"rate_limit": "100 requests/minute"},
-                        "security_settings": {"jwt_expiry": "15 minutes"}
+                        "security_settings": {"jwt_expiry": "15 minutes"},
                     }
-                }
+                },
             },
             "deployment_readiness": {
                 "method": "GET",
@@ -770,9 +737,9 @@ async def get_api_documentation(
                     "overall_status": "production_ready",
                     "readiness_score": 95.0,
                     "checks": {"authentication": {"status": "pass"}},
-                    "recommendations": ["System is production ready!"]
-                }
-            }
+                    "recommendations": ["System is production ready!"],
+                },
+            },
         }
 
         return {
@@ -783,11 +750,11 @@ async def get_api_documentation(
                 "header": "Authorization: Bearer <token>",
                 "required_roles": ["admin", "orchestration_manager", "system_admin"],
                 "token_expiry": "15 minutes",
-                "refresh_available": True
+                "refresh_available": True,
             },
             "rate_limiting": {
                 "limit": "100 requests per minute",
-                "headers": ["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"]
+                "headers": ["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
             },
             "error_handling": {
                 "400": "Bad Request - Invalid input parameters",
@@ -795,15 +762,14 @@ async def get_api_documentation(
                 "403": "Forbidden - Insufficient permissions",
                 "404": "Not Found - Resource not found",
                 "429": "Too Many Requests - Rate limit exceeded",
-                "500": "Internal Server Error - System error"
+                "500": "Internal Server Error - System error",
             },
             "endpoints": endpoints_docs,
-            "last_updated": datetime.now().isoformat()
+            "last_updated": datetime.now().isoformat(),
         }
 
     except Exception as e:
         logger.error(f"API documentation failed: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"API documentation failed: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"API documentation failed: {e!s}"
         )

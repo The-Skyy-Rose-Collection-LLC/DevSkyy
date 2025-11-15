@@ -6,9 +6,8 @@ without actually executing them
 """
 
 import ast
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 # Critical files to verify
 CRITICAL_FILES = [
@@ -25,13 +24,14 @@ CRITICAL_FILES = [
     "api/training_data_interface.py",
 ]
 
+
 def extract_imports(file_path: Path) -> tuple[bool, list[str], str]:
     """
     Extract and verify all import statements from a Python file.
     Returns (success, imports_list, error_message)
     """
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Parse the file into an AST
@@ -48,7 +48,9 @@ def extract_imports(file_path: Path) -> tuple[bool, list[str], str]:
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ""
                 for alias in node.names:
-                    imports.append(f"from {module} import {alias.name}" + (f" as {alias.asname}" if alias.asname else ""))
+                    imports.append(
+                        f"from {module} import {alias.name}" + (f" as {alias.asname}" if alias.asname else "")
+                    )
 
         return True, imports, ""
 
@@ -56,6 +58,7 @@ def extract_imports(file_path: Path) -> tuple[bool, list[str], str]:
         return False, [], f"Syntax error: Line {e.lineno}: {e.msg}"
     except Exception as e:
         return False, [], f"Error: {e!s}"
+
 
 def check_common_issues(imports: list[str]) -> list[str]:
     """Check for common import issues"""
@@ -76,6 +79,7 @@ def check_common_issues(imports: list[str]) -> list[str]:
         import_names.append(name)
 
     return issues
+
 
 def main():
     """Main verification function"""
@@ -108,8 +112,8 @@ def main():
         else:
             failed += 1
 
-
     return 0 if failed == 0 else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

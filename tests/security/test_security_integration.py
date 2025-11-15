@@ -8,19 +8,19 @@ References:
 - OWASP Top 10: Security best practices
 """
 
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 from main import app
 from security.encryption import AESEncryption, KeyManager
 from security.input_validation import InputSanitizer
 from security.jwt_auth import (
-    UserRole,
     create_access_token,
     create_refresh_token,
     hash_password,
+    UserRole,
     verify_password,
     verify_token,
 )
@@ -144,9 +144,7 @@ class TestRBAC:
     def test_protected_endpoint_requires_auth(self, client):
         """Test that protected endpoints require authentication"""
         # Try to access agents endpoint without authentication
-        response = client.post(
-            "/api/v1/agents/scanner/execute", json={"parameters": {}}
-        )
+        response = client.post("/api/v1/agents/scanner/execute", json={"parameters": {}})
 
         assert response.status_code == 401  # Unauthorized
 

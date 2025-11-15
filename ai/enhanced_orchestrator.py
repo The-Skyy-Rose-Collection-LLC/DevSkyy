@@ -1,15 +1,14 @@
 import asyncio
-from datetime import datetime
-from enum import Enum
 import json
 import logging
 import time
+from datetime import datetime
+from enum import Enum
 from typing import Any, Optional
 
 import anthropic
 import openai
 from pydantic import BaseModel, Field
-
 
 """
 DevSkyy Enhanced AI Orchestrator v2.0.0
@@ -43,16 +42,20 @@ logger = logging.getLogger(__name__)
 # ENUMS AND MODELS
 # ============================================================================
 
+
 class ModelProvider(str, Enum):
     """Supported AI model providers."""
+
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     GOOGLE = "google"
     MISTRAL = "mistral"
     LOCAL = "local"
 
+
 class ModelCapability(str, Enum):
     """AI model capabilities."""
+
     TEXT_GENERATION = "text_generation"
     CODE_GENERATION = "code_generation"
     IMAGE_ANALYSIS = "image_analysis"
@@ -60,15 +63,19 @@ class ModelCapability(str, Enum):
     REASONING = "reasoning"
     CREATIVE_WRITING = "creative_writing"
 
+
 class RequestPriority(str, Enum):
     """Request priority levels."""
+
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
     CRITICAL = "critical"
 
+
 class ModelConfig(BaseModel):
     """AI model configuration."""
+
     provider: ModelProvider
     model_name: str
     api_key: Optional[str] = None
@@ -80,8 +87,10 @@ class ModelConfig(BaseModel):
     enabled: bool = True
     fallback_models: list[str] = Field(default_factory=list)
 
+
 class AIRequest(BaseModel):
     """AI processing request."""
+
     request_id: str = Field(default_factory=lambda: f"req_{int(time.time())}")
     prompt: str
     system_prompt: Optional[str] = None
@@ -94,8 +103,10 @@ class AIRequest(BaseModel):
     cache_key: Optional[str] = None
     cache_ttl: int = 3600
 
+
 class AIResponse(BaseModel):
     """AI processing response."""
+
     request_id: str
     content: str
     model_used: str
@@ -107,9 +118,11 @@ class AIResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=datetime.now)
 
+
 # ============================================================================
 # ENHANCED AI ORCHESTRATOR
 # ============================================================================
+
 
 class EnhancedAIOrchestrator:
     """
@@ -139,7 +152,7 @@ class EnhancedAIOrchestrator:
             "total_cost": 0.0,
             "average_response_time": 0.0,
             "cache_hit_rate": 0.0,
-            "error_rate": 0.0
+            "error_rate": 0.0,
         }
 
         # Initialize default models
@@ -158,11 +171,11 @@ class EnhancedAIOrchestrator:
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.CODE_GENERATION,
                     ModelCapability.REASONING,
-                    ModelCapability.CREATIVE_WRITING
+                    ModelCapability.CREATIVE_WRITING,
                 ],
                 cost_per_token=0.000003,
                 rate_limit_rpm=1000,
-                fallback_models=["claude-3-haiku", "gpt-4o-mini"]
+                fallback_models=["claude-3-haiku", "gpt-4o-mini"],
             )
 
             self.models["claude-3-haiku"] = ModelConfig(
@@ -170,12 +183,9 @@ class EnhancedAIOrchestrator:
                 model_name="claude-3-haiku-20240307",
                 max_tokens=4096,
                 temperature=0.7,
-                capabilities=[
-                    ModelCapability.TEXT_GENERATION,
-                    ModelCapability.CODE_GENERATION
-                ],
+                capabilities=[ModelCapability.TEXT_GENERATION, ModelCapability.CODE_GENERATION],
                 cost_per_token=0.00000025,
-                rate_limit_rpm=2000
+                rate_limit_rpm=2000,
             )
 
         # OpenAI models
@@ -189,11 +199,11 @@ class EnhancedAIOrchestrator:
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.CODE_GENERATION,
                     ModelCapability.FUNCTION_CALLING,
-                    ModelCapability.IMAGE_ANALYSIS
+                    ModelCapability.IMAGE_ANALYSIS,
                 ],
                 cost_per_token=0.000005,
                 rate_limit_rpm=500,
-                fallback_models=["gpt-4o-mini", "claude-3-haiku"]
+                fallback_models=["gpt-4o-mini", "claude-3-haiku"],
             )
 
             self.models["gpt-4o-mini"] = ModelConfig(
@@ -204,10 +214,10 @@ class EnhancedAIOrchestrator:
                 capabilities=[
                     ModelCapability.TEXT_GENERATION,
                     ModelCapability.CODE_GENERATION,
-                    ModelCapability.FUNCTION_CALLING
+                    ModelCapability.FUNCTION_CALLING,
                 ],
                 cost_per_token=0.00000015,
-                rate_limit_rpm=1000
+                rate_limit_rpm=1000,
             )
 
     async def initialize(self, anthropic_api_key: str | None = None, openai_api_key: str | None = None):
@@ -215,16 +225,12 @@ class EnhancedAIOrchestrator:
         try:
             # Initialize Anthropic client
             if ANTHROPIC_AVAILABLE and anthropic_api_key:
-                self.clients[ModelProvider.ANTHROPIC] = anthropic.AsyncAnthropic(
-                    api_key=anthropic_api_key
-                )
+                self.clients[ModelProvider.ANTHROPIC] = anthropic.AsyncAnthropic(api_key=anthropic_api_key)
                 logger.info("✅ Anthropic client initialized")
 
             # Initialize OpenAI client
             if OPENAI_AVAILABLE and openai_api_key:
-                self.clients[ModelProvider.OPENAI] = openai.AsyncOpenAI(
-                    api_key=openai_api_key
-                )
+                self.clients[ModelProvider.OPENAI] = openai.AsyncOpenAI(api_key=openai_api_key)
                 logger.info("✅ OpenAI client initialized")
 
             # Start health monitoring
@@ -297,8 +303,7 @@ class EnhancedAIOrchestrator:
                 continue
 
             # Check capability requirement
-            if (request.capability_required and
-                request.capability_required not in config.capabilities):
+            if request.capability_required and request.capability_required not in config.capabilities:
                 continue
 
             # Check health status
@@ -372,7 +377,7 @@ class EnhancedAIOrchestrator:
                 tokens_used=response["tokens_used"],
                 cost=response["tokens_used"] * config.cost_per_token,
                 response_time=response_time,
-                metadata=response.get("metadata", {})
+                metadata=response.get("metadata", {}),
             )
 
         except Exception as e:
@@ -392,16 +397,13 @@ class EnhancedAIOrchestrator:
             model=config.model_name,
             max_tokens=request.max_tokens or config.max_tokens,
             temperature=request.temperature or config.temperature,
-            messages=messages
+            messages=messages,
         )
 
         return {
             "content": response.content[0].text,
             "tokens_used": response.usage.input_tokens + response.usage.output_tokens,
-            "metadata": {
-                "input_tokens": response.usage.input_tokens,
-                "output_tokens": response.usage.output_tokens
-            }
+            "metadata": {"input_tokens": response.usage.input_tokens, "output_tokens": response.usage.output_tokens},
         }
 
     async def _process_openai(self, client, request: AIRequest, config: ModelConfig) -> dict:
@@ -417,7 +419,7 @@ class EnhancedAIOrchestrator:
             model=config.model_name,
             max_tokens=request.max_tokens or config.max_tokens,
             temperature=request.temperature or config.temperature,
-            messages=messages
+            messages=messages,
         )
 
         return {
@@ -425,8 +427,8 @@ class EnhancedAIOrchestrator:
             "tokens_used": response.usage.total_tokens,
             "metadata": {
                 "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens
-            }
+                "completion_tokens": response.usage.completion_tokens,
+            },
         }
 
     async def _get_cached_response(self, cache_key: str) -> Optional[AIResponse]:
@@ -456,11 +458,7 @@ class EnhancedAIOrchestrator:
             cache_data = response.dict()
             cache_data["timestamp"] = cache_data["timestamp"].isoformat()
 
-            await self.redis_client.setex(
-                f"ai_cache:{cache_key}",
-                ttl,
-                json.dumps(cache_data)
-            )
+            await self.redis_client.setex(f"ai_cache:{cache_key}", ttl, json.dumps(cache_data))
 
         except Exception as e:
             logger.warning(f"Cache storage failed: {e}")
@@ -475,8 +473,8 @@ class EnhancedAIOrchestrator:
         current_avg = self.metrics["average_response_time"]
         total_requests = self.metrics["total_requests"]
         self.metrics["average_response_time"] = (
-            (current_avg * (total_requests - 1) + response.response_time) / total_requests
-        )
+            current_avg * (total_requests - 1) + response.response_time
+        ) / total_requests
 
         # Update cache hit rate
         cached_requests = sum(1 for r in self.request_history if r.cached)
@@ -493,7 +491,7 @@ class EnhancedAIOrchestrator:
             tokens_used=0,
             cost=0.0,
             response_time=0.0,
-            metadata={"error": error}
+            metadata={"error": error},
         )
 
     async def _health_monitor_loop(self):
@@ -514,11 +512,7 @@ class EnhancedAIOrchestrator:
 
             try:
                 # Simple health check with minimal request
-                test_request = AIRequest(
-                    prompt="Hello",
-                    max_tokens=10,
-                    temperature=0.1
-                )
+                test_request = AIRequest(prompt="Hello", max_tokens=10, temperature=0.1)
 
                 start_time = time.time()
                 await self._process_with_model(test_request, model_name)
@@ -528,7 +522,7 @@ class EnhancedAIOrchestrator:
                     "status": "healthy",
                     "last_check": datetime.now().isoformat(),
                     "response_time": response_time,
-                    "score": min(1.0, 2.0 / (response_time + 1.0))  # Score based on response time
+                    "score": min(1.0, 2.0 / (response_time + 1.0)),  # Score based on response time
                 }
 
             except Exception as e:
@@ -536,7 +530,7 @@ class EnhancedAIOrchestrator:
                     "status": "unhealthy",
                     "last_check": datetime.now().isoformat(),
                     "error": str(e),
-                    "score": 0.0
+                    "score": 0.0,
                 }
 
     def get_metrics(self) -> dict[str, Any]:
@@ -546,15 +540,12 @@ class EnhancedAIOrchestrator:
             "models_available": len([m for m in self.models.values() if m.enabled]),
             "models_healthy": len([h for h in self.health_status.values() if h.get("status") == "healthy"]),
             "recent_requests": len(self.request_history),
-            "cost_by_model": self.cost_tracking
+            "cost_by_model": self.cost_tracking,
         }
 
     def get_model_status(self) -> dict[str, dict]:
         """Get status of all models."""
         return {
-            model_name: {
-                "config": config.dict(),
-                "health": self.health_status.get(model_name, {"status": "unknown"})
-            }
+            model_name: {"config": config.dict(), "health": self.health_status.get(model_name, {"status": "unknown"})}
             for model_name, config in self.models.items()
         }

@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
 import hashlib
 import logging
 import random
-from typing import Any
 import uuid
-
+from datetime import datetime, timedelta
+from typing import Any
 
 # Heavy imports removed - using random instead of numpy for mock data
 # If CV/ML features needed in future, lazy load: cv2, imagehash, PIL, sklearn
@@ -31,9 +30,7 @@ class InventoryAgent:
         # EXPERIMENTAL: Quantum inventory optimization
         self.quantum_optimizer = self._initialize_quantum_optimizer()
         self.predictive_demand_engine = self._initialize_predictive_engine()
-        logger.info(
-            "🎯 Production Inventory Agent Initialized with Quantum Optimization"
-        )
+        logger.info("🎯 Production Inventory Agent Initialized with Quantum Optimization")
 
     async def scan_assets(self) -> dict[str, Any]:
         """Comprehensive asset scanning with AI-powered analysis."""
@@ -48,9 +45,7 @@ class InventoryAgent:
             product_analysis = await self._analyze_product_catalog()
 
             # Generate asset fingerprints for duplicate detection
-            fingerprints = await self._generate_asset_fingerprints(
-                scan_results["assets"]
-            )
+            fingerprints = await self._generate_asset_fingerprints(scan_results["assets"])
 
             # AI-powered categorization
             categories = await self._ai_categorize_assets(scan_results["assets"])
@@ -72,9 +67,7 @@ class InventoryAgent:
                 "recommendations": self._generate_scan_recommendations(scan_results),
             }
 
-            logger.info(
-                f"✅ Asset scan completed: {results['total_assets']} assets processed"
-            )
+            logger.info(f"✅ Asset scan completed: {results['total_assets']} assets processed")
             return results
 
         except Exception as e:
@@ -111,20 +104,14 @@ class InventoryAgent:
             # Calculate potential space savings
             space_savings = self._calculate_space_savings(all_duplicates)
 
-            self.performance_metrics["duplicates_found"] = sum(
-                len(group) for group in all_duplicates.values()
-            )
+            self.performance_metrics["duplicates_found"] = sum(len(group) for group in all_duplicates.values())
 
             return {
                 "duplicate_analysis": all_duplicates,
-                "total_duplicate_groups": len(
-                    [g for groups in all_duplicates.values() for g in groups]
-                ),
+                "total_duplicate_groups": len([g for groups in all_duplicates.values() for g in groups]),
                 "potential_space_savings_mb": space_savings,
                 "confidence_scores": self._calculate_confidence_scores(all_duplicates),
-                "cleanup_recommendations": self._generate_cleanup_recommendations(
-                    all_duplicates
-                ),
+                "cleanup_recommendations": self._generate_cleanup_recommendations(all_duplicates),
             }
 
         except Exception as e:
@@ -250,15 +237,9 @@ class InventoryAgent:
                             "path": file_path,
                             "name": file,
                             "extension": file_ext,
-                            "size": (
-                                os.path.getsize(file_path)
-                                if os.path.exists(file_path)
-                                else 0
-                            ),
+                            "size": (os.path.getsize(file_path) if os.path.exists(file_path) else 0),
                             "modified": (
-                                datetime.fromtimestamp(
-                                    os.path.getmtime(file_path)
-                                ).isoformat()
+                                datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat()
                                 if os.path.exists(file_path)
                                 else None
                             ),
@@ -314,15 +295,9 @@ class InventoryAgent:
 
         for asset in assets:
             name_lower = asset.get("name", "").lower()
-            if any(
-                keyword in name_lower
-                for keyword in ["product", "item", "dress", "accessory"]
-            ):
+            if any(keyword in name_lower for keyword in ["product", "item", "dress", "accessory"]):
                 categories["product_images"] += 1
-            elif any(
-                keyword in name_lower
-                for keyword in ["banner", "promo", "ad", "marketing"]
-            ):
+            elif any(keyword in name_lower for keyword in ["banner", "promo", "ad", "marketing"]):
                 categories["marketing_materials"] += 1
             elif any(keyword in name_lower for keyword in ["doc", "readme", "guide"]):
                 categories["documentation"] += 1
@@ -443,9 +418,7 @@ class InventoryAgent:
 
         for method, groups in duplicates.items():
             if groups:
-                recommendations.append(
-                    f"Review {len(groups)} duplicate groups found via {method}"
-                )
+                recommendations.append(f"Review {len(groups)} duplicate groups found via {method}")
 
         recommendations.extend(
             [
@@ -635,17 +608,11 @@ class InventoryAgent:
         quality_factors = []
 
         # Check for appropriate file sizes
-        oversized_files = sum(
-            1 for asset in assets if asset.get("size", 0) > 5000000
-        )  # 5MB
+        oversized_files = sum(1 for asset in assets if asset.get("size", 0) > 5000000)  # 5MB
         quality_factors.append(max(0, 100 - (oversized_files / len(assets)) * 50))
 
         # Check for proper naming conventions
-        well_named = sum(
-            1
-            for asset in assets
-            if "_" in asset.get("name", "") or "-" in asset.get("name", "")
-        )
+        well_named = sum(1 for asset in assets if "_" in asset.get("name", "") or "-" in asset.get("name", ""))
         quality_factors.append((well_named / len(assets)) * 100)
 
         return int(sum(quality_factors) / len(quality_factors))
@@ -661,9 +628,7 @@ class InventoryAgent:
         # Check for large files
         large_files = [a for a in assets if a.get("size", 0) > 5000000]
         if large_files:
-            recommendations.append(
-                f"Optimize {len(large_files)} large files for better performance"
-            )
+            recommendations.append(f"Optimize {len(large_files)} large files for better performance")
 
         # Check for duplicate-prone patterns
         similar_names = {}
@@ -673,9 +638,7 @@ class InventoryAgent:
 
         duplicates = [name for name, count in similar_names.items() if count > 1]
         if duplicates:
-            recommendations.append(
-                f"Review {len(duplicates)} potential duplicate file groups"
-            )
+            recommendations.append(f"Review {len(duplicates)} potential duplicate file groups")
 
         # EXPERIMENTAL: Quantum optimization recommendations
         quantum_recs = self._quantum_optimization_recommendations(assets)
@@ -718,9 +681,7 @@ class InventoryAgent:
         # Simulate quantum asset analysis
         asset_count = len(assets)
         if asset_count > 1000:
-            quantum_recs.append(
-                "QUANTUM: Implement superposition-based asset clustering"
-            )
+            quantum_recs.append("QUANTUM: Implement superposition-based asset clustering")
         if asset_count > 500:
             quantum_recs.append("QUANTUM: Enable entangled asset relationship mapping")
 

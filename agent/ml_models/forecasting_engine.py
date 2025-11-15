@@ -22,7 +22,6 @@ from sklearn.metrics import (  # noqa: F401 - Reserved for Phase 3 model evaluat
     mean_squared_error,
 )
 
-
 # TensorFlow disabled due to system compatibility issues
 # Will be re-enabled in Phase 3 with proper system requirements
 TENSORFLOW_AVAILABLE = False
@@ -77,17 +76,11 @@ class ForecastingEngine:
         if method == "linear":
             forecast, lower, upper = self._linear_forecast(historical_data, periods)
         elif method == "rf":
-            forecast, lower, upper = self._random_forest_forecast(
-                historical_data, periods
-            )
+            forecast, lower, upper = self._random_forest_forecast(historical_data, periods)
         elif method == "seasonal":
-            forecast, lower, upper = self._seasonal_forecast(
-                historical_data, periods, seasonality
-            )
+            forecast, lower, upper = self._seasonal_forecast(historical_data, periods, seasonality)
         else:
-            forecast, lower, upper = self._random_forest_forecast(
-                historical_data, periods
-            )
+            forecast, lower, upper = self._random_forest_forecast(historical_data, periods)
 
         return {
             "forecast": forecast,
@@ -103,9 +96,7 @@ class ForecastingEngine:
             },
         }
 
-    def _linear_forecast(
-        self, data: list[float], periods: int
-    ) -> tuple[list[float], list[float], list[float]]:
+    def _linear_forecast(self, data: list[float], periods: int) -> tuple[list[float], list[float], list[float]]:
         """Linear regression forecast"""
         X = np.array(range(len(data))).reshape(-1, 1)
         y = np.array(data)
@@ -126,9 +117,7 @@ class ForecastingEngine:
 
         return forecast, lower, upper
 
-    def _random_forest_forecast(
-        self, data: list[float], periods: int
-    ) -> tuple[list[float], list[float], list[float]]:
+    def _random_forest_forecast(self, data: list[float], periods: int) -> tuple[list[float], list[float], list[float]]:
         """Random Forest forecast with feature engineering"""
         # Create features: lag features, rolling stats, etc.
         features = []
@@ -281,9 +270,7 @@ class ForecastingEngine:
             "direction": direction,
             "slope": float(slope),
             "strength": float(r_squared),
-            "percentage_change": (
-                (data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0
-            ),
+            "percentage_change": ((data[-1] - data[0]) / data[0] * 100 if data[0] != 0 else 0),
         }
 
     async def forecast_revenue(
@@ -304,18 +291,14 @@ class ForecastingEngine:
             Revenue forecast with breakdown
         """
         # Calculate AOV trend
-        aov = [
-            r / o if o > 0 else 0 for r, o in zip(historical_revenue, historical_orders, strict=False)
-        ]
+        aov = [r / o if o > 0 else 0 for r, o in zip(historical_revenue, historical_orders, strict=False)]
 
         # Forecast orders and AOV separately
         order_forecast = await self.forecast_demand(historical_orders, periods, "auto")
         aov_forecast = await self.forecast_demand(aov, periods, "linear")
 
         # Calculate revenue forecast
-        revenue_forecast = [
-            o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"], strict=False)
-        ]
+        revenue_forecast = [o * a for o, a in zip(order_forecast["forecast"], aov_forecast["forecast"], strict=False)]
 
         return {
             "revenue_forecast": revenue_forecast,
@@ -328,22 +311,22 @@ class ForecastingEngine:
                     o * a
                     for o, a in zip(
                         order_forecast["confidence_interval_lower"],
-                        aov_forecast["confidence_interval_lower"], strict=False,
+                        aov_forecast["confidence_interval_lower"],
+                        strict=False,
                     )
                 ],
                 "upper": [
                     o * a
                     for o, a in zip(
                         order_forecast["confidence_interval_upper"],
-                        aov_forecast["confidence_interval_upper"], strict=False,
+                        aov_forecast["confidence_interval_upper"],
+                        strict=False,
                     )
                 ],
             },
         }
 
-    async def detect_anomalies(
-        self, data: list[float], sensitivity: float = 2.0
-    ) -> dict[str, Any]:
+    async def detect_anomalies(self, data: list[float], sensitivity: float = 2.0) -> dict[str, Any]:
         """
         Detect anomalies in time series data
 
@@ -387,9 +370,7 @@ class ForecastingEngine:
             "sensitivity": sensitivity,
         }
 
-    def calculate_forecast_accuracy(
-        self, actual: list[float], forecast: list[float]
-    ) -> dict[str, float]:
+    def calculate_forecast_accuracy(self, actual: list[float], forecast: list[float]) -> dict[str, float]:
         """
         Calculate forecast accuracy metrics
 

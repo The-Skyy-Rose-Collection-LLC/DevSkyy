@@ -8,13 +8,13 @@ and development tasks across the DevSkyy platform.
 import logging
 from typing import Optional
 
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from todo_tracker import Category, Priority, Status, TodoItem, TodoTracker
-import uvicorn
-
 
 logger = logging.getLogger(__name__)
+
 
 class TodoDashboard:
     """Web dashboard for TODO management"""
@@ -37,7 +37,7 @@ class TodoDashboard:
             status: Optional[str] = None,
             priority: Optional[str] = None,
             category: Optional[str] = None,
-            file_path: Optional[str] = None
+            file_path: Optional[str] = None,
         ):
             """Get TODO items with optional filters"""
             todos = list(self.tracker.todos.values())
@@ -52,10 +52,7 @@ class TodoDashboard:
             if file_path:
                 todos = [t for t in todos if file_path in t.file_path]
 
-            return {
-                "todos": [self.todo_to_dict(todo) for todo in todos],
-                "total": len(todos)
-            }
+            return {"todos": [self.todo_to_dict(todo) for todo in todos], "total": len(todos)}
 
         @self.app.get("/api/todos/{todo_id}")
         async def get_todo(todo_id: str):
@@ -72,12 +69,12 @@ class TodoDashboard:
                 raise HTTPException(status_code=404, detail="TODO not found")
 
             # Convert string enums to enum objects
-            if 'status' in update_data:
-                update_data['status'] = Status(update_data['status'])
-            if 'priority' in update_data:
-                update_data['priority'] = Priority(update_data['priority'])
-            if 'category' in update_data:
-                update_data['category'] = Category(update_data['category'])
+            if "status" in update_data:
+                update_data["status"] = Status(update_data["status"])
+            if "priority" in update_data:
+                update_data["priority"] = Priority(update_data["priority"])
+            if "category" in update_data:
+                update_data["category"] = Category(update_data["category"])
 
             success = self.tracker.update_todo(todo_id, **update_data)
             if not success:
@@ -126,7 +123,7 @@ class TodoDashboard:
             "assignee": todo.assignee,
             "estimated_hours": todo.estimated_hours,
             "tags": todo.tags,
-            "related_issues": todo.related_issues
+            "related_issues": todo.related_issues,
         }
 
     def get_dashboard_stats(self) -> dict:
@@ -141,7 +138,7 @@ class TodoDashboard:
                 "completed": 0,
                 "critical": 0,
                 "high": 0,
-                "completion_rate": 0
+                "completion_rate": 0,
             }
 
         open_todos = len(self.tracker.get_todos_by_status(Status.OPEN))
@@ -159,7 +156,7 @@ class TodoDashboard:
             "completed": completed,
             "critical": critical,
             "high": high,
-            "completion_rate": round(completion_rate, 1)
+            "completion_rate": round(completion_rate, 1),
         }
 
     def render_dashboard(self) -> str:
@@ -400,6 +397,7 @@ class TodoDashboard:
 
         return html
 
+
 def main():
     """Run the TODO dashboard server"""
 
@@ -413,6 +411,7 @@ def main():
     dashboard.tracker.sync_with_codebase()
 
     uvicorn.run(dashboard.app, host="0.0.0.0", port=8001)
+
 
 if __name__ == "__main__":
     main()

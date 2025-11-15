@@ -3,7 +3,6 @@ from typing import Any
 
 import numpy as np
 
-
 """
 Recommendation Engine - Product Recommendations
 Collaborative filtering and content-based recommendations
@@ -11,6 +10,7 @@ Reference: AGENTS.md Line 1577-1581
 """
 
 logger = logging.getLogger(__name__)
+
 
 class RecommendationEngine:
     """Product recommendation system"""

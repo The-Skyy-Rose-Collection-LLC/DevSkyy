@@ -2,11 +2,11 @@ import os
 from typing import Optional
 from urllib.parse import quote_plus
 
-
 """
 Enterprise Database Configuration
 Supports multiple database backends with production-ready configurations
 """
+
 
 class DatabaseConfig:
     """Enterprise database configuration manager"""
@@ -79,9 +79,7 @@ class DatabaseConfig:
         # URL encode password to handle special characters
         encoded_password = quote_plus(password)
 
-        return (
-            f"postgresql+asyncpg://{user}:{encoded_password}@{host}:{port}/{database}"
-        )
+        return f"postgresql+asyncpg://{user}:{encoded_password}@{host}:{port}/{database}"
 
     @staticmethod
     def get_connection_args() -> dict:
@@ -118,6 +116,7 @@ class DatabaseConfig:
             if "postgresql" in db_url or "mysql" in db_url:
                 return {"ssl": "require"}
         return None
+
 
 # Export configuration
 DATABASE_URL = DatabaseConfig.get_database_url()

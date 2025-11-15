@@ -5,21 +5,22 @@ Enterprise-grade orchestration with Gemini, Cursor, ChatGPT, and HuggingFace int
 """
 
 import asyncio
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import logging
 from typing import Any, Optional
 
 # Core imports
 from intelligence.claude_sonnet import ClaudeSonnetIntelligenceService
 from intelligence.openai_service import OpenAIIntelligenceService
 
-
 logger = logging.getLogger(__name__)
+
 
 class AIProvider(Enum):
     """Supported AI providers."""
+
     CLAUDE_SONNET = "claude_sonnet"
     OPENAI_GPT4 = "openai_gpt4"
     OPENAI_GPT35 = "openai_gpt35"
@@ -27,8 +28,10 @@ class AIProvider(Enum):
     CURSOR_AI = "cursor_ai"
     HUGGINGFACE = "huggingface"
 
+
 class TaskType(Enum):
     """Types of tasks for AI processing."""
+
     SECURITY_ANALYSIS = "security_analysis"
     WEBHOOK_PROCESSING = "webhook_processing"
     GDPR_COMPLIANCE = "gdpr_compliance"
@@ -40,9 +43,11 @@ class TaskType(Enum):
     VISUAL_GENERATION = "visual_generation"
     FASHION_ANALYSIS = "fashion_analysis"
 
+
 @dataclass
 class AICapability:
     """AI provider capability definition."""
+
     provider: AIProvider
     task_types: list[TaskType]
     performance_score: float
@@ -53,9 +58,11 @@ class AICapability:
     supports_vision: bool = False
     supports_code_execution: bool = False
 
+
 @dataclass
 class TaskRequest:
     """Task request for AI processing."""
+
     task_id: str
     task_type: TaskType
     content: str
@@ -67,9 +74,11 @@ class TaskRequest:
     requires_vision: bool = False
     requires_function_calling: bool = False
 
+
 @dataclass
 class TaskResult:
     """Result from AI task processing."""
+
     task_id: str
     provider: AIProvider
     result: str
@@ -79,6 +88,7 @@ class TaskResult:
     cost: float = 0.0
     success: bool = True
     error: Optional[str] = None
+
 
 class MultiAgentOrchestrator:
     """
@@ -110,13 +120,13 @@ class MultiAgentOrchestrator:
                     TaskType.SECURITY_ANALYSIS,
                     TaskType.CODE_GENERATION,
                     TaskType.GDPR_COMPLIANCE,
-                    TaskType.FINANCIAL_ANALYSIS
+                    TaskType.FINANCIAL_ANALYSIS,
                 ],
                 performance_score=9.5,
                 cost_per_request=0.015,
                 max_tokens=100000,
                 supports_streaming=True,
-                supports_function_calling=True
+                supports_function_calling=True,
             ),
             AIProvider.OPENAI_GPT4: AICapability(
                 provider=AIProvider.OPENAI_GPT4,
@@ -124,63 +134,48 @@ class MultiAgentOrchestrator:
                     TaskType.SECURITY_ANALYSIS,
                     TaskType.WEBHOOK_PROCESSING,
                     TaskType.CODE_GENERATION,
-                    TaskType.VISUAL_GENERATION
+                    TaskType.VISUAL_GENERATION,
                 ],
                 performance_score=9.0,
                 cost_per_request=0.03,
                 max_tokens=128000,
                 supports_streaming=True,
                 supports_function_calling=True,
-                supports_vision=True
+                supports_vision=True,
             ),
             AIProvider.OPENAI_GPT35: AICapability(
                 provider=AIProvider.OPENAI_GPT35,
-                task_types=[
-                    TaskType.WEBHOOK_PROCESSING,
-                    TaskType.MARKETING_CONTENT,
-                    TaskType.MEDIA_PROCESSING
-                ],
+                task_types=[TaskType.WEBHOOK_PROCESSING, TaskType.MARKETING_CONTENT, TaskType.MEDIA_PROCESSING],
                 performance_score=7.5,
                 cost_per_request=0.002,
                 max_tokens=16000,
                 supports_streaming=True,
-                supports_function_calling=True
+                supports_function_calling=True,
             ),
             AIProvider.GEMINI_PRO: AICapability(
                 provider=AIProvider.GEMINI_PRO,
-                task_types=[
-                    TaskType.VISUAL_GENERATION,
-                    TaskType.FASHION_ANALYSIS,
-                    TaskType.DESIGN_CREATION
-                ],
+                task_types=[TaskType.VISUAL_GENERATION, TaskType.FASHION_ANALYSIS, TaskType.DESIGN_CREATION],
                 performance_score=8.5,
                 cost_per_request=0.001,
                 max_tokens=32000,
-                supports_vision=True
+                supports_vision=True,
             ),
             AIProvider.CURSOR_AI: AICapability(
                 provider=AIProvider.CURSOR_AI,
-                task_types=[
-                    TaskType.CODE_GENERATION,
-                    TaskType.DESIGN_CREATION
-                ],
+                task_types=[TaskType.CODE_GENERATION, TaskType.DESIGN_CREATION],
                 performance_score=8.0,
                 cost_per_request=0.005,
                 max_tokens=8000,
-                supports_code_execution=True
+                supports_code_execution=True,
             ),
             AIProvider.HUGGINGFACE: AICapability(
                 provider=AIProvider.HUGGINGFACE,
-                task_types=[
-                    TaskType.MEDIA_PROCESSING,
-                    TaskType.VISUAL_GENERATION,
-                    TaskType.FASHION_ANALYSIS
-                ],
+                task_types=[TaskType.MEDIA_PROCESSING, TaskType.VISUAL_GENERATION, TaskType.FASHION_ANALYSIS],
                 performance_score=7.0,
                 cost_per_request=0.0001,
                 max_tokens=4000,
-                supports_vision=True
-            )
+                supports_vision=True,
+            ),
         }
 
     def _initialize_providers(self):
@@ -240,10 +235,7 @@ class MultiAgentOrchestrator:
             return None
 
         # Sort by performance score and cost efficiency
-        suitable_providers.sort(
-            key=lambda x: (x[1].performance_score, -x[1].cost_per_request),
-            reverse=True
-        )
+        suitable_providers.sort(key=lambda x: (x[1].performance_score, -x[1].cost_per_request), reverse=True)
 
         return suitable_providers[0][0]
 
@@ -260,14 +252,14 @@ class MultiAgentOrchestrator:
                     provider=AIProvider.CLAUDE_SONNET,  # Default
                     result="",
                     success=False,
-                    error="No suitable provider found"
+                    error="No suitable provider found",
                 )
 
             # Track active task
             self.active_tasks[task.task_id] = {
-                'provider': provider,
-                'start_time': start_time,
-                'task_type': task.task_type
+                "provider": provider,
+                "start_time": start_time,
+                "task_type": task.task_type,
             }
 
             # Process with selected provider
@@ -286,11 +278,7 @@ class MultiAgentOrchestrator:
             self._update_metrics(provider, processing_time, True)
 
             return TaskResult(
-                task_id=task.task_id,
-                provider=provider,
-                result=result,
-                processing_time=processing_time,
-                success=True
+                task_id=task.task_id, provider=provider, result=result, processing_time=processing_time, success=True
             )
 
         except Exception as e:
@@ -298,16 +286,16 @@ class MultiAgentOrchestrator:
             logger.error(f"❌ Task {task.task_id} failed: {e}")
 
             # Update metrics for failure
-            if 'provider' in locals():
+            if "provider" in locals():
                 self._update_metrics(provider, processing_time, False)
 
             return TaskResult(
                 task_id=task.task_id,
-                provider=provider if 'provider' in locals() else AIProvider.CLAUDE_SONNET,
+                provider=provider if "provider" in locals() else AIProvider.CLAUDE_SONNET,
                 result="",
                 processing_time=processing_time,
                 success=False,
-                error=str(e)
+                error=str(e),
             )
 
         finally:
@@ -330,44 +318,43 @@ class MultiAgentOrchestrator:
         """Update performance metrics for a provider."""
         if provider not in self.performance_metrics:
             self.performance_metrics[provider] = {
-                'total_requests': 0,
-                'successful_requests': 0,
-                'total_processing_time': 0.0,
-                'average_processing_time': 0.0,
-                'success_rate': 0.0
+                "total_requests": 0,
+                "successful_requests": 0,
+                "total_processing_time": 0.0,
+                "average_processing_time": 0.0,
+                "success_rate": 0.0,
             }
 
         metrics = self.performance_metrics[provider]
-        metrics['total_requests'] += 1
-        metrics['total_processing_time'] += processing_time
+        metrics["total_requests"] += 1
+        metrics["total_processing_time"] += processing_time
 
         if success:
-            metrics['successful_requests'] += 1
+            metrics["successful_requests"] += 1
 
-        metrics['average_processing_time'] = metrics['total_processing_time'] / metrics['total_requests']
-        metrics['success_rate'] = metrics['successful_requests'] / metrics['total_requests']
+        metrics["average_processing_time"] = metrics["total_processing_time"] / metrics["total_requests"]
+        metrics["success_rate"] = metrics["successful_requests"] / metrics["total_requests"]
 
     async def batch_process(self, tasks: list[TaskRequest]) -> list[TaskResult]:
         """Process multiple tasks concurrently."""
         logger.info(f"🚀 Processing batch of {len(tasks)} tasks")
 
         # Process tasks concurrently
-        results = await asyncio.gather(
-            *[self.process_task(task) for task in tasks],
-            return_exceptions=True
-        )
+        results = await asyncio.gather(*[self.process_task(task) for task in tasks], return_exceptions=True)
 
         # Handle any exceptions
         processed_results = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                processed_results.append(TaskResult(
-                    task_id=tasks[i].task_id,
-                    provider=AIProvider.CLAUDE_SONNET,
-                    result="",
-                    success=False,
-                    error=str(result)
-                ))
+                processed_results.append(
+                    TaskResult(
+                        task_id=tasks[i].task_id,
+                        provider=AIProvider.CLAUDE_SONNET,
+                        result="",
+                        success=False,
+                        error=str(result),
+                    )
+                )
             else:
                 processed_results.append(result)
 
@@ -377,18 +364,19 @@ class MultiAgentOrchestrator:
     def get_system_status(self) -> dict[str, Any]:
         """Get comprehensive system status."""
         return {
-            'active_providers': list(self.providers.keys()),
-            'active_tasks': len(self.active_tasks),
-            'performance_metrics': self.performance_metrics,
-            'capabilities': {
+            "active_providers": list(self.providers.keys()),
+            "active_tasks": len(self.active_tasks),
+            "performance_metrics": self.performance_metrics,
+            "capabilities": {
                 provider.value: {
-                    'task_types': [t.value for t in cap.task_types],
-                    'performance_score': cap.performance_score,
-                    'cost_per_request': cap.cost_per_request
+                    "task_types": [t.value for t in cap.task_types],
+                    "performance_score": cap.performance_score,
+                    "cost_per_request": cap.cost_per_request,
                 }
                 for provider, cap in self.capabilities.items()
-            }
+            },
         }
+
 
 # Global orchestrator instance
 multi_agent_orchestrator = MultiAgentOrchestrator()

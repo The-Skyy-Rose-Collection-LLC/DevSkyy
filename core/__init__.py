@@ -12,7 +12,6 @@ from .error_ledger import (
     log_error,
 )
 
-
 __all__ = [
     "ErrorCategory",
     "ErrorEntry",

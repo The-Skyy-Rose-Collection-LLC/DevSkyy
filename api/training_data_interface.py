@@ -1,19 +1,18 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 import gc
 import json
 import logging
-from pathlib import Path
 import shutil
 import tempfile
-from typing import Any, Optional
 import zipfile
+from concurrent.futures import as_completed, ThreadPoolExecutor
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Optional
 
+import psutil
 from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
-import psutil
 from pydantic import BaseModel
-
 
 """
 Training Data Upload Interface
@@ -25,6 +24,7 @@ logger = logging.getLogger(__name__)
 # Production-grade image processing imports
 try:
     from PIL import Image, ImageEnhance, ImageOps
+
     PIL_AVAILABLE = True
 except ImportError:
     logger.error("PIL/Pillow not available - image processing will be limited")
@@ -33,6 +33,7 @@ except ImportError:
 try:
     import cv2
     import numpy as np
+
     OPENCV_AVAILABLE = True
 except ImportError:
     logger.warning("OpenCV not available - advanced image processing disabled")
@@ -41,6 +42,7 @@ except ImportError:
 # Import the brand trainer
 try:
     from agent.modules.backend.brand_model_trainer import brand_trainer
+
     BRAND_TRAINER_AVAILABLE = True
 except ImportError:
     logger.warning("Brand trainer not available")
@@ -50,7 +52,6 @@ app = FastAPI(title="Skyy Rose Training Data Interface", version="1.0.0")
 
 # Add CORS middleware for web interface
 from fastapi.middleware.cors import CORSMiddleware
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -79,15 +80,15 @@ MAX_BATCH_SIZE = 100  # Maximum files per batch
 # Production quality processing configuration
 QUALITY_CONFIG = {
     "max_image_size": (4096, 4096),  # Maximum allowed dimensions
-    "min_image_size": (64, 64),      # Minimum allowed dimensions
+    "min_image_size": (64, 64),  # Minimum allowed dimensions
     "max_file_size": 50 * 1024 * 1024,  # 50MB max file size
-    "supported_formats": {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff'},
+    "supported_formats": {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"},
     "output_format": "JPEG",
     "output_quality": 95,
     "memory_limit_mb": 1024,  # Memory limit per operation
     "max_concurrent_operations": 4,  # Max concurrent image processing
     "temp_dir": Path("temp_processing"),
-    "backup_originals": True
+    "backup_originals": True,
 }
 
 # Create temp directory
@@ -100,6 +101,7 @@ class BulkCategoryUpdate(BaseModel):
     new_category: str
     preserve_existing_metadata: bool = True
 
+
 class BulkCaptionUpdate(BaseModel):
     image_paths: list[str]
     caption_template: str
@@ -107,11 +109,13 @@ class BulkCaptionUpdate(BaseModel):
     add_trigger_words: list[str] = []
     remove_trigger_words: list[str] = []
 
+
 class BulkTagUpdate(BaseModel):
     image_paths: list[str]
     add_tags: list[str] = []
     remove_tags: list[str] = []
     replace_tags: dict[str, str] = {}
+
 
 class BulkQualitySettings(BaseModel):
     image_paths: list[str]
@@ -126,16 +130,19 @@ class BulkQualitySettings(BaseModel):
         """Convert resize_dimensions to tuple for internal use."""
         return tuple(self.resize_dimensions[:2]) if len(self.resize_dimensions) >= 2 else (1024, 1024)
 
+
 class BulkMetadataUpdate(BaseModel):
     image_paths: list[str]
     metadata_updates: dict[str, Any]
     merge_with_existing: bool = True
+
 
 class BulkOperationPreview(BaseModel):
     operation_type: str
     affected_images: list[str]
     changes_preview: dict[str, Any]
     estimated_processing_time: float
+
 
 class UndoOperation(BaseModel):
     operation_id: str
@@ -151,7 +158,8 @@ async def get_upload_interface():
         with open("api/bulk_editing_interface.html", "r") as f:
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
-        return HTMLResponse(content="""
+        return HTMLResponse(
+            content="""
         <html>
             <body>
                 <h1>🌹 Skyy Rose Training Data Upload Interface</h1>
@@ -169,7 +177,9 @@ async def get_upload_interface():
                 </ul>
             </body>
         </html>
-        """)
+        """
+        )
+
 
 @app.get("/simple", response_class=HTMLResponse)
 async def get_simple_interface():
@@ -179,6 +189,7 @@ async def get_simple_interface():
             return HTMLResponse(content=f.read())
     except FileNotFoundError:
         return HTMLResponse(content="<h1>Simple interface not found</h1>")
+
 
 @app.get("/classic", response_class=HTMLResponse)
 async def get_classic_interface():
@@ -196,7 +207,7 @@ async def upload_single_image(
     file: UploadFile = File(...),
     category: str = Form("general"),
     description: Optional[str] = Form(None),
-    auto_process: bool = Form(True)
+    auto_process: bool = Form(True),
 ):
     """
     Upload a single training image for Skyy Rose Collection.
@@ -218,8 +229,7 @@ async def upload_single_image(
         file_ext = Path(file.filename).suffix.lower()
         if file_ext not in ALLOWED_EXTENSIONS:
             raise HTTPException(
-                status_code=400,
-                detail=f"Unsupported file format. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
+                status_code=400, detail=f"Unsupported file format. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
             )
 
         # Check file size
@@ -229,8 +239,7 @@ async def upload_single_image(
 
         if file_size > MAX_FILE_SIZE:
             raise HTTPException(
-                status_code=400,
-                detail =f"File too large. Maximum size: {MAX_FILE_SIZE // (1024 * 1024)}MB"
+                status_code=400, detail=f"File too large. Maximum size: {MAX_FILE_SIZE // (1024 * 1024)}MB"
             )
 
         # Create category directory
@@ -253,33 +262,31 @@ async def upload_single_image(
             "description": description,
             "file_size": file_size,
             "upload_timestamp": datetime.now().isoformat(),
-            "processed": False
+            "processed": False,
         }
 
         # Save metadata
         metadata_file = category_dir / f"{safe_filename}.json"
         import json
+
         with open(metadata_file, "w") as f:
             json.dump(metadata, f, indent=2)
 
         # Schedule processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE:
-            background_tasks.add_task(
-                process_single_image,
-                str(file_path),
-                category,
-                metadata
-            )
+            background_tasks.add_task(process_single_image, str(file_path), category, metadata)
 
-        return JSONResponse({
-            "success": True,
-            "message": "Image uploaded successfully",
-            "file_path": str(file_path),
-            "category": category,
-            "file_size": file_size,
-            "auto_process": auto_process,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "message": "Image uploaded successfully",
+                "file_path": str(file_path),
+                "category": category,
+                "file_size": file_size,
+                "auto_process": auto_process,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Single image upload failed: {e}")
@@ -291,7 +298,7 @@ async def upload_batch_images(
     background_tasks: BackgroundTasks,
     files: list[UploadFile] = File(...),
     category: str = Form("general"),
-    auto_process: bool = Form(True)
+    auto_process: bool = Form(True),
 ):
     """
     Upload multiple training images in batch.
@@ -306,10 +313,7 @@ async def upload_batch_images(
     """
     try:
         if len(files) > MAX_BATCH_SIZE:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Too many files. Maximum batch size: {MAX_BATCH_SIZE}"
-            )
+            raise HTTPException(status_code=400, detail=f"Too many files. Maximum batch size: {MAX_BATCH_SIZE}")
 
         uploaded_files = []
         failed_files = []
@@ -328,10 +332,7 @@ async def upload_batch_images(
 
                 file_ext = Path(file.filename).suffix.lower()
                 if file_ext not in ALLOWED_EXTENSIONS:
-                    failed_files.append({
-                        "filename": file.filename,
-                        "error": f"Unsupported format: {file_ext}"
-                    })
+                    failed_files.append({"filename": file.filename, "error": f"Unsupported format: {file_ext}"})
                     continue
 
                 # Read and validate file size
@@ -339,10 +340,9 @@ async def upload_batch_images(
                 file_size = len(content)
 
                 if file_size > MAX_FILE_SIZE:
-                    failed_files.append({
-                        "filename": file.filename,
-                        "error": f"File too large: {file_size // (1024 * 1024)}MB"
-                    })
+                    failed_files.append(
+                        {"filename": file.filename, "error": f"File too large: {file_size // (1024 * 1024)}MB"}
+                    )
                     continue
 
                 # Save file
@@ -360,50 +360,48 @@ async def upload_batch_images(
                     "category": category,
                     "file_size": file_size,
                     "upload_timestamp": datetime.now().isoformat(),
-                    "processed": False
+                    "processed": False,
                 }
 
                 # Save metadata
                 metadata_file = category_dir / f"{safe_filename}.json"
                 import json
+
                 with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
 
-                uploaded_files.append({
-                    "filename": safe_filename,
-                    "original_filename": file.filename,
-                    "file_path": str(file_path),
-                    "file_size": file_size
-                })
+                uploaded_files.append(
+                    {
+                        "filename": safe_filename,
+                        "original_filename": file.filename,
+                        "file_path": str(file_path),
+                        "file_size": file_size,
+                    }
+                )
 
                 total_size += file_size
 
             except Exception as e:
-                failed_files.append({
-                    "filename": file.filename if file.filename else "unknown",
-                    "error": str(e)
-                })
+                failed_files.append({"filename": file.filename if file.filename else "unknown", "error": str(e)})
 
         # Schedule batch processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE and uploaded_files:
-            background_tasks.add_task(
-                process_batch_images,
-                str(category_dir),
-                category
-            )
+            background_tasks.add_task(process_batch_images, str(category_dir), category)
 
-        return JSONResponse({
-            "success": True,
-            "message": "Batch upload completed",
-            "uploaded_count": len(uploaded_files),
-            "failed_count": len(failed_files),
-            "total_size": total_size,
-            "category": category,
-            "uploaded_files": uploaded_files,
-            "failed_files": failed_files,
-            "auto_process": auto_process,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "message": "Batch upload completed",
+                "uploaded_count": len(uploaded_files),
+                "failed_count": len(failed_files),
+                "total_size": total_size,
+                "category": category,
+                "uploaded_files": uploaded_files,
+                "failed_files": failed_files,
+                "auto_process": auto_process,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Batch upload failed: {e}")
@@ -415,7 +413,7 @@ async def upload_zip_archive(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     category: str = Form("general"),
-    auto_process: bool = Form(True)
+    auto_process: bool = Form(True),
 ):
     """
     Upload a ZIP archive containing training images.
@@ -429,7 +427,7 @@ async def upload_zip_archive(
         Archive extraction and upload results
     """
     try:
-        if not file.filename or not file.filename.endswith('.zip'):
+        if not file.filename or not file.filename.endswith(".zip"):
             raise HTTPException(status_code=400, detail="File must be a ZIP archive")
 
         # Save uploaded ZIP file
@@ -448,24 +446,25 @@ async def upload_zip_archive(
         failed_files = []
 
         try:
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
                 for file_info in zip_ref.filelist:
                     if file_info.is_dir():
                         continue
 
                     file_ext = Path(file_info.filename).suffix.lower()
                     if file_ext not in ALLOWED_EXTENSIONS:
-                        failed_files.append({
-                            "filename": file_info.filename,
-                            "error": f"Unsupported format: {file_ext}"
-                        })
+                        failed_files.append(
+                            {"filename": file_info.filename, "error": f"Unsupported format: {file_ext}"}
+                        )
                         continue
 
                     if file_info.file_size > MAX_FILE_SIZE:
-                        failed_files.append({
-                            "filename": file_info.filename,
-                            "error": f"File too large: {file_info.file_size // (1024 * 1024)}MB"
-                        })
+                        failed_files.append(
+                            {
+                                "filename": file_info.filename,
+                                "error": f"File too large: {file_info.file_size // (1024 * 1024)}MB",
+                            }
+                        )
                         continue
 
                     # Extract file
@@ -489,21 +488,24 @@ async def upload_zip_archive(
                         "file_size": file_info.file_size,
                         "upload_timestamp": datetime.now().isoformat(),
                         "source": "zip_archive",
-                        "processed": False
+                        "processed": False,
                     }
 
                     # Save metadata
                     metadata_file = category_dir / f"{safe_filename}.json"
                     import json
+
                     with open(metadata_file, "w") as f:
                         json.dump(metadata, f, indent=2)
 
-                    extracted_files.append({
-                        "filename": safe_filename,
-                        "original_filename": file_info.filename,
-                        "file_path": str(dest_path),
-                        "file_size": file_info.file_size
-                    })
+                    extracted_files.append(
+                        {
+                            "filename": safe_filename,
+                            "original_filename": file_info.filename,
+                            "file_path": str(dest_path),
+                            "file_size": file_info.file_size,
+                        }
+                    )
 
         finally:
             # Cleanup
@@ -512,23 +514,21 @@ async def upload_zip_archive(
 
         # Schedule processing if requested
         if auto_process and BRAND_TRAINER_AVAILABLE and extracted_files:
-            background_tasks.add_task(
-                process_batch_images,
-                str(UPLOAD_DIR / category),
-                category
-            )
+            background_tasks.add_task(process_batch_images, str(UPLOAD_DIR / category), category)
 
-        return JSONResponse({
-            "success": True,
-            "message": "ZIP archive processed successfully",
-            "extracted_count": len(extracted_files),
-            "failed_count": len(failed_files),
-            "category": category,
-            "extracted_files": extracted_files,
-            "failed_files": failed_files,
-            "auto_process": auto_process,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "message": "ZIP archive processed successfully",
+                "extracted_count": len(extracted_files),
+                "failed_count": len(failed_files),
+                "category": category,
+                "extracted_files": extracted_files,
+                "failed_files": failed_files,
+                "auto_process": auto_process,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"ZIP archive upload failed: {e}")
@@ -555,29 +555,34 @@ async def get_upload_status():
                     metadata = {"processed": False}
                     if metadata_file.exists():
                         import json
+
                         with open(metadata_file, "r") as f:
                             metadata = json.load(f)
 
-                    image_files.append({
-                        "filename": file_path.name,
-                        "file_size": file_path.stat().st_size,
-                        "processed": metadata.get("processed", False),
-                        "upload_timestamp": metadata.get("upload_timestamp")
-                    })
+                    image_files.append(
+                        {
+                            "filename": file_path.name,
+                            "file_size": file_path.stat().st_size,
+                            "processed": metadata.get("processed", False),
+                            "upload_timestamp": metadata.get("upload_timestamp"),
+                        }
+                    )
 
             categories[category_name] = {
                 "total_images": len(image_files),
                 "processed_images": sum(1 for f in image_files if f["processed"]),
                 "total_size": sum(f["file_size"] for f in image_files),
-                "images": image_files
+                "images": image_files,
             }
 
-        return JSONResponse({
-            "success": True,
-            "categories": categories,
-            "total_categories": len(categories),
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "categories": categories,
+                "total_categories": len(categories),
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Failed to get upload status: {e}")
@@ -586,10 +591,7 @@ async def get_upload_status():
 
 @app.post("/process/category/{category}")
 async def process_category(
-    category: str,
-    background_tasks: BackgroundTasks,
-    remove_background: bool = False,
-    enhance_images: bool = True
+    category: str, background_tasks: BackgroundTasks, remove_background: bool = False, enhance_images: bool = True
 ):
     """
     Process all images in a category for training.
@@ -604,35 +606,27 @@ async def process_category(
     """
     try:
         if not BRAND_TRAINER_AVAILABLE:
-            raise HTTPException(
-                status_code=503,
-                detail="Brand trainer not available"
-            )
+            raise HTTPException(status_code=503, detail="Brand trainer not available")
 
         category_dir = UPLOAD_DIR / category
         if not category_dir.exists():
-            raise HTTPException(
-                status_code=404,
-                detail=f"Category '{category}' not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
 
         # Schedule processing
         background_tasks.add_task(
-            process_category_for_training,
-            str(category_dir),
-            category,
-            remove_background,
-            enhance_images
+            process_category_for_training, str(category_dir), category, remove_background, enhance_images
         )
 
-        return JSONResponse({
-            "success": True,
-            "message": f"Processing initiated for category '{category}'",
-            "category": category,
-            "remove_background": remove_background,
-            "enhance_images": enhance_images,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "message": f"Processing initiated for category '{category}'",
+                "category": category,
+                "remove_background": remove_background,
+                "enhance_images": enhance_images,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Failed to initiate category processing: {e}")
@@ -642,6 +636,7 @@ async def process_category(
 # ============================================================================
 # BULK OPERATIONS API ENDPOINTS
 # ============================================================================
+
 
 @app.post("/bulk/preview")
 async def preview_bulk_operation(operation_data: dict[str, Any] = Body(...)):
@@ -663,13 +658,15 @@ async def preview_bulk_operation(operation_data: dict[str, Any] = Body(...)):
 
         preview = await generate_bulk_operation_preview(operation_type, operation_data)
 
-        return JSONResponse({
-            "success": True,
-            "preview": preview,
-            "affected_images_count": len(image_paths),
-            "estimated_processing_time": len(image_paths) * 0.5,  # Estimate 0.5 seconds per image
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "preview": preview,
+                "affected_images_count": len(image_paths),
+                "estimated_processing_time": len(image_paths) * 0.5,  # Estimate 0.5 seconds per image
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Failed to generate bulk operation preview: {e}")
@@ -677,10 +674,7 @@ async def preview_bulk_operation(operation_data: dict[str, Any] = Body(...)):
 
 
 @app.post("/bulk/category-update")
-async def bulk_category_update(
-    background_tasks: BackgroundTasks,
-    update_data: BulkCategoryUpdate
-):
+async def bulk_category_update(background_tasks: BackgroundTasks, update_data: BulkCategoryUpdate):
     """
     Update category for multiple images at once.
 
@@ -720,7 +714,7 @@ async def bulk_category_update(
             "previous_state": previous_state,
             "new_category": update_data.new_category,
             "timestamp": datetime.now().isoformat(),
-            "status": "in_progress"
+            "status": "in_progress",
         }
 
         # Schedule background processing
@@ -729,19 +723,21 @@ async def bulk_category_update(
             operation_id,
             valid_paths,
             update_data.new_category,
-            update_data.preserve_existing_metadata
+            update_data.preserve_existing_metadata,
         )
 
-        return JSONResponse({
-            "success": True,
-            "operation_id": operation_id,
-            "message": f"Bulk category update initiated for {len(valid_paths)} images",
-            "valid_images": len(valid_paths),
-            "invalid_images": len(invalid_paths),
-            "invalid_paths": invalid_paths,
-            "new_category": update_data.new_category,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operation_id": operation_id,
+                "message": f"Bulk category update initiated for {len(valid_paths)} images",
+                "valid_images": len(valid_paths),
+                "invalid_images": len(invalid_paths),
+                "invalid_paths": invalid_paths,
+                "new_category": update_data.new_category,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk category update failed: {e}")
@@ -749,10 +745,7 @@ async def bulk_category_update(
 
 
 @app.post("/bulk/caption-update")
-async def bulk_caption_update(
-    background_tasks: BackgroundTasks,
-    update_data: BulkCaptionUpdate
-):
+async def bulk_caption_update(background_tasks: BackgroundTasks, update_data: BulkCaptionUpdate):
     """
     Update captions for multiple images at once.
 
@@ -785,7 +778,7 @@ async def bulk_caption_update(
             "previous_state": previous_state,
             "caption_template": update_data.caption_template,
             "timestamp": datetime.now().isoformat(),
-            "status": "in_progress"
+            "status": "in_progress",
         }
 
         # Schedule background processing
@@ -796,17 +789,19 @@ async def bulk_caption_update(
             update_data.caption_template,
             update_data.preserve_trigger_words,
             update_data.add_trigger_words,
-            update_data.remove_trigger_words
+            update_data.remove_trigger_words,
         )
 
-        return JSONResponse({
-            "success": True,
-            "operation_id": operation_id,
-            "message": f"Bulk caption update initiated for {len(valid_paths)} images",
-            "affected_images": len(valid_paths),
-            "caption_template": update_data.caption_template,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operation_id": operation_id,
+                "message": f"Bulk caption update initiated for {len(valid_paths)} images",
+                "affected_images": len(valid_paths),
+                "caption_template": update_data.caption_template,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk caption update failed: {e}")
@@ -814,10 +809,7 @@ async def bulk_caption_update(
 
 
 @app.post("/bulk/tag-update")
-async def bulk_tag_update(
-    background_tasks: BackgroundTasks,
-    update_data: BulkTagUpdate
-):
+async def bulk_tag_update(background_tasks: BackgroundTasks, update_data: BulkTagUpdate):
     """
     Update tags for multiple images at once.
 
@@ -852,7 +844,7 @@ async def bulk_tag_update(
             "remove_tags": update_data.remove_tags,
             "replace_tags": update_data.replace_tags,
             "timestamp": datetime.now().isoformat(),
-            "status": "in_progress"
+            "status": "in_progress",
         }
 
         # Schedule background processing
@@ -862,18 +854,20 @@ async def bulk_tag_update(
             valid_paths,
             update_data.add_tags,
             update_data.remove_tags,
-            update_data.replace_tags
+            update_data.replace_tags,
         )
 
-        return JSONResponse({
-            "success": True,
-            "operation_id": operation_id,
-            "message": f"Bulk tag update initiated for {len(valid_paths)} images",
-            "affected_images": len(valid_paths),
-            "add_tags": update_data.add_tags,
-            "remove_tags": update_data.remove_tags,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operation_id": operation_id,
+                "message": f"Bulk tag update initiated for {len(valid_paths)} images",
+                "affected_images": len(valid_paths),
+                "add_tags": update_data.add_tags,
+                "remove_tags": update_data.remove_tags,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk tag update failed: {e}")
@@ -881,10 +875,7 @@ async def bulk_tag_update(
 
 
 @app.post("/bulk/quality-update")
-async def bulk_quality_update(
-    background_tasks: BackgroundTasks,
-    update_data: BulkQualitySettings
-):
+async def bulk_quality_update(background_tasks: BackgroundTasks, update_data: BulkQualitySettings):
     """
     Apply quality settings to multiple images at once.
 
@@ -920,28 +911,25 @@ async def bulk_quality_update(
                 "quality_enhancement": update_data.quality_enhancement,
                 "auto_contrast": update_data.auto_contrast,
                 "equalize": update_data.equalize,
-                "remove_background": update_data.remove_background
+                "remove_background": update_data.remove_background,
             },
             "timestamp": datetime.now().isoformat(),
-            "status": "in_progress"
+            "status": "in_progress",
         }
 
         # Schedule background processing
-        background_tasks.add_task(
-            execute_bulk_quality_update,
-            operation_id,
-            valid_paths,
-            update_data
-        )
+        background_tasks.add_task(execute_bulk_quality_update, operation_id, valid_paths, update_data)
 
-        return JSONResponse({
-            "success": True,
-            "operation_id": operation_id,
-            "message": f"Bulk quality update initiated for {len(valid_paths)} images",
-            "affected_images": len(valid_paths),
-            "quality_settings": update_data.dict(),
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operation_id": operation_id,
+                "message": f"Bulk quality update initiated for {len(valid_paths)} images",
+                "affected_images": len(valid_paths),
+                "quality_settings": update_data.dict(),
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk quality update failed: {e}")
@@ -949,10 +937,7 @@ async def bulk_quality_update(
 
 
 @app.post("/bulk/metadata-update")
-async def bulk_metadata_update(
-    background_tasks: BackgroundTasks,
-    update_data: BulkMetadataUpdate
-):
+async def bulk_metadata_update(background_tasks: BackgroundTasks, update_data: BulkMetadataUpdate):
     """
     Update metadata for multiple images at once.
 
@@ -986,7 +971,7 @@ async def bulk_metadata_update(
             "metadata_updates": update_data.metadata_updates,
             "merge_with_existing": update_data.merge_with_existing,
             "timestamp": datetime.now().isoformat(),
-            "status": "in_progress"
+            "status": "in_progress",
         }
 
         # Schedule background processing
@@ -995,17 +980,19 @@ async def bulk_metadata_update(
             operation_id,
             valid_paths,
             update_data.metadata_updates,
-            update_data.merge_with_existing
+            update_data.merge_with_existing,
         )
 
-        return JSONResponse({
-            "success": True,
-            "operation_id": operation_id,
-            "message": f"Bulk metadata update initiated for {len(valid_paths)} images",
-            "affected_images": len(valid_paths),
-            "metadata_updates": update_data.metadata_updates,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operation_id": operation_id,
+                "message": f"Bulk metadata update initiated for {len(valid_paths)} images",
+                "affected_images": len(valid_paths),
+                "metadata_updates": update_data.metadata_updates,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk metadata update failed: {e}")
@@ -1029,11 +1016,7 @@ async def get_bulk_operation_status(operation_id: str):
 
         operation = bulk_operations_history[operation_id]
 
-        return JSONResponse({
-            "success": True,
-            "operation": operation,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse({"success": True, "operation": operation, "timestamp": datetime.now().isoformat()})
 
     except Exception as e:
         logger.error(f"Failed to get bulk operation status: {e}")
@@ -1041,10 +1024,7 @@ async def get_bulk_operation_status(operation_id: str):
 
 
 @app.post("/bulk/undo/{operation_id}")
-async def undo_bulk_operation(
-    operation_id: str,
-    background_tasks: BackgroundTasks
-):
+async def undo_bulk_operation(operation_id: str, background_tasks: BackgroundTasks):
     """
     Undo a bulk operation.
 
@@ -1071,19 +1051,17 @@ async def undo_bulk_operation(
         undo_operation_id = f"undo_{operation_id}_{bulk_operation_counter}"
 
         # Schedule background undo processing
-        background_tasks.add_task(
-            execute_bulk_undo,
-            undo_operation_id,
-            operation
-        )
+        background_tasks.add_task(execute_bulk_undo, undo_operation_id, operation)
 
-        return JSONResponse({
-            "success": True,
-            "undo_operation_id": undo_operation_id,
-            "message": f"Undo operation initiated for {operation_id}",
-            "original_operation": operation_id,
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "undo_operation_id": undo_operation_id,
+                "message": f"Undo operation initiated for {operation_id}",
+                "original_operation": operation_id,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk undo failed: {e}")
@@ -1101,23 +1079,27 @@ async def list_bulk_operations():
     try:
         operations = []
         for op_id, operation in bulk_operations_history.items():
-            operations.append({
-                "operation_id": op_id,
-                "operation_type": operation["operation_type"],
-                "affected_images_count": len(operation["affected_images"]),
-                "status": operation["status"],
-                "timestamp": operation["timestamp"]
-            })
+            operations.append(
+                {
+                    "operation_id": op_id,
+                    "operation_type": operation["operation_type"],
+                    "affected_images_count": len(operation["affected_images"]),
+                    "status": operation["status"],
+                    "timestamp": operation["timestamp"],
+                }
+            )
 
         # Sort by timestamp (most recent first)
         operations.sort(key=lambda x: x["timestamp"], reverse=True)
 
-        return JSONResponse({
-            "success": True,
-            "operations": operations,
-            "total_operations": len(operations),
-            "timestamp": datetime.now().isoformat()
-        })
+        return JSONResponse(
+            {
+                "success": True,
+                "operations": operations,
+                "total_operations": len(operations),
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Failed to list bulk operations: {e}")
@@ -1142,6 +1124,7 @@ async def process_single_image(file_path: str, category: str, metadata: dict[str
             # Save updated metadata
             metadata_file = Path(file_path).with_suffix(Path(file_path).suffix + ".json")
             import json
+
             with open(metadata_file, "w") as f:
                 json.dump(metadata, f, indent=2)
 
@@ -1159,10 +1142,7 @@ async def process_batch_images(category_dir: str, category: str):
         if BRAND_TRAINER_AVAILABLE:
             # Use the brand trainer's dataset preparation
             result = await brand_trainer.prepare_training_dataset(
-                input_directory=category_dir,
-                category=category,
-                remove_background=False,
-                enhance_images=True
+                input_directory=category_dir, category=category, remove_background=False, enhance_images=True
             )
 
             logger.info(f"Batch processing completed for {category}: {result}")
@@ -1172,10 +1152,7 @@ async def process_batch_images(category_dir: str, category: str):
 
 
 async def process_category_for_training(
-    category_dir: str,
-    category: str,
-    remove_background: bool,
-    enhance_images: bool
+    category_dir: str, category: str, remove_background: bool, enhance_images: bool
 ):
     """Background task to process category for training."""
     try:
@@ -1186,7 +1163,7 @@ async def process_category_for_training(
                 input_directory=category_dir,
                 category=category,
                 remove_background=remove_background,
-                enhance_images=enhance_images
+                enhance_images=enhance_images,
             )
 
             logger.info(f"Category processing completed: {result}")
@@ -1198,6 +1175,7 @@ async def process_category_for_training(
 # ============================================================================
 # PRODUCTION-GRADE IMAGE QUALITY PROCESSING
 # ============================================================================
+
 
 class ImageQualityProcessor:
     """Production-grade image quality processor with robust error handling."""
@@ -1231,7 +1209,7 @@ class ImageQualityProcessor:
                 settings.quality_enhancement,
                 settings.auto_contrast,
                 settings.equalize,
-                settings.remove_background
+                settings.remove_background,
             ]
 
             for setting in bool_settings:
@@ -1247,7 +1225,9 @@ class ImageQualityProcessor:
 
             # Warn about experimental features
             if settings.remove_background:
-                validation_result["warnings"].append("Background removal is experimental and may not work on all images")
+                validation_result["warnings"].append(
+                    "Background removal is experimental and may not work on all images"
+                )
 
         except Exception as e:
             validation_result["errors"].append(f"Validation error: {e!s}")
@@ -1269,7 +1249,9 @@ class ImageQualityProcessor:
             # Check file size
             file_size = image_path.stat().st_size
             if file_size > self.config["max_file_size"]:
-                validation_result["errors"].append(f"File too large: {file_size / (1024 * 1024):.1f}MB > {self.config['max_file_size'] / (1024 * 1024)}MB")
+                validation_result["errors"].append(
+                    f"File too large: {file_size / (1024 * 1024):.1f}MB > {self.config['max_file_size'] / (1024 * 1024)}MB"
+                )
                 validation_result["valid"] = False
 
             # Check file format
@@ -1293,13 +1275,15 @@ class ImageQualityProcessor:
                             validation_result["warnings"].append(f"Image very small: {width}x{height}")
 
                         # Check for potential issues
-                        if img.mode not in ['RGB', 'RGBA', 'L']:
+                        if img.mode not in ["RGB", "RGBA", "L"]:
                             validation_result["warnings"].append(f"Unusual color mode: {img.mode}")
 
                         # Estimate memory usage
                         estimated_memory = (width * height * 4) / (1024 * 1024)  # 4 bytes per pixel for RGBA
                         if estimated_memory > 100:  # 100MB
-                            validation_result["warnings"].append(f"Large image may use significant memory: ~{estimated_memory:.1f}MB")
+                            validation_result["warnings"].append(
+                                f"Large image may use significant memory: ~{estimated_memory:.1f}MB"
+                            )
 
                 except Exception as e:
                     validation_result["errors"].append(f"Cannot open image: {e!s}")
@@ -1332,10 +1316,7 @@ class ImageQualityProcessor:
             return None
 
     def process_single_image(
-        self,
-        image_path: Path,
-        settings: BulkQualitySettings,
-        operation_id: str
+        self, image_path: Path, settings: BulkQualitySettings, operation_id: str
     ) -> dict[str, Any]:
         """Process a single image with comprehensive error handling."""
         result = {
@@ -1347,7 +1328,7 @@ class ImageQualityProcessor:
             "final_size": None,
             "backup_path": None,
             "errors": [],
-            "warnings": []
+            "warnings": [],
         }
 
         start_time = datetime.now()
@@ -1369,13 +1350,11 @@ class ImageQualityProcessor:
                 result["backup_path"] = str(backup_path) if backup_path else None
 
             # Create temporary file for processing
-            with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp:
                 temp_file = Path(temp.name)
 
             # Process image
-            processed_successfully = self._apply_quality_enhancements(
-                image_path, temp_file, settings, result
-            )
+            processed_successfully = self._apply_quality_enhancements(image_path, temp_file, settings, result)
 
             if processed_successfully:
                 # Replace original with processed image
@@ -1410,11 +1389,7 @@ class ImageQualityProcessor:
         return result
 
     def _apply_quality_enhancements(
-        self,
-        input_path: Path,
-        output_path: Path,
-        settings: BulkQualitySettings,
-        result: dict[str, Any]
+        self, input_path: Path, output_path: Path, settings: BulkQualitySettings, result: dict[str, Any]
     ) -> bool:
         """Apply quality enhancements to image with fallback mechanisms."""
 
@@ -1426,14 +1401,14 @@ class ImageQualityProcessor:
             # Open and validate image
             with Image.open(input_path) as img:
                 # Convert to RGB if necessary (handles RGBA, CMYK, etc.)
-                if img.mode != 'RGB':
-                    if img.mode == 'RGBA':
+                if img.mode != "RGB":
+                    if img.mode == "RGBA":
                         # Handle transparency by creating white background
-                        background = Image.new('RGB', img.size, (255, 255, 255))
-                        background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                        background = Image.new("RGB", img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[-1] if img.mode == "RGBA" else None)
                         img = background
                     else:
-                        img = img.convert('RGB')
+                        img = img.convert("RGB")
 
                 # Apply resize if dimensions changed
                 target_size = settings.resize_dimensions_tuple
@@ -1452,14 +1427,14 @@ class ImageQualityProcessor:
 
                 # Save with high quality
                 save_kwargs = {
-                    'format': self.config["output_format"],
-                    'quality': self.config["output_quality"],
-                    'optimize': True
+                    "format": self.config["output_format"],
+                    "quality": self.config["output_quality"],
+                    "optimize": True,
                 }
 
                 # Add progressive JPEG for better loading
-                if self.config["output_format"] == 'JPEG':
-                    save_kwargs['progressive'] = True
+                if self.config["output_format"] == "JPEG":
+                    save_kwargs["progressive"] = True
 
                 img.save(output_path, **save_kwargs)
 
@@ -1471,10 +1446,7 @@ class ImageQualityProcessor:
             return False
 
     def _enhance_image_quality(
-        self,
-        img: Image.Image,
-        settings: BulkQualitySettings,
-        result: dict[str, Any]
+        self, img: Image.Image, settings: BulkQualitySettings, result: dict[str, Any]
     ) -> Image.Image:
         """Apply quality enhancements with error handling."""
 
@@ -1516,11 +1488,7 @@ class ImageQualityProcessor:
 
         return img
 
-    def _remove_background_fallback(
-        self,
-        img: Image.Image,
-        result: dict[str, Any]
-    ) -> Image.Image:
+    def _remove_background_fallback(self, img: Image.Image, result: dict[str, Any]) -> Image.Image:
         """Fallback background removal implementation."""
 
         try:
@@ -1537,7 +1505,7 @@ class ImageQualityProcessor:
                 edges = cv2.Canny(gray, 50, 150)
 
                 # Create mask (this is very basic - production would be more sophisticated)
-                mask = cv2.dilate(edges, np.ones((3,3), np.uint8), iterations=1)
+                mask = cv2.dilate(edges, np.ones((3, 3), np.uint8), iterations=1)
                 mask = cv2.GaussianBlur(mask, (5, 5), 0)
 
                 # Apply mask (simplified)
@@ -1567,21 +1535,18 @@ image_processor = ImageQualityProcessor()
 # BULK OPERATIONS SUPPORT FUNCTIONS
 # ============================================================================
 
+
 async def generate_bulk_operation_preview(operation_type: str, operation_data: dict[str, Any]) -> dict[str, Any]:
     """Generate a preview of what a bulk operation would do."""
     try:
         image_paths = operation_data.get("image_paths", [])
-        preview = {
-            "operation_type": operation_type,
-            "affected_images": len(image_paths),
-            "changes": {}
-        }
+        preview = {"operation_type": operation_type, "affected_images": len(image_paths), "changes": {}}
 
         if operation_type == "category_update":
             new_category = operation_data.get("new_category")
             preview["changes"] = {
                 "category_change": f"All images will be moved to category: {new_category}",
-                "metadata_preserved": operation_data.get("preserve_existing_metadata", True)
+                "metadata_preserved": operation_data.get("preserve_existing_metadata", True),
             }
 
         elif operation_type == "caption_update":
@@ -1589,14 +1554,14 @@ async def generate_bulk_operation_preview(operation_type: str, operation_data: d
             preview["changes"] = {
                 "caption_template": template,
                 "add_trigger_words": operation_data.get("add_trigger_words", []),
-                "remove_trigger_words": operation_data.get("remove_trigger_words", [])
+                "remove_trigger_words": operation_data.get("remove_trigger_words", []),
             }
 
         elif operation_type == "tag_update":
             preview["changes"] = {
                 "add_tags": operation_data.get("add_tags", []),
                 "remove_tags": operation_data.get("remove_tags", []),
-                "replace_tags": operation_data.get("replace_tags", {})
+                "replace_tags": operation_data.get("replace_tags", {}),
             }
 
         elif operation_type == "quality_update":
@@ -1605,13 +1570,13 @@ async def generate_bulk_operation_preview(operation_type: str, operation_data: d
                 "quality_enhancement": operation_data.get("quality_enhancement", True),
                 "auto_contrast": operation_data.get("auto_contrast", True),
                 "equalize": operation_data.get("equalize", True),
-                "remove_background": operation_data.get("remove_background", False)
+                "remove_background": operation_data.get("remove_background", False),
             }
 
         elif operation_type == "metadata_update":
             preview["changes"] = {
                 "metadata_updates": operation_data.get("metadata_updates", {}),
-                "merge_with_existing": operation_data.get("merge_with_existing", True)
+                "merge_with_existing": operation_data.get("merge_with_existing", True),
             }
 
         return preview
@@ -1636,7 +1601,7 @@ async def capture_images_state(image_paths: list[str]) -> dict[str, Any]:
             metadata = {}
 
             if metadata_file.exists():
-                with open(metadata_file, 'r') as f:
+                with open(metadata_file, "r") as f:
                     metadata = json.load(f)
 
             # Capture file stats
@@ -1646,7 +1611,7 @@ async def capture_images_state(image_paths: list[str]) -> dict[str, Any]:
                 "metadata": metadata,
                 "file_size": file_stats.st_size,
                 "modified_time": file_stats.st_mtime,
-                "category": metadata.get("category", "unknown")
+                "category": metadata.get("category", "unknown"),
             }
 
         return state
@@ -1657,10 +1622,7 @@ async def capture_images_state(image_paths: list[str]) -> dict[str, Any]:
 
 
 async def execute_bulk_category_update(
-    operation_id: str,
-    image_paths: list[str],
-    new_category: str,
-    preserve_existing_metadata: bool
+    operation_id: str, image_paths: list[str], new_category: str, preserve_existing_metadata: bool
 ):
     """Execute bulk category update operation."""
     try:
@@ -1685,7 +1647,7 @@ async def execute_bulk_category_update(
                 metadata = {}
 
                 if metadata_file.exists() and preserve_existing_metadata:
-                    with open(metadata_file, 'r') as f:
+                    with open(metadata_file, "r") as f:
                         metadata = json.load(f)
 
                 # Update category in metadata
@@ -1705,7 +1667,7 @@ async def execute_bulk_category_update(
                     new_metadata_path = new_category_dir / f"{image_path_obj.name}.json"
 
                 # Save updated metadata
-                with open(new_metadata_path, 'w') as f:
+                with open(new_metadata_path, "w") as f:
                     json.dump(metadata, f, indent=2)
 
                 successful_updates += 1
@@ -1719,10 +1681,12 @@ async def execute_bulk_category_update(
         bulk_operations_history[operation_id]["results"] = {
             "successful_updates": successful_updates,
             "failed_updates": failed_updates,
-            "completion_time": datetime.now().isoformat()
+            "completion_time": datetime.now().isoformat(),
         }
 
-        logger.info(f"✅ Bulk category update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed")
+        logger.info(
+            f"✅ Bulk category update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed"
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk category update failed: {operation_id} - {e}")
@@ -1736,7 +1700,7 @@ async def execute_bulk_caption_update(
     caption_template: str,
     preserve_trigger_words: bool,
     add_trigger_words: list[str],
-    remove_trigger_words: list[str]
+    remove_trigger_words: list[str],
 ):
     """Execute bulk caption update operation."""
     try:
@@ -1757,7 +1721,7 @@ async def execute_bulk_caption_update(
                 metadata = {}
 
                 if metadata_file.exists():
-                    with open(metadata_file, 'r') as f:
+                    with open(metadata_file, "r") as f:
                         metadata = json.load(f)
 
                 # Process caption
@@ -1791,7 +1755,7 @@ async def execute_bulk_caption_update(
                 metadata["bulk_operation_id"] = operation_id
 
                 # Save updated metadata
-                with open(metadata_file, 'w') as f:
+                with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
 
                 successful_updates += 1
@@ -1805,10 +1769,12 @@ async def execute_bulk_caption_update(
         bulk_operations_history[operation_id]["results"] = {
             "successful_updates": successful_updates,
             "failed_updates": failed_updates,
-            "completion_time": datetime.now().isoformat()
+            "completion_time": datetime.now().isoformat(),
         }
 
-        logger.info(f"✅ Bulk caption update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed")
+        logger.info(
+            f"✅ Bulk caption update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed"
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk caption update failed: {operation_id} - {e}")
@@ -1821,7 +1787,7 @@ async def execute_bulk_tag_update(
     image_paths: list[str],
     add_tags: list[str],
     remove_tags: list[str],
-    replace_tags: dict[str, str]
+    replace_tags: dict[str, str],
 ):
     """Execute bulk tag update operation."""
     try:
@@ -1842,7 +1808,7 @@ async def execute_bulk_tag_update(
                 metadata = {}
 
                 if metadata_file.exists():
-                    with open(metadata_file, 'r') as f:
+                    with open(metadata_file, "r") as f:
                         metadata = json.load(f)
 
                 # Get existing tags
@@ -1874,7 +1840,7 @@ async def execute_bulk_tag_update(
                 metadata["bulk_operation_id"] = operation_id
 
                 # Save updated metadata
-                with open(metadata_file, 'w') as f:
+                with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
 
                 successful_updates += 1
@@ -1888,10 +1854,12 @@ async def execute_bulk_tag_update(
         bulk_operations_history[operation_id]["results"] = {
             "successful_updates": successful_updates,
             "failed_updates": failed_updates,
-            "completion_time": datetime.now().isoformat()
+            "completion_time": datetime.now().isoformat(),
         }
 
-        logger.info(f"✅ Bulk tag update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed")
+        logger.info(
+            f"✅ Bulk tag update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed"
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk tag update failed: {operation_id} - {e}")
@@ -1900,9 +1868,7 @@ async def execute_bulk_tag_update(
 
 
 async def execute_bulk_quality_update(
-    operation_id: str,
-    image_paths: list[str],
-    quality_settings: BulkQualitySettings
+    operation_id: str, image_paths: list[str], quality_settings: BulkQualitySettings
 ):
     """Execute bulk quality update operation with production-grade error handling."""
 
@@ -1915,7 +1881,7 @@ async def execute_bulk_quality_update(
         "total_processing_time": 0,
         "individual_results": [],
         "validation_errors": [],
-        "system_warnings": []
+        "system_warnings": [],
     }
 
     try:
@@ -1947,23 +1913,22 @@ async def execute_bulk_quality_update(
             # Quick validation
             if not image_path.exists():
                 processing_results["skipped_updates"] += 1
-                processing_results["individual_results"].append({
-                    "image_path": image_path_str,
-                    "success": False,
-                    "error": "File not found",
-                    "skipped": True
-                })
+                processing_results["individual_results"].append(
+                    {"image_path": image_path_str, "success": False, "error": "File not found", "skipped": True}
+                )
                 continue
 
             # Check file extension
             if image_path.suffix.lower() not in QUALITY_CONFIG["supported_formats"]:
                 processing_results["skipped_updates"] += 1
-                processing_results["individual_results"].append({
-                    "image_path": image_path_str,
-                    "success": False,
-                    "error": f"Unsupported format: {image_path.suffix}",
-                    "skipped": True
-                })
+                processing_results["individual_results"].append(
+                    {
+                        "image_path": image_path_str,
+                        "success": False,
+                        "error": f"Unsupported format: {image_path.suffix}",
+                        "skipped": True,
+                    }
+                )
                 continue
 
             valid_paths.append(image_path)
@@ -1974,20 +1939,19 @@ async def execute_bulk_quality_update(
         batch_size = min(QUALITY_CONFIG["max_concurrent_operations"], 10)
 
         for i in range(0, len(valid_paths), batch_size):
-            batch = valid_paths[i:i + batch_size]
+            batch = valid_paths[i : i + batch_size]
             batch_start_time = datetime.now()
 
-            logger.info(f"Processing batch {i // batch_size + 1}/{(len(valid_paths) + batch_size - 1) // batch_size} ({len(batch)} images)")
+            logger.info(
+                f"Processing batch {i // batch_size + 1}/{(len(valid_paths) + batch_size - 1) // batch_size} ({len(batch)} images)"
+            )
 
             # Process batch with thread pool
             batch_futures = []
             with ThreadPoolExecutor(max_workers=len(batch)) as executor:
                 for image_path in batch:
                     future = executor.submit(
-                        image_processor.process_single_image,
-                        image_path,
-                        quality_settings,
-                        operation_id
+                        image_processor.process_single_image, image_path, quality_settings, operation_id
                     )
                     batch_futures.append(future)
 
@@ -2002,10 +1966,7 @@ async def execute_bulk_quality_update(
 
                             # Update metadata
                             await _update_quality_metadata(
-                                Path(result["image_path"]),
-                                quality_settings,
-                                operation_id,
-                                result
+                                Path(result["image_path"]), quality_settings, operation_id, result
                             )
                         else:
                             processing_results["failed_updates"] += 1
@@ -2015,11 +1976,9 @@ async def execute_bulk_quality_update(
                         processing_results["failed_updates"] += 1
                         error_msg = f"Processing exception: {e!s}"
                         logger.error(error_msg)
-                        processing_results["individual_results"].append({
-                            "success": False,
-                            "error": error_msg,
-                            "image_path": "unknown"
-                        })
+                        processing_results["individual_results"].append(
+                            {"success": False, "error": error_msg, "image_path": "unknown"}
+                        )
 
             batch_time = (datetime.now() - batch_start_time).total_seconds()
             logger.info(f"Batch completed in {batch_time:.2f} seconds")
@@ -2064,10 +2023,7 @@ async def execute_bulk_quality_update(
 
 
 async def _update_quality_metadata(
-    image_path: Path,
-    quality_settings: BulkQualitySettings,
-    operation_id: str,
-    processing_result: dict[str, Any]
+    image_path: Path, quality_settings: BulkQualitySettings, operation_id: str, processing_result: dict[str, Any]
 ):
     """Update metadata file with quality processing information."""
     try:
@@ -2077,7 +2033,7 @@ async def _update_quality_metadata(
         # Load existing metadata if it exists
         if metadata_file.exists():
             try:
-                with open(metadata_file, 'r') as f:
+                with open(metadata_file, "r") as f:
                     metadata = json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to load existing metadata for {image_path}: {e}")
@@ -2088,7 +2044,7 @@ async def _update_quality_metadata(
             "quality_enhancement": quality_settings.quality_enhancement,
             "auto_contrast": quality_settings.auto_contrast,
             "equalize": quality_settings.equalize,
-            "remove_background": quality_settings.remove_background
+            "remove_background": quality_settings.remove_background,
         }
 
         metadata["quality_processing"] = {
@@ -2098,14 +2054,14 @@ async def _update_quality_metadata(
             "final_size": processing_result.get("final_size"),
             "backup_path": processing_result.get("backup_path"),
             "warnings": processing_result.get("warnings", []),
-            "processed_timestamp": datetime.now().isoformat()
+            "processed_timestamp": datetime.now().isoformat(),
         }
 
         metadata["last_updated"] = datetime.now().isoformat()
         metadata["bulk_operation_id"] = operation_id
 
         # Save updated metadata
-        with open(metadata_file, 'w') as f:
+        with open(metadata_file, "w") as f:
             json.dump(metadata, f, indent=2)
 
     except Exception as e:
@@ -2113,10 +2069,7 @@ async def _update_quality_metadata(
 
 
 async def execute_bulk_metadata_update(
-    operation_id: str,
-    image_paths: list[str],
-    metadata_updates: dict[str, Any],
-    merge_with_existing: bool
+    operation_id: str, image_paths: list[str], metadata_updates: dict[str, Any], merge_with_existing: bool
 ):
     """Execute bulk metadata update operation."""
     try:
@@ -2137,7 +2090,7 @@ async def execute_bulk_metadata_update(
                 metadata = {}
 
                 if metadata_file.exists() and merge_with_existing:
-                    with open(metadata_file, 'r') as f:
+                    with open(metadata_file, "r") as f:
                         metadata = json.load(f)
 
                 # Apply metadata updates
@@ -2146,7 +2099,7 @@ async def execute_bulk_metadata_update(
                 metadata["bulk_operation_id"] = operation_id
 
                 # Save updated metadata
-                with open(metadata_file, 'w') as f:
+                with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
 
                 successful_updates += 1
@@ -2160,10 +2113,12 @@ async def execute_bulk_metadata_update(
         bulk_operations_history[operation_id]["results"] = {
             "successful_updates": successful_updates,
             "failed_updates": failed_updates,
-            "completion_time": datetime.now().isoformat()
+            "completion_time": datetime.now().isoformat(),
         }
 
-        logger.info(f"✅ Bulk metadata update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed")
+        logger.info(
+            f"✅ Bulk metadata update completed: {operation_id} - {successful_updates} successful, {failed_updates} failed"
+        )
 
     except Exception as e:
         logger.error(f"❌ Bulk metadata update failed: {operation_id} - {e}")
@@ -2185,7 +2140,7 @@ async def execute_bulk_undo(operation_id: str, original_operation: dict[str, Any
             "operation_id": operation_id,
             "original_operation_id": original_operation["operation_id"],
             "status": "completed",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         logger.info(f"✅ Bulk undo completed: {operation_id}")
@@ -2198,4 +2153,5 @@ async def execute_bulk_undo(operation_id: str, original_operation: dict[str, Any
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8001)

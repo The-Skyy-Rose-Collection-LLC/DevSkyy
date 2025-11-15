@@ -3,10 +3,9 @@ Integration Tests for API Endpoints
 Tests for complete API workflows with database and external services
 """
 
-
+import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
-import pytest
 
 from main import app
 
@@ -225,9 +224,7 @@ class TestMLEndpoints:
             "max_results": 5,
         }
 
-        response = self.client.post(
-            "/api/v1/ml/predict", json=prediction_data, headers=self.headers
-        )
+        response = self.client.post("/api/v1/ml/predict", json=prediction_data, headers=self.headers)
 
         # Should accept the request (actual prediction might be mocked)
         assert response.status_code in [200, 404]  # 404 if model doesn't exist
@@ -266,9 +263,7 @@ class TestGDPREndpoints:
             "reason": "User requested data export",
         }
 
-        response = self.client.post(
-            "/api/v1/gdpr/data-request", json=export_data, headers=self.headers
-        )
+        response = self.client.post("/api/v1/gdpr/data-request", json=export_data, headers=self.headers)
 
         assert response.status_code == 200
 
@@ -284,9 +279,7 @@ class TestGDPREndpoints:
             "reason": "User requested account deletion",
         }
 
-        response = self.client.post(
-            "/api/v1/gdpr/data-request", json=deletion_data, headers=self.headers
-        )
+        response = self.client.post("/api/v1/gdpr/data-request", json=deletion_data, headers=self.headers)
 
         assert response.status_code == 200
 
@@ -315,9 +308,7 @@ class TestAsyncEndpoints:
                 "role": "api_user",
             }
 
-            reg_response = await client.post(
-                "/api/v1/auth/register", json=registration_data
-            )
+            reg_response = await client.post("/api/v1/auth/register", json=registration_data)
             assert reg_response.status_code == 201
 
             # Login

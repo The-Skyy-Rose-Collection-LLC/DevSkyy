@@ -4,8 +4,8 @@ API module initialization for DevSkyy Platform.
 """
 from fastapi import FastAPI
 
-
 __version__ = "2.0.0"
+
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application instance.
@@ -22,6 +22,8 @@ def create_app() -> FastAPI:
     )
 
     return app
+
+
 """DevSkyy API Package"""
 
-__VERSION__ =  "1.0.0"
+__VERSION__ = "1.0.0"

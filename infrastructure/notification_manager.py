@@ -1,15 +1,14 @@
 import asyncio
+import hashlib
+import logging
+import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import hashlib
-import logging
-import time
 from typing import Any, Optional
 
 from httpx import AsyncClient
-
 
 """
 Enterprise Notification Manager - Multi-Channel Communication System
@@ -18,6 +17,7 @@ Target: Max 1 message/second rate limiting with rich formatting support
 """
 
 logger = logging.getLogger(__name__)
+
 
 class NotificationChannel(Enum):
     """Notification channel types"""
@@ -28,6 +28,7 @@ class NotificationChannel(Enum):
     SMS = "sms"
     WEBHOOK = "webhook"
 
+
 class NotificationPriority(Enum):
     """Notification priority levels"""
 
@@ -36,6 +37,7 @@ class NotificationPriority(Enum):
     HIGH = "high"
     CRITICAL = "critical"
     URGENT = "urgent"
+
 
 class NotificationStatus(Enum):
     """Notification delivery status"""
@@ -46,6 +48,7 @@ class NotificationStatus(Enum):
     FAILED = "failed"
     RATE_LIMITED = "rate_limited"
     RETRYING = "retrying"
+
 
 @dataclass
 class NotificationTemplate:
@@ -96,6 +99,7 @@ class NotificationTemplate:
                 "color": "#ff0000",
             }
 
+
 @dataclass
 class NotificationMessage:
     """Notification message structure"""
@@ -127,6 +131,7 @@ class NotificationMessage:
             self.context = {}
         if self.fashion_context is None:
             self.fashion_context = {}
+
 
 class RateLimiter:
     """Rate limiter for notification channels"""
@@ -169,6 +174,7 @@ class RateLimiter:
 
         return wait_time
 
+
 class NotificationManager:
     """Enterprise notification manager with multi-channel support"""
 
@@ -179,9 +185,7 @@ class NotificationManager:
         request_timeout: int = 30,
         retry_delay: int = 5,
     ):
-        self.rate_limiter = RateLimiter(
-            max_requests=rate_limit_per_second, time_window=1
-        )
+        self.rate_limiter = RateLimiter(max_requests=rate_limit_per_second, time_window=1)
         self.max_concurrent_requests = max_concurrent_requests
         self.request_timeout = request_timeout
         self.retry_delay = retry_delay
@@ -339,9 +343,7 @@ class NotificationManager:
         """Send notification message"""
 
         # Generate unique message ID
-        message_id = hashlib.sha256(
-            f"{channel.value}_{webhook_url}_{title}_{time.time()}".encode()
-        ).hexdigest()
+        message_id = hashlib.sha256(f"{channel.value}_{webhook_url}_{title}_{time.time()}".encode()).hexdigest()
 
         # Create notification message
         notification = NotificationMessage(
@@ -408,9 +410,7 @@ class NotificationManager:
                 notification.status = NotificationStatus.RATE_LIMITED
                 self.metrics["total_rate_limited"] += 1
 
-                logger.debug(
-                    f"Rate limited notification {notification.id}, waited {wait_time:.2f}s"
-                )
+                logger.debug(f"Rate limited notification {notification.id}, waited {wait_time:.2f}s")
 
                 # Try to acquire again after waiting
                 if not await self.rate_limiter.acquire(channel_key):
@@ -458,9 +458,7 @@ class NotificationManager:
         except Exception as e:
             await self._handle_delivery_error(notification, str(e))
 
-    async def _prepare_payload(
-        self, notification: NotificationMessage
-    ) -> dict[str, Any]:
+    async def _prepare_payload(self, notification: NotificationMessage) -> dict[str, Any]:
         """Prepare webhook payload based on channel type"""
 
         if notification.channel == NotificationChannel.SLACK:
@@ -477,9 +475,7 @@ class NotificationManager:
                 "context": notification.context,
             }
 
-    async def _prepare_slack_payload(
-        self, notification: NotificationMessage
-    ) -> dict[str, Any]:
+    async def _prepare_slack_payload(self, notification: NotificationMessage) -> dict[str, Any]:
         """Prepare Slack webhook payload"""
 
         payload = {
@@ -505,25 +501,17 @@ class NotificationManager:
         # Add fashion context if present
         if notification.fashion_context:
             payload["attachments"][0]["footer"] = "Fashion Industry Context"
-            payload["attachments"][0][
-                "footer_icon"
-            ] = "https://example.com/fashion-icon.png"
+            payload["attachments"][0]["footer_icon"] = "https://example.com/fashion-icon.png"
 
         return payload
 
-    async def _prepare_discord_payload(
-        self, notification: NotificationMessage
-    ) -> dict[str, Any]:
+    async def _prepare_discord_payload(self, notification: NotificationMessage) -> dict[str, Any]:
         """Prepare Discord webhook payload"""
 
         embed = {
             "title": notification.title,
             "description": notification.message,
-            "color": (
-                int(notification.color.replace("#", ""), 16)
-                if notification.color
-                else 3447003
-            ),
+            "color": (int(notification.color.replace("#", ""), 16) if notification.color else 3447003),
             "timestamp": notification.created_at.isoformat(),
         }
 
@@ -546,9 +534,7 @@ class NotificationManager:
 
         return payload
 
-    async def _handle_delivery_error(
-        self, notification: NotificationMessage, error: str
-    ):
+    async def _handle_delivery_error(self, notification: NotificationMessage, error: str):
         """Handle notification delivery error with retry logic"""
 
         notification.error_message = error
@@ -558,9 +544,7 @@ class NotificationManager:
             # Schedule retry
             notification.status = NotificationStatus.RETRYING
 
-            retry_delay = self.retry_delay * (
-                2 ** (notification.retry_count - 1)
-            )  # Exponential backoff
+            retry_delay = self.retry_delay * (2 ** (notification.retry_count - 1))  # Exponential backoff
 
             logger.warning(
                 f"Notification {notification.id} failed, retrying in {retry_delay}s (attempt {notification.retry_count}/{notification.max_retries})"
@@ -601,9 +585,7 @@ class NotificationManager:
         else:
             # Exponential moving average
             alpha = 0.1
-            self.metrics["avg_delivery_time"] = (
-                alpha * delivery_time + (1 - alpha) * self.metrics["avg_delivery_time"]
-            )
+            self.metrics["avg_delivery_time"] = alpha * delivery_time + (1 - alpha) * self.metrics["avg_delivery_time"]
 
         self.metrics["last_updated"] = datetime.now()
 
@@ -648,9 +630,7 @@ class NotificationManager:
                 "max_per_second": self.rate_limiter.max_requests,
                 "time_window": self.rate_limiter.time_window,
             },
-            "recent_deliveries": list(self.delivery_history)[
-                -10:
-            ],  # Last 10 deliveries
+            "recent_deliveries": list(self.delivery_history)[-10:],  # Last 10 deliveries
         }
 
     async def health_check(self) -> dict[str, Any]:
@@ -658,9 +638,7 @@ class NotificationManager:
 
         try:
             # Test HTTP client
-            test_response = await self.http_client.get(
-                "https://httpbin.org/status/200", timeout=5
-            )
+            test_response = await self.http_client.get("https://httpbin.org/status/200", timeout=5)
             http_client_healthy = test_response.status_code == 200
 
             metrics = await self.get_metrics()
@@ -684,6 +662,7 @@ class NotificationManager:
         """Close HTTP client and cleanup"""
         await self.http_client.aclose()
         logger.info("Notification manager closed")
+
 
 # Global notification manager instance
 notification_manager = NotificationManager()

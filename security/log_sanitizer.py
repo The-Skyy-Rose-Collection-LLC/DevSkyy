@@ -31,18 +31,18 @@ def sanitize_for_log(value: Any, max_length: int = 200) -> str:
     str_value = str(value)
 
     # Remove newlines and carriage returns
-    str_value = str_value.replace('\n', ' ').replace('\r', ' ')
+    str_value = str_value.replace("\n", " ").replace("\r", " ")
 
     # Remove ANSI escape sequences
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    str_value = ansi_escape.sub('', str_value)
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    str_value = ansi_escape.sub("", str_value)
 
     # Remove other control characters
-    str_value = ''.join(char if ord(char) >= 32 or char in ('\t',) else ' ' for char in str_value)
+    str_value = "".join(char if ord(char) >= 32 or char in ("\t",) else " " for char in str_value)
 
     # Truncate if too long
     if len(str_value) > max_length:
-        str_value = str_value[:max_length] + '...'
+        str_value = str_value[:max_length] + "..."
 
     return str_value
 

@@ -1,13 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
 
-from fastapi import status
 import pytest
-
+from fastapi import status
 
 """
 DevSkyy Enterprise - Main API Endpoint Tests
 Comprehensive tests for core API endpoints
 """
+
 
 class TestHealthEndpoints:
     """Test health and monitoring endpoints"""
@@ -38,6 +38,7 @@ class TestHealthEndpoints:
 
         # Metrics endpoint should return 200 or 404 if not configured
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
+
 
 class TestAuthenticationEndpoints:
     """Test authentication endpoints"""
@@ -79,6 +80,7 @@ class TestAuthenticationEndpoints:
         # Should return 200 OK or 404 if endpoint doesn't exist yet
         assert response.status_code in [status.HTTP_200_OK, status.HTTP_404_NOT_FOUND]
 
+
 class TestAgentEndpoints:
     """Test AI agent endpoints"""
 
@@ -101,9 +103,7 @@ class TestAgentEndpoints:
     @pytest.mark.api
     def test_create_agent(self, test_client, auth_headers, mock_agent_data):
         """Test creating a new agent"""
-        response = test_client.post(
-            "/api/v1/agents", json=mock_agent_data, headers=auth_headers
-        )
+        response = test_client.post("/api/v1/agents", json=mock_agent_data, headers=auth_headers)
 
         # Endpoint might not exist yet
         assert response.status_code in [
@@ -126,6 +126,7 @@ class TestAgentEndpoints:
             status.HTTP_401_UNAUTHORIZED,
         ]
 
+
 class TestProjectEndpoints:
     """Test project management endpoints"""
 
@@ -143,9 +144,7 @@ class TestProjectEndpoints:
     @pytest.mark.api
     def test_create_project(self, test_client, auth_headers, mock_project_data):
         """Test creating a new project"""
-        response = test_client.post(
-            "/api/v1/projects", json=mock_project_data, headers=auth_headers
-        )
+        response = test_client.post("/api/v1/projects", json=mock_project_data, headers=auth_headers)
 
         assert response.status_code in [
             status.HTTP_201_CREATED,
@@ -153,6 +152,7 @@ class TestProjectEndpoints:
             status.HTTP_404_NOT_FOUND,
             status.HTTP_422_UNPROCESSABLE_ENTITY,
         ]
+
 
 class TestAIEndpoints:
     """Test AI interaction endpoints"""
@@ -166,9 +166,7 @@ class TestAIEndpoints:
             "model": "claude-3-5-sonnet-20241022",
         }
 
-        response = test_client.post(
-            "/api/v1/ai/chat", json=chat_data, headers=auth_headers
-        )
+        response = test_client.post("/api/v1/ai/chat", json=chat_data, headers=auth_headers)
 
         # Endpoint might not exist or require external API
         assert response.status_code in [
@@ -177,6 +175,7 @@ class TestAIEndpoints:
             status.HTTP_422_UNPROCESSABLE_ENTITY,
             status.HTTP_503_SERVICE_UNAVAILABLE,
         ]
+
 
 class TestErrorHandling:
     """Test error handling and edge cases"""
@@ -214,6 +213,7 @@ class TestErrorHandling:
             status.HTTP_404_NOT_FOUND,
         ]
 
+
 class TestCORS:
     """Test CORS configuration"""
 
@@ -228,6 +228,7 @@ class TestCORS:
             status.HTTP_404_NOT_FOUND,
             status.HTTP_405_METHOD_NOT_ALLOWED,
         ]
+
 
 class TestRateLimiting:
     """Test rate limiting (if configured)"""
@@ -247,9 +248,11 @@ class TestRateLimiting:
         # Rate limiting might not be configured yet
         # assert status.HTTP_429_TOO_MANY_REQUESTS in responses
 
+
 # ============================================================================
 # Performance Tests
 # ============================================================================
+
 
 @pytest.mark.slow
 class TestAPIPerformance:

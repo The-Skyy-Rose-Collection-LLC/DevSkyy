@@ -8,18 +8,15 @@ Version: 1.0.0
 """
 
 import asyncio
-from datetime import datetime
 import logging
 import sys
+from datetime import datetime
 from typing import Any
 
-
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - TEST - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - TEST - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 class OrchestrationSystemTest:
     """Comprehensive test suite for AI orchestration system"""
@@ -44,7 +41,7 @@ class OrchestrationSystemTest:
             ("Communication Protocols", self.test_communication_protocols),
             ("Performance Monitoring", self.test_performance_monitoring),
             ("Error Handling", self.test_error_handling),
-            ("End-to-End Workflow", self.test_end_to_end_workflow)
+            ("End-to-End Workflow", self.test_end_to_end_workflow),
         ]
 
         for test_name, test_func in tests:
@@ -83,12 +80,12 @@ class OrchestrationSystemTest:
                 return False
 
             # Verify monitoring configuration
-            if not hasattr(central, 'monitoring_config'):
+            if not hasattr(central, "monitoring_config"):
                 logger.error("Monitoring configuration missing")
                 return False
 
             # Verify quality gates
-            if not hasattr(central, 'quality_gates'):
+            if not hasattr(central, "quality_gates"):
                 logger.error("Quality gates configuration missing")
                 return False
 
@@ -116,10 +113,7 @@ class OrchestrationSystemTest:
             # Test real-time metrics collection
             metrics = await tech_engine.get_real_time_metrics()
 
-            required_metrics = [
-                "development_velocity", "system_uptime",
-                "api_response_time", "security_score"
-            ]
+            required_metrics = ["development_velocity", "system_uptime", "api_response_time", "security_score"]
 
             for metric in required_metrics:
                 if metric not in metrics:
@@ -162,18 +156,14 @@ class OrchestrationSystemTest:
                 return False
 
             # Test content management
-            content_id = await brand_engine.add_content_piece(
-                "instagram", "test_post", 8.5, 10000, 50
-            )
+            content_id = await brand_engine.add_content_piece("instagram", "test_post", 8.5, 10000, 50)
 
             if not content_id:
                 logger.error("Failed to add content piece")
                 return False
 
             # Test influencer management
-            influencer_id = await brand_engine.add_influencer(
-                "Test_Influencer", "instagram", 100000, 7.5, "tier_2"
-            )
+            influencer_id = await brand_engine.add_influencer("Test_Influencer", "instagram", 100000, 7.5, "tier_2")
 
             if not influencer_id:
                 logger.error("Failed to add influencer")
@@ -182,10 +172,7 @@ class OrchestrationSystemTest:
             # Test metrics collection
             metrics = await brand_engine.get_real_time_brand_metrics()
 
-            required_metrics = [
-                "social_engagement", "viral_coefficient",
-                "brand_sentiment", "social_revenue"
-            ]
+            required_metrics = ["social_engagement", "viral_coefficient", "brand_sentiment", "social_revenue"]
 
             for metric in required_metrics:
                 if metric not in metrics:
@@ -279,7 +266,7 @@ class OrchestrationSystemTest:
                 "expected_revenue": 300000,
                 "technical_complexity": 6,
                 "affects_technical": True,
-                "affects_brand": False
+                "affects_brand": False,
             }
 
             # Test strategic decision making
@@ -418,7 +405,7 @@ class OrchestrationSystemTest:
                 "revenue_impact": 200000,
                 "customer_impact": 1000,
                 "estimated_cost": 50000,
-                "expected_revenue": 150000
+                "expected_revenue": 150000,
             }
 
             decision = await central.strategic_decision_engine(decision_context)
@@ -441,10 +428,8 @@ class OrchestrationSystemTest:
         end_time = datetime.now()
         end_time - self.start_time
 
-
         passed = sum(1 for result in self.test_results.values() if result)
         total = len(self.test_results)
-
 
         for _test_name, _result in self.test_results.items():
             pass
@@ -454,6 +439,7 @@ class OrchestrationSystemTest:
         else:
 
             [name for name, result in self.test_results.items() if not result]
+
 
 async def main():
     """Main test execution"""
@@ -470,6 +456,7 @@ async def main():
         sys.exit(0)
     else:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

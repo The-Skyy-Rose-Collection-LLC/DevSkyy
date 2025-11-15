@@ -11,7 +11,6 @@ enabling precise error handling and better debugging.
 
 from typing import Any, Optional
 
-
 # ============================================================================
 # BASE EXCEPTIONS
 # ============================================================================
@@ -25,7 +24,7 @@ class DevSkyyError(Exception):
         message: str,
         error_code: Optional[str] = None,
         details: Optional[dict[str, Any]] = None,
-        original_error: Optional[Exception] = None
+        original_error: Optional[Exception] = None,
     ):
         """
         Initialize the exception with a human-readable message and optional metadata.
@@ -59,7 +58,7 @@ class DevSkyyError(Exception):
             "error_type": self.__class__.__name__,
             "error_code": self.error_code,
             "message": self.message,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -432,11 +431,7 @@ HTTP_STATUS_TO_EXCEPTION = {
 }
 
 
-def exception_from_status_code(
-    status_code: int,
-    message: str,
-    **kwargs
-) -> DevSkyyError:
+def exception_from_status_code(status_code: int, message: str, **kwargs) -> DevSkyyError:
     """
     Map an HTTP status code to a corresponding DevSkyyError subclass and instantiate it.
 
@@ -465,11 +460,7 @@ DATABASE_ERROR_MAPPING = {
 }
 
 
-def map_database_error(
-    error_type: str,
-    message: str,
-    original_error: Optional[Exception] = None
-) -> DatabaseError:
+def map_database_error(error_type: str, message: str, original_error: Optional[Exception] = None) -> DatabaseError:
     """
     Create an exception instance that represents a database error for a given error type.
 

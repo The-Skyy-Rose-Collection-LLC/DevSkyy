@@ -20,12 +20,12 @@ from typing import Any, Optional
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
-from services.mcp_client import MCPToolClient, get_mcp_client
-
+from services.mcp_client import get_mcp_client, MCPToolClient
 
 # Logfire for observability
 try:
     import logfire
+
     LOGFIRE_AVAILABLE = True
 except ImportError:
     LOGFIRE_AVAILABLE = False
@@ -113,7 +113,10 @@ class DevSkyyMCPServer:
                         "properties": {
                             "title": {"type": "string", "description": "Content title"},
                             "content": {"type": "string", "description": "Full content text"},
-                            "meta_description": {"type": "string", "description": "Meta description for search engines"},
+                            "meta_description": {
+                                "type": "string",
+                                "description": "Meta description for search engines",
+                            },
                             "keywords": {
                                 "type": "array",
                                 "items": {"type": "string"},
@@ -250,6 +253,7 @@ class DevSkyyMCPServer:
 
                 # Return result as TextContent
                 import json
+
                 return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
             except Exception as e:

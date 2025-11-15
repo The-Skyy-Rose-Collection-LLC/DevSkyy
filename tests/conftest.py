@@ -16,9 +16,8 @@ CRITICAL CI/CD FIXES:
 # =============================================================================
 
 import os
-from pathlib import Path
 import sys
-
+from pathlib import Path
 
 # Add project root to Python path for CI/CD
 project_root = Path(__file__).parent.parent
@@ -31,13 +30,13 @@ if str(project_root) not in sys.path:
 # =============================================================================
 
 import asyncio
-from collections.abc import AsyncGenerator, Generator
 import time
+from collections.abc import AsyncGenerator, Generator
 
-from fastapi.testclient import TestClient
-from httpx import AsyncClient
 import pytest
 import requests
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -48,8 +47,7 @@ from models_sqlalchemy import Base
 # =============================================================================
 # Local Imports (now work because of sys.path fix above)
 # =============================================================================
-from security.jwt_auth import User, UserRole, create_access_token, create_refresh_token, user_manager
-
+from security.jwt_auth import create_access_token, create_refresh_token, User, user_manager, UserRole
 
 # Import main app
 
@@ -61,6 +59,7 @@ from security.jwt_auth import User, UserRole, create_access_token, create_refres
 # Pytest Configuration
 # ============================================================================
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create event loop for async tests"""
@@ -68,9 +67,11 @@ def event_loop():
     yield loop
     loop.close()
 
+
 # ============================================================================
 # Database Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_db_engine():
@@ -85,27 +86,29 @@ def test_db_engine():
     Base.metadata.drop_all(bind=engine)
     engine.dispose()
 
+
 @pytest.fixture(scope="function")
 def test_db_session(test_db_engine):
     """Create database session for testing"""
-    TestingSessionLocal = sessionmaker(
-        autocommit=False, autoflush=False, bind=test_db_engine
-    )
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
     session = TestingSessionLocal()
     try:
         yield session
     finally:
         session.close()
 
+
 # ============================================================================
 # FastAPI Test Client Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_client() -> Generator[TestClient, None, None]:
     """Create FastAPI test client"""
     with TestClient(app) as client:
         yield client
+
 
 @pytest.fixture(scope="function")
 async def async_test_client() -> AsyncGenerator:
@@ -114,9 +117,11 @@ async def async_test_client() -> AsyncGenerator:
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
+
 # ============================================================================
 # Authentication Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def test_user_data():
@@ -129,6 +134,7 @@ def test_user_data():
         "role": "admin",
         "permissions": ["read", "write", "admin"],
     }
+
 
 @pytest.fixture(scope="function")
 def setup_test_user(test_user_data):
@@ -155,24 +161,29 @@ def setup_test_user(test_user_data):
     if test_user.email in user_manager.email_index:
         del user_manager.email_index[test_user.email]
 
+
 @pytest.fixture(scope="function")
 def test_access_token(test_user_data):
     """Generate test JWT access token"""
     return create_access_token(data=test_user_data)
+
 
 @pytest.fixture(scope="function")
 def test_refresh_token(test_user_data):
     """Generate test JWT refresh token"""
     return create_refresh_token(data=test_user_data)
 
+
 @pytest.fixture(scope="function")
 def auth_headers(test_access_token):
     """Generate authorization headers with test token"""
     return {"Authorization": f"Bearer {test_access_token}"}
 
+
 # ============================================================================
 # Mock Data Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def mock_ai_response():
@@ -182,6 +193,7 @@ def mock_ai_response():
         "model": "claude-3-5-sonnet-20241022",
         "usage": {"input_tokens": 10, "output_tokens": 25},
     }
+
 
 @pytest.fixture(scope="function")
 def mock_project_data():
@@ -194,6 +206,7 @@ def mock_project_data():
         "owner": "test_user_001",
     }
 
+
 @pytest.fixture(scope="function")
 def mock_agent_data():
     """Sample agent data"""
@@ -205,9 +218,11 @@ def mock_agent_data():
         "status": "active",
     }
 
+
 # ============================================================================
 # Environment Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
@@ -235,8 +250,8 @@ def setup_test_environment():
     os.environ.setdefault("LOG_LEVEL", "DEBUG")
     os.environ.setdefault("ENABLE_RATE_LIMITING", "false")
 
-
     yield
+
 
 @pytest.fixture(scope="function")
 def test_env_vars(monkeypatch):
@@ -248,9 +263,11 @@ def test_env_vars(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test_anthropic_key")
     monkeypatch.setenv("OPENAI_API_KEY", "test_openai_key")
 
+
 # ============================================================================
 # Cleanup Fixtures
 # ============================================================================
+
 
 @pytest.fixture(autouse=True)
 def cleanup_after_test():
@@ -258,9 +275,11 @@ def cleanup_after_test():
     yield
     # Add any cleanup logic here
 
+
 # ============================================================================
 # Performance Testing Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def performance_timer():
@@ -269,9 +288,11 @@ def performance_timer():
     start_time = time.time()
     yield lambda: time.time() - start_time
 
+
 # ============================================================================
 # Mocking Fixtures
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def mock_external_api(monkeypatch):
@@ -299,9 +320,11 @@ def mock_external_api(monkeypatch):
     monkeypatch.setattr(requests, "get", mock_get)
     monkeypatch.setattr(requests, "post", mock_post)
 
+
 # ============================================================================
 # Test Data Generators
 # ============================================================================
+
 
 @pytest.fixture(scope="function")
 def generate_test_users():
@@ -320,9 +343,11 @@ def generate_test_users():
 
     return _generate
 
+
 # ============================================================================
 # Pytest Hooks for Custom Behavior
 # ============================================================================
+
 
 def pytest_configure(config):
     """Configure pytest with custom markers"""
@@ -337,6 +362,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "content: Content publishing tests")
     config.addinivalue_line("markers", "wordpress: WordPress integration tests")
     config.addinivalue_line("markers", "infrastructure: Infrastructure tests (database, redis)")
+
 
 def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers automatically"""

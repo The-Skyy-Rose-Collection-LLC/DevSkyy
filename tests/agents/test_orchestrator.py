@@ -11,7 +11,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-
 # Import orchestrator (adjust import path as needed)
 try:
     from agent.orchestrator import AgentOrchestrator
@@ -42,8 +41,8 @@ class TestOrchestratorInitialization:
     def test_orchestrator_creates_successfully(self, orchestrator):
         """Orchestrator should initialize with default configuration."""
         assert orchestrator is not None
-        assert hasattr(orchestrator, 'agents')
-        assert hasattr(orchestrator, 'max_concurrent_tasks')
+        assert hasattr(orchestrator, "agents")
+        assert hasattr(orchestrator, "max_concurrent_tasks")
 
     def test_orchestrator_has_default_config(self, orchestrator):
         """Orchestrator should have sensible defaults."""
@@ -62,14 +61,14 @@ class TestAgentRegistration:
     @pytest.mark.asyncio
     async def test_register_agent_success(self, orchestrator, mock_agent):
         """Should successfully register a new agent."""
-        if hasattr(orchestrator, 'register_agent'):
+        if hasattr(orchestrator, "register_agent"):
             result = await orchestrator.register_agent(mock_agent)
             assert result is True or mock_agent.id in orchestrator.agents
 
     @pytest.mark.asyncio
     async def test_register_duplicate_agent_fails(self, orchestrator, mock_agent):
         """Should reject duplicate agent registration."""
-        if hasattr(orchestrator, 'register_agent'):
+        if hasattr(orchestrator, "register_agent"):
             await orchestrator.register_agent(mock_agent)
 
             # Try to register again - should return False or raise exception
@@ -85,7 +84,7 @@ class TestAgentRegistration:
     @pytest.mark.asyncio
     async def test_unregister_agent_success(self, orchestrator, mock_agent):
         """Should successfully unregister an existing agent."""
-        if hasattr(orchestrator, 'register_agent') and hasattr(orchestrator, 'unregister_agent'):
+        if hasattr(orchestrator, "register_agent") and hasattr(orchestrator, "unregister_agent"):
             await orchestrator.register_agent(mock_agent)
             result = await orchestrator.unregister_agent(mock_agent.id)
             assert result is True or mock_agent.id not in orchestrator.agents
@@ -97,15 +96,10 @@ class TestAgentExecution:
     @pytest.mark.asyncio
     async def test_execute_single_agent_task(self, orchestrator, mock_agent):
         """Should execute a task with a single agent."""
-        if hasattr(orchestrator, 'execute_task'):
-            task = {
-                "id": "task-001",
-                "type": "test_task",
-                "agent_id": mock_agent.id,
-                "params": {"test": "data"}
-            }
+        if hasattr(orchestrator, "execute_task"):
+            task = {"id": "task-001", "type": "test_task", "agent_id": mock_agent.id, "params": {"test": "data"}}
 
-            with patch.object(orchestrator, 'get_agent', return_value=mock_agent):
+            with patch.object(orchestrator, "get_agent", return_value=mock_agent):
                 result = await orchestrator.execute_task(task)
                 assert result is not None
                 assert result.get("status") in ["success", "completed", "done"]
@@ -113,11 +107,8 @@ class TestAgentExecution:
     @pytest.mark.asyncio
     async def test_execute_multiple_concurrent_tasks(self, orchestrator):
         """Should handle multiple concurrent tasks within limits."""
-        if hasattr(orchestrator, 'execute_tasks'):
-            tasks = [
-                {"id": f"task-{i}", "type": "test", "params": {}}
-                for i in range(5)
-            ]
+        if hasattr(orchestrator, "execute_tasks"):
+            tasks = [{"id": f"task-{i}", "type": "test", "params": {}} for i in range(5)]
 
             results = await orchestrator.execute_tasks(tasks)
             assert len(results) == len(tasks)
@@ -125,7 +116,7 @@ class TestAgentExecution:
     @pytest.mark.asyncio
     async def test_respects_max_concurrent_limit(self, orchestrator):
         """Should not exceed max_concurrent_tasks limit."""
-        if hasattr(orchestrator, 'max_concurrent_tasks'):
+        if hasattr(orchestrator, "max_concurrent_tasks"):
             # Create more tasks than the limit
             max_limit = orchestrator.max_concurrent_tasks
 
@@ -140,37 +131,34 @@ class TestCoordination:
     @pytest.mark.asyncio
     async def test_coordinate_multiple_agents(self, orchestrator):
         """Should coordinate tasks across multiple agents."""
-        if hasattr(orchestrator, 'coordinate'):
+        if hasattr(orchestrator, "coordinate"):
             agents = [
-                MagicMock(id=f"agent-{i}", execute=AsyncMock(return_value={"status": "success"}))
-                for i in range(3)
+                MagicMock(id=f"agent-{i}", execute=AsyncMock(return_value={"status": "success"})) for i in range(3)
             ]
 
             workflow = {
                 "steps": [
                     {"agent_id": agents[0].id, "action": "step1"},
                     {"agent_id": agents[1].id, "action": "step2"},
-                    {"agent_id": agents[2].id, "action": "step3"}
+                    {"agent_id": agents[2].id, "action": "step3"},
                 ]
             }
 
-            with patch.object(orchestrator, 'agents', {a.id: a for a in agents}):
+            with patch.object(orchestrator, "agents", {a.id: a for a in agents}):
                 result = await orchestrator.coordinate(workflow)
                 assert result is not None
 
     @pytest.mark.asyncio
     async def test_handle_coordination_failure(self, orchestrator):
         """Should gracefully handle coordination failures."""
-        if hasattr(orchestrator, 'coordinate'):
+        if hasattr(orchestrator, "coordinate"):
             failing_agent = MagicMock()
             failing_agent.id = "failing-agent"
             failing_agent.execute = AsyncMock(side_effect=Exception("Agent failed"))
 
-            workflow = {
-                "steps": [{"agent_id": failing_agent.id, "action": "fail"}]
-            }
+            workflow = {"steps": [{"agent_id": failing_agent.id, "action": "fail"}]}
 
-            with patch.object(orchestrator, 'agents', {failing_agent.id: failing_agent}):
+            with patch.object(orchestrator, "agents", {failing_agent.id: failing_agent}):
                 # Should either handle gracefully OR propagate exception
                 try:
                     result = await orchestrator.coordinate(workflow)
@@ -178,14 +166,15 @@ class TestCoordination:
                     assert result is not None, "Should return result object"
                     # Check for error indicators in result
                     assert (
-                        result.get('status') == 'failed' or
-                        result.get('error') is not None or
-                        result.get('success') is False
+                        result.get("status") == "failed"
+                        or result.get("error") is not None
+                        or result.get("success") is False
                     ), "Result should indicate failure"
                 except Exception as e:
                     # If exception propagated, that's also valid behavior
-                    assert "failed" in str(e).lower() or "error" in str(e).lower(), \
-                        f"Exception should be related to agent failure: {e}"
+                    assert (
+                        "failed" in str(e).lower() or "error" in str(e).lower()
+                    ), f"Exception should be related to agent failure: {e}"
 
 
 class TestMonitoring:
@@ -193,14 +182,14 @@ class TestMonitoring:
 
     def test_get_orchestrator_status(self, orchestrator):
         """Should return current orchestrator status."""
-        if hasattr(orchestrator, 'get_status'):
+        if hasattr(orchestrator, "get_status"):
             status = orchestrator.get_status()
             assert status is not None
             assert isinstance(status, dict)
 
     def test_get_agent_metrics(self, orchestrator, mock_agent):
         """Should return metrics for registered agents."""
-        if hasattr(orchestrator, 'get_metrics'):
+        if hasattr(orchestrator, "get_metrics"):
             metrics = orchestrator.get_metrics()
             assert metrics is not None
             assert isinstance(metrics, dict)
@@ -208,7 +197,7 @@ class TestMonitoring:
     @pytest.mark.asyncio
     async def test_health_check(self, orchestrator):
         """Should perform health check successfully."""
-        if hasattr(orchestrator, 'health_check'):
+        if hasattr(orchestrator, "health_check"):
             health = await orchestrator.health_check()
             assert health is not None
             assert health.get("status") in ["healthy", "ok", "running"]
@@ -224,21 +213,24 @@ class TestErrorHandling:
         failing_agent.id = "failing-agent"
         failing_agent.execute = AsyncMock(side_effect=Exception("Agent crashed"))
 
-        if hasattr(orchestrator, 'execute_task'):
+        if hasattr(orchestrator, "execute_task"):
             task = {"id": "task-fail", "agent_id": failing_agent.id}
 
-            with patch.object(orchestrator, 'get_agent', return_value=failing_agent):
+            with patch.object(orchestrator, "get_agent", return_value=failing_agent):
                 # Should either raise exception OR return error status
                 try:
                     result = await orchestrator.execute_task(task)
                     # If no exception, should return error status
                     assert result is not None, "Should return result object"
-                    assert result.get("status") in ["error", "failed"], \
-                        f"Result should indicate failure, got: {result.get('status')}"
+                    assert result.get("status") in [
+                        "error",
+                        "failed",
+                    ], f"Result should indicate failure, got: {result.get('status')}"
                 except Exception as e:
                     # If exception propagated, that's also valid behavior
-                    assert "crashed" in str(e).lower() or "failed" in str(e).lower(), \
-                        f"Exception should be related to agent failure: {e}"
+                    assert (
+                        "crashed" in str(e).lower() or "failed" in str(e).lower()
+                    ), f"Exception should be related to agent failure: {e}"
 
     @pytest.mark.asyncio
     async def test_timeout_handling(self, orchestrator):
@@ -252,19 +244,12 @@ class TestErrorHandling:
 
         slow_agent.execute = slow_execute
 
-        if hasattr(orchestrator, 'execute_task'):
-            task = {
-                "id": "task-slow",
-                "agent_id": slow_agent.id,
-                "timeout": 1  # 1 second timeout
-            }
+        if hasattr(orchestrator, "execute_task"):
+            task = {"id": "task-slow", "agent_id": slow_agent.id, "timeout": 1}  # 1 second timeout
 
-            with patch.object(orchestrator, 'get_agent', return_value=slow_agent):
+            with patch.object(orchestrator, "get_agent", return_value=slow_agent):
                 with pytest.raises(asyncio.TimeoutError):
-                    await asyncio.wait_for(
-                        orchestrator.execute_task(task),
-                        timeout=2
-                    )
+                    await asyncio.wait_for(orchestrator.execute_task(task), timeout=2)
 
 
 class TestPerformanceRequirements:
@@ -273,7 +258,7 @@ class TestPerformanceRequirements:
     @pytest.mark.asyncio
     async def test_p95_latency_under_200ms(self, orchestrator):
         """P95 latency should be under 200ms per Truth Protocol."""
-        if not hasattr(orchestrator, 'execute_task'):
+        if not hasattr(orchestrator, "execute_task"):
             pytest.skip("execute_task not available")
 
         latencies = []
@@ -281,7 +266,7 @@ class TestPerformanceRequirements:
         mock_agent.id = "perf-agent"
         mock_agent.execute = AsyncMock(return_value={"status": "success"})
 
-        with patch.object(orchestrator, 'get_agent', return_value=mock_agent):
+        with patch.object(orchestrator, "get_agent", return_value=mock_agent):
             for i in range(100):
                 start = datetime.now()
                 task = {"id": f"task-{i}", "agent_id": mock_agent.id}
@@ -306,7 +291,7 @@ class TestPerformanceRequirements:
     @pytest.mark.asyncio
     async def test_error_rate_under_threshold(self, orchestrator):
         """Error rate should be under 0.5% per Truth Protocol."""
-        if not hasattr(orchestrator, 'execute_task'):
+        if not hasattr(orchestrator, "execute_task"):
             pytest.skip("execute_task not available")
 
         total_tasks = 100
@@ -316,7 +301,7 @@ class TestPerformanceRequirements:
         mock_agent.id = "reliability-agent"
         mock_agent.execute = AsyncMock(return_value={"status": "success"})
 
-        with patch.object(orchestrator, 'get_agent', return_value=mock_agent):
+        with patch.object(orchestrator, "get_agent", return_value=mock_agent):
             for i in range(total_tasks):
                 task = {"id": f"task-{i}", "agent_id": mock_agent.id}
 
@@ -339,19 +324,20 @@ class TestTruthProtocolCompliance:
     def test_orchestrator_has_logging(self, orchestrator):
         """Should have proper logging per Truth Protocol."""
         # Orchestrator should use structured logging
-        assert hasattr(orchestrator, 'logger') or 'logger' in dir(orchestrator.__class__)
+        assert hasattr(orchestrator, "logger") or "logger" in dir(orchestrator.__class__)
 
     def test_orchestrator_validates_inputs(self, orchestrator):
         """Should validate all inputs per Truth Protocol."""
-        if hasattr(orchestrator, 'execute_task'):
+        if hasattr(orchestrator, "execute_task"):
             # Should reject invalid task format (missing required fields)
             # Should either raise exception OR return error status
             try:
                 result = asyncio.run(orchestrator.execute_task({}))
                 # If no exception, should return error status
                 assert result is not None, "Should return result object"
-                assert result.get("status") == "error", \
-                    f"Invalid task should return error status, got: {result.get('status')}"
+                assert (
+                    result.get("status") == "error"
+                ), f"Invalid task should return error status, got: {result.get('status')}"
             except (ValueError, KeyError, TypeError, Exception) as e:
                 # If exception raised for invalid input, that's also valid
                 assert True, f"Invalid task correctly raised: {type(e).__name__}"
@@ -360,9 +346,7 @@ class TestTruthProtocolCompliance:
         """Should maintain security context per Truth Protocol."""
         # Orchestrator should have security features
         assert (
-            hasattr(orchestrator, 'auth') or
-            hasattr(orchestrator, 'rbac') or
-            hasattr(orchestrator, 'security_context')
+            hasattr(orchestrator, "auth") or hasattr(orchestrator, "rbac") or hasattr(orchestrator, "security_context")
         ) or True  # Allow if security is handled at API layer
 
 
@@ -406,16 +390,13 @@ class TestOrchestratorAdvancedScenarios:
             MagicMock(
                 agent_name=f"agent-{i}",
                 status=MagicMock(value="initializing"),
-                initialize=AsyncMock(return_value=True)
+                initialize=AsyncMock(return_value=True),
             )
             for i in range(10)
         ]
 
         # Register agents concurrently
-        tasks = [
-            orchestrator.register_agent(agent, [f"capability-{i}"])
-            for i, agent in enumerate(mock_agents)
-        ]
+        tasks = [orchestrator.register_agent(agent, [f"capability-{i}"]) for i, agent in enumerate(mock_agents)]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -427,14 +408,10 @@ class TestOrchestratorAdvancedScenarios:
     async def test_circular_dependency_detection(self, orchestrator):
         """Should detect and handle circular dependencies."""
         agent_a = MagicMock(
-            agent_name="agent_a",
-            status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=True)
+            agent_name="agent_a", status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
         )
         agent_b = MagicMock(
-            agent_name="agent_b",
-            status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=True)
+            agent_name="agent_b", status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
         )
 
         # Create circular dependency: a -> b -> a
@@ -451,9 +428,7 @@ class TestOrchestratorAdvancedScenarios:
         from agent.modules.base_agent import AgentStatus
 
         mock_agent = MagicMock(
-            agent_name="status_agent",
-            status=AgentStatus.INITIALIZING,
-            initialize=AsyncMock(return_value=True)
+            agent_name="status_agent", status=AgentStatus.INITIALIZING, initialize=AsyncMock(return_value=True)
         )
 
         await orchestrator.register_agent(mock_agent, ["test"])
@@ -470,18 +445,12 @@ class TestOrchestratorAdvancedScenarios:
         # Create more tasks than max_concurrent
         max_concurrent = orchestrator.max_concurrent_tasks
 
-        MagicMock(
-            agent_name="queue_agent",
-            execute=AsyncMock(return_value={"status": "success"})
-        )
+        MagicMock(agent_name="queue_agent", execute=AsyncMock(return_value={"status": "success"}))
 
         # Fill up the queue beyond capacity
         tasks = []
         for i in range(max_concurrent + 20):
-            task_id = await orchestrator.create_video_generation_task(
-                "runway_video",
-                {"prompt": f"test {i}"}
-            )
+            task_id = await orchestrator.create_video_generation_task("runway_video", {"prompt": f"test {i}"})
             tasks.append(task_id)
 
         # Queue should handle overflow
@@ -528,7 +497,7 @@ class TestOrchestratorAdvancedScenarios:
             agent_name="fashion_vision",
             status=MagicMock(value="initializing"),
             initialize=AsyncMock(return_value=True),
-            generate_fashion_runway_video=AsyncMock()
+            generate_fashion_runway_video=AsyncMock(),
         )
 
         await orchestrator.register_agent(mock_vision_agent, ["vision"])
@@ -546,16 +515,11 @@ class TestOrchestratorDependencyResolution:
         """Should resolve complex multi-level dependencies."""
         # Create chain: A -> B -> C -> D
         agents = []
-        for _i, (name, deps) in enumerate([
-            ("agent_d", []),
-            ("agent_c", ["agent_d"]),
-            ("agent_b", ["agent_c"]),
-            ("agent_a", ["agent_b"])
-        ]):
+        for _i, (name, deps) in enumerate(
+            [("agent_d", []), ("agent_c", ["agent_d"]), ("agent_b", ["agent_c"]), ("agent_a", ["agent_b"])]
+        ):
             agent = MagicMock(
-                agent_name=name,
-                status=MagicMock(value="initializing"),
-                initialize=AsyncMock(return_value=True)
+                agent_name=name, status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
             )
             await orchestrator.register_agent(agent, [f"cap_{name}"], dependencies=deps)
             agents.append(name)
@@ -576,20 +540,16 @@ class TestOrchestratorDependencyResolution:
             ("agent_d", []),
             ("agent_b", ["agent_d"]),
             ("agent_c", ["agent_d"]),
-            ("agent_a", ["agent_b", "agent_c"])
+            ("agent_a", ["agent_b", "agent_c"]),
         ]
 
         for name, deps in agents_config:
             agent = MagicMock(
-                agent_name=name,
-                status=MagicMock(value="initializing"),
-                initialize=AsyncMock(return_value=True)
+                agent_name=name, status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
             )
             await orchestrator.register_agent(agent, [f"cap_{name}"], dependencies=deps)
 
-        order = orchestrator._resolve_dependencies(
-            ["agent_a", "agent_b", "agent_c", "agent_d"]
-        )
+        order = orchestrator._resolve_dependencies(["agent_a", "agent_b", "agent_c", "agent_d"])
 
         # D must come before B and C, B and C before A
         d_idx = order.index("agent_d")
@@ -609,19 +569,12 @@ class TestOrchestratorVideoGeneration:
         """Should create and execute runway video generation task."""
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            generate_fashion_runway_video=AsyncMock(
-                return_value={"success": True, "video_path": "/tmp/video.mp4"}
-            )
+            generate_fashion_runway_video=AsyncMock(return_value={"success": True, "video_path": "/tmp/video.mp4"}),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "runway_video",
-            {
-                "prompt": "luxury runway show",
-                "duration": 4,
-                "upscale": True
-            }
+            "runway_video", {"prompt": "luxury runway show", "duration": 4, "upscale": True}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -635,18 +588,12 @@ class TestOrchestratorVideoGeneration:
         """Should generate product 360° videos."""
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            generate_product_360_video=AsyncMock(
-                return_value={"success": True, "video_path": "/tmp/360.mp4"}
-            )
+            generate_product_360_video=AsyncMock(return_value={"success": True, "video_path": "/tmp/360.mp4"}),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "product_360",
-            {
-                "product_image_path": "/tmp/product.jpg",
-                "rotation_steps": 24
-            }
+            "product_360", {"product_image_path": "/tmp/product.jpg", "rotation_steps": 24}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -659,18 +606,12 @@ class TestOrchestratorVideoGeneration:
         """Should upscale videos to higher resolution."""
         mock_agent = MagicMock(
             agent_name="fashion_vision_agent",
-            upscale_video=AsyncMock(
-                return_value={"success": True, "upscaled_path": "/tmp/upscaled.mp4"}
-            )
+            upscale_video=AsyncMock(return_value={"success": True, "upscaled_path": "/tmp/upscaled.mp4"}),
         )
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "video_upscaling",
-            {
-                "video_path": "/tmp/input.mp4",
-                "target_resolution": (2048, 1152)
-            }
+            "video_upscaling", {"video_path": "/tmp/input.mp4", "target_resolution": (2048, 1152)}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -683,18 +624,12 @@ class TestOrchestratorVideoGeneration:
         """Should execute brand model training."""
         mock_agent = MagicMock(
             agent_name="brand_trainer",
-            train_lora_model=AsyncMock(
-                return_value={"success": True, "model_name": "skyy_rose_v1"}
-            )
+            train_lora_model=AsyncMock(return_value={"success": True, "model_name": "skyy_rose_v1"}),
         )
         orchestrator.agents["brand_trainer"] = mock_agent
 
         task_id = await orchestrator.create_video_generation_task(
-            "brand_training",
-            {
-                "dataset_path": "/tmp/dataset",
-                "model_name": "skyy_rose_v1"
-            }
+            "brand_training", {"dataset_path": "/tmp/dataset", "model_name": "skyy_rose_v1"}
         )
 
         result = await orchestrator.execute_video_generation_task(task_id)
@@ -705,10 +640,7 @@ class TestOrchestratorVideoGeneration:
     @pytest.mark.asyncio
     async def test_video_generation_missing_agent(self, orchestrator):
         """Should handle missing video generation agent gracefully."""
-        task_id = await orchestrator.create_video_generation_task(
-            "runway_video",
-            {"prompt": "test"}
-        )
+        task_id = await orchestrator.create_video_generation_task("runway_video", {"prompt": "test"})
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
@@ -721,10 +653,7 @@ class TestOrchestratorVideoGeneration:
         mock_agent = MagicMock(agent_name="fashion_vision_agent")
         orchestrator.agents["fashion_vision_agent"] = mock_agent
 
-        task_id = await orchestrator.create_video_generation_task(
-            "unknown_task_type",
-            {"prompt": "test"}
-        )
+        task_id = await orchestrator.create_video_generation_task("unknown_task_type", {"prompt": "test"})
 
         result = await orchestrator.execute_video_generation_task(task_id)
 
@@ -738,10 +667,7 @@ class TestOrchestratorCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_opens_after_failures(self, orchestrator):
         """Should open circuit breaker after multiple failures."""
-        failing_agent = MagicMock(
-            agent_name="failing_agent",
-            execute=AsyncMock(side_effect=Exception("Agent failed"))
-        )
+        failing_agent = MagicMock(agent_name="failing_agent", execute=AsyncMock(side_effect=Exception("Agent failed")))
         orchestrator.agents["failing_agent"] = failing_agent
 
         # Simulate multiple failures
@@ -763,8 +689,8 @@ class TestOrchestratorCircuitBreaker:
 
         # Manually set opened_at to past
         from datetime import timedelta
-        orchestrator.circuit_breakers["timeout_agent"]["opened_at"] = \
-            datetime.now() - timedelta(seconds=70)
+
+        orchestrator.circuit_breakers["timeout_agent"]["opened_at"] = datetime.now() - timedelta(seconds=70)
 
         # Should be half-open now
         is_open = orchestrator._is_circuit_open("timeout_agent", timeout=60)
@@ -775,11 +701,7 @@ class TestOrchestratorCircuitBreaker:
     async def test_circuit_breaker_resets_on_success(self, orchestrator):
         """Should reset circuit breaker after successful execution."""
         # Set up circuit breaker state
-        orchestrator.circuit_breakers["reset_agent"] = {
-            "failures": 3,
-            "opened_at": datetime.now(),
-            "state": "open"
-        }
+        orchestrator.circuit_breakers["reset_agent"] = {"failures": 3, "opened_at": datetime.now(), "state": "open"}
 
         # Reset it
         orchestrator._reset_circuit_breaker("reset_agent")
@@ -833,14 +755,10 @@ class TestOrchestratorMetrics:
     async def test_dependency_graph_retrieval(self, orchestrator):
         """Should return complete dependency graph."""
         agent_a = MagicMock(
-            agent_name="agent_a",
-            status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=True)
+            agent_name="agent_a", status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
         )
         agent_b = MagicMock(
-            agent_name="agent_b",
-            status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=True)
+            agent_name="agent_b", status=MagicMock(value="initializing"), initialize=AsyncMock(return_value=True)
         )
 
         await orchestrator.register_agent(agent_a, ["cap_a"], dependencies=["agent_b"])
@@ -879,11 +797,7 @@ class TestOrchestratorDataSharing:
     @pytest.mark.asyncio
     async def test_broadcast_to_all_agents(self, orchestrator):
         """Should broadcast to all registered agents when no filter specified."""
-        orchestrator.agents = {
-            "agent1": MagicMock(),
-            "agent2": MagicMock(),
-            "agent3": MagicMock()
-        }
+        orchestrator.agents = {"agent1": MagicMock(), "agent2": MagicMock(), "agent3": MagicMock()}
 
         message = {"event": "system_alert", "priority": "high"}
         await orchestrator.broadcast_to_agents(message)
@@ -903,7 +817,7 @@ class TestOrchestratorRobustness:
         failing_agent = MagicMock(
             agent_name="failing_init",
             status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=False)  # Initialization fails
+            initialize=AsyncMock(return_value=False),  # Initialization fails
         )
 
         result = await orchestrator.register_agent(failing_agent, ["test"])
@@ -926,30 +840,21 @@ class TestOrchestratorRobustness:
         working_agent = MagicMock(
             agent_name="working_agent",
             status=AgentStatus.HEALTHY,
-            execute=AsyncMock(return_value={"status": "success", "data": "ok"})
+            execute=AsyncMock(return_value={"status": "success", "data": "ok"}),
         )
-        failing_agent = MagicMock(
-            agent_name="failing_agent",
-            status=AgentStatus.FAILED
-        )
+        failing_agent = MagicMock(agent_name="failing_agent", status=AgentStatus.FAILED)
 
         orchestrator.agents["working_agent"] = working_agent
         orchestrator.agents["failing_agent"] = failing_agent
 
         orchestrator.agent_capabilities["working_agent"] = MagicMock(
-            capabilities=["test_cap"],
-            priority=MagicMock(value=1)
+            capabilities=["test_cap"], priority=MagicMock(value=1)
         )
         orchestrator.agent_capabilities["failing_agent"] = MagicMock(
-            capabilities=["test_cap"],
-            priority=MagicMock(value=2)
+            capabilities=["test_cap"], priority=MagicMock(value=2)
         )
 
-        result = await orchestrator.execute_task(
-            "test_task",
-            {},
-            ["test_cap"]
-        )
+        result = await orchestrator.execute_task("test_task", {}, ["test_cap"])
 
         # Should have errors but also some results
         assert "errors" in result or "results" in result
@@ -958,12 +863,10 @@ class TestOrchestratorRobustness:
     async def test_find_agents_with_multiple_capabilities(self, orchestrator):
         """Should find agents matching multiple capability requirements."""
         orchestrator.agent_capabilities["multi_cap_agent"] = MagicMock(
-            capabilities=["cap1", "cap2", "cap3"],
-            priority=MagicMock(value=1)
+            capabilities=["cap1", "cap2", "cap3"], priority=MagicMock(value=1)
         )
         orchestrator.agent_capabilities["partial_cap_agent"] = MagicMock(
-            capabilities=["cap1", "cap2"],
-            priority=MagicMock(value=2)
+            capabilities=["cap1", "cap2"], priority=MagicMock(value=2)
         )
 
         agents = orchestrator._find_agents_with_capabilities(["cap1", "cap2"])
@@ -979,12 +882,12 @@ class TestOrchestratorRobustness:
         healthy_agent = MagicMock(
             agent_name="healthy",
             status=AgentStatus.HEALTHY,
-            health_check=AsyncMock(return_value={"status": "healthy"})
+            health_check=AsyncMock(return_value={"status": "healthy"}),
         )
         degraded_agent = MagicMock(
             agent_name="degraded",
             status=AgentStatus.DEGRADED,
-            health_check=AsyncMock(return_value={"status": "degraded"})
+            health_check=AsyncMock(return_value={"status": "degraded"}),
         )
 
         orchestrator.agents["healthy"] = healthy_agent
@@ -1005,19 +908,15 @@ class TestOrchestratorConcurrency:
         mock_agent = MagicMock(
             agent_name="concurrent_agent",
             status=MagicMock(value="healthy"),
-            execute=AsyncMock(return_value={"status": "success"})
+            execute=AsyncMock(return_value={"status": "success"}),
         )
         orchestrator.agents["concurrent_agent"] = mock_agent
         orchestrator.agent_capabilities["concurrent_agent"] = MagicMock(
-            capabilities=["test"],
-            priority=MagicMock(value=1)
+            capabilities=["test"], priority=MagicMock(value=1)
         )
 
         # Execute multiple tasks concurrently
-        tasks = [
-            orchestrator.execute_task(f"task_{i}", {}, ["test"])
-            for i in range(10)
-        ]
+        tasks = [orchestrator.execute_task(f"task_{i}", {}, ["test"]) for i in range(10)]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -1027,6 +926,7 @@ class TestOrchestratorConcurrency:
     @pytest.mark.asyncio
     async def test_shared_context_concurrent_access(self, orchestrator):
         """Should handle concurrent access to shared context."""
+
         async def write_data(key, value):
             orchestrator.share_data(key, value)
             await asyncio.sleep(0.01)
@@ -1035,18 +935,10 @@ class TestOrchestratorConcurrency:
             return orchestrator.get_shared_data(key)
 
         # Concurrent writes
-        await asyncio.gather(
-            write_data("key1", "value1"),
-            write_data("key2", "value2"),
-            write_data("key3", "value3")
-        )
+        await asyncio.gather(write_data("key1", "value1"), write_data("key2", "value2"), write_data("key3", "value3"))
 
         # Concurrent reads
-        results = await asyncio.gather(
-            read_data("key1"),
-            read_data("key2"),
-            read_data("key3")
-        )
+        results = await asyncio.gather(read_data("key1"), read_data("key2"), read_data("key3"))
 
         assert "value1" in results
         assert "value2" in results
@@ -1070,7 +962,7 @@ class TestOrchestratorEdgeCases:
         agent = MagicMock(
             agent_name="empty_cap_agent",
             status=MagicMock(value="initializing"),
-            initialize=AsyncMock(return_value=True)
+            initialize=AsyncMock(return_value=True),
         )
 
         result = await orchestrator.register_agent(agent, [])
@@ -1083,13 +975,10 @@ class TestOrchestratorEdgeCases:
         mock_agent = MagicMock(
             agent_name="param_agent",
             status=MagicMock(value="healthy"),
-            execute=AsyncMock(return_value={"status": "success"})
+            execute=AsyncMock(return_value={"status": "success"}),
         )
         orchestrator.agents["param_agent"] = mock_agent
-        orchestrator.agent_capabilities["param_agent"] = MagicMock(
-            capabilities=["test"],
-            priority=MagicMock(value=1)
-        )
+        orchestrator.agent_capabilities["param_agent"] = MagicMock(capabilities=["test"], priority=MagicMock(value=1))
 
         result = await orchestrator.execute_task("test", {}, ["test"])
 
@@ -1114,11 +1003,6 @@ class TestOrchestratorEdgeCases:
 
 # Run all tests
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=agent.orchestrator",
-        "--cov-report=term",
-        "--cov-report=html",
-        "-m", "not integration"
-    ])
+    pytest.main(
+        [__file__, "-v", "--cov=agent.orchestrator", "--cov-report=term", "--cov-report=html", "-m", "not integration"]
+    )

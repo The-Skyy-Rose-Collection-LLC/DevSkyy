@@ -4,43 +4,48 @@ Enterprise Metrics and Alerting System for DevSkyy Platform
 Comprehensive metrics collection, alerting, and dashboard integration
 """
 
+import threading
+import time
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import threading
-import time
 from typing import Any, Optional
-
 
 # Prometheus imports (optional)
 try:
-    from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, Summary, generate_latest
+    from prometheus_client import CollectorRegistry, Counter, Gauge, generate_latest, Histogram, Summary
+
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-from monitoring.enterprise_logging import LogCategory, enterprise_logger
+from monitoring.enterprise_logging import enterprise_logger, LogCategory
 
 
 class MetricType(Enum):
     """Types of metrics."""
+
     COUNTER = "counter"
     GAUGE = "gauge"
     HISTOGRAM = "histogram"
     SUMMARY = "summary"
 
+
 class AlertSeverity(Enum):
     """Alert severity levels."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
+
 @dataclass
 class MetricDefinition:
     """Metric definition with metadata."""
+
     name: str
     metric_type: MetricType
     description: str
@@ -48,9 +53,11 @@ class MetricDefinition:
     unit: str = ""
     help_text: str = ""
 
+
 @dataclass
 class AlertRule:
     """Alert rule definition."""
+
     name: str
     metric_name: str
     condition: str  # e.g., "> 100", "< 0.95"
@@ -60,9 +67,11 @@ class AlertRule:
     description: str = ""
     runbook_url: str = ""
 
+
 @dataclass
 class Alert:
     """Active alert."""
+
     rule_name: str
     metric_name: str
     current_value: float
@@ -72,6 +81,7 @@ class Alert:
     description: str
     labels: dict[str, str] = field(default_factory=dict)
     resolved_at: Optional[datetime] = None
+
 
 class MetricsCollector:
     """
@@ -101,7 +111,7 @@ class MetricsCollector:
         enterprise_logger.info(
             "Metrics collector initialized",
             category=LogCategory.SYSTEM,
-            metadata={"prometheus_available": PROMETHEUS_AVAILABLE}
+            metadata={"prometheus_available": PROMETHEUS_AVAILABLE},
         )
 
     def _initialize_core_metrics(self):
@@ -112,7 +122,7 @@ class MetricsCollector:
                 metric_type=MetricType.COUNTER,
                 description="Total HTTP requests",
                 labels=["method", "endpoint", "status_code"],
-                help_text="Total number of HTTP requests processed"
+                help_text="Total number of HTTP requests processed",
             ),
             MetricDefinition(
                 name="http_request_duration_seconds",
@@ -120,34 +130,34 @@ class MetricsCollector:
                 description="HTTP request duration",
                 labels=["method", "endpoint"],
                 unit="seconds",
-                help_text="Time spent processing HTTP requests"
+                help_text="Time spent processing HTTP requests",
             ),
             MetricDefinition(
                 name="active_connections",
                 metric_type=MetricType.GAUGE,
                 description="Active connections",
-                help_text="Number of active connections"
+                help_text="Number of active connections",
             ),
             MetricDefinition(
                 name="memory_usage_bytes",
                 metric_type=MetricType.GAUGE,
                 description="Memory usage",
                 unit="bytes",
-                help_text="Current memory usage in bytes"
+                help_text="Current memory usage in bytes",
             ),
             MetricDefinition(
                 name="cpu_usage_percent",
                 metric_type=MetricType.GAUGE,
                 description="CPU usage percentage",
                 unit="percent",
-                help_text="Current CPU usage percentage"
+                help_text="Current CPU usage percentage",
             ),
             MetricDefinition(
                 name="ai_model_requests_total",
                 metric_type=MetricType.COUNTER,
                 description="AI model requests",
                 labels=["model", "provider", "status"],
-                help_text="Total AI model requests processed"
+                help_text="Total AI model requests processed",
             ),
             MetricDefinition(
                 name="ai_model_response_time_seconds",
@@ -155,28 +165,28 @@ class MetricsCollector:
                 description="AI model response time",
                 labels=["model", "provider"],
                 unit="seconds",
-                help_text="Time spent processing AI model requests"
+                help_text="Time spent processing AI model requests",
             ),
             MetricDefinition(
                 name="database_connections_active",
                 metric_type=MetricType.GAUGE,
                 description="Active database connections",
-                help_text="Number of active database connections"
+                help_text="Number of active database connections",
             ),
             MetricDefinition(
                 name="cache_hit_rate",
                 metric_type=MetricType.GAUGE,
                 description="Cache hit rate",
                 unit="percent",
-                help_text="Cache hit rate percentage"
+                help_text="Cache hit rate percentage",
             ),
             MetricDefinition(
                 name="security_events_total",
                 metric_type=MetricType.COUNTER,
                 description="Security events",
                 labels=["event_type", "severity"],
-                help_text="Total security events detected"
-            )
+                help_text="Total security events detected",
+            ),
         ]
 
         for metric_def in core_metrics:
@@ -193,7 +203,7 @@ class MetricsCollector:
                 severity=AlertSeverity.HIGH,
                 duration=120,
                 description="HTTP response time is too high",
-                runbook_url="https://docs.devskyy.com/runbooks/high-response-time"
+                runbook_url="https://docs.devskyy.com/runbooks/high-response-time",
             ),
             AlertRule(
                 name="high_error_rate",
@@ -202,7 +212,7 @@ class MetricsCollector:
                 threshold=0.05,
                 severity=AlertSeverity.CRITICAL,
                 duration=60,
-                description="HTTP error rate is too high"
+                description="HTTP error rate is too high",
             ),
             AlertRule(
                 name="low_memory",
@@ -211,7 +221,7 @@ class MetricsCollector:
                 threshold=0.9,
                 severity=AlertSeverity.HIGH,
                 duration=300,
-                description="Memory usage is critically high"
+                description="Memory usage is critically high",
             ),
             AlertRule(
                 name="high_cpu",
@@ -220,7 +230,7 @@ class MetricsCollector:
                 threshold=80,
                 severity=AlertSeverity.MEDIUM,
                 duration=300,
-                description="CPU usage is high"
+                description="CPU usage is high",
             ),
             AlertRule(
                 name="ai_model_failures",
@@ -229,7 +239,7 @@ class MetricsCollector:
                 threshold=0.1,
                 severity=AlertSeverity.HIGH,
                 duration=180,
-                description="AI model failure rate is too high"
+                description="AI model failure rate is too high",
             ),
             AlertRule(
                 name="security_events",
@@ -238,8 +248,8 @@ class MetricsCollector:
                 threshold=10,
                 severity=AlertSeverity.CRITICAL,
                 duration=60,
-                description="High number of security events detected"
-            )
+                description="High number of security events detected",
+            ),
         ]
 
         for rule in default_rules:
@@ -256,38 +266,26 @@ class MetricsCollector:
         enterprise_logger.debug(
             f"Registered metric: {metric_def.name}",
             category=LogCategory.SYSTEM,
-            metadata={"metric_type": metric_def.metric_type.value}
+            metadata={"metric_type": metric_def.metric_type.value},
         )
 
     def _create_prometheus_metric(self, metric_def: MetricDefinition):
         """Create Prometheus metric."""
         if metric_def.metric_type == MetricType.COUNTER:
             self.prometheus_metrics[metric_def.name] = Counter(
-                metric_def.name,
-                metric_def.description,
-                metric_def.labels,
-                registry=self.registry
+                metric_def.name, metric_def.description, metric_def.labels, registry=self.registry
             )
         elif metric_def.metric_type == MetricType.GAUGE:
             self.prometheus_metrics[metric_def.name] = Gauge(
-                metric_def.name,
-                metric_def.description,
-                metric_def.labels,
-                registry=self.registry
+                metric_def.name, metric_def.description, metric_def.labels, registry=self.registry
             )
         elif metric_def.metric_type == MetricType.HISTOGRAM:
             self.prometheus_metrics[metric_def.name] = Histogram(
-                metric_def.name,
-                metric_def.description,
-                metric_def.labels,
-                registry=self.registry
+                metric_def.name, metric_def.description, metric_def.labels, registry=self.registry
             )
         elif metric_def.metric_type == MetricType.SUMMARY:
             self.prometheus_metrics[metric_def.name] = Summary(
-                metric_def.name,
-                metric_def.description,
-                metric_def.labels,
-                registry=self.registry
+                metric_def.name, metric_def.description, metric_def.labels, registry=self.registry
             )
 
     def increment_counter(self, metric_name: str, value: float = 1, labels: Optional[dict[str, str]] = None):
@@ -297,11 +295,9 @@ class MetricsCollector:
             return
 
         # Store in history
-        self.metric_history[metric_name].append({
-            "timestamp": datetime.utcnow(),
-            "value": value,
-            "labels": labels or {}
-        })
+        self.metric_history[metric_name].append(
+            {"timestamp": datetime.utcnow(), "value": value, "labels": labels or {}}
+        )
 
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
@@ -317,11 +313,9 @@ class MetricsCollector:
             return
 
         # Store in history
-        self.metric_history[metric_name].append({
-            "timestamp": datetime.utcnow(),
-            "value": value,
-            "labels": labels or {}
-        })
+        self.metric_history[metric_name].append(
+            {"timestamp": datetime.utcnow(), "value": value, "labels": labels or {}}
+        )
 
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
@@ -340,11 +334,9 @@ class MetricsCollector:
             return
 
         # Store in history
-        self.metric_history[metric_name].append({
-            "timestamp": datetime.utcnow(),
-            "value": value,
-            "labels": labels or {}
-        })
+        self.metric_history[metric_name].append(
+            {"timestamp": datetime.utcnow(), "value": value, "labels": labels or {}}
+        )
 
         # Update Prometheus metric
         if PROMETHEUS_AVAILABLE and metric_name in self.prometheus_metrics:
@@ -362,11 +354,7 @@ class MetricsCollector:
         enterprise_logger.info(
             f"Added alert rule: {rule.name}",
             category=LogCategory.SYSTEM,
-            metadata={
-                "metric": rule.metric_name,
-                "threshold": rule.threshold,
-                "severity": rule.severity.value
-            }
+            metadata={"metric": rule.metric_name, "threshold": rule.threshold, "severity": rule.severity.value},
         )
 
     def _check_alert_rules(self, metric_name: str, value: float, labels: dict[str, str]):
@@ -404,7 +392,7 @@ class MetricsCollector:
                 severity=rule.severity,
                 triggered_at=datetime.utcnow(),
                 description=rule.description,
-                labels=labels
+                labels=labels,
             )
 
             self.active_alerts[alert_key] = alert
@@ -418,8 +406,8 @@ class MetricsCollector:
                     "current_value": current_value,
                     "threshold": rule.threshold,
                     "severity": rule.severity.value,
-                    "labels": labels
-                }
+                    "labels": labels,
+                },
             )
 
             # Notify callbacks
@@ -427,18 +415,11 @@ class MetricsCollector:
                 try:
                     callback(alert)
                 except Exception as e:
-                    enterprise_logger.error(
-                        f"Alert callback failed: {e}",
-                        category=LogCategory.SYSTEM,
-                        error=e
-                    )
+                    enterprise_logger.error(f"Alert callback failed: {e}", category=LogCategory.SYSTEM, error=e)
 
     def _resolve_alert(self, rule_name: str):
         """Resolve an alert."""
-        alerts_to_resolve = [
-            key for key in self.active_alerts
-            if self.active_alerts[key].rule_name == rule_name
-        ]
+        alerts_to_resolve = [key for key in self.active_alerts if self.active_alerts[key].rule_name == rule_name]
 
         for alert_key in alerts_to_resolve:
             alert = self.active_alerts[alert_key]
@@ -447,9 +428,7 @@ class MetricsCollector:
             enterprise_logger.info(
                 f"Alert resolved: {rule_name}",
                 category=LogCategory.SYSTEM,
-                metadata={
-                    "duration": (alert.resolved_at - alert.triggered_at).total_seconds()
-                }
+                metadata={"duration": (alert.resolved_at - alert.triggered_at).total_seconds()},
             )
 
             del self.active_alerts[alert_key]
@@ -466,13 +445,13 @@ class MetricsCollector:
             "active_alerts": len(self.active_alerts),
             "prometheus_available": PROMETHEUS_AVAILABLE,
             "metrics": list(self.metrics.keys()),
-            "active_alert_names": [alert.rule_name for alert in self.active_alerts.values()]
+            "active_alert_names": [alert.rule_name for alert in self.active_alerts.values()],
         }
 
     def get_prometheus_metrics(self) -> str:
         """Get Prometheus metrics in text format."""
         if PROMETHEUS_AVAILABLE:
-            return generate_latest(self.registry).decode('utf-8')
+            return generate_latest(self.registry).decode("utf-8")
         return "# Prometheus not available\n"
 
     def start_monitoring(self):
@@ -502,11 +481,7 @@ class MetricsCollector:
                 self._collect_system_metrics()
                 time.sleep(30)  # Collect every 30 seconds
             except Exception as e:
-                enterprise_logger.error(
-                    f"Monitoring loop error: {e}",
-                    category=LogCategory.SYSTEM,
-                    error=e
-                )
+                enterprise_logger.error(f"Monitoring loop error: {e}", category=LogCategory.SYSTEM, error=e)
                 time.sleep(60)  # Wait longer on error
 
     def _collect_system_metrics(self):
@@ -526,27 +501,28 @@ class MetricsCollector:
             # psutil not available
             pass
         except Exception as e:
-            enterprise_logger.error(
-                f"System metrics collection failed: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"System metrics collection failed: {e}", category=LogCategory.SYSTEM, error=e)
+
 
 # Global metrics collector instance
 metrics_collector = MetricsCollector()
+
 
 # Convenience functions
 def increment_counter(metric_name: str, value: float = 1, **labels):
     """Increment counter metric."""
     metrics_collector.increment_counter(metric_name, value, labels)
 
+
 def set_gauge(metric_name: str, value: float, **labels):
     """Set gauge metric."""
     metrics_collector.set_gauge(metric_name, value, labels)
 
+
 def observe_histogram(metric_name: str, value: float, **labels):
     """Observe histogram metric."""
     metrics_collector.observe_histogram(metric_name, value, labels)
+
 
 # Start monitoring on import
 metrics_collector.start_monitoring()

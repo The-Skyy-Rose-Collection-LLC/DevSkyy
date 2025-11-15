@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
+
 class RAGConfig:
     """RAG system configuration"""
 
@@ -66,6 +67,7 @@ class RAGConfig:
 # =============================================================================
 # DOCUMENT PROCESSORS
 # =============================================================================
+
 
 class DocumentProcessor:
     """Process and chunk documents for RAG ingestion"""
@@ -109,17 +111,19 @@ class DocumentProcessor:
                 page_chunks = self.text_splitter.split_text(text)
 
                 for chunk_idx, chunk in enumerate(page_chunks):
-                    chunks.append({
-                        "content": chunk,
-                        "metadata": {
-                            "source": file_path,
-                            "page": page_num,
-                            "chunk_index": chunk_idx,
-                            "total_pages": len(reader.pages),
-                            "file_type": "pdf",
-                            "tokens": len(self.tokenizer.encode(chunk)),
-                        },
-                    })
+                    chunks.append(
+                        {
+                            "content": chunk,
+                            "metadata": {
+                                "source": file_path,
+                                "page": page_num,
+                                "chunk_index": chunk_idx,
+                                "total_pages": len(reader.pages),
+                                "file_type": "pdf",
+                                "tokens": len(self.tokenizer.encode(chunk)),
+                            },
+                        }
+                    )
 
             logger.info(f"Processed PDF: {file_path} -> {len(chunks)} chunks")
             return chunks
@@ -167,6 +171,7 @@ class DocumentProcessor:
 # =============================================================================
 # VECTOR DATABASE
 # =============================================================================
+
 
 class VectorDatabase:
     """ChromaDB vector database manager"""
@@ -224,7 +229,7 @@ class VectorDatabase:
             skipped = 0
 
             for i in range(0, total_docs, batch_size):
-                batch = documents[i:i + batch_size]
+                batch = documents[i : i + batch_size]
 
                 # Extract content and metadata
                 contents = [doc["content"] for doc in batch]
@@ -294,13 +299,15 @@ class VectorDatabase:
 
             if results["documents"] and results["documents"][0]:
                 for idx in range(len(results["documents"][0])):
-                    formatted_results.append({
-                        "content": results["documents"][0][idx],
-                        "metadata": results["metadatas"][0][idx] if results["metadatas"] else {},
-                        "distance": results["distances"][0][idx] if results["distances"] else 0.0,
-                        "similarity": 1 - (results["distances"][0][idx] if results["distances"] else 0.0),
-                        "id": results["ids"][0][idx] if results["ids"] else "",
-                    })
+                    formatted_results.append(
+                        {
+                            "content": results["documents"][0][idx],
+                            "metadata": results["metadatas"][0][idx] if results["metadatas"] else {},
+                            "distance": results["distances"][0][idx] if results["distances"] else 0.0,
+                            "similarity": 1 - (results["distances"][0][idx] if results["distances"] else 0.0),
+                            "id": results["ids"][0][idx] if results["ids"] else "",
+                        }
+                    )
 
             logger.info(f"Search query: '{query}' -> {len(formatted_results)} results")
             return formatted_results
@@ -331,6 +338,7 @@ class VectorDatabase:
 # =============================================================================
 # RAG SERVICE
 # =============================================================================
+
 
 class RAGService:
     """Main RAG service orchestrating document processing, retrieval, and generation"""
@@ -458,10 +466,7 @@ class RAGService:
             results = self.vector_db.search(query, top_k=top_k, filters=filters)
 
             # Filter by similarity threshold
-            filtered_results = [
-                r for r in results
-                if r["similarity"] >= min_similarity
-            ]
+            filtered_results = [r for r in results if r["similarity"] >= min_similarity]
 
             return filtered_results
 
@@ -500,10 +505,9 @@ class RAGService:
                 }
 
             # 2. Build context string
-            context_str = "\n\n".join([
-                f"[Source {idx + 1}] {result['content']}"
-                for idx, result in enumerate(context_results)
-            ])
+            context_str = "\n\n".join(
+                [f"[Source {idx + 1}] {result['content']}" for idx, result in enumerate(context_results)]
+            )
 
             # 3. Build system prompt
             if not system_prompt:
@@ -589,6 +593,7 @@ def get_rag_service() -> RAGService:
 # =============================================================================
 
 if __name__ == "__main__":
+
     async def main():
         """Example usage"""
         rag = get_rag_service()
