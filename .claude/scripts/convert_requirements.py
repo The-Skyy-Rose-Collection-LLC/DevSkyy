@@ -35,7 +35,6 @@ def convert_requirement(line: str) -> str:
     # Security-critical packages: use range constraints
     if base_package in SECURITY_PACKAGES:
         # e.g., cryptography==46.0.3 → cryptography>=46.0.3,<47.0.0
-        major_minor = '.'.join(version.split('.')[:2])  # Get X.Y from X.Y.Z
         major = version.split('.')[0]
         next_major = str(int(major) + 1)
         return line.replace(f'=={version}', f'>={version},<{next_major}.0.0')
