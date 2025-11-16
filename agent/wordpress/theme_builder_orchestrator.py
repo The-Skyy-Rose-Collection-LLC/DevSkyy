@@ -27,7 +27,7 @@ except ImportError:
 
     wordpress_credentials_manager = None
     get_skyy_rose_credentials = None
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from core.logging import enterprise_logger, LogCategory
 
 
 class ThemeType(Enum):

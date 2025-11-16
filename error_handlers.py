@@ -10,7 +10,7 @@ from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from logger_config import get_logger
+from core.logging import get_logger
 
 logger = get_logger(__name__)
 

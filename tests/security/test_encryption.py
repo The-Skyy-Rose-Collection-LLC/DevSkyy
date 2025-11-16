@@ -14,7 +14,7 @@ import pytest
 
 # Import encryption module
 try:
-    from security.encryption_v2 import decrypt_data, encrypt_data, EncryptionService, generate_encryption_key
+    from security.encryption import decrypt_data, encrypt_data, EncryptionService, generate_encryption_key
 
     ENCRYPTION_AVAILABLE = True
 except ImportError:
@@ -353,7 +353,7 @@ class TestTruthProtocolCompliance:
             pytest.skip("Encryption not available")
 
         # Read the encryption module source
-        import security.encryption_v2 as enc_module
+        import security.encryption as enc_module
 
         source = enc_module.__file__
 
@@ -393,7 +393,7 @@ class TestTruthProtocolCompliance:
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--cov=security.encryption_v2", "--cov-report=term"])
+    pytest.main([__file__, "-v", "--cov=security.encryption", "--cov-report=term"])
 
 
 # ============================================================================
@@ -508,7 +508,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, encrypt_dict
+        from security.encryption import decrypt_dict, encrypt_dict
 
         fields_to_encrypt = ["user_id", "email"]
         encrypted = encrypt_dict(sample_data, fields_to_encrypt)
@@ -529,7 +529,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
         nested_data = {"public": "visible", "secret": "hidden", "nested": {"inner": "value"}}
 
@@ -542,7 +542,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
         encrypted = encrypt_dict(sample_data, ["nonexistent_field"])
         # Should not raise error, just skip the field
@@ -553,7 +553,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
         encrypted = encrypt_dict(sample_data, [])
         # Nothing should be encrypted
@@ -564,7 +564,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, encrypt_dict
+        from security.encryption import decrypt_dict, encrypt_dict
 
         # Encrypt multiple fields
         encrypted = encrypt_dict(sample_data, ["user_id", "email"])
@@ -584,7 +584,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         key1, salt1 = derive_key("password123")
         key2, salt2 = derive_key("password123")
@@ -600,7 +600,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         salt = os.urandom(16)
         key1, _ = derive_key("password123", salt)
@@ -613,7 +613,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         salt = os.urandom(16)
         key1, _ = derive_key("password1", salt)
@@ -626,7 +626,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         weak_passwords = ["123", "a", "password"]
 
@@ -644,7 +644,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import rotate_keys, settings
+        from security.encryption import rotate_keys, settings
 
         old_key = settings.MASTER_KEY
         new_key_b64 = rotate_keys()
@@ -658,7 +658,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import rotate_keys, settings
+        from security.encryption import rotate_keys, settings
 
         initial_legacy_count = len(settings.LEGACY_KEYS)
 
@@ -672,7 +672,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         original = "data before rotation"
         encrypted = encryption_service.encrypt(original, test_key)
@@ -697,7 +697,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_pii
+        from security.encryption import mask_pii
 
         masked = mask_pii("sensitive_data", show_chars=3)
         assert masked.startswith("sen")
@@ -709,7 +709,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_pii
+        from security.encryption import mask_pii
 
         masked = mask_pii("ab", show_chars=5)
         assert masked == "**"
@@ -719,7 +719,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_email
+        from security.encryption import mask_email
 
         masked = mask_email("user@example.com")
         assert "@" in masked
@@ -731,7 +731,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_phone
+        from security.encryption import mask_phone
 
         masked = mask_phone("555-123-4567")
         assert masked.endswith("4567")
@@ -742,7 +742,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_phone
+        from security.encryption import mask_phone
 
         masked = mask_phone("123")
         assert "*" in masked or len(masked) <= 4
@@ -756,7 +756,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, encrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, encrypt_field, generate_encryption_key
 
         key = generate_encryption_key()
         key_bytes = base64.b64decode(key)
@@ -773,7 +773,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, encrypt_field
+        from security.encryption import decrypt_field, encrypt_field
 
         plaintext = "default key test"
         encrypted = encrypt_field(plaintext)
@@ -786,7 +786,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_field, settings
+        from security.encryption import encrypt_field, settings
 
         # Temporarily remove master key
         old_key = settings.MASTER_KEY
@@ -803,7 +803,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, generate_encryption_key
 
         key_bytes = base64.b64decode(generate_encryption_key())
 
@@ -816,7 +816,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, generate_encryption_key
 
         key_bytes = base64.b64decode(generate_encryption_key())
 
@@ -832,7 +832,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         assert settings.MASTER_KEY is not None
         assert len(settings.MASTER_KEY) == 32
@@ -845,7 +845,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         # NIST SP 800-38D recommendations
         assert settings.GCM_NONCE_LENGTH == 12  # 96 bits (recommended)
@@ -857,7 +857,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import generate_master_key
+        from security.encryption import generate_master_key
 
         key = generate_master_key()
 
@@ -872,7 +872,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import generate_master_key
+        from security.encryption import generate_master_key
 
         keys = [generate_master_key() for _ in range(10)]
 
@@ -992,7 +992,7 @@ class TestEncryptionDocumentation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        import security.encryption_v2 as enc_module
+        import security.encryption as enc_module
 
         assert enc_module.__doc__ is not None
         assert "AES-256-GCM" in enc_module.__doc__
@@ -1003,7 +1003,7 @@ class TestEncryptionDocumentation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, decrypt_field, derive_key, encrypt_dict, encrypt_field
+        from security.encryption import decrypt_dict, decrypt_field, derive_key, encrypt_dict, encrypt_field
 
         assert encrypt_field.__doc__ is not None
         assert decrypt_field.__doc__ is not None
@@ -1014,4 +1014,4 @@ class TestEncryptionDocumentation:
 
 # Run all tests
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--cov=security.encryption_v2", "--cov-report=term", "--cov-report=html"])
+    pytest.main([__file__, "-v", "--cov=security.encryption", "--cov-report=term", "--cov-report=html"])

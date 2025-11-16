@@ -20,7 +20,7 @@ from typing import Any, Optional
 import paramiko
 import requests
 
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from core.logging import enterprise_logger, LogCategory
 
 
 class UploadMethod(Enum):
