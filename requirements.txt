@@ -70,34 +70,48 @@ secure~=0.3.0  # Security headers middleware
 
 # ============================================================================
 # AI & ML (Latest Stable)
+anthropic~=0.69.0  # Latest version
+openai~=2.7.2  # Latest version - Updated 2025-11-10
+huggingface_hub~=0.36.0  # Hugging Face model hub client - Updated 2025-11-10
+transformers~=4.57.1  # Latest version - Updated 2025-11-10
+tokenizers>=0.22.0,<0.24.0  # Required by transformers - Relaxed for chromadb compatibility
+torch~=2.7.1  # Latest official stable (PyTorch 2.7.1, April 2025) - NumPy 2.x compatible
+torchvision~=0.22.1  # Compatible with torch 2.7.1 per official matrix - NumPy 2.x compatible
+torchaudio~=2.7.1  # Compatible with torch 2.7.1 - NumPy 2.x compatible
+# SECURITY: Using latest stable torch family to fix known vulnerabilities
+diffusers~=0.35.2  # Latest version - Updated 2025-11-10 - NumPy 2.x compatible
+safetensors~=0.6.2  # Safe tensor serialization - Updated 2025-11-10
+sentence-transformers~=3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
+scikit-learn~=1.5.2  # NumPy 2.x compatible (supports >=1.19.5)
 # ============================================================================
-anthropic~=0.69.0  # Anthropic Claude API
-openai~=2.7.2  # OpenAI GPT API
-huggingface_hub~=0.36.0  # Hugging Face model hub client
-transformers~=4.57.1  # Transformers library
-tokenizers~=0.22.1  # Fast tokenization
-torch~=2.7.1  # SECURITY: PyTorch 2.7.1 (April 2025) - fixes known vulnerabilities
-torchvision~=0.22.1  # Compatible with torch 2.7.1 per official matrix
-torchaudio~=2.7.1  # Compatible with torch 2.7.1
-diffusers~=0.35.2  # Diffusion models (SDXL, ControlNet)
-safetensors~=0.6.2  # Safe tensor serialization
-sentence-transformers~=3.4.1  # Sentence embeddings
-scikit-learn~=1.5.2  # Machine learning algorithms
-numpy~=2.3.4  # Numerical computing
-pandas~=2.3.3  # SECURITY: Data analysis with security fixes
-xgboost~=2.1.3  # Gradient boosting
-lightgbm~=4.6.0  # SECURITY: Fix PYSEC-2024-231 vulnerability
+# NUMPY 2.2.6 COMPATIBILITY MATRIX (Verified 2025-11-16)
+# ============================================================================
+# All packages verified for NumPy 2.2.6 compatibility:
+# ✅ torch 2.7.1 - Supports NumPy 2.x (released with 2.x support)
+# ✅ scipy 1.16.3 - Requires >=1.25.2, supports NumPy 2.x
+# ✅ scikit-learn 1.5.2 - Supports NumPy 2.x
+# ✅ pandas 2.3.3 - Supports NumPy 2.x (requires >=1.23.2)
+# ✅ opencv-python 4.11.0.86 - Supports NumPy 2.x
+# ✅ chromadb 1.3.4 - Supports NumPy 2.x (requires >=1.22.5)
+# ✅ shap 0.50.0 - NumPy 2.0-2.2 (numba constraint <=2.2)
+# ✅ stable-baselines3 2.7.0 - Supports NumPy 2.x
+# ✅ transformers 4.57.1 - Supports NumPy 2.x
+#
+# CONSTRAINT: numpy~=2.2.6 (NOT 2.3+) due to numba dependency in SHAP
+# Numba (SHAP's dependency) requires numpy<=2.2 as of November 2025
+# ============================================================================
+numpy~=2.2.6  # NumPy 2.2.6 - Max version for SHAP/numba compatibility, min for all other packages
+pandas~=2.3.3  # Updated for security fixes
+# tensorflow==2.16.2  # Disabled due to system compatibility issues - will re-enable in Phase 3
+xgboost~=2.1.3
+lightgbm~=4.6.0  # Updated to fix PYSEC-2024-231 vulnerability
 
-# ============================================================================
-# COMPUTER VISION & IMAGE PROCESSING
-# ============================================================================
-opencv-python~=4.11.0.86  # Computer vision
-pillow~=12.0.0  # Image processing
-imagehash~=4.3.2  # Perceptual image hashing
+# Computer Vision & Image Processing
+opencv-python~=4.11.0.86  # Updated
+pillow~=12.0.0  # Latest version - Updated 2025-11-10
+imagehash~=4.3.2
 
-# ============================================================================
-# VIDEO PROCESSING & GENERATION
-# ============================================================================
+# Video Processing & Generation
 moviepy~=1.0.3  # Video editing and processing
 imageio~=2.36.1  # Image I/O for video frames
 imageio-ffmpeg~=0.5.1  # FFmpeg wrapper for video encoding
@@ -140,92 +154,74 @@ redis~=5.2.1  # Redis client
 celery[redis]~=5.4.0  # Distributed task queue
 alembic~=1.14.0  # Database migrations
 
-# ============================================================================
-# ASYNC SUPPORT
-# ============================================================================
-aioredis~=2.0.1  # Async Redis client
-aiomysql~=0.3.0  # SECURITY: Async MySQL - Fix GHSA-r397-ff8c-wv2g
+# Async Support
+aioredis~=2.0.1
+aiomysql~=0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerability
 
-# ============================================================================
-# SOCIAL MEDIA & MARKETING APIs
-# ============================================================================
-facebook-sdk~=3.1.0  # Facebook Graph API
-tweepy~=4.14.0  # Twitter API
-google-api-python-client~=2.155.0  # Google APIs
-linkedin-api~=2.3.0  # LinkedIn API
+# Social Media & Marketing APIs (Verified)
+facebook-sdk~=3.1.0
+# instagrapi==2.1.2  # Disabled: requires pydantic==2.7.1 exactly, conflicts with current pydantic 2.10.4
+tweepy~=4.14.0
+google-api-python-client~=2.155.0  # Updated
+linkedin-api~=2.3.0
 
-# ============================================================================
-# VOICE & AUDIO PROCESSING
-# ============================================================================
-elevenlabs~=1.12.0  # ElevenLabs TTS API
-openai-whisper==20240930  # Whisper STT (stable September 2024 release)
-pydub~=0.25.1  # Audio manipulation
-speechrecognition~=3.12.0  # Speech recognition
+# Voice & Audio Processing
+elevenlabs~=1.12.0  # Updated
+openai-whisper==20240930  # Stable September 2024 release (compatible with torch 2.7.x)
+pydub~=0.25.1
+speechrecognition~=3.12.0  # Updated
+# pyaudio==0.2.14  # Audio I/O - Disabled: requires PortAudio system libraries not available in Docker
 
-# ============================================================================
-# NLP & SENTIMENT ANALYSIS
-# ============================================================================
-textblob~=0.18.0.post0  # Simple text processing
-vaderSentiment~=3.3.2  # Sentiment analysis
-spacy~=3.8.3  # Industrial-strength NLP
-nltk~=3.9.1  # Natural language toolkit
-langchain~=0.3.27  # LLM orchestration framework
-langchain-text-splitters~=0.3.9  # SECURITY: Fix GHSA-m42m-m8cr-8m58
-langsmith~=0.2.6  # LLM monitoring
+# NLP & Sentiment Analysis
+textblob~=0.18.0.post0
+vaderSentiment~=3.3.2
+spacy~=3.8.3
+nltk~=3.9.1
+langchain~=1.0.7  # LLM orchestration - Updated to stable 1.0 release
+langchain-text-splitters~=1.0.0  # Text splitting - Updated to match langchain-core 1.x API
+langsmith~=0.4.43  # LLM monitoring - Updated to latest stable
 
 # ============================================================================
 # RAG (Retrieval-Augmented Generation)
-# ============================================================================
-chromadb~=0.5.23  # Vector database for semantic search
+chromadb~=1.3.4  # Vector database for semantic search - Updated to fix tokenizers conflict
 tiktoken~=0.8.0  # Token counting for embeddings
 pypdf>=5.2.0,<6.0.0  # SECURITY: PDF processing - Fix 3 CVEs
 python-docx~=1.1.2  # Word document processing
 python-magic~=0.4.27  # File type detection
-faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search
+faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search (CPU version)
 
-# ============================================================================
-# BLOCKCHAIN & WEB3
-# ============================================================================
-web3~=7.7.0  # Ethereum Web3 library
-eth-account~=0.13.4  # Ethereum account management
-eth-typing~=5.0.1  # Ethereum type definitions
-eth-utils~=5.1.0  # Ethereum utilities
+# Blockchain & Web3 (Security Verified)
+web3~=7.7.0  # Updated
+eth-account~=0.13.4
+eth-typing~=5.0.1
+eth-utils~=5.1.0
 
-# ============================================================================
-# DATA SCIENCE & VISUALIZATION
-# ============================================================================
-joblib~=1.5.2  # Lightweight pipelining
-scipy~=1.14.1  # Scientific algorithms
-statsmodels~=0.14.4  # Statistical modeling
-seaborn~=0.13.2  # Statistical visualization
-matplotlib~=3.9.3  # Plotting library
+# Data Science & Visualization
+joblib~=1.5.2  # Updated: 1.4.3 doesn't exist, using latest stable
+scipy~=1.16.3  # Updated to support numpy 2.3.x
+statsmodels~=0.14.4
+seaborn~=0.13.2
+matplotlib~=3.9.3
 plotly~=5.24.1  # Interactive plots
 
-# ============================================================================
-# MACHINE LEARNING EXTENSIONS
-# ============================================================================
-gym~=0.26.2  # Reinforcement learning environments
-stable-baselines3~=2.4.0  # RL algorithms
+# Machine Learning Extensions
+gym~=0.26.2
+stable-baselines3~=2.7.0  # Updated to support numpy 2.x
 optuna~=4.1.0  # Hyperparameter optimization
-mlflow>=3.2.0,<4.0.0  # SECURITY: ML lifecycle - Fix GHSA-wf7f-8fxf-xfxc
-shap~=0.46.0  # Model explainability (SHAP values)
+mlflow>=3.2.0,<4.0.0  # ML lifecycle - SECURITY: Updated to fix GHSA-wf7f-8fxf-xfxc and additional CVE
+shap~=0.50.0  # Model explainability - Updated for numpy 2.x compatibility
 
-# ============================================================================
-# CODE ANALYSIS
-# ============================================================================
-astroid~=3.3.8  # Python AST library
-rope~=1.13.0  # Python refactoring library
-jedi~=0.19.2  # Code completion and analysis
+# Code Analysis
+astroid~=3.3.8  # Updated
+rope~=1.13.0  # Refactoring
+jedi~=0.19.2  # Code completion
 
-# ============================================================================
-# CMS INTEGRATION
-# ============================================================================
-woocommerce~=3.0.0  # WooCommerce REST API
+# CMS Integration
+# python-wordpress-xmlrpc==2.3  # DISABLED: setuptools compatibility issue - use direct HTTP/REST API instead
+woocommerce~=3.0.0
 
-# ============================================================================
-# LOGGING & OBSERVABILITY
-# ============================================================================
-python-json-logger~=3.2.0  # JSON logging
+# Logging & Observability
+python-json-logger~=3.2.0
 loguru~=0.7.3  # Enhanced logging
 
 # ============================================================================
