@@ -75,12 +75,12 @@ responses~=0.25.3  # Mock HTTP requests
 pytest-httpx~=0.32.0  # Mock httpx
 requests-mock~=1.12.1  # Mock requests library
 httpretty~=1.1.4  # HTTP client mock
-fastapi-testclient~=0.1.0  # FastAPI test client
+# fastapi-testclient - Built into starlette (included with fastapi)
 
 # ============================================================================
 # API TESTING FRAMEWORKS
 # ============================================================================
-tavern~=2.12.1  # API testing framework
+tavern~=2.17.0  # API testing framework (latest v2)
 schemathesis~=3.34.1  # API schema testing
 
 # ============================================================================
