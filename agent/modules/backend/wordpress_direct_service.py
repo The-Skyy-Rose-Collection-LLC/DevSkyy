@@ -6,6 +6,16 @@ from typing import Any
 import requests
 from requests.auth import HTTPBasicAuth
 
+# SECURITY: Protect against XML attacks (XXE, billion laughs, etc.)
+# Per SECURITY_VERIFICATION_REPORT.md - P0 CRITICAL fix
+try:
+    from defusedxml import xmlrpc as defused_xmlrpc
+    defused_xmlrpc.monkey_patch()
+    XMLRPC_SECURED = True
+except ImportError:
+    # Fallback if defusedxml not installed (will warn in method)
+    XMLRPC_SECURED = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -141,6 +151,13 @@ class WordPressDirectService:
     async def _try_xmlrpc_connection(self) -> dict[str, Any]:
         """Try XML-RPC connection (fallback method)."""
         try:
+            # SECURITY: Warn if defusedxml protection is not active
+            if not XMLRPC_SECURED:
+                logger.warning(
+                    "⚠️ XML-RPC security protection not active! "
+                    "Install defusedxml to protect against XXE attacks: pip install defusedxml"
+                )
+
             import xmlrpc.client
 
             # WordPress XML-RPC endpoint

@@ -50,6 +50,7 @@ cryptography>=46.0.3,<47.0.0  # Fix CVE-2024-26130 (NULL ptr crash), CVE-2023-50
 PyJWT~=2.10.1  # Updated for security
 bcrypt>=4.2.1,<5.0.0  # Latest
 argon2-cffi>=23.1.0,<24.0.0  # Additional password hashing
+defusedxml>=0.7.1,<1.0.0  # SECURITY: Protect against XML attacks (XXE, billion laughs) - P0 CRITICAL fix
 
 # Security Middleware & Tools
 slowapi~=0.1.9  # Rate limiting
