@@ -63,7 +63,7 @@ anthropic~=0.69.0  # Latest version
 openai~=2.7.2  # Latest version - Updated 2025-11-10
 huggingface_hub~=0.36.0  # Hugging Face model hub client - Updated 2025-11-10
 transformers~=4.57.1  # Latest version - Updated 2025-11-10
-tokenizers~=0.22.1  # Required by transformers - Updated 2025-11-10
+tokenizers>=0.22.0,<0.24.0  # Required by transformers - Relaxed for chromadb compatibility
 torch~=2.7.1  # Latest official stable (PyTorch 2.7.1, April 2025)
 torchvision~=0.22.1  # Compatible with torch 2.7.1 per official matrix
 torchaudio~=2.7.1  # Compatible with torch 2.7.1
@@ -155,12 +155,12 @@ textblob~=0.18.0.post0
 vaderSentiment~=3.3.2
 spacy~=3.8.3
 nltk~=3.9.1
-langchain~=0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27
-langchain-text-splitters~=0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability
-langsmith~=0.2.6  # LLM monitoring
+langchain~=1.0.7  # LLM orchestration - Updated to stable 1.0 release
+langchain-text-splitters~=0.3.11  # Text splitting - Updated for langchain 1.0 compatibility
+langsmith~=0.4.43  # LLM monitoring - Updated to latest stable
 
 # RAG (Retrieval-Augmented Generation)
-chromadb~=0.5.23  # Vector database for semantic search
+chromadb~=1.3.4  # Vector database for semantic search - Updated to fix tokenizers conflict
 tiktoken~=0.8.0  # Token counting for embeddings
 pypdf>=5.2.0,<6.0.0  # PDF document processing - SECURITY: Updated to fix 3 CVEs
 python-docx~=1.1.2  # Word document processing
@@ -175,7 +175,7 @@ eth-utils~=5.1.0
 
 # Data Science & Visualization
 joblib~=1.5.2  # Updated: 1.4.3 doesn't exist, using latest stable
-scipy~=1.14.1
+scipy~=1.16.3  # Updated to support numpy 2.3.x
 statsmodels~=0.14.4
 seaborn~=0.13.2
 matplotlib~=3.9.3
@@ -183,7 +183,7 @@ plotly~=5.24.1  # Interactive plots
 
 # Machine Learning Extensions
 gym~=0.26.2
-stable-baselines3~=2.4.0
+stable-baselines3~=2.7.0  # Updated to support numpy 2.x
 optuna~=4.1.0  # Hyperparameter optimization
 mlflow>=3.2.0,<4.0.0  # ML lifecycle - SECURITY: Updated to fix GHSA-wf7f-8fxf-xfxc and additional CVE
 shap~=0.46.0  # Model explainability - SHAP values for interpretability
