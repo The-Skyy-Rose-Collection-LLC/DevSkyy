@@ -37,8 +37,9 @@ WORKDIR /tmp
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
+# Install Python dependencies with secure pip version
+# SECURITY: pip>=25.3 fixes GHSA-4xh5-x5gv-qwph (path traversal vulnerability)
+RUN pip install --upgrade "pip>=25.3" setuptools && \
     pip install --no-cache-dir -r requirements.txt
 
 # Stage 3: Production Application

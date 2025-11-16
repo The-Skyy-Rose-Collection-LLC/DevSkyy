@@ -22,8 +22,10 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies with secure versions
+# SECURITY: pip>=25.3 fixes GHSA-4xh5-x5gv-qwph, setuptools>=78.1.1 fixes CVE-2025-47273
+RUN pip install --no-cache-dir --upgrade "pip>=25.3" "setuptools>=78.1.1,<79.0.0" && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .

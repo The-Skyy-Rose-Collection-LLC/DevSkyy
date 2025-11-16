@@ -24,7 +24,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements-production.txt .
 
 # Install Python dependencies (excludes heavy ML libs to reduce size)
-RUN pip install --no-cache-dir --user -r requirements-production.txt
+# SECURITY: pip>=25.3 fixes GHSA-4xh5-x5gv-qwph (path traversal vulnerability)
+RUN pip install --no-cache-dir --user --upgrade "pip>=25.3" "setuptools>=78.1.1,<79.0.0" && \
+    pip install --no-cache-dir --user -r requirements-production.txt
 
 # ============================================================================
 # Stage 2: Production Runtime
