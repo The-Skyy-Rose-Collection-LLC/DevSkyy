@@ -7,6 +7,8 @@ import openai
 import requests  # noqa: F401 - Reserved for Phase 3 API automation
 from selenium import webdriver  # noqa: F401 - Reserved for Phase 3 web automation
 
+from config.unified_config import get_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,12 +16,20 @@ class OpenAIIntelligenceService:
     """OpenAI integration service for enhanced agent intelligence and decision making."""
 
     def __init__(self):
-        self.api_key = os.getenv("OPENAI_API_KEY")
+        config = get_config()
+        self.api_key = config.ai.openai_api_key or os.getenv("OPENAI_API_KEY")
+        self.is_consequential = config.ai.openai_is_consequential
 
         if self.api_key:
             openai.api_key = self.api_key
-            self.client = openai.OpenAI(api_key=self.api_key)
-            logger.info("🧠 OpenAI Intelligence Service initialized for luxury agent enhancement")
+            # Set x-openai-isConsequential header for high-stakes operations
+            # Per OpenAI safety features: marks requests that could have significant real-world consequences
+            default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+            self.client = openai.OpenAI(api_key=self.api_key, default_headers=default_headers)
+            logger.info(
+                f"🧠 OpenAI Intelligence Service initialized for luxury agent enhancement "
+                f"(consequential={self.is_consequential})"
+            )
         else:
             self.client = None
             logger.warning("🧠 OpenAI Intelligence Service initialized without API key")
