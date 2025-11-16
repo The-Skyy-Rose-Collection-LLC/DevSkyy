@@ -623,4 +623,82 @@ class UserManager:
 # Global user manager instance
 user_manager = UserManager()
 
+
+# ============================================================================
+# JWT MANAGER (Unified Interface)
+# ============================================================================
+
+
+class JWTManager:
+    """
+    Unified JWT Management System
+
+    Provides centralized interface for JWT operations including:
+    - Token creation and validation
+    - User authentication
+    - Role-based access control
+    - Token blacklisting
+    - Account lockout management
+    """
+
+    def __init__(self):
+        """Initialize JWT Manager with user manager instance"""
+        self.user_manager = user_manager
+        self.secret_key = JWT_SECRET_KEY
+        self.algorithm = JWT_ALGORITHM
+        self.access_token_expire_minutes = ACCESS_TOKEN_EXPIRE_MINUTES
+        self.refresh_token_expire_days = REFRESH_TOKEN_EXPIRE_DAYS
+        logger.info("✅ JWTManager initialized")
+
+    def create_access_token(self, user: User) -> str:
+        """Create access token for user"""
+        data = {
+            "sub": user.user_id,
+            "email": user.email,
+            "role": user.role,
+            "type": "access"
+        }
+        return create_access_token(data)
+
+    def create_refresh_token(self, user: User) -> str:
+        """Create refresh token for user"""
+        data = {
+            "sub": user.user_id,
+            "email": user.email,
+            "type": "refresh"
+        }
+        return create_refresh_token(data)
+
+    def create_user_tokens(self, user: User) -> TokenResponse:
+        """Create both access and refresh tokens for user"""
+        return create_user_tokens(user)
+
+    def verify_token(self, token: str, token_type: str = "access") -> TokenData:
+        """Verify and decode token"""
+        return verify_token(token, token_type)
+
+    def authenticate_user(self, username_or_email: str, password: str) -> Optional[User]:
+        """Authenticate user with credentials"""
+        return self.user_manager.authenticate_user(username_or_email, password)
+
+    def blacklist_token(self, token: str):
+        """Add token to blacklist"""
+        blacklist_token(token)
+
+    def is_token_blacklisted(self, token: str) -> bool:
+        """Check if token is blacklisted"""
+        return is_token_blacklisted(token)
+
+    def check_role_permission(self, user_role: str, required_role: str) -> bool:
+        """Check if user role has required permissions"""
+        role_hierarchy = {
+            UserRole.SUPER_ADMIN: 5,
+            UserRole.ADMIN: 4,
+            UserRole.DEVELOPER: 3,
+            UserRole.API_USER: 2,
+            UserRole.READ_ONLY: 1,
+        }
+        return role_hierarchy.get(user_role, 0) >= role_hierarchy.get(required_role, 0)
+
+
 logger.info("🔐 Enterprise JWT Authentication System initialized")
