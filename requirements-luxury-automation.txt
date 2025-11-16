@@ -25,9 +25,9 @@ bcrypt==4.2.1  # bcrypt for passwords (updated to match main)
 # AI & ML Libraries (Exact versions required)
 # ============================================================================
 # PyTorch & CUDA (updated to match main requirements.txt)
-torch==2.9.1  # PyTorch framework - SECURITY: Latest stable (Nov 2025)
-torchvision==0.20.1  # Vision utilities - Compatible with torch 2.9.1
-torchaudio==2.9.1  # Audio utilities - Compatible with torch 2.9.1
+torch==2.7.1  # PyTorch framework - SECURITY: Latest official stable (April 2025)
+torchvision==0.22.1  # Vision utilities - Compatible with torch 2.7.1 per official matrix
+torchaudio==2.7.1  # Audio utilities - Compatible with torch 2.7.1
 
 # HuggingFace Ecosystem (updated to match main requirements.txt)
 transformers==4.57.1  # Transformers library (updated)
