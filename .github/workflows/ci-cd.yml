@@ -427,9 +427,9 @@ jobs:
         if: always()
         uses: codecov/codecov-action@v4
         with:
-          file: ./coverage.xml
-          flags: unittests
-          name: codecov-devskyy
+          files: ./coverage-${{ matrix.test-suite }}.xml
+          flags: ${{ matrix.test-suite }}
+          name: codecov-devskyy-${{ matrix.test-suite }}
           fail_ci_if_error: false
 
       - name: Upload test reports
