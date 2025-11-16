@@ -445,7 +445,18 @@ class AutomatedThemeUploader:
                 pass  # Directory might already exist
 
     async def _deploy_via_sftp(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
-        """Deploy theme via SFTP."""
+        """
+        Deploys a theme package to a remote WordPress site over SFTP.
+        
+        Attempts to verify SSH host keys by loading the user's known_hosts file when available and will log unknown hosts; connects using either an SSH private key or a password, extracts the package, and uploads its files into /wp-content/themes/{package.name} on the remote host.
+        
+        Parameters:
+            package (ThemePackage): The theme package to upload; its package_path must point to a valid ZIP archive and package.name determines the remote theme directory.
+            credentials (WordPressCredentials): Must include SFTP connection info: `sftp_host` and `sftp_username`, and either `sftp_private_key` (path to a private key file) or `ftp_password` (used as the SFTP password).
+        
+        Returns:
+            bool: `True` if the theme was uploaded successfully, `False` otherwise.
+        """
         try:
             if not credentials.sftp_host:
                 raise ValueError("SFTP credentials not provided")

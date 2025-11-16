@@ -37,11 +37,11 @@ class ExactMatchCache:
 
     def __init__(self, redis_client: redis.Redis, ttl_minutes: int = 60):
         """
-        Initialize exact-match cache.
-
-        Args:
-            redis_client: Configured Redis connection
-            ttl_minutes: Time-to-live for cached entries (default: 60)
+        Create an ExactMatchCache bound to a Redis client and configure TTL and metrics counters.
+        
+        Parameters:
+            redis_client (redis.Redis): Redis connection used to store cache entries.
+            ttl_minutes (int): Default time-to-live for cached entries in minutes (default: 60).
         """
         self.redis = redis_client
         self.ttl_seconds = ttl_minutes * 60
@@ -50,7 +50,12 @@ class ExactMatchCache:
         self.namespace = "mcp:exact"
 
     def _generate_key(self, tool: str, params: Dict[str, Any]) -> str:
-        """Generate deterministic cache key from tool + parameters."""
+        """
+        Produce a deterministic cache key that combines the server namespace, tool name, and a stable fingerprint of the provided parameters.
+        
+        Returns:
+            str: Cache key in the form "<namespace>:<tool>:<fingerprint>" where the fingerprint is a stable, short representation of `params`.
+        """
         # Sort parameters for consistent hashing across calls
         normalized = json.dumps(params, sort_keys=True, default=str)
         hash_digest = hashlib.sha256(normalized.encode()).hexdigest()[:12]
@@ -58,9 +63,12 @@ class ExactMatchCache:
 
     async def get(self, tool: str, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Retrieve cached response if exists.
-
-        Returns: Cached response dict or None if cache miss
+        Return a cached response for an exact-match tool query if present.
+        
+        If a stored entry exists for the deterministic key derived from `tool` and `params`, increments internal hit counter and returns the entry's `response`; otherwise increments miss counter and returns `None`.
+        
+        Returns:
+            dict: The cached response object if found, `None` otherwise.
         """
         key = self._generate_key(tool, params)
 
@@ -83,14 +91,14 @@ class ExactMatchCache:
     async def set(self, tool: str, params: Dict[str, Any], response: Dict[str, Any],
                   tokens_consumed: int = 500) -> None:
         """
-        Cache response with metadata.
-
-        Args:
-            tool: Tool name
-            params: Tool parameters (used for cache key)
-            response: Response data to cache
-            tokens_consumed: Tokens in original response (for metrics)
-        """
+                  Store a response in the exact-match cache along with metadata used for metrics and TTL.
+                  
+                  Parameters:
+                      tool (str): Name of the tool the response came from (used in the cache key).
+                      params (Dict[str, Any]): Parameters used to generate the deterministic cache key.
+                      response (Dict[str, Any]): Payload to store in cache.
+                      tokens_consumed (int): Number of tokens the original response consumed; used to estimate tokens saved for metrics.
+                  """
         key = self._generate_key(tool, params)
 
         entry = {
@@ -108,7 +116,17 @@ class ExactMatchCache:
             print(f"⚠ Cache set error: {e}")
 
     def metrics(self) -> Dict[str, Any]:
-        """Return cache performance metrics."""
+        """
+        Return performance metrics for the exact-match cache.
+        
+        Returns:
+            metrics (dict): Dictionary containing:
+                'hit_ratio_percent' (float): Hit rate as a percentage rounded to two decimals.
+                'total_hits' (int): Number of cache hits.
+                'total_misses' (int): Number of cache misses.
+                'estimated_tokens_saved' (int): Estimated tokens saved (hits * 500).
+                'estimated_cost_saved_dollars' (float): Estimated cost saved in USD based on $0.15 per 1k tokens.
+        """
         total = self.hits + self.misses
         hit_ratio = (self.hits / total * 100) if total > 0 else 0
 
@@ -121,7 +139,11 @@ class ExactMatchCache:
         }
 
     def flush(self) -> None:
-        """Clear all exact cache entries."""
+        """
+        Remove every Redis key in the exact-match cache namespace.
+        
+        This deletes all keys matching the cache namespace pattern and prints the number of entries removed.
+        """
         pattern = f"{self.namespace}:*"
         keys = self.redis.keys(pattern)
         if keys:
@@ -145,13 +167,13 @@ class SemanticCache:
                  similarity_threshold: float = 0.92,
                  model_name: str = 'all-MiniLM-L6-v2'):
         """
-        Initialize semantic cache.
-
-        Args:
-            redis_client: Configured Redis connection
-            similarity_threshold: Cosine similarity threshold (0.92 = high confidence)
-            model_name: Sentence transformer model
-        """
+                 Initialize the semantic similarity cache with Redis storage and a sentence-transformer embedding model.
+                 
+                 Parameters:
+                     redis_client: Redis client used to persist semantic cache entries.
+                     similarity_threshold: Cosine similarity cutoff used to consider a stored embedding a match (range roughly -1.0 to 1.0; higher values require closer semantic similarity).
+                     model_name: Pretrained SentenceTransformer model identifier used to generate embeddings.
+                 """
         self.redis = redis_client
         self.model = SentenceTransformer(model_name)
         self.threshold = similarity_threshold
@@ -160,11 +182,26 @@ class SemanticCache:
         self.misses = 0
 
     def _embed(self, text: str) -> np.ndarray:
-        """Generate embedding for text (384 dimensions for MiniLM)."""
+        """
+        Compute a vector embedding for the provided text.
+        
+        Parameters:
+            text (str): Input text to encode into an embedding vector.
+        
+        Returns:
+            np.ndarray: 1D numpy array representing the embedding vector for the input text.
+        """
         return self.model.encode(text, convert_to_numpy=True)
 
     def _cosine_similarity(self, a: np.ndarray, b: np.ndarray) -> float:
-        """Calculate cosine similarity between embeddings."""
+        """
+        Compute the cosine similarity between two vectors.
+        
+        If either vector has zero magnitude, returns 0.0.
+        
+        Returns:
+            float: Cosine similarity in the range [-1.0, 1.0]; `0.0` if either vector has zero norm.
+        """
         norm_a = np.linalg.norm(a)
         norm_b = np.linalg.norm(b)
 
@@ -175,13 +212,16 @@ class SemanticCache:
 
     async def get_similar(self, query: str, tool: str) -> Optional[Dict[str, Any]]:
         """
-        Find cached response from semantically similar query.
-
-        Args:
-            query: Input query text
-            tool: Tool name to scope search
-
-        Returns: Cached response if match found, None otherwise
+        Retrieve a cached response whose stored embedding is semantically similar to the given query within the specified tool namespace.
+        
+        Searches the semantic cache for the best-matching stored embedding and returns its associated response only if the match exceeds the configured similarity threshold.
+        
+        Parameters:
+            query (str): The input text to match against cached embeddings.
+            tool (str): Tool namespace used to scope the semantic search.
+        
+        Returns:
+            dict: Cached response if a similar entry is found, `None` otherwise.
         """
         try:
             query_embedding = self._embed(query)
@@ -219,14 +259,14 @@ class SemanticCache:
     async def set(self, query: str, tool: str, response: Dict[str, Any],
                   ttl_seconds: int = 3600) -> None:
         """
-        Cache response with embedding.
-
-        Args:
-            query: Original query text
-            tool: Tool name
-            response: Response to cache
-            ttl_seconds: Cache TTL (default: 1 hour)
-        """
+                  Store a response in the semantic cache keyed by an embedding of the provided query.
+                  
+                  Args:
+                      query: Original user query text to embed and index.
+                      tool: Tool identifier namespace for the cached entry.
+                      response: The response payload to store alongside the embedding.
+                      ttl_seconds: Time-to-live for the cache entry in seconds (default: 3600).
+                  """
         try:
             embedding = self._embed(query).tolist()
             query_hash = hashlib.sha256(query.encode()).hexdigest()[:8]
@@ -246,7 +286,16 @@ class SemanticCache:
             print(f"⚠ Semantic cache set error: {e}")
 
     def metrics(self) -> Dict[str, Any]:
-        """Return semantic cache metrics."""
+        """
+        Provide aggregated performance metrics for the semantic similarity cache.
+        
+        Returns:
+            metrics (Dict[str, Any]): A dictionary containing:
+                - `hit_ratio_percent` (float): Cache hit rate as a percentage rounded to two decimals.
+                - `total_hits` (int): Number of semantic cache hits.
+                - `total_misses` (int): Number of semantic cache misses.
+                - `estimated_tokens_saved` (int): Estimated tokens saved by cache hits (hits * 300).
+        """
         total = self.hits + self.misses
         hit_ratio = (self.hits / total * 100) if total > 0 else 0
 
@@ -283,6 +332,12 @@ class BatchRequest:
     status: str = "queued"
 
     def to_dict(self) -> Dict:
+        """
+        Convert the BatchRequest dataclass to a dictionary.
+        
+        Returns:
+            A dictionary containing all dataclass fields and their values, suitable for serialization.
+        """
         return asdict(self)
 
 
@@ -296,11 +351,10 @@ class BatchProcessor:
 
     def __init__(self, redis_client: redis.Redis, max_batch_size: int = 50):
         """
-        Initialize batch processor.
-
-        Args:
-            redis_client: Configured Redis connection
-            max_batch_size: Maximum requests per batch
+        Create a BatchProcessor that manages a Redis-backed queue of batched requests and stores results.
+        
+        Parameters:
+            max_batch_size (int): Maximum number of requests to collect and process in a single batch (default 50).
         """
         self.redis = redis_client
         self.max_batch_size = max_batch_size
@@ -311,13 +365,14 @@ class BatchProcessor:
 
     async def add_to_batch(self, tool: str, params: Dict[str, Any]) -> str:
         """
-        Queue a request for batch processing.
-
-        Args:
-            tool: Tool name
-            params: Tool parameters
-
-        Returns: Request ID for later retrieval
+        Enqueues a batch request for the given tool and parameters.
+        
+        Parameters:
+            tool (str): Name of the tool to execute in the batch.
+            params (Dict[str, Any]): Parameters for the tool invocation.
+        
+        Returns:
+            str: Request identifier for the queued batch request; empty string if the request failed to be enqueued.
         """
         request_id = str(uuid.uuid4())[:8]
         request = BatchRequest(
@@ -344,15 +399,18 @@ class BatchProcessor:
                            batch_size: int = 50,
                            timeout_seconds: int = 10) -> Dict[str, Dict[str, Any]]:
         """
-        Execute queued requests in parallel batches.
-
-        Args:
-            tool_handlers: Dict mapping tool_name → async handler function
-            batch_size: Number of requests per batch
-            timeout_seconds: Max wait time for batch completion
-
-        Returns: Dict mapping request_id → result
-        """
+                           Process queued batch requests by dispatching them concurrently to provided handlers.
+                           
+                           Dispatches up to `batch_size` requests at a time from the internal Redis queue, invokes the matching async handler for each request, and collects per-request results until the queue is empty or processing times out.
+                           
+                           Parameters:
+                               tool_handlers (Dict[str, Callable]): Mapping of tool name to an async handler accepting the request params and returning a result dict.
+                               batch_size (int): Maximum number of requests to process in a single batch.
+                               timeout_seconds (int): Maximum time in seconds to wait for all tasks in a batch to complete.
+                           
+                           Returns:
+                               Dict[str, Dict[str, Any]]: Mapping from request_id to a result dictionary containing at minimum `request_id` and `status`; on failure entries include an `error` field.
+                           """
         results = {}
         batch_num = 0
 
@@ -422,7 +480,26 @@ class BatchProcessor:
 
     async def _execute_request(self, request: BatchRequest,
                                handler: Callable) -> Dict[str, Any]:
-        """Execute single request handler."""
+        """
+                               Execute a single batched request using the provided handler and record its outcome.
+                               
+                               Parameters:
+                                   request (BatchRequest): The queued request to execute; its fields (status, result, completed_at, error) will be updated in-place.
+                                   handler (Callable): The async callable invoked with the contents of `request.params` (passed as keyword arguments).
+                               
+                               Returns:
+                                   dict: On success, a mapping with keys:
+                                       - `request_id`: the request's id
+                                       - `status`: `"completed"`
+                                       - `tool`: the tool name from the request
+                                       - `result`: the handler's returned value
+                                       - `latency_ms`: round-trip latency in milliseconds (float, two decimals)
+                                   On failure, a mapping with keys:
+                                       - `request_id`
+                                       - `status`: `"failed"`
+                                       - `tool`
+                                       - `error`: stringified exception message
+                               """
         try:
             request.status = "processing"
             result = await handler(**request.params)
@@ -456,7 +533,15 @@ class BatchProcessor:
             }
 
     def metrics(self) -> Dict[str, Any]:
-        """Return batch processing metrics."""
+        """
+        Provide batch processing statistics.
+        
+        Returns:
+            metrics (dict): Dictionary with keys:
+                - 'total_processed' (int): Number of successfully processed requests.
+                - 'total_failed' (int): Number of failed requests.
+                - 'success_rate_percent' (float): Percentage of successful requests (0–100).
+        """
         return {
             'total_processed': self.processed,
             'total_failed': self.failed,
@@ -485,7 +570,13 @@ class OptimizedMCPServer:
     """
 
     def __init__(self, redis_host: str = 'localhost', redis_port: int = 6379):
-        """Initialize optimized server with Redis backend."""
+        """
+        Create an OptimizedMCPServer configured to use a Redis backend and initialize its optimization components.
+        
+        Parameters:
+            redis_host (str): Hostname or IP of the Redis server (default: 'localhost').
+            redis_port (int): TCP port of the Redis server (default: 6379).
+        """
         self.redis = redis.Redis(
             host=redis_host,
             port=redis_port,
@@ -504,9 +595,16 @@ class OptimizedMCPServer:
 
     async def execute_tool(self, tool_name: str, params: Dict[str, Any]) -> str:
         """
-        Execute tool with full optimization stack.
-
-        Returns: JSON response (compact or full based on params)
+        Orchestrates optimized execution of a tool by checking exact-match and semantic caches, performing the tool action when needed, and caching the result.
+        
+        Parameters:
+            tool_name (str): The name of the tool to execute.
+            params (Dict[str, Any]): Execution parameters. May include:
+                - "search_query" (str): Query text used for semantic cache lookups.
+                - "fields" (Iterable[str]): If present, the returned response will be filtered to only these fields.
+        
+        Returns:
+            str: Compact JSON string of the tool response (cached or newly produced). If "fields" is provided in params, the JSON contains only those fields.
         """
 
         # Step 1: Exact-match cache
@@ -538,7 +636,20 @@ class OptimizedMCPServer:
         return json.dumps(compressed, separators=(',', ':'))
 
     async def _mock_tool_execution(self, tool_name: str, params: Dict) -> Dict:
-        """Mock tool execution for demonstration."""
+        """
+        Simulate a tool invocation and return a deterministic mock response payload.
+        
+        Parameters:
+            tool_name (str): Identifier of the tool being invoked.
+            params (Dict): Input parameters for the tool (ignored by this mock).
+        
+        Returns:
+            Dict: A payload with keys:
+                - 'tool' (str): the provided tool_name,
+                - 'status' (str): the execution status, set to 'success',
+                - 'data' (Dict): a small mock result payload,
+                - 'timestamp' (str): ISO 8601 UTC timestamp of the mock response.
+        """
         await asyncio.sleep(0.1)  # Simulate API latency
 
         return {
@@ -549,7 +660,18 @@ class OptimizedMCPServer:
         }
 
     def _compress_response(self, data: Dict[str, Any], params: Dict) -> Dict:
-        """Compress response using field filtering."""
+        """
+        Filter a response to only the fields requested in params.
+        
+        Parameters:
+            data (Dict[str, Any]): The full response dictionary to filter.
+            params (Dict): Request parameters; when it contains a 'fields' key with an iterable of field names,
+                only those fields present in `data` will be included in the returned mapping.
+        
+        Returns:
+            Dict[str, Any]: A new dictionary containing only the requested fields that exist in `data`,
+            or the original `data` unchanged if no 'fields' key is provided.
+        """
         # Extract only requested fields
         if params.get('fields'):
             fields = params['fields']
@@ -558,7 +680,18 @@ class OptimizedMCPServer:
         return data
 
     def get_optimization_report(self) -> Dict[str, Any]:
-        """Generate comprehensive optimization metrics report."""
+        """
+        Produce a consolidated optimization metrics report.
+        
+        The report aggregates metrics from the exact-match cache, semantic cache, and batch processor and includes a UTC ISO8601 timestamp.
+        
+        Returns:
+            report (dict): Mapping with keys:
+                - "exact_cache": metrics dict from the ExactMatchCache
+                - "semantic_cache": metrics dict from the SemanticCache
+                - "batch_processor": metrics dict from the BatchProcessor
+                - "timestamp": UTC ISO8601 timestamp string indicating report generation time
+        """
         return {
             'exact_cache': self.exact_cache.metrics(),
             'semantic_cache': self.semantic_cache.metrics(),
@@ -572,7 +705,16 @@ class OptimizedMCPServer:
 # ===========================
 
 async def demo():
-    """Demonstrate optimization techniques."""
+    """
+    Run a short interactive demonstration of the OptimizedMCPServer features.
+    
+    Initializes an OptimizedMCPServer connected to localhost Redis, exercises:
+    - exact-match caching with two identical requests (showing a miss then a hit),
+    - semantic caching with a similar query (showing a semantic match),
+    and prints a consolidated optimization metrics report.
+    
+    This function is intended for manual or example runs and prints results to stdout; it does not return a value.
+    """
 
     # Initialize server
     server = OptimizedMCPServer(redis_host='localhost')
