@@ -1,0 +1,130 @@
+# ============================================================================
+# DevSkyy Database Backup Service - Docker Compose Configuration
+# Automated backup container with scheduled backups and monitoring
+# ============================================================================
+#
+# Usage:
+#   # Start backup service
+#   docker-compose -f docker-compose.yml -f docker-compose.backup.yml up -d
+#
+#   # Run manual backup
+#   docker-compose -f docker-compose.backup.yml run --rm backup /scripts/backup_database.sh
+#
+#   # Monitor backups
+#   docker-compose -f docker-compose.backup.yml run --rm backup /scripts/monitor_backups.sh
+#
+#   # Restore from backup
+#   docker-compose -f docker-compose.backup.yml run --rm backup /scripts/restore_database.sh <backup-file>
+#
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # DevSkyy Backup Service
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: devskyy-backup
+    restart: unless-stopped
+    environment:
+      # Environment
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+
+      # Database connection
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-devskyy}
+      - POSTGRES_USER=${POSTGRES_USER:-devskyy}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+
+      # Backup configuration
+      - BACKUP_DIR=/backups/devskyy
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
+
+      # S3 configuration (optional)
+      - S3_BACKUP_BUCKET=${S3_BACKUP_BUCKET:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+
+      # GPG encryption (optional)
+      - BACKUP_GPG_RECIPIENT=${BACKUP_GPG_RECIPIENT:-}
+
+      # Alerting (optional)
+      - ALERT_EMAIL=${ALERT_EMAIL:-}
+      - ALERT_WEBHOOK=${ALERT_WEBHOOK:-}
+
+      # Timezone for cron jobs
+      - TZ=${TZ:-UTC}
+
+    volumes:
+      # Backup storage (persistent)
+      - backup-data:/backups
+
+      # Logs (persistent)
+      - backup-logs:/logs
+
+      # Artifacts (persistent)
+      - backup-artifacts:/artifacts
+
+      # Scripts (bind mount for development)
+      - ./scripts:/scripts:ro
+
+      # GPG keys (optional, bind mount)
+      # Uncomment and configure if using GPG encryption
+      # - ./secrets/gpg:/home/backup/.gnupg:ro
+
+    networks:
+      - devskyy-network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["/usr/local/bin/healthcheck.sh"]
+      interval: 1h
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+    labels:
+      - "com.devskyy.service=backup"
+      - "com.devskyy.description=Database backup service"
+      - "com.devskyy.version=1.0.0"
+
+# Volumes
+volumes:
+  backup-data:
+    driver: local
+    labels:
+      - "com.devskyy.volume=backup-data"
+      - "com.devskyy.description=Database backup storage"
+
+  backup-logs:
+    driver: local
+    labels:
+      - "com.devskyy.volume=backup-logs"
+      - "com.devskyy.description=Backup logs"
+
+  backup-artifacts:
+    driver: local
+    labels:
+      - "com.devskyy.volume=backup-artifacts"
+      - "com.devskyy.description=Backup artifacts and error ledgers"
+
+# Use existing network from main docker-compose.yml
+networks:
+  devskyy-network:
+    external: true

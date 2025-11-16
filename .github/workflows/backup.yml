@@ -1,0 +1,418 @@
+name: DevSkyy Database Backup
+
+on:
+  # Daily scheduled backups (2 AM UTC)
+  schedule:
+    - cron: '0 2 * * *'
+
+  # Backup on merge to main branch
+  push:
+    branches:
+      - main
+
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to backup'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+      upload_to_s3:
+        description: 'Upload backup to S3'
+        required: false
+        default: true
+        type: boolean
+      enable_encryption:
+        description: 'Enable GPG encryption'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11.9'
+  ERROR_LEDGER_PATH: artifacts/error-ledger-backup-${{ github.run_id }}.json
+
+jobs:
+  # ============================================================================
+  # JOB 1: Database Backup
+  # ============================================================================
+  backup-database:
+    name: Backup PostgreSQL Database
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write  # For OIDC authentication to AWS
+
+    # Only run on main branch or manual trigger for production
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        id: set-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+            echo "ENABLE_S3=${{ github.event.inputs.upload_to_s3 }}" >> $GITHUB_ENV
+            echo "ENABLE_ENCRYPTION=${{ github.event.inputs.enable_encryption }}" >> $GITHUB_ENV
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "ENABLE_S3=true" >> $GITHUB_ENV
+            echo "ENABLE_ENCRYPTION=true" >> $GITHUB_ENV
+          else
+            # Push to main
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "ENABLE_S3=true" >> $GITHUB_ENV
+            echo "ENABLE_ENCRYPTION=true" >> $GITHUB_ENV
+          fi
+
+          # Set backup directory
+          BACKUP_DIR="${GITHUB_WORKSPACE}/backups"
+          echo "BACKUP_DIR=${BACKUP_DIR}" >> $GITHUB_ENV
+          mkdir -p "${BACKUP_DIR}"
+          mkdir -p "${GITHUB_WORKSPACE}/logs/backups"
+          mkdir -p "${GITHUB_WORKSPACE}/artifacts"
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-15
+
+      - name: Install AWS CLI
+        if: env.ENABLE_S3 == 'true'
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+
+      - name: Configure AWS credentials
+        if: env.ENABLE_S3 == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_BACKUP_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Import GPG key for encryption
+        if: env.ENABLE_ENCRYPTION == 'true'
+        run: |
+          if [[ -n "${{ secrets.BACKUP_GPG_PUBLIC_KEY }}" ]]; then
+            echo "${{ secrets.BACKUP_GPG_PUBLIC_KEY }}" | gpg --import
+            echo "BACKUP_GPG_RECIPIENT=${{ secrets.BACKUP_GPG_RECIPIENT }}" >> $GITHUB_ENV
+          else
+            echo "::warning::GPG public key not configured, backup will not be encrypted"
+            echo "ENABLE_ENCRYPTION=false" >> $GITHUB_ENV
+          fi
+
+      # For GitHub Actions, we use a PostgreSQL service container
+      - name: Setup PostgreSQL service
+        if: env.ENVIRONMENT == 'development' || env.ENVIRONMENT == 'staging'
+        run: |
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_DB=devskyy \
+            -e POSTGRES_USER=devskyy \
+            -e POSTGRES_PASSWORD=changeme \
+            -p 5432:5432 \
+            postgres:15-alpine
+
+          # Wait for PostgreSQL to be ready
+          timeout 30 bash -c 'until pg_isready -h localhost -p 5432 -U devskyy; do sleep 1; done'
+
+      - name: Configure database connection
+        run: |
+          if [[ "${{ env.ENVIRONMENT }}" == "production" ]]; then
+            # Production database credentials from secrets
+            echo "POSTGRES_HOST=${{ secrets.PROD_DB_HOST }}" >> $GITHUB_ENV
+            echo "POSTGRES_PORT=${{ secrets.PROD_DB_PORT }}" >> $GITHUB_ENV
+            echo "POSTGRES_DB=${{ secrets.PROD_DB_NAME }}" >> $GITHUB_ENV
+            echo "POSTGRES_USER=${{ secrets.PROD_DB_USER }}" >> $GITHUB_ENV
+            echo "POSTGRES_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+          elif [[ "${{ env.ENVIRONMENT }}" == "staging" ]]; then
+            # Staging database credentials from secrets
+            echo "POSTGRES_HOST=${{ secrets.STAGING_DB_HOST }}" >> $GITHUB_ENV
+            echo "POSTGRES_PORT=${{ secrets.STAGING_DB_PORT }}" >> $GITHUB_ENV
+            echo "POSTGRES_DB=${{ secrets.STAGING_DB_NAME }}" >> $GITHUB_ENV
+            echo "POSTGRES_USER=${{ secrets.STAGING_DB_USER }}" >> $GITHUB_ENV
+            echo "POSTGRES_PASSWORD=${{ secrets.STAGING_DB_PASSWORD }}" >> $GITHUB_ENV
+          else
+            # Development (local container)
+            echo "POSTGRES_HOST=localhost" >> $GITHUB_ENV
+            echo "POSTGRES_PORT=5432" >> $GITHUB_ENV
+            echo "POSTGRES_DB=devskyy" >> $GITHUB_ENV
+            echo "POSTGRES_USER=devskyy" >> $GITHUB_ENV
+            echo "POSTGRES_PASSWORD=changeme" >> $GITHUB_ENV
+          fi
+
+      - name: Run backup script
+        id: backup
+        run: |
+          # Build backup command
+          BACKUP_CMD="./scripts/backup_database.sh --verify"
+
+          if [[ "${{ env.ENABLE_ENCRYPTION }}" != "true" ]]; then
+            BACKUP_CMD="${BACKUP_CMD} --no-encryption"
+          fi
+
+          if [[ "${{ env.ENABLE_S3 }}" != "true" ]]; then
+            BACKUP_CMD="${BACKUP_CMD} --no-upload"
+          fi
+
+          # Run backup
+          ${BACKUP_CMD}
+
+          # Get backup file for artifacts
+          BACKUP_FILE=$(find ${BACKUP_DIR} -name "devskyy_backup_*.sql*" -type f | head -1)
+          echo "backup_file=${BACKUP_FILE}" >> $GITHUB_OUTPUT
+
+      - name: Upload backup to GitHub Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-${{ env.ENVIRONMENT }}-${{ github.run_id }}
+          path: |
+            backups/
+            logs/backups/
+            artifacts/
+          retention-days: 30
+          compression-level: 9
+
+      - name: Run backup monitoring
+        if: always()
+        run: |
+          ./scripts/monitor_backups.sh --json > backup_status.json
+          cat backup_status.json
+
+      - name: Upload backup status
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-status-${{ env.ENVIRONMENT }}-${{ github.run_id }}
+          path: backup_status.json
+          retention-days: 7
+
+      - name: Cleanup local PostgreSQL
+        if: always() && (env.ENVIRONMENT == 'development' || env.ENVIRONMENT == 'staging')
+        run: |
+          docker stop postgres || true
+          docker rm postgres || true
+
+      - name: Send success notification
+        if: success()
+        run: |
+          echo "::notice::Database backup completed successfully for ${{ env.ENVIRONMENT }}"
+
+      - name: Send failure notification
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const environment = process.env.ENVIRONMENT;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Create an issue for failed backups
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Database Backup Failed - ${environment}`,
+              body: `## Backup Failure Alert\n\n` +
+                    `**Environment:** ${environment}\n` +
+                    `**Workflow:** ${context.workflow}\n` +
+                    `**Run:** [${context.runId}](${runUrl})\n` +
+                    `**Timestamp:** ${new Date().toISOString()}\n\n` +
+                    `### Action Required\n\n` +
+                    `The database backup failed. Please investigate immediately.\n\n` +
+                    `### Debug Steps\n\n` +
+                    `1. Check the workflow logs: ${runUrl}\n` +
+                    `2. Review the error ledger artifact\n` +
+                    `3. Verify database connectivity\n` +
+                    `4. Check S3 bucket permissions (if applicable)\n` +
+                    `5. Verify GPG key configuration (if applicable)\n`,
+              labels: ['bug', 'critical', 'backup', 'devops']
+            });
+
+  # ============================================================================
+  # JOB 2: Verify Backup (Production Only)
+  # ============================================================================
+  verify-backup:
+    name: Verify Backup Integrity
+    runs-on: ubuntu-latest
+    needs: backup-database
+    timeout-minutes: 20
+    if: success()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-15
+
+      - name: Download backup artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: database-backup-${{ needs.backup-database.outputs.environment || 'production' }}-${{ github.run_id }}
+
+      - name: Setup test PostgreSQL
+        run: |
+          docker run -d \
+            --name postgres-verify \
+            -e POSTGRES_DB=verify_test \
+            -e POSTGRES_USER=devskyy \
+            -e POSTGRES_PASSWORD=changeme \
+            -p 5433:5432 \
+            postgres:15-alpine
+
+          # Wait for PostgreSQL to be ready
+          timeout 30 bash -c 'until pg_isready -h localhost -p 5433 -U devskyy; do sleep 1; done'
+
+      - name: Test restore
+        id: test-restore
+        run: |
+          export POSTGRES_HOST=localhost
+          export POSTGRES_PORT=5433
+          export POSTGRES_USER=devskyy
+          export POSTGRES_PASSWORD=changeme
+          export POSTGRES_DB=verify_test
+
+          # Find backup file
+          BACKUP_FILE=$(find backups/ -name "devskyy_backup_*.sql*" -type f | head -1)
+
+          if [[ -z "${BACKUP_FILE}" ]]; then
+            echo "::error::Backup file not found"
+            exit 1
+          fi
+
+          # Test restore
+          ./scripts/restore_database.sh --test-only --force "${BACKUP_FILE}"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop postgres-verify || true
+          docker rm postgres-verify || true
+
+      - name: Report verification status
+        if: success()
+        run: |
+          echo "::notice::Backup verification completed successfully"
+
+  # ============================================================================
+  # JOB 3: Backup Retention Cleanup (S3)
+  # ============================================================================
+  cleanup-old-backups:
+    name: Cleanup Old Backups
+    runs-on: ubuntu-latest
+    needs: verify-backup
+    timeout-minutes: 10
+    if: success()
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_BACKUP_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Cleanup old S3 backups
+        run: |
+          # Keep backups for 30 days in S3
+          RETENTION_DAYS=30
+          CUTOFF_DATE=$(date -d "${RETENTION_DAYS} days ago" +%Y-%m-%d)
+
+          echo "Cleaning up S3 backups older than ${CUTOFF_DATE}"
+
+          # List and delete old backups
+          aws s3 ls s3://${{ secrets.S3_BACKUP_BUCKET }}/ --recursive | \
+            awk '{print $4}' | \
+            while read -r key; do
+              FILE_DATE=$(echo "${key}" | grep -oP '\d{4}-\d{2}-\d{2}' | head -1)
+              if [[ -n "${FILE_DATE}" ]] && [[ "${FILE_DATE}" < "${CUTOFF_DATE}" ]]; then
+                echo "Deleting old backup: ${key}"
+                aws s3 rm "s3://${{ secrets.S3_BACKUP_BUCKET }}/${key}"
+              fi
+            done
+
+      - name: Report cleanup status
+        run: |
+          echo "::notice::Backup cleanup completed"
+
+  # ============================================================================
+  # JOB 4: Backup Monitoring & Alerting
+  # ============================================================================
+  monitor-backup-health:
+    name: Monitor Backup Health
+    runs-on: ubuntu-latest
+    needs: backup-database
+    timeout-minutes: 10
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download backup artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: database-backup-${{ needs.backup-database.outputs.environment || 'production' }}-${{ github.run_id }}
+
+      - name: Download backup status
+        uses: actions/download-artifact@v4
+        with:
+          name: backup-status-${{ needs.backup-database.outputs.environment || 'production' }}-${{ github.run_id }}
+
+      - name: Check backup health
+        id: health-check
+        run: |
+          if [[ -f backup_status.json ]]; then
+            STATUS=$(jq -r '.status' backup_status.json)
+            echo "status=${STATUS}" >> $GITHUB_OUTPUT
+
+            if [[ "${STATUS}" != "HEALTHY" ]]; then
+              echo "::warning::Backup health status: ${STATUS}"
+              exit 1
+            fi
+          else
+            echo "::error::Backup status file not found"
+            exit 1
+          fi
+
+      - name: Send alert on unhealthy backup
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Backup Health Check Failed`,
+              body: `## Backup Health Alert\n\n` +
+                    `The backup health monitoring detected issues.\n\n` +
+                    `**Workflow:** ${context.workflow}\n` +
+                    `**Run:** [${context.runId}](${runUrl})\n` +
+                    `**Timestamp:** ${new Date().toISOString()}\n\n` +
+                    `Please review the backup status and take corrective action.\n`,
+              labels: ['warning', 'backup', 'monitoring']
+            });

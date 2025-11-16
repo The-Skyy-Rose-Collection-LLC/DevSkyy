@@ -1,0 +1,880 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DevSkyy - Luxury Fashion AI Platform",
+    "description": "Enterprise-grade AI-powered fashion platform with multi-modal capabilities",
+    "version": "5.1.0-enterprise",
+    "contact": {
+      "name": "DevSkyy Platform Team",
+      "email": "api@devskyy.com",
+      "url": "https://devskyy.com/support"
+    },
+    "license": {
+      "name": "Proprietary",
+      "url": "https://devskyy.com/license"
+    },
+    "termsOfService": "https://devskyy.com/terms",
+    "x-api-version": "5.1.0-enterprise",
+    "x-generated-at": "2025-11-16T04:31:29.839599"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Get Bulk Editing Interface",
+        "description": "Serve the bulk editing interface (primary interface).",
+        "operationId": "get_bulk_editing_interface__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/simple": {
+      "get": {
+        "summary": "Get Simple Interface",
+        "description": "Serve the simple drag & drop interface.",
+        "operationId": "get_simple_interface_simple_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classic": {
+      "get": {
+        "summary": "Get Classic Interface",
+        "description": "Serve the classic form-based upload interface.",
+        "operationId": "get_classic_interface_classic_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Health check endpoint.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "System Status",
+        "description": "Comprehensive system status endpoint.",
+        "operationId": "system_status_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/{agent_type}/{agent_name}": {
+      "get": {
+        "summary": "Get Agent Endpoint",
+        "description": "Get or create an agent instance.",
+        "operationId": "get_agent_endpoint_api_v1_agents__agent_type___agent_name__get",
+        "parameters": [
+          {
+            "name": "agent_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Type"
+            }
+          },
+          {
+            "name": "agent_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/{agent_type}/{agent_name}/execute": {
+      "post": {
+        "summary": "Execute Agent Task",
+        "description": "Execute a task using the specified agent.",
+        "operationId": "execute_agent_task_api_v1_agents__agent_type___agent_name__execute_post",
+        "parameters": [
+          {
+            "name": "agent_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Type"
+            }
+          },
+          {
+            "name": "agent_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Name"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Task Data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orchestration/multi-agent": {
+      "post": {
+        "summary": "Execute Multi Agent Task",
+        "description": "Execute task using multi-agent orchestration.",
+        "operationId": "execute_multi_agent_task_api_v1_orchestration_multi_agent_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Task Data"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/3d/models/upload": {
+      "post": {
+        "summary": "Upload 3D Model",
+        "description": "Upload and process a 3D model.",
+        "operationId": "upload_3d_model_api_v1_3d_models_upload_post",
+        "parameters": [
+          {
+            "name": "file_path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Path"
+            }
+          },
+          {
+            "name": "model_format",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Model Format"
+            }
+          },
+          {
+            "name": "brand_context",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Brand Context"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/avatars/create": {
+      "post": {
+        "summary": "Create Avatar",
+        "description": "Create a new avatar.",
+        "operationId": "create_avatar_api_v1_avatars_create_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Avatar Data"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system/advanced-status": {
+      "get": {
+        "summary": "Get Advanced System Status",
+        "description": "Get advanced system status including all new features.",
+        "operationId": "get_advanced_system_status_api_v1_system_advanced_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Get Prometheus Metrics",
+        "description": "Get Prometheus metrics.",
+        "operationId": "get_prometheus_metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/monitoring/status": {
+      "get": {
+        "summary": "Get Monitoring Status",
+        "description": "Get comprehensive monitoring system status.",
+        "operationId": "get_monitoring_status_api_v1_monitoring_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/monitoring/incidents": {
+      "get": {
+        "summary": "Get Active Incidents",
+        "description": "Get active incidents.",
+        "operationId": "get_active_incidents_api_v1_monitoring_incidents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/build-and-deploy": {
+      "post": {
+        "summary": "Build And Deploy Theme",
+        "description": "Build and deploy a WordPress theme automatically.",
+        "operationId": "build_and_deploy_theme_api_v1_themes_build_and_deploy_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Theme Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/build-status/{build_id}": {
+      "get": {
+        "summary": "Get Theme Build Status",
+        "description": "Get theme build status.",
+        "operationId": "get_theme_build_status_api_v1_themes_build_status__build_id__get",
+        "parameters": [
+          {
+            "name": "build_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Build Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/upload-only": {
+      "post": {
+        "summary": "Upload Theme Only",
+        "description": "Upload an existing theme package without building.",
+        "operationId": "upload_theme_only_api_v1_themes_upload_only_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Upload Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/system-status": {
+      "get": {
+        "summary": "Get Theme System Status",
+        "description": "Get theme builder and uploader system status.",
+        "operationId": "get_theme_system_status_api_v1_themes_system_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/skyy-rose/build": {
+      "post": {
+        "summary": "Build Skyy Rose Theme",
+        "description": "Build and deploy a theme specifically for Skyy Rose Collection using configured credentials.",
+        "operationId": "build_skyy_rose_theme_api_v1_themes_skyy_rose_build_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Theme Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/credentials/status": {
+      "get": {
+        "summary": "Get Credentials Status",
+        "description": "Get status of configured WordPress credentials.",
+        "operationId": "get_credentials_status_api_v1_themes_credentials_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/themes/credentials/test": {
+      "post": {
+        "summary": "Test Wordpress Connection",
+        "description": "Test WordPress connection with configured or provided credentials.",
+        "operationId": "test_wordpress_connection_api_v1_themes_credentials_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Test Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debug/cache": {
+      "get": {
+        "summary": "Debug Cache",
+        "description": "Debug endpoint to inspect agent cache.",
+        "operationId": "debug_cache_debug_cache_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debug/clear-cache": {
+      "post": {
+        "summary": "Clear Cache",
+        "description": "Debug endpoint to clear agent cache.",
+        "operationId": "clear_cache_debug_clear_cache_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT access token from /api/v1/auth/login endpoint. Include in Authorization header as: Bearer <token>. Token expires in 1 hour. Use refresh token to get new access token. Per RFC 7519 (JSON Web Token)."
+      },
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "tokenUrl": "/api/v1/auth/login",
+            "scopes": {
+              "read": "Read access to resources",
+              "write": "Write and modify resources",
+              "admin": "Administrative access to all resources",
+              "developer": "Developer access to code and infrastructure"
+            }
+          }
+        },
+        "description": "OAuth2 password flow with JWT access and refresh tokens. RBAC roles: SuperAdmin, Admin, Developer, APIUser, ReadOnly. Per RFC 6749 (OAuth 2.0 Authorization Framework)."
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Development server"
+    },
+    {
+      "url": "http://localhost:5000",
+      "description": "Local testing server"
+    },
+    {
+      "url": "https://api.devskyy.com",
+      "description": "Production server"
+    },
+    {
+      "url": "https://staging-api.devskyy.com",
+      "description": "Staging server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "v1-auth",
+      "description": "Authentication & authorization endpoints (JWT/OAuth2)",
+      "externalDocs": {
+        "description": "Auth Guide",
+        "url": "https://docs.devskyy.com/auth"
+      }
+    },
+    {
+      "name": "v1-agents",
+      "description": "AI agent execution endpoints (25+ agents)",
+      "externalDocs": {
+        "description": "Agent Guide",
+        "url": "https://docs.devskyy.com/agents"
+      }
+    },
+    {
+      "name": "v1-webhooks",
+      "description": "Webhook management and event subscriptions",
+      "externalDocs": {
+        "description": "Webhook Guide",
+        "url": "https://docs.devskyy.com/webhooks"
+      }
+    },
+    {
+      "name": "v1-monitoring",
+      "description": "System monitoring, health checks, and observability",
+      "externalDocs": {
+        "description": "Monitoring Guide",
+        "url": "https://docs.devskyy.com/monitoring"
+      }
+    },
+    {
+      "name": "v1-ml",
+      "description": "ML infrastructure, model registry, and cache",
+      "externalDocs": {
+        "description": "ML Guide",
+        "url": "https://docs.devskyy.com/ml"
+      }
+    },
+    {
+      "name": "v1-gdpr",
+      "description": "GDPR compliance endpoints (Articles 15 & 17)",
+      "externalDocs": {
+        "description": "GDPR Guide",
+        "url": "https://docs.devskyy.com/gdpr"
+      }
+    },
+    {
+      "name": "automation-ecommerce",
+      "description": "E-commerce automation workflows",
+      "externalDocs": {
+        "description": "E-commerce Guide",
+        "url": "https://docs.devskyy.com/ecommerce"
+      }
+    },
+    {
+      "name": "v1-luxury-automation",
+      "description": "Luxury fashion automation platform",
+      "externalDocs": {
+        "description": "Luxury Guide",
+        "url": "https://docs.devskyy.com/luxury"
+      }
+    }
+  ],
+  "externalDocs": {
+    "description": "DevSkyy Platform Documentation",
+    "url": "https://docs.devskyy.com"
+  },
+  "x-logo": {
+    "url": "https://devskyy.com/logo.png",
+    "altText": "DevSkyy Platform"
+  },
+  "x-tagGroups": [
+    {
+      "name": "Core API",
+      "tags": [
+        "v1-auth",
+        "v1-agents",
+        "v1-webhooks"
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "tags": [
+        "v1-monitoring",
+        "v1-ml",
+        "v1-gdpr"
+      ]
+    },
+    {
+      "name": "Automation",
+      "tags": [
+        "automation-ecommerce",
+        "v1-luxury-automation"
+      ]
+    }
+  ]
+}

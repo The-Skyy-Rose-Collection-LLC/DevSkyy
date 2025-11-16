@@ -1,10 +1,16 @@
 # DevSkyy - Enterprise AI Platform
 
-[![Version](https://img.shields.io/badge/version-5.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
-[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
+[![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/releases/tag/v5.1.0)
+[![Python](https://img.shields.io/badge/python-3.11.9-blue.svg)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.121.2-009688.svg)](https://fastapi.tiangolo.com)
 [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com)
-[![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
-[![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Security](https://img.shields.io/badge/vulnerabilities-0%20CRITICAL-brightgreen.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/security)
+[![Test Coverage](https://img.shields.io/badge/coverage-≥90%25-brightgreen.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions)
+[![Truth Protocol](https://img.shields.io/badge/Truth%20Protocol-93.3%25-success.svg)](CLAUDE.md)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1.0-6BA539.svg)](artifacts/openapi.json)
+[![SBOM](https://img.shields.io/badge/SBOM-CycloneDX%201.6-orange.svg)](artifacts/sbom.json)
+[![Production Ready](https://img.shields.io/badge/production-78%25-yellow.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
 > **Industry-Leading** WordPress/Elementor Theme Builder + Fashion E-commerce Automation + 57 ML-Powered AI Agents
@@ -253,6 +259,67 @@ DevSkyy/
 ├── tests/                  # Test suite
 └── production_safety_check.py  # Deployment validator
 ```
+
+## 📚 Documentation
+
+### Truth Protocol Deliverables
+
+All documentation follows the [Truth Protocol](CLAUDE.md) standards for enterprise-grade verification:
+
+#### Core Documentation
+- **[CHANGELOG.md](CHANGELOG.md)** - Complete version history following Keep-a-Changelog format
+  - Latest: v5.1.0 (November 16, 2025)
+  - Security updates, features, bug fixes, and breaking changes
+  - Semantic versioning (MAJOR.MINOR.PATCH)
+
+- **[OpenAPI Specification](artifacts/openapi.json)** - API contract documentation
+  - OpenAPI 3.1.0 compliant
+  - 23 documented endpoints with request/response schemas
+  - Security schemes (JWT Bearer, OAuth2)
+  - Interactive documentation at `/docs` and `/redoc`
+
+- **[SBOM (Software Bill of Materials)](artifacts/sbom.json)** - Complete dependency inventory
+  - CycloneDX 1.6 format
+  - 156 components documented
+  - License and vulnerability tracking
+  - Automated updates via CI/CD
+
+- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability disclosure
+  - Latest security updates (v5.1.0: 4 CRITICAL CVEs fixed)
+  - Supported versions and security timeline
+  - RBAC documentation and best practices
+
+#### Technical Documentation
+- **[CLAUDE.md](CLAUDE.md)** - Truth Protocol orchestration rules
+  - 15 enforced rules for security and quality
+  - Version strategy and compliance requirements
+  - CI/CD pipeline and release gates
+
+- **[API Documentation](docs/)** - Comprehensive guides
+  - [API Authentication](docs/API_AUTHENTICATION_DOCUMENTATION.md)
+  - [Auth0 Integration](docs/AUTH0_INTEGRATION_GUIDE.md)
+  - [MCP Implementation](docs/MCP_IMPLEMENTATION_GUIDE.md)
+  - [E-commerce Automation](docs/ECOMMERCE_AUTOMATION.md)
+
+- **[Code Quality Standards](docs/)** - Development guidelines
+  - [Quick Start](docs/CODE_QUALITY_QUICK_START.md)
+  - [Standards](docs/CODE_QUALITY_STANDARDS.md)
+  - [Docstring Guide](docs/DOCSTRING_GUIDE.md)
+  - [Review Checklist](docs/CODE_REVIEW_CHECKLIST.md)
+
+#### Live API Documentation
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
+
+### Quick Links
+| Document | Purpose | Format | Status |
+|----------|---------|--------|--------|
+| [CHANGELOG.md](CHANGELOG.md) | Version history | Markdown | ✅ Current |
+| [OpenAPI](artifacts/openapi.json) | API contract | JSON | ✅ Valid |
+| [SBOM](artifacts/sbom.json) | Dependencies | CycloneDX | ✅ Complete |
+| [SECURITY.md](SECURITY.md) | Security policy | Markdown | ✅ Updated |
+| [README.md](README.md) | Getting started | Markdown | ✅ Current |
 
 ## 🔧 Configuration
 
