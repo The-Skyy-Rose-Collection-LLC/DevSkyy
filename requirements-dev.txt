@@ -1,312 +1,317 @@
 # ============================================================================
-# DEVSKYY ENTERPRISE PLATFORM - DEVELOPMENT DEPENDENCIES
-# Development, Testing, and Quality Assurance Tools
-# Version: 5.2.0
+# DEVSKYY ENTERPRISE PLATFORM - DEVELOPMENT & TESTING DEPENDENCIES
+# Development, Testing, Code Quality, and Security Scanning Tools
+# Version: 6.0.0 - Consolidated from requirements-dev.txt + requirements-test.txt
 # ============================================================================
-
-# Include production dependencies
--r requirements.txt
+#
+# IMPORTANT: Install alongside production dependencies:
+#   pip install -r requirements.txt -r requirements-dev.txt
+#
+# Per CLAUDE.md Truth Protocol:
+# - Test coverage ≥90% required
+# - Security scanning in CI/CD pipeline
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# ============================================================================
 
 # ============================================================================
 # CODE QUALITY & FORMATTING
 # ============================================================================
+black~=24.10.0  # Code formatter
+isort~=5.13.2  # Import sorting
+autopep8~=2.3.1  # PEP 8 auto-formatter
+autoflake~=2.3.1  # Remove unused imports/variables
 
-# Code Formatting (pinned for reproducibility)
-black==24.10.0
-isort==5.13.2
-autopep8==2.3.1
+# ============================================================================
+# LINTING & STATIC ANALYSIS
+# ============================================================================
+flake8~=7.1.1  # Style guide enforcement
+pylint~=3.3.2  # Code analysis
+mypy~=1.13.0  # Static type checking
+ruff~=0.8.4  # Fast Python linter
 
-# Linting & Static Analysis (pinned for reproducibility)
-flake8==7.1.1
-pylint==3.3.2
-mypy==1.13.0
-ruff==0.8.4
-
-# Code Complexity Analysis (pinned for reproducibility)
-radon==6.0.1
-xenon==0.9.1
-vulture==2.14
-
-# Import Organization (pinned for reproducibility)
-autoflake==2.3.1
+# ============================================================================
+# CODE COMPLEXITY ANALYSIS
+# ============================================================================
+radon~=6.0.1  # Code complexity metrics
+xenon~=0.9.1  # Code complexity monitoring
+vulture~=2.14  # Dead code detection
 
 # ============================================================================
 # SECURITY & VULNERABILITY SCANNING
 # ============================================================================
-
-# Security Linting (pinned for reproducibility)
-bandit==1.8.0
-safety==3.2.11
-semgrep==1.95.0
-
-# Dependency Security (pinned for reproducibility)
-pip-audit==2.7.3
-cyclonedx-bom==4.6.1
+bandit~=1.8.0  # Security issue scanner
+safety~=3.2.11  # Dependency vulnerability scanner
+semgrep~=1.95.0  # Static analysis for security
+pip-audit~=2.7.3  # Audit Python packages for known vulnerabilities
+cyclonedx-bom~=4.6.1  # SBOM generation
 
 # ============================================================================
-# TESTING FRAMEWORK
+# CORE TESTING FRAMEWORK
 # ============================================================================
-
-# Core Testing (pinned for reproducibility)
-pytest==8.4.2
-pytest-asyncio==0.24.0
-pytest-cov==6.0.0
-pytest-mock==3.14.0
-pytest-xdist==3.6.0
-pytest-benchmark==4.0.0
-pytest-timeout==2.3.1
-pytest-env==1.1.5
-pytest-html==4.1.1
-pytest-json-report==1.5.0
-
-# Test Data & Factories (pinned for reproducibility)
-factory-boy==3.3.1
-faker==33.1.0
-hypothesis==6.122.1
-
-# HTTP Testing
-httpx>=0.28.1
-responses>=0.25.3
-pytest-httpx>=0.32.0
-
-# Database Testing
-pytest-postgresql>=6.1.1
-pytest-redis>=3.1.2
-pytest-mongodb>=2.4.3
+pytest~=8.4.2  # Primary testing framework
+pytest-asyncio~=0.24.0  # Async test support
+pytest-cov~=6.0.0  # Coverage plugin
+pytest-mock~=3.14.0  # Mock/stub plugin
+pytest-xdist~=3.6.0  # Parallel test execution
+pytest-timeout~=2.3.1  # Test timeout plugin
+pytest-env~=1.1.5  # Environment variable plugin
+pytest-html~=4.1.1  # HTML test reports
+pytest-json-report~=1.5.0  # JSON test reports
+pytest-sugar~=1.0.0  # Enhanced test output
+pytest-benchmark~=4.0.0  # Performance benchmarking
 
 # ============================================================================
-# DOCUMENTATION
+# TEST DATA & FACTORIES
 # ============================================================================
+factory-boy~=3.3.1  # Test fixture factories
+faker~=33.1.0  # Fake data generation
+hypothesis~=6.122.1  # Property-based testing
+pytest-factoryboy~=2.7.0  # Factory Boy integration with pytest
 
-# Documentation Generation
-sphinx>=8.1.3
-sphinx-rtd-theme>=3.0.2
-sphinx-autodoc-typehints>=2.4.4
-myst-parser>=4.0.0
+# ============================================================================
+# HTTP & API TESTING
+# ============================================================================
+responses~=0.25.3  # Mock HTTP requests
+pytest-httpx~=0.32.0  # Mock httpx
+requests-mock~=1.12.1  # Mock requests library
+httpretty~=1.1.4  # HTTP client mock
+fastapi-testclient~=0.1.0  # FastAPI test client
 
-# API Documentation
-mkdocs>=1.6.1
-mkdocs-material>=9.5.47
-mkdocs-swagger-ui-tag>=0.6.10
+# ============================================================================
+# API TESTING FRAMEWORKS
+# ============================================================================
+tavern~=2.12.1  # API testing framework
+schemathesis~=3.34.1  # API schema testing
+
+# ============================================================================
+# DATABASE TESTING
+# ============================================================================
+pytest-postgresql~=6.1.1  # PostgreSQL test fixtures
+pytest-redis~=3.1.2  # Redis test fixtures
+pytest-mongodb~=2.4.3  # MongoDB test fixtures
+pytest-elasticsearch~=2.1.1  # Elasticsearch test fixtures
+testing.postgresql~=1.3.0  # PostgreSQL testing utilities
+sqlalchemy-utils~=0.41.2  # SQLAlchemy testing utilities
+sqlalchemy-stubs~=0.4  # Type stubs for SQLAlchemy
+
+# ============================================================================
+# INTEGRATION & CONTAINER TESTING
+# ============================================================================
+testcontainers~=4.8.2  # Docker container testing
+docker~=7.1.0  # Docker SDK for Python
+docker-compose~=1.29.2  # Docker Compose integration
+pytest-services~=2.2.1  # Service testing
+pytest-docker~=3.1.1  # Docker fixtures for pytest
+
+# ============================================================================
+# PERFORMANCE & LOAD TESTING
+# ============================================================================
+locust~=2.32.4  # Load testing framework
+py-spy~=0.3.14  # Statistical profiler
+memory-profiler~=0.61.0  # Memory usage profiler
+line-profiler~=4.1.3  # Line-by-line profiler
+pympler~=0.9  # Memory profiling
+artillery~=1.0.0  # Load testing toolkit
+pytest-stress~=1.0.1  # Stress testing plugin
+
+# ============================================================================
+# SECURITY TESTING
+# ============================================================================
+pytest-security~=0.1.0  # Security testing plugin
+
+# ============================================================================
+# WEB & UI TESTING
+# ============================================================================
+pytest-playwright~=0.6.2  # Playwright integration
+pytest-selenium~=4.1.0  # Selenium integration
+
+# ============================================================================
+# MOCKING & TIME MANIPULATION
+# ============================================================================
+freezegun~=1.5.1  # Mock datetime
+time-machine~=2.16.0  # Fast datetime mocking
+wiremock~=2.6.1  # HTTP service mocking
+mockserver-client~=5.15.0  # MockServer client
+aioresponses~=0.7.6  # Mock aiohttp requests
+
+# ============================================================================
+# DATA TESTING & VALIDATION
+# ============================================================================
+great-expectations~=1.2.3  # Data validation framework
+pandera~=0.22.0  # Statistical data validation
+pytest-datadir~=1.5.0  # Data directory fixtures
+pytest-csv~=3.0.0  # CSV testing
+openpyxl~=3.1.5  # Excel file support
+deepdiff~=8.6.1  # Deep comparison of data structures
+numpy-testing~=1.26.4  # NumPy testing utilities
+pandas-testing~=2.2.3  # Pandas testing utilities
+pytest-ml~=0.1.0  # ML model testing
+pytest-image-diff~=0.0.11  # Image comparison testing
+
+# ============================================================================
+# COVERAGE & REPORTING
+# ============================================================================
+coverage~=7.6.9  # Coverage measurement
+coverage-badge~=1.1.2  # Coverage badge generation
+allure-pytest~=2.13.5  # Allure test reporting
+pytest-reportlog~=1.2.0  # Report log generation
+
+# ============================================================================
+# PARALLEL & DISTRIBUTED TESTING
+# ============================================================================
+pytest-parallel~=0.1.1  # Parallel test execution
+pytest-remote~=0.1.2  # Remote test execution
+
+# ============================================================================
+# FILE & FILESYSTEM TESTING
+# ============================================================================
+pytest-tmpdir~=0.1.0  # Temporary directory fixtures
+pyfakefs~=5.7.1  # Fake filesystem
+pytest-datafiles~=3.0.0  # Data file fixtures
+
+# ============================================================================
+# LOGGING & DEBUGGING
+# ============================================================================
+pytest-pdb~=0.2.0  # PDB integration
+pytest-pudb~=0.7.0  # PUDB integration
+ipdb~=0.13.13  # IPython debugger
+pdbpp~=0.10.3  # Enhanced PDB
+icecream~=2.1.3  # Debugging print statements
+pytest-logging~=2016.11.4  # Log capture testing
+
+# ============================================================================
+# NETWORK & SOCKET TESTING
+# ============================================================================
+pytest-socket~=0.7.0  # Socket blocking for tests
+pytest-httpserver~=1.1.0  # HTTP server for testing
+
+# ============================================================================
+# DATABASE DEVELOPMENT TOOLS
+# ============================================================================
+sqlparse~=0.5.2  # SQL formatting and parsing
+sqlalchemy-migrate~=0.13.0  # Schema migration
+
+# ============================================================================
+# OPENAPI & DOCUMENTATION TESTING
+# ============================================================================
+openapi-spec-validator~=0.7.1  # OpenAPI schema validation
+swagger-spec-validator~=3.0.4  # Swagger schema validation
+pytest-doctest~=0.1.0  # Doctest integration
+doctest~=1.0.0  # Doctest module
+
+# ============================================================================
+# DOCUMENTATION GENERATION
+# ============================================================================
+sphinx~=8.1.3  # Documentation generator
+sphinx-rtd-theme~=3.0.2  # Read the Docs theme
+sphinx-autodoc-typehints~=2.4.4  # Type hints in docs
+myst-parser~=4.0.0  # Markdown parser for Sphinx
+mkdocs-swagger-ui-tag~=0.6.10  # Swagger UI for MkDocs
 
 # ============================================================================
 # DEVELOPMENT TOOLS
 # ============================================================================
-
-# Pre-commit Hooks
-pre-commit>=3.8.0
-
-# Environment Management
-python-dotenv>=1.0.1
-environs>=11.2.1
-
-# Debugging
-ipdb>=0.13.13
-pdbpp>=0.10.3
-icecream>=2.1.3
-
-# Profiling & Performance
-py-spy>=0.3.14
-memory-profiler>=0.61.0
-line-profiler>=4.1.3
-pympler>=0.9
+pre-commit~=3.8.0  # Git pre-commit hooks
+ipython~=8.31.0  # Enhanced interactive Python shell
 
 # ============================================================================
-# MONITORING & OBSERVABILITY (DEV)
+# CONTAINERIZATION & ORCHESTRATION
 # ============================================================================
-
-# Local Monitoring
-prometheus-client>=0.22.0
-grafana-api>=1.0.3
-
-# Logging
-structlog>=24.4.0
-loguru>=0.7.3
-python-json-logger>=3.2.0
-
-# ============================================================================
-# DATABASE DEVELOPMENT
-# ============================================================================
-
-# Database Tools
-alembic>=1.14.0
-sqlalchemy-utils>=0.41.2
-sqlalchemy-stubs>=0.4
-
-# Database Inspection
-sqlparse>=0.5.2
-sqlalchemy-migrate>=0.13.0
-
-# ============================================================================
-# API DEVELOPMENT & TESTING
-# ============================================================================
-
-# API Testing
-tavern>=2.12.1
-schemathesis>=3.34.1
-
-# OpenAPI Tools
-openapi-spec-validator>=0.7.1
-swagger-spec-validator>=3.0.4
-
-# ============================================================================
-# CONTAINERIZATION & DEPLOYMENT
-# ============================================================================
-
-# Docker Tools
-docker>=7.1.0
-docker-compose>=1.29.2
-
-# Kubernetes Tools
-kubernetes>=31.0.0
-pykube-ng>=24.3.0
+kubernetes~=31.0.0  # Kubernetes Python client
+pykube-ng~=24.3.0  # Kubernetes API library
 
 # ============================================================================
 # CI/CD TOOLS
 # ============================================================================
-
-# GitHub Actions
-github3.py>=4.0.1
-pygithub>=2.5.0
-
-# Build Tools
-build>=1.2.2
-twine>=6.0.1
-wheel>=0.45.1
-
-# ============================================================================
-# LOAD TESTING & PERFORMANCE
-# ============================================================================
-
-# Load Testing
-locust==2.32.4
-
-# Performance Testing
-# (pytest-benchmark and py-spy already defined in Profiling & Performance section)
+github3.py~=4.0.1  # GitHub API v3
+pygithub~=2.5.0  # GitHub API wrapper
+build~=1.2.2  # PEP 517 build frontend
+twine~=6.0.1  # PyPI package uploader
+wheel~=0.45.1  # Wheel package format
 
 # ============================================================================
 # MACHINE LEARNING DEVELOPMENT
 # ============================================================================
-
-# ML Development
-jupyter>=1.1.1
-jupyterlab>=4.3.4,<5.0.0  # SECURITY: Updated to fix XSS vulnerability (CVE)
-notebook>=7.3.1
-
-# Data Science
-pandas-profiling>=3.6.6
-sweetviz>=2.3.1
-
-# Model Development
-mlflow>=3.2.0,<4.0.0  # SECURITY: Updated to fix CVE
-wandb>=0.18.7
-tensorboard>=2.18.0
+jupyter>=1.1.1,<2.0.0  # Jupyter notebook
+jupyterlab>=4.3.4,<5.0.0  # SECURITY: Fix XSS vulnerability
+notebook~=7.3.1  # Jupyter notebook server
+pandas-profiling~=3.6.6  # Automated EDA reports
+sweetviz~=2.3.1  # Visual EDA tool
+wandb~=0.18.7  # Weights & Biases experiment tracking
+tensorboard~=2.18.0  # TensorFlow visualization
 
 # ============================================================================
-# FASHION INDUSTRY SPECIFIC TOOLS
+# WEB SCRAPING DEVELOPMENT
 # ============================================================================
-
-# Web Scraping Development
-scrapy>=2.12.1,<3.0.0  # SECURITY: Updated to fix 2 CVEs (injection + DoS)
-scrapy-splash>=0.8.0
-
-# Image Processing Development
-opencv-contrib-python>=4.11.0.86
-scikit-image>=0.24.0
+scrapy>=2.12.1,<3.0.0  # SECURITY: Fix injection + DoS vulnerabilities
+scrapy-splash~=0.8.0  # JavaScript rendering for Scrapy
 
 # ============================================================================
-# UTILITY TOOLS
+# IMAGE PROCESSING DEVELOPMENT
 # ============================================================================
-
-# File Processing
-watchdog>=6.0.0
-pathlib2>=2.3.7.post1
-
-# JSON/YAML Processing
-pyyaml>=6.0.2
-jsonschema>=4.23.0
-yamllint>=1.35.1
-
-# Text Processing
-textdistance>=4.6.3
-fuzzywuzzy>=0.18.0
-python-levenshtein>=0.26.0
+opencv-contrib-python~=4.11.0.86  # OpenCV with contrib modules
+scikit-image~=0.24.0  # Image processing algorithms
 
 # ============================================================================
-# DEVELOPMENT UTILITIES
+# FILE & CONFIGURATION UTILITIES
 # ============================================================================
-
-# Code Navigation
-jedi>=0.19.2
-rope>=1.13.0
-
-# Terminal Enhancement
-rich>=13.9.4
-typer>=0.15.1
-click>=8.1.8
-
-# Time & Date Development
-freezegun>=1.5.1
-time-machine>=2.16.0
+watchdog~=6.0.0  # Filesystem event monitoring
+pathlib2~=2.3.7.post1  # Backport of pathlib
+pyyaml~=6.0.2  # YAML parser
+jsonschema~=4.23.0  # JSON schema validation
+yamllint~=1.35.1  # YAML linter
+configparser~=7.1.0  # Configuration file parser
 
 # ============================================================================
-# CONFIGURATION & SECRETS MANAGEMENT
+# TEXT PROCESSING UTILITIES
 # ============================================================================
-
-# Configuration Management
-dynaconf>=3.2.8
-python-decouple>=3.8
-configparser>=7.1.0
-
-# Secrets Management (Development)
-keyring>=25.5.0
-python-keyring>=25.5.0
+textdistance~=4.6.3  # Text distance algorithms
+fuzzywuzzy~=0.18.0  # Fuzzy string matching
+python-levenshtein~=0.26.0  # Fast Levenshtein distance
 
 # ============================================================================
-# NETWORKING & HTTP DEVELOPMENT
+# TERMINAL & CLI ENHANCEMENT
 # ============================================================================
-
-# HTTP Development
-httpie>=3.2.5,<4.0.0  # SECURITY: Updated to fix MITM/SSL vulnerability
-curl-cffi>=0.7.3
-
-# Network Testing
-pytest-socket==0.7.0
-# (responses already defined in HTTP Testing section)
+rich~=13.9.4  # Rich terminal formatting
+typer~=0.15.1  # CLI framework
 
 # ============================================================================
-# ENTERPRISE DEVELOPMENT TOOLS
+# SECRETS & CONFIGURATION MANAGEMENT
 # ============================================================================
-
-# Enterprise Logging
-# (python-json-logger and structlog already defined in Logging section)
-
-# Enterprise Monitoring
-datadog==0.50.2
-newrelic==10.4.0
-
-# Enterprise Security
-cryptography==46.0.3  # Updated to match requirements.txt
-pycryptodome>=3.21.0
+keyring~=25.5.0  # System keyring access
+python-keyring~=25.5.0  # Keyring library
 
 # ============================================================================
-# VERSION CONTROL & GIT TOOLS
+# HTTP DEVELOPMENT & DEBUGGING
 # ============================================================================
-
-# Git Integration
-gitpython==3.1.43
-pygit2==1.16.0
-# (pre-commit already defined in Pre-commit Hooks section)
+httpie>=3.2.5,<4.0.0  # SECURITY: Fix MITM/SSL vulnerability
+curl-cffi~=0.7.3  # Python binding for curl-impersonate
 
 # ============================================================================
-# PACKAGE MANAGEMENT
+# PACKAGE MANAGEMENT & ANALYSIS
 # ============================================================================
+pip-tools~=7.4.1  # Requirements management
+pipdeptree~=2.23.4  # Dependency tree visualization
+pip-check~=2.8.1  # Check for outdated packages
+pipreqs~=0.5.0  # Generate requirements from imports
+johnnydep~=1.20.4  # Dependency analysis
 
-# Package Tools
-pip-tools>=7.4.1
-pipdeptree>=2.23.4
-pip-check>=2.8.1
+# ============================================================================
+# CONTINUOUS INTEGRATION
+# ============================================================================
+tox~=4.23.2  # Test automation across Python versions
+nox~=2024.10.9  # Flexible test automation
 
-# Dependency Analysis
-pipreqs>=0.5.0
-johnnydep>=1.20.4
+# ============================================================================
+# ADVANCED TESTING UTILITIES
+# ============================================================================
+pytest-randomly~=3.15.0  # Randomize test order
+pytest-repeat~=0.9.3  # Repeat tests
+pytest-rerunfailures~=14.0  # Rerun failed tests
+tenacity~=9.0.0  # Retry library
+pytest-pythonpath~=0.7.4  # Python path manipulation
+pytest-custom-exit-code~=0.3.0  # Custom exit codes
+pytest-metadata~=3.1.1  # Test metadata plugin
+pytest-testmon~=2.1.3  # Test selection based on code changes
+pytest-picked~=0.5.0  # Run tests related to changed files
+pytest-config~=0.1.0  # Configuration testing

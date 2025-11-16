@@ -150,9 +150,9 @@ is_valid = verify_password("user_password", hashed)
 
 ### 5. Encryption (NIST SP 800-38D)
 
-**File:** `security/encryption.py`, `security/encryption_v2.py`
+**File:** `security/encryption.py`
 **Algorithm:** AES-256-GCM
-**Status:** Production-Ready (existing modules)
+**Status:** Production-Ready
 
 **Features:**
 - ✅ AES-256-GCM authenticated encryption

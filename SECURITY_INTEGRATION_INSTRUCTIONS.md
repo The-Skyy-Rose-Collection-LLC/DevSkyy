@@ -3,7 +3,7 @@
 ## Required Imports
 
 ```python
-from security.encryption_v2 import EncryptionManager
+from security.encryption import EncryptionManager
 ```
 
 ```python

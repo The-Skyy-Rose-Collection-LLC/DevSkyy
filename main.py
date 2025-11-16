@@ -78,7 +78,7 @@ except ImportError:
 
 # Security imports
 try:
-    from security.encryption_v2 import EncryptionManager
+    from security.encryption import EncryptionManager
     from security.gdpr_compliance import GDPRManager
     from security.input_validation import validation_middleware
     from security.jwt_auth import JWTManager
@@ -723,7 +723,7 @@ except ImportError as e:
 
 # Import and initialize enterprise monitoring
 try:
-    from monitoring.enterprise_logging import enterprise_logger
+    from core.logging import enterprise_logger
     from monitoring.enterprise_metrics import metrics_collector
     from monitoring.incident_response import incident_response_system
 

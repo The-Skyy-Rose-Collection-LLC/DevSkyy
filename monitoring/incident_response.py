@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from core.logging import enterprise_logger, LogCategory
 from monitoring.enterprise_metrics import Alert, AlertSeverity, metrics_collector
 
 

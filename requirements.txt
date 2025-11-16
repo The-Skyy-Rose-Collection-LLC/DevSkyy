@@ -1,63 +1,74 @@
-# DevSkyy Enterprise Platform - Security-Hardened Dependencies
-# All versions pinned and verified for production use
-# Last security audit: 2025-11-10
-# Security update: 2025-11-10 - Addressed 7 CVEs in cryptography, pip, setuptools
+# DevSkyy Enterprise Platform - Security-Hardened Production Dependencies
+# Core production dependencies only - NO dev/test tools
+# Last security audit: 2025-11-16
+# Version Strategy: ~= for compatible releases, >=,< for security-critical packages
+# Per CLAUDE.md Truth Protocol - Enterprise-Grade Security & Performance
 
-# Build Dependencies (Security-Critical)
-# WHY: setuptools and pip have RCE vulnerabilities (CVE-2025-47273, CVE-2025-8869)
-# Note: pip managed by system, upgrade in deployment environment
-setuptools>=78.1.1,<79.0.0  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345 (RCE via package_index)
+# ============================================================================
+# BUILD DEPENDENCIES (Security-Critical)
+# ============================================================================
+# WHY: setuptools has RCE vulnerabilities (CVE-2025-47273, CVE-2024-6345)
+setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE, package_index RCE
 
-# Core Framework (Latest Secure Versions)
+# ============================================================================
+# CORE FRAMEWORK
+# ============================================================================
 fastapi~=0.119.0  # Includes starlette dependency - do not pin separately
-flask~=3.1.2  # Flask web framework (installed 2025-11-10)
-uvicorn[standard]~=0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency
-pydantic[email]>=2.9.0,<3.0.0 # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)
-python-dotenv~=1.0.1
+flask~=3.1.2  # Flask web framework
+uvicorn[standard]~=0.38.0  # ASGI server with websockets
+pydantic[email]>=2.9.0,<3.0.0  # SECURITY: Schema validation, supports langchain 0.3+
+python-dotenv~=1.0.1  # Environment variable management
 email-validator~=2.1.0  # Required for Pydantic email validation
-blinker~=1.9.0  # Flask signaling support (updated from system 1.7.0)
-werkzeug>=3.1.3,<4.0.0  # WSGI utility library for Flask
-itsdangerous>=2.2.0,<3.0.0  # Secure data signing for Flask
+blinker~=1.9.0  # Flask signaling support
+werkzeug>=3.1.3,<4.0.0  # SECURITY: WSGI utility library for Flask
+itsdangerous>=2.2.0,<3.0.0  # SECURITY: Secure data signing for Flask
 
-# Agent Framework & MCP
-claude-agent-sdk~=0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)
+# ============================================================================
+# AGENT FRAMEWORK & MCP
+# ============================================================================
+claude-agent-sdk~=0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0
 mcp~=1.21.0  # Model Context Protocol - official implementation
 
-# Agent Observability & Training
-logfire[fastapi]~=4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)
-# agentlightning==0.2.1  # DISABLED: May have pydantic version conflicts - needs verification
+# ============================================================================
+# AGENT OBSERVABILITY & TRAINING
+# ============================================================================
+logfire[fastapi]~=4.14.2  # OpenTelemetry-based observability for FastAPI
 
-# Database (Enterprise-Grade)
-# SQLAlchemy (Primary - works with SQLite, PostgreSQL, MySQL)
-SQLAlchemy~=2.0.36
+# ============================================================================
+# DATABASE (Enterprise-Grade)
+# ============================================================================
+SQLAlchemy~=2.0.36  # ORM - works with SQLite, PostgreSQL, MySQL
 aiosqlite~=0.20.0  # Async SQLite driver
-asyncpg~=0.30.0  # Async PostgreSQL driver (optional)
-psycopg2-binary~=2.9.9  # PostgreSQL driver (for Neon database integration & consensus workflow)
+asyncpg~=0.30.0  # Async PostgreSQL driver
+psycopg2-binary~=2.9.9  # PostgreSQL driver for Neon integration
 
-# MongoDB removed - using SQLAlchemy exclusively
+# ============================================================================
+# HTTP & API
+# ============================================================================
+requests>=2.32.4,<3.0.0  # SECURITY: Fix GHSA-9hjg-9r4m-mvj7
+python-multipart~=0.0.18  # File upload support
+aiofiles~=24.1.0  # Async file operations
+httpx~=0.28.1  # Modern async HTTP client
 
-# HTTP & API (Security Updates)
-requests>=2.32.4,<3.0.0  # Security fix GHSA-9hjg-9r4m-mvj7
-python-multipart~=0.0.18
-aiofiles~=24.1.0
-httpx~=0.28.1
+# ============================================================================
+# AUTHENTICATION & SECURITY (Enterprise)
+# ============================================================================
+passlib[bcrypt]>=1.7.4,<2.0.0  # SECURITY: Password hashing
+paramiko>=3.5.0,<4.0.0  # SECURITY: SSH protocol
+certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
+cryptography>=46.0.3,<47.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
+PyJWT~=2.10.1  # JWT authentication per RFC 7519
+bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
+argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2 password hashing
+defusedxml>=0.7.1,<1.0.0  # SECURITY: P0 CRITICAL - Protect against XML attacks (XXE, billion laughs)
 
-# Authentication & Security (Enterprise)
-passlib[bcrypt]>=1.7.4,<2.0.0
-paramiko>=3.5.0,<4.0.0
-certifi>=2024.12.14,<2025.0.0  # Security update
-cryptography>=46.0.3,<47.0.0  # Fix CVE-2024-26130 (NULL ptr crash), CVE-2023-50782 (TLS decrypt), CVE-2024-0727 (PKCS12 DoS), OpenSSL vulns
-PyJWT~=2.10.1  # Updated for security
-bcrypt>=4.2.1,<5.0.0  # Latest
-argon2-cffi>=23.1.0,<24.0.0  # Additional password hashing
-defusedxml>=0.7.1,<1.0.0  # SECURITY: Protect against XML attacks (XXE, billion laughs) - P0 CRITICAL fix
+# ============================================================================
+# SECURITY MIDDLEWARE
+# ============================================================================
+slowapi~=0.1.9  # Rate limiting middleware
+secure~=0.3.0  # Security headers middleware
 
-# Security Middleware & Tools
-slowapi~=0.1.9  # Rate limiting
-secure~=0.3.0  # Security headers
-bandit~=1.8.0  # Security linting
-safety~=3.2.11  # Vulnerability scanning
-
+# ============================================================================
 # AI & ML (Latest Stable)
 anthropic~=0.69.0  # Latest version
 openai~=2.7.2  # Latest version - Updated 2025-11-10
@@ -89,47 +100,41 @@ imageio~=2.36.1  # Image I/O for video frames
 imageio-ffmpeg~=0.5.1  # FFmpeg wrapper for video encoding
 peft~=0.14.0  # Parameter-Efficient Fine-Tuning for LoRA
 
-# Web Scraping & Parsing
-beautifulsoup4~=4.12.3
-lxml~=5.3.0  # Security update
+# ============================================================================
+# WEB SCRAPING & PARSING
+# ============================================================================
+beautifulsoup4~=4.12.3  # HTML/XML parsing
+lxml~=5.3.0  # SECURITY: XML/HTML parser
 
-# Web Automation (Phase 3 Enhancement)
-selenium~=4.27.1  # Web automation
+# ============================================================================
+# WEB AUTOMATION
+# ============================================================================
+selenium~=4.27.1  # Browser automation
 playwright~=1.49.1  # Modern web automation
 webdriver-manager~=4.0.2  # WebDriver management
 
-# Code Quality & Security Analysis
-autopep8~=2.3.1  # Updated
-black~=24.10.0
-isort~=5.13.2
-flake8~=7.1.1
-pylint~=3.3.2
-mypy~=1.13.0  # Type checking
-radon~=6.0.1
-vulture~=2.14  # Updated
-
-# Testing & Development
-pytest~=8.4.2
-pytest-asyncio~=0.24.0
-pytest-cov~=6.0.0  # Updated
-pytest-env~=1.1.5
-
-# Performance & Monitoring
-psutil~=6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)
-prometheus-client~=0.22.0  # Metrics
+# ============================================================================
+# PERFORMANCE & MONITORING
+# ============================================================================
+psutil~=6.0.0  # System utilization
+prometheus-client~=0.22.0  # Metrics collection
 sentry-sdk~=2.19.0  # Error tracking
-elastic-apm~=6.24.0  # APM
+elastic-apm~=6.24.0  # Application Performance Monitoring
 
-# Advanced Monitoring (Phase 5 Enhancement)
+# ============================================================================
+# ADVANCED MONITORING
+# ============================================================================
 grafana-api~=1.0.3  # Grafana integration
 structlog~=24.4.0  # Structured logging
 py-cpuinfo~=9.0.0  # System information
 
-# Additional Enterprise Tools
-click~=8.1.8
-python-slugify~=8.0.4
-redis~=5.2.1
-celery[redis]~=5.4.0
+# ============================================================================
+# ADDITIONAL ENTERPRISE TOOLS
+# ============================================================================
+click~=8.1.8  # CLI framework
+python-slugify~=8.0.4  # URL-safe slugs
+redis~=5.2.1  # Redis client
+celery[redis]~=5.4.0  # Distributed task queue
 alembic~=1.14.0  # Database migrations
 
 # Async Support
@@ -159,10 +164,11 @@ langchain~=1.0.7  # LLM orchestration - Updated to stable 1.0 release
 langchain-text-splitters~=0.3.11  # Text splitting - Updated for langchain 1.0 compatibility
 langsmith~=0.4.43  # LLM monitoring - Updated to latest stable
 
+# ============================================================================
 # RAG (Retrieval-Augmented Generation)
 chromadb~=1.3.4  # Vector database for semantic search - Updated to fix tokenizers conflict
 tiktoken~=0.8.0  # Token counting for embeddings
-pypdf>=5.2.0,<6.0.0  # PDF document processing - SECURITY: Updated to fix 3 CVEs
+pypdf>=5.2.0,<6.0.0  # SECURITY: PDF processing - Fix 3 CVEs
 python-docx~=1.1.2  # Word document processing
 python-magic~=0.4.27  # File type detection
 faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search (CPU version)
@@ -201,56 +207,75 @@ woocommerce~=3.0.0
 python-json-logger~=3.2.0
 loguru~=0.7.3  # Enhanced logging
 
-# Data Validation
+# ============================================================================
+# DATA VALIDATION
+# ============================================================================
 cerberus~=1.3.6  # Schema validation
-marshmallow~=3.23.2  # Serialization
+marshmallow~=3.23.2  # Object serialization/deserialization
 
-# Caching
-cachetools~=5.5.0
-diskcache~=5.6.3
-pymemcache~=4.0.0
+# ============================================================================
+# CACHING
+# ============================================================================
+cachetools~=5.5.0  # In-memory caching
+diskcache~=5.6.3  # Disk-based cache
+pymemcache~=4.0.0  # Memcached client
 
-# Queue & Messaging
-kombu~=5.4.2
-pika~=1.3.2  # RabbitMQ
-kafka-python~=2.0.2
+# ============================================================================
+# QUEUE & MESSAGING
+# ============================================================================
+kombu~=5.4.2  # Messaging library for Celery
+pika~=1.3.2  # RabbitMQ client
+kafka-python~=2.0.2  # Apache Kafka client
 
-# Compression & Encoding
-python-snappy~=0.7.3
-lz4~=4.3.3
-zstandard~=0.23.0
+# ============================================================================
+# COMPRESSION & ENCODING
+# ============================================================================
+python-snappy~=0.7.3  # Snappy compression
+lz4~=4.3.3  # LZ4 compression
+zstandard~=0.23.0  # Zstandard compression
 
-# Date & Time
-python-dateutil~=2.9.0.post0
-pytz~=2024.2
-pendulum~=3.0.0
+# ============================================================================
+# DATE & TIME
+# ============================================================================
+python-dateutil~=2.9.0.post0  # Date utilities
+pytz~=2024.2  # Timezone definitions
+pendulum~=3.0.0  # Python datetimes made easy
 
-# Environment & Config
-python-decouple~=3.8
-environs~=11.2.1
-dynaconf~=3.2.8
+# ============================================================================
+# ENVIRONMENT & CONFIG
+# ============================================================================
+python-decouple~=3.8  # Separate settings from code
+environs~=11.2.1  # Environment variable parsing
+dynaconf~=3.2.8  # Dynamic configuration management
 
-# API Documentation
-# flasgger==0.9.7.1  # DISABLED: setuptools compatibility issue - using FastAPI's built-in OpenAPI docs
-apispec~=6.7.1
-pydantic-openapi-schema~=1.5.1
+# ============================================================================
+# API DOCUMENTATION
+# ============================================================================
+apispec~=6.7.1  # API specification generator
+pydantic-openapi-schema~=1.5.1  # Pydantic OpenAPI schema
 
-# Security Compliance
-pycryptodome~=3.21.0  # Encryption
-# python-owasp==1.4.0  # OWASP tools - Package does not exist in PyPI
-pyotp~=2.9.0  # 2FA/MFA
-# python-secrets==24.10.12  # DISABLED: gnupg dependency has setuptools issues - using python-decouple instead
+# ============================================================================
+# SECURITY COMPLIANCE
+# ============================================================================
+pycryptodome~=3.21.0  # Cryptographic library
+pyotp~=2.9.0  # 2FA/MFA support
 
-# Enterprise Monitoring
-datadog~=0.50.2
-newrelic~=10.4.0
+# ============================================================================
+# ENTERPRISE MONITORING
+# ============================================================================
+datadog~=0.50.2  # Datadog monitoring
+newrelic~=10.4.0  # New Relic APM
 boto3~=1.36.7  # AWS SDK
 
-# Version Control
-gitpython~=3.1.43
-pygit2~=1.16.0
+# ============================================================================
+# VERSION CONTROL
+# ============================================================================
+gitpython~=3.1.43  # Git integration
+pygit2~=1.16.0  # Python bindings to libgit2
 
-# Documentation
-sphinx~=8.1.3
-mkdocs~=1.6.1
-mkdocs-material~=9.5.47
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+sphinx~=8.1.3  # Documentation generator
+mkdocs~=1.6.1  # Project documentation with Markdown
+mkdocs-material~=9.5.47  # Material Design theme for MkDocs
