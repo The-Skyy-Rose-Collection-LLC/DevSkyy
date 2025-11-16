@@ -150,6 +150,17 @@ class AIConfig(BaseModel):
     max_tokens: int = Field(default=4096, ge=256, le=200000)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     timeout_seconds: int = Field(default=120, ge=10, le=300)
+    openai_is_consequential: bool = Field(default=True)
+
+    # Safeguard configuration
+    enable_safeguards: bool = Field(default=True)
+    safeguard_level: str = Field(default="strict")  # strict, moderate, permissive
+    enable_rate_limiting: bool = Field(default=True)
+    max_requests_per_minute: int = Field(default=60, ge=1, le=1000)
+    max_consequential_per_hour: int = Field(default=100, ge=1, le=10000)
+    enable_circuit_breaker: bool = Field(default=True)
+    enable_audit_logging: bool = Field(default=True)
+    enforce_production_safeguards: bool = Field(default=True)
 
     class Config:
         frozen = True
@@ -448,6 +459,15 @@ class UnifiedConfig:
         - AI_MAX_TOKENS: 4096
         - AI_TEMPERATURE: 0.7
         - AI_TIMEOUT_SECONDS: 120
+        - OPENAI_IS_CONSEQUENTIAL: "true" (marks OpenAI requests as having real-world consequences per OpenAI safety features)
+        - OPENAI_ENABLE_SAFEGUARDS: "true" (enable comprehensive safeguards)
+        - OPENAI_SAFEGUARD_LEVEL: "strict" (strict, moderate, permissive)
+        - OPENAI_ENABLE_RATE_LIMITING: "true"
+        - OPENAI_MAX_REQUESTS_PER_MINUTE: 60
+        - OPENAI_MAX_CONSEQUENTIAL_PER_HOUR: 100
+        - OPENAI_ENABLE_CIRCUIT_BREAKER: "true"
+        - OPENAI_ENABLE_AUDIT_LOGGING: "true"
+        - OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS: "true"
         """
         self.ai = AIConfig(
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -456,6 +476,15 @@ class UnifiedConfig:
             max_tokens=int(os.getenv("AI_MAX_TOKENS", 4096)),
             temperature=float(os.getenv("AI_TEMPERATURE", 0.7)),
             timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120)),
+            openai_is_consequential=os.getenv("OPENAI_IS_CONSEQUENTIAL", "true").lower() == "true",
+            enable_safeguards=os.getenv("OPENAI_ENABLE_SAFEGUARDS", "true").lower() == "true",
+            safeguard_level=os.getenv("OPENAI_SAFEGUARD_LEVEL", "strict").lower(),
+            enable_rate_limiting=os.getenv("OPENAI_ENABLE_RATE_LIMITING", "true").lower() == "true",
+            max_requests_per_minute=int(os.getenv("OPENAI_MAX_REQUESTS_PER_MINUTE", 60)),
+            max_consequential_per_hour=int(os.getenv("OPENAI_MAX_CONSEQUENTIAL_PER_HOUR", 100)),
+            enable_circuit_breaker=os.getenv("OPENAI_ENABLE_CIRCUIT_BREAKER", "true").lower() == "true",
+            enable_audit_logging=os.getenv("OPENAI_ENABLE_AUDIT_LOGGING", "true").lower() == "true",
+            enforce_production_safeguards=os.getenv("OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS", "true").lower() == "true"
         )
 
     def is_production(self) -> bool:

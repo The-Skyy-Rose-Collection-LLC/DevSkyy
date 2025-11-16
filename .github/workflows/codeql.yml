@@ -86,7 +86,7 @@ jobs:
       - name: Install Python dependencies
         if: matrix.language == 'python'
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade "pip>=25.3" "setuptools>=78.1.1,<79.0.0"
           # Install dependencies to improve code analysis
           pip install -r requirements.txt || echo "::warning::Some dependencies failed to install"
 
@@ -125,7 +125,7 @@ jobs:
 
       - name: Install security analysis tools
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade "pip>=25.3" "setuptools>=78.1.1,<79.0.0"
           pip install bandit[toml]==1.8.0 semgrep==1.99.0
 
       - name: Run Bandit SAST

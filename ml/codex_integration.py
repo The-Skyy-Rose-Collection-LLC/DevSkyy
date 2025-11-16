@@ -25,6 +25,8 @@ try:
 except ImportError:
     AsyncOpenAI = None
 
+from config.unified_config import get_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,12 +43,19 @@ class CodexIntegration:
         Args:
             api_key: OpenAI API key (uses environment variable if not provided)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        config = get_config()
+        self.api_key = api_key or config.ai.openai_api_key or os.getenv("OPENAI_API_KEY")
+        self.is_consequential = config.ai.openai_is_consequential
         self.client = None
 
         if self.api_key and AsyncOpenAI:
-            self.client = AsyncOpenAI(api_key=self.api_key)
-            logger.info("🤖 OpenAI Codex Integration initialized (using GPT-4)")
+            # Set x-openai-isConsequential header for high-stakes operations
+            # Per OpenAI safety features: marks requests that could have significant real-world consequences
+            default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+            self.client = AsyncOpenAI(api_key=self.api_key, default_headers=default_headers)
+            logger.info(
+                f"🤖 OpenAI Codex Integration initialized (using GPT-4, consequential={self.is_consequential})"
+            )
         else:
             if not self.api_key:
                 logger.warning("⚠️  OpenAI API key not configured")
