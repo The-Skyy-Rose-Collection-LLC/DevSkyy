@@ -1,0 +1,2835 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:devskyy-20251116-010255",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-11-16T01:02:55.437009",
+    "tools": [
+      {
+        "vendor": "DevSkyy",
+        "name": "SBOM Generator",
+        "version": "1.0.0"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "pkg:github/The-Skyy-Rose-Collection-LLC/DevSkyy@5.2.1",
+      "name": "DevSkyy",
+      "version": "5.2.1",
+      "description": "Luxury Fashion AI Platform with Multi-Agent Orchestration",
+      "licenses": [
+        {
+          "license": {
+            "name": "Proprietary"
+          }
+        }
+      ],
+      "purl": "pkg:github/The-Skyy-Rose-Collection-LLC/DevSkyy@5.2.1"
+    },
+    "properties": [
+      {
+        "name": "truth-protocol-compliant",
+        "value": "true"
+      },
+      {
+        "name": "test-coverage",
+        "value": "\u226590%"
+      },
+      {
+        "name": "security-baseline",
+        "value": "AES-256-GCM, OAuth2+JWT, RBAC"
+      },
+      {
+        "name": "python-version",
+        "value": "3.11.9"
+      },
+      {
+        "name": "framework",
+        "value": "FastAPI 0.104+"
+      },
+      {
+        "name": "database",
+        "value": "PostgreSQL 15"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/setuptools@68.1.2",
+      "name": "setuptools",
+      "version": "68.1.2",
+      "purl": "pkg:pypi/setuptools@68.1.2",
+      "description": "Python package: setuptools"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fastapi@0.119.0  # Includes starlette dependency - do not pin separately",
+      "name": "fastapi",
+      "version": "0.119.0  # Includes starlette dependency - do not pin separately",
+      "purl": "pkg:pypi/fastapi@0.119.0  # Includes starlette dependency - do not pin separately",
+      "description": "Python package: fastapi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/flask@3.1.2  # Flask web framework (installed 2025-11-10)",
+      "name": "flask",
+      "version": "3.1.2  # Flask web framework (installed 2025-11-10)",
+      "purl": "pkg:pypi/flask@3.1.2  # Flask web framework (installed 2025-11-10)",
+      "description": "Python package: flask"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/uvicorn@[standard]~=0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency",
+      "name": "uvicorn",
+      "version": "[standard]~=0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency",
+      "purl": "pkg:pypi/uvicorn@[standard]~=0.38.0  # Updated from 0.34.0 by claude-agent-sdk dependency",
+      "description": "Python package: uvicorn"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic@[email]>=2.9.0,<3.0.0 # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)",
+      "name": "pydantic",
+      "version": "[email]>=2.9.0,<3.0.0 # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)",
+      "purl": "pkg:pypi/pydantic@[email]>=2.9.0,<3.0.0 # Updated: langchain 0.3+ supports pydantic v2 (fastapi 0.119 requires >=2.9)",
+      "description": "Python package: pydantic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dotenv@1.0.1",
+      "name": "python-dotenv",
+      "version": "1.0.1",
+      "purl": "pkg:pypi/python-dotenv@1.0.1",
+      "description": "Python package: python-dotenv"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/email-validator@2.1.0  # Required for Pydantic email validation",
+      "name": "email-validator",
+      "version": "2.1.0  # Required for Pydantic email validation",
+      "purl": "pkg:pypi/email-validator@2.1.0  # Required for Pydantic email validation",
+      "description": "Python package: email-validator"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/blinker@1.7.0",
+      "name": "blinker",
+      "version": "1.7.0",
+      "purl": "pkg:pypi/blinker@1.7.0",
+      "description": "Python package: blinker"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/werkzeug@3.1.3,<4.0.0  # WSGI utility library for Flask",
+      "name": "werkzeug",
+      "version": "3.1.3,<4.0.0  # WSGI utility library for Flask",
+      "purl": "pkg:pypi/werkzeug@3.1.3,<4.0.0  # WSGI utility library for Flask",
+      "description": "Python package: werkzeug"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/itsdangerous@2.2.0,<3.0.0  # Secure data signing for Flask",
+      "name": "itsdangerous",
+      "version": "2.2.0,<3.0.0  # Secure data signing for Flask",
+      "purl": "pkg:pypi/itsdangerous@2.2.0,<3.0.0  # Secure data signing for Flask",
+      "description": "Python package: itsdangerous"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/claude-agent-sdk@0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)",
+      "name": "claude-agent-sdk",
+      "version": "0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)",
+      "purl": "pkg:pypi/claude-agent-sdk@0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0 (installed 2025-11-10)",
+      "description": "Python package: claude-agent-sdk"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mcp@1.21.0  # Model Context Protocol - official implementation",
+      "name": "mcp",
+      "version": "1.21.0  # Model Context Protocol - official implementation",
+      "purl": "pkg:pypi/mcp@1.21.0  # Model Context Protocol - official implementation",
+      "description": "Python package: mcp"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/logfire@[fastapi]~=4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)",
+      "name": "logfire",
+      "version": "[fastapi]~=4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)",
+      "purl": "pkg:pypi/logfire@[fastapi]~=4.14.2  # OpenTelemetry-based observability for FastAPI (installed 2025-11-10)",
+      "description": "Python package: logfire"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/SQLAlchemy@2.0.36",
+      "name": "SQLAlchemy",
+      "version": "2.0.36",
+      "purl": "pkg:pypi/SQLAlchemy@2.0.36",
+      "description": "Python package: SQLAlchemy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiosqlite@0.20.0  # Async SQLite driver",
+      "name": "aiosqlite",
+      "version": "0.20.0  # Async SQLite driver",
+      "purl": "pkg:pypi/aiosqlite@0.20.0  # Async SQLite driver",
+      "description": "Python package: aiosqlite"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/asyncpg@0.30.0  # Async PostgreSQL driver (optional)",
+      "name": "asyncpg",
+      "version": "0.30.0  # Async PostgreSQL driver (optional)",
+      "purl": "pkg:pypi/asyncpg@0.30.0  # Async PostgreSQL driver (optional)",
+      "description": "Python package: asyncpg"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/psycopg2-binary@2.9.9  # PostgreSQL driver (for Neon database integration & consensus workflow)",
+      "name": "psycopg2-binary",
+      "version": "2.9.9  # PostgreSQL driver (for Neon database integration & consensus workflow)",
+      "purl": "pkg:pypi/psycopg2-binary@2.9.9  # PostgreSQL driver (for Neon database integration & consensus workflow)",
+      "description": "Python package: psycopg2-binary"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/requests@2.32.5",
+      "name": "requests",
+      "version": "2.32.5",
+      "purl": "pkg:pypi/requests@2.32.5",
+      "description": "Python package: requests"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-multipart@0.0.18",
+      "name": "python-multipart",
+      "version": "0.0.18",
+      "purl": "pkg:pypi/python-multipart@0.0.18",
+      "description": "Python package: python-multipart"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiofiles@24.1.0",
+      "name": "aiofiles",
+      "version": "24.1.0",
+      "purl": "pkg:pypi/aiofiles@24.1.0",
+      "description": "Python package: aiofiles"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpx@0.28.1",
+      "name": "httpx",
+      "version": "0.28.1",
+      "purl": "pkg:pypi/httpx@0.28.1",
+      "description": "Python package: httpx"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/passlib@[bcrypt]>=1.7.4,<2.0.0",
+      "name": "passlib",
+      "version": "[bcrypt]>=1.7.4,<2.0.0",
+      "purl": "pkg:pypi/passlib@[bcrypt]>=1.7.4,<2.0.0",
+      "description": "Python package: passlib"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/paramiko@3.5.0,<4.0.0",
+      "name": "paramiko",
+      "version": "3.5.0,<4.0.0",
+      "purl": "pkg:pypi/paramiko@3.5.0,<4.0.0",
+      "description": "Python package: paramiko"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/certifi@2025.11.12",
+      "name": "certifi",
+      "version": "2025.11.12",
+      "purl": "pkg:pypi/certifi@2025.11.12",
+      "description": "Python package: certifi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cryptography@41.0.7",
+      "name": "cryptography",
+      "version": "41.0.7",
+      "purl": "pkg:pypi/cryptography@41.0.7",
+      "description": "Python package: cryptography"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/PyJWT@2.7.0",
+      "name": "PyJWT",
+      "version": "2.7.0",
+      "purl": "pkg:pypi/PyJWT@2.7.0",
+      "description": "Python package: PyJWT"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/bcrypt@4.2.1,<5.0.0  # Latest",
+      "name": "bcrypt",
+      "version": "4.2.1,<5.0.0  # Latest",
+      "purl": "pkg:pypi/bcrypt@4.2.1,<5.0.0  # Latest",
+      "description": "Python package: bcrypt"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/argon2-cffi@23.1.0,<24.0.0  # Additional password hashing",
+      "name": "argon2-cffi",
+      "version": "23.1.0,<24.0.0  # Additional password hashing",
+      "purl": "pkg:pypi/argon2-cffi@23.1.0,<24.0.0  # Additional password hashing",
+      "description": "Python package: argon2-cffi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/slowapi@0.1.9  # Rate limiting",
+      "name": "slowapi",
+      "version": "0.1.9  # Rate limiting",
+      "purl": "pkg:pypi/slowapi@0.1.9  # Rate limiting",
+      "description": "Python package: slowapi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/secure@0.3.0  # Security headers",
+      "name": "secure",
+      "version": "0.3.0  # Security headers",
+      "purl": "pkg:pypi/secure@0.3.0  # Security headers",
+      "description": "Python package: secure"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/bandit@1.8.0  # Security linting",
+      "name": "bandit",
+      "version": "1.8.0  # Security linting",
+      "purl": "pkg:pypi/bandit@1.8.0  # Security linting",
+      "description": "Python package: bandit"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/safety@3.2.11  # Vulnerability scanning",
+      "name": "safety",
+      "version": "3.2.11  # Vulnerability scanning",
+      "purl": "pkg:pypi/safety@3.2.11  # Vulnerability scanning",
+      "description": "Python package: safety"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/anthropic@0.69.0  # Latest version",
+      "name": "anthropic",
+      "version": "0.69.0  # Latest version",
+      "purl": "pkg:pypi/anthropic@0.69.0  # Latest version",
+      "description": "Python package: anthropic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openai@2.7.2  # Latest version - Updated 2025-11-10",
+      "name": "openai",
+      "version": "2.7.2  # Latest version - Updated 2025-11-10",
+      "purl": "pkg:pypi/openai@2.7.2  # Latest version - Updated 2025-11-10",
+      "description": "Python package: openai"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/huggingface_hub@0.36.0  # Hugging Face model hub client - Updated 2025-11-10",
+      "name": "huggingface_hub",
+      "version": "0.36.0  # Hugging Face model hub client - Updated 2025-11-10",
+      "purl": "pkg:pypi/huggingface_hub@0.36.0  # Hugging Face model hub client - Updated 2025-11-10",
+      "description": "Python package: huggingface_hub"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/transformers@4.57.1  # Latest version - Updated 2025-11-10",
+      "name": "transformers",
+      "version": "4.57.1  # Latest version - Updated 2025-11-10",
+      "purl": "pkg:pypi/transformers@4.57.1  # Latest version - Updated 2025-11-10",
+      "description": "Python package: transformers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tokenizers@0.22.1  # Required by transformers - Updated 2025-11-10",
+      "name": "tokenizers",
+      "version": "0.22.1  # Required by transformers - Updated 2025-11-10",
+      "purl": "pkg:pypi/tokenizers@0.22.1  # Required by transformers - Updated 2025-11-10",
+      "description": "Python package: tokenizers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/torch@2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes",
+      "name": "torch",
+      "version": "2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes",
+      "purl": "pkg:pypi/torch@2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes",
+      "description": "Python package: torch"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/torchvision@0.20.0  # Compatible with torch 2.9.0",
+      "name": "torchvision",
+      "version": "0.20.0  # Compatible with torch 2.9.0",
+      "purl": "pkg:pypi/torchvision@0.20.0  # Compatible with torch 2.9.0",
+      "description": "Python package: torchvision"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/diffusers@0.35.2  # Latest version - Updated 2025-11-10",
+      "name": "diffusers",
+      "version": "0.35.2  # Latest version - Updated 2025-11-10",
+      "purl": "pkg:pypi/diffusers@0.35.2  # Latest version - Updated 2025-11-10",
+      "description": "Python package: diffusers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/safetensors@0.6.2  # Safe tensor serialization - Updated 2025-11-10",
+      "name": "safetensors",
+      "version": "0.6.2  # Safe tensor serialization - Updated 2025-11-10",
+      "purl": "pkg:pypi/safetensors@0.6.2  # Safe tensor serialization - Updated 2025-11-10",
+      "description": "Python package: safetensors"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sentence-transformers@3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1",
+      "name": "sentence-transformers",
+      "version": "3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1",
+      "purl": "pkg:pypi/sentence-transformers@3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1",
+      "description": "Python package: sentence-transformers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scikit-learn@1.5.2",
+      "name": "scikit-learn",
+      "version": "1.5.2",
+      "purl": "pkg:pypi/scikit-learn@1.5.2",
+      "description": "Python package: scikit-learn"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy@2.3.4  # Updated 2025-11-10",
+      "name": "numpy",
+      "version": "2.3.4  # Updated 2025-11-10",
+      "purl": "pkg:pypi/numpy@2.3.4  # Updated 2025-11-10",
+      "description": "Python package: numpy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pandas@2.3.3  # Updated for security fixes",
+      "name": "pandas",
+      "version": "2.3.3  # Updated for security fixes",
+      "purl": "pkg:pypi/pandas@2.3.3  # Updated for security fixes",
+      "description": "Python package: pandas"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/xgboost@2.1.3",
+      "name": "xgboost",
+      "version": "2.1.3",
+      "purl": "pkg:pypi/xgboost@2.1.3",
+      "description": "Python package: xgboost"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/lightgbm@4.6.0  # Updated to fix PYSEC-2024-231 vulnerability",
+      "name": "lightgbm",
+      "version": "4.6.0  # Updated to fix PYSEC-2024-231 vulnerability",
+      "purl": "pkg:pypi/lightgbm@4.6.0  # Updated to fix PYSEC-2024-231 vulnerability",
+      "description": "Python package: lightgbm"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/opencv-python@4.11.0.86  # Updated",
+      "name": "opencv-python",
+      "version": "4.11.0.86  # Updated",
+      "purl": "pkg:pypi/opencv-python@4.11.0.86  # Updated",
+      "description": "Python package: opencv-python"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pillow@12.0.0  # Latest version - Updated 2025-11-10",
+      "name": "pillow",
+      "version": "12.0.0  # Latest version - Updated 2025-11-10",
+      "purl": "pkg:pypi/pillow@12.0.0  # Latest version - Updated 2025-11-10",
+      "description": "Python package: pillow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/imagehash@4.3.2",
+      "name": "imagehash",
+      "version": "4.3.2",
+      "purl": "pkg:pypi/imagehash@4.3.2",
+      "description": "Python package: imagehash"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/moviepy@1.0.3  # Video editing and processing",
+      "name": "moviepy",
+      "version": "1.0.3  # Video editing and processing",
+      "purl": "pkg:pypi/moviepy@1.0.3  # Video editing and processing",
+      "description": "Python package: moviepy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/imageio@2.36.1  # Image I/O for video frames",
+      "name": "imageio",
+      "version": "2.36.1  # Image I/O for video frames",
+      "purl": "pkg:pypi/imageio@2.36.1  # Image I/O for video frames",
+      "description": "Python package: imageio"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/imageio-ffmpeg@0.5.1  # FFmpeg wrapper for video encoding",
+      "name": "imageio-ffmpeg",
+      "version": "0.5.1  # FFmpeg wrapper for video encoding",
+      "purl": "pkg:pypi/imageio-ffmpeg@0.5.1  # FFmpeg wrapper for video encoding",
+      "description": "Python package: imageio-ffmpeg"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/peft@0.14.0  # Parameter-Efficient Fine-Tuning for LoRA",
+      "name": "peft",
+      "version": "0.14.0  # Parameter-Efficient Fine-Tuning for LoRA",
+      "purl": "pkg:pypi/peft@0.14.0  # Parameter-Efficient Fine-Tuning for LoRA",
+      "description": "Python package: peft"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/beautifulsoup4@4.12.3",
+      "name": "beautifulsoup4",
+      "version": "4.12.3",
+      "purl": "pkg:pypi/beautifulsoup4@4.12.3",
+      "description": "Python package: beautifulsoup4"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/lxml@5.3.0  # Security update",
+      "name": "lxml",
+      "version": "5.3.0  # Security update",
+      "purl": "pkg:pypi/lxml@5.3.0  # Security update",
+      "description": "Python package: lxml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/selenium@4.27.1  # Web automation",
+      "name": "selenium",
+      "version": "4.27.1  # Web automation",
+      "purl": "pkg:pypi/selenium@4.27.1  # Web automation",
+      "description": "Python package: selenium"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/playwright@1.49.1  # Modern web automation",
+      "name": "playwright",
+      "version": "1.49.1  # Modern web automation",
+      "purl": "pkg:pypi/playwright@1.49.1  # Modern web automation",
+      "description": "Python package: playwright"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/webdriver-manager@4.0.2  # WebDriver management",
+      "name": "webdriver-manager",
+      "version": "4.0.2  # WebDriver management",
+      "purl": "pkg:pypi/webdriver-manager@4.0.2  # WebDriver management",
+      "description": "Python package: webdriver-manager"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/autopep8@2.3.1  # Updated",
+      "name": "autopep8",
+      "version": "2.3.1  # Updated",
+      "purl": "pkg:pypi/autopep8@2.3.1  # Updated",
+      "description": "Python package: autopep8"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/black@24.10.0",
+      "name": "black",
+      "version": "24.10.0",
+      "purl": "pkg:pypi/black@24.10.0",
+      "description": "Python package: black"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/isort@5.13.2",
+      "name": "isort",
+      "version": "5.13.2",
+      "purl": "pkg:pypi/isort@5.13.2",
+      "description": "Python package: isort"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/flake8@7.1.1",
+      "name": "flake8",
+      "version": "7.1.1",
+      "purl": "pkg:pypi/flake8@7.1.1",
+      "description": "Python package: flake8"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pylint@3.3.2",
+      "name": "pylint",
+      "version": "3.3.2",
+      "purl": "pkg:pypi/pylint@3.3.2",
+      "description": "Python package: pylint"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mypy@1.13.0  # Type checking",
+      "name": "mypy",
+      "version": "1.13.0  # Type checking",
+      "purl": "pkg:pypi/mypy@1.13.0  # Type checking",
+      "description": "Python package: mypy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/radon@6.0.1",
+      "name": "radon",
+      "version": "6.0.1",
+      "purl": "pkg:pypi/radon@6.0.1",
+      "description": "Python package: radon"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/vulture@2.14  # Updated",
+      "name": "vulture",
+      "version": "2.14  # Updated",
+      "purl": "pkg:pypi/vulture@2.14  # Updated",
+      "description": "Python package: vulture"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest@8.4.2",
+      "name": "pytest",
+      "version": "8.4.2",
+      "purl": "pkg:pypi/pytest@8.4.2",
+      "description": "Python package: pytest"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-asyncio@0.24.0",
+      "name": "pytest-asyncio",
+      "version": "0.24.0",
+      "purl": "pkg:pypi/pytest-asyncio@0.24.0",
+      "description": "Python package: pytest-asyncio"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-cov@6.0.0  # Updated",
+      "name": "pytest-cov",
+      "version": "6.0.0  # Updated",
+      "purl": "pkg:pypi/pytest-cov@6.0.0  # Updated",
+      "description": "Python package: pytest-cov"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-env@1.1.5",
+      "name": "pytest-env",
+      "version": "1.1.5",
+      "purl": "pkg:pypi/pytest-env@1.1.5",
+      "description": "Python package: pytest-env"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/psutil@6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)",
+      "name": "psutil",
+      "version": "6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)",
+      "purl": "pkg:pypi/psutil@6.0.0  # Downgraded for safety 3.2.11 compatibility (requires ~=6.0.0)",
+      "description": "Python package: psutil"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/prometheus-client@0.22.0  # Metrics",
+      "name": "prometheus-client",
+      "version": "0.22.0  # Metrics",
+      "purl": "pkg:pypi/prometheus-client@0.22.0  # Metrics",
+      "description": "Python package: prometheus-client"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sentry-sdk@2.19.0  # Error tracking",
+      "name": "sentry-sdk",
+      "version": "2.19.0  # Error tracking",
+      "purl": "pkg:pypi/sentry-sdk@2.19.0  # Error tracking",
+      "description": "Python package: sentry-sdk"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/elastic-apm@6.24.0  # APM",
+      "name": "elastic-apm",
+      "version": "6.24.0  # APM",
+      "purl": "pkg:pypi/elastic-apm@6.24.0  # APM",
+      "description": "Python package: elastic-apm"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/grafana-api@1.0.3  # Grafana integration",
+      "name": "grafana-api",
+      "version": "1.0.3  # Grafana integration",
+      "purl": "pkg:pypi/grafana-api@1.0.3  # Grafana integration",
+      "description": "Python package: grafana-api"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/structlog@24.4.0  # Structured logging",
+      "name": "structlog",
+      "version": "24.4.0  # Structured logging",
+      "purl": "pkg:pypi/structlog@24.4.0  # Structured logging",
+      "description": "Python package: structlog"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/py-cpuinfo@9.0.0  # System information",
+      "name": "py-cpuinfo",
+      "version": "9.0.0  # System information",
+      "purl": "pkg:pypi/py-cpuinfo@9.0.0  # System information",
+      "description": "Python package: py-cpuinfo"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/click@8.1.8",
+      "name": "click",
+      "version": "8.1.8",
+      "purl": "pkg:pypi/click@8.1.8",
+      "description": "Python package: click"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-slugify@8.0.4",
+      "name": "python-slugify",
+      "version": "8.0.4",
+      "purl": "pkg:pypi/python-slugify@8.0.4",
+      "description": "Python package: python-slugify"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/redis@5.2.1",
+      "name": "redis",
+      "version": "5.2.1",
+      "purl": "pkg:pypi/redis@5.2.1",
+      "description": "Python package: redis"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/celery@[redis]~=5.4.0",
+      "name": "celery",
+      "version": "[redis]~=5.4.0",
+      "purl": "pkg:pypi/celery@[redis]~=5.4.0",
+      "description": "Python package: celery"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/alembic@1.14.0  # Database migrations",
+      "name": "alembic",
+      "version": "1.14.0  # Database migrations",
+      "purl": "pkg:pypi/alembic@1.14.0  # Database migrations",
+      "description": "Python package: alembic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aioredis@2.0.1",
+      "name": "aioredis",
+      "version": "2.0.1",
+      "purl": "pkg:pypi/aioredis@2.0.1",
+      "description": "Python package: aioredis"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiomysql@0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerability",
+      "name": "aiomysql",
+      "version": "0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerability",
+      "purl": "pkg:pypi/aiomysql@0.3.0  # MySQL async - Updated to fix GHSA-r397-ff8c-wv2g vulnerability",
+      "description": "Python package: aiomysql"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/facebook-sdk@3.1.0",
+      "name": "facebook-sdk",
+      "version": "3.1.0",
+      "purl": "pkg:pypi/facebook-sdk@3.1.0",
+      "description": "Python package: facebook-sdk"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tweepy@4.14.0",
+      "name": "tweepy",
+      "version": "4.14.0",
+      "purl": "pkg:pypi/tweepy@4.14.0",
+      "description": "Python package: tweepy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/google-api-python-client@2.155.0  # Updated",
+      "name": "google-api-python-client",
+      "version": "2.155.0  # Updated",
+      "purl": "pkg:pypi/google-api-python-client@2.155.0  # Updated",
+      "description": "Python package: google-api-python-client"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/linkedin-api@2.3.0",
+      "name": "linkedin-api",
+      "version": "2.3.0",
+      "purl": "pkg:pypi/linkedin-api@2.3.0",
+      "description": "Python package: linkedin-api"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/elevenlabs@1.12.0  # Updated",
+      "name": "elevenlabs",
+      "version": "1.12.0  # Updated",
+      "purl": "pkg:pypi/elevenlabs@1.12.0  # Updated",
+      "description": "Python package: elevenlabs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openai-whisper@20240930  # Latest whisper (date-based version, must use exact pin)",
+      "name": "openai-whisper",
+      "version": "20240930  # Latest whisper (date-based version, must use exact pin)",
+      "purl": "pkg:pypi/openai-whisper@20240930  # Latest whisper (date-based version, must use exact pin)",
+      "description": "Python package: openai-whisper"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydub@0.25.1",
+      "name": "pydub",
+      "version": "0.25.1",
+      "purl": "pkg:pypi/pydub@0.25.1",
+      "description": "Python package: pydub"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/speechrecognition@3.12.0  # Updated",
+      "name": "speechrecognition",
+      "version": "3.12.0  # Updated",
+      "purl": "pkg:pypi/speechrecognition@3.12.0  # Updated",
+      "description": "Python package: speechrecognition"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/textblob@0.18.0.post0",
+      "name": "textblob",
+      "version": "0.18.0.post0",
+      "purl": "pkg:pypi/textblob@0.18.0.post0",
+      "description": "Python package: textblob"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/vaderSentiment@3.3.2",
+      "name": "vaderSentiment",
+      "version": "3.3.2",
+      "purl": "pkg:pypi/vaderSentiment@3.3.2",
+      "description": "Python package: vaderSentiment"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/spacy@3.8.3",
+      "name": "spacy",
+      "version": "3.8.3",
+      "purl": "pkg:pypi/spacy@3.8.3",
+      "description": "Python package: spacy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nltk@3.9.1",
+      "name": "nltk",
+      "version": "3.9.1",
+      "purl": "pkg:pypi/nltk@3.9.1",
+      "description": "Python package: nltk"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/langchain@0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27",
+      "name": "langchain",
+      "version": "0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27",
+      "purl": "pkg:pypi/langchain@0.3.27  # LLM orchestration - Updated: 0.4.0 doesn't exist, using latest stable 0.3.27",
+      "description": "Python package: langchain"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/langchain-text-splitters@0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability",
+      "name": "langchain-text-splitters",
+      "version": "0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability",
+      "purl": "pkg:pypi/langchain-text-splitters@0.3.9  # Text splitting - Updated to fix GHSA-m42m-m8cr-8m58 vulnerability",
+      "description": "Python package: langchain-text-splitters"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/langsmith@0.2.6  # LLM monitoring",
+      "name": "langsmith",
+      "version": "0.2.6  # LLM monitoring",
+      "purl": "pkg:pypi/langsmith@0.2.6  # LLM monitoring",
+      "description": "Python package: langsmith"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/chromadb@0.5.23  # Vector database for semantic search",
+      "name": "chromadb",
+      "version": "0.5.23  # Vector database for semantic search",
+      "purl": "pkg:pypi/chromadb@0.5.23  # Vector database for semantic search",
+      "description": "Python package: chromadb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tiktoken@0.8.0  # Token counting for embeddings",
+      "name": "tiktoken",
+      "version": "0.8.0  # Token counting for embeddings",
+      "purl": "pkg:pypi/tiktoken@0.8.0  # Token counting for embeddings",
+      "description": "Python package: tiktoken"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pypdf@5.1.0  # PDF document processing",
+      "name": "pypdf",
+      "version": "5.1.0  # PDF document processing",
+      "purl": "pkg:pypi/pypdf@5.1.0  # PDF document processing",
+      "description": "Python package: pypdf"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-docx@1.1.2  # Word document processing",
+      "name": "python-docx",
+      "version": "1.1.2  # Word document processing",
+      "purl": "pkg:pypi/python-docx@1.1.2  # Word document processing",
+      "description": "Python package: python-docx"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-magic@0.4.27  # File type detection",
+      "name": "python-magic",
+      "version": "0.4.27  # File type detection",
+      "purl": "pkg:pypi/python-magic@0.4.27  # File type detection",
+      "description": "Python package: python-magic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/faiss-cpu@1.9.0.post1  # Facebook AI Similarity Search (CPU version)",
+      "name": "faiss-cpu",
+      "version": "1.9.0.post1  # Facebook AI Similarity Search (CPU version)",
+      "purl": "pkg:pypi/faiss-cpu@1.9.0.post1  # Facebook AI Similarity Search (CPU version)",
+      "description": "Python package: faiss-cpu"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/web3@7.7.0  # Updated",
+      "name": "web3",
+      "version": "7.7.0  # Updated",
+      "purl": "pkg:pypi/web3@7.7.0  # Updated",
+      "description": "Python package: web3"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/eth-account@0.13.4",
+      "name": "eth-account",
+      "version": "0.13.4",
+      "purl": "pkg:pypi/eth-account@0.13.4",
+      "description": "Python package: eth-account"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/eth-typing@5.0.1",
+      "name": "eth-typing",
+      "version": "5.0.1",
+      "purl": "pkg:pypi/eth-typing@5.0.1",
+      "description": "Python package: eth-typing"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/eth-utils@5.1.0",
+      "name": "eth-utils",
+      "version": "5.1.0",
+      "purl": "pkg:pypi/eth-utils@5.1.0",
+      "description": "Python package: eth-utils"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/joblib@1.5.2  # Updated: 1.4.3 doesn't exist, using latest stable",
+      "name": "joblib",
+      "version": "1.5.2  # Updated: 1.4.3 doesn't exist, using latest stable",
+      "purl": "pkg:pypi/joblib@1.5.2  # Updated: 1.4.3 doesn't exist, using latest stable",
+      "description": "Python package: joblib"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scipy@1.14.1",
+      "name": "scipy",
+      "version": "1.14.1",
+      "purl": "pkg:pypi/scipy@1.14.1",
+      "description": "Python package: scipy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/statsmodels@0.14.4",
+      "name": "statsmodels",
+      "version": "0.14.4",
+      "purl": "pkg:pypi/statsmodels@0.14.4",
+      "description": "Python package: statsmodels"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/seaborn@0.13.2",
+      "name": "seaborn",
+      "version": "0.13.2",
+      "purl": "pkg:pypi/seaborn@0.13.2",
+      "description": "Python package: seaborn"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/matplotlib@3.9.3",
+      "name": "matplotlib",
+      "version": "3.9.3",
+      "purl": "pkg:pypi/matplotlib@3.9.3",
+      "description": "Python package: matplotlib"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/plotly@5.24.1  # Interactive plots",
+      "name": "plotly",
+      "version": "5.24.1  # Interactive plots",
+      "purl": "pkg:pypi/plotly@5.24.1  # Interactive plots",
+      "description": "Python package: plotly"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/gym@0.26.2",
+      "name": "gym",
+      "version": "0.26.2",
+      "purl": "pkg:pypi/gym@0.26.2",
+      "description": "Python package: gym"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/stable-baselines3@2.4.0",
+      "name": "stable-baselines3",
+      "version": "2.4.0",
+      "purl": "pkg:pypi/stable-baselines3@2.4.0",
+      "description": "Python package: stable-baselines3"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/optuna@4.1.0  # Hyperparameter optimization",
+      "name": "optuna",
+      "version": "4.1.0  # Hyperparameter optimization",
+      "purl": "pkg:pypi/optuna@4.1.0  # Hyperparameter optimization",
+      "description": "Python package: optuna"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mlflow@3.1.0  # ML lifecycle - Updated to fix GHSA-wf7f-8fxf-xfxc vulnerability",
+      "name": "mlflow",
+      "version": "3.1.0  # ML lifecycle - Updated to fix GHSA-wf7f-8fxf-xfxc vulnerability",
+      "purl": "pkg:pypi/mlflow@3.1.0  # ML lifecycle - Updated to fix GHSA-wf7f-8fxf-xfxc vulnerability",
+      "description": "Python package: mlflow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/shap@0.46.0  # Model explainability - SHAP values for interpretability",
+      "name": "shap",
+      "version": "0.46.0  # Model explainability - SHAP values for interpretability",
+      "purl": "pkg:pypi/shap@0.46.0  # Model explainability - SHAP values for interpretability",
+      "description": "Python package: shap"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/astroid@3.3.8  # Updated",
+      "name": "astroid",
+      "version": "3.3.8  # Updated",
+      "purl": "pkg:pypi/astroid@3.3.8  # Updated",
+      "description": "Python package: astroid"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/rope@1.13.0  # Refactoring",
+      "name": "rope",
+      "version": "1.13.0  # Refactoring",
+      "purl": "pkg:pypi/rope@1.13.0  # Refactoring",
+      "description": "Python package: rope"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jedi@0.19.2  # Code completion",
+      "name": "jedi",
+      "version": "0.19.2  # Code completion",
+      "purl": "pkg:pypi/jedi@0.19.2  # Code completion",
+      "description": "Python package: jedi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/woocommerce@3.0.0",
+      "name": "woocommerce",
+      "version": "3.0.0",
+      "purl": "pkg:pypi/woocommerce@3.0.0",
+      "description": "Python package: woocommerce"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-json-logger@3.2.0",
+      "name": "python-json-logger",
+      "version": "3.2.0",
+      "purl": "pkg:pypi/python-json-logger@3.2.0",
+      "description": "Python package: python-json-logger"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/loguru@0.7.3  # Enhanced logging",
+      "name": "loguru",
+      "version": "0.7.3  # Enhanced logging",
+      "purl": "pkg:pypi/loguru@0.7.3  # Enhanced logging",
+      "description": "Python package: loguru"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cerberus@1.3.6  # Schema validation",
+      "name": "cerberus",
+      "version": "1.3.6  # Schema validation",
+      "purl": "pkg:pypi/cerberus@1.3.6  # Schema validation",
+      "description": "Python package: cerberus"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/marshmallow@3.23.2  # Serialization",
+      "name": "marshmallow",
+      "version": "3.23.2  # Serialization",
+      "purl": "pkg:pypi/marshmallow@3.23.2  # Serialization",
+      "description": "Python package: marshmallow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cachetools@5.5.0",
+      "name": "cachetools",
+      "version": "5.5.0",
+      "purl": "pkg:pypi/cachetools@5.5.0",
+      "description": "Python package: cachetools"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/diskcache@5.6.3",
+      "name": "diskcache",
+      "version": "5.6.3",
+      "purl": "pkg:pypi/diskcache@5.6.3",
+      "description": "Python package: diskcache"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pymemcache@4.0.0",
+      "name": "pymemcache",
+      "version": "4.0.0",
+      "purl": "pkg:pypi/pymemcache@4.0.0",
+      "description": "Python package: pymemcache"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/kombu@5.4.2",
+      "name": "kombu",
+      "version": "5.4.2",
+      "purl": "pkg:pypi/kombu@5.4.2",
+      "description": "Python package: kombu"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pika@1.3.2  # RabbitMQ",
+      "name": "pika",
+      "version": "1.3.2  # RabbitMQ",
+      "purl": "pkg:pypi/pika@1.3.2  # RabbitMQ",
+      "description": "Python package: pika"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/kafka-python@2.0.2",
+      "name": "kafka-python",
+      "version": "2.0.2",
+      "purl": "pkg:pypi/kafka-python@2.0.2",
+      "description": "Python package: kafka-python"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-snappy@0.7.3",
+      "name": "python-snappy",
+      "version": "0.7.3",
+      "purl": "pkg:pypi/python-snappy@0.7.3",
+      "description": "Python package: python-snappy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/lz4@4.3.3",
+      "name": "lz4",
+      "version": "4.3.3",
+      "purl": "pkg:pypi/lz4@4.3.3",
+      "description": "Python package: lz4"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/zstandard@0.23.0",
+      "name": "zstandard",
+      "version": "0.23.0",
+      "purl": "pkg:pypi/zstandard@0.23.0",
+      "description": "Python package: zstandard"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "description": "Python package: python-dateutil"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytz@2024.2",
+      "name": "pytz",
+      "version": "2024.2",
+      "purl": "pkg:pypi/pytz@2024.2",
+      "description": "Python package: pytz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pendulum@3.0.0",
+      "name": "pendulum",
+      "version": "3.0.0",
+      "purl": "pkg:pypi/pendulum@3.0.0",
+      "description": "Python package: pendulum"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-decouple@3.8",
+      "name": "python-decouple",
+      "version": "3.8",
+      "purl": "pkg:pypi/python-decouple@3.8",
+      "description": "Python package: python-decouple"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/environs@11.2.1",
+      "name": "environs",
+      "version": "11.2.1",
+      "purl": "pkg:pypi/environs@11.2.1",
+      "description": "Python package: environs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/dynaconf@3.2.8",
+      "name": "dynaconf",
+      "version": "3.2.8",
+      "purl": "pkg:pypi/dynaconf@3.2.8",
+      "description": "Python package: dynaconf"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/apispec@6.7.1",
+      "name": "apispec",
+      "version": "6.7.1",
+      "purl": "pkg:pypi/apispec@6.7.1",
+      "description": "Python package: apispec"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic-openapi-schema@1.5.1",
+      "name": "pydantic-openapi-schema",
+      "version": "1.5.1",
+      "purl": "pkg:pypi/pydantic-openapi-schema@1.5.1",
+      "description": "Python package: pydantic-openapi-schema"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pycryptodome@3.21.0  # Encryption",
+      "name": "pycryptodome",
+      "version": "3.21.0  # Encryption",
+      "purl": "pkg:pypi/pycryptodome@3.21.0  # Encryption",
+      "description": "Python package: pycryptodome"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyotp@2.9.0  # 2FA/MFA",
+      "name": "pyotp",
+      "version": "2.9.0  # 2FA/MFA",
+      "purl": "pkg:pypi/pyotp@2.9.0  # 2FA/MFA",
+      "description": "Python package: pyotp"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/datadog@0.50.2",
+      "name": "datadog",
+      "version": "0.50.2",
+      "purl": "pkg:pypi/datadog@0.50.2",
+      "description": "Python package: datadog"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/newrelic@10.4.0",
+      "name": "newrelic",
+      "version": "10.4.0",
+      "purl": "pkg:pypi/newrelic@10.4.0",
+      "description": "Python package: newrelic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/boto3@1.36.7  # AWS SDK",
+      "name": "boto3",
+      "version": "1.36.7  # AWS SDK",
+      "purl": "pkg:pypi/boto3@1.36.7  # AWS SDK",
+      "description": "Python package: boto3"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/gitpython@3.1.43",
+      "name": "gitpython",
+      "version": "3.1.43",
+      "purl": "pkg:pypi/gitpython@3.1.43",
+      "description": "Python package: gitpython"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pygit2@1.16.0",
+      "name": "pygit2",
+      "version": "1.16.0",
+      "purl": "pkg:pypi/pygit2@1.16.0",
+      "description": "Python package: pygit2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sphinx@8.1.3",
+      "name": "sphinx",
+      "version": "8.1.3",
+      "purl": "pkg:pypi/sphinx@8.1.3",
+      "description": "Python package: sphinx"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mkdocs@1.6.1",
+      "name": "mkdocs",
+      "version": "1.6.1",
+      "purl": "pkg:pypi/mkdocs@1.6.1",
+      "description": "Python package: mkdocs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mkdocs-material@9.5.47",
+      "name": "mkdocs-material",
+      "version": "9.5.47",
+      "purl": "pkg:pypi/mkdocs-material@9.5.47",
+      "description": "Python package: mkdocs-material"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/-r@ requirements.txt",
+      "name": "-r",
+      "version": " requirements.txt",
+      "purl": "pkg:pypi/-r@ requirements.txt",
+      "description": "Python package: -r"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/autopep8@2.3.1",
+      "name": "autopep8",
+      "version": "2.3.1",
+      "purl": "pkg:pypi/autopep8@2.3.1",
+      "description": "Python package: autopep8"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mypy@1.13.0",
+      "name": "mypy",
+      "version": "1.13.0",
+      "purl": "pkg:pypi/mypy@1.13.0",
+      "description": "Python package: mypy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/ruff@0.8.4",
+      "name": "ruff",
+      "version": "0.8.4",
+      "purl": "pkg:pypi/ruff@0.8.4",
+      "description": "Python package: ruff"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/xenon@0.9.1",
+      "name": "xenon",
+      "version": "0.9.1",
+      "purl": "pkg:pypi/xenon@0.9.1",
+      "description": "Python package: xenon"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/vulture@2.14",
+      "name": "vulture",
+      "version": "2.14",
+      "purl": "pkg:pypi/vulture@2.14",
+      "description": "Python package: vulture"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/autoflake@2.3.1",
+      "name": "autoflake",
+      "version": "2.3.1",
+      "purl": "pkg:pypi/autoflake@2.3.1",
+      "description": "Python package: autoflake"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/bandit@1.8.0",
+      "name": "bandit",
+      "version": "1.8.0",
+      "purl": "pkg:pypi/bandit@1.8.0",
+      "description": "Python package: bandit"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/safety@3.2.11",
+      "name": "safety",
+      "version": "3.2.11",
+      "purl": "pkg:pypi/safety@3.2.11",
+      "description": "Python package: safety"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/semgrep@1.95.0",
+      "name": "semgrep",
+      "version": "1.95.0",
+      "purl": "pkg:pypi/semgrep@1.95.0",
+      "description": "Python package: semgrep"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pip-audit@2.7.3",
+      "name": "pip-audit",
+      "version": "2.7.3",
+      "purl": "pkg:pypi/pip-audit@2.7.3",
+      "description": "Python package: pip-audit"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cyclonedx-bom@4.6.1",
+      "name": "cyclonedx-bom",
+      "version": "4.6.1",
+      "purl": "pkg:pypi/cyclonedx-bom@4.6.1",
+      "description": "Python package: cyclonedx-bom"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-cov@6.0.0",
+      "name": "pytest-cov",
+      "version": "6.0.0",
+      "purl": "pkg:pypi/pytest-cov@6.0.0",
+      "description": "Python package: pytest-cov"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-mock@3.14.0",
+      "name": "pytest-mock",
+      "version": "3.14.0",
+      "purl": "pkg:pypi/pytest-mock@3.14.0",
+      "description": "Python package: pytest-mock"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-xdist@3.6.0",
+      "name": "pytest-xdist",
+      "version": "3.6.0",
+      "purl": "pkg:pypi/pytest-xdist@3.6.0",
+      "description": "Python package: pytest-xdist"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-benchmark@4.0.0",
+      "name": "pytest-benchmark",
+      "version": "4.0.0",
+      "purl": "pkg:pypi/pytest-benchmark@4.0.0",
+      "description": "Python package: pytest-benchmark"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-timeout@2.3.1",
+      "name": "pytest-timeout",
+      "version": "2.3.1",
+      "purl": "pkg:pypi/pytest-timeout@2.3.1",
+      "description": "Python package: pytest-timeout"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-html@4.1.1",
+      "name": "pytest-html",
+      "version": "4.1.1",
+      "purl": "pkg:pypi/pytest-html@4.1.1",
+      "description": "Python package: pytest-html"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-json-report@1.5.0",
+      "name": "pytest-json-report",
+      "version": "1.5.0",
+      "purl": "pkg:pypi/pytest-json-report@1.5.0",
+      "description": "Python package: pytest-json-report"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/factory-boy@3.3.1",
+      "name": "factory-boy",
+      "version": "3.3.1",
+      "purl": "pkg:pypi/factory-boy@3.3.1",
+      "description": "Python package: factory-boy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/faker@33.1.0",
+      "name": "faker",
+      "version": "33.1.0",
+      "purl": "pkg:pypi/faker@33.1.0",
+      "description": "Python package: faker"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/hypothesis@6.122.1",
+      "name": "hypothesis",
+      "version": "6.122.1",
+      "purl": "pkg:pypi/hypothesis@6.122.1",
+      "description": "Python package: hypothesis"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/responses@0.25.3",
+      "name": "responses",
+      "version": "0.25.3",
+      "purl": "pkg:pypi/responses@0.25.3",
+      "description": "Python package: responses"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-httpx@0.32.0",
+      "name": "pytest-httpx",
+      "version": "0.32.0",
+      "purl": "pkg:pypi/pytest-httpx@0.32.0",
+      "description": "Python package: pytest-httpx"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-postgresql@6.1.1",
+      "name": "pytest-postgresql",
+      "version": "6.1.1",
+      "purl": "pkg:pypi/pytest-postgresql@6.1.1",
+      "description": "Python package: pytest-postgresql"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-redis@3.1.2",
+      "name": "pytest-redis",
+      "version": "3.1.2",
+      "purl": "pkg:pypi/pytest-redis@3.1.2",
+      "description": "Python package: pytest-redis"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-mongodb@2.4.3",
+      "name": "pytest-mongodb",
+      "version": "2.4.3",
+      "purl": "pkg:pypi/pytest-mongodb@2.4.3",
+      "description": "Python package: pytest-mongodb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sphinx-rtd-theme@3.0.2",
+      "name": "sphinx-rtd-theme",
+      "version": "3.0.2",
+      "purl": "pkg:pypi/sphinx-rtd-theme@3.0.2",
+      "description": "Python package: sphinx-rtd-theme"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sphinx-autodoc-typehints@2.4.4",
+      "name": "sphinx-autodoc-typehints",
+      "version": "2.4.4",
+      "purl": "pkg:pypi/sphinx-autodoc-typehints@2.4.4",
+      "description": "Python package: sphinx-autodoc-typehints"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/myst-parser@4.0.0",
+      "name": "myst-parser",
+      "version": "4.0.0",
+      "purl": "pkg:pypi/myst-parser@4.0.0",
+      "description": "Python package: myst-parser"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mkdocs-swagger-ui-tag@0.6.10",
+      "name": "mkdocs-swagger-ui-tag",
+      "version": "0.6.10",
+      "purl": "pkg:pypi/mkdocs-swagger-ui-tag@0.6.10",
+      "description": "Python package: mkdocs-swagger-ui-tag"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pre-commit@3.8.0",
+      "name": "pre-commit",
+      "version": "3.8.0",
+      "purl": "pkg:pypi/pre-commit@3.8.0",
+      "description": "Python package: pre-commit"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/ipdb@0.13.13",
+      "name": "ipdb",
+      "version": "0.13.13",
+      "purl": "pkg:pypi/ipdb@0.13.13",
+      "description": "Python package: ipdb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pdbpp@0.10.3",
+      "name": "pdbpp",
+      "version": "0.10.3",
+      "purl": "pkg:pypi/pdbpp@0.10.3",
+      "description": "Python package: pdbpp"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/icecream@2.1.3",
+      "name": "icecream",
+      "version": "2.1.3",
+      "purl": "pkg:pypi/icecream@2.1.3",
+      "description": "Python package: icecream"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/py-spy@0.3.14",
+      "name": "py-spy",
+      "version": "0.3.14",
+      "purl": "pkg:pypi/py-spy@0.3.14",
+      "description": "Python package: py-spy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/memory-profiler@0.61.0",
+      "name": "memory-profiler",
+      "version": "0.61.0",
+      "purl": "pkg:pypi/memory-profiler@0.61.0",
+      "description": "Python package: memory-profiler"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/line-profiler@4.1.3",
+      "name": "line-profiler",
+      "version": "4.1.3",
+      "purl": "pkg:pypi/line-profiler@4.1.3",
+      "description": "Python package: line-profiler"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pympler@0.9",
+      "name": "pympler",
+      "version": "0.9",
+      "purl": "pkg:pypi/pympler@0.9",
+      "description": "Python package: pympler"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/prometheus-client@0.22.0",
+      "name": "prometheus-client",
+      "version": "0.22.0",
+      "purl": "pkg:pypi/prometheus-client@0.22.0",
+      "description": "Python package: prometheus-client"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/grafana-api@1.0.3",
+      "name": "grafana-api",
+      "version": "1.0.3",
+      "purl": "pkg:pypi/grafana-api@1.0.3",
+      "description": "Python package: grafana-api"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/structlog@24.4.0",
+      "name": "structlog",
+      "version": "24.4.0",
+      "purl": "pkg:pypi/structlog@24.4.0",
+      "description": "Python package: structlog"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/loguru@0.7.3",
+      "name": "loguru",
+      "version": "0.7.3",
+      "purl": "pkg:pypi/loguru@0.7.3",
+      "description": "Python package: loguru"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/alembic@1.14.0",
+      "name": "alembic",
+      "version": "1.14.0",
+      "purl": "pkg:pypi/alembic@1.14.0",
+      "description": "Python package: alembic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sqlalchemy-utils@0.41.2",
+      "name": "sqlalchemy-utils",
+      "version": "0.41.2",
+      "purl": "pkg:pypi/sqlalchemy-utils@0.41.2",
+      "description": "Python package: sqlalchemy-utils"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sqlalchemy-stubs@0.4",
+      "name": "sqlalchemy-stubs",
+      "version": "0.4",
+      "purl": "pkg:pypi/sqlalchemy-stubs@0.4",
+      "description": "Python package: sqlalchemy-stubs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sqlparse@0.5.2",
+      "name": "sqlparse",
+      "version": "0.5.2",
+      "purl": "pkg:pypi/sqlparse@0.5.2",
+      "description": "Python package: sqlparse"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sqlalchemy-migrate@0.13.0",
+      "name": "sqlalchemy-migrate",
+      "version": "0.13.0",
+      "purl": "pkg:pypi/sqlalchemy-migrate@0.13.0",
+      "description": "Python package: sqlalchemy-migrate"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tavern@2.12.1",
+      "name": "tavern",
+      "version": "2.12.1",
+      "purl": "pkg:pypi/tavern@2.12.1",
+      "description": "Python package: tavern"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/schemathesis@3.34.1",
+      "name": "schemathesis",
+      "version": "3.34.1",
+      "purl": "pkg:pypi/schemathesis@3.34.1",
+      "description": "Python package: schemathesis"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openapi-spec-validator@0.7.1",
+      "name": "openapi-spec-validator",
+      "version": "0.7.1",
+      "purl": "pkg:pypi/openapi-spec-validator@0.7.1",
+      "description": "Python package: openapi-spec-validator"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/swagger-spec-validator@3.0.4",
+      "name": "swagger-spec-validator",
+      "version": "3.0.4",
+      "purl": "pkg:pypi/swagger-spec-validator@3.0.4",
+      "description": "Python package: swagger-spec-validator"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/docker@7.1.0",
+      "name": "docker",
+      "version": "7.1.0",
+      "purl": "pkg:pypi/docker@7.1.0",
+      "description": "Python package: docker"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/docker-compose@1.29.2",
+      "name": "docker-compose",
+      "version": "1.29.2",
+      "purl": "pkg:pypi/docker-compose@1.29.2",
+      "description": "Python package: docker-compose"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/kubernetes@31.0.0",
+      "name": "kubernetes",
+      "version": "31.0.0",
+      "purl": "pkg:pypi/kubernetes@31.0.0",
+      "description": "Python package: kubernetes"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pykube-ng@24.3.0",
+      "name": "pykube-ng",
+      "version": "24.3.0",
+      "purl": "pkg:pypi/pykube-ng@24.3.0",
+      "description": "Python package: pykube-ng"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/github3.py@4.0.1",
+      "name": "github3.py",
+      "version": "4.0.1",
+      "purl": "pkg:pypi/github3.py@4.0.1",
+      "description": "Python package: github3.py"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pygithub@2.5.0",
+      "name": "pygithub",
+      "version": "2.5.0",
+      "purl": "pkg:pypi/pygithub@2.5.0",
+      "description": "Python package: pygithub"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/build@1.2.2",
+      "name": "build",
+      "version": "1.2.2",
+      "purl": "pkg:pypi/build@1.2.2",
+      "description": "Python package: build"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/twine@6.0.1",
+      "name": "twine",
+      "version": "6.0.1",
+      "purl": "pkg:pypi/twine@6.0.1",
+      "description": "Python package: twine"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/wheel@0.42.0",
+      "name": "wheel",
+      "version": "0.42.0",
+      "purl": "pkg:pypi/wheel@0.42.0",
+      "description": "Python package: wheel"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/locust@2.32.4",
+      "name": "locust",
+      "version": "2.32.4",
+      "purl": "pkg:pypi/locust@2.32.4",
+      "description": "Python package: locust"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jupyter@1.1.1",
+      "name": "jupyter",
+      "version": "1.1.1",
+      "purl": "pkg:pypi/jupyter@1.1.1",
+      "description": "Python package: jupyter"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jupyterlab@4.3.3",
+      "name": "jupyterlab",
+      "version": "4.3.3",
+      "purl": "pkg:pypi/jupyterlab@4.3.3",
+      "description": "Python package: jupyterlab"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/notebook@7.3.1",
+      "name": "notebook",
+      "version": "7.3.1",
+      "purl": "pkg:pypi/notebook@7.3.1",
+      "description": "Python package: notebook"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pandas-profiling@3.6.6",
+      "name": "pandas-profiling",
+      "version": "3.6.6",
+      "purl": "pkg:pypi/pandas-profiling@3.6.6",
+      "description": "Python package: pandas-profiling"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sweetviz@2.3.1",
+      "name": "sweetviz",
+      "version": "2.3.1",
+      "purl": "pkg:pypi/sweetviz@2.3.1",
+      "description": "Python package: sweetviz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mlflow@3.1.0",
+      "name": "mlflow",
+      "version": "3.1.0",
+      "purl": "pkg:pypi/mlflow@3.1.0",
+      "description": "Python package: mlflow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/wandb@0.18.7",
+      "name": "wandb",
+      "version": "0.18.7",
+      "purl": "pkg:pypi/wandb@0.18.7",
+      "description": "Python package: wandb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tensorboard@2.18.0",
+      "name": "tensorboard",
+      "version": "2.18.0",
+      "purl": "pkg:pypi/tensorboard@2.18.0",
+      "description": "Python package: tensorboard"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scrapy@2.12.0",
+      "name": "scrapy",
+      "version": "2.12.0",
+      "purl": "pkg:pypi/scrapy@2.12.0",
+      "description": "Python package: scrapy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scrapy-splash@0.8.0",
+      "name": "scrapy-splash",
+      "version": "0.8.0",
+      "purl": "pkg:pypi/scrapy-splash@0.8.0",
+      "description": "Python package: scrapy-splash"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/opencv-contrib-python@4.11.0.86",
+      "name": "opencv-contrib-python",
+      "version": "4.11.0.86",
+      "purl": "pkg:pypi/opencv-contrib-python@4.11.0.86",
+      "description": "Python package: opencv-contrib-python"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scikit-image@0.24.0",
+      "name": "scikit-image",
+      "version": "0.24.0",
+      "purl": "pkg:pypi/scikit-image@0.24.0",
+      "description": "Python package: scikit-image"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/watchdog@6.0.0",
+      "name": "watchdog",
+      "version": "6.0.0",
+      "purl": "pkg:pypi/watchdog@6.0.0",
+      "description": "Python package: watchdog"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pathlib2@2.3.7.post1",
+      "name": "pathlib2",
+      "version": "2.3.7.post1",
+      "purl": "pkg:pypi/pathlib2@2.3.7.post1",
+      "description": "Python package: pathlib2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyyaml@6.0.1",
+      "name": "pyyaml",
+      "version": "6.0.1",
+      "purl": "pkg:pypi/pyyaml@6.0.1",
+      "description": "Python package: pyyaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jsonschema@4.23.0",
+      "name": "jsonschema",
+      "version": "4.23.0",
+      "purl": "pkg:pypi/jsonschema@4.23.0",
+      "description": "Python package: jsonschema"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/yamllint@1.35.1",
+      "name": "yamllint",
+      "version": "1.35.1",
+      "purl": "pkg:pypi/yamllint@1.35.1",
+      "description": "Python package: yamllint"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/textdistance@4.6.3",
+      "name": "textdistance",
+      "version": "4.6.3",
+      "purl": "pkg:pypi/textdistance@4.6.3",
+      "description": "Python package: textdistance"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fuzzywuzzy@0.18.0",
+      "name": "fuzzywuzzy",
+      "version": "0.18.0",
+      "purl": "pkg:pypi/fuzzywuzzy@0.18.0",
+      "description": "Python package: fuzzywuzzy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-levenshtein@0.26.0",
+      "name": "python-levenshtein",
+      "version": "0.26.0",
+      "purl": "pkg:pypi/python-levenshtein@0.26.0",
+      "description": "Python package: python-levenshtein"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/jedi@0.19.2",
+      "name": "jedi",
+      "version": "0.19.2",
+      "purl": "pkg:pypi/jedi@0.19.2",
+      "description": "Python package: jedi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/rope@1.13.0",
+      "name": "rope",
+      "version": "1.13.0",
+      "purl": "pkg:pypi/rope@1.13.0",
+      "description": "Python package: rope"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/rich@13.9.4",
+      "name": "rich",
+      "version": "13.9.4",
+      "purl": "pkg:pypi/rich@13.9.4",
+      "description": "Python package: rich"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/typer@0.15.1",
+      "name": "typer",
+      "version": "0.15.1",
+      "purl": "pkg:pypi/typer@0.15.1",
+      "description": "Python package: typer"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/freezegun@1.5.1",
+      "name": "freezegun",
+      "version": "1.5.1",
+      "purl": "pkg:pypi/freezegun@1.5.1",
+      "description": "Python package: freezegun"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/time-machine@2.16.0",
+      "name": "time-machine",
+      "version": "2.16.0",
+      "purl": "pkg:pypi/time-machine@2.16.0",
+      "description": "Python package: time-machine"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/configparser@7.1.0",
+      "name": "configparser",
+      "version": "7.1.0",
+      "purl": "pkg:pypi/configparser@7.1.0",
+      "description": "Python package: configparser"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/keyring@25.5.0",
+      "name": "keyring",
+      "version": "25.5.0",
+      "purl": "pkg:pypi/keyring@25.5.0",
+      "description": "Python package: keyring"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-keyring@25.5.0",
+      "name": "python-keyring",
+      "version": "25.5.0",
+      "purl": "pkg:pypi/python-keyring@25.5.0",
+      "description": "Python package: python-keyring"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpie@3.2.4",
+      "name": "httpie",
+      "version": "3.2.4",
+      "purl": "pkg:pypi/httpie@3.2.4",
+      "description": "Python package: httpie"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/curl-cffi@0.7.3",
+      "name": "curl-cffi",
+      "version": "0.7.3",
+      "purl": "pkg:pypi/curl-cffi@0.7.3",
+      "description": "Python package: curl-cffi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-socket@0.7.0",
+      "name": "pytest-socket",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/pytest-socket@0.7.0",
+      "description": "Python package: pytest-socket"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pycryptodome@3.21.0",
+      "name": "pycryptodome",
+      "version": "3.21.0",
+      "purl": "pkg:pypi/pycryptodome@3.21.0",
+      "description": "Python package: pycryptodome"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pip-tools@7.4.1",
+      "name": "pip-tools",
+      "version": "7.4.1",
+      "purl": "pkg:pypi/pip-tools@7.4.1",
+      "description": "Python package: pip-tools"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pipdeptree@2.23.4",
+      "name": "pipdeptree",
+      "version": "2.23.4",
+      "purl": "pkg:pypi/pipdeptree@2.23.4",
+      "description": "Python package: pipdeptree"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pip-check@2.8.1",
+      "name": "pip-check",
+      "version": "2.8.1",
+      "purl": "pkg:pypi/pip-check@2.8.1",
+      "description": "Python package: pip-check"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pipreqs@0.5.0",
+      "name": "pipreqs",
+      "version": "0.5.0",
+      "purl": "pkg:pypi/pipreqs@0.5.0",
+      "description": "Python package: pipreqs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/johnnydep@1.20.4",
+      "name": "johnnydep",
+      "version": "1.20.4",
+      "purl": "pkg:pypi/johnnydep@1.20.4",
+      "description": "Python package: johnnydep"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-sugar@1.0.0",
+      "name": "pytest-sugar",
+      "version": "1.0.0",
+      "purl": "pkg:pypi/pytest-sugar@1.0.0",
+      "description": "Python package: pytest-sugar"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-factoryboy@2.7.0",
+      "name": "pytest-factoryboy",
+      "version": "2.7.0",
+      "purl": "pkg:pypi/pytest-factoryboy@2.7.0",
+      "description": "Python package: pytest-factoryboy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/requests-mock@1.12.1",
+      "name": "requests-mock",
+      "version": "1.12.1",
+      "purl": "pkg:pypi/requests-mock@1.12.1",
+      "description": "Python package: requests-mock"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/fastapi-testclient@0.1.0",
+      "name": "fastapi-testclient",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/fastapi-testclient@0.1.0",
+      "description": "Python package: fastapi-testclient"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-elasticsearch@2.1.1",
+      "name": "pytest-elasticsearch",
+      "version": "2.1.1",
+      "purl": "pkg:pypi/pytest-elasticsearch@2.1.1",
+      "description": "Python package: pytest-elasticsearch"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/testing.postgresql@1.3.0",
+      "name": "testing.postgresql",
+      "version": "1.3.0",
+      "purl": "pkg:pypi/testing.postgresql@1.3.0",
+      "description": "Python package: testing.postgresql"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/artillery@1.0.0",
+      "name": "artillery",
+      "version": "1.0.0",
+      "purl": "pkg:pypi/artillery@1.0.0",
+      "description": "Python package: artillery"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-stress@1.0.1",
+      "name": "pytest-stress",
+      "version": "1.0.1",
+      "purl": "pkg:pypi/pytest-stress@1.0.1",
+      "description": "Python package: pytest-stress"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-security@0.1.0",
+      "name": "pytest-security",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/pytest-security@0.1.0",
+      "description": "Python package: pytest-security"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/selenium@4.27.1",
+      "name": "selenium",
+      "version": "4.27.1",
+      "purl": "pkg:pypi/selenium@4.27.1",
+      "description": "Python package: selenium"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/playwright@1.49.1",
+      "name": "playwright",
+      "version": "1.49.1",
+      "purl": "pkg:pypi/playwright@1.49.1",
+      "description": "Python package: playwright"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-playwright@0.6.2",
+      "name": "pytest-playwright",
+      "version": "0.6.2",
+      "purl": "pkg:pypi/pytest-playwright@0.6.2",
+      "description": "Python package: pytest-playwright"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-selenium@4.1.0",
+      "name": "pytest-selenium",
+      "version": "4.1.0",
+      "purl": "pkg:pypi/pytest-selenium@4.1.0",
+      "description": "Python package: pytest-selenium"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/webdriver-manager@4.0.2",
+      "name": "webdriver-manager",
+      "version": "4.0.2",
+      "purl": "pkg:pypi/webdriver-manager@4.0.2",
+      "description": "Python package: webdriver-manager"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/testcontainers@4.8.2",
+      "name": "testcontainers",
+      "version": "4.8.2",
+      "purl": "pkg:pypi/testcontainers@4.8.2",
+      "description": "Python package: testcontainers"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-services@2.2.1",
+      "name": "pytest-services",
+      "version": "2.2.1",
+      "purl": "pkg:pypi/pytest-services@2.2.1",
+      "description": "Python package: pytest-services"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-docker@3.1.1",
+      "name": "pytest-docker",
+      "version": "3.1.1",
+      "purl": "pkg:pypi/pytest-docker@3.1.1",
+      "description": "Python package: pytest-docker"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/httpretty@1.1.4",
+      "name": "httpretty",
+      "version": "1.1.4",
+      "purl": "pkg:pypi/httpretty@1.1.4",
+      "description": "Python package: httpretty"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/wiremock@2.6.1",
+      "name": "wiremock",
+      "version": "2.6.1",
+      "purl": "pkg:pypi/wiremock@2.6.1",
+      "description": "Python package: wiremock"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/mockserver-client@5.15.0",
+      "name": "mockserver-client",
+      "version": "5.15.0",
+      "purl": "pkg:pypi/mockserver-client@5.15.0",
+      "description": "Python package: mockserver-client"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/great-expectations@1.2.3",
+      "name": "great-expectations",
+      "version": "1.2.3",
+      "purl": "pkg:pypi/great-expectations@1.2.3",
+      "description": "Python package: great-expectations"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pandera@0.22.0",
+      "name": "pandera",
+      "version": "0.22.0",
+      "purl": "pkg:pypi/pandera@0.22.0",
+      "description": "Python package: pandera"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-datadir@1.5.0",
+      "name": "pytest-datadir",
+      "version": "1.5.0",
+      "purl": "pkg:pypi/pytest-datadir@1.5.0",
+      "description": "Python package: pytest-datadir"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-csv@3.0.0",
+      "name": "pytest-csv",
+      "version": "3.0.0",
+      "purl": "pkg:pypi/pytest-csv@3.0.0",
+      "description": "Python package: pytest-csv"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openpyxl@3.1.5",
+      "name": "openpyxl",
+      "version": "3.1.5",
+      "purl": "pkg:pypi/openpyxl@3.1.5",
+      "description": "Python package: openpyxl"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-ml@0.1.0",
+      "name": "pytest-ml",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/pytest-ml@0.1.0",
+      "description": "Python package: pytest-ml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/deepdiff@8.6.1",
+      "name": "deepdiff",
+      "version": "8.6.1",
+      "purl": "pkg:pypi/deepdiff@8.6.1",
+      "description": "Python package: deepdiff"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy-testing@1.26.4",
+      "name": "numpy-testing",
+      "version": "1.26.4",
+      "purl": "pkg:pypi/numpy-testing@1.26.4",
+      "description": "Python package: numpy-testing"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pandas-testing@2.2.3",
+      "name": "pandas-testing",
+      "version": "2.2.3",
+      "purl": "pkg:pypi/pandas-testing@2.2.3",
+      "description": "Python package: pandas-testing"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/scikit-learn@1.6.0",
+      "name": "scikit-learn",
+      "version": "1.6.0",
+      "purl": "pkg:pypi/scikit-learn@1.6.0",
+      "description": "Python package: scikit-learn"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/opencv-python@4.11.0.86",
+      "name": "opencv-python",
+      "version": "4.11.0.86",
+      "purl": "pkg:pypi/opencv-python@4.11.0.86",
+      "description": "Python package: opencv-python"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pillow@11.1.0",
+      "name": "pillow",
+      "version": "11.1.0",
+      "purl": "pkg:pypi/pillow@11.1.0",
+      "description": "Python package: pillow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-image-diff@0.0.11",
+      "name": "pytest-image-diff",
+      "version": "0.0.11",
+      "purl": "pkg:pypi/pytest-image-diff@0.0.11",
+      "description": "Python package: pytest-image-diff"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/lxml@5.3.0",
+      "name": "lxml",
+      "version": "5.3.0",
+      "purl": "pkg:pypi/lxml@5.3.0",
+      "description": "Python package: lxml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/coverage@7.6.9",
+      "name": "coverage",
+      "version": "7.6.9",
+      "purl": "pkg:pypi/coverage@7.6.9",
+      "description": "Python package: coverage"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/coverage-badge@1.1.2",
+      "name": "coverage-badge",
+      "version": "1.1.2",
+      "purl": "pkg:pypi/coverage-badge@1.1.2",
+      "description": "Python package: coverage-badge"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/allure-pytest@2.13.5",
+      "name": "allure-pytest",
+      "version": "2.13.5",
+      "purl": "pkg:pypi/allure-pytest@2.13.5",
+      "description": "Python package: allure-pytest"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-reportlog@1.2.0",
+      "name": "pytest-reportlog",
+      "version": "1.2.0",
+      "purl": "pkg:pypi/pytest-reportlog@1.2.0",
+      "description": "Python package: pytest-reportlog"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-parallel@0.1.1",
+      "name": "pytest-parallel",
+      "version": "0.1.1",
+      "purl": "pkg:pypi/pytest-parallel@0.1.1",
+      "description": "Python package: pytest-parallel"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-remote@0.1.2",
+      "name": "pytest-remote",
+      "version": "0.1.2",
+      "purl": "pkg:pypi/pytest-remote@0.1.2",
+      "description": "Python package: pytest-remote"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-config@0.1.0",
+      "name": "pytest-config",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/pytest-config@0.1.0",
+      "description": "Python package: pytest-config"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-pdb@0.2.0",
+      "name": "pytest-pdb",
+      "version": "0.2.0",
+      "purl": "pkg:pypi/pytest-pdb@0.2.0",
+      "description": "Python package: pytest-pdb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-pudb@0.7.0",
+      "name": "pytest-pudb",
+      "version": "0.7.0",
+      "purl": "pkg:pypi/pytest-pudb@0.7.0",
+      "description": "Python package: pytest-pudb"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-logging@2016.11.4",
+      "name": "pytest-logging",
+      "version": "2016.11.4",
+      "purl": "pkg:pypi/pytest-logging@2016.11.4",
+      "description": "Python package: pytest-logging"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-httpserver@1.1.0",
+      "name": "pytest-httpserver",
+      "version": "1.1.0",
+      "purl": "pkg:pypi/pytest-httpserver@1.1.0",
+      "description": "Python package: pytest-httpserver"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aioresponses@0.7.6",
+      "name": "aioresponses",
+      "version": "0.7.6",
+      "purl": "pkg:pypi/aioresponses@0.7.6",
+      "description": "Python package: aioresponses"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-tmpdir@0.1.0",
+      "name": "pytest-tmpdir",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/pytest-tmpdir@0.1.0",
+      "description": "Python package: pytest-tmpdir"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyfakefs@5.7.1",
+      "name": "pyfakefs",
+      "version": "5.7.1",
+      "purl": "pkg:pypi/pyfakefs@5.7.1",
+      "description": "Python package: pyfakefs"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-datafiles@3.0.0",
+      "name": "pytest-datafiles",
+      "version": "3.0.0",
+      "purl": "pkg:pypi/pytest-datafiles@3.0.0",
+      "description": "Python package: pytest-datafiles"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tox@4.23.2",
+      "name": "tox",
+      "version": "4.23.2",
+      "purl": "pkg:pypi/tox@4.23.2",
+      "description": "Python package: tox"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/nox@2024.10.9",
+      "name": "nox",
+      "version": "2024.10.9",
+      "purl": "pkg:pypi/nox@2024.10.9",
+      "description": "Python package: nox"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-randomly@3.15.0",
+      "name": "pytest-randomly",
+      "version": "3.15.0",
+      "purl": "pkg:pypi/pytest-randomly@3.15.0",
+      "description": "Python package: pytest-randomly"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-repeat@0.9.3",
+      "name": "pytest-repeat",
+      "version": "0.9.3",
+      "purl": "pkg:pypi/pytest-repeat@0.9.3",
+      "description": "Python package: pytest-repeat"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-rerunfailures@14.0",
+      "name": "pytest-rerunfailures",
+      "version": "14.0",
+      "purl": "pkg:pypi/pytest-rerunfailures@14.0",
+      "description": "Python package: pytest-rerunfailures"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/tenacity@9.0.0",
+      "name": "tenacity",
+      "version": "9.0.0",
+      "purl": "pkg:pypi/tenacity@9.0.0",
+      "description": "Python package: tenacity"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-doctest@0.1.0",
+      "name": "pytest-doctest",
+      "version": "0.1.0",
+      "purl": "pkg:pypi/pytest-doctest@0.1.0",
+      "description": "Python package: pytest-doctest"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/doctest@1.0.0",
+      "name": "doctest",
+      "version": "1.0.0",
+      "purl": "pkg:pypi/doctest@1.0.0",
+      "description": "Python package: doctest"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-pythonpath@0.7.4",
+      "name": "pytest-pythonpath",
+      "version": "0.7.4",
+      "purl": "pkg:pypi/pytest-pythonpath@0.7.4",
+      "description": "Python package: pytest-pythonpath"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-custom-exit-code@0.3.0",
+      "name": "pytest-custom-exit-code",
+      "version": "0.3.0",
+      "purl": "pkg:pypi/pytest-custom-exit-code@0.3.0",
+      "description": "Python package: pytest-custom-exit-code"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-metadata@3.1.1",
+      "name": "pytest-metadata",
+      "version": "3.1.1",
+      "purl": "pkg:pypi/pytest-metadata@3.1.1",
+      "description": "Python package: pytest-metadata"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-testmon@2.1.3",
+      "name": "pytest-testmon",
+      "version": "2.1.3",
+      "purl": "pkg:pypi/pytest-testmon@2.1.3",
+      "description": "Python package: pytest-testmon"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pytest-picked@0.5.0",
+      "name": "pytest-picked",
+      "version": "0.5.0",
+      "purl": "pkg:pypi/pytest-picked@0.5.0",
+      "description": "Python package: pytest-picked"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/uvicorn@[standard]==0.34.0",
+      "name": "uvicorn",
+      "version": "[standard]==0.34.0",
+      "purl": "pkg:pypi/uvicorn@[standard]==0.34.0",
+      "description": "Python package: uvicorn"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pydantic@2.10.4  # Updated: langchain 0.3+ supports pydantic v2",
+      "name": "pydantic",
+      "version": "2.10.4  # Updated: langchain 0.3+ supports pydantic v2",
+      "purl": "pkg:pypi/pydantic@2.10.4  # Updated: langchain 0.3+ supports pydantic v2",
+      "description": "Python package: pydantic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiosqlite@0.20.0",
+      "name": "aiosqlite",
+      "version": "0.20.0",
+      "purl": "pkg:pypi/aiosqlite@0.20.0",
+      "description": "Python package: aiosqlite"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/asyncpg@0.30.0",
+      "name": "asyncpg",
+      "version": "0.30.0",
+      "purl": "pkg:pypi/asyncpg@0.30.0",
+      "description": "Python package: asyncpg"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/passlib@[bcrypt]==1.7.4",
+      "name": "passlib",
+      "version": "[bcrypt]==1.7.4",
+      "purl": "pkg:pypi/passlib@[bcrypt]==1.7.4",
+      "description": "Python package: passlib"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/paramiko@3.5.0",
+      "name": "paramiko",
+      "version": "3.5.0",
+      "purl": "pkg:pypi/paramiko@3.5.0",
+      "description": "Python package: paramiko"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/bcrypt@4.2.1",
+      "name": "bcrypt",
+      "version": "4.2.1",
+      "purl": "pkg:pypi/bcrypt@4.2.1",
+      "description": "Python package: bcrypt"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/argon2-cffi@23.1.0",
+      "name": "argon2-cffi",
+      "version": "23.1.0",
+      "purl": "pkg:pypi/argon2-cffi@23.1.0",
+      "description": "Python package: argon2-cffi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/slowapi@0.1.9",
+      "name": "slowapi",
+      "version": "0.1.9",
+      "purl": "pkg:pypi/slowapi@0.1.9",
+      "description": "Python package: slowapi"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/secure@0.3.0",
+      "name": "secure",
+      "version": "0.3.0",
+      "purl": "pkg:pypi/secure@0.3.0",
+      "description": "Python package: secure"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/anthropic@0.69.0",
+      "name": "anthropic",
+      "version": "0.69.0",
+      "purl": "pkg:pypi/anthropic@0.69.0",
+      "description": "Python package: anthropic"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/openai@2.3.0",
+      "name": "openai",
+      "version": "2.3.0",
+      "purl": "pkg:pypi/openai@2.3.0",
+      "description": "Python package: openai"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/Pillow@11.1.0",
+      "name": "Pillow",
+      "version": "11.1.0",
+      "purl": "pkg:pypi/Pillow@11.1.0",
+      "description": "Python package: Pillow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/psutil@6.0.0",
+      "name": "psutil",
+      "version": "6.0.0",
+      "purl": "pkg:pypi/psutil@6.0.0",
+      "description": "Python package: psutil"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/sentry-sdk@2.19.0",
+      "name": "sentry-sdk",
+      "version": "2.19.0",
+      "purl": "pkg:pypi/sentry-sdk@2.19.0",
+      "description": "Python package: sentry-sdk"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/celery@[redis]==5.4.0",
+      "name": "celery",
+      "version": "[redis]==5.4.0",
+      "purl": "pkg:pypi/celery@[redis]==5.4.0",
+      "description": "Python package: celery"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/aiomysql@0.3.0",
+      "name": "aiomysql",
+      "version": "0.3.0",
+      "purl": "pkg:pypi/aiomysql@0.3.0",
+      "description": "Python package: aiomysql"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/google-api-python-client@2.155.0",
+      "name": "google-api-python-client",
+      "version": "2.155.0",
+      "purl": "pkg:pypi/google-api-python-client@2.155.0",
+      "description": "Python package: google-api-python-client"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/web3@7.7.0",
+      "name": "web3",
+      "version": "7.7.0",
+      "purl": "pkg:pypi/web3@7.7.0",
+      "description": "Python package: web3"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/numpy@1.26.4",
+      "name": "numpy",
+      "version": "1.26.4",
+      "purl": "pkg:pypi/numpy@1.26.4",
+      "description": "Python package: numpy"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pandas@2.2.3",
+      "name": "pandas",
+      "version": "2.2.3",
+      "purl": "pkg:pypi/pandas@2.2.3",
+      "description": "Python package: pandas"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/joblib@1.4.2",
+      "name": "joblib",
+      "version": "1.4.2",
+      "purl": "pkg:pypi/joblib@1.4.2",
+      "description": "Python package: joblib"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/python-wordpress-xmlrpc@2.3",
+      "name": "python-wordpress-xmlrpc",
+      "version": "2.3",
+      "purl": "pkg:pypi/python-wordpress-xmlrpc@2.3",
+      "description": "Python package: python-wordpress-xmlrpc"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/cerberus@1.3.6",
+      "name": "cerberus",
+      "version": "1.3.6",
+      "purl": "pkg:pypi/cerberus@1.3.6",
+      "description": "Python package: cerberus"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/marshmallow@3.23.2",
+      "name": "marshmallow",
+      "version": "3.23.2",
+      "purl": "pkg:pypi/marshmallow@3.23.2",
+      "description": "Python package: marshmallow"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pika@1.3.2",
+      "name": "pika",
+      "version": "1.3.2",
+      "purl": "pkg:pypi/pika@1.3.2",
+      "description": "Python package: pika"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/flasgger@0.9.7.1",
+      "name": "flasgger",
+      "version": "0.9.7.1",
+      "purl": "pkg:pypi/flasgger@0.9.7.1",
+      "description": "Python package: flasgger"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/pyotp@2.9.0",
+      "name": "pyotp",
+      "version": "2.9.0",
+      "purl": "pkg:pypi/pyotp@2.9.0",
+      "description": "Python package: pyotp"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:pypi/boto3@1.36.7",
+      "name": "boto3",
+      "version": "1.36.7",
+      "purl": "pkg:pypi/boto3@1.36.7",
+      "description": "Python package: boto3"
+    }
+  ]
+}
