@@ -313,8 +313,10 @@ class InventoryAgent:
 
     def _extract_metadata(self, index: int) -> dict[str, Any]:
         """Extract metadata for asset."""
+        # SECURITY: MD5 used for non-security purpose (asset checksum for tracking)
+        # Per SECURITY_VERIFICATION_REPORT.md - P1 HIGH fix
         return {
-            "checksum": hashlib.md5(f"asset_{index}".encode()).hexdigest(),
+            "checksum": hashlib.md5(f"asset_{index}".encode(), usedforsecurity=False).hexdigest(),
             "dimensions": f"{random.randint(800, 2000)}x{random.randint(600, 1500)}",
             "color_profile": "sRGB",
             "camera_model": "Professional Camera" if index % 10 == 0 else None,

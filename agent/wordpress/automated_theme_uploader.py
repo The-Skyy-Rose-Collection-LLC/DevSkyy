@@ -6,7 +6,9 @@ Enterprise-grade theme deployment with multiple upload methods and validation
 
 import base64
 import contextlib
-import ftplib
+# SECURITY: ftplib removed - insecure FTP deprecated in favor of SFTP
+# Per SECURITY_VERIFICATION_REPORT.md - P1 HIGH fix
+# import ftplib  # DEPRECATED - use SFTP instead
 import hashlib
 import os
 import tempfile
@@ -386,63 +388,25 @@ class AutomatedThemeUploader:
             return False
 
     async def _deploy_via_ftp(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
-        """Deploy theme via FTP."""
-        try:
-            if not credentials.ftp_host:
-                raise ValueError("FTP credentials not provided")
+        """
+        DEPRECATED: FTP deployment disabled for security reasons.
 
-            # Extract theme to temporary directory
-            with tempfile.TemporaryDirectory() as temp_dir:
-                with zipfile.ZipFile(package.package_path, "r") as zipf:
-                    zipf.extractall(temp_dir)
+        FTP transmits credentials and data in plaintext, exposing them to MITM attacks.
+        Per SECURITY_VERIFICATION_REPORT.md - P1 HIGH priority fix.
 
-                # Connect to FTP
-                with ftplib.FTP(credentials.ftp_host) as ftp:
-                    ftp.login(credentials.ftp_username, credentials.ftp_password)
+        Automatically redirects to SFTP for secure encrypted file transfer.
+        """
+        enterprise_logger.warning(
+            "⚠️ FTP deployment is DEPRECATED and INSECURE - automatically using SFTP instead",
+            category=LogCategory.SECURITY
+        )
+        enterprise_logger.warning(
+            "FTP transmits credentials in plaintext. Update your configuration to use SFTP.",
+            category=LogCategory.SECURITY
+        )
 
-                    # Navigate to themes directory
-                    ftp.cwd("/wp-content/themes/")
-
-                    # Create theme directory
-                    try:
-                        ftp.mkd(package.name)
-                    except ftplib.error_perm:
-                        pass  # Directory might already exist
-
-                    ftp.cwd(package.name)
-
-                    # Upload files
-                    temp_path = Path(temp_dir)
-                    for file_path in temp_path.rglob("*"):
-                        if file_path.is_file():
-                            relative_path = file_path.relative_to(temp_path)
-
-                            # Create directories if needed
-                            if relative_path.parent != Path("."):
-                                self._create_ftp_directories(ftp, str(relative_path.parent))
-
-                            # Upload file
-                            with open(file_path, "rb") as f:
-                                ftp.storbinary(f"STOR {relative_path}", f)
-
-            enterprise_logger.info(f"Theme uploaded via FTP: {package.name}", category=LogCategory.SYSTEM)
-            return True
-
-        except Exception as e:
-            enterprise_logger.error(f"FTP deployment error: {e}", category=LogCategory.SYSTEM, error=e)
-            return False
-
-    def _create_ftp_directories(self, ftp: ftplib.FTP, path: str):
-        """Create FTP directories recursively."""
-        parts = path.split("/")
-        current_path = ""
-
-        for part in parts:
-            current_path = f"{current_path}/{part}" if current_path else part
-            try:
-                ftp.mkd(current_path)
-            except ftplib.error_perm:
-                pass  # Directory might already exist
+        # Redirect to SFTP deployment for security
+        return await self._deploy_via_sftp(package, credentials)
 
     async def _deploy_via_sftp(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
         """Deploy theme via SFTP."""

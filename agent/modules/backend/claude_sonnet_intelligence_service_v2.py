@@ -346,10 +346,12 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     def _generate_cache_key(self, key: str, context: Optional[dict]) -> str:
         """Generate a unique cache key"""
+        # SECURITY: MD5 used for non-security purpose (cache key generation)
+        # Per SECURITY_VERIFICATION_REPORT.md - P1 HIGH fix
         if context:
             context_str = json.dumps(context, sort_keys=True)
-            return hashlib.md5(f"{key}:{context_str}".encode()).hexdigest()
-        return hashlib.md5(key.encode()).hexdigest()
+            return hashlib.md5(f"{key}:{context_str}".encode(), usedforsecurity=False).hexdigest()
+        return hashlib.md5(key.encode(), usedforsecurity=False).hexdigest()
 
     async def _rate_limit_check(self):
         """Check and enforce rate limiting"""
