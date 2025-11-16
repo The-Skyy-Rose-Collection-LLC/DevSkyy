@@ -21,7 +21,7 @@ try:
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-from monitoring.enterprise_logging import enterprise_logger, LogCategory
+from core.logging import enterprise_logger, LogCategory
 
 
 class MetricType(Enum):

@@ -10,7 +10,7 @@ from typing import Any, Optional
 
 from fastapi import HTTPException, status
 
-from logging_config import error_logger, get_correlation_id
+from core.logging import error_logger, get_correlation_id
 
 """
 Enterprise Error Handling & Recovery System for DevSkyy Platform
