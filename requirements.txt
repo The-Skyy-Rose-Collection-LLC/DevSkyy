@@ -63,8 +63,8 @@ openai~=2.7.2  # Latest version - Updated 2025-11-10
 huggingface_hub~=0.36.0  # Hugging Face model hub client - Updated 2025-11-10
 transformers~=4.57.1  # Latest version - Updated 2025-11-10
 tokenizers~=0.22.1  # Required by transformers - Updated 2025-11-10
-torch~=2.9.0  # Updated from 2.2.2 - Latest stable version with security fixes
-torchvision~=0.20.0  # Compatible with torch 2.9.0
+torch~=2.9.1  # Updated to latest stable version with security fixes (Nov 2025)
+torchvision~=0.20.1  # Compatible with torch 2.9.1
 # SECURITY: Updated to latest torch version to fix known vulnerabilities
 diffusers~=0.35.2  # Latest version - Updated 2025-11-10
 safetensors~=0.6.2  # Safe tensor serialization - Updated 2025-11-10
@@ -143,7 +143,7 @@ linkedin-api~=2.3.0
 
 # Voice & Audio Processing
 elevenlabs~=1.12.0  # Updated
-openai-whisper==20240930  # Latest whisper (date-based version, must use exact pin)
+openai-whisper==20250625  # Latest whisper June 2025 (date-based version, must use exact pin)
 pydub~=0.25.1
 speechrecognition~=3.12.0  # Updated
 # pyaudio==0.2.14  # Audio I/O - Disabled: requires PortAudio system libraries not available in Docker
@@ -160,7 +160,7 @@ langsmith~=0.2.6  # LLM monitoring
 # RAG (Retrieval-Augmented Generation)
 chromadb~=0.5.23  # Vector database for semantic search
 tiktoken~=0.8.0  # Token counting for embeddings
-pypdf~=5.1.0  # PDF document processing
+pypdf>=5.2.0,<6.0.0  # PDF document processing - SECURITY: Updated to fix 3 CVEs
 python-docx~=1.1.2  # Word document processing
 python-magic~=0.4.27  # File type detection
 faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search (CPU version)
@@ -183,7 +183,7 @@ plotly~=5.24.1  # Interactive plots
 gym~=0.26.2
 stable-baselines3~=2.4.0
 optuna~=4.1.0  # Hyperparameter optimization
-mlflow~=3.1.0  # ML lifecycle - Updated to fix GHSA-wf7f-8fxf-xfxc vulnerability
+mlflow>=3.2.0,<4.0.0  # ML lifecycle - SECURITY: Updated to fix GHSA-wf7f-8fxf-xfxc and additional CVE
 shap~=0.46.0  # Model explainability - SHAP values for interpretability
 
 # Code Analysis
