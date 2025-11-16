@@ -149,7 +149,15 @@ class WordPressDirectService:
             raise e
 
     async def _try_xmlrpc_connection(self) -> dict[str, Any]:
-        """Try XML-RPC connection (fallback method)."""
+        """
+        Attempt to authenticate to the WordPress site using the XML-RPC endpoint and return connection metadata.
+        
+        Returns:
+            dict[str, Any]: Connection result with keys including "status" (set to "connected" on success), "method", "site_url", "user_info", "connection_method", "agents_ready", "health", and "authenticated".
+        
+        Raises:
+            Exception: If XML-RPC authentication or communication fails.
+        """
         try:
             # SECURITY: Warn if defusedxml protection is not active
             if not XMLRPC_SECURED:

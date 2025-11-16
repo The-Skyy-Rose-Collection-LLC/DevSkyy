@@ -50,7 +50,23 @@ class WordPressServerAccess:
         logger.info("🚀 WordPress Server Access initialized - GOD MODE LEVEL 2")
 
     async def connect_server_access(self) -> dict[str, Any]:
-        """Establish full server access via SFTP and SSH."""
+        """
+        Establishes SFTP access (and optional SSH) to the configured WordPress server and initiates brand learning.
+        
+        Returns:
+            result (dict[str, Any]): A summary of the connection attempt and subsequent actions. Possible keys include:
+                - "status": "connected", "failed", or "error".
+                - "access_level": e.g., "GOD_MODE_LEVEL_2" when connected.
+                - "sftp_connected": `true` if SFTP was established, `false` otherwise.
+                - "ssh_connected": `true` if SSH was established, `false` if SSH was unavailable or not attempted.
+                - "server_access": description of the access scope (e.g., "full").
+                - "brand_learning": status of brand learning ("active" when started).
+                - "analysis_results": brand learning analysis output (present when connected).
+                - "capabilities": list of capability descriptions when connected.
+                - "message": human-readable summary message.
+                - On failure due to SFTP: "error" and "details" (SFTP test results).
+                - On unexpected exception: "error" (message) and "fallback" (indicates continued use of REST API).
+        """
         try:
             # Create SSH client
             self.ssh_client = paramiko.SSHClient()
