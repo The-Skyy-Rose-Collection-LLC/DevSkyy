@@ -16,7 +16,7 @@ pydantic==2.10.4      # Data validation and settings management (updated to matc
 asyncio-throttle==1.0.0  # Rate limiting for async operations
 
 # Security & Analytics (pinned versions)
-PyJWT==2.10.1                      # JWT handling for secure API calls (updated, replaces python-jose)
+PyJWT>=2.10.1,<3.0.0  # Truth Protocol: Allow patch updates                      # JWT handling for secure API calls (updated, replaces python-jose)
 python-dotenv==1.0.1               # Environment variable management
 rich==13.9.4                       # Enhanced console output (updated to match requirements.txt)
 

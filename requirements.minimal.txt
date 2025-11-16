@@ -28,7 +28,7 @@ aiofiles==24.1.0
 python-multipart==0.0.18
 
 # Authentication & Security
-PyJWT==2.10.1
+PyJWT>=2.10.1,<3.0.0  # Truth Protocol: Allow patch updates
 bcrypt==4.2.1
 cryptography==46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
 passlib[bcrypt]==1.7.4

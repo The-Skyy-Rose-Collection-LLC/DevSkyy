@@ -6,7 +6,7 @@
 setuptools==78.1.1  # Fix CVE-2025-47273 (path traversal → RCE), CVE-2024-6345
 
 # Core Framework
-fastapi==0.119.0  # Includes starlette dependency - do not pin separately
+fastapi==0.121.2  # Security fix: Starlette DoS (GHSA-7f5h-v6xp-fcq8) - updated 2025-11-15
 uvicorn[standard]==0.34.0
 pydantic==2.10.4  # Updated: langchain 0.3+ supports pydantic v2
 python-dotenv==1.0.1
@@ -25,9 +25,9 @@ httpx==0.28.1
 # Authentication & Security
 passlib[bcrypt]==1.7.4
 paramiko==3.5.0
-certifi==2024.12.14
+certifi==2025.11.12  # Security update: Latest CA certificates - updated 2025-11-15
 cryptography==46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
-PyJWT==2.10.1
+PyJWT==2.10.1  # Note: Use range constraint >=2.10.1,<3.0.0 in main requirements.txt for auto-patching
 bcrypt==4.2.1
 argon2-cffi==23.1.0
 
