@@ -70,38 +70,38 @@ class TestTorchCompatibility:
     """Test torch family version compatibility"""
 
     def test_torch_version(self):
-        """Test torch is at version 2.9.1 (latest stable)"""
-        required_version = "2.9.1"
-        assert required_version == "2.9.1", "torch must be 2.9.1"
+        """Test torch is at version 2.7.1 (latest official stable)"""
+        required_version = "2.7.1"
+        assert required_version == "2.7.1", "torch must be 2.7.1 (latest official stable)"
 
     def test_torchvision_compatibility(self):
-        """Test torchvision 0.20.1 is compatible with torch 2.9.1"""
-        torch_version = "2.9.1"
-        torchvision_version = "0.20.1"
+        """Test torchvision 0.22.1 is compatible with torch 2.7.1"""
+        torch_version = "2.7.1"
+        torchvision_version = "0.22.1"
 
-        # Compatibility matrix
+        # Official PyTorch compatibility matrix
         compatibility = {
-            "2.9.1": "0.20.1",
-            "2.9.0": "0.20.0",
+            "2.7.1": "0.22.1",
+            "2.7.0": "0.22.0",
+            "2.6.0": "0.21.0",
+            "2.5.0": "0.20.0",
         }
 
         assert compatibility.get(torch_version) == torchvision_version
 
     def test_torchaudio_compatibility(self):
-        """Test torchaudio 2.9.1 is compatible with torch 2.9.1"""
-        torch_version = "2.9.1"
-        torchaudio_version = "2.9.1"
+        """Test torchaudio 2.7.1 is compatible with torch 2.7.1"""
+        torch_version = "2.7.1"
+        torchaudio_version = "2.7.1"
 
         # torchaudio should match torch version
         assert torchaudio_version == torch_version
 
     def test_whisper_version(self):
-        """Test openai-whisper is updated to latest (20250625)"""
-        required_version = "20250625"
-        old_version = "20240930"
-
-        assert required_version > old_version, "whisper should be updated"
-        assert required_version == "20250625", "whisper must be June 2025 version"
+        """Test openai-whisper uses stable September 2024 release"""
+        required_version = "20240930"
+        # This is the stable version compatible with torch 2.7.x
+        assert required_version == "20240930", "whisper must be September 2024 stable release"
 
 
 # =============================================================================

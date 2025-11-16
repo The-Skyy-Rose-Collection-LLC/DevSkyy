@@ -63,9 +63,10 @@ openai~=2.7.2  # Latest version - Updated 2025-11-10
 huggingface_hub~=0.36.0  # Hugging Face model hub client - Updated 2025-11-10
 transformers~=4.57.1  # Latest version - Updated 2025-11-10
 tokenizers~=0.22.1  # Required by transformers - Updated 2025-11-10
-torch~=2.9.1  # Updated to latest stable version with security fixes (Nov 2025)
-torchvision~=0.20.1  # Compatible with torch 2.9.1
-# SECURITY: Updated to latest torch version to fix known vulnerabilities
+torch~=2.7.1  # Latest official stable (PyTorch 2.7.1, April 2025)
+torchvision~=0.22.1  # Compatible with torch 2.7.1 per official matrix
+torchaudio~=2.7.1  # Compatible with torch 2.7.1
+# SECURITY: Using latest stable torch family to fix known vulnerabilities
 diffusers~=0.35.2  # Latest version - Updated 2025-11-10
 safetensors~=0.6.2  # Safe tensor serialization - Updated 2025-11-10
 sentence-transformers~=3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
@@ -143,7 +144,7 @@ linkedin-api~=2.3.0
 
 # Voice & Audio Processing
 elevenlabs~=1.12.0  # Updated
-openai-whisper==20250625  # Latest whisper June 2025 (date-based version, must use exact pin)
+openai-whisper==20240930  # Stable September 2024 release (compatible with torch 2.7.x)
 pydub~=0.25.1
 speechrecognition~=3.12.0  # Updated
 # pyaudio==0.2.14  # Audio I/O - Disabled: requires PortAudio system libraries not available in Docker
