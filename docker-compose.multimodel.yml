@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  devskyy-multimodel:
+    build:
+      context: .
+      dockerfile: Dockerfile.multimodel
+    container_name: devskyy-multimodel
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - devskyy-network
+
+networks:
+  devskyy-network:
+    driver: bridge
