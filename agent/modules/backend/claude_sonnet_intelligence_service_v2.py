@@ -24,7 +24,7 @@ from typing import Any, Optional
 
 from anthropic import Anthropic, AsyncAnthropic
 
-from .base_agent import BaseAgent
+from agent.modules.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)
 

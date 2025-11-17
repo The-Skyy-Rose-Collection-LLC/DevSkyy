@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any
 
 from . import http_client
-from .telemetry import Telemetry
+from agent.modules.backend.telemetry import Telemetry
 
 logger = logging.getLogger(__name__)
 
