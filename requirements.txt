@@ -13,7 +13,7 @@ setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE, package_inde
 # ============================================================================
 # CORE FRAMEWORK
 # ============================================================================
-fastapi~=0.119.0  # Includes starlette dependency - do not pin separately
+fastapi>=0.120.0,<0.121.0  # SECURITY FIX: CVE-2025-62727 (Starlette Range header DoS)
 flask~=3.1.2  # Flask web framework
 uvicorn[standard]~=0.38.0  # ASGI server with websockets
 pydantic[email]>=2.9.0,<3.0.0  # SECURITY: Schema validation, supports langchain 0.3+
@@ -75,10 +75,10 @@ openai~=2.7.2  # Latest version - Updated 2025-11-10
 huggingface_hub~=0.36.0  # Hugging Face model hub client - Updated 2025-11-10
 transformers~=4.57.1  # Latest version - Updated 2025-11-10
 tokenizers>=0.22.0,<0.24.0  # Required by transformers - Relaxed for chromadb compatibility
-torch~=2.7.1  # Latest official stable (PyTorch 2.7.1, April 2025) - NumPy 2.x compatible
-torchvision~=0.22.1  # Compatible with torch 2.7.1 per official matrix - NumPy 2.x compatible
-torchaudio~=2.7.1  # Compatible with torch 2.7.1 - NumPy 2.x compatible
-# SECURITY: Using latest stable torch family to fix known vulnerabilities
+torch>=2.8.0,<2.9.0  # SECURITY FIX CVE-2025-3730 (DoS vulnerability) - NumPy 2.x compatible
+torchvision>=0.23.0,<0.24.0  # Compatible with torch 2.8+ per official matrix - NumPy 2.x compatible
+torchaudio>=2.8.0,<2.9.0  # Compatible with torch 2.8+ - NumPy 2.x compatible
+# SECURITY: Using torch 2.8.0+ to fix DoS vulnerability in 2.7.1
 diffusers~=0.35.2  # Latest version - Updated 2025-11-10 - NumPy 2.x compatible
 safetensors~=0.6.2  # Safe tensor serialization - Updated 2025-11-10
 sentence-transformers~=3.4.1  # Updated: 4.48.0 doesn't exist, using stable 3.4.1
@@ -185,7 +185,7 @@ langsmith~=0.4.43  # LLM monitoring - Updated to latest stable
 # RAG (Retrieval-Augmented Generation)
 chromadb~=1.3.4  # Vector database for semantic search - Updated to fix tokenizers conflict
 tiktoken~=0.8.0  # Token counting for embeddings
-pypdf>=5.2.0,<6.0.0  # SECURITY: PDF processing - Fix 3 CVEs
+pypdf>=6.1.3,<7.0.0  # SECURITY: PDF processing - Fix 3 CVEs (RAM exhaustion, infinite loop, memory exhaustion)
 python-docx~=1.1.2  # Word document processing
 python-magic~=0.4.27  # File type detection
 faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search (CPU version)
