@@ -1,0 +1,57 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - TESTING DEPENDENCIES
+# Testing-specific packages for CI/CD pipelines
+# Version: 1.0.0
+# ============================================================================
+# INSTALL: pip install -r requirements.txt -r requirements-test.txt
+#
+# This file is referenced by GitHub Actions workflows and should remain synchronized
+# with requirements-dev.txt for testing-related dependencies.
+# ============================================================================
+
+# ============================================================================
+# CORE TESTING FRAMEWORK
+# ============================================================================
+pytest~=8.4.2
+pytest-asyncio~=0.24.0
+pytest-cov~=6.0.0
+pytest-mock~=3.14.0
+pytest-xdist~=3.6.0
+pytest-timeout~=2.3.1
+pytest-env~=1.1.5
+pytest-html~=4.1.1
+pytest-json-report~=1.5.0
+pytest-sugar~=1.0.0
+
+# ============================================================================
+# HTTP & API TESTING
+# ============================================================================
+responses~=0.25.3
+pytest-httpx~=0.32.0
+requests-mock~=1.12.1
+httpretty~=1.1.4
+
+# ============================================================================
+# DATABASE TESTING
+# ============================================================================
+pytest-postgresql~=6.1.1
+sqlalchemy-utils~=0.41.2
+
+# ============================================================================
+# MOCKING & TIME MANIPULATION
+# ============================================================================
+freezegun~=1.5.1
+aioresponses~=0.7.6
+
+# ============================================================================
+# COVERAGE & REPORTING
+# ============================================================================
+coverage~=7.6.9
+coverage-badge~=1.1.2
+
+# ============================================================================
+# CODE QUALITY (For tests)
+# ============================================================================
+pytest-randomly~=3.15.0
+pytest-rerunfailures~=14.0
+tenacity~=9.0.0
