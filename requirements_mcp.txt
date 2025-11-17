@@ -1,0 +1,262 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - MCP SERVER DEPENDENCIES
+# Model Context Protocol (MCP) server implementation dependencies
+# Version: 1.0.0 - MCP 1.21.0 compatible
+# ============================================================================
+#
+# INSTALLATION:
+#   pip install -r requirements_mcp.txt
+#
+# USE CASE: Running DevSkyy as an MCP server for Claude Desktop and other MCP clients
+# ARCHITECTURE: 54-agent orchestration with MCP protocol support
+#
+# Per CLAUDE.md Truth Protocol:
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# - MCP Protocol: Official Anthropic MCP 1.21.0 implementation
+# ============================================================================
+
+# ============================================================================
+# BUILD DEPENDENCIES (Security-Critical)
+# ============================================================================
+setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE
+
+# ============================================================================
+# MCP CORE FRAMEWORK
+# ============================================================================
+claude-agent-sdk~=0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0
+mcp~=1.21.0  # Model Context Protocol - official implementation
+fastmcp~=0.1.0  # FastMCP framework for building MCP servers
+asyncio-throttle~=1.0.0  # Rate limiting for async MCP operations
+
+# ============================================================================
+# CORE FRAMEWORK
+# ============================================================================
+fastapi~=0.119.0  # Web framework for MCP HTTP endpoints
+uvicorn[standard]~=0.38.0  # ASGI server with WebSocket support for MCP
+pydantic[email]>=2.9.0,<3.0.0  # SECURITY: Schema validation for MCP messages
+python-dotenv~=1.0.1  # Environment variable management
+
+# ============================================================================
+# DATABASE (MCP State Management)
+# ============================================================================
+SQLAlchemy~=2.0.36  # ORM for MCP state persistence
+aiosqlite~=0.20.0  # Async SQLite driver
+asyncpg~=0.30.0  # Async PostgreSQL driver
+alembic~=1.14.0  # Database migrations
+
+# ============================================================================
+# HTTP & ASYNC OPERATIONS
+# ============================================================================
+httpx~=0.28.1  # Modern async HTTP client for MCP external calls
+aiofiles~=24.1.0  # Async file operations for MCP tools
+python-multipart~=0.0.18  # File upload support
+requests>=2.32.4,<3.0.0  # SECURITY: HTTP library
+
+# ============================================================================
+# AUTHENTICATION & SECURITY
+# ============================================================================
+certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
+cryptography>=46.0.3,<47.0.0  # SECURITY: Cryptographic operations
+PyJWT~=2.10.1  # JWT authentication for MCP clients
+defusedxml>=0.7.1,<1.0.0  # SECURITY: XML attack protection
+
+# ============================================================================
+# AI & ML (MCP AI Agents)
+# ============================================================================
+anthropic~=0.69.0  # Claude API for agent orchestration
+openai~=2.7.2  # OpenAI API for multi-model support
+transformers~=4.57.1  # HuggingFace transformers
+torch~=2.7.1  # PyTorch for model inference
+sentence-transformers~=3.4.1  # Sentence embeddings
+
+# ============================================================================
+# OBSERVABILITY (MCP Monitoring)
+# ============================================================================
+logfire[fastapi]~=4.14.2  # OpenTelemetry-based observability for MCP
+structlog~=24.4.0  # Structured logging for MCP events
+prometheus-client~=0.22.0  # Metrics collection
+python-json-logger~=3.2.0  # JSON logging for MCP traces
+
+# ============================================================================
+# RAG (MCP Knowledge Tools)
+# ============================================================================
+chromadb~=1.3.4  # Vector database for semantic search
+tiktoken~=0.8.0  # Token counting for embeddings
+pypdf>=5.2.0,<6.0.0  # SECURITY: PDF processing
+python-docx~=1.1.2  # Word document processing
+faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search
+
+# ============================================================================
+# DATA PROCESSING (MCP Tools)
+# ============================================================================
+numpy~=2.2.6  # NumPy 2.2.6 for compatibility
+pandas~=2.3.3  # Data manipulation
+python-slugify~=8.0.4  # URL-safe slugs
+python-dateutil~=2.9.0.post0  # Date utilities
+
+# ============================================================================
+# WEB SCRAPING (MCP Web Tools)
+# ============================================================================
+beautifulsoup4~=4.12.3  # HTML/XML parsing
+lxml~=5.3.0  # SECURITY: XML/HTML parser
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+click~=8.1.8  # CLI framework for MCP server management
+redis~=5.2.1  # Redis client for MCP caching
+celery[redis]~=5.4.0  # Distributed task queue for MCP background jobs
+
+# ============================================================================
+# DATA VALIDATION
+# ============================================================================
+cerberus~=1.3.6  # Schema validation
+marshmallow~=3.23.2  # Object serialization
+
+# ============================================================================
+# PERFORMANCE
+# ============================================================================
+ujson~=5.10.0  # Ultra-fast JSON for MCP message serialization
+orjson~=3.10.13  # Fastest Python JSON library
+
+# ============================================================================
+# MCP SERVER ARCHITECTURE
+# ============================================================================
+#
+# DevSkyy MCP Enterprise v2.0 provides:
+#   - 54 specialized agents organized in 9 orchestration layers
+#   - MCP protocol support for Claude Desktop integration
+#   - Tool calling, resource management, and prompt templates
+#   - Enterprise security and compliance monitoring
+#
+# Orchestration Layers:
+#   1. Ingress Layer (3 agents): Validation, routing, rate limiting
+#   2. Intelligence Layer (7 agents): Strategic planning, ML orchestration
+#   3. Execution Layer (10 agents): Core business logic execution
+#   4. Data Layer (6 agents): Database, caching, vector operations
+#   5. Integration Layer (8 agents): External APIs, webhooks, CMS
+#   6. Security Layer (6 agents): Auth, encryption, compliance
+#   7. Observability Layer (5 agents): Logging, metrics, tracing
+#   8. Infrastructure Layer (5 agents): Redis, queues, notifications
+#   9. Egress Layer (4 agents): Response formatting, compression
+#
+# ============================================================================
+# MCP SERVER CONFIGURATION
+# ============================================================================
+#
+# Environment Variables:
+#   - MCP_SERVER_NAME: DevSkyy Enterprise MCP Server
+#   - MCP_SERVER_VERSION: 2.0.0
+#   - ANTHROPIC_API_KEY: Claude API key for agent orchestration
+#   - DATABASE_URL: PostgreSQL connection for state persistence
+#   - REDIS_URL: Redis connection for caching
+#
+# Claude Desktop Configuration (~/.config/claude/claude_desktop_config.json):
+#   {
+#     "mcpServers": {
+#       "devskyy": {
+#         "command": "python",
+#         "args": ["/path/to/devskyy_mcp_enterprise_v2.py"],
+#         "env": {
+#           "ANTHROPIC_API_KEY": "your-api-key",
+#           "DATABASE_URL": "postgresql://...",
+#           "REDIS_URL": "redis://localhost:6379"
+#         }
+#       }
+#     }
+#   }
+#
+# ============================================================================
+# RUNNING THE MCP SERVER
+# ============================================================================
+#
+# 1. Install dependencies:
+#    pip install -r requirements_mcp.txt
+#
+# 2. Configure environment (.env):
+#    ANTHROPIC_API_KEY=your-api-key
+#    DATABASE_URL=postgresql://user:pass@localhost/devskyy
+#    REDIS_URL=redis://localhost:6379
+#    MCP_SERVER_PORT=8080
+#
+# 3. Initialize database:
+#    alembic upgrade head
+#
+# 4. Start MCP server:
+#    python devskyy_mcp_enterprise_v2.py
+#
+# 5. Test MCP server:
+#    curl http://localhost:8080/mcp/tools
+#    curl http://localhost:8080/mcp/resources
+#
+# 6. Connect from Claude Desktop:
+#    - Configure claude_desktop_config.json
+#    - Restart Claude Desktop
+#    - Use MCP tools in conversations
+#
+# ============================================================================
+# MCP TOOLS PROVIDED
+# ============================================================================
+#
+# Content Management:
+#   - wordpress_publish: Publish content to WordPress
+#   - woocommerce_import: Import products to WooCommerce
+#   - content_optimize: SEO optimization
+#
+# AI & Generation:
+#   - generate_fashion_content: Create fashion product descriptions
+#   - analyze_trends: Fashion trend analysis
+#   - image_generation: AI image generation
+#
+# Data & Analytics:
+#   - query_analytics: Analytics queries
+#   - rag_search: Semantic search with RAG
+#   - vector_similarity: Find similar items
+#
+# Automation:
+#   - schedule_task: Schedule background tasks
+#   - workflow_execute: Execute automation workflows
+#   - webhook_trigger: Trigger webhooks
+#
+# ============================================================================
+# MCP RESOURCES PROVIDED
+# ============================================================================
+#
+# Documentation:
+#   - devskyy://docs/api: API documentation
+#   - devskyy://docs/guides: User guides
+#
+# Templates:
+#   - devskyy://templates/product: Product templates
+#   - devskyy://templates/content: Content templates
+#
+# Configuration:
+#   - devskyy://config/agents: Agent configurations
+#   - devskyy://config/workflows: Workflow definitions
+#
+# ============================================================================
+# MONITORING & DEBUGGING
+# ============================================================================
+#
+# MCP Server Metrics:
+#   - http://localhost:8080/metrics: Prometheus metrics
+#   - http://localhost:8080/health: Health check
+#   - http://localhost:8080/mcp/status: MCP server status
+#
+# Logs:
+#   - Structured JSON logs to stdout
+#   - Logfire integration for OpenTelemetry traces
+#   - MCP message traces for debugging
+#
+# ============================================================================
+# UPGRADING MCP VERSION
+# ============================================================================
+#
+# To upgrade to a newer MCP version:
+#   1. Check compatibility: https://modelcontextprotocol.io/changelog
+#   2. Update mcp package: pip install mcp~=1.x.0
+#   3. Update claude-agent-sdk: pip install claude-agent-sdk~=0.x.0
+#   4. Test MCP tools: python -m pytest tests/test_mcp_server.py
+#   5. Update claude_desktop_config.json if protocol changes
+#
+# ============================================================================

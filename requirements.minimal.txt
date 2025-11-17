@@ -1,0 +1,158 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - MINIMAL DEPENDENCIES
+# Bare minimum dependencies for core functionality
+# Version: 1.0.0 - Lightweight deployment option
+# ============================================================================
+#
+# INSTALLATION:
+#   pip install -r requirements.minimal.txt
+#
+# USE CASE: Minimal deployments, development prototyping, or resource-constrained environments
+# LIMITATION: Does not include AI/ML, monitoring, advanced features
+#
+# For full production deployment, use: pip install -r requirements-production.txt
+#
+# Per CLAUDE.md Truth Protocol:
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# - Security baseline maintained even in minimal setup
+# ============================================================================
+
+# ============================================================================
+# BUILD DEPENDENCIES (Security-Critical)
+# ============================================================================
+setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE, package_index RCE
+
+# ============================================================================
+# CORE FRAMEWORK
+# ============================================================================
+fastapi~=0.119.0  # Web framework with automatic API documentation
+uvicorn[standard]~=0.38.0  # ASGI server with WebSocket support
+pydantic[email]>=2.9.0,<3.0.0  # SECURITY: Data validation and settings management
+python-dotenv~=1.0.1  # Environment variable management
+email-validator~=2.1.0  # Email validation for Pydantic
+starlette~=0.49.1  # ASGI framework (included in FastAPI, explicit for clarity)
+
+# ============================================================================
+# DATABASE (Core)
+# ============================================================================
+SQLAlchemy~=2.0.36  # ORM - works with SQLite, PostgreSQL, MySQL
+aiosqlite~=0.20.0  # Async SQLite driver (for development/testing)
+alembic~=1.14.0  # Database migrations
+
+# ============================================================================
+# HTTP & API
+# ============================================================================
+requests>=2.32.4,<3.0.0  # SECURITY: HTTP library
+python-multipart~=0.0.18  # File upload support for FastAPI
+aiofiles~=24.1.0  # Async file operations
+httpx~=0.28.1  # Modern async HTTP client
+
+# ============================================================================
+# AUTHENTICATION & SECURITY (Enterprise)
+# ============================================================================
+passlib[bcrypt]>=1.7.4,<2.0.0  # SECURITY: Password hashing
+certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
+cryptography>=46.0.3,<47.0.0  # SECURITY: Cryptographic operations
+PyJWT~=2.10.1  # JWT authentication per RFC 7519
+bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
+defusedxml>=0.7.1,<1.0.0  # SECURITY: Protection against XML attacks
+
+# ============================================================================
+# SECURITY MIDDLEWARE
+# ============================================================================
+slowapi~=0.1.9  # Rate limiting middleware
+secure~=0.3.0  # Security headers middleware
+
+# ============================================================================
+# LOGGING & OBSERVABILITY (Minimal)
+# ============================================================================
+python-json-logger~=3.2.0  # Structured JSON logging
+loguru~=0.7.3  # Enhanced logging with better defaults
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+click~=8.1.8  # CLI framework for management commands
+python-slugify~=8.0.4  # URL-safe slug generation
+python-dateutil~=2.9.0.post0  # Date utilities
+
+# ============================================================================
+# DATA VALIDATION
+# ============================================================================
+cerberus~=1.3.6  # Schema validation
+marshmallow~=3.23.2  # Object serialization/deserialization
+
+# ============================================================================
+# ENVIRONMENT & CONFIG
+# ============================================================================
+python-decouple~=3.8  # Separate settings from code
+environs~=11.2.1  # Environment variable parsing
+
+# ============================================================================
+# WHAT'S EXCLUDED FROM MINIMAL
+# ============================================================================
+#
+# Not included in minimal setup (install separately as needed):
+#
+# AI & ML:
+#   - anthropic, openai, transformers, torch, etc.
+#   - Install with: pip install -r requirements.txt (AI section)
+#
+# Advanced Database:
+#   - asyncpg (PostgreSQL), psycopg2-binary
+#   - Install with: pip install asyncpg~=0.30.0 psycopg2-binary~=2.9.9
+#
+# Caching & Queuing:
+#   - redis, celery, rabbitmq clients
+#   - Install with: pip install redis~=5.2.1 celery[redis]~=5.4.0
+#
+# Monitoring & APM:
+#   - prometheus-client, sentry-sdk, elastic-apm
+#   - Install with: pip install -r requirements.txt (monitoring section)
+#
+# Web Scraping:
+#   - selenium, playwright, beautifulsoup4
+#   - Install with: pip install -r requirements.txt (scraping section)
+#
+# Advanced Features:
+#   - blockchain (web3), voice (elevenlabs), video (moviepy)
+#   - Install individually as needed
+#
+# ============================================================================
+# MINIMAL DEPLOYMENT EXAMPLE
+# ============================================================================
+#
+# 1. Install minimal dependencies:
+#    pip install -r requirements.minimal.txt
+#
+# 2. Set up environment variables (.env):
+#    DATABASE_URL=sqlite:///./devskyy.db
+#    SECRET_KEY=your-secret-key-here
+#    JWT_SECRET_KEY=your-jwt-secret-here
+#
+# 3. Initialize database:
+#    alembic upgrade head
+#
+# 4. Run development server:
+#    uvicorn main:app --reload --host 0.0.0.0 --port 8000
+#
+# 5. Access API documentation:
+#    http://localhost:8000/docs
+#
+# ============================================================================
+# UPGRADE PATH
+# ============================================================================
+#
+# To upgrade from minimal to full production:
+#   pip install -r requirements.txt
+#
+# To add specific features:
+#   pip install -r requirements-optional.txt  # For MCP, Vercel, Luxury features
+#
+# To add development tools:
+#   pip install -r requirements-dev.txt
+#
+# To add testing framework:
+#   pip install -r requirements-test.txt
+#
+# ============================================================================

@@ -1,0 +1,212 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - VERCEL DEPLOYMENT DEPENDENCIES
+# Optimized for serverless deployment on Vercel
+# Version: 1.0.0 - Lightweight serverless configuration
+# ============================================================================
+#
+# INSTALLATION:
+#   pip install -r requirements.vercel.txt
+#
+# USE CASE: Vercel serverless functions and edge deployment
+# OPTIMIZED FOR: Cold start performance, minimal bundle size
+#
+# Per CLAUDE.md Truth Protocol:
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# - Performance SLO: P95 < 200ms (critical for serverless)
+# ============================================================================
+
+# ============================================================================
+# BUILD DEPENDENCIES (Security-Critical)
+# ============================================================================
+setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE
+
+# ============================================================================
+# CORE FRAMEWORK (Serverless-Optimized)
+# ============================================================================
+fastapi~=0.119.0  # Web framework with automatic API documentation
+uvicorn[standard]~=0.38.0  # ASGI server
+pydantic[email]>=2.9.0,<3.0.0  # SECURITY: Data validation
+python-dotenv~=1.0.1  # Environment variable management
+email-validator~=2.1.0  # Email validation for Pydantic
+
+# ============================================================================
+# ASGI & TEMPLATE ENGINE
+# ============================================================================
+starlette~=0.49.1  # ASGI framework (explicitly pinned for Vercel compatibility)
+jinja2~=3.1.4  # Template engine for dynamic content
+
+# ============================================================================
+# NETWORK & DNS
+# ============================================================================
+dnspython~=2.7.0  # DNS toolkit for network operations
+
+# ============================================================================
+# TYPE HINTS & COMPATIBILITY
+# ============================================================================
+typing-extensions~=4.12.2  # Backported type hints for compatibility
+
+# ============================================================================
+# HTTP & API
+# ============================================================================
+requests>=2.32.4,<3.0.0  # SECURITY: HTTP library
+python-multipart~=0.0.18  # File upload support
+httpx~=0.28.1  # Modern async HTTP client
+aiofiles~=24.1.0  # Async file operations
+
+# ============================================================================
+# AUTHENTICATION & SECURITY (Lightweight)
+# ============================================================================
+passlib[bcrypt]>=1.7.4,<2.0.0  # SECURITY: Password hashing
+certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
+cryptography>=46.0.3,<47.0.0  # SECURITY: Cryptographic operations
+PyJWT~=2.10.1  # JWT authentication per RFC 7519
+bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
+
+# ============================================================================
+# DATABASE (Serverless-Compatible)
+# ============================================================================
+SQLAlchemy~=2.0.36  # ORM
+asyncpg~=0.30.0  # Async PostgreSQL driver (recommended for Vercel with Neon/Supabase)
+psycopg2-binary~=2.9.9  # PostgreSQL driver (fallback)
+
+# ============================================================================
+# SECURITY MIDDLEWARE
+# ============================================================================
+slowapi~=0.1.9  # Rate limiting middleware
+secure~=0.3.0  # Security headers middleware
+
+# ============================================================================
+# LOGGING (Serverless-Optimized)
+# ============================================================================
+python-json-logger~=3.2.0  # Structured JSON logging for Vercel logs
+loguru~=0.7.3  # Enhanced logging
+
+# ============================================================================
+# UTILITIES (Minimal)
+# ============================================================================
+python-slugify~=8.0.4  # URL-safe slug generation
+python-dateutil~=2.9.0.post0  # Date utilities
+
+# ============================================================================
+# DATA VALIDATION
+# ============================================================================
+cerberus~=1.3.6  # Schema validation
+marshmallow~=3.23.2  # Object serialization
+
+# ============================================================================
+# PERFORMANCE (Serverless-Critical)
+# ============================================================================
+ujson~=5.10.0  # Ultra-fast JSON encoder/decoder (faster cold starts)
+orjson~=3.10.13  # Fastest Python JSON library (Rust-based)
+
+# ============================================================================
+# VERCEL-SPECIFIC OPTIMIZATIONS
+# ============================================================================
+#
+# Environment Variables for Vercel:
+#   - DATABASE_URL: PostgreSQL connection string (Neon, Supabase, or Vercel Postgres)
+#   - SECRET_KEY: Application secret key
+#   - JWT_SECRET_KEY: JWT signing key
+#   - REDIS_URL: Redis connection (Upstash Redis recommended)
+#
+# Vercel Configuration (vercel.json):
+#   {
+#     "builds": [
+#       {
+#         "src": "main.py",
+#         "use": "@vercel/python"
+#       }
+#     ],
+#     "routes": [
+#       {
+#         "src": "/(.*)",
+#         "dest": "main.py"
+#       }
+#     ]
+#   }
+#
+# Cold Start Optimization:
+#   - Keep bundle size minimal
+#   - Use connection pooling (asyncpg with small pool size)
+#   - Avoid heavy ML libraries (offload to separate services)
+#   - Use edge caching for static content
+#
+# ============================================================================
+# DEPLOYMENT CHECKLIST
+# ============================================================================
+#
+# 1. Install dependencies:
+#    pip install -r requirements.vercel.txt
+#
+# 2. Configure vercel.json:
+#    - Build command: pip install -r requirements.vercel.txt
+#    - Output directory: .vercel/output
+#
+# 3. Set environment variables in Vercel dashboard:
+#    - DATABASE_URL (Vercel Postgres or Neon)
+#    - SECRET_KEY
+#    - JWT_SECRET_KEY
+#    - REDIS_URL (Upstash Redis)
+#
+# 4. Deploy:
+#    vercel --prod
+#
+# 5. Monitor:
+#    - Check Vercel logs for cold start times
+#    - Monitor function execution time
+#    - Set up alerts for errors
+#
+# ============================================================================
+# RECOMMENDED VERCEL INTEGRATIONS
+# ============================================================================
+#
+# Database:
+#   - Vercel Postgres (native integration)
+#   - Neon (serverless PostgreSQL)
+#   - Supabase (PostgreSQL + real-time)
+#
+# Caching:
+#   - Upstash Redis (serverless Redis)
+#   - Vercel KV (key-value store)
+#
+# Storage:
+#   - Vercel Blob (file storage)
+#   - AWS S3 (object storage)
+#
+# Monitoring:
+#   - Vercel Analytics (built-in)
+#   - Sentry (error tracking)
+#
+# ============================================================================
+# WHAT'S EXCLUDED FROM VERCEL
+# ============================================================================
+#
+# Heavy dependencies excluded for optimal cold start:
+#
+# ML/AI Libraries:
+#   - torch, transformers, tensorflow (use separate API services)
+#   - anthropic, openai (can be added if needed, but adds to bundle size)
+#
+# Heavy Processing:
+#   - selenium, playwright (use Puppeteer service or Browserless)
+#   - opencv, pillow (use image processing API)
+#   - moviepy, ffmpeg (use video processing service)
+#
+# Background Tasks:
+#   - celery (use Vercel Cron or external job queue)
+#
+# Install separately only if required:
+#   pip install anthropic~=0.69.0  # For AI features
+#   pip install redis~=5.2.1  # For caching with Upstash
+#
+# ============================================================================
+# PERFORMANCE BENCHMARKS
+# ============================================================================
+#
+# Target metrics for Vercel deployment:
+#   - Cold start: < 3 seconds
+#   - Warm request: < 200ms (P95)
+#   - Bundle size: < 50MB
+#   - Memory usage: < 512MB
+#
+# ============================================================================

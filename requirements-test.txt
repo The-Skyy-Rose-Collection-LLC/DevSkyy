@@ -1,0 +1,180 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - TESTING DEPENDENCIES
+# Core testing framework and utilities for test execution
+# Version: 1.0.0 - Extracted from requirements-dev.txt
+# ============================================================================
+#
+# INSTALLATION:
+#   pip install -r requirements.txt -r requirements-test.txt
+#
+# Per CLAUDE.md Truth Protocol:
+# - Test coverage ≥90% required
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# ============================================================================
+
+# ============================================================================
+# CORE TESTING FRAMEWORK
+# ============================================================================
+pytest~=8.4.2  # Primary testing framework
+pytest-asyncio~=0.24.0  # Async test support
+pytest-cov~=6.0.0  # Coverage plugin
+pytest-mock~=3.14.0  # Mock/stub plugin
+pytest-xdist~=3.6.0  # Parallel test execution
+pytest-timeout~=2.3.1  # Test timeout plugin
+pytest-env~=1.1.5  # Environment variable plugin
+pytest-html~=4.1.1  # HTML test reports
+pytest-json-report~=1.5.0  # JSON test reports
+pytest-sugar~=1.0.0  # Enhanced test output
+pytest-benchmark~=4.0.0  # Performance benchmarking
+
+# ============================================================================
+# TEST DATA & FACTORIES
+# ============================================================================
+factory-boy~=3.3.1  # Test fixture factories
+faker~=33.1.0  # Fake data generation
+hypothesis~=6.122.1  # Property-based testing
+pytest-factoryboy~=2.7.0  # Factory Boy integration with pytest
+
+# ============================================================================
+# HTTP & API TESTING
+# ============================================================================
+responses~=0.25.3  # Mock HTTP requests
+pytest-httpx~=0.32.0  # Mock httpx
+requests-mock~=1.12.1  # Mock requests library
+httpretty~=1.1.4  # HTTP client mock
+fastapi-testclient~=0.1.0  # FastAPI test client
+
+# ============================================================================
+# API TESTING FRAMEWORKS
+# ============================================================================
+tavern~=2.12.1  # API testing framework
+schemathesis~=3.34.1  # API schema testing
+
+# ============================================================================
+# DATABASE TESTING
+# ============================================================================
+pytest-postgresql~=6.1.1  # PostgreSQL test fixtures
+pytest-redis~=3.1.2  # Redis test fixtures
+pytest-mongodb~=2.4.3  # MongoDB test fixtures
+pytest-elasticsearch~=2.1.1  # Elasticsearch test fixtures
+testing.postgresql~=1.3.0  # PostgreSQL testing utilities
+sqlalchemy-utils~=0.41.2  # SQLAlchemy testing utilities
+
+# ============================================================================
+# INTEGRATION & CONTAINER TESTING
+# ============================================================================
+testcontainers~=4.8.2  # Docker container testing
+docker~=7.1.0  # Docker SDK for Python
+pytest-services~=2.2.1  # Service testing
+pytest-docker~=3.1.1  # Docker fixtures for pytest
+
+# ============================================================================
+# PERFORMANCE & LOAD TESTING
+# ============================================================================
+locust~=2.32.4  # Load testing framework
+py-spy~=0.3.14  # Statistical profiler
+memory-profiler~=0.61.0  # Memory usage profiler
+line-profiler~=4.1.3  # Line-by-line profiler
+pympler~=0.9  # Memory profiling
+pytest-stress~=1.0.1  # Stress testing plugin
+
+# ============================================================================
+# SECURITY TESTING
+# ============================================================================
+pytest-security~=0.1.0  # Security testing plugin
+
+# ============================================================================
+# WEB & UI TESTING
+# ============================================================================
+pytest-playwright~=0.6.2  # Playwright integration
+pytest-selenium~=4.1.0  # Selenium integration
+
+# ============================================================================
+# MOCKING & TIME MANIPULATION
+# ============================================================================
+freezegun~=1.5.1  # Mock datetime
+time-machine~=2.16.0  # Fast datetime mocking
+wiremock~=2.6.1  # HTTP service mocking
+mockserver-client~=5.15.0  # MockServer client
+aioresponses~=0.7.6  # Mock aiohttp requests
+
+# ============================================================================
+# DATA TESTING & VALIDATION
+# ============================================================================
+great-expectations~=1.2.3  # Data validation framework
+pandera~=0.22.0  # Statistical data validation
+pytest-datadir~=1.5.0  # Data directory fixtures
+pytest-csv~=3.0.0  # CSV testing
+openpyxl~=3.1.5  # Excel file support
+deepdiff~=8.6.1  # Deep comparison of data structures
+pytest-ml~=0.1.0  # ML model testing
+pytest-image-diff~=0.0.11  # Image comparison testing
+
+# ============================================================================
+# COVERAGE & REPORTING
+# ============================================================================
+coverage~=7.6.9  # Coverage measurement
+coverage-badge~=1.1.2  # Coverage badge generation
+allure-pytest~=2.13.5  # Allure test reporting
+pytest-reportlog~=1.2.0  # Report log generation
+
+# ============================================================================
+# PARALLEL & DISTRIBUTED TESTING
+# ============================================================================
+pytest-parallel~=0.1.1  # Parallel test execution
+pytest-remote~=0.1.2  # Remote test execution
+
+# ============================================================================
+# FILE & FILESYSTEM TESTING
+# ============================================================================
+pytest-tmpdir~=0.1.0  # Temporary directory fixtures
+pyfakefs~=5.7.1  # Fake filesystem
+pytest-datafiles~=3.0.0  # Data file fixtures
+
+# ============================================================================
+# NETWORK & SOCKET TESTING
+# ============================================================================
+pytest-socket~=0.7.0  # Socket blocking for tests
+pytest-httpserver~=1.1.0  # HTTP server for testing
+
+# ============================================================================
+# ADVANCED TESTING UTILITIES
+# ============================================================================
+pytest-randomly~=3.15.0  # Randomize test order
+pytest-repeat~=0.9.3  # Repeat tests
+pytest-rerunfailures~=14.0  # Rerun failed tests
+tenacity~=9.0.0  # Retry library
+pytest-pythonpath~=0.7.4  # Python path manipulation
+pytest-custom-exit-code~=0.3.0  # Custom exit codes
+pytest-metadata~=3.1.1  # Test metadata plugin
+pytest-testmon~=2.1.3  # Test selection based on code changes
+pytest-picked~=0.5.0  # Run tests related to changed files
+
+# ============================================================================
+# NUMPY & PANDAS TESTING UTILITIES
+# ============================================================================
+numpy-testing~=1.26.4  # NumPy testing utilities
+pandas-testing~=2.2.3  # Pandas testing utilities
+
+# ============================================================================
+# USAGE EXAMPLES
+# ============================================================================
+#
+# Example 1: Run all tests with coverage
+#   pytest --cov=. --cov-report=html --cov-report=term-missing
+#
+# Example 2: Run tests in parallel
+#   pytest -n auto
+#
+# Example 3: Run specific test markers
+#   pytest -m "not slow"
+#   pytest -m "unit"
+#   pytest -m "integration"
+#
+# Example 4: Generate HTML report
+#   pytest --html=report.html --self-contained-html
+#
+# Example 5: Run load tests
+#   locust -f tests/load/locustfile.py --host=http://localhost:8000
+#
+# ============================================================================

@@ -1,0 +1,124 @@
+# ============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - PRODUCTION DEPENDENCIES
+# Production-ready dependencies for enterprise deployment
+# Version: 1.0.0 - Production-optimized subset
+# ============================================================================
+#
+# INSTALLATION:
+#   pip install -r requirements-production.txt
+#
+# IMPORTANT: This file contains the same dependencies as requirements.txt
+# The main requirements.txt is already production-focused and security-hardened.
+# This file serves as an explicit production deployment reference.
+#
+# For development, use: pip install -r requirements.txt -r requirements-dev.txt
+# For testing, add: pip install -r requirements-test.txt
+# For optional features, add: pip install -r requirements-optional.txt
+#
+# Per CLAUDE.md Truth Protocol:
+# - Version strategy: ~= for compatible releases, >=,< for security packages
+# - Security baseline: AES-256-GCM, Argon2id, OAuth2+JWT
+# - Performance SLO: P95 < 200ms, error rate < 0.5%
+# ============================================================================
+
+# Include the main production requirements
+-r requirements.txt
+
+# ============================================================================
+# PRODUCTION DEPLOYMENT CHECKLIST
+# ============================================================================
+#
+# Before deploying to production, ensure:
+#
+# 1. Security:
+#    - All environment variables configured (see .env.example)
+#    - Secrets stored in secret manager (not in code)
+#    - SSL/TLS certificates configured
+#    - Rate limiting enabled
+#    - Security headers configured
+#
+# 2. Database:
+#    - Database migrations applied (alembic upgrade head)
+#    - Database backups configured
+#    - Connection pooling configured
+#    - Read replicas configured (if needed)
+#
+# 3. Monitoring:
+#    - Prometheus metrics endpoint exposed
+#    - Sentry error tracking configured
+#    - Structured logging enabled
+#    - APM (Elastic APM) configured
+#
+# 4. Performance:
+#    - Redis cache configured
+#    - Celery workers running
+#    - Load balancer configured
+#    - CDN configured for static assets
+#
+# 5. Infrastructure:
+#    - Docker image built and scanned
+#    - Kubernetes manifests applied
+#    - Auto-scaling configured
+#    - Health checks configured
+#
+# 6. Compliance:
+#    - GDPR compliance checks passed
+#    - Security audit completed
+#    - Vulnerability scan clean (no HIGH/CRITICAL)
+#    - Test coverage ≥90%
+#
+# ============================================================================
+# ENVIRONMENT VARIABLES REQUIRED
+# ============================================================================
+#
+# Core:
+#   - DATABASE_URL: PostgreSQL connection string
+#   - REDIS_URL: Redis connection string
+#   - SECRET_KEY: Application secret key
+#
+# AI Services:
+#   - ANTHROPIC_API_KEY: Claude API key
+#   - OPENAI_API_KEY: OpenAI API key
+#
+# Authentication:
+#   - JWT_SECRET_KEY: JWT signing key
+#   - JWT_ALGORITHM: JWT algorithm (default: HS256)
+#
+# Monitoring:
+#   - SENTRY_DSN: Sentry error tracking DSN
+#   - ELASTIC_APM_SERVER_URL: Elastic APM server URL
+#   - PROMETHEUS_MULTIPROC_DIR: Prometheus metrics directory
+#
+# External Services:
+#   - AWS_ACCESS_KEY_ID: AWS access key
+#   - AWS_SECRET_ACCESS_KEY: AWS secret key
+#   - GOOGLE_APPLICATION_CREDENTIALS: GCP service account JSON
+#
+# ============================================================================
+# DOCKER PRODUCTION BUILD
+# ============================================================================
+#
+# Build optimized production image:
+#   docker build -t devskyy:production -f Dockerfile.production .
+#
+# Run production container:
+#   docker run -d \
+#     --name devskyy-api \
+#     -p 8000:8000 \
+#     --env-file .env.production \
+#     devskyy:production
+#
+# ============================================================================
+# KUBERNETES DEPLOYMENT
+# ============================================================================
+#
+# Apply Kubernetes manifests:
+#   kubectl apply -f k8s/production/
+#
+# Scale deployment:
+#   kubectl scale deployment devskyy-api --replicas=5
+#
+# Check deployment status:
+#   kubectl rollout status deployment/devskyy-api
+#
+# ============================================================================
