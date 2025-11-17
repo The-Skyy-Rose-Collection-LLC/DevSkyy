@@ -1,0 +1,35 @@
+# Deployment Pipeline
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-production.txt
+
+      - name: Run pre-deployment checks
+        run: |
+          echo "Running pre-deployment validation..."
+          python -m py_compile main.py
+          echo "✅ Syntax check passed"
+
+      - name: Deploy (placeholder)
+        run: |
+          echo "🚀 Deployment logic goes here"
+          echo "Configure with your deployment platform (Vercel, Railway, etc.)"
