@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
 import requests
 from requests.auth import HTTPBasicAuth
+
 
 # SECURITY: Protect against XML attacks (XXE, billion laughs, etc.)
 # Per SECURITY_VERIFICATION_REPORT.md - P0 CRITICAL fix

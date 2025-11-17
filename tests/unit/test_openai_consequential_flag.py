@@ -8,8 +8,7 @@ Per Truth Protocol:
 - Rule #13: Security baseline verification
 """
 
-import os
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -22,7 +21,7 @@ class TestAIConfigConsequentialFlag:
         """Test AIConfig includes openai_is_consequential field"""
         monkeypatch.setenv("OPENAI_IS_CONSEQUENTIAL", "true")
 
-        from config.unified_config import AIConfig, get_config
+        from config.unified_config import get_config
 
         config = get_config()
 

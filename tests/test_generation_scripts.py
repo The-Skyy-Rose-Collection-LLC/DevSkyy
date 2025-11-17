@@ -8,7 +8,6 @@ Tests the automated generation scripts created for enterprise compliance.
 
 import json
 import sys
-from pathlib import Path
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
@@ -258,15 +257,14 @@ class TestScriptErrorHandling:
 
     def test_openapi_import_error_handling(self):
         """Test graceful handling of import errors"""
-        with patch.dict(sys.modules, {"main": None}):
-            with patch("builtins.print") as mock_print:
-                try:
-                    # This would normally raise ImportError
-                    raise ImportError("No module named 'fastapi'")
-                except ImportError as e:
-                    # Verify error is caught and logged
-                    error_msg = str(e)
-                    assert "fastapi" in error_msg.lower()
+        with patch.dict(sys.modules, {"main": None}), patch("builtins.print") as mock_print:
+            try:
+                # This would normally raise ImportError
+                raise ImportError("No module named 'fastapi'")
+            except ImportError as e:
+                # Verify error is caught and logged
+                error_msg = str(e)
+                assert "fastapi" in error_msg.lower()
 
     def test_sbom_file_write_error(self, tmp_path):
         """Test handling of file write errors"""

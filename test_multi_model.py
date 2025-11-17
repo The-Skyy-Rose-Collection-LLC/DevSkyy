@@ -6,7 +6,9 @@ Tests all API connections and intelligent duo routing
 
 import asyncio
 import os
+
 from dotenv import load_dotenv
+
 
 # Load environment
 load_dotenv()
@@ -34,7 +36,7 @@ async def test_multi_model_system():
         )
         print(f"   ✅ Claude: {response.content[0].text}\n")
     except Exception as e:
-        print(f"   ❌ Error: {str(e)}\n")
+        print(f"   ❌ Error: {e!s}\n")
 
     # Test 2: OpenAI GPT-4
     print("2️⃣  Testing OPENAI (GPT-4 Turbo)...")
@@ -51,7 +53,7 @@ async def test_multi_model_system():
         )
         print(f"   ✅ GPT-4: {response.choices[0].message.content}\n")
     except Exception as e:
-        print(f"   ❌ Error: {str(e)}\n")
+        print(f"   ❌ Error: {e!s}\n")
 
     # Test 3: Google Gemini
     print("3️⃣  Testing GOOGLE GEMINI (1.5 Flash)...")
@@ -64,15 +66,15 @@ async def test_multi_model_system():
         )
         print(f"   ✅ Gemini: {response.text}\n")
     except Exception as e:
-        print(f"   ❌ Error: {str(e)}\n")
+        print(f"   ❌ Error: {e!s}\n")
 
     # Test 4: Hugging Face
     print("4️⃣  Testing HUGGING FACE...")
     hf_token = os.getenv('HUGGING_FACE_TOKEN')
     if hf_token and hf_token.startswith('hf_'):
-        print(f"   ✅ Hugging Face token valid\n")
+        print("   ✅ Hugging Face token valid\n")
     else:
-        print(f"   ❌ Invalid Hugging Face token\n")
+        print("   ❌ Invalid Hugging Face token\n")
 
     print("=" * 70)
     print("🎯 Multi-Model Orchestration Ready!")

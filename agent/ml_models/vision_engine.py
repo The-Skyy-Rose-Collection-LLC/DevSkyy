@@ -3,6 +3,7 @@ from typing import Any
 
 import numpy as np
 
+
 """
 Vision Engine - Computer Vision for Fashion
 Image classification, object detection, style transfer

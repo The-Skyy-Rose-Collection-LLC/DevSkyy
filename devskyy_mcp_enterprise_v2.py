@@ -41,27 +41,27 @@ Claude Desktop Config:
 GOD MODE 3.0 VERIFIED - All patterns from official MCP SDK
 """
 
-import os
-import sys
-import json
-import asyncio
 import argparse
-import hashlib
-from typing import Optional, List, Dict, Any, Literal
-from enum import Enum
-from datetime import datetime
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+import hashlib
+import json
+import os
 from pathlib import Path
+import sys
+from typing import Any, Literal, Optional
+
 
 try:
-    from mcp.server.fastmcp import FastMCP, Context
-    from mcp.server.session import ServerSession
-    from mcp.server.fastmcp.prompts import base
-    from mcp.types import CallToolResult, TextContent
-    from pydantic import BaseModel, Field, ConfigDict
     import httpx
+    from mcp.server.fastmcp import Context, FastMCP
+    from mcp.server.fastmcp.prompts import base
+    from mcp.server.session import ServerSession
+    from mcp.types import CallToolResult, TextContent
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"❌ Missing required packages: {e}")
     print('Install: pip install "mcp[cli]" httpx pydantic python-jose[cryptography]')
@@ -109,22 +109,22 @@ class ExecuteRequest(BaseModel):
     """Execute request - structured input."""
     intent: AgentIntent = Field(description="Agent category for routing")
     action: str = Field(description="Specific action (scan, fix, predict, etc)")
-    parameters: Dict[str, Any] = Field(description="Agent-specific parameters")
-    options: Optional[Dict[str, Any]] = Field(default=None, description="Execution options")
+    parameters: dict[str, Any] = Field(description="Agent-specific parameters")
+    options: Optional[dict[str, Any]] = Field(default=None, description="Execution options")
 
 class ExecuteResult(BaseModel):
     """Execute result - structured output."""
     status: ExecutionStatus
     agent_used: str = Field(description="Agent that handled the request")
     execution_time_ms: float
-    result: Dict[str, Any] = Field(description="Agent output data")
-    next_actions: Optional[List[str]] = Field(default=None, description="Suggested next steps")
+    result: dict[str, Any] = Field(description="Agent output data")
+    next_actions: Optional[list[str]] = Field(default=None, description="Suggested next steps")
 
 # Tool 2: Batch Execute
 class BatchRequest(BaseModel):
     """Batch execution request."""
     workflow: Literal["product_launch", "code_quality", "content_marketing", "ecommerce_optimize"]
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     execution_mode: Literal["parallel", "sequential"] = "parallel"
 
 class BatchResult(BaseModel):
@@ -132,21 +132,21 @@ class BatchResult(BaseModel):
     workflow_id: str
     total_agents: int
     total_time_ms: float
-    results: List[ExecuteResult]
-    summary: Dict[str, Any]
+    results: list[ExecuteResult]
+    summary: dict[str, Any]
 
 # Tool 3: Query
 class QueryRequest(BaseModel):
     """Query request for cached data."""
     query_type: Literal["agents", "health", "metrics", "capabilities"]
-    filters: Optional[Dict[str, Any]] = None
+    filters: Optional[dict[str, Any]] = None
     cache_ttl: int = Field(default=300, description="Cache TTL in seconds")
 
 class QueryResult(BaseModel):
     """Query result."""
     query_type: str
     cache_hit: bool
-    data: Dict[str, Any]
+    data: dict[str, Any]
     cached_at: Optional[datetime] = None
 
 # Tool 4: Analyze
@@ -154,15 +154,15 @@ class AnalyzeRequest(BaseModel):
     """ML analysis request."""
     analysis_type: Literal["trend_forecast", "customer_segment", "price_optimize", "sentiment"]
     data_source: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
 
 class AnalyzeResult(BaseModel):
     """ML analysis result - compressed."""
     analysis_type: str
     model_used: str
     confidence: float = Field(ge=0.0, le=1.0)
-    top_insights: List[str] = Field(max_length=5, description="Top 5 insights only")
-    recommendations: List[str] = Field(max_length=3, description="Top 3 actions")
+    top_insights: list[str] = Field(max_length=5, description="Top 5 insights only")
+    recommendations: list[str] = Field(max_length=3, description="Top 3 actions")
     full_report_url: Optional[str] = None
 
 # Tool 5: Status
@@ -394,7 +394,7 @@ def code_quality_workflow(
     code_path: str,
     language: str,
     priority: str = "security"
-) -> List[base.Message]:
+) -> list[base.Message]:
     """
     Multi-step code improvement workflow.
     """
@@ -702,7 +702,7 @@ async def devskyy_query(
     redis_client = ctx.request_context.lifespan_context.redis_client
 
     # Generate cache key
-    cache_key = f"devskyy:query:{request.query_type}:{hashlib.md5(json.dumps(request.filters or {}).encode()).hexdigest()}"
+    cache_key = f"devskyy:query:{request.query_type}:{hashlib.md5(json.dumps(request.filters or {}).encode(), usedforsecurity=False).hexdigest()}"
 
     # Try cache first
     if redis_client:
@@ -842,7 +842,7 @@ async def devskyy_analyze(
             analysis_type=request.analysis_type,
             model_used="error",
             confidence=0.0,
-            top_insights=[f"Analysis failed: {str(e)}"],
+            top_insights=[f"Analysis failed: {e!s}"],
             recommendations=["Check API connectivity", "Verify data source"],
             full_report_url=None
         )
@@ -913,7 +913,7 @@ async def devskyy_status(
             uptime_hours=0,
             active_agents=0,
             recent_errors=999,
-            summary=f"ERROR: Status check failed - {str(e)}",
+            summary=f"ERROR: Status check failed - {e!s}",
             details_url=None
         )
 

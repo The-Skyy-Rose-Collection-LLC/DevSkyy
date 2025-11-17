@@ -8,14 +8,15 @@ IMPACT: Increases organic traffic by 30-50% through optimized meta tags
 Truth Protocol: Validated output, character limits enforced, no placeholders
 """
 
+from enum import Enum
 import json
 import logging
-from enum import Enum
 from typing import Optional
 
 import anthropic
 from openai import OpenAI
 from pydantic import BaseModel, Field, validator
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,13 @@
 import asyncio
+from datetime import datetime
 import logging
 import random
-import uuid
-from datetime import datetime
 from typing import Any
+import uuid
 
 from . import http_client
 from .telemetry import Telemetry
+
 
 logger = logging.getLogger(__name__)
 

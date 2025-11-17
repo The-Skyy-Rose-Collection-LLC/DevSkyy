@@ -7,16 +7,17 @@ from fastapi.security import OAuth2PasswordRequestForm
 from api.v1.auth0_endpoints import router as auth0_router
 from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
-    create_user_tokens,
-    get_current_active_user,
     TokenData,
     TokenResponse,
     User,
-    user_manager,
     UserRole,
+    create_user_tokens,
+    get_current_active_user,
+    user_manager,
     verify_token,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+
 
 """
 Authentication API Endpoints

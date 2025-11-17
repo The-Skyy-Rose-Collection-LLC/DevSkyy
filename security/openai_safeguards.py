@@ -21,15 +21,14 @@ Features:
 """
 
 import asyncio
-from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Enum
-import json
+from functools import wraps
 import logging
 from pathlib import Path
 import time
-from typing import Any, Callable, Optional, Dict, List
-from functools import wraps
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -65,7 +64,7 @@ class SafeguardViolation(BaseModel):
     severity: str  # critical, high, medium, low
     operation_type: OperationType
     is_consequential: bool
-    details: Dict[str, Any]
+    details: dict[str, Any]
     stack_trace: Optional[str] = None
     resolved: bool = False
 
@@ -78,7 +77,7 @@ class AuditLogEntry(BaseModel):
     is_consequential: bool
     user_id: Optional[str] = None
     ip_address: Optional[str] = None
-    request_params: Dict[str, Any] = Field(default_factory=dict)
+    request_params: dict[str, Any] = Field(default_factory=dict)
     response_summary: Optional[str] = None
     success: bool
     error_message: Optional[str] = None
@@ -120,7 +119,7 @@ class SafeguardConfig(BaseModel):
     # Validation
     enable_request_validation: bool = Field(default=True)
     max_prompt_length: int = Field(default=100000, ge=1000, le=1000000)
-    blocked_keywords: List[str] = Field(default_factory=list)
+    blocked_keywords: list[str] = Field(default_factory=list)
 
     # Monitoring
     enable_monitoring: bool = Field(default=True)
@@ -158,8 +157,8 @@ class RateLimiter:
         self.max_per_minute = max_per_minute
         self.max_consequential_per_hour = max_consequential_per_hour
 
-        self.requests: List[float] = []
-        self.consequential_requests: List[float] = []
+        self.requests: list[float] = []
+        self.consequential_requests: list[float] = []
         self.lock = asyncio.Lock()
 
     async def check_rate_limit(self, is_consequential: bool = False) -> tuple[bool, Optional[str]]:
@@ -234,7 +233,7 @@ class CircuitBreaker:
 
             return result
 
-        except Exception as e:
+        except Exception:
             async with self.lock:
                 self.failures += 1
                 self.last_failure_time = time.time()
@@ -267,7 +266,7 @@ class AuditLogger:
         except Exception as e:
             logger.error(f"Failed to write audit log: {e}")
 
-    def get_recent_logs(self, hours: int = 24) -> List[AuditLogEntry]:
+    def get_recent_logs(self, hours: int = 24) -> list[AuditLogEntry]:
         """Retrieve recent audit logs"""
         if not self.log_path.exists():
             return []
@@ -315,7 +314,7 @@ class RequestValidator:
 
         return True, None
 
-    def sanitize_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def sanitize_params(self, params: dict[str, Any]) -> dict[str, Any]:
         """Sanitize request parameters"""
         sanitized = params.copy()
 
@@ -355,7 +354,7 @@ class OpenAISafeguardManager:
 
         self.validator = RequestValidator(self.config)
 
-        self.violations: List[SafeguardViolation] = []
+        self.violations: list[SafeguardViolation] = []
 
         logger.info(
             f"🛡️  OpenAI Safeguard Manager initialized - Level: {self.config.level}, "
@@ -369,7 +368,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: Optional[str] = None,
-        params: Optional[Dict[str, Any]] = None
+        params: Optional[dict[str, Any]] = None
     ) -> tuple[bool, Optional[str]]:
         """
         Validate request before sending to OpenAI API
@@ -427,7 +426,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: Optional[str] = None,
-        params: Optional[Dict[str, Any]] = None,
+        params: Optional[dict[str, Any]] = None,
         *args,
         **kwargs
     ) -> Any:
@@ -490,7 +489,7 @@ class OpenAISafeguardManager:
         severity: str,
         operation_type: OperationType,
         is_consequential: bool,
-        details: Dict[str, Any]
+        details: dict[str, Any]
     ):
         """Record safeguard violation"""
         violation = SafeguardViolation(
@@ -519,7 +518,7 @@ class OpenAISafeguardManager:
                 f"Details: {details}"
             )
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """Get safeguard statistics"""
         recent_violations = [v for v in self.violations if (datetime.utcnow() - v.timestamp).total_seconds() < 3600]
 
@@ -602,13 +601,13 @@ def reload_safeguard_manager(config: Optional[SafeguardConfig] = None) -> OpenAI
 # ============================================================================
 
 __all__ = [
-    "SafeguardLevel",
-    "OperationType",
-    "SafeguardConfig",
-    "SafeguardViolation",
     "AuditLogEntry",
     "OpenAISafeguardManager",
-    "with_safeguards",
+    "OperationType",
+    "SafeguardConfig",
+    "SafeguardLevel",
+    "SafeguardViolation",
     "get_safeguard_manager",
     "reload_safeguard_manager",
+    "with_safeguards",
 ]

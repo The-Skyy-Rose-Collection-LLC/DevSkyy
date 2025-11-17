@@ -5,8 +5,9 @@ Verifies that all critical files can import successfully
 """
 
 import importlib.util
-import sys
 from pathlib import Path
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [

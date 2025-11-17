@@ -1,9 +1,10 @@
 from monitoring.system_monitor import SystemMonitor
-from security.jwt_auth import get_current_user, require_role, UserRole
+from security.jwt_auth import UserRole, get_current_user, require_role
+
 
 # Security availability check
 try:
-    from security.jwt_auth import require_role, UserRole
+    from security.jwt_auth import UserRole, require_role
 
     SECURITY_AVAILABLE = True
 except ImportError:
@@ -16,6 +17,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
+
 
 """
 DevSkyy Enterprise Dashboard API v1.0.0

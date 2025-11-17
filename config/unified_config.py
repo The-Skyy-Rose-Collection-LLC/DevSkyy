@@ -15,13 +15,14 @@ Per Truth Protocol Rule #11: Verified languages - Python 3.11.* only
 
 import logging
 import os
-import secrets
 from pathlib import Path
+import secrets
 from typing import Any, Optional
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
+
 
 # Load environment variables from .env file
 load_dotenv()

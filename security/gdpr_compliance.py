@@ -9,14 +9,15 @@ Date: October 26, 2025
 Citation: GDPR Articles 15, 17, 5; Recital 83
 """
 
-import logging
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from enum import Enum
+import logging
 from typing import Any, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter
 from pydantic import BaseModel
+
 
 logger = logging.getLogger(__name__)
 

@@ -12,9 +12,10 @@ import os
 
 import pytest
 
+
 # Import encryption module
 try:
-    from security.encryption import decrypt_data, encrypt_data, EncryptionService, generate_encryption_key
+    from security.encryption import EncryptionService, decrypt_data, encrypt_data, generate_encryption_key
 
     ENCRYPTION_AVAILABLE = True
 except ImportError:

@@ -8,9 +8,9 @@ IMPACT: Higher quality content through AI peer review and human oversight
 Truth Protocol: Input validation, error handling, audit trails, webhook security
 """
 
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
@@ -22,6 +22,7 @@ from services.consensus_orchestrator import (
     ConsensusOrchestrator,
     HumanDecision,
 )
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/consensus", tags=["Consensus Workflow"])

@@ -5,9 +5,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, HttpUrl
 
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
-from webhooks.webhook_system import webhook_manager, WebhookEvent, WebhookSubscription
+from webhooks.webhook_system import WebhookEvent, WebhookSubscription, webhook_manager
+
 
 """
 Webhook API Endpoints

@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 import os
-import uuid
-from datetime import datetime
 from typing import Any
+import uuid
 
 import openai
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

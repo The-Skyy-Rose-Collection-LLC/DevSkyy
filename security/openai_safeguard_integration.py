@@ -8,15 +8,16 @@ Per Truth Protocol:
 - Rule #13: Security baseline enforcement
 """
 
+from collections.abc import Callable
 import logging
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Optional
 
 from config.unified_config import get_config
 from security.openai_safeguards import (
     OpenAISafeguardManager,
+    OperationType,
     SafeguardConfig,
     SafeguardLevel,
-    OperationType,
     get_safeguard_manager,
 )
 
@@ -84,7 +85,7 @@ def validate_openai_request(
     operation_type: OperationType,
     is_consequential: bool,
     prompt: Optional[str] = None,
-    params: Optional[Dict[str, Any]] = None
+    params: Optional[dict[str, Any]] = None
 ) -> tuple[bool, Optional[str]]:
     """
     Validate OpenAI API request before execution
@@ -128,7 +129,7 @@ def execute_with_safeguards(
     operation_type: OperationType,
     is_consequential: bool,
     prompt: Optional[str] = None,
-    params: Optional[Dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
     *args,
     **kwargs
 ) -> Any:
@@ -180,7 +181,7 @@ def execute_with_safeguards(
     )
 
 
-def get_safeguard_statistics() -> Dict[str, Any]:
+def get_safeguard_statistics() -> dict[str, Any]:
     """
     Get current safeguard statistics
 
@@ -260,10 +261,10 @@ if _manager:
 
 
 __all__ = [
-    "initialize_safeguards",
-    "validate_openai_request",
-    "execute_with_safeguards",
-    "get_safeguard_statistics",
     "check_production_safeguards",
     "create_safeguard_config_from_app_config",
+    "execute_with_safeguards",
+    "get_safeguard_statistics",
+    "initialize_safeguards",
+    "validate_openai_request",
 ]

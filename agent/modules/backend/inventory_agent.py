@@ -1,9 +1,10 @@
+from datetime import datetime, timedelta
 import hashlib
 import logging
 import random
-import uuid
-from datetime import datetime, timedelta
 from typing import Any
+import uuid
+
 
 # Heavy imports removed - using random instead of numpy for mock data
 # If CV/ML features needed in future, lazy load: cv2, imagehash, PIL, sklearn
@@ -314,7 +315,7 @@ class InventoryAgent:
     def _extract_metadata(self, index: int) -> dict[str, Any]:
         """Extract metadata for asset."""
         return {
-            "checksum": hashlib.md5(f"asset_{index}".encode()).hexdigest(),
+            "checksum": hashlib.md5(f"asset_{index}".encode(), usedforsecurity=False).hexdigest(),
             "dimensions": f"{random.randint(800, 2000)}x{random.randint(600, 1500)}",
             "color_profile": "sRGB",
             "camera_model": "Professional Camera" if index % 10 == 0 else None,

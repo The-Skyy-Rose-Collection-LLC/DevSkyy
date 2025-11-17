@@ -1,8 +1,8 @@
 import asyncio
-import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
+import logging
 from typing import Any
 
 from api_integration.core_engine import api_gateway
@@ -10,16 +10,17 @@ from api_integration.workflow_engine import (
     ActionType,
     TriggerType,
     Workflow,
-    workflow_engine,
     WorkflowStep,
     WorkflowTrigger,
+    workflow_engine,
 )
 from fashion.intelligence_engine import (
-    fashion_intelligence,
     FashionCategory,
+    fashion_intelligence,
 )
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
+
 
 """
 Fashion Domain API Integrations

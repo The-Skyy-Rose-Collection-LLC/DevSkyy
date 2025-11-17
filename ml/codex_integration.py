@@ -15,10 +15,11 @@ Features:
 - Context-aware generation with repository understanding
 """
 
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from typing import Any, Literal, Optional
+
 
 try:
     from openai import AsyncOpenAI
@@ -26,6 +27,7 @@ except ImportError:
     AsyncOpenAI = None
 
 from config.unified_config import get_config
+
 
 logger = logging.getLogger(__name__)
 

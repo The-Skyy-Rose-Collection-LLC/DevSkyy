@@ -1,16 +1,17 @@
+from datetime import datetime
 import importlib.util
 import logging
 import os
+from pathlib import Path
 import re
 import time
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 import requests
 
 from . import http_client
 from .telemetry import Telemetry
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

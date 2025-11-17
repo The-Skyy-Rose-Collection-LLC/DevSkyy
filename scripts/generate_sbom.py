@@ -5,11 +5,11 @@ Truth Protocol: Document all dependencies with versions and licenses
 Format: CycloneDX JSON
 """
 
+from datetime import datetime
 import json
+from pathlib import Path
 import re
 import subprocess
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 
@@ -40,7 +40,7 @@ def parse_requirements(requirements_file: Path) -> list[dict[str, Any]]:
                 try:
                     result = subprocess.run(
                         ["pip", "show", name],
-                        capture_output=True,
+                        check=False, capture_output=True,
                         text=True,
                         timeout=5
                     )
@@ -136,11 +136,11 @@ def generate_sbom():
         json.dump(sbom, f, indent=2)
 
     print(f"✅ SBOM generated: {output_file}")
-    print(f"   Format: CycloneDX 1.5")
+    print("   Format: CycloneDX 1.5")
     print(f"   Components: {len(all_components)} packages")
     print(f"   Timestamp: {sbom['metadata']['timestamp']}")
-    print(f"   Truth Protocol: ✅ Compliant")
-    print(f"\nTop dependencies:")
+    print("   Truth Protocol: ✅ Compliant")
+    print("\nTop dependencies:")
     for component in sorted(all_components, key=lambda x: x["name"])[:10]:
         print(f"   - {component['name']} {component['version']}")
 

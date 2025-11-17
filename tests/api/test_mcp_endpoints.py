@@ -11,12 +11,12 @@ Per Truth Protocol:
 import base64
 import json
 
-import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+import pytest
 
 from main import app
-from security.jwt_auth import create_access_token, User, user_manager, UserRole
+from security.jwt_auth import User, UserRole, create_access_token, user_manager
 
 
 @pytest.fixture

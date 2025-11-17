@@ -8,13 +8,14 @@ GROK Role: Viral Content Creation & Social Automation
 """
 
 import asyncio
+from dataclasses import dataclass
+from datetime import datetime
 import hashlib
 import logging
 import os
 import sys
-from dataclasses import dataclass
-from datetime import datetime
 from typing import Any
+
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -275,7 +276,7 @@ class ClaudeGrokBrandEngine:
     ) -> str:
         """Add a new content piece to the library"""
 
-        content_id = hashlib.md5(f"{platform}_{content_type}_{datetime.now()}".encode()).hexdigest()[:8]
+        content_id = hashlib.md5(f"{platform}_{content_type}_{datetime.now()}".encode(), usedforsecurity=False).hexdigest()[:8]
 
         content = ContentPiece(
             id=content_id,
@@ -295,7 +296,7 @@ class ClaudeGrokBrandEngine:
     async def add_influencer(self, name: str, platform: str, followers: int, engagement_rate: float, tier: str) -> str:
         """Add an influencer to the network"""
 
-        influencer_id = hashlib.md5(f"{name}_{platform}".encode()).hexdigest()[:8]
+        influencer_id = hashlib.md5(f"{name}_{platform}".encode(), usedforsecurity=False).hexdigest()[:8]
 
         self.influencer_network[influencer_id] = {
             "name": name,

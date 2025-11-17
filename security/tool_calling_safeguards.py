@@ -19,22 +19,21 @@ Features:
 """
 
 import asyncio
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Optional
-import logging
 import json
+import logging
+from pathlib import Path
+from typing import Any, Optional
 import uuid
 
 from pydantic import BaseModel, Field
 
 from security.openai_safeguards import (
-    SafeguardConfig,
-    OperationType,
-    SafeguardViolation,
-    AuditLogEntry,
     CircuitBreaker,
+    SafeguardConfig,
+    SafeguardViolation,
 )
 
 
@@ -266,10 +265,9 @@ class ToolAuthorizationManager:
             elif required_level == ToolPermissionLevel.AUTHENTICATED:
                 if not user_perms:
                     return False, f"Tool '{request.tool_name}' requires authentication"
-        else:
-            # No user_id provided
-            if config.permission_level != ToolPermissionLevel.PUBLIC:
-                return False, f"Tool '{request.tool_name}' requires authentication"
+        # No user_id provided
+        elif config.permission_level != ToolPermissionLevel.PUBLIC:
+            return False, f"Tool '{request.tool_name}' requires authentication"
 
         return True, None
 
@@ -309,7 +307,7 @@ class ToolCallValidator:
             "private_key", "access_token", "refresh_token"
         ]
 
-        for key in parameters.keys():
+        for key in parameters:
             if any(sensitive in key.lower() for sensitive in sensitive_keys):
                 return False, (
                     f"Tool '{tool_name}' parameters contain sensitive key: '{key}'. "
@@ -691,18 +689,18 @@ def reload_tool_safeguard_manager(
 
 
 __all__ = [
-    "ToolPermissionLevel",
-    "ToolRiskLevel",
-    "ToolProvider",
+    "ToolAuthorizationManager",
+    "ToolCallAuditEntry",
+    "ToolCallAuditLogger",
     "ToolCallConfig",
     "ToolCallRequest",
     "ToolCallResponse",
-    "ToolCallAuditEntry",
-    "ToolRateLimiter",
-    "ToolAuthorizationManager",
     "ToolCallValidator",
-    "ToolCallAuditLogger",
     "ToolCallingSafeguardManager",
+    "ToolPermissionLevel",
+    "ToolProvider",
+    "ToolRateLimiter",
+    "ToolRiskLevel",
     "get_tool_safeguard_manager",
     "reload_tool_safeguard_manager",
 ]

@@ -4,6 +4,7 @@ from typing import Any
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 
+
 """
 Inventory Optimizer
 ML-powered inventory management and forecasting

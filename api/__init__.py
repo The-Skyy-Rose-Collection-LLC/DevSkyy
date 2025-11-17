@@ -4,6 +4,7 @@ API module initialization for DevSkyy Platform.
 """
 from fastapi import FastAPI
 
+
 __version__ = "2.0.0"
 
 

@@ -17,11 +17,12 @@ Architecture:
 5. Learning → Store successful patterns
 """
 
-import logging
 from datetime import datetime
+import logging
 from typing import Any, Optional
 
 from ml.codex_integration import codex
+
 
 logger = logging.getLogger(__name__)
 

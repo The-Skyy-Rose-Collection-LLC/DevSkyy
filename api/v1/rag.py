@@ -15,18 +15,19 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import logging
-import tempfile
 from datetime import datetime
+import logging
 from pathlib import Path
+import tempfile
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, status, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
 
 from security.jwt_auth import get_current_user_with_role
 from services.rag_service import get_rag_service
+
 
 logger = logging.getLogger(__name__)
 

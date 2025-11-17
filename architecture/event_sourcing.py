@@ -1,9 +1,10 @@
-import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, Optional
+import uuid
 
 from pydantic import BaseModel
+
 
 """
 Event Sourcing Pattern for Grade A+ Architecture

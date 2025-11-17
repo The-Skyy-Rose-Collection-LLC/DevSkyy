@@ -9,14 +9,15 @@ Dependencies: redis, sentence-transformers, numpy
 Install: pip install redis sentence-transformers numpy
 """
 
+import asyncio
+from collections.abc import Callable
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
 import hashlib
 import json
-import asyncio
+from typing import Any, Optional
 import uuid
-from typing import Dict, Any, Optional, List, Callable
-from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
-from enum import Enum
 
 import numpy as np
 import redis
@@ -49,14 +50,14 @@ class ExactMatchCache:
         self.misses = 0
         self.namespace = "mcp:exact"
 
-    def _generate_key(self, tool: str, params: Dict[str, Any]) -> str:
+    def _generate_key(self, tool: str, params: dict[str, Any]) -> str:
         """Generate deterministic cache key from tool + parameters."""
         # Sort parameters for consistent hashing across calls
         normalized = json.dumps(params, sort_keys=True, default=str)
         hash_digest = hashlib.sha256(normalized.encode()).hexdigest()[:12]
         return f"{self.namespace}:{tool}:{hash_digest}"
 
-    async def get(self, tool: str, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def get(self, tool: str, params: dict[str, Any]) -> Optional[dict[str, Any]]:
         """
         Retrieve cached response if exists.
 
@@ -80,7 +81,7 @@ class ExactMatchCache:
             print(f"⚠ Cache retrieval error: {e}")
             return None
 
-    async def set(self, tool: str, params: Dict[str, Any], response: Dict[str, Any],
+    async def set(self, tool: str, params: dict[str, Any], response: dict[str, Any],
                   tokens_consumed: int = 500) -> None:
         """
         Cache response with metadata.
@@ -107,7 +108,7 @@ class ExactMatchCache:
         except Exception as e:
             print(f"⚠ Cache set error: {e}")
 
-    def metrics(self) -> Dict[str, Any]:
+    def metrics(self) -> dict[str, Any]:
         """Return cache performance metrics."""
         total = self.hits + self.misses
         hit_ratio = (self.hits / total * 100) if total > 0 else 0
@@ -173,7 +174,7 @@ class SemanticCache:
 
         return float(np.dot(a, b) / (norm_a * norm_b))
 
-    async def get_similar(self, query: str, tool: str) -> Optional[Dict[str, Any]]:
+    async def get_similar(self, query: str, tool: str) -> Optional[dict[str, Any]]:
         """
         Find cached response from semantically similar query.
 
@@ -216,7 +217,7 @@ class SemanticCache:
             print(f"⚠ Semantic cache retrieval error: {e}")
             return None
 
-    async def set(self, query: str, tool: str, response: Dict[str, Any],
+    async def set(self, query: str, tool: str, response: dict[str, Any],
                   ttl_seconds: int = 3600) -> None:
         """
         Cache response with embedding.
@@ -245,7 +246,7 @@ class SemanticCache:
         except Exception as e:
             print(f"⚠ Semantic cache set error: {e}")
 
-    def metrics(self) -> Dict[str, Any]:
+    def metrics(self) -> dict[str, Any]:
         """Return semantic cache metrics."""
         total = self.hits + self.misses
         hit_ratio = (self.hits / total * 100) if total > 0 else 0
@@ -275,14 +276,14 @@ class BatchRequest:
     """Individual request in a batch."""
     request_id: str
     tool: str
-    params: Dict[str, Any]
+    params: dict[str, Any]
     submitted_at: str
     completed_at: Optional[str] = None
-    result: Optional[Dict[str, Any]] = None
+    result: Optional[dict[str, Any]] = None
     error: Optional[str] = None
     status: str = "queued"
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return asdict(self)
 
 
@@ -309,7 +310,7 @@ class BatchProcessor:
         self.processed = 0
         self.failed = 0
 
-    async def add_to_batch(self, tool: str, params: Dict[str, Any]) -> str:
+    async def add_to_batch(self, tool: str, params: dict[str, Any]) -> str:
         """
         Queue a request for batch processing.
 
@@ -340,9 +341,9 @@ class BatchProcessor:
             return ""
 
     async def execute_batch(self,
-                           tool_handlers: Dict[str, Callable],
+                           tool_handlers: dict[str, Callable],
                            batch_size: int = 50,
-                           timeout_seconds: int = 10) -> Dict[str, Dict[str, Any]]:
+                           timeout_seconds: int = 10) -> dict[str, dict[str, Any]]:
         """
         Execute queued requests in parallel batches.
 
@@ -411,7 +412,7 @@ class BatchProcessor:
                             results[result['request_id']] = result
                             self.processed += 1
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     print(f"⚠ Batch timeout after {timeout_seconds}s")
                     self.failed += len(tasks)
 
@@ -421,7 +422,7 @@ class BatchProcessor:
         return results
 
     async def _execute_request(self, request: BatchRequest,
-                               handler: Callable) -> Dict[str, Any]:
+                               handler: Callable) -> dict[str, Any]:
         """Execute single request handler."""
         try:
             request.status = "processing"
@@ -455,7 +456,7 @@ class BatchProcessor:
                 'error': str(e)
             }
 
-    def metrics(self) -> Dict[str, Any]:
+    def metrics(self) -> dict[str, Any]:
         """Return batch processing metrics."""
         return {
             'total_processed': self.processed,
@@ -498,11 +499,11 @@ class OptimizedMCPServer:
         self.batch_processor = BatchProcessor(self.redis, max_batch_size=50)
 
         print("✓ Optimized MCP Server initialized")
-        print(f"  - Exact cache: TTL 60 minutes")
-        print(f"  - Semantic cache: threshold 0.92")
-        print(f"  - Batch processor: max 50/batch")
+        print("  - Exact cache: TTL 60 minutes")
+        print("  - Semantic cache: threshold 0.92")
+        print("  - Batch processor: max 50/batch")
 
-    async def execute_tool(self, tool_name: str, params: Dict[str, Any]) -> str:
+    async def execute_tool(self, tool_name: str, params: dict[str, Any]) -> str:
         """
         Execute tool with full optimization stack.
 
@@ -537,7 +538,7 @@ class OptimizedMCPServer:
 
         return json.dumps(compressed, separators=(',', ':'))
 
-    async def _mock_tool_execution(self, tool_name: str, params: Dict) -> Dict:
+    async def _mock_tool_execution(self, tool_name: str, params: dict) -> dict:
         """Mock tool execution for demonstration."""
         await asyncio.sleep(0.1)  # Simulate API latency
 
@@ -548,7 +549,7 @@ class OptimizedMCPServer:
             'timestamp': datetime.utcnow().isoformat()
         }
 
-    def _compress_response(self, data: Dict[str, Any], params: Dict) -> Dict:
+    def _compress_response(self, data: dict[str, Any], params: dict) -> dict:
         """Compress response using field filtering."""
         # Extract only requested fields
         if params.get('fields'):
@@ -557,7 +558,7 @@ class OptimizedMCPServer:
 
         return data
 
-    def get_optimization_report(self) -> Dict[str, Any]:
+    def get_optimization_report(self) -> dict[str, Any]:
         """Generate comprehensive optimization metrics report."""
         return {
             'exact_cache': self.exact_cache.metrics(),

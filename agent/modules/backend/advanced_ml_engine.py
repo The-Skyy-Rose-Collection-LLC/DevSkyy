@@ -12,8 +12,8 @@ This engine provides:
 """
 
 import asyncio
-import logging
 from datetime import datetime
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +28,7 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 
 logger = logging.getLogger(__name__)
 

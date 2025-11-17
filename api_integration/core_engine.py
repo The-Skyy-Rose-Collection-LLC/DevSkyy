@@ -1,13 +1,13 @@
-import hashlib
-import json
-import logging
-import time
-import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
+import hashlib
+import json
+import logging
+import time
 from typing import Any, Optional
+import uuid
 
 import aiohttp
 from aiohttp import ClientTimeout
@@ -15,6 +15,7 @@ from aiohttp import ClientTimeout
 from api_integration.auth_manager import auth_manager, rate_limit_manager
 from infrastructure.elasticsearch_manager import elasticsearch_manager
 from infrastructure.redis_manager import redis_manager
+
 
 """
 Core API Integration Engine
@@ -25,6 +26,7 @@ data transformation pipelines, and circuit breaker patterns for fault tolerance
 from api_integration.discovery_engine import (
     api_discovery_engine,
 )
+
 
 logger = logging.getLogger(__name__)
 

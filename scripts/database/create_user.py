@@ -4,18 +4,19 @@ User Creation Utility for DevSkyy Enterprise Platform
 Creates new users with proper password hashing and authentication setup
 """
 
+from getpass import getpass
 import os
 import sys
-from getpass import getpass
+
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from security.jwt_auth import (
+    UserRole,
     create_access_token,
     create_refresh_token,
     user_manager,
-    UserRole,
 )
 
 

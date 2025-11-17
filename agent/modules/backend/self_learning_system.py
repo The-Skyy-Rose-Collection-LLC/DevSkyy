@@ -1,16 +1,17 @@
 import asyncio
+from collections import Counter
+from datetime import datetime
 import json
 import logging
 import os
+from pathlib import Path
 import pickle
 import sys
-from collections import Counter
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 from sklearn.ensemble import IsolationForest
+
 
 """
 Self-Learning System with Machine Learning

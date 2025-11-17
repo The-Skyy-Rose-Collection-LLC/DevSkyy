@@ -8,7 +8,7 @@ Tests configuration files, error handlers, and utility functions.
 
 import os
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 

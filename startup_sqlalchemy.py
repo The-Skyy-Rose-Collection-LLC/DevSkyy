@@ -5,10 +5,11 @@ SQLAlchemy-based database initialization with zero MongoDB dependencies
 """
 
 import logging
-import sys
 from pathlib import Path
+import sys
 
 from database import db_manager, init_db
+
 
 # Add the project root to Python path
 project_root = Path(__file__).parent

@@ -4,9 +4,10 @@ DevSkyy Requirements Validation Script (Python version)
 Fast validation of requirements files for CI/CD
 """
 
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
+
 
 # ANSI color codes
 RED = "\033[0;31m"

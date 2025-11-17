@@ -1,10 +1,10 @@
 import base64
-import logging
-import secrets
-import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from enum import Enum
+import logging
+import secrets
+import time
 from typing import Any, Optional
 from urllib.parse import urlencode
 
@@ -13,6 +13,7 @@ from cryptography.fernet import Fernet
 
 from api_integration.discovery_engine import AuthenticationType
 from infrastructure.redis_manager import redis_manager
+
 
 """
 API Authentication & Rate Limiting Manager

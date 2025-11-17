@@ -9,14 +9,15 @@ Truth Protocol: All operations validated, errors logged, no placeholders
 """
 
 import asyncio
-import logging
 from datetime import datetime
+import logging
 from typing import Any, Optional
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from pydantic import BaseModel, Field, validator
 from woocommerce import API as WooCommerceAPI
+
 
 logger = logging.getLogger(__name__)
 

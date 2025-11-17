@@ -20,7 +20,7 @@ Features:
 import logging
 from typing import Any, Optional
 
-from services.mcp_client import MCPToolClient
+from config.unified_config import get_config
 from security.tool_calling_safeguards import (
     ToolCallConfig,
     ToolCallRequest,
@@ -29,7 +29,7 @@ from security.tool_calling_safeguards import (
     ToolRiskLevel,
     get_tool_safeguard_manager,
 )
-from config.unified_config import get_config
+from services.mcp_client import MCPToolClient
 
 
 logger = logging.getLogger(__name__)

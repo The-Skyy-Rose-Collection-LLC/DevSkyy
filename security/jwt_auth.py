@@ -3,21 +3,22 @@ Enterprise JWT Authentication System
 Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 """
 
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 import logging
 import os
-from collections import defaultdict
-from datetime import datetime, timedelta, UTC
 from typing import Any, Optional
 
-import jwt
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
     OAuth2PasswordBearer,
 )
+import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
+
 
 logger = logging.getLogger(__name__)
 

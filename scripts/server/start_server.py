@@ -4,10 +4,11 @@ DevSkyy API Server - Simplified Startup
 Bypasses complex initialization for quick MCP testing
 """
 
+from datetime import datetime
 import logging
 import os
 import sys
-from datetime import datetime
+
 
 # Set up basic logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -29,9 +31,9 @@ if not API_KEY:
 
 try:
     # Import FastAPI
-    import uvicorn
     from fastapi import FastAPI
     from fastapi.middleware.cors import CORSMiddleware
+    import uvicorn
 
     # Create FastAPI app
     app = FastAPI(

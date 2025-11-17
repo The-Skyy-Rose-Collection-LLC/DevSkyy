@@ -17,15 +17,13 @@ Features:
 - Audit logging for compliance
 """
 
-import asyncio
-from datetime import datetime
+from collections.abc import Callable
 import inspect
 import json
 import logging
-from typing import Any, Callable, Optional, get_type_hints
+from typing import Any, Optional, get_type_hints
 
 import openai
-from pydantic import BaseModel, Field
 
 from config.unified_config import get_config
 from security.openai_safeguards import OperationType, get_safeguard_manager
@@ -392,12 +390,11 @@ class OpenAIFunctionCallingClient:
 
             return response.result
 
+        # Execute without safeguards
+        elif inspect.iscoroutinefunction(func):
+            return await func(**arguments)
         else:
-            # Execute without safeguards
-            if inspect.iscoroutinefunction(func):
-                return await func(**arguments)
-            else:
-                return func(**arguments)
+            return func(**arguments)
 
     def get_registered_functions(self) -> list[str]:
         """Get list of registered function names"""
@@ -480,6 +477,6 @@ def get_openai_function_client(
 __all__ = [
     "OpenAIFunctionCallingClient",
     "generate_function_schema",
-    "openai_function",
     "get_openai_function_client",
+    "openai_function",
 ]

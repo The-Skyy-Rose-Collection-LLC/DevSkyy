@@ -2,6 +2,7 @@ from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
+
 """
 API Pagination Utilities for Grade A+ API Score
 Implements cursor-based and offset-based pagination

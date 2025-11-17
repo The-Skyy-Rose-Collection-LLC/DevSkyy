@@ -2,6 +2,7 @@ import os
 from typing import Optional
 from urllib.parse import quote_plus
 
+
 """
 Enterprise Database Configuration
 Supports multiple database backends with production-ready configurations

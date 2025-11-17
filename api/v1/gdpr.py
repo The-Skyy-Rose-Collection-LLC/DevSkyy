@@ -1,19 +1,20 @@
+from datetime import datetime
 import logging
 import re
-import uuid
-from datetime import datetime
 from typing import Any, Optional
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from security.jwt_auth import (
+    TokenData,
     get_current_active_user,
     require_admin,
-    TokenData,
     user_manager,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+
 
 """
 GDPR Compliance API Endpoints

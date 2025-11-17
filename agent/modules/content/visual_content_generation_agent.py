@@ -16,16 +16,17 @@ Monitoring: Prometheus metrics, detailed logging
 """
 
 import asyncio
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
 import hashlib
 import json
 import logging
 import os
-import uuid
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Any, Optional
+import uuid
+
 
 # Third-party imports (with graceful fallbacks)
 try:
@@ -37,8 +38,8 @@ except ImportError:
     logging.warning("PIL not available - image processing limited")
 
 try:
-    import torch
     from diffusers import DPMSolverMultistepScheduler, StableDiffusionXLPipeline
+    import torch
 
     TORCH_AVAILABLE = True
 except ImportError:

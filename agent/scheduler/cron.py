@@ -1,8 +1,8 @@
+from collections.abc import Callable
+from datetime import datetime
 import logging
 import threading
 import time
-from collections.abc import Callable
-from datetime import datetime
 from typing import Any
 
 import schedule
@@ -10,6 +10,7 @@ import schedule
 from ..git_commit import commit_fixes
 from ..modules.fixer import fix_code
 from ..modules.scanner import scan_site
+
 
 logger = logging.getLogger(__name__)
 

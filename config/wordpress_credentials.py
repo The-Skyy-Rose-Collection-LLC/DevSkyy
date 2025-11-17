@@ -4,12 +4,13 @@ WordPress Credentials Management for DevSkyy Platform
 Secure credential handling with environment variables and validation
 """
 
+from dataclasses import dataclass
 import logging
 import os
-from dataclasses import dataclass
 from typing import Any, Optional
 
 from dotenv import load_dotenv
+
 
 # Load environment variables
 load_dotenv()

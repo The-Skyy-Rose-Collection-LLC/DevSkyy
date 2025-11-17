@@ -10,11 +10,12 @@ Python: 3.11+
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+import pytest
 
 from main import app
+
 
 # =============================================================================
 # FIXTURES
