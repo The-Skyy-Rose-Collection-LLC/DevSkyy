@@ -570,10 +570,148 @@ for agent_name, metadata in registry.agents.items():
 - ✅ No hardcoded secrets (Rule 5)
 - ✅ Full documentation (Rule 9)
 
+## Multi-Model AI Integration
+
+### Agent Category Model Assignments
+
+Each agent category uses specific AI models for optimal performance:
+
+```python
+from skills.multi_model_orchestrator import (
+    MultiModelOrchestrator,
+    FrontendAgentOrchestrator,
+    BackendAgentOrchestrator,
+    ContentAgentOrchestrator,
+    DevelopmentAgentOrchestrator,
+    AgentCategory,
+    AIModel
+)
+
+class EnhancedAgentRouter:
+    """Agent router with multi-model AI support"""
+
+    def __init__(self, registry: AgentRegistry):
+        self.registry = registry
+        self.model_orchestrator = MultiModelOrchestrator()
+
+        # Category-specific orchestrators
+        self.frontend_orchestrator = FrontendAgentOrchestrator(self.model_orchestrator)
+        self.backend_orchestrator = BackendAgentOrchestrator(self.model_orchestrator)
+        self.content_orchestrator = ContentAgentOrchestrator(self.model_orchestrator)
+        self.development_orchestrator = DevelopmentAgentOrchestrator(self.model_orchestrator)
+
+    async def route_with_ai(
+        self,
+        task: Dict[str, Any],
+        agent_category: AgentCategory
+    ) -> Dict[str, Any]:
+        """
+        Route task to agent with multi-model AI support.
+
+        Args:
+            task: Task to execute
+            agent_category: Category of agent
+
+        Returns:
+            Task result with AI model info
+        """
+        # Route to appropriate category orchestrator
+        if agent_category == AgentCategory.FRONTEND:
+            # Frontend: Claude + Gemini
+            result = await self.frontend_orchestrator.generate_ui_component(
+                task.get('params', {})
+            )
+
+        elif agent_category == AgentCategory.BACKEND:
+            # Backend: Claude + ChatGPT-5
+            result = await self.backend_orchestrator.design_api(
+                task.get('params', {})
+            )
+
+        elif agent_category == AgentCategory.CONTENT:
+            # Content: Huggingface + Claude + Gemini + ChatGPT-5
+            result = await self.content_orchestrator.generate_marketing_content(
+                task.get('params', {})
+            )
+
+        elif agent_category == AgentCategory.DEVELOPMENT:
+            # Development: Claude + Codex
+            result = await self.development_orchestrator.generate_code(
+                task.get('params', {})
+            )
+
+        else:
+            result = {"error": f"Unknown category: {agent_category}"}
+
+        return {
+            "success": result.get("success", False),
+            "agent_category": agent_category.value,
+            "model_used": result.get("model_used"),
+            "result": result.get("content"),
+            "latency_ms": result.get("latency_ms"),
+            "usage": result.get("usage")
+        }
+```
+
+### Model Performance Dashboard
+
+```python
+async def get_multi_model_performance() -> Dict[str, Any]:
+    """Get performance metrics across all models"""
+
+    orchestrator = MultiModelOrchestrator()
+    report = orchestrator.get_performance_report(time_window_hours=24)
+
+    # Performance by category
+    category_performance = {
+        "frontend": {
+            "models": ["claude-sonnet-4-5", "gemini-pro"],
+            "total_requests": 0,
+            "avg_latency_ms": 0,
+            "success_rate": 100.0
+        },
+        "backend": {
+            "models": ["claude-sonnet-4-5", "gpt-5"],
+            "total_requests": 0,
+            "avg_latency_ms": 0,
+            "success_rate": 100.0
+        },
+        "content": {
+            "models": ["huggingface", "claude-sonnet-4-5", "gemini-pro", "gpt-5"],
+            "total_requests": 0,
+            "avg_latency_ms": 0,
+            "success_rate": 100.0
+        },
+        "development": {
+            "models": ["claude-sonnet-4-5", "codex"],
+            "total_requests": 0,
+            "avg_latency_ms": 0,
+            "success_rate": 100.0
+        }
+    }
+
+    return {
+        "time_window_hours": 24,
+        "categories": category_performance,
+        "overall_health": "healthy"
+    }
+```
+
 ## Integration Points
 
 - **Enhanced Agent Manager** (`agent/enhanced_agent_manager.py`)
 - **Multi-Agent Orchestrator** (`intelligence/multi_agent_orchestrator.py`)
 - **Agent Assignment Manager** (`agent/modules/backend/agent_assignment_manager.py`)
+- **Multi-Model Orchestrator** (`skills/multi_model_orchestrator.md`) ✨ NEW
+- **Google Gemini Integration** (`skills/google_gemini_integration.md`) ✨ NEW
 
-Use this skill to coordinate complex multi-agent workflows and optimize task distribution across DevSkyy's 54+ specialized agents.
+## Model Routing Summary
+
+| Agent Category | Primary Model | Secondary Model(s) | Use Case |
+|----------------|---------------|-------------------|----------|
+| **Frontend** | Gemini Pro | Claude Sonnet 4.5 | UI/UX, Design, Components |
+| **Backend** | Claude Sonnet 4.5 | ChatGPT-5 | APIs, Databases, Logic |
+| **Content** | Claude Sonnet 4.5 | Gemini, GPT-5, Huggingface | Marketing, Images, Videos |
+| **Development** | Claude Sonnet 4.5 | Codex | Code Gen, Reviews, Refactoring |
+
+Use this skill to coordinate complex multi-agent workflows with intelligent multi-model AI routing across DevSkyy's 54+ specialized agents.
