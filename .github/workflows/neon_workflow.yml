@@ -11,6 +11,8 @@ on:
 env:
   NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+  PRODUCTION_HEALTH_CHECK_URL: ${{ secrets.PRODUCTION_HEALTH_CHECK_URL || 'https://api.devskyy.io/health' }}
+  PRODUCTION_HEALTH_ENDPOINTS: /api/v1/consensus/health,/api/v1/content/health,/api/v1/ecommerce/health
 
 jobs:
   create-neon-branch:
@@ -40,6 +42,7 @@ jobs:
 
   setup-database-schema:
     needs: create-neon-branch
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -71,6 +74,7 @@ jobs:
 
   run-tests:
     needs: [create-neon-branch, setup-database-schema]
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -200,11 +204,16 @@ jobs:
           # Example: ssh deploy@$PRODUCTION_SERVER "cd /app && git pull && systemctl restart devskyy"
 
       - name: Verify deployment
+        env:
+          PROD_URL: ${{ secrets.PRODUCTION_URL || 'https://api.devskyy.io' }}
         run: |
           # Health check on production
-          curl -f https://skyyrose.co/api/v1/consensus/health || exit 1
-          curl -f https://skyyrose.co/api/v1/content/health || exit 1
-          curl -f https://skyyrose.co/api/v1/ecommerce/health || exit 1
+          # Note: Set PRODUCTION_URL secret if using a different domain
+          echo "Checking health endpoints at: $PROD_URL"
+          curl -f "$PROD_URL/api/v1/consensus/health" || { echo "Consensus health check failed"; exit 1; }
+          curl -f "$PROD_URL/api/v1/content/health" || { echo "Content health check failed"; exit 1; }
+          curl -f "$PROD_URL/api/v1/ecommerce/health" || { echo "Ecommerce health check failed"; exit 1; }
+          echo "✓ All health endpoints verified"
 
       - name: Notify deployment success
         if: success()
