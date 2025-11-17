@@ -1,0 +1,47 @@
+# --- START FILE: .github/workflows/reusable-security.yml ---
+name: Reusable Security Suite
+
+on:
+  workflow_call:
+
+permissions:
+  security-events: write
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install security tools
+        run: |
+          pip install safety pip-audit bandit semgrep
+          sudo apt-get update
+          sudo apt-get install -y trivy grype
+
+      - name: Safety
+        run: safety check --full-report --exit-code 1
+
+      - name: pip-audit
+        run: pip-audit --strict
+
+      - name: Bandit
+        run: bandit -r .
+
+      - name: Semgrep
+        run: semgrep scan --error
+
+      - name: Trivy FS scan
+        run: trivy fs --exit-code 1 .
+
+      - name: SBOM Generation
+        run: |
+          pip install cyclonedx-bom
+          cyclonedx-py --format json -o sbom.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+# --- END FILE ---

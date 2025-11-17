@@ -1,0 +1,59 @@
+# --- START FILE: .github/workflows/deploy.yml ---
+name: Deploy to Cloud Run
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+env:
+  SERVICE_NAME: api
+  REGION: us-central1
+  IMAGE: ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate with GHCR
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t $IMAGE .
+
+      - name: Scan Docker (Trivy)
+        run: trivy image --exit-code 1 $IMAGE
+
+      - name: Push to GHCR
+        run: docker push $IMAGE
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.GCP_WIP }}
+          service_account: ${{ secrets.GCP_SA }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image $IMAGE \
+            --region $REGION \
+            --allow-unauthenticated
+
+      - name: Neon DB migrations
+        run: |
+          pip install -r requirements.txt
+          python manage.py migrate
+
+      - name: Health check
+        run: |
+          curl -f https://${SERVICE_NAME}-${REGION}.a.run.app/health || exit 1
+# --- END FILE ---

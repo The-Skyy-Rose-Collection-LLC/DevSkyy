@@ -1,0 +1,36 @@
+# --- START FILE: .github/workflows/reusable-quality.yml ---
+name: Reusable Quality Suite
+
+on:
+  workflow_call:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          pip install ruff black isort flake8 mypy jsonschema pyyaml
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Black
+        run: black --check .
+
+      - name: isort
+        run: isort --check-only .
+
+      - name: Flake8
+        run: flake8 .
+
+      - name: Type Checking
+        run: mypy .
+
+      - name: Validate OpenAPI (if exists)
+        run: |
+          if [ -f openapi.yml ]; then python -m jsonschema validate --instance openapi.yml; fi
+# --- END FILE ---

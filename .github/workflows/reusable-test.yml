@@ -1,0 +1,55 @@
+# --- START FILE: .github/workflows/reusable-test.yml ---
+name: Reusable Test Suite
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    name: Python Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ matrix.python-version }}-${{ hashFiles('requirements*.txt') }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Run Test Suite
+        run: |
+          pytest -n auto --maxfail=1 --disable-warnings \
+            --cov=./ --cov-report=xml --cov-report=term
+
+      - name: Enforce Coverage ≥90%
+        run: |
+          python3 - <<EOF
+          import sys, xml.etree.ElementTree as ET
+          tree = ET.parse('coverage.xml')
+          pct = float(tree.getroot().attrib['line-rate']) * 100
+          print("Coverage:", pct)
+          sys.exit(0 if pct >= 90 else 1)
+          EOF
+
+      - name: Upload Test Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: coverage.xml
+# --- END FILE ---

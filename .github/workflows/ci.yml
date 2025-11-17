@@ -1,0 +1,38 @@
+# --- START FILE: .github/workflows/ci.yml ---
+name: CI Orchestrator
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+  security-events: write
+
+jobs:
+  tests:
+    uses: ./.github/workflows/reusable-test.yml
+    secrets: inherit
+
+  quality:
+    uses: ./.github/workflows/reusable-quality.yml
+    secrets: inherit
+    needs: tests
+
+  security:
+    uses: ./.github/workflows/reusable-security.yml
+    secrets: inherit
+    needs: [tests, quality]
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    needs: [tests, quality, security]
+# --- END FILE ---
