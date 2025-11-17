@@ -119,7 +119,7 @@ class BrandAwareProductManager:
             material=product_data.get('material'),
             cost=product_data.get('cost'),
             price=product_data.get('price', product_data.get('cost') * 2.5),  # Default markup
-            brand_aligned_description=description.get('description', ''),
+            brand_aligned_description=description.get('description', '') if isinstance(description, dict) else description,
             seo_optimized_title=seo_content.get('title', product_data.get('name')),
             seo_meta_description=seo_content.get('meta_description', ''),
             colors=variants.get('colors', ['Black', 'White']),

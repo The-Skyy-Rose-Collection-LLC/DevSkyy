@@ -20,7 +20,7 @@ class SocialMediaContentGenerator:
     def __init__(self, brand_manager):
         self.brand_manager = brand_manager
         self.brand_context = brand_manager.get_brand_context()
-        self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.client = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
     async def generate_post(
         self,
@@ -93,7 +93,7 @@ Format as JSON:
 }}"""
 
         try:
-            message = self.client.messages.create(
+            message = await self.client.messages.create(
                 model="claude-sonnet-4-5-20250929",
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}]

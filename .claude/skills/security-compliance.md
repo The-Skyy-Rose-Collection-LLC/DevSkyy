@@ -38,7 +38,8 @@ class SecurityScanner:
 
                 if scanner_name == "pip_audit":
                     output = json.loads(result.stdout) if result.stdout else {}
-                    vulnerabilities = output.get('vulnerabilities', [])
+                    # pip_audit can return list or dict depending on version
+                    vulnerabilities = output if isinstance(output, list) else output.get('vulnerabilities', [])
                 elif scanner_name == "safety":
                     output = json.loads(result.stdout) if result.stdout else []
                     vulnerabilities = output

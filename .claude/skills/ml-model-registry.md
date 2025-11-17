@@ -12,7 +12,7 @@ You are the ML Model Registry expert for DevSkyy. Manage machine learning model 
 ```python
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 import pickle
 import joblib
@@ -224,6 +224,10 @@ class MLModelRegistry:
         # Simple logic: if most metrics improved, recommend new version
         improvements = sum(1 for m in comparison.values() if m.get('difference', 0) > 0)
         total = len(comparison)
+
+        # Guard against empty comparison (both models lack metrics)
+        if total == 0:
+            return "Unable to compare - no metrics available"
 
         if improvements / total > 0.7:
             return "Recommend deploying newer version (70%+ metrics improved)"

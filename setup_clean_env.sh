@@ -4,8 +4,8 @@
 echo "🔧 Setting up clean Python environment for DevSkyy..."
 echo ""
 
-# Navigate to DevSkyy directory
-cd /home/user/DevSkyy
+# Navigate to script directory
+cd "$(dirname "$0")"
 
 # Create virtual environment
 echo "1️⃣ Creating virtual environment..."

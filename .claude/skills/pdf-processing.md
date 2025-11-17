@@ -34,8 +34,8 @@ async def extract_pdf_text(pdf_path: str) -> Dict[str, Any]:
         with open(pdf_file, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
 
-            # Extract metadata
-            metadata = reader.metadata
+            # Extract metadata (can be None for some PDFs)
+            metadata = reader.metadata or {}
             page_count = len(reader.pages)
 
             # Extract text from all pages
@@ -43,7 +43,7 @@ async def extract_pdf_text(pdf_path: str) -> Dict[str, Any]:
             pages = []
 
             for i, page in enumerate(reader.pages):
-                page_text = page.extract_text()
+                page_text = page.extract_text() or ""
                 full_text.append(page_text)
                 pages.append({
                     "page_number": i + 1,

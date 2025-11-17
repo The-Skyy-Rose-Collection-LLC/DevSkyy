@@ -264,8 +264,27 @@ class BrandIntelligenceManager:
 
     def _deserialize_brand_identity(self, data: Dict[str, Any]) -> BrandIdentity:
         """Convert dict to BrandIdentity"""
-        # Implementation for deserialization
-        pass
+        # Deserialize nested components
+        colors = BrandColors(**data.get('colors', {}))
+        typography = BrandTypography(**data.get('typography', {}))
+        assets = BrandAssets(**data.get('assets', {}))
+        voice = BrandVoice(**data.get('voice', {}))
+
+        # Create BrandIdentity with all components
+        return BrandIdentity(
+            brand_name=data.get('brand_name', ''),
+            tagline=data.get('tagline', ''),
+            industry=data.get('industry', ''),
+            target_audience=data.get('target_audience', ''),
+            colors=colors,
+            typography=typography,
+            assets=assets,
+            voice=voice,
+            mission=data.get('mission', ''),
+            vision=data.get('vision', ''),
+            values=data.get('values', []),
+            version=data.get('version', '1.0.0')
+        )
 ```
 
 ### 2. 3D Asset Manager

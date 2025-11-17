@@ -210,32 +210,47 @@ Once Gemini is enabled, you can use these powerful features:
 ### 1. Fashion Image Analysis
 
 ```python
+import asyncio
 from skills.google_gemini_integration import GeminiContentAgent, GeminiClient
 from skills.brand_intelligence import BrandIntelligenceManager
 
-brand_manager = BrandIntelligenceManager()
-gemini = GeminiClient()
-content_agent = GeminiContentAgent(brand_manager, gemini)
+async def analyze_fashion_product():
+    brand_manager = BrandIntelligenceManager()
+    gemini = GeminiClient()
+    content_agent = GeminiContentAgent(brand_manager, gemini)
 
-# Analyze product image
-analysis = await content_agent.analyze_fashion_image(
-    "products/dress.jpg",
-    analysis_type="comprehensive"
-)
+    # Analyze product image
+    analysis = await content_agent.analyze_fashion_image(
+        "products/dress.jpg",
+        analysis_type="comprehensive"
+    )
+    return analysis
+
+# Run the async function
+asyncio.run(analyze_fashion_product())
 ```
 
 ### 2. UI Component Generation
 
 ```python
+import asyncio
 from skills.google_gemini_integration import GeminiFrontendAgent, GeminiClient
+from skills.brand_intelligence import BrandIntelligenceManager
 
-frontend = GeminiFrontendAgent(brand_manager, gemini)
+async def generate_product_card():
+    brand_manager = BrandIntelligenceManager()
+    gemini = GeminiClient()
+    frontend = GeminiFrontendAgent(brand_manager, gemini)
 
-# Generate React component
-component = await frontend.generate_ui_component(
-    component_type="ProductCard",
-    requirements={"features": ["image", "price", "add_to_cart"]}
-)
+    # Generate React component
+    component = await frontend.generate_ui_component(
+        component_type="ProductCard",
+        requirements={"features": ["image", "price", "add_to_cart"]}
+    )
+    return component
+
+# Run the async function
+asyncio.run(generate_product_card())
 ```
 
 ### 3. Intelligent Duo Routing

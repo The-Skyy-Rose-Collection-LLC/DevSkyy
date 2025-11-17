@@ -384,26 +384,14 @@ add_filter('woocommerce_product_single_add_to_cart_text', '{config['theme_slug']
 add_filter('woocommerce_product_add_to_cart_text', '{config['theme_slug']}_woocommerce_add_to_cart_text');
 
 // Optimize product images
-function {config['theme_slug']}_woocommerce_image_sizes() {{
+function {config['theme_slug']}_woocommerce_image_size_shop_catalog($size) {{
     return array(
-        'shop_catalog' => array(
-            'width' => 600,
-            'height' => 800,
-            'crop' => 1,
-        ),
-        'shop_single' => array(
-            'width' => 1200,
-            'height' => 1600,
-            'crop' => 1,
-        ),
-        'shop_thumbnail' => array(
-            'width' => 150,
-            'height' => 150,
-            'crop' => 1,
-        ),
+        'width' => 600,
+        'height' => 800,
+        'crop' => 1,
     );
 }}
-add_filter('woocommerce_get_image_size_shop_catalog', '{config['theme_slug']}_woocommerce_image_sizes');
+add_filter('woocommerce_get_image_size_shop_catalog', '{config['theme_slug']}_woocommerce_image_size_shop_catalog');
 """
 
         return {
@@ -447,7 +435,7 @@ add_filter('woocommerce_get_image_size_shop_catalog', '{config['theme_slug']}_wo
                                         "title": f"Welcome to {brand['brand_name']}",
                                         "header_size": "h1",
                                         "align": "center",
-                                        "title_color": brand['colors']['neutral_light']
+                                        "title_color": brand['colors'].get('neutral_light', '#f5f5f5')
                                     }
                                 },
                                 {
@@ -455,7 +443,7 @@ add_filter('woocommerce_get_image_size_shop_catalog', '{config['theme_slug']}_wo
                                     "settings": {
                                         "editor": brand.get('tagline', 'Discover timeless elegance'),
                                         "align": "center",
-                                        "text_color": brand['colors']['neutral_light']
+                                        "text_color": brand['colors'].get('neutral_light', '#f5f5f5')
                                     }
                                 },
                                 {

@@ -35,6 +35,7 @@ async def test_multi_model_system():
         print(f"   ✅ Claude: {response.content[0].text}\n")
     except Exception as e:
         print(f"   ❌ Error: {str(e)}\n")
+        raise  # Re-raise to fail the test
 
     # Test 2: OpenAI GPT-4
     print("2️⃣  Testing OPENAI (GPT-4 Turbo)...")
@@ -52,6 +53,7 @@ async def test_multi_model_system():
         print(f"   ✅ GPT-4: {response.choices[0].message.content}\n")
     except Exception as e:
         print(f"   ❌ Error: {str(e)}\n")
+        raise  # Re-raise to fail the test
 
     # Test 3: Google Gemini
     print("3️⃣  Testing GOOGLE GEMINI (1.5 Flash)...")
@@ -65,6 +67,7 @@ async def test_multi_model_system():
         print(f"   ✅ Gemini: {response.text}\n")
     except Exception as e:
         print(f"   ❌ Error: {str(e)}\n")
+        raise  # Re-raise to fail the test
 
     # Test 4: Hugging Face
     print("4️⃣  Testing HUGGING FACE...")
@@ -73,6 +76,8 @@ async def test_multi_model_system():
         print(f"   ✅ Hugging Face token valid\n")
     else:
         print(f"   ❌ Invalid Hugging Face token\n")
+        import sys
+        sys.exit(1)  # Exit with error code for invalid token
 
     print("=" * 70)
     print("🎯 Multi-Model Orchestration Ready!")

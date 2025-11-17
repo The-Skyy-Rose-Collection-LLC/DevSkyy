@@ -182,7 +182,7 @@ class AgentRegistry:
 
 ```python
 import asyncio
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 class AgentRouter:
     """Route tasks to the most appropriate agent"""
@@ -249,7 +249,8 @@ class AgentRouter:
             "assigned_agent": best_agent.name,
             "agent_category": best_agent.category.value,
             "task_id": result.get("task_id"),
-            "estimated_duration": result.get("estimated_duration")
+            "estimated_duration": result.get("estimated_duration"),
+            "result": result  # Include full agent execution result
         }
 
     def _select_best_agent(

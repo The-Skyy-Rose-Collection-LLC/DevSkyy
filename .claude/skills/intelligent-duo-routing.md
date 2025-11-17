@@ -339,9 +339,10 @@ class IntelligentDuoRouter:
         Returns:
             Combined result from both models
         """
-        from skills.multi_model_orchestrator import MultiModelOrchestrator
-
-        orchestrator = MultiModelOrchestrator()
+        # TODO: Implement MultiModelOrchestrator or use direct API clients
+        # from skills.multi_model_orchestrator import MultiModelOrchestrator
+        # For now, using direct implementation
+        orchestrator = None  # Placeholder - implement orchestrator
 
         # Step 1: Primary model execution
         primary_role = reasoning["primary_model"]["role"]
@@ -402,16 +403,10 @@ class IntelligentDuoRouter:
 
     def _get_ai_model_enum(self, model_name: str):
         """Convert model name to enum"""
-        from skills.multi_model_orchestrator import AIModel
-
-        mapping = {
-            "claude-sonnet-4-5": AIModel.CLAUDE_SONNET_45,
-            "gemini-pro": AIModel.GEMINI_PRO,
-            "gpt-5": AIModel.CHATGPT_5,
-            "codex": AIModel.CODEX,
-            "huggingface": AIModel.HUGGINGFACE
-        }
-        return mapping.get(model_name, AIModel.CLAUDE_SONNET_45)
+        # TODO: Implement AIModel enum or use direct API clients
+        # from skills.multi_model_orchestrator import AIModel
+        # For now, return model name string directly
+        return model_name
 
     def _calculate_cost(self, usage: Dict[str, int], cost_per_1k: float) -> float:
         """Calculate cost for this execution"""
