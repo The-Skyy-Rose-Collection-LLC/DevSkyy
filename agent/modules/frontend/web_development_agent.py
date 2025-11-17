@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from .telemetry import Telemetry
+from agent.modules.backend.telemetry import Telemetry
 
 logger = logging.getLogger(__name__)
 
