@@ -343,8 +343,8 @@ docker-compose -f docker-compose.production.yml.backup up -d
 # Kubernetes
 kubectl rollout undo deployment/devskyy
 
-# Database
-psql devskyy_prod < backup-previous.sql
+# Database (replace YYYYMMDD with your backup date)
+psql devskyy_prod < backup-YYYYMMDD.sql
 ```
 
 ### Monitoring After Rollback
