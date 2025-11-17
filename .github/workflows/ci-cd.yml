@@ -404,6 +404,7 @@ jobs:
               ;;
           esac
 
+          # Run pytest with coverage
           pytest $TEST_PATH \
             --cov=. \
             --cov-report=xml:coverage-${{ matrix.test-suite }}.xml \
@@ -417,11 +418,17 @@ jobs:
           DATABASE_URL: postgresql://devskyy_test:test_password@localhost:5432/devskyy_test
           REDIS_URL: redis://localhost:6379/0
 
-      - name: Generate coverage badge
+      - name: Prepare coverage artifacts
         if: always()
         run: |
-          pip install coverage-badge
-          coverage-badge -o artifacts/coverage.svg -f
+          mkdir -p artifacts
+          # Copy coverage files if they exist
+          if [ -f coverage-${{ matrix.test-suite }}.xml ]; then
+            cp coverage-${{ matrix.test-suite }}.xml artifacts/ || true
+            echo "✓ Coverage XML saved for ${{ matrix.test-suite }}"
+          else
+            echo "::warning::No coverage XML found for ${{ matrix.test-suite }}"
+          fi
 
       - name: Upload coverage to Codecov
         if: always()
@@ -440,7 +447,9 @@ jobs:
           path: |
             coverage-${{ matrix.test-suite }}.xml
             htmlcov-${{ matrix.test-suite }}/
+            artifacts/
           retention-days: 30
+          if-no-files-found: warn
 
   # ============================================================================
   # JOB 5: Docker Build & Test
@@ -553,7 +562,8 @@ jobs:
     name: Generate Error Ledger
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [lint, type-check, security, test, docker]
+    needs: [lint, type-check, security, test]
+    # Docker is optional (only runs on main/develop), so don't block on it
     if: always()
 
     steps:
@@ -580,15 +590,14 @@ jobs:
               "lint": "${{ needs.lint.result }}",
               "type-check": "${{ needs.type-check.result }}",
               "security": "${{ needs.security.result }}",
-              "test": "${{ needs.test.result }}",
-              "docker": "${{ needs.docker.result }}"
+              "test": "${{ needs.test.result }}"
             },
             "truth_protocol_compliance": {
               "test_coverage_90_percent": "${{ needs.test.result == 'success' }}",
               "no_high_critical_cves": "${{ needs.security.result == 'success' }}",
-              "docker_build_success": "${{ needs.docker.result == 'success' }}",
-              "all_checks_passed": "${{ needs.lint.result == 'success' && needs.type-check.result == 'success' && needs.security.result == 'success' && needs.test.result == 'success' && needs.docker.result == 'success' }}"
-            }
+              "all_required_checks_passed": "${{ needs.lint.result == 'success' && needs.type-check.result == 'success' && needs.security.result == 'success' && needs.test.result == 'success' }}"
+            },
+            "note": "Docker build runs only on main/develop branches"
           }
           EOF
 
@@ -659,7 +668,8 @@ jobs:
     name: Build Summary & Notifications
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [lint, type-check, security, test, docker, error-ledger, openapi-validation]
+    needs: [lint, type-check, security, test, error-ledger, openapi-validation]
+    # Docker is optional (only runs on main/develop), so don't block on it
     if: always()
 
     steps:
@@ -680,7 +690,6 @@ jobs:
           echo "| Type Check | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Error Ledger | ${{ needs.error-ledger.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| OpenAPI | ${{ needs.openapi-validation.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -689,16 +698,16 @@ jobs:
           echo "- ✅ No HIGH/CRITICAL CVEs" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Error Ledger Generated" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ OpenAPI Spec Valid" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Docker Build & Scan Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note**: Docker build runs only on main/develop branches" >> $GITHUB_STEP_SUMMARY
 
       - name: Check overall build status
         run: |
           if [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.type-check.result }}" != "success" ]] || \
              [[ "${{ needs.security.result }}" != "success" ]] || \
-             [[ "${{ needs.test.result }}" != "success" ]] || \
-             [[ "${{ needs.docker.result }}" != "success" ]]; then
+             [[ "${{ needs.test.result }}" != "success" ]]; then
             echo "::error::One or more CI/CD jobs failed. Please review the logs."
             exit 1
           fi
-          echo "::notice::All CI/CD checks passed successfully! ✅"
+          echo "::notice::All required CI/CD checks passed successfully! ✅"
