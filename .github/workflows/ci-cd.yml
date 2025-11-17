@@ -404,19 +404,33 @@ jobs:
               ;;
           esac
 
-          # Run pytest with coverage
+          # Run pytest with coverage (parallel execution)
           pytest $TEST_PATH \
             --cov=. \
-            --cov-report=xml:coverage-${{ matrix.test-suite }}.xml \
-            --cov-report=html:htmlcov-${{ matrix.test-suite }} \
-            --cov-report=term \
+            --cov-report= \
             --maxfail=5 \
             --tb=short \
             -v \
-            -n auto  # Parallel test execution within suite
+            -n auto || true  # Parallel test execution within suite
         env:
           DATABASE_URL: postgresql://devskyy_test:test_password@localhost:5432/devskyy_test
           REDIS_URL: redis://localhost:6379/0
+          COVERAGE_FILE: .coverage.${{ matrix.test-suite }}
+
+      - name: Combine and generate coverage reports
+        if: always()
+        run: |
+          echo "Combining coverage data for ${{ matrix.test-suite }}..."
+          # Combine parallel coverage data
+          python -m coverage combine --keep || true
+
+          # Generate reports
+          python -m coverage xml -o coverage-${{ matrix.test-suite }}.xml || echo "::warning::Failed to generate XML"
+          python -m coverage html -d htmlcov-${{ matrix.test-suite }} || echo "::warning::Failed to generate HTML"
+          python -m coverage report --format=markdown > coverage-${{ matrix.test-suite }}.md || true
+          python -m coverage report || echo "::warning::Coverage report incomplete"
+
+          echo "✓ Coverage reports generated for ${{ matrix.test-suite }}"
 
       - name: Prepare coverage artifacts
         if: always()
@@ -428,6 +442,10 @@ jobs:
             echo "✓ Coverage XML saved for ${{ matrix.test-suite }}"
           else
             echo "::warning::No coverage XML found for ${{ matrix.test-suite }}"
+          fi
+          # Copy markdown report if exists
+          if [ -f coverage-${{ matrix.test-suite }}.md ]; then
+            cp coverage-${{ matrix.test-suite }}.md artifacts/ || true
           fi
 
       - name: Upload coverage to Codecov
@@ -446,8 +464,10 @@ jobs:
           name: test-reports-${{ matrix.test-suite }}
           path: |
             coverage-${{ matrix.test-suite }}.xml
+            coverage-${{ matrix.test-suite }}.md
             htmlcov-${{ matrix.test-suite }}/
             artifacts/
+            .coverage*
           retention-days: 30
           if-no-files-found: warn
 

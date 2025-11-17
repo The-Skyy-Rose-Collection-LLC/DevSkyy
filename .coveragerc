@@ -1,0 +1,76 @@
+# ============================================================================
+# Coverage.py Configuration for DevSkyy Enterprise Platform
+# Per CLAUDE.md Truth Protocol: Test coverage ≥90% required
+# ============================================================================
+
+[run]
+source = .
+omit =
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */env/*
+    */.venv/*
+    setup.py
+    */migrations/*
+    */htmlcov/*
+    */.git/*
+    */node_modules/*
+    */.pytest_cache/*
+    */.mypy_cache/*
+    */build/*
+    */dist/*
+    */.eggs/*
+    */wordpress-mastery/*
+branch = true
+parallel = true
+concurrency = multiprocessing
+
+[report]
+# Report configuration
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    @abstractmethod
+    # Type checking
+    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
+    # Defensive programming
+    pass
+    \.\.\.
+ignore_errors = true
+show_missing = true
+precision = 2
+skip_covered = false
+skip_empty = false
+sort = Cover
+
+[html]
+directory = htmlcov
+title = DevSkyy Coverage Report
+
+[xml]
+output = coverage.xml
+
+[paths]
+source =
+    .
+    */site-packages/
+
+# ============================================================================
+# Coverage Targets per Truth Protocol
+# ============================================================================
+# - Overall coverage: ≥90%
+# - Security modules: ≥95%
+# - API endpoints: ≥90%
+# - Database operations: ≥85%
+# ============================================================================
