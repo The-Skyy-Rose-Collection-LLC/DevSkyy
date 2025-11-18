@@ -8,6 +8,9 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+# HTTP timeout for external API requests (per enterprise best practices)
+HTTP_TIMEOUT = 15  # seconds
+
 
 class WordPressIntegrationService:
     """WordPress REST API integration service for luxury brand agent management."""
@@ -53,7 +56,7 @@ class WordPressIntegrationService:
                 "code": authorization_code,
             }
 
-            response = requests.post(self.token_url, data=token_data)
+            response = requests.post(self.token_url, data=token_data, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             token_info = response.json()
@@ -82,7 +85,7 @@ class WordPressIntegrationService:
         """Get WordPress site information."""
         try:
             headers = {"Authorization": f"Bearer {self.access_token}"}
-            response = requests.get(f"{self.api_base}/sites/me", headers=headers)
+            response = requests.get(f"{self.api_base}/sites/me", headers=headers, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             site_data = response.json()
@@ -171,6 +174,7 @@ class WordPressIntegrationService:
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -197,6 +201,7 @@ class WordPressIntegrationService:
                 f"{self.api_base}/sites/{self.site_id}/posts",
                 headers=headers,
                 params=params,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -214,13 +219,13 @@ class WordPressIntegrationService:
 
             headers = {"Authorization": f"Bearer {self.access_token}"}
 
-            response = requests.get(f"{self.api_base}/sites/{self.site_id}/themes/mine", headers=headers)
+            response = requests.get(f"{self.api_base}/sites/{self.site_id}/themes/mine", headers=headers, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             theme_data = response.json()
 
             # Also get site customization options
-            customizer_response = requests.get(f"{self.api_base}/sites/{self.site_id}/customizer", headers=headers)
+            customizer_response = requests.get(f"{self.api_base}/sites/{self.site_id}/customizer", headers=headers, timeout=HTTP_TIMEOUT)
 
             customizer_data = {}
             if customizer_response.status_code == 200:
@@ -252,6 +257,7 @@ class WordPressIntegrationService:
                 f"{self.api_base}/sites/{self.site_id}/posts/{post_id}",
                 headers=headers,
                 json=content_updates,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -305,6 +311,7 @@ class WordPressIntegrationService:
                 f"{self.api_base}/sites/{self.site_id}/posts/new",
                 headers=headers,
                 json=page_data,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -337,6 +344,7 @@ class WordPressIntegrationService:
                 f"{self.api_base}/sites/{self.site_id}/stats",
                 headers=headers,
                 params={"period": "day", "date": datetime.now().strftime("%Y-%m-%d")},
+                timeout=HTTP_TIMEOUT,
             )
 
             performance_data = {}
@@ -381,7 +389,7 @@ class WordPressIntegrationService:
                 "refresh_token": self.refresh_token,
             }
 
-            response = requests.post(self.token_url, data=refresh_data)
+            response = requests.post(self.token_url, data=refresh_data, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             token_info = response.json()

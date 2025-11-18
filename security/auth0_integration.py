@@ -29,6 +29,9 @@ load_dotenv()
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# HTTP timeout for external API requests (per enterprise best practices)
+HTTP_TIMEOUT = 15  # seconds
+
 # Auth0 Configuration
 AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN", "devskyy.auth0.com")
 AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE", "https://api.devskyy.com")
@@ -133,7 +136,7 @@ class Auth0OAuth2Client:
 
     async def exchange_code_for_token(self, code: str, redirect_uri: str) -> dict[str, Any]:
         """Exchange authorization code for access token."""
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.post(
                 AUTH0_TOKEN_URL,
                 data={
@@ -156,7 +159,7 @@ class Auth0OAuth2Client:
 
     async def get_user_info(self, access_token: str) -> dict[str, Any]:
         """Get user information from Auth0."""
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.get(AUTH0_USERINFO_URL, headers={"Authorization": f"Bearer {access_token}"})
 
             if response.status_code != 200:
@@ -201,7 +204,7 @@ class Auth0Client:
         ):
             return self.management_token
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.post(
                 f"https://{self.domain}/oauth/token",
                 json={
@@ -227,7 +230,7 @@ class Auth0Client:
         """Get user from Auth0."""
         token = await self.get_management_token()
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.get(
                 f"https://{self.domain}/api/v2/users/{user_id}", headers={"Authorization": f"Bearer {token}"}
             )
@@ -245,7 +248,7 @@ class Auth0Client:
         """Update user in Auth0."""
         token = await self.get_management_token()
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.patch(
                 f"https://{self.domain}/api/v2/users/{user_id}",
                 headers={"Authorization": f"Bearer {token}"},
@@ -263,7 +266,7 @@ class Auth0Client:
         """Get user permissions from Auth0."""
         token = await self.get_management_token()
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
             response = await client.get(
                 f"https://{self.domain}/api/v2/users/{user_id}/permissions",
                 headers={"Authorization": f"Bearer {token}"},
