@@ -39,30 +39,31 @@ jobs:
       - name: Ruff - Fast Python Linter
         run: |
           echo "Running Ruff linter..."
-          ruff check . --output-format=github || echo "::warning::Ruff found issues"
-        continue-on-error: true
+          echo "This check will FAIL the build if issues are found"
+          ruff check . --output-format=github
 
       - name: Black - Code Formatter Check
         run: |
           echo "Checking code formatting with Black..."
-          black --check --diff . || echo "::warning::Black formatting issues found"
-        continue-on-error: true
+          echo "This check will FAIL the build if formatting issues are found"
+          black --check --diff .
 
       - name: isort - Import Order Check
         run: |
           echo "Checking import order with isort..."
-          isort --check-only --diff . || echo "::warning::isort found issues"
-        continue-on-error: true
+          echo "This check will FAIL the build if import order issues are found"
+          isort --check-only --diff .
 
       - name: Flake8 - PEP8 Compliance
         run: |
           echo "Running Flake8 PEP8 checker..."
-          flake8 . --exclude=migrations,venv,node_modules --max-line-length=120 --statistics || echo "::warning::Flake8 found PEP8 violations"
-        continue-on-error: true
+          echo "This check will FAIL the build if PEP8 violations are found"
+          flake8 . --exclude=migrations,venv,node_modules --statistics
 
       - name: mypy - Static Type Checking
         run: |
           echo "Running mypy static type checker..."
+          echo "This check will WARN but not fail the build (type checking is advisory)"
           mypy . --ignore-missing-imports --no-strict-optional || echo "::warning::mypy found type issues"
         continue-on-error: true
 
@@ -85,11 +86,18 @@ jobs:
             "commit": "${{ github.sha }}",
             "branch": "${{ github.ref_name }}",
             "checks": {
-              "ruff": "completed",
-              "black": "completed",
-              "isort": "completed",
-              "flake8": "completed",
-              "mypy": "completed"
+              "ruff": "completed (blocking)",
+              "black": "completed (blocking)",
+              "isort": "completed (blocking)",
+              "flake8": "completed (blocking)",
+              "mypy": "completed (advisory)"
+            },
+            "enforcement": {
+              "ruff": "FAIL on errors",
+              "black": "FAIL on formatting issues",
+              "isort": "FAIL on import order issues",
+              "flake8": "FAIL on PEP8 violations",
+              "mypy": "WARNING only (advisory)"
             }
           }
           EOF
