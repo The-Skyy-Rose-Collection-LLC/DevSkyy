@@ -8,10 +8,11 @@ and development tasks across the DevSkyy platform.
 import logging
 from typing import Optional
 
-import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from todo_tracker import Category, Priority, Status, TodoItem, TodoTracker
+import uvicorn
+
 
 logger = logging.getLogger(__name__)
 

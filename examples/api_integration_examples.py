@@ -1,24 +1,25 @@
 import asyncio
-import logging
 from datetime import datetime
+import logging
 
-from api_integration.auth_manager import auth_manager, AuthenticationType
+from api_integration.auth_manager import AuthenticationType, auth_manager
 from api_integration.core_engine import api_gateway
-from api_integration.discovery_engine import api_discovery_engine, APICategory
+from api_integration.discovery_engine import APICategory, api_discovery_engine
 from api_integration.fashion_apis import fashion_api_integrator
 from api_integration.workflow_engine import (
     ActionType,
     TriggerType,
     Workflow,
-    workflow_engine,
     WorkflowStep,
     WorkflowTrigger,
+    workflow_engine,
 )
 from fashion.intelligence_engine import (
-    fashion_intelligence,
     FashionCategory,
     FashionSeason,
+    fashion_intelligence,
 )
+
 
 """
 API Integration Examples & Templates

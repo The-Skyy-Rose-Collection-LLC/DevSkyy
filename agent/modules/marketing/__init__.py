@@ -8,11 +8,12 @@ from .marketing_campaign_orchestrator import (
     CampaignVariant,
     Channel,
     CustomerSegment,
-    marketing_orchestrator,
     MarketingCampaignOrchestrator,
     SegmentCriteria,
     TestType,
+    marketing_orchestrator,
 )
+
 
 __all__ = [
     "Campaign",

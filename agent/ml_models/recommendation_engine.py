@@ -3,6 +3,7 @@ from typing import Any
 
 import numpy as np
 
+
 """
 Recommendation Engine - Product Recommendations
 Collaborative filtering and content-based recommendations

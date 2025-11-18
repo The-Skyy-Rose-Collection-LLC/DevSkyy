@@ -5,9 +5,10 @@ Test all WordPress credential configurations and theme builder integration
 """
 
 import asyncio
+from pathlib import Path
 import sys
 import tempfile
-from pathlib import Path
+
 
 # Add DevSkyy to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -166,7 +167,7 @@ async def test_theme_builder_orchestrator():
     """Test theme builder orchestrator."""
 
     try:
-        from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator, ThemeType
+        from agent.wordpress.theme_builder_orchestrator import ThemeType, theme_builder_orchestrator
         from config.wordpress_credentials import get_skyy_rose_credentials
 
         credentials = get_skyy_rose_credentials()

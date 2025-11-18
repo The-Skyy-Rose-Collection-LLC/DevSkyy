@@ -6,21 +6,21 @@ Enterprise-grade theme deployment with multiple upload methods and validation
 
 import base64
 import contextlib
-import ftplib
-import hashlib
-import os
-import tempfile
-import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import ftplib
+import hashlib
+import os
 from pathlib import Path
+import tempfile
 from typing import Any, Optional
+import zipfile
 
 import paramiko
 import requests
 
-from core.logging import enterprise_logger, LogCategory
+from core.logging import LogCategory, enterprise_logger
 
 
 class UploadMethod(Enum):
@@ -386,7 +386,16 @@ class AutomatedThemeUploader:
             return False
 
     async def _deploy_via_ftp(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
-        """Deploy theme via FTP."""
+        """Deploy theme via FTP.
+
+        SECURITY WARNING: FTP transmits credentials and data in plaintext.
+        Use SFTP (UploadMethod.SFTP) instead for encrypted connections.
+        Per CWE-319: Cleartext Transmission of Sensitive Information.
+        """
+        enterprise_logger.warning(
+            "FTP is insecure (cleartext transmission). Use SFTP instead.",
+            category=LogCategory.SECURITY
+        )
         try:
             if not credentials.ftp_host:
                 raise ValueError("FTP credentials not provided")
@@ -460,18 +469,24 @@ class AutomatedThemeUploader:
                 if os.path.exists(known_hosts_path):
                     ssh.load_host_keys(known_hosts_path)
                     enterprise_logger.info(
-                        f"✅ Loaded SSH known hosts from {known_hosts_path}",
-                        category=LogCategory.SECURITY
+                        f"✅ Loaded SSH known hosts from {known_hosts_path}", category=LogCategory.SECURITY
                     )
             except Exception as e:
+                enterprise_logger.warning(f"Could not load known_hosts: {e}", category=LogCategory.SECURITY)
+
+            # SECURITY: Use AutoAddPolicy for development, RejectPolicy for production
+            # Per CWE-295: Improper Certificate Validation
+            # Set SSH_STRICT_HOST_KEY_CHECKING=true for production environments
+            strict_checking = os.getenv("SSH_STRICT_HOST_KEY_CHECKING", "false").lower() == "true"
+            if strict_checking:
+                ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+                enterprise_logger.info("SSH strict host key checking enabled (RejectPolicy)", category=LogCategory.SECURITY)
+            else:
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 enterprise_logger.warning(
-                    f"Could not load known_hosts: {e}",
+                    "SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production",
                     category=LogCategory.SECURITY
                 )
-
-            # Use WarningPolicy for initial setup (logs unknown hosts)
-            # In production with known hosts, change to RejectPolicy for max security
-            ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
 
             # Connect
             if credentials.sftp_private_key:

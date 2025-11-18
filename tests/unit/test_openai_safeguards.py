@@ -9,26 +9,22 @@ Per Truth Protocol:
 """
 
 import asyncio
-from datetime import datetime
-import os
 from pathlib import Path
 import tempfile
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 
 from security.openai_safeguards import (
-    SafeguardLevel,
-    OperationType,
-    SafeguardConfig,
-    SafeguardViolation,
     AuditLogEntry,
-    RateLimiter,
+    AuditLogger,
     CircuitBreaker,
     CircuitBreakerState,
-    AuditLogger,
-    RequestValidator,
     OpenAISafeguardManager,
+    OperationType,
+    RateLimiter,
+    RequestValidator,
+    SafeguardConfig,
+    SafeguardLevel,
     get_safeguard_manager,
     reload_safeguard_manager,
 )
@@ -37,6 +33,7 @@ from security.openai_safeguards import (
 # ============================================================================
 # CONFIGURATION TESTS
 # ============================================================================
+
 
 class TestSafeguardConfig:
     """Test SafeguardConfig validation and defaults"""
@@ -70,10 +67,7 @@ class TestSafeguardConfig:
     @pytest.mark.unit
     def test_custom_rate_limits(self):
         """Test custom rate limit configuration"""
-        config = SafeguardConfig(
-            max_requests_per_minute=100,
-            max_consequential_per_hour=200
-        )
+        config = SafeguardConfig(max_requests_per_minute=100, max_consequential_per_hour=200)
 
         assert config.max_requests_per_minute == 100
         assert config.max_consequential_per_hour == 200
@@ -81,11 +75,7 @@ class TestSafeguardConfig:
     @pytest.mark.unit
     def test_disable_features(self):
         """Test disabling individual features"""
-        config = SafeguardConfig(
-            enable_rate_limiting=False,
-            enable_circuit_breaker=False,
-            enable_monitoring=False
-        )
+        config = SafeguardConfig(enable_rate_limiting=False, enable_circuit_breaker=False, enable_monitoring=False)
 
         assert config.enable_rate_limiting is False
         assert config.enable_circuit_breaker is False
@@ -103,6 +93,7 @@ class TestSafeguardConfig:
 # ============================================================================
 # RATE LIMITER TESTS
 # ============================================================================
+
 
 class TestRateLimiter:
     """Test RateLimiter functionality"""
@@ -158,6 +149,7 @@ class TestRateLimiter:
 # ============================================================================
 # CIRCUIT BREAKER TESTS
 # ============================================================================
+
 
 class TestCircuitBreaker:
     """Test CircuitBreaker pattern"""
@@ -215,6 +207,7 @@ class TestCircuitBreaker:
 # AUDIT LOGGER TESTS
 # ============================================================================
 
+
 class TestAuditLogger:
     """Test AuditLogger functionality"""
 
@@ -231,7 +224,7 @@ class TestAuditLogger:
                 operation_type=OperationType.CONTENT_GENERATION,
                 is_consequential=True,
                 success=True,
-                execution_time_ms=150.5
+                execution_time_ms=150.5,
             )
 
             await logger.log(entry)
@@ -250,13 +243,17 @@ class TestAuditLogger:
             logger = AuditLogger(log_path)
 
             # Write test entries
-            asyncio.run(logger.log(AuditLogEntry(
-                operation_id="test-1",
-                operation_type=OperationType.CODE_GENERATION,
-                is_consequential=True,
-                success=True,
-                execution_time_ms=100
-            )))
+            asyncio.run(
+                logger.log(
+                    AuditLogEntry(
+                        operation_id="test-1",
+                        operation_type=OperationType.CODE_GENERATION,
+                        is_consequential=True,
+                        success=True,
+                        execution_time_ms=100,
+                    )
+                )
+            )
 
             recent = logger.get_recent_logs(hours=24)
             assert len(recent) == 1
@@ -266,6 +263,7 @@ class TestAuditLogger:
 # ============================================================================
 # REQUEST VALIDATOR TESTS
 # ============================================================================
+
 
 class TestRequestValidator:
     """Test RequestValidator functionality"""
@@ -313,12 +311,7 @@ class TestRequestValidator:
         config = SafeguardConfig()
         validator = RequestValidator(config)
 
-        params = {
-            "model": "gpt-4",
-            "api_key": "secret-key-123",
-            "password": "user-password",
-            "normal_param": "value"
-        }
+        params = {"model": "gpt-4", "api_key": "secret-key-123", "password": "user-password", "normal_param": "value"}
 
         sanitized = validator.sanitize_params(params)
 
@@ -331,6 +324,7 @@ class TestRequestValidator:
 # ============================================================================
 # SAFEGUARD MANAGER TESTS
 # ============================================================================
+
 
 class TestOpenAISafeguardManager:
     """Test OpenAISafeguardManager integration"""
@@ -355,9 +349,7 @@ class TestOpenAISafeguardManager:
         manager = OpenAISafeguardManager(config)
 
         allowed, reason = await manager.validate_request(
-            operation_type=OperationType.CONTENT_GENERATION,
-            is_consequential=True,
-            prompt="Test prompt"
+            operation_type=OperationType.CONTENT_GENERATION, is_consequential=True, prompt="Test prompt"
         )
 
         assert allowed is True
@@ -374,8 +366,7 @@ class TestOpenAISafeguardManager:
 
         # Should block non-consequential in production
         allowed, reason = await manager.validate_request(
-            operation_type=OperationType.CONTENT_GENERATION,
-            is_consequential=False
+            operation_type=OperationType.CONTENT_GENERATION, is_consequential=False
         )
 
         assert allowed is False
@@ -389,14 +380,10 @@ class TestOpenAISafeguardManager:
         manager = OpenAISafeguardManager(config)
 
         # Exceed rate limit
-        await manager.validate_request(
-            operation_type=OperationType.CONTENT_GENERATION,
-            is_consequential=True
-        )
+        await manager.validate_request(operation_type=OperationType.CONTENT_GENERATION, is_consequential=True)
 
         allowed, _ = await manager.validate_request(
-            operation_type=OperationType.CONTENT_GENERATION,
-            is_consequential=True
+            operation_type=OperationType.CONTENT_GENERATION, is_consequential=True
         )
 
         assert allowed is False
@@ -422,6 +409,7 @@ class TestOpenAISafeguardManager:
 # INTEGRATION TESTS
 # ============================================================================
 
+
 class TestSafeguardIntegration:
     """Test full safeguard integration"""
 
@@ -429,11 +417,7 @@ class TestSafeguardIntegration:
     @pytest.mark.asyncio
     async def test_end_to_end_request_flow(self):
         """Test complete request flow with safeguards"""
-        config = SafeguardConfig(
-            max_requests_per_minute=10,
-            enable_rate_limiting=True,
-            enable_circuit_breaker=True
-        )
+        config = SafeguardConfig(max_requests_per_minute=10, enable_rate_limiting=True, enable_circuit_breaker=True)
         manager = OpenAISafeguardManager(config)
 
         async def mock_api_call():
@@ -444,7 +428,7 @@ class TestSafeguardIntegration:
             operation_type=OperationType.CONTENT_GENERATION,
             is_consequential=True,
             prompt="Test prompt",
-            params={"model": "gpt-4"}
+            params={"model": "gpt-4"},
         )
 
         assert result["status"] == "success"
@@ -461,15 +445,14 @@ class TestSafeguardIntegration:
 
         with pytest.raises(Exception, match="API Error"):
             await manager.execute_with_safeguards(
-                func=failing_api_call,
-                operation_type=OperationType.CONTENT_GENERATION,
-                is_consequential=True
+                func=failing_api_call, operation_type=OperationType.CONTENT_GENERATION, is_consequential=True
             )
 
 
 # ============================================================================
 # GLOBAL MANAGER TESTS
 # ============================================================================
+
 
 class TestGlobalSafeguardManager:
     """Test global safeguard manager functions"""
@@ -495,6 +478,7 @@ class TestGlobalSafeguardManager:
 # SECURITY TESTS
 # ============================================================================
 
+
 class TestSafeguardSecurity:
     """Test security aspects of safeguards"""
 
@@ -505,11 +489,7 @@ class TestSafeguardSecurity:
         config = SafeguardConfig()
         validator = RequestValidator(config)
 
-        params = {
-            "api_key": "sk-secret123",
-            "password": "mypassword",
-            "token": "token123"
-        }
+        params = {"api_key": "sk-secret123", "password": "mypassword", "token": "token123"}
 
         sanitized = validator.sanitize_params(params)
 
@@ -529,8 +509,7 @@ class TestSafeguardSecurity:
         manager = OpenAISafeguardManager(config)
 
         allowed, reason = await manager.validate_request(
-            operation_type=OperationType.SYSTEM_MODIFICATION,
-            is_consequential=False
+            operation_type=OperationType.SYSTEM_MODIFICATION, is_consequential=False
         )
 
         assert allowed is False
@@ -540,6 +519,7 @@ class TestSafeguardSecurity:
 # ============================================================================
 # PERFORMANCE TESTS
 # ============================================================================
+
 
 class TestSafeguardPerformance:
     """Test performance characteristics of safeguards"""
@@ -557,9 +537,7 @@ class TestSafeguardPerformance:
 
         for i in range(50):
             await manager.validate_request(
-                operation_type=OperationType.CONTENT_GENERATION,
-                is_consequential=True,
-                prompt="Test prompt"
+                operation_type=OperationType.CONTENT_GENERATION, is_consequential=True, prompt="Test prompt"
             )
 
         duration = time.time() - start
@@ -576,8 +554,7 @@ class TestSafeguardPerformance:
 
         async def validate():
             return await manager.validate_request(
-                operation_type=OperationType.CONTENT_GENERATION,
-                is_consequential=True
+                operation_type=OperationType.CONTENT_GENERATION, is_consequential=True
             )
 
         # Run 20 concurrent validations

@@ -5,10 +5,11 @@ Specialized agents for multimedia processing using HuggingFace, Claude, OpenAI
 """
 
 import asyncio
-import logging
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 from typing import Any, Optional
+
 
 # Configure logging
 logging.basicConfig(

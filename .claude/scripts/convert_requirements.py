@@ -5,8 +5,9 @@ Convert requirements.txt from exact pinning (==) to compatible releases (~=).
 Security-critical packages use range constraints (>=,<) to allow patch updates.
 """
 
-import re
 from pathlib import Path
+import re
+
 
 # Security-critical packages that need patch updates
 SECURITY_PACKAGES = {

@@ -9,16 +9,17 @@ Python: 3.11+
 """
 
 import base64
+from enum import Enum
 import json
 import logging
 import os
-from enum import Enum
 from typing import Any, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from security.jwt_auth import get_current_active_user, TokenData
+from security.jwt_auth import TokenData, get_current_active_user
+
 
 logger = logging.getLogger(__name__)
 

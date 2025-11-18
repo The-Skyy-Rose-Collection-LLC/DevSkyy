@@ -4,13 +4,14 @@ Test script for production-grade bulk quality processing
 Tests the enhanced quality update functionality with comprehensive error handling
 """
 
+from pathlib import Path
 import shutil
 import sys
 import time
-from pathlib import Path
 
-import requests
 from PIL import Image
+import requests
+
 
 # Test configuration
 API_BASE = "http://localhost:8001"

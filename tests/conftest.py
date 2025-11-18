@@ -16,8 +16,9 @@ CRITICAL CI/CD FIXES:
 # =============================================================================
 
 import os
-import sys
 from pathlib import Path
+import sys
+
 
 # Add project root to Python path for CI/CD
 project_root = Path(__file__).parent.parent
@@ -30,13 +31,13 @@ if str(project_root) not in sys.path:
 # =============================================================================
 
 import asyncio
-import time
 from collections.abc import AsyncGenerator, Generator
+import time
 
-import pytest
-import requests
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+import pytest
+import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -47,7 +48,8 @@ from models_sqlalchemy import Base
 # =============================================================================
 # Local Imports (now work because of sys.path fix above)
 # =============================================================================
-from security.jwt_auth import create_access_token, create_refresh_token, User, user_manager, UserRole
+from security.jwt_auth import User, UserRole, create_access_token, create_refresh_token, user_manager
+
 
 # Import main app
 

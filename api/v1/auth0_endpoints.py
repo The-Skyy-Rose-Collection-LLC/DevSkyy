@@ -1,7 +1,7 @@
+from datetime import timedelta
 import json
 import logging
 import os
-from datetime import timedelta
 from typing import Any, Optional
 
 from authlib.common.security import generate_token
@@ -16,6 +16,7 @@ from security.auth0_integration import (
     log_auth_event,
     verify_devskyy_jwt_token,
 )
+
 
 """
 Auth0 Authentication Endpoints for DevSkyy FastAPI Platform

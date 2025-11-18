@@ -17,16 +17,17 @@ Truth Protocol: Validated reviews, audit trail, no placeholders, comprehensive l
 """
 
 import asyncio
-import logging
-import secrets
 from datetime import datetime, timedelta
 from enum import Enum
+import logging
+import secrets
 from typing import Any, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
 from services.mcp_client import MCPToolClient, MCPToolError
+
 
 # Logfire for observability
 try:

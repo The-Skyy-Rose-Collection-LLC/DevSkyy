@@ -21,15 +21,14 @@ Features:
 """
 
 import asyncio
-from collections import defaultdict
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Enum
-import json
+from functools import wraps
 import logging
 from pathlib import Path
 import time
-from typing import Any, Callable, Optional, Dict, List
-from functools import wraps
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -41,8 +40,10 @@ logger = logging.getLogger(__name__)
 # ENUMS AND MODELS
 # ============================================================================
 
+
 class SafeguardLevel(str, Enum):
     """Safeguard enforcement levels"""
+
     STRICT = "strict"  # Maximum safety, production default
     MODERATE = "moderate"  # Balanced safety
     PERMISSIVE = "permissive"  # Development/testing only
@@ -50,6 +51,7 @@ class SafeguardLevel(str, Enum):
 
 class OperationType(str, Enum):
     """Types of operations requiring safeguards"""
+
     CONTENT_GENERATION = "content_generation"
     CODE_GENERATION = "code_generation"
     DATA_ANALYSIS = "data_analysis"
@@ -60,25 +62,27 @@ class OperationType(str, Enum):
 
 class SafeguardViolation(BaseModel):
     """Record of a safeguard violation"""
+
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     violation_type: str
     severity: str  # critical, high, medium, low
     operation_type: OperationType
     is_consequential: bool
-    details: Dict[str, Any]
+    details: dict[str, Any]
     stack_trace: Optional[str] = None
     resolved: bool = False
 
 
 class AuditLogEntry(BaseModel):
     """Audit log entry for consequential operations"""
+
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     operation_id: str
     operation_type: OperationType
     is_consequential: bool
     user_id: Optional[str] = None
     ip_address: Optional[str] = None
-    request_params: Dict[str, Any] = Field(default_factory=dict)
+    request_params: dict[str, Any] = Field(default_factory=dict)
     response_summary: Optional[str] = None
     success: bool
     error_message: Optional[str] = None
@@ -88,6 +92,7 @@ class AuditLogEntry(BaseModel):
 
 class CircuitBreakerState(str, Enum):
     """Circuit breaker states"""
+
     CLOSED = "closed"  # Normal operation
     OPEN = "open"  # Blocking requests
     HALF_OPEN = "half_open"  # Testing recovery
@@ -96,6 +101,7 @@ class CircuitBreakerState(str, Enum):
 # ============================================================================
 # CONFIGURATION VALIDATION
 # ============================================================================
+
 
 class SafeguardConfig(BaseModel):
     """Configuration for OpenAI safeguards"""
@@ -120,7 +126,7 @@ class SafeguardConfig(BaseModel):
     # Validation
     enable_request_validation: bool = Field(default=True)
     max_prompt_length: int = Field(default=100000, ge=1000, le=1000000)
-    blocked_keywords: List[str] = Field(default_factory=list)
+    blocked_keywords: list[str] = Field(default_factory=list)
 
     # Monitoring
     enable_monitoring: bool = Field(default=True)
@@ -134,6 +140,7 @@ class SafeguardConfig(BaseModel):
     def validate_level(cls, v, values):
         """Ensure production uses STRICT level"""
         import os
+
         env = os.getenv("ENVIRONMENT", "development").lower()
         if env == "production" and v != SafeguardLevel.STRICT:
             logger.warning(
@@ -151,6 +158,7 @@ class SafeguardConfig(BaseModel):
 # RATE LIMITER
 # ============================================================================
 
+
 class RateLimiter:
     """Token bucket rate limiter for API requests"""
 
@@ -158,8 +166,8 @@ class RateLimiter:
         self.max_per_minute = max_per_minute
         self.max_consequential_per_hour = max_consequential_per_hour
 
-        self.requests: List[float] = []
-        self.consequential_requests: List[float] = []
+        self.requests: list[float] = []
+        self.consequential_requests: list[float] = []
         self.lock = asyncio.Lock()
 
     async def check_rate_limit(self, is_consequential: bool = False) -> tuple[bool, Optional[str]]:
@@ -198,6 +206,7 @@ class RateLimiter:
 # CIRCUIT BREAKER
 # ============================================================================
 
+
 class CircuitBreaker:
     """Circuit breaker pattern for fault tolerance"""
 
@@ -234,7 +243,7 @@ class CircuitBreaker:
 
             return result
 
-        except Exception as e:
+        except Exception:
             async with self.lock:
                 self.failures += 1
                 self.last_failure_time = time.time()
@@ -252,6 +261,7 @@ class CircuitBreaker:
 # AUDIT LOGGER
 # ============================================================================
 
+
 class AuditLogger:
     """Comprehensive audit logging for consequential operations"""
 
@@ -267,7 +277,7 @@ class AuditLogger:
         except Exception as e:
             logger.error(f"Failed to write audit log: {e}")
 
-    def get_recent_logs(self, hours: int = 24) -> List[AuditLogEntry]:
+    def get_recent_logs(self, hours: int = 24) -> list[AuditLogEntry]:
         """Retrieve recent audit logs"""
         if not self.log_path.exists():
             return []
@@ -290,6 +300,7 @@ class AuditLogger:
 # ============================================================================
 # REQUEST VALIDATOR
 # ============================================================================
+
 
 class RequestValidator:
     """Validate and sanitize OpenAI API requests"""
@@ -315,7 +326,7 @@ class RequestValidator:
 
         return True, None
 
-    def sanitize_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    def sanitize_params(self, params: dict[str, Any]) -> dict[str, Any]:
         """Sanitize request parameters"""
         sanitized = params.copy()
 
@@ -332,6 +343,7 @@ class RequestValidator:
 # SAFEGUARD MANAGER
 # ============================================================================
 
+
 class OpenAISafeguardManager:
     """Central manager for all OpenAI API safeguards"""
 
@@ -339,23 +351,31 @@ class OpenAISafeguardManager:
         self.config = config or SafeguardConfig()
 
         # Initialize components
-        self.rate_limiter = RateLimiter(
-            max_per_minute=self.config.max_requests_per_minute,
-            max_consequential_per_hour=self.config.max_consequential_per_hour
-        ) if self.config.enable_rate_limiting else None
+        self.rate_limiter = (
+            RateLimiter(
+                max_per_minute=self.config.max_requests_per_minute,
+                max_consequential_per_hour=self.config.max_consequential_per_hour,
+            )
+            if self.config.enable_rate_limiting
+            else None
+        )
 
-        self.circuit_breaker = CircuitBreaker(
-            failure_threshold=self.config.failure_threshold,
-            recovery_timeout_seconds=self.config.recovery_timeout_seconds
-        ) if self.config.enable_circuit_breaker else None
+        self.circuit_breaker = (
+            CircuitBreaker(
+                failure_threshold=self.config.failure_threshold,
+                recovery_timeout_seconds=self.config.recovery_timeout_seconds,
+            )
+            if self.config.enable_circuit_breaker
+            else None
+        )
 
-        self.audit_logger = AuditLogger(
-            log_path=self.config.audit_log_path
-        ) if self.config.require_audit_logging else None
+        self.audit_logger = (
+            AuditLogger(log_path=self.config.audit_log_path) if self.config.require_audit_logging else None
+        )
 
         self.validator = RequestValidator(self.config)
 
-        self.violations: List[SafeguardViolation] = []
+        self.violations: list[SafeguardViolation] = []
 
         logger.info(
             f"🛡️  OpenAI Safeguard Manager initialized - Level: {self.config.level}, "
@@ -369,7 +389,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: Optional[str] = None,
-        params: Optional[Dict[str, Any]] = None
+        params: Optional[dict[str, Any]] = None,
     ) -> tuple[bool, Optional[str]]:
         """
         Validate request before sending to OpenAI API
@@ -386,7 +406,7 @@ class OpenAISafeguardManager:
                     severity="high",
                     operation_type=operation_type,
                     is_consequential=is_consequential,
-                    details={"reason": reason}
+                    details={"reason": reason},
                 )
                 return False, reason
 
@@ -399,13 +419,14 @@ class OpenAISafeguardManager:
                     severity="medium",
                     operation_type=operation_type,
                     is_consequential=is_consequential,
-                    details={"reason": reason}
+                    details={"reason": reason},
                 )
                 return False, reason
 
         # Production safeguards
         if self.config.enforce_consequential_in_production:
             from config.unified_config import get_config
+
             config = get_config()
 
             if config.is_production() and not is_consequential:
@@ -415,7 +436,7 @@ class OpenAISafeguardManager:
                     severity="critical",
                     operation_type=operation_type,
                     is_consequential=is_consequential,
-                    details={"reason": reason}
+                    details={"reason": reason},
                 )
                 return False, reason
 
@@ -427,22 +448,20 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: Optional[str] = None,
-        params: Optional[Dict[str, Any]] = None,
+        params: Optional[dict[str, Any]] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> Any:
         """Execute OpenAI API call with all safeguards"""
         import uuid
+
         operation_id = str(uuid.uuid4())
         start_time = time.time()
 
         try:
             # Validate request
             allowed, reason = await self.validate_request(
-                operation_type=operation_type,
-                is_consequential=is_consequential,
-                prompt=prompt,
-                params=params
+                operation_type=operation_type, is_consequential=is_consequential, prompt=prompt, params=params
             )
 
             if not allowed:
@@ -457,14 +476,16 @@ class OpenAISafeguardManager:
             # Log successful operation
             execution_time = (time.time() - start_time) * 1000
             if self.audit_logger:
-                await self.audit_logger.log(AuditLogEntry(
-                    operation_id=operation_id,
-                    operation_type=operation_type,
-                    is_consequential=is_consequential,
-                    request_params=self.validator.sanitize_params(params or {}),
-                    success=True,
-                    execution_time_ms=execution_time
-                ))
+                await self.audit_logger.log(
+                    AuditLogEntry(
+                        operation_id=operation_id,
+                        operation_type=operation_type,
+                        is_consequential=is_consequential,
+                        request_params=self.validator.sanitize_params(params or {}),
+                        success=True,
+                        execution_time_ms=execution_time,
+                    )
+                )
 
             return result
 
@@ -472,15 +493,17 @@ class OpenAISafeguardManager:
             # Log failed operation
             execution_time = (time.time() - start_time) * 1000
             if self.audit_logger:
-                await self.audit_logger.log(AuditLogEntry(
-                    operation_id=operation_id,
-                    operation_type=operation_type,
-                    is_consequential=is_consequential,
-                    request_params=self.validator.sanitize_params(params or {}),
-                    success=False,
-                    error_message=str(e),
-                    execution_time_ms=execution_time
-                ))
+                await self.audit_logger.log(
+                    AuditLogEntry(
+                        operation_id=operation_id,
+                        operation_type=operation_type,
+                        is_consequential=is_consequential,
+                        request_params=self.validator.sanitize_params(params or {}),
+                        success=False,
+                        error_message=str(e),
+                        execution_time_ms=execution_time,
+                    )
+                )
 
             raise
 
@@ -490,7 +513,7 @@ class OpenAISafeguardManager:
         severity: str,
         operation_type: OperationType,
         is_consequential: bool,
-        details: Dict[str, Any]
+        details: dict[str, Any],
     ):
         """Record safeguard violation"""
         violation = SafeguardViolation(
@@ -498,7 +521,7 @@ class OpenAISafeguardManager:
             severity=severity,
             operation_type=operation_type,
             is_consequential=is_consequential,
-            details=details
+            details=details,
         )
 
         self.violations.append(violation)
@@ -519,7 +542,7 @@ class OpenAISafeguardManager:
                 f"Details: {details}"
             )
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """Get safeguard statistics"""
         recent_violations = [v for v in self.violations if (datetime.utcnow() - v.timestamp).total_seconds() < 3600]
 
@@ -530,11 +553,11 @@ class OpenAISafeguardManager:
                 "critical": len([v for v in recent_violations if v.severity == "critical"]),
                 "high": len([v for v in recent_violations if v.severity == "high"]),
                 "medium": len([v for v in recent_violations if v.severity == "medium"]),
-                "low": len([v for v in recent_violations if v.severity == "low"])
+                "low": len([v for v in recent_violations if v.severity == "low"]),
             },
             "circuit_breaker_state": self.circuit_breaker.state.value if self.circuit_breaker else None,
             "rate_limiter_active": self.rate_limiter is not None,
-            "config_level": self.config.level.value
+            "config_level": self.config.level.value,
         }
 
 
@@ -542,31 +565,28 @@ class OpenAISafeguardManager:
 # DECORATOR FOR EASY INTEGRATION
 # ============================================================================
 
+
 def with_safeguards(operation_type: OperationType, is_consequential: bool = True):
     """Decorator to apply safeguards to OpenAI API calls"""
+
     def decorator(func):
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
             manager = get_safeguard_manager()
             return await manager.execute_with_safeguards(
-                func=func,
-                operation_type=operation_type,
-                is_consequential=is_consequential,
-                *args,
-                **kwargs
+                func=func, operation_type=operation_type, is_consequential=is_consequential, *args, **kwargs
             )
 
         @wraps(func)
         def sync_wrapper(*args, **kwargs):
             manager = get_safeguard_manager()
             import asyncio
-            return asyncio.run(manager.execute_with_safeguards(
-                func=func,
-                operation_type=operation_type,
-                is_consequential=is_consequential,
-                *args,
-                **kwargs
-            ))
+
+            return asyncio.run(
+                manager.execute_with_safeguards(
+                    func=func, operation_type=operation_type, is_consequential=is_consequential, *args, **kwargs
+                )
+            )
 
         return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
 
@@ -602,13 +622,13 @@ def reload_safeguard_manager(config: Optional[SafeguardConfig] = None) -> OpenAI
 # ============================================================================
 
 __all__ = [
-    "SafeguardLevel",
-    "OperationType",
-    "SafeguardConfig",
-    "SafeguardViolation",
     "AuditLogEntry",
     "OpenAISafeguardManager",
-    "with_safeguards",
+    "OperationType",
+    "SafeguardConfig",
+    "SafeguardLevel",
+    "SafeguardViolation",
     "get_safeguard_manager",
     "reload_safeguard_manager",
+    "with_safeguards",
 ]

@@ -4,17 +4,18 @@ DevSkyy Fixed Luxury Theme Builder Server
 Corrected server that generates actual luxury fashion themes with verifiable styling
 """
 
+from datetime import datetime
 import os
+from pathlib import Path
 import sys
 import tempfile
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
-import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+
 
 # Load environment
 load_dotenv()
@@ -38,6 +39,7 @@ app.add_middleware(
 # Add WordPress credentials to app state
 sys.path.append(os.getcwd())
 from config.wordpress_credentials import get_skyy_rose_credentials
+
 
 credentials = get_skyy_rose_credentials()
 app.state.wordpress_credentials = credentials

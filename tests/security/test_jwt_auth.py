@@ -9,11 +9,12 @@ Version: 1.0.0
 Python: >=3.11.0
 """
 
-import os
 from datetime import datetime, timedelta
+import os
 from unittest.mock import patch
 
 import pytest
+
 
 # Set test JWT secret before importing jwt_auth
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-min-length-required"
@@ -21,6 +22,10 @@ os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-min-length-require
 from fastapi import HTTPException
 
 from security.jwt_auth import (
+    ROLE_HIERARCHY,
+    TokenBlacklist,
+    TokenType,
+    UserRole,
     create_access_token,
     create_refresh_token,
     create_token_pair,
@@ -29,10 +34,6 @@ from security.jwt_auth import (
     refresh_access_token,
     require_role,
     revoke_token,
-    ROLE_HIERARCHY,
-    TokenBlacklist,
-    TokenType,
-    UserRole,
     verify_jwt_token,
 )
 

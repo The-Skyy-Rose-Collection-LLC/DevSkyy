@@ -1,11 +1,12 @@
-import json
-import logging
 from collections import defaultdict
 from datetime import datetime
+import json
+import logging
 from typing import Any, Optional
 
 import numpy as np
 import pandas as pd  # noqa: F401 - Reserved for Phase 3 data analysis enhancements
+
 
 """
 E-commerce Analytics Engine

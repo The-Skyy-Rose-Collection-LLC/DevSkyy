@@ -3,10 +3,10 @@ Unit tests for PerformanceTracker
 Tests KPI tracking and improvement proposal generation
 """
 
+from pathlib import Path
 import shutil
 import sqlite3
 import tempfile
-from pathlib import Path
 
 import pytest
 

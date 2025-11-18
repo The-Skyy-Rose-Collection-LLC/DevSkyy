@@ -8,8 +8,8 @@ IMPACT: Enables automated product management workflows
 Truth Protocol: Input validation, error handling, logging, no placeholders
 """
 
-import logging
 from datetime import datetime
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from services.seo_optimizer import ProductInfo, SEOOptimizerService
 from services.woocommerce_importer import WooCommerceImporterService
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ecommerce", tags=["E-Commerce Automation"])

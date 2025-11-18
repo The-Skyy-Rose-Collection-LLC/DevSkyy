@@ -4,9 +4,9 @@ Tests health monitoring and recovery
 """
 
 import asyncio
+from pathlib import Path
 import shutil
 import tempfile
-from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
 import pytest

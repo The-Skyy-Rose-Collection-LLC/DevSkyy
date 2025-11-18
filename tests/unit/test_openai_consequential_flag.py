@@ -8,8 +8,7 @@ Per Truth Protocol:
 - Rule #13: Security baseline verification
 """
 
-import os
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -22,7 +21,7 @@ class TestAIConfigConsequentialFlag:
         """Test AIConfig includes openai_is_consequential field"""
         monkeypatch.setenv("OPENAI_IS_CONSEQUENTIAL", "true")
 
-        from config.unified_config import AIConfig, get_config
+        from config.unified_config import get_config
 
         config = get_config()
 
@@ -99,9 +98,7 @@ class TestOpenAIIntelligenceServiceConsequentialFlag:
             call_args = mock_openai.call_args
 
             assert "default_headers" in call_args.kwargs
-            assert call_args.kwargs["default_headers"] == {
-                "x-openai-isConsequential": "true"
-            }
+            assert call_args.kwargs["default_headers"] == {"x-openai-isConsequential": "true"}
 
     @pytest.mark.unit
     def test_service_uses_config_value(self, monkeypatch):
@@ -121,9 +118,7 @@ class TestOpenAIIntelligenceServiceConsequentialFlag:
             service = OpenAIIntelligenceService()
 
             call_args = mock_openai.call_args
-            assert call_args.kwargs["default_headers"] == {
-                "x-openai-isConsequential": "false"
-            }
+            assert call_args.kwargs["default_headers"] == {"x-openai-isConsequential": "false"}
 
 
 class TestCodexIntegrationConsequentialFlag:
@@ -149,9 +144,7 @@ class TestCodexIntegrationConsequentialFlag:
             call_args = mock_async_openai.call_args
 
             assert "default_headers" in call_args.kwargs
-            assert call_args.kwargs["default_headers"] == {
-                "x-openai-isConsequential": "true"
-            }
+            assert call_args.kwargs["default_headers"] == {"x-openai-isConsequential": "true"}
 
 
 class TestEnhancedOrchestratorConsequentialFlag:

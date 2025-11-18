@@ -20,18 +20,19 @@ Features:
 - Ad campaign automation
 """
 
+from datetime import datetime
 import json
 import logging
 import os
 import random
-from datetime import datetime
 from typing import Any, Optional
 
-import httpx
 from anthropic import AsyncAnthropic
+import httpx
 from openai import AsyncOpenAI
 
 from config.unified_config import get_config
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +50,7 @@ class MetaSocialAutomationAgent:
         default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
 
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            default_headers=default_headers
-        )
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), default_headers=default_headers)
 
         # Meta API Configuration
         self.meta_app_id = os.getenv("META_APP_ID")

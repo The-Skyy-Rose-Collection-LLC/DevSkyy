@@ -3,9 +3,9 @@ Integration Tests for API Endpoints
 Tests for complete API workflows with database and external services
 """
 
-import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+import pytest
 
 from main import app
 

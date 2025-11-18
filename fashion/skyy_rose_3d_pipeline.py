@@ -4,14 +4,15 @@ Skyy Rose Collection 3D Model Pipeline
 Enterprise-grade 3D model processing and avatar system for luxury fashion
 """
 
-import hashlib
-import json
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import hashlib
+import json
+import logging
 from pathlib import Path
 from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 
@@ -180,7 +181,7 @@ class SkyRose3DPipeline:
 
     def _generate_model_id(self, file_path: str) -> str:
         """Generate unique ID for a model."""
-        content_hash = hashlib.md5(str(file_path).encode()).hexdigest()
+        content_hash = hashlib.md5(str(file_path).encode(), usedforsecurity=False).hexdigest()
         return f"model_{content_hash[:12]}"
 
     async def _extract_model_metadata(self, file_path: Path, model_format: ModelFormat) -> dict[str, Any]:
@@ -324,7 +325,7 @@ class SkyRose3DPipeline:
 
     def _generate_avatar_id(self, customization_options: dict[str, Any]) -> str:
         """Generate unique ID for an avatar."""
-        options_hash = hashlib.md5(json.dumps(customization_options, sort_keys=True).encode()).hexdigest()
+        options_hash = hashlib.md5(json.dumps(customization_options, sort_keys=True).encode(), usedforsecurity=False).hexdigest()
         return f"avatar_{options_hash[:12]}"
 
     async def _create_ready_player_me_avatar(

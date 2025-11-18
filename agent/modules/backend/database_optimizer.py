@@ -1,11 +1,12 @@
 import asyncio
+from datetime import datetime
+from functools import wraps
 import hashlib
 import json
 import logging
 import time
-from datetime import datetime
-from functools import wraps
 from typing import Any
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class QueryOptimizer:
     def analyze_query(self, query: str, execution_time: float, params: dict | None = None) -> dict[str, Any]:
         """Analyze query performance and provide optimization suggestions."""
         analysis = {
-            "query_hash": hashlib.md5(query.encode()).hexdigest()[:8],
+            "query_hash": hashlib.md5(query.encode(), usedforsecurity=False).hexdigest()[:8],
             "execution_time": execution_time,
             "is_slow": execution_time > self.slow_query_threshold,
             "optimization_suggestions": [],
@@ -198,7 +199,7 @@ class DatabaseConnectionPool:
         """Generate cache key for query."""
         key_data = {"query": query, "params": params or {}}
         key_string = json.dumps(key_data, sort_keys=True)
-        return hashlib.md5(key_string.encode()).hexdigest()
+        return hashlib.md5(key_string.encode(), usedforsecurity=False).hexdigest()
 
     async def _execute_with_connection(self, connection, query: str, params: dict | None = None) -> Any:
         """Execute query with specific connection."""

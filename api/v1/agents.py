@@ -10,7 +10,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from api.validation_models import AgentExecutionRequest
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
+
 
 logger = logging.getLogger(__name__)
 

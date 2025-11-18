@@ -1,11 +1,12 @@
+from datetime import datetime
 import json
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
-import openai
 from dotenv import load_dotenv
+import openai
+
 
 load_dotenv()
 logger = logging.getLogger(__name__)

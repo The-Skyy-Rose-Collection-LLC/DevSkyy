@@ -7,7 +7,8 @@ from typing import Any, Optional
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import ExecutionPriority, orchestrator
-from agent.security_manager import security_manager, SecurityRole
+from agent.security_manager import SecurityRole, security_manager
+
 
 """
 Enterprise Agent Registry

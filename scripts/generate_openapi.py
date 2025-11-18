@@ -5,8 +5,9 @@ Truth Protocol: Auto-generate and validate OpenAPI spec
 """
 
 import json
-import sys
 from pathlib import Path
+import sys
+
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -44,21 +45,16 @@ except ImportError as e:
             "title": "DevSkyy Enterprise API",
             "version": "5.2.1",
             "description": "Luxury Fashion AI Platform with Multi-Agent Orchestration",
-            "contact": {
-                "name": "DevSkyy Team",
-                "url": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy"
-            },
-            "license": {
-                "name": "Proprietary"
-            },
+            "contact": {"name": "DevSkyy Team", "url": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy"},
+            "license": {"name": "Proprietary"},
             "x-truth-protocol": "Verified API specification",
             "x-generated-date": "2025-11-16",
-            "x-security-baseline": "AES-256-GCM, OAuth2+JWT, RBAC"
+            "x-security-baseline": "AES-256-GCM, OAuth2+JWT, RBAC",
         },
         "servers": [
             {"url": "https://api.devskyy.com", "description": "Production"},
             {"url": "https://staging-api.devskyy.com", "description": "Staging"},
-            {"url": "http://localhost:8000", "description": "Development"}
+            {"url": "http://localhost:8000", "description": "Development"},
         ],
         "paths": {
             "/health": {
@@ -76,13 +72,13 @@ except ImportError as e:
                                         "properties": {
                                             "status": {"type": "string"},
                                             "version": {"type": "string"},
-                                            "timestamp": {"type": "string", "format": "date-time"}
-                                        }
+                                            "timestamp": {"type": "string", "format": "date-time"},
+                                        },
                                     }
                                 }
-                            }
+                            },
                         }
-                    }
+                    },
                 }
             },
             "/metrics": {
@@ -90,11 +86,7 @@ except ImportError as e:
                     "summary": "Prometheus metrics",
                     "operationId": "prometheus_metrics",
                     "tags": ["Monitoring"],
-                    "responses": {
-                        "200": {
-                            "description": "Prometheus metrics in text format"
-                        }
-                    }
+                    "responses": {"200": {"description": "Prometheus metrics in text format"}},
                 }
             },
             "/api/v1/rag/query": {
@@ -112,11 +104,11 @@ except ImportError as e:
                                     "required": ["question"],
                                     "properties": {
                                         "question": {"type": "string"},
-                                        "top_k": {"type": "integer", "default": 5}
-                                    }
+                                        "top_k": {"type": "integer", "default": 5},
+                                    },
                                 }
                             }
-                        }
+                        },
                     },
                     "responses": {
                         "200": {
@@ -128,13 +120,13 @@ except ImportError as e:
                                         "properties": {
                                             "answer": {"type": "string"},
                                             "sources": {"type": "array", "items": {"type": "object"}},
-                                            "metadata": {"type": "object"}
-                                        }
+                                            "metadata": {"type": "object"},
+                                        },
                                     }
                                 }
-                            }
+                            },
                         }
-                    }
+                    },
                 }
             },
             "/api/v1/mcp/servers": {
@@ -147,17 +139,12 @@ except ImportError as e:
                         "200": {
                             "description": "List of MCP servers",
                             "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "array",
-                                        "items": {"type": "object"}
-                                    }
-                                }
-                            }
+                                "application/json": {"schema": {"type": "array", "items": {"type": "object"}}}
+                            },
                         }
-                    }
+                    },
                 }
-            }
+            },
         },
         "components": {
             "securitySchemes": {
@@ -165,7 +152,7 @@ except ImportError as e:
                     "type": "http",
                     "scheme": "bearer",
                     "bearerFormat": "JWT",
-                    "description": "JWT token from Auth0 or OAuth2"
+                    "description": "JWT token from Auth0 or OAuth2",
                 }
             },
             "schemas": {
@@ -175,10 +162,10 @@ except ImportError as e:
                     "properties": {
                         "detail": {"type": "string"},
                         "status_code": {"type": "integer"},
-                        "timestamp": {"type": "string", "format": "date-time"}
-                    }
+                        "timestamp": {"type": "string", "format": "date-time"},
+                    },
                 }
-            }
+            },
         },
         "tags": [
             {"name": "System", "description": "System and health endpoints"},
@@ -188,8 +175,8 @@ except ImportError as e:
             {"name": "Agents", "description": "AI Agent orchestration"},
             {"name": "E-Commerce", "description": "E-commerce automation"},
             {"name": "WordPress", "description": "WordPress automation"},
-            {"name": "Marketing", "description": "Marketing automation"}
-        ]
+            {"name": "Marketing", "description": "Marketing automation"},
+        ],
     }
 
     output_file = Path(__file__).parent.parent / "openapi.json"

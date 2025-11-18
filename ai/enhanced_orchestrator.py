@@ -1,9 +1,9 @@
 import asyncio
+from datetime import datetime
+from enum import Enum
 import json
 import logging
 import time
-from datetime import datetime
-from enum import Enum
 from typing import Any, Optional
 
 import anthropic
@@ -237,8 +237,7 @@ class EnhancedAIOrchestrator:
                 is_consequential = config.ai.openai_is_consequential
                 default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
                 self.clients[ModelProvider.OPENAI] = openai.AsyncOpenAI(
-                    api_key=openai_api_key,
-                    default_headers=default_headers
+                    api_key=openai_api_key, default_headers=default_headers
                 )
                 logger.info(f"✅ OpenAI client initialized (consequential={is_consequential})")
 

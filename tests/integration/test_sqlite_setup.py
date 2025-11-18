@@ -1,8 +1,8 @@
 import asyncio
 import logging
+from pathlib import Path
 import sys
 import time
-from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import select, text
@@ -10,6 +10,7 @@ from sqlalchemy import select, text
 from database import AsyncSessionLocal, db_manager, init_db
 from database_config import DATABASE_URL
 from models_sqlalchemy import AgentLog, BrandAsset, Product, User
+
 
 #!/usr/bin/env python3
 """

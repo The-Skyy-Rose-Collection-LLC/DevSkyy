@@ -1,9 +1,10 @@
+from datetime import UTC, datetime
 import json
 import logging
 import sys
 import traceback
-from datetime import datetime, UTC
 from typing import Any, Optional
+
 
 """
 Structured Logging for Grade A+ Infrastructure Score

@@ -1,8 +1,9 @@
+from datetime import datetime, timedelta
 import logging
 import random
-import uuid
-from datetime import datetime, timedelta
 from typing import Any
+import uuid
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

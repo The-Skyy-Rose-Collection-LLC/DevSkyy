@@ -1,10 +1,11 @@
+from datetime import datetime, timedelta
 import logging
 import os
-from datetime import datetime, timedelta
 from typing import Any
 from urllib.parse import urlencode
 
 import requests
+
 
 logger = logging.getLogger(__name__)
 

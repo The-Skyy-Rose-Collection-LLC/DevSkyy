@@ -3,14 +3,15 @@ Base ML Engine
 Foundational machine learning capabilities for all agents
 """
 
-import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
+import logging
 from typing import Any, Optional
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 
 logger = logging.getLogger(__name__)
 

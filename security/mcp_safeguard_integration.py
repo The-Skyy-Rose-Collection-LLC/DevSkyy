@@ -20,7 +20,7 @@ Features:
 import logging
 from typing import Any, Optional
 
-from services.mcp_client import MCPToolClient
+from config.unified_config import get_config
 from security.tool_calling_safeguards import (
     ToolCallConfig,
     ToolCallRequest,
@@ -29,7 +29,7 @@ from security.tool_calling_safeguards import (
     ToolRiskLevel,
     get_tool_safeguard_manager,
 )
-from config.unified_config import get_config
+from services.mcp_client import MCPToolClient
 
 
 logger = logging.getLogger(__name__)
@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # MCP SAFEGUARD WRAPPER
 # ============================================================================
+
 
 class SafeguardedMCPClient:
     """
@@ -55,7 +56,7 @@ class SafeguardedMCPClient:
         self,
         schema_path: str = "config/mcp/mcp_tool_calling_schema.json",
         anthropic_api_key: Optional[str] = None,
-        enable_safeguards: bool = True
+        enable_safeguards: bool = True,
     ):
         """
         Initialize safeguarded MCP client
@@ -65,10 +66,7 @@ class SafeguardedMCPClient:
             anthropic_api_key: Anthropic API key
             enable_safeguards: Enable safeguard protection
         """
-        self.mcp_client = MCPToolClient(
-            schema_path=schema_path,
-            anthropic_api_key=anthropic_api_key
-        )
+        self.mcp_client = MCPToolClient(schema_path=schema_path, anthropic_api_key=anthropic_api_key)
         self.enable_safeguards = enable_safeguards
 
         if enable_safeguards:
@@ -78,8 +76,7 @@ class SafeguardedMCPClient:
             self.safeguard_manager = None
 
         logger.info(
-            f"✅ Safeguarded MCP Client initialized "
-            f"(safeguards={'enabled' if enable_safeguards else 'disabled'})"
+            f"✅ Safeguarded MCP Client initialized " f"(safeguards={'enabled' if enable_safeguards else 'disabled'})"
         )
 
     def _register_mcp_tools(self):
@@ -116,7 +113,7 @@ class SafeguardedMCPClient:
                     provider=ToolProvider.ANTHROPIC,
                     max_calls_per_minute=10,
                     max_calls_per_hour=100,
-                    is_consequential=True
+                    is_consequential=True,
                 )
 
                 # Register with safeguard manager
@@ -132,7 +129,7 @@ class SafeguardedMCPClient:
         user_id: Optional[str] = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
         model: str = "claude-3-5-sonnet-20241022",
-        max_tokens: int = 2000
+        max_tokens: int = 2000,
     ) -> dict[str, Any]:
         """
         Invoke MCP tool with safeguards
@@ -159,7 +156,7 @@ class SafeguardedMCPClient:
             provider=ToolProvider.ANTHROPIC,
             user_id=user_id,
             permission_level=permission_level,
-            parameters=inputs
+            parameters=inputs,
         )
 
         # Execute with safeguards
@@ -167,28 +164,17 @@ class SafeguardedMCPClient:
             # Wrap MCP client call
             async def execute_mcp_tool():
                 return await self.mcp_client.invoke_tool(
-                    tool_name=tool_name,
-                    category=category,
-                    inputs=inputs,
-                    model=model,
-                    max_tokens=max_tokens
+                    tool_name=tool_name, category=category, inputs=inputs, model=model, max_tokens=max_tokens
                 )
 
-            response = await self.safeguard_manager.execute_tool_call(
-                request=request,
-                func=execute_mcp_tool
-            )
+            response = await self.safeguard_manager.execute_tool_call(request=request, func=execute_mcp_tool)
 
             return response.result
 
         else:
             # Execute without safeguards
             return await self.mcp_client.invoke_tool(
-                tool_name=tool_name,
-                category=category,
-                inputs=inputs,
-                model=model,
-                max_tokens=max_tokens
+                tool_name=tool_name, category=category, inputs=inputs, model=model, max_tokens=max_tokens
             )
 
     def load_tool(self, tool_name: str, category: str) -> dict[str, Any]:
@@ -214,9 +200,8 @@ class SafeguardedMCPClient:
 # CONVENIENCE FUNCTIONS
 # ============================================================================
 
-def create_safeguarded_mcp_client(
-    enable_safeguards: Optional[bool] = None
-) -> SafeguardedMCPClient:
+
+def create_safeguarded_mcp_client(enable_safeguards: Optional[bool] = None) -> SafeguardedMCPClient:
     """
     Create safeguarded MCP client with application configuration
 

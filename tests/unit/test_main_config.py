@@ -5,8 +5,8 @@ Testing SECRET_KEY handling, environment configuration, and application setup
 
 import logging
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 
 class TestSecretKeyConfiguration:

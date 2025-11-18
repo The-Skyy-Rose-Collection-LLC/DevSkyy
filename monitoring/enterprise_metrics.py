@@ -4,24 +4,25 @@ Enterprise Metrics and Alerting System for DevSkyy Platform
 Comprehensive metrics collection, alerting, and dashboard integration
 """
 
-import threading
-import time
 from collections import defaultdict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import threading
+import time
 from typing import Any, Optional
+
 
 # Prometheus imports (optional)
 try:
-    from prometheus_client import CollectorRegistry, Counter, Gauge, generate_latest, Histogram, Summary
+    from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, Summary, generate_latest
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-from core.logging import enterprise_logger, LogCategory
+from core.logging import LogCategory, enterprise_logger
 
 
 class MetricType(Enum):

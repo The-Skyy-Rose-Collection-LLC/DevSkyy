@@ -8,11 +8,11 @@ Version: 5.1.0 Enterprise
 Python: >=3.11
 """
 
+from datetime import datetime
 import logging
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
+import sys
 from typing import Any, Optional
 
 # Core FastAPI imports
@@ -25,6 +25,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 # Observability: Logfire (OpenTelemetry-based monitoring)
 try:
     import logfire
@@ -35,7 +36,7 @@ except ImportError:
 
 # Prometheus monitoring
 try:
-    from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest, Histogram
+    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
     from prometheus_fastapi_instrumentator import Instrumentator
 
     PROMETHEUS_AVAILABLE = True
@@ -1049,12 +1050,12 @@ async def build_and_deploy_theme(theme_request: dict[str, Any]):
     """Build and deploy a WordPress theme automatically."""
     try:
         from agent.wordpress.theme_builder_orchestrator import (
-            theme_builder_orchestrator,
             ThemeBuildRequest,
             ThemeType,
             UploadMethod,
+            theme_builder_orchestrator,
         )
-        from config.wordpress_credentials import wordpress_credentials_manager, WordPressCredentials
+        from config.wordpress_credentials import WordPressCredentials, wordpress_credentials_manager
 
         # Get credentials - either from request or use configured credentials
         site_key = theme_request.get("site_key", "skyy_rose")
@@ -1162,9 +1163,9 @@ async def upload_theme_only(upload_request: dict[str, Any]):
     """Upload an existing theme package without building."""
     try:
         from agent.wordpress.automated_theme_uploader import (
-            automated_theme_uploader,
             UploadMethod,
             WordPressCredentials,
+            automated_theme_uploader,
         )
 
         # Parse credentials
@@ -1238,7 +1239,7 @@ async def get_theme_system_status():
 async def build_skyy_rose_theme(theme_request: dict[str, Any]):
     """Build and deploy a theme specifically for Skyy Rose Collection using configured credentials."""
     try:
-        from agent.wordpress.theme_builder_orchestrator import theme_builder_orchestrator, ThemeType
+        from agent.wordpress.theme_builder_orchestrator import ThemeType, theme_builder_orchestrator
 
         # Use the convenience method for Skyy Rose themes
         result = await theme_builder_orchestrator.build_skyy_rose_theme(

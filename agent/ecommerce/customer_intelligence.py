@@ -11,8 +11,8 @@ Features:
 - Customer journey mapping
 """
 
-import logging
 from datetime import datetime, timedelta
+import logging
 from typing import Any, Optional
 
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
@@ -23,6 +23,7 @@ from sklearn.cluster import (  # noqa: F401 - Reserved for future ML clustering 
 from sklearn.preprocessing import (  # noqa: F401 - Reserved for Phase 3 data preprocessing
     StandardScaler,
 )
+
 
 logger = logging.getLogger(__name__)
 

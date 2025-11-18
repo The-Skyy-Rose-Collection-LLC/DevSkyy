@@ -4,8 +4,8 @@ Comprehensive tests to verify all security vulnerabilities have been fixed
 """
 
 import logging
-import re
 from pathlib import Path
+import re
 from unittest.mock import patch
 
 import pytest

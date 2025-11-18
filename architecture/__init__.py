@@ -1,5 +1,6 @@
-from .cqrs import Command, command_bus, CommandHandler, Query, query_bus, QueryHandler
-from .event_sourcing import AggregateRoot, DomainEvent, event_store, EventStore
+from .cqrs import Command, CommandHandler, Query, QueryHandler, command_bus, query_bus
+from .event_sourcing import AggregateRoot, DomainEvent, EventStore, event_store
+
 
 """
 Architecture module for Grade A+ implementation

@@ -5,6 +5,7 @@ Verifies that workflow_engine.py works correctly with the new enums module
 
 import sys
 
+
 sys.path.insert(0, ".")
 
 from dataclasses import dataclass, field

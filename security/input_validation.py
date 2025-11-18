@@ -6,6 +6,7 @@ from typing import Union
 from fastapi import HTTPException, Request, status
 from pydantic import BaseModel, Field
 
+
 """
 Enterprise Input Validation & Sanitization
 Protection against SQL injection, XSS, command injection, and other attacks

@@ -8,10 +8,11 @@ Version: 1.0.0
 """
 
 import asyncio
+from datetime import datetime
 import logging
 import sys
-from datetime import datetime
 from typing import Any
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - TEST - %(levelname)s - %(message)s")
