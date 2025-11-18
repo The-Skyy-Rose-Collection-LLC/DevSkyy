@@ -34,9 +34,9 @@ oauth_configured = bool(oauth_vars["WORDPRESS_CLIENT_ID"] and oauth_vars["WORDPR
 
 for key, value in oauth_vars.items():
     if value:
-        # Mask sensitive values
+        # Mask sensitive values - never log passwords or secrets
         if "SECRET" in key or "PASSWORD" in key:
-            display_value = value[:8] + "..." if len(value) > 8 else "***"
+            display_value = "***REDACTED***"
         elif "CLIENT_ID" in key:
             display_value = value[:12] + "..." if len(value) > 12 else value
         else:
@@ -60,9 +60,9 @@ basic_configured = bool(basic_vars["SKYY_ROSE_SITE_URL"] and basic_vars["SKYY_RO
 
 for key, value in basic_vars.items():
     if value:
-        # Mask sensitive values
+        # Mask sensitive values - never log passwords
         if "PASSWORD" in key:
-            display_value = value[:6] + "..." if len(value) > 6 else "***"
+            display_value = "***REDACTED***"
         else:
             display_value = value
 
