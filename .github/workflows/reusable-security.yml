@@ -24,11 +24,27 @@ jobs:
           pip install --upgrade "pip>=25.3,<26.0" "setuptools>=78.1.1,<79.0.0"
           pip install safety==3.7.0 pip-audit==2.9.0 bandit[toml]==1.8.0
 
-          # Install Trivy
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.58.1
-
           # Install Semgrep
           pip install semgrep==1.99.0
+
+      # SECURITY: Install Trivy using verified checksum instead of piped script
+      - name: Install Trivy with checksum verification
+        run: |
+          TRIVY_VERSION="0.58.1"
+          
+          # Download Trivy binary and checksums
+          curl -sfL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" -o trivy.tar.gz
+          curl -sfL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_checksums.txt" -o checksums.txt
+          
+          # Verify checksum before installation
+          sha256sum --ignore-missing -c checksums.txt
+          
+          # Extract and install
+          tar -xzf trivy.tar.gz
+          sudo mv trivy /usr/local/bin/
+          rm -f trivy.tar.gz checksums.txt
+          
+          trivy --version
 
       - name: Safety vulnerability check
         run: |
