@@ -207,7 +207,7 @@ Comprehensive security scanning with SBOM generation.
 3. **Bandit** - Python security linter
 4. **Semgrep** - Semantic code analysis
 5. **Trivy** - Filesystem vulnerability scanner
-6. **Grype** - Additional container scanning
+6. **CycloneDX** - SBOM generation (CycloneDX JSON)
 
 #### SBOM Generation
 
