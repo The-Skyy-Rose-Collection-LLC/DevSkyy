@@ -135,8 +135,7 @@ def update_changelog():
 
 > Multi-agent fashion e-commerce automation platform with AI-powered workflows
 
-[![CI/CD](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml)
-[![Security](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml)
+[![CI/CD](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci.yml)
 [![Test Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)
 
 ## 🚀 Features
