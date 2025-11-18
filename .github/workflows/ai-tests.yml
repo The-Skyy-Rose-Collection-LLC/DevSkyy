@@ -68,7 +68,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt && pip install pytest
 
       - name: Run integration tests
         run: pytest tests/integration/ -v --tb=short -m "not slow"
