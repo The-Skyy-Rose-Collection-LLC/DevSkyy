@@ -54,22 +54,20 @@ jobs:
             --file Dockerfile \
             .
 
-          # Get image digest for signing
-          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" 2>/dev/null || echo "")
-          echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
-
-      # Install Trivy for container scanning
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.58.1
-          trivy --version
-
-      # SECURITY: Scan Docker image for vulnerabilities before push
+      # SECURITY: Scan Docker image for vulnerabilities using official Trivy action
       - name: Scan Docker image with Trivy
-        run: |
-          trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-image-report.json "$IMAGE"
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0  # v0.30.0
+        with:
+          scan-type: 'image'
+          image-ref: ${{ env.IMAGE }}
+          format: 'json'
+          output: 'trivy-image-report.json'
+          exit-code: '0'
+          severity: 'HIGH,CRITICAL'
 
-          # Fail on CRITICAL vulnerabilities
+      # Fail on CRITICAL vulnerabilities
+      - name: Check for CRITICAL vulnerabilities
+        run: |
           CRITICAL=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' trivy-image-report.json || echo 0)
           if [ "$CRITICAL" -gt 0 ]; then
             echo "::error::Found $CRITICAL CRITICAL vulnerabilities in Docker image"
@@ -78,9 +76,15 @@ jobs:
           fi
 
       - name: Push to GHCR
+        id: push-image
         run: |
           docker push "$IMAGE"
           docker push "ghcr.io/${{ github.repository }}/api:latest"
+
+          # Extract image digest after push (RepoDigests only populated after push)
+          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
+          echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
+          echo "Image digest: $IMAGE_DIGEST"
 
       # SECURITY: Sign container image with Cosign (keyless OIDC signing)
       - name: Sign container image with Cosign
@@ -104,7 +108,7 @@ jobs:
         uses: actions/attest-build-provenance@1c608d11d69870c2092266b3f9a6f3abbf17002c  # v1.4.3
         with:
           subject-name: ${{ env.IMAGE }}
-          subject-digest: ${{ steps.build-image.outputs.image_digest }}
+          subject-digest: ${{ steps.push-image.outputs.image_digest }}
           push-to-registry: true
 
       # SECURITY: SHA-pinned to v2.1.7 (2024-11-18)
@@ -147,7 +151,7 @@ jobs:
         run: |
           pip install --upgrade "pip>=25.3,<26.0" "setuptools>=78.1.1,<79.0.0"
           pip install -r requirements.txt
-          python manage.py migrate --noinput
+          alembic upgrade head
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 

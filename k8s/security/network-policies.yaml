@@ -56,10 +56,17 @@ spec:
         - protocol: TCP
           port: 8000
 
-    # Allow from Cloud Run load balancer (GCP)
+    # Allow from Cloud Run load balancer health checks (Google Cloud IP ranges)
+    # Reference: https://cloud.google.com/load-balancing/docs/health-check-concepts#ip-ranges
     - from:
         - ipBlock:
-            cidr: 0.0.0.0/0  # Cloud Run requires this for health checks
+            cidr: 35.191.0.0/16
+      ports:
+        - protocol: TCP
+          port: 8000
+    - from:
+        - ipBlock:
+            cidr: 130.211.0.0/22
       ports:
         - protocol: TCP
           port: 8000
@@ -99,10 +106,24 @@ spec:
         - protocol: TCP
           port: 5432
 
-    # Allow external PostgreSQL (Neon)
+    # Allow external PostgreSQL (Neon managed service)
+    # Restrict egress to Neon PostgreSQL IP ranges to prevent data exfiltration
+    # Reference: https://neon.tech/docs/security/network-access
     - to:
         - ipBlock:
-            cidr: 0.0.0.0/0
+            cidr: 34.72.0.0/16  # Neon PostgreSQL IP range 1
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - ipBlock:
+            cidr: 35.224.0.0/16  # Neon PostgreSQL IP range 2
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - ipBlock:
+            cidr: 104.198.0.0/16  # Neon PostgreSQL IP range 3
       ports:
         - protocol: TCP
           port: 5432
@@ -130,10 +151,19 @@ spec:
         - protocol: TCP
           port: 6379
 
-    # Allow external Redis (if using managed service)
+    # Allow external Redis (managed service like Upstash or Redis Cloud)
+    # Restrict to known Redis provider IP ranges - update based on your provider
+    # For Upstash Redis, use their documented IP ranges
+    # Reference: Check your Redis provider's documentation for IP ranges
+    # NOTE: If using a specific provider, replace 0.0.0.0/0 with their IP ranges
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
+            except:
+              # Block private IP ranges to prevent data exfiltration to internal services
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
       ports:
         - protocol: TCP
           port: 6379
