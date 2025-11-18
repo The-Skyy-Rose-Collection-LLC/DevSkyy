@@ -394,6 +394,161 @@ Ingress
 
 ---
 
+## Enterprise Code Review & Quality Gates
+
+### AI-Generated Code Review (NEW 2025 Practice)
+
+Per 2025 enterprise standards, all AI-generated code requires **enhanced review** for:
+
+**Functionality Verification**:
+- ✅ Verify AI code matches intended behavior (intent vs implementation)
+- ✅ Check for subtle logic errors that might pass tests
+- ✅ Verify integration points work correctly with existing code
+- ✅ Test edge cases and error handling
+
+**Code Quality Checks**:
+- ✅ Duplicate code detection (AI may generate redundant patterns)
+- ✅ Performance implications (AI may miss optimization)
+- ✅ Security gaps (AI may miss context-specific vulnerabilities)
+- ✅ Test coverage for generated code (minimum 90%)
+
+**Integration Review**:
+- ✅ API compatibility (no breaking changes)
+- ✅ Database schema alignment
+- ✅ Message queue format consistency
+- ✅ Error handling integration with error ledger
+
+**Mandatory Checks per AI Code Contribution**:
+1. ✅ **Human Code Review**: ≥2 approvals required (one must be senior)
+2. ✅ **Automated Checks**: All CI/CD gates pass
+3. ✅ **Security Scan**: Bandit + pip-audit pass
+4. ✅ **Type Checking**: MyPy strict mode pass
+5. ✅ **Performance Test**: Load test shows P95 < 200ms
+6. ✅ **Test Coverage**: ≥90% coverage maintained
+7. ✅ **Integration Test**: Full end-to-end test pass
+
+### Automated Quality Gates Enforcement
+
+**Gate 1: Pre-commit Hooks** (Local)
+- Black formatting check
+- Ruff linting auto-fix
+- isort import sorting
+- detect-secrets for credentials
+- MyPy type checking
+
+**Gate 2: Branch Protection Rules** (GitHub)
+- ✅ Require pull request reviews before merge (≥2 approvals)
+- ✅ Require status checks to pass (all CI/CD)
+- ✅ Require branches to be up to date before merging
+- ✅ Require code review from code owners
+- ✅ Require up-to-date branches
+
+**Gate 3: CI/CD Pipeline Gates** (Automated)
+- ✅ Ruff linting passes
+- ✅ MyPy type checking passes
+- ✅ Black formatting validated
+- ✅ Security scanning (Bandit, Safety, pip-audit) passes
+- ✅ All tests pass (≥90% coverage)
+- ✅ Docker build succeeds
+- ✅ Performance baselines met (P95 < 200ms)
+- ✅ Error ledger shows no CRITICAL errors
+
+**Gate 4: Deployment Gates** (Manual Approval)
+- ✅ Change log entry exists
+- ✅ Release notes prepared
+- ✅ Performance baseline verified
+- ✅ Rollback plan documented
+- ✅ Deployment checklist signed off
+
+### Modern Enterprise Tools Integration
+
+**AI-Powered Code Quality Tools** (2025+):
+- **DeepSource**: Intelligent issue prioritization with AI
+- **Codacy**: AI-assisted code review suggestions
+- **GitHub Copilot with Code Quality**: Native GitHub integration
+- **Qodana**: JetBrains AI-powered code quality
+
+**Integration Pattern**:
+```
+AI Code Generation → Automated Pre-commit → Human Review → CI/CD Gates → Deployment
+```
+
+### Systematic Code Review Process
+
+**Review Checklist per PR**:
+
+1. **Functionality**
+   - [ ] Code implements the stated requirement
+   - [ ] Edge cases handled
+   - [ ] Error handling complete
+   - [ ] Backward compatible (no breaking changes)
+
+2. **Security**
+   - [ ] No hardcoded secrets
+   - [ ] Input validation present (Pydantic schemas)
+   - [ ] SQL injection prevention (SQLAlchemy ORM)
+   - [ ] Authentication/authorization checks
+   - [ ] PII protection in logs
+   - [ ] CORS/CSRF configuration correct
+
+3. **Performance**
+   - [ ] No N+1 database queries
+   - [ ] Caching strategy implemented
+   - [ ] Algorithm complexity acceptable
+   - [ ] Memory usage reasonable
+   - [ ] Load test passes (P95 < 200ms)
+
+4. **Code Quality**
+   - [ ] Follows code style (Black, Ruff)
+   - [ ] Type hints on all functions
+   - [ ] Docstrings complete (Google-style)
+   - [ ] Comments explain "why", not "what"
+   - [ ] No dead code or unused imports
+   - [ ] Complexity <= 12 (max nesting/branches)
+
+5. **Testing**
+   - [ ] Unit tests cover happy path
+   - [ ] Unit tests cover error cases
+   - [ ] Integration tests verify components
+   - [ ] Security tests added
+   - [ ] Coverage maintained (≥90%)
+   - [ ] Tests are deterministic (not flaky)
+
+6. **Documentation**
+   - [ ] API documentation updated
+   - [ ] CHANGELOG entry added
+   - [ ] README updated if needed
+   - [ ] Architecture diagrams updated
+   - [ ] Deployment instructions clear
+
+### Team Coordination Practices
+
+**Code Ownership** (CODEOWNERS file):
+```
+# API endpoints
+/api/v1/*.py @api-team
+
+# Security modules
+/security/*.py @security-team
+
+# AI agents
+/agent/*.py @ai-team
+
+# Infrastructure
+/infrastructure/*.py @devops-team
+```
+
+**Review Turnaround SLO**:
+- **P0 (Critical/Security)**: 2 hours
+- **P1 (Bug fixes)**: 4 hours
+- **P2 (Features)**: 24 hours
+- **P3 (Docs/Tests)**: 48 hours
+
+**Escalation Path**:
+- Code author → Code owner → Team lead → Engineering manager → VP Engineering
+
+---
+
 ## Code Quality Standards
 
 ### File Structure
@@ -439,6 +594,97 @@ except:
 
 ---
 
+## Enterprise Monitoring & Observability
+
+### Structured Logging Strategy
+
+**Log Levels** (ordered by severity):
+- **CRITICAL**: System failures requiring immediate action (P0)
+- **ERROR**: Operational errors that need investigation (P1)
+- **WARNING**: Unexpected conditions that may indicate issues (P2)
+- **INFO**: Important business events and state changes (P3)
+- **DEBUG**: Detailed diagnostic information (development only)
+
+**Log Format** (JSON per line):
+```json
+{
+  "timestamp": "2025-11-17T19:00:00Z",
+  "level": "ERROR",
+  "logger": "api.v1.agents",
+  "message": "Failed to process agent request",
+  "error_id": "err_abc123",
+  "request_id": "req_xyz789",
+  "user_id": "***REDACTED***",
+  "component": "agent.orchestrator",
+  "duration_ms": 1234,
+  "trace_id": "trace_456def"
+}
+```
+
+**PII Redaction** (Automatic):
+- ✅ `password`, `api_key`, `secret`, `token` → `***REDACTED***`
+- ✅ `email`, `phone`, `ssn`, `credit_card` → `***REDACTED***`
+- ✅ Full names → `[REDACTED_USER_NAME]`
+- ✅ IP addresses → `[REDACTED_IP]`
+
+### Metrics & Monitoring
+
+**Key Performance Indicators (KPIs)**:
+- **Latency**: P50, P95, P99 (target: P95 < 200ms)
+- **Throughput**: Requests/second (baseline: monitor trends)
+- **Error Rate**: Percentage 5xx errors (target: < 0.5%)
+- **Cache Hit Rate**: Percentage (target: > 80%)
+- **Database Connections**: Active/pool size (target: < 80% utilization)
+- **Queue Depth**: Messages pending (target: zero)
+
+**Metrics Tools**:
+- **Prometheus**: Time-series metrics collection
+- **Grafana**: Dashboard visualization
+- **Datadog**: APM and log aggregation
+- **New Relic**: Full-stack monitoring
+
+**Alert Thresholds**:
+```yaml
+- name: HighLatency
+  condition: P95 > 500ms for 5 minutes
+  severity: P2
+  action: Page on-call, trigger investigation
+
+- name: HighErrorRate
+  condition: Error rate > 1% for 1 minute
+  severity: P1
+  action: Immediate page, prepare rollback
+
+- name: ExhaustedDatabasePool
+  condition: DB connections > 90% for 2 minutes
+  severity: P1
+  action: Immediate page, connection pool scale-up
+
+- name: LowCacheHitRate
+  condition: Cache hit rate < 50% for 10 minutes
+  severity: P3
+  action: Investigation ticket, cache strategy review
+```
+
+### Error Tracking & Analysis
+
+**Error Ledger Processing**:
+1. **Collection**: Every error recorded in JSON format
+2. **Aggregation**: Daily error reports by component
+3. **Analysis**: Trend analysis and root cause detection
+4. **Alerting**: High-severity error escalation
+5. **Remediation**: Bug fix prioritization based on frequency
+
+**Error Investigation Process**:
+1. Retrieve error from ledger: `error_id`, `timestamp`, `trace_id`
+2. Correlate with related errors (same `trace_id`)
+3. Check logs for context (same `request_id`)
+4. Review metrics (performance impact)
+5. Create incident ticket with root cause
+6. Fix deployed within SLO
+
+---
+
 ## Enterprise Deployment
 
 **See**: [ENTERPRISE_DEPLOYMENT.md](./ENTERPRISE_DEPLOYMENT.md)
@@ -454,6 +700,210 @@ docker-compose -f docker-compose.production.yml up -d
 # Monitor errors
 curl https://your-domain/api/v1/monitoring/error-ledger
 ```
+
+---
+
+## Incident Response & Post-Mortems
+
+### Incident Classification
+
+**P0 - Critical** (Immediate Page)
+- Production down (0% availability)
+- Data loss or corruption
+- Security breach
+- Major business impact
+- **Response Time**: 5 minutes
+- **Resolution Time**: 30 minutes target
+
+**P1 - High** (Urgent Page)
+- Partial outage (< 50% users affected)
+- Significant degradation (P95 > 1 second)
+- Security vulnerability discovered
+- **Response Time**: 15 minutes
+- **Resolution Time**: 2 hours target
+
+**P2 - Medium** (Alert)
+- Minor outage (< 10% users affected)
+- Elevated error rate (0.5% - 2%)
+- Performance degradation (P95 < 500ms)
+- **Response Time**: 1 hour
+- **Resolution Time**: 24 hours target
+
+**P3 - Low** (Ticket)
+- Cosmetic issues
+- Documentation updates needed
+- Code quality improvements
+- **Response Time**: 24 hours
+- **Resolution Time**: 1 week target
+
+### Incident Response Process
+
+**Phase 1: Detection** (< 5 min)
+1. Alert triggered by monitoring
+2. On-call engineer notified
+3. Incident created in tracking system
+4. Status page updated (if applicable)
+
+**Phase 2: Triage** (< 10 min)
+1. Confirm issue (false alarm check)
+2. Assess impact (users/revenue affected)
+3. Assign severity (P0-P3)
+4. Identify on-call responders
+
+**Phase 3: Mitigation** (< 30 min for P0)
+1. Rollback previous change (if likely culprit)
+2. Scale resources (increase capacity)
+3. Feature flag disable (if isolated)
+4. Database restart (if hung)
+5. Switch to backup system (if critical)
+
+**Phase 4: Resolution**
+1. Root cause identified
+2. Fix tested in staging
+3. Fix deployed to production
+4. Monitoring confirms resolution
+5. All-clear notification sent
+
+**Phase 5: Post-Mortem** (< 24 hours after)
+1. Timeline documented
+2. Root cause analysis (5 whys)
+3. Contributing factors identified
+4. Action items created
+5. Lessons learned documented
+6. Post-mortem published (transparency)
+
+### Post-Mortem Template
+
+```markdown
+# Incident Post-Mortem: [Incident Name]
+
+## Summary
+- **Duration**: Start → End (X minutes)
+- **Severity**: P0/P1/P2/P3
+- **Impact**: X% users affected, $Y revenue impact
+- **Root Cause**: [Brief description]
+
+## Timeline
+- HH:MM - Event triggered
+- HH:MM - Alert received
+- HH:MM - Mitigation started
+- HH:MM - Resolution deployed
+- HH:MM - Monitoring confirmed
+
+## Root Cause (5 Whys)
+1. Why did X fail? → Because Y
+2. Why Y? → Because Z
+3. ...continue until root identified
+
+## Contributing Factors
+- Lack of monitoring on endpoint X
+- No rate limiting on endpoint Y
+- Missing test case for scenario Z
+
+## What Went Well
+- Team responded quickly
+- Communication was clear
+- Rollback was successful
+
+## What Could Be Better
+- Earlier detection possible with metric X
+- Documentation for scenario Y was missing
+- Process Z was not followed
+
+## Action Items
+- [ ] Add monitoring for metric X (Assign: @user, Due: Date)
+- [ ] Update runbook for scenario Y (Assign: @user, Due: Date)
+- [ ] Add test case for Z (Assign: @user, Due: Date)
+- [ ] Update documentation (Assign: @user, Due: Date)
+
+## Follow-up
+- [ ] Action items completed within 1 week
+- [ ] Monitoring improvements verified
+- [ ] Team training on lessons learned
+```
+
+---
+
+## Team Scaling & Multi-Team Coordination
+
+### Team Structure for Enterprise Scale
+
+**Platform Team** (Core Infrastructure)
+- Database & caching optimization
+- API gateway & rate limiting
+- Infrastructure & DevOps
+- Monitoring & observability
+
+**Feature Teams** (Product Delivery)
+- Agent development team
+- API endpoint owners
+- ML/AI integration team
+- Frontend & UX team
+
+**Cross-functional Roles**
+- **Release Manager**: Coordinates deployments
+- **Security Officer**: Security reviews & audits
+- **Performance Officer**: SLO enforcement
+- **Quality Lead**: Testing & coverage standards
+
+### Communication Patterns
+
+**Synchronous** (Real-time):
+- Code review comments (2-4 hours response)
+- Slack critical alerts
+- On-call incidents
+- Sprint planning meetings
+
+**Asynchronous** (Batched):
+- Pull request updates (24 hours review window)
+- Documentation updates
+- Metrics dashboards
+- Post-mortems & retrospectives
+
+**Decision Records** (ADR):
+```
+# ADR-001: Use FastAPI instead of Flask
+
+## Status
+Accepted
+
+## Context
+Need to choose Python web framework for API.
+
+## Decision
+FastAPI 0.120.0+ per CVE-2025-62727 requirements.
+
+## Consequences
+- ✅ Async support
+- ✅ Type hints integrated
+- ✅ Auto-generated OpenAPI docs
+- ⚠️ Smaller ecosystem than Flask
+- ⚠️ Learning curve for team
+
+## Alternatives Considered
+- Flask: Better ecosystem but no async
+- Django: Too heavy, overkill for our use case
+```
+
+### Metrics for Team Health
+
+**Code Quality Metrics**:
+- Ruff compliance: 95%+
+- MyPy type coverage: 90%+
+- Test coverage: 90%+
+- Deployment frequency: 1+ per day
+
+**Team Velocity Metrics**:
+- Pull requests merged per sprint
+- Average cycle time (idea → production)
+- Deployment success rate: 99%+
+- Mean time to recovery (MTTR): < 30 min
+
+**Team Well-being Metrics**:
+- On-call satisfaction: 4+/5 rating
+- Code review turnaround: 24-48 hours
+- Meeting time: < 10 hours/week
+- Technical debt reduction: 10%+ per quarter
 
 ---
 
