@@ -20,6 +20,7 @@ class ElementorThemeBuilder:
     Features:
     - Automated theme generation from brand guidelines
     - Elementor widget creation and customization
+    - Elementor Pro features (18+ professional widgets and features)
     - Responsive design optimization (mobile, tablet, desktop)
     - Color palette generation using ML
     - Typography optimization
@@ -28,6 +29,14 @@ class ElementorThemeBuilder:
     - Performance optimization
     - SEO-optimized structure
     - WooCommerce integration for fashion brands
+
+    Elementor Pro Features:
+    - Pro Widgets: Posts, Portfolio, Form Builder, Slides, Animated Headlines,
+                   Price Tables, Countdown, Share Buttons, Lottie animations
+    - Pro Features: Theme Builder, Popup Builder, WooCommerce Builder,
+                    Loop Builder, Mega Menu, Global Widgets, Custom CSS/Fonts,
+                    Role Manager
+    - Advanced gallery options with pro lightbox and filters
     """
 
     def __init__(self, api_key: Optional[str] = None):
