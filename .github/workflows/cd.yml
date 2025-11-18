@@ -30,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [deploy-staging]
     steps:
       - uses: actions/checkout@v4
 
