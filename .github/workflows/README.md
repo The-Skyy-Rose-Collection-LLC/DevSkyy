@@ -47,7 +47,7 @@ Ingress → Validation → Auth → RBAC → Logic → Encryption → Output →
 2. **Security Scan** - Bandit, Safety, pip-audit, Trivy
 3. **Test Coverage ≥90%** - Pytest with coverage enforcement
 4. **Performance SLOs** - P95 < 200ms, error rate < 0.5%
-5. **Container Security** - Trivy, Grype scanning
+5. **Container Security** - Trivy scanning (filesystem and image)
 6. **Secret Scanning** - TruffleHog, detect-secrets
 7. **SBOM Generation** - CycloneDX, SPDX formats
 8. **Error Ledger** - JSON audit trail
@@ -83,11 +83,17 @@ ANTHROPIC_API_KEY        # For Claude API
 OPENAI_API_KEY          # For OpenAI API
 CODECOV_TOKEN           # For coverage uploads
 
+# Database (required for deployment)
+DATABASE_URL            # PostgreSQL connection string
+
 # Deployment (if needed)
 DOCKER_USERNAME         # For Docker Hub
 DOCKER_PASSWORD         # For Docker Hub
 AWS_ACCESS_KEY_ID       # For AWS deployment
 AWS_SECRET_ACCESS_KEY   # For AWS deployment
+GCP_SA_KEY             # For Google Cloud deployment
+KUBE_CONFIG            # For Kubernetes deployment
+SLACK_WEBHOOK          # For deployment notifications
 ```
 
 ## 📖 Workflow Details
@@ -190,7 +196,7 @@ Comprehensive security scanning with SBOM generation.
 
 4. **Container Scan** (20 min)
    - Trivy container scanning
-   - Grype vulnerability detection
+   - Filesystem vulnerability detection
    - SARIF results to Security tab
 
 5. **SBOM Generation** (15 min)

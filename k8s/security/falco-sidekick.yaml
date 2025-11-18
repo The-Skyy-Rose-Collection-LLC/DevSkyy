@@ -1,0 +1,164 @@
+---
+# DevSkyy Platform - Falco Sidekick Configuration
+# Routes Falco alerts to external systems (Slack, PagerDuty, etc.)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-sidekick-config
+  namespace: falco
+  labels:
+    app: falco-sidekick
+data:
+  config.yaml: |
+    # Slack configuration (optional)
+    slack:
+      webhookurl: ""  # Replace with your Slack webhook URL
+      channel: "#security-alerts"
+      username: "Falco"
+      icon: ":falco:"
+      minimumpriority: "warning"
+
+    # PagerDuty configuration (optional)
+    pagerduty:
+      routingkey: ""  # Replace with your PagerDuty routing key
+      minimumpriority: "critical"
+
+    # Webhook configuration (generic)
+    webhook:
+      address: ""  # Replace with your webhook endpoint
+      minimumpriority: "warning"
+
+    # Output formatting
+    customfields:
+      environment: "production"
+      cluster: "devskyy"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falco-sidekick
+  namespace: falco
+  labels:
+    app: falco-sidekick
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: falco-sidekick
+  template:
+    metadata:
+      labels:
+        app: falco-sidekick
+    spec:
+      serviceAccountName: falco-sidekick
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1234
+        fsGroup: 1234
+
+      containers:
+      - name: falco-sidekick
+        image: falcosecurity/falco-sidekick:2.28.0
+        imagePullPolicy: IfNotPresent
+
+        env:
+        - name: SLACK_WEBHOOKURL
+          valueFrom:
+            secretKeyRef:
+              name: falco-sidekick-secrets
+              key: slack-webhook-url
+              optional: true
+
+        - name: PAGERDUTY_ROUTINGKEY
+          valueFrom:
+            secretKeyRef:
+              name: falco-sidekick-secrets
+              key: pagerduty-routing-key
+              optional: true
+
+        ports:
+        - name: http
+          containerPort: 2801
+          protocol: TCP
+
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+
+        volumeMounts:
+        - name: config
+          mountPath: /etc/falco-sidekick
+          readOnly: true
+
+      volumes:
+      - name: config
+        configMap:
+          name: falco-sidekick-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: falco-sidekick
+  namespace: falco
+  labels:
+    app: falco-sidekick
+spec:
+  type: ClusterIP
+  selector:
+    app: falco-sidekick
+  ports:
+  - name: http
+    port: 2801
+    targetPort: http
+    protocol: TCP
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falco-sidekick
+  namespace: falco
+  labels:
+    app: falco-sidekick
+automountServiceAccountToken: true
+
+---
+# Secret template for Falco Sidekick credentials
+# IMPORTANT: Replace with sealed-secrets or external secrets operator
+apiVersion: v1
+kind: Secret
+metadata:
+  name: falco-sidekick-secrets
+  namespace: falco
+  labels:
+    app: falco-sidekick
+type: Opaque
+stringData:
+  slack-webhook-url: "REPLACE_WITH_SLACK_WEBHOOK_URL"
+  pagerduty-routing-key: "REPLACE_WITH_PAGERDUTY_ROUTING_KEY"
