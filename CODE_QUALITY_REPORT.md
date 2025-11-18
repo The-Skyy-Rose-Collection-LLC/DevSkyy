@@ -411,7 +411,7 @@ logger.info("Processing item", item=item, extra={"category": LogCategory.BUSINES
    - Command:
      ```python
      # Replace constr(...) with constr[...]
-     sed -i 's/constr(/constr[/g; s/max_length=/max_length=/g' api/validation_models.py
+     sed -i -E 's/constr\(([^()]*)\)/constr[\1]/g' api/validation_models.py
      ```
 
 2. **Fix Hardcoded Secrets (14 instances)**
