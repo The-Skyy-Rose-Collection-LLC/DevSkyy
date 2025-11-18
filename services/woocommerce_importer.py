@@ -319,8 +319,11 @@ class WooCommerceImporterService:
         try:
             import httpx
 
+            # HTTP timeout for external API requests (per enterprise best practices)
+            HTTP_TIMEOUT = 15  # seconds
+
             url = f"https://api.telegram.org/bot{self.telegram_bot_token}/sendMessage"
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
                 response = await client.post(url, json={"chat_id": self.telegram_chat_id, "text": message})
                 response.raise_for_status()
 

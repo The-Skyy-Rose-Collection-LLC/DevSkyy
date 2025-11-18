@@ -511,6 +511,9 @@ class ClickHouseManager:
 
     async def create_tables(self) -> bool:
         """Create fashion analytics tables"""
+        if not self.client:
+            raise Exception("Database not connected")
+
         tables = [
             """
             CREATE TABLE IF NOT EXISTS user_events (

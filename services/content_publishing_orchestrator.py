@@ -35,6 +35,9 @@ from config.wordpress_credentials import (
 
 logger = logging.getLogger(__name__)
 
+# HTTP timeout for external API requests (per enterprise best practices)
+HTTP_TIMEOUT = 15  # seconds
+
 
 class PexelsImageService:
     """
@@ -80,7 +83,7 @@ class PexelsImageService:
             Image data with URL and metadata
         """
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
                 params = {
                     "query": query,
                     "orientation": orientation,
@@ -123,7 +126,7 @@ class PexelsImageService:
             Image bytes or None
         """
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
                 response = await client.get(image_url)
                 response.raise_for_status()
                 return response.content
@@ -233,7 +236,7 @@ class TelegramNotificationService:
             True if successful
         """
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=HTTP_TIMEOUT) as client:
                 response = await client.post(
                     f"{self.api_url}/sendMessage",
                     json={"chat_id": self.chat_id, "text": message, "parse_mode": "HTML"},
