@@ -22,7 +22,8 @@ jobs:
         id: changelog
         run: |
           echo "## What's Changed" > RELEASE_NOTES.md
-          git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> RELEASE_NOTES.md
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          git log --pretty=format:"- %s (%h)" ${PREV_TAG}..HEAD >> RELEASE_NOTES.md
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
