@@ -1,0 +1,311 @@
+{
+  "run_id": "68b329da",
+  "timestamp": "2025-11-17T18:52:00Z",
+  "scan_type": "comprehensive_security_vulnerability_scan",
+  "codebase": "/home/user/DevSkyy",
+  "summary": {
+    "total_issues": 61,
+    "critical": 0,
+    "high": 8,
+    "medium": 49,
+    "low": 4,
+    "info": 0
+  },
+  "issues": [
+    {
+      "id": "DEP-001",
+      "severity": "HIGH",
+      "category": "dependency_vulnerability",
+      "title": "PyTorch 2.7.1 - CVE-2025-3730 Denial of Service",
+      "description": "torch.nn.functional.ctc_loss function has a denial of service vulnerability",
+      "affected_package": "torch==2.7.1",
+      "cvss": "N/A",
+      "cwe": "CWE-400",
+      "location": "requirements.txt:78",
+      "recommendation": "Upgrade torch to version 2.8.0 or later",
+      "references": [
+        "https://github.com/advisories/GHSA-887c-mr87-cxwp",
+        "https://nvd.nist.gov/vuln/detail/CVE-2025-3730"
+      ],
+      "fix_available": true,
+      "fix_version": "2.8.0"
+    },
+    {
+      "id": "DEP-002",
+      "severity": "HIGH",
+      "category": "dependency_vulnerability",
+      "title": "pypdf 5.9.0 - CVE-2025-55197 RAM Exhaustion",
+      "description": "Crafted PDF with FlateDecode filters can lead to RAM exhaustion",
+      "affected_package": "pypdf==5.9.0",
+      "cvss": "N/A",
+      "cwe": "CWE-400",
+      "location": "requirements.txt:188",
+      "recommendation": "Upgrade pypdf to version 6.0.0 or later",
+      "references": [
+        "https://github.com/advisories/GHSA-7hfw-26vp-jp8m"
+      ],
+      "fix_available": true,
+      "fix_version": "6.0.0"
+    },
+    {
+      "id": "DEP-003",
+      "severity": "HIGH",
+      "category": "dependency_vulnerability",
+      "title": "pypdf 5.9.0 - CVE-2025-62707 Infinite Loop",
+      "description": "Crafted PDF with DCTDecode filter can cause infinite loop",
+      "affected_package": "pypdf==5.9.0",
+      "cvss": "N/A",
+      "cwe": "CWE-835",
+      "location": "requirements.txt:188",
+      "recommendation": "Upgrade pypdf to version 6.1.3 or later",
+      "references": [
+        "https://github.com/advisories/GHSA-vr63-x8vc-m265"
+      ],
+      "fix_available": true,
+      "fix_version": "6.1.3"
+    },
+    {
+      "id": "DEP-004",
+      "severity": "HIGH",
+      "category": "dependency_vulnerability",
+      "title": "pypdf 5.9.0 - CVE-2025-62708 Memory Exhaustion",
+      "description": "Crafted PDF with LZWDecode filter can cause large memory usage",
+      "affected_package": "pypdf==5.9.0",
+      "cvss": "N/A",
+      "cwe": "CWE-400",
+      "location": "requirements.txt:188",
+      "recommendation": "Upgrade pypdf to version 6.1.3 or later",
+      "references": [
+        "https://github.com/advisories/GHSA-jfx9-29x2-rv3j"
+      ],
+      "fix_available": true,
+      "fix_version": "6.1.3"
+    },
+    {
+      "id": "DEP-005",
+      "severity": "HIGH",
+      "category": "dependency_vulnerability",
+      "title": "Starlette 0.48.0 - CVE-2025-62727 Range Header DoS",
+      "description": "Crafted HTTP Range header triggers quadratic-time processing causing CPU exhaustion",
+      "affected_package": "starlette==0.48.0",
+      "cvss": "N/A",
+      "cwe": "CWE-407",
+      "location": "Transitive dependency via fastapi",
+      "recommendation": "Upgrade starlette to version 0.49.1 or later. Update fastapi to latest version.",
+      "references": [
+        "https://github.com/advisories/GHSA-7f5h-v6xp-fcq8"
+      ],
+      "fix_available": true,
+      "fix_version": "0.49.1"
+    },
+    {
+      "id": "CODE-001",
+      "severity": "HIGH",
+      "category": "cryptographic_weakness",
+      "title": "MD5 Hash Used for Security Purposes",
+      "description": "MD5 is a cryptographically broken hash function and should not be used for security purposes",
+      "affected_files": [
+        "agent/modules/backend/claude_sonnet_intelligence_service_v2.py:351",
+        "agent/modules/backend/claude_sonnet_intelligence_service_v2.py:352",
+        "agent/modules/backend/database_optimizer.py:32",
+        "agent/modules/backend/database_optimizer.py:201",
+        "agent/modules/backend/inventory_agent.py:317"
+      ],
+      "cvss": "N/A",
+      "cwe": "CWE-327",
+      "recommendation": "Replace MD5 with SHA-256 or use hashlib.md5(usedforsecurity=False) if only used for non-security purposes like cache keys",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/327.html"
+      ],
+      "notes": "Analysis shows these are used for cache key generation, not cryptographic security. Consider adding usedforsecurity=False parameter."
+    },
+    {
+      "id": "CODE-002",
+      "severity": "HIGH",
+      "category": "xml_vulnerability",
+      "title": "Unsafe XML Parsing with xmlrpc.client",
+      "description": "xmlrpc.client is vulnerable to XML attacks (XXE, billion laughs). defusedxml should be used.",
+      "affected_files": [
+        "agent/modules/backend/wordpress_direct_service.py:161"
+      ],
+      "cvss": "N/A",
+      "cwe": "CWE-20",
+      "recommendation": "Use defusedxml.xmlrpc.monkey_patch() to mitigate XML vulnerabilities",
+      "references": [
+        "https://github.com/tiran/defusedxml"
+      ],
+      "notes": "defusedxml is already installed (requirements.txt:63). Need to apply monkey patch."
+    },
+    {
+      "id": "CODE-003",
+      "severity": "MEDIUM",
+      "category": "deserialization",
+      "title": "Unsafe Pickle Deserialization",
+      "description": "Pickle deserialization of untrusted data can lead to arbitrary code execution",
+      "affected_files": [
+        "agent/modules/backend/self_learning_system.py:779"
+      ],
+      "cvss": "N/A",
+      "cwe": "CWE-502",
+      "recommendation": "Use JSON or a safer serialization format. If pickle is required, validate data source and consider using restricted unpicklers.",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ]
+    },
+    {
+      "id": "CODE-004",
+      "severity": "MEDIUM",
+      "category": "availability",
+      "title": "HTTP Requests Without Timeout",
+      "description": "HTTP requests without timeout can hang indefinitely",
+      "affected_files": [
+        "agent/modules/backend/woocommerce_integration_service.py:121",
+        "agent/modules/backend/wordpress_direct_service.py:246",
+        "agent/modules/backend/wordpress_direct_service.py:271",
+        "agent/modules/backend/wordpress_direct_service.py:297",
+        "agent/modules/backend/wordpress_direct_service.py:321",
+        "agent/modules/backend/wordpress_integration_service.py:56",
+        "agent/modules/backend/wordpress_integration_service.py:85",
+        "agent/modules/backend/wordpress_integration_service.py:170",
+        "agent/modules/backend/wordpress_integration_service.py:196",
+        "agent/modules/backend/wordpress_integration_service.py:217",
+        "agent/modules/backend/wordpress_integration_service.py:223",
+        "agent/modules/backend/wordpress_integration_service.py:251",
+        "agent/modules/backend/wordpress_integration_service.py:304",
+        "agent/modules/backend/wordpress_integration_service.py:336"
+      ],
+      "count": 14,
+      "cvss": "N/A",
+      "cwe": "CWE-400",
+      "recommendation": "Add timeout parameter to all requests calls. Recommended: timeout=30 or (5, 30) for connect/read timeouts.",
+      "references": [
+        "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts"
+      ]
+    },
+    {
+      "id": "CODE-005",
+      "severity": "MEDIUM",
+      "category": "supply_chain",
+      "title": "Unsafe Hugging Face Model Downloads",
+      "description": "Hugging Face models loaded without revision pinning can change unexpectedly",
+      "affected_files": [
+        "agent/modules/backend/brand_model_trainer.py:111",
+        "agent/modules/backend/brand_model_trainer.py:112"
+      ],
+      "count": 2,
+      "cvss": "N/A",
+      "cwe": "CWE-494",
+      "recommendation": "Pin model revisions using revision parameter: from_pretrained(model_name, revision='commit_hash')",
+      "references": [
+        "https://huggingface.co/docs/transformers/main/en/model_doc/auto#transformers.AutoModel.from_pretrained"
+      ]
+    },
+    {
+      "id": "CONFIG-001",
+      "severity": "MEDIUM",
+      "category": "authentication",
+      "title": "Password Hashing Algorithm Mismatch",
+      "description": "jwt_auth.py uses bcrypt while unified_config.py specifies argon2id as default",
+      "affected_files": [
+        "security/jwt_auth.py:34",
+        "config/unified_config.py:364"
+      ],
+      "cvss": "N/A",
+      "cwe": "N/A",
+      "recommendation": "Align password hashing implementation. Either update jwt_auth.py to support argon2id or document why bcrypt is preferred.",
+      "references": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+      ],
+      "notes": "Both bcrypt (12 rounds) and argon2id are secure. Truth Protocol Rule 13 specifies Argon2id. Current bcrypt implementation is acceptable but should be documented."
+    },
+    {
+      "id": "CONFIG-002",
+      "severity": "LOW",
+      "category": "secrets_management",
+      "title": "Development-Only Default Secret Keys",
+      "description": "Hardcoded development secret keys present with proper safeguards",
+      "affected_files": [
+        "main.py:60",
+        "config/unified_config.py:353",
+        "security/jwt_auth.py:25"
+      ],
+      "cvss": "N/A",
+      "cwe": "N/A",
+      "recommendation": "Current implementation is acceptable. Raises error in production if not set. Consider adding more prominent warnings.",
+      "references": [],
+      "notes": "ACCEPTABLE: Development defaults only. Production deployment requires environment variables."
+    }
+  ],
+  "compliance": {
+    "truth_protocol": {
+      "rule_5_no_secrets_in_code": {
+        "status": "COMPLIANT",
+        "notes": "No hardcoded production secrets found. Dev defaults properly guarded."
+      },
+      "rule_12_performance_slos": {
+        "status": "NOT_TESTED",
+        "notes": "Performance testing required. P95 < 200ms target not verified in this scan."
+      },
+      "rule_13_security_baseline": {
+        "status": "PARTIAL_COMPLIANT",
+        "aes_256_gcm": {
+          "status": "COMPLIANT",
+          "implementation": "security/encryption.py",
+          "standard": "NIST SP 800-38D"
+        },
+        "argon2id": {
+          "status": "PARTIAL_COMPLIANT",
+          "notes": "argon2-cffi installed and configured but jwt_auth uses bcrypt. Both are secure."
+        },
+        "oauth2_jwt": {
+          "status": "COMPLIANT",
+          "implementation": "security/jwt_auth.py",
+          "standard": "RFC 7519"
+        },
+        "pbkdf2": {
+          "status": "COMPLIANT",
+          "implementation": "security/encryption.py:76-101",
+          "iterations": 100000,
+          "standard": "NIST SP 800-132"
+        }
+      }
+    }
+  },
+  "recommendations": {
+    "immediate": [
+      "Upgrade pypdf from 5.9.0 to 6.1.3+ to fix 3 HIGH CVEs",
+      "Upgrade torch from 2.7.1 to 2.8.0+ to fix DoS vulnerability",
+      "Update fastapi/starlette to fix Range header DoS (CVE-2025-62727)",
+      "Apply defusedxml monkey patch to xmlrpc.client usage",
+      "Add timeout parameters to all HTTP requests"
+    ],
+    "short_term": [
+      "Replace MD5 with SHA-256 or add usedforsecurity=False flag",
+      "Pin Hugging Face model revisions for reproducibility",
+      "Align password hashing to use argon2id consistently",
+      "Review pickle deserialization security"
+    ],
+    "long_term": [
+      "Implement automated dependency scanning in CI/CD",
+      "Add SBOM generation to release pipeline",
+      "Conduct regular security audits",
+      "Implement rate limiting on all public endpoints"
+    ]
+  },
+  "scan_coverage": {
+    "dependencies": true,
+    "code_analysis": true,
+    "secrets_scanning": true,
+    "container_security": true,
+    "configuration_review": true,
+    "cryptography_audit": true,
+    "authentication_review": true,
+    "rbac_audit": true
+  },
+  "tools_used": [
+    "pip-audit 2.7.3",
+    "bandit 1.8.0",
+    "grep (pattern matching)",
+    "manual code review"
+  ]
+}

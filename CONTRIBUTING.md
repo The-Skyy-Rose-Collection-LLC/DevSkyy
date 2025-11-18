@@ -1,10 +1,19 @@
-# Contributing to DevSkyy
+# Contributing to DevSkyy Enterprise Platform
 
 Thank you for your interest in contributing to DevSkyy! This document provides guidelines and information for contributors.
 
+**Status**: Enterprise-Ready | **Version**: 5.2.0 | **Truth Protocol**: All 15 Rules Enforced
+
 ## 🎯 Overview
 
-DevSkyy is a luxury fashion AI platform with a multi-AI orchestration system. We welcome contributions that enhance the platform's capabilities, improve code quality, or expand documentation.
+DevSkyy is an enterprise-grade AI-powered platform with multi-agent orchestration, advanced ML capabilities, and strict Truth Protocol compliance. We welcome contributions that enhance the platform's capabilities, improve code quality, security, and performance.
+
+### Key Principles
+
+1. **Truth Protocol Compliance**: All 15 rules must be followed
+2. **Enterprise Quality**: 90%+ test coverage, P95 < 200ms latency
+3. **Security First**: No shortcuts on security, encryption, or authentication
+4. **Zero Placeholders**: Every line must execute or be removed
 
 ## 🚀 Getting Started
 
