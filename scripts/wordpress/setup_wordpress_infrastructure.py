@@ -68,7 +68,7 @@ class WordPressInfrastructureSetup:
             logger.info("✅ WordPress OAuth 2.0 credentials configured")
         else:
             missing = [var for var in required_oauth if not os.getenv(var)]
-            logger.warning(f"⚠️  Missing OAuth credentials: {', '.join(missing)}")
+            logger.warning("⚠️  Missing one or more required WordPress OAuth credentials.")
 
         return all_configured
 

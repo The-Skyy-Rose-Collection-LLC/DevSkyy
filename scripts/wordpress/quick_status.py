@@ -44,7 +44,8 @@ for key, value in oauth_vars.items():
 
         print(f"   ✅ {key}: {display_value}")
     else:
-        print(f"   ❌ {key}: Not configured")
+        if "SECRET" not in key and "PASSWORD" not in key:
+            print(f"   ❌ {key}: Not configured")
 
 # Check Basic Auth credentials
 print("\n📊 WordPress Basic Auth Credentials (Skyy Rose Collection):")
@@ -67,7 +68,8 @@ for key, value in basic_vars.items():
 
         print(f"   ✅ {key}: {display_value}")
     else:
-        print(f"   ❌ {key}: Not configured")
+        if "PASSWORD" not in key:
+            print(f"   ❌ {key}: Not configured")
 
 # Summary
 print("\n" + "=" * 80)
