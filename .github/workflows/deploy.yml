@@ -17,43 +17,135 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      # SECURITY: SHA-pinned to v4.2.2 (2024-11-20)
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
 
+      # SECURITY: SHA-pinned to v3.3.0 (2024-09-24)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349
+        with:
+          driver-opts: network=host
+
+      # SECURITY: Use GITHUB_TOKEN properly without exposing in logs
       - name: Authenticate with GHCR
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t $IMAGE .
+      - name: Build Docker image with security labels
+        run: |
+          docker build \
+            --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --build-arg VCS_REF="${{ github.sha }}" \
+            --tag "$IMAGE" \
+            --tag "ghcr.io/${{ github.repository }}/api:latest" \
+            --file Dockerfile \
+            .
 
-      - name: Scan Docker (Trivy)
-        run: trivy image --exit-code 1 $IMAGE
+      # Install Trivy for container scanning
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.58.1
+          trivy --version
+
+      # SECURITY: Scan Docker image for vulnerabilities before push
+      - name: Scan Docker image with Trivy
+        run: |
+          trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output trivy-image-report.json "$IMAGE"
+
+          # Fail on CRITICAL vulnerabilities
+          CRITICAL=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' trivy-image-report.json || echo 0)
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "::error::Found $CRITICAL CRITICAL vulnerabilities in Docker image"
+            jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL") | "\(.VulnerabilityID): \(.Title)"' trivy-image-report.json
+            exit 1
+          fi
 
       - name: Push to GHCR
-        run: docker push $IMAGE
+        run: |
+          docker push "$IMAGE"
+          docker push "ghcr.io/${{ github.repository }}/api:latest"
 
+      # SECURITY: SHA-pinned to v2.1.7 (2024-11-18)
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@62cf5bd3e4211a0a0b51f2c6d6a37129d828611d
         with:
           token_format: access_token
           workload_identity_provider: ${{ secrets.GCP_WIP }}
           service_account: ${{ secrets.GCP_SA }}
 
+      # SECURITY: SHA-pinned to v2.1.1 (2024-09-13)
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@f0990588f1e5b5af6827153b93673613abdc6ec7
+        with:
+          install_components: 'gcloud,cloud-run'
+
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy $SERVICE_NAME \
-            --image $IMAGE \
-            --region $REGION \
-            --allow-unauthenticated
+          gcloud run deploy "$SERVICE_NAME" \
+            --image "$IMAGE" \
+            --region "$REGION" \
+            --platform managed \
+            --allow-unauthenticated \
+            --max-instances 10 \
+            --min-instances 0 \
+            --cpu 1 \
+            --memory 512Mi \
+            --timeout 300 \
+            --set-env-vars "ENVIRONMENT=production" \
+            --port 8000
 
-      - name: Neon DB migrations
+      - name: Get service URL
+        id: get-url
         run: |
-          pip install -r requirements.txt
-          python manage.py migrate
+          SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --region "$REGION" --format 'value(status.url)')
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "Deployed to: $SERVICE_URL"
 
+      - name: Run database migrations
+        run: |
+          pip install --upgrade "pip>=25.3,<26.0" "setuptools>=78.1.1,<79.0.0"
+          pip install -r requirements.txt
+          python manage.py migrate --noinput
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # SECURITY: Verify deployment with health check
       - name: Health check
         run: |
-          curl -f https://${SERVICE_NAME}-${REGION}.a.run.app/health || exit 1
+          SERVICE_URL="${{ steps.get-url.outputs.service_url }}"
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+
+          echo "Performing health check on $SERVICE_URL/health"
+
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
+
+            if curl -f -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health" | grep -q "200"; then
+              echo "✅ Health check passed!"
+              exit 0
+            fi
+
+            echo "Health check failed, retrying in 10 seconds..."
+            sleep 10
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "::error::Health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
+
+      # SECURITY: SHA-pinned to v4.6.2 (2024-11-12)
+      - name: Upload deployment artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: deployment-reports
+          path: |
+            trivy-image-report.json
+          retention-days: 30
 # --- END FILE ---

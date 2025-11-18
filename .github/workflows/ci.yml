@@ -7,32 +7,53 @@ on:
     branches: [main, develop]
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 3 * * *"  # Daily at 3 AM UTC
 
+# SECURITY: Minimal permissions - grant only what's needed
 permissions:
   contents: read
   id-token: write
   packages: write
   security-events: write
 
+# SECURITY: Cancel in-progress runs to save resources
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
+    name: Test Suite
     uses: ./.github/workflows/reusable-test.yml
     secrets: inherit
+    permissions:
+      contents: read
 
   quality:
+    name: Code Quality
     uses: ./.github/workflows/reusable-quality.yml
     secrets: inherit
     needs: tests
+    permissions:
+      contents: read
 
   security:
+    name: Security Scan
     uses: ./.github/workflows/reusable-security.yml
     secrets: inherit
     needs: [tests, quality]
+    permissions:
+      contents: read
+      security-events: write
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    name: Deploy to Production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     needs: [tests, quality, security]
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
 # --- END FILE ---
