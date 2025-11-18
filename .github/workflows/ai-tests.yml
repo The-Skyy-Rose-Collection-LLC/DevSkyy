@@ -1,0 +1,74 @@
+name: AI Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'agent/**'
+      - 'ml/**'
+      - 'ai_orchestration/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  agent-tests:
+    name: Agent System Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Run agent tests
+        run: pytest tests/agents/ -v --tb=short
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+  ml-tests:
+    name: ML Pipeline Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install ML dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run ML tests
+        run: pytest tests/ml/ -v --tb=short
+
+  integration-tests:
+    name: AI Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt && pip install pytest
+
+      - name: Run integration tests
+        run: pytest tests/integration/ -v --tb=short -m "not slow"

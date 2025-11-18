@@ -80,6 +80,7 @@ def validate_openai_request(
     operation_type: OperationType,
     is_consequential: bool,
     prompt: Optional[str] = None,
+    params: Optional[dict[str, Any]] = None
     params: Optional[dict[str, Any]] = None,
 ) -> tuple[bool, Optional[str]]:
     """
