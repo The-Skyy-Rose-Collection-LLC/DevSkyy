@@ -4,14 +4,15 @@ from .finance_inventory_pipeline_agent import (
     AlertType,
     Channel,
     DemandForecast,
-    finance_inventory_agent,
     FinanceInventoryPipelineAgent,
     FinancialTransaction,
     InventoryAlert,
     InventoryItem,
     InventoryStatus,
     TransactionType,
+    finance_inventory_agent,
 )
+
 
 __all__ = [
     "AlertType",

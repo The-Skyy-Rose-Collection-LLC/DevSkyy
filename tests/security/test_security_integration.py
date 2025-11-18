@@ -8,19 +8,19 @@ References:
 - OWASP Top 10: Security best practices
 """
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 from main import app
 from security.encryption import AESEncryption, KeyManager
 from security.input_validation import InputSanitizer
 from security.jwt_auth import (
+    UserRole,
     create_access_token,
     create_refresh_token,
     hash_password,
-    UserRole,
     verify_password,
     verify_token,
 )

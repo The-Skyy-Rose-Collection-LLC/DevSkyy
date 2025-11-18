@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
+
 """
 Production Configuration for The Skyy Rose Collection Platform
 """

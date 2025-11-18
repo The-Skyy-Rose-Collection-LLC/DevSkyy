@@ -3,21 +3,22 @@ Enterprise JWT Authentication System
 Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 """
 
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 import logging
 import os
-from collections import defaultdict
-from datetime import datetime, timedelta, UTC
 from typing import Any, Optional
 
-import jwt
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
     OAuth2PasswordBearer,
 )
+import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +31,17 @@ MAX_LOGIN_ATTEMPTS = 5  # Maximum failed login attempts
 LOCKOUT_DURATION_MINUTES = 15  # Account lockout duration
 TOKEN_BLACKLIST_EXPIRE_HOURS = 24  # How long to keep blacklisted tokens
 
-# Password hashing - Enhanced
+# Password hashing - Enhanced with Argon2id (Truth Protocol requirement)
+# Argon2id is primary, bcrypt for backward compatibility
 pwd_context = CryptContext(
-    schemes=["bcrypt"],
+    schemes=["argon2", "bcrypt"],  # Argon2id primary, bcrypt for legacy
     deprecated="auto",
+    # Argon2id parameters (OWASP recommendations)
+    argon2__memory_cost=65536,  # 64 MB memory
+    argon2__time_cost=3,  # 3 iterations
+    argon2__parallelism=4,  # 4 parallel threads
+    argon2__type="id",  # Use Argon2id variant (hybrid mode)
+    # Bcrypt for backward compatibility
     bcrypt__rounds=12,  # Increased rounds for better security
 )
 
@@ -652,21 +660,12 @@ class JWTManager:
 
     def create_access_token(self, user: User) -> str:
         """Create access token for user"""
-        data = {
-            "sub": user.user_id,
-            "email": user.email,
-            "role": user.role,
-            "type": "access"
-        }
+        data = {"sub": user.user_id, "email": user.email, "role": user.role, "type": "access"}
         return create_access_token(data)
 
     def create_refresh_token(self, user: User) -> str:
         """Create refresh token for user"""
-        data = {
-            "sub": user.user_id,
-            "email": user.email,
-            "type": "refresh"
-        }
+        data = {"sub": user.user_id, "email": user.email, "type": "refresh"}
         return create_refresh_token(data)
 
     def create_user_tokens(self, user: User) -> TokenResponse:

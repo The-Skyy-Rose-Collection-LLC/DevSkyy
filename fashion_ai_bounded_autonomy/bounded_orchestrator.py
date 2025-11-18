@@ -10,14 +10,15 @@ Features:
 - Emergency controls
 """
 
-import logging
 from datetime import datetime
+import logging
 from typing import Any, Optional
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import AgentOrchestrator, AgentTask, ExecutionPriority, TaskStatus
 from fashion_ai_bounded_autonomy.approval_system import ApprovalSystem, ApprovalWorkflowType
 from fashion_ai_bounded_autonomy.bounded_autonomy_wrapper import ActionRiskLevel, BoundedAutonomyWrapper
+
 
 logger = logging.getLogger(__name__)
 

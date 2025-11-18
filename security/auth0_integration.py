@@ -1,21 +1,22 @@
+from datetime import datetime, timedelta
+from functools import lru_cache
 import json
 import logging
 import os
-from datetime import datetime, timedelta
-from functools import lru_cache
 from typing import Any, Optional
 from urllib.parse import quote_plus, urlencode
 
-import httpx
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import jwt, JWTError
+import httpx
+from jose import JWTError, jwt
 from jose.backends import RSAKey
 from pydantic import BaseModel
 
 from security.log_sanitizer import sanitize_for_log
+
 
 """
 Auth0 Integration for DevSkyy Enterprise Platform

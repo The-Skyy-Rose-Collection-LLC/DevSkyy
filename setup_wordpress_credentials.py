@@ -4,10 +4,10 @@ WordPress Credentials Setup Script for DevSkyy Platform
 Interactive script to configure WordPress credentials securely
 """
 
-import os
-import sys
 from getpass import getpass
+import os
 from pathlib import Path
+import sys
 from typing import Any
 
 import requests

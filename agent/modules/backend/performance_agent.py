@@ -1,11 +1,12 @@
+from datetime import datetime
 import json
 import logging
 import os
-import uuid
-from datetime import datetime
 from typing import Any
+import uuid
 
 import openai
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -137,6 +138,7 @@ class PerformanceAgent:
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
             from config.unified_config import get_config
+
             config = get_config()
             is_consequential = config.ai.openai_is_consequential
             default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}

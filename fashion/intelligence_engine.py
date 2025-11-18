@@ -4,12 +4,13 @@ Comprehensive knowledge base and intelligence system for fashion industry contex
 Integrated into all agents for fashion-specific insights and decision making
 """
 
-import logging
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
+import logging
 from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 

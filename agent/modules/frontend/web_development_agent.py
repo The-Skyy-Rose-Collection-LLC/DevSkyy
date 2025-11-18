@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 import re
-import uuid
-from datetime import datetime
 from typing import Any
+import uuid
 
 from .telemetry import Telemetry
+
 
 logger = logging.getLogger(__name__)
 

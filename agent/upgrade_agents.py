@@ -1,6 +1,7 @@
 import logging
-import re
 from pathlib import Path
+import re
+
 
 """
 Agent Upgrade Script

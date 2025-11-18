@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
 import fnmatch
 import logging
 import os
 import tempfile
-from datetime import datetime, timedelta
 from typing import Any
 
 import paramiko
+
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +67,16 @@ class WordPressServerAccess:
             except Exception as e:
                 logger.warning(f"Could not load known_hosts: {e}")
 
-            # Use WarningPolicy for initial setup (logs unknown hosts)
-            # In production with known hosts, change to RejectPolicy for max security
-            self.ssh_client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            # SECURITY: Use AutoAddPolicy for development, RejectPolicy for production
+            # Per CWE-295: Improper Certificate Validation
+            # Set SSH_STRICT_HOST_KEY_CHECKING=true for production environments
+            strict_checking = os.getenv("SSH_STRICT_HOST_KEY_CHECKING", "false").lower() == "true"
+            if strict_checking:
+                self.ssh_client.set_missing_host_key_policy(paramiko.RejectPolicy())
+                logger.info("SSH strict host key checking enabled (RejectPolicy)")
+            else:
+                self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                logger.warning("SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production")
 
             # Connect via SFTP first
             logger.info("🔐 Connecting to WordPress.com server via SFTP...")

@@ -11,6 +11,7 @@ enabling precise error handling and better debugging.
 
 from typing import Any, Optional
 
+
 # ============================================================================
 # BASE EXCEPTIONS
 # ============================================================================

@@ -22,6 +22,7 @@ from typing import Any, Optional
 
 from anthropic import Anthropic
 
+
 # Logfire for observability
 try:
     import logfire

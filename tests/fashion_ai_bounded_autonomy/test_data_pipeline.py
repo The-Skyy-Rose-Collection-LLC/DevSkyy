@@ -4,9 +4,9 @@ Tests data ingestion, validation, and processing
 """
 
 import json
+from pathlib import Path
 import shutil
 import tempfile
-from pathlib import Path
 
 import pandas as pd
 import pytest

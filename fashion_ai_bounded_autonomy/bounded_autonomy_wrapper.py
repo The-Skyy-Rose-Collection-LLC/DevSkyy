@@ -7,15 +7,16 @@ Wraps existing agents with bounded autonomy controls:
 - Deterministic execution tracking
 """
 
-import json
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import json
+import logging
 from pathlib import Path
 from typing import Any, Optional
 
 from agent.modules.base_agent import BaseAgent
+
 
 logger = logging.getLogger(__name__)
 

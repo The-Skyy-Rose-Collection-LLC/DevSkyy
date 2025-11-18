@@ -6,8 +6,9 @@ without actually executing them
 """
 
 import ast
-import sys
 from pathlib import Path
+import sys
+
 
 # Critical files to verify
 CRITICAL_FILES = [

@@ -13,18 +13,18 @@ Features:
 Truth Protocol Compliant: All implementations verified, no placeholders.
 """
 
-import os
 from collections.abc import Callable
 from datetime import datetime
 from functools import wraps
+import os
 from typing import Any, Optional
 
 from agentlightning import (
     AgentOpsTracer,
-    emit_reward,
     LitAgent,
     LLMProxy,
     OtelTracer,
+    emit_reward,
 )
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter

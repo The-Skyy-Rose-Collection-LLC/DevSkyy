@@ -1,9 +1,10 @@
-import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, Generic, Optional, TypeVar
+import uuid
 
 from pydantic import BaseModel
+
 
 """
 CQRS (Command Query Responsibility Segregation) Pattern

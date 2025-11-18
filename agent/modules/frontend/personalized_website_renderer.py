@@ -1,10 +1,11 @@
 import asyncio
+from datetime import datetime
 import logging
 import random
-from datetime import datetime
 from typing import Any, Optional
 
 from geopy.geocoders import Nominatim
+
 
 """
 Personalized Website Renderer with Dynamic Content Based on User Context

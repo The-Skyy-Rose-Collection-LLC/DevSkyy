@@ -36,19 +36,20 @@ Role Requirements by Endpoint Type:
 - System status: READ_ONLY
 """
 
-import logging
 from datetime import datetime
+import logging
 from typing import Any, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+
 # Security imports (RFC 7519 JWT + RBAC)
 try:
     from security.jwt_auth import (
+        UserRole,
         get_current_user,
         require_role,
-        UserRole,
     )
 
     SECURITY_AVAILABLE = True
@@ -100,14 +101,12 @@ except ImportError:
     logging.warning("Marketing Orchestrator not available")
 
 try:
-    from agent.modules.development.code_recovery_cursor_agent import (
-        code_recovery_agent,
-    )
     from agent.modules.development.code_recovery_cursor_agent import CodeGenerationRequest as CodeGenRequest
     from agent.modules.development.code_recovery_cursor_agent import (
         CodeLanguage,
         CodeRecoveryRequest,
         RecoveryStrategy,
+        code_recovery_agent,
     )
 
     CODE_AGENT_AVAILABLE = True
@@ -117,8 +116,8 @@ except ImportError:
 
 try:
     from agent.enterprise_workflow_engine import (
-        workflow_engine,
         WorkflowType,
+        workflow_engine,
     )
 
     WORKFLOW_ENGINE_AVAILABLE = True
@@ -128,10 +127,10 @@ except ImportError:
 
 try:
     from agent.modules.content.asset_preprocessing_pipeline import (
-        asset_pipeline,
         AssetType,
         ProcessingRequest,
         UpscaleQuality,
+        asset_pipeline,
     )
 
     ASSET_PIPELINE_AVAILABLE = True

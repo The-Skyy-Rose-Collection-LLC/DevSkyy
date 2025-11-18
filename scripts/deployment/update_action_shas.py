@@ -13,12 +13,13 @@ This script:
 
 import json
 import os
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
 from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
 
 # GitHub API base URL
 GITHUB_API = "https://api.github.com"

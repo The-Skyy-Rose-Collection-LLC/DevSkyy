@@ -1,22 +1,24 @@
 import logging
 import re
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 
+from api.rate_limiting import get_client_identifier, rate_limiter
 from api.v1.auth0_endpoints import router as auth0_router
 from api.validation_models import EnhancedRegisterRequest
 from security.jwt_auth import (
-    create_user_tokens,
-    get_current_active_user,
     TokenData,
     TokenResponse,
     User,
-    user_manager,
     UserRole,
+    create_user_tokens,
+    get_current_active_user,
+    user_manager,
     verify_token,
 )
 from security.log_sanitizer import sanitize_for_log, sanitize_user_identifier
+
 
 """
 Authentication API Endpoints
@@ -45,16 +47,33 @@ except Exception as e:
 
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
-async def register(request: EnhancedRegisterRequest):
+async def register(request_data: EnhancedRegisterRequest, request: Request):
     """
     Register a new user
 
     Creates a new user account with the specified email, username, and password.
     Default role is API_USER unless specified.
+    Rate limited: 5 requests per minute per client.
     """
+    # Rate limiting: 5 requests per minute
+    client_id = get_client_identifier(request)
+    is_allowed, rate_info = rate_limiter.is_allowed(client_id, max_requests=5, window_seconds=60)
+
+    if not is_allowed:
+        logger.warning(f"Rate limit exceeded for registration: {client_id}")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many registration attempts. Please try again later.",
+            headers={
+                "X-RateLimit-Limit": str(rate_info["limit"]),
+                "X-RateLimit-Remaining": str(rate_info["remaining"]),
+                "X-RateLimit-Reset": str(rate_info["reset"]),
+            },
+        )
+
     try:
         # Check if user already exists
-        existing_user = user_manager.get_user_by_email(request.email)
+        existing_user = user_manager.get_user_by_email(request_data.email)
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -63,10 +82,10 @@ async def register(request: EnhancedRegisterRequest):
 
         # Create user with enhanced validation
         user = user_manager.create_user(
-            email=request.email,
-            username=request.username,
-            password=request.password,
-            role=request.role,
+            email=request_data.email,
+            username=request_data.username,
+            password=request_data.password,
+            role=request_data.role,
         )
 
         # Log security event
@@ -89,13 +108,30 @@ async def register(request: EnhancedRegisterRequest):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Login and get access token
 
     Uses OAuth2 password flow. Provide username/email and password.
     Returns access token and refresh token.
+    Rate limited: 5 requests per minute per client.
     """
+    # Rate limiting: 5 requests per minute (Truth Protocol requirement)
+    client_id = get_client_identifier(request)
+    is_allowed, rate_info = rate_limiter.is_allowed(client_id, max_requests=5, window_seconds=60)
+
+    if not is_allowed:
+        logger.warning(f"Rate limit exceeded for login: {client_id}")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many login attempts. Please try again later.",
+            headers={
+                "X-RateLimit-Limit": str(rate_info["limit"]),
+                "X-RateLimit-Remaining": str(rate_info["remaining"]),
+                "X-RateLimit-Reset": str(rate_info["reset"]),
+            },
+        )
+
     try:
         # Authenticate user with username/email and password
         user = user_manager.authenticate_user(form_data.username, form_data.password)
@@ -134,12 +170,29 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh_token(refresh_token: str):
+async def refresh_token(refresh_token: str, request: Request):
     """
     Refresh access token using refresh token
 
     Provide refresh token to get a new access token.
+    Rate limited: 10 requests per minute per client.
     """
+    # Rate limiting: 10 requests per minute (more lenient for token refresh)
+    client_id = get_client_identifier(request)
+    is_allowed, rate_info = rate_limiter.is_allowed(client_id, max_requests=10, window_seconds=60)
+
+    if not is_allowed:
+        logger.warning(f"Rate limit exceeded for token refresh: {client_id}")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many token refresh attempts. Please try again later.",
+            headers={
+                "X-RateLimit-Limit": str(rate_info["limit"]),
+                "X-RateLimit-Remaining": str(rate_info["remaining"]),
+                "X-RateLimit-Reset": str(rate_info["reset"]),
+            },
+        )
+
     try:
         # Verify refresh token
         token_data = verify_token(refresh_token, token_type="refresh")

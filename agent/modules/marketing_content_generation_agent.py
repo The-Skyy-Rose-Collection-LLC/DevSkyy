@@ -11,13 +11,14 @@ This agent specializes in:
 - Performance tracking and optimization
 """
 
-import logging
-import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import logging
+import os
 from typing import Any
 
 import openai
+
 
 logger = logging.getLogger(__name__)
 

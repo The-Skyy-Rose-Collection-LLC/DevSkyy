@@ -20,7 +20,8 @@ from typing import Any, Optional
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
-from services.mcp_client import get_mcp_client, MCPToolClient
+from services.mcp_client import MCPToolClient, get_mcp_client
+
 
 # Logfire for observability
 try:

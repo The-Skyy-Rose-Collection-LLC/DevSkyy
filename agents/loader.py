@@ -7,9 +7,9 @@ Implements caching for performance (MCP efficiency pattern).
 Truth Protocol: Pydantic validation, no placeholders, explicit error handling.
 """
 
-import json
 from dataclasses import dataclass, field
 from datetime import datetime
+import json
 from pathlib import Path
 from typing import Any, Optional
 

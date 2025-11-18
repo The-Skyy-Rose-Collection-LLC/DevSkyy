@@ -15,9 +15,10 @@ import os
 import subprocess
 from typing import Any, Optional
 
-import httpx
 from fastapi import FastAPI
+import httpx
 from pydantic import BaseModel, Field
+
 
 # =============================================================================
 # CONFIGURATION

@@ -7,12 +7,13 @@ Author: DevSkyy Enterprise Team
 Date: October 26, 2025
 """
 
-import logging
 from datetime import datetime
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from jwt_auth import create_access_token, create_refresh_token, get_current_user, RefreshTokenRequest, settings
+from jwt_auth import RefreshTokenRequest, create_access_token, create_refresh_token, get_current_user, settings
 from pydantic import BaseModel, EmailStr
+
 
 logger = logging.getLogger(__name__)
 

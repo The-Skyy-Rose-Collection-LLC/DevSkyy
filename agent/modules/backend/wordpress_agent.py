@@ -5,6 +5,7 @@ from typing import Any
 
 import openai
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,6 +31,7 @@ class WordPressAgent:
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
             from config.unified_config import get_config
+
             config = get_config()
             is_consequential = config.ai.openai_is_consequential
             default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}

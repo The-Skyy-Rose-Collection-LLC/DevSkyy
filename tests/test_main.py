@@ -1,7 +1,7 @@
 import importlib
+from pathlib import Path
 import sys
 import types
-from pathlib import Path
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient

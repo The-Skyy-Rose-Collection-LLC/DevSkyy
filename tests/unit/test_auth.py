@@ -5,9 +5,9 @@ Tests for enhanced JWT authentication, validation, and security features
 
 from unittest.mock import Mock, patch
 
-import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+import pytest
 
 from api.validation_models import EnhancedRegisterRequest
 from main import app

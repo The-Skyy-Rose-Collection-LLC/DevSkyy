@@ -15,13 +15,14 @@ Per Truth Protocol Rule #11: Verified languages - Python 3.11.* only
 
 import logging
 import os
-import secrets
 from pathlib import Path
+import secrets
 from typing import Any, Optional
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -484,7 +485,7 @@ class UnifiedConfig:
             max_consequential_per_hour=int(os.getenv("OPENAI_MAX_CONSEQUENTIAL_PER_HOUR", 100)),
             enable_circuit_breaker=os.getenv("OPENAI_ENABLE_CIRCUIT_BREAKER", "true").lower() == "true",
             enable_audit_logging=os.getenv("OPENAI_ENABLE_AUDIT_LOGGING", "true").lower() == "true",
-            enforce_production_safeguards=os.getenv("OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS", "true").lower() == "true"
+            enforce_production_safeguards=os.getenv("OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS", "true").lower() == "true",
         )
 
     def is_production(self) -> bool:

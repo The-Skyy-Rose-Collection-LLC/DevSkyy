@@ -1,10 +1,11 @@
+from datetime import datetime
 import logging
 import re
-from datetime import datetime
 from typing import Any, Optional
 
-import numpy as np
 from anthropic import Anthropic
+import numpy as np
+
 
 """
 Product Manager

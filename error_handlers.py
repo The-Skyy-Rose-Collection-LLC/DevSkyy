@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 
 from core.logging import get_logger
 
+
 logger = get_logger(__name__)
 
 

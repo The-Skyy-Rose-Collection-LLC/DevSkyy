@@ -1,7 +1,6 @@
 """Content generation agents."""
 
 from .asset_preprocessing_pipeline import (
-    asset_pipeline,
     AssetMetadata,
     AssetPreprocessingPipeline,
     AssetType,
@@ -9,6 +8,7 @@ from .asset_preprocessing_pipeline import (
     ProcessingResult,
     ProcessingStage,
     UpscaleQuality,
+    asset_pipeline,
 )
 from .virtual_tryon_huggingface_agent import (
     BodyType,
@@ -18,8 +18,8 @@ from .virtual_tryon_huggingface_agent import (
     PoseType,
     TryOnRequest,
     TryOnResult,
-    virtual_tryon_agent,
     VirtualTryOnHuggingFaceAgent,
+    virtual_tryon_agent,
 )
 from .visual_content_generation_agent import (
     ContentProvider,
@@ -27,9 +27,10 @@ from .visual_content_generation_agent import (
     GenerationRequest,
     GenerationResult,
     StylePreset,
-    visual_content_agent,
     VisualContentGenerationAgent,
+    visual_content_agent,
 )
+
 
 __all__ = [
     "AssetMetadata",

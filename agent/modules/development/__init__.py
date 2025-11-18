@@ -1,7 +1,6 @@
 """Code development, generation, and recovery agents."""
 
 from .code_recovery_cursor_agent import (
-    code_recovery_agent,
     CodeGenerationRequest,
     CodeGenerationResult,
     CodeLanguage,
@@ -12,7 +11,9 @@ from .code_recovery_cursor_agent import (
     RecoveryStrategy,
     WebScrapingRequest,
     WebScrapingResult,
+    code_recovery_agent,
 )
+
 
 __all__ = [
     "CodeGenerationRequest",

@@ -3,24 +3,25 @@ DevSkyy Enterprise Logging - Truth Protocol Aligned
 Unified logging with structlog, correlation IDs, security, and performance tracking
 """
 
+from contextlib import contextmanager
+from contextvars import ContextVar
+from datetime import datetime
+from enum import Enum
 import json
 import logging
 import logging.config
 import logging.handlers
 import os
+from pathlib import Path
 import re
 import sys
 import traceback
-import uuid
-from contextlib import contextmanager
-from contextvars import ContextVar
-from datetime import datetime
-from enum import Enum
-from pathlib import Path
 from typing import Any, Optional
+import uuid
 
 import structlog
 from structlog.stdlib import LoggerFactory
+
 
 # =============================================================================
 # CORRELATION ID MANAGEMENT (Thread-safe)
@@ -73,9 +74,7 @@ def redact_sensitive_data(data: Any) -> Any:
     elif isinstance(data, dict):
         return {
             k: (
-                "***REDACTED***"
-                if any(field in k.lower() for field in SENSITIVE_FIELDS)
-                else redact_sensitive_data(v)
+                "***REDACTED***" if any(field in k.lower() for field in SENSITIVE_FIELDS) else redact_sensitive_data(v)
             )
             for k, v in data.items()
         }
@@ -484,7 +483,9 @@ def log_to_error_ledger(error_type: str, error_message: str, context: dict = Non
     with open(ledger_file, "a") as f:
         f.write(json.dumps(error_entry) + "\n")
 
-    get_logger("error_ledger").error("error_recorded", error_type=error_type, error_message=error_message, **context or {})
+    get_logger("error_ledger").error(
+        "error_recorded", error_type=error_type, error_message=error_message, **context or {}
+    )
 
 
 # =============================================================================

@@ -1,11 +1,12 @@
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
 from typing import Any
 
 import schedule
+
 
 logger = logging.getLogger(__name__)
 

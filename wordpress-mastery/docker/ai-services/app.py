@@ -17,10 +17,6 @@ from datetime import datetime
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from utils.cache import CacheManager
-from utils.logger import setup_logger
-from utils.security import validate_request, verify_api_key
-
 from services.customer_segmentation import CustomerSegmentation
 from services.dynamic_pricing import DynamicPricing
 from services.media_optimizer import MediaOptimizer
@@ -28,6 +24,10 @@ from services.media_optimizer import MediaOptimizer
 # Import AI service modules
 from services.product_analyzer import ProductAnalyzer
 from services.recommendation_engine import RecommendationEngine
+from utils.cache import CacheManager
+from utils.logger import setup_logger
+from utils.security import validate_request, verify_api_key
+
 
 # Initialize Flask app
 app = Flask(__name__)

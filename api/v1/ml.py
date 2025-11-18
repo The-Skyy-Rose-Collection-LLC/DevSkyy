@@ -1,13 +1,14 @@
 import logging
 from typing import Any
 
-import numpy as np
-import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
 from fastapi import APIRouter, Depends, HTTPException
+import numpy as np
 from pydantic import BaseModel, Field
+import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
 
-from ml import explainer, model_registry, ModelStage, redis_cache
-from security.jwt_auth import get_current_active_user, require_developer, TokenData
+from ml import ModelStage, explainer, model_registry, redis_cache
+from security.jwt_auth import TokenData, get_current_active_user, require_developer
+
 
 """
 ML Infrastructure API Endpoints

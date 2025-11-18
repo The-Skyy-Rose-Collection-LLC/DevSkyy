@@ -1,18 +1,19 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 import gc
 import json
 import logging
+from pathlib import Path
 import shutil
 import tempfile
-import zipfile
-from concurrent.futures import as_completed, ThreadPoolExecutor
-from datetime import datetime
-from pathlib import Path
 from typing import Any, Optional
+import zipfile
 
-import psutil
 from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
+import psutil
 from pydantic import BaseModel
+
 
 """
 Training Data Upload Interface
@@ -52,6 +53,7 @@ app = FastAPI(title="Skyy Rose Training Data Interface", version="1.0.0")
 
 # Add CORS middleware for web interface
 from fastapi.middleware.cors import CORSMiddleware
+
 
 app.add_middleware(
     CORSMiddleware,

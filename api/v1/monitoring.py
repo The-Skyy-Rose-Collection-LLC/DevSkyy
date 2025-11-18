@@ -7,7 +7,8 @@ from monitoring.observability import (
     metrics_collector,
     performance_tracker,
 )
-from security.jwt_auth import get_current_active_user, require_admin, TokenData
+from security.jwt_auth import TokenData, get_current_active_user, require_admin
+
 
 """
 Monitoring & Observability API Endpoints

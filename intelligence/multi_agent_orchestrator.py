@@ -5,15 +5,16 @@ Enterprise-grade orchestration with Gemini, Cursor, ChatGPT, and HuggingFace int
 """
 
 import asyncio
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import logging
 from typing import Any, Optional
 
 # Core imports
 from intelligence.claude_sonnet import ClaudeSonnetIntelligenceService
 from intelligence.openai_service import OpenAIIntelligenceService
+
 
 logger = logging.getLogger(__name__)
 

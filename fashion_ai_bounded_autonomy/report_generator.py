@@ -4,11 +4,12 @@ Generate organized, human-readable reports for operator review
 """
 
 import csv
+from datetime import datetime
 import json
 import logging
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+
 
 logger = logging.getLogger(__name__)
 

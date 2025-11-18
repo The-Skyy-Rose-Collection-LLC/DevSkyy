@@ -1,16 +1,17 @@
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from enum import Enum
 import hashlib
 import logging
 import os
 import time
-from dataclasses import asdict, dataclass
-from datetime import datetime
-from enum import Enum
 from typing import Any, Optional
 
 import aiohttp
 
 from fashion.intelligence_engine import fashion_intelligence
 from infrastructure.redis_manager import redis_manager
+
 
 """
 Automated API Discovery & Evaluation Framework

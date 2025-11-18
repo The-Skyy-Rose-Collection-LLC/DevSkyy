@@ -1,15 +1,16 @@
+from datetime import datetime
 import logging
 import secrets
 import time
-import uuid
-from datetime import datetime
 from typing import Any, Optional
+import uuid
 
 from fastapi import HTTPException, Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
-from infrastructure.redis_manager import redis_manager, SessionData
+from infrastructure.redis_manager import SessionData, redis_manager
+
 
 """
 Enterprise Session Middleware - FastAPI Integration

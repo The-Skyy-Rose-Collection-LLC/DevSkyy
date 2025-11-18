@@ -7,6 +7,7 @@ from sklearn.ensemble import GradientBoostingRegressor, RandomForestClassifier
 
 from .base_ml_engine import BaseMLEngine
 
+
 """
 Fashion ML Engine
 Advanced machine learning for fashion industry applications

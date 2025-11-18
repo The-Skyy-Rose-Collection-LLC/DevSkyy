@@ -1,11 +1,12 @@
 import asyncio
 import os
-import sys
 from pathlib import Path
+import sys
 
 import pytest
 
 import main
+
 
 """
 Basic functionality tests to ensure CI/CD pipeline works

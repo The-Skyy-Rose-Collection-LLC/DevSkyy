@@ -5,15 +5,16 @@ Downloads, categorizes, and processes images from Google Drive for AI training
 """
 
 import asyncio
+from datetime import datetime
 import json
 import logging
-import re
-from datetime import datetime
 from pathlib import Path
+import re
 from typing import Any, Optional
 
-import requests
 from PIL import Image, ImageOps
+import requests
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
