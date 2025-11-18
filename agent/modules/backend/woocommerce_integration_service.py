@@ -9,6 +9,9 @@ from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 
+# HTTP timeout for external API requests (per enterprise best practices)
+HTTP_TIMEOUT = 15  # seconds
+
 
 class WooCommerceIntegrationService:
     """WooCommerce REST API integration service for luxury e-commerce automation."""
@@ -123,6 +126,7 @@ class WooCommerceIntegrationService:
                 f"{self.base_url}/products/{product_id}",
                 auth=self.auth,
                 json=luxury_updates,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 

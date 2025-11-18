@@ -1,0 +1,126 @@
+{
+  "CRITICAL_PRIORITY": [
+    {
+      "issue": "Vulnerable cryptography package (4 CVEs)",
+      "severity": "HIGH",
+      "impact": "Potential RSA key decryption, PKCS12 DoS, NULL pointer dereference",
+      "action": "Upgrade cryptography from 41.0.7 to >=43.0.1",
+      "command": "pip install 'cryptography>=43.0.1'",
+      "truth_protocol_violation": "Security baseline requires up-to-date crypto libraries",
+      "owasp": "A06:2021-Vulnerable and Outdated Components"
+    },
+    {
+      "issue": "setuptools path traversal vulnerability (2 CVEs)",
+      "severity": "HIGH",
+      "impact": "Remote code execution, arbitrary file write",
+      "action": "Upgrade setuptools from 68.1.2 to >=78.1.1",
+      "command": "pip install 'setuptools>=78.1.1'",
+      "truth_protocol_violation": "No HIGH/CRITICAL CVEs allowed",
+      "owasp": "A06:2021-Vulnerable and Outdated Components"
+    },
+    {
+      "issue": "pip tarfile extraction vulnerability",
+      "severity": "HIGH",
+      "impact": "Arbitrary file overwrite during sdist installation",
+      "action": "Upgrade pip from 24.0 to >=25.3",
+      "command": "pip install --upgrade 'pip>=25.3'",
+      "truth_protocol_violation": "No HIGH/CRITICAL CVEs allowed",
+      "owasp": "A06:2021-Vulnerable and Outdated Components"
+    }
+  ],
+  "HIGH_PRIORITY": [
+    {
+      "issue": "MD5 hash usage for security purposes (10 occurrences)",
+      "severity": "HIGH",
+      "impact": "Weak cryptographic hashing, vulnerable to collisions",
+      "files": [
+        "./agent/modules/backend/claude_sonnet_intelligence_service_v2.py",
+        "./agent/modules/backend/database_optimizer.py",
+        "./agent/modules/backend/inventory_agent.py"
+      ],
+      "action": "Replace MD5 with SHA-256 or use usedforsecurity=False parameter",
+      "truth_protocol_violation": "Security baseline requires strong crypto (SHA-256+)",
+      "owasp": "A02:2021-Cryptographic Failures"
+    },
+    {
+      "issue": "XML-RPC vulnerability (untrusted XML parsing)",
+      "severity": "HIGH",
+      "impact": "XML external entity attacks, DoS, information disclosure",
+      "files": [
+        "./agent/modules/backend/wordpress_direct_service.py:161"
+      ],
+      "action": "Use defusedxml.xmlrpc.monkey_patch() before xmlrpc usage",
+      "truth_protocol_violation": "Input validation required for all external data",
+      "owasp": "A03:2021-Injection"
+    },
+    {
+      "issue": "Insecure FTP usage (2 occurrences)",
+      "severity": "HIGH",
+      "impact": "Credentials transmitted in cleartext, MITM attacks",
+      "files": [
+        "./agent/wordpress/automated_theme_uploader.py"
+      ],
+      "action": "Replace FTP with SFTP/SCP using paramiko or fabric",
+      "truth_protocol_violation": "Security baseline requires encrypted protocols only",
+      "owasp": "A02:2021-Cryptographic Failures"
+    },
+    {
+      "issue": "SSH host key verification disabled (2 occurrences)",
+      "severity": "HIGH",
+      "impact": "Man-in-the-middle attacks on SSH connections",
+      "files": [
+        "./agent/modules/backend/wordpress_server_access.py:71",
+        "./agent/wordpress/automated_theme_uploader.py:474"
+      ],
+      "action": "Implement proper host key verification with known_hosts",
+      "truth_protocol_violation": "Security misconfiguration violates secure defaults",
+      "owasp": "A05:2021-Security Misconfiguration"
+    }
+  ],
+  "MEDIUM_PRIORITY": [
+    {
+      "issue": "Requests without timeout (23 occurrences)",
+      "severity": "MEDIUM",
+      "impact": "Denial of service via resource exhaustion",
+      "action": "Add timeout parameter to all requests calls",
+      "example": "requests.get(url, timeout=30)",
+      "owasp": "A04:2021-Insecure Design"
+    },
+    {
+      "issue": "Pickle usage for deserialization (2 occurrences)",
+      "severity": "MEDIUM",
+      "impact": "Arbitrary code execution if untrusted data is deserialized",
+      "files": [
+        "./agent/modules/backend/self_learning_system.py:779",
+        "./infrastructure/redis_manager.py:253"
+      ],
+      "action": "Use JSON or msgpack for data serialization instead of pickle",
+      "owasp": "A08:2021-Software and Data Integrity Failures"
+    },
+    {
+      "issue": "Hardcoded temporary directories (8 occurrences)",
+      "severity": "MEDIUM",
+      "impact": "Race conditions, symlink attacks",
+      "action": "Use tempfile.mkdtemp() or tempfile.NamedTemporaryFile()",
+      "owasp": "A05:2021-Security Misconfiguration"
+    },
+    {
+      "issue": "Binding to all interfaces 0.0.0.0 (10 occurrences)",
+      "severity": "MEDIUM",
+      "impact": "Unnecessary exposure of services to external networks",
+      "action": "Bind to 127.0.0.1 for local development, use firewall for production",
+      "owasp": "A05:2021-Security Misconfiguration"
+    },
+    {
+      "issue": "SQL injection potential (1 occurrence)",
+      "severity": "MEDIUM",
+      "impact": "Database compromise, data exfiltration",
+      "files": [
+        "./scripts/enhanced_drive_processor.py:223"
+      ],
+      "action": "Use parameterized queries with prepared statements",
+      "truth_protocol_violation": "Input validation and sanitization required",
+      "owasp": "A03:2021-Injection"
+    }
+  ]
+}

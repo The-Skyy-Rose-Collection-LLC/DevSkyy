@@ -1,0 +1,432 @@
+{
+  "scan_date": "2025-11-17T19:34:10.996782",
+  "run_id": "d01f9bfe",
+  "summary": {
+    "total_code_issues": 2296,
+    "critical": 0,
+    "high": 15,
+    "medium": 54,
+    "low": 2227,
+    "vulnerable_dependencies": 7,
+    "total_cves": 7
+  },
+  "dependency_vulnerabilities": [
+    {
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cve_id": "PYSEC-2024-225",
+      "fix_versions": [
+        "42.0.4"
+      ],
+      "description": "cryptography is a package designed to expose cryptographic primitives and recipes to Python developers. Starting in version 38.0.0 and prior to version 42.0.4, if `pkcs12.serialize_key_and_certificate...",
+      "aliases": [
+        "CVE-2024-26130"
+      ]
+    },
+    {
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cve_id": "GHSA-3ww4-gg4f-jr7f",
+      "fix_versions": [
+        "42.0.0"
+      ],
+      "description": "A flaw was found in the python-cryptography package. This issue may allow a remote attacker to decrypt captured messages in TLS servers that use RSA key exchanges, which may lead to exposure of confid...",
+      "aliases": [
+        "CVE-2023-50782"
+      ]
+    },
+    {
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cve_id": "GHSA-9v9h-cgj8-h64p",
+      "fix_versions": [
+        "42.0.2"
+      ],
+      "description": "Issue summary: Processing a maliciously formatted PKCS12 file may lead OpenSSL to crash leading to a potential Denial of Service attack  Impact summary: Applications loading files in the PKCS12 format...",
+      "aliases": [
+        "CVE-2024-0727"
+      ]
+    },
+    {
+      "package": "cryptography",
+      "version": "41.0.7",
+      "cve_id": "GHSA-h4gh-qq45-vh27",
+      "fix_versions": [
+        "43.0.1"
+      ],
+      "description": "pyca/cryptography's wheels include a statically linked copy of OpenSSL. The versions of OpenSSL included in cryptography 37.0.0-43.0.0 are vulnerable to a security issue. More details about the vulner...",
+      "aliases": []
+    },
+    {
+      "package": "pip",
+      "version": "24.0",
+      "cve_id": "GHSA-4xh5-x5gv-qwph",
+      "fix_versions": [
+        "25.3"
+      ],
+      "description": "### Summary  In the fallback extraction path for source distributions, `pip` used Python\u2019s `tarfile` module without verifying that symbolic/hard link targets resolve inside the intended extraction dir...",
+      "aliases": [
+        "CVE-2025-8869"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "68.1.2",
+      "cve_id": "PYSEC-2025-49",
+      "fix_versions": [
+        "78.1.1"
+      ],
+      "description": "setuptools is a package that allows users to download, build, install, upgrade, and uninstall Python packages. A path traversal vulnerability in `PackageIndex` is present in setuptools prior to versio...",
+      "aliases": [
+        "CVE-2025-47273",
+        "GHSA-5rjg-fvgr-3xxf"
+      ]
+    },
+    {
+      "package": "setuptools",
+      "version": "68.1.2",
+      "cve_id": "GHSA-cx63-2mw6-8hw5",
+      "fix_versions": [
+        "70.0.0"
+      ],
+      "description": "A vulnerability in the `package_index` module of pypa/setuptools versions up to 69.1.1 allows for remote code execution via its download functions. These functions, which are used to download packages...",
+      "aliases": [
+        "CVE-2024-6345"
+      ]
+    }
+  ],
+  "code_security_issues": {
+    "critical": [],
+    "high": [
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./agent/modules/backend/claude_sonnet_intelligence_service_v2.py",
+        "line": 351,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "350             context_str = json.dumps(context, sort_keys=True)\n351             return hashlib.md5(f\"{key}:{context_str}\".encode()).hexdigest()\n352         return hashlib.md5(key.encode()).hexdigest()\n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./agent/modules/backend/claude_sonnet_intelligence_service_v2.py",
+        "line": 352,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "351             return hashlib.md5(f\"{key}:{context_str}\".encode()).hexdigest()\n352         return hashlib.md5(key.encode()).hexdigest()\n353 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./agent/modules/backend/database_optimizer.py",
+        "line": 32,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "31         analysis = {\n32             \"query_hash\": hashlib.md5(query.encode()).hexdigest()[:8],\n33             \"execution_time\": execution_time,\n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./agent/modules/backend/database_optimizer.py",
+        "line": 201,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "200         key_string = json.dumps(key_data, sort_keys=True)\n201         return hashlib.md5(key_string.encode()).hexdigest()\n202 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./agent/modules/backend/inventory_agent.py",
+        "line": 317,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "316         return {\n317             \"checksum\": hashlib.md5(f\"asset_{index}\".encode()).hexdigest(),\n318             \"dimensions\": f\"{random.randint(800, 2000)}x{random.randint(600, 1500)}\",\n"
+      },
+      {
+        "test_id": "B411",
+        "test_name": "blacklist",
+        "file": "./agent/modules/backend/wordpress_direct_service.py",
+        "line": 161,
+        "issue": "Using xmlrpc.client to parse untrusted XML data is known to be vulnerable to XML attacks. Use defusedxml.xmlrpc.monkey_patch() function to monkey-patch xmlrpclib and mitigate XML vulnerabilities.",
+        "confidence": "HIGH",
+        "code": "160 \n161             import xmlrpc.client\n162 \n"
+      },
+      {
+        "test_id": "B507",
+        "test_name": "ssh_no_host_key_verification",
+        "file": "./agent/modules/backend/wordpress_server_access.py",
+        "line": 71,
+        "issue": "Paramiko call with policy set to automatically trust the unknown host key.",
+        "confidence": "MEDIUM",
+        "code": "70             # In production with known hosts, change to RejectPolicy for max security\n71             self.ssh_client.set_missing_host_key_policy(paramiko.WarningPolicy())\n72 \n"
+      },
+      {
+        "test_id": "B402",
+        "test_name": "blacklist",
+        "file": "./agent/wordpress/automated_theme_uploader.py",
+        "line": 9,
+        "issue": "A FTP-related module is being imported.  FTP is considered insecure. Use SSH/SFTP/SCP or some other encrypted protocol.",
+        "confidence": "HIGH",
+        "code": "8 import contextlib\n9 import ftplib\n10 import hashlib\n"
+      },
+      {
+        "test_id": "B321",
+        "test_name": "blacklist",
+        "file": "./agent/wordpress/automated_theme_uploader.py",
+        "line": 400,
+        "issue": "FTP-related functions are being called. FTP is considered insecure. Use SSH/SFTP/SCP or some other encrypted protocol.",
+        "confidence": "HIGH",
+        "code": "399                 # Connect to FTP\n400                 with ftplib.FTP(credentials.ftp_host) as ftp:\n401                     ftp.login(credentials.ftp_username, credentials.ftp_password)\n"
+      },
+      {
+        "test_id": "B507",
+        "test_name": "ssh_no_host_key_verification",
+        "file": "./agent/wordpress/automated_theme_uploader.py",
+        "line": 474,
+        "issue": "Paramiko call with policy set to automatically trust the unknown host key.",
+        "confidence": "MEDIUM",
+        "code": "473             # In production with known hosts, change to RejectPolicy for max security\n474             ssh.set_missing_host_key_policy(paramiko.WarningPolicy())\n475 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./ai_orchestration/partnership_grok_brand.py",
+        "line": 278,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "277 \n278         content_id = hashlib.md5(f\"{platform}_{content_type}_{datetime.now()}\".encode()).hexdigest()[:8]\n279 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./ai_orchestration/partnership_grok_brand.py",
+        "line": 298,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "297 \n298         influencer_id = hashlib.md5(f\"{name}_{platform}\".encode()).hexdigest()[:8]\n299 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./devskyy_mcp_enterprise_v2.py",
+        "line": 705,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "704     # Generate cache key\n705     cache_key = f\"devskyy:query:{request.query_type}:{hashlib.md5(json.dumps(request.filters or {}).encode()).hexdigest()}\"\n706 \n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./fashion/skyy_rose_3d_pipeline.py",
+        "line": 183,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "182         \"\"\"Generate unique ID for a model.\"\"\"\n183         content_hash = hashlib.md5(str(file_path).encode()).hexdigest()\n184         return f\"model_{content_hash[:12]}\"\n"
+      },
+      {
+        "test_id": "B324",
+        "test_name": "hashlib",
+        "file": "./fashion/skyy_rose_3d_pipeline.py",
+        "line": 327,
+        "issue": "Use of weak MD5 hash for security. Consider usedforsecurity=False",
+        "confidence": "HIGH",
+        "code": "326         \"\"\"Generate unique ID for an avatar.\"\"\"\n327         options_hash = hashlib.md5(json.dumps(customization_options, sort_keys=True).encode()).hexdigest()\n328         return f\"avatar_{options_hash[:12]}\"\n"
+      }
+    ],
+    "medium": [
+      {
+        "test_id": "B615",
+        "test_name": "huggingface_unsafe_download",
+        "file": "./agent/modules/backend/brand_model_trainer.py",
+        "line": 111,
+        "issue": "Unsafe Hugging Face Hub download without revision pinning in from_pretrained()",
+        "confidence": "HIGH",
+        "code": "110             # Load BLIP-2 for automatic captioning\n111             self.blip2_processor = Blip2Processor.from_pretrained(\"Salesforce/blip2-opt-2.7b\")\n112             self.blip2_model = Blip2ForConditionalGeneration.from_pretrained(\n"
+      },
+      {
+        "test_id": "B615",
+        "test_name": "huggingface_unsafe_download",
+        "file": "./agent/modules/backend/brand_model_trainer.py",
+        "line": 112,
+        "issue": "Unsafe Hugging Face Hub download without revision pinning in from_pretrained()",
+        "confidence": "HIGH",
+        "code": "111             self.blip2_processor = Blip2Processor.from_pretrained(\"Salesforce/blip2-opt-2.7b\")\n112             self.blip2_model = Blip2ForConditionalGeneration.from_pretrained(\n113                 \"Salesforce/blip2-opt-2.7b\", torch_dtype=torch.float16 if self.device == \"cuda\" else torch.float32\n114             )\n115             self.blip2_model.to(self.device)\n"
+      },
+      {
+        "test_id": "B301",
+        "test_name": "blacklist",
+        "file": "./agent/modules/backend/self_learning_system.py",
+        "line": 779,
+        "issue": "Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.",
+        "confidence": "HIGH",
+        "code": "778             with open(model_file, \"rb\") as f:\n779                 self.error_classifier = pickle.load(f)\n780 \n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/woocommerce_integration_service.py",
+        "line": 121,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "120 \n121             response = requests.put(\n122                 f\"{self.base_url}/products/{product_id}\",\n123                 auth=self.auth,\n124                 json=luxury_updates,\n125             )\n126             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_direct_service.py",
+        "line": 246,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "245 \n246             response = requests.get(\n247                 f\"{self.api_base}/posts\",\n248                 auth=self.auth,\n249                 params={\"per_page\": per_page, \"_embed\": True},\n250             )\n251             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_direct_service.py",
+        "line": 271,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "270 \n271             response = requests.get(\n272                 f\"{self.api_base}/pages\",\n273                 auth=self.auth,\n274                 params={\"per_page\": per_page, \"_embed\": True},\n275             )\n276             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_direct_service.py",
+        "line": 297,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "296             # Create the page\n297             response = requests.post(f\"{self.api_base}/pages\", auth=self.auth, json=page_data)\n298             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_direct_service.py",
+        "line": 321,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "320 \n321             response = requests.post(f\"{self.api_base}/posts/{post_id}\", auth=self.auth, json=updates)\n322             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 56,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "55 \n56             response = requests.post(self.token_url, data=token_data)\n57             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 85,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "84             headers = {\"Authorization\": f\"Bearer {self.access_token}\"}\n85             response = requests.get(f\"{self.api_base}/sites/me\", headers=headers)\n86             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 170,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "169 \n170             response = requests.get(\n171                 f\"{self.api_base}/sites/{self.site_id}/posts\",\n172                 headers=headers,\n173                 params=params,\n174             )\n175             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 196,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "195 \n196             response = requests.get(\n197                 f\"{self.api_base}/sites/{self.site_id}/posts\",\n198                 headers=headers,\n199                 params=params,\n200             )\n201             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 217,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "216 \n217             response = requests.get(f\"{self.api_base}/sites/{self.site_id}/themes/mine\", headers=headers)\n218             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 223,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "222             # Also get site customization options\n223             customizer_response = requests.get(f\"{self.api_base}/sites/{self.site_id}/customizer\", headers=headers)\n224 \n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 251,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "250 \n251             response = requests.post(\n252                 f\"{self.api_base}/sites/{self.site_id}/posts/{post_id}\",\n253                 headers=headers,\n254                 json=content_updates,\n255             )\n256             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 304,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "303 \n304             response = requests.post(\n305                 f\"{self.api_base}/sites/{self.site_id}/posts/new\",\n306                 headers=headers,\n307                 json=page_data,\n308             )\n309             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 336,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "335             # Get site stats\n336             stats_response = requests.get(\n337                 f\"{self.api_base}/sites/{self.site_id}/stats\",\n338                 headers=headers,\n339                 params={\"period\": \"day\", \"date\": datetime.now().strftime(\"%Y-%m-%d\")},\n340             )\n341 \n"
+      },
+      {
+        "test_id": "B113",
+        "test_name": "request_without_timeout",
+        "file": "./agent/modules/backend/wordpress_integration_service.py",
+        "line": 384,
+        "issue": "Call to requests without timeout",
+        "confidence": "LOW",
+        "code": "383 \n384             response = requests.post(self.token_url, data=refresh_data)\n385             response.raise_for_status()\n"
+      },
+      {
+        "test_id": "B615",
+        "test_name": "huggingface_unsafe_download",
+        "file": "./agent/modules/frontend/fashion_computer_vision_agent.py",
+        "line": 57,
+        "issue": "Unsafe Hugging Face Hub download without revision pinning in from_pretrained()",
+        "confidence": "HIGH",
+        "code": "56         try:\n57             self.clip_model = CLIPModel.from_pretrained(\"openai/clip-vit-large-patch14\")\n58             self.clip_processor = CLIPProcessor.from_pretrained(\"openai/clip-vit-large-patch14\")\n"
+      },
+      {
+        "test_id": "B615",
+        "test_name": "huggingface_unsafe_download",
+        "file": "./agent/modules/frontend/fashion_computer_vision_agent.py",
+        "line": 58,
+        "issue": "Unsafe Hugging Face Hub download without revision pinning in from_pretrained()",
+        "confidence": "HIGH",
+        "code": "57             self.clip_model = CLIPModel.from_pretrained(\"openai/clip-vit-large-patch14\")\n58             self.clip_processor = CLIPProcessor.from_pretrained(\"openai/clip-vit-large-patch14\")\n59             self.clip_model.to(self.device)\n"
+      }
+    ]
+  },
+  "owasp_top_10_violations": {
+    "A02:2021-Cryptographic Failures": 10,
+    "A03:2021-Injection": 1,
+    "A05:2021-Security Misconfiguration": 15,
+    "A08:2021-Software and Data Integrity Failures": 3
+  },
+  "truth_protocol_violations": {
+    "weak_cryptography": 10,
+    "insecure_protocols": 2,
+    "xml_vulnerabilities": 1,
+    "ssh_misconfig": 2
+  }
+}

@@ -389,7 +389,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: Optional[str] = None,
-        params: Optional[dict[str, Any]] = None,
+        params: Optional[dict[str, Any]] = None
     ) -> tuple[bool, Optional[str]]:
         """
         Validate request before sending to OpenAI API
@@ -513,7 +513,7 @@ class OpenAISafeguardManager:
         severity: str,
         operation_type: OperationType,
         is_consequential: bool,
-        details: dict[str, Any],
+        details: dict[str, Any]
     ):
         """Record safeguard violation"""
         violation = SafeguardViolation(

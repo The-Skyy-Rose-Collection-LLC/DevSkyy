@@ -4,7 +4,11 @@
 # Exit code 0 = all validations passed
 # Exit code 1 = validation failures found
 
-set -e
+# Strict mode with explicit error handling via VALIDATION_FAILED flag
+set -eEuo pipefail
+
+# Trap for cleanup on unexpected errors
+trap 'echo "Error on line $LINENO. Validation aborted."; exit 1' ERR
 
 echo "=================================================="
 echo "DevSkyy Requirements Validation"
@@ -64,7 +68,9 @@ echo "Step 3: Checking version pinning standards..."
 echo "-----------------------------------"
 # Check main requirements.txt for unpinned versions (except build tools)
 if [ -f "requirements.txt" ]; then
-    UNPINNED=$(grep -v "^#" requirements.txt | grep -v "^$" | grep -E ">=|~=" | grep -v "setuptools" || true)
+    set +e  # Allow grep to return no matches without failing
+    UNPINNED=$(grep -v "^#" requirements.txt | grep -v "^$" | grep -E ">=|~=" | grep -v "setuptools")
+    set -e  # Re-enable strict error checking
     if [ -z "$UNPINNED" ]; then
         echo -e "${GREEN}✓${NC} requirements.txt - all packages properly pinned"
     else
