@@ -404,7 +404,11 @@ docker run -p 8000:8000 --env-file .env devSkyy
 - **Final Status**: `FINAL_SECURITY_STATUS.md`
 - **Security Policy**: `SECURITY.md`
 - **Dependabot Config**: `.github/dependabot.yml`
-- **Security Workflow**: `.github/workflows/security-scan.yml`
+- **CI/CD Workflows**: `.github/workflows/` (modular reusable workflows)
+  - Main orchestrator: `ci.yml`
+  - Security scanning: `reusable-security.yml`
+  - Quality checks: `reusable-quality.yml`
+  - Testing: `reusable-test.yml`
 
 ### Verification
 
