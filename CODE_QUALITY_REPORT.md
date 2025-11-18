@@ -556,7 +556,7 @@ echo "  - Type annotations (1,200+ instances)"
 | **Rule 13** | Security baseline | ❌ | 183 security issues |
 | **Rule 15** | No placeholders | ❌ | Type errors suggest incomplete code |
 
-**Overall Truth Protocol Compliance: 42.9% (3/7 passing)**
++**Overall Truth Protocol Compliance: 14.3% (1/7 passing)**
 
 ---
 
