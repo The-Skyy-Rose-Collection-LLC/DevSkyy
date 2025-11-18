@@ -8,6 +8,7 @@ permissions:
   contents: read
   id-token: write
   packages: write
+  attestations: write  # SLSA provenance
 
 env:
   SERVICE_NAME: api
@@ -36,7 +37,14 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      # SECURITY: Install Cosign for image signing (Sigstore)
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da  # v3.7.0
+        with:
+          cosign-release: 'v2.4.1'
+
       - name: Build Docker image with security labels
+        id: build-image
         run: |
           docker build \
             --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -45,6 +53,10 @@ jobs:
             --tag "ghcr.io/${{ github.repository }}/api:latest" \
             --file Dockerfile \
             .
+
+          # Get image digest for signing
+          IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" 2>/dev/null || echo "")
+          echo "image_digest=$IMAGE_DIGEST" >> $GITHUB_OUTPUT
 
       # Install Trivy for container scanning
       - name: Install Trivy
@@ -69,6 +81,31 @@ jobs:
         run: |
           docker push "$IMAGE"
           docker push "ghcr.io/${{ github.repository }}/api:latest"
+
+      # SECURITY: Sign container image with Cosign (keyless OIDC signing)
+      - name: Sign container image with Cosign
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          echo "Signing image: $IMAGE"
+
+          # Keyless signing using GitHub OIDC token
+          cosign sign --yes "$IMAGE"
+
+          echo "✅ Image signed successfully with Cosign"
+
+          # Verify signature immediately
+          cosign verify "$IMAGE" \
+            --certificate-identity-regexp="https://github.com/${{ github.repository }}" \
+            --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+
+      # SLSA Level 3: Generate build provenance attestation
+      - name: Generate SLSA Provenance
+        uses: actions/attest-build-provenance@1c608d11d69870c2092266b3f9a6f3abbf17002c  # v1.4.3
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.build-image.outputs.image_digest }}
+          push-to-registry: true
 
       # SECURITY: SHA-pinned to v2.1.7 (2024-11-18)
       - name: Authenticate to Google Cloud
