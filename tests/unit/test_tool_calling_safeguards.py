@@ -36,16 +36,14 @@ from security.tool_calling_safeguards import (
 # TOOL CALL CONFIG TESTS
 # ============================================================================
 
+
 class TestToolCallConfig:
     """Test ToolCallConfig validation"""
 
     @pytest.mark.unit
     def test_default_config(self):
         """Test default tool configuration"""
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test tool"
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test tool")
 
         assert config.tool_name == "test_tool"
         assert config.permission_level == ToolPermissionLevel.AUTHENTICATED
@@ -63,7 +61,7 @@ class TestToolCallConfig:
             permission_level=ToolPermissionLevel.ADMIN,
             risk_level=ToolRiskLevel.CRITICAL,
             max_calls_per_minute=1,
-            require_approval=True
+            require_approval=True,
         )
 
         assert config.risk_level == ToolRiskLevel.CRITICAL
@@ -74,10 +72,7 @@ class TestToolCallConfig:
     @pytest.mark.unit
     def test_config_is_frozen(self):
         """Test configuration is immutable"""
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test"
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test")
 
         with pytest.raises(Exception):
             config.max_calls_per_minute = 100
@@ -87,6 +82,7 @@ class TestToolCallConfig:
 # TOOL RATE LIMITER TESTS
 # ============================================================================
 
+
 class TestToolRateLimiter:
     """Test ToolRateLimiter functionality"""
 
@@ -95,11 +91,7 @@ class TestToolRateLimiter:
     async def test_allows_calls_within_limit(self):
         """Test calls are allowed within rate limit"""
         limiter = ToolRateLimiter()
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test",
-            max_calls_per_minute=5
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test", max_calls_per_minute=5)
 
         for i in range(5):
             allowed, reason = await limiter.check_rate_limit("test_tool", config)
@@ -111,11 +103,7 @@ class TestToolRateLimiter:
     async def test_blocks_calls_exceeding_limit(self):
         """Test calls are blocked when exceeding rate limit"""
         limiter = ToolRateLimiter()
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test",
-            max_calls_per_minute=3
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test", max_calls_per_minute=3)
 
         # Use up the limit
         for i in range(3):
@@ -133,17 +121,9 @@ class TestToolRateLimiter:
         """Test rate limiting is per-tool"""
         limiter = ToolRateLimiter()
 
-        config1 = ToolCallConfig(
-            tool_name="tool_a",
-            description="Tool A",
-            max_calls_per_minute=2
-        )
+        config1 = ToolCallConfig(tool_name="tool_a", description="Tool A", max_calls_per_minute=2)
 
-        config2 = ToolCallConfig(
-            tool_name="tool_b",
-            description="Tool B",
-            max_calls_per_minute=2
-        )
+        config2 = ToolCallConfig(tool_name="tool_b", description="Tool B", max_calls_per_minute=2)
 
         # Use up limit for tool_a
         for i in range(2):
@@ -163,6 +143,7 @@ class TestToolRateLimiter:
 # TOOL AUTHORIZATION TESTS
 # ============================================================================
 
+
 class TestToolAuthorizationManager:
     """Test ToolAuthorizationManager functionality"""
 
@@ -173,16 +154,11 @@ class TestToolAuthorizationManager:
         manager = ToolAuthorizationManager()
 
         config = ToolCallConfig(
-            tool_name="public_tool",
-            description="Public tool",
-            permission_level=ToolPermissionLevel.PUBLIC
+            tool_name="public_tool", description="Public tool", permission_level=ToolPermissionLevel.PUBLIC
         )
         manager.register_tool(config)
 
-        request = ToolCallRequest(
-            tool_name="public_tool",
-            provider=ToolProvider.OPENAI
-        )
+        request = ToolCallRequest(tool_name="public_tool", provider=ToolProvider.OPENAI)
 
         authorized, reason = await manager.authorize_tool_call(request)
         assert authorized is True
@@ -195,17 +171,11 @@ class TestToolAuthorizationManager:
         manager = ToolAuthorizationManager()
 
         config = ToolCallConfig(
-            tool_name="auth_tool",
-            description="Authenticated tool",
-            permission_level=ToolPermissionLevel.AUTHENTICATED
+            tool_name="auth_tool", description="Authenticated tool", permission_level=ToolPermissionLevel.AUTHENTICATED
         )
         manager.register_tool(config)
 
-        request = ToolCallRequest(
-            tool_name="auth_tool",
-            provider=ToolProvider.OPENAI,
-            user_id=None  # No user
-        )
+        request = ToolCallRequest(tool_name="auth_tool", provider=ToolProvider.OPENAI, user_id=None)  # No user
 
         authorized, reason = await manager.authorize_tool_call(request)
         assert authorized is False
@@ -218,23 +188,14 @@ class TestToolAuthorizationManager:
         manager = ToolAuthorizationManager()
 
         config = ToolCallConfig(
-            tool_name="admin_tool",
-            description="Admin tool",
-            permission_level=ToolPermissionLevel.ADMIN
+            tool_name="admin_tool", description="Admin tool", permission_level=ToolPermissionLevel.ADMIN
         )
         manager.register_tool(config)
 
         # Set user permissions
-        manager.set_user_permissions(
-            "user_123",
-            {ToolPermissionLevel.ADMIN}
-        )
+        manager.set_user_permissions("user_123", {ToolPermissionLevel.ADMIN})
 
-        request = ToolCallRequest(
-            tool_name="admin_tool",
-            provider=ToolProvider.OPENAI,
-            user_id="user_123"
-        )
+        request = ToolCallRequest(tool_name="admin_tool", provider=ToolProvider.OPENAI, user_id="user_123")
 
         authorized, reason = await manager.authorize_tool_call(request)
         assert authorized is True
@@ -246,23 +207,14 @@ class TestToolAuthorizationManager:
         manager = ToolAuthorizationManager()
 
         config = ToolCallConfig(
-            tool_name="admin_tool",
-            description="Admin tool",
-            permission_level=ToolPermissionLevel.ADMIN
+            tool_name="admin_tool", description="Admin tool", permission_level=ToolPermissionLevel.ADMIN
         )
         manager.register_tool(config)
 
         # User only has authenticated permission
-        manager.set_user_permissions(
-            "user_123",
-            {ToolPermissionLevel.AUTHENTICATED}
-        )
+        manager.set_user_permissions("user_123", {ToolPermissionLevel.AUTHENTICATED})
 
-        request = ToolCallRequest(
-            tool_name="admin_tool",
-            provider=ToolProvider.OPENAI,
-            user_id="user_123"
-        )
+        request = ToolCallRequest(tool_name="admin_tool", provider=ToolProvider.OPENAI, user_id="user_123")
 
         authorized, reason = await manager.authorize_tool_call(request)
         assert authorized is False
@@ -274,18 +226,12 @@ class TestToolAuthorizationManager:
         """Test provider compatibility checking"""
         manager = ToolAuthorizationManager()
 
-        config = ToolCallConfig(
-            tool_name="openai_only_tool",
-            description="OpenAI only",
-            provider=ToolProvider.OPENAI
-        )
+        config = ToolCallConfig(tool_name="openai_only_tool", description="OpenAI only", provider=ToolProvider.OPENAI)
         manager.register_tool(config)
 
         # Try with Anthropic
         request = ToolCallRequest(
-            tool_name="openai_only_tool",
-            provider=ToolProvider.ANTHROPIC,
-            permission_level=ToolPermissionLevel.PUBLIC
+            tool_name="openai_only_tool", provider=ToolProvider.ANTHROPIC, permission_level=ToolPermissionLevel.PUBLIC
         )
 
         authorized, reason = await manager.authorize_tool_call(request)
@@ -297,6 +243,7 @@ class TestToolAuthorizationManager:
 # TOOL CALL VALIDATOR TESTS
 # ============================================================================
 
+
 class TestToolCallValidator:
     """Test ToolCallValidator functionality"""
 
@@ -305,10 +252,7 @@ class TestToolCallValidator:
         """Test validation of safe parameters"""
         validator = ToolCallValidator(SafeguardConfig())
 
-        valid, reason = validator.validate_parameters(
-            "test_tool",
-            {"name": "test", "value": 123}
-        )
+        valid, reason = validator.validate_parameters("test_tool", {"name": "test", "value": 123})
 
         assert valid is True
         assert reason is None
@@ -323,7 +267,7 @@ class TestToolCallValidator:
             {"api_key": "secret"},
             {"password": "pass123"},
             {"access_token": "token"},
-            {"private_key": "key123"}
+            {"private_key": "key123"},
         ]
 
         for params in sensitive_params:
@@ -348,12 +292,7 @@ class TestToolCallValidator:
         """Test sanitization of sensitive data"""
         validator = ToolCallValidator(SafeguardConfig())
 
-        params = {
-            "name": "test",
-            "api_key": "secret123",
-            "password": "pass456",
-            "normal_field": "value"
-        }
+        params = {"name": "test", "api_key": "secret123", "password": "pass456", "normal_field": "value"}
 
         sanitized = validator.sanitize_parameters(params)
 
@@ -366,6 +305,7 @@ class TestToolCallValidator:
 # ============================================================================
 # TOOL CALL AUDIT LOGGER TESTS
 # ============================================================================
+
 
 class TestToolCallAuditLogger:
     """Test ToolCallAuditLogger functionality"""
@@ -388,7 +328,7 @@ class TestToolCallAuditLogger:
                 parameters={"test": "value"},
                 success=True,
                 execution_time_ms=150.5,
-                tokens_used=100
+                tokens_used=100,
             )
 
             await logger.log(entry)
@@ -407,18 +347,22 @@ class TestToolCallAuditLogger:
             logger = ToolCallAuditLogger(log_path)
 
             # Write test entries
-            asyncio.run(logger.log(ToolCallAuditEntry(
-                request_id="test-1",
-                tool_name="test_tool",
-                provider=ToolProvider.OPENAI,
-                user_id="user_123",
-                permission_level=ToolPermissionLevel.AUTHENTICATED,
-                risk_level=ToolRiskLevel.LOW,
-                parameters={},
-                success=True,
-                execution_time_ms=100,
-                tokens_used=50
-            )))
+            asyncio.run(
+                logger.log(
+                    ToolCallAuditEntry(
+                        request_id="test-1",
+                        tool_name="test_tool",
+                        provider=ToolProvider.OPENAI,
+                        user_id="user_123",
+                        permission_level=ToolPermissionLevel.AUTHENTICATED,
+                        risk_level=ToolRiskLevel.LOW,
+                        parameters={},
+                        success=True,
+                        execution_time_ms=100,
+                        tokens_used=50,
+                    )
+                )
+            )
 
             recent = logger.get_recent_logs(hours=24)
             assert len(recent) == 1
@@ -428,6 +372,7 @@ class TestToolCallAuditLogger:
 # ============================================================================
 # SAFEGUARD MANAGER TESTS
 # ============================================================================
+
 
 class TestToolCallingSafeguardManager:
     """Test ToolCallingSafeguardManager integration"""
@@ -450,10 +395,7 @@ class TestToolCallingSafeguardManager:
         """Test tool registration"""
         manager = ToolCallingSafeguardManager(SafeguardConfig())
 
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test tool"
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test tool")
 
         manager.register_tool(config)
 
@@ -469,18 +411,12 @@ class TestToolCallingSafeguardManager:
 
         # Register tool
         config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test tool",
-            permission_level=ToolPermissionLevel.PUBLIC
+            tool_name="test_tool", description="Test tool", permission_level=ToolPermissionLevel.PUBLIC
         )
         manager.register_tool(config)
 
         # Create request
-        request = ToolCallRequest(
-            tool_name="test_tool",
-            provider=ToolProvider.OPENAI,
-            parameters={"test": "value"}
-        )
+        request = ToolCallRequest(tool_name="test_tool", provider=ToolProvider.OPENAI, parameters={"test": "value"})
 
         # Validate
         allowed, reason = await manager.validate_tool_call(request)
@@ -495,18 +431,12 @@ class TestToolCallingSafeguardManager:
 
         # Register tool with authentication requirement
         config = ToolCallConfig(
-            tool_name="auth_tool",
-            description="Requires auth",
-            permission_level=ToolPermissionLevel.AUTHENTICATED
+            tool_name="auth_tool", description="Requires auth", permission_level=ToolPermissionLevel.AUTHENTICATED
         )
         manager.register_tool(config)
 
         # Create request without user
-        request = ToolCallRequest(
-            tool_name="auth_tool",
-            provider=ToolProvider.OPENAI,
-            user_id=None
-        )
+        request = ToolCallRequest(tool_name="auth_tool", provider=ToolProvider.OPENAI, user_id=None)
 
         # Should be blocked
         allowed, reason = await manager.validate_tool_call(request)
@@ -521,9 +451,7 @@ class TestToolCallingSafeguardManager:
 
         # Register tool
         config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test tool",
-            permission_level=ToolPermissionLevel.PUBLIC
+            tool_name="test_tool", description="Test tool", permission_level=ToolPermissionLevel.PUBLIC
         )
         manager.register_tool(config)
 
@@ -532,10 +460,7 @@ class TestToolCallingSafeguardManager:
             return {"success": True, "data": "result"}
 
         # Create request
-        request = ToolCallRequest(
-            tool_name="test_tool",
-            provider=ToolProvider.OPENAI
-        )
+        request = ToolCallRequest(tool_name="test_tool", provider=ToolProvider.OPENAI)
 
         # Execute
         response = await manager.execute_tool_call(request, mock_func)
@@ -550,10 +475,7 @@ class TestToolCallingSafeguardManager:
         manager = ToolCallingSafeguardManager(SafeguardConfig())
 
         # Try to call unregistered tool
-        request = ToolCallRequest(
-            tool_name="nonexistent_tool",
-            provider=ToolProvider.OPENAI
-        )
+        request = ToolCallRequest(tool_name="nonexistent_tool", provider=ToolProvider.OPENAI)
 
         allowed, reason = await manager.validate_tool_call(request)
 
@@ -579,6 +501,7 @@ class TestToolCallingSafeguardManager:
 # GLOBAL MANAGER TESTS
 # ============================================================================
 
+
 class TestGlobalToolSafeguardManager:
     """Test global tool safeguard manager functions"""
 
@@ -603,6 +526,7 @@ class TestGlobalToolSafeguardManager:
 # SECURITY TESTS
 # ============================================================================
 
+
 class TestToolCallingSecurity:
     """Test security aspects of tool calling"""
 
@@ -613,18 +537,12 @@ class TestToolCallingSecurity:
         """Test sensitive data is not logged in audit"""
         manager = ToolCallingSafeguardManager(SafeguardConfig())
 
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test",
-            permission_level=ToolPermissionLevel.PUBLIC
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test", permission_level=ToolPermissionLevel.PUBLIC)
         manager.register_tool(config)
 
         # Create request with sensitive data
         request = ToolCallRequest(
-            tool_name="test_tool",
-            provider=ToolProvider.OPENAI,
-            parameters={"data": "safe", "api_key": "secret123"}
+            tool_name="test_tool", provider=ToolProvider.OPENAI, parameters={"data": "safe", "api_key": "secret123"}
         )
 
         # This should fail validation
@@ -643,14 +561,11 @@ class TestToolCallingSecurity:
             description="Dangerous",
             permission_level=ToolPermissionLevel.PUBLIC,
             risk_level=ToolRiskLevel.CRITICAL,
-            require_approval=True
+            require_approval=True,
         )
         manager.register_tool(config)
 
-        request = ToolCallRequest(
-            tool_name="dangerous_tool",
-            provider=ToolProvider.OPENAI
-        )
+        request = ToolCallRequest(tool_name="dangerous_tool", provider=ToolProvider.OPENAI)
 
         # Should validate but log warning
         allowed, reason = await manager.validate_tool_call(request)
@@ -660,6 +575,7 @@ class TestToolCallingSecurity:
 # ============================================================================
 # PERFORMANCE TESTS
 # ============================================================================
+
 
 class TestToolCallingPerformance:
     """Test performance characteristics"""
@@ -672,21 +588,13 @@ class TestToolCallingPerformance:
 
         manager = ToolCallingSafeguardManager(SafeguardConfig())
 
-        config = ToolCallConfig(
-            tool_name="test_tool",
-            description="Test",
-            permission_level=ToolPermissionLevel.PUBLIC
-        )
+        config = ToolCallConfig(tool_name="test_tool", description="Test", permission_level=ToolPermissionLevel.PUBLIC)
         manager.register_tool(config)
 
         start = time.time()
 
         for i in range(50):
-            request = ToolCallRequest(
-                tool_name="test_tool",
-                provider=ToolProvider.OPENAI,
-                parameters={"iteration": i}
-            )
+            request = ToolCallRequest(tool_name="test_tool", provider=ToolProvider.OPENAI, parameters={"iteration": i})
             await manager.validate_tool_call(request)
 
         duration = time.time() - start
@@ -704,15 +612,12 @@ class TestToolCallingPerformance:
             tool_name="test_tool",
             description="Test",
             permission_level=ToolPermissionLevel.PUBLIC,
-            max_calls_per_minute=100
+            max_calls_per_minute=100,
         )
         manager.register_tool(config)
 
         async def validate():
-            request = ToolCallRequest(
-                tool_name="test_tool",
-                provider=ToolProvider.OPENAI
-            )
+            request = ToolCallRequest(tool_name="test_tool", provider=ToolProvider.OPENAI)
             return await manager.validate_tool_call(request)
 
         # Run 20 concurrent validations

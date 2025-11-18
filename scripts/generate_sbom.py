@@ -39,10 +39,13 @@ def parse_requirements(requirements_file: Path) -> list[dict[str, Any]]:
                 # Try to get actual installed version
                 try:
                     result = subprocess.run(
+       
                         ["pip", "show", name],
                         check=False, capture_output=True,
                         text=True,
                         timeout=5
+                        ["pip", "show", name], check=False, capture_output=True, text=True, timeout=5
+          main
                     )
                     if result.returncode == 0:
                         for show_line in result.stdout.split("\n"):
@@ -53,14 +56,16 @@ def parse_requirements(requirements_file: Path) -> list[dict[str, Any]]:
                 except Exception:
                     license_text = "Unknown"
 
-                components.append({
-                    "type": "library",
-                    "bom-ref": f"pkg:pypi/{name}@{version}",
-                    "name": name,
-                    "version": version,
-                    "purl": f"pkg:pypi/{name}@{version}",
-                    "description": f"Python package: {name}",
-                })
+                components.append(
+                    {
+                        "type": "library",
+                        "bom-ref": f"pkg:pypi/{name}@{version}",
+                        "name": name,
+                        "version": version,
+                        "purl": f"pkg:pypi/{name}@{version}",
+                        "description": f"Python package: {name}",
+                    }
+                )
 
     return components
 
@@ -96,27 +101,15 @@ def generate_sbom():
         "version": 1,
         "metadata": {
             "timestamp": datetime.now().isoformat(),
-            "tools": [
-                {
-                    "vendor": "DevSkyy",
-                    "name": "SBOM Generator",
-                    "version": "1.0.0"
-                }
-            ],
+            "tools": [{"vendor": "DevSkyy", "name": "SBOM Generator", "version": "1.0.0"}],
             "component": {
                 "type": "application",
                 "bom-ref": "pkg:github/The-Skyy-Rose-Collection-LLC/DevSkyy@5.2.1",
                 "name": "DevSkyy",
                 "version": "5.2.1",
                 "description": "Luxury Fashion AI Platform with Multi-Agent Orchestration",
-                "licenses": [
-                    {
-                        "license": {
-                            "name": "Proprietary"
-                        }
-                    }
-                ],
-                "purl": "pkg:github/The-Skyy-Rose-Collection-LLC/DevSkyy@5.2.1"
+                "licenses": [{"license": {"name": "Proprietary"}}],
+                "purl": "pkg:github/The-Skyy-Rose-Collection-LLC/DevSkyy@5.2.1",
             },
             "properties": [
                 {"name": "truth-protocol-compliant", "value": "true"},
@@ -125,9 +118,9 @@ def generate_sbom():
                 {"name": "python-version", "value": "3.11.9"},
                 {"name": "framework", "value": "FastAPI 0.104+"},
                 {"name": "database", "value": "PostgreSQL 15"},
-            ]
+            ],
         },
-        "components": all_components
+        "components": all_components,
     }
 
     # Write SBOM

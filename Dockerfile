@@ -37,9 +37,15 @@ WORKDIR /tmp
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python dependencies with secure pip version
-# SECURITY: pip>=25.3 fixes GHSA-4xh5-x5gv-qwph (path traversal vulnerability)
-RUN pip install --upgrade "pip>=25.3" setuptools && \
+# Install Python dependencies with secure versions
+# SECURITY: Fixes CRITICAL CVEs per SECURITY_SCAN_REPORT_20251118.md
+# - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
+# - cryptography>=46.0.3: Fixes CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27
+# - setuptools>=78.1.1: Fixes CVE-2025-47273, CVE-2024-6345
+RUN pip install --no-cache-dir --upgrade \
+    "pip>=25.3" \
+    "cryptography>=46.0.3,<47.0.0" \
+    "setuptools>=78.1.1,<79.0.0" && \
     pip install --no-cache-dir -r requirements.txt
 
 # Stage 3: Production Application

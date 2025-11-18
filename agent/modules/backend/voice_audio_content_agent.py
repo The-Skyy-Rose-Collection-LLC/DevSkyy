@@ -43,14 +43,12 @@ class VoiceAudioContentAgent:
     def __init__(self):
         # AI Services
         from config.unified_config import get_config
+
         config = get_config()
         is_consequential = config.ai.openai_is_consequential
         default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
 
-        self.openai = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            default_headers=default_headers
-        )
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), default_headers=default_headers)
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
         # ElevenLabs configuration

@@ -33,13 +33,10 @@ def create_safeguard_config_from_app_config() -> SafeguardConfig:
     level_mapping = {
         "strict": SafeguardLevel.STRICT,
         "moderate": SafeguardLevel.MODERATE,
-        "permissive": SafeguardLevel.PERMISSIVE
+        "permissive": SafeguardLevel.PERMISSIVE,
     }
 
-    safeguard_level = level_mapping.get(
-        config.ai.safeguard_level.lower(),
-        SafeguardLevel.STRICT
-    )
+    safeguard_level = level_mapping.get(config.ai.safeguard_level.lower(), SafeguardLevel.STRICT)
 
     return SafeguardConfig(
         level=safeguard_level,
@@ -51,7 +48,7 @@ def create_safeguard_config_from_app_config() -> SafeguardConfig:
         enable_circuit_breaker=config.ai.enable_circuit_breaker,
         enable_request_validation=True,
         enable_monitoring=True,
-        alert_on_violations=config.is_production()
+        alert_on_violations=config.is_production(),
     )
 
 
@@ -65,9 +62,7 @@ def initialize_safeguards() -> OpenAISafeguardManager:
     app_config = get_config()
 
     if not app_config.ai.enable_safeguards:
-        logger.warning(
-            "⚠️  OpenAI safeguards are DISABLED. This should only be done in development."
-        )
+        logger.warning("⚠️  OpenAI safeguards are DISABLED. This should only be done in development.")
         return None
 
     safeguard_config = create_safeguard_config_from_app_config()
@@ -86,6 +81,7 @@ def validate_openai_request(
     is_consequential: bool,
     prompt: Optional[str] = None,
     params: Optional[dict[str, Any]] = None
+    params: Optional[dict[str, Any]] = None,
 ) -> tuple[bool, Optional[str]]:
     """
     Validate OpenAI API request before execution
@@ -108,6 +104,7 @@ def validate_openai_request(
 
     # Run async validation in sync context
     import asyncio
+
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
@@ -116,10 +113,7 @@ def validate_openai_request(
 
     return loop.run_until_complete(
         manager.validate_request(
-            operation_type=operation_type,
-            is_consequential=is_consequential,
-            prompt=prompt,
-            params=params
+            operation_type=operation_type, is_consequential=is_consequential, prompt=prompt, params=params
         )
     )
 
@@ -131,7 +125,7 @@ def execute_with_safeguards(
     prompt: Optional[str] = None,
     params: Optional[dict[str, Any]] = None,
     *args,
-    **kwargs
+    **kwargs,
 ) -> Any:
     """
     Execute OpenAI API call with full safeguard protection
@@ -162,6 +156,7 @@ def execute_with_safeguards(
 
     # Run async execution in sync context
     import asyncio
+
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
@@ -176,7 +171,7 @@ def execute_with_safeguards(
             prompt=prompt,
             params=params,
             *args,
-            **kwargs
+            **kwargs,
         )
     )
 
@@ -254,10 +249,7 @@ _manager = initialize_safeguards()
 if _manager:
     valid, warnings = check_production_safeguards()
     if not valid:
-        logger.error(
-            "🚨 CRITICAL PRODUCTION SAFEGUARD ISSUES DETECTED - "
-            "Review configuration immediately"
-        )
+        logger.error("🚨 CRITICAL PRODUCTION SAFEGUARD ISSUES DETECTED - " "Review configuration immediately")
 
 
 __all__ = [

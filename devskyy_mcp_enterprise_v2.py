@@ -70,6 +70,7 @@ except ImportError as e:
 # Optional Redis for caching
 try:
     import redis.asyncio as redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -88,8 +89,10 @@ REQUEST_TIMEOUT = 60.0
 # Pydantic Models (Structured Output)
 # ===========================
 
+
 class AgentIntent(str, Enum):
     """Agent routing intents."""
+
     CODE = "code"
     COMMERCE = "commerce"
     MARKETING = "marketing"
@@ -98,66 +101,84 @@ class AgentIntent(str, Enum):
     WORDPRESS = "wordpress"
     SYSTEM = "system"
 
+
 class ExecutionStatus(str, Enum):
     """Execution status."""
+
     SUCCESS = "success"
     ERROR = "error"
     PARTIAL = "partial"
 
+
 # Tool 1: Execute
 class ExecuteRequest(BaseModel):
     """Execute request - structured input."""
+
     intent: AgentIntent = Field(description="Agent category for routing")
     action: str = Field(description="Specific action (scan, fix, predict, etc)")
     parameters: dict[str, Any] = Field(description="Agent-specific parameters")
     options: Optional[dict[str, Any]] = Field(default=None, description="Execution options")
 
+
 class ExecuteResult(BaseModel):
     """Execute result - structured output."""
+
     status: ExecutionStatus
     agent_used: str = Field(description="Agent that handled the request")
     execution_time_ms: float
     result: dict[str, Any] = Field(description="Agent output data")
     next_actions: Optional[list[str]] = Field(default=None, description="Suggested next steps")
 
+
 # Tool 2: Batch Execute
 class BatchRequest(BaseModel):
     """Batch execution request."""
+
     workflow: Literal["product_launch", "code_quality", "content_marketing", "ecommerce_optimize"]
     parameters: dict[str, Any]
     execution_mode: Literal["parallel", "sequential"] = "parallel"
 
+
 class BatchResult(BaseModel):
     """Batch execution result."""
+
     workflow_id: str
     total_agents: int
     total_time_ms: float
     results: list[ExecuteResult]
     summary: dict[str, Any]
 
+
 # Tool 3: Query
 class QueryRequest(BaseModel):
     """Query request for cached data."""
+
     query_type: Literal["agents", "health", "metrics", "capabilities"]
     filters: Optional[dict[str, Any]] = None
     cache_ttl: int = Field(default=300, description="Cache TTL in seconds")
 
+
 class QueryResult(BaseModel):
     """Query result."""
+
     query_type: str
     cache_hit: bool
     data: dict[str, Any]
     cached_at: Optional[datetime] = None
 
+
 # Tool 4: Analyze
 class AnalyzeRequest(BaseModel):
     """ML analysis request."""
+
     analysis_type: Literal["trend_forecast", "customer_segment", "price_optimize", "sentiment"]
     data_source: str
     parameters: dict[str, Any]
 
+
 class AnalyzeResult(BaseModel):
     """ML analysis result - compressed."""
+
     analysis_type: str
     model_used: str
     confidence: float = Field(ge=0.0, le=1.0)
@@ -165,14 +186,18 @@ class AnalyzeResult(BaseModel):
     recommendations: list[str] = Field(max_length=3, description="Top 3 actions")
     full_report_url: Optional[str] = None
 
+
 # Tool 5: Status
 class StatusRequest(BaseModel):
     """Status request."""
+
     scope: Literal["platform", "agents", "workflows", "performance"] = "platform"
     details: bool = False
 
+
 class StatusResult(BaseModel):
     """Minimal status result."""
+
     status: Literal["healthy", "degraded", "critical"]
     uptime_hours: float
     active_agents: int
@@ -180,19 +205,23 @@ class StatusResult(BaseModel):
     summary: str
     details_url: Optional[str] = None
 
+
 # ===========================
 # Lifespan Context
 # ===========================
 
+
 @dataclass
 class DevSkyyAppContext:
     """Shared application resources."""
+
     http_client: httpx.AsyncClient
     redis_client: Optional[Any]  # redis.Redis if available
     api_base_url: str
     api_key: str
     start_time: datetime
     agents_prompt: str  # AGENTS_PROMPT.md content
+
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
@@ -215,7 +244,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
         base_url=API_BASE_URL,
         headers={"Authorization": f"Bearer {API_KEY}"} if API_KEY else {},
         timeout=httpx.Timeout(REQUEST_TIMEOUT),
-        limits=httpx.Limits(max_connections=100, max_keepalive_connections=20)
+        limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
     )
 
     # Initialize Redis (if available)
@@ -254,7 +283,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
             api_base_url=API_BASE_URL,
             api_key=API_KEY,
             start_time=start_time,
-            agents_prompt=agents_prompt
+            agents_prompt=agents_prompt,
         )
     finally:
         # Cleanup
@@ -265,19 +294,17 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
         uptime = datetime.utcnow() - start_time
         print(f"👋 Server shutdown. Uptime: {uptime}")
 
+
 # ===========================
 # Initialize MCP Server
 # ===========================
 
-mcp = FastMCP(
-    "devskyy_enterprise_v2",
-    lifespan=app_lifespan,
-    dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"]
-)
+mcp = FastMCP("devskyy_enterprise_v2", lifespan=app_lifespan, dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"])
 
 # ===========================
 # MCP Resources (Data Exposure)
 # ===========================
+
 
 @mcp.resource("devskyy://agents/directory")
 def get_agents_directory(ctx: Context[ServerSession, DevSkyyAppContext]) -> str:
@@ -290,6 +317,7 @@ def get_agents_directory(ctx: Context[ServerSession, DevSkyyAppContext]) -> str:
     Cached: 1 hour (loaded from memory, no API call)
     """
     return ctx.request_context.lifespan_context.agents_prompt
+
 
 @mcp.resource("devskyy://agents/quick-ref")
 def get_agents_quick_ref() -> str:
@@ -308,6 +336,7 @@ content → content_generator, seo_optimizer, copywriting_agent
 wordpress → wordpress_theme_builder, wordpress_divi_elementor
 system → self_healing_system, performance_monitor, system_health
 """
+
 
 @mcp.resource("devskyy://health/status")
 async def get_health_status(ctx: Context[ServerSession, DevSkyyAppContext]) -> str:
@@ -331,24 +360,20 @@ async def get_health_status(ctx: Context[ServerSession, DevSkyyAppContext]) -> s
 
         # Cache result
         if ctx.request_context.lifespan_context.redis_client:
-            await ctx.request_context.lifespan_context.redis_client.setex(
-                "health:status", 30, result
-            )
+            await ctx.request_context.lifespan_context.redis_client.setex("health:status", 30, result)
 
         return result
     except Exception as e:
         return json.dumps({"error": str(e), "status": "unknown"})
 
+
 # ===========================
 # MCP Prompts (Guided Workflows)
 # ===========================
 
+
 @mcp.prompt(title="Product Launch Workflow")
-def product_launch_workflow(
-    product_name: str,
-    target_market: str = "US",
-    budget: str = "$10,000"
-) -> str:
+def product_launch_workflow(product_name: str, target_market: str = "US", budget: str = "$10,000") -> str:
     """
     Generate a comprehensive product launch workflow prompt.
 
@@ -389,12 +414,9 @@ Execute the following workflow using DevSkyy agents:
 Provide detailed recommendations at each step.
 """
 
+
 @mcp.prompt(title="Code Quality Improvement")
-def code_quality_workflow(
-    code_path: str,
-    language: str,
-    priority: str = "security"
-) -> list[base.Message]:
+def code_quality_workflow(code_path: str, language: str, priority: str = "security") -> list[base.Message]:
     """
     Multi-step code improvement workflow.
     """
@@ -402,20 +424,17 @@ def code_quality_workflow(
         base.UserMessage("I need to improve code quality for:"),
         base.UserMessage(f"Path: {code_path}\nLanguage: {language}\nPriority: {priority}"),
         base.AssistantMessage("I'll help you improve this code. Let me start by scanning for issues."),
-        base.UserMessage(
-            "Use `devskyy_execute` with intent='code', action='scan' to analyze the codebase first."
-        )
+        base.UserMessage("Use `devskyy_execute` with intent='code', action='scan' to analyze the codebase first."),
     ]
+
 
 # ===========================
 # Tool 1: Execute (Unified Agent Orchestrator)
 # ===========================
 
+
 @mcp.tool()
-async def devskyy_execute(
-    request: ExecuteRequest,
-    ctx: Context[ServerSession, DevSkyyAppContext]
-) -> ExecuteResult:
+async def devskyy_execute(request: ExecuteRequest, ctx: Context[ServerSession, DevSkyyAppContext]) -> ExecuteResult:
     """
     Execute any DevSkyy agent via intelligent routing.
 
@@ -449,40 +468,29 @@ async def devskyy_execute(
 
     # Smart routing based on intent
     agent_routes = {
-        AgentIntent.CODE: {
-            "scan": "scanner_v2",
-            "fix": "fixer_v2",
-            "security": "security_agent"
-        },
+        AgentIntent.CODE: {"scan": "scanner_v2", "fix": "fixer_v2", "security": "security_agent"},
         AgentIntent.COMMERCE: {
             "products": "product_manager",
             "pricing": "pricing_engine",
-            "inventory": "inventory_optimizer"
+            "inventory": "inventory_optimizer",
         },
         AgentIntent.MARKETING: {
             "campaign": "marketing_campaign",
             "email": "email_marketing",
-            "social": "social_media_manager"
+            "social": "social_media_manager",
         },
         AgentIntent.ML: {
             "predict": "ml_trend_prediction",
             "forecast": "demand_forecasting",
-            "sentiment": "sentiment_analysis"
+            "sentiment": "sentiment_analysis",
         },
-        AgentIntent.CONTENT: {
-            "generate": "content_generator",
-            "seo": "seo_optimizer",
-            "copy": "copywriting_agent"
-        },
-        AgentIntent.WORDPRESS: {
-            "theme": "wordpress_theme_builder",
-            "builder": "wordpress_divi_elementor"
-        },
+        AgentIntent.CONTENT: {"generate": "content_generator", "seo": "seo_optimizer", "copy": "copywriting_agent"},
+        AgentIntent.WORDPRESS: {"theme": "wordpress_theme_builder", "builder": "wordpress_divi_elementor"},
         AgentIntent.SYSTEM: {
             "heal": "self_healing_system",
             "monitor": "performance_monitor",
-            "health": "system_health_monitor"
-        }
+            "health": "system_health_monitor",
+        },
     }
 
     # Get agent name from routing table
@@ -502,7 +510,7 @@ async def devskyy_execute(
         response = await client.post(
             f"/api/v1/agents/{agent_name}/execute",
             json=request.parameters,
-            headers={"Accept-Encoding": "gzip"}  # 76% compression
+            headers={"Accept-Encoding": "gzip"},  # 76% compression
         )
         response.raise_for_status()
 
@@ -516,7 +524,7 @@ async def devskyy_execute(
             agent_used=agent_name,
             execution_time_ms=execution_time,
             result=result_data.get("data", {}),
-            next_actions=result_data.get("recommendations", [])
+            next_actions=result_data.get("recommendations", []),
         )
 
     except httpx.HTTPError as e:
@@ -528,18 +536,17 @@ async def devskyy_execute(
             agent_used=agent_name,
             execution_time_ms=execution_time,
             result={"error": str(e)},
-            next_actions=["Check API connectivity", "Verify agent status"]
+            next_actions=["Check API connectivity", "Verify agent status"],
         )
+
 
 # ===========================
 # Tool 2: Batch Execute (Multi-Agent Workflows)
 # ===========================
 
+
 @mcp.tool()
-async def devskyy_batch_execute(
-    request: BatchRequest,
-    ctx: Context[ServerSession, DevSkyyAppContext]
-) -> BatchResult:
+async def devskyy_batch_execute(request: BatchRequest, ctx: Context[ServerSession, DevSkyyAppContext]) -> BatchResult:
     """
     Execute pre-defined workflows involving multiple agents.
 
@@ -574,26 +581,26 @@ async def devskyy_batch_execute(
             {"agent": "product_manager", "action": "create"},
             {"agent": "ml_trend_prediction", "action": "forecast"},
             {"agent": "pricing_engine", "action": "optimize"},
-            {"agent": "marketing_campaign", "action": "generate"}
+            {"agent": "marketing_campaign", "action": "generate"},
         ],
         "code_quality": [
             {"agent": "scanner_v2", "action": "scan"},
             {"agent": "fixer_v2", "action": "fix"},
             {"agent": "security_agent", "action": "audit"},
-            {"agent": "performance_monitor", "action": "benchmark"}
+            {"agent": "performance_monitor", "action": "benchmark"},
         ],
         "content_marketing": [
             {"agent": "seo_optimizer", "action": "research"},
             {"agent": "content_generator", "action": "write"},
             {"agent": "email_marketing", "action": "campaign"},
-            {"agent": "analytics_reporter", "action": "track"}
+            {"agent": "analytics_reporter", "action": "track"},
         ],
         "ecommerce_optimize": [
             {"agent": "inventory_optimizer", "action": "forecast"},
             {"agent": "pricing_engine", "action": "optimize"},
             {"agent": "cart_optimizer", "action": "reduce_abandonment"},
-            {"agent": "recommendation_engine", "action": "suggest"}
-        ]
+            {"agent": "recommendation_engine", "action": "suggest"},
+        ],
     }
 
     workflow_steps = workflows.get(request.workflow)
@@ -604,7 +611,7 @@ async def devskyy_batch_execute(
             total_agents=0,
             total_time_ms=0,
             results=[],
-            summary={"error": f"Unknown workflow: {request.workflow}"}
+            summary={"error": f"Unknown workflow: {request.workflow}"},
         )
 
     # Execute workflow
@@ -620,9 +627,9 @@ async def devskyy_batch_execute(
                 "workflow": request.workflow,
                 "steps": workflow_steps,
                 "parameters": request.parameters,
-                "mode": request.execution_mode
+                "mode": request.execution_mode,
             },
-            timeout=120.0
+            timeout=120.0,
         )
         response.raise_for_status()
 
@@ -638,7 +645,7 @@ async def devskyy_batch_execute(
                 agent_used=step.get("agent"),
                 execution_time_ms=step.get("duration_ms", 0),
                 result=step.get("result", {}),
-                next_actions=None
+                next_actions=None,
             )
             for step in result_data.get("steps", [])
         ]
@@ -651,7 +658,7 @@ async def devskyy_batch_execute(
             total_agents=len(workflow_steps),
             total_time_ms=execution_time,
             results=step_results,
-            summary=result_data.get("summary", {})
+            summary=result_data.get("summary", {}),
         )
 
     except httpx.HTTPError as e:
@@ -663,18 +670,17 @@ async def devskyy_batch_execute(
             total_agents=len(workflow_steps),
             total_time_ms=execution_time,
             results=[],
-            summary={"error": str(e)}
+            summary={"error": str(e)},
         )
+
 
 # ===========================
 # Tool 3: Query (Cached Intelligence)
 # ===========================
 
+
 @mcp.tool()
-async def devskyy_query(
-    request: QueryRequest,
-    ctx: Context[ServerSession, DevSkyyAppContext]
-) -> QueryResult:
+async def devskyy_query(request: QueryRequest, ctx: Context[ServerSession, DevSkyyAppContext]) -> QueryResult:
     """
     Query DevSkyy platform data with Redis caching.
 
@@ -702,7 +708,9 @@ async def devskyy_query(
     redis_client = ctx.request_context.lifespan_context.redis_client
 
     # Generate cache key
-    cache_key = f"devskyy:query:{request.query_type}:{hashlib.md5(json.dumps(request.filters or {}).encode(), usedforsecurity=False).hexdigest()}"
+    cache_key = (
+        f"devskyy:query:{request.query_type}:{hashlib.md5(json.dumps(request.filters or {}).encode(), usedforsecurity=False).hexdigest()}"
+    )
 
     # Try cache first
     if redis_client:
@@ -714,7 +722,7 @@ async def devskyy_query(
                     query_type=request.query_type,
                     cache_hit=True,
                     data=json.loads(cached_data),
-                    cached_at=datetime.utcnow()
+                    cached_at=datetime.utcnow(),
                 )
         except Exception as e:
             await ctx.warning(f"Cache read failed: {e}")
@@ -725,10 +733,7 @@ async def devskyy_query(
     client = ctx.request_context.lifespan_context.http_client
 
     try:
-        response = await client.get(
-            f"/api/v1/agents/registry/{request.query_type}",
-            params=request.filters
-        )
+        response = await client.get(f"/api/v1/agents/registry/{request.query_type}", params=request.filters)
         response.raise_for_status()
 
         data = response.json()
@@ -736,40 +741,25 @@ async def devskyy_query(
         # Cache the result
         if redis_client:
             try:
-                await redis_client.setex(
-                    cache_key,
-                    request.cache_ttl,
-                    json.dumps(data)
-                )
+                await redis_client.setex(cache_key, request.cache_ttl, json.dumps(data))
                 await ctx.debug(f"Cached result for {request.cache_ttl}s")
             except Exception as e:
                 await ctx.warning(f"Cache write failed: {e}")
 
-        return QueryResult(
-            query_type=request.query_type,
-            cache_hit=False,
-            data=data,
-            cached_at=None
-        )
+        return QueryResult(query_type=request.query_type, cache_hit=False, data=data, cached_at=None)
 
     except httpx.HTTPError as e:
         await ctx.error(f"Query failed: {e}")
-        return QueryResult(
-            query_type=request.query_type,
-            cache_hit=False,
-            data={"error": str(e)},
-            cached_at=None
-        )
+        return QueryResult(query_type=request.query_type, cache_hit=False, data={"error": str(e)}, cached_at=None)
+
 
 # ===========================
 # Tool 4: Analyze (ML-Powered Insights)
 # ===========================
 
+
 @mcp.tool()
-async def devskyy_analyze(
-    request: AnalyzeRequest,
-    ctx: Context[ServerSession, DevSkyyAppContext]
-) -> AnalyzeResult:
+async def devskyy_analyze(request: AnalyzeRequest, ctx: Context[ServerSession, DevSkyyAppContext]) -> AnalyzeResult:
     """
     ML-powered analysis with compressed insights.
 
@@ -803,12 +793,8 @@ async def devskyy_analyze(
     try:
         response = await client.post(
             "/api/v1/ml/analyze",
-            json={
-                "type": request.analysis_type,
-                "source": request.data_source,
-                **request.parameters
-            },
-            timeout=30.0
+            json={"type": request.analysis_type, "source": request.data_source, **request.parameters},
+            timeout=30.0,
         )
         response.raise_for_status()
 
@@ -833,7 +819,7 @@ async def devskyy_analyze(
             confidence=data.get("confidence", 0.0),
             top_insights=top_insights,
             recommendations=top_recommendations,
-            full_report_url=data.get("report_url")
+            full_report_url=data.get("report_url"),
         )
 
     except httpx.HTTPError as e:
@@ -844,18 +830,17 @@ async def devskyy_analyze(
             confidence=0.0,
             top_insights=[f"Analysis failed: {e!s}"],
             recommendations=["Check API connectivity", "Verify data source"],
-            full_report_url=None
+            full_report_url=None,
         )
+
 
 # ===========================
 # Tool 5: Status (Real-Time Monitoring)
 # ===========================
 
+
 @mcp.tool()
-async def devskyy_status(
-    request: StatusRequest,
-    ctx: Context[ServerSession, DevSkyyAppContext]
-) -> StatusResult:
+async def devskyy_status(request: StatusRequest, ctx: Context[ServerSession, DevSkyyAppContext]) -> StatusResult:
     """
     Get system status with minimal token usage.
 
@@ -903,7 +888,7 @@ async def devskyy_status(
             active_agents=data.get("active_agents", 0),
             recent_errors=data.get("recent_errors", 0),
             summary=summary,
-            details_url=data.get("dashboard_url")
+            details_url=data.get("dashboard_url"),
         )
 
     except httpx.HTTPError as e:
@@ -914,12 +899,14 @@ async def devskyy_status(
             active_agents=0,
             recent_errors=999,
             summary=f"ERROR: Status check failed - {e!s}",
-            details_url=None
+            details_url=None,
         )
+
 
 # ===========================
 # Main Entry Point
 # ===========================
+
 
 def main():
     """Main entry point with argument parsing."""
@@ -928,19 +915,10 @@ def main():
         "--transport",
         choices=["stdio", "streamable-http"],
         default="stdio",
-        help="Transport protocol (default: stdio for Claude Desktop)"
+        help="Transport protocol (default: stdio for Claude Desktop)",
     )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port for HTTP transport (default: 8000)"
-    )
-    parser.add_argument(
-        "--host",
-        default="0.0.0.0",
-        help="Host for HTTP transport (default: 0.0.0.0)"
-    )
+    parser.add_argument("--port", type=int, default=8000, help="Port for HTTP transport (default: 8000)")
+    parser.add_argument("--host", default="0.0.0.0", help="Host for HTTP transport (default: 0.0.0.0)")
 
     args = parser.parse_args()
 
@@ -948,7 +926,8 @@ def main():
     if not API_KEY:
         print("⚠️  DEVSKYY_API_KEY not set - using empty key for testing")
 
-    print(f"""
+    print(
+        f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
 ║   DevSkyy Enterprise MCP Server v2.0                         ║
@@ -981,13 +960,15 @@ def main():
    • Code Quality Improvement
 
 Starting server on {args.transport}...
-""")
+"""
+    )
 
     # Run server
     if args.transport == "streamable-http":
         mcp.run(transport="streamable-http", port=args.port, host=args.host)
     else:
         mcp.run(transport="stdio")
+
 
 if __name__ == "__main__":
     main()

@@ -270,39 +270,20 @@ class SecurityManager:
     # ============================================================================
     # ENCRYPTION & SECRETS
     # ============================================================================
-
-    def encrypt_data(self, data: str, key: Optional[str] = None) -> str:
-        """
-        Encrypt sensitive data.
-
-        Args:
-            data: Data to encrypt
-            key: Encryption key (generated if not provided)
-
-        Returns:
-            Encrypted data as hex string
-        """
-        if not key:
-            key = secrets.token_bytes(32)
-
-        # Simple XOR encryption (in production, use proper encryption like AES)
-        encrypted = bytearray()
-        data_bytes = data.encode()
-
-        for i, byte in enumerate(data_bytes):
-            encrypted.append(byte ^ key[i % len(key)])
-
-        return encrypted.hex()
-
-    def decrypt_data(self, encrypted_hex: str, key: str) -> str:
-        """Decrypt data"""
-        encrypted = bytes.fromhex(encrypted_hex)
-        decrypted = bytearray()
-
-        for i, byte in enumerate(encrypted):
-            decrypted.append(byte ^ key[i % len(key)])
-
-        return decrypted.decode()
+    # NOTE: For data encryption, use the security.encryption module which provides
+    # AES-256-GCM encryption (NIST SP 800-38D compliant).
+    #
+    # Example usage:
+    #   from security.encryption import encrypt_field, decrypt_field
+    #   encrypted = encrypt_field("sensitive_data")
+    #   decrypted = decrypt_field(encrypted)
+    #
+    # The security.encryption module provides:
+    # - AES-256-GCM authenticated encryption
+    # - PBKDF2 key derivation (NIST SP 800-132)
+    # - Automatic nonce generation
+    # - Key rotation support
+    # - Field-level and dictionary encryption
 
     def store_secret(self, secret_name: str, secret_value: str):
         """Store a secret securely"""

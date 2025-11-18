@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 # FUNCTION SCHEMA GENERATION
 # ============================================================================
 
+
 def python_type_to_json_schema(py_type: type) -> dict[str, str]:
     """
     Convert Python type to JSON Schema type
@@ -67,10 +68,7 @@ def python_type_to_json_schema(py_type: type) -> dict[str, str]:
     if hasattr(py_type, "__origin__"):
         if py_type.__origin__ is list:
             item_type = py_type.__args__[0] if py_type.__args__ else Any
-            return {
-                "type": "array",
-                "items": python_type_to_json_schema(item_type)
-            }
+            return {"type": "array", "items": python_type_to_json_schema(item_type)}
         elif py_type.__origin__ is dict:
             return {"type": "object"}
 
@@ -117,11 +115,7 @@ def generate_function_schema(func: Callable) -> dict[str, Any]:
     function_schema = {
         "name": func.__name__,
         "description": func.__doc__ or f"Function: {func.__name__}",
-        "parameters": {
-            "type": "object",
-            "properties": properties,
-            "required": required
-        }
+        "parameters": {"type": "object", "properties": properties, "required": required},
     }
 
     return function_schema
@@ -130,6 +124,7 @@ def generate_function_schema(func: Callable) -> dict[str, Any]:
 # ============================================================================
 # OPENAI FUNCTION CALLING CLIENT
 # ============================================================================
+
 
 class OpenAIFunctionCallingClient:
     """
@@ -143,12 +138,7 @@ class OpenAIFunctionCallingClient:
     - Error handling
     """
 
-    def __init__(
-        self,
-        api_key: Optional[str] = None,
-        model: str = "gpt-4o",
-        enable_safeguards: bool = True
-    ):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o", enable_safeguards: bool = True):
         """
         Initialize OpenAI function calling client
 
@@ -165,13 +155,8 @@ class OpenAIFunctionCallingClient:
 
         # Initialize OpenAI client with consequential header
         if self.api_key:
-            default_headers = {
-                "x-openai-isConsequential": str(self.is_consequential).lower()
-            }
-            self.client = openai.AsyncOpenAI(
-                api_key=self.api_key,
-                default_headers=default_headers
-            )
+            default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+            self.client = openai.AsyncOpenAI(api_key=self.api_key, default_headers=default_headers)
             logger.info(
                 f"✅ OpenAI Function Calling Client initialized "
                 f"(model={model}, consequential={self.is_consequential})"
@@ -192,10 +177,7 @@ class OpenAIFunctionCallingClient:
         self.functions: dict[str, tuple[Callable, dict, ToolCallConfig]] = {}
 
     def register_function(
-        self,
-        func: Callable,
-        tool_config: Optional[ToolCallConfig] = None,
-        schema: Optional[dict] = None
+        self, func: Callable, tool_config: Optional[ToolCallConfig] = None, schema: Optional[dict] = None
     ):
         """
         Register a function for calling
@@ -218,7 +200,7 @@ class OpenAIFunctionCallingClient:
                 description=schema["description"],
                 permission_level=ToolPermissionLevel.AUTHENTICATED,
                 risk_level=ToolRiskLevel.MEDIUM,
-                provider=ToolProvider.OPENAI
+                provider=ToolProvider.OPENAI,
             )
 
         # Register with tool safeguard manager
@@ -236,7 +218,7 @@ class OpenAIFunctionCallingClient:
         function_names: Optional[list[str]] = None,
         user_id: Optional[str] = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
-        max_tokens: int = 1000
+        max_tokens: int = 1000,
     ) -> dict[str, Any]:
         """
         Use AI to determine which function to call and execute it
@@ -256,11 +238,7 @@ class OpenAIFunctionCallingClient:
 
         # Get functions to make available
         if function_names:
-            available_functions = {
-                name: self.functions[name]
-                for name in function_names
-                if name in self.functions
-            }
+            available_functions = {name: self.functions[name] for name in function_names if name in self.functions}
         else:
             available_functions = self.functions
 
@@ -268,20 +246,12 @@ class OpenAIFunctionCallingClient:
             raise ValueError("No functions registered")
 
         # Build tools array for OpenAI
-        tools = [
-            {
-                "type": "function",
-                "function": schema
-            }
-            for _, schema, _ in available_functions.values()
-        ]
+        tools = [{"type": "function", "function": schema} for _, schema, _ in available_functions.values()]
 
         # Validate with OpenAI safeguards
         if self.enable_safeguards:
             allowed, reason = await self.safeguard_manager.validate_request(
-                operation_type=OperationType.CODE_GENERATION,
-                is_consequential=self.is_consequential,
-                prompt=prompt
+                operation_type=OperationType.CODE_GENERATION, is_consequential=self.is_consequential, prompt=prompt
             )
 
             if not allowed:
@@ -291,12 +261,10 @@ class OpenAIFunctionCallingClient:
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 tools=tools,
                 tool_choice="auto",
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
             )
 
             # Check if AI wants to call a function
@@ -315,26 +283,15 @@ class OpenAIFunctionCallingClient:
                         function_name=function_name,
                         arguments=function_args,
                         user_id=user_id,
-                        permission_level=permission_level
+                        permission_level=permission_level,
                     )
 
-                    results.append({
-                        "function": function_name,
-                        "arguments": function_args,
-                        "result": result
-                    })
+                    results.append({"function": function_name, "arguments": function_args, "result": result})
 
-                return {
-                    "type": "function_calls",
-                    "calls": results,
-                    "ai_message": message.content
-                }
+                return {"type": "function_calls", "calls": results, "ai_message": message.content}
             else:
                 # No function calls, just return AI response
-                return {
-                    "type": "text_response",
-                    "content": message.content
-                }
+                return {"type": "text_response", "content": message.content}
 
         except Exception as e:
             logger.error(f"❌ OpenAI function calling failed: {e}")
@@ -345,7 +302,7 @@ class OpenAIFunctionCallingClient:
         function_name: str,
         arguments: dict[str, Any],
         user_id: Optional[str] = None,
-        permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
+        permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
     ) -> Any:
         """
         Execute a registered function with safeguards
@@ -370,7 +327,7 @@ class OpenAIFunctionCallingClient:
             provider=ToolProvider.OPENAI,
             user_id=user_id,
             permission_level=permission_level,
-            parameters=arguments
+            parameters=arguments,
         )
 
         # Execute with safeguards
@@ -383,10 +340,7 @@ class OpenAIFunctionCallingClient:
                 else:
                     return func(**arguments)
 
-            response = await self.tool_safeguard_manager.execute_tool_call(
-                request=request,
-                func=execute_func
-            )
+            response = await self.tool_safeguard_manager.execute_tool_call(request=request, func=execute_func)
 
             return response.result
 
@@ -411,11 +365,12 @@ class OpenAIFunctionCallingClient:
 # DECORATOR FOR EASY FUNCTION REGISTRATION
 # ============================================================================
 
+
 def openai_function(
     permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
     risk_level: ToolRiskLevel = ToolRiskLevel.MEDIUM,
     max_calls_per_minute: int = 10,
-    is_consequential: bool = True
+    is_consequential: bool = True,
 ):
     """
     Decorator to register a function for OpenAI function calling
@@ -426,6 +381,7 @@ def openai_function(
             '''Get weather for a location'''
             return {"temperature": 72, "conditions": "sunny"}
     """
+
     def decorator(func: Callable) -> Callable:
         # Store metadata on function
         func._openai_function_config = ToolCallConfig(
@@ -435,7 +391,7 @@ def openai_function(
             risk_level=risk_level,
             provider=ToolProvider.OPENAI,
             max_calls_per_minute=max_calls_per_minute,
-            is_consequential=is_consequential
+            is_consequential=is_consequential,
         )
         return func
 
@@ -449,10 +405,7 @@ def openai_function(
 _global_client: Optional[OpenAIFunctionCallingClient] = None
 
 
-def get_openai_function_client(
-    model: str = "gpt-4o",
-    enable_safeguards: bool = True
-) -> OpenAIFunctionCallingClient:
+def get_openai_function_client(model: str = "gpt-4o", enable_safeguards: bool = True) -> OpenAIFunctionCallingClient:
     """
     Get global OpenAI function calling client
 
@@ -466,10 +419,7 @@ def get_openai_function_client(
     global _global_client
 
     if _global_client is None:
-        _global_client = OpenAIFunctionCallingClient(
-            model=model,
-            enable_safeguards=enable_safeguards
-        )
+        _global_client = OpenAIFunctionCallingClient(model=model, enable_safeguards=enable_safeguards)
 
     return _global_client
 

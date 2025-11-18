@@ -5,6 +5,56 @@ All notable changes to the DevSkyy Enterprise Platform are documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and the Truth Protocol.
 
+## [Unreleased] - 2025-11-18
+
+### Security - Comprehensive Vulnerability Scan & Remediation
+
+- **Security Scan Completed** - Full SAST and dependency analysis
+  - Bandit SAST scan: 174 issues identified (15 HIGH, 41 MED, 118 LOW)
+  - pip-audit: 7 CVEs found in 3 packages
+  - Generated error ledger: `artifacts/error-ledger-20251118_160258.json`
+  - Generated comprehensive report: `artifacts/SECURITY_SCAN_REPORT_20251118.md`
+
+### Fixed - HIGH Severity Security Issues
+
+- **MD5 Hash Usage (CWE-327)** - Fixed 10 occurrences across 6 files
+  - Added `usedforsecurity=False` parameter to all MD5 calls
+  - Files: claude_sonnet_intelligence_service_v2.py, database_optimizer.py, inventory_agent.py, partnership_grok_brand.py, devskyy_mcp_enterprise_v2.py, skyy_rose_3d_pipeline.py
+  - Justification: MD5 used only for cache keys and identifiers, not security operations
+
+- **FTP Cleartext Transmission (CWE-319)** - Added security warnings
+  - Added deprecation notice recommending SFTP instead
+  - Runtime warning when FTP method is used
+  - File: agent/wordpress/automated_theme_uploader.py
+
+- **SSH Host Key Verification (CWE-295)** - Implemented environment-based control
+  - Changed from WarningPolicy to AutoAddPolicy (dev) or RejectPolicy (prod)
+  - New environment variable: SSH_STRICT_HOST_KEY_CHECKING
+  - Files: wordpress_server_access.py, automated_theme_uploader.py
+
+- **setuptools Vulnerability** - Upgraded from 68.1.2 to 78.1.1
+  - Fixes CVE-2025-47273 (path traversal → RCE)
+  - Fixes CVE-2024-6345 (package_index RCE)
+
+### Known Issues - Require Docker Rebuild
+
+- **cryptography 41.0.7** - Needs upgrade to >=46.0.3 (4 CVEs)
+  - System-installed by Debian, cannot be upgraded without Docker rebuild
+  - requirements.txt already specifies correct version
+  - Remediation: Add `RUN pip install --upgrade 'cryptography>=46.0.3'` to Dockerfiles
+
+- **pip 24.0** - Needs upgrade to >=25.3 (CVE-2025-8869)
+  - System-installed, requires Docker base image update
+  - Remediation: Add `RUN pip install --upgrade 'pip>=25.3'` to Dockerfiles
+
+### Verified - Already Secured
+
+- **XML-RPC Protection** - defusedxml.xmlrpc.monkey_patch() already implemented
+  - Protects against XXE, billion laughs, and quadratic blowup attacks
+  - File: wordpress_direct_service.py
+
+---
+
 ## [Unreleased] - 2025-11-16
 
 ### Added - Repository Consolidation & Optimization

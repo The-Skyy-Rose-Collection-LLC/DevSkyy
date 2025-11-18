@@ -346,9 +346,7 @@ class TestScriptIntegration:
         sbom = {
             "bomFormat": "CycloneDX",
             "specVersion": "1.5",
-            "metadata": {
-                "component": {"type": "application", "name": "DevSkyy", "version": "5.2.1"}
-            },
+            "metadata": {"component": {"type": "application", "name": "DevSkyy", "version": "5.2.1"}},
             "components": [
                 {"name": "fastapi", "version": "0.119.0", "purl": "pkg:pypi/fastapi@0.119.0"},
                 {"name": "pydantic", "version": "2.9.0", "purl": "pkg:pypi/pydantic@2.9.0"},

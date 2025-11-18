@@ -33,13 +33,16 @@ class CustomerServiceAgent:
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
             from config.unified_config import get_config
+
             config = get_config()
             is_consequential = config.ai.openai_is_consequential
             default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
 
             self.openai_client = openai.OpenAI(api_key=api_key, default_headers=default_headers)
             self.god_mode_active = True
-            logger.info(f"💎 Customer Service Agent initialized with OpenAI GOD MODE (consequential={is_consequential})")
+            logger.info(
+                f"💎 Customer Service Agent initialized with OpenAI GOD MODE (consequential={is_consequential})"
+            )
         else:
             self.openai_client = None
             self.god_mode_active = False

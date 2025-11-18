@@ -52,10 +52,7 @@ class ContinuousLearningBackgroundAgent:
         default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
 
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            default_headers=default_headers
-        )
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), default_headers=default_headers)
 
         # Knowledge base
         self.learned_practices: dict[str, list[dict[str, Any]]] = defaultdict(list)
