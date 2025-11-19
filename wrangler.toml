@@ -1,0 +1,22 @@
+name = "devskyy-enterprise-platform"
+compatibility_date = "2024-11-19"
+
+# Cloudflare Pages configuration
+pages_build_output_dir = "public"
+
+[build]
+command = "mkdir -p public && cp -r templates/* public/ 2>/dev/null || echo 'Creating public directory'"
+cwd = ""
+
+[env.production]
+name = "devskyy-enterprise-platform"
+
+[env.preview]
+name = "devskyy-preview"
+
+# Note: This is a Python FastAPI backend project.
+# Cloudflare Pages is designed for static sites.
+# Consider using:
+# 1. Cloudflare Workers with Python (via Pyodide) for backend
+# 2. Keep using Vercel for the FastAPI backend
+# 3. Or use Cloudflare Pages for static documentation only
