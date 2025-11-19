@@ -5,8 +5,8 @@
 
 # Build arguments for CI/CD integration
 ARG PYTHON_VERSION=3.11
-ARG BUILD_DATE
-ARG VCS_REF
+ARG BUILD_DATE="unknown"
+ARG VCS_REF="unknown"
 
 # Stage 1: Base Python image
 FROM python:${PYTHON_VERSION}-slim AS base
@@ -53,7 +53,7 @@ FROM base AS application
 
 # Build metadata for CI/CD tracking
 LABEL maintainer="DevSkyy Enterprise Team" \
-      version="5.1.0" \
+      version="5.2.0" \
       description="DevSkyy Enterprise AI Platform" \
       build-date="${BUILD_DATE}" \
       vcs-ref="${VCS_REF}"

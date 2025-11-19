@@ -1,0 +1,77 @@
+# Vercel Serverless Function Dependencies
+# Minimal production dependencies for Vercel deployment
+# Max bundle size: 50MB (per Vercel limits)
+# Version: 1.0.0
+# ============================================================================
+
+# ============================================================================
+# BUILD DEPENDENCIES (Security-Critical)
+# ============================================================================
+setuptools>=78.1.1,<79.0.0  # SECURITY: Fix CVE-2025-47273, CVE-2024-6345
+pip>=25.3
+
+# ============================================================================
+# CORE FRAMEWORK (Required)
+# ============================================================================
+fastapi>=0.120.0,<0.121.0  # SECURITY FIX: CVE-2025-62727
+uvicorn[standard]~=0.38.0  # ASGI server
+pydantic[email]>=2.9.0,<3.0.0  # Schema validation
+python-dotenv>=1.1.0,<2.0.0  # Environment variables (compatible with fastmcp>=2.13.0)
+email-validator~=2.1.0  # Email validation
+
+# ============================================================================
+# DATABASE (Essential)
+# ============================================================================
+SQLAlchemy~=2.0.36  # ORM
+aiosqlite~=0.20.0  # Async SQLite (lightweight for Vercel)
+
+# ============================================================================
+# HTTP & API (Essential)
+# ============================================================================
+requests>=2.32.4,<3.0.0  # SECURITY: Fix GHSA-9hjg-9r4m-mvj7
+python-multipart~=0.0.18  # File upload support
+aiofiles~=24.1.0  # Async file operations
+httpx~=0.28.1  # Async HTTP client
+
+# ============================================================================
+# AUTHENTICATION & SECURITY (Required)
+# ============================================================================
+passlib[bcrypt]>=1.7.4,<2.0.0  # Password hashing
+cryptography>=46.0.3,<47.0.0  # SECURITY: AES-256-GCM encryption
+PyJWT~=2.10.1  # JWT tokens (RFC 7519)
+bcrypt>=4.2.1,<5.0.0  # SECURITY: Password hashing
+argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2id hashing
+defusedxml>=0.7.1,<1.0.0  # SECURITY: XXE protection
+
+# ============================================================================
+# SECURITY MIDDLEWARE (Required)
+# ============================================================================
+slowapi~=0.1.9  # Rate limiting
+secure~=0.3.0  # Security headers
+
+# ============================================================================
+# AI CORE (Essential - Keep lightweight)
+# ============================================================================
+anthropic~=0.69.0  # Claude API
+openai~=2.7.2  # GPT API
+
+# ============================================================================
+# MONITORING (Lightweight)
+# ============================================================================
+python-json-logger~=3.2.0  # JSON logging
+loguru~=0.7.3  # Logging
+
+# ============================================================================
+# DATE & TIME (Essential)
+# ============================================================================
+python-dateutil~=2.9.0.post0
+pytz~=2024.2
+
+# ============================================================================
+# NOTE: Heavy dependencies excluded for Vercel bundle size limits
+# - No torch/transformers (use API calls instead)
+# - No computer vision libraries (use external services)
+# - No video processing
+# - No web automation (Selenium/Playwright)
+# For full feature set, use Docker deployment or other platforms
+# ============================================================================
