@@ -1,3 +1,0 @@
-# Cloudflare Pages redirects
-/api/*  https://devskyy.vercel.app/api/:splat  200
-/*      /index.html  200
