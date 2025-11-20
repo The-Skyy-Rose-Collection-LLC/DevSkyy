@@ -41,6 +41,7 @@ SQLAlchemy~=2.0.36  # ORM - works with SQLite, PostgreSQL, MySQL
 aiosqlite~=0.20.0  # Async SQLite driver
 asyncpg~=0.30.0  # Async PostgreSQL driver
 psycopg2-binary~=2.9.9  # PostgreSQL driver for Neon integration
+neon-api~=0.3.0  # Neon serverless Postgres API client
 
 # ============================================================================
 # HTTP & API
