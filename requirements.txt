@@ -308,6 +308,6 @@ pinecone-client~=5.0.1  # Managed vector database for production RAG
 # ============================================================================
 stripe~=11.1.1  # Payment processing and subscriptions
 # sendgrid~=6.11.0  # Email delivery - DISABLED: starkbank-ecdsa build issue, use SMTP or alternatives
-litellm~=1.52.14  # Multi-LLM routing with fallbacks and cost optimization
+litellm>=1.61.15,<2.0.0  # SECURITY: Fix GHSA-fh2c-86xm-pm2x, GHSA-fjcf-3j3r-78rp, GHSA-gw2q-qw9j-rgv7 (3 HIGH severity CVEs)
 PyGithub~=2.5.0  # GitHub API automation
 posthog~=3.8.2  # Product analytics and feature flags

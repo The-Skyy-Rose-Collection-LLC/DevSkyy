@@ -62,7 +62,7 @@ class PineconeManager:
             indexes = self.pc.list_indexes()
 
             print("✅ Successfully connected to Pinecone!")
-            print(f"📊 API Key: ***{self.api_key[-8:]}")
+            print("📊 API Key configured (redacted for security)")
             print(f"🌍 Environment: {self.environment}")
             print(f"📁 Default Index Name: {self.index_name}")
             print(f"📋 Total Indexes: {len(indexes.names())}")

@@ -66,20 +66,63 @@ if [[ $has_credentials == "y" || $has_credentials == "Y" ]]; then
     echo "Great! Let's configure your Neon credentials..."
     echo ""
 
-    # Get DATABASE_URL
+    # Get DATABASE_URL with validation
     echo "📝 DATABASE_URL:"
     echo "   (Example: postgresql://user:pass@ep-xxx-xxx.us-east-2.aws.neon.tech/devskyy?sslmode=require)"
-    read -p "   Enter your DATABASE_URL: " database_url
+    database_url=""
+    attempts=0
+    max_attempts=3
+    while [[ -z "$database_url" || ! "$database_url" =~ ^postgresql:// ]]; do
+        read -p "   Enter your DATABASE_URL: " database_url
+        if [[ -z "$database_url" ]]; then
+            echo "   ❌ ERROR: DATABASE_URL cannot be empty"
+            ((attempts++))
+        elif [[ ! "$database_url" =~ ^postgresql:// ]]; then
+            echo "   ❌ ERROR: DATABASE_URL must start with 'postgresql://'"
+            ((attempts++))
+        fi
+        if [[ $attempts -ge $max_attempts ]]; then
+            echo "   ❌ Maximum attempts reached. Exiting."
+            exit 1
+        fi
+    done
 
-    # Get NEON_API_KEY
+    # Get NEON_API_KEY with validation
     echo ""
     echo "📝 NEON_API_KEY:"
-    read -p "   Enter your API key: " neon_api_key
+    neon_api_key=""
+    attempts=0
+    while [[ -z "$neon_api_key" || ${#neon_api_key} -lt 10 ]]; do
+        read -p "   Enter your API key: " neon_api_key
+        if [[ -z "$neon_api_key" ]]; then
+            echo "   ❌ ERROR: NEON_API_KEY cannot be empty"
+            ((attempts++))
+        elif [[ ${#neon_api_key} -lt 10 ]]; then
+            echo "   ❌ ERROR: NEON_API_KEY seems too short (must be at least 10 characters)"
+            ((attempts++))
+        fi
+        if [[ $attempts -ge $max_attempts ]]; then
+            echo "   ❌ Maximum attempts reached. Exiting."
+            exit 1
+        fi
+    done
 
-    # Get NEON_PROJECT_ID
+    # Get NEON_PROJECT_ID with validation
     echo ""
     echo "📝 NEON_PROJECT_ID:"
-    read -p "   Enter your project ID: " neon_project_id
+    neon_project_id=""
+    attempts=0
+    while [[ -z "$neon_project_id" ]]; do
+        read -p "   Enter your project ID: " neon_project_id
+        if [[ -z "$neon_project_id" ]]; then
+            echo "   ❌ ERROR: NEON_PROJECT_ID cannot be empty"
+            ((attempts++))
+        fi
+        if [[ $attempts -ge $max_attempts ]]; then
+            echo "   ❌ Maximum attempts reached. Exiting."
+            exit 1
+        fi
+    done
 
     # Update .env file
     echo ""

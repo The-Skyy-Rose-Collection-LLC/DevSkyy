@@ -35,7 +35,7 @@ claude mcp test neon
 
 ```bash
 # Start MCP gateway
-docker-compose -f docker-compose.dev.yml up -d mcp-gateway
+docker-compose -f docker-compose.mcp.yml up -d mcp-gateway
 
 # Check gateway status
 curl http://localhost:3000/health
@@ -161,8 +161,15 @@ curl http://localhost:3000/health
 # List servers
 curl http://localhost:3000/servers
 
-# Test Neon specifically
-curl http://localhost:3000/health/neon
+# Test Neon server with MCP request
+curl -X POST http://localhost:3000/mcp/neon \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "list_branches",
+    "params": {},
+    "id": 1
+  }'
 ```
 
 ### Test Local Claude Desktop
@@ -180,13 +187,13 @@ List all branches in my Neon project
 
 ```bash
 # Check if gateway is running
-docker-compose ps mcp-gateway
+docker-compose -f docker-compose.mcp.yml ps mcp-gateway
 
 # Check logs
-docker-compose logs mcp-gateway
+docker-compose -f docker-compose.mcp.yml logs mcp-gateway
 
 # Restart gateway
-docker-compose restart mcp-gateway
+docker-compose -f docker-compose.mcp.yml restart mcp-gateway
 ```
 
 ### Issue: "Authentication failed"
