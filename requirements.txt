@@ -302,3 +302,12 @@ mkdocs-material~=9.5.47  # Material Design theme for MkDocs
 # VECTOR DATABASES (PRODUCTION-GRADE)
 # ============================================================================
 pinecone-client~=5.0.1  # Managed vector database for production RAG
+
+# ============================================================================
+# TIER 1 SDKs (High Priority) - Added 2025-11-20
+# ============================================================================
+stripe~=11.1.1  # Payment processing and subscriptions
+# sendgrid~=6.11.0  # Email delivery - DISABLED: starkbank-ecdsa build issue, use SMTP or alternatives
+litellm~=1.52.14  # Multi-LLM routing with fallbacks and cost optimization
+PyGithub~=2.5.0  # GitHub API automation
+posthog~=3.8.2  # Product analytics and feature flags
