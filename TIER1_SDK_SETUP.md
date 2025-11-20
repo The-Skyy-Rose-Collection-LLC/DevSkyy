@@ -267,11 +267,13 @@ async def send_email_via_sendgrid_api(to: str, subject: str, html_body: str):
     print(f"✅ Email sent to {to}")
 
 # Usage
-await send_email_via_sendgrid_api(
+import asyncio
+
+asyncio.run(send_email_via_sendgrid_api(
     to="user@example.com",
     subject="Welcome to DevSkyy",
     html_body="<h1>Welcome!</h1>"
-)
+))
 ```
 
 #### Option 3: Alternative Email SDKs

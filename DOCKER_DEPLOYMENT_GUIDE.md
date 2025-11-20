@@ -372,11 +372,14 @@ OPENAI_API_KEY=your-key-here
 # Database
 POSTGRES_DB=devskyy
 POSTGRES_USER=devskyy
-DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD}@postgres:5432/devskyy
 
 # Domain
 DOMAIN=your-domain.com
 EOF
+
+# Generate DATABASE_URL with the password (must be done separately for proper expansion)
+POSTGRES_PASSWORD=$(grep POSTGRES_PASSWORD= .env.prod | cut -d= -f2)
+echo "DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD}@postgres:5432/devskyy" >> .env.prod
 ```
 
 ### 4. Deploy to Production

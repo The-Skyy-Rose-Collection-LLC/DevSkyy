@@ -177,8 +177,8 @@ curl https://your-domain.com/health
 # Monitor logs
 docker-compose -f docker-compose.prod.yml logs -f api
 
-# Access monitoring
-open https://your-domain.com:3001  # Grafana (admin/admin)
+# Access monitoring (change default credentials immediately after first login)
+open https://your-domain.com:3001  # Grafana - login and set secure credentials
 
 # Check backups
 docker-compose -f docker-compose.prod.yml exec backup ls -lh /backups/

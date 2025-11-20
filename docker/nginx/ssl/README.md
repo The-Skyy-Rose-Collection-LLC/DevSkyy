@@ -51,9 +51,26 @@ docker run -it --rm --name certbot \
 
 ### Auto-Renewal Setup
 
-Add to crontab:
+Add to crontab (replace `/path/to/devskyy` with your actual project path):
 ```bash
-0 0 * * * docker run --rm --name certbot -v "$PWD/docker/nginx/ssl:/etc/letsencrypt" -v "$PWD/certbot-webroot:/var/www/certbot" certbot/certbot renew && docker-compose -f docker-compose.prod.yml restart nginx
+0 0 * * * docker run --rm --name certbot -v "/path/to/devskyy/docker/nginx/ssl:/etc/letsencrypt" -v "/path/to/devskyy/certbot-webroot:/var/www/certbot" certbot/certbot renew && cd /path/to/devskyy && docker-compose -f docker-compose.prod.yml restart nginx
+```
+
+Or create a renewal script `/usr/local/bin/renew-devskyy-certs.sh`:
+```bash
+#!/bin/bash
+PROJECT_DIR="/path/to/devskyy"
+docker run --rm --name certbot \
+  -v "${PROJECT_DIR}/docker/nginx/ssl:/etc/letsencrypt" \
+  -v "${PROJECT_DIR}/certbot-webroot:/var/www/certbot" \
+  certbot/certbot renew && \
+cd "${PROJECT_DIR}" && \
+docker-compose -f docker-compose.prod.yml restart nginx
+```
+
+Then add to crontab:
+```bash
+0 0 * * * /usr/local/bin/renew-devskyy-certs.sh >> /var/log/certbot-renewal.log 2>&1
 ```
 
 ## Required Files

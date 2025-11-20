@@ -438,6 +438,8 @@ subscription = stripe.Subscription.create(
 ### 3. Usage-Based Billing
 
 ```python
+import time
+
 # Metered billing (e.g., per API call)
 stripe.SubscriptionItem.create_usage_record(
     subscription_item="si_xxxxx",

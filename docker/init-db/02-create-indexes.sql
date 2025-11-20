@@ -73,7 +73,7 @@ CREATE OR REPLACE VIEW devskyy.table_stats AS
 SELECT
     schemaname,
     tablename,
-    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size,
+    pg_size_pretty(pg_total_relation_size(format('%I.%I', schemaname, tablename)::regclass)) AS size,
     n_live_tup AS row_count,
     n_dead_tup AS dead_rows,
     last_vacuum,
@@ -81,7 +81,7 @@ SELECT
     last_analyze,
     last_autoanalyze
 FROM pg_stat_user_tables
-ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+ORDER BY pg_total_relation_size(format('%I.%I', schemaname, tablename)::regclass) DESC;
 
 -- ============================================================================
 -- Success Message

@@ -13,7 +13,7 @@ GET /health
 ```json
 {
   "status": "healthy",
-  "version": "5.1.0-enterprise",
+  "version": "5.2.0",
   "environment": "development|staging|production",
   "timestamp": "2025-11-20T12:00:00",
   "uptime_seconds": 123.45

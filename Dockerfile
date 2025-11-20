@@ -121,7 +121,7 @@ CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000
 FROM base AS production
 
 # Copy Python packages from dependencies stage (minimal footprint)
-COPY --from=dependencies /root/.local /home/devskyy/.local
+COPY --from=dependencies --chown=devskyy:devskyy /root/.local /home/devskyy/.local
 
 # Copy application code with proper ownership (Truth Protocol Rule #13)
 COPY --chown=devskyy:devskyy . .

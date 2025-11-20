@@ -128,17 +128,22 @@ if [[ $has_credentials == "y" || $has_credentials == "Y" ]]; then
     echo ""
     echo "💾 Updating .env file..."
 
+    # Escape special characters for sed (& | / \)
+    database_url_escaped=$(printf '%s\n' "$database_url" | sed 's/[&/\]/\\&/g')
+    neon_api_key_escaped=$(printf '%s\n' "$neon_api_key" | sed 's/[&/\]/\\&/g')
+    neon_project_id_escaped=$(printf '%s\n' "$neon_project_id" | sed 's/[&/\]/\\&/g')
+
     # Use sed to replace placeholders
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
-        sed -i '' "s|DATABASE_URL=postgresql://user:password@ep-your-project.us-east-2.aws.neon.tech/devskyy?sslmode=require|DATABASE_URL=$database_url|g" .env
-        sed -i '' "s|NEON_API_KEY=your_neon_api_key_here|NEON_API_KEY=$neon_api_key|g" .env
-        sed -i '' "s|NEON_PROJECT_ID=your_project_id_here|NEON_PROJECT_ID=$neon_project_id|g" .env
+        sed -i '' "s|DATABASE_URL=postgresql://user:password@ep-your-project.us-east-2.aws.neon.tech/devskyy?sslmode=require|DATABASE_URL=$database_url_escaped|g" .env
+        sed -i '' "s|NEON_API_KEY=your_neon_api_key_here|NEON_API_KEY=$neon_api_key_escaped|g" .env
+        sed -i '' "s|NEON_PROJECT_ID=your_project_id_here|NEON_PROJECT_ID=$neon_project_id_escaped|g" .env
     else
         # Linux
-        sed -i "s|DATABASE_URL=postgresql://user:password@ep-your-project.us-east-2.aws.neon.tech/devskyy?sslmode=require|DATABASE_URL=$database_url|g" .env
-        sed -i "s|NEON_API_KEY=your_neon_api_key_here|NEON_API_KEY=$neon_api_key|g" .env
-        sed -i "s|NEON_PROJECT_ID=your_project_id_here|NEON_PROJECT_ID=$neon_project_id|g" .env
+        sed -i "s|DATABASE_URL=postgresql://user:password@ep-your-project.us-east-2.aws.neon.tech/devskyy?sslmode=require|DATABASE_URL=$database_url_escaped|g" .env
+        sed -i "s|NEON_API_KEY=your_neon_api_key_here|NEON_API_KEY=$neon_api_key_escaped|g" .env
+        sed -i "s|NEON_PROJECT_ID=your_project_id_here|NEON_PROJECT_ID=$neon_project_id_escaped|g" .env
     fi
 
     echo "✅ Configuration saved!"

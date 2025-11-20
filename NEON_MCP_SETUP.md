@@ -246,6 +246,8 @@ Once configured, you can use these tools:
 ### Example: Create Branch via API
 
 ```python
+import os
+import asyncio
 import httpx
 
 async def create_neon_branch(branch_name: str, parent_branch: str = "main"):
@@ -266,7 +268,7 @@ async def create_neon_branch(branch_name: str, parent_branch: str = "main"):
         return response.json()
 
 # Usage
-result = await create_neon_branch("feature-xyz")
+result = asyncio.run(create_neon_branch("feature-xyz"))
 print(f"Created branch: {result['result']['branch_id']}")
 ```
 
@@ -443,12 +445,26 @@ NEON_POOL_TIMEOUT = 30
 Cache frequently accessed data:
 
 ```python
-from functools import lru_cache
+# For async functions, use async-aware caching (e.g., aiocache or async_lru)
+# Note: functools.lru_cache does not work with async functions
 
-@lru_cache(maxsize=100)
+from aiocache import cached, Cache
+from aiocache.serializers import JsonSerializer
+
+@cached(ttl=300, cache=Cache.MEMORY, serializer=JsonSerializer())
 async def get_neon_branches(project_id: str):
-    # Cached for 5 minutes
+    # Cached for 5 minutes (300 seconds)
     return await mcp_client.list_branches(project_id)
+
+# Alternative: Manual caching with dict
+_branch_cache = {}
+
+async def get_neon_branches_manual(project_id: str):
+    if project_id in _branch_cache:
+        return _branch_cache[project_id]
+    result = await mcp_client.list_branches(project_id)
+    _branch_cache[project_id] = result
+    return result
 ```
 
 ### 3. Batch Operations
