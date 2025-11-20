@@ -1,0 +1,248 @@
+# ============================================================================
+# DevSkyy Enterprise Platform - Staging Docker Compose
+# Version: 5.2.0 | Production-like Environment for Testing
+# ============================================================================
+# Usage: docker-compose -f docker-compose.staging.yml up -d
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DevSkyy API (Staging Mode)
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        PYTHON_VERSION: 3.11
+        BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
+        VCS_REF: ${VCS_REF:-$(git rev-parse --short HEAD)}
+    image: devskyy:staging
+    container_name: devskyy-api-staging
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Staging Settings (production-like but with more logging)
+      - ENVIRONMENT=staging
+      - DEBUG=false
+      - LOG_LEVEL=DEBUG
+      - WORKERS=2
+
+      # Secrets
+      - SECRET_KEY=${SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+      # Database
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-devskyy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-devskyy_staging}
+
+      # Cache
+      - REDIS_URL=redis://redis:6379/0
+
+      # Performance (reduced for staging)
+      - PYTHONOPTIMIZE=1
+    volumes:
+      - staging-data:/app/data
+      - staging-logs:/app/logs
+      - staging-artifacts:/app/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - devskyy-staging-network
+    command: >
+      sh -c "
+        python -m uvicorn main:app
+          --host 0.0.0.0
+          --port 8000
+          --workers 2
+          --log-level debug
+          --proxy-headers
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/monitoring/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================================================
+  # PostgreSQL Database (Staging)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: devskyy-postgres-staging
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-devskyy_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-devskyy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stagingpassword}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-staging-data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d:ro
+    networks:
+      - devskyy-staging-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devskyy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================================================
+  # Redis Cache (Staging)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: devskyy-redis-staging
+    restart: unless-stopped
+    command: >
+      redis-server
+        --maxmemory 512mb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-staging-data:/data
+    networks:
+      - devskyy-staging-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+  # ============================================================================
+  # Prometheus (Monitoring - Staging)
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: devskyy-prometheus-staging
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-staging-data:/prometheus
+    networks:
+      - devskyy-staging-network
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+  # ============================================================================
+  # Grafana (Dashboards - Staging)
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: devskyy-grafana-staging
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-staging123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-staging-data:/var/lib/grafana
+    networks:
+      - devskyy-staging-network
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+
+# ============================================================================
+# VOLUMES (Staging)
+# ============================================================================
+volumes:
+  postgres-staging-data:
+    driver: local
+  redis-staging-data:
+    driver: local
+  staging-data:
+    driver: local
+  staging-logs:
+    driver: local
+  staging-artifacts:
+    driver: local
+  prometheus-staging-data:
+    driver: local
+  grafana-staging-data:
+    driver: local
+
+# ============================================================================
+# NETWORKS (Staging)
+# ============================================================================
+networks:
+  devskyy-staging-network:
+    driver: bridge
+    name: devskyy-staging
+
+# ============================================================================
+# STAGING USAGE INSTRUCTIONS
+# ============================================================================
+# Purpose: Production-like environment for final testing before deployment
+#
+# Start staging environment:
+#   docker-compose -f docker-compose.staging.yml up -d
+#
+# View logs:
+#   docker-compose -f docker-compose.staging.yml logs -f api
+#
+# Access services:
+#   - API: http://localhost:8000
+#   - API Docs: http://localhost:8000/docs
+#   - Prometheus: http://localhost:9090
+#   - Grafana: http://localhost:3000
+#
+# Run integration tests:
+#   docker-compose -f docker-compose.staging.yml exec api pytest tests/integration/
+#
+# Load test staging:
+#   docker-compose -f docker-compose.staging.yml exec api \
+#     locust -f tests/performance/locustfile.py --host=http://localhost:8000
+#
+# Stop and cleanup:
+#   docker-compose -f docker-compose.staging.yml down -v
+# ============================================================================

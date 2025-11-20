@@ -38,6 +38,18 @@ MCP_SERVERS = {
             "DEVSKYY_API_URL": os.getenv("DEVSKYY_API_URL", "http://localhost:8000"),
         },
     },
+    "neon": {
+        "type": "http",
+        "url": os.getenv("NEON_MCP_URL", "https://mcp.neon.tech/mcp"),
+        "headers": (
+            {
+                "Authorization": f"Bearer {os.getenv('NEON_API_KEY', '')}",
+                "X-Neon-Project-Id": os.getenv("NEON_PROJECT_ID", ""),
+            }
+            if os.getenv("NEON_API_KEY")
+            else {}
+        ),
+    },
     "huggingface": {
         "type": "http",
         "url": "https://huggingface.co/mcp",

@@ -17,7 +17,7 @@ System metrics, health checks, and performance monitoring
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/monitoring", tags=["monitoring"])
+router = APIRouter(tags=["monitoring"])
 
 # ============================================================================
 # HEALTH CHECKS
