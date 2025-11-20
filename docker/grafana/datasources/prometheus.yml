@@ -1,0 +1,21 @@
+# ============================================================================
+# DevSkyy Enterprise Platform - Grafana Datasource Configuration
+# Prometheus Integration
+# ============================================================================
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: '15s'
+      queryTimeout: '30s'
+      httpMethod: 'POST'
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: 'tempo'  # If Tempo is added for distributed tracing
