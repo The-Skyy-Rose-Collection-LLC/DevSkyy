@@ -221,17 +221,52 @@ if LOGFIRE_AVAILABLE:
 # MIDDLEWARE CONFIGURATION
 # ============================================================================
 
-# CORS configuration
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+# CORS configuration (Truth Protocol Rule #7: Input Validation & Security)
+# Environment-specific CORS setup for security
+if ENVIRONMENT == "production":
+    # Production: strict whitelist only
+    cors_origins_str = os.getenv("CORS_ORIGINS", "")
+    cors_origins = cors_origins_str.split(",") if cors_origins_str else []
+    if not cors_origins:
+        logger.warning("⚠️ No CORS_ORIGINS set in production - blocking all cross-origin requests")
+    else:
+        logger.info(f"✅ Production CORS origins: {len(cors_origins)} domains whitelisted")
+else:
+    # Development: allow localhost and common dev ports
+    cors_origins_str = os.getenv(
+        "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000"
+    )
+    cors_origins = cors_origins_str.split(",")
+    logger.info(f"ℹ️ Development CORS origins: {cors_origins}")
 
-trusted_hosts = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+# Trusted hosts configuration
+trusted_hosts_str = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver")
+trusted_hosts = trusted_hosts_str.split(",")
 
+# Add CORS middleware with comprehensive security settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "X-API-Key",
+        "X-Request-ID",
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+    ],
+    expose_headers=[
+        "X-Request-ID",
+        "X-Response-Time",
+        "X-RateLimit-Limit",
+        "X-RateLimit-Remaining",
+        "X-RateLimit-Reset",
+    ],
+    max_age=600,  # Cache preflight requests for 10 minutes
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
@@ -245,6 +280,21 @@ if SECURITY_MODULES_AVAILABLE:
 if PROMETHEUS_AVAILABLE:
     instrumentator = Instrumentator()
     instrumentator.instrument(app).expose(app)
+
+# Add enterprise middleware stack (Truth Protocol compliance)
+try:
+    from middleware import add_enterprise_middleware
+
+    add_enterprise_middleware(
+        app,
+        rate_limit=100,  # 100 requests/minute per IP (Truth Protocol Rule #7)
+        rate_window=60,  # 60 seconds window
+        p95_threshold=200,  # P95 < 200ms target (Truth Protocol Rule #12)
+        log_file="logs/requests.jsonl",  # Structured request logs
+    )
+    logger.info("✅ Enterprise middleware stack activated")
+except ImportError as e:
+    logger.warning(f"⚠️ Enterprise middleware not available: {e}")
 
 # ============================================================================
 # GLOBAL VARIABLES AND CACHES
