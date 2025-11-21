@@ -1,0 +1,252 @@
+> """
+> E-Commerce Automation API Endpoints
+  
+> WHY: Provide REST API for automated product imports with AI-powered SEO
+> HOW: FastAPI endpoints orchestrating WooCommerce importer and SEO optimizer services
+> IMPACT: Enables automated product management workflows
+  
+> Truth Protocol: Input validation, error handling, logging, no placeholders
+> """
+  
+! from datetime import datetime
+! import logging
+! from typing import Optional
+  
+! from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+! from pydantic import BaseModel, Field
+  
+! from services.seo_optimizer import ProductInfo, SEOOptimizerService
+! from services.woocommerce_importer import WooCommerceImporterService
+  
+  
+! logger = logging.getLogger(__name__)
+! router = APIRouter(prefix="/ecommerce", tags=["E-Commerce Automation"])
+  
+  
+! class ImportProductsRequest(BaseModel):
+!     """Request to import products from Google Sheets"""
+  
+!     spreadsheet_id: str = Field(..., description="Google Sheets document ID")
+!     sheet_name: str = Field(default="Foglio1", description="Sheet name to import from")
+!     notify_telegram: bool = Field(default=True, description="Send Telegram notification")
+  
+  
+! class ImportProductsResponse(BaseModel):
+!     """Response from product import"""
+  
+!     success: bool
+!     message: str
+!     job_id: Optional[str] = None
+!     total: int = 0
+!     succeeded: int = 0
+!     failed: int = 0
+!     duration_seconds: Optional[float] = None
+  
+  
+! class GenerateSEORequest(BaseModel):
+!     """Request to generate SEO tags for a product"""
+  
+!     title: str = Field(..., min_length=1, max_length=200)
+!     category: str = Field(default="")
+!     short_description: str = Field(default="")
+!     description: str = Field(default="")
+!     keywords: Optional[str] = None
+  
+  
+! class GenerateSEOResponse(BaseModel):
+!     """Response with generated SEO tags"""
+  
+!     success: bool
+!     metatitle: Optional[str] = None
+!     metadescription: Optional[str] = None
+!     error: Optional[str] = None
+  
+  
+! class WorkflowRequest(BaseModel):
+!     """Request to execute complete e-commerce workflow"""
+  
+!     spreadsheet_id: str = Field(..., description="Google Sheets document ID")
+!     sheet_name: str = Field(default="Foglio1", description="Sheet name")
+!     generate_seo: bool = Field(default=True, description="Generate AI SEO tags")
+!     update_woocommerce_seo: bool = Field(default=True, description="Update WooCommerce with SEO")
+!     notify_telegram: bool = Field(default=True, description="Send notifications")
+  
+  
+! class WorkflowResponse(BaseModel):
+!     """Response from workflow execution"""
+  
+!     success: bool
+!     message: str
+!     products_imported: int = 0
+!     products_with_seo: int = 0
+!     duration_seconds: Optional[float] = None
+  
+  
+  # Dependency injection for services
+! def get_importer_service() -> WooCommerceImporterService:
+!     """Get WooCommerce importer service instance"""
+      # TODO: Load from config/environment
+-     raise NotImplementedError("Configure WooCommerce importer service")
+  
+  
+! def get_seo_service() -> SEOOptimizerService:
+!     """Get SEO optimizer service instance"""
+      # TODO: Load from config/environment
+-     raise NotImplementedError("Configure SEO optimizer service")
+  
+  
+! @router.post("/import-products", response_model=ImportProductsResponse)
+! async def import_products(
+!     request: ImportProductsRequest,
+!     background_tasks: BackgroundTasks,
+!     importer: WooCommerceImporterService = Depends(get_importer_service),
+! ):
+!     """
+!     Import products from Google Sheets to WooCommerce
+  
+!     This endpoint:
+!     1. Fetches product data from specified Google Sheet
+!     2. Validates and maps category data
+!     3. Creates products in WooCommerce
+!     4. Updates sheet with results
+!     5. Sends Telegram notification (optional)
+  
+!     Returns immediately with job ID for async processing.
+!     """
+!     try:
+!         logger.info("Product import requested", extra={"spreadsheet_id": request.spreadsheet_id})
+  
+          # Execute workflow in background
+!         result = await importer.import_products_workflow(
+!             spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=request.notify_telegram
+!         )
+  
+!         return ImportProductsResponse(
+!             success=result["success"],
+!             message="Product import completed" if result["success"] else result.get("error", "Import failed"),
+!             total=result["total"],
+!             succeeded=result["succeeded"],
+!             failed=result["failed"],
+!             duration_seconds=result.get("duration_seconds"),
+!         )
+  
+!     except Exception as e:
+!         logger.exception("Product import failed")
+!         raise HTTPException(status_code=500, detail=f"Import failed: {e!s}")
+  
+  
+! @router.post("/generate-seo", response_model=GenerateSEOResponse)
+! async def generate_seo_tags(request: GenerateSEORequest, seo_service: SEOOptimizerService = Depends(get_seo_service)):
+!     """
+!     Generate AI-powered SEO meta tags for a product
+  
+!     This endpoint:
+!     1. Analyzes product information
+!     2. Generates optimized meta title (max 60 chars)
+!     3. Generates optimized meta description (max 160 chars)
+!     4. Validates against SEO best practices
+  
+!     Uses Claude Sonnet 4 (primary) with GPT-4 fallback.
+!     """
+!     try:
+!         logger.info("SEO generation requested", extra={"product": request.title})
+  
+!         product_info = ProductInfo(
+!             title=request.title,
+!             category=request.category,
+!             short_description=request.short_description,
+!             description=request.description,
+!             keywords=request.keywords,
+!         )
+  
+!         seo_tags = await seo_service.generate_seo_tags(product=product_info, fallback=True)
+  
+!         return GenerateSEOResponse(
+!             success=True, metatitle=seo_tags.metatitle, metadescription=seo_tags.metadescription
+!         )
+  
+!     except Exception as e:
+!         logger.exception("SEO generation failed")
+!         return GenerateSEOResponse(success=False, error=str(e))
+  
+  
+! @router.post("/workflow/complete", response_model=WorkflowResponse)
+! async def execute_complete_workflow(
+!     request: WorkflowRequest,
+!     background_tasks: BackgroundTasks,
+!     importer: WooCommerceImporterService = Depends(get_importer_service),
+!     seo_service: SEOOptimizerService = Depends(get_seo_service),
+! ):
+!     """
+!     Execute complete e-commerce automation workflow
+  
+!     This is the full n8n workflow equivalent:
+!     1. Import products from Google Sheets
+!     2. Create products in WooCommerce
+!     3. Generate AI SEO tags for each product
+!     4. Update WooCommerce products with SEO
+!     5. Update Google Sheets with results
+!     6. Send completion notification
+  
+!     Processes products in batches for efficiency.
+!     """
+!     start_time = datetime.utcnow()
+  
+!     try:
+!         logger.info(
+!             "Complete workflow requested",
+!             extra={"spreadsheet_id": request.spreadsheet_id, "generate_seo": request.generate_seo},
+!         )
+  
+          # Step 1 & 2: Import products
+!         import_result = await importer.import_products_workflow(
+!             spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=False  # Don't notify yet
+!         )
+  
+!         if not import_result["success"]:
+!             raise Exception(import_result.get("error", "Import failed"))
+  
+!         products_imported = import_result["succeeded"]
+!         products_with_seo = 0
+  
+          # Step 3 & 4: Generate and apply SEO (if requested)
+!         if request.generate_seo and products_imported > 0:
+              # TODO: Implement SEO generation for imported products
+              # This would require fetching product details from WooCommerce
+              # and updating them with SEO tags
+!             logger.info("SEO generation for imported products not yet implemented")
+  
+          # Step 5: Notification
+!         if request.notify_telegram:
+!             duration = (datetime.utcnow() - start_time).total_seconds()
+!             message = (
+!                 f"✅ E-Commerce Workflow Complete\n\n"
+!                 f"📦 Products Imported: {products_imported}\n"
+!                 f"🔍 SEO Optimized: {products_with_seo}\n"
+!                 f"⏱ Duration: {duration:.1f}s"
+!             )
+!             await importer.send_telegram_notification(message)
+  
+!         duration = (datetime.utcnow() - start_time).total_seconds()
+  
+!         return WorkflowResponse(
+!             success=True,
+!             message="Workflow completed successfully",
+!             products_imported=products_imported,
+!             products_with_seo=products_with_seo,
+!             duration_seconds=duration,
+!         )
+  
+!     except Exception as e:
+!         logger.exception("Workflow execution failed")
+  
+!         if request.notify_telegram:
+!             await importer.send_telegram_notification(f"❌ Workflow Failed\n\nError: {e!s}")
+  
+!         raise HTTPException(status_code=500, detail=f"Workflow failed: {e!s}")
+  
+  
+! @router.get("/health")
+! async def health_check():
+!     """Health check endpoint"""
+!     return {"status": "healthy", "service": "E-Commerce Automation", "timestamp": datetime.utcnow().isoformat()}

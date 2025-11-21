@@ -1,0 +1,556 @@
+> """
+> Error Ledger System - Truth Protocol Compliance
+> Per Truth Protocol Rule #10: No-skip rule - Log all errors
+  
+> Implements centralized error tracking and reporting for the DevSkyy Platform.
+> All errors are logged to /artifacts/error-ledger-<run_id>.json
+  
+> Features:
+> - Persistent error logging across application lifetime
+> - Error categorization and severity levels
+> - Stack trace capture
+> - Context capture for debugging
+> - Error metrics and statistics
+> - JSON format for machine readability
+> """
+  
+! from dataclasses import asdict, dataclass, field
+! from datetime import datetime
+! from enum import Enum
+! import json
+! import logging
+! from pathlib import Path
+! import sys
+! import traceback
+! from typing import Any, Optional
+! import uuid
+  
+  
+! logger = logging.getLogger(__name__)
+  
+  
+! class ErrorSeverity(str, Enum):
+!     """Error severity levels"""
+  
+!     CRITICAL = "critical"  # System failure, immediate action required
+!     HIGH = "high"  # Major functionality broken
+!     MEDIUM = "medium"  # Partial functionality affected
+!     LOW = "low"  # Minor issue, workaround available
+!     INFO = "info"  # Informational, not actually an error
+  
+  
+! class ErrorCategory(str, Enum):
+!     """Error categories for classification"""
+  
+!     AUTHENTICATION = "authentication"
+!     AUTHORIZATION = "authorization"
+!     DATABASE = "database"
+!     NETWORK = "network"
+!     VALIDATION = "validation"
+!     BUSINESS_LOGIC = "business_logic"
+!     CONFIGURATION = "configuration"
+!     EXTERNAL_API = "external_api"
+!     FILE_SYSTEM = "file_system"
+!     AGENT = "agent"
+!     ML_MODEL = "ml_model"
+!     SECURITY = "security"
+!     PERFORMANCE = "performance"
+!     UNKNOWN = "unknown"
+  
+  
+! @dataclass
+! class ErrorEntry:
+!     """Single error entry in the ledger"""
+  
+!     error_id: str
+!     timestamp: str
+!     severity: ErrorSeverity
+!     category: ErrorCategory
+!     error_type: str
+!     error_message: str
+!     stack_trace: Optional[str] = None
+!     context: dict[str, Any] = field(default_factory=dict)
+!     correlation_id: Optional[str] = None
+!     user_id: Optional[str] = None
+!     endpoint: Optional[str] = None
+!     method: Optional[str] = None
+!     source_file: Optional[str] = None
+!     source_line: Optional[int] = None
+!     resolved: bool = False
+!     resolution_notes: Optional[str] = None
+  
+!     def to_dict(self) -> dict[str, Any]:
+!         """
+!         Return a dictionary representation of the ErrorEntry with enum fields converted to their string values.
+  
+!         Returns:
+!             dict: Mapping of all dataclass fields to their values; `severity` and `category` are returned as their string values.
+!         """
+!         return {**asdict(self), "severity": self.severity.value, "category": self.category.value}
+  
+  
+! class ErrorLedger:
+!     """
+!     Centralized error ledger for the DevSkyy Platform
+  
+!     Thread-safe error logging with automatic persistence
+!     """
+  
+!     def __init__(self, run_id: Optional[str] = None, artifacts_dir: str = "artifacts"):
+!         """
+!         Initialize the error ledger and create its on-disk ledger file.
+  
+!         Creates or uses the provided run identifier, ensures the artifacts directory exists, sets the ledger file path, initializes in-memory metadata and error list, and writes the initial ledger file.
+  
+!         Parameters:
+!             run_id (Optional[str]): Optional unique run identifier; a new run ID is generated if not provided.
+!             artifacts_dir (str): Filesystem directory where the ledger JSON file will be stored.
+!         """
+!         self.run_id = run_id or self._generate_run_id()
+!         self.artifacts_dir = Path(artifacts_dir)
+!         self.artifacts_dir.mkdir(parents=True, exist_ok=True)
+  
+!         self.ledger_file = self.artifacts_dir / f"error-ledger-{self.run_id}.json"
+!         self.errors: list[ErrorEntry] = []
+  
+          # Metadata
+!         self.metadata = {
+!             "run_id": self.run_id,
+!             "started_at": datetime.utcnow().isoformat() + "Z",
+!             "platform": sys.platform,
+!             "python_version": sys.version,
+!             "environment": self._get_environment(),
+!         }
+  
+          # Initialize ledger file
+!         self._initialize_ledger()
+  
+!         logger.info(f"✅ Error ledger initialized - Run ID: {self.run_id}")
+  
+!     def _generate_run_id(self) -> str:
+!         """
+!         Create a compact unique run identifier composed of the current UTC timestamp and a short UUID suffix.
+  
+!         Returns:
+!             run_id (str): Identifier in the format `YYYYMMDD_HHMMSS_<8-char-uuid>`.
+!         """
+!         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+!         unique_id = str(uuid.uuid4())[:8]
+!         return f"{timestamp}_{unique_id}"
+  
+!     def _get_environment(self) -> str:
+!         """
+!         Return the configured runtime environment name.
+  
+!         Returns:
+!             env (str): The value of the `ENVIRONMENT` environment variable if set; otherwise `"development"`.
+!         """
+!         import os
+  
+!         return os.getenv("ENVIRONMENT", "development")
+  
+!     def _initialize_ledger(self):
+!         """
+!         Create the initial ledger file containing metadata, an empty errors list, and zeroed statistics.
+  
+!         Writes a JSON file at self.ledger_file with the current metadata, an empty "errors" array, and a "statistics" object initialized with zero counts.
+!         """
+!         initial_data = {
+!             "metadata": self.metadata,
+!             "errors": [],
+!             "statistics": {"total_errors": 0, "by_severity": {}, "by_category": {}, "resolved_count": 0},
+!         }
+  
+!         with open(self.ledger_file, "w") as f:
+!             json.dump(initial_data, f, indent=2)
+  
+!     def log_error(
+!         self,
+!         error: Exception,
+!         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+!         category: ErrorCategory = ErrorCategory.UNKNOWN,
+!         context: Optional[dict[str, Any]] = None,
+!         correlation_id: Optional[str] = None,
+!         user_id: Optional[str] = None,
+!         endpoint: Optional[str] = None,
+!         method: Optional[str] = None,
+!     ) -> str:
+!         """
+!         Record an exception in the ledger and persist the corresponding error entry.
+  
+!         Parameters:
+!             error (Exception): The exception instance to record.
+!             severity (ErrorSeverity): Classification of the error's severity.
+!             category (ErrorCategory): Classification of the error's category.
+!             context (Optional[Dict[str, Any]]): Arbitrary contextual data to attach to the entry.
+!             correlation_id (Optional[str]): Request or trace correlation identifier.
+!             user_id (Optional[str]): Identifier for the affected user, if applicable.
+!             endpoint (Optional[str]): API endpoint or operation name where the error occurred.
+!             method (Optional[str]): HTTP method or action associated with the endpoint.
+  
+!         Returns:
+!             error_id (str): The unique identifier assigned to the logged error.
+!         """
+          # Extract error information
+!         error_type = type(error).__name__
+!         error_message = str(error)
+!         stack_trace = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+  
+          # Get source information
+!         tb = error.__traceback__
+!         source_file = None
+!         source_line = None
+  
+!         if tb:
+              # Get the deepest frame in our code (not in libraries)
+!             while tb.tb_next:
+!                 tb = tb.tb_next
+!             source_file = tb.tb_frame.f_code.co_filename
+!             source_line = tb.tb_lineno
+  
+          # Create error entry
+!         error_entry = ErrorEntry(
+!             error_id=str(uuid.uuid4()),
+!             timestamp=datetime.utcnow().isoformat() + "Z",
+!             severity=severity,
+!             category=category,
+!             error_type=error_type,
+!             error_message=error_message,
+!             stack_trace=stack_trace,
+!             context=context or {},
+!             correlation_id=correlation_id,
+!             user_id=user_id,
+!             endpoint=endpoint,
+!             method=method,
+!             source_file=source_file,
+!             source_line=source_line,
+!         )
+  
+          # Add to in-memory list
+!         self.errors.append(error_entry)
+  
+          # Persist to file
+!         self._persist_error(error_entry)
+  
+          # Log to standard logger
+!         log_message = (
+!             f"Error logged [{error_entry.error_id}] - {severity.value.upper()}: {error_type} - {error_message}"
+!         )
+  
+!         if severity == ErrorSeverity.CRITICAL:
+!             logger.critical(log_message)
+!         elif severity == ErrorSeverity.HIGH:
+!             logger.error(log_message)
+!         elif severity == ErrorSeverity.MEDIUM:
+!             logger.warning(log_message)
+!         else:
+!             logger.info(log_message)
+  
+!         return error_entry.error_id
+  
+!     def _persist_error(self, error_entry: ErrorEntry):
+!         """
+!         Append the given ErrorEntry to the ledger file and update the ledger's statistics on disk.
+  
+!         Parameters:
+!             error_entry (ErrorEntry): The error entry to persist. The entry will be serialized to JSON and added to the ledger's "errors" list; ledger statistics (total_errors, by_severity, by_category, resolved_count) will be recalculated and written back to the ledger file.
+  
+!         Notes:
+!             On failure the method logs an error and does not raise.
+!         """
+!         try:
+              # Read current ledger
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+  
+              # Add new error
+!             ledger_data["errors"].append(error_entry.to_dict())
+  
+              # Update statistics
+!             ledger_data["statistics"]["total_errors"] = len(ledger_data["errors"])
+  
+              # By severity
+!             severity_key = error_entry.severity.value
+!             ledger_data["statistics"]["by_severity"][severity_key] = (
+!                 ledger_data["statistics"]["by_severity"].get(severity_key, 0) + 1
+!             )
+  
+              # By category
+!             category_key = error_entry.category.value
+!             ledger_data["statistics"]["by_category"][category_key] = (
+!                 ledger_data["statistics"]["by_category"].get(category_key, 0) + 1
+!             )
+  
+              # Resolved count
+!             ledger_data["statistics"]["resolved_count"] = sum(
+!                 1 for e in ledger_data["errors"] if e.get("resolved", False)
+!             )
+  
+              # Write back to file
+!             with open(self.ledger_file, "w") as f:
+!                 json.dump(ledger_data, f, indent=2)
+  
+!         except Exception as e:
+!             logger.error(f"Failed to persist error to ledger: {e}")
+  
+!     def mark_resolved(self, error_id: str, resolution_notes: str):
+!         """
+!         Mark the ledger entry with the given error_id as resolved and record resolution notes.
+  
+!         Parameters:
+!             error_id (str): Identifier of the error to mark resolved.
+!             resolution_notes (str): Description or notes explaining how the error was resolved.
+!         """
+!         try:
+              # Update in-memory
+!             for error in self.errors:
+!                 if error.error_id == error_id:
+!                     error.resolved = True
+!                     error.resolution_notes = resolution_notes
+!                     break
+  
+              # Update in file
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+  
+!             for error in ledger_data["errors"]:
+!                 if error["error_id"] == error_id:
+!                     error["resolved"] = True
+!                     error["resolution_notes"] = resolution_notes
+!                     break
+  
+              # Update resolved count
+!             ledger_data["statistics"]["resolved_count"] = sum(
+!                 1 for e in ledger_data["errors"] if e.get("resolved", False)
+!             )
+  
+!             with open(self.ledger_file, "w") as f:
+!                 json.dump(ledger_data, f, indent=2)
+  
+!             logger.info(f"✅ Error {error_id} marked as resolved: {resolution_notes}")
+  
+!         except Exception as e:
+!             logger.error(f"Failed to mark error as resolved: {e}")
+  
+!     def get_statistics(self) -> dict[str, Any]:
+!         """
+!         Retrieve current ledger statistics from the persisted ledger file.
+  
+!         Returns:
+!             statistics (Dict[str, Any]): Dictionary containing ledger statistics (e.g., "total_errors", "by_severity", "by_category", "resolved_count"); returns an empty dict if the ledger file cannot be read or parsed.
+!         """
+!         try:
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+!             return ledger_data["statistics"]
+!         except Exception as e:
+!             logger.error(f"Failed to get statistics: {e}")
+!             return {}
+  
+!     def get_errors(
+!         self,
+!         severity: Optional[ErrorSeverity] = None,
+!         category: Optional[ErrorCategory] = None,
+!         resolved: Optional[bool] = None,
+!         limit: Optional[int] = None,
+!     ) -> list[dict[str, Any]]:
+!         """
+!         Retrieve persisted errors with optional filtering by severity, category, resolution status, and result limit.
+  
+!         Parameters:
+!             severity (Optional[ErrorSeverity]): If provided, include only errors whose severity matches this value.
+!             category (Optional[ErrorCategory]): If provided, include only errors whose category matches this value.
+!             resolved (Optional[bool]): If provided, include only errors whose `resolved` flag matches this value.
+!             limit (Optional[int]): If provided, return at most this many most-recent errors.
+  
+!         Returns:
+!             List[Dict[str, Any]]: A list of error records as dictionaries from the ledger, possibly filtered and limited.
+!         """
+!         try:
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+  
+!             errors = ledger_data["errors"]
+  
+              # Apply filters
+!             if severity:
+!                 errors = [e for e in errors if e["severity"] == severity.value]
+!             if category:
+!                 errors = [e for e in errors if e["category"] == category.value]
+!             if resolved is not None:
+!                 errors = [e for e in errors if e.get("resolved", False) == resolved]
+  
+              # Apply limit
+!             if limit:
+!                 errors = errors[-limit:]
+  
+!             return errors
+  
+!         except Exception as e:
+!             logger.error(f"Failed to get errors: {e}")
+!             return []
+  
+!     def export_report(self, output_file: Optional[str] = None) -> str:
+!         """
+!         Generate a human-readable text report of the current error ledger and optionally write it to a file.
+  
+!         The report includes run metadata (run ID, start time, environment), aggregated statistics (total, resolved/unresolved, counts by severity and category), and detailed entries for each recorded error (ID, timestamp, severity, category, type, message, resolution status, optional resolution notes, and source file/line when available).
+  
+!         Parameters:
+!             output_file (Optional[str]): Path where the report should be saved. If omitted, the report is only returned.
+  
+!         Returns:
+!             str: The formatted report text on success, or an error message string if report generation or file writing fails.
+!         """
+!         try:
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+  
+              # Generate report
+!             report_lines = [
+!                 "=" * 80,
+!                 "ERROR LEDGER REPORT",
+!                 "=" * 80,
+!                 "",
+!                 f"Run ID: {self.run_id}",
+!                 f"Started: {self.metadata['started_at']}",
+!                 f"Environment: {self.metadata['environment']}",
+!                 "",
+!                 "=" * 80,
+!                 "STATISTICS",
+!                 "=" * 80,
+!                 "",
+!                 f"Total Errors: {ledger_data['statistics']['total_errors']}",
+!                 f"Resolved: {ledger_data['statistics']['resolved_count']}",
+!                 f"Unresolved: {ledger_data['statistics']['total_errors'] - ledger_data['statistics']['resolved_count']}",
+!                 "",
+!                 "By Severity:",
+!             ]
+  
+!             for severity, count in ledger_data["statistics"]["by_severity"].items():
+!                 report_lines.append(f"  {severity.upper()}: {count}")
+  
+!             report_lines.extend(
+!                 [
+!                     "",
+!                     "By Category:",
+!                 ]
+!             )
+  
+!             for category, count in ledger_data["statistics"]["by_category"].items():
+!                 report_lines.append(f"  {category}: {count}")
+  
+!             report_lines.extend(["", "=" * 80, "ERROR DETAILS", "=" * 80, ""])
+  
+              # Add error details
+!             for error in ledger_data["errors"]:
+!                 report_lines.extend(
+!                     [
+!                         f"Error ID: {error['error_id']}",
+!                         f"Timestamp: {error['timestamp']}",
+!                         f"Severity: {error['severity'].upper()}",
+!                         f"Category: {error['category']}",
+!                         f"Type: {error['error_type']}",
+!                         f"Message: {error['error_message']}",
+!                         f"Resolved: {'✅ Yes' if error.get('resolved') else '❌ No'}",
+!                         "",
+!                     ]
+!                 )
+  
+!                 if error.get("resolution_notes"):
+!                     report_lines.append(f"Resolution: {error['resolution_notes']}")
+!                     report_lines.append("")
+  
+!                 if error.get("source_file"):
+!                     report_lines.append(f"Source: {error['source_file']}:{error.get('source_line', '?')}")
+!                     report_lines.append("")
+  
+!                 report_lines.append("-" * 80)
+!                 report_lines.append("")
+  
+!             report_text = "\n".join(report_lines)
+  
+              # Save to file if specified
+!             if output_file:
+!                 output_path = Path(output_file)
+!                 output_path.parent.mkdir(parents=True, exist_ok=True)
+!                 with open(output_path, "w") as f:
+!                     f.write(report_text)
+!                 logger.info(f"✅ Error report exported to {output_file}")
+  
+!             return report_text
+  
+!         except Exception as e:
+!             logger.error(f"Failed to export report: {e}")
+!             return f"Error generating report: {e}"
+  
+!     def close(self):
+!         """
+!         Finalize the ledger by recording the completion time in the persisted ledger metadata.
+  
+!         Sets `metadata["completed_at"]` to the current UTC ISO‑8601 timestamp and writes the updated ledger file; failures are caught and logged.
+!         """
+!         try:
+!             with open(self.ledger_file, "r") as f:
+!                 ledger_data = json.load(f)
+  
+!             ledger_data["metadata"]["completed_at"] = datetime.utcnow().isoformat() + "Z"
+  
+!             with open(self.ledger_file, "w") as f:
+!                 json.dump(ledger_data, f, indent=2)
+  
+!             logger.info(f"✅ Error ledger closed - Run ID: {self.run_id}")
+  
+!         except Exception as e:
+!             logger.error(f"Failed to close ledger: {e}")
+  
+  
+  # ============================================================================
+  # GLOBAL ERROR LEDGER INSTANCE
+  # ============================================================================
+  
+! _error_ledger: Optional[ErrorLedger] = None
+  
+  
+! def get_error_ledger(run_id: Optional[str] = None) -> ErrorLedger:
+!     """
+!     Get the module-level ErrorLedger singleton, creating it if necessary.
+  
+!     Parameters:
+!         run_id (Optional[str]): Optional run identifier to assign to the ledger; a new run ID is generated when omitted.
+  
+!     Returns:
+!         ErrorLedger: The global ErrorLedger instance.
+!     """
+!     global _error_ledger
+  
+!     if _error_ledger is None:
+!         _error_ledger = ErrorLedger(run_id=run_id)
+  
+!     return _error_ledger
+  
+  
+! def log_error(
+!     error: Exception,
+!     severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+!     category: ErrorCategory = ErrorCategory.UNKNOWN,
+!     **kwargs,
+! ) -> str:
+!     """
+!     Log an exception to the global error ledger.
+  
+!     Parameters:
+!         error (Exception): The exception instance to record.
+!         severity (ErrorSeverity): Severity level for the error (default: ErrorSeverity.MEDIUM).
+!         category (ErrorCategory): Category for the error (default: ErrorCategory.UNKNOWN).
+!         **kwargs: Additional metadata forwarded to the ledger such as `context`, `correlation_id`, `user_id`, `endpoint`, and `method`.
+  
+!     Returns:
+!         error_id (str): The unique identifier assigned to the recorded error.
+!     """
+!     ledger = get_error_ledger()
+!     return ledger.log_error(error, severity, category, **kwargs)
+  
+  
+  # Export main components
+! __all__ = ["ErrorCategory", "ErrorEntry", "ErrorLedger", "ErrorSeverity", "get_error_ledger", "log_error"]

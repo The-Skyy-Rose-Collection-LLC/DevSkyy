@@ -18,7 +18,7 @@ from typing import Any, Optional
 from uuid import uuid4
 
 import httpx
-from pydantic import BaseModel, HttpUrl, validator
+from pydantic import BaseModel, Field, HttpUrl
 
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class DeliveryStatus(str, Enum):
 class WebhookSubscription(BaseModel):
     """Webhook subscription configuration"""
 
-    subscription_id: str = None
+    subscription_id: str = Field(default_factory=lambda: str(uuid4()))
     endpoint: HttpUrl
     events: list[WebhookEvent]
     secret: str  # HMAC secret for signature generation
@@ -101,34 +101,18 @@ class WebhookSubscription(BaseModel):
     max_retries: int = 3
     retry_delay_seconds: int = 60
     timeout_seconds: int = 30
-    created_at: datetime = None
-    metadata: dict[str, Any] = {}
-
-    @validator("subscription_id", pre=True, always=True)
-    def set_subscription_id(cls, v):
-        return v or str(uuid4())
-
-    @validator("created_at", pre=True, always=True)
-    def set_created_at(cls, v):
-        return v or datetime.now(UTC)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class WebhookPayload(BaseModel):
     """Webhook payload structure (RFC 2104 for signature)"""
 
-    event_id: str  # Unique event identifier
+    event_id: str = Field(default_factory=lambda: str(uuid4()))  # Unique event identifier
     event_type: WebhookEvent
     timestamp: datetime
     data: dict[str, Any]
-    idempotency_key: str = None  # Prevent duplicate processing
-
-    @validator("event_id", pre=True, always=True)
-    def set_event_id(cls, v):
-        return v or str(uuid4())
-
-    @validator("idempotency_key", pre=True, always=True)
-    def set_idempotency_key(cls, v):
-        return v or str(uuid4())
+    idempotency_key: str = Field(default_factory=lambda: str(uuid4()))  # Prevent duplicate processing
 
 
 class WebhookDelivery(BaseModel):
@@ -290,7 +274,7 @@ class WebhookManager:
             payload: Webhook payload
             attempt: Attempt number (for exponential backoff)
         """
-        payload_json = payload.json()
+        payload_json = payload.model_dump_json()
         signature = generate_signature(payload_json, subscription.secret)
 
         headers = {

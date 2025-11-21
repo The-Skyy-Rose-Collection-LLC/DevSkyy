@@ -1035,6 +1035,19 @@ class EcommerceAgent:
             "our_position": "competitive",
         }
 
+    def _update_search_index(self, product: dict) -> None:
+        """Update search index with product data."""
+        # Simplified search index update
+        # In production, this would update Elasticsearch or similar
+        product_id = product["id"]
+        search_terms = [
+            product["name"].lower(),
+            product["category"],
+            *product.get("tags", []),
+        ]
+        # Store for future search functionality
+        logger.debug(f"Updated search index for product {product_id}: {search_terms}")
+
     # Additional analytics methods
     def _get_revenue_by_category(self) -> dict[str, float]:
         """Get revenue breakdown by product category."""

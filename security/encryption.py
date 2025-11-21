@@ -18,7 +18,7 @@ from typing import Optional
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 logger = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ def derive_key(password: str, salt: Optional[bytes] = None) -> tuple[bytes, byte
     if salt is None:
         salt = secrets.token_bytes(settings.PBKDF2_SALT_LENGTH)
 
-    kdf = PBKDF2(
+    kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,  # 256 bits for AES-256
         salt=salt,

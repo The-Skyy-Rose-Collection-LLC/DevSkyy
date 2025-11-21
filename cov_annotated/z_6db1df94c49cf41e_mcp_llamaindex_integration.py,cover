@@ -1,0 +1,473 @@
+> """
+> LlamaIndex + MCP Integration for Enhanced Fine-Tuning
+  
+> Combines LlamaIndex RAG with MCP infrastructure for enterprise-grade fine-tuning:
+> - MCP Gateway for database access (Neon PostgreSQL)
+> - LlamaIndex for intelligent example retrieval
+> - Vector search + SQL hybrid queries
+> - Distributed training data management
+> """
+  
+! import os
+! import uuid
+! import asyncio
+! import logging
+! from typing import Dict, Any, Optional, List
+! from datetime import datetime
+! from pathlib import Path
+  
+! from llama_index.core import (
+!     VectorStoreIndex,
+!     Document,
+!     Settings,
+!     StorageContext,
+!     load_index_from_storage
+! )
+! from llama_index.core.vector_stores import SimpleVectorStore
+! from llama_index.embeddings.openai import OpenAIEmbedding
+! from llama_index.llms.openai import OpenAI as LlamaOpenAI
+! from sqlalchemy.ext.asyncio import AsyncSession
+! from sqlalchemy import text
+! import openai
+! from anthropic import Anthropic
+! import httpx
+  
+! logger = logging.getLogger(__name__)
+  
+  
+! class MCPLlamaIndexOrchestrator:
+!     """
+!     Enterprise fine-tuning orchestrator combining MCP + LlamaIndex.
+  
+!     Architecture:
+!     ┌─────────────────────────────────────────────────────────┐
+!     │                   MCP Gateway Layer                      │
+!     │  - Neon PostgreSQL (training data storage)              │
+!     │  - SQL queries for structured metadata                  │
+!     │  - Transaction management                               │
+!     └─────────────────────────────────────────────────────────┘
+!                              ↕
+!     ┌─────────────────────────────────────────────────────────┐
+!     │              LlamaIndex RAG Layer                        │
+!     │  - Vector embeddings for semantic search               │
+!     │  - Intelligent example retrieval                       │
+!     │  - Similarity-based ranking                            │
+!     └─────────────────────────────────────────────────────────┘
+!                              ↕
+!     ┌─────────────────────────────────────────────────────────┐
+!     │            Fine-Tuning Execution Layer                   │
+!     │  - OpenAI fine-tuning API                               │
+!     │  - Claude prompt optimization                           │
+!     │  - Model deployment pipeline                            │
+!     └─────────────────────────────────────────────────────────┘
+  
+!     Benefits of Integration:
+!     1. **Hybrid Retrieval**: SQL for exact filters + vector search for relevance
+!     2. **Persistent Storage**: Training data in Neon, indexes in vector store
+!     3. **Scalability**: Distributed MCP gateway + LlamaIndex caching
+!     4. **Observability**: Full query logging through MCP + LlamaIndex metrics
+!     """
+  
+!     def __init__(
+!         self,
+!         session: AsyncSession,
+!         mcp_gateway_url: str = "http://localhost:3000/mcp",
+!         index_dir: str = "./mcp_llamaindex_storage",
+!         openai_api_key: Optional[str] = None,
+!         anthropic_api_key: Optional[str] = None
+!     ):
+!         """
+!         Initialize MCP + LlamaIndex orchestrator.
+  
+!         Args:
+!             session: SQLAlchemy async session (for direct DB access)
+!             mcp_gateway_url: MCP gateway endpoint
+!             index_dir: Directory for LlamaIndex vector indexes
+!             openai_api_key: OpenAI API key
+!             anthropic_api_key: Anthropic API key
+!         """
+!         self.session = session
+!         self.mcp_gateway_url = mcp_gateway_url
+!         self.index_dir = Path(index_dir)
+!         self.index_dir.mkdir(exist_ok=True)
+  
+          # API keys
+!         self.openai_key = openai_api_key or os.getenv("OPENAI_API_KEY")
+!         self.anthropic_key = anthropic_api_key or os.getenv("ANTHROPIC_API_KEY")
+  
+!         if not self.openai_key:
+!             logger.warning("OPENAI_API_KEY not set")
+!         if not self.anthropic_key:
+!             logger.warning("ANTHROPIC_API_KEY not set")
+  
+          # API clients
+!         self.openai_client = openai.OpenAI(api_key=self.openai_key) if self.openai_key else None
+!         self.anthropic_client = Anthropic(api_key=self.anthropic_key) if self.anthropic_key else None
+!         self.http_client = httpx.AsyncClient()
+  
+          # LlamaIndex configuration
+!         if self.openai_key:
+!             Settings.llm = LlamaOpenAI(model="gpt-4", api_key=self.openai_key)
+!             Settings.embed_model = OpenAIEmbedding(api_key=self.openai_key)
+  
+!         self.indexes: Dict[str, VectorStoreIndex] = {}
+  
+!     async def sync_training_data_to_vector_store(
+!         self,
+!         agent_id: uuid.UUID,
+!         force_rebuild: bool = False
+!     ) -> VectorStoreIndex:
+!         """
+!         Sync training data from MCP/Neon to LlamaIndex vector store.
+  
+!         Flow:
+!         1. Query training_examples from Neon via SQL
+!         2. Convert to LlamaIndex Documents
+!         3. Build vector index for semantic search
+!         4. Persist index to disk
+  
+!         Args:
+!             agent_id: Agent UUID
+!             force_rebuild: Rebuild index even if exists
+  
+!         Returns:
+!             VectorStoreIndex with training examples
+!         """
+!         agent_id_str = str(agent_id)
+!         agent_index_dir = self.index_dir / agent_id_str
+  
+          # Try loading existing index
+!         if not force_rebuild and agent_index_dir.exists():
+!             try:
+!                 storage_context = StorageContext.from_defaults(
+!                     persist_dir=str(agent_index_dir)
+!                 )
+!                 index = load_index_from_storage(storage_context)
+!                 self.indexes[agent_id_str] = index
+!                 logger.info(f"Loaded existing vector index for agent {agent_id}")
+!                 return index
+!             except Exception as e:
+!                 logger.warning(f"Failed to load index, rebuilding: {e}")
+  
+          # Fetch training examples from database (via MCP or direct SQL)
+!         query = text("""
+!             SELECT id, prompt, completion, reward_score, example_type, created_at
+!             FROM training_examples
+!             WHERE agent_id = :agent_id
+!             ORDER BY reward_score DESC
+!         """)
+  
+!         result = await self.session.execute(query, {"agent_id": agent_id})
+!         rows = result.fetchall()
+  
+!         if not rows:
+!             raise ValueError(f"No training examples found for agent {agent_id}")
+  
+          # Convert to LlamaIndex Documents
+!         documents = []
+!         for row in rows:
+!             example_id, prompt, completion, score, ex_type, created_at = row
+  
+!             doc = Document(
+!                 text=f"Input: {prompt}\n\nOutput: {completion}",
+!                 metadata={
+!                     "example_id": str(example_id),
+!                     "agent_id": agent_id_str,
+!                     "score": float(score),
+!                     "type": ex_type,
+!                     "input": prompt,
+!                     "output": completion,
+!                     "created_at": created_at.isoformat() if created_at else None
+!                 }
+!             )
+!             documents.append(doc)
+  
+          # Build vector index
+!         index = VectorStoreIndex.from_documents(documents)
+  
+          # Persist to disk
+!         agent_index_dir.mkdir(parents=True, exist_ok=True)
+!         index.storage_context.persist(persist_dir=str(agent_index_dir))
+  
+!         self.indexes[agent_id_str] = index
+!         logger.info(f"Synced {len(documents)} examples to vector store for agent {agent_id}")
+  
+!         return index
+  
+!     async def hybrid_retrieve_best_examples(
+!         self,
+!         agent_id: uuid.UUID,
+!         query: Optional[str] = None,
+!         min_score: float = 0.7,
+!         top_k: int = 10,
+!         example_type: Optional[str] = "positive"
+!     ) -> List[Dict[str, Any]]:
+!         """
+!         Hybrid retrieval: SQL filtering + vector semantic search.
+  
+!         Strategy:
+!         1. SQL: Filter by agent_id, min_score, example_type (exact matches)
+!         2. Vector: Semantic similarity search within filtered set
+!         3. Combine: Best of both approaches
+  
+!         Args:
+!             agent_id: Agent UUID
+!             query: Semantic search query
+!             min_score: Minimum reward score (SQL filter)
+!             top_k: Number of results
+!             example_type: Filter by type (positive/negative)
+  
+!         Returns:
+!             Hybrid-ranked best examples
+!         """
+!         agent_id_str = str(agent_id)
+  
+          # Ensure vector index exists
+!         if agent_id_str not in self.indexes:
+!             await self.sync_training_data_to_vector_store(agent_id)
+  
+!         index = self.indexes[agent_id_str]
+  
+          # Vector search query
+!         query_text = query or "high quality examples with excellent performance"
+!         retriever = index.as_retriever(similarity_top_k=top_k * 2)  # Over-retrieve
+  
+!         nodes = retriever.retrieve(query_text)
+  
+          # Filter and rank results
+!         examples = []
+!         for node in nodes:
+!             metadata = node.node.metadata
+  
+              # Apply SQL-like filters
+!             if metadata.get("score", 0) < min_score:
+!                 continue
+!             if example_type and metadata.get("type") != example_type:
+!                 continue
+  
+!             examples.append({
+!                 "example_id": metadata.get("example_id"),
+!                 "input": metadata.get("input", ""),
+!                 "output": metadata.get("output", ""),
+!                 "score": float(metadata.get("score", 0.0)),
+!                 "similarity": node.score,
+!                 "type": metadata.get("type"),
+!                 "created_at": metadata.get("created_at"),
+                  # Hybrid rank: combine reward score + semantic similarity
+!                 "hybrid_rank": (node.score * 0.6) + (metadata.get("score", 0) * 0.4)
+!             })
+  
+          # Sort by hybrid rank
+!         examples.sort(key=lambda x: x["hybrid_rank"], reverse=True)
+  
+!         return examples[:top_k]
+  
+!     async def optimize_prompt_with_mcp_rag(
+!         self,
+!         agent_id: uuid.UUID,
+!         top_k_examples: int = 10
+!     ) -> Dict[str, Any]:
+!         """
+!         Optimize agent prompt using MCP + LlamaIndex hybrid retrieval.
+  
+!         Flow:
+!         1. Fetch current prompt from database (MCP)
+!         2. Retrieve best examples via hybrid search (LlamaIndex + SQL)
+!         3. Optimize with Claude using best practices
+!         4. Update agent in database (MCP transaction)
+  
+!         Args:
+!             agent_id: Agent UUID
+!             top_k_examples: Number of examples for optimization
+  
+!         Returns:
+!             Optimization result
+!         """
+!         if not self.anthropic_client:
+!             raise ValueError("Anthropic client not initialized")
+  
+          # Fetch current agent prompt from database
+!         agent_query = text("SELECT base_prompt, name FROM agents WHERE id = :agent_id")
+!         agent_result = await self.session.execute(agent_query, {"agent_id": agent_id})
+!         row = agent_result.fetchone()
+  
+!         if not row:
+!             raise ValueError(f"Agent {agent_id} not found in database")
+  
+!         current_prompt, agent_name = row
+  
+          # Retrieve best examples using hybrid search
+!         best_examples = await self.hybrid_retrieve_best_examples(
+!             agent_id,
+!             query=f"best examples for {agent_name}",
+!             top_k=top_k_examples
+!         )
+  
+!         if not best_examples:
+!             raise ValueError(f"No training examples found for agent {agent_id}")
+  
+          # Format with XML (Claude best practice)
+!         examples_xml = self._format_examples_xml(best_examples)
+  
+          # Claude optimization prompt
+!         optimization_prompt = f"""You are a prompt engineering expert specializing in Claude optimization.
+  
+! Your task is to analyze successful examples and refine an agent's system prompt to maximize performance.
+  
+! <current_prompt>
+! {current_prompt}
+! </current_prompt>
+  
+! <successful_examples>
+! {examples_xml}
+! </successful_examples>
+  
+! <instructions>
+! Follow these steps to optimize the prompt:
+  
+! 1. **Analysis Phase**: Examine the successful examples and identify:
+!    - Common patterns in high-performing outputs
+!    - What makes outputs effective (clarity, structure, completeness)
+!    - Edge cases or challenging scenarios handled well
+!    - Tone, style, and formatting preferences
+  
+! 2. **Pattern Recognition**: Extract key insights:
+!    - What instructions would produce these outputs consistently?
+!    - What constraints or guidelines are implicitly followed?
+!    - What common mistakes are avoided?
+  
+! 3. **Prompt Refinement**: Create an optimized prompt that:
+!    - Uses clear, direct instructions (no ambiguity)
+!    - Employs XML tags to structure sections (like <context>, <instructions>, <examples>)
+!    - Includes 2-3 few-shot examples from the best performers
+!    - Encourages step-by-step reasoning for complex tasks
+!    - Preserves core functionality while improving clarity
+!    - Adds explicit guidelines based on successful patterns
+  
+! 4. **Quality Checks**: Ensure the optimized prompt:
+!    - Is more specific and actionable than the original
+!    - Addresses edge cases identified in examples
+!    - Uses plain language without jargon
+!    - Has clear success criteria
+! </instructions>
+  
+! <output_format>
+! Return ONLY the optimized prompt as plain text. Do not include explanations, meta-commentary, or wrapper tags.
+! The prompt should be ready to use directly as a system prompt.
+! </output_format>
+  
+! Think through your analysis step by step, then provide the optimized prompt."""
+  
+          # Call Claude
+!         response = self.anthropic_client.messages.create(
+!             model="claude-3-5-sonnet-20241022",
+!             max_tokens=8000,
+!             temperature=0.3,
+!             messages=[{"role": "user", "content": optimization_prompt}]
+!         )
+  
+!         optimized_prompt = response.content[0].text
+  
+          # Update agent in database (MCP transaction)
+!         update_query = text("""
+!             UPDATE agents
+!             SET base_prompt = :optimized_prompt,
+!                 version = version + 1,
+!                 updated_at = :updated_at
+!             WHERE id = :agent_id
+!         """)
+  
+!         await self.session.execute(update_query, {
+!             "optimized_prompt": optimized_prompt,
+!             "updated_at": datetime.utcnow(),
+!             "agent_id": agent_id
+!         })
+!         await self.session.commit()
+  
+!         logger.info(f"Optimized prompt for agent {agent_id} using MCP+LlamaIndex hybrid")
+  
+!         return {
+!             "agent_id": str(agent_id),
+!             "agent_name": agent_name,
+!             "provider": "anthropic",
+!             "method": "mcp_llamaindex_hybrid_rag",
+!             "model": "claude-3-5-sonnet-20241022",
+!             "examples_used": len(best_examples),
+!             "optimized_prompt": optimized_prompt,
+!             "original_prompt": current_prompt,
+!             "optimization_technique": "xml_structured_hybrid_rag_cot",
+!             "retrieval_strategy": "sql_filter + vector_similarity"
+!         }
+  
+!     def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+!         """Format examples with XML for Claude."""
+!         formatted = []
+!         for i, ex in enumerate(examples, 1):
+!             formatted.append(f"""
+! <example id="{i}" score="{ex['score']:.2f}" similarity="{ex.get('similarity', 0):.2f}" hybrid_rank="{ex.get('hybrid_rank', 0):.2f}">
+!   <input>
+! {ex['input'][:500]}
+!   </input>
+!   <output>
+! {ex['output'][:500]}
+!   </output>
+!   <metadata type="{ex.get('type', 'unknown')}" created="{ex.get('created_at', 'unknown')}" />
+! </example>""")
+!         return "\n".join(formatted)
+  
+!     async def close(self):
+!         """Cleanup resources."""
+!         await self.http_client.aclose()
+  
+  
+  # Integration example
+! async def demo_mcp_llamaindex():
+!     """
+!     Demo: MCP + LlamaIndex integration for fine-tuning.
+  
+!     Requirements:
+!     - MCP Gateway running on localhost:3000
+!     - Neon PostgreSQL with training_examples table
+!     - LlamaIndex vector storage
+!     """
+!     from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+!     from sqlalchemy.orm import sessionmaker
+  
+      # Database connection via MCP/Neon
+!     DATABASE_URL = os.getenv("DATABASE_URL")
+!     engine = create_async_engine(DATABASE_URL, echo=True)
+!     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+  
+!     async with async_session() as session:
+!         orchestrator = MCPLlamaIndexOrchestrator(
+!             session=session,
+!             mcp_gateway_url="http://localhost:3000/mcp"
+!         )
+  
+!         agent_id = uuid.UUID("12345678-1234-5678-1234-567812345678")  # Example
+  
+          # Sync training data from Neon to LlamaIndex
+!         await orchestrator.sync_training_data_to_vector_store(agent_id)
+  
+          # Hybrid retrieval: SQL + Vector search
+!         examples = await orchestrator.hybrid_retrieve_best_examples(
+!             agent_id,
+!             query="high quality coding examples",
+!             min_score=0.8,
+!             top_k=10
+!         )
+  
+!         print(f"Retrieved {len(examples)} examples via hybrid search")
+  
+          # Optimize prompt with Claude
+!         result = await orchestrator.optimize_prompt_with_mcp_rag(agent_id, top_k_examples=5)
+  
+!         print(f"Optimized prompt for agent {result['agent_name']}")
+!         print(f"Method: {result['method']}")
+!         print(f"New prompt: {result['optimized_prompt'][:200]}...")
+  
+!         await orchestrator.close()
+  
+  
+- if __name__ == "__main__":
+-     asyncio.run(demo_mcp_llamaindex())

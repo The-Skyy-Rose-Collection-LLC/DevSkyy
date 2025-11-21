@@ -15,7 +15,7 @@ from security.jwt_auth import TokenData, get_current_active_user, require_develo
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/agents", tags=["agents"])
+router = APIRouter(tags=["agents"])
 
 
 # ============================================================================

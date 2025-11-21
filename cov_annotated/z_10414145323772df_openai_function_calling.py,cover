@@ -1,0 +1,432 @@
+> """
+> OpenAI Function Calling Integration with Safeguards
+> Enterprise-grade function calling for OpenAI models
+  
+> Per Truth Protocol:
+> - Rule #1: Never guess - Verify all function calls
+> - Rule #5: No secrets in function parameters
+> - Rule #7: Validate all function inputs/outputs
+> - Rule #8: Test coverage ≥90%
+> - Rule #13: Security baseline enforcement
+  
+> Features:
+> - Native OpenAI function calling support
+> - Integrated safeguards and rate limiting
+> - Automatic schema generation from Python functions
+> - Type-safe parameter validation
+> - Audit logging for compliance
+> """
+  
+! from collections.abc import Callable
+! import inspect
+! import json
+! import logging
+! from typing import Any, Optional, get_type_hints
+  
+! import openai
+  
+! from config.unified_config import get_config
+! from security.openai_safeguards import OperationType, get_safeguard_manager
+! from security.tool_calling_safeguards import (
+!     ToolCallConfig,
+!     ToolCallRequest,
+!     ToolPermissionLevel,
+!     ToolProvider,
+!     ToolRiskLevel,
+!     get_tool_safeguard_manager,
+! )
+  
+  
+! logger = logging.getLogger(__name__)
+  
+  
+  # ============================================================================
+  # FUNCTION SCHEMA GENERATION
+  # ============================================================================
+  
+  
+! def python_type_to_json_schema(py_type: type) -> dict[str, str]:
+!     """
+!     Convert Python type to JSON Schema type
+  
+!     Args:
+!         py_type: Python type
+  
+!     Returns:
+!         JSON Schema type definition
+!     """
+!     type_mapping = {
+!         str: {"type": "string"},
+!         int: {"type": "integer"},
+!         float: {"type": "number"},
+!         bool: {"type": "boolean"},
+!         list: {"type": "array"},
+!         dict: {"type": "object"},
+!     }
+  
+      # Handle Optional types
+!     if hasattr(py_type, "__origin__"):
+!         if py_type.__origin__ is list:
+!             item_type = py_type.__args__[0] if py_type.__args__ else Any
+!             return {"type": "array", "items": python_type_to_json_schema(item_type)}
+!         elif py_type.__origin__ is dict:
+!             return {"type": "object"}
+  
+!     return type_mapping.get(py_type, {"type": "string"})
+  
+  
+! def generate_function_schema(func: Callable) -> dict[str, Any]:
+!     """
+!     Generate OpenAI function schema from Python function
+  
+!     Args:
+!         func: Python function
+  
+!     Returns:
+!         OpenAI function schema
+!     """
+      # Get function signature
+!     sig = inspect.signature(func)
+!     type_hints = get_type_hints(func)
+  
+      # Build parameters schema
+!     properties = {}
+!     required = []
+  
+!     for param_name, param in sig.parameters.items():
+!         if param_name == "self":
+!             continue
+  
+!         param_type = type_hints.get(param_name, str)
+!         schema = python_type_to_json_schema(param_type)
+  
+          # Add description from docstring if available
+!         if func.__doc__:
+              # Simple extraction - would need more sophisticated parsing in production
+!             schema["description"] = f"Parameter: {param_name}"
+  
+!         properties[param_name] = schema
+  
+          # Check if parameter is required
+!         if param.default == inspect.Parameter.empty:
+!             required.append(param_name)
+  
+      # Build function schema
+!     function_schema = {
+!         "name": func.__name__,
+!         "description": func.__doc__ or f"Function: {func.__name__}",
+!         "parameters": {"type": "object", "properties": properties, "required": required},
+!     }
+  
+!     return function_schema
+  
+  
+  # ============================================================================
+  # OPENAI FUNCTION CALLING CLIENT
+  # ============================================================================
+  
+  
+! class OpenAIFunctionCallingClient:
+!     """
+!     OpenAI function calling client with safeguards
+  
+!     Features:
+!     - Automatic schema generation
+!     - Integrated safeguards
+!     - Rate limiting
+!     - Audit logging
+!     - Error handling
+!     """
+  
+!     def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o", enable_safeguards: bool = True):
+!         """
+!         Initialize OpenAI function calling client
+  
+!         Args:
+!             api_key: OpenAI API key (uses config if not provided)
+!             model: OpenAI model to use
+!             enable_safeguards: Enable safeguard protection
+!         """
+!         config = get_config()
+!         self.api_key = api_key or config.ai.openai_api_key
+!         self.model = model
+!         self.enable_safeguards = enable_safeguards
+!         self.is_consequential = config.ai.openai_is_consequential
+  
+          # Initialize OpenAI client with consequential header
+!         if self.api_key:
+!             default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+!             self.client = openai.AsyncOpenAI(api_key=self.api_key, default_headers=default_headers)
+!             logger.info(
+!                 f"✅ OpenAI Function Calling Client initialized "
+!                 f"(model={model}, consequential={self.is_consequential})"
+!             )
+!         else:
+!             self.client = None
+!             logger.error("❌ OpenAI API key not configured")
+  
+          # Get safeguard managers
+!         if enable_safeguards:
+!             self.safeguard_manager = get_safeguard_manager()
+!             self.tool_safeguard_manager = get_tool_safeguard_manager()
+!         else:
+!             self.safeguard_manager = None
+!             self.tool_safeguard_manager = None
+  
+          # Registered functions
+!         self.functions: dict[str, tuple[Callable, dict, ToolCallConfig]] = {}
+  
+!     def register_function(
+!         self, func: Callable, tool_config: Optional[ToolCallConfig] = None, schema: Optional[dict] = None
+!     ):
+!         """
+!         Register a function for calling
+  
+!         Args:
+!             func: Python function to register
+!             tool_config: Tool configuration for safeguards
+!             schema: Optional OpenAI function schema (auto-generated if not provided)
+!         """
+!         func_name = func.__name__
+  
+          # Generate schema if not provided
+!         if schema is None:
+!             schema = generate_function_schema(func)
+  
+          # Create default tool config if not provided
+!         if tool_config is None:
+!             tool_config = ToolCallConfig(
+!                 tool_name=func_name,
+!                 description=schema["description"],
+!                 permission_level=ToolPermissionLevel.AUTHENTICATED,
+!                 risk_level=ToolRiskLevel.MEDIUM,
+!                 provider=ToolProvider.OPENAI,
+!             )
+  
+          # Register with tool safeguard manager
+!         if self.enable_safeguards:
+!             self.tool_safeguard_manager.register_tool(tool_config)
+  
+          # Store function
+!         self.functions[func_name] = (func, schema, tool_config)
+  
+!         logger.info(f"✅ Registered function: {func_name}")
+  
+!     async def call_function_with_ai(
+!         self,
+!         prompt: str,
+!         function_names: Optional[list[str]] = None,
+!         user_id: Optional[str] = None,
+!         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
+!         max_tokens: int = 1000,
+!     ) -> dict[str, Any]:
+!         """
+!         Use AI to determine which function to call and execute it
+  
+!         Args:
+!             prompt: User prompt
+!             function_names: Optional list of function names to make available
+!             user_id: User ID for authorization
+!             permission_level: User's permission level
+!             max_tokens: Maximum tokens for AI response
+  
+!         Returns:
+!             Function execution result
+!         """
+!         if not self.client:
+!             raise ValueError("OpenAI client not initialized")
+  
+          # Get functions to make available
+!         if function_names:
+!             available_functions = {name: self.functions[name] for name in function_names if name in self.functions}
+!         else:
+!             available_functions = self.functions
+  
+!         if not available_functions:
+!             raise ValueError("No functions registered")
+  
+          # Build tools array for OpenAI
+!         tools = [{"type": "function", "function": schema} for _, schema, _ in available_functions.values()]
+  
+          # Validate with OpenAI safeguards
+!         if self.enable_safeguards:
+!             allowed, reason = await self.safeguard_manager.validate_request(
+!                 operation_type=OperationType.CODE_GENERATION, is_consequential=self.is_consequential, prompt=prompt
+!             )
+  
+!             if not allowed:
+!                 raise ValueError(f"OpenAI safeguards blocked request: {reason}")
+  
+          # Call OpenAI with function calling
+!         try:
+!             response = await self.client.chat.completions.create(
+!                 model=self.model,
+!                 messages=[{"role": "user", "content": prompt}],
+!                 tools=tools,
+!                 tool_choice="auto",
+!                 max_tokens=max_tokens,
+!             )
+  
+              # Check if AI wants to call a function
+!             message = response.choices[0].message
+  
+!             if message.tool_calls:
+                  # Execute the function call(s)
+!                 results = []
+  
+!                 for tool_call in message.tool_calls:
+!                     function_name = tool_call.function.name
+!                     function_args = json.loads(tool_call.function.arguments)
+  
+                      # Execute the function
+!                     result = await self.execute_function(
+!                         function_name=function_name,
+!                         arguments=function_args,
+!                         user_id=user_id,
+!                         permission_level=permission_level,
+!                     )
+  
+!                     results.append({"function": function_name, "arguments": function_args, "result": result})
+  
+!                 return {"type": "function_calls", "calls": results, "ai_message": message.content}
+!             else:
+                  # No function calls, just return AI response
+!                 return {"type": "text_response", "content": message.content}
+  
+!         except Exception as e:
+!             logger.error(f"❌ OpenAI function calling failed: {e}")
+!             raise
+  
+!     async def execute_function(
+!         self,
+!         function_name: str,
+!         arguments: dict[str, Any],
+!         user_id: Optional[str] = None,
+!         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
+!     ) -> Any:
+!         """
+!         Execute a registered function with safeguards
+  
+!         Args:
+!             function_name: Name of function to execute
+!             arguments: Function arguments
+!             user_id: User ID for authorization
+!             permission_level: User's permission level
+  
+!         Returns:
+!             Function execution result
+!         """
+!         if function_name not in self.functions:
+!             raise ValueError(f"Function not registered: {function_name}")
+  
+!         func, schema, tool_config = self.functions[function_name]
+  
+          # Create tool call request
+!         request = ToolCallRequest(
+!             tool_name=function_name,
+!             provider=ToolProvider.OPENAI,
+!             user_id=user_id,
+!             permission_level=permission_level,
+!             parameters=arguments,
+!         )
+  
+          # Execute with safeguards
+!         if self.enable_safeguards:
+              # Wrap function call for async execution
+!             async def execute_func():
+                  # Call function (handle both sync and async)
+!                 if inspect.iscoroutinefunction(func):
+!                     return await func(**arguments)
+!                 else:
+!                     return func(**arguments)
+  
+!             response = await self.tool_safeguard_manager.execute_tool_call(request=request, func=execute_func)
+  
+!             return response.result
+  
+          # Execute without safeguards
+!         elif inspect.iscoroutinefunction(func):
+!             return await func(**arguments)
+!         else:
+!             return func(**arguments)
+  
+!     def get_registered_functions(self) -> list[str]:
+!         """Get list of registered function names"""
+!         return list(self.functions.keys())
+  
+!     def get_function_schema(self, function_name: str) -> Optional[dict]:
+!         """Get schema for a registered function"""
+!         if function_name in self.functions:
+!             return self.functions[function_name][1]
+!         return None
+  
+  
+  # ============================================================================
+  # DECORATOR FOR EASY FUNCTION REGISTRATION
+  # ============================================================================
+  
+  
+! def openai_function(
+!     permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
+!     risk_level: ToolRiskLevel = ToolRiskLevel.MEDIUM,
+!     max_calls_per_minute: int = 10,
+!     is_consequential: bool = True,
+! ):
+!     """
+!     Decorator to register a function for OpenAI function calling
+  
+!     Example:
+!         @openai_function(risk_level=ToolRiskLevel.LOW)
+!         def get_weather(location: str) -> dict:
+!             '''Get weather for a location'''
+!             return {"temperature": 72, "conditions": "sunny"}
+!     """
+  
+!     def decorator(func: Callable) -> Callable:
+          # Store metadata on function
+!         func._openai_function_config = ToolCallConfig(
+!             tool_name=func.__name__,
+!             description=func.__doc__ or f"Function: {func.__name__}",
+!             permission_level=permission_level,
+!             risk_level=risk_level,
+!             provider=ToolProvider.OPENAI,
+!             max_calls_per_minute=max_calls_per_minute,
+!             is_consequential=is_consequential,
+!         )
+!         return func
+  
+!     return decorator
+  
+  
+  # ============================================================================
+  # GLOBAL CLIENT
+  # ============================================================================
+  
+! _global_client: Optional[OpenAIFunctionCallingClient] = None
+  
+  
+! def get_openai_function_client(model: str = "gpt-4o", enable_safeguards: bool = True) -> OpenAIFunctionCallingClient:
+!     """
+!     Get global OpenAI function calling client
+  
+!     Args:
+!         model: OpenAI model to use
+!         enable_safeguards: Enable safeguard protection
+  
+!     Returns:
+!         Shared OpenAIFunctionCallingClient instance
+!     """
+!     global _global_client
+  
+!     if _global_client is None:
+!         _global_client = OpenAIFunctionCallingClient(model=model, enable_safeguards=enable_safeguards)
+  
+!     return _global_client
+  
+  
+! __all__ = [
+!     "OpenAIFunctionCallingClient",
+!     "generate_function_schema",
+!     "get_openai_function_client",
+!     "openai_function",
+! ]
