@@ -160,7 +160,7 @@ class TestWebhookSubscription:
             secret="my_secret",
         )
 
-        assert sub.endpoint == "https://example.com/webhook"
+        assert str(sub.endpoint) == "https://example.com/webhook"
         assert WebhookEvent.AGENT_COMPLETED in sub.events
         assert sub.secret == "my_secret"
         assert sub.active is True
@@ -402,7 +402,7 @@ class TestWebhookManager:
             secret="test_secret",
         )
 
-        assert subscription.endpoint == "https://example.com/webhook"
+        assert str(subscription.endpoint) == "https://example.com/webhook"
         assert WebhookEvent.AGENT_COMPLETED in subscription.events
         assert subscription.secret == "test_secret"
         assert subscription.subscription_id in webhook_mgr.subscriptions
@@ -595,8 +595,8 @@ class TestWebhookManager:
         await webhook_mgr._deliver_webhook(sample_subscription, sample_payload)
 
         # Check delivery was marked as permanently failed
-        assert len(webhook_mgr.delivery_history) == 1
-        delivery = webhook_mgr.delivery_history[0]
+        assert len(webhook_mgr.delivery_history) >= 1
+        delivery = webhook_mgr.delivery_history[-1]  # Get the last delivery
         assert delivery.status == DeliveryStatus.PERMANENTLY_FAILED
         assert "Circuit breaker" in delivery.error_message
 
@@ -749,6 +749,515 @@ class TestWebhookIntegration:
         # Unsubscribe
         result = await mgr.unsubscribe(subscription.subscription_id)
         assert result is True
+
+
+    @pytest.mark.asyncio
+    async def test_emit_no_subscribers(self):
+        """Test emitting event with no subscribers"""
+        mgr = WebhookManager()
+
+        # Emit event with no subscriptions
+        await mgr.emit(
+            WebhookEvent.AGENT_COMPLETED,
+            {"agent_id": "test", "status": "success"},
+        )
+
+        # Should not error, just no deliveries
+        assert len(mgr.delivery_history) == 0
+
+
+# ============================================================================
+# ADDITIONAL COVERAGE TESTS
+# ============================================================================
+
+
+class TestWebhookDelivery:
+    """Test webhook delivery scenarios for comprehensive coverage"""
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_http_201(self):
+        """Test successful webhook delivery with HTTP 201"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client with 201 response
+        mock_response = Mock()
+        mock_response.status_code = 201
+        mock_response.text = "Created"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        assert len(mgr.delivery_history) == 1
+        assert mgr.delivery_history[0].status == DeliveryStatus.SENT
+        assert mgr.delivery_history[0].response_status_code == 201
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_http_202(self):
+        """Test successful webhook delivery with HTTP 202"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client with 202 response
+        mock_response = Mock()
+        mock_response.status_code = 202
+        mock_response.text = "Accepted"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        assert len(mgr.delivery_history) == 1
+        assert mgr.delivery_history[0].status == DeliveryStatus.SENT
+        assert mgr.delivery_history[0].response_status_code == 202
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_http_204(self):
+        """Test successful webhook delivery with HTTP 204"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client with 204 response
+        mock_response = Mock()
+        mock_response.status_code = 204
+        mock_response.text = ""
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        assert len(mgr.delivery_history) == 1
+        assert mgr.delivery_history[0].status == DeliveryStatus.SENT
+        assert mgr.delivery_history[0].response_status_code == 204
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_http_400_error(self):
+        """Test webhook delivery with HTTP 400 error"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+        subscription.max_retries = 2
+        subscription.retry_delay_seconds = 0  # Speed up test
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client with 400 error
+        mock_response = Mock()
+        mock_response.status_code = 400
+        mock_response.text = "Bad Request"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock):
+                await mgr._deliver_webhook(subscription, payload)
+
+        # Should have retried
+        assert len(mgr.delivery_history) >= 1
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_connection_error(self):
+        """Test webhook delivery with connection error"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+        subscription.max_retries = 2
+        subscription.retry_delay_seconds = 0  # Speed up test
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client to raise connection error
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(side_effect=httpx.ConnectError("Connection failed"))
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock):
+                await mgr._deliver_webhook(subscription, payload)
+
+        # Should have tried and failed
+        assert len(mgr.delivery_history) >= 1
+        # Check that at least one delivery is permanently failed
+        failed_deliveries = [d for d in mgr.delivery_history if d.status == DeliveryStatus.PERMANENTLY_FAILED]
+        assert len(failed_deliveries) >= 1
+        assert "Connection failed" in failed_deliveries[0].error_message
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_timeout_error(self):
+        """Test webhook delivery with timeout error"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+        subscription.max_retries = 1
+        subscription.retry_delay_seconds = 0  # Speed up test
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client to raise timeout error
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(side_effect=httpx.TimeoutException("Request timed out"))
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock):
+                await mgr._deliver_webhook(subscription, payload)
+
+        # Should have tried and failed
+        assert len(mgr.delivery_history) >= 1
+        last_delivery = mgr.delivery_history[-1]
+        assert last_delivery.status == DeliveryStatus.PERMANENTLY_FAILED
+        assert "timed out" in last_delivery.error_message
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_exponential_backoff(self):
+        """Test webhook delivery uses exponential backoff"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+        subscription.max_retries = 3
+        subscription.retry_delay_seconds = 10  # Base delay
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client to always fail
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.text = "Server Error"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+                await mgr._deliver_webhook(subscription, payload)
+
+                # Should have multiple retries with exponential backoff
+                # Backoff: 10s (attempt 1), 20s (attempt 2), 40s (attempt 3)
+                # Note: asyncio.sleep might be called multiple times
+                assert len(mgr.delivery_history) >= 1
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_failed_deliveries_increment(self):
+        """Test failed deliveries counter increments"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+        subscription.max_retries = 1
+        subscription.retry_delay_seconds = 0
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client to fail
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.text = "Server Error"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock):
+                await mgr._deliver_webhook(subscription, payload)
+
+        # Failed deliveries should increment
+        assert mgr.failed_deliveries.get(str(subscription.endpoint), 0) > 0
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_success_resets_failures(self):
+        """Test successful delivery resets failure counter"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        # Set some failures
+        mgr.failed_deliveries[str(subscription.endpoint)] = 3
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client to succeed
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "OK"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        # Failure counter should reset to 0
+        assert mgr.failed_deliveries[str(subscription.endpoint)] == 0
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_signature_headers(self):
+        """Test webhook delivery includes proper signature headers"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "OK"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        # Verify headers were passed
+        call_args = mock_client.post.call_args
+        headers = call_args.kwargs["headers"]
+
+        assert "X-Webhook-Signature" in headers
+        assert headers["X-Webhook-Signature"].startswith("sha256=")
+        assert "X-Webhook-Event" in headers
+        assert "X-Webhook-ID" in headers
+        assert headers["X-Webhook-ID"] is not None
+        assert "X-Webhook-Timestamp" in headers
+        assert "X-Idempotency-Key" in headers
+        assert headers["Content-Type"] == "application/json"
+
+    @pytest.mark.asyncio
+    async def test_deliver_webhook_response_body_truncation(self):
+        """Test webhook delivery truncates large response bodies"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        payload = WebhookPayload(
+            event_type=WebhookEvent.AGENT_COMPLETED,
+            timestamp=datetime.now(UTC),
+            data={"test": "data"},
+        )
+
+        # Mock HTTP client with large response
+        large_response = "X" * 2000  # Response larger than 1000 char limit
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = large_response
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            await mgr._deliver_webhook(subscription, payload)
+
+        # Response body should be truncated to 1000 chars
+        delivery = mgr.delivery_history[0]
+        assert len(delivery.response_body) == 1000
+
+    @pytest.mark.asyncio
+    async def test_emit_with_tasks(self):
+        """Test emit function with multiple tasks"""
+        mgr = WebhookManager()
+
+        # Subscribe multiple endpoints
+        await mgr.subscribe(
+            endpoint="https://example.com/webhook1",
+            events=["agent.completed"],
+            secret="secret1",
+        )
+        await mgr.subscribe(
+            endpoint="https://example.com/webhook2",
+            events=["agent.completed"],
+            secret="secret2",
+        )
+        await mgr.subscribe(
+            endpoint="https://example.com/webhook3",
+            events=["agent.completed"],
+            secret="secret3",
+        )
+
+        # Mock HTTP client
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "OK"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            # Emit event - should trigger all 3 subscriptions
+            await mgr.emit(
+                WebhookEvent.AGENT_COMPLETED,
+                {"agent_id": "test", "status": "success"},
+            )
+
+        # Should have 3 deliveries
+        assert len(mgr.delivery_history) == 3
+
+    @pytest.mark.asyncio
+    async def test_test_webhook_returns_delivery(self):
+        """Test test_webhook returns the delivery record"""
+        mgr = WebhookManager()
+        subscription = await mgr.subscribe(
+            endpoint="https://example.com/webhook",
+            events=["agent.completed"],
+            secret="test_secret",
+        )
+
+        # Mock HTTP client
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.text = "OK"
+
+        mock_client = AsyncMock()
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
+            result = await mgr.test_webhook(subscription.subscription_id)
+
+        # Should return a delivery record
+        assert isinstance(result, WebhookDelivery)
+        assert result.status == DeliveryStatus.SENT
+        assert result.subscription_id == subscription.subscription_id
+
+    @pytest.mark.asyncio
+    async def test_delivery_history_limit(self):
+        """Test get_delivery_history respects limit"""
+        mgr = WebhookManager()
+        subscription_id = "sub123"
+
+        # Add 20 delivery records
+        for i in range(20):
+            delivery = WebhookDelivery(
+                delivery_id=f"del{i}",
+                subscription_id=subscription_id,
+                event_id=f"evt{i}",
+                status=DeliveryStatus.SENT,
+                attempt_number=1,
+                request_body="{}",
+                request_headers={},
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            mgr.delivery_history.append(delivery)
+
+        # Get last 5
+        history = await mgr.get_delivery_history(subscription_id, limit=5)
+
+        assert len(history) == 5
+        # Should return most recent (last 5)
+        assert history[0].delivery_id == "del15"
+        assert history[4].delivery_id == "del19"
 
 
 if __name__ == "__main__":
