@@ -131,11 +131,21 @@ class FineTuningOrchestrator:
         base_model = base_model or "gpt-3.5-turbo"
         hyperparameters = hyperparameters or {}
 
+        # Sanitize agent_id to avoid unsafe filename usage
+        if not isinstance(agent_id, uuid.UUID):
+            try:
+                agent_uuid = uuid.UUID(str(agent_id))
+            except Exception:
+                raise ValueError("Invalid agent_id; must be a valid UUID")
+        else:
+            agent_uuid = agent_id
+        safe_agent_id = str(agent_uuid)
+
         # Export training data to temporary file
         with tempfile.NamedTemporaryFile(
             mode='w',
             suffix='.jsonl',
-            prefix=f'training_{agent_id}_',
+            prefix=f'training_{safe_agent_id}_',
             delete=False
         ) as temp_file:
             training_file_path = temp_file.name
