@@ -17,7 +17,7 @@ from typing import Callable, Optional
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import Request, Response, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.datastructures import Headers
