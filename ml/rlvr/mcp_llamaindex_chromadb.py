@@ -13,6 +13,7 @@ Architecture:
 import os
 import uuid
 import asyncio
+import html
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -454,18 +455,28 @@ Think through your analysis step by step, then provide the optimized prompt."""
         }
 
     def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
-        """Format examples with XML for Claude."""
+        """
+        Format examples with XML for Claude.
+
+        Escapes XML special characters to prevent injection attacks and parsing errors.
+        """
         formatted = []
         for i, ex in enumerate(examples, 1):
+            # Escape XML special characters (<, >, &) to prevent injection
+            escaped_input = html.escape(ex['input'][:500])
+            escaped_output = html.escape(ex['output'][:500])
+            escaped_type = html.escape(str(ex.get('type', 'unknown')))
+            escaped_created = html.escape(str(ex.get('created_at', 'unknown')))
+
             formatted.append(f"""
 <example id="{i}" score="{ex['score']:.2f}" similarity="{ex['similarity']:.2f}" hybrid_rank="{ex['hybrid_rank']:.2f}">
   <input>
-{ex['input'][:500]}
+{escaped_input}
   </input>
   <output>
-{ex['output'][:500]}
+{escaped_output}
   </output>
-  <metadata type="{ex.get('type', 'unknown')}" created="{ex.get('created_at', 'unknown')}" />
+  <metadata type="{escaped_type}" created="{escaped_created}" />
 </example>""")
         return "\n".join(formatted)
 

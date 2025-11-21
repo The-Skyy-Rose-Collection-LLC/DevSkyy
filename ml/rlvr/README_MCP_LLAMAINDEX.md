@@ -121,10 +121,11 @@ export DATABASE_URL="postgresql+asyncpg://user:pass@host/db"
 ### Example 1: Sync Training Data
 
 ```python
+import os
+import uuid
 from ml.rlvr.mcp_llamaindex_integration import MCPLlamaIndexOrchestrator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-import uuid
 
 # Setup database connection
 DATABASE_URL = os.getenv("DATABASE_URL")
