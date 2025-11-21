@@ -6,6 +6,7 @@ Manages the end-to-end fine-tuning process for agents across different model pro
 
 import uuid
 import os
+import tempfile
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from decimal import Decimal
@@ -13,6 +14,7 @@ import asyncio
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 import openai
 from anthropic import Anthropic
 
@@ -35,9 +37,17 @@ class FineTuningOrchestrator:
         self.session = session
         self.collector = TrainingDataCollector(session)
 
-        # API clients
-        self.openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.anthropic_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        # API clients with error handling (Truth Protocol Rule #5: No Secrets)
+        openai_key = os.getenv("OPENAI_API_KEY")
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+
+        if not openai_key:
+            logger.warning("OPENAI_API_KEY not set - OpenAI fine-tuning will fail")
+        if not anthropic_key:
+            logger.warning("ANTHROPIC_API_KEY not set - Anthropic optimization will fail")
+
+        self.openai_client = openai.OpenAI(api_key=openai_key) if openai_key else None
+        self.anthropic_client = Anthropic(api_key=anthropic_key) if anthropic_key else None
 
     async def start_fine_tuning(
         self,
@@ -115,21 +125,37 @@ class FineTuningOrchestrator:
 
         Supports: gpt-3.5-turbo, gpt-4
         """
+        if not self.openai_client:
+            raise ValueError("OpenAI client not initialized - check OPENAI_API_KEY")
+
         base_model = base_model or "gpt-3.5-turbo"
         hyperparameters = hyperparameters or {}
 
-        # Export training data
-        training_file_path = f"/tmp/training_{agent_id}.jsonl"
-        await self.collector.export_for_openai_finetuning(
-            agent_id, training_file_path
-        )
+        # Export training data to temporary file
+        with tempfile.NamedTemporaryFile(
+            mode='w',
+            suffix='.jsonl',
+            prefix=f'training_{agent_id}_',
+            delete=False
+        ) as temp_file:
+            training_file_path = temp_file.name
 
-        # Upload training file
-        with open(training_file_path, "rb") as f:
-            training_file = self.openai_client.files.create(
-                file=f,
-                purpose="fine-tune"
+        try:
+            await self.collector.export_for_openai_finetuning(
+                agent_id, training_file_path
             )
+
+            # Upload training file
+            with open(training_file_path, "rb") as f:
+                training_file = self.openai_client.files.create(
+                    file=f,
+                    purpose="fine-tune"
+                )
+        finally:
+            # Clean up local temporary file
+            if os.path.exists(training_file_path):
+                os.unlink(training_file_path)
+                logger.info(f"Cleaned up temporary training file: {training_file_path}")
 
         # Create fine-tuning job
         fine_tuning_job = self.openai_client.fine_tuning.jobs.create(
@@ -194,18 +220,28 @@ class FineTuningOrchestrator:
 
         Since Anthropic doesn't offer fine-tuning, we optimize through:
         1. Few-shot learning (add best examples to prompt)
-        2. Prompt engineering (refine system prompt)
-        3. Instruction tuning (improve task instructions)
+        2. Prompt engineering (refine system prompt with XML structure)
+        3. Instruction tuning (improve task instructions with chain-of-thought)
+
+        Uses Claude 4.x best practices:
+        - Clear, direct instructions
+        - XML tags for structure
+        - Realistic examples with edge cases
+        - Chain-of-thought reasoning
+        - Iterative refinement
         """
-        # Get best examples
-        query = """
+        if not self.anthropic_client:
+            raise ValueError("Anthropic client not initialized - check ANTHROPIC_API_KEY")
+
+        # Get best examples with SQL text wrapper (Truth Protocol Rule #7)
+        query = text("""
             SELECT prompt, completion, reward_score
             FROM training_examples
             WHERE agent_id = :agent_id
                 AND example_type = 'positive'
             ORDER BY reward_score DESC
             LIMIT 10
-        """
+        """)
 
         result = await self.session.execute(query, {"agent_id": agent_id})
         best_examples = [
@@ -214,46 +250,77 @@ class FineTuningOrchestrator:
         ]
 
         # Get agent's current prompt
-        agent_query = "SELECT base_prompt FROM agents WHERE id = :agent_id"
+        agent_query = text("SELECT base_prompt FROM agents WHERE id = :agent_id")
         agent_result = await self.session.execute(agent_query, {"agent_id": agent_id})
         current_prompt = agent_result.scalar()
 
-        # Generate optimized prompt using Claude
-        optimization_prompt = f"""
-You are a prompt engineering expert. Optimize the following agent prompt based on successful examples.
+        # Generate optimized prompt using Claude with best practices
+        # Using XML tags for clear structure (Claude 4.x best practice)
+        optimization_prompt = f"""You are a prompt engineering expert specializing in Claude optimization.
 
-Current Prompt:
+Your task is to analyze successful examples and refine an agent's system prompt to maximize performance.
+
+<current_prompt>
 {current_prompt}
+</current_prompt>
 
-Top 10 Successful Examples:
-{self._format_examples(best_examples)}
+<successful_examples>
+{self._format_examples_xml(best_examples)}
+</successful_examples>
 
-Instructions:
-1. Analyze what makes the successful examples work well
-2. Identify patterns in high-quality outputs
-3. Refine the system prompt to encourage these patterns
-4. Keep the core functionality but improve clarity and effectiveness
-5. Add few-shot examples if beneficial
+<instructions>
+Follow these steps to optimize the prompt:
 
-Return ONLY the optimized prompt, nothing else.
-"""
+1. **Analysis Phase**: Examine the successful examples and identify:
+   - Common patterns in high-performing outputs
+   - What makes outputs effective (clarity, structure, completeness)
+   - Edge cases or challenging scenarios handled well
+   - Tone, style, and formatting preferences
+
+2. **Pattern Recognition**: Extract key insights:
+   - What instructions would produce these outputs consistently?
+   - What constraints or guidelines are implicitly followed?
+   - What common mistakes are avoided?
+
+3. **Prompt Refinement**: Create an optimized prompt that:
+   - Uses clear, direct instructions (no ambiguity)
+   - Employs XML tags to structure sections (like <context>, <instructions>, <examples>)
+   - Includes 2-3 few-shot examples from the best performers
+   - Encourages step-by-step reasoning for complex tasks
+   - Preserves core functionality while improving clarity
+   - Adds explicit guidelines based on successful patterns
+
+4. **Quality Checks**: Ensure the optimized prompt:
+   - Is more specific and actionable than the original
+   - Addresses edge cases identified in examples
+   - Uses plain language without jargon
+   - Has clear success criteria
+</instructions>
+
+<output_format>
+Return ONLY the optimized prompt as plain text. Do not include explanations, meta-commentary, or wrapper tags.
+The prompt should be ready to use directly as a system prompt.
+</output_format>
+
+Think through your analysis step by step, then provide the optimized prompt."""
 
         response = self.anthropic_client.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=4000,
+            model="claude-3-5-sonnet-20241022",  # Latest Claude 3.5 Sonnet (2025)
+            max_tokens=8000,
+            temperature=0.3,  # Lower temperature for consistent optimization
             messages=[{"role": "user", "content": optimization_prompt}]
         )
 
         optimized_prompt = response.content[0].text
 
-        # Update agent prompt
-        update_query = """
+        # Update agent prompt with SQL text wrapper
+        update_query = text("""
             UPDATE agents
             SET base_prompt = :optimized_prompt,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
-        """
+        """)
 
         await self.session.execute(update_query, {
             "optimized_prompt": optimized_prompt,
@@ -265,8 +332,10 @@ Return ONLY the optimized prompt, nothing else.
         return {
             "provider": "anthropic",
             "method": "prompt_optimization",
+            "model": "claude-3-5-sonnet-20241022",
             "examples_used": len(best_examples),
             "optimized_prompt": optimized_prompt,
+            "optimization_technique": "xml_structured_few_shot_cot"
         }
 
     async def _fine_tune_local(
@@ -280,20 +349,33 @@ Return ONLY the optimized prompt, nothing else.
         Fine-tune a local open-source model using LoRA.
 
         Supports: Llama, Mistral, and other HuggingFace models
-        """
-        # This would integrate with your local fine-tuning infrastructure
-        # Using libraries like: transformers, peft, trl
 
-        # For now, return placeholder
-        # TODO: Implement full local fine-tuning pipeline
+        Implementation requires:
+        - transformers library for model loading
+        - peft (Parameter-Efficient Fine-Tuning) for LoRA
+        - trl (Transformer Reinforcement Learning) for training
+        - accelerate for distributed training
+        - bitsandbytes for quantization (optional)
+
+        See: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
+        Track implementation status in GitHub issues tagged with 'ml/fine-tuning'
+        """
+        logger.warning(
+            f"Local fine-tuning not yet implemented for agent {agent_id}. "
+            "Use OpenAI or Anthropic providers instead."
+        )
+
         return {
             "provider": "local",
             "status": "not_implemented",
-            "message": "Local fine-tuning coming in next version"
+            "message": "Local fine-tuning requires additional infrastructure setup",
+            "alternatives": ["openai", "anthropic"],
+            "required_packages": ["transformers", "peft", "trl", "accelerate"],
+            "documentation": "See CLAUDE.md for implementation roadmap"
         }
 
     def _format_examples(self, examples: List[Dict[str, Any]]) -> str:
-        """Format examples for prompt optimization."""
+        """Format examples for prompt optimization (legacy format)."""
         formatted = []
         for i, ex in enumerate(examples, 1):
             formatted.append(
@@ -301,6 +383,26 @@ Return ONLY the optimized prompt, nothing else.
                 f"Input: {ex['input'][:200]}...\n"
                 f"Output: {ex['output'][:200]}..."
             )
+        return "\n".join(formatted)
+
+    def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+        """
+        Format examples using XML tags for Claude 4.x optimization.
+
+        Claude is fine-tuned to pay special attention to XML tags,
+        which improves parsing and understanding of structured content.
+        """
+        formatted = []
+        for i, ex in enumerate(examples, 1):
+            formatted.append(f"""
+<example id="{i}" score="{ex['score']:.2f}">
+  <input>
+{ex['input'][:500]}
+  </input>
+  <output>
+{ex['output'][:500]}
+  </output>
+</example>""")
         return "\n".join(formatted)
 
     async def _create_fine_tuning_run(
@@ -313,7 +415,7 @@ Return ONLY the optimized prompt, nothing else.
         """Create a fine-tuning run record."""
         run_id = uuid.uuid4()
 
-        query = """
+        query = text("""
             INSERT INTO fine_tuning_runs (
                 id, agent_id, base_model, training_examples_count,
                 provider, status, progress_percentage, started_at, created_at
@@ -321,7 +423,7 @@ Return ONLY the optimized prompt, nothing else.
                 :id, :agent_id, :base_model, :training_count,
                 :provider, :status, :progress, :started_at, :created_at
             )
-        """
+        """)
 
         await self.session.execute(query, {
             "id": run_id,
@@ -345,7 +447,7 @@ Return ONLY the optimized prompt, nothing else.
         result: Dict[str, Any]
     ):
         """Update fine-tuning run status."""
-        query = """
+        query = text("""
             UPDATE fine_tuning_runs
             SET status = :status,
                 trained_model_id = :model_id,
@@ -353,7 +455,7 @@ Return ONLY the optimized prompt, nothing else.
                 error_message = :error_message,
                 progress_percentage = :progress
             WHERE id = :run_id
-        """
+        """)
 
         await self.session.execute(query, {
             "run_id": run_id,
@@ -367,11 +469,11 @@ Return ONLY the optimized prompt, nothing else.
 
     async def _update_run_provider_id(self, run_id: uuid.UUID, provider_job_id: str):
         """Update provider job ID."""
-        query = """
+        query = text("""
             UPDATE fine_tuning_runs
             SET provider_job_id = :provider_job_id
             WHERE id = :run_id
-        """
+        """)
 
         await self.session.execute(query, {
             "run_id": run_id,
@@ -381,11 +483,11 @@ Return ONLY the optimized prompt, nothing else.
 
     async def _update_run_progress(self, run_id: uuid.UUID, progress: int):
         """Update fine-tuning progress."""
-        query = """
+        query = text("""
             UPDATE fine_tuning_runs
             SET progress_percentage = :progress
             WHERE id = :run_id
-        """
+        """)
 
         await self.session.execute(query, {
             "run_id": run_id,
@@ -409,11 +511,11 @@ Return ONLY the optimized prompt, nothing else.
             Deployment details
         """
         # Get run details
-        query = """
+        query = text("""
             SELECT agent_id, trained_model_id, provider
             FROM fine_tuning_runs
             WHERE id = :run_id AND status = 'completed'
-        """
+        """)
 
         result = await self.session.execute(query, {"run_id": run_id})
         row = result.fetchone()
@@ -424,13 +526,13 @@ Return ONLY the optimized prompt, nothing else.
         agent_id, model_id, provider = row
 
         # Update agent with new model
-        update_query = """
+        update_query = text("""
             UPDATE agents
             SET model_name = :model_id,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
-        """
+        """)
 
         await self.session.execute(update_query, {
             "model_id": model_id,
@@ -439,12 +541,12 @@ Return ONLY the optimized prompt, nothing else.
         })
 
         # Update fine-tuning run deployment status
-        deployment_query = """
+        deployment_query = text("""
             UPDATE fine_tuning_runs
             SET deployed_at = :deployed_at,
                 deployed_version = (SELECT version FROM agents WHERE id = :agent_id)
             WHERE id = :run_id
-        """
+        """)
 
         await self.session.execute(deployment_query, {
             "deployed_at": datetime.utcnow(),
