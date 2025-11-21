@@ -112,11 +112,7 @@ def fix_ternary_operators(content: str) -> Tuple[str, list[str]]:
     """Convert simple if/else to ternary operators."""
     changes = []
 
-    # Pattern for simple if/else assignments:
-    # if condition:
-    #     var = a
-    # else:
-    #     var = b
+    # Intended pattern: simple if/else assignments converting to ternary operator.
     # This is too complex for regex, skip for manual review
 
     return content, changes
