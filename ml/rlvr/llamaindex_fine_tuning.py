@@ -8,6 +8,7 @@ instead of database queries. Works without MCP infrastructure.
 import os
 import asyncio
 import tempfile
+import json
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -342,7 +343,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
                         {"role": "assistant", "content": example["output"]}
                     ]
                 }
-                temp_file.write(str(training_example) + "\n")
+                # Write valid JSON (not Python dict repr)
+                temp_file.write(json.dumps(training_example) + "\n")
 
         try:
             # Upload training file

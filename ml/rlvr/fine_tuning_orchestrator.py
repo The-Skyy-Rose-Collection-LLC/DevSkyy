@@ -7,6 +7,7 @@ Manages the end-to-end fine-tuning process for agents across different model pro
 import uuid
 import os
 import tempfile
+import html
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from decimal import Decimal
@@ -404,13 +405,16 @@ Think through your analysis step by step, then provide the optimized prompt."""
         """
         formatted = []
         for i, ex in enumerate(examples, 1):
+            # Escape XML special characters to prevent injection
+            escaped_input = html.escape(ex['input'][:500])
+            escaped_output = html.escape(ex['output'][:500])
             formatted.append(f"""
 <example id="{i}" score="{ex['score']:.2f}">
   <input>
-{ex['input'][:500]}
+{escaped_input}
   </input>
   <output>
-{ex['output'][:500]}
+{escaped_output}
   </output>
 </example>""")
         return "\n".join(formatted)
