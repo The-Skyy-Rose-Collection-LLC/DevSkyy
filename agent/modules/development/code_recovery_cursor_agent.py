@@ -97,9 +97,9 @@ class CodeGenerationRequest:
     language: CodeLanguage = CodeLanguage.PYTHON
 
     # Context
-    existing_code: Optional[str] = None
-    file_path: Optional[str] = None
-    framework: Optional[str] = None
+    existing_code: str | None = None
+    file_path: str | None = None
+    framework: str | None = None
     libraries: list[str] = field(default_factory=list)
 
     # Requirements
@@ -108,8 +108,8 @@ class CodeGenerationRequest:
     documentation_required: bool = True
 
     # Style preferences
-    style_guide: Optional[str] = None  # "pep8", "airbnb", "google", etc.
-    formatting: Optional[str] = None  # "black", "prettier", etc.
+    style_guide: str | None = None  # "pep8", "airbnb", "google", etc.
+    formatting: str | None = None  # "black", "prettier", etc.
 
     # AI model preferences
     model: str = "cursor"  # "cursor", "codex", "claude", "copilot"
@@ -130,13 +130,13 @@ class CodeGenerationResult:
 
     # Generated code
     code: str = ""
-    file_path: Optional[str] = None
+    file_path: str | None = None
     language: CodeLanguage = CodeLanguage.PYTHON
 
     # Quality metrics
-    complexity_score: Optional[float] = None
-    quality_score: Optional[float] = None
-    test_coverage: Optional[float] = None
+    complexity_score: float | None = None
+    quality_score: float | None = None
+    test_coverage: float | None = None
 
     # Analysis
     issues_found: list[dict[str, Any]] = field(default_factory=list)
@@ -152,7 +152,7 @@ class CodeGenerationResult:
     # Metadata
     model_used: str = ""
     tokens_used: int = 0
-    error: Optional[str] = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
 
 
@@ -164,11 +164,11 @@ class CodeRecoveryRequest:
     recovery_type: RecoveryStrategy = RecoveryStrategy.GIT_HISTORY
 
     # Target information
-    repository_url: Optional[str] = None
-    file_path: Optional[str] = None
+    repository_url: str | None = None
+    file_path: str | None = None
     branch: str = "main"
-    commit_hash: Optional[str] = None
-    timestamp: Optional[datetime] = None
+    commit_hash: str | None = None
+    timestamp: datetime | None = None
 
     # Recovery options
     prefer_latest: bool = True
@@ -193,16 +193,16 @@ class CodeRecoveryResult:
 
     # Recovery details
     strategy_used: RecoveryStrategy = RecoveryStrategy.GIT_HISTORY
-    commit_hash: Optional[str] = None
+    commit_hash: str | None = None
     recovery_time: float = 0.0
 
     # Verification
     integrity_verified: bool = False
-    tests_passed: Optional[bool] = None
+    tests_passed: bool | None = None
 
     # Issues
     issues_found: list[str] = field(default_factory=list)
-    error: Optional[str] = None
+    error: str | None = None
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.now)
@@ -229,7 +229,7 @@ class WebScrapingRequest:
 
     # Authentication
     requires_auth: bool = False
-    auth_token: Optional[str] = None
+    auth_token: str | None = None
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.now)
@@ -255,7 +255,7 @@ class WebScrapingResult:
     scraping_time: float = 0.0
 
     # Issues
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
 
     # Metadata
@@ -321,7 +321,7 @@ class CodeRecoveryCursorAgent:
         Build and return a mapping of available AI model clients detected from environment variables.
 
         Returns:
-            clients (Dict[str, Any]): A dictionary keyed by provider name ("cursor", "codex", "claude") for each detected client. Each entry contains provider-specific connection info and an `available` boolean, for example:
+            clients (dict[str, Any]): A dictionary keyed by provider name ("cursor", "codex", "claude") for each detected client. Each entry contains provider-specific connection info and an `available` boolean, for example:
                 - "cursor": {"api_key": str, "endpoint": str, "available": True}
                 - "codex": {"client": <openai.OpenAI>, "available": True}
                 - "claude": {"client": <anthropic.Anthropic>, "available": True}
@@ -672,14 +672,14 @@ module.exports = {{ main }};
         else:
             return f"// {request.description}\n// Auto-generated placeholder code\n"
 
-    async def _format_code(self, code: str, language: CodeLanguage, formatter: Optional[str]) -> str:
+    async def _format_code(self, code: str, language: CodeLanguage, formatter: str | None) -> str:
         """
         Format source code using the specified formatter when available.
 
         Parameters:
             code (str): The source code to format.
             language (CodeLanguage): The programming language of the source code.
-            formatter (Optional[str]): Name of the formatter to apply (e.g., "black" for Python, "prettier" for JavaScript/TypeScript). If None or unsupported, the original code is returned unchanged.
+            formatter (str | None): Name of the formatter to apply (e.g., "black" for Python, "prettier" for JavaScript/TypeScript). If None or unsupported, the original code is returned unchanged.
 
         Returns:
             str: The formatted source code if formatting succeeded and a supported formatter was specified; otherwise, the original input `code`.

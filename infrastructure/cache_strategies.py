@@ -37,9 +37,9 @@ class InvalidationRule:
     strategy: InvalidationStrategy
     patterns: list[str]
     delay_seconds: int = 0
-    schedule_time: Optional[datetime] = None
+    schedule_time: datetime | None = None
     dependencies: list[str] = None
-    condition: Optional[Callable] = None
+    condition: Callable | None = None
     fashion_context: bool = False  # Fashion industry specific rule
 
 

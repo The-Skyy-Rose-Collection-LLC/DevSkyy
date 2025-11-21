@@ -58,7 +58,7 @@ class ProductInfo(BaseModel):
     category: str = Field(default="")
     short_description: str = Field(default="")
     description: str = Field(default="")
-    keywords: Optional[str] = None
+    keywords: str | None = None
 
 
 class SEOOptimizerError(Exception):
@@ -136,8 +136,8 @@ Output ONLY valid JSON with this exact structure:
 
     def __init__(
         self,
-        anthropic_api_key: Optional[str] = None,
-        openai_api_key: Optional[str] = None,
+        anthropic_api_key: str | None = None,
+        openai_api_key: str | None = None,
         primary_provider: AIProvider = AIProvider.ANTHROPIC,
         anthropic_model: str = "claude-sonnet-4-20250514",
         openai_model: str = "gpt-4",

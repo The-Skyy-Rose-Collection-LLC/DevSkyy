@@ -107,7 +107,7 @@ class AgentConfigLoader:
     Truth Protocol Compliant: No placeholders, explicit error handling
     """
 
-    def __init__(self, config_dir: Optional[Path] = None):
+    def __init__(self, config_dir: Path | None = None):
         """
         Initialize loader
 
@@ -266,7 +266,7 @@ class AgentConfigLoader:
         """
         return self.load_config(agent_id, force_reload=True)
 
-    def validate_config_file(self, config_path: Path) -> tuple[bool, Optional[str]]:
+    def validate_config_file(self, config_path: Path) -> tuple[bool, str | None]:
         """
         Validate a configuration file without loading it into cache
 
@@ -310,7 +310,7 @@ class AgentConfigLoader:
 
 
 # Export convenience function
-def load_agent_config(agent_id: str, config_dir: Optional[Path] = None) -> AgentConfig:
+def load_agent_config(agent_id: str, config_dir: Path | None = None) -> AgentConfig:
     """
     Convenience function to load a single agent config
 

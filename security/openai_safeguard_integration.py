@@ -79,10 +79,10 @@ def initialize_safeguards() -> OpenAISafeguardManager:
 def validate_openai_request(
     operation_type: OperationType,
     is_consequential: bool,
-    prompt: Optional[str] = None,
+    prompt: str | None = None,
     params: Optional[dict[str, Any]] = None
     params: Optional[dict[str, Any]] = None,
-) -> tuple[bool, Optional[str]]:
+) -> tuple[bool, str | None]:
     """
     Validate OpenAI API request before execution
 
@@ -122,7 +122,7 @@ def execute_with_safeguards(
     func: Callable,
     operation_type: OperationType,
     is_consequential: bool,
-    prompt: Optional[str] = None,
+    prompt: str | None = None,
     params: Optional[dict[str, Any]] = None,
     *args,
     **kwargs,

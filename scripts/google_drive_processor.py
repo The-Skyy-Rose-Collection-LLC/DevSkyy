@@ -123,7 +123,7 @@ class SkyRoseGoogleDriveProcessor:
         # Processing stats
         self.stats = {"total_downloaded": 0, "total_processed": 0, "categories": {}, "errors": []}
 
-    def extract_folder_id(self, drive_url: str) -> Optional[str]:
+    def extract_folder_id(self, drive_url: str) -> str | None:
         """Extract folder ID from Google Drive URL."""
         patterns = [r"/folders/([a-zA-Z0-9-_]+)", r"id=([a-zA-Z0-9-_]+)", r"folders/([a-zA-Z0-9-_]+)"]
 

@@ -214,7 +214,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     Generates structured logs for observability and error tracking.
     """
 
-    def __init__(self, app, log_file: Optional[str] = None):
+    def __init__(self, app, log_file: str | None = None):
         """
         Initialize request logging.
 
@@ -356,7 +356,7 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
                 self.latencies.pop(0)
             raise
 
-    def get_p95_latency(self) -> Optional[float]:
+    def get_p95_latency(self) -> float | None:
         """Calculate P95 latency from stored samples."""
         if not self.latencies:
             return None

@@ -223,10 +223,10 @@ class GetAgentQuery(Query):
 
 
 # Example Query Handler
-class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[dict]]):
+class GetAgentHandler(QueryHandler[GetAgentQuery, dict | None]):
     """Handler for GetAgentQuery"""
 
-    async def handle(self, query: GetAgentQuery) -> Optional[dict]:
+    async def handle(self, query: GetAgentQuery) -> dict | None:
         """
         Handle agent retrieval query
 

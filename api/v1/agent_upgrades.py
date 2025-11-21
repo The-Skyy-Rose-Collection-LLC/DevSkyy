@@ -36,22 +36,22 @@ class UpgradeVerificationRequest(BaseModel):
     verification_method: str = Field(..., pattern="^(user_feedback|test_execution|code_analysis|business_metrics|automated_check)$")
 
     # Optional verification data fields
-    thumbs_up: Optional[bool] = None
-    user_rating: Optional[int] = Field(None, ge=1, le=5)
-    user_feedback: Optional[str] = None
+    thumbs_up: bool | None = None
+    user_rating: int | None = Field(None, ge=1, le=5)
+    user_feedback: str | None = None
 
-    tests_passed: Optional[int] = Field(None, ge=0)
-    tests_total: Optional[int] = Field(None, gt=0)
-    test_output: Optional[str] = None
+    tests_passed: int | None = Field(None, ge=0)
+    tests_total: int | None = Field(None, gt=0)
+    test_output: str | None = None
 
-    lint_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    complexity_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    security_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    lint_score: float | None = Field(None, ge=0.0, le=1.0)
+    complexity_score: float | None = Field(None, ge=0.0, le=1.0)
+    security_score: float | None = Field(None, ge=0.0, le=1.0)
 
-    revenue_impact_usd: Optional[float] = None
-    conversion_impact: Optional[float] = Field(None, ge=0.0, le=1.0)
+    revenue_impact_usd: float | None = None
+    conversion_impact: float | None = Field(None, ge=0.0, le=1.0)
 
-    passed: Optional[bool] = None
+    passed: bool | None = None
 
 
 class ABTestResultRequest(BaseModel):

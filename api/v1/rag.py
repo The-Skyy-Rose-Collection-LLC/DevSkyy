@@ -89,7 +89,7 @@ class QueryRequest(BaseModel):
         default="claude-sonnet-4-5-20250929",
         description="LLM model to use",
     )
-    system_prompt: Optional[str] = Field(
+    system_prompt: str | None = Field(
         default=None,
         description="Custom system prompt",
     )
@@ -102,8 +102,8 @@ class IngestResponse(BaseModel):
     total_documents: int = Field(..., description="Total documents in collection")
     added: int = Field(..., description="Documents added in this operation")
     chunks_created: int = Field(..., description="Number of chunks created")
-    file_path: Optional[str] = Field(None, description="Source file path")
-    source: Optional[str] = Field(None, description="Source identifier")
+    file_path: str | None = Field(None, description="Source file path")
+    source: str | None = Field(None, description="Source identifier")
     ingested_at: str = Field(..., description="Ingestion timestamp")
 
 
@@ -130,7 +130,7 @@ class QueryResponse(BaseModel):
     answer: str = Field(..., description="Generated answer")
     sources: list[SearchResult] = Field(..., description="Source documents")
     context_used: int = Field(..., description="Number of context chunks used")
-    model: Optional[str] = Field(None, description="LLM model used")
+    model: str | None = Field(None, description="LLM model used")
     tokens_used: Optional[dict[str, int]] = Field(None, description="Token usage")
 
 

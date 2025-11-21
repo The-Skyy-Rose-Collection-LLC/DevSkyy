@@ -164,7 +164,7 @@ class CodexOrchestrator:
             logger.error(f"Code healing failed: {e}")
             return {"status": "error", "error": str(e), "original_code": code}
 
-    async def _scan_code(self, code: str, language: str, context: Optional[dict] = None) -> dict[str, Any]:
+    async def _scan_code(self, code: str, language: str, context: dict | None = None) -> dict[str, Any]:
         """Scan code for issues using scanner agent"""
         logger.info("📊 Scanning code for issues...")
 
@@ -190,7 +190,7 @@ class CodexOrchestrator:
         code: str,
         issues: list[dict],
         language: str,
-        context: Optional[dict] = None,
+        context: dict | None = None,
     ) -> dict[str, Any]:
         """Use GPT-4 to analyze issues and generate optimal healing strategy"""
         logger.info("🧠 Generating AI-powered healing strategy...")

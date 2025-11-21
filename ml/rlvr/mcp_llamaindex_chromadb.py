@@ -63,10 +63,10 @@ class ProductionMCPLlamaIndexOrchestrator:
         session: AsyncSession,
         chroma_path: str = "./chroma_db",
         mcp_gateway_url: str = "http://localhost:3000/mcp",
-        openai_api_key: Optional[str] = None,
-        anthropic_api_key: Optional[str] = None,
-        chroma_host: Optional[str] = None,  # For server mode
-        chroma_port: Optional[int] = None
+        openai_api_key: str | None = None,
+        anthropic_api_key: str | None = None,
+        chroma_host: str | None = None,  # For server mode
+        chroma_port: int | None = None
     ):
         """
         Initialize production orchestrator with ChromaDB.
@@ -233,10 +233,10 @@ class ProductionMCPLlamaIndexOrchestrator:
     async def hybrid_retrieve_best_examples(
         self,
         agent_id: uuid.UUID,
-        query: Optional[str] = None,
+        query: str | None = None,
         min_score: float = 0.7,
         top_k: int = 10,
-        example_type: Optional[str] = "positive"
+        example_type: str | None = "positive"
     ) -> List[Dict[str, Any]]:
         """
         Hybrid retrieval using ChromaDB vector search + SQL filters.

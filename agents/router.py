@@ -127,7 +127,7 @@ class TaskRequest:
     description: str
     priority: int = 50  # 0-100
     parameters: dict[str, Any] = field(default_factory=dict)
-    timeout_seconds: Optional[int] = None
+    timeout_seconds: int | None = None
 
     def __post_init__(self):
         """Validate task request"""
@@ -158,7 +158,7 @@ class AgentRouter:
     Truth Protocol: No placeholders, all methods fully implemented
     """
 
-    def __init__(self, config_loader: Optional[AgentConfigLoader] = None):
+    def __init__(self, config_loader: AgentConfigLoader | None = None):
         """
         Initialize router
 
@@ -332,7 +332,7 @@ class AgentRouter:
 
         return results
 
-    def _exact_match_routing(self, task: TaskRequest) -> Optional[RoutingResult]:
+    def _exact_match_routing(self, task: TaskRequest) -> RoutingResult | None:
         """
         Attempt exact match routing based on task type
 
@@ -372,7 +372,7 @@ class AgentRouter:
             metadata={"matched_types": agent_types},
         )
 
-    def _fuzzy_match_routing(self, task: TaskRequest) -> Optional[RoutingResult]:
+    def _fuzzy_match_routing(self, task: TaskRequest) -> RoutingResult | None:
         """
         Attempt fuzzy matching based on task description
 
@@ -422,7 +422,7 @@ class AgentRouter:
 
         return None
 
-    def _fallback_routing(self, task: TaskRequest) -> Optional[RoutingResult]:
+    def _fallback_routing(self, task: TaskRequest) -> RoutingResult | None:
         """
         Fallback routing to general agent
 
@@ -449,7 +449,7 @@ class AgentRouter:
 
         return None
 
-    def _select_best_agent(self, agents: list[AgentConfig], task: TaskRequest) -> Optional[AgentConfig]:
+    def _select_best_agent(self, agents: list[AgentConfig], task: TaskRequest) -> AgentConfig | None:
         """
         Select best agent from a list based on priority and capabilities
 

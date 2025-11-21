@@ -27,7 +27,7 @@ from structlog.stdlib import LoggerFactory
 # CORRELATION ID MANAGEMENT (Thread-safe)
 # =============================================================================
 
-correlation_id: ContextVar[Optional[str]] = ContextVar("correlation_id", default=None)
+correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
 
 
 def get_correlation_id() -> str:
@@ -449,7 +449,7 @@ class PerformanceLogger:
                     exceeded_by_ms=round(elapsed_ms - 200, 2),
                 )
 
-    def get_p95(self, operation: str) -> Optional[float]:
+    def get_p95(self, operation: str) -> float | None:
         """Calculate P95 latency for an operation."""
         if operation not in self.latencies or not self.latencies[operation]:
             return None

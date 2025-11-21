@@ -117,7 +117,7 @@ class InventoryItem:
     # Pricing
     cost_price: Decimal = Decimal("0.00")
     retail_price: Decimal = Decimal("0.00")
-    sale_price: Optional[Decimal] = None
+    sale_price: Decimal | None = None
     currency: str = "USD"
     margin_percent: Decimal = Decimal("0.00")
 
@@ -126,20 +126,20 @@ class InventoryItem:
     store_locations: dict[str, int] = field(default_factory=dict)
 
     # Attributes
-    size: Optional[str] = None
-    color: Optional[str] = None
-    material: Optional[str] = None
-    weight: Optional[float] = None
+    size: str | None = None
+    color: str | None = None
+    material: str | None = None
+    weight: float | None = None
     dimensions: Optional[dict[str, float]] = None
 
     # Timestamps
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
-    last_restocked_at: Optional[datetime] = None
+    last_restocked_at: datetime | None = None
 
     # Metadata
-    supplier_id: Optional[str] = None
-    barcode: Optional[str] = None
+    supplier_id: str | None = None
+    barcode: str | None = None
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -155,8 +155,8 @@ class FinancialTransaction:
 
     # Transaction details
     channel: Channel = Channel.ONLINE_STORE
-    order_id: Optional[str] = None
-    customer_id: Optional[str] = None
+    order_id: str | None = None
+    customer_id: str | None = None
 
     # Line items
     line_items: list[dict[str, Any]] = field(default_factory=list)
@@ -169,20 +169,20 @@ class FinancialTransaction:
     total_amount: Decimal = Decimal("0.00")
 
     # Payment details
-    payment_method: Optional[str] = None
+    payment_method: str | None = None
     payment_status: str = "pending"
-    payment_gateway: Optional[str] = None
+    payment_gateway: str | None = None
 
     # Reconciliation
     reconciled: bool = False
-    reconciled_at: Optional[datetime] = None
+    reconciled_at: datetime | None = None
 
     # Timestamps
     transaction_date: datetime = field(default_factory=datetime.now)
     created_at: datetime = field(default_factory=datetime.now)
 
     # Metadata
-    notes: Optional[str] = None
+    notes: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -195,22 +195,22 @@ class InventoryAlert:
     severity: str = "medium"  # low, medium, high, critical
 
     # Alert details
-    item_id: Optional[str] = None
-    sku: Optional[str] = None
+    item_id: str | None = None
+    sku: str | None = None
     message: str = ""
-    current_value: Optional[float] = None
-    threshold_value: Optional[float] = None
+    current_value: float | None = None
+    threshold_value: float | None = None
 
     # Actions
     action_taken: bool = False
-    action_details: Optional[str] = None
+    action_details: str | None = None
 
     # Status
     acknowledged: bool = False
-    acknowledged_by: Optional[str] = None
-    acknowledged_at: Optional[datetime] = None
+    acknowledged_by: str | None = None
+    acknowledged_at: datetime | None = None
     resolved: bool = False
-    resolved_at: Optional[datetime] = None
+    resolved_at: datetime | None = None
 
     # Timestamps
     created_at: datetime = field(default_factory=datetime.now)
@@ -244,7 +244,7 @@ class DemandForecast:
 
     # Recommendations
     recommended_order_quantity: int = 0
-    recommended_order_date: Optional[datetime] = None
+    recommended_order_date: datetime | None = None
 
     # Timestamps
     generated_at: datetime = field(default_factory=datetime.now)
@@ -282,16 +282,16 @@ class FinanceInventoryPipelineAgent:
             agent_name (str): Human-readable agent name.
             agent_type (str): Internal agent type identifier.
             version (str): Agent semantic version.
-            inventory (Dict[str, InventoryItem]): In-memory inventory items keyed by item_id.
-            transactions (Dict[str, FinancialTransaction]): Stored financial transactions keyed by transaction_id.
-            alerts (Dict[str, InventoryAlert]): Stored inventory alerts keyed by alert_id.
-            forecasts (Dict[str, DemandForecast]): Cached demand forecasts keyed by forecast_id.
-            alert_thresholds (Dict[AlertType, int]): Threshold values used when evaluating alert conditions.
+            inventory (dict[str, InventoryItem]): In-memory inventory items keyed by item_id.
+            transactions (dict[str, FinancialTransaction]): Stored financial transactions keyed by transaction_id.
+            alerts (dict[str, InventoryAlert]): Stored inventory alerts keyed by alert_id.
+            forecasts (dict[str, DemandForecast]): Cached demand forecasts keyed by forecast_id.
+            alert_thresholds (dict[AlertType, int]): Threshold values used when evaluating alert conditions.
             sync_count (int): Number of completed inventory sync operations.
             transaction_count (int): Number of recorded transactions.
             alert_count (int): Number of created alerts.
             event_queue (asyncio.Queue): Async queue for emitting internal events.
-            circuit_breakers (Dict[str, dict]): Per-integration circuit-breaker state and failure metadata.
+            circuit_breakers (dict[str, dict]): Per-integration circuit-breaker state and failure metadata.
         """
         self.agent_name = "Finance & Inventory Pipeline Agent"
         self.agent_type = "finance_inventory"
@@ -333,7 +333,7 @@ class FinanceInventoryPipelineAgent:
 
         Parameters:
             channel (Channel): Source channel of the inventory payload.
-            items (List[Dict[str, Any]]): List of item payloads to ingest. Each item dict is expected to contain identifying and stock fields such as:
+            items (list[dict[str, Any]]): List of item payloads to ingest. Each item dict is expected to contain identifying and stock fields such as:
                 - item_id (str): Unique identifier for the item (preferred).
                 - sku (str): Stock-keeping unit.
                 - quantity_available (int | float): Available stock level.
@@ -344,13 +344,13 @@ class FinanceInventoryPipelineAgent:
                 Additional keys are accepted and will be used when creating or updating InventoryItem fields.
 
         Returns:
-            Dict[str, Any]: Summary of the sync operation with these keys on success:
+            dict[str, Any]: Summary of the sync operation with these keys on success:
                 - success (bool): True when the sync completed without fatal errors.
                 - channel (str): Name of the source channel.
                 - synced_items (int): Number of newly created items.
                 - updated_items (int): Number of existing items updated.
                 - errors (int): Number of item-level errors encountered.
-                - error_details (List[Dict[str, str]]): Per-item error entries with `item` and `error` keys.
+                - error_details (list[dict[str, str]]): Per-item error entries with `item` and `error` keys.
                 - timestamp (str): ISO-8601 timestamp of when the summary was produced.
             On failure (fatal error), returns:
                 - success (bool): False
@@ -411,7 +411,7 @@ class FinanceInventoryPipelineAgent:
         Record a financial transaction, persist it in the agent store, update inventory for sales, and enqueue a transaction event.
 
         Parameters:
-            transaction_data (Dict[str, Any]): Transaction payload. Recognized keys include:
+            transaction_data (dict[str, Any]): Transaction payload. Recognized keys include:
                 - type: transaction type name (e.g., "sale", "refund")
                 - amount, subtotal, tax_amount, shipping_amount, discount_amount, total_amount: numeric amounts (strings or numbers)
                 - currency: currency code (e.g., "USD")
@@ -559,7 +559,7 @@ class FinanceInventoryPipelineAgent:
             days (int): Number of past days to retrieve daily sales for.
 
         Returns:
-            List[float]: One daily sales quantity per requested day. This function returns simulated data (random floats between 1 and 10) representing daily sales.
+            list[float]: One daily sales quantity per requested day. This function returns simulated data (random floats between 1 and 10) representing daily sales.
         """
         # Placeholder - would query transaction history
         # For now, return simulated data
@@ -572,7 +572,7 @@ class FinanceInventoryPipelineAgent:
         Compute the population standard deviation of the provided numeric samples.
 
         Parameters:
-            data (List[float]): Numeric samples to evaluate. If empty, no variance is computed.
+            data (list[float]): Numeric samples to evaluate. If empty, no variance is computed.
 
         Returns:
             float: Population standard deviation of `data`; `0.0` if `data` is empty.
@@ -717,7 +717,7 @@ class FinanceInventoryPipelineAgent:
 
         Parameters:
             item (InventoryItem): The inventory item to modify in place.
-            item_data (Dict[str, Any]): Source data that may include keys
+            item_data (dict[str, Any]): Source data that may include keys
                 'quantity_available', 'quantity_reserved', and 'retail_price'.
                 Values provided overwrite the corresponding fields; missing keys leave existing values.
                 The 'retail_price' value is converted to a Decimal.

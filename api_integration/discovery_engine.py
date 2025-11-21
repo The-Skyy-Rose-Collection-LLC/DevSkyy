@@ -486,7 +486,7 @@ class APIDiscoveryEngine:
 
         return apis
 
-    def _parse_rapidapi_result(self, api_data: dict[str, Any]) -> Optional[APIEndpoint]:
+    def _parse_rapidapi_result(self, api_data: dict[str, Any]) -> APIEndpoint | None:
         """Parse RapidAPI search result"""
         try:
             return APIEndpoint(
@@ -517,7 +517,7 @@ class APIDiscoveryEngine:
             logger.error(f"Error parsing RapidAPI result: {e}")
             return None
 
-    def _parse_apis_guru_result(self, provider: str, api_name: str, api_info: dict[str, Any]) -> Optional[APIEndpoint]:
+    def _parse_apis_guru_result(self, provider: str, api_name: str, api_info: dict[str, Any]) -> APIEndpoint | None:
         """Parse APIs.guru result"""
         try:
             swagger_url = api_info.get("swaggerUrl", "")

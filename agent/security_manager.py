@@ -182,7 +182,7 @@ class SecurityManager:
             return True
         return False
 
-    def rotate_api_key(self, agent_name: str) -> Optional[str]:
+    def rotate_api_key(self, agent_name: str) -> str | None:
         """Rotate an agent's API key"""
         if agent_name not in self.agent_credentials:
             return None
@@ -396,8 +396,8 @@ class SecurityManager:
 
     def get_audit_log(
         self,
-        agent_name: Optional[str] = None,
-        event_type: Optional[str] = None,
+        agent_name: str | None = None,
+        event_type: str | None = None,
         limit: int = 100,
     ) -> list[dict[str, Any]]:
         """

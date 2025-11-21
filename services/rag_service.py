@@ -346,8 +346,8 @@ class RAGService:
 
     def __init__(
         self,
-        vector_db: Optional[VectorDatabase] = None,
-        doc_processor: Optional[DocumentProcessor] = None,
+        vector_db: VectorDatabase | None = None,
+        doc_processor: DocumentProcessor | None = None,
     ):
         self.vector_db = vector_db or VectorDatabase()
         self.doc_processor = doc_processor or DocumentProcessor()
@@ -362,7 +362,7 @@ class RAGService:
     async def ingest_document(
         self,
         file_path: str,
-        file_type: Optional[str] = None,
+        file_type: str | None = None,
     ) -> dict[str, Any]:
         """
         Ingest a document into the RAG system
@@ -480,7 +480,7 @@ class RAGService:
         question: str,
         top_k: int = RAGConfig.TOP_K_RESULTS,
         model: str = RAGConfig.DEFAULT_MODEL,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
     ) -> dict[str, Any]:
         """
         RAG query - Retrieve relevant context and generate answer
@@ -575,7 +575,7 @@ class RAGService:
 # =============================================================================
 
 # Global RAG service instance
-_rag_service: Optional[RAGService] = None
+_rag_service: RAGService | None = None
 
 
 def get_rag_service() -> RAGService:

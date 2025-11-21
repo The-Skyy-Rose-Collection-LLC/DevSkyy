@@ -59,8 +59,8 @@ class NotificationTemplate:
     channel: NotificationChannel
     title_template: str
     message_template: str
-    color: Optional[str] = None
-    emoji: Optional[str] = None
+    color: str | None = None
+    emoji: str | None = None
     fields: list[dict[str, str]] = None
     attachments: list[dict[str, Any]] = None
     fashion_context: bool = False
@@ -111,18 +111,18 @@ class NotificationMessage:
     title: str
     message: str
     priority: NotificationPriority
-    template_name: Optional[str] = None
+    template_name: str | None = None
     context: dict[str, Any] = None
-    color: Optional[str] = None
-    emoji: Optional[str] = None
+    color: str | None = None
+    emoji: str | None = None
     fields: list[dict[str, str]] = None
     attachments: list[dict[str, Any]] = None
     retry_count: int = 0
     max_retries: int = 3
     created_at: datetime = None
-    sent_at: Optional[datetime] = None
+    sent_at: datetime | None = None
     status: NotificationStatus = NotificationStatus.PENDING
-    error_message: Optional[str] = None
+    error_message: str | None = None
     fashion_context: dict[str, Any] = None
 
     def __post_init__(self):
@@ -337,7 +337,7 @@ class NotificationManager:
         title: str,
         message: str,
         priority: NotificationPriority = NotificationPriority.NORMAL,
-        template_name: Optional[str] = None,
+        template_name: str | None = None,
         context: dict[str, Any] | None = None,
         **kwargs,
     ) -> str:

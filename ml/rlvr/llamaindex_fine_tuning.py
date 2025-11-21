@@ -49,8 +49,8 @@ class LlamaIndexFineTuningOrchestrator:
     def __init__(
         self,
         index_dir: str = "./llamaindex_storage",
-        openai_api_key: Optional[str] = None,
-        anthropic_api_key: Optional[str] = None
+        openai_api_key: str | None = None,
+        anthropic_api_key: str | None = None
     ):
         """
         Initialize the LlamaIndex-powered fine-tuning orchestrator.
@@ -147,7 +147,7 @@ class LlamaIndexFineTuningOrchestrator:
     def retrieve_best_examples(
         self,
         agent_id: str,
-        query: Optional[str] = None,
+        query: str | None = None,
         top_k: int = 10
     ) -> List[Dict[str, Any]]:
         """

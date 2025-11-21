@@ -74,8 +74,8 @@ class MCPLlamaIndexOrchestrator:
         session: AsyncSession,
         mcp_gateway_url: str = "http://localhost:3000/mcp",
         index_dir: str = "./mcp_llamaindex_storage",
-        openai_api_key: Optional[str] = None,
-        anthropic_api_key: Optional[str] = None
+        openai_api_key: str | None = None,
+        anthropic_api_key: str | None = None
     ):
         """
         Initialize MCP + LlamaIndex orchestrator.
@@ -198,10 +198,10 @@ class MCPLlamaIndexOrchestrator:
     async def hybrid_retrieve_best_examples(
         self,
         agent_id: uuid.UUID,
-        query: Optional[str] = None,
+        query: str | None = None,
         min_score: float = 0.7,
         top_k: int = 10,
-        example_type: Optional[str] = "positive"
+        example_type: str | None = "positive"
     ) -> List[Dict[str, Any]]:
         """
         Hybrid retrieval: SQL filtering + vector semantic search.

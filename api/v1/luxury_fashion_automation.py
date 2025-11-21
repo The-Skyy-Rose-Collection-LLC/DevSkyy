@@ -19,7 +19,7 @@ SECURITY STATUS (Per CLAUDE.md Truth Protocol):
 - Pattern established - see existing endpoints for implementation example
 
 TO COMPLETE AUTHENTICATION (For each remaining endpoint):
-1. Add parameter: current_user: Dict[str, Any] = Depends(require_role(UserRole.XXX) if SECURITY_AVAILABLE else get_current_user)
+1. Add parameter: current_user: dict[str, Any] = Depends(require_role(UserRole.XXX) if SECURITY_AVAILABLE else get_current_user)
 2. Update docstring with: **Authentication Required:** XXX role or higher
 3. Update docstring with: **RBAC:** [list of allowed roles]
 
@@ -169,8 +169,8 @@ class VisualContentRequest(BaseModel):
 
     prompt: str = Field(..., description="Description of the content to generate")
     content_type: str = Field(default="product_photo", description="Type of content")
-    style_preset: Optional[str] = Field(default="minimalist_luxury", description="Style preset")
-    provider: Optional[str] = Field(default=None, description="Specific provider to use")
+    style_preset: str | None = Field(default="minimalist_luxury", description="Style preset")
+    provider: str | None = Field(default=None, description="Specific provider to use")
     width: int = Field(default=1024, ge=512, le=2048)
     height: int = Field(default=1024, ge=512, le=2048)
     quality: str = Field(default="high", description="Quality level")
@@ -181,15 +181,15 @@ class CampaignRequest(BaseModel):
     """Request model for marketing campaign creation."""
 
     name: str = Field(..., description="Campaign name")
-    description: Optional[str] = Field(default="")
+    description: str | None = Field(default="")
     campaign_type: str = Field(default="email")
     channels: list[str] = Field(default=["email"])
     target_segments: list[str] = Field(default=[])
     enable_testing: bool = Field(default=False)
     variants: Optional[list[dict[str, Any]]] = Field(default=None)
     budget: float = Field(default=0.0)
-    scheduled_start: Optional[datetime] = None
-    scheduled_end: Optional[datetime] = None
+    scheduled_start: datetime | None = None
+    scheduled_end: datetime | None = None
 
 
 class InventorySyncRequest(BaseModel):
@@ -206,10 +206,10 @@ class FinancialTransactionRequest(BaseModel):
     amount: float = Field(..., ge=0)
     currency: str = Field(default="USD")
     channel: str = Field(default="online_store")
-    order_id: Optional[str] = None
-    customer_id: Optional[str] = None
+    order_id: str | None = None
+    customer_id: str | None = None
     line_items: list[dict[str, Any]] = Field(default=[])
-    payment_method: Optional[str] = None
+    payment_method: str | None = None
 
 
 class CodeGenerationRequest(BaseModel):
@@ -217,7 +217,7 @@ class CodeGenerationRequest(BaseModel):
 
     description: str = Field(..., description="What code to generate")
     language: str = Field(default="python")
-    framework: Optional[str] = None
+    framework: str | None = None
     requirements: list[str] = Field(default=[])
     include_tests: bool = Field(default=True)
     include_docs: bool = Field(default=True)
@@ -228,10 +228,10 @@ class CodeRecoveryRequestModel(BaseModel):
     """Request model for code recovery."""
 
     recovery_type: str = Field(default="git_history")
-    repository_url: Optional[str] = None
-    file_path: Optional[str] = None
+    repository_url: str | None = None
+    file_path: str | None = None
     branch: str = Field(default="main")
-    commit_hash: Optional[str] = None
+    commit_hash: str | None = None
 
 
 class WorkflowExecutionRequest(BaseModel):
@@ -251,9 +251,9 @@ class AssetUploadRequest(BaseModel):
     remove_background: bool = Field(default=True)
     generate_3d: bool = Field(default=True)
     extract_textures: bool = Field(default=True)
-    product_name: Optional[str] = None
-    brand: Optional[str] = None
-    collection: Optional[str] = None
+    product_name: str | None = None
+    brand: str | None = None
+    collection: str | None = None
 
 
 class VirtualTryOnRequestModel(BaseModel):
@@ -303,12 +303,12 @@ async def upload_and_process_asset(
             - final_resolution (dict): { "width": int, "height": int } of the processed asset.
             - processed_file (str): Path or URL to the processed asset file.
             - thumbnail_file (str): Path or URL to the generated thumbnail.
-            - model_3d_file (Optional[str]): Path or URL to the generated 3D model, if any.
-            - texture_files (List[str]): Paths or URLs to extracted texture files, if any.
+            - model_3d_file (str | None): Path or URL to the generated 3D model, if any.
+            - texture_files (list[str]): Paths or URLs to extracted texture files, if any.
             - quality_score (float): Overall quality score assigned to the processed asset.
             - sharpness_score (float): Sharpness metric for the processed asset.
             - processing_time (float): Total processing time in seconds.
-            - stages_completed (List[str]): Ordered list of completed processing stage identifiers.
+            - stages_completed (list[str]): Ordered list of completed processing stage identifiers.
 
     Raises:
         HTTPException: With 503 when the asset preprocessing pipeline is unavailable, or with 500 when processing fails.
@@ -385,18 +385,18 @@ async def get_asset_info(
         dict: Asset metadata containing:
             - asset_id (str): Asset identifier.
             - asset_type (str): Asset type name.
-            - product_name (Optional[str]): Associated product name.
-            - brand (Optional[str]): Brand name.
-            - collection (Optional[str]): Collection name.
+            - product_name (str | None): Associated product name.
+            - brand (str | None): Brand name.
+            - collection (str | None): Collection name.
             - original_resolution (dict): {"width": int, "height": int} before processing.
             - final_resolution (dict): {"width": int, "height": int} after processing.
             - upscale_factor (float): Applied upscale multiplier.
             - has_3d_model (bool): Whether a 3D model was generated.
             - processed_path (str): Filesystem or storage path to the processed asset.
             - thumbnail_path (str): Path to the thumbnail image.
-            - model_3d_path (Optional[str]): Path to the 3D model file, if present.
+            - model_3d_path (str | None): Path to the 3D model file, if present.
             - uploaded_at (str): ISO 8601 timestamp when the asset was uploaded.
-            - processed_at (Optional[str]): ISO 8601 timestamp when processing completed, or `None`.
+            - processed_at (str | None): ISO 8601 timestamp when processing completed, or `None`.
     """
     if not ASSET_PIPELINE_AVAILABLE:
         raise HTTPException(
@@ -475,8 +475,8 @@ async def generate_virtual_tryon(request: VirtualTryOnRequestModel, background_t
         dict: A result payload containing:
             - `success` (bool): `True` when generation succeeded.
             - `request_id` (str): Unique identifier for the generation request.
-            - `images` (List[str]): Generated image URLs or encoded image data.
-            - `videos` (List[str]): Generated video URLs or encoded video data (may be empty if not requested).
+            - `images` (list[str]): Generated image URLs or encoded image data.
+            - `videos` (list[str]): Generated video URLs or encoded video data (may be empty if not requested).
             - `model_3d` (Optional[dict or str]): 3D preview data or URL when `generate_3d_preview` is requested.
             - `variations_generated` (int): Number of variations produced.
             - `quality_score` (float): Overall quality metric for the generated outputs.
@@ -617,7 +617,7 @@ async def generate_visual_content(request: VisualContentRequest, background_task
             - `success` (bool): `true` when generation succeeded, `false` otherwise.
             - `request_id` (str|None): Provider request identifier when available.
             - `provider` (str|None): Name of the content provider used.
-            - `images` (List[dict]|None): Generated image objects or metadata.
+            - `images` (list[dict]|None): Generated image objects or metadata.
             - `quality_score` (float|None): Estimated quality or confidence score.
             - `generation_time` (float|None): Time taken to generate content in seconds.
             - `cost` (float|None): Estimated cost for the generation operation.
@@ -670,16 +670,16 @@ async def batch_generate_visual_content(requests: list[VisualContentRequest]):
     Generate visual content for a batch of VisualContentRequest objects.
 
     Parameters:
-        requests (List[VisualContentRequest]): List of visual content requests to process in bulk.
+        requests (list[VisualContentRequest]): List of visual content requests to process in bulk.
 
     Returns:
         dict: Summary of the batch operation with keys:
             - `success` (bool): `True` if the batch request was submitted and processed.
             - `total_requests` (int): Number of requests in the batch.
-            - `results` (List[dict]): Per-request results, each containing:
+            - `results` (list[dict]): Per-request results, each containing:
                 - `request_id` (str): Identifier for the generated request.
                 - `success` (bool): `True` if that request succeeded, `false` otherwise.
-                - `images` (List[str]): Generated image asset paths or URLs.
+                - `images` (list[str]): Generated image asset paths or URLs.
                 - `error` (str | None): Error message when generation failed, otherwise `None`.
     """
     if not VISUAL_AGENT_AVAILABLE:
@@ -951,7 +951,7 @@ async def create_campaign(request: CampaignRequest):
             - name (str): Campaign name.
             - type (str): Campaign type.
             - status (str): Current campaign status.
-            - channels (List[str]): Enabled distribution channels.
+            - channels (list[str]): Enabled distribution channels.
             - enable_testing (bool): Whether A/B testing is enabled.
             - variants_count (int): Number of campaign variants.
             - created_at (str): ISO-8601 timestamp when the campaign was created.
@@ -1039,7 +1039,7 @@ async def create_segment(segment_data: dict[str, Any]):
     Create a customer segment for targeted marketing.
 
     Parameters:
-        segment_data (Dict[str, Any]): Criteria and metadata for the segment (for example: "name", "demographics", "behavior", "purchase_history", "engagement", "filters"). Keys and value shapes depend on the marketing orchestrator's schema.
+        segment_data (dict[str, Any]): Criteria and metadata for the segment (for example: "name", "demographics", "behavior", "purchase_history", "engagement", "filters"). Keys and value shapes depend on the marketing orchestrator's schema.
 
     Returns:
         dict: Result object with keys:
@@ -1113,8 +1113,8 @@ async def generate_code(request: CodeGenerationRequest):
             - `language` (str): Target programming language.
             - `quality_score` (float|None): Heuristic quality score for the generated code.
             - `complexity_score` (float|None): Heuristic complexity metric.
-            - `issues_found` (List[dict]|None): Detected issues or linting findings.
-            - `suggestions` (List[str]|None): Recommendations to improve or refactor the generated code.
+            - `issues_found` (list[dict]|None): Detected issues or linting findings.
+            - `suggestions` (list[str]|None): Recommendations to improve or refactor the generated code.
             - `generation_time` (float|None): Time in seconds taken to generate the code.
             - `model_used` (str|None): Model identifier used for generation.
             - `error` (str|None): Error message when generation failed.

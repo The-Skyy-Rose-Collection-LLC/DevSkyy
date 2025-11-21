@@ -276,7 +276,7 @@ class FinancialAgent:
         self,
         transaction_id: str,
         reason: ChargebackReason,
-        amount: Optional[float] = None,
+        amount: float | None = None,
     ) -> dict[str, Any]:
         """Handle chargeback creation with automated response system."""
         try:

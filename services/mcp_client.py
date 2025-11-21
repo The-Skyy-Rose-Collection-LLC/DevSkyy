@@ -75,7 +75,7 @@ class MCPToolClient:
     def __init__(
         self,
         schema_path: str = "config/mcp/mcp_tool_calling_schema.json",
-        anthropic_api_key: Optional[str] = None,
+        anthropic_api_key: str | None = None,
     ):
         """
         Initialize MCP client
@@ -221,7 +221,7 @@ class MCPToolClient:
         model: str,
         max_tokens: int,
         invocation_id: int,
-        tool_def: Optional[dict] = None,
+        tool_def: dict | None = None,
     ) -> dict[str, Any]:
         """Internal method for executing tool invocation with instrumentation"""
 
@@ -411,7 +411,7 @@ Provide ONLY the JSON response below:
 """
         return prompt
 
-    def _get_nested(self, data: dict, path: str) -> Optional[Any]:
+    def _get_nested(self, data: dict, path: str) -> Any | None:
         """
         Get nested dictionary value by dot-notation path
 
@@ -442,7 +442,7 @@ Provide ONLY the JSON response below:
         """
         return list(self.loaded_tools.keys())
 
-    def get_available_tools(self, category: Optional[str] = None) -> list[str]:
+    def get_available_tools(self, category: str | None = None) -> list[str]:
         """
         Get list of available tools from schema
 
@@ -466,7 +466,7 @@ Provide ONLY the JSON response below:
 
 
 # Singleton instance for easy import
-_default_client: Optional[MCPToolClient] = None
+_default_client: MCPToolClient | None = None
 
 
 def get_mcp_client() -> MCPToolClient:

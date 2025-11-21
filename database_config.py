@@ -110,7 +110,7 @@ class DatabaseConfig:
         return os.getenv("ENVIRONMENT", "development").lower() == "production"
 
     @staticmethod
-    def get_ssl_config() -> Optional[dict]:
+    def get_ssl_config() -> dict | None:
         """Get SSL configuration for database connections"""
         if DatabaseConfig.is_production():
             db_url = DatabaseConfig.get_database_url()

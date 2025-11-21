@@ -138,7 +138,7 @@ class OpenAIFunctionCallingClient:
     - Error handling
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o", enable_safeguards: bool = True):
+    def __init__(self, api_key: str | None = None, model: str = "gpt-4o", enable_safeguards: bool = True):
         """
         Initialize OpenAI function calling client
 
@@ -177,7 +177,7 @@ class OpenAIFunctionCallingClient:
         self.functions: dict[str, tuple[Callable, dict, ToolCallConfig]] = {}
 
     def register_function(
-        self, func: Callable, tool_config: Optional[ToolCallConfig] = None, schema: Optional[dict] = None
+        self, func: Callable, tool_config: ToolCallConfig | None = None, schema: dict | None = None
     ):
         """
         Register a function for calling
@@ -216,7 +216,7 @@ class OpenAIFunctionCallingClient:
         self,
         prompt: str,
         function_names: Optional[list[str]] = None,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
         max_tokens: int = 1000,
     ) -> dict[str, Any]:
@@ -301,7 +301,7 @@ class OpenAIFunctionCallingClient:
         self,
         function_name: str,
         arguments: dict[str, Any],
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
     ) -> Any:
         """
@@ -354,7 +354,7 @@ class OpenAIFunctionCallingClient:
         """Get list of registered function names"""
         return list(self.functions.keys())
 
-    def get_function_schema(self, function_name: str) -> Optional[dict]:
+    def get_function_schema(self, function_name: str) -> dict | None:
         """Get schema for a registered function"""
         if function_name in self.functions:
             return self.functions[function_name][1]
@@ -402,7 +402,7 @@ def openai_function(
 # GLOBAL CLIENT
 # ============================================================================
 
-_global_client: Optional[OpenAIFunctionCallingClient] = None
+_global_client: OpenAIFunctionCallingClient | None = None
 
 
 def get_openai_function_client(model: str = "gpt-4o", enable_safeguards: bool = True) -> OpenAIFunctionCallingClient:

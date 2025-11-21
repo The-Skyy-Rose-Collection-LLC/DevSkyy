@@ -55,7 +55,7 @@ class SafeguardedMCPClient:
     def __init__(
         self,
         schema_path: str = "config/mcp/mcp_tool_calling_schema.json",
-        anthropic_api_key: Optional[str] = None,
+        anthropic_api_key: str | None = None,
         enable_safeguards: bool = True,
     ):
         """
@@ -126,7 +126,7 @@ class SafeguardedMCPClient:
         tool_name: str,
         category: str,
         inputs: dict[str, Any],
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
         model: str = "claude-3-5-sonnet-20241022",
         max_tokens: int = 2000,
@@ -185,7 +185,7 @@ class SafeguardedMCPClient:
         """Get list of loaded tools"""
         return self.mcp_client.get_loaded_tools()
 
-    def get_available_tools(self, category: Optional[str] = None) -> list[str]:
+    def get_available_tools(self, category: str | None = None) -> list[str]:
         """Get list of available tools"""
         return self.mcp_client.get_available_tools(category)
 
@@ -201,7 +201,7 @@ class SafeguardedMCPClient:
 # ============================================================================
 
 
-def create_safeguarded_mcp_client(enable_safeguards: Optional[bool] = None) -> SafeguardedMCPClient:
+def create_safeguarded_mcp_client(enable_safeguards: bool | None = None) -> SafeguardedMCPClient:
     """
     Create safeguarded MCP client with application configuration
 
@@ -220,7 +220,7 @@ def create_safeguarded_mcp_client(enable_safeguards: Optional[bool] = None) -> S
 
 
 # Singleton instance
-_global_safeguarded_client: Optional[SafeguardedMCPClient] = None
+_global_safeguarded_client: SafeguardedMCPClient | None = None
 
 
 def get_safeguarded_mcp_client() -> SafeguardedMCPClient:

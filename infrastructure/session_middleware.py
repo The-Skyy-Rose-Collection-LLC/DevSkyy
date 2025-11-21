@@ -221,17 +221,17 @@ class SessionManager:
         self.middleware = middleware
 
     @staticmethod
-    def get_session_data(request: Request) -> Optional[SessionData]:
+    def get_session_data(request: Request) -> SessionData | None:
         """Get session data from request"""
         return getattr(request.state, "session_data", None)
 
     @staticmethod
-    def get_user_id(request: Request) -> Optional[str]:
+    def get_user_id(request: Request) -> str | None:
         """Get user ID from session"""
         return getattr(request.state, "user_id", None)
 
     @staticmethod
-    def get_user_role(request: Request) -> Optional[str]:
+    def get_user_role(request: Request) -> str | None:
         """Get user role from session"""
         return getattr(request.state, "user_role", None)
 
@@ -289,7 +289,7 @@ class SessionManager:
 
 
 # Dependency for FastAPI routes
-async def get_current_session(request: Request) -> Optional[SessionData]:
+async def get_current_session(request: Request) -> SessionData | None:
     """FastAPI dependency to get current session"""
     return SessionManager.get_session_data(request)
 

@@ -83,7 +83,7 @@ def create_paginated_response(items: list[T], total: int, page: int, page_size: 
 class CursorPaginationParams(BaseModel):
     """Cursor-based pagination parameters (better for large datasets)"""
 
-    cursor: Optional[str] = Field(default=None, description="Cursor for next page")
+    cursor: str | None = Field(default=None, description="Cursor for next page")
     limit: int = Field(default=20, ge=1, le=100, description="Items per page (max 100)")
 
 
@@ -91,7 +91,7 @@ class CursorPaginatedResponse(BaseModel, Generic[T]):
     """Cursor-based paginated response"""
 
     items: list[T] = Field(description="List of items for current page")
-    next_cursor: Optional[str] = Field(default=None, description="Cursor for next page")
+    next_cursor: str | None = Field(default=None, description="Cursor for next page")
     has_more: bool = Field(description="Whether there are more items")
 
     class Config:

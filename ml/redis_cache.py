@@ -48,7 +48,7 @@ class RedisCache:
         """Generate consistent hash for key"""
         return hashlib.sha256(key.encode()).hexdigest()
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """Get cached value"""
         hashed_key = self._hash_key(key)
 
@@ -62,7 +62,7 @@ class RedisCache:
         else:
             return self.memory_cache.get(hashed_key)
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None):
+    def set(self, key: str, value: Any, ttl: int | None = None):
         """Set cached value"""
         hashed_key = self._hash_key(key)
         serialized = json.dumps(value)

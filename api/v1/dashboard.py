@@ -78,7 +78,7 @@ class ActivityLogModel(BaseModel):
     title: str = Field(..., description="Event title")
     description: str = Field(..., description="Event description")
     severity: str = Field(default="info", description="Event severity: info, warning, error")
-    agent_id: Optional[str] = Field(None, description="Related agent ID")
+    agent_id: str | None = Field(None, description="Related agent ID")
     metadata: dict[str, Any] = Field(default_factory=dict, description="Additional event data")
 
 
@@ -374,7 +374,7 @@ async def get_agent_status(
     Requires a user with the READ_ONLY role or higher.
 
     Returns:
-        List[AgentStatusModel]: A list of agent status records containing agent_id, name, status, last_active, tasks_completed, tasks_pending, performance_score, and capabilities.
+        list[AgentStatusModel]: A list of agent status records containing agent_id, name, status, last_active, tasks_completed, tasks_pending, performance_score, and capabilities.
     """
     if hasattr(request.app, "state"):
         await dashboard_service.initialize(request.app.state)
@@ -399,7 +399,7 @@ async def get_recent_activities(
         limit (int): Maximum number of activity entries to return.
 
     Returns:
-        activities (List[ActivityLogModel]): Recent activity log entries up to `limit`.
+        activities (list[ActivityLogModel]): Recent activity log entries up to `limit`.
     """
     if hasattr(request.app, "state"):
         await dashboard_service.initialize(request.app.state)
@@ -425,7 +425,7 @@ async def get_performance_history(
         hours (int): Number of past hours to include in the history (default 24).
 
     Returns:
-        List[dict]: A list of performance datapoints. Each datapoint contains keys
+        list[dict]: A list of performance datapoints. Each datapoint contains keys
         `timestamp`, `response_time`, `cpu_usage`, `memory_usage`, and `requests_per_minute`.
     """
     if hasattr(request.app, "state"):

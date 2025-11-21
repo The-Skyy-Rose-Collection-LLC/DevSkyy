@@ -438,7 +438,7 @@ class ScannerAgentV2(BaseAgent):
         else:
             return f"✅ Scan completed with {warnings} warnings, {security} security issues"
 
-    def _get_last_modified_time(self, files: list[str]) -> Optional[str]:
+    def _get_last_modified_time(self, files: list[str]) -> str | None:
         """Get last modified time of most recent file"""
         if not files:
             return None

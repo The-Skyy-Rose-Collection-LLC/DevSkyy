@@ -81,7 +81,7 @@ class Alert:
     triggered_at: datetime
     description: str
     labels: dict[str, str] = field(default_factory=dict)
-    resolved_at: Optional[datetime] = None
+    resolved_at: datetime | None = None
 
 
 class MetricsCollector:

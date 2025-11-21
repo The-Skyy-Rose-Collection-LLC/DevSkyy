@@ -44,7 +44,7 @@ class DevSkyyMCPServer:
     - E-commerce automation (product SEO)
     """
 
-    def __init__(self, mcp_client: Optional[MCPToolClient] = None):
+    def __init__(self, mcp_client: MCPToolClient | None = None):
         """
         Initialize DevSkyy MCP Server
 
@@ -277,7 +277,7 @@ class DevSkyyMCPServer:
 
 
 # Singleton instance
-_mcp_server: Optional[DevSkyyMCPServer] = None
+_mcp_server: DevSkyyMCPServer | None = None
 
 
 def get_mcp_server() -> DevSkyyMCPServer:

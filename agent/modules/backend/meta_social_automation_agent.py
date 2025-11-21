@@ -117,7 +117,7 @@ class MetaSocialAutomationAgent:
         content_text: str,
         media_urls: Optional[list[str]] = None,
         platforms: list[str] | None = None,
-        schedule_time: Optional[datetime] = None,
+        schedule_time: datetime | None = None,
         shopping_tags: Optional[list[dict]] = None,
     ) -> dict[str, Any]:
         """
@@ -284,7 +284,7 @@ Return as JSON array of hashtags."""
         content: str,
         media_urls: Optional[list[str]],
         hashtags: list[str],
-        schedule_time: Optional[datetime],
+        schedule_time: datetime | None,
         shopping_tags: Optional[list[dict]],
     ) -> dict[str, Any]:
         """
@@ -446,7 +446,7 @@ Return as JSON array of hashtags."""
         self,
         content: str,
         media_urls: Optional[list[str]],
-        schedule_time: Optional[datetime],
+        schedule_time: datetime | None,
     ) -> dict[str, Any]:
         """
         Publish content to Facebook Page.
@@ -691,7 +691,7 @@ Return as JSON array."""
         ]
 
     async def generate_viral_content(
-        self, product_info: dict[str, Any], trend_data: Optional[dict] = None
+        self, product_info: dict[str, Any], trend_data: dict | None = None
     ) -> dict[str, Any]:
         """
         Generate viral content optimized for Meta platforms.

@@ -285,9 +285,9 @@ class BatchRequest:
     tool: str
     params: dict[str, Any]
     submitted_at: str
-    completed_at: Optional[str] = None
+    completed_at: str | None = None
     result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    error: str | None = None
     status: str = "queued"
 
     def to_dict(self) -> dict:

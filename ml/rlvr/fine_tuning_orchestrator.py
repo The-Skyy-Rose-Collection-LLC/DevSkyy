@@ -54,7 +54,7 @@ class FineTuningOrchestrator:
         self,
         agent_id: uuid.UUID,
         provider: str = "openai",
-        base_model: Optional[str] = None,
+        base_model: str | None = None,
         hyperparameters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
@@ -118,7 +118,7 @@ class FineTuningOrchestrator:
         self,
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
-        base_model: Optional[str] = None,
+        base_model: str | None = None,
         hyperparameters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
@@ -353,7 +353,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         self,
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
-        base_model: Optional[str] = None,
+        base_model: str | None = None,
         hyperparameters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
@@ -423,7 +423,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         self,
         agent_id: uuid.UUID,
         provider: str,
-        base_model: Optional[str],
+        base_model: str | None,
         training_count: int
     ) -> uuid.UUID:
         """Create a fine-tuning run record."""

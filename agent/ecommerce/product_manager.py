@@ -30,7 +30,7 @@ class ProductManager:
     - Inventory forecasting
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.anthropic = Anthropic(api_key=api_key) if api_key else None
         self.products_database = []
         self.categories = self._initialize_categories()

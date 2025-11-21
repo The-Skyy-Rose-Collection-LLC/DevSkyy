@@ -141,12 +141,12 @@ class WebhookDelivery(BaseModel):
     attempt_number: int
     request_body: str  # JSON payload
     request_headers: dict[str, str]
-    response_status_code: Optional[int] = None
-    response_body: Optional[str] = None
-    error_message: Optional[str] = None
+    response_status_code: int | None = None
+    response_body: str | None = None
+    error_message: str | None = None
     created_at: datetime
     updated_at: datetime
-    next_retry_at: Optional[datetime] = None
+    next_retry_at: datetime | None = None
 
 
 # ============================================================================
@@ -216,7 +216,7 @@ class WebhookManager:
         logger.info("Webhook manager initialized")
 
     async def subscribe(
-        self, endpoint: str, events: list[str], secret: Optional[str] = None, metadata: Optional[dict] = None
+        self, endpoint: str, events: list[str], secret: str | None = None, metadata: dict | None = None
     ) -> WebhookSubscription:
         """
         Subscribe to webhook events
@@ -413,7 +413,7 @@ class WebhookManager:
         matching = [d for d in self.delivery_history if d.subscription_id == subscription_id]
         return matching[-limit:]  # Return most recent
 
-    async def get_subscription(self, subscription_id: str) -> Optional[WebhookSubscription]:
+    async def get_subscription(self, subscription_id: str) -> WebhookSubscription | None:
         """Get subscription by ID"""
         return self.subscriptions.get(subscription_id)
 

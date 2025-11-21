@@ -919,7 +919,7 @@ async def execute_multi_agent_task(task_data: dict[str, Any]):
 
 
 @app.post("/api/v1/3d/models/upload")
-async def upload_3d_model(file_path: str, model_format: str, brand_context: Optional[str] = None):
+async def upload_3d_model(file_path: str, model_format: str, brand_context: str | None = None):
     """Upload and process a 3D model."""
     try:
         if not hasattr(app.state, "skyy_rose_3d_pipeline"):

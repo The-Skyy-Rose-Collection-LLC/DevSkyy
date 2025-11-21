@@ -499,9 +499,9 @@ class FashionIntelligenceEngine:
 
     async def get_trend_recommendations(
         self,
-        category: Optional[FashionCategory] = None,
-        season: Optional[FashionSeason] = None,
-        target_demographic: Optional[str] = None,
+        category: FashionCategory | None = None,
+        season: FashionSeason | None = None,
+        target_demographic: str | None = None,
         sustainability_focus: bool = False,
     ) -> list[dict[str, Any]]:
         """Get fashion trend recommendations based on criteria"""
@@ -619,7 +619,7 @@ class FashionIntelligenceEngine:
 
         return suggestions
 
-    async def get_market_intelligence(self, region: str = "global", segment: Optional[str] = None) -> dict[str, Any]:
+    async def get_market_intelligence(self, region: str = "global", segment: str | None = None) -> dict[str, Any]:
         """Get market intelligence for fashion industry"""
 
         # Find relevant market data
@@ -650,7 +650,7 @@ class FashionIntelligenceEngine:
 
         return aggregated_intelligence
 
-    def _get_default_market_intelligence(self, region: str, segment: Optional[str]) -> dict[str, Any]:
+    def _get_default_market_intelligence(self, region: str, segment: str | None) -> dict[str, Any]:
         """Get default market intelligence when specific data is not available"""
 
         return {

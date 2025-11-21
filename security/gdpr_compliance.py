@@ -62,7 +62,7 @@ class ConsentRecord(BaseModel):
     consent_type: ConsentType
     given: bool
     timestamp: datetime
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
     ip_address: str
     user_agent: str
     metadata: dict[str, Any] = {}
@@ -122,7 +122,7 @@ class AuditLog(BaseModel):
     user_id: str
     action: str  # "export", "delete", "consent_update", "data_access"
     timestamp: datetime
-    actor_id: Optional[str] = None  # Admin who performed action
+    actor_id: str | None = None  # Admin who performed action
     ip_address: str
     details: dict[str, Any] = {}
 
@@ -358,7 +358,7 @@ class GDPRManager:
         return RETENTION_POLICIES
 
     async def get_audit_logs(
-        self, user_id: Optional[str] = None, action: Optional[str] = None, limit: int = 100
+        self, user_id: str | None = None, action: str | None = None, limit: int = 100
     ) -> list[AuditLog]:
         """Get GDPR audit logs"""
         logs = self.audit_logs
@@ -376,7 +376,7 @@ class GDPRManager:
         user_id: str,
         action: str,
         details: dict[str, Any],
-        actor_id: Optional[str] = None,
+        actor_id: str | None = None,
         ip_address: str = "0.0.0.0",
     ) -> AuditLog:
         """Create audit log entry"""

@@ -397,7 +397,7 @@ class FashionComputerVisionAgent:
 
         return 0.0
 
-    def _detect_stitch_types(self, edges: np.ndarray, lines: Optional[np.ndarray]) -> list[str]:
+    def _detect_stitch_types(self, edges: np.ndarray, lines: np.ndarray | None) -> list[str]:
         """
         Detect types of stitches present.
         """
@@ -754,7 +754,7 @@ Provide detailed, expert fashion analysis.""",
         self,
         prompt: str,
         style: str = "luxury fashion photography",
-        negative_prompt: Optional[str] = None,
+        negative_prompt: str | None = None,
         width: int = 1024,
         height: int = 1024,
     ) -> dict[str, Any]:

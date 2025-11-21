@@ -49,8 +49,8 @@ class MCPConfigRequest(BaseModel):
     """Request model for MCP configuration generation"""
 
     api_key: str = Field(..., description="DevSkyy API key for authentication")
-    api_url: Optional[str] = Field(default=None, description="Custom API URL (defaults to production)")
-    server_name: Optional[str] = Field(default="devskyy", description="MCP server name")
+    api_url: str | None = Field(default=None, description="Custom API URL (defaults to production)")
+    server_name: str | None = Field(default="devskyy", description="MCP server name")
 
 
 class AddServerRequest(BaseModel):
@@ -58,8 +58,8 @@ class AddServerRequest(BaseModel):
 
     server_name: str = Field(..., description="Unique name for the MCP server")
     transport: TransportType = Field(..., description="Transport type (stdio, http, etc.)")
-    url: Optional[str] = Field(default=None, description="Server URL (required for HTTP transport)")
-    command: Optional[str] = Field(default=None, description="Command to run (required for stdio transport)")
+    url: str | None = Field(default=None, description="Server URL (required for HTTP transport)")
+    command: str | None = Field(default=None, description="Command to run (required for stdio transport)")
     args: Optional[list[str]] = Field(default=None, description="Command arguments (for stdio transport)")
     env: Optional[dict[str, str]] = Field(default=None, description="Environment variables")
     headers: Optional[dict[str, str]] = Field(default=None, description="HTTP headers (for HTTP transport)")
@@ -71,7 +71,7 @@ class MultiServerConfigRequest(BaseModel):
 
     servers: list[AddServerRequest] = Field(..., description="List of MCP servers to configure")
     include_devskyy: bool = Field(default=True, description="Include DevSkyy MCP server in configuration")
-    devskyy_api_key: Optional[str] = Field(
+    devskyy_api_key: str | None = Field(
         default=None, description="DevSkyy API key (required if include_devskyy=True)"
     )
 
@@ -101,7 +101,7 @@ class MCPStatusResponse(BaseModel):
 
 def generate_mcp_config(
     api_key: str,
-    api_url: Optional[str] = None,
+    api_url: str | None = None,
     server_name: str = "devskyy",
 ) -> dict[str, Any]:
     """
@@ -236,7 +236,7 @@ def generate_server_config(server_request: AddServerRequest) -> dict[str, Any]:
 
 
 def create_huggingface_server(
-    hf_token: Optional[str] = None,
+    hf_token: str | None = None,
     server_name: str = "huggingface",
     url: str = "https://huggingface.co/mcp",
 ) -> AddServerRequest:
@@ -308,8 +308,8 @@ def merge_server_configs(base_config: dict[str, Any], servers: list[AddServerReq
 @router.get("/install", response_model=MCPConfigResponse)
 async def get_mcp_install_deeplink(
     api_key: str = Query(..., description="DevSkyy API key for authentication"),
-    api_url: Optional[str] = Query(default=None, description="Custom API URL (defaults to production)"),
-    server_name: Optional[str] = Query(default="devskyy", description="MCP server name"),
+    api_url: str | None = Query(default=None, description="Custom API URL (defaults to production)"),
+    server_name: str | None = Query(default="devskyy", description="MCP server name"),
 ):
     """
     Generate MCP install deeplink for one-click installation.
@@ -413,8 +413,8 @@ API Reference: https://devskyy.com/api/docs
 @router.get("/config", response_model=dict[str, Any])
 async def get_mcp_config(
     api_key: str = Query(..., description="DevSkyy API key for authentication"),
-    api_url: Optional[str] = Query(default=None, description="Custom API URL (defaults to production)"),
-    server_name: Optional[str] = Query(default="devskyy", description="MCP server name"),
+    api_url: str | None = Query(default=None, description="Custom API URL (defaults to production)"),
+    server_name: str | None = Query(default="devskyy", description="MCP server name"),
 ):
     """
     Get MCP server configuration JSON only (without deeplink).
@@ -558,7 +558,7 @@ async def validate_api_key(
 @router.post("/servers/add", response_model=MCPConfigResponse)
 async def add_mcp_server(
     server: AddServerRequest = Body(...),
-    devskyy_api_key: Optional[str] = Query(
+    devskyy_api_key: str | None = Query(
         default=None, description="DevSkyy API key (optional, to include DevSkyy server)"
     ),
 ):
@@ -801,9 +801,9 @@ For issues with specific servers, check their documentation:
 
 @router.get("/servers/huggingface")
 async def get_huggingface_config(
-    hf_token: Optional[str] = Query(default=None, description="HuggingFace API token (optional)"),
+    hf_token: str | None = Query(default=None, description="HuggingFace API token (optional)"),
     server_name: str = Query(default="huggingface", description="Server name for HuggingFace"),
-    devskyy_api_key: Optional[str] = Query(default=None, description="DevSkyy API key (optional)"),
+    devskyy_api_key: str | None = Query(default=None, description="DevSkyy API key (optional)"),
 ):
     """
     Quick helper endpoint to generate HuggingFace MCP server configuration.

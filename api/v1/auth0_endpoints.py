@@ -69,7 +69,7 @@ class Auth0LogoutResponse(BaseModel):
 
 @router.get("/login", response_model=Auth0LoginResponse)
 async def auth0_login(
-    request: Request, redirect_uri: Optional[str] = Query(None, description="Custom redirect URI after login")
+    request: Request, redirect_uri: str | None = Query(None, description="Custom redirect URI after login")
 ):
     """
     Initiate Auth0 login flow.
@@ -109,10 +109,10 @@ async def auth0_login(
 @router.post("/callback", response_model=Auth0TokenResponse)
 async def auth0_callback(
     request: Request,
-    code: Optional[str] = Query(None, description="Authorization code from Auth0"),
-    state: Optional[str] = Query(None, description="State parameter for CSRF protection"),
-    error: Optional[str] = Query(None, description="Error from Auth0"),
-    error_description: Optional[str] = Query(None, description="Error description from Auth0"),
+    code: str | None = Query(None, description="Authorization code from Auth0"),
+    state: str | None = Query(None, description="State parameter for CSRF protection"),
+    error: str | None = Query(None, description="Error from Auth0"),
+    error_description: str | None = Query(None, description="Error description from Auth0"),
 ):
     """
     Handle Auth0 callback and exchange code for tokens.
@@ -183,7 +183,7 @@ async def auth0_callback(
 @router.post("/logout", response_model=Auth0LogoutResponse)
 @router.get("/logout", response_model=Auth0LogoutResponse)
 async def auth0_logout(
-    request: Request, return_to: Optional[str] = Query(None, description="URL to return to after logout")
+    request: Request, return_to: str | None = Query(None, description="URL to return to after logout")
 ):
     """
     Handle Auth0 logout.

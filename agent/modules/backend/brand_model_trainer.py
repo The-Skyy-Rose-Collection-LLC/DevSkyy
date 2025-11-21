@@ -320,7 +320,7 @@ class SkyRoseBrandTrainer:
         self,
         dataset_path: Union[str, Path],
         model_name: str = "skyy_rose_v1",
-        resume_from_checkpoint: Optional[str] = None,
+        resume_from_checkpoint: str | None = None,
     ) -> dict[str, Any]:
         """
         Train LoRA model for Skyy Rose Collection.
@@ -400,7 +400,7 @@ class SkyRoseBrandTrainer:
         train_data: list[dict],
         val_data: list[dict],
         output_dir: Path,
-        resume_checkpoint: Optional[str] = None,
+        resume_checkpoint: str | None = None,
     ) -> dict[str, Any]:
         """Run the actual training loop."""
         # This is a simplified training loop

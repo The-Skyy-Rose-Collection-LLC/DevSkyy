@@ -81,7 +81,7 @@ class EcommerceAnalytics:
         return analytics
 
     async def analyze_customer_behavior(
-        self, customer_segment: Optional[str] = None, time_period: int = 30
+        self, customer_segment: str | None = None, time_period: int = 30
     ) -> dict[str, Any]:
         """
         Analyze customer behavior patterns

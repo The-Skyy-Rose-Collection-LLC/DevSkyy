@@ -48,7 +48,7 @@ class WorkflowStatusResponse(BaseModel):
     total_reviews: int
     human_decision: str
     ready_for_approval: bool
-    approval_urls: Optional[dict] = None
+    approval_urls: dict | None = None
     current_draft: dict
     review_summary: dict
 
@@ -60,7 +60,7 @@ class HumanDecisionResponse(BaseModel):
     message: str
     workflow_id: str
     decision: str
-    next_action: Optional[str] = None
+    next_action: str | None = None
 
 
 # Global orchestrator instance (in production, use dependency injection)
@@ -368,7 +368,7 @@ async def get_workflow_status(workflow_id: str, orchestrator: ConsensusOrchestra
 async def approve_content(
     workflow_id: str,
     token: str = Query(..., description="Approval token"),
-    feedback: Optional[str] = Query(None, description="Optional feedback"),
+    feedback: str | None = Query(None, description="Optional feedback"),
     orchestrator: ConsensusOrchestrator = None,
 ):
     """
@@ -431,7 +431,7 @@ async def approve_content(
 async def reject_content(
     workflow_id: str,
     token: str = Query(..., description="Rejection token"),
-    feedback: Optional[str] = Query(None, description="Rejection reason"),
+    feedback: str | None = Query(None, description="Rejection reason"),
     orchestrator: ConsensusOrchestrator = None,
 ):
     """

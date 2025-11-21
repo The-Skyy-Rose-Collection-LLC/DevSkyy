@@ -93,7 +93,7 @@ class PerformanceTracker:
         conn.commit()
         conn.close()
 
-    def log_system_metric(self, metric_name: str, metric_value: float, metadata: Optional[dict] = None):
+    def log_system_metric(self, metric_name: str, metric_value: float, metadata: dict | None = None):
         """Log system-wide metric"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -261,7 +261,7 @@ class PerformanceTracker:
 
         logger.info(f"📝 Saved {len(new_proposals)} proposals to {self.proposals_path}")
 
-    async def get_proposals(self, status: Optional[str] = None) -> list[dict[str, Any]]:
+    async def get_proposals(self, status: str | None = None) -> list[dict[str, Any]]:
         """Get all proposals, optionally filtered by status"""
         if not self.proposals_path.exists():
             return []
@@ -275,7 +275,7 @@ class PerformanceTracker:
         return proposals
 
     async def update_proposal_status(
-        self, proposal_id: str, status: str, operator: str, notes: Optional[str] = None
+        self, proposal_id: str, status: str, operator: str, notes: str | None = None
     ) -> dict[str, Any]:
         """Update proposal status (approved/rejected/implemented)"""
         if not self.proposals_path.exists():
