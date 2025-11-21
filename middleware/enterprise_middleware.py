@@ -20,7 +20,6 @@ from pathlib import Path
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.datastructures import Headers
 
 logger = logging.getLogger(__name__)
 
